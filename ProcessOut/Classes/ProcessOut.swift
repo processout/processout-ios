@@ -4,6 +4,14 @@ import Foundation
 
 public class ProcessOut {
     
+    
+    public enum POError {
+        case NetworkError
+        case MissingProjectId
+        case BadRequest(error: String)
+        case InternalError
+    }
+    
     public struct Card {
         var CardNumber: String
         var ExpMonth: Int
@@ -95,14 +103,6 @@ public class ProcessOut {
             completion(nil, POError.MissingProjectId)
         }
     }
-
-    public enum POError: Error {
-        case NetworkError
-        case MissingProjectId
-        case BadRequest(error: String)
-        case InternalError
-    }
-
     
 }
 
