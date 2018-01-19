@@ -1,0 +1,6 @@
+framework module ProcessOut {
+  umbrella header "ProcessOut-umbrella.h"
+
+  export *
+  module * { export * }
+}

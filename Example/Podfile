@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'ProcessOut_Example' do
+  pod 'ProcessOut', :path => '../'
+
+  target 'ProcessOut_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
