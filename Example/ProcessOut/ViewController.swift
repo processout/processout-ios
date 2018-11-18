@@ -28,13 +28,14 @@ class ViewController: UIViewController {
         ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) -> Void in
             if error != nil {
                 switch error! {
-                case .BadRequest(let message):
+                case .BadRequest(let message, let code):
                     // developers, message can help you
-                    print(message)
-                case .InternalError:
-                    print("An internal error occured")
+                    print(message, code)
+            
                 case .MissingProjectId:
                     print("Check your app delegate file")
+                case .InternalError:
+                    print("An internal error occured")
                 case .NetworkError:
                     print("Request could not go through")
                 }

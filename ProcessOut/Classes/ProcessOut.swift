@@ -5,10 +5,10 @@ import Foundation
 public class ProcessOut {
     
     
-    public enum POError {
+    public enum ProcessOutException: Error {
         case NetworkError
         case MissingProjectId
-        case BadRequest(error: String)
+        case BadRequest(errorMessage: String, errorCode: String)
         case InternalError
     }
     
@@ -36,7 +36,7 @@ public class ProcessOut {
         ProcessOut.ProjectId = projectId
     }
     
-    public static func Tokenize(card: Card, metadata: [String: Any]?, completion: @escaping (String?, POError?) -> Void) {
+    public static func Tokenize(card: Card, metadata: [String: Any]?, completion: @escaping (String?, ProcessOutException?) -> Void) {
         var parameters: [String: Any] = [:]
         parameters["number"] = card.CardNumber
         GenerateToken(card: card, metadata: metadata, completion: {(tokenResponse, error) -> Void in
@@ -46,13 +46,13 @@ public class ProcessOut {
                 if let card = tokenResponse!["card"] as? [String: Any], let token = card["id"] as? String {
                     completion(token, nil)
                 } else {
-                    completion(nil, POError.InternalError)
+                    completion(nil, error)
                 }
             }
         })
     }
     
-    public static func UpdateCvc(cardId: String, newCvc: String, completion: @escaping (POError?) -> Void) {
+    public static func UpdateCvc(cardId: String, newCvc: String, completion: @escaping (ProcessOutException?) -> Void) {
         let parameters: [String: Any] = [
             "cvc": newCvc
         ]
@@ -62,7 +62,7 @@ public class ProcessOut {
         }
     }
     
-    private static func GenerateToken(card: Card, metadata: [String: Any]?, completion: @escaping ([String: Any]?, POError?) -> Void) {
+    private static func GenerateToken(card: Card, metadata: [String: Any]?, completion: @escaping ([String: Any]?, ProcessOutException?) -> Void) {
         var parameters: [String: Any] = [:]
         if metadata != nil {
             parameters["metadata"] = metadata!
@@ -80,7 +80,7 @@ public class ProcessOut {
 
     }
     
-    private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters, completion: @escaping ([String: Any]?, POError?) -> Void) {
+    private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters, completion: @escaping ([String: Any]?, ProcessOutException?) -> Void) {
         var headers: HTTPHeaders = [:]
         if let projectId = ProjectId, let authorizationHeader = Request.authorizationHeader(user: projectId, password: "") {
             headers[authorizationHeader.key] = authorizationHeader.value
@@ -89,18 +89,19 @@ public class ProcessOut {
                     if let success = data["success"] as? Bool, success {
                         completion(data, nil)
                     } else {
-                        if let errorType = data["error_type"] as? String {
-                            completion(nil, POError.BadRequest(error: errorType))
+                        if let errorMessage = data["message"] as? String, let errorType = data["error_type"] as? String {
+                            completion(nil, ProcessOutException.BadRequest(errorMessage: errorMessage, errorCode: errorType))
                         } else {
-                            completion(nil, POError.NetworkError)
+                            
+                            completion(nil, ProcessOutException.InternalError)
                         }
                     }
                 } else {
-                    completion(nil, POError.NetworkError)
+                    completion(nil, ProcessOutException.NetworkError)
                 }
             })
         } else {
-            completion(nil, POError.MissingProjectId)
+            completion(nil, ProcessOutException.MissingProjectId)
         }
     }
     
