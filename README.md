@@ -41,9 +41,9 @@ To retrieve a card token simply instantiate a card object using:
 ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) -> Void in
     if error != nil {
         switch error! {
-        case .BadRequest(let message):
+        case .BadRequest(let message, let errorCode):
             // developers, message can help you
-            print(message)
+            print(message, errorCode)
         case .InternalError:
             print("An internal error occured")
         case .MissingProjectId:
