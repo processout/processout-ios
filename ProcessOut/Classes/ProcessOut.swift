@@ -28,7 +28,7 @@ public class ProcessOut {
         }
     }
 
-    private static var ApiUrl: String = "https://api.processout.ninja"
+    private static var ApiUrl: String = "https://api.processout.com"
     private static var ProjectId: String?
     
     
