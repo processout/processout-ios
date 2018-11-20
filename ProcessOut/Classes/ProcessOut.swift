@@ -56,6 +56,24 @@ public class ProcessOut {
             }
         }
     }
+  
+    public static func Tokenize(payment: PKPayment, metadata: [String: Any]?, completion: @escaping (String?, ProcessOutException?) -> Void) {
+        var parameters: [String: Any] = [:]
+        if let metadata = metadata {
+            parameters["metadata"] = metadata
+        }
+      
+        parameters["applepay_response"] = payment
+        parameters["token_type"] = "applepay"
+    
+        HttpRequest(route: "/cards", method: .post, parameters: parameters) { (tokenResponse, error) in
+            if let card = tokenResponse?["card"] as? [String: Any], let token = card["id"] as? String {
+                completion(token, nil)
+            } else {
+                completion(nil, error)
+            }
+        }
+    }
     
     public static func UpdateCvc(cardId: String, newCvc: String, completion: @escaping (ProcessOutException?) -> Void) {
         let parameters: [String: Any] = [
