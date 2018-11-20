@@ -48,12 +48,13 @@ public class ProcessOut {
             parameters["cvc2"] = cvc
         }
       
-      HttpRequest(route: "/cards", method: .post, parameters: parameters) { (tokenResponse, error) in
-          if let card = tokenResponse?["card"] as? [String: Any], let token = card["id"] as? String {
-              completion(token, nil)
-          } else {
-              completion(nil, error)
-          }
+        HttpRequest(route: "/cards", method: .post, parameters: parameters) { (tokenResponse, error) in
+            if let card = tokenResponse?["card"] as? [String: Any], let token = card["id"] as? String {
+                completion(token, nil)
+            } else {
+                completion(nil, error)
+            }
+        }
     }
     
     public static func UpdateCvc(cardId: String, newCvc: String, completion: @escaping (ProcessOutException?) -> Void) {
