@@ -10,6 +10,7 @@ public class ProcessOut {
         case MissingProjectId
         case BadRequest(errorMessage: String, errorCode: String)
         case InternalError
+        case GenericError(error: Error)
     }
     
     public struct Card {
@@ -58,20 +59,67 @@ public class ProcessOut {
     }
   
     public static func Tokenize(payment: PKPayment, metadata: [String: Any]?, completion: @escaping (String?, ProcessOutException?) -> Void) {
+        
         var parameters: [String: Any] = [:]
         if let metadata = metadata {
             parameters["metadata"] = metadata
         }
-      
-        parameters["applepay_response"] = payment
-        parameters["token_type"] = "applepay"
-    
-        HttpRequest(route: "/cards", method: .post, parameters: parameters) { (tokenResponse, error) in
-            if let card = tokenResponse?["card"] as? [String: Any], let token = card["id"] as? String {
-                completion(token, nil)
+        
+        do {
+            // Serializing the paymentdata object
+            let paymentDataJson: [String: AnyObject]? = try JSONSerialization.jsonObject(with: payment.token.paymentData, options: []) as? [String: AnyObject]
+            
+            var applepayResponse: [String: Any] = [:]
+            var token: [String: Any] = [:]
+            
+            
+            if #available(iOS 9.0, *) {
+                // Retrieving additional information
+                var paymentMethodType: String
+                switch payment.token.paymentMethod.type {
+                case .debit:
+                    paymentMethodType = "debit"
+                    break
+                case .credit:
+                    paymentMethodType = "credit"
+                    break
+                case .prepaid:
+                    paymentMethodType = "prepaid"
+                    break
+                case .store:
+                    paymentMethodType = "store"
+                    break
+                default:
+                    paymentMethodType = "unknown"
+                    break
+                }
+                let paymentMethod: [String: Any] = [
+                    "displayName":payment.token.paymentMethod.displayName ?? "",
+                    "network": payment.token.paymentMethod.network?.rawValue ?? "",
+                    "type": paymentMethodType
+                ]
+                token["paymentMethod"] = paymentMethod
             } else {
-                completion(nil, error)
+                // PaymentMethod isn't available we just skip this field
             }
+            
+            token["transactionIdentifier"] = payment.token.transactionIdentifier
+            token["paymentData"] = paymentDataJson
+            applepayResponse["token"] = token
+            parameters["applepay_response"] = applepayResponse
+            parameters["token_type"] = "applepay"
+            
+            HttpRequest(route: "/cards", method: .post, parameters: parameters) { (tokenResponse, error) in
+                if let card = tokenResponse?["card"] as? [String: Any], let token = card["id"] as? String {
+                    completion(token, nil)
+                } else {
+                    completion(nil, error)
+                }
+            }
+        } catch {
+            // Could not parse the PKPaymentData object
+            completion(nil, ProcessOutException.GenericError(error: error))
+            
         }
     }
     
