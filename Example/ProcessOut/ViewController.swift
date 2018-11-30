@@ -41,6 +41,8 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
                     print("An internal error occured")
                 case .NetworkError:
                     print("Request could not go through")
+                case .GenericError(let error):
+                    print(error)
                 }
             } else {
                 // send token to your backend to charge the customer

@@ -10,6 +10,7 @@ public class ProcessOut {
         case MissingProjectId
         case BadRequest(errorMessage: String, errorCode: String)
         case InternalError
+        case GenericError(error: Error)
     }
     
     public struct Card {
@@ -117,7 +118,8 @@ public class ProcessOut {
             }
         } catch {
             // Could not parse the PKPaymentData object
-            completion(nil, ProcessOutException.InternalError)
+            completion(nil, ProcessOutException.GenericError(error: error))
+            
         }
     }
     
