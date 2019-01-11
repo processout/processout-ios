@@ -13,12 +13,27 @@ public class ProcessOut {
         case GenericError(error: Error)
     }
     
+    public struct Contact {
+        var Address1: String
+        var Address2: String
+        var City: String
+        var State: String
+        
+        public init(address1: String, address2: String, city: String, state: String) {
+            self.Address1 = address1
+            self.Address2 = address2
+            self.City = city
+            self.State = state
+        }
+    }
+    
     public struct Card {
         var CardNumber: String
         var ExpMonth: Int
         var ExpYear: Int
         var CVC: String?
         var Name: String
+        var Contact: Contact?
         
         public init(cardNumber: String, expMonth: Int, expYear: Int, cvc: String?, name: String) {
             self.CardNumber = cardNumber
@@ -26,6 +41,15 @@ public class ProcessOut {
             self.ExpYear = expYear
             self.CVC = cvc
             self.Name = name
+        }
+        
+        public init(cardNumber: String, expMonth: Int, expYear: Int, cvc: String?, name: String, contact: Contact) {
+            self.CardNumber = cardNumber
+            self.ExpMonth = expMonth
+            self.ExpYear = expYear
+            self.CVC = cvc
+            self.Name = name
+            self.Contact = contact
         }
     }
 
@@ -45,6 +69,18 @@ public class ProcessOut {
         parameters["number"] = card.CardNumber
         parameters["exp_month"] = card.ExpMonth
         parameters["exp_year"] = card.ExpYear
+        
+        if let contact = card.Contact {
+            let contactParameters = [
+                "address1": contact.Address1,
+                "address2": contact.Address2,
+                "city": contact.City,
+                "state": contact.State
+            ]
+            parameters["contact"] = contactParameters
+            
+        }
+    
         if let cvc = card.CVC {
             parameters["cvc2"] = cvc
         }
@@ -55,10 +91,16 @@ public class ProcessOut {
             } else {
                 completion(nil, error)
             }
+            print(tokenResponse)
         }
     }
-  
+    
     public static func Tokenize(payment: PKPayment, metadata: [String: Any]?, completion: @escaping (String?, ProcessOutException?) -> Void) {
+        return Tokenize(payment: payment, metadata: metadata, contact: nil, completion: completion)
+    }
+    
+  
+    public static func Tokenize(payment: PKPayment, metadata: [String: Any]?, contact: Contact?, completion: @escaping (String?, ProcessOutException?) -> Void) {
         
         var parameters: [String: Any] = [:]
         if let metadata = metadata {
@@ -108,6 +150,17 @@ public class ProcessOut {
             applepayResponse["token"] = token
             parameters["applepay_response"] = applepayResponse
             parameters["token_type"] = "applepay"
+            
+            if contact != nil {
+                let contactParameters = [
+                    "address1": contact!.Address1,
+                    "address2": contact!.Address2,
+                    "city": contact!.City,
+                    "state": contact!.State
+                ]
+                parameters["contact"] = contactParameters
+                
+            }
             
             HttpRequest(route: "/cards", method: .post, parameters: parameters) { (tokenResponse, error) in
                 if let card = tokenResponse?["card"] as? [String: Any], let token = card["id"] as? String {

@@ -27,7 +27,8 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
     }
     
     func testTokenization() {
-        let card = ProcessOut.Card(cardNumber: "4242424242424242", expMonth: 11, expYear: 19, cvc: nil, name: "Jeremy Lejoux")
+        let contact = ProcessOut.Contact(address1: "1 great street", address2: "Address 2", city: "Ctiy", state: "State")
+        let card = ProcessOut.Card(cardNumber: "4242424242424242", expMonth: 11, expYear: 19, cvc: nil, name: "Jeremy Lejoux", contact: contact)
         ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) -> Void in
             if error != nil {
                 switch error! {
