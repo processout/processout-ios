@@ -18,12 +18,16 @@ public class ProcessOut {
         var Address2: String
         var City: String
         var State: String
+        var Zip: String
+        var CountryCode: String
         
-        public init(address1: String, address2: String, city: String, state: String) {
+        public init(address1: String, address2: String, city: String, state: String, zip: String, countryCode: String) {
             self.Address1 = address1
             self.Address2 = address2
             self.City = city
             self.State = state
+            self.Zip = zip
+            self.CountryCode = countryCode
         }
     }
     
@@ -75,7 +79,9 @@ public class ProcessOut {
                 "address1": contact.Address1,
                 "address2": contact.Address2,
                 "city": contact.City,
-                "state": contact.State
+                "state": contact.State,
+                "zip": contact.Zip,
+                "country_code": contact.CountryCode
             ]
             parameters["contact"] = contactParameters
             
@@ -91,7 +97,6 @@ public class ProcessOut {
             } else {
                 completion(nil, error)
             }
-            print(tokenResponse)
         }
     }
     
@@ -106,7 +111,7 @@ public class ProcessOut {
         if let metadata = metadata {
             parameters["metadata"] = metadata
         }
-        
+
         do {
             // Serializing the paymentdata object
             let paymentDataJson: [String: AnyObject]? = try JSONSerialization.jsonObject(with: payment.token.paymentData, options: []) as? [String: AnyObject]
@@ -153,13 +158,14 @@ public class ProcessOut {
             
             if contact != nil {
                 let contactParameters = [
-                    "address1": contact!.Address1,
-                    "address2": contact!.Address2,
-                    "city": contact!.City,
-                    "state": contact!.State
+                    "address1": contact?.Address1,
+                    "address2": contact?.Address2,
+                    "city": contact?.City,
+                    "state": contact?.State,
+                    "zip": contact?.Zip,
+                    "country_code": contact?.CountryCode
                 ]
                 parameters["contact"] = contactParameters
-                
             }
             
             HttpRequest(route: "/cards", method: .post, parameters: parameters) { (tokenResponse, error) in
@@ -168,6 +174,7 @@ public class ProcessOut {
                 } else {
                     completion(nil, error)
                 }
+            
             }
         } catch {
             // Could not parse the PKPaymentData object
