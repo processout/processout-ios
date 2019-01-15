@@ -27,7 +27,8 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
     }
     
     func testTokenization() {
-        let card = ProcessOut.Card(cardNumber: "4242424242424242", expMonth: 11, expYear: 19, cvc: nil, name: "Jeremy Lejoux")
+        let contact = ProcessOut.Contact(address1: "1 great street", address2: nil, city: "City", state: "State", zip: "10000", countryCode: "US")
+        let card = ProcessOut.Card(cardNumber: "4242424242424242", expMonth: 11, expYear: 19, cvc: nil, name: "Jeremy Lejoux", contact: contact)
         ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) -> Void in
             if error != nil {
                 switch error! {
@@ -88,8 +89,9 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
         controller.dismiss(animated: true, completion: nil)
     }
     func paymentAuthorizationViewController(_ controller: PKPaymentAuthorizationViewController, didAuthorizePayment payment: PKPayment, completion: @escaping ((PKPaymentAuthorizationStatus) -> Void)) {
-        ProcessOut.Tokenize(payment: payment, metadata: [:], completion: {token, err in
-            if token != nil {
+        let contact = ProcessOut.Contact(address1: "1 great street", address2: "Address 2", city: "City", state: "State", zip: "10000", countryCode: "US")
+        ProcessOut.Tokenize(payment: payment, metadata: [:], contact: contact, completion: {token, err in
+            if token == nil {
                 completion(PKPaymentAuthorizationStatus.failure)
             } else {
                 completion(PKPaymentAuthorizationStatus.success)
