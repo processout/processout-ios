@@ -14,14 +14,14 @@ public class ProcessOut {
     }
     
     public struct Contact {
-        var Address1: String
-        var Address2: String
-        var City: String
-        var State: String
-        var Zip: String
-        var CountryCode: String
+        var Address1: String?
+        var Address2: String?
+        var City: String?
+        var State: String?
+        var Zip: String?
+        var CountryCode: String?
         
-        public init(address1: String, address2: String, city: String, state: String, zip: String, countryCode: String) {
+        public init(address1: String?, address2: String?, city: String?, state: String?, zip: String?, countryCode: String?) {
             self.Address1 = address1
             self.Address2 = address2
             self.City = city

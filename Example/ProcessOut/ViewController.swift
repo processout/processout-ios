@@ -24,11 +24,10 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
 
     @IBAction func clicked(_ sender: Any) {
         // either test applepaye tokenization or card
-        testApplePay()
     }
     
     func testTokenization() {
-        let contact = ProcessOut.Contact(address1: "1 great street", address2: "Address 2", city: "City", state: "State", zip: "10000", countryCode: "US")
+        let contact = ProcessOut.Contact(address1: "1 great street", address2: nil, city: "City", state: "State", zip: "10000", countryCode: "US")
         let card = ProcessOut.Card(cardNumber: "4242424242424242", expMonth: 11, expYear: 19, cvc: nil, name: "Jeremy Lejoux", contact: contact)
         ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) -> Void in
             if error != nil {
