@@ -58,12 +58,19 @@ public class ProcessOut {
     }
 
     private static var ApiUrl: String = "https://api.processout.com"
-    private static var ProjectId: String?
+    internal static var CheckoutUrl: String = "https://checkout.processout.com"
+    internal static var ProjectId: String?
     
     public static func Setup(projectId: String) {
         ProcessOut.ProjectId = projectId
     }
     
+    /// Tokenizes a card with metadata
+    ///
+    /// - Parameters:
+    ///   - card: The card object to be tokenized
+    ///   - metadata: Optional metadata to apply to the card tokenization
+    ///   - completion: Completion callback
     public static func Tokenize(card: Card, metadata: [String: Any]?, completion: @escaping (String?, ProcessOutException?) -> Void) {
         var parameters: [String: Any] = [:]
         if let metadata = metadata {
@@ -100,11 +107,25 @@ public class ProcessOut {
         }
     }
     
+    
+    /// ApplePay tokenization
+    ///
+    /// - Parameters:
+    ///   - payment: PKPayment object to be tokenize
+    ///   - metadata: Optional metadata
+    ///   - completion: Completion callback
     public static func Tokenize(payment: PKPayment, metadata: [String: Any]?, completion: @escaping (String?, ProcessOutException?) -> Void) {
         return Tokenize(payment: payment, metadata: metadata, contact: nil, completion: completion)
     }
     
-  
+    
+    /// ApplePay tokenization with contact information
+    ///
+    /// - Parameters:
+    ///   - payment: PKPayment object to be tokenize
+    ///   - metadata: Optional metadata
+    ///   - contact: Customer contact information
+    ///   - completion: Completion callback
     public static func Tokenize(payment: PKPayment, metadata: [String: Any]?, contact: Contact?, completion: @escaping (String?, ProcessOutException?) -> Void) {
         
         var parameters: [String: Any] = [:]
@@ -183,6 +204,13 @@ public class ProcessOut {
         }
     }
     
+    
+    /// Update a previously stored card CVC
+    ///
+    /// - Parameters:
+    ///   - cardId: Card ID to be updated
+    ///   - newCvc: New CVC
+    ///   - completion: Completion callback
     public static func UpdateCvc(cardId: String, newCvc: String, completion: @escaping (ProcessOutException?) -> Void) {
         let parameters: [String: Any] = [
             "cvc": newCvc
@@ -191,6 +219,48 @@ public class ProcessOut {
         HttpRequest(route: "/cards/" + cardId, method: .put, parameters: parameters) { (response, error) in
             completion(error)
         }
+    }
+    
+    
+    /// List alternative gateway configurations activated on your account
+    ///
+    /// - Parameter completion: Completion callback
+    public static func listAlternativeMethods(completion: @escaping ([AlternativeGateway]?, Error?) -> Void) {
+        HttpRequest(route: "/gateway-configurations?filter=alternative-payment-methods", method: .get, parameters: [:]) { (gateways
+            , e) in
+            if gateways != nil {
+                do {
+                    if let gConfs = gateways!["gateway_configurations"] {
+                        let jsondata = try JSONSerialization.data(withJSONObject: gConfs, options: JSONSerialization.WritingOptions.prettyPrinted)
+                        print(jsondata)
+                        let altG = try JSONDecoder().decode([AlternativeGateway].self, from: jsondata)
+                        completion(altG, nil)
+                    } else {
+                        completion(nil, ProcessOutException.InternalError)
+                    }
+                } catch {
+                    completion(nil, error)
+                }
+            } else {
+                completion(nil, e)
+            }
+        }
+    }
+    
+    /// Checks if an URL matches the ProcessOut return url schemes and returns the chargeable gateway token if so
+    ///
+    /// - Parameter url: URL catched by the app delegate
+    /// - Returns: a chargeable gateway token if applicable, nil otherwise
+    public static func handleURLCallback(url: URL) -> String? {
+        func getQueryStringParameter(url: String, param: String) -> String? {
+            guard let url = URLComponents(string: url) else { return nil }
+            return url.queryItems?.first(where: { $0.name == param })?.value
+        }
+        
+        if let token = getQueryStringParameter(url: url.absoluteString, param: "token") {
+            return token
+        }
+        return nil
     }
     
     private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters, completion: @escaping ([String: Any]?, ProcessOutException?) -> Void) {
@@ -218,6 +288,5 @@ public class ProcessOut {
             }
         })
     }
-    
 }
 
