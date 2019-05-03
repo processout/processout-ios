@@ -226,7 +226,7 @@ public class ProcessOut {
     ///
     /// - Parameter completion: Completion callback
     public static func listAlternativeMethods(completion: @escaping ([AlternativeGateway]?, Error?) -> Void) {
-        HttpRequest(route: "/gateway-configurations?filter=alternative-payment-methods", method: .get, parameters: [:]) { (gateways
+        HttpRequest(route: "/gateway-configurations?filter=alternative-payment-methods&expand_merchant_accounts=true", method: .get, parameters: [:]) { (gateways
             , e) in
             if gateways != nil {
                 do {
