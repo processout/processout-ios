@@ -15,10 +15,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        ProcessOut.Setup(projectId: "proj_kVWqvz7UoS3oux2UZg5tgLjXxvPTnh0k")
+        ProcessOut.Setup(projectId: "test-proj_id")
         return true
+    }
+    
+    // This method handles opening native URLs (e.g., "your-app://")
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        if let token = ProcessOut.handleURLCallback(url: url) {
+            print(token)
+            // You can now send this token to your backend to complete the charge
+            return true
+        } else {
+            // This was not a processout url – do whatever url handling your app
+            // normally does, if any.
+            return false
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

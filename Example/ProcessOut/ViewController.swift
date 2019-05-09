@@ -24,6 +24,14 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
 
     @IBAction func clicked(_ sender: Any) {
         // either test applepaye tokenization or card
+        ProcessOut.listAlternativeMethods { (gateways, error) in
+            if gateways != nil {
+                for gateway in gateways! {
+                    let url = gateway.getRedirectURL(invoiceId: "invoice-id")
+                    UIApplication.shared.openURL(NSURL(string: url!.absoluteString!)! as URL)
+                }
+            }
+        }
     }
     
     func testTokenization() {
