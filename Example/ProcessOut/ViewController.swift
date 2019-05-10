@@ -30,6 +30,8 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
                     let url = gateway.getRedirectURL(invoiceId: "invoice-id")
                     UIApplication.shared.openURL(NSURL(string: url!.absoluteString!)! as URL)
                 }
+            } else if error != nil {
+                print(error)
             }
         }
     }

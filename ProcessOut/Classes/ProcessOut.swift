@@ -225,7 +225,7 @@ public class ProcessOut {
     /// List alternative gateway configurations activated on your account
     ///
     /// - Parameter completion: Completion callback
-    public static func listAlternativeMethods(completion: @escaping ([AlternativeGateway]?, Error?) -> Void) {
+    public static func listAlternativeMethods(completion: @escaping ([AlternativeGateway]?, ProcessOutException?) -> Void) {
         HttpRequest(route: "/gateway-configurations?filter=alternative-payment-methods&expand_merchant_accounts=true", method: .get, parameters: [:]) { (gateways
             , e) in
             if gateways != nil {
@@ -239,7 +239,7 @@ public class ProcessOut {
                         completion(nil, ProcessOutException.InternalError)
                     }
                 } catch {
-                    completion(nil, error)
+                    completion(nil, ProcessOutException.GenericError(error: error))
                 }
             } else {
                 completion(nil, e)
