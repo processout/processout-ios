@@ -32,18 +32,14 @@ public protocol ThreeDSHandler {
     func onError(error: ProcessOutException)
 }
 
-
-/// Creates a test 3DS2 handler that lets you integrate and test the 3DS2 flow seamlessly. Only use this while using sandbox API keys
-///
-/// - Parameter viewController: UIViewController (needed to display a 3DS2 challenge popup)
-/// - Returns: Returns a sandbox ready ThreeDS2Handler
-public func createThreDSTestHandler(viewController: UIViewController) -> ThreeDSHandler {
-    return ThreeDSTestHandler(controller: viewController)
-}
 public class ThreeDSTestHandler: ThreeDSHandler {
     var controller: UIViewController
-    public init(controller: UIViewController) {
+    var completion: (String?, ProcessOutException?) -> Void
+    
+    
+    public init(controller: UIViewController, completion: @escaping (String?, ProcessOutException?) -> Void) {
         self.controller = controller
+        self.completion = completion
     }
     
     public func doFingerprint(directoryServerData: DirectoryServerData, completion: (ThreeDSFingerprintResponse) -> Void) {
@@ -51,22 +47,25 @@ public class ThreeDSTestHandler: ThreeDSHandler {
     
     }
     
-    public func doChallenge(authentificationData: AuthentificationChallengeData, completion: (Bool) -> Void) {
-        let alert = UIAlertController(title: "Did you bring your towel?", message: "It's recommended you bring your towel before continuing.", preferredStyle: .alert)
+    public func doChallenge(authentificationData: AuthentificationChallengeData, completion: @escaping (Bool) -> Void) {
+        let alert = UIAlertController(title: "Do you want to accept the 3DS2 challenge", message: "", preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: nil))
-        alert.addAction(UIAlertAction(title: "No", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Accept", style: .default, handler: { (action) in
+            completion(true)
+        }))
+        alert.addAction(UIAlertAction(title: "Reject", style: .default, handler: { (action) in
+            completion(false)
+        }))
         
         self.controller.present(alert, animated: true)
-        completion(true)
     }
     
     public func onSuccess(invoiceId: String) {
-        print("success: " + invoiceId)
+        self.completion(invoiceId, nil)
     }
     
     public func onError(error: ProcessOutException) {
-        print(error)
+        self.completion(nil, error)
     }
     
     

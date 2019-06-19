@@ -1,16 +1,13 @@
 PODS:
-  - Adyen3DS2 (2.1.0-rc.1)
   - Alamofire (4.8.2)
   - ProcessOut (2.5.1):
     - Alamofire (~> 4.8.2)
 
 DEPENDENCIES:
-  - Adyen3DS2 (= 2.1.0-rc.1)
   - ProcessOut (from `../`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
-    - Adyen3DS2
     - Alamofire
 
 EXTERNAL SOURCES:
@@ -18,10 +15,9 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Adyen3DS2: 57ab8ddc1f342c5e020c89ea5ea4ba805ab3dda6
   Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
   ProcessOut: 613feaf7bf460db3a3ee6a8e178b67cc9952ef3c
 
-PODFILE CHECKSUM: 8eb7eb1cb8a3834175d264f39505f0f8bec3ca2c
+PODFILE CHECKSUM: 3e927cd6acd5dc169ab447cba9d2c18d5317d402
 
 COCOAPODS: 1.5.3

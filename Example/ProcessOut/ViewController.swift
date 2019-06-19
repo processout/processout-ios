@@ -25,7 +25,7 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
     @IBAction func clicked(_ sender: Any) {
         // either test applepaye tokenization or card
         let contact = ProcessOut.Contact(address1: "1 great street", address2: nil, city: "City", state: "State", zip: "10000", countryCode: "US")
-        let card = ProcessOut.Card(cardNumber: "4212345678901245", expMonth: 10, expYear: 20, cvc: "737", name: "Jeremy Lejoux", contact: contact)
+        let card = ProcessOut.Card(cardNumber: "4000000000000101", expMonth: 10, expYear: 20, cvc: "737", name: "Jeremy Lejoux", contact: contact)
         ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) -> Void in
             if error != nil {
                 switch error! {
@@ -44,9 +44,18 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
                 }
             } else {
                 // send token to your backend to charge the customer
-                ProcessOut.makeCardPayment(invoiceId: "iv_jPfer8htwGBFDl3G1cuGMrriH1i7kBFQ", token: token!, handler: AdyenThreeDSHandler())
             }
         })
+    }
+    
+    func testThreeDS2Payment(token: String) {
+        ProcessOut.makeCardPayment(invoiceId: "invoice-id", token: token, handler: ProcessOut.createThreeDSTestHandler(viewController: self, completion: { (invoiceId, error) in
+            if invoiceId != nil {
+                // Authorization successful
+            } else {
+                // Display error
+            }
+        }))
     }
     
     func testTokenization() {
