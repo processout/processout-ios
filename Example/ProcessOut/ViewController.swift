@@ -24,16 +24,29 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
 
     @IBAction func clicked(_ sender: Any) {
         // either test applepaye tokenization or card
-        ProcessOut.listAlternativeMethods { (gateways, error) in
-            if gateways != nil {
-                for gateway in gateways! {
-                    let url = gateway.getRedirectURL(invoiceId: "invoice-id")
-                    UIApplication.shared.openURL(NSURL(string: url!.absoluteString!)! as URL)
+        let contact = ProcessOut.Contact(address1: "1 great street", address2: nil, city: "City", state: "State", zip: "10000", countryCode: "US")
+        let card = ProcessOut.Card(cardNumber: "4212345678901245", expMonth: 10, expYear: 20, cvc: "737", name: "Jeremy Lejoux", contact: contact)
+        ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) -> Void in
+            if error != nil {
+                switch error! {
+                case .BadRequest(let message, let code):
+                    // developers, message can help you
+                    print(message, code)
+                    
+                case .MissingProjectId:
+                    print("Check your app delegate file")
+                case .InternalError:
+                    print("An internal error occured")
+                case .NetworkError:
+                    print("Request could not go through")
+                case .GenericError(let error):
+                    print(error)
                 }
-            } else if error != nil {
-                print(error)
+            } else {
+                // send token to your backend to charge the customer
+                ProcessOut.makeCardPayment(invoiceId: "iv_jPfer8htwGBFDl3G1cuGMrriH1i7kBFQ", token: token!, handler: AdyenThreeDSHandler())
             }
-        }
+        })
     }
     
     func testTokenization() {
