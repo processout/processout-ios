@@ -43,3 +43,11 @@ public class AlternativeGateway: Decodable {
         return nil
     }
 }
+
+class AlternativeGatewaysResult: ApiResponse {
+    var gatewayConfigurations: [AlternativeGateway]?
+    
+    enum CodingKeys: String, CodingKey {
+        case gatewayConfigurations = "gateway_configurations"
+    }
+}

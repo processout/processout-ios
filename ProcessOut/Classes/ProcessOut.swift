@@ -5,14 +5,6 @@ import PassKit
 
 public class ProcessOut {
     
-    public enum ProcessOutException: Error {
-        case NetworkError
-        case MissingProjectId
-        case BadRequest(errorMessage: String, errorCode: String)
-        case InternalError
-        case GenericError(error: Error)
-    }
-    
     public struct Contact {
         var Address1: String?
         var Address2: String?
@@ -57,9 +49,11 @@ public class ProcessOut {
         }
     }
 
-    private static var ApiUrl: String = "https://api.processout.com"
-    internal static var CheckoutUrl: String = "https://checkout.processout.com"
+    private static let ApiUrl: String = "https://api.processout.com"
+    internal static let CheckoutUrl: String = "https://checkout.processout.com"
     internal static var ProjectId: String?
+    internal static let threeDS2ChallengeSuccess: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ==";
+    internal static let threeDS2ChallengeError: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ==";
     
     public static func Setup(projectId: String) {
         ProcessOut.ProjectId = projectId
@@ -99,10 +93,22 @@ public class ProcessOut {
         }
       
         HttpRequest(route: "/cards", method: .post, parameters: parameters) { (tokenResponse, error) in
-            if let card = tokenResponse?["card"] as? [String: Any], let token = card["id"] as? String {
-                completion(token, nil)
-            } else {
-                completion(nil, error)
+            do {
+                if tokenResponse != nil {
+                    print(String(data: tokenResponse!, encoding: String.Encoding.utf8) ?? "Data could not be printed")
+                    let tokenizationResult = try JSONDecoder().decode(TokenizationResult.self, from: tokenResponse!)
+                    if let card = tokenizationResult.card, tokenizationResult.success {
+                        completion(card.id, nil)
+                    } else {
+                        if let message = tokenizationResult.message, let errorType = tokenizationResult.errorType {
+                            completion(nil, ProcessOutException.BadRequest(errorMessage: message, errorCode: errorType))
+                        } else {
+                            completion(nil, ProcessOutException.InternalError)
+                        }
+                    }
+                }
+            } catch {
+                completion(nil, ProcessOutException.InternalError)
             }
         }
     }
@@ -190,12 +196,22 @@ public class ProcessOut {
             }
             
             HttpRequest(route: "/cards", method: .post, parameters: parameters) { (tokenResponse, error) in
-                if let card = tokenResponse?["card"] as? [String: Any], let token = card["id"] as? String {
-                    completion(token, nil)
-                } else {
-                    completion(nil, error)
+                do {
+                    if tokenResponse != nil {
+                        let tokenizationResult = try JSONDecoder().decode(TokenizationResult.self, from: tokenResponse!)
+                        if let card = tokenizationResult.card, tokenizationResult.success {
+                            completion(card.id, nil)
+                        } else {
+                            if let message = tokenizationResult.message, let errorType = tokenizationResult.errorType {
+                                completion(nil, ProcessOutException.BadRequest(errorMessage: message, errorCode: errorType))
+                            } else {
+                                completion(nil, ProcessOutException.InternalError)
+                            }
+                        }
+                    }
+                } catch {
+                    completion(nil, ProcessOutException.InternalError)
                 }
-            
             }
         } catch {
             // Could not parse the PKPaymentData object
@@ -230,7 +246,9 @@ public class ProcessOut {
             , e) in
             if gateways != nil {
                 do {
-                    if let gConfs = gateways!["gateway_configurations"] {
+                    let result = try JSONDecoder().decode(AlternativeGatewaysResult.self, from: gateways!)
+                    
+                    if let gConfs = result.gatewayConfigurations {
                         let jsondata = try JSONSerialization.data(withJSONObject: gConfs, options: JSONSerialization.WritingOptions.prettyPrinted)
                         print(jsondata)
                         let altG = try JSONDecoder().decode([AlternativeGateway].self, from: jsondata)
@@ -263,7 +281,118 @@ public class ProcessOut {
         return nil
     }
     
-    private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters, completion: @escaping ([String: Any]?, ProcessOutException?) -> Void) {
+    /// Initiate a payment authorization from a previously generated invoice and card token
+    ///
+    /// - Parameters:
+    ///   - invoiceId: Invoice generated on your backend
+    ///   - token: Card token to be used for the charge
+    ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
+    public static func makeCardPayment(invoiceId: String, token: String, handler: ThreeDSHandler) {
+        let authRequest = AuthorizationRequest(source: token)
+        if let body = try? JSONEncoder().encode(authRequest) {
+            do {
+                let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
+                HttpRequest(route: "/invoices/" + invoiceId + "/authorize", method: .post, parameters: json, completion: {(data, error) -> Void in
+                    do {
+                        if data != nil {
+                            let authorizationResult = try JSONDecoder().decode(AuthorizationResult.self, from: data!)
+                            handleAuthorizationRequest(invoiceId: invoiceId, source: token, handler: handler, result: authorizationResult)
+                        } else {
+                            handler.onError(error: error!)
+                        }
+                    } catch {
+                        handler.onError(error: ProcessOutException.GenericError(error: error))
+                    }
+                })
+            } catch {
+                handler.onError(error: ProcessOutException.GenericError(error: error))
+            }
+        } else {
+            handler.onError(error: ProcessOutException.InternalError)
+        }
+    
+    }
+    
+    /// Creates a test 3DS2 handler that lets you integrate and test the 3DS2 flow seamlessly. Only use this while using sandbox API keys
+    ///
+    /// - Parameter viewController: UIViewController (needed to display a 3DS2 challenge popup)
+    /// - Returns: Returns a sandbox ready ThreeDS2Handler
+    public static func createThreeDSTestHandler(viewController: UIViewController, completion: @escaping (String?, ProcessOutException?) -> Void) -> ThreeDSHandler {
+        return ThreeDSTestHandler(controller: viewController, completion: completion)
+    }
+    
+    private static func handleAuthorizationRequest(invoiceId: String, source: String, handler: ThreeDSHandler, result: AuthorizationResult) {
+        if let customerAction = result.customerAction {
+            switch customerAction.type{
+            case .fingerPrintMobile:
+                performFingerprint(customerAction: customerAction, handler: handler, completion: { (encodedData, error) in
+                    if encodedData != nil {
+                        makeCardPayment(invoiceId: invoiceId, token: "gway_req_" + encodedData!, handler: handler)
+                    } else {
+                        handler.onError(error: error!)
+                    }
+                })
+            case .challengeMobile:
+                performChallenge(customerAction: customerAction, handler: handler) { (success, error) in
+                    if (success) {
+                        makeCardPayment(invoiceId: invoiceId, token: threeDS2ChallengeSuccess, handler: handler )
+                    } else {
+                        makeCardPayment(invoiceId: invoiceId, token: threeDS2ChallengeError, handler: handler)
+                    }
+                }
+            default:
+                handler.onError(error: ProcessOutException.BadRequest(
+                    errorMessage: "Unsupported customer action. Make sure that the device channel was correctly set to ios when creating the invoice.", errorCode: ""))
+            }
+        } else {
+            handler.onSuccess(invoiceId: invoiceId)
+        }
+    }
+    
+    private static func performFingerprint(customerAction: AuthorizationResult.CustomerAction, handler: ThreeDSHandler, completion: @escaping (String?, ProcessOutException?) -> Void) {
+        do {
+            let decodedData = Data(base64Encoded: customerAction.value)!
+            let directoryServerData = try JSONDecoder().decode(DirectoryServerData.self, from: decodedData)
+            handler.doFingerprint(directoryServerData: directoryServerData) { (response) in
+                do {
+                    if let body = String(data: try JSONEncoder().encode(response), encoding: .utf8) {
+                        let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: body)
+                        let encodedJson = try JSONEncoder().encode(miscGatewayRequest)
+                        if let base64Encoded = String(data: encodedJson.base64EncodedData(), encoding: .utf8) {
+                            completion(base64Encoded, nil)
+                        } else {
+                            completion(nil, ProcessOutException.InternalError)
+                        }
+                    } else {
+                        completion(nil, ProcessOutException.InternalError)
+                    }
+                } catch {
+                    completion(nil, ProcessOutException.InternalError)
+                }
+                
+            }
+        } catch {
+            completion(nil, ProcessOutException.InternalError)
+        }
+    }
+    
+    private static func performChallenge(customerAction: AuthorizationResult.CustomerAction, handler: ThreeDSHandler, completion: @escaping (Bool, ProcessOutException?) -> Void) {
+        do {
+            if let decodedB64Data = Data(base64Encoded: customerAction.value) {
+                let authentificationChallengeData = try JSONDecoder().decode(AuthentificationChallengeData.self, from: decodedB64Data)
+                handler.doChallenge(authentificationData: authentificationChallengeData) { (success) in
+                    completion(success, nil)
+                }
+            } else {
+                completion(false, ProcessOutException.InternalError)
+            }
+        } catch {
+            completion(false, ProcessOutException.InternalError)
+        }
+        
+    }
+    
+    private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters, completion: @escaping (Data?, ProcessOutException?) -> Void) {
         guard let projectId = ProjectId, let authorizationHeader = Request.authorizationHeader(user: projectId, password: "") else {
             completion(nil, ProcessOutException.MissingProjectId)
             return
@@ -272,19 +401,25 @@ public class ProcessOut {
         var headers: HTTPHeaders = [:]
       
         headers[authorizationHeader.key] = authorizationHeader.value
+        print(parameters)
         Alamofire.request(ApiUrl + route, method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(completionHandler: {(response) -> Void in
-            if let data = response.result.value as? [String: Any] {
-                if let success = data["success"] as? Bool, success {
-                    completion(data, nil)
-                } else {
-                    if let errorMessage = data["message"] as? String, let errorType = data["error_type"] as? String {
-                        completion(nil, ProcessOutException.BadRequest(errorMessage: errorMessage, errorCode: errorType))
+            do {
+                if let data = response.data {
+                    let result = try JSONDecoder().decode(ApiResponse.self, from: response.data!)
+                    if result.success {
+                       completion(data, nil)
                     } else {
-                        completion(nil, ProcessOutException.InternalError)
+                        if let message = result.message, let errorType = result.errorType {
+                            completion(nil, ProcessOutException.BadRequest(errorMessage: message, errorCode: errorType))
+                        } else {
+                            completion(nil, ProcessOutException.NetworkError)
+                        }
                     }
+                } else {
+                    completion(nil, ProcessOutException.NetworkError)
                 }
-            } else {
-                completion(nil, ProcessOutException.NetworkError)
+            } catch {
+                completion(nil, ProcessOutException.InternalError)
             }
         })
     }
