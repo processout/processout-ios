@@ -95,7 +95,6 @@ public class ProcessOut {
         HttpRequest(route: "/cards", method: .post, parameters: parameters) { (tokenResponse, error) in
             do {
                 if tokenResponse != nil {
-                    print(String(data: tokenResponse!, encoding: String.Encoding.utf8) ?? "Data could not be printed")
                     let tokenizationResult = try JSONDecoder().decode(TokenizationResult.self, from: tokenResponse!)
                     if let card = tokenizationResult.card, tokenizationResult.success {
                         completion(card.id, nil)
@@ -265,18 +264,29 @@ public class ProcessOut {
         }
     }
     
-    /// Checks if an URL matches the ProcessOut return url schemes and returns the chargeable gateway token if so
+    /// Checks if an URL matches the ProcessOut return url schemes and returns an object containing chargeable information
     ///
     /// - Parameter url: URL catched by the app delegate
-    /// - Returns: a chargeable gateway token if applicable, nil otherwise
-    public static func handleURLCallback(url: URL) -> String? {
+    /// - Returns: a WebViewReturn object containing its type and chargeable value (token or invoiceId)
+    public static func handleURLCallback(url: URL) -> WebViewReturn? {
         func getQueryStringParameter(url: String, param: String) -> String? {
             guard let url = URLComponents(string: url) else { return nil }
             return url.queryItems?.first(where: { $0.name == param })?.value
         }
         
+        if let host = url.host, host != "processout.return" {
+            return nil
+        }
+        
         if let token = getQueryStringParameter(url: url.absoluteString, param: "token") {
-            return token
+            return WebViewReturn(success: true, type: .APMAuthorization, value: token)
+        } else if let threeDSStatus = getQueryStringParameter(url: url.absoluteString, param: "three_d_s_status"), let invoiceId = getQueryStringParameter(url: url.absoluteString, param: "invoice_id") {
+            if threeDSStatus == "success" {
+             return WebViewReturn(success: true, type: .ThreeDSResult, value: invoiceId)
+            }
+            else {
+                return WebViewReturn(success: false, type: .ThreeDSResult, value: invoiceId)
+            }
         }
         return nil
     }
@@ -340,6 +350,21 @@ public class ProcessOut {
                         makeCardPayment(invoiceId: invoiceId, token: threeDS2ChallengeError, handler: handler)
                     }
                 }
+            case .url:
+                // need to open a new web tab
+            guard let url = URL(string: customerAction.value) else {
+                // Invalid URL
+                handler.onError(error: ProcessOutException.InternalError)
+                return
+            }
+            
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            } else {
+                UIApplication.shared.openURL(url)
+                }
+                break
+                
             default:
                 handler.onError(error: ProcessOutException.BadRequest(
                     errorMessage: "Unsupported customer action. Make sure that the device channel was correctly set to ios when creating the invoice.", errorCode: ""))
