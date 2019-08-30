@@ -1,6 +1,5 @@
 //
 //  FingerPrintWebViewSchemeHandler.swift
-//  Alamofire
 //
 //  Created by Jeremy Lejoux on 27/08/2019.
 //
@@ -8,7 +7,7 @@
 import Foundation
 import WebKit
 
-@available(iOS 11.0, *)
+@available(iOS 11.0, *) // When not available we fallback to default fingerprinting values and continue the authorization flow
 public class FingerPrintWebViewSchemeHandler: NSObject, WKURLSchemeHandler {
     
     private var completion: ((String?, String?, ProcessOutException?) -> Void)? = nil
@@ -24,7 +23,6 @@ public class FingerPrintWebViewSchemeHandler: NSObject, WKURLSchemeHandler {
                 var token = ""
                 if let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: true)?.queryItems {
                     for queryParams in queryItems {
-                        //example : custom-scheme:// path ? type=remote & url=http://placehold.it/120x120&text=image1
                         if queryParams.name == "invoice_id", let value = queryParams.value {
                             invoice = value
                         } else if queryParams.name == "token", let value = queryParams.value {

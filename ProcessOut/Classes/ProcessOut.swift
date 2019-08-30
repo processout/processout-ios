@@ -57,7 +57,6 @@ public class ProcessOut {
     internal static var UrlScheme: String?
     internal static let threeDS2ChallengeSuccess: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ==";
     internal static let threeDS2ChallengeError: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ==";
-    public static var fingerPrintWebViewDelegate: FingerPrintWebView? = nil
 
     public static func Setup(projectId: String) {
         ProcessOut.ProjectId = projectId
@@ -390,7 +389,6 @@ public class ProcessOut {
                     return
                 }
                 // Prepare the fingerprint hiddenWebview
-                fingerPrintWebViewDelegate = FingerPrintWebView()
                 var webView: WKWebView!
                 let preferences = WKPreferences()
                 preferences.javaScriptEnabled = true
@@ -419,7 +417,6 @@ public class ProcessOut {
                     }), forURLScheme: appURLScheme)
                     // Add the webview to the app view
                     webView = WKWebView(frame: with.view.frame, configuration: configuration)
-                    webView.navigationDelegate = fingerPrintWebViewDelegate
                     webView.load(URLRequest(url: url))
                     webView.isHidden = true
                     with.view.addSubview(webView)
