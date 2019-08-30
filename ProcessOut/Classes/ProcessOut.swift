@@ -289,19 +289,21 @@ public class ProcessOut {
         let threeDSStatus = getQueryStringParameter(url: url.absoluteString, param: "three_d_s_status")
         let invoice = getQueryStringParameter(url: url.absoluteString, param: "invoice_id")
         
-        if token != nil && token != "" && threeDSStatus == nil && threeDSStatus != "" {
-            return WebViewReturn(success: true, type: .APMAuthorization, value: token!)
-        } else if token != nil && token != "" && invoice != nil && invoice != "" {
-            return WebViewReturn(success: true, type: .ThreeDSFallbackVerification, value: token!, invoiceId: invoice!)
+        if let tokenValue = token, !tokenValue.isEmpty, threeDSStatus == nil || threeDSStatus!.isEmpty {
+            return WebViewReturn(success: true, type: .APMAuthorization, value: tokenValue)
         }
-        if threeDSStatus != nil && threeDSStatus != "" && invoice != nil && invoice != "" {
-            switch threeDSStatus {
+        if let tokenValue = token, !tokenValue.isEmpty, let invoiceValue = invoice, !invoiceValue.isEmpty {
+            return WebViewReturn(success: true, type: .ThreeDSFallbackVerification, value: tokenValue, invoiceId: invoiceValue)
+        }
+        if let threeDSStatusValue = threeDSStatus, !threeDSStatusValue.isEmpty, let invoiceValue = invoice, !invoiceValue.isEmpty {
+            switch threeDSStatusValue {
             case "success":
-                return WebViewReturn(success: true, type: .ThreeDSResult, value: invoice!)
+                return WebViewReturn(success: true, type: .ThreeDSResult, value: invoiceValue)
             default:
                 return WebViewReturn(success: false, type: .ThreeDSResult, value: "")
             }
         }
+        
         return nil
     }
     
