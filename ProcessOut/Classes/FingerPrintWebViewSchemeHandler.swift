@@ -41,5 +41,6 @@ public class FingerPrintWebViewSchemeHandler: NSObject, WKURLSchemeHandler {
         }
     }
     public func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {
+        // Nothing needed here
     }
 }
