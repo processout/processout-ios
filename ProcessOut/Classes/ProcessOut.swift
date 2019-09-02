@@ -353,7 +353,7 @@ public class ProcessOut {
             case .fingerPrintMobile:
                 performFingerprint(customerAction: customerAction, handler: handler, completion: { (encodedData, error) in
                     if encodedData != nil {
-                        makeCardPayment(invoiceId: invoiceId, token: "gway_req_" + encodedData!, handler: handler, with: with)
+                        makeCardPayment(invoiceId: invoiceId, token: encodedData!, handler: handler, with: with)
                     } else {
                         handler.onError(error: error!)
                     }
@@ -458,18 +458,13 @@ public class ProcessOut {
     }
     
     private static func fallbackFingerprint(invoiceId: String, URL: String, handler: ThreeDSHandler, with: UIViewController) {
-        do {
-            let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: "{\"threeDS2FingerprintTimeout\":true}")
-            miscGatewayRequest.headers = ["Content-Type": "application/json"]
-            miscGatewayRequest.url = URL
-            let encodedJson = try JSONEncoder().encode(miscGatewayRequest)
-            if let base64Encoded = String(data: encodedJson.base64EncodedData(), encoding: .utf8) {
-                makeCardPayment(invoiceId: invoiceId, token: "gway_req_" + base64Encoded, handler: handler, with: with)
-            } else {
-                handler.onError(error: ProcessOutException.InternalError)
-            }
-        } catch {
-            handler.onError(error:  ProcessOutException.InternalError)
+        let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: "{\"threeDS2FingerprintTimeout\":true}")
+        miscGatewayRequest.headers = ["Content-Type": "application/json"]
+        miscGatewayRequest.url = URL
+        if let gatewayToken = miscGatewayRequest.generateToken() {
+            makeCardPayment(invoiceId: invoiceId, token: gatewayToken, handler: handler, with: with)
+        } else {
+            handler.onError(error: ProcessOutException.InternalError)
         }
     }
     
@@ -481,9 +476,8 @@ public class ProcessOut {
                 do {
                     if let body = String(data: try JSONEncoder().encode(response), encoding: .utf8) {
                         let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: body)
-                        let encodedJson = try JSONEncoder().encode(miscGatewayRequest)
-                        if let base64Encoded = String(data: encodedJson.base64EncodedData(), encoding: .utf8) {
-                            completion(base64Encoded, nil)
+                        if let gatewayToken = miscGatewayRequest.generateToken() {
+                            completion(gatewayToken, nil)
                         } else {
                             completion(nil, ProcessOutException.InternalError)
                         }
