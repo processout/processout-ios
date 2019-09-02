@@ -44,6 +44,11 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
                 }
             } else {
                 // Use the card token to initiate an authorization/charge
+                if token != nil {
+                    ProcessOut.makeCardPayment(invoiceId: "invoice-id", token: token!, handler: ProcessOut.createThreeDSTestHandler(viewController: self, completion: { (invoiceId, error) in
+                        // Send the invoice to your backend to complete the charge
+                    }), with: self)
+                }
             }
         })
     }
@@ -55,7 +60,7 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
             } else {
                 // Display error
             }
-        }))
+        }), with: self)
     }
     
     func testTokenization() {

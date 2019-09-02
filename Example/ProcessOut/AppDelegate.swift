@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        ProcessOut.Setup(projectId: "test-proj_WijDbvE1oEkS67ikx2cfu25Nr5Qx4emX")
+        ProcessOut.Setup(projectId: "project-id")
         return true
     }
     
@@ -33,7 +33,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 case .ThreeDSResult:
                     let invoiceId = processoutResult.value
                     // Send the invoice ID to your backend to complete the charge
+                case .ThreeDSFallbackVerification:
+                    ProcessOut.continueThreeDSVerification(invoiceId: processoutResult.invoiceId, token: processoutResult.value) { (invoiceId, error) in
+                        // Send the invoice to your backend to complete the charge
+                    }
                 }
+            } else {
+                // Authorization failed
             }
         } else {
             // This was not a processout url – do whatever url handling your app
