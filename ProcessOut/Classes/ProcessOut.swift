@@ -395,7 +395,7 @@ public class ProcessOut {
                 let preferences = WKPreferences()
                 preferences.javaScriptEnabled = true
                 let configuration = WKWebViewConfiguration()
-                // Check if the device supports custom URL scheme handlind for WebViews
+                // Check if the device supports custom URL scheme handling for WebViews
                 if #available(iOS 11.0, *), let appURLScheme = ProcessOut.UrlScheme {
                     // Setup the fingerprint timeout handler
                     let timeOutHandler = DispatchWorkItem {
