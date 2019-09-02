@@ -18,7 +18,7 @@ public class WebViewReturn {
     public var success: Bool
     public var value: String = ""
     public var type: ReturnType
-    public var invoideId: String = ""
+    public var invoiceId: String = ""
     
     public init(success: Bool, type: ReturnType, value: String) {
         self.success = success
