@@ -413,7 +413,7 @@ public class ProcessOut {
                         if error != nil {
                             handler.onError(error: error!)
                         } else {
-                            // Finggerprint token successfuly received, we continue the authorization flow
+                            // Fingerprint token successfully received, we continue the authorization flow
                             makeCardPayment(invoiceId: invoiceId!, token: token!, handler: handler, with: with)
                         }
                     }), forURLScheme: appURLScheme)
