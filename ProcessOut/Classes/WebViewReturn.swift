@@ -30,7 +30,7 @@ public class WebViewReturn {
         self.success = success
         self.value = value
         self.type = type
-        self.invoideId = invoiceId
+        self.invoiceId = invoiceId
     }
     
 }
