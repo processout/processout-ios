@@ -8,6 +8,14 @@
 import Foundation
 
 public class AlternativeGateway: Decodable {
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "id"
+        case name = "name"
+        case gateway = "gateway"
+        case enabled = "enabled"
+    }
+    
     public struct Gateway: Decodable {
         
         enum CodingKeys: String, CodingKey {
@@ -49,5 +57,11 @@ class AlternativeGatewaysResult: ApiResponse {
     
     enum CodingKeys: String, CodingKey {
         case gatewayConfigurations = "gateway_configurations"
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.gatewayConfigurations = try container.decode([AlternativeGateway].self, forKey: .gatewayConfigurations)
+        try super.init(from: decoder)
     }
 }

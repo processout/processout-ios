@@ -254,11 +254,8 @@ public class ProcessOut {
             if gateways != nil {
                 do {
                     let result = try JSONDecoder().decode(AlternativeGatewaysResult.self, from: gateways!)
-                    
                     if let gConfs = result.gatewayConfigurations {
-                        let jsondata = try JSONSerialization.data(withJSONObject: gConfs, options: JSONSerialization.WritingOptions.prettyPrinted)
-                        let altG = try JSONDecoder().decode([AlternativeGateway].self, from: jsondata)
-                        completion(altG, nil)
+                        completion(result.gatewayConfigurations, nil)
                     } else {
                         completion(nil, ProcessOutException.InternalError)
                     }
@@ -376,7 +373,9 @@ public class ProcessOut {
             }
             
             if #available(iOS 10.0, *) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                UIApplication.shared.open(url, options: [:], completionHandler: {(success) in
+                    print("success")
+                })
             } else {
                 UIApplication.shared.openURL(url)
                 }
