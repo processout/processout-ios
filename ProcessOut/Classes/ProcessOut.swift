@@ -373,9 +373,7 @@ public class ProcessOut {
             }
             
             if #available(iOS 10.0, *) {
-                UIApplication.shared.open(url, options: [:], completionHandler: {(success) in
-                    print("success")
-                })
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
             } else {
                 UIApplication.shared.openURL(url)
                 }
