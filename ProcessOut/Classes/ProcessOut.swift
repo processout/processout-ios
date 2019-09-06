@@ -254,11 +254,8 @@ public class ProcessOut {
             if gateways != nil {
                 do {
                     let result = try JSONDecoder().decode(AlternativeGatewaysResult.self, from: gateways!)
-                    
                     if let gConfs = result.gatewayConfigurations {
-                        let jsondata = try JSONSerialization.data(withJSONObject: gConfs, options: JSONSerialization.WritingOptions.prettyPrinted)
-                        let altG = try JSONDecoder().decode([AlternativeGateway].self, from: jsondata)
-                        completion(altG, nil)
+                        completion(gConfs, nil)
                     } else {
                         completion(nil, ProcessOutException.InternalError)
                     }
