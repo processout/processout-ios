@@ -310,6 +310,7 @@ public class ProcessOut {
     ///   - invoiceId: Invoice generated on your backend
     ///   - token: Card token to be used for the charge
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
+    ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeCardPayment(invoiceId: String, token: String, handler: ThreeDSHandler, with: UIViewController) {
         let authRequest = AuthorizationRequest(source: token)
         if let body = try? JSONEncoder().encode(authRequest) {
@@ -334,6 +335,33 @@ public class ProcessOut {
             handler.onError(error: ProcessOutException.InternalError)
         }
     
+    }
+    
+    /// Create a customer token from a card ID
+    ///
+    /// - Parameters:
+    ///   - cardId: Card ID used for the customer token
+    ///   - customerId: Customer ID created in backend
+    ///   - tokenId: Token ID created in backend
+    ///   - handler: 3DS2 handler
+    ///   - with: UIViewController to display webviews and perform fingerprinting
+    public static func makeCardToken(cardId: String, customerId: String, tokenId: String, handler: ThreeDSHandler, with: UIViewController) {
+        let tokenRequest = TokenRequest(source: cardId)
+        guard let body = try? JSONEncoder().encode(tokenRequest) else {
+            handler.onError(error: ProcessOutException.InternalError)
+            return
+        }
+        do {
+            let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String: Any]
+            HttpRequest(route: "/customers/" + customerId + "/tokens/" + tokenId, method: .post, parameters: json) { (data, error) in
+                guard error == nil else {
+                    handler.onError(error: error!)
+                    return
+                }
+            }
+        } catch {
+            handler.onError(error: ProcessOutException.InternalError)
+        }
     }
     
     /// Creates a test 3DS2 handler that lets you integrate and test the 3DS2 flow seamlessly. Only use this while using sandbox API keys
