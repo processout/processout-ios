@@ -313,28 +313,29 @@ public class ProcessOut {
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeCardPayment(invoiceId: String, token: String, handler: ThreeDSHandler, with: UIViewController) {
         let authRequest = AuthorizationRequest(source: token)
-        if let body = try? JSONEncoder().encode(authRequest) {
-            do {
-                let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
-                HttpRequest(route: "/invoices/" + invoiceId + "/authorize", method: .post, parameters: json, completion: {(data, error) -> Void in
-                    do {
-                        if data != nil {
-                            let authorizationResult = try JSONDecoder().decode(AuthorizationResult.self, from: data!)
-                            handleAuthorizationRequest(invoiceId: invoiceId, source: token, handler: handler, result: authorizationResult, with: with)
-                        } else {
-                            handler.onError(error: error!)
-                        }
-                    } catch {
-                        handler.onError(error: ProcessOutException.GenericError(error: error))
-                    }
-                })
-            } catch {
-                handler.onError(error: ProcessOutException.GenericError(error: error))
-            }
-        } else {
+        guard let body = try? JSONEncoder().encode(authRequest) else {
             handler.onError(error: ProcessOutException.InternalError)
+            return
         }
-    
+        
+        do {
+            let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
+            HttpRequest(route: "/invoices/" + invoiceId + "/authorize", method: .post, parameters: json, completion: {(data, error) -> Void in
+                guard data != nil else {
+                    handler.onError(error: error!)
+                    return
+                }
+                
+            
+                guard let authorizationResult = try? JSONDecoder().decode(AuthorizationResult.self, from: data!) else {
+                    handler.onError(error: ProcessOutException.InternalError)
+                    return
+                }
+                handleAuthorizationRequest(invoiceId: invoiceId, source: token, handler: handler, result: authorizationResult, with: with)
+            })
+        } catch {
+            handler.onError(error: ProcessOutException.GenericError(error: error))
+        }
     }
     
     /// Create a customer token from a card ID
@@ -353,10 +354,16 @@ public class ProcessOut {
         }
         do {
             let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String: Any]
-            HttpRequest(route: "/customers/" + customerId + "/tokens/" + tokenId, method: .post, parameters: json) { (data, error) in
-                guard error == nil else {
+            HttpRequest(route: "/customers/" + customerId + "/tokens/" + tokenId, method: .put, parameters: json) { (data, error) in
+                guard error == nil, data != nil else {
                     handler.onError(error: error!)
                     return
+                }
+                
+                do {
+                    let result = try JSONDecoder().decode(AuthorizationResult.self, from: data!)
+                } catch {
+                    handler.onError(error: ProcessOutException.InternalError)
                 }
             }
         } catch {
