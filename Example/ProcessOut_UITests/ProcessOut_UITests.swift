@@ -32,35 +32,6 @@ class ProcessOutUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
     
-    func createInvoice(invoice: Invoice, completion: @escaping (String?, Error?) -> Void) {
-        if let body = try? JSONEncoder().encode(invoice), let authorizationHeader = Request.authorizationHeader(user: projectId, password: projectKey) {
-            do {
-                let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
-                var headers: HTTPHeaders = [:]
-                
-                headers[authorizationHeader.key] = authorizationHeader.value
-                Alamofire.request("https://api.processout.com/invoices", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON(completionHandler: {(response) -> Void in
-                    switch response.result {
-                    case .success(let data):
-                        guard let j = data as? [String: AnyObject] else {
-                            completion(nil, ProcessOutException.InternalError)
-                            return
-                        }
-                        if let inv = j["invoice"] as? [String: AnyObject], let id = inv["id"] as? String {
-                            completion(id, nil)
-                        } else {
-                            completion(nil, ProcessOutException.InternalError)
-                        }
-                    default:
-                        completion(nil, ProcessOutException.InternalError)
-                    }
-                })
-            } catch {
-                completion(nil, error)
-            }
-        }
-    }
-    
     func testInvoiceCreation() {
         
         let expectation = XCTestExpectation(description: "Invoice creation")
@@ -124,4 +95,148 @@ class ProcessOutUITests: XCTestCase {
         wait(for: [expectation], timeout: 10.0)
     }
     
+    func testMakeCardToken() {
+        let expectation = XCTestExpectation(description: "Make card token")
+        let view = ViewController()
+        
+        let card = ProcessOut.Card(cardNumber: "4242424242424242", expMonth: 11, expYear: 20, cvc: "123", name: "test card")
+        // Tokenizing the card
+        ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) in
+            
+            guard error == nil else {
+                print(error!)
+                XCTAssertTrue(false)
+                return
+            }
+            
+            // Creating the customer
+            self.createCustomer(completion: { (customerId, error) in
+                guard error == nil else {
+                    print(error!)
+                    XCTAssertTrue(false)
+                    return
+                }
+                
+                // Create the customer token
+                self.createCustomerToken(customerId: customerId!, cardId: token!, completion: { (customerTokenId, error) in
+                    
+                    guard error == nil else {
+                        print(error!)
+                        XCTAssertTrue(false)
+                        return
+                    }
+                    
+                    ProcessOut.makeCardToken(cardId: token!, customerId: customerId!, tokenId: customerTokenId!, handler: ProcessOut.createThreeDSTestHandler(viewController: view, completion: { (invoiceId, error) in
+                        
+                        guard error == nil else {
+                            print(error!)
+                            XCTAssertTrue(false)
+                            return
+                        }
+                        
+                        XCTAssertNotNil(invoiceId)
+                        
+                        expectation.fulfill()
+                    }), with: view)
+                })
+            })
+        })
+        
+        wait(for: [expectation], timeout: 15.0)
+    }
+    
+    
+    // HELPERS functions
+    func createInvoice(invoice: Invoice, completion: @escaping (String?, Error?) -> Void) {
+        if let body = try? JSONEncoder().encode(invoice), let authorizationHeader = Request.authorizationHeader(user: projectId, password: projectKey) {
+            do {
+                let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
+                var headers: HTTPHeaders = [:]
+                
+                headers[authorizationHeader.key] = authorizationHeader.value
+                Alamofire.request("https://api.processout.com/invoices", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON(completionHandler: {(response) -> Void in
+                    switch response.result {
+                    case .success(let data):
+                        guard let j = data as? [String: AnyObject] else {
+                            completion(nil, ProcessOutException.InternalError)
+                            return
+                        }
+                        if let inv = j["invoice"] as? [String: AnyObject], let id = inv["id"] as? String {
+                            completion(id, nil)
+                        } else {
+                            completion(nil, ProcessOutException.InternalError)
+                        }
+                    default:
+                        completion(nil, ProcessOutException.InternalError)
+                    }
+                })
+            } catch {
+                completion(nil, error)
+            }
+        }
+    }
+    
+    func createCustomer(completion: @escaping (String?, Error?) -> Void) {
+        let customerRequest = CustomerRequest(firstName: "test", lastName: "test", currency: "USD")
+        guard let body = try? JSONEncoder().encode(customerRequest), let authorizationHeader = Request.authorizationHeader(user: projectId, password: projectKey) else {
+            completion(nil, ProcessOutException.InternalError)
+            return
+        }
+        
+        do {
+            let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String: Any]
+            var headers: HTTPHeaders = [:]
+            headers[authorizationHeader.key] = authorizationHeader.value
+            Alamofire.request("https://api.processout.com/customers", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON { (response) in
+                switch response.result {
+                case .success(let data):
+                    guard let j = data as? [String: AnyObject] else {
+                        completion(nil, ProcessOutException.InternalError)
+                        return
+                    }
+                    if let cust = j["customer"] as? [String: AnyObject], let id = cust["id"] as? String {
+                        completion(id, nil)
+                    } else {
+                        completion(nil, ProcessOutException.InternalError)
+                    }
+                default:
+                    completion(nil, ProcessOutException.InternalError)
+                }
+            }
+        } catch {
+            completion(nil, ProcessOutException.InternalError)
+        }
+    }
+    
+    func createCustomerToken(customerId: String, cardId: String, completion: @escaping (String?, Error?) -> Void) {
+        let tokenRequest = CustomerTokenRequest(source: cardId)
+        guard let body = try? JSONEncoder().encode(tokenRequest), let authorizationHeader = Request.authorizationHeader(user: projectId, password: projectKey) else {
+            completion(nil, ProcessOutException.InternalError)
+            return
+        }
+        
+        do {
+            let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String: AnyObject]
+            var headers: HTTPHeaders = [:]
+            headers[authorizationHeader.key] = authorizationHeader.value
+            Alamofire.request("https://api.processout.com/customers/" + customerId + "/tokens", method: .post, parameters: json, encoding :JSONEncoding.default, headers: headers).responseJSON {(response) in
+                switch response.result {
+                case .success(let data):
+                    guard let j = data as? [String: AnyObject] else {
+                        completion(nil, ProcessOutException.InternalError)
+                        return
+                    }
+                    if let cust = j["token"] as? [String: AnyObject], let id = cust["id"] as? String {
+                        completion(id, nil)
+                    } else {
+                        completion(nil, ProcessOutException.InternalError)
+                    }
+                default:
+                    completion(nil, ProcessOutException.InternalError)
+                }
+            }
+        } catch {
+            completion(nil, ProcessOutException.InternalError)
+        }
+    }
 }
