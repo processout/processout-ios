@@ -5,7 +5,7 @@
 //  Created by Jeremy Lejoux on 18/06/2019.
 //
 
-class ApiResponse: Decodable {
+public class ApiResponse: Decodable {
     var success: Bool
     var message: String?
     var errorType: String?
