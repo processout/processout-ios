@@ -326,7 +326,6 @@ public class ProcessOut {
                     return
                 }
                 
-            
                 guard let authorizationResult = try? JSONDecoder().decode(AuthorizationResult.self, from: data!) else {
                     handler.onError(error: ProcessOutException.InternalError)
                     return
@@ -346,8 +345,8 @@ public class ProcessOut {
     ///   - tokenId: Token ID created in backend
     ///   - handler: 3DS2 handler
     ///   - with: UIViewController to display webviews and perform fingerprinting
-    public static func makeCardToken(cardId: String, customerId: String, tokenId: String, handler: ThreeDSHandler, with: UIViewController) {
-        let tokenRequest = TokenRequest(source: cardId)
+    public static func makeCardToken(source: String, customerId: String, tokenId: String, handler: ThreeDSHandler, with: UIViewController) {
+        let tokenRequest = TokenRequest(source: source)
         guard let body = try? JSONEncoder().encode(tokenRequest) else {
             handler.onError(error: ProcessOutException.InternalError)
             return
@@ -362,6 +361,14 @@ public class ProcessOut {
                 
                 do {
                     let result = try JSONDecoder().decode(AuthorizationResult.self, from: data!)
+                    if let customerAction = result.customerAction {
+                        let actionHandler = CustomerActionHandler(handler: handler, with: with)
+                        actionHandler.handleCustomerAction(customerAction: customerAction, completion: { (newSource) in
+                            makeCardToken(source: newSource, customerId: customerId, tokenId: tokenId, handler: handler, with: with)
+                        })
+                    } else {
+                        handler.onSuccess(invoiceId: tokenId)
+                    }
                 } catch {
                     handler.onError(error: ProcessOutException.InternalError)
                 }
@@ -381,88 +388,9 @@ public class ProcessOut {
     
     private static func handleAuthorizationRequest(invoiceId: String, source: String, handler: ThreeDSHandler, result: AuthorizationResult, with: UIViewController) {
         if let customerAction = result.customerAction {
-            switch customerAction.type{
-            case .fingerPrintMobile:
-                performFingerprint(customerAction: customerAction, handler: handler, completion: { (encodedData, error) in
-                    if encodedData != nil {
-                        makeCardPayment(invoiceId: invoiceId, token: encodedData!, handler: handler, with: with)
-                    } else {
-                        handler.onError(error: error!)
-                    }
-                })
-            case .challengeMobile:
-                performChallenge(customerAction: customerAction, handler: handler) { (success, error) in
-                    if (success) {
-                        makeCardPayment(invoiceId: invoiceId, token: threeDS2ChallengeSuccess, handler: handler, with: with)
-                    } else {
-                        makeCardPayment(invoiceId: invoiceId, token: threeDS2ChallengeError, handler: handler, with: with)
-                    }
-                }
-        
-            case .url, .redirect:
-                // need to open a new web tab
-            guard let url = URL(string: customerAction.value) else {
-                // Invalid URL
-                handler.onError(error: ProcessOutException.InternalError)
-                return
-            }
-            
-            if #available(iOS 10.0, *) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            } else {
-                UIApplication.shared.openURL(url)
-                }
-                break
-                
-            case .fingerprint:
-                // Need to open a webview for fingerprinting fallback
-                
-                guard let url = URL(string: customerAction.value) else {
-                    // Invalid URL
-                    handler.onError(error: ProcessOutException.InternalError)
-                    return
-                }
-                // Prepare the fingerprint hiddenWebview
-                var webView: WKWebView!
-                let preferences = WKPreferences()
-                preferences.javaScriptEnabled = true
-                let configuration = WKWebViewConfiguration()
-                // Check if the device supports custom URL scheme handling for WebViews
-                if #available(iOS 11.0, *), let appURLScheme = ProcessOut.UrlScheme {
-                    // Setup the fingerprint timeout handler
-                    let timeOutHandler = DispatchWorkItem {
-                        // Remove the webview
-                        webView.removeFromSuperview()
-                        webView = nil
-                        // Fallback to default fingerprint values
-                        fallbackFingerprint(invoiceId: invoiceId, URL: customerAction.value, handler: handler, with: with)
-                    }
-                    configuration.preferences = preferences
-                    // Setup the custom URL scheme handler to detect redirects within the hidden webview
-                    configuration.setURLSchemeHandler(FingerPrintWebViewSchemeHandler(completion: {(invoiceId, token, error) in
-                        // Cancel the timeout as we catched the redirect
-                        timeOutHandler.cancel()
-                        if error != nil {
-                            handler.onError(error: error!)
-                        } else {
-                            // Fingerprint token successfully received, we continue the authorization flow
-                            makeCardPayment(invoiceId: invoiceId!, token: token!, handler: handler, with: with)
-                        }
-                    }), forURLScheme: appURLScheme)
-                    // Add the webview to the app view
-                    webView = WKWebView(frame: with.view.frame, configuration: configuration)
-                    webView.load(URLRequest(url: url))
-                    webView.isHidden = true
-                    with.view.addSubview(webView)
-                    
-                    // Start the timeout handler with a 10s timeout
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 10.0, execute: timeOutHandler)
-                } else {
-                    // Fallback on earlier versions
-                    fallbackFingerprint(invoiceId: invoiceId, URL: customerAction.value,handler: handler, with: with)
-                }
-                
-                break
+            let actionHandler = CustomerActionHandler(handler: handler, with: with)
+            actionHandler.handleCustomerAction(customerAction: customerAction) { (newSource) in
+                makeCardPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
             }
         } else {
             handler.onSuccess(invoiceId: invoiceId)
@@ -487,59 +415,6 @@ public class ProcessOut {
         } else {
             completion(nil, ProcessOutException.InternalError)
         }
-    }
-    
-    private static func fallbackFingerprint(invoiceId: String, URL: String, handler: ThreeDSHandler, with: UIViewController) {
-        let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: "{\"threeDS2FingerprintTimeout\":true}")
-        miscGatewayRequest.headers = ["Content-Type": "application/json"]
-        miscGatewayRequest.url = URL
-        if let gatewayToken = miscGatewayRequest.generateToken() {
-            makeCardPayment(invoiceId: invoiceId, token: gatewayToken, handler: handler, with: with)
-        } else {
-            handler.onError(error: ProcessOutException.InternalError)
-        }
-    }
-    
-    private static func performFingerprint(customerAction: AuthorizationResult.CustomerAction, handler: ThreeDSHandler, completion: @escaping (String?, ProcessOutException?) -> Void) {
-        do {
-            let decodedData = Data(base64Encoded: customerAction.value)!
-            let directoryServerData = try JSONDecoder().decode(DirectoryServerData.self, from: decodedData)
-            handler.doFingerprint(directoryServerData: directoryServerData) { (response) in
-                do {
-                    if let body = String(data: try JSONEncoder().encode(response), encoding: .utf8) {
-                        let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: body)
-                        if let gatewayToken = miscGatewayRequest.generateToken() {
-                            completion(gatewayToken, nil)
-                        } else {
-                            completion(nil, ProcessOutException.InternalError)
-                        }
-                    } else {
-                        completion(nil, ProcessOutException.InternalError)
-                    }
-                } catch {
-                    completion(nil, ProcessOutException.InternalError)
-                }
-                
-            }
-        } catch {
-            completion(nil, ProcessOutException.InternalError)
-        }
-    }
-    
-    private static func performChallenge(customerAction: AuthorizationResult.CustomerAction, handler: ThreeDSHandler, completion: @escaping (Bool, ProcessOutException?) -> Void) {
-        do {
-            if let decodedB64Data = Data(base64Encoded: customerAction.value) {
-                let authentificationChallengeData = try JSONDecoder().decode(AuthentificationChallengeData.self, from: decodedB64Data)
-                handler.doChallenge(authentificationData: authentificationChallengeData) { (success) in
-                    completion(success, nil)
-                }
-            } else {
-                completion(false, ProcessOutException.InternalError)
-            }
-        } catch {
-            completion(false, ProcessOutException.InternalError)
-        }
-        
     }
     
     private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters, completion: @escaping (Data?, ProcessOutException?) -> Void) {
