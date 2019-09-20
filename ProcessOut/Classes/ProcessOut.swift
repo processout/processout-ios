@@ -533,25 +533,30 @@ public class ProcessOut {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
             
             sessionManager.request(request as URLRequestConvertible).responseJSON(completionHandler: {(response) -> Void in
-                do {
-                    if let data = response.data {
-                        let result = try JSONDecoder().decode(ApiResponse.self, from: response.data!)
-                        if result.success {
-                            completion(data, nil)
-                        } else {
-                            if let message = result.message, let errorType = result.errorType {
-                                completion(nil, ProcessOutException.BadRequest(errorMessage: message, errorCode: errorType))
-                            } else {
-                                completion(nil, ProcessOutException.NetworkError)
-                            }
-                        }
-                    } else {
-                        completion(nil, ProcessOutException.NetworkError)
-                    }
-                } catch {
-                    completion(nil, ProcessOutException.InternalError)
+                guard let data = response.data else {
+                    completion(nil, ProcessOutException.NetworkError)
+                    return
                 }
+                handleNetworkResult(data: data, completion: completion)
             })
+        } catch {
+            completion(nil, ProcessOutException.InternalError)
+        }
+    }
+    
+    private static func handleNetworkResult(data: Data, completion: @escaping (Data?, ProcessOutException?) -> Void) {
+        do {
+            let result = try JSONDecoder().decode(ApiResponse.self, from: data)
+            if result.success {
+                completion(data, nil)
+                return
+            }
+            
+            if let message = result.message, let errorType = result.errorType {
+                completion(nil, ProcessOutException.BadRequest(errorMessage: message, errorCode: errorType))
+            } else {
+                completion(nil, ProcessOutException.NetworkError)
+            }
         } catch {
             completion(nil, ProcessOutException.InternalError)
         }
