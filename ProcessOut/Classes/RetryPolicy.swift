@@ -32,11 +32,12 @@ class RetryPolicy: RequestRetrier {
             // Should retry
             currentRetriedRequests[url] = retryCount + 1
             completion(true, RETRY_INTERVAL)
-        } else {
-            // Shouldn't retry
-            clearRetriedForUrl(url: url)
-            completion(false, 0.0)
+            return
         }
+        
+        // Shouldn't retry
+        clearRetriedForUrl(url: url)
+        completion(false, 0.0)
     }
     
     private func clearRetriedForUrl(url: String?) {

@@ -554,9 +554,10 @@ public class ProcessOut {
             
             if let message = result.message, let errorType = result.errorType {
                 completion(nil, ProcessOutException.BadRequest(errorMessage: message, errorCode: errorType))
-            } else {
-                completion(nil, ProcessOutException.NetworkError)
+                return
             }
+            
+            completion(nil, ProcessOutException.NetworkError)
         } catch {
             completion(nil, ProcessOutException.InternalError)
         }
