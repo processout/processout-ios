@@ -11,7 +11,7 @@ import ProcessOut
 import PassKit
 import WebKit
 
-class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDelegate, WKUIDelegate {
+class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,7 +26,7 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
     @IBAction func clicked(_ sender: Any) {
         // either test applepaye tokenization or card
         let contact = ProcessOut.Contact(address1: "1 great street", address2: nil, city: "City", state: "State", zip: "10000", countryCode: "US")
-        let card = ProcessOut.Card(cardNumber: "4000000000003253", expMonth: 10, expYear: 20, cvc: "737", name: "Jeremy Lejoux", contact: contact)
+        let card = ProcessOut.Card(cardNumber: "4000000000003246", expMonth: 10, expYear: 20, cvc: "737", name: "Jeremy Lejoux", contact: contact)
         ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) -> Void in
             if error != nil {
                 switch error! {
