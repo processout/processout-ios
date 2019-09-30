@@ -21,6 +21,12 @@ public protocol ThreeDSHandler {
     ///   - completion: Callback specifying wheter or not the challenge was successful
     func doChallenge(authentificationData: AuthentificationChallengeData, completion: @escaping (Bool) -> Void)
     
+    
+    /// Method called when a web challenge is required
+    ///
+    /// - Parameter webView: The webView to present
+    func doPresentWebView(webView: ProcessOutWebView)
+    
     /// Called when the authorization was successful
     ///
     /// - Parameter invoiceId: Invoice id that was authorized
@@ -60,6 +66,10 @@ public class ThreeDSTestHandler: ThreeDSHandler {
         self.controller.present(alert, animated: true)
     }
     
+    public func doPresentWebView(webView: ProcessOutWebView) {
+        controller.view.addSubview(webView)
+    }
+    
     public func onSuccess(invoiceId: String) {
         self.completion(invoiceId, nil)
     }
@@ -67,6 +77,4 @@ public class ThreeDSTestHandler: ThreeDSHandler {
     public func onError(error: ProcessOutException) {
         self.completion(nil, error)
     }
-    
-    
 }

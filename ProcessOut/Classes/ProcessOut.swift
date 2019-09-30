@@ -268,42 +268,6 @@ public class ProcessOut {
         }
     }
     
-    /// Checks if an URL matches the ProcessOut return url schemes and returns an object containing chargeable information
-    ///
-    /// - Parameter url: URL catched by the app delegate
-    /// - Returns: a WebViewReturn object containing its type and chargeable value (token or invoiceId)
-    public static func handleURLCallback(url: URL) -> WebViewReturn? {
-        func getQueryStringParameter(url: String, param: String) -> String? {
-            guard let url = URLComponents(string: url) else { return nil }
-            return url.queryItems?.first(where: { $0.name == param })?.value
-        }
-        
-        if let host = url.host, host != "processout.return" {
-            return nil
-        }
-        
-        let token = getQueryStringParameter(url: url.absoluteString, param: "token")
-        let threeDSStatus = getQueryStringParameter(url: url.absoluteString, param: "three_d_s_status")
-        let invoice = getQueryStringParameter(url: url.absoluteString, param: "invoice_id")
-        
-        if let tokenValue = token, !tokenValue.isEmpty, threeDSStatus == nil || threeDSStatus!.isEmpty {
-            return WebViewReturn(success: true, type: .APMAuthorization, value: tokenValue)
-        }
-        if let tokenValue = token, !tokenValue.isEmpty, let invoiceValue = invoice, !invoiceValue.isEmpty {
-            return WebViewReturn(success: true, type: .ThreeDSFallbackVerification, value: tokenValue, invoiceId: invoiceValue)
-        }
-        if let threeDSStatusValue = threeDSStatus, !threeDSStatusValue.isEmpty, let invoiceValue = invoice, !invoiceValue.isEmpty {
-            switch threeDSStatusValue {
-            case "success":
-                return WebViewReturn(success: true, type: .ThreeDSResult, value: invoiceValue)
-            default:
-                return WebViewReturn(success: false, type: .ThreeDSResult, value: "")
-            }
-        }
-        
-        return nil
-    }
-    
     /// Initiate a payment authorization from a previously generated invoice and card token
     ///
     /// - Parameters:
@@ -330,7 +294,29 @@ public class ProcessOut {
                     handler.onError(error: ProcessOutException.InternalError)
                     return
                 }
-                handleAuthorizationRequest(invoiceId: invoiceId, source: token, handler: handler, result: authorizationResult, with: with)
+                guard let customerAction = authorizationResult.customerAction else {
+                    // No customer action required, payment authorized
+                    handler.onSuccess(invoiceId: invoiceId)
+                    return
+                }
+                
+                // Initiate the webView component
+                let poWebView = CardPaymentWebView(frame: with.view.frame, onResult: {(token) in
+                    // Web authentication completed
+                    makeCardPayment(invoiceId: invoiceId, token: token, handler: handler, with: with)
+                }, onAuthenticationError: {() in
+                    // Error while authenticating
+                    handler.onError(error: ProcessOutException.BadRequest(errorMessage: "Web authentication failed.", errorCode: ""))
+                })
+                
+                // Initiate the action handler
+                let actionHandler = CustomerActionHandler(handler: handler, processOutWebView: poWebView, with: with)
+                
+                // Start the action handling
+                actionHandler.handleCustomerAction(customerAction: customerAction, completion: { (newSource) in
+                    // Successful, new source available to continue the flow
+                    makeCardPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
+                })
             })
         } catch {
             handler.onError(error: ProcessOutException.GenericError(error: error))
@@ -359,23 +345,53 @@ public class ProcessOut {
                     return
                 }
                 
-                do {
-                    let result = try JSONDecoder().decode(AuthorizationResult.self, from: data!)
-                    if let customerAction = result.customerAction {
-                        let actionHandler = CustomerActionHandler(handler: handler, with: with)
-                        actionHandler.handleCustomerAction(customerAction: customerAction, completion: { (newSource) in
-                            makeCardToken(source: newSource, customerId: customerId, tokenId: tokenId, handler: handler, with: with)
-                        })
-                    } else {
-                        handler.onSuccess(invoiceId: tokenId)
-                    }
-                } catch {
+                // Try to decode the auth result
+                guard let result = try? JSONDecoder().decode(AuthorizationResult.self, from: data!) else {
                     handler.onError(error: ProcessOutException.InternalError)
+                    return
                 }
+                
+                guard let customerAction = result.customerAction else {
+                    // Card token verified
+                    handler.onSuccess(invoiceId: tokenId)
+                    return
+                }
+                
+                // Instantiate the webView
+                let poWebView = CardTokenWebView(frame: with.view.frame, onResult: { (token) in
+                    // Web authentication completed
+                    makeCardToken(source: token, customerId: customerId, tokenId: tokenId, handler: handler, with: with)
+                }, onAuthenticationError: {() in
+                    // Error while authenticating
+                    handler.onError(error: ProcessOutException.BadRequest(errorMessage: "Web authentication failed.", errorCode: ""))
+                })
+                
+                // Instantiate the customer action handler
+                let actionHandler = CustomerActionHandler(handler: handler, processOutWebView: poWebView, with: with)
+                
+                // Start the action handling flow
+                actionHandler.handleCustomerAction(customerAction: customerAction, completion: { (newSource) in
+                    // Successful, new source available to continue the flow
+                    makeCardToken(source: newSource, customerId: customerId, tokenId: tokenId, handler: handler, with: with)
+                })
+                
             }
         } catch {
             handler.onError(error: ProcessOutException.InternalError)
         }
+    }
+    
+    
+    /// Handles returns with deep-links for APM authorizations
+    ///
+    /// - Parameter url: Deeplink opened
+    /// - Returns: A gateway token string if available, nil if not a ProcessOut URL or not available
+    public static func handleURLCallback(url: URL) -> String? {
+        guard let host = url.host, host == "processout.return", let parameters = url.queryParameters else {
+            return nil
+        }
+        
+        return parameters["token"]
     }
     
     /// Creates a test 3DS2 handler that lets you integrate and test the 3DS2 flow seamlessly. Only use this while using sandbox API keys
@@ -384,17 +400,6 @@ public class ProcessOut {
     /// - Returns: Returns a sandbox ready ThreeDS2Handler
     public static func createThreeDSTestHandler(viewController: UIViewController, completion: @escaping (String?, ProcessOutException?) -> Void) -> ThreeDSHandler {
         return ThreeDSTestHandler(controller: viewController, completion: completion)
-    }
-    
-    private static func handleAuthorizationRequest(invoiceId: String, source: String, handler: ThreeDSHandler, result: AuthorizationResult, with: UIViewController) {
-        if let customerAction = result.customerAction {
-            let actionHandler = CustomerActionHandler(handler: handler, with: with)
-            actionHandler.handleCustomerAction(customerAction: customerAction) { (newSource) in
-                makeCardPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
-            }
-        } else {
-            handler.onSuccess(invoiceId: invoiceId)
-        }
     }
 
     public static func continueThreeDSVerification(invoiceId: String, token: String, completion: @escaping (String?, ProcessOutException?) -> Void) {
