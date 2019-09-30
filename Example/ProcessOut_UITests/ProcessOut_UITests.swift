@@ -7,14 +7,13 @@
 //
 
 import XCTest
-import Pods_ProcessOut_Example_ProcessOut_UITests
 import ProcessOut
 import Alamofire
 
 class ProcessOutUITests: XCTestCase {
 
-    var projectId = "test-proj_gAO1Uu0ysZJvDuUpOGPkUBeE3pGalk3x"
-    var projectKey = "key_sandbox_mah31RDFqcDxmaS7MvhDbJfDJvjtsFTB"
+    var projectId = "test-proj_dHvuowrjviYWm7ZX0hXlb7X2yaxdgo06"
+    var projectKey = "key_test_kRdQo3Jm7ybpDqflvbC0T0Mc7UDN1g8t"
     
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -118,7 +117,7 @@ class ProcessOutUITests: XCTestCase {
                 }
                 
                 // Create the customer token
-                self.createCustomerToken(customerId: customerId!, cardId: token!, completion: { (customerTokenId, error) in
+                self.createCustomerToken(customerId: customerId!, cardId: "", completion: { (customerTokenId, error) in
                     
                     guard error == nil else {
                         print(error!)
@@ -126,7 +125,7 @@ class ProcessOutUITests: XCTestCase {
                         return
                     }
                     
-                    ProcessOut.makeCardToken(cardId: token!, customerId: customerId!, tokenId: customerTokenId!, handler: ProcessOut.createThreeDSTestHandler(viewController: view, completion: { (invoiceId, error) in
+                    ProcessOut.makeCardToken(source: token!, customerId: customerId!, tokenId: customerTokenId!, handler: ProcessOut.createThreeDSTestHandler(viewController: view, completion: { (invoiceId, error) in
                         
                         guard error == nil else {
                             print(error!)
@@ -134,6 +133,7 @@ class ProcessOutUITests: XCTestCase {
                             return
                         }
                         
+                        print(invoiceId)
                         XCTAssertNotNil(invoiceId)
                         
                         expectation.fulfill()
@@ -142,7 +142,7 @@ class ProcessOutUITests: XCTestCase {
             })
         })
         
-        wait(for: [expectation], timeout: 15.0)
+        wait(for: [expectation], timeout: 150.0)
     }
     
     
@@ -154,7 +154,7 @@ class ProcessOutUITests: XCTestCase {
                 var headers: HTTPHeaders = [:]
                 
                 headers[authorizationHeader.key] = authorizationHeader.value
-                Alamofire.request("https://api.processout.com/invoices", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON(completionHandler: {(response) -> Void in
+                Alamofire.request("https://api.processout.ninja/invoices", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON(completionHandler: {(response) -> Void in
                     switch response.result {
                     case .success(let data):
                         guard let j = data as? [String: AnyObject] else {
@@ -187,7 +187,7 @@ class ProcessOutUITests: XCTestCase {
             let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String: Any]
             var headers: HTTPHeaders = [:]
             headers[authorizationHeader.key] = authorizationHeader.value
-            Alamofire.request("https://api.processout.com/customers", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON { (response) in
+            Alamofire.request("https://api.processout.ninja/customers", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON { (response) in
                 switch response.result {
                 case .success(let data):
                     guard let j = data as? [String: AnyObject] else {
@@ -219,7 +219,7 @@ class ProcessOutUITests: XCTestCase {
             let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String: AnyObject]
             var headers: HTTPHeaders = [:]
             headers[authorizationHeader.key] = authorizationHeader.value
-            Alamofire.request("https://api.processout.com/customers/" + customerId + "/tokens", method: .post, parameters: json, encoding :JSONEncoding.default, headers: headers).responseJSON {(response) in
+            Alamofire.request("https://api.processout.ninja/customers/" + customerId + "/tokens", method: .post, parameters: json, encoding :JSONEncoding.default, headers: headers).responseJSON {(response) in
                 switch response.result {
                 case .success(let data):
                     guard let j = data as? [String: AnyObject] else {
