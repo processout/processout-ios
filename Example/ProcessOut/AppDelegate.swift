@@ -23,28 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // This method handles opening native URLs (e.g., "yourapp://")
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        if let processoutResult = ProcessOut.handleURLCallback(url: url) {
-            if processoutResult.success {
-                switch processoutResult.type {
-                case .APMAuthorization:
-                   let token = processoutResult.value
-                    // You can now send this token to your backend to complete the charge
-                    break
-                case .ThreeDSResult:
-                    let invoiceId = processoutResult.value
-                    // Send the invoice ID to your backend to complete the charge
-                case .ThreeDSFallbackVerification:
-                    ProcessOut.continueThreeDSVerification(invoiceId: processoutResult.invoiceId, token: processoutResult.value) { (invoiceId, error) in
-                        // Send the invoice to your backend to complete the charge
-                    }
-                }
-            } else {
-                // Authorization failed
-            }
-        } else {
-            // This was not a processout url – do whatever url handling your app
-            // normally does, if any.
-            return false
+        if let token = ProcessOut.handleURLCallback(url: url) {
+            print(token)
         }
         return false
     }
