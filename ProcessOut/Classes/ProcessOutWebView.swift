@@ -23,7 +23,7 @@ public class ProcessOutWebView: WKWebView, WKNavigationDelegate {
         self.onResult = onResult
         self.onAuthenticationError = onAuthenticationError
         super.init(frame: frame, configuration: config)
-        self.customUserAgent = "ProcessOut iOS-Webview/v2.9.0"
+        self.customUserAgent = "ProcessOut iOS-Webview/" + ProcessOut.ApiVersion
         self.navigationDelegate = self
     }
     

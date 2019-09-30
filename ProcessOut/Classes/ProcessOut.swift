@@ -51,8 +51,9 @@ public class ProcessOut {
         }
     }
 
-    private static let ApiUrl: String = "https://api.processout.com"
-    internal static let CheckoutUrl: String = "https://checkout.processout.com"
+    static let ApiVersion: String = "v2.9.0"
+    private static let ApiUrl: String = "https://api.processout.ninja"
+    internal static let CheckoutUrl: String = "https://checkout.processout.ninja"
     internal static var ProjectId: String?
     internal static var UrlScheme: String?
     internal static let threeDS2ChallengeSuccess: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ==";
@@ -443,6 +444,7 @@ public class ProcessOut {
             request.httpMethod = method.rawValue
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue(authorizationHeader.value, forHTTPHeaderField: authorizationHeader.key)
+            request.setValue("ProcessOut iOS-Bindings/" + ApiVersion, forHTTPHeaderField: "User-Agent")
             request.setValue(UUID().uuidString, forHTTPHeaderField: "Idempotency-Key")
             request.timeoutInterval = 15
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
