@@ -248,20 +248,24 @@ public class ProcessOut {
     public static func listAlternativeMethods(completion: @escaping ([AlternativeGateway]?, ProcessOutException?) -> Void) {
         HttpRequest(route: "/gateway-configurations?filter=alternative-payment-methods&expand_merchant_accounts=true", method: .get, parameters: [:]) { (gateways
             , e) in
-            if gateways != nil {
-                do {
-                    let result = try JSONDecoder().decode(AlternativeGatewaysResult.self, from: gateways!)
-                    if let gConfs = result.gatewayConfigurations {
-                        completion(gConfs, nil)
-                    } else {
-                        completion(nil, ProcessOutException.InternalError)
-                    }
-                } catch {
-                    completion(nil, ProcessOutException.GenericError(error: error))
-                }
-            } else {
+            guard gateways != nil else {
                 completion(nil, e)
+                return
             }
+            
+            var result: AlternativeGatewaysResult
+            do {
+                result = try JSONDecoder().decode(AlternativeGatewaysResult.self, from: gateways!)
+            } catch {
+                completion(nil, ProcessOutException.GenericError(error: error))
+                return
+            }
+            
+            if let gConfs = result.gatewayConfigurations {
+                completion(gConfs, nil)
+                return
+            }
+            completion(nil, ProcessOutException.InternalError)
         }
     }
     
