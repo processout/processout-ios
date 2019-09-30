@@ -98,28 +98,31 @@ class CustomerActionHandler {
     }
     
     private func performFingerprint(customerAction: CustomerAction, handler: ThreeDSHandler, completion: @escaping (String?, ProcessOutException?) -> Void) {
+        let decodedData = Data(base64Encoded: customerAction.value)!
+        var directoryServerData: DirectoryServerData
         do {
-            let decodedData = Data(base64Encoded: customerAction.value)!
-            let directoryServerData = try JSONDecoder().decode(DirectoryServerData.self, from: decodedData)
-            handler.doFingerprint(directoryServerData: directoryServerData) { (response) in
-                do {
-                    if let body = String(data: try JSONEncoder().encode(response), encoding: .utf8) {
-                        let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: body)
-                        if let gatewayToken = miscGatewayRequest.generateToken() {
-                            completion(gatewayToken, nil)
-                        } else {
-                            completion(nil, ProcessOutException.InternalError)
-                        }
-                    } else {
-                        completion(nil, ProcessOutException.InternalError)
-                    }
-                } catch {
-                    completion(nil, ProcessOutException.InternalError)
-                }
-                
-            }
+            directoryServerData = try JSONDecoder().decode(DirectoryServerData.self, from: decodedData)
         } catch {
             completion(nil, ProcessOutException.InternalError)
+            return
+        }
+        
+        handler.doFingerprint(directoryServerData: directoryServerData) { (response) in
+            do {
+                guard let body = String(data: try JSONEncoder().encode(response), encoding: .utf8) else {
+                    completion(nil, ProcessOutException.InternalError)
+                    return
+                }
+                
+                let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: body)
+                if let gatewayToken = miscGatewayRequest.generateToken() {
+                    completion(gatewayToken, nil)
+                } else {
+                    completion(nil, ProcessOutException.InternalError)
+                }
+            } catch {
+                completion(nil, ProcessOutException.InternalError)
+            }
         }
     }
     
