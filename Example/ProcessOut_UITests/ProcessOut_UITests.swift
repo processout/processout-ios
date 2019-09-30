@@ -12,8 +12,8 @@ import Alamofire
 
 class ProcessOutUITests: XCTestCase {
 
-    var projectId = "test-proj_dHvuowrjviYWm7ZX0hXlb7X2yaxdgo06"
-    var projectKey = "key_test_kRdQo3Jm7ybpDqflvbC0T0Mc7UDN1g8t"
+    var projectId = "test-proj_gAO1Uu0ysZJvDuUpOGPkUBeE3pGalk3x"
+    var projectKey = "key_sandbox_mah31RDFqcDxmaS7MvhDbJfDJvjtsFTB"
     
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
