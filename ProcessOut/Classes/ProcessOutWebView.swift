@@ -8,7 +8,7 @@
 import Foundation
 import WebKit
 
-public class ProcessOutWebView: WKWebView, WKNavigationDelegate {
+public class ProcessOutWebView: WKWebView, WKNavigationDelegate, WKUIDelegate {
     private let REDIRECT_URL_PATTERN = "https:\\/\\/checkout\\.processout\\.(ninja|com)\\/helpers\\/mobile-processout-webview-landing.*"
     internal var onResult: (_ token: String) -> Void
     internal var onAuthenticationError: () -> Void
@@ -25,6 +25,7 @@ public class ProcessOutWebView: WKWebView, WKNavigationDelegate {
         super.init(frame: frame, configuration: config)
         self.customUserAgent = "ProcessOut iOS-Webview/" + ProcessOut.ApiVersion
         self.navigationDelegate = self
+        self.uiDelegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -43,6 +44,12 @@ public class ProcessOutWebView: WKWebView, WKNavigationDelegate {
         if url.absoluteString.range(of: REDIRECT_URL_PATTERN, options: .regularExpression, range: nil, locale: nil) != nil {
          self.onRedirect(url: url)
         }
+    }
+    
+    public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures)-> WKWebView? {
+        // Add support for popups/new tabs
+        webView.load(navigationAction.request)
+        return nil
     }
 }
 

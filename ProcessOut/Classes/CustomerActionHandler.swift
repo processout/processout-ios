@@ -76,58 +76,23 @@ class CustomerActionHandler {
                 handler.onError(error: ProcessOutException.InternalError)
                 return
             }
+            
             // Prepare the fingerprint hiddenWebview
-            var webView: WKWebView!
-            let preferences = WKPreferences()
-            preferences.javaScriptEnabled = true
-            let configuration = WKWebViewConfiguration()
-            // Check if the device supports custom URL scheme handling for WebViews
-            if #available(iOS 11.0, *), let appURLScheme = ProcessOut.UrlScheme {
-                // Setup the fingerprint timeout handler
-                let timeOutHandler = DispatchWorkItem {
-                    // Remove the webview
-                    webView.removeFromSuperview()
-                    webView = nil
-                    // Fallback to default fingerprint values
-                    let fallback = self.generateFallbackFingerprintToken(URL: customerAction.value)
-                    guard fallback.error == nil else {
-                        self.handler.onError(error: fallback.error!)
-                        return
-                    }
-                    
-                    completion(fallback.fallbackToken!)
-                }
-                configuration.preferences = preferences
-                // Setup the custom URL scheme handler to detect redirects within the hidden webview
-                configuration.setURLSchemeHandler(FingerPrintWebViewSchemeHandler(completion: {(invoiceId, token, error) in
-                    // Cancel the timeout as we catched the redirect
-                    timeOutHandler.cancel()
-                    if error != nil {
-                        self.handler.onError(error: error!)
-                    } else {
-                        // Fingerprint token successfully received, we continue the authorization flow
-                        completion(token!)
-                    }
-                }), forURLScheme: appURLScheme)
-                // Add the webview to the app view
-                webView = WKWebView(frame: with.view.frame, configuration: configuration)
-                webView.load(URLRequest(url: url))
-                webView.isHidden = true
-                with.view.addSubview(webView)
-                
-                // Start the timeout handler with a 10s timeout
-                DispatchQueue.main.asyncAfter(deadline: .now() + 10.0, execute: timeOutHandler)
-            } else {
-                // Fallback on earlier versions
-                let fallback = self.generateFallbackFingerprintToken(URL: customerAction.value)
-                guard fallback.error == nil else {
-                    handler.onError(error: fallback.error!)
-                    return
-                }
-                
-                completion(fallback.fallbackToken!)
+            let fingerprintWebView = FingerprintWebView(customerAction: customerAction, frame: with.view.frame, onResult: { (newSource) in
+                completion(newSource)
+            }) {
+                self.handler.onError(error: ProcessOutException.BadRequest(errorMessage: "Web authentication failed", errorCode: ""))
             }
             
+            // Loading the url
+            let request = URLRequest(url: url)
+            guard let _ = fingerprintWebView.load(request) else {
+                handler.onError(error: ProcessOutException.InternalError)
+                return
+            }
+            
+            // We force the webView display
+            with.view.addSubview(fingerprintWebView)
             break
         }
     }
@@ -172,16 +137,5 @@ class CustomerActionHandler {
             completion(false, ProcessOutException.InternalError)
         }
         
-    }
-    
-    private func generateFallbackFingerprintToken(URL: String) -> (fallbackToken: String?, error: ProcessOutException?) {
-        let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: "{\"threeDS2FingerprintTimeout\":true}")
-        miscGatewayRequest.headers = ["Content-Type": "application/json"]
-        miscGatewayRequest.url = URL
-        if let gatewayToken = miscGatewayRequest.generateToken() {
-            return (gatewayToken, nil)
-        } else {
-            return (nil, ProcessOutException.InternalError)
-        }
     }
 }

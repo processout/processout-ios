@@ -52,10 +52,9 @@ public class ProcessOut {
     }
 
     static let ApiVersion: String = "v2.9.0"
-    private static let ApiUrl: String = "https://api.processout.ninja"
-    internal static let CheckoutUrl: String = "https://checkout.processout.ninja"
+    private static let ApiUrl: String = "https://api.processout.com"
+    internal static let CheckoutUrl: String = "https://checkout.processout.com"
     internal static var ProjectId: String?
-    internal static var UrlScheme: String?
     internal static let threeDS2ChallengeSuccess: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ==";
     internal static let threeDS2ChallengeError: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ==";
     internal static let sessionManager = SessionManager()
@@ -63,11 +62,6 @@ public class ProcessOut {
 
     public static func Setup(projectId: String) {
         ProcessOut.ProjectId = projectId
-    }
-    
-    public static func Setup(projectId: String, urlScheme: String) {
-        ProcessOut.ProjectId = projectId
-        ProcessOut.UrlScheme = urlScheme
     }
     
     /// Tokenizes a card with metadata
