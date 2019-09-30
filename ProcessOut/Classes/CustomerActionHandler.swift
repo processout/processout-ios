@@ -14,15 +14,23 @@ class CustomerActionHandler {
     
     var handler: ThreeDSHandler
     var with: UIViewController
+    var processOutWebView: ProcessOutWebView
     
-    public init(handler: ThreeDSHandler, with: UIViewController) {
+    public init(handler: ThreeDSHandler, processOutWebView: ProcessOutWebView, with: UIViewController) {
         self.handler = handler
         self.with = with
+        self.processOutWebView = processOutWebView
     }
     
     
+    /// Handle a customer action request for an authorization
+    ///
+    /// - Parameters:
+    ///   - customerAction: the customerAction returned by the auth request
+    ///   - completion: completion callback
     public func handleCustomerAction(customerAction: CustomerAction, completion: @escaping (String) -> Void) {
         switch customerAction.type{
+            // 3DS2 fingerprint request
         case .fingerPrintMobile:
             performFingerprint(customerAction: customerAction, handler: handler, completion: { (encodedData, error) in
                 if encodedData != nil {
@@ -31,6 +39,7 @@ class CustomerActionHandler {
                     self.handler.onError(error: error!)
                 }
             })
+            // 3DS2 challenge request
         case .challengeMobile:
             performChallenge(customerAction: customerAction, handler: handler) { (success, error) in
                 if (success) {
@@ -39,20 +48,24 @@ class CustomerActionHandler {
                     completion(ProcessOut.threeDS2ChallengeError)
                 }
             }
-            
+            // 3DS1 web fallback
         case .url, .redirect:
-            // need to open a new web tab
             guard let url = URL(string: customerAction.value) else {
                 // Invalid URL
                 handler.onError(error: ProcessOutException.InternalError)
                 return
             }
-            
-            if #available(iOS 10.0, *) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            } else {
-                UIApplication.shared.openURL(url)
+
+            // Loading the url
+            let request = URLRequest(url: url)
+            guard let _ = processOutWebView.load(request) else {
+                handler.onError(error: ProcessOutException.InternalError)
+                return
             }
+            
+            // Displaying the webview
+            handler.doPresentWebView(webView: processOutWebView)
+            
             break
             
         case .fingerprint:
