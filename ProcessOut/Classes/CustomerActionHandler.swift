@@ -35,18 +35,18 @@ class CustomerActionHandler {
             performFingerprint(customerAction: customerAction, handler: handler, completion: { (encodedData, error) in
                 if encodedData != nil {
                     completion(encodedData!)
-                } else {
-                    self.handler.onError(error: error!)
+                    return
                 }
+                self.handler.onError(error: error!)
             })
             // 3DS2 challenge request
         case .challengeMobile:
             performChallenge(customerAction: customerAction, handler: handler) { (success, error) in
-                if (success) {
-                    completion(ProcessOut.threeDS2ChallengeSuccess)
-                } else {
+                guard success else {
                     completion(ProcessOut.threeDS2ChallengeError)
+                    return
                 }
+                completion(ProcessOut.threeDS2ChallengeSuccess)
             }
             // 3DS1 web fallback
         case .url, .redirect:
@@ -115,11 +115,12 @@ class CustomerActionHandler {
                 }
                 
                 let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: body)
-                if let gatewayToken = miscGatewayRequest.generateToken() {
-                    completion(gatewayToken, nil)
-                } else {
+                guard let gatewayToken = miscGatewayRequest.generateToken() else {
                     completion(nil, ProcessOutException.InternalError)
+                    return
                 }
+                
+                completion(gatewayToken, nil)
             } catch {
                 completion(nil, ProcessOutException.InternalError)
             }
@@ -128,13 +129,13 @@ class CustomerActionHandler {
     
     private func performChallenge(customerAction: CustomerAction, handler: ThreeDSHandler, completion: @escaping (Bool, ProcessOutException?) -> Void) {
         do {
-            if let decodedB64Data = Data(base64Encoded: customerAction.value) {
-                let authentificationChallengeData = try JSONDecoder().decode(AuthentificationChallengeData.self, from: decodedB64Data)
-                handler.doChallenge(authentificationData: authentificationChallengeData) { (success) in
-                    completion(success, nil)
-                }
-            } else {
+            guard let decodedB64Data = Data(base64Encoded: customerAction.value) else {
                 completion(false, ProcessOutException.InternalError)
+                return
+            }
+            let authentificationChallengeData = try JSONDecoder().decode(AuthentificationChallengeData.self, from: decodedB64Data)
+            handler.doChallenge(authentificationData: authentificationChallengeData) { (success) in
+                completion(success, nil)
             }
         } catch {
             completion(false, ProcessOutException.InternalError)

@@ -148,31 +148,36 @@ class ProcessOutUITests: XCTestCase {
     
     // HELPERS functions
     func createInvoice(invoice: Invoice, completion: @escaping (String?, Error?) -> Void) {
-        if let body = try? JSONEncoder().encode(invoice), let authorizationHeader = Request.authorizationHeader(user: projectId, password: projectKey) {
-            do {
-                let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
-                var headers: HTTPHeaders = [:]
-                
-                headers[authorizationHeader.key] = authorizationHeader.value
-                Alamofire.request("https://api.processout.ninja/invoices", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON(completionHandler: {(response) -> Void in
-                    switch response.result {
-                    case .success(let data):
-                        guard let j = data as? [String: AnyObject] else {
-                            completion(nil, ProcessOutException.InternalError)
-                            return
-                        }
-                        if let inv = j["invoice"] as? [String: AnyObject], let id = inv["id"] as? String {
-                            completion(id, nil)
-                        } else {
-                            completion(nil, ProcessOutException.InternalError)
-                        }
-                    default:
+        guard let body = try? JSONEncoder().encode(invoice), let authorizationHeader = Request.authorizationHeader(user: projectId, password: projectKey) else {
+            completion(nil, ProcessOutException.InternalError)
+            return
+        }
+        
+        do {
+            let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
+            var headers: HTTPHeaders = [:]
+            
+            headers[authorizationHeader.key] = authorizationHeader.value
+            Alamofire.request("https://api.processout.com/invoices", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON(completionHandler: {(response) -> Void in
+                switch response.result {
+                case .success(let data):
+                    guard let j = data as? [String: AnyObject] else {
                         completion(nil, ProcessOutException.InternalError)
+                        return
                     }
-                })
-            } catch {
-                completion(nil, error)
-            }
+                    
+                    guard let inv = j["invoice"] as? [String: AnyObject], let id = inv["id"] as? String else {
+                        completion(nil, ProcessOutException.InternalError)
+                        return
+                    }
+                    
+                    completion(id, nil)
+                default:
+                    completion(nil, ProcessOutException.InternalError)
+                }
+            })
+        } catch {
+            completion(nil, error)
         }
     }
     
@@ -187,18 +192,18 @@ class ProcessOutUITests: XCTestCase {
             let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String: Any]
             var headers: HTTPHeaders = [:]
             headers[authorizationHeader.key] = authorizationHeader.value
-            Alamofire.request("https://api.processout.ninja/customers", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON { (response) in
+            Alamofire.request("https://api.processout.com/customers", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON { (response) in
                 switch response.result {
                 case .success(let data):
                     guard let j = data as? [String: AnyObject] else {
                         completion(nil, ProcessOutException.InternalError)
                         return
                     }
-                    if let cust = j["customer"] as? [String: AnyObject], let id = cust["id"] as? String {
-                        completion(id, nil)
-                    } else {
+                    guard let cust = j["customer"] as? [String: AnyObject], let id = cust["id"] as? String else {
                         completion(nil, ProcessOutException.InternalError)
+                        return
                     }
+                    completion(id, nil)
                 default:
                     completion(nil, ProcessOutException.InternalError)
                 }
@@ -219,18 +224,18 @@ class ProcessOutUITests: XCTestCase {
             let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String: AnyObject]
             var headers: HTTPHeaders = [:]
             headers[authorizationHeader.key] = authorizationHeader.value
-            Alamofire.request("https://api.processout.ninja/customers/" + customerId + "/tokens", method: .post, parameters: json, encoding :JSONEncoding.default, headers: headers).responseJSON {(response) in
+            Alamofire.request("https://api.processout.com/customers/" + customerId + "/tokens", method: .post, parameters: json, encoding :JSONEncoding.default, headers: headers).responseJSON {(response) in
                 switch response.result {
                 case .success(let data):
                     guard let j = data as? [String: AnyObject] else {
                         completion(nil, ProcessOutException.InternalError)
                         return
                     }
-                    if let cust = j["token"] as? [String: AnyObject], let id = cust["id"] as? String {
-                        completion(id, nil)
-                    } else {
+                    guard let cust = j["token"] as? [String: AnyObject], let id = cust["id"] as? String else {
                         completion(nil, ProcessOutException.InternalError)
+                        return
                     }
+                    completion(id, nil)
                 default:
                     completion(nil, ProcessOutException.InternalError)
                 }

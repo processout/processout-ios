@@ -39,11 +39,12 @@ class FingerprintWebView: ProcessOutWebView {
         let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: "{\"threeDS2FingerprintTimeout\":true}")
         miscGatewayRequest.headers = ["Content-Type": "application/json"]
         miscGatewayRequest.url = URL
-        if let gatewayToken = miscGatewayRequest.generateToken() {
-            return (gatewayToken, nil)
-        } else {
+        
+        guard let gatewayToken = miscGatewayRequest.generateToken() else {
             return (nil, ProcessOutException.InternalError)
         }
+        
+        return (gatewayToken, nil)
     }
     
     override func onRedirect(url: URL) {
