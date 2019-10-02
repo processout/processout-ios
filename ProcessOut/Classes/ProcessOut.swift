@@ -59,6 +59,9 @@ public class ProcessOut {
     internal static let threeDS2ChallengeError: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ==";
     internal static let sessionManager = SessionManager()
     internal static let retryPolicy = RetryPolicy()
+    
+    // Getting the device user agent
+    private static let defaultUserAgent = UIWebView(frame: .zero).stringByEvaluatingJavaScript(from: "navigator.userAgent")
 
     public static func Setup(projectId: String) {
         ProcessOut.ProjectId = projectId
@@ -445,7 +448,12 @@ public class ProcessOut {
             request.httpMethod = method.rawValue
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue(authorizationHeader.value, forHTTPHeaderField: authorizationHeader.key)
-            request.setValue("ProcessOut iOS-Bindings/" + ApiVersion, forHTTPHeaderField: "User-Agent")
+            
+            if defaultUserAgent != nil {
+                request.setValue(ProcessOut.defaultUserAgent! + " ProcessOut iOS-Bindings/" + ApiVersion, forHTTPHeaderField: "User-Agent")
+            } else {
+                request.setValue("ProcessOut iOS-Bindings/" + ApiVersion, forHTTPHeaderField: "User-Agent")
+            }
             request.setValue(UUID().uuidString, forHTTPHeaderField: "Idempotency-Key")
             request.timeoutInterval = 15
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
