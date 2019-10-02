@@ -29,7 +29,7 @@ This token can then be used and stored on your backend to charge customers.
   s.source           = { :git => 'https://github.com/processout/processout-ios.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/processout'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '9.0'
 
   s.source_files = 'ProcessOut/Classes/**/*'
   
