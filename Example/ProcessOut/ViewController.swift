@@ -9,6 +9,7 @@
 import UIKit
 import ProcessOut
 import PassKit
+import WebKit
 
 class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDelegate {
 
@@ -45,55 +46,13 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
             } else {
                 // Use the card token to initiate an authorization/charge
                 if token != nil {
+                    //Initiate a card payment from an invoice generated on your backend
                     ProcessOut.makeCardPayment(invoiceId: "invoice-id", token: token!, handler: ProcessOut.createThreeDSTestHandler(viewController: self, completion: { (invoiceId, error) in
                         // Send the invoice to your backend to complete the charge
+                        print(invoiceId)
+                        print(error)
                     }), with: self)
                 }
-            }
-        })
-    }
-    
-    func testThreeDS2Payment(token: String) {
-        ProcessOut.makeCardPayment(invoiceId: "invoice-id", token: token, handler: ProcessOut.createThreeDSTestHandler(viewController: self, completion: { (invoiceId, error) in
-            if invoiceId != nil {
-                // Authorization successful
-            } else {
-                // Display error
-            }
-        }), with: self)
-    }
-    
-    func testTokenization() {
-        let contact = ProcessOut.Contact(address1: "1 great street", address2: nil, city: "City", state: "State", zip: "10000", countryCode: "US")
-        let card = ProcessOut.Card(cardNumber: "4242424242424242", expMonth: 11, expYear: 19, cvc: nil, name: "Jeremy Lejoux", contact: contact)
-        ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) -> Void in
-            if error != nil {
-                switch error! {
-                case .BadRequest(let message, let code):
-                    // developers, message can help you
-                    print(message, code)
-                    
-                case .MissingProjectId:
-                    print("Check your app delegate file")
-                case .InternalError:
-                    print("An internal error occured")
-                case .NetworkError:
-                    print("Request could not go through")
-                case .GenericError(let error):
-                    print(error)
-                }
-            } else {
-                // send token to your backend to charge the customer
-                print(token!)
-            }
-        })
-        
-        ProcessOut.UpdateCvc(cardId: "a_card_token", newCvc: "123", completion: { (error) in
-            if error != nil {
-                // an error occured
-                print(error!)
-            } else {
-                // card CVC updated
             }
         })
     }
