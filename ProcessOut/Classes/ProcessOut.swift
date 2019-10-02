@@ -108,11 +108,11 @@ public class ProcessOut {
                 if let card = tokenizationResult.card, tokenizationResult.success {
                     completion(card.id, nil)
                 } else {
-                    if let message = tokenizationResult.message, let errorType = tokenizationResult.errorType {
-                        completion(nil, ProcessOutException.BadRequest(errorMessage: message, errorCode: errorType))
-                    } else {
+                    guard let message = tokenizationResult.message, let errorType = tokenizationResult.errorType else {
                         completion(nil, ProcessOutException.InternalError)
+                        return
                     }
+                    completion(nil, ProcessOutException.BadRequest(errorMessage: message, errorCode: errorType))
                 }
             } catch {
                 completion(nil, ProcessOutException.InternalError)
