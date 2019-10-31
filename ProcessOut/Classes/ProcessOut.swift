@@ -248,11 +248,17 @@ public class ProcessOut {
     }
     
     
+    public enum GatewayConfigurationsFilter: String {
+        case All = ""
+        case AlternativePaymentMethods = "alternative-payment-methods"
+        case AlternativePaymentMethodWithTokenization = " alternative-payment-methods-with-tokenization"
+    }
+    
     /// List alternative gateway configurations activated on your account
     ///
     /// - Parameter completion: Completion callback
-    public static func listAlternativeMethods(completion: @escaping ([AlternativeGateway]?, ProcessOutException?) -> Void) {
-        HttpRequest(route: "/gateway-configurations?filter=alternative-payment-methods&expand_merchant_accounts=true", method: .get, parameters: [:]) { (gateways
+    public static func fetchGatewayConfigurations(filter: GatewayConfigurationsFilter, completion: @escaping ([GatewayConfiguration]?, ProcessOutException?) -> Void) {
+        HttpRequest(route: "/gateway-configurations?filter=" + filter.rawValue + "&expand_merchant_accounts=true", method: .get, parameters: [:]) { (gateways
             , e) in
             guard gateways != nil else {
                 completion(nil, e)
@@ -451,7 +457,7 @@ public class ProcessOut {
     ///   - gateway: The alternative payment method configuration
     ///   - customerId: The customer ID
     ///   - tokenId: The token ID generated on your backend with an empty source
-    public static func makeAPMToken(gateway: AlternativeGateway, customerId: String, tokenId: String) {
+    public static func makeAPMToken(gateway: GatewayConfiguration, customerId: String, tokenId: String) {
         // Generate the redirection URL
         let checkout = ProcessOut.ProjectId! + "/" + customerId + "/" + tokenId + "/redirect/" + gateway.id
         if let url = NSURL(string: ProcessOut.CheckoutUrl + "/" + checkout) {

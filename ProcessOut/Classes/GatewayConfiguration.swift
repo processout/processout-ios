@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class AlternativeGateway: Decodable {
+public class GatewayConfiguration: Decodable {
     
     enum CodingKeys: String, CodingKey {
         case id = "id"
@@ -53,7 +53,7 @@ public class AlternativeGateway: Decodable {
 }
 
 class AlternativeGatewaysResult: ApiResponse {
-    var gatewayConfigurations: [AlternativeGateway]?
+    var gatewayConfigurations: [GatewayConfiguration]?
     
     enum CodingKeys: String, CodingKey {
         case gatewayConfigurations = "gateway_configurations"
@@ -61,7 +61,7 @@ class AlternativeGatewaysResult: ApiResponse {
     
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.gatewayConfigurations = try container.decode([AlternativeGateway].self, forKey: .gatewayConfigurations)
+        self.gatewayConfigurations = try container.decode([GatewayConfiguration].self, forKey: .gatewayConfigurations)
         try super.init(from: decoder)
     }
 }
