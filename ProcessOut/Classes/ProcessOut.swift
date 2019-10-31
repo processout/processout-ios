@@ -401,12 +401,61 @@ public class ProcessOut {
         return parameters["token"]
     }
     
+    
+    /// Parses an intent uri. Either for an APM payment return or after an makeAPMToken call
+    ///
+    /// - Parameter url: URI from the deep-link app opening
+    /// - Returns: nil if the URL is not a ProcessOut return URL, an APMTokenReturn object otherwise
+    public static func handleAPMURLCallback(url: URL) -> APMTokenReturn? {
+        // Check for the URL host
+        guard let host = url.host, host == "processout.return" else {
+            return nil
+        }
+        
+        // Retrieve the URL parameters
+        guard let params = url.queryParameters else {
+            return APMTokenReturn(error: ProcessOutException.InternalError)
+        }
+        
+        // Retrieve the token
+        guard let token = params["token"], !token.isEmpty else {
+            return APMTokenReturn(error: ProcessOutException.InternalError)
+        }
+        
+        // Retrieve the customer_id and token_id if available
+        let customerId = params["customer_id"]
+        let tokenId = params["token_id"]
+        
+        // Check if we're on a tokenization return
+        if customerId != nil && !customerId!.isEmpty && tokenId != nil && !tokenId!.isEmpty {
+            return APMTokenReturn(token: token, customerId: customerId!, tokenId: tokenId!)
+        }
+        
+        // Simple APM authorization case
+        return APMTokenReturn(token: token)
+    }
+    
     /// Creates a test 3DS2 handler that lets you integrate and test the 3DS2 flow seamlessly. Only use this while using sandbox API keys
     ///
     /// - Parameter viewController: UIViewController (needed to display a 3DS2 challenge popup)
     /// - Returns: Returns a sandbox ready ThreeDS2Handler
     public static func createThreeDSTestHandler(viewController: UIViewController, completion: @escaping (String?, ProcessOutException?) -> Void) -> ThreeDSHandler {
         return ThreeDSTestHandler(controller: viewController, completion: completion)
+    }
+    
+    
+    /// Generates an alternative payment method token
+    ///
+    /// - Parameters:
+    ///   - gateway: The alternative payment method configuration
+    ///   - customerId: The customer ID
+    ///   - tokenId: The token ID generated on your backend with an empty source
+    public static func makeAPMToken(gateway: AlternativeGateway, customerId: String, tokenId: String) {
+        // Generate the redirection URL
+        let checkout = ProcessOut.ProjectId! + "/" + customerId + "/" + tokenId + "/redirect/" + gateway.id
+        if let url = NSURL(string: ProcessOut.CheckoutUrl + "/" + checkout) {
+            UIApplication.shared.openURL(url as URL)
+        }
     }
     
     private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters, completion: @escaping (Data?, ProcessOutException?) -> Void) {
