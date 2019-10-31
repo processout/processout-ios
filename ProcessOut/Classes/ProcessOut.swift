@@ -408,26 +408,6 @@ public class ProcessOut {
     public static func createThreeDSTestHandler(viewController: UIViewController, completion: @escaping (String?, ProcessOutException?) -> Void) -> ThreeDSHandler {
         return ThreeDSTestHandler(controller: viewController, completion: completion)
     }
-
-    public static func continueThreeDSVerification(invoiceId: String, token: String, completion: @escaping (String?, ProcessOutException?) -> Void) {
-        let authRequest = AuthorizationRequest(source: token)
-        if let body = try? JSONEncoder().encode(authRequest) {
-            do {
-                let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
-                HttpRequest(route: "/invoices/" + invoiceId + "/authorize", method: .post, parameters: json, completion: {(data, error) -> Void in
-                    if data != nil {
-                        completion(invoiceId, nil)
-                    } else {
-                        completion(nil, error!)
-                    }
-                })
-            } catch {
-                completion(nil, ProcessOutException.GenericError(error: error))
-            }
-        } else {
-            completion(nil, ProcessOutException.InternalError)
-        }
-    }
     
     private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters, completion: @escaping (Data?, ProcessOutException?) -> Void) {
         guard let projectId = ProjectId, let authorizationHeader = Request.authorizationHeader(user: projectId, password: "") else {
