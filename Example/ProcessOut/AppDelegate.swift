@@ -23,8 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // This method handles opening native URLs (e.g., "yourapp://")
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        if let token = ProcessOut.handleURLCallback(url: url) {
-            print(token)
+        if let apmReturn = ProcessOut.handleAPMURLCallback(url: url) {
+            print(apmReturn.returnType)
         }
         return false
     }
