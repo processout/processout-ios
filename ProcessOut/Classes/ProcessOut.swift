@@ -265,9 +265,9 @@ public class ProcessOut {
                 return
             }
             
-            var result: AlternativeGatewaysResult
+            var result: GatewayConfigurationResult
             do {
-                result = try JSONDecoder().decode(AlternativeGatewaysResult.self, from: gateways!)
+                result = try JSONDecoder().decode(GatewayConfigurationResult.self, from: gateways!)
             } catch {
                 completion(nil, ProcessOutException.GenericError(error: error))
                 return
@@ -460,6 +460,19 @@ public class ProcessOut {
     public static func makeAPMToken(gateway: GatewayConfiguration, customerId: String, tokenId: String) {
         // Generate the redirection URL
         let checkout = ProcessOut.ProjectId! + "/" + customerId + "/" + tokenId + "/redirect/" + gateway.id
+        if let url = NSURL(string: ProcessOut.CheckoutUrl + "/" + checkout) {
+            UIApplication.shared.openURL(url as URL)
+        }
+    }
+    
+    /// Initiate an alternative payment method payment
+    ///
+    /// - Parameters:
+    ///   - gateway: Gateway to use (previously fetched)
+    ///   - invoiceId: Invoice ID generated on your backend
+    public static func makeAPMPayment(gateway: GatewayConfiguration, invoiceId: String) {
+        // Generate the redirection URL
+        let checkout = ProcessOut.ProjectId! + "/" + invoiceId + "/redirect/" + gateway.id
         if let url = NSURL(string: ProcessOut.CheckoutUrl + "/" + checkout) {
             UIApplication.shared.openURL(url as URL)
         }
