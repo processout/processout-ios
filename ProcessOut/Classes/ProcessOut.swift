@@ -393,6 +393,7 @@ public class ProcessOut {
     ///
     /// - Parameter url: Deeplink opened
     /// - Returns: A gateway token string if available, nil if not a ProcessOut URL or not available
+    @available(*, deprecated, message: "Use handleAPMURLCallback instead.")
     public static func handleURLCallback(url: URL) -> String? {
         guard let host = url.host, host == "processout.return", let parameters = url.queryParameters else {
             return nil
