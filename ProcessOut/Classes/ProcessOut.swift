@@ -478,7 +478,7 @@ public class ProcessOut {
         let checkout = ProcessOut.ProjectId! + "/" + invoiceId + "/redirect/" + gateway.id
         let additionalDataString = generateAdditionalDataString(additionalData: additionalData)
         let urlString = ProcessOut.CheckoutUrl + "/" + checkout + additionalDataString
-        print(urlString)
+        
         if let url = NSURL(string: urlString) {
             UIApplication.shared.openURL(url as URL)
         }
