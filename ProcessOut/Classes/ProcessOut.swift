@@ -493,7 +493,11 @@ public class ProcessOut {
         // Transform the map into an array of additional_data[key]=value
         let addData = additionalData.map({ (data) -> String in
             let (key, value) = data
-            return "additional_data[" + key + "]" + "=" + value
+            
+            // Try to encode value
+            let encodedValue = value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+            
+            return "additional_data[" + key + "]" + "=" + (encodedValue ?? "")
         })
         
         // The array is empty we return an empty string
