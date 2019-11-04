@@ -51,7 +51,7 @@ public class ProcessOut {
         }
     }
 
-    static let ApiVersion: String = "v2.9.0"
+    static let ApiVersion: String = "v2.10.0"
     private static let ApiUrl: String = "https://api.processout.com"
     internal static let CheckoutUrl: String = "https://checkout.processout.com"
     internal static var ProjectId: String?
@@ -248,20 +248,26 @@ public class ProcessOut {
     }
     
     
+    public enum GatewayConfigurationsFilter: String {
+        case All = ""
+        case AlternativePaymentMethods = "alternative-payment-methods"
+        case AlternativePaymentMethodWithTokenization = " alternative-payment-methods-with-tokenization"
+    }
+    
     /// List alternative gateway configurations activated on your account
     ///
     /// - Parameter completion: Completion callback
-    public static func listAlternativeMethods(completion: @escaping ([AlternativeGateway]?, ProcessOutException?) -> Void) {
-        HttpRequest(route: "/gateway-configurations?filter=alternative-payment-methods&expand_merchant_accounts=true", method: .get, parameters: [:]) { (gateways
+    public static func fetchGatewayConfigurations(filter: GatewayConfigurationsFilter, completion: @escaping ([GatewayConfiguration]?, ProcessOutException?) -> Void) {
+        HttpRequest(route: "/gateway-configurations?filter=" + filter.rawValue + "&expand_merchant_accounts=true", method: .get, parameters: [:]) { (gateways
             , e) in
             guard gateways != nil else {
                 completion(nil, e)
                 return
             }
             
-            var result: AlternativeGatewaysResult
+            var result: GatewayConfigurationResult
             do {
-                result = try JSONDecoder().decode(AlternativeGatewaysResult.self, from: gateways!)
+                result = try JSONDecoder().decode(GatewayConfigurationResult.self, from: gateways!)
             } catch {
                 completion(nil, ProcessOutException.GenericError(error: error))
                 return
@@ -393,12 +399,47 @@ public class ProcessOut {
     ///
     /// - Parameter url: Deeplink opened
     /// - Returns: A gateway token string if available, nil if not a ProcessOut URL or not available
+    @available(*, deprecated, message: "Use handleAPMURLCallback instead.")
     public static func handleURLCallback(url: URL) -> String? {
         guard let host = url.host, host == "processout.return", let parameters = url.queryParameters else {
             return nil
         }
         
         return parameters["token"]
+    }
+    
+    
+    /// Parses an intent uri. Either for an APM payment return or after an makeAPMToken call
+    ///
+    /// - Parameter url: URI from the deep-link app opening
+    /// - Returns: nil if the URL is not a ProcessOut return URL, an APMTokenReturn object otherwise
+    public static func handleAPMURLCallback(url: URL) -> APMTokenReturn? {
+        // Check for the URL host
+        guard let host = url.host, host == "processout.return" else {
+            return nil
+        }
+        
+        // Retrieve the URL parameters
+        guard let params = url.queryParameters else {
+            return APMTokenReturn(error: ProcessOutException.InternalError)
+        }
+        
+        // Retrieve the token
+        guard let token = params["token"], !token.isEmpty else {
+            return APMTokenReturn(error: ProcessOutException.InternalError)
+        }
+        
+        // Retrieve the customer_id and token_id if available
+        let customerId = params["customer_id"]
+        let tokenId = params["token_id"]
+        
+        // Check if we're on a tokenization return
+        if customerId != nil && !customerId!.isEmpty && tokenId != nil && !tokenId!.isEmpty {
+            return APMTokenReturn(token: token, customerId: customerId!, tokenId: tokenId!)
+        }
+        
+        // Simple APM authorization case
+        return APMTokenReturn(token: token)
     }
     
     /// Creates a test 3DS2 handler that lets you integrate and test the 3DS2 flow seamlessly. Only use this while using sandbox API keys
@@ -408,24 +449,32 @@ public class ProcessOut {
     public static func createThreeDSTestHandler(viewController: UIViewController, completion: @escaping (String?, ProcessOutException?) -> Void) -> ThreeDSHandler {
         return ThreeDSTestHandler(controller: viewController, completion: completion)
     }
-
-    public static func continueThreeDSVerification(invoiceId: String, token: String, completion: @escaping (String?, ProcessOutException?) -> Void) {
-        let authRequest = AuthorizationRequest(source: token)
-        if let body = try? JSONEncoder().encode(authRequest) {
-            do {
-                let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
-                HttpRequest(route: "/invoices/" + invoiceId + "/authorize", method: .post, parameters: json, completion: {(data, error) -> Void in
-                    if data != nil {
-                        completion(invoiceId, nil)
-                    } else {
-                        completion(nil, error!)
-                    }
-                })
-            } catch {
-                completion(nil, ProcessOutException.GenericError(error: error))
-            }
-        } else {
-            completion(nil, ProcessOutException.InternalError)
+    
+    
+    /// Generates an alternative payment method token
+    ///
+    /// - Parameters:
+    ///   - gateway: The alternative payment method configuration
+    ///   - customerId: The customer ID
+    ///   - tokenId: The token ID generated on your backend with an empty source
+    public static func makeAPMToken(gateway: GatewayConfiguration, customerId: String, tokenId: String) {
+        // Generate the redirection URL
+        let checkout = ProcessOut.ProjectId! + "/" + customerId + "/" + tokenId + "/redirect/" + gateway.id
+        if let url = NSURL(string: ProcessOut.CheckoutUrl + "/" + checkout) {
+            UIApplication.shared.openURL(url as URL)
+        }
+    }
+    
+    /// Initiate an alternative payment method payment
+    ///
+    /// - Parameters:
+    ///   - gateway: Gateway to use (previously fetched)
+    ///   - invoiceId: Invoice ID generated on your backend
+    public static func makeAPMPayment(gateway: GatewayConfiguration, invoiceId: String) {
+        // Generate the redirection URL
+        let checkout = ProcessOut.ProjectId! + "/" + invoiceId + "/redirect/" + gateway.id
+        if let url = NSURL(string: ProcessOut.CheckoutUrl + "/" + checkout) {
+            UIApplication.shared.openURL(url as URL)
         }
     }
     

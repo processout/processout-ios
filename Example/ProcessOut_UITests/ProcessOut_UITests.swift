@@ -84,12 +84,11 @@ class ProcessOutUITests: XCTestCase {
     func testApmListing() {
         let expectation = XCTestExpectation(description: "List available APM")
         
-        ProcessOut.listAlternativeMethods(completion: {(gateways, error) in
-            
+        ProcessOut.fetchGatewayConfigurations(filter: .AlternativePaymentMethods) { (gateways, error) in
             XCTAssertNotNil(gateways)
             
             expectation.fulfill()
-        })
+        }
         
         wait(for: [expectation], timeout: 10.0)
     }
