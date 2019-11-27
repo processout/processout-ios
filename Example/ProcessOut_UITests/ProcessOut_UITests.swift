@@ -12,6 +12,7 @@ import Alamofire
 
 class ProcessOutUITests: XCTestCase {
 
+    // These are tests credentials from a tests project on ProcessOut production env
     var projectId = "test-proj_gAO1Uu0ysZJvDuUpOGPkUBeE3pGalk3x"
     var projectKey = "key_sandbox_mah31RDFqcDxmaS7MvhDbJfDJvjtsFTB"
     

@@ -14,6 +14,7 @@ import Alamofire
 
 class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDelegate {
     
+    // These are tests credentials from a tests project on ProcessOut production env
     var projectId = "test-proj_gAO1Uu0ysZJvDuUpOGPkUBeE3pGalk3x"
     var projectKey = "key_sandbox_mah31RDFqcDxmaS7MvhDbJfDJvjtsFTB"
     
@@ -25,6 +26,8 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         statusBar.backgroundColor = UIColor.orange
+        
+        // Retrieve the current test name if tests are running
         guard let testName = UserDefaults.standard.string(forKey: "testName") else {
             return
         }
@@ -32,11 +35,7 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
         self.testNameLabel.text = "Testing: " + testName
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
+    // Pay button clicked
     @IBAction func clicked(_ sender: Any) {
         statusLabel.text = "Requesting payment..."
         statusBar.backgroundColor = UIColor.orange
@@ -44,6 +43,9 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
         self.startPayment()
     }
     
+    /*
+        Some UI helpers
+    */
     func setPaymentAsFailed() {
         self.statusBar.backgroundColor = UIColor.red
         self.statusLabel.text = "PAYMENT FAILED"
@@ -54,12 +56,9 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
         self.statusLabel.text = "Payment successful"
     }
     
-    /**
-    *
-    * TESTS
-    *
+    /*
+        Payment functions
     */
-    
     func startPayment() {
         guard let cardNumber = UserDefaults.standard.string(forKey: "card") else {
             self.setPaymentAsFailed()
