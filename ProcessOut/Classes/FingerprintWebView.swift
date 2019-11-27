@@ -11,7 +11,7 @@ class FingerprintWebView: ProcessOutWebView {
     
     public init(customerAction: CustomerAction, frame: CGRect, onResult: @escaping (String) -> Void, onAuthenticationError: @escaping () -> Void) {
         super.init(frame: frame, onResult: onResult, onAuthenticationError: onAuthenticationError)
-        self.isHidden = true
+        self.isHidden = false
         
         // Setup the fingerprint timeout handler
         let timeOutHandler = DispatchWorkItem {

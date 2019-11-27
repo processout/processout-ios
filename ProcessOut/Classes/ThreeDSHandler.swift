@@ -41,7 +41,7 @@ public protocol ThreeDSHandler {
 public class ThreeDSTestHandler: ThreeDSHandler {
     var controller: UIViewController
     var completion: (String?, ProcessOutException?) -> Void
-    
+    var webView: ProcessOutWebView?
     
     public init(controller: UIViewController, completion: @escaping (String?, ProcessOutException?) -> Void) {
         self.controller = controller
@@ -67,14 +67,21 @@ public class ThreeDSTestHandler: ThreeDSHandler {
     }
     
     public func doPresentWebView(webView: ProcessOutWebView) {
+        self.webView = webView
         controller.view.addSubview(webView)
     }
     
     public func onSuccess(invoiceId: String) {
+        if self.webView != nil {
+            webView!.removeFromSuperview()
+        }
         self.completion(invoiceId, nil)
     }
     
     public func onError(error: ProcessOutException) {
+        if self.webView != nil {
+            webView!.removeFromSuperview()
+        }
         self.completion(nil, error)
     }
 }
