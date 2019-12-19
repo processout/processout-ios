@@ -457,10 +457,13 @@ public class ProcessOut {
     ///   - gateway: The alternative payment method configuration
     ///   - customerId: The customer ID
     ///   - tokenId: The token ID generated on your backend with an empty source
-    public static func makeAPMToken(gateway: GatewayConfiguration, customerId: String, tokenId: String) {
+    public static func makeAPMToken(gateway: GatewayConfiguration, customerId: String, tokenId: String, additionalData: [String: String] = [:]) {
         // Generate the redirection URL
         let checkout = ProcessOut.ProjectId! + "/" + customerId + "/" + tokenId + "/redirect/" + gateway.id
-        if let url = NSURL(string: ProcessOut.CheckoutUrl + "/" + checkout) {
+        let additionalDataString = generateAdditionalDataString(additionalData: additionalData)
+        let urlString = ProcessOut.CheckoutUrl + "/" + checkout + additionalDataString
+        
+        if let url = NSURL(string: urlString) {
             UIApplication.shared.openURL(url as URL)
         }
     }
@@ -470,12 +473,46 @@ public class ProcessOut {
     /// - Parameters:
     ///   - gateway: Gateway to use (previously fetched)
     ///   - invoiceId: Invoice ID generated on your backend
-    public static func makeAPMPayment(gateway: GatewayConfiguration, invoiceId: String) {
+    public static func makeAPMPayment(gateway: GatewayConfiguration, invoiceId: String, additionalData: [String: String] = [:]) {
         // Generate the redirection URL
         let checkout = ProcessOut.ProjectId! + "/" + invoiceId + "/redirect/" + gateway.id
-        if let url = NSURL(string: ProcessOut.CheckoutUrl + "/" + checkout) {
+        let additionalDataString = generateAdditionalDataString(additionalData: additionalData)
+        let urlString = ProcessOut.CheckoutUrl + "/" + checkout + additionalDataString
+        
+        if let url = NSURL(string: urlString) {
             UIApplication.shared.openURL(url as URL)
         }
+    }
+    
+    
+    /// Generates an additionalData query parameter string
+    ///
+    /// - Parameter additionalData: additionalData to send to the APM
+    /// - Returns: a empty string or a string starting with ? followed by the query value
+    private static func generateAdditionalDataString(additionalData: [String: String]) -> String {
+        // Transform the map into an array of additional_data[key]=value
+        let addData = additionalData.map({ (data) -> String in
+            let (key, value) = data
+            
+            // Try to encode value
+            let encodedValue = value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+            
+            return "additional_data[" + key + "]" + "=" + (encodedValue ?? "")
+        })
+        
+        // The array is empty we return an empty string
+        if addData.count == 0 {
+            return ""
+        }
+        
+        // Reduce the array into a single string
+        return "?" + addData.reduce("", { (result, current) -> String in
+            if result.isEmpty {
+                return result + current
+            }
+            
+            return result + "&" + current
+        })
     }
     
     private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters, completion: @escaping (Data?, ProcessOutException?) -> Void) {
