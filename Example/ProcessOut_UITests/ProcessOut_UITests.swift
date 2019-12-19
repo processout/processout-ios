@@ -12,6 +12,7 @@ import Alamofire
 
 class ProcessOutUITests: XCTestCase {
 
+    // These are tests credentials from a tests project on ProcessOut production env
     var projectId = "test-proj_gAO1Uu0ysZJvDuUpOGPkUBeE3pGalk3x"
     var projectKey = "key_sandbox_mah31RDFqcDxmaS7MvhDbJfDJvjtsFTB"
     
@@ -20,11 +21,6 @@ class ProcessOutUITests: XCTestCase {
         ProcessOut.Setup(projectId: projectId)
         // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // UI tests must launch the application that they test. Doing this in setup will make sure it happens for each test method.
-        XCUIApplication().launch()
-        
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
     }
     
     override func tearDown() {
@@ -32,6 +28,7 @@ class ProcessOutUITests: XCTestCase {
     }
     
     func testInvoiceCreation() {
+        XCUIApplication().launch()
         
         let expectation = XCTestExpectation(description: "Invoice creation")
         let inv = Invoice(name: "test", amount: "12.01", currency: "EUR")
@@ -43,30 +40,10 @@ class ProcessOutUITests: XCTestCase {
         
         wait(for: [expectation], timeout: 10.0)
     }
-    
-    func testPayment() {
-        let expectation = XCTestExpectation(description: "Make card payment")
-        let view = ViewController()
-        
-        let inv = Invoice(name: "test", amount: "12.01", currency: "EUR")
-        createInvoice(invoice: inv, completion: {(invoiceId, error) in
-            XCTAssertNotNil(invoiceId)
-            
-            let card = ProcessOut.Card(cardNumber: "424242424242", expMonth: 11, expYear: 20, cvc: "123", name: "test card")
-            ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) in
-                XCTAssertNotNil(token)
-                
-                ProcessOut.makeCardPayment(invoiceId: invoiceId!, token: token!, handler: ProcessOut.createThreeDSTestHandler(viewController: view, completion: {(token, error) in
-                    XCTAssertNil(error)
-                    expectation.fulfill()
-                }), with: view)
-            })
-        })
-        
-        wait(for: [expectation], timeout: 10.0)
-    }
  
     func testTokenize() {
+        XCUIApplication().launch()
+        
         // Create an expectation for a background download task.
         let expectation = XCTestExpectation(description: "Tokenize a card")
         
@@ -82,6 +59,8 @@ class ProcessOutUITests: XCTestCase {
     }
     
     func testApmListing() {
+        XCUIApplication().launch()
+        
         let expectation = XCTestExpectation(description: "List available APM")
         
         ProcessOut.fetchGatewayConfigurations(filter: .AlternativePaymentMethods) { (gateways, error) in
@@ -93,57 +72,91 @@ class ProcessOutUITests: XCTestCase {
         wait(for: [expectation], timeout: 10.0)
     }
     
-    func testMakeCardToken() {
-        let expectation = XCTestExpectation(description: "Make card token")
-        let view = ViewController()
+    // Test 3DS2 web payment
+    func test3DS2WebPayment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-card", "4000000000003246", "-testName", "3DS2 web success"]
+        app.launch()
         
-        let card = ProcessOut.Card(cardNumber: "4242424242424242", expMonth: 11, expYear: 20, cvc: "123", name: "test card")
-        // Tokenizing the card
-        ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) in
-            
-            guard error == nil else {
-                print(error!)
-                XCTAssertTrue(false)
-                return
-            }
-            
-            // Creating the customer
-            self.createCustomer(completion: { (customerId, error) in
-                guard error == nil else {
-                    print(error!)
-                    XCTAssertTrue(false)
-                    return
-                }
-                
-                // Create the customer token
-                self.createCustomerToken(customerId: customerId!, cardId: "", completion: { (customerTokenId, error) in
-                    
-                    guard error == nil else {
-                        print(error!)
-                        XCTAssertTrue(false)
-                        return
-                    }
-                    
-                    ProcessOut.makeCardToken(source: token!, customerId: customerId!, tokenId: customerTokenId!, handler: ProcessOut.createThreeDSTestHandler(viewController: view, completion: { (invoiceId, error) in
-                        
-                        guard error == nil else {
-                            print(error!)
-                            XCTAssertTrue(false)
-                            return
-                        }
-                        
-                        print(invoiceId)
-                        XCTAssertNotNil(invoiceId)
-                        
-                        expectation.fulfill()
-                    }), with: view)
-                })
-            })
-        })
+        app.buttons["pay"].tap()
         
-        wait(for: [expectation], timeout: 150.0)
+        sleep(4)
+        app.staticTexts["SUCCESSFUL"].tap()
+        sleep(3)
+        
+        XCTAssertEqual(app.staticTexts["statusLabel"].label, "Payment successful" )
     }
     
+    // Test 3DS2 web failed payment
+    func test3DS2WebFailedPayment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-card", "4000000000003246", "-testName", "3DS2 web failed"]
+        app.launch()
+        
+        app.buttons["pay"].tap()
+        
+        sleep(4)
+        app.staticTexts["FAILURE"].tap()
+        sleep(3)
+        
+        XCTAssertEqual(app.staticTexts["statusLabel"].label, "PAYMENT FAILED" )
+    }
+    
+    // Test 3DS2 mobile payment
+    func test3DS2NativePayment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-card", "4000000000003253", "-testName", "3DS2 native success"]
+        app.launch()
+        
+        app.buttons["pay"].tap()
+        
+        sleep(4)
+        app.buttons["Accept"].tap()
+        sleep(3)
+        
+        XCTAssertEqual(app.staticTexts["statusLabel"].label, "Payment successful" )
+    }
+    
+    // Test 3DS2 refused challenge mobile payment
+    func test3DS2FailedPayment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-card", "4000000000003253", "-testName", "3DS2 native failed"]
+        app.launch()
+        
+        app.buttons["pay"].tap()
+        
+        sleep(4)
+        app.buttons["Reject"].tap()
+        sleep(3)
+        
+        XCTAssertEqual(app.staticTexts["statusLabel"].label, "PAYMENT FAILED" )
+    }
+    
+    // Test normal failed payment
+    func testFailedPayment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-card", "4000000000000002", "-testName", "Normal payment failed"]
+        app.launch()
+        
+        app.buttons["pay"].tap()
+        
+        sleep(3)
+        
+        XCTAssertEqual(app.staticTexts["statusLabel"].label, "PAYMENT FAILED" )
+    }
+    
+    // Test normal payment
+    func testNormalPayment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-card", "4977830000000001", "-testName", "Normal payment success"]
+        app.launch()
+        
+        app.buttons["pay"].tap()
+        
+        sleep(3)
+        
+        XCTAssertEqual(app.staticTexts["statusLabel"].label, "Payment successful" )
+    }
     
     // HELPERS functions
     func createInvoice(invoice: Invoice, completion: @escaping (String?, Error?) -> Void) {

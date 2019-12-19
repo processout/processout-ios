@@ -10,50 +10,87 @@ import UIKit
 import ProcessOut
 import PassKit
 import WebKit
+import Alamofire
 
 class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDelegate {
-
+    
+    // These are tests credentials from a tests project on ProcessOut production env
+    var projectId = "test-proj_gAO1Uu0ysZJvDuUpOGPkUBeE3pGalk3x"
+    var projectKey = "key_sandbox_mah31RDFqcDxmaS7MvhDbJfDJvjtsFTB"
+    
+    @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var statusBar: UIView!
+    @IBOutlet weak var testNameLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        statusBar.backgroundColor = UIColor.orange
+        
+        // Retrieve the current test name if tests are running
+        guard let testName = UserDefaults.standard.string(forKey: "testName") else {
+            return
+        }
+        
+        self.testNameLabel.text = "Testing: " + testName
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
+    // Pay button clicked
     @IBAction func clicked(_ sender: Any) {
-        // either test applepaye tokenization or card
+        statusLabel.text = "Requesting payment..."
+        statusBar.backgroundColor = UIColor.orange
+        
+        self.startPayment()
+    }
+    
+    /*
+        Some UI helpers
+    */
+    func setPaymentAsFailed() {
+        self.statusBar.backgroundColor = UIColor.red
+        self.statusLabel.text = "PAYMENT FAILED"
+    }
+    
+    func setPaymentAsSuccess() {
+        self.statusBar.backgroundColor = UIColor.green
+        self.statusLabel.text = "Payment successful"
+    }
+    
+    /*
+        Payment functions
+    */
+    func startPayment() {
+        guard let cardNumber = UserDefaults.standard.string(forKey: "card") else {
+            self.setPaymentAsFailed()
+            return
+        }
+        
         let contact = ProcessOut.Contact(address1: "1 great street", address2: nil, city: "City", state: "State", zip: "10000", countryCode: "US")
-        let card = ProcessOut.Card(cardNumber: "4000000000003246", expMonth: 10, expYear: 20, cvc: "737", name: "Jeremy Lejoux", contact: contact)
-        ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) -> Void in
-            if error != nil {
-                switch error! {
-                case .BadRequest(let message, let code):
-                    // developers, message can help you
-                    print(message, code)
-                    
-                case .MissingProjectId:
-                    print("Check your app delegate file")
-                case .InternalError:
-                    print("An internal error occured")
-                case .NetworkError:
-                    print("Request could not go through")
-                case .GenericError(let error):
-                    print(error)
-                }
-            } else {
-                // Use the card token to initiate an authorization/charge
-                if token != nil {
-                    //Initiate a card payment from an invoice generated on your backend
-                    ProcessOut.makeCardPayment(invoiceId: "invoice-id", token: token!, handler: ProcessOut.createThreeDSTestHandler(viewController: self, completion: { (invoiceId, error) in
-                        // Send the invoice to your backend to complete the charge
-                        print(invoiceId)
-                        print(error)
-                    }), with: self)
-                }
+        let card = ProcessOut.Card(cardNumber: cardNumber, expMonth: 10, expYear: 20, cvc: "737", name: "Mr", contact: contact)
+        // Create invoice
+        let inv = Invoice(name: "test 3DS", amount: "12.01", currency: "EUR")
+        createInvoice(invoice: inv, completion: {(invoiceId, error) in
+            guard error == nil else {
+                self.setPaymentAsFailed()
+                return
             }
+            
+            ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) -> Void in
+                guard error == nil else {
+                    self.setPaymentAsFailed()
+                    return
+                }
+                
+                ProcessOut.makeCardPayment(invoiceId: invoiceId!, token: token!, handler: ProcessOut.createThreeDSTestHandler(viewController: self, completion: { (invoiceId, error) in
+                    // Send the invoice to your backend to complete the charge
+                    guard error == nil else {
+                        self.setPaymentAsFailed()
+                        return
+                    }
+                    
+                    self.setPaymentAsSuccess()
+                }), with: self)
+            })
         })
     }
     
@@ -95,6 +132,105 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
         }
             
         )
+    }
+    
+    // HELPERS functions
+    func createInvoice(invoice: Invoice, completion: @escaping (String?, Error?) -> Void) {
+        guard let body = try? JSONEncoder().encode(invoice), let authorizationHeader = Request.authorizationHeader(user: projectId, password: projectKey) else {
+            completion(nil, ProcessOutException.InternalError)
+            return
+        }
+        
+        do {
+            let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
+            var headers: HTTPHeaders = [:]
+            
+            headers[authorizationHeader.key] = authorizationHeader.value
+            Alamofire.request("https://api.processout.com/invoices", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON(completionHandler: {(response) -> Void in
+                switch response.result {
+                case .success(let data):
+                    guard let j = data as? [String: AnyObject] else {
+                        completion(nil, ProcessOutException.InternalError)
+                        return
+                    }
+                    
+                    guard let inv = j["invoice"] as? [String: AnyObject], let id = inv["id"] as? String else {
+                        completion(nil, ProcessOutException.InternalError)
+                        return
+                    }
+                    
+                    completion(id, nil)
+                default:
+                    completion(nil, ProcessOutException.InternalError)
+                }
+            })
+        } catch {
+            completion(nil, error)
+        }
+    }
+    
+    func createCustomer(completion: @escaping (String?, Error?) -> Void) {
+        let customerRequest = CustomerRequest(firstName: "test", lastName: "test", currency: "USD")
+        guard let body = try? JSONEncoder().encode(customerRequest), let authorizationHeader = Request.authorizationHeader(user: projectId, password: projectKey) else {
+            completion(nil, ProcessOutException.InternalError)
+            return
+        }
+        
+        do {
+            let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String: Any]
+            var headers: HTTPHeaders = [:]
+            headers[authorizationHeader.key] = authorizationHeader.value
+            Alamofire.request("https://api.processout.com/customers", method: .post, parameters: json, encoding: JSONEncoding.default, headers: headers).responseJSON { (response) in
+                switch response.result {
+                case .success(let data):
+                    guard let j = data as? [String: AnyObject] else {
+                        completion(nil, ProcessOutException.InternalError)
+                        return
+                    }
+                    guard let cust = j["customer"] as? [String: AnyObject], let id = cust["id"] as? String else {
+                        completion(nil, ProcessOutException.InternalError)
+                        return
+                    }
+                    completion(id, nil)
+                default:
+                    completion(nil, ProcessOutException.InternalError)
+                }
+            }
+        } catch {
+            completion(nil, ProcessOutException.InternalError)
+        }
+    }
+    
+    func createCustomerToken(customerId: String, cardId: String, completion: @escaping (String?, Error?) -> Void) {
+        let tokenRequest = CustomerTokenRequest(source: cardId)
+        guard let body = try? JSONEncoder().encode(tokenRequest), let authorizationHeader = Request.authorizationHeader(user: projectId, password: projectKey) else {
+            completion(nil, ProcessOutException.InternalError)
+            return
+        }
+        
+        do {
+            let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String: AnyObject]
+            var headers: HTTPHeaders = [:]
+            headers[authorizationHeader.key] = authorizationHeader.value
+            Alamofire.request("https://api.processout.com/customers/" + customerId + "/tokens", method: .post, parameters: json, encoding :JSONEncoding.default, headers: headers).responseJSON {(response) in
+                switch response.result {
+                case .success(let data):
+                    guard let j = data as? [String: AnyObject] else {
+                        completion(nil, ProcessOutException.InternalError)
+                        return
+                    }
+                    guard let cust = j["token"] as? [String: AnyObject], let id = cust["id"] as? String else {
+                        completion(nil, ProcessOutException.InternalError)
+                        return
+                    }
+                    completion(id, nil)
+                default:
+                    completion(nil, ProcessOutException.InternalError)
+                }
+            }
+        } catch {
+            completion(nil, ProcessOutException.InternalError)
+        }
     }
 }
 
