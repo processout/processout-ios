@@ -51,7 +51,7 @@ public class ProcessOut {
         }
     }
 
-    static let ApiVersion: String = "v2.10.0"
+    static let ApiVersion: String = "v2.10.1"
     private static let ApiUrl: String = "https://api.processout.com"
     internal static let CheckoutUrl: String = "https://checkout.processout.com"
     internal static var ProjectId: String?
@@ -61,7 +61,7 @@ public class ProcessOut {
     internal static let retryPolicy = RetryPolicy()
     
     // Getting the device user agent
-    private static let defaultUserAgent = UIWebView(frame: .zero).stringByEvaluatingJavaScript(from: "navigator.userAgent")
+    private static let defaultUserAgent = "iOS/" + UIDevice.current.systemVersion
 
     public static func Setup(projectId: String) {
         ProcessOut.ProjectId = projectId
@@ -534,12 +534,7 @@ public class ProcessOut {
             request.httpMethod = method.rawValue
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue(authorizationHeader.value, forHTTPHeaderField: authorizationHeader.key)
-            
-            if defaultUserAgent != nil {
-                request.setValue(ProcessOut.defaultUserAgent! + " ProcessOut iOS-Bindings/" + ApiVersion, forHTTPHeaderField: "User-Agent")
-            } else {
-                request.setValue("ProcessOut iOS-Bindings/" + ApiVersion, forHTTPHeaderField: "User-Agent")
-            }
+            request.setValue(ProcessOut.defaultUserAgent + " ProcessOut iOS-Bindings/" + ApiVersion, forHTTPHeaderField: "User-Agent")
             request.setValue(UUID().uuidString, forHTTPHeaderField: "Idempotency-Key")
             request.timeoutInterval = 15
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
