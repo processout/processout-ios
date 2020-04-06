@@ -258,7 +258,7 @@ public class ProcessOut {
     ///
     /// - Parameter completion: Completion callback
     public static func fetchGatewayConfigurations(filter: GatewayConfigurationsFilter, completion: @escaping ([GatewayConfiguration]?, ProcessOutException?) -> Void) {
-        HttpRequest(route: "/gateway-configurations?filter=" + filter.rawValue + "&expand_merchant_accounts=true", method: .get, parameters: [:]) { (gateways
+        HttpRequest(route: "/gateway-configurations?filter=" + filter.rawValue + "&expand_merchant_accounts=true", method: .get, parameters: nil) { (gateways
             , e) in
             guard gateways != nil else {
                 completion(nil, e)
@@ -515,7 +515,7 @@ public class ProcessOut {
         })
     }
     
-    private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters, completion: @escaping (Data?, ProcessOutException?) -> Void) {
+    private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters?, completion: @escaping (Data?, ProcessOutException?) -> Void) {
         guard let projectId = ProjectId, let authorizationHeader = Request.authorizationHeader(user: projectId, password: "") else {
             completion(nil, ProcessOutException.MissingProjectId)
             return
@@ -537,7 +537,11 @@ public class ProcessOut {
             request.setValue(ProcessOut.defaultUserAgent + " ProcessOut iOS-Bindings/" + ApiVersion, forHTTPHeaderField: "User-Agent")
             request.setValue(UUID().uuidString, forHTTPHeaderField: "Idempotency-Key")
             request.timeoutInterval = 15
-            request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
+            
+            if let body = parameters {
+                request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+            }
+
             
             sessionManager.request(request as URLRequestConvertible).responseJSON(completionHandler: {(response) -> Void in
                 guard let data = response.data else {

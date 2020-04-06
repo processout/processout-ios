@@ -333,23 +333,19 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-ProcessOut_Example-ProcessOut_UITests/Pods-ProcessOut_Example-ProcessOut_UITests-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-ProcessOut_Example-ProcessOut_UITests/Pods-ProcessOut_Example-ProcessOut_UITests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/ProcessOut/ProcessOut.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProcessOut.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ProcessOut_Example-ProcessOut_UITests/Pods-ProcessOut_Example-ProcessOut_UITests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ProcessOut_Example-ProcessOut_UITests/Pods-ProcessOut_Example-ProcessOut_UITests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		99E1B105A9C61298CE41EB03 /* [CP] Check Pods Manifest.lock */ = {
@@ -379,23 +375,19 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-ProcessOut_Example/Pods-ProcessOut_Example-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-ProcessOut_Example/Pods-ProcessOut_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/ProcessOut/ProcessOut.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProcessOut.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ProcessOut_Example/Pods-ProcessOut_Example-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ProcessOut_Example/Pods-ProcessOut_Example-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F6FE899D7BB78DF85BC0C4A3 /* [CP] Check Pods Manifest.lock */ = {
