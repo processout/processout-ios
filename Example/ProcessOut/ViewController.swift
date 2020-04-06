@@ -39,7 +39,7 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
     @IBAction func clicked(_ sender: Any) {
         statusLabel.text = "Requesting payment..."
         statusBar.backgroundColor = UIColor.orange
-        
+    
         self.startPayment()
     }
     
