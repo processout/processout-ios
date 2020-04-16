@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ProcessOut'
-  s.version          = '2.10.2'
+  s.version          = '2.10.3'
   s.summary          = 'The smart router for payments. Smartly route each transaction to the relevant payment providers.'
 
 # This description is used to generate tags and improve search results.

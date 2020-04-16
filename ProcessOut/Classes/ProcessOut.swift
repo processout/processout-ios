@@ -468,20 +468,34 @@ public class ProcessOut {
         }
     }
     
-    /// Initiate an alternative payment method payment
+    /// Initiate an alternative payment method payment by opening the default browser
     ///
     /// - Parameters:
     ///   - gateway: Gateway to use (previously fetched)
     ///   - invoiceId: Invoice ID generated on your backend
+    @available(*, deprecated)
     public static func makeAPMPayment(gateway: GatewayConfiguration, invoiceId: String, additionalData: [String: String] = [:]) {
+        // Generate the redirection URL
+        let urlString: String = makeAPMPayment(gateway: gateway, invoiceId: invoiceId, additionalData: additionalData)
+        
+        if let url = NSURL(string: urlString) {
+            UIApplication.shared.openURL(url as URL)
+        }
+    }
+    
+    /// Returns the URL to initiate an alternative payment method payment
+    ///
+    /// - Parameters:
+    ///   - gateway: Gateway to use (previously fetched)
+    ///   - invoiceId: Invoice ID generated on your backend
+    /// - Returns: Redirect URL that should be displayed in a webview
+    public static func makeAPMPayment(gateway: GatewayConfiguration, invoiceId: String, additionalData: [String: String] = [:]) -> String {
         // Generate the redirection URL
         let checkout = ProcessOut.ProjectId! + "/" + invoiceId + "/redirect/" + gateway.id
         let additionalDataString = generateAdditionalDataString(additionalData: additionalData)
         let urlString = ProcessOut.CheckoutUrl + "/" + checkout + additionalDataString
         
-        if let url = NSURL(string: urlString) {
-            UIApplication.shared.openURL(url as URL)
-        }
+        return urlString
     }
     
     
