@@ -98,44 +98,53 @@ class CustomerActionHandler {
     }
     
     private func performFingerprint(customerAction: CustomerAction, handler: ThreeDSHandler, completion: @escaping (String?, ProcessOutException?) -> Void) {
-        var encodedData = customerAction.value
-        let remainder = encodedData.count % 4
-        if remainder > 0 {
-            encodedData = encodedData.padding(toLength: encodedData.count + 4 - remainder, withPad: "=", startingAt: 0)
-        }
-        
-        let decodedData = Data(base64Encoded: encodedData)!
-        var directoryServerData: DirectoryServerData
         do {
+            var encodedData = customerAction.value
+            let remainder = encodedData.count % 4
+            if remainder > 0 {
+                encodedData = encodedData.padding(toLength: encodedData.count + 4 - remainder, withPad: "=", startingAt: 0)
+            }
+            
+            guard let decodedData = Data(base64Encoded: encodedData) else {
+                completion(nil, ProcessOutException.InternalError)
+                return
+            }
+            var directoryServerData: DirectoryServerData
+        
             directoryServerData = try JSONDecoder().decode(DirectoryServerData.self, from: decodedData)
+            handler.doFingerprint(directoryServerData: directoryServerData) { (response) in
+                do {
+                    guard let body = String(data: try JSONEncoder().encode(response), encoding: .utf8) else {
+                        completion(nil, ProcessOutException.InternalError)
+                        return
+                    }
+                    
+                    let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: body)
+                    guard let gatewayToken = miscGatewayRequest.generateToken() else {
+                        completion(nil, ProcessOutException.InternalError)
+                        return
+                    }
+                    
+                    completion(gatewayToken, nil)
+                } catch {
+                    completion(nil, ProcessOutException.InternalError)
+                }
+            }
         } catch {
             completion(nil, ProcessOutException.InternalError)
             return
-        }
-        
-        handler.doFingerprint(directoryServerData: directoryServerData) { (response) in
-            do {
-                guard let body = String(data: try JSONEncoder().encode(response), encoding: .utf8) else {
-                    completion(nil, ProcessOutException.InternalError)
-                    return
-                }
-                
-                let miscGatewayRequest = MiscGatewayRequest(fingerprintResponse: body)
-                guard let gatewayToken = miscGatewayRequest.generateToken() else {
-                    completion(nil, ProcessOutException.InternalError)
-                    return
-                }
-                
-                completion(gatewayToken, nil)
-            } catch {
-                completion(nil, ProcessOutException.InternalError)
-            }
         }
     }
     
     private func performChallenge(customerAction: CustomerAction, handler: ThreeDSHandler, completion: @escaping (Bool, ProcessOutException?) -> Void) {
         do {
-            guard let decodedB64Data = Data(base64Encoded: customerAction.value) else {
+            var encodedData = customerAction.value
+            let remainder = encodedData.count % 4
+            if remainder > 0 {
+                encodedData = encodedData.padding(toLength: encodedData.count + 4 - remainder, withPad: "=", startingAt: 0)
+            }
+            
+            guard let decodedB64Data = Data(base64Encoded: encodedData) else {
                 completion(false, ProcessOutException.InternalError)
                 return
             }
