@@ -98,7 +98,13 @@ class CustomerActionHandler {
     }
     
     private func performFingerprint(customerAction: CustomerAction, handler: ThreeDSHandler, completion: @escaping (String?, ProcessOutException?) -> Void) {
-        let decodedData = Data(base64Encoded: customerAction.value)!
+        var encodedData = customerAction.value
+        let remainder = encodedData.count % 4
+        if remainder > 0 {
+            encodedData = encodedData.padding(toLength: encodedData.count + 4 - remainder, withPad: "=", startingAt: 0)
+        }
+        
+        let decodedData = Data(base64Encoded: encodedData)!
         var directoryServerData: DirectoryServerData
         do {
             directoryServerData = try JSONDecoder().decode(DirectoryServerData.self, from: decodedData)
