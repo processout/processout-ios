@@ -1,13 +1,13 @@
 PODS:
-  - Alamofire (4.6.0)
-  - ProcessOut (2.3.1):
-    - Alamofire (~> 4.5)
+  - Alamofire (4.8.2)
+  - ProcessOut (2.10.5):
+    - Alamofire (~> 4.8.2)
 
 DEPENDENCIES:
   - ProcessOut (from `../`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
     - Alamofire
 
 EXTERNAL SOURCES:
@@ -15,9 +15,9 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Alamofire: f41a599bd63041760b26d393ec1069d9d7b917f4
-  ProcessOut: 318ae8dd5cd3c721ccd676a0c85ce44084af9b65
+  Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
+  ProcessOut: e7b373699d41a963b9fa5f6440d75a6d40dff621
 
-PODFILE CHECKSUM: f288598a5e45104ecc5261d9643743aca9aa94d1
+PODFILE CHECKSUM: 83b66f4905a18bf0e9f7210dcd6a5ddf11c24ead
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.9.1

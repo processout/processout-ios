@@ -1,137 +1,161 @@
 //
-//  ViewController.swift
-//  ProcessOut
+//  ProcessOutUITests.swift
+//  ProcessOut_Tests
 //
-//  Created by Jeremy Lejoux on 01/15/2018.
-//  Copyright (c) 2018 Jeremy Lejoux. All rights reserved.
+//  Created by Jeremy Lejoux on 09/09/2019.
+//  Copyright © 2019 CocoaPods. All rights reserved.
 //
 
-import UIKit
+import XCTest
 import ProcessOut
-import PassKit
-import WebKit
 import Alamofire
 
-class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDelegate {
-    
+class ProcessOutUITests: XCTestCase {
+
     // These are tests credentials from a tests project on ProcessOut production env
     var projectId = "test-proj_gAO1Uu0ysZJvDuUpOGPkUBeE3pGalk3x"
     var projectKey = "key_sandbox_mah31RDFqcDxmaS7MvhDbJfDJvjtsFTB"
     
-    @IBOutlet weak var statusLabel: UILabel!
-    @IBOutlet weak var statusBar: UIView!
-    @IBOutlet weak var testNameLabel: UILabel!
+    override func setUp() {
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+        ProcessOut.Setup(projectId: projectId)
+        // In UI tests it is usually best to stop immediately when a failure occurs.
+        continueAfterFailure = false
+    }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        statusBar.backgroundColor = UIColor.orange
+    override func tearDown() {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    }
+    
+    func testInvoiceCreation() {
+        XCUIApplication().launch()
         
-        // Retrieve the current test name if tests are running
-        guard let testName = UserDefaults.standard.string(forKey: "testName") else {
-            return
-        }
-        
-        self.testNameLabel.text = "Testing: " + testName
-    }
-
-    // Pay button clicked
-    @IBAction func clicked(_ sender: Any) {
-        statusLabel.text = "Requesting payment..."
-        statusBar.backgroundColor = UIColor.orange
-    
-        self.startPayment()
-    }
-    
-    /*
-        Some UI helpers
-    */
-    func setPaymentAsFailed() {
-        self.statusBar.backgroundColor = UIColor.red
-        self.statusLabel.text = "PAYMENT FAILED"
-    }
-    
-    func setPaymentAsSuccess() {
-        self.statusBar.backgroundColor = UIColor.green
-        self.statusLabel.text = "Payment successful"
-    }
-    
-    /*
-        Payment functions
-    */
-    func startPayment() {
-        guard let cardNumber = UserDefaults.standard.string(forKey: "card") else {
-            self.setPaymentAsFailed()
-            return
-        }
-        
-        let contact = ProcessOut.Contact(address1: "1 great street", address2: nil, city: "City", state: "State", zip: "10000", countryCode: "US")
-        let card = ProcessOut.Card(cardNumber: cardNumber, expMonth: 10, expYear: 20, cvc: "737", name: "Mr", contact: contact)
-        // Create invoice
-        let inv = Invoice(name: "test 3DS", amount: "12.01", currency: "EUR")
+        let expectation = XCTestExpectation(description: "Invoice creation")
+        let inv = Invoice(name: "test", amount: "12.01", currency: "EUR")
         createInvoice(invoice: inv, completion: {(invoiceId, error) in
-            guard error == nil else {
-                self.setPaymentAsFailed()
-                return
-            }
-            
-            ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) -> Void in
-                guard error == nil else {
-                    self.setPaymentAsFailed()
-                    return
-                }
-                
-                ProcessOut.makeCardPayment(invoiceId: invoiceId!, token: token!, handler: ProcessOut.createThreeDSTestHandler(viewController: self, completion: { (invoiceId, error) in
-                    // Send the invoice to your backend to complete the charge
-                    guard error == nil else {
-                        self.setPaymentAsFailed()
-                        return
-                    }
-                    
-                    self.setPaymentAsSuccess()
-                }), with: self)
-            })
+            XCTAssertNotNil(invoiceId)
+            XCTAssertNil(error)
+            expectation.fulfill()
         })
+        
+        wait(for: [expectation], timeout: 10.0)
+    }
+ 
+    func testTokenize() {
+        XCUIApplication().launch()
+        
+        // Create an expectation for a background download task.
+        let expectation = XCTestExpectation(description: "Tokenize a card")
+        
+        let card = ProcessOut.Card(cardNumber: "424242424242", expMonth: 11, expYear: 20, cvc: "123", name: "test card")
+        ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) in
+            XCTAssertNotNil(token)
+            expectation.fulfill()
+        })
+        
+        // Wait until the expectation is fulfilled, with a timeout of 10 seconds.
+        wait(for: [expectation], timeout: 10.0)
+        // This is an example of a functional test case.
     }
     
-    func testApplePay() {
-        let request = PKPaymentRequest()
-        let paymentNetworks:[PKPaymentNetwork] = [.amex,.masterCard,.visa]
-        request.merchantIdentifier = "merchant.jeremy-test"
-        request.countryCode = "FR"
-        request.currencyCode = "EUR"
-        request.supportedNetworks = paymentNetworks
+    func testApmListing() {
+        XCUIApplication().launch()
         
+        let expectation = XCTestExpectation(description: "List available APM")
         
-        // This is based on using Stripe
-        request.merchantCapabilities = .capability3DS
-        
-        if #available(iOS 9.0, *) {
-            let tshirt = PKPaymentSummaryItem(label: "T-shirt", amount: NSDecimalNumber(decimal:1.00), type: .final)
-            request.paymentSummaryItems = [tshirt]
+        ProcessOut.fetchGatewayConfigurations(filter: .AlternativePaymentMethods) { (gateways, error) in
+            XCTAssertNotNil(gateways)
             
-            let applePayController = PKPaymentAuthorizationViewController(paymentRequest: request)
-            applePayController?.delegate = self
-            present(applePayController!, animated: true, completion: nil)
-        } else {
-            // Fallback on earlier versions
+            expectation.fulfill()
         }
+        
+        wait(for: [expectation], timeout: 10.0)
     }
     
-    func paymentAuthorizationViewControllerDidFinish(_ controller: PKPaymentAuthorizationViewController) {
-        controller.dismiss(animated: true, completion: nil)
+    // Test 3DS2 web payment
+    func test3DS2WebPayment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-card", "4000000000003246", "-testName", "3DS2 web success"]
+        app.launch()
+        
+        app.buttons["pay"].tap()
+        
+        sleep(4)
+        app.staticTexts["SUCCESSFUL"].tap()
+        sleep(3)
+        
+        XCTAssertEqual(app.staticTexts["statusLabel"].label, "Payment successful" )
     }
-    func paymentAuthorizationViewController(_ controller: PKPaymentAuthorizationViewController, didAuthorizePayment payment: PKPayment, completion: @escaping ((PKPaymentAuthorizationStatus) -> Void)) {
-        let contact = ProcessOut.Contact(address1: "1 great street", address2: "Address 2", city: "City", state: "State", zip: "10000", countryCode: "US")
-        ProcessOut.Tokenize(payment: payment, metadata: [:], contact: contact, completion: {token, err in
-            if token == nil {
-                completion(PKPaymentAuthorizationStatus.failure)
-            } else {
-                completion(PKPaymentAuthorizationStatus.success)
-            }
-        }
-            
-        )
+    
+    // Test 3DS2 web failed payment
+    func test3DS2WebFailedPayment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-card", "4000000000003246", "-testName", "3DS2 web failed"]
+        app.launch()
+        
+        app.buttons["pay"].tap()
+        
+        sleep(4)
+        app.staticTexts["FAILURE"].tap()
+        sleep(3)
+        
+        XCTAssertEqual(app.staticTexts["statusLabel"].label, "PAYMENT FAILED" )
+    }
+    
+    // Test 3DS2 mobile payment
+    func test3DS2NativePayment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-card", "4000000000003253", "-testName", "3DS2 native success"]
+        app.launch()
+        
+        app.buttons["pay"].tap()
+        
+        sleep(4)
+        app.buttons["Accept"].tap()
+        sleep(3)
+        
+        XCTAssertEqual(app.staticTexts["statusLabel"].label, "Payment successful" )
+    }
+    
+    // Test 3DS2 refused challenge mobile payment
+    func test3DS2FailedPayment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-card", "4000000000003253", "-testName", "3DS2 native failed"]
+        app.launch()
+        
+        app.buttons["pay"].tap()
+        
+        sleep(4)
+        app.buttons["Reject"].tap()
+        sleep(3)
+        
+        XCTAssertEqual(app.staticTexts["statusLabel"].label, "PAYMENT FAILED" )
+    }
+    
+    // Test normal failed payment
+    func testFailedPayment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-card", "4000000000000002", "-testName", "Normal payment failed"]
+        app.launch()
+        
+        app.buttons["pay"].tap()
+        
+        sleep(3)
+        
+        XCTAssertEqual(app.staticTexts["statusLabel"].label, "PAYMENT FAILED" )
+    }
+    
+    // Test normal payment
+    func testNormalPayment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-card", "4977830000000001", "-testName", "Normal payment success"]
+        app.launch()
+        
+        app.buttons["pay"].tap()
+        
+        sleep(3)
+        
+        XCTAssertEqual(app.staticTexts["statusLabel"].label, "Payment successful" )
     }
     
     // HELPERS functions
@@ -233,4 +257,3 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
         }
     }
 }
-

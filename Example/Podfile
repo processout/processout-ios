@@ -1,11 +1,8 @@
 use_frameworks!
-
+platform :ios, '9.0'
 target 'ProcessOut_Example' do
   pod 'ProcessOut', :path => '../'
-
-  target 'ProcessOut_Tests' do
-    inherit! :search_paths
-
-    
+  target 'ProcessOut_UITests' do
+    inherit! :complete
   end
 end

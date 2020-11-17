@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ProcessOut'
-  s.version          = '2.4.0'
+  s.version          = '2.10.5'
   s.summary          = 'The smart router for payments. Smartly route each transaction to the relevant payment providers.'
 
 # This description is used to generate tags and improve search results.
@@ -29,7 +29,7 @@ This token can then be used and stored on your backend to charge customers.
   s.source           = { :git => 'https://github.com/processout/processout-ios.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/processout'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '9.0'
 
   s.source_files = 'ProcessOut/Classes/**/*'
   
@@ -39,5 +39,5 @@ This token can then be used and stored on your backend to charge customers.
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
-  s.dependency 'Alamofire', '~> 4.5'
+  s.dependency 'Alamofire', '~> 4.8.2'
 end

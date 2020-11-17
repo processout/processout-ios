@@ -15,10 +15,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        ProcessOut.Setup(projectId: "proj_kVWqvz7UoS3oux2UZg5tgLjXxvPTnh0k")
+        ProcessOut.Setup(projectId: "test-proj_gAO1Uu0ysZJvDuUpOGPkUBeE3pGalk3x")
         return true
+    }
+    
+    // This method handles opening native URLs (e.g., "yourapp://")
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        if let apmReturn = ProcessOut.handleAPMURLCallback(url: url) {
+            guard apmReturn.error == nil else {
+                // Error while parsing the URL
+                return false
+            }
+            
+            switch apmReturn.returnType {
+            case .Authorization:
+                // Finish the charge on your backend with apmReturn.token
+                break
+            case .CreateToken:
+                // Update the customer token on your backend with source: apmReturn.token and apmReturn.customerId, apmReturn.tokenId
+                break
+            }
+        }
+        return false
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
