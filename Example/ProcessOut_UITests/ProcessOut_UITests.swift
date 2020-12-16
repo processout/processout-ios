@@ -72,6 +72,21 @@ class ProcessOutUITests: XCTestCase {
         wait(for: [expectation], timeout: 10.0)
     }
     
+    // Test that a successful response is returned from the gateway configurations endpoint when pagination is requested
+    func testGatewayConfigurationListingWithPagination() {
+        XCUIApplication().launch()
+        
+        let expectation = XCTestExpectation(description: "Fetch gateway configurations with pagination options")
+        
+        ProcessOut.fetchGatewayConfigurations(filter: .All, paginationOptions: ProcessOut.PaginationOptions(StartAfter: "1234", Limit: 20, Order: "asc")) { (gateways, error) in
+            XCTAssertNotNil(gateways)
+            
+            expectation.fulfill()
+        }
+        
+        wait(for: [expectation], timeout: 10.0)
+    }
+    
     // Test 3DS2 web payment
     func test3DS2WebPayment() {
         let app = XCUIApplication()
