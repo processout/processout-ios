@@ -51,6 +51,20 @@ public class ProcessOut {
         }
     }
 
+    public struct PaginationOptions {
+        var StartAfter: String?
+        var EndBefore: String?
+        var Limit: Int?
+        var Order: String?
+
+        public init(StartAfter: String? = nil, EndBefore: String? = nil, Limit: Int? = nil, Order: String? = nil) {
+            self.StartAfter = StartAfter
+            self.EndBefore = EndBefore
+            self.Limit = Limit
+            self.Order = Order
+        }
+    }
+
     static let ApiVersion: String = "v2.10.1"
     private static let ApiUrl: String = "https://api.processout.com"
     internal static let CheckoutUrl: String = "https://checkout.processout.com"
