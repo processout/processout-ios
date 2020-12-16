@@ -543,6 +543,31 @@ public class ProcessOut {
         })
     }
     
+    /// Generates a query parameter string to facilitate pagination on many endpoints.
+    /// For more information, see https://docs.processout.com/refs/#pagination
+    ///
+    /// - Parameter paginationOptions: Pagination options to use
+    /// - Returns: An empty string or a string containing a set of query parameters.
+    /// Note that the returned string is not prefixed or suffixed with ? or &, so you may need to do this yourself depending on where these parameters will appear in your URL
+    private static func generatePaginationParamsString(paginationOptions: PaginationOptions) -> String {
+        // Construct the individual query params
+        let startAfterParam = paginationOptions.StartAfter != nil ? "start_after=" + paginationOptions.StartAfter! + "&" : ""
+        let endBeforeParam = paginationOptions.EndBefore != nil ? "end_before=" + paginationOptions.EndBefore! + "&" : ""
+        let limitParam = paginationOptions.Limit != nil ? "limit=" + String(paginationOptions.Limit!) + "&" : ""
+        let orderParam = paginationOptions.Order != nil ? "order=" + paginationOptions.Order! : ""
+
+        // Combine the individual query params into a single string
+        let paginationParams = startAfterParam + endBeforeParam + limitParam + orderParam
+
+        // Check if the combined query params have a trailing ampersand
+        if paginationParams.hasSuffix("&") {
+            // If there is a trailing ampersand, return the combined query params with the last character removed
+            return String(paginationParams.prefix(paginationParams.count - 1))
+        }
+        // If there is no trailing ampersand, return the combined query params
+        return paginationParams
+    }
+
     private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters?, completion: @escaping (Data?, ProcessOutException?) -> Void) {
         guard let projectId = ProjectId, let authorizationHeader = Request.authorizationHeader(user: projectId, password: "") else {
             completion(nil, ProcessOutException.MissingProjectId)
