@@ -270,9 +270,13 @@ public class ProcessOut {
     
     /// List alternative gateway configurations activated on your account
     ///
-    /// - Parameter completion: Completion callback
-    public static func fetchGatewayConfigurations(filter: GatewayConfigurationsFilter, completion: @escaping ([GatewayConfiguration]?, ProcessOutException?) -> Void) {
-        HttpRequest(route: "/gateway-configurations?filter=" + filter.rawValue + "&expand_merchant_accounts=true", method: .get, parameters: nil) { (gateways
+    /// - Parameters:
+    ///   - completion: Completion callback
+    ///   - paginationOptions: Pagination options to use
+    public static func fetchGatewayConfigurations(filter: GatewayConfigurationsFilter, completion: @escaping ([GatewayConfiguration]?, ProcessOutException?) -> Void, paginationOptions: PaginationOptions? = nil) {
+        let paginationParams = paginationOptions != nil ? "&" + generatePaginationParamsString(paginationOptions: paginationOptions!) : ""
+
+        HttpRequest(route: "/gateway-configurations?filter=" + filter.rawValue + "&expand_merchant_accounts=true" + paginationParams, method: .get, parameters: nil) { (gateways
             , e) in
             guard gateways != nil else {
                 completion(nil, e)
