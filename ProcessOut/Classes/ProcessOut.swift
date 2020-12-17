@@ -554,22 +554,19 @@ public class ProcessOut {
     /// - Returns: An empty string or a string containing a set of query parameters.
     /// Note that the returned string is not prefixed or suffixed with ? or &, so you may need to do this yourself depending on where these parameters will appear in your URL
     private static func generatePaginationParamsString(paginationOptions: PaginationOptions) -> String {
-        // Construct the individual query params
-        let startAfterParam = paginationOptions.StartAfter != nil ? "start_after=" + paginationOptions.StartAfter! + "&" : ""
-        let endBeforeParam = paginationOptions.EndBefore != nil ? "end_before=" + paginationOptions.EndBefore! + "&" : ""
-        let limitParam = paginationOptions.Limit != nil ? "limit=" + String(paginationOptions.Limit!) + "&" : ""
-        let orderParam = paginationOptions.Order != nil ? "order=" + paginationOptions.Order! : ""
+        // Construct the individual query params and store them in an array
+        let paginationParams: [String?] = [
+            paginationOptions.StartAfter != nil ? "start_after=" + paginationOptions.StartAfter! : nil,
+            paginationOptions.EndBefore != nil ? "end_before=" + paginationOptions.EndBefore! : nil,
+            paginationOptions.Limit != nil ? "limit=" + String(paginationOptions.Limit!) : nil,
+            paginationOptions.Order != nil ? "order=" + paginationOptions.Order! : nil
+        ]
 
-        // Combine the individual query params into a single string
-        let paginationParams = startAfterParam + endBeforeParam + limitParam + orderParam
+        // Remove any nil values from the array
+        let filteredPaginationParams = paginationParams.flatMap {$0}
 
-        // Check if the combined query params have a trailing ampersand
-        if paginationParams.hasSuffix("&") {
-            // If there is a trailing ampersand, return the combined query params with the last character removed
-            return String(paginationParams.prefix(paginationParams.count - 1))
-        }
-        // If there is no trailing ampersand, return the combined query params
-        return paginationParams
+        // Join the array into a single string separated by ampersands and return it
+        return filteredPaginationParams.joined(separator: "&")
     }
 
     private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters?, completion: @escaping (Data?, ProcessOutException?) -> Void) {
