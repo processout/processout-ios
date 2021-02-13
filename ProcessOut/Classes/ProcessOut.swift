@@ -51,6 +51,20 @@ public class ProcessOut {
         }
     }
 
+    public struct PaginationOptions {
+        var StartAfter: String?
+        var EndBefore: String?
+        var Limit: Int?
+        var Order: String?
+
+        public init(StartAfter: String? = nil, EndBefore: String? = nil, Limit: Int? = nil, Order: String? = nil) {
+            self.StartAfter = StartAfter
+            self.EndBefore = EndBefore
+            self.Limit = Limit
+            self.Order = Order
+        }
+    }
+
     static let ApiVersion: String = "v2.10.1"
     private static let ApiUrl: String = "https://api.processout.com"
     internal static let CheckoutUrl: String = "https://checkout.processout.com"
@@ -256,9 +270,13 @@ public class ProcessOut {
     
     /// List alternative gateway configurations activated on your account
     ///
-    /// - Parameter completion: Completion callback
-    public static func fetchGatewayConfigurations(filter: GatewayConfigurationsFilter, completion: @escaping ([GatewayConfiguration]?, ProcessOutException?) -> Void) {
-        HttpRequest(route: "/gateway-configurations?filter=" + filter.rawValue + "&expand_merchant_accounts=true", method: .get, parameters: nil) { (gateways
+    /// - Parameters:
+    ///   - completion: Completion callback
+    ///   - paginationOptions: Pagination options to use
+    public static func fetchGatewayConfigurations(filter: GatewayConfigurationsFilter, completion: @escaping ([GatewayConfiguration]?, ProcessOutException?) -> Void, paginationOptions: PaginationOptions? = nil) {
+        let paginationParams = paginationOptions != nil ? "&" + generatePaginationParamsString(paginationOptions: paginationOptions!) : ""
+
+        HttpRequest(route: "/gateway-configurations?filter=" + filter.rawValue + "&expand_merchant_accounts=true" + paginationParams, method: .get, parameters: nil) { (gateways
             , e) in
             guard gateways != nil else {
                 completion(nil, e)
@@ -529,6 +547,28 @@ public class ProcessOut {
         })
     }
     
+    /// Generates a query parameter string to facilitate pagination on many endpoints.
+    /// For more information, see https://docs.processout.com/refs/#pagination
+    ///
+    /// - Parameter paginationOptions: Pagination options to use
+    /// - Returns: An empty string or a string containing a set of query parameters.
+    /// Note that the returned string is not prefixed or suffixed with ? or &, so you may need to do this yourself depending on where these parameters will appear in your URL
+    private static func generatePaginationParamsString(paginationOptions: PaginationOptions) -> String {
+        // Construct the individual query params and store them in an array
+        let paginationParams: [String?] = [
+            paginationOptions.StartAfter != nil ? "start_after=" + paginationOptions.StartAfter! : nil,
+            paginationOptions.EndBefore != nil ? "end_before=" + paginationOptions.EndBefore! : nil,
+            paginationOptions.Limit != nil ? "limit=" + String(paginationOptions.Limit!) : nil,
+            paginationOptions.Order != nil ? "order=" + paginationOptions.Order! : nil
+        ]
+
+        // Remove any nil values from the array
+        let filteredPaginationParams = paginationParams.flatMap {$0}
+
+        // Join the array into a single string separated by ampersands and return it
+        return filteredPaginationParams.joined(separator: "&")
+    }
+
     private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters?, completion: @escaping (Data?, ProcessOutException?) -> Void) {
         guard let projectId = ProjectId, let authorizationHeader = Request.authorizationHeader(user: projectId, password: "") else {
             completion(nil, ProcessOutException.MissingProjectId)
