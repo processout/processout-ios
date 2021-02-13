@@ -6,17 +6,24 @@
 //
 
 import Foundation
-import Alamofire
 
-class RetryPolicy: RequestRetrier {
+public typealias MyRequestRetryCompletion = (_ shouldRetry: Bool, _ timeDelay: TimeInterval) -> Void
+
+protocol MyRequestRetrier {
+  
+  func should(_ session: URLSession, retry task: URLSessionTask, with error: Error, completion: @escaping MyRequestRetryCompletion)
+  
+}
+
+class MyRetryPolicy: MyRequestRetrier {
     
     private var currentRetriedRequests: [String: Int] = [:]
     private let RETRY_INTERVAL: TimeInterval = 0.1; // Retry after .1s
     private let MAXIMUM_RETRIES = 2
 
-    func should(_ manager: SessionManager, retry request: Request, with error: Error, completion: @escaping RequestRetryCompletion) {
-        guard request.task?.response == nil, let url = request.request?.url?.absoluteString else {
-            clearRetriedForUrl(url: request.request?.url?.absoluteString)
+  func should(_ session: URLSession, retry task: URLSessionTask, with error: Error, completion: @escaping MyRequestRetryCompletion) {
+        guard task.response == nil, let url = task.currentRequest?.url?.absoluteString else {
+            clearRetriedForUrl(url: task.currentRequest?.url?.absoluteString)
             completion(false, 0.0) // Shouldn't retry
             return
         }
@@ -47,4 +54,28 @@ class RetryPolicy: RequestRetrier {
 
         currentRetriedRequests.removeValue(forKey: url)
     }
+}
+
+class MySessionDelegate: NSObject, URLSessionDelegate {
+  
+  var retrier: MyRequestRetrier?
+  
+  open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+      if let retrier = retrier, let error = error {
+          retrier.should(session, retry: task, with: error) { [weak task] shouldRetry, timeDelay in
+              guard shouldRetry else {
+                return
+              }
+
+              DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + timeDelay) {
+                  guard let request = task?.currentRequest else {
+                    return
+                  }
+                
+                session.dataTask(with: request).resume()
+              }
+          }
+      }
+  }
+  
 }

@@ -1,9 +1,20 @@
 
-import Alamofire
 import Foundation
 import PassKit
 import UIKit
 import WebKit
+
+enum HTTPMethod: String {
+    case options = "OPTIONS"
+    case get     = "GET"
+    case head    = "HEAD"
+    case post    = "POST"
+    case put     = "PUT"
+    case patch   = "PATCH"
+    case delete  = "DELETE"
+    case trace   = "TRACE"
+    case connect = "CONNECT"
+}
 
 public class ProcessOut {
     
@@ -71,8 +82,13 @@ public class ProcessOut {
     internal static var ProjectId: String?
     internal static let threeDS2ChallengeSuccess: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ==";
     internal static let threeDS2ChallengeError: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ==";
-    internal static let sessionManager = SessionManager()
-    internal static let retryPolicy = RetryPolicy()
+    
+    internal static let urlSession: URLSession = {
+      URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: .main)
+    }()
+  
+    internal static let sessionDelegate = MySessionDelegate()
+    internal static let retryPolicy = MyRetryPolicy()
     
     // Getting the device user agent
     private static let defaultUserAgent = "iOS/" + UIDevice.current.systemVersion
@@ -568,16 +584,25 @@ public class ProcessOut {
         // Join the array into a single string separated by ampersands and return it
         return filteredPaginationParams.joined(separator: "&")
     }
+  
+  private static func authorizationHeader(user: String, password: String) -> (key: String, value: String)? {
+      guard let data = "\(user):\(password)".data(using: .utf8) else { return nil }
 
-    private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters?, completion: @escaping (Data?, ProcessOutException?) -> Void) {
-        guard let projectId = ProjectId, let authorizationHeader = Request.authorizationHeader(user: projectId, password: "") else {
+      let credential = data.base64EncodedString(options: [])
+
+      return (key: "Authorization", value: "Basic \(credential)")
+  }
+  
+    private static func HttpRequest(route: String, method: HTTPMethod, parameters: [String: Any]?, completion: @escaping (Data?, ProcessOutException?) -> Void) {
+        guard let projectId = ProjectId, let authorizationHeader = self.authorizationHeader(user: projectId, password: "") else {
             completion(nil, ProcessOutException.MissingProjectId)
             return
         }
         
-        if sessionManager.retrier == nil {
-            sessionManager.retrier = retryPolicy
+        if sessionDelegate.retrier == nil {
+          sessionDelegate.retrier = retryPolicy
         }
+        
         do {
             guard let url = NSURL(string: ApiUrl + route) else {
                 completion(nil, ProcessOutException.InternalError)
@@ -597,13 +622,14 @@ public class ProcessOut {
             }
 
             
-            sessionManager.request(request as URLRequestConvertible).responseJSON(completionHandler: {(response) -> Void in
-                guard let data = response.data else {
-                    completion(nil, ProcessOutException.NetworkError)
-                    return
-                }
-                handleNetworkResult(data: data, completion: completion)
-            })
+          self.urlSession.dataTask(with: request) { (data, _, _) in
+            guard let data = data else {
+                completion(nil, ProcessOutException.NetworkError)
+                return
+            }
+            
+            handleNetworkResult(data: data, completion: completion)
+          }
         } catch {
             completion(nil, ProcessOutException.InternalError)
         }
