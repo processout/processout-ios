@@ -622,14 +622,15 @@ public class ProcessOut {
             }
 
             
-          self.urlSession.dataTask(with: request) { (data, _, _) in
-            guard let data = data else {
-                completion(nil, ProcessOutException.NetworkError)
-                return
+            self.urlSession.dataTask(with: request) { (data, _, _) in
+              guard let data = data else {
+                  completion(nil, ProcessOutException.NetworkError)
+                  return
+              }
+              
+              handleNetworkResult(data: data, completion: completion)
             }
-            
-            handleNetworkResult(data: data, completion: completion)
-          }
+            .resume()
         } catch {
             completion(nil, ProcessOutException.InternalError)
         }
