@@ -31,14 +31,6 @@ final class ProcessOutRequestManager {
       
       self.urlSession = URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: .main)
     }
-    
-    private func authorizationHeader(user: String, password: String) -> (key: String, value: String)? {
-        guard let data = "\(user):\(password)".data(using: .utf8) else { return nil }
-
-        let credential = data.base64EncodedString(options: [])
-
-        return (key: "Authorization", value: "Basic \(credential)")
-    }
   
     func HttpRequest(route: String, method: HTTPMethod, parameters: [String: Any]?, completion: @escaping (Data?, ProcessOutException?) -> Void) {
         guard let projectId = ProcessOut.ProjectId, let authorizationHeader = self.authorizationHeader(user: projectId, password: "") else {
@@ -96,6 +88,14 @@ final class ProcessOutRequestManager {
         } catch {
             completion(nil, ProcessOutException.InternalError)
         }
+    }
+    
+    private func authorizationHeader(user: String, password: String) -> (key: String, value: String)? {
+        guard let data = "\(user):\(password)".data(using: .utf8) else { return nil }
+
+        let credential = data.base64EncodedString(options: [])
+
+        return (key: "Authorization", value: "Basic \(credential)")
     }
     
 }
