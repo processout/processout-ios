@@ -7,21 +7,21 @@
 
 import Foundation
 
-public typealias MyRequestRetryCompletion = (_ shouldRetry: Bool, _ timeDelay: TimeInterval) -> Void
+public typealias RequestRetryCompletion = (_ shouldRetry: Bool, _ timeDelay: TimeInterval) -> Void
 
-protocol MyRequestRetrier {
+protocol RequestRetrier {
   
-  func should(_ session: URLSession, retry task: URLSessionTask, with error: Error, completion: @escaping MyRequestRetryCompletion)
+  func should(_ session: URLSession, retry task: URLSessionTask, with error: Error, completion: @escaping RequestRetryCompletion)
   
 }
 
-class MyRetryPolicy: MyRequestRetrier {
+class RetryPolicy: RequestRetrier {
     
     private var currentRetriedRequests: [String: Int] = [:]
     private let RETRY_INTERVAL: TimeInterval = 0.1; // Retry after .1s
     private let MAXIMUM_RETRIES = 2
 
-  func should(_ session: URLSession, retry task: URLSessionTask, with error: Error, completion: @escaping MyRequestRetryCompletion) {
+  func should(_ session: URLSession, retry task: URLSessionTask, with error: Error, completion: @escaping RequestRetryCompletion) {
         guard task.response == nil, let url = task.currentRequest?.url?.absoluteString else {
             clearRetriedForUrl(url: task.currentRequest?.url?.absoluteString)
             completion(false, 0.0) // Shouldn't retry
@@ -54,28 +54,4 @@ class MyRetryPolicy: MyRequestRetrier {
 
         currentRetriedRequests.removeValue(forKey: url)
     }
-}
-
-class MySessionDelegate: NSObject, URLSessionDelegate {
-  
-  var retrier: MyRequestRetrier?
-  
-  open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-      if let retrier = retrier, let error = error {
-          retrier.should(session, retry: task, with: error) { [weak task] shouldRetry, timeDelay in
-              guard shouldRetry else {
-                return
-              }
-
-              DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + timeDelay) {
-                  guard let request = task?.currentRequest else {
-                    return
-                  }
-                
-                session.dataTask(with: request).resume()
-              }
-          }
-      }
-  }
-  
 }

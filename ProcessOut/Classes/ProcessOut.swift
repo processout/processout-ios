@@ -83,12 +83,7 @@ public class ProcessOut {
     internal static let threeDS2ChallengeSuccess: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ==";
     internal static let threeDS2ChallengeError: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ==";
     
-    internal static let urlSession: URLSession = {
-      URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: .main)
-    }()
-  
-    internal static let sessionDelegate = MySessionDelegate()
-    internal static let retryPolicy = MyRetryPolicy()
+    internal static let requestManager = ProcessOutRequestManager(apiUrl: ApiUrl, apiVersion: ApiVersion, defaultUserAgent: defaultUserAgent)
     
     // Getting the device user agent
     private static let defaultUserAgent = "iOS/" + UIDevice.current.systemVersion
@@ -585,74 +580,9 @@ public class ProcessOut {
         return filteredPaginationParams.joined(separator: "&")
     }
   
-  private static func authorizationHeader(user: String, password: String) -> (key: String, value: String)? {
-      guard let data = "\(user):\(password)".data(using: .utf8) else { return nil }
-
-      let credential = data.base64EncodedString(options: [])
-
-      return (key: "Authorization", value: "Basic \(credential)")
-  }
-  
     private static func HttpRequest(route: String, method: HTTPMethod, parameters: [String: Any]?, completion: @escaping (Data?, ProcessOutException?) -> Void) {
-        guard let projectId = ProjectId, let authorizationHeader = self.authorizationHeader(user: projectId, password: "") else {
-            completion(nil, ProcessOutException.MissingProjectId)
-            return
-        }
-        
-        if sessionDelegate.retrier == nil {
-          sessionDelegate.retrier = retryPolicy
-        }
-        
-        do {
-            guard let url = NSURL(string: ApiUrl + route) else {
-                completion(nil, ProcessOutException.InternalError)
-                return
-            }
-            
-            var request = URLRequest(url: url as URL)
-            request.httpMethod = method.rawValue
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue(authorizationHeader.value, forHTTPHeaderField: authorizationHeader.key)
-            request.setValue(ProcessOut.defaultUserAgent + " ProcessOut iOS-Bindings/" + ApiVersion, forHTTPHeaderField: "User-Agent")
-            request.setValue(UUID().uuidString, forHTTPHeaderField: "Idempotency-Key")
-            request.timeoutInterval = 15
-            
-            if let body = parameters {
-                request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
-            }
-
-            
-            self.urlSession.dataTask(with: request) { (data, _, _) in
-              guard let data = data else {
-                  completion(nil, ProcessOutException.NetworkError)
-                  return
-              }
-              
-              handleNetworkResult(data: data, completion: completion)
-            }
-            .resume()
-        } catch {
-            completion(nil, ProcessOutException.InternalError)
-        }
+        self.requestManager.HttpRequest(route: route, method: method, parameters: parameters, completion: completion)
     }
     
-    private static func handleNetworkResult(data: Data, completion: @escaping (Data?, ProcessOutException?) -> Void) {
-        do {
-            let result = try JSONDecoder().decode(ApiResponse.self, from: data)
-            if result.success {
-                completion(data, nil)
-                return
-            }
-            
-            if let message = result.message, let errorType = result.errorType {
-                completion(nil, ProcessOutException.BadRequest(errorMessage: message, errorCode: errorType))
-                return
-            }
-            
-            completion(nil, ProcessOutException.NetworkError)
-        } catch {
-            completion(nil, ProcessOutException.InternalError)
-        }
-    }
 }
 
