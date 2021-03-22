@@ -12,26 +12,26 @@ final class ProcessOutRequestManager {
     let apiUrl: String
     let apiVersion: String
     let defaultUserAgent: String
-  
+    
     let sessionDelegate: SessionDelegate
     let retryPolicy: RetryPolicy
     let urlSession: URLSession
     
     init(apiUrl: String, apiVersion: String, defaultUserAgent: String) {
-      self.apiUrl = apiUrl
-      self.apiVersion = apiVersion
-      self.defaultUserAgent = defaultUserAgent
-      
-      let retryPolicy = RetryPolicy()
-      self.retryPolicy = retryPolicy
-      
-      let sessionDelegate = SessionDelegate()
-      sessionDelegate.retrier = retryPolicy
-      self.sessionDelegate = sessionDelegate
-      
-      self.urlSession = URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: .main)
+        self.apiUrl = apiUrl
+        self.apiVersion = apiVersion
+        self.defaultUserAgent = defaultUserAgent
+        
+        let retryPolicy = RetryPolicy()
+        self.retryPolicy = retryPolicy
+        
+        let sessionDelegate = SessionDelegate()
+        sessionDelegate.retrier = retryPolicy
+        self.sessionDelegate = sessionDelegate
+        
+        self.urlSession = URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: .main)
     }
-  
+    
     func HttpRequest(route: String, method: HTTPMethod, parameters: [String: Any]?, completion: @escaping (Data?, ProcessOutException?) -> Void) {
         guard let projectId = ProcessOut.ProjectId, let authorizationHeader = self.authorizationHeader(user: projectId, password: "") else {
             completion(nil, ProcessOutException.MissingProjectId)
@@ -39,7 +39,7 @@ final class ProcessOutRequestManager {
         }
         
         do {
-          guard let url = NSURL(string: self.apiUrl + route) else {
+            guard let url = NSURL(string: self.apiUrl + route) else {
                 completion(nil, ProcessOutException.InternalError)
                 return
             }
@@ -55,22 +55,22 @@ final class ProcessOutRequestManager {
             if let body = parameters {
                 request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
             }
-
+            
             
             self.urlSession.dataTask(with: request) { [weak self] (data, _, _) in
-              guard let data = data else {
-                  completion(nil, ProcessOutException.NetworkError)
-                  return
-              }
-              
-              self?.handleNetworkResult(data: data, completion: completion)
+                guard let data = data else {
+                    completion(nil, ProcessOutException.NetworkError)
+                    return
+                }
+                
+                self?.handleNetworkResult(data: data, completion: completion)
             }
             .resume()
         } catch {
             completion(nil, ProcessOutException.InternalError)
         }
     }
-  
+    
     private func handleNetworkResult(data: Data, completion: @escaping (Data?, ProcessOutException?) -> Void) {
         do {
             let result = try JSONDecoder().decode(ApiResponse.self, from: data)
@@ -92,9 +92,9 @@ final class ProcessOutRequestManager {
     
     private func authorizationHeader(user: String, password: String) -> (key: String, value: String)? {
         guard let data = "\(user):\(password)".data(using: .utf8) else { return nil }
-
+        
         let credential = data.base64EncodedString(options: [])
-
+        
         return (key: "Authorization", value: "Basic \(credential)")
     }
     
@@ -108,14 +108,14 @@ final class SessionDelegate: NSObject, URLSessionDelegate {
         if let retrier = retrier, let error = error {
             retrier.should(session, retry: task, with: error) { [weak task] shouldRetry, timeDelay in
                 guard shouldRetry else {
-                  return
+                    return
                 }
-
+                
                 DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + timeDelay) {
                     guard let request = task?.currentRequest else {
-                      return
+                        return
                     }
-                  
+                    
                     session.dataTask(with: request).resume()
                 }
             }
