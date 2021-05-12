@@ -2,6 +2,7 @@ use_frameworks!
 platform :ios, '9.0'
 target 'ProcessOut_Example' do
   pod 'ProcessOut', :path => '../'
+  pod 'Alamofire', '~> 4.8.2'
   target 'ProcessOut_UITests' do
     inherit! :complete
   end

@@ -1,9 +1,20 @@
 
-import Alamofire
 import Foundation
 import PassKit
 import UIKit
 import WebKit
+
+enum HTTPMethod: String {
+    case options = "OPTIONS"
+    case get     = "GET"
+    case head    = "HEAD"
+    case post    = "POST"
+    case put     = "PUT"
+    case patch   = "PATCH"
+    case delete  = "DELETE"
+    case trace   = "TRACE"
+    case connect = "CONNECT"
+}
 
 public class ProcessOut {
     
@@ -71,8 +82,8 @@ public class ProcessOut {
     internal static var ProjectId: String?
     internal static let threeDS2ChallengeSuccess: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ==";
     internal static let threeDS2ChallengeError: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ==";
-    internal static let sessionManager = SessionManager()
-    internal static let retryPolicy = RetryPolicy()
+    
+    internal static let requestManager = ProcessOutRequestManager(apiUrl: ApiUrl, apiVersion: ApiVersion, defaultUserAgent: defaultUserAgent)
     
     // Getting the device user agent
     private static let defaultUserAgent = "iOS/" + UIDevice.current.systemVersion
@@ -568,64 +579,10 @@ public class ProcessOut {
         // Join the array into a single string separated by ampersands and return it
         return filteredPaginationParams.joined(separator: "&")
     }
-
-    private static func HttpRequest(route: String, method: HTTPMethod, parameters: Parameters?, completion: @escaping (Data?, ProcessOutException?) -> Void) {
-        guard let projectId = ProjectId, let authorizationHeader = Request.authorizationHeader(user: projectId, password: "") else {
-            completion(nil, ProcessOutException.MissingProjectId)
-            return
-        }
-        
-        if sessionManager.retrier == nil {
-            sessionManager.retrier = retryPolicy
-        }
-        do {
-            guard let url = NSURL(string: ApiUrl + route) else {
-                completion(nil, ProcessOutException.InternalError)
-                return
-            }
-            
-            var request = URLRequest(url: url as URL)
-            request.httpMethod = method.rawValue
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue(authorizationHeader.value, forHTTPHeaderField: authorizationHeader.key)
-            request.setValue(ProcessOut.defaultUserAgent + " ProcessOut iOS-Bindings/" + ApiVersion, forHTTPHeaderField: "User-Agent")
-            request.setValue(UUID().uuidString, forHTTPHeaderField: "Idempotency-Key")
-            request.timeoutInterval = 15
-            
-            if let body = parameters {
-                request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
-            }
-
-            
-            sessionManager.request(request as URLRequestConvertible).responseJSON(completionHandler: {(response) -> Void in
-                guard let data = response.data else {
-                    completion(nil, ProcessOutException.NetworkError)
-                    return
-                }
-                handleNetworkResult(data: data, completion: completion)
-            })
-        } catch {
-            completion(nil, ProcessOutException.InternalError)
-        }
+  
+    private static func HttpRequest(route: String, method: HTTPMethod, parameters: [String: Any]?, completion: @escaping (Data?, ProcessOutException?) -> Void) {
+        self.requestManager.HttpRequest(route: route, method: method, parameters: parameters, completion: completion)
     }
     
-    private static func handleNetworkResult(data: Data, completion: @escaping (Data?, ProcessOutException?) -> Void) {
-        do {
-            let result = try JSONDecoder().decode(ApiResponse.self, from: data)
-            if result.success {
-                completion(data, nil)
-                return
-            }
-            
-            if let message = result.message, let errorType = result.errorType {
-                completion(nil, ProcessOutException.BadRequest(errorMessage: message, errorCode: errorType))
-                return
-            }
-            
-            completion(nil, ProcessOutException.NetworkError)
-        } catch {
-            completion(nil, ProcessOutException.InternalError)
-        }
-    }
 }
 
