@@ -39,5 +39,4 @@ This token can then be used and stored on your backend to charge customers.
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
-  s.dependency 'Alamofire', '~> 4.8.2'
 end

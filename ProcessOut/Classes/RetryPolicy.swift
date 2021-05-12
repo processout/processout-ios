@@ -6,17 +6,24 @@
 //
 
 import Foundation
-import Alamofire
+
+public typealias RequestRetryCompletion = (_ shouldRetry: Bool, _ timeDelay: TimeInterval) -> Void
+
+protocol RequestRetrier {
+    
+    func should(_ session: URLSession, retry task: URLSessionTask, with error: Error, completion: @escaping RequestRetryCompletion)
+    
+}
 
 class RetryPolicy: RequestRetrier {
     
     private var currentRetriedRequests: [String: Int] = [:]
     private let RETRY_INTERVAL: TimeInterval = 0.1; // Retry after .1s
     private let MAXIMUM_RETRIES = 2
-
-    func should(_ manager: SessionManager, retry request: Request, with error: Error, completion: @escaping RequestRetryCompletion) {
-        guard request.task?.response == nil, let url = request.request?.url?.absoluteString else {
-            clearRetriedForUrl(url: request.request?.url?.absoluteString)
+    
+    func should(_ session: URLSession, retry task: URLSessionTask, with error: Error, completion: @escaping RequestRetryCompletion) {
+        guard task.response == nil, let url = task.currentRequest?.url?.absoluteString else {
+            clearRetriedForUrl(url: task.currentRequest?.url?.absoluteString)
             completion(false, 0.0) // Shouldn't retry
             return
         }
@@ -44,7 +51,7 @@ class RetryPolicy: RequestRetrier {
         guard let url = url else {
             return
         }
-
+        
         currentRetriedRequests.removeValue(forKey: url)
     }
 }
