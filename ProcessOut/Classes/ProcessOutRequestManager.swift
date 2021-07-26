@@ -16,11 +16,14 @@ final class ProcessOutRequestManager {
     let sessionDelegate: SessionDelegate
     let retryPolicy: RetryPolicy
     let urlSession: URLSession
+    let urlSessionConfiguration: URLSessionConfiguration
     
     init(apiUrl: String, apiVersion: String, defaultUserAgent: String) {
         self.apiUrl = apiUrl
         self.apiVersion = apiVersion
         self.defaultUserAgent = defaultUserAgent
+        self.urlSessionConfiguration = URLSessionConfiguration.default
+        self.urlSessionConfiguration.urlCache = nil
         
         let retryPolicy = RetryPolicy()
         self.retryPolicy = retryPolicy
@@ -29,7 +32,7 @@ final class ProcessOutRequestManager {
         sessionDelegate.retrier = retryPolicy
         self.sessionDelegate = sessionDelegate
         
-        self.urlSession = URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: .main)
+        self.urlSession = URLSession(configuration: self.urlSessionConfiguration, delegate: sessionDelegate, delegateQueue: .main)
     }
     
     func HttpRequest(route: String, method: HTTPMethod, parameters: [String: Any]?, completion: @escaping (Data?, ProcessOutException?) -> Void) {
