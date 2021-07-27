@@ -22,7 +22,7 @@ final class ProcessOutRequestManager {
         self.apiUrl = apiUrl
         self.apiVersion = apiVersion
         self.defaultUserAgent = defaultUserAgent
-        self.urlSessionConfiguration = URLSessionConfiguration.default
+        self.urlSessionConfiguration = .default
         self.urlSessionConfiguration.urlCache = nil
         self.urlSessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
         
