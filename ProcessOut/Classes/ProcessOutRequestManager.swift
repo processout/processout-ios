@@ -24,6 +24,7 @@ final class ProcessOutRequestManager {
         self.defaultUserAgent = defaultUserAgent
         self.urlSessionConfiguration = URLSessionConfiguration.default
         self.urlSessionConfiguration.urlCache = nil
+        self.urlSessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
         
         let retryPolicy = RetryPolicy()
         self.retryPolicy = retryPolicy
