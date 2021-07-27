@@ -66,7 +66,7 @@ class ViewController: UIViewController, PKPaymentAuthorizationViewControllerDele
         }
         
         let contact = ProcessOut.Contact(address1: "1 great street", address2: nil, city: "City", state: "State", zip: "10000", countryCode: "US")
-        let card = ProcessOut.Card(cardNumber: cardNumber, expMonth: 10, expYear: 20, cvc: "737", name: "Mr", contact: contact)
+        let card = ProcessOut.Card(cardNumber: cardNumber, expMonth: 10, expYear: 24, cvc: "737", name: "Mr", contact: contact)
         // Create invoice
         let inv = Invoice(name: "test 3DS", amount: "12.01", currency: "EUR")
         createInvoice(invoice: inv, completion: {(invoiceId, error) in
