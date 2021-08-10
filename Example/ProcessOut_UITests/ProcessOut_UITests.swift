@@ -47,7 +47,7 @@ class ProcessOutUITests: XCTestCase {
         // Create an expectation for a background download task.
         let expectation = XCTestExpectation(description: "Tokenize a card")
         
-        let card = ProcessOut.Card(cardNumber: "424242424242", expMonth: 11, expYear: 20, cvc: "123", name: "test card")
+        let card = ProcessOut.Card(cardNumber: "424242424242", expMonth: 11, expYear: 24, cvc: "123", name: "test card")
         ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) in
             XCTAssertNotNil(token)
             expectation.fulfill()
