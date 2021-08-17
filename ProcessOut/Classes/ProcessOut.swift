@@ -315,10 +315,11 @@ public class ProcessOut {
     /// - Parameters:
     ///   - invoiceId: Invoice generated on your backend
     ///   - token: Card token to be used for the charge
+    ///   - incremental: Whether the invoice should be marked as incremental (optional, false if no value provided)
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
-    public static func makeCardPayment(invoiceId: String, token: String, handler: ThreeDSHandler, with: UIViewController) {
-        let authRequest = AuthorizationRequest(source: token)
+    public static func makeCardPayment(invoiceId: String, token: String, incremental: Bool = false, handler: ThreeDSHandler, with: UIViewController) {
+        let authRequest = AuthorizationRequest(source: token, incremental: incremental)
         guard let body = try? JSONEncoder().encode(authRequest) else {
             handler.onError(error: ProcessOutException.InternalError)
             return
@@ -362,6 +363,34 @@ public class ProcessOut {
             })
         } catch {
             handler.onError(error: ProcessOutException.GenericError(error: error))
+        }
+    }
+    
+    /// Increments the authorization of an applicable invoice by a given amount
+    ///
+    /// - Parameters:
+    ///   - invoiceId: Invoice generated on your backend
+    ///   - amount: The amount by which the authorization should be incremented
+    ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
+    public static func incrementAuthorizationAmount(invoiceId: String, amount: Int, handler: ThreeDSHandler) {
+        let incrementRequest = IncrementAuthorizationRequest(amount: amount)
+        guard let body = try? JSONEncoder().encode(incrementRequest) else {
+            handler.onError(error: ProcessOutException.InternalError)
+            return
+        }
+        
+        do {
+            let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
+            HttpRequest(route: "/invoices/" + invoiceId + "/increment_authorization", method: .post, parameters: json, completion: {(data, error) -> Void in
+                guard data != nil else {
+                    handler.onError(error: error!)
+                    return
+                }
+                
+                handler.onSuccess(invoiceId: invoiceId)
+            })
+        } catch {
+            handler.onError(error: .GenericError(error: error))
         }
     }
     

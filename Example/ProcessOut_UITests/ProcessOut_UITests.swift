@@ -40,7 +40,66 @@ class ProcessOutUITests: XCTestCase {
         
         wait(for: [expectation], timeout: 10.0)
     }
- 
+    
+    func testAuthorisation() {
+        XCUIApplication().launch()
+        
+        let expectation = XCTestExpectation(description: "Invoice authorization")
+        let inv = Invoice(name: "test", amount: "12.01", currency: "EUR")
+        let card = ProcessOut.Card(cardNumber: "424242424242", expMonth: 11, expYear: 24, cvc: "123", name: "test card")
+        let handler = ProcessOut.createThreeDSTestHandler(viewController: UIViewController(), completion: { (invoiceId, error) in
+            if invoiceId != nil {
+                expectation.fulfill()
+            } else {
+                // An error occurred
+                print(error)
+            }
+        })
+        ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) in
+            XCTAssertNotNil(token)
+            
+            self.createInvoice(invoice: inv, completion: {(invoiceId, error) in
+                XCTAssertNotNil(invoiceId)
+                
+                ProcessOut.makeCardPayment(invoiceId: invoiceId!, token: token!, handler: handler, with: UIViewController())
+            })
+        })
+        
+        wait(for: [expectation], timeout: 10.0)
+    }
+    
+    func testIncrementalAuthorization() {
+        XCUIApplication().launch()
+        
+        let expectation = XCTestExpectation(description: "Incremental invoice authorization")
+        let inv = Invoice(name: "test", amount: "12.01", currency: "EUR")
+        let card = ProcessOut.Card(cardNumber: "424242424242", expMonth: 11, expYear: 24, cvc: "123", name: "test card")
+        let incrementAuthorizationAmountHandler = ProcessOut.createThreeDSTestHandler(viewController: UIViewController(), completion: { (invoiceId, error) in
+            if invoiceId != nil {
+                expectation.fulfill()
+            } else {
+                // An error occurred
+                print(error)
+            }
+        })
+        let makeCardPaymentHandler = ProcessOut.createThreeDSTestHandler(viewController: UIViewController(), completion: { (invoiceId, error) in
+            if invoiceId != nil {
+                ProcessOut.incrementAuthorizationAmount(invoiceId: invoiceId!, amount: 5, handler: incrementAuthorizationAmountHandler)
+            }
+        })
+        ProcessOut.Tokenize(card: card, metadata: [:], completion: {(token, error) in
+            XCTAssertNotNil(token)
+            
+            self.createInvoice(invoice: inv, completion: {(invoiceId, error) in
+                XCTAssertNotNil(invoiceId)
+                
+                ProcessOut.makeCardPayment(invoiceId: invoiceId!, token: token!, incremental: true, handler: makeCardPaymentHandler, with: UIViewController())
+            })
+        })
+        
+        wait(for: [expectation], timeout: 10.0)
+    }
+    
     func testTokenize() {
         XCUIApplication().launch()
         
