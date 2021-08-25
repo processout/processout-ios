@@ -325,7 +325,10 @@ public class ProcessOut {
         }
         
         do {
-            let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
+            guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
+                handler.onError(error: ProcessOutException.InternalError)
+                return
+            }
             makeAuthorizationRequest(invoiceId: invoiceId, json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
                 makeCardPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
             })
@@ -349,7 +352,10 @@ public class ProcessOut {
         }
         
         do {
-            let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
+            guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
+                handler.onError(error: ProcessOutException.InternalError)
+                return
+            }
             makeAuthorizationRequest(invoiceId: invoiceId, json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
                 makeIncrementalAuthorizationPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
             })
@@ -372,7 +378,10 @@ public class ProcessOut {
         }
         
         do {
-            let json = try JSONSerialization.jsonObject(with: body, options: []) as! [String : Any]
+            guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
+                handler.onError(error: ProcessOutException.InternalError)
+                return
+            }
             HttpRequest(route: "/invoices/" + invoiceId + "/increment_authorization", method: .post, parameters: json, completion: {(data, error) -> Void in
                 guard data != nil else {
                     handler.onError(error: error!)
@@ -609,7 +618,7 @@ public class ProcessOut {
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
     ///   - actionHandlerCompletion: Callback to pass to action handler to be executed following web authentication
-    private static func makeAuthorizationRequest(invoiceId: String, json: [String: Any], handler: ThreeDSHandler, with: UIViewController, actionHandlerCompletion: @escaping (String) -> Void) -> Void {
+    private static func makeAuthorizationRequest(invoiceId: String, json: [String: Any]?, handler: ThreeDSHandler, with: UIViewController, actionHandlerCompletion: @escaping (String) -> Void) -> Void {
         HttpRequest(route: "/invoices/" + invoiceId + "/authorize", method: .post, parameters: json, completion: {(data, error) -> Void in
             guard data != nil else {
                 handler.onError(error: error ?? ProcessOutException.InternalError)
