@@ -612,7 +612,7 @@ public class ProcessOut {
     private static func makeAuthorizationRequest(invoiceId: String, json: [String: Any], handler: ThreeDSHandler, with: UIViewController, actionHandlerCompletion: @escaping (String) -> Void) -> Void {
         HttpRequest(route: "/invoices/" + invoiceId + "/authorize", method: .post, parameters: json, completion: {(data, error) -> Void in
             guard data != nil else {
-                handler.onError(error: error!)
+                handler.onError(error: error ?? ProcessOutException.InternalError)
                 return
             }
             
