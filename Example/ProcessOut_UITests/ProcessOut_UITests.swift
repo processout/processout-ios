@@ -93,7 +93,7 @@ class ProcessOutUITests: XCTestCase {
             self.createInvoice(invoice: inv, completion: {(invoiceId, error) in
                 XCTAssertNotNil(invoiceId)
                 
-                ProcessOut.makeCardPayment(invoiceId: invoiceId!, token: token!, incremental: true, handler: makeCardPaymentHandler, with: UIViewController())
+                ProcessOut.makeIncrementalAuthorizationPayment(invoiceId: invoiceId!, token: token!, handler: makeCardPaymentHandler, with: UIViewController())
             })
         })
         
