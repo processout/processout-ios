@@ -232,16 +232,17 @@ public class ProcessOut {
             
             HttpRequest(route: "/cards", method: .post, parameters: parameters) { (tokenResponse, error) in
                 do {
-                    if tokenResponse != nil {
-                        let tokenizationResult = try JSONDecoder().decode(TokenizationResult.self, from: tokenResponse!)
-                        if let card = tokenizationResult.card, tokenizationResult.success {
-                            completion(card.id, nil)
+                    guard let tokenResponse = tokenResponse else {
+                        throw ProcessOutException.InternalError
+                    }
+                    let tokenizationResult = try JSONDecoder().decode(TokenizationResult.self, from: tokenResponse!)
+                    if let card = tokenizationResult.card, tokenizationResult.success {
+                        completion(card.id, nil)
+                    } else {
+                        if let message = tokenizationResult.message, let errorType = tokenizationResult.errorType {
+                            completion(nil, ProcessOutException.BadRequest(errorMessage: message, errorCode: errorType))
                         } else {
-                            if let message = tokenizationResult.message, let errorType = tokenizationResult.errorType {
-                                completion(nil, ProcessOutException.BadRequest(errorMessage: message, errorCode: errorType))
-                            } else {
-                                completion(nil, ProcessOutException.InternalError)
-                            }
+                            completion(nil, ProcessOutException.InternalError)
                         }
                     }
                 } catch {
