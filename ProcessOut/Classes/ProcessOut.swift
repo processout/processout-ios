@@ -235,7 +235,7 @@ public class ProcessOut {
                     guard let tokenResponse = tokenResponse else {
                         throw ProcessOutException.InternalError
                     }
-                    let tokenizationResult = try JSONDecoder().decode(TokenizationResult.self, from: tokenResponse!)
+                    let tokenizationResult = try JSONDecoder().decode(TokenizationResult.self, from: tokenResponse)
                     if let card = tokenizationResult.card, tokenizationResult.success {
                         completion(card.id, nil)
                     } else {
