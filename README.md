@@ -66,7 +66,6 @@ ProcessOut.UpdateCvc(cardId: "a_card_token", newCvc: "123", completion: { (error
 })
 ```
 
-
 ## Contributing
 
 ### Requirements
