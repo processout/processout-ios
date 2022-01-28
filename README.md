@@ -4,10 +4,6 @@
 [![License](https://img.shields.io/cocoapods/l/ProcessOut.svg?style=flat)](http://cocoapods.org/pods/ProcessOut)
 [![Platform](https://img.shields.io/cocoapods/p/ProcessOut.svg?style=flat)](http://cocoapods.org/pods/ProcessOut)
 
-## Example
-
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
-
 ## Requirements
 
 *iOS 8.0+*
@@ -70,6 +66,25 @@ ProcessOut.UpdateCvc(cardId: "a_card_token", newCvc: "123", completion: { (error
 })
 ```
 
+## Contributing
+
+### Requirements
+
+- A recent version of macOS (tested with version 12.1)
+- A recent version of Xcode (tested with version 13.2)
+- [Cocoapods](https://cocoapods.org/)
+
+### Running the example project
+
+1. In the `Example/` directory, install the dependencies using [Cocoapods](https://cocoapods.org/)
+
+```Shell
+$ pod install
+```
+
+2. Using Xcode, open `ProcessOut.xcworkspace`
+
+3. Build and run the project by choosing Product > Run in the Xcode menu bar
 
 ## Author
 
