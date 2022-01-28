@@ -311,15 +311,17 @@ public class ProcessOut {
         }
     }
     
+    
     /// Initiate a payment authorization from a previously generated invoice and card token
     ///
     /// - Parameters:
     ///   - invoiceId: Invoice generated on your backend
     ///   - token: Card token to be used for the charge
+    ///   - sdkVersion: Version of the 3rd party SDK being used for the calls
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
-    public static func makeCardPayment(invoiceId: String, token: String, handler: ThreeDSHandler, with: UIViewController) {
-        let authRequest = AuthorizationRequest(source: token, incremental: false)
+    public static func makeCardPayment(invoiceId: String, token: String, sdkVersion: String, handler: ThreeDSHandler, with: UIViewController) {
+        let authRequest = AuthorizationRequest(source: token, incremental: false, sdkVersion: sdkVersion)
         guard let body = try? JSONEncoder().encode(authRequest) else {
             handler.onError(error: ProcessOutException.InternalError)
             return
@@ -330,7 +332,34 @@ public class ProcessOut {
                 handler.onError(error: ProcessOutException.InternalError)
                 return
             }
-            makeAuthorizationRequest(invoiceId: invoiceId, json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
+            makeAuthorizationRequest(invoiceId: invoiceId, sdkVersion: sdkVersion, json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
+                makeCardPayment(invoiceId: invoiceId, token: newSource, sdkVersion: sdkVersion, handler: handler, with: with)
+            })
+        } catch {
+            handler.onError(error: ProcessOutException.GenericError(error: error))
+        }
+    }
+    
+    /// Initiate a payment authorization from a previously generated invoice and card token
+    ///
+    /// - Parameters:
+    ///   - invoiceId: Invoice generated on your backend
+    ///   - token: Card token to be used for the charge
+    ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
+    ///   - with: UIViewController to display webviews and perform fingerprinting
+    public static func makeCardPayment(invoiceId: String, token: String, handler: ThreeDSHandler, with: UIViewController) {
+        let authRequest = AuthorizationRequest(source: token, incremental: false, sdkVersion: "")
+        guard let body = try? JSONEncoder().encode(authRequest) else {
+            handler.onError(error: ProcessOutException.InternalError)
+            return
+        }
+        
+        do {
+            guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
+                handler.onError(error: ProcessOutException.InternalError)
+                return
+            }
+            makeAuthorizationRequest(invoiceId: invoiceId, sdkVersion: "", json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
                 makeCardPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
             })
         } catch {
@@ -346,7 +375,7 @@ public class ProcessOut {
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeIncrementalAuthorizationPayment(invoiceId: String, token: String, handler: ThreeDSHandler, with: UIViewController) {
-        let authRequest = AuthorizationRequest(source: token, incremental: true)
+        let authRequest = AuthorizationRequest(source: token, incremental: true, sdkVersion: "")
         guard let body = try? JSONEncoder().encode(authRequest) else {
             handler.onError(error: ProcessOutException.InternalError)
             return
@@ -357,7 +386,7 @@ public class ProcessOut {
                 handler.onError(error: ProcessOutException.InternalError)
                 return
             }
-            makeAuthorizationRequest(invoiceId: invoiceId, json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
+            makeAuthorizationRequest(invoiceId: invoiceId, sdkVersion: "", json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
                 makeIncrementalAuthorizationPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
             })
         } catch {
@@ -616,10 +645,11 @@ public class ProcessOut {
     /// - Parameters:
     ///   - invoiceId: Invoice generated on your backend
     ///   - json: The request body
+    ///   - sdkVersion: version of the 3ds2 SDK
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
     ///   - actionHandlerCompletion: Callback to pass to action handler to be executed following web authentication
-    private static func makeAuthorizationRequest(invoiceId: String, json: [String: Any]?, handler: ThreeDSHandler, with: UIViewController, actionHandlerCompletion: @escaping (String) -> Void) -> Void {
+    private static func makeAuthorizationRequest(invoiceId: String, sdkVersion: String, json: [String: Any]?, handler: ThreeDSHandler, with: UIViewController, actionHandlerCompletion: @escaping (String) -> Void) -> Void {
         HttpRequest(route: "/invoices/" + invoiceId + "/authorize", method: .post, parameters: json, completion: {(data, error) -> Void in
             guard data != nil else {
                 handler.onError(error: error ?? ProcessOutException.InternalError)
@@ -639,7 +669,7 @@ public class ProcessOut {
             // Initiate the webView component
             let poWebView = CardPaymentWebView(frame: with.view.frame, onResult: {(token) in
                 // Web authentication completed
-                makeCardPayment(invoiceId: invoiceId, token: token, handler: handler, with: with)
+                makeCardPayment(invoiceId: invoiceId, token: token, sdkVersion: sdkVersion, handler: handler, with: with)
             }, onAuthenticationError: {() in
                 // Error while authenticating
                 handler.onError(error: ProcessOutException.BadRequest(errorMessage: "Web authentication failed.", errorCode: ""))
