@@ -7,21 +7,21 @@
 
 class AuthorizationRequest: Codable {
     var source: String = ""
-    var sdkVersion: String = ""
+    var thirdPartySDKVersion: String = ""
     var incremental: Bool = false
     var threeDS2Enabled: Bool = true
     
     enum CodingKeys: String, CodingKey {
         case source = "source"
-        case clientVersion = "sdk_version"
+        case thirdPartySDKVersion = "third_party_sdk_version"
         case incremental = "incremental"
         case threeDS2Enabled = "enable_three_d_s_2"
     }
     
-    init(source: String, incremental: Bool, sdkVersion: String) {
+    init(source: String, incremental: Bool, thirdPartySDKVersion: String) {
         self.source = source
         self.incremental = incremental
-        self.sdkVersion = sdkVersion
+        self.thirdPartySDKVersion = thirdPartySDKVersion
     }
 
 }
