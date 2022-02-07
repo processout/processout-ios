@@ -75,8 +75,8 @@ public class ProcessOut {
             self.Order = Order
         }
     }
-    
-    static let ApiVersion: String = "v2.12.1"
+
+    static let ApiVersion: String = "v2.13.0"
     private static let ApiUrl: String = "https://api.processout.com"
     internal static let CheckoutUrl: String = "https://checkout.processout.com"
     internal static var ProjectId: String?
