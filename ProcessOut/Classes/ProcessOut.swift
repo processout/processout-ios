@@ -61,13 +61,13 @@ public class ProcessOut {
             self.Contact = contact
         }
     }
-
+    
     public struct PaginationOptions {
         var StartAfter: String?
         var EndBefore: String?
         var Limit: Int?
         var Order: String?
-
+        
         public init(StartAfter: String? = nil, EndBefore: String? = nil, Limit: Int? = nil, Order: String? = nil) {
             self.StartAfter = StartAfter
             self.EndBefore = EndBefore
@@ -87,7 +87,7 @@ public class ProcessOut {
     
     // Getting the device user agent
     private static let defaultUserAgent = "iOS/" + UIDevice.current.systemVersion
-
+    
     public static func Setup(projectId: String) {
         ProcessOut.ProjectId = projectId
     }
@@ -120,11 +120,11 @@ public class ProcessOut {
             parameters["contact"] = contactParameters
             
         }
-    
+        
         if let cvc = card.CVC {
             parameters["cvc2"] = cvc
         }
-      
+        
         HttpRequest(route: "/cards", method: .post, parameters: parameters) { (tokenResponse, error) in
             do {
                 guard error == nil else {
@@ -173,7 +173,7 @@ public class ProcessOut {
         if let metadata = metadata {
             parameters["metadata"] = metadata
         }
-
+        
         do {
             // Serializing the paymentdata object
             let paymentDataJson: [String: AnyObject]? = try JSONSerialization.jsonObject(with: payment.token.paymentData, options: []) as? [String: AnyObject]
@@ -287,9 +287,9 @@ public class ProcessOut {
     ///   - paginationOptions: Pagination options to use
     public static func fetchGatewayConfigurations(filter: GatewayConfigurationsFilter, completion: @escaping ([GatewayConfiguration]?, ProcessOutException?) -> Void, paginationOptions: PaginationOptions? = nil) {
         let paginationParams = paginationOptions != nil ? "&" + generatePaginationParamsString(paginationOptions: paginationOptions!) : ""
-
+        
         HttpRequest(route: "/gateway-configurations?filter=" + filter.rawValue + "&expand_merchant_accounts=true" + paginationParams, method: .get, parameters: nil) { (gateways
-            , e) in
+                                                                                                                                                                        , e) in
             guard gateways != nil else {
                 completion(nil, e)
                 return
@@ -327,17 +327,13 @@ public class ProcessOut {
             return
         }
         
-        do {
-            guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
-                handler.onError(error: ProcessOutException.InternalError)
-                return
-            }
-            makeAuthorizationRequest(invoiceId: invoiceId, thirdPartySDKVersion: thirdPartySDKVersion, json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
-                makeCardPayment(invoiceId: invoiceId, token: newSource, thirdPartySDKVersion: thirdPartySDKVersion, handler: handler, with: with)
-            })
-        } catch {
-            handler.onError(error: ProcessOutException.GenericError(error: error))
+        guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
+            handler.onError(error: ProcessOutException.InternalError)
+            return
         }
+        makeAuthorizationRequest(invoiceId: invoiceId, thirdPartySDKVersion: thirdPartySDKVersion, json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
+            makeCardPayment(invoiceId: invoiceId, token: newSource, thirdPartySDKVersion: thirdPartySDKVersion, handler: handler, with: with)
+        })
     }
     
     /// Initiate a payment authorization from a previously generated invoice and card token
@@ -354,17 +350,13 @@ public class ProcessOut {
             return
         }
         
-        do {
-            guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
-                handler.onError(error: ProcessOutException.InternalError)
-                return
-            }
-            makeAuthorizationRequest(invoiceId: invoiceId, thirdPartySDKVersion: "", json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
-                makeCardPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
-            })
-        } catch {
-            handler.onError(error: ProcessOutException.GenericError(error: error))
+        guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
+            handler.onError(error: ProcessOutException.InternalError)
+            return
         }
+        makeAuthorizationRequest(invoiceId: invoiceId, thirdPartySDKVersion: "", json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
+            makeCardPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
+        })
     }
     
     /// Initiate an incremental payment authorization from a previously generated invoice and card token
@@ -381,17 +373,14 @@ public class ProcessOut {
             return
         }
         
-        do {
-            guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
-                handler.onError(error: ProcessOutException.InternalError)
-                return
-            }
-            makeAuthorizationRequest(invoiceId: invoiceId, thirdPartySDKVersion: "", json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
-                makeIncrementalAuthorizationPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
-            })
-        } catch {
-            handler.onError(error: ProcessOutException.GenericError(error: error))
+        guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
+            handler.onError(error: ProcessOutException.InternalError)
+            return
         }
+        makeAuthorizationRequest(invoiceId: invoiceId, thirdPartySDKVersion: "", json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
+            makeIncrementalAuthorizationPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
+        })
+        
     }
     
     /// Increments the authorization of an applicable invoice by a given amount
@@ -407,22 +396,19 @@ public class ProcessOut {
             return
         }
         
-        do {
-            guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
-                handler.onError(error: ProcessOutException.InternalError)
+        guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
+            handler.onError(error: ProcessOutException.InternalError)
+            return
+        }
+        HttpRequest(route: "/invoices/" + invoiceId + "/increment_authorization", method: .post, parameters: json, completion: {(data, error) -> Void in
+            guard data != nil else {
+                handler.onError(error: error!)
                 return
             }
-            HttpRequest(route: "/invoices/" + invoiceId + "/increment_authorization", method: .post, parameters: json, completion: {(data, error) -> Void in
-                guard data != nil else {
-                    handler.onError(error: error!)
-                    return
-                }
-                
-                handler.onSuccess(invoiceId: invoiceId)
-            })
-        } catch {
-            handler.onError(error: .GenericError(error: error))
-        }
+            
+            handler.onSuccess(invoiceId: invoiceId)
+        })
+        
     }
     
     /// Create a customer token from a card ID
@@ -632,10 +618,10 @@ public class ProcessOut {
             paginationOptions.Limit != nil ? "limit=" + String(paginationOptions.Limit!) : nil,
             paginationOptions.Order != nil ? "order=" + paginationOptions.Order! : nil
         ]
-
+        
         // Remove any nil values from the array
-        let filteredPaginationParams = paginationParams.flatMap {$0}
-
+        let filteredPaginationParams = paginationParams.compactMap {$0}
+        
         // Join the array into a single string separated by ampersands and return it
         return filteredPaginationParams.joined(separator: "&")
     }
