@@ -325,17 +325,13 @@ public class ProcessOut {
             return
         }
         
-        do {
-            guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
-                handler.onError(error: ProcessOutException.InternalError)
-                return
-            }
-            makeAuthorizationRequest(invoiceId: invoiceId, json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
-                makeCardPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
-            })
-        } catch {
-            handler.onError(error: ProcessOutException.GenericError(error: error))
+        guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
+            handler.onError(error: ProcessOutException.InternalError)
+            return
         }
+        makeAuthorizationRequest(invoiceId: invoiceId, json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
+            makeCardPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
+        })
     }
     
     /// Initiate an incremental payment authorization from a previously generated invoice and card token
@@ -352,17 +348,14 @@ public class ProcessOut {
             return
         }
         
-        do {
-            guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
-                handler.onError(error: ProcessOutException.InternalError)
-                return
-            }
-            makeAuthorizationRequest(invoiceId: invoiceId, json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
-                makeIncrementalAuthorizationPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
-            })
-        } catch {
-            handler.onError(error: ProcessOutException.GenericError(error: error))
+        guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
+            handler.onError(error: ProcessOutException.InternalError)
+            return
         }
+        makeAuthorizationRequest(invoiceId: invoiceId, json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
+            makeIncrementalAuthorizationPayment(invoiceId: invoiceId, token: newSource, handler: handler, with: with)
+        })
+        
     }
     
     /// Increments the authorization of an applicable invoice by a given amount
@@ -378,22 +371,19 @@ public class ProcessOut {
             return
         }
         
-        do {
-            guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
-                handler.onError(error: ProcessOutException.InternalError)
+        guard let json = try? JSONSerialization.jsonObject(with: body, options: []) as? [String : Any] else {
+            handler.onError(error: ProcessOutException.InternalError)
+            return
+        }
+        HttpRequest(route: "/invoices/" + invoiceId + "/increment_authorization", method: .post, parameters: json, completion: {(data, error) -> Void in
+            guard data != nil else {
+                handler.onError(error: error!)
                 return
             }
-            HttpRequest(route: "/invoices/" + invoiceId + "/increment_authorization", method: .post, parameters: json, completion: {(data, error) -> Void in
-                guard data != nil else {
-                    handler.onError(error: error!)
-                    return
-                }
-                
-                handler.onSuccess(invoiceId: invoiceId)
-            })
-        } catch {
-            handler.onError(error: .GenericError(error: error))
-        }
+            
+            handler.onSuccess(invoiceId: invoiceId)
+        })
+        
     }
     
     /// Create a customer token from a card ID
