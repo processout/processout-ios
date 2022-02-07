@@ -595,7 +595,7 @@ public class ProcessOut {
         ]
 
         // Remove any nil values from the array
-        let filteredPaginationParams = paginationParams.flatMap {$0}
+        let filteredPaginationParams = paginationParams.compactMap {$0}
 
         // Join the array into a single string separated by ampersands and return it
         return filteredPaginationParams.joined(separator: "&")
