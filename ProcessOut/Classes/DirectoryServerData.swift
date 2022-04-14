@@ -6,7 +6,7 @@
 //
 
 /// Object passed to the doFingerprint function
-public class DirectoryServerData: Codable {
+public  class DirectoryServerData: Codable {
     public var directoryServerID: String = ""
     public var directoryServerPublicKey: String = ""
     public var threeDSServerTransactionID: String = ""
