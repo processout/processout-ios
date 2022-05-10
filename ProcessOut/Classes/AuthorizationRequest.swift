@@ -6,6 +6,7 @@
 //
 
 class AuthorizationRequest: Codable {
+    var invoiceID: String = ""
     var source: String = ""
     var thirdPartySDKVersion: String = ""
     var incremental: Bool = false
@@ -13,6 +14,7 @@ class AuthorizationRequest: Codable {
     var preferredScheme: String = ""
 
     enum CodingKeys: String, CodingKey {
+        case invoiceID = "invoice_id"
         case source = "source"
         case thirdPartySDKVersion = "third_party_sdk_version"
         case incremental = "incremental"
