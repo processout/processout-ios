@@ -22,11 +22,12 @@ class AuthorizationRequest: Codable {
         case preferredScheme = "preferred_scheme"
     }
     
-    init(source: String, incremental: Bool, thirdPartySDKVersion: String, preferredScheme: String) {
+    init(source: String, incremental: Bool, thirdPartySDKVersion: String, preferredScheme: String, invoiceID: String) {
         self.source = source
         self.incremental = incremental
         self.thirdPartySDKVersion = thirdPartySDKVersion
         self.preferredScheme = preferredScheme
+        self.invoiceID = invoiceID
     }
 
 }

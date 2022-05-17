@@ -25,8 +25,11 @@ class TokenRequest: Encodable {
         case preferredScheme = "preferred_scheme"
     }
     
-    init(source: String, thirdPartySDKVersion: String) {
+    init(source: String, thirdPartySDKVersion: String, preferredScheme: String, customerID: String, tokenID: String) {
         self.source = source
         self.thirdPartySDKVersion = thirdPartySDKVersion
+        self.preferredScheme = preferredScheme
+        self.customerID = customerID
+        self.tokenID = tokenID
     }
 }
