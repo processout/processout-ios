@@ -5,7 +5,7 @@
 //  Created by Jeremy Lejoux on 17/06/2019.
 //
 
-class AuthorizationRequest: Codable {
+public class AuthorizationRequest: Codable {
     var invoiceID: String = ""
     var source: String = ""
     var thirdPartySDKVersion: String = ""
@@ -22,7 +22,7 @@ class AuthorizationRequest: Codable {
         case preferredScheme = "preferred_scheme"
     }
     
-    init(source: String, incremental: Bool, thirdPartySDKVersion: String, preferredScheme: String, invoiceID: String) {
+    init(source: String, incremental: Bool, invoiceID: String) {
         self.source = source
         self.incremental = incremental
         self.thirdPartySDKVersion = thirdPartySDKVersion

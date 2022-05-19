@@ -321,7 +321,8 @@ public class ProcessOut {
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeCardPayment(invoiceId: String, token: String, thirdPartySDKVersion: String, handler: ThreeDSHandler, with: UIViewController) {
-        let authRequest = AuthorizationRequest(source: token, incremental: false, thirdPartySDKVersion: thirdPartySDKVersion)
+        let authRequest = AuthorizationRequest(source: token, incremental: false, invoiceID: invoiceId)
+        authRequest.thirdPartySDKVersion = thirdPartySDKVersion
         guard let body = try? JSONEncoder().encode(authRequest) else {
             handler.onError(error: ProcessOutException.InternalError)
             return
@@ -344,7 +345,7 @@ public class ProcessOut {
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeCardPayment(invoiceId: String, token: String, handler: ThreeDSHandler, with: UIViewController) {
-        let authRequest = AuthorizationRequest(source: token, incremental: false, thirdPartySDKVersion: "")
+        let authRequest = AuthorizationRequest(source: token, incremental: false, invoiceID: invoiceId)
         guard let body = try? JSONEncoder().encode(authRequest) else {
             handler.onError(error: ProcessOutException.InternalError)
             return
@@ -367,7 +368,7 @@ public class ProcessOut {
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeCardPayment(AuthorizationRequest: AuthorizationRequest, handler: ThreeDSHandler, with: UIViewController) {
         // Handle empty source
-        if (AuthorizationRequest.source.isEmpty()) {
+        if (AuthorizationRequest.source.isEmpty || AuthorizationRequest.invoiceID.isEmpty) {
             handler.onError(error: ProcessOutException.InternalError)
             return
         }
@@ -394,7 +395,7 @@ public class ProcessOut {
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeIncrementalAuthorizationPayment(invoiceId: String, token: String,  handler: ThreeDSHandler, with: UIViewController) {
-        let authRequest = AuthorizationRequest(source: token, incremental: true, thirdPartySDKVersion: "")
+        let authRequest = AuthorizationRequest(source: token, incremental: true, invoiceID: invoiceId)
         guard let body = try? JSONEncoder().encode(authRequest) else {
             handler.onError(error: ProcessOutException.InternalError)
             return
@@ -418,7 +419,8 @@ public class ProcessOut {
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeIncrementalAuthorizationPayment(invoiceId: String, token: String, thirdPartySDKVersion: String, handler: ThreeDSHandler, with: UIViewController) {
-        let authRequest = AuthorizationRequest(source: token, incremental: true, thirdPartySDKVersion: thirdPartySDKVersion)
+        let authRequest = AuthorizationRequest(source: token, incremental: true, invoiceID: invoiceId)
+        authRequest.thirdPartySDKVersion = thirdPartySDKVersion
         guard let body = try? JSONEncoder().encode(authRequest) else {
             handler.onError(error: ProcessOutException.InternalError)
             return
@@ -441,7 +443,7 @@ public class ProcessOut {
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeIncrementalAuthorizationPayment(AuthorizationRequest: AuthorizationRequest, handler: ThreeDSHandler, with: UIViewController) {
         // Handle empty source
-        if (AuthorizationRequest.source.isEmpty()) {
+        if (AuthorizationRequest.source.isEmpty || AuthorizationRequest.invoiceID.isEmpty) {
             handler.onError(error: ProcessOutException.InternalError)
             return
         }
@@ -455,7 +457,7 @@ public class ProcessOut {
             handler.onError(error: ProcessOutException.InternalError)
             return
         }
-        makeAuthorizationRequest(AuthorizationRequest: AuthorizationRequest, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
+        makeAuthorizationRequest(AuthorizationRequest: AuthorizationRequest, json: json, handler: handler, with: with, actionHandlerCompletion: { (newSource) in
             makeIncrementalAuthorizationPayment(AuthorizationRequest: AuthorizationRequest, handler: handler, with: with)
         })
     }
@@ -497,7 +499,7 @@ public class ProcessOut {
     ///   - handler: 3DS2 handler
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeCardToken(source: String, customerId: String, tokenId: String, handler: ThreeDSHandler, with: UIViewController) {
-        let tokenRequest = TokenRequest(source: source, thirdPartySDKVersion: "")
+        let tokenRequest = TokenRequest(source: source, customerID: customerId, tokenID: tokenId)
         guard let body = try? JSONEncoder().encode(tokenRequest) else {
             handler.onError(error: ProcessOutException.InternalError)
             return
@@ -556,7 +558,8 @@ public class ProcessOut {
     ///   - handler: 3DS2 handler
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeCardToken(source: String, customerId: String, tokenId: String, thirdPartySDKVersion: String, handler: ThreeDSHandler, with: UIViewController) {
-        let tokenRequest = TokenRequest(source: source, thirdPartySDKVersion: thirdPartySDKVersion)
+        let tokenRequest = TokenRequest(source: source, customerID: customerId, tokenID: tokenId)
+        tokenRequest.thirdPartySDKVersion = thirdPartySDKVersion
         guard let body = try? JSONEncoder().encode(tokenRequest) else {
             handler.onError(error: ProcessOutException.InternalError)
             return
@@ -613,7 +616,7 @@ public class ProcessOut {
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeCardToken(TokenRequest: TokenRequest, handler: ThreeDSHandler, with: UIViewController) {
         // Handle empty source
-        if (TokenRequest.source.isEmpty()) {
+        if (TokenRequest.source.isEmpty || TokenRequest.customerID.isEmpty || TokenRequest.tokenID.isEmpty) {
             handler.onError(error: ProcessOutException.InternalError)
             return
         }
