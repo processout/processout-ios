@@ -25,8 +25,6 @@ public class AuthorizationRequest: Codable {
     init(source: String, incremental: Bool, invoiceID: String) {
         self.source = source
         self.incremental = incremental
-        self.thirdPartySDKVersion = thirdPartySDKVersion
-        self.preferredScheme = preferredScheme
         self.invoiceID = invoiceID
     }
 
