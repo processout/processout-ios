@@ -738,8 +738,8 @@ public class ProcessOut {
         let additionalDataString = generateAdditionalDataString(additionalData: additionalData)
         let urlString = ProcessOut.CheckoutUrl + "/" + checkout + additionalDataString
         
-        if let url = NSURL(string: urlString) {
-            UIApplication.shared.openURL(url as URL)
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url)
         }
     }
     
@@ -753,8 +753,8 @@ public class ProcessOut {
         // Generate the redirection URL
         let urlString: String = makeAPMPayment(gateway: gateway, invoiceId: invoiceId, additionalData: additionalData)
         
-        if let url = NSURL(string: urlString) {
-            UIApplication.shared.openURL(url as URL)
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url)
         }
     }
     

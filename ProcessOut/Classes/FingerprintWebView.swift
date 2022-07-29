@@ -5,7 +5,7 @@
 //  Created by Jeremy Lejoux on 30/09/2019.
 //
 
-import Foundation
+import UIKit
 
 class FingerprintWebView: ProcessOutWebView {
     

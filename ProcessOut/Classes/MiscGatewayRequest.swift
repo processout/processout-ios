@@ -5,6 +5,8 @@
 //  Created by Jeremy Lejoux on 18/06/2019.
 //
 
+import Foundation
+
 class MiscGatewayRequest: Codable {
     var url: String = ""
     var headers: [String:String] = [:]
