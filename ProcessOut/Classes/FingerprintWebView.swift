@@ -8,23 +8,26 @@
 import Foundation
 
 class FingerprintWebView: ProcessOutWebView {
+    var timeOutHandler: DispatchWorkItem = DispatchWorkItem{}
     
     public init(customerAction: CustomerAction, frame: CGRect, onResult: @escaping (String) -> Void, onAuthenticationError: @escaping () -> Void) {
         super.init(frame: frame, onResult: onResult, onAuthenticationError: onAuthenticationError)
         self.isHidden = false
-        
+          
         // Setup the fingerprint timeout handler
-        let timeOutHandler = DispatchWorkItem {
-            // Remove the webview
-            self.removeFromSuperview()
+        self.timeOutHandler = DispatchWorkItem {
+            if !self.timeOutHandler.isCancelled {
+                // Remove the webview
+                self.removeFromSuperview()
 
-            // Fallback to default fingerprint values
-            let fallback = self.generateFallbackFingerprintToken(URL: customerAction.value)
-            guard fallback.error == nil else {
-                onAuthenticationError()
-                return
+                // Fallback to default fingerprint values
+                let fallback = self.generateFallbackFingerprintToken(URL: customerAction.value)
+                guard fallback.error == nil else {
+                    onAuthenticationError()
+                    return
+                }
+                onResult(fallback.fallbackToken!)
             }
-            onResult(fallback.fallbackToken!)
         }
         
         // Start the timeout handler with a 10s timeout
@@ -51,7 +54,7 @@ class FingerprintWebView: ProcessOutWebView {
         guard let parameters = url.queryParameters, let token = parameters["token"] else {
             return
         }
-        
+        self.timeOutHandler.cancel()
         onResult(token)
     }
 }
