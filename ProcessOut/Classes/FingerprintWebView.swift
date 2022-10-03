@@ -8,30 +8,17 @@
 import Foundation
 
 class FingerprintWebView: ProcessOutWebView {
-    var timeOutHandler: DispatchWorkItem = DispatchWorkItem{}
+
+    private var timeOutTimer: Timer?
+    private let customerAction: CustomerAction
     
     public init(customerAction: CustomerAction, frame: CGRect, onResult: @escaping (String) -> Void, onAuthenticationError: @escaping () -> Void) {
+        self.customerAction = customerAction
         super.init(frame: frame, onResult: onResult, onAuthenticationError: onAuthenticationError)
         self.isHidden = false
-          
-        // Setup the fingerprint timeout handler
-        self.timeOutHandler = DispatchWorkItem {
-            if !self.timeOutHandler.isCancelled {
-                // Remove the webview
-                self.removeFromSuperview()
-
-                // Fallback to default fingerprint values
-                let fallback = self.generateFallbackFingerprintToken(URL: customerAction.value)
-                guard fallback.error == nil else {
-                    onAuthenticationError()
-                    return
-                }
-                onResult(fallback.fallbackToken!)
-            }
-        }
         
         // Start the timeout handler with a 10s timeout
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10.0, execute: timeOutHandler)
+        timeOutTimer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(timeOutTimerDidFire), userInfo: nil, repeats: false)
     }
     
     required init?(coder: NSCoder) {
@@ -54,7 +41,20 @@ class FingerprintWebView: ProcessOutWebView {
         guard let parameters = url.queryParameters, let token = parameters["token"] else {
             return
         }
-        self.timeOutHandler.cancel()
+        timeOutTimer?.invalidate()
         onResult(token)
+    }
+    
+    @objc private func timeOutTimerDidFire() {
+        // Remove the webview
+        self.removeFromSuperview()
+
+        // Fallback to default fingerprint values
+        let fallback = self.generateFallbackFingerprintToken(URL: customerAction.value)
+        guard fallback.error == nil else {
+            onAuthenticationError()
+            return
+        }
+        onResult(fallback.fallbackToken!)
     }
 }
