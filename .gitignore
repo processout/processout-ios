@@ -1,0 +1,18 @@
+### fastlane ###
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/screenshots/screenshots.html
+fastlane/test_output
+
+### macOS ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+## Project
+.build
+.swiftpm
+Packages
+*.xcodeproj
+xcuserdata/

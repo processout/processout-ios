@@ -1,0 +1,39 @@
+name: ProcessOut
+settings:
+  GENERATE_INFOPLIST_FILE: true
+  CODE_SIGN_IDENTITY: ""
+  GCC_TREAT_WARNINGS_AS_ERRORS: true
+  SWIFT_TREAT_WARNINGS_AS_ERRORS: true
+targets:
+  ProcessOut:
+    type: framework
+    platform: iOS
+    deploymentTarget: "11.0"
+    settings:
+      CURRENT_PROJECT_VERSION: ${CURRENT_VERSION}
+    preBuildScripts:
+      - path: Scripts/Lint.sh
+        name: Swiftlint
+        basedOnDependencyAnalysis: false
+      - path: Scripts/SwiftGen/SwiftGen.sh
+        name: SwiftGen
+        inputFileLists:
+          - $(PROJECT_DIR)/Scripts/SwiftGen/Input.xcfilelist
+        outputFileLists:
+          - $(PROJECT_DIR)/Scripts/SwiftGen/Output.xcfilelist
+    sources: Sources/ProcessOut
+  ProcessOutTests:
+    type: bundle.unit-test
+    platform: iOS
+    depencencies:
+      - target: ProcessOut
+    sources: Tests/ProcessOutTests
+schemes:
+  ProcessOut:
+    build:
+      targets:
+        ProcessOut: all
+        ProcessOutTests: [test]
+    test:
+      gatherCoverageData: true
+      targets: [ProcessOutTests]

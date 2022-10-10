@@ -1,0 +1,34 @@
+name: Create Release Candidate
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        default: 'minor'
+        type: choice
+        options:
+          - minor
+          - patch 
+jobs:
+  update-version:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update Version
+        run: |
+          source Scripts/UpdateVersion.sh --${{ inputs.release_type }}
+          echo "UPDATED_VERSION=$(cat Version.resolved)" >> $GITHUB_ENV
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.PO_GITHUB_USER }}
+          add-paths:
+            - ProcessOut.podspec
+            - Version.resolved
+            - Sources/**/*.swift
+          commit-message: Update version
+          branch: release/${{ env.UPDATED_VERSION }}
+          delete-branch: true
+          title: Release/${{ env.UPDATED_VERSION }}
+          assignees: ${{ github.actor }}

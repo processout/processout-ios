@@ -1,0 +1,24 @@
+name: 'Test'
+on:
+  pull_request:
+    types: [opened, synchronize]
+jobs:
+  run-tests:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1.2'
+          bundler-cache: true
+      - name: Install Mint
+        run: brew update && brew install mint
+      - name: Cache Mint Packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.mint/packages
+          key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+      - name: Bootstrap Project
+        run: ./Scripts/BootstrapProject.sh --skip-bundle-instal
+      - name: Run Tests
+        run: bundle exec fastlane tests

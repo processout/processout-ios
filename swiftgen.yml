@@ -1,0 +1,28 @@
+##   Every input/output paths in the rest of the config will then be expressed relative to these.
+input_dir: ${PROJECT_DIR}/Sources/${TARGET_NAME}/Resources/
+output_dir: ${PROJECT_DIR}/Sources/${TARGET_NAME}/Sources/Generated/
+
+## Constants for Assets Catalogs.
+xcassets:
+  inputs:
+    - Images.xcassets
+    - Colors.xcassets
+  outputs:
+    - templateName: swift5
+      params:
+        forceFileNameEnum: true
+        forceProvidesNamespaces: true
+        bundle: BundleLocator.bundle
+      output: Assets+Generated.swift
+      
+## Constants for Localized Strings.
+strings:
+  inputs:
+    - Strings/en.lproj/ProcessOut.strings
+  outputs:
+    - templateName: structured-swift5
+      params:
+        enumName: Strings
+        bundle: BundleLocator.bundle
+        lookupFunction: Strings.localized
+      output: Strings+Generated.swift

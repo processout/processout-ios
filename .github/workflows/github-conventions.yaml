@@ -1,0 +1,13 @@
+name: Conventions
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+jobs:
+  verify:
+    name: Verify
+    uses: processout/actions/.github/workflows/github-conventions.yaml@master
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
