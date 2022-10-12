@@ -22,7 +22,7 @@ public class AuthorizationRequest: Codable {
         case preferredScheme = "preferred_scheme"
     }
     
-    init(source: String, incremental: Bool, invoiceID: String) {
+    public init(source: String, incremental: Bool, invoiceID: String) {
         self.source = source
         self.incremental = incremental
         self.invoiceID = invoiceID
