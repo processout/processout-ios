@@ -8,10 +8,10 @@
 public class AuthorizationRequest: Codable {
     var invoiceID: String = ""
     var source: String = ""
-    var thirdPartySDKVersion: String = ""
+    public var thirdPartySDKVersion: String = ""
     var incremental: Bool = false
     var threeDS2Enabled: Bool = true
-    var preferredScheme: String = ""
+    public var preferredScheme: String = ""
 
     enum CodingKeys: String, CodingKey {
         case invoiceID = "invoice_id"
