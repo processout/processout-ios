@@ -120,8 +120,8 @@ final class HttpConnector: HttpConnectorType {
                 switch response {
                 case let .success(value):
                     completeRequest(with: .success(value), completion: completion)
-                case let .failure(externalFailure):
-                    throw Failure.external(externalFailure, statusCode: urlResponse.statusCode)
+                case let .failure(serverFailure):
+                    throw Failure.server(serverFailure, statusCode: urlResponse.statusCode)
                 }
             } catch {
                 completeRequest(with: .failure(error), completion: completion)
@@ -156,16 +156,17 @@ final class HttpConnector: HttpConnectorType {
 
 private enum HttpConnectorResponse<Value: Decodable>: Decodable {
 
-    case success(Value), failure(HttpConnectorFailure.External)
+    case success(Value), failure(HttpConnectorFailure.Server)
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         if try container.decode(Bool.self, forKey: .success) {
             let value = try decoder.singleValueContainer().decode(Value.self)
             self = .success(value)
+        } else {
+            let failure = try decoder.singleValueContainer().decode(HttpConnectorFailure.Server.self)
+            self = .failure(failure)
         }
-        let failure = try decoder.singleValueContainer().decode(HttpConnectorFailure.External.self)
-        self = .failure(failure)
     }
 
     // MARK: - Private Nested Types

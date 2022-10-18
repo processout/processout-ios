@@ -7,7 +7,7 @@
 
 enum HttpConnectorFailure: Error {
 
-    struct External: Decodable {
+    struct Server: Decodable {
 
         /// Error type.
         let errorType: String
@@ -22,8 +22,8 @@ enum HttpConnectorFailure: Error {
     /// Either there's no network connection, or request didn't finish in time.
     case networkUnreachable
 
-    /// External error.
-    case external(External, statusCode: Int)
+    /// Server error.
+    case server(Server, statusCode: Int)
 
     /// Cancellation error.
     case cancelled

@@ -46,7 +46,7 @@ final class HttpConnectorRetryDecorator: HttpConnectorType {
         switch failure {
         case .networkUnreachable:
             return true
-        case .external(_, let statusCode):
+        case .server(_, let statusCode):
             return (500...599).contains(statusCode)
         default:
             return false

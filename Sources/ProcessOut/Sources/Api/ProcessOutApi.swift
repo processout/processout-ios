@@ -18,12 +18,22 @@ public final class ProcessOutApi: ProcessOutApiType {
             assertionFailure("Already configured.")
             return
         }
-        shared = ProcessOutApi()
+        let connector = createHttpConnector(configuration: configuration)
+        let failureFactory = RepositoryFailureFactory()
+        shared = ProcessOutApi(
+            gatewayConfigurations: GatewayConfigurationsRepository(connector: connector, failureFactory: failureFactory)
+        )
     }
+
+    // MARK: - ProcessOutApiType
+
+    public let gatewayConfigurations: POGatewayConfigurationsRepositoryType
 
     // MARK: -
 
-    private init() { }
+    private init(gatewayConfigurations: POGatewayConfigurationsRepositoryType) {
+        self.gatewayConfigurations = gatewayConfigurations
+    }
 
     // MARK: - Private Methods
 
