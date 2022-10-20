@@ -21,18 +21,26 @@ public final class ProcessOutApi: ProcessOutApiType {
         let connector = createHttpConnector(configuration: configuration)
         let failureFactory = RepositoryFailureFactory()
         shared = ProcessOutApi(
-            gatewayConfigurations: GatewayConfigurationsRepository(connector: connector, failureFactory: failureFactory)
+            gatewayConfigurations: GatewayConfigurationsRepository(
+                connector: connector, failureFactory: failureFactory
+            ),
+            invoicesRepository: InvoicesRepository(connector: connector, failureFactory: failureFactory)
         )
     }
 
     // MARK: - ProcessOutApiType
 
     public let gatewayConfigurations: POGatewayConfigurationsRepositoryType
+    public let invoicesRepository: POInvoicesRepositoryType
 
     // MARK: -
 
-    private init(gatewayConfigurations: POGatewayConfigurationsRepositoryType) {
+    private init(
+        gatewayConfigurations: POGatewayConfigurationsRepositoryType,
+        invoicesRepository: POInvoicesRepositoryType
+    ) {
         self.gatewayConfigurations = gatewayConfigurations
+        self.invoicesRepository = invoicesRepository
     }
 
     // MARK: - Private Methods

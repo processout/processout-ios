@@ -1,5 +1,5 @@
 //
-//  PONativeApmParameter.swift
+//  PONativeAlternativePaymentMethodParameter.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 17.10.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PONativeApmParameter: Decodable {
+public struct PONativeAlternativePaymentMethodParameter: Decodable {
 
     public enum ParameterType: String, Decodable {
 

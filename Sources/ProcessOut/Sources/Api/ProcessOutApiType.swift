@@ -9,4 +9,7 @@ public protocol ProcessOutApiType {
 
     /// Returns gateway configurations repository.
     var gatewayConfigurations: POGatewayConfigurationsRepositoryType { get }
+
+    /// Returns invoices repository.
+    var invoicesRepository: POInvoicesRepositoryType { get }
 }

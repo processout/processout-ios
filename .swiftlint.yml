@@ -11,6 +11,10 @@ large_tuple:
 enum_case_associated_values_count:
   warning: 4
 
+type_name:
+  max_length:
+    warning: 50
+
 opt_in_rules:
   - anonymous_argument_in_multiline_closure
   - anyobject_protocol

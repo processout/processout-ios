@@ -9,10 +9,10 @@ import Foundation
 
 public struct POGatewayConfiguration: Decodable {
 
-    public struct NativeApmConfig: Decodable {
+    public struct NativeAlternativePaymentMethodConfig: Decodable {
 
         /// Configuration parameters.
-        public let parameters: [PONativeApmParameter]
+        public let parameters: [PONativeAlternativePaymentMethodParameter]
     }
 
     public struct Gateway: Decodable {
@@ -39,7 +39,7 @@ public struct POGatewayConfiguration: Decodable {
         public let canRefund: Bool
 
         /// Native alternative payment method configuration.
-        public let nativeApmConfig: NativeApmConfig?
+        public let nativeApmConfig: NativeAlternativePaymentMethodConfig?
     }
 
     // MARK: -
