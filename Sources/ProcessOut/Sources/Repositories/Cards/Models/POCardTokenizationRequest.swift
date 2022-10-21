@@ -10,10 +10,10 @@ import Foundation
 public struct POCardTokenizationRequest: Encodable {
     /// Metada related to the card
     public let metadata: [String: AnyEncodable]?
-    
+
     /// Information about the card's user
     public let card: Card
-    
+
     /// Card details
     public struct Card: Encodable {
         let cardNumber: String
@@ -22,7 +22,7 @@ public struct POCardTokenizationRequest: Encodable {
         let cvc: String?
         let name: String
         let contact: Contact?
-            
+
         public init(cardNumber: String, expMonth: Int, expYear: Int, cvc: String?, name: String, contact: Contact?) {
             self.cardNumber = cardNumber
             self.expMonth = expMonth
@@ -41,8 +41,15 @@ public struct POCardTokenizationRequest: Encodable {
         let state: String?
         let zip: String?
         let countryCode: String?
-        
-        public init(address1: String?, address2: String?, city: String?, state: String?, zip: String?, countryCode: String?) {
+
+        public init(
+            address1: String?,
+            address2: String?,
+            city: String?,
+            state: String?,
+            zip: String?,
+            countryCode: String?
+        ) {
             self.address1 = address1
             self.address2 = address2
             self.city = city
@@ -58,5 +65,3 @@ public struct POCardTokenizationRequest: Encodable {
         self.metadata = metadata
     }
 }
-
-

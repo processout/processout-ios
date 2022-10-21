@@ -12,10 +12,13 @@ final class CardsRepository: POCardsRepositoryType {
         self.connector = connector
         self.failureFactory = failureFactory
     }
-    
+
     // MARK: - POCardsRepositoryType
-    
-    func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCardTokenizationResponse, Failure>) -> Void) {
+
+    func tokenize(
+        request: POCardTokenizationRequest,
+        completion: @escaping (Result<POCardTokenizationResponse, Failure>) -> Void
+    ) {
         let httpRequest = HttpConnectorRequest<POCardTokenizationResponse>.post(
             path: "/cards", body: request
         )
@@ -24,7 +27,11 @@ final class CardsRepository: POCardsRepositoryType {
         }
     }
 
-    func updateCvc(cardId: String, newCvc: String, completion: @escaping (Result<POCardTokenizationResponse, Failure>) -> Void) {
+    func updateCvc(
+        cardId: String,
+        newCvc: String,
+        completion: @escaping (Result<POCardTokenizationResponse, Failure>) -> Void
+    ) {
         let parameters: [String: String] = [
             "cvc": newCvc
         ]

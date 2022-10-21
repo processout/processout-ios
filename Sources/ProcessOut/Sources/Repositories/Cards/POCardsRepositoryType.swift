@@ -14,7 +14,11 @@ public protocol POCardsRepositoryType: PORepositoryType {
         request: POCardTokenizationRequest,
         completion: @escaping (Result<POCardTokenizationResponse, Failure>) -> Void
     )
-    
+
     // Update CVC
-    func updateCvc(cardId: String, newCvc: String, completion: @escaping (Result<POCardTokenizationResponse, Failure>) -> Void)
+    func updateCvc(
+        cardId: String,
+        newCvc: String,
+        completion: @escaping (Result<POCardTokenizationResponse, Failure>) -> Void
+    )
 }
