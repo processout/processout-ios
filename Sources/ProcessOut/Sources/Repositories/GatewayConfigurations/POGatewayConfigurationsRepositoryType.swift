@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol POGatewayConfigurationsRepositoryType: PORepositoryType {
+public protocol POGatewayConfigurationsRepositoryType: PORepositoryType, POAutoAsync {
 
     /// Returns available gateway configurations.
     func all(
