@@ -1,0 +1,40 @@
+// swiftlint:disable all
+
+{%- macro createAsyncMethodParameters parameters %}
+    {% for parameter in parameters %}
+        {% if forloop.last %}
+            {% continue %}
+        {% endif %}
+        {{ parameter.asSource }}{% if forloop.counter < forloop.length-1 %},{% endif %}
+    {% endfor %}
+{% endmacro -%}
+
+{% for type in types.implementing.POAutoAsync|protocol %}
+
+@available(iOS 13.0, *)
+extension {{ type.name }} {
+    {% for method in type.methods %}
+        {% set closure method.parameters.last.typeName.closure %}
+        {% set resultGeneric closure.parameters.first.typeName.generic %}
+        {% if method.returnType != nil 
+            or not closure.actualReturnTypeName.isVoid
+            or closure.parameters.count != 1
+            or resultGeneric.name != "Result" %}
+            {% continue %}
+        {% endif %}
+
+    @MainActor
+    {% if method.parameters.count == 1 %}
+    public func {{ method.callName }}() async throws -> {{ resultGeneric.typeParameters.first.typeName.name }} {
+    {% else %}
+    public func {{ method.callName }}(
+        {% call createAsyncMethodParameters method.parameters %}
+    ) async throws -> {{ resultGeneric.typeParameters.first.typeName.name }} {
+    {% endif %}
+        try await withUnsafeThrowingContinuation { continuation in
+            {{ method.callName }}({% for parameter in method.parameters %}{% if forloop.last %}{% continue %}{% endif %}{{ parameter.argumentLabel }}: {{ parameter.argumentLabel }}, {% endfor %}{{ method.parameters.last.argumentLabel }}: continuation.resume)
+        }
+    }
+    {% endfor %}
+}
+{% endfor %}

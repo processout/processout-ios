@@ -21,6 +21,9 @@ targets:
           - $(PROJECT_DIR)/Scripts/SwiftGen/Input.xcfilelist
         outputFileLists:
           - $(PROJECT_DIR)/Scripts/SwiftGen/Output.xcfilelist
+      - path: Scripts/Sourcery.sh
+        name: Sourcery
+        basedOnDependencyAnalysis: false
     sources: Sources/ProcessOut
   ProcessOutTests:
     type: bundle.unit-test
