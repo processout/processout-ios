@@ -24,7 +24,8 @@ public final class ProcessOutApi: ProcessOutApiType {
             gatewayConfigurations: GatewayConfigurationsRepository(
                 connector: connector, failureFactory: failureFactory
             ),
-            invoicesRepository: InvoicesRepository(connector: connector, failureFactory: failureFactory)
+            invoicesRepository: InvoicesRepository(connector: connector, failureFactory: failureFactory),
+            cardsRepository: CardsRepository(connector: connector, failureFactory: failureFactory)
         )
     }
 
@@ -32,15 +33,18 @@ public final class ProcessOutApi: ProcessOutApiType {
 
     public let gatewayConfigurations: POGatewayConfigurationsRepositoryType
     public let invoicesRepository: POInvoicesRepositoryType
+    public let cardsRepository: POCardsRepositoryType
 
     // MARK: -
 
     private init(
         gatewayConfigurations: POGatewayConfigurationsRepositoryType,
-        invoicesRepository: POInvoicesRepositoryType
+        invoicesRepository: POInvoicesRepositoryType,
+        cardsRepository: POCardsRepositoryType
     ) {
         self.gatewayConfigurations = gatewayConfigurations
         self.invoicesRepository = invoicesRepository
+        self.cardsRepository = cardsRepository
     }
 
     // MARK: - Private Methods
