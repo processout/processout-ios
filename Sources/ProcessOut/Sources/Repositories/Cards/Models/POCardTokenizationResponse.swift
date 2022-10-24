@@ -84,33 +84,6 @@ public struct POCardTokenizationResponse: Decodable {
         /// ZIP code of cardholder’s address
         public let zip: String
 
-        /// IP address of the cardholder
-        public let ipAddress: String
-
-        /// Value of the User-Agent header of the cardholder
-        public let userAgent: String?
-
-        /// Value of the Accept header of the cardholder
-        public let headerAccept: String?
-
-        /// Supported color depth on the cardholder’s screen, if one is available
-        public let appColorDepth: String?
-
-        /// Denotes whether or not Java is enabled on the cardholder device
-        public let appJavaEnabled: Bool?
-
-        /// Language of the cardholder’s device, if available
-        public let appLanguage: String?
-
-        /// Height in pixels of the cardholder’s screen
-        public let appScreenHeight: Int?
-
-        /// Width in pixels of the cardholder’s screen
-        public let appScreenWidth: Int?
-
-        /// Timezone offset of the cardholder
-        public let appTimezoneOffset: Int
-
         /// Set to true if the card will expire soon, otherwise false
         public let expiresSoon: Bool
 
