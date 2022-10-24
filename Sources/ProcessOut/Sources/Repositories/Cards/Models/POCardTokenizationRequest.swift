@@ -12,35 +12,39 @@ public struct POCardTokenizationRequest: Encodable {
     public let metadata: [String: AnyEncodable]?
 
     /// Information about the card's user
-    public let card: Card
+    public let number: String
+    public let expMonth: Int
+    public let expYear: Int
+    public let cvc: String?
+    public let name: String
+    public let contact: Contact?
 
-    /// Card details
-    public struct Card: Encodable {
-        let cardNumber: String
-        let expMonth: Int
-        let expYear: Int
-        let cvc: String?
-        let name: String
-        let contact: Contact?
-
-        public init(cardNumber: String, expMonth: Int, expYear: Int, cvc: String?, name: String, contact: Contact?) {
-            self.cardNumber = cardNumber
-            self.expMonth = expMonth
-            self.expYear = expYear
-            self.cvc = cvc
-            self.name = name
-            self.contact = contact
-        }
+    public init(
+        metadata: [String: AnyEncodable]?,
+        number: String,
+        expMonth: Int,
+        expYear: Int,
+        cvc: String?,
+        name: String,
+        contact: Contact?
+    ) {
+        self.metadata = metadata
+        self.number = number
+        self.expMonth = expMonth
+        self.expYear = expYear
+        self.cvc = cvc
+        self.name = name
+        self.contact = contact
     }
 
     /// Information about the user
     public struct Contact: Encodable {
-        let address1: String?
-        let address2: String?
-        let city: String?
-        let state: String?
-        let zip: String?
-        let countryCode: String?
+        public let address1: String?
+        public let address2: String?
+        public let city: String?
+        public let state: String?
+        public let zip: String?
+        public let countryCode: String?
 
         public init(
             address1: String?,
@@ -57,11 +61,5 @@ public struct POCardTokenizationRequest: Encodable {
             self.zip = zip
             self.countryCode = countryCode
         }
-    }
-
-    /// init the tokenization of the card
-    public init(card: Card, metadata: [String: AnyEncodable]?) {
-        self.card = card
-        self.metadata = metadata
     }
 }
