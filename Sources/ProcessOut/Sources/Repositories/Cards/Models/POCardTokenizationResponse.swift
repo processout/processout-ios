@@ -11,6 +11,18 @@ public struct POCardTokenizationResponse: Decodable {
 
     let card: POCard
 
+    public enum CardType: String, Decodable {
+          case debit, credit
+       }
+
+    public enum CardCategory: String, Decodable {
+          case consumer, commercial
+       }
+
+    public enum CardBrand: String, Decodable {
+          case electron, classic, gold
+       }
+
     public struct POCard: Decodable {
         /// Value that uniquely identifies the card
         public let id: String
@@ -18,7 +30,7 @@ public struct POCardTokenizationResponse: Decodable {
         /// Project that the card belongs to
         public let projectId: String
 
-        /// Scheme of the card, such as Visa or Mastercard
+        /// Scheme of the card
         public let scheme: String
 
         /// Co-scheme of the card, such as Carte Bancaire
@@ -27,17 +39,17 @@ public struct POCardTokenizationResponse: Decodable {
         /// Preferred scheme defined by the Customer
         public let preferredScheme: String?
 
-        /// Card type (debit or credit)
-        public let type: String
+        /// Card type
+        public let type: CardType
 
         /// Name of the card’s issuing bank
         public let bankName: String
 
-        /// Brand of the card, such as Electron, Classic or Gold
-        public let brand: String
+        /// Brand of the card
+        public let brand: CardBrand
 
-        /// Card category (consumer or commercial)
-        public let category: String
+        /// Card category
+        public let category: CardCategory
 
         /// Issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
         public let iin: String
