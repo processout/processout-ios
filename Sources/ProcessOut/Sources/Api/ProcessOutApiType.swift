@@ -14,5 +14,5 @@ public protocol ProcessOutApiType {
     var invoicesRepository: POInvoicesRepositoryType { get }
 
     /// Return cards repository
-    var cardsRepository: POCardsRepositoryType { get }
+    var cards: POCardsRepositoryType { get }
 }
