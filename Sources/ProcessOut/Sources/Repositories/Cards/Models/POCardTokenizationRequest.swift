@@ -67,7 +67,7 @@ public struct POCardTokenizationRequest: Encodable {
     public let contact: Contact?
 
     public init(
-        metadata: [String: AnyEncodable]?,
+        metadata: [String: AnyEncodable]? = nil,
         number: String,
         expMonth: Int,
         expYear: Int,
