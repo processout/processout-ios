@@ -91,7 +91,7 @@ public struct POCardTokenizationResponse: Decodable {
         public let metadata: [String: String]
 
         /// Denotes whether or not this card was created in the sandbox testing environment
-        public let sandbox: String
+        public let sandbox: Bool
 
         /// Date and time when this card was created
         public let createdAt: Date
