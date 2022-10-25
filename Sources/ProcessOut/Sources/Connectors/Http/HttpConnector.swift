@@ -19,6 +19,9 @@ final class HttpConnector: HttpConnectorType {
         /// Project id to associate requests with.
         let projectId: String
 
+        /// Project's password.
+        let password: String?
+
         /// SDK version.
         let version: String
     }
@@ -101,7 +104,10 @@ final class HttpConnector: HttpConnectorType {
     }
 
     private func authorize(request: inout URLRequest) {
-        let value = configuration.projectId + ":"
+        var value = configuration.projectId + ":"
+        if let password = configuration.password {
+            value += password
+        }
         let authorization = "Basic " + Data(value.utf8).base64EncodedString()
         request.setValue(authorization, forHTTPHeaderField: "Authorization")
     }

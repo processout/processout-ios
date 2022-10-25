@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol POCardsRepositoryType: PORepositoryType {
+public protocol POCardsRepositoryType: PORepositoryType, POAutoAsync {
 
     // Tokenize a card
     func tokenize(

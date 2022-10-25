@@ -16,6 +16,11 @@ public struct ProcessOutApiConfiguration {
     /// Project id.
     public let projectId: String
 
+    /// Project's password.
+    /// - Warning: this is only intended to be used for testing purposes storing your private key
+    /// inside application is extremely dangerous and is highly discouraged.
+    @_spi(PO) public let password: String?
+
     /// Environment to use.
     /// - NOTE: `Environment.staging` is intented ONLY for internal use.
     public let environment: Environment
@@ -23,6 +28,15 @@ public struct ProcessOutApiConfiguration {
     /// Creates configuration instance.
     public init(projectId: String, environment: Environment = .production) {
         self.projectId = projectId
+        self.password = nil
+        self.environment = environment
+    }
+
+    /// Creates configuration instance.
+    @_spi(PO)
+    public init(projectId: String, password: String, environment: Environment = .production) {
+        self.projectId = projectId
+        self.password = password
         self.environment = environment
     }
 }

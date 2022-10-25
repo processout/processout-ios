@@ -1,0 +1,13 @@
+### macOS ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+## Project
+.build
+.swiftpm
+Packages
+*.xcodeproj
+xcuserdata/
+Example/Sources/Generated
+Example/Resources/Constants.yml

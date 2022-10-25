@@ -15,4 +15,8 @@ public protocol POInvoicesRepositoryType: PORepositoryType, POAutoAsync {
         request: PONativeAlternativePaymentMethodRequest,
         completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, Failure>) -> Void
     )
+
+    /// Creates invoice with given parameters.
+    @_spi(PO)
+    func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void)
 }

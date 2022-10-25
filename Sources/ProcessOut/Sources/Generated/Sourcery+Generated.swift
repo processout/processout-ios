@@ -4,6 +4,28 @@
 // swiftlint:disable all
 
 @available(iOS 13.0, *)
+extension POCardsRepositoryType {
+
+    @MainActor
+    public func tokenize(
+        request: POCardTokenizationRequest
+    ) async throws -> POCard {
+        try await withUnsafeThrowingContinuation { continuation in
+            tokenize(request: request, completion: continuation.resume)
+        }
+    }
+
+    @MainActor
+    public func updateCvc(
+        cardId: String, newCvc: String
+    ) async throws -> POCard {
+        try await withUnsafeThrowingContinuation { continuation in
+            updateCvc(cardId: cardId, newCvc: newCvc, completion: continuation.resume)
+        }
+    }
+}
+
+@available(iOS 13.0, *)
 extension POGatewayConfigurationsRepositoryType {
 
     @MainActor
@@ -41,6 +63,16 @@ extension POInvoicesRepositoryType {
     ) async throws -> PONativeAlternativePaymentMethodResponse {
         try await withUnsafeThrowingContinuation { continuation in
             initiatePayment(request: request, completion: continuation.resume)
+        }
+    }
+
+    @MainActor
+    @_spi(PO)
+    public func createInvoice(
+        request: POInvoiceCreationRequest
+    ) async throws -> POInvoice {
+        try await withUnsafeThrowingContinuation { continuation in
+            createInvoice(request: request, completion: continuation.resume)
         }
     }
 }

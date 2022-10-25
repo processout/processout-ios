@@ -32,6 +32,16 @@ final class InvoicesRepository: POInvoicesRepositoryType {
         }
     }
 
+    func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void) {
+        struct Response: Decodable {
+            let invoice: POInvoice
+        }
+        let httpRequest = HttpConnectorRequest<Response>.post(path: "/invoices", body: request)
+        connector.execute(request: httpRequest) { [failureFactory] result in
+            completion(result.map(\.invoice).mapError(failureFactory.repositoryFailure))
+        }
+    }
+
     // MARK: - Private Nested Types
 
     private struct NativeAlternativePaymentRequestBox: Encodable {

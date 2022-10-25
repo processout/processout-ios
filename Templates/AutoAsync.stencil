@@ -1,14 +1,4 @@
 // swiftlint:disable all
-
-{%- macro createAsyncMethodParameters parameters %}
-    {% for parameter in parameters %}
-        {% if forloop.last %}
-            {% continue %}
-        {% endif %}
-        {{ parameter.asSource }}{% if forloop.counter < forloop.length-1 %},{% endif %}
-    {% endfor %}
-{% endmacro -%}
-
 {% for type in types.implementing.POAutoAsync|protocol %}
 
 @available(iOS 13.0, *)
@@ -24,11 +14,14 @@ extension {{ type.name }} {
         {% endif %}
 
     @MainActor
+    {% for key, value in method.attributes %}
+    {{ value.first }}
+    {% endfor %}
     {% if method.parameters.count == 1 %}
     public func {{ method.callName }}() async throws -> {{ resultGeneric.typeParameters.first.typeName.name }} {
     {% else %}
     public func {{ method.callName }}(
-        {% call createAsyncMethodParameters method.parameters %}
+        {% for parameter in method.parameters %}{% if forloop.last %}{% continue %}{% endif %}{%- if not forloop.first %}, {% endif %}{{ parameter.asSource }}{% endfor %}
     ) async throws -> {{ resultGeneric.typeParameters.first.typeName.name }} {
     {% endif %}
         try await withUnsafeThrowingContinuation { continuation in

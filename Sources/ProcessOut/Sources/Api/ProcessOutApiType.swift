@@ -11,7 +11,7 @@ public protocol ProcessOutApiType {
     var gatewayConfigurations: POGatewayConfigurationsRepositoryType { get }
 
     /// Returns invoices repository.
-    var invoicesRepository: POInvoicesRepositoryType { get }
+    var invoices: POInvoicesRepositoryType { get }
 
     /// Return cards repository.
     var cards: POCardsRepositoryType { get }
