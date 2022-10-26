@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 17.10.2022.
 //
 
-public protocol POInvoicesRepositoryType: PORepositoryType, POAutoAsync {
+public protocol POInvoicesRepositoryType: PORepositoryType {
 
     /// Initiates native alternative payment with a given request.
     ///

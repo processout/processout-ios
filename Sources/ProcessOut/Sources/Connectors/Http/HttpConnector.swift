@@ -52,6 +52,7 @@ final class HttpConnector: HttpConnectorType {
                 }
                 dataTask.resume()
             } catch {
+                Logger.connectors.error("Did fail to create a request: '\(error.localizedDescription)'.")
                 self.completeRequest(with: .failure(error), completion: completion)
             }
         }
@@ -130,6 +131,7 @@ final class HttpConnector: HttpConnectorType {
                     throw Failure.server(serverFailure, statusCode: urlResponse.statusCode)
                 }
             } catch {
+                Logger.connectors.error("Did fail to decode response: '\(error.localizedDescription)'.")
                 completeRequest(with: .failure(error), completion: completion)
             }
         } else {
