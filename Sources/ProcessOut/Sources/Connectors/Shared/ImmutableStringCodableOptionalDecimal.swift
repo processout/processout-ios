@@ -1,5 +1,5 @@
 //
-//  StringCodableDecimal.swift
+//  ImmutableStringCodableOptionalDecimal.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 18.10.2022.
@@ -10,14 +10,18 @@
 import Foundation
 
 @propertyWrapper
-public struct ImmutableStringCodableDecimal: Codable {
+public struct ImmutableStringCodableOptionalDecimal: Codable {
 
-    public let wrappedValue: Decimal
+    public let wrappedValue: Decimal?
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        let value = try container.decode(String.self)
-        wrappedValue = NSDecimalNumber(string: value, locale: Self.locale).decimalValue
+        let value = try container.decode(Optional<String>.self)
+        if let value {
+            wrappedValue = NSDecimalNumber(string: value, locale: Self.locale).decimalValue
+        } else {
+            wrappedValue = nil
+        }
         guard description != value else {
             return
         }
@@ -25,7 +29,7 @@ public struct ImmutableStringCodableDecimal: Codable {
         throw DecodingError.dataCorrupted(context)
     }
 
-    public init(value: Decimal) {
+    public init(value: Decimal?) {
         self.wrappedValue = value
     }
 
@@ -38,7 +42,7 @@ public struct ImmutableStringCodableDecimal: Codable {
 
     private static let locale = NSLocale(localeIdentifier: "en_US")
 
-    private var description: String {
-        NSDecimalNumber(decimal: wrappedValue).description(withLocale: Self.locale)
+    private var description: String? {
+        wrappedValue.map(NSDecimalNumber.init)?.description(withLocale: Self.locale)
     }
 }

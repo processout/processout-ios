@@ -120,6 +120,7 @@ public struct PORepositoryFailure: Error {
         case resourceNotLinked                   = "resource.not-linked"
         case routingRulesTransactionBlocked      = "routing-rules.transaction-blocked"
         case sandboxNotSupported                 = "sandbox.not-supported"
+        case serviceNotSupported                 = "service.not-supported"
     }
 
     public enum Code {

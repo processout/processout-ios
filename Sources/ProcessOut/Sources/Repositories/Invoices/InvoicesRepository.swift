@@ -32,6 +32,20 @@ final class InvoicesRepository: POInvoicesRepositoryType {
         }
     }
 
+    func authorizeInvoice(
+        request: POInvoiceAuthorizationRequest, completion: @escaping (Result<POCustomerAction?, Failure>) -> Void
+    ) {
+        struct Response: Decodable {
+            let customerAction: POCustomerAction?
+        }
+        let httpRequest = HttpConnectorRequest<Response>.post(
+            path: "/invoices/\(request.invoiceId)/authorize", body: request
+        )
+        connector.execute(request: httpRequest) { [failureFactory] result in
+            completion(result.map(\.customerAction).mapError(failureFactory.repositoryFailure))
+        }
+    }
+
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void) {
         struct Response: Decodable {
             let invoice: POInvoice

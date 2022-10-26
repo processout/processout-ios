@@ -76,6 +76,15 @@ extension POInvoicesRepositoryType {
     }
 
     @MainActor
+    public func authorizeInvoice(
+        request: POInvoiceAuthorizationRequest
+    ) async throws -> POCustomerAction? {
+        try await withUnsafeThrowingContinuation { continuation in
+            authorizeInvoice(request: request, completion: continuation.resume)
+        }
+    }
+
+    @MainActor
     @_spi(PO)
     public func createInvoice(
         request: POInvoiceCreationRequest

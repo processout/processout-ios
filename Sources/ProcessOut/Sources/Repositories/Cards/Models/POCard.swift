@@ -60,7 +60,7 @@ public struct POCard: Decodable {
     public let tokenType: String?
 
     /// Cardholder’s name
-    public let name: String
+    public let name: String?
 
     /// First line of cardholder’s address
     public let address1: String?
