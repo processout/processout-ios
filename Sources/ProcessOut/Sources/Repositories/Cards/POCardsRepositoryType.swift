@@ -9,16 +9,22 @@ import Foundation
 
 public protocol POCardsRepositoryType: PORepositoryType {
 
-    // Tokenize a card
+    /// Tokenize a card
     func tokenize(
         request: POCardTokenizationRequest,
         completion: @escaping (Result<POCard, Failure>) -> Void
     )
 
-    // Update CVC
+    /// Update CVC
     func updateCvc(
         cardId: String,
         newCvc: String,
+        completion: @escaping (Result<POCard, Failure>) -> Void
+    )
+
+    /// Tokenize a card via ApplePay
+    func tokenize(
+        request: POApplePayCardTokenizationRequest,
         completion: @escaping (Result<POCard, Failure>) -> Void
     )
 }

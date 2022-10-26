@@ -20,12 +20,17 @@ public final class ProcessOutApi: ProcessOutApiType {
         }
         let connector = createHttpConnector(configuration: configuration)
         let failureFactory = RepositoryFailureFactory()
+        let applePayCardTokenizationRequestFactory = ApplePayCardTokenizationRequestFactory(decoder: createDecoder())
         shared = ProcessOutApi(
             gatewayConfigurations: GatewayConfigurationsRepository(
                 connector: connector, failureFactory: failureFactory
             ),
             invoices: InvoicesRepository(connector: connector, failureFactory: failureFactory),
-            cards: CardsRepository(connector: connector, failureFactory: failureFactory)
+            cards: CardsRepository(
+                connector: connector,
+                failureFactory: failureFactory,
+                applePayCardTokenizationRequestFactory: applePayCardTokenizationRequestFactory
+            )
         )
     }
 

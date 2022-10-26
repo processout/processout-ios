@@ -8,9 +8,14 @@
 import Foundation
 
 final class CardsRepository: POCardsRepositoryType {
-    init(connector: HttpConnectorType, failureFactory: RepositoryFailureFactoryType) {
+    init(
+        connector: HttpConnectorType,
+        failureFactory: RepositoryFailureFactoryType,
+        applePayCardTokenizationRequestFactory: ApplePayCardTokenizationRequestFactoryType
+    ) {
         self.connector = connector
         self.failureFactory = failureFactory
+        self.applePayCardTokenizationRequestFactory = applePayCardTokenizationRequestFactory
     }
 
     // MARK: - POCardsRepositoryType
@@ -43,8 +48,27 @@ final class CardsRepository: POCardsRepositoryType {
         }
     }
 
+    func tokenize(
+        request: POApplePayCardTokenizationRequest,
+        completion: @escaping (Result<POCard, Failure>) -> Void
+    ) {
+        do {
+            let request = try applePayCardTokenizationRequestFactory.tokenizationRequest(from: request)
+            let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
+                path: "/cards", body: request
+            )
+            connector.execute(request: httpRequest) { [failureFactory] result in
+                completion(result.map(\.card).mapError(failureFactory.repositoryFailure))
+            }
+        } catch {
+            let failure = PORepositoryFailure(message: nil, code: .internal, underlyingError: error)
+            completion(.failure(failure))
+        }
+    }
+
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType
     private let failureFactory: RepositoryFailureFactoryType
+    private let applePayCardTokenizationRequestFactory: ApplePayCardTokenizationRequestFactoryType
 }
