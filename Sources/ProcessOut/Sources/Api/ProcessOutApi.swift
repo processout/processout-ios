@@ -30,7 +30,8 @@ public final class ProcessOutApi: ProcessOutApiType {
                 connector: connector,
                 failureFactory: failureFactory,
                 applePayCardTokenizationRequestFactory: applePayCardTokenizationRequestFactory
-            )
+            ),
+            customerTokens: CustomerTokensRepository(connector: connector, failureFactory: failureFactory)
         )
     }
 
@@ -39,17 +40,20 @@ public final class ProcessOutApi: ProcessOutApiType {
     public let gatewayConfigurations: POGatewayConfigurationsRepositoryType
     public let invoices: POInvoicesRepositoryType
     public let cards: POCardsRepositoryType
+    public let customerTokens: POCustomerTokensRepositoryType
 
     // MARK: -
 
     private init(
         gatewayConfigurations: POGatewayConfigurationsRepositoryType,
         invoices: POInvoicesRepositoryType,
-        cards: POCardsRepositoryType
+        cards: POCardsRepositoryType,
+        customerTokens: POCustomerTokensRepositoryType
     ) {
         self.gatewayConfigurations = gatewayConfigurations
         self.invoices = invoices
         self.cards = cards
+        self.customerTokens = customerTokens
     }
 
     // MARK: - Private Methods

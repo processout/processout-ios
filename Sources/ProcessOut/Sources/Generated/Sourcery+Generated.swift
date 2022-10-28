@@ -35,6 +35,19 @@ extension POCardsRepositoryType {
 }
 
 @available(iOS 13.0, *)
+extension POCustomerTokensRepositoryType {
+
+    @MainActor
+    public func assignCustomerToken(
+        request: POCustomerTokensRequest
+    ) async throws -> POCustomerAction? {
+        try await withUnsafeThrowingContinuation { continuation in
+            assignCustomerToken(request: request, completion: continuation.resume)
+        }
+    }
+}
+
+@available(iOS 13.0, *)
 extension POGatewayConfigurationsRepositoryType {
 
     @MainActor

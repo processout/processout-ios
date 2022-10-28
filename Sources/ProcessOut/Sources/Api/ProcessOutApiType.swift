@@ -15,4 +15,7 @@ public protocol ProcessOutApiType {
 
     /// Return cards repository.
     var cards: POCardsRepositoryType { get }
+
+    /// Return customer tokens repository.
+    var customerTokens: POCustomerTokensRepositoryType { get }
 }
