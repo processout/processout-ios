@@ -61,10 +61,10 @@ extension POGatewayConfigurationsRepositoryType {
 
     @MainActor
     public func find(
-        id: String
+        request: POFindGatewayConfigurationRequest
     ) async throws -> POGatewayConfiguration {
         try await withUnsafeThrowingContinuation { continuation in
-            find(id: id, completion: continuation.resume)
+            find(request: request, completion: continuation.resume)
         }
     }
 

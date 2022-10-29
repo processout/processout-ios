@@ -60,7 +60,7 @@ final class InvoicesRepository: POInvoicesRepositoryType {
 
     private struct NativeAlternativePaymentRequestBox: Encodable {
         struct NativeApm: Encodable { // swiftlint:disable:this nesting
-            let parameterValues: [String: PONativeAlternativePaymentMethodRequest.ParameterValue]
+            let parameterValues: [String: String]
         }
         let gatewayConfigurationId: String
         let nativeApm: NativeApm

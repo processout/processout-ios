@@ -15,8 +15,11 @@ public protocol POGatewayConfigurationsRepositoryType: PORepositoryType {
         completion: @escaping (Result<POAllGatewayConfigurationsResponse, Failure>) -> Void
     )
 
-    /// Searches configuration with given id.
-    func find(id: String, completion: @escaping (Result<POGatewayConfiguration, Failure>) -> Void)
+    /// Searches configuration with given request.
+    func find(
+        request: POFindGatewayConfigurationRequest,
+        completion: @escaping (Result<POGatewayConfiguration, Failure>) -> Void
+    )
 }
 
 extension POGatewayConfigurationsRepositoryType {

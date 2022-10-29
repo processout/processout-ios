@@ -7,6 +7,9 @@
 
 extension Logger {
 
+    /// Logger with a UI subsystem.
+    static let ui: Logger = createLogger(for: "UI") // swiftlint:disable:this identifier_name
+
     /// Logger with a connectors subsystem.
     static let connectors: Logger = createLogger(for: "Connectors")
 

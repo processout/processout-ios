@@ -32,12 +32,20 @@ final class GatewayConfigurationsRepository: POGatewayConfigurationsRepositoryTy
         }
     }
 
-    func find(id: String, completion: @escaping (Result<POGatewayConfiguration, Failure>) -> Void) {
+    func find(
+        request: POFindGatewayConfigurationRequest,
+        completion: @escaping (Result<POGatewayConfiguration, Failure>) -> Void
+    ) {
         struct Response: Decodable {
             let gatewayConfiguration: POGatewayConfiguration
         }
-        let request = HttpConnectorRequest<Response>.get(path: "/gateway-configurations/" + id)
-        connector.execute(request: request) { [failureFactory] result in
+        let httpRequest = HttpConnectorRequest<Response>.get(
+            path: "/gateway-configurations/" + request.id,
+            query: [
+                "expand": request.expands.map(\.rawValue).joined(separator: ",")
+            ]
+        )
+        connector.execute(request: httpRequest) { [failureFactory] result in
             completion(result.map(\.gatewayConfiguration).mapError(failureFactory.repositoryFailure))
         }
     }
