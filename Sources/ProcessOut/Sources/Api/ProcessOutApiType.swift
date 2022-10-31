@@ -18,4 +18,7 @@ public protocol ProcessOutApiType {
 
     /// Return customer tokens repository.
     var customerTokens: POCustomerTokensRepositoryType { get }
+
+    /// Return Alternative Payment Methods service.
+    var alternativePaymentMethods: POAlternativePaymentMethodsServiceType { get }
 }

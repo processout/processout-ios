@@ -31,7 +31,8 @@ public final class ProcessOutApi: ProcessOutApiType {
                 failureFactory: failureFactory,
                 applePayCardTokenizationRequestFactory: applePayCardTokenizationRequestFactory
             ),
-            customerTokens: CustomerTokensRepository(connector: connector, failureFactory: failureFactory)
+            customerTokens: CustomerTokensRepository(connector: connector, failureFactory: failureFactory),
+            alternativePaymentMethods: createAlternativePaymentMethodsService(configuration: configuration)
         )
     }
 
@@ -41,6 +42,7 @@ public final class ProcessOutApi: ProcessOutApiType {
     public let invoices: POInvoicesRepositoryType
     public let cards: POCardsRepositoryType
     public let customerTokens: POCustomerTokensRepositoryType
+    public let alternativePaymentMethods: POAlternativePaymentMethodsServiceType
 
     // MARK: -
 
@@ -48,12 +50,14 @@ public final class ProcessOutApi: ProcessOutApiType {
         gatewayConfigurations: POGatewayConfigurationsRepositoryType,
         invoices: POInvoicesRepositoryType,
         cards: POCardsRepositoryType,
-        customerTokens: POCustomerTokensRepositoryType
+        customerTokens: POCustomerTokensRepositoryType,
+        alternativePaymentMethods: POAlternativePaymentMethodsServiceType
     ) {
         self.gatewayConfigurations = gatewayConfigurations
         self.invoices = invoices
         self.cards = cards
         self.customerTokens = customerTokens
+        self.alternativePaymentMethods = alternativePaymentMethods
     }
 
     // MARK: - Private Methods
@@ -84,6 +88,20 @@ public final class ProcessOutApi: ProcessOutApiType {
         )
         let retryStrategy = RetryStrategy.exponential(maximumRetries: 3, interval: 0.1, rate: 3)
         return HttpConnectorRetryDecorator(connector: connector, retryStrategy: retryStrategy)
+    }
+
+    private static func createAlternativePaymentMethodsService(configuration: ProcessOutApiConfiguration) -> POAlternativePaymentMethodsServiceType { // swiftlint:disable:this line_length
+        var baseUrlString: String = ""
+        switch configuration.environment {
+        case .production:
+            baseUrlString = "https://checkout.processout.com"
+        case .staging:
+            baseUrlString = "https://checkout.processout.ninja"
+        }
+        return AlternativePaymentMethodsService(
+            // swiftlint:disable:next force_unwrapping
+            projectId: configuration.projectId, baseUrl: URL(string: baseUrlString)!
+        )
     }
 
     private static func createDecoder() -> JSONDecoder {

@@ -1,0 +1,71 @@
+//
+//  AlternativePaymentMethodsService.swift
+//  ProcessOut
+//
+//  Created by Simeon Kostadinov on 27/10/2022.
+//
+
+import Foundation
+
+final class AlternativePaymentMethodsService: POAlternativePaymentMethodsServiceType {
+
+    init(projectId: String, baseUrl: URL) {
+        self.projectId = projectId
+        self.baseUrl = baseUrl
+    }
+
+    // MARK: - POAlternativePaymentMethodsServiceType
+
+    func alternativePaymentMethodUrl(request: POAlternativePaymentMethodRequest) -> URL {
+        guard var components = URLComponents(url: baseUrl, resolvingAgainstBaseURL: true) else {
+            let message = "Can't create components from base url."
+            Logger.services.error("\(message)")
+            fatalError(message)
+        }
+        let pathComponents: [String]
+        if let tokenId = request.tokenId, let customerId = request.customerId {
+            pathComponents = [projectId, customerId, tokenId, "redirect", request.gatewayConfigurationId]
+        } else {
+            pathComponents = [projectId, request.invoiceId, "redirect", request.gatewayConfigurationId]
+        }
+        components.path = "/" + pathComponents.joined(separator: "/")
+        components.queryItems = request.additionalData?.map { data in
+            URLQueryItem(name: "additional_data[" + data.key + "]", value: data.value)
+        }
+        guard let url = components.url else {
+            let message = "Failed to create APM redirection URL."
+            Logger.services.error("\(message)")
+            fatalError(message)
+        }
+        return url
+    }
+
+    func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse? {
+        guard url.host == "processout.return" else {
+            return nil
+        }
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+              let queryItems = components.queryItems,
+              let gatewayToken = queryItems.queryItemValue(name: "token") else {
+            let message = "Invalid or malformed Alternative Payment Mehod URL response provided."
+            throw PORepositoryFailure(message: message, code: .internal, underlyingError: nil)
+        }
+        guard let customerId = queryItems.queryItemValue(name: "customer_id"),
+              let tokenId = queryItems.queryItemValue(name: "token_id") else {
+            return .init(gatewayToken: gatewayToken, customerId: nil, tokenId: nil, returnType: .authorization)
+        }
+        return .init(gatewayToken: gatewayToken, customerId: customerId, tokenId: tokenId, returnType: .createToken)
+    }
+
+    // MARK: - Private
+
+    private let projectId: String
+    private let baseUrl: URL
+}
+
+private extension Array where Element == URLQueryItem { // swiftlint:disable:this no_extension_access_modifier
+
+    func queryItemValue(name: String) -> String? {
+        first { $0.name == name }?.value
+    }
+}
