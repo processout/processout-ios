@@ -8,19 +8,16 @@
 import Foundation
 
 final class CustomerTokensRepository: POCustomerTokensRepositoryType {
-    init(
-        connector: HttpConnectorType,
-        failureFactory: RepositoryFailureFactoryType
-    ) {
+
+    init(connector: HttpConnectorType, failureMapper: RepositoryFailureMapperType) {
         self.connector = connector
-        self.failureFactory = failureFactory
+        self.failureMapper = failureMapper
     }
 
     // MARK: - POCustomerTokensRepositoryType
 
     func assignCustomerToken(
-        request: POCustomerTokensRequest,
-        completion: @escaping (Result<POCustomerAction?, Failure>) -> Void
+        request: POCustomerTokensRequest, completion: @escaping (Result<POCustomerAction?, Failure>) -> Void
     ) {
         struct Response: Decodable {
             let customerAction: POCustomerAction?
@@ -30,13 +27,13 @@ final class CustomerTokensRepository: POCustomerTokensRepositoryType {
             body: request,
             includesDeviceMetadata: true
         )
-        connector.execute(request: httpRequest) { [failureFactory] result in
-            completion(result.map(\.customerAction).mapError(failureFactory.repositoryFailure))
+        connector.execute(request: httpRequest) { [failureMapper] result in
+            completion(result.map(\.customerAction).mapError(failureMapper.repositoryFailure))
         }
     }
 
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType
-    private let failureFactory: RepositoryFailureFactoryType
+    private let failureMapper: RepositoryFailureMapperType
 }

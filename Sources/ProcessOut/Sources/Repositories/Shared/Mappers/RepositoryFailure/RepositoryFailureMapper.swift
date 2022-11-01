@@ -1,5 +1,5 @@
 //
-//  RepositoryFailureFactory.swift
+//  RepositoryFailureMapper.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 16.10.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class RepositoryFailureFactory: RepositoryFailureFactoryType {
+final class RepositoryFailureMapper: RepositoryFailureMapperType {
 
     func repositoryFailure(from failure: HttpConnectorFailure) -> PORepositoryFailure {
         let message: String?

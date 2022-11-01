@@ -9,9 +9,9 @@ import Foundation
 
 final class GatewayConfigurationsRepository: POGatewayConfigurationsRepositoryType {
 
-    init(connector: HttpConnectorType, failureFactory: RepositoryFailureFactoryType) {
+    init(connector: HttpConnectorType, failureMapper: RepositoryFailureMapperType) {
         self.connector = connector
-        self.failureFactory = failureFactory
+        self.failureMapper = failureMapper
     }
 
     // MARK: - POGatewayConfigurationsRepositoryType
@@ -27,8 +27,8 @@ final class GatewayConfigurationsRepository: POGatewayConfigurationsRepositoryTy
         let request = HttpConnectorRequest<POAllGatewayConfigurationsResponse>.get(
             path: "/gateway-configurations", query: query
         )
-        connector.execute(request: request) { [failureFactory] result in
-            completion(result.mapError(failureFactory.repositoryFailure))
+        connector.execute(request: request) { [failureMapper] result in
+            completion(result.mapError(failureMapper.repositoryFailure))
         }
     }
 
@@ -45,13 +45,13 @@ final class GatewayConfigurationsRepository: POGatewayConfigurationsRepositoryTy
                 "expand": request.expand.map(\.rawValue).joined(separator: ",")
             ]
         )
-        connector.execute(request: httpRequest) { [failureFactory] result in
-            completion(result.map(\.gatewayConfiguration).mapError(failureFactory.repositoryFailure))
+        connector.execute(request: httpRequest) { [failureMapper] result in
+            completion(result.map(\.gatewayConfiguration).mapError(failureMapper.repositoryFailure))
         }
     }
 
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType
-    private let failureFactory: RepositoryFailureFactoryType
+    private let failureMapper: RepositoryFailureMapperType
 }

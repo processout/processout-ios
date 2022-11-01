@@ -23,18 +23,18 @@ public struct ProcessOutApiConfiguration {
 
     /// Environment to use.
     /// - NOTE: `Environment.staging` is intented ONLY for internal use.
-    public let environment: Environment
+    @_spi(PO) public let environment: Environment
 
     /// Creates configuration instance.
-    public init(projectId: String, environment: Environment = .production) {
+    public init(projectId: String) {
         self.projectId = projectId
         self.password = nil
-        self.environment = environment
+        self.environment = .production
     }
 
     /// Creates configuration instance.
     @_spi(PO)
-    public init(projectId: String, password: String, environment: Environment = .production) {
+    public init(projectId: String, password: String, environment: Environment) {
         self.projectId = projectId
         self.password = password
         self.environment = environment

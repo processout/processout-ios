@@ -1,5 +1,5 @@
 //
-//  ApplePayCardTokenizationRequestFactory.swift
+//  ApplePayCardTokenizationRequestMapper.swift
 //  ProcessOut
 //
 //  Created by Julien.Rodrigues on 26/10/2022.
@@ -8,13 +8,13 @@
 import Foundation
 import PassKit
 
-final class ApplePayCardTokenizationRequestFactory: ApplePayCardTokenizationRequestFactoryType {
+final class ApplePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapperType {
 
     init(decoder: JSONDecoder) {
         self.decoder = decoder
     }
 
-    // MARK: - ApplePayCardTokenizationRequestFactoryType
+    // MARK: - ApplePayCardTokenizationRequestMapperType
 
     func tokenizationRequest(
         from request: POApplePayCardTokenizationRequest

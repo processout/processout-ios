@@ -9,9 +9,9 @@ import Foundation
 
 final class InvoicesRepository: POInvoicesRepositoryType {
 
-    init(connector: HttpConnectorType, failureFactory: RepositoryFailureFactoryType) {
+    init(connector: HttpConnectorType, failureMapper: RepositoryFailureMapperType) {
         self.connector = connector
-        self.failureFactory = failureFactory
+        self.failureMapper = failureMapper
     }
 
     // MARK: - POInvoicesRepositoryType
@@ -27,8 +27,8 @@ final class InvoicesRepository: POInvoicesRepositoryType {
         let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentMethodResponse>.post(
             path: "/invoices/\(request.invoiceId)/native-payment", body: requestBox
         )
-        connector.execute(request: httpRequest) { [failureFactory] result in
-            completion(result.mapError(failureFactory.repositoryFailure))
+        connector.execute(request: httpRequest) { [failureMapper] result in
+            completion(result.mapError(failureMapper.repositoryFailure))
         }
     }
 
@@ -41,8 +41,8 @@ final class InvoicesRepository: POInvoicesRepositoryType {
         let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/invoices/\(request.invoiceId)/authorize", body: request, includesDeviceMetadata: true
         )
-        connector.execute(request: httpRequest) { [failureFactory] result in
-            completion(result.map(\.customerAction).mapError(failureFactory.repositoryFailure))
+        connector.execute(request: httpRequest) { [failureMapper] result in
+            completion(result.map(\.customerAction).mapError(failureMapper.repositoryFailure))
         }
     }
 
@@ -50,12 +50,9 @@ final class InvoicesRepository: POInvoicesRepositoryType {
         struct Response: Decodable {
             let invoice: POInvoice
         }
-        let httpRequest = HttpConnectorRequest<Response>.post(
-            path: "/invoices",
-            body: request
-        )
-        connector.execute(request: httpRequest) { [failureFactory] result in
-            completion(result.map(\.invoice).mapError(failureFactory.repositoryFailure))
+        let httpRequest = HttpConnectorRequest<Response>.post(path: "/invoices", body: request)
+        connector.execute(request: httpRequest) { [failureMapper] result in
+            completion(result.map(\.invoice).mapError(failureMapper.repositoryFailure))
         }
     }
 
@@ -72,5 +69,5 @@ final class InvoicesRepository: POInvoicesRepositoryType {
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType
-    private let failureFactory: RepositoryFailureFactoryType
+    private let failureMapper: RepositoryFailureMapperType
 }

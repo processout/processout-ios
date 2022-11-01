@@ -19,11 +19,7 @@ public struct POApplePayCardTokenizationRequest {
     /// Additional matadata.
     public let metadata: [String: AnyEncodable]?
 
-    public init(
-        payment: PKPayment,
-        contact: POContact? = nil,
-        metadata: [String: AnyEncodable]? = nil
-    ) {
+    public init(payment: PKPayment, contact: POContact? = nil, metadata: [String: AnyEncodable]? = nil) {
         self.payment = payment
         self.contact = contact
         self.metadata = metadata

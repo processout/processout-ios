@@ -42,8 +42,6 @@ public struct POGatewayConfiguration: Decodable {
         public let nativeApmConfig: NativeAlternativePaymentMethodConfig?
     }
 
-    // MARK: -
-
     /// String value that uniquely identifies the configuration.
     public let id: String
 

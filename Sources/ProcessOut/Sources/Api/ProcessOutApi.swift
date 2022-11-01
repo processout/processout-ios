@@ -20,19 +20,18 @@ public final class ProcessOutApi: ProcessOutApiType {
             return
         }
         let connector = createHttpConnector(configuration: configuration)
-        let failureFactory = RepositoryFailureFactory()
-        let applePayCardTokenizationRequestFactory = ApplePayCardTokenizationRequestFactory(decoder: createDecoder())
+        let failureMapper = RepositoryFailureMapper()
         shared = ProcessOutApi(
             gatewayConfigurations: GatewayConfigurationsRepository(
-                connector: connector, failureFactory: failureFactory
+                connector: connector, failureMapper: failureMapper
             ),
-            invoices: InvoicesRepository(connector: connector, failureFactory: failureFactory),
+            invoices: InvoicesRepository(connector: connector, failureMapper: failureMapper),
             cards: CardsRepository(
                 connector: connector,
-                failureFactory: failureFactory,
-                applePayCardTokenizationRequestFactory: applePayCardTokenizationRequestFactory
+                failureMapper: failureMapper,
+                applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper(decoder: decoder)
             ),
-            customerTokens: CustomerTokensRepository(connector: connector, failureFactory: failureFactory),
+            customerTokens: CustomerTokensRepository(connector: connector, failureMapper: failureMapper),
             alternativePaymentMethods: createAlternativePaymentMethodsService(configuration: configuration)
         )
     }
@@ -84,46 +83,47 @@ public final class ProcessOutApi: ProcessOutApiType {
                 version: Self.version
             ),
             sessionConfiguration: sessionConfiguration,
-            decoder: createDecoder(),
-            encoder: createEncoder(),
+            decoder: decoder,
+            encoder: encoder,
             deviceMetadataProvider: DeviceMetadataProvider(screen: UIScreen.main, bundle: Bundle.main)
         )
         let retryStrategy = RetryStrategy.exponential(maximumRetries: 3, interval: 0.1, rate: 3)
         return HttpConnectorRetryDecorator(connector: connector, retryStrategy: retryStrategy)
     }
 
-    private static func createAlternativePaymentMethodsService(configuration: ProcessOutApiConfiguration) -> POAlternativePaymentMethodsServiceType { // swiftlint:disable:this line_length
-        var baseUrlString: String = ""
+    private static func createAlternativePaymentMethodsService(
+        configuration: ProcessOutApiConfiguration
+    ) -> POAlternativePaymentMethodsServiceType {
+        let baseUrlString: String
         switch configuration.environment {
         case .production:
             baseUrlString = "https://checkout.processout.com"
         case .staging:
             baseUrlString = "https://checkout.processout.ninja"
         }
-        return AlternativePaymentMethodsService(
-            // swiftlint:disable:next force_unwrapping
-            projectId: configuration.projectId, baseUrl: URL(string: baseUrlString)!
-        )
+        // swiftlint:disable:next force_unwrapping
+        let baseUrl = URL(string: baseUrlString)!
+        return AlternativePaymentMethodsService(projectId: configuration.projectId, baseUrl: baseUrl)
     }
 
-    private static func createDecoder() -> JSONDecoder {
+    private static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
-        decoder.dateDecodingStrategy = .formatted(createDateFormatter())
+        decoder.dateDecodingStrategy = .formatted(dateFormatter)
         return decoder
-    }
+    }()
 
-    private static func createEncoder() -> JSONEncoder {
+    private static let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
-        encoder.dateEncodingStrategy = .formatted(createDateFormatter())
+        encoder.dateEncodingStrategy = .formatted(dateFormatter)
         return encoder
-    }
+    }()
 
-    private static func createDateFormatter() -> DateFormatter {
+    private static let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         return dateFormatter
-    }
+    }()
 }

@@ -17,7 +17,7 @@ public struct POInvoiceCreationRequest: Encodable {
     public let amount: String
 
     /// Currency for payment of the invoice, in ISO 4217 format (for example, USD). Must be a valid
-    /// ISO 4217 currency code with 3 characters
+    /// ISO 4217 currency code with 3 characters.
     public let currency: String
 
     /// Device information.

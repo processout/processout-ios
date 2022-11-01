@@ -1,13 +1,12 @@
 //
-//  ApplePayCardTokenizationRequestFactoryType.swift
+//  ApplePayCardTokenizationRequestMapperType.swift
 //  ProcessOut
 //
 //  Created by Julien.Rodrigues on 25/10/2022.
 //
 
-import Foundation
+protocol ApplePayCardTokenizationRequestMapperType {
 
-protocol ApplePayCardTokenizationRequestFactoryType {
     /// Creates tokenization request with given ``POApplePayCardTokenizationRequest`` instance.
     func tokenizationRequest(from request: POApplePayCardTokenizationRequest) throws -> ApplePayCardTokenizationRequest
 }

@@ -31,11 +31,11 @@ struct HttpConnectorRequest<Value: Decodable> {
     /// Custom headers.
     let headers: [String: String]
 
+    /// Lets us inject device metadata into requests.
+    let includesDeviceMetadata: Bool
+
     /// Expected value type.
     let expectedValueType: Value.Type = Value.self
-
-    /// Lets us inject device metadata into requests
-    let includesDeviceMetadata: Bool
 }
 
 extension HttpConnectorRequest {

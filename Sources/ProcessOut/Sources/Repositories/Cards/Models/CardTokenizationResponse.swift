@@ -1,6 +1,6 @@
 //
 //  CardTokenizationResponse.swift
-//  
+//  ProcessOut
 //
 //  Created by Julien.Rodrigues on 20/10/2022.
 //
