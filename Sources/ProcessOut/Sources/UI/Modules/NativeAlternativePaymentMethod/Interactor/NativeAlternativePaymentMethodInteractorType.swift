@@ -58,7 +58,7 @@ enum NativeAlternativePaymentMethodInteractorState {
     case submitting(snapshot: Started)
 
     /// Submit operation did fail.
-    case submissionFailure(snapshot: Started)
+    case submissionFailure(snapshot: Started, failure: PORepositoryFailure)
 
     /// Parameters were submitted and accepted. This is a sink state.
     case submitted(snapshot: Started)

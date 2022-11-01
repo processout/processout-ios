@@ -10,8 +10,14 @@ import Foundation
 final class NativeAlternativePaymentMethodViewModel:
     BaseViewModel<NativeAlternativePaymentMethodViewModelState>, NativeAlternativePaymentMethodViewModelType {
 
-    init(interactor: any NativeAlternativePaymentMethodInteractorType) {
+    init(
+        interactor: any NativeAlternativePaymentMethodInteractorType,
+        router: any RouterType<NativeAlternativePaymentMethodRoute>,
+        completion: (() -> Void)?
+    ) {
         self.interactor = interactor
+        self.router = router
+        self.completion = completion
         super.init(state: .idle)
         observeInteractorStateChanges()
     }
@@ -31,6 +37,8 @@ final class NativeAlternativePaymentMethodViewModel:
     // MARK: - NativeAlternativePaymentMethodInteractorType
 
     private let interactor: any NativeAlternativePaymentMethodInteractorType
+    private let router: any RouterType<NativeAlternativePaymentMethodRoute>
+    private let completion: (() -> Void)?
 
     // MARK: - Private Methods
 
@@ -45,20 +53,23 @@ final class NativeAlternativePaymentMethodViewModel:
             state = .idle
         case .starting:
             state = .starting
-        case .started(let state):
-            update(with: state)
+        case .started(let startedState):
+            state = convertToState(startedState: startedState)
         case let .submitting(stateSnapshot):
-            update(with: stateSnapshot, isSubmitting: true)
-        case let .submissionFailure(stateSnapshot):
-            update(with: stateSnapshot)
+            state = convertToState(startedState: stateSnapshot, isSubmitting: true)
+        case let .submissionFailure(stateSnapshot, failure):
+            state = convertToState(startedState: stateSnapshot, failureMessage: failure.message)
         case let .submitted(stateSnapshot):
-            update(with: stateSnapshot)
+            state = convertToState(startedState: stateSnapshot)
+            router.trigger(route: .close(completion: completion))
         case .failure:
             state = .failure
         }
     }
 
-    private func update(with startedState: InteractorState.Started, isSubmitting: Bool = false) {
+    private func convertToState(
+        startedState: InteractorState.Started, failureMessage: String? = nil, isSubmitting: Bool = false
+    ) -> State {
         let parameters = startedState.parameters.map { parameter -> State.Parameter in
             let value = startedState.values[parameter.key]?.value ?? ""
             let parameterViewModel = State.Parameter(
@@ -76,10 +87,11 @@ final class NativeAlternativePaymentMethodViewModel:
         let state = State.Started(
             message: startedState.message,
             parameters: parameters,
+            failureMessage: failureMessage,
             isSubmitAllowed: startedState.isSubmitAllowed,
             isSubmitting: isSubmitting
         )
-        self.state = .started(state)
+        return .started(state)
     }
 
     // MARK: - Utils

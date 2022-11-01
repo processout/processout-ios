@@ -47,6 +47,9 @@ enum NativeAlternativePaymentMethodViewModelState {
         /// Available parameters.
         let parameters: [Parameter]
 
+        /// The most recent failure message if any.
+        let failureMessage: String?
+
         /// Boolean value indicating whether data can be submitted.
         let isSubmitAllowed: Bool
 

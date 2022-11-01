@@ -47,7 +47,7 @@ final class NativeAlternativePaymentMethodInteractor:
     func updateValue(_ value: String?, for key: String) -> Bool {
         let startedState: State.Started
         switch state {
-        case let .started(state), let .submissionFailure(state):
+        case let .started(state), let .submissionFailure(state, _):
             startedState = state
         default:
             return false
@@ -60,16 +60,11 @@ final class NativeAlternativePaymentMethodInteractor:
         updatedValues[key] = .init(
             value: value, isValid: isValid(value: value, for: parameter)
         )
-        let isSubmitAllowed = startedState.parameters
-            .map { parameter in
-                updatedValues[parameter.key]?.isValid ?? false
-            }
-            .allSatisfy { $0 }
         let updatedStartedState = State.Started(
             message: startedState.message,
             parameters: startedState.parameters,
             values: updatedValues,
-            isSubmitAllowed: isSubmitAllowed
+            isSubmitAllowed: areValuesValid(updatedValues, parameters: startedState.parameters)
         )
         state = .started(updatedStartedState)
         return true
@@ -78,7 +73,7 @@ final class NativeAlternativePaymentMethodInteractor:
     func submit() {
         let startedState: State.Started
         switch state {
-        case let .started(state), let .submissionFailure(state):
+        case let .started(state), let .submissionFailure(state, _):
             startedState = state
         default:
             return
@@ -120,7 +115,7 @@ final class NativeAlternativePaymentMethodInteractor:
             message: nil,
             parameters: configuration.parameters,
             values: [:],
-            isSubmitAllowed: !configuration.parameters.contains(where: \.required)
+            isSubmitAllowed: areValuesValid(nil, parameters: configuration.parameters)
         )
         state = .started(startedState)
     }
@@ -140,13 +135,13 @@ final class NativeAlternativePaymentMethodInteractor:
             message: response.nativeApm.parameterValues?.message,
             parameters: parameters,
             values: [:],
-            isSubmitAllowed: !parameters.contains(where: \.required)
+            isSubmitAllowed: areValuesValid(nil, parameters: parameters)
         )
         state = .started(updatedStartedState)
     }
 
     private func setSubmissionFailureState(startedState: State.Started, failure: PORepositoryFailure) {
-        state = .submissionFailure(snapshot: startedState)
+        state = .submissionFailure(snapshot: startedState, failure: failure)
     }
 
     // MARK: - Utils
@@ -155,7 +150,7 @@ final class NativeAlternativePaymentMethodInteractor:
         guard let value, !value.isEmpty else {
             return !parameter.required
         }
-        if let length = parameter.length, value.count < length {
+        if let length = parameter.length, value.count != length {
             return false
         }
         switch parameter.type {
@@ -168,5 +163,11 @@ final class NativeAlternativePaymentMethodInteractor:
         case .phone:
             return true
         }
+    }
+
+    private func areValuesValid(
+        _ values: [String: State.ParameterValue]?, parameters: [PONativeAlternativePaymentMethodParameter]
+    ) -> Bool {
+         parameters.map { values?[$0.key]?.isValid ?? isValid(value: nil, for: $0) }.allSatisfy { $0 }
     }
 }

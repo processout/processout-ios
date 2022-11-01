@@ -21,6 +21,7 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
 
     override func loadView() {
         let view = UIView()
+        view.backgroundColor = .white
         view.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(contentView)
         let constraints = [
@@ -44,8 +45,17 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
 
     private lazy var contentView: UIStackView = {
         let view = UIStackView(arrangedSubviews: [
-            titleLabel, submitButton
+            titleLabel, inputsContainerView, failureLabel, submitButton
         ])
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.alignment = .fill
+        view.spacing = 16
+        view.axis = .vertical
+        return view
+    }()
+
+    private lazy var inputsContainerView: UIStackView = {
+        let view = UIStackView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.alignment = .fill
         view.spacing = 16
@@ -55,10 +65,20 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
+        label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .preferredFont(forTextStyle: .title2)
         label.numberOfLines = 0
         label.textAlignment = .center
+        return label
+    }()
+
+    private lazy var failureLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .orange
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .preferredFont(forTextStyle: .body)
+        label.numberOfLines = 0
         return label
     }()
 
@@ -67,6 +87,8 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Submit", for: .normal)
         button.addTarget(self, action: #selector(didTouchSubmitButton), for: .touchUpInside)
+        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(.gray, for: .disabled)
         return button
     }()
 
@@ -99,7 +121,9 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
     private func configureWithStartedState(startedState: NativeAlternativePaymentMethodViewModelState.Started) {
         contentView.isHidden = false
         titleLabel.text = startedState.message
-        titleLabel.isHidden = startedState.message != nil
+        titleLabel.isHidden = startedState.message == nil
+        failureLabel.text = startedState.failureMessage
+        failureLabel.isHidden = startedState.failureMessage == nil
         submitButton.isEnabled = startedState.isSubmitAllowed
         configureParameterTextFields(startedState: startedState)
     }
@@ -115,9 +139,12 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             let count = startedState.parameters.count - parameterTextFields.count
             stride(from: 0, to: count, by: 1).forEach { _ in
                 let textField = UITextField()
+                textField.borderStyle = .roundedRect
+                textField.textColor = .black
                 textField.translatesAutoresizingMaskIntoConstraints = false
                 textField.addTarget(self, action: #selector(textFieldValueChanged(textField:)), for: .editingChanged)
                 parameterTextFields.append(textField)
+                inputsContainerView.addArrangedSubview(textField)
             }
         } else {
             let count = parameterTextFields.count - startedState.parameters.count

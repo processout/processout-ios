@@ -23,8 +23,8 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         return self
     }
 
-    /// Completion to invoke after authorization is completed.
-    public func with(completion: @escaping (Bool) -> Void) -> Self {
+    /// Completion to invoke after authorization is completed successfully.
+    public func with(completion: @escaping () -> Void) -> Self {
         self.completion = completion
         return self
     }
@@ -41,8 +41,12 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
             gatewayConfigurationId: gatewayConfigurationId,
             invoiceId: invoiceId
         )
-        let viewModel = NativeAlternativePaymentMethodViewModel(interactor: interactor)
+        let router = NativeAlternativePaymentMethodRouter()
+        let viewModel = NativeAlternativePaymentMethodViewModel(
+            interactor: interactor, router: router, completion: completion
+        )
         let viewController = NativeAlternativePaymentMethodViewController(viewModel: viewModel)
+        router.viewController = viewController
         return viewController
     }
 
@@ -59,5 +63,5 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
     private let invoiceId: String
 
     private var api: ProcessOutApiType?
-    private var completion: ((Bool) -> Void)?
+    private var completion: (() -> Void)?
 }
