@@ -39,7 +39,7 @@ final class InvoicesRepository: POInvoicesRepositoryType {
             let customerAction: POCustomerAction?
         }
         let httpRequest = HttpConnectorRequest<Response>.post(
-            path: "/invoices/\(request.invoiceId)/authorize", body: request
+            path: "/invoices/\(request.invoiceId)/authorize", body: request, includesDeviceMetadata: true
         )
         connector.execute(request: httpRequest) { [failureFactory] result in
             completion(result.map(\.customerAction).mapError(failureFactory.repositoryFailure))
@@ -50,7 +50,10 @@ final class InvoicesRepository: POInvoicesRepositoryType {
         struct Response: Decodable {
             let invoice: POInvoice
         }
-        let httpRequest = HttpConnectorRequest<Response>.post(path: "/invoices", body: request)
+        let httpRequest = HttpConnectorRequest<Response>.post(
+            path: "/invoices",
+            body: request
+        )
         connector.execute(request: httpRequest) { [failureFactory] result in
             completion(result.map(\.invoice).mapError(failureFactory.repositoryFailure))
         }

@@ -25,7 +25,7 @@ final class CardsRepository: POCardsRepositoryType {
         completion: @escaping (Result<POCard, Failure>) -> Void
     ) {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
-            path: "/cards", body: request
+            path: "/cards", body: request, includesDeviceMetadata: true
         )
         connector.execute(request: httpRequest) { [failureFactory] result in
             completion(result.map(\.card).mapError(failureFactory.repositoryFailure))
@@ -41,7 +41,7 @@ final class CardsRepository: POCardsRepositoryType {
             "cvc": newCvc
         ]
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.put(
-            path: "/cards/" + cardId, body: parameters
+            path: "/cards/" + cardId, body: parameters, includesDeviceMetadata: true
         )
         connector.execute(request: httpRequest) { [failureFactory] result in
             completion(result.map(\.card).mapError(failureFactory.repositoryFailure))
@@ -55,7 +55,7 @@ final class CardsRepository: POCardsRepositoryType {
         do {
             let request = try applePayCardTokenizationRequestFactory.tokenizationRequest(from: request)
             let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
-                path: "/cards", body: request
+                path: "/cards", body: request, includesDeviceMetadata: true
             )
             connector.execute(request: httpRequest) { [failureFactory] result in
                 completion(result.map(\.card).mapError(failureFactory.repositoryFailure))

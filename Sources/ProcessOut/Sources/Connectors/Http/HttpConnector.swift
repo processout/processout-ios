@@ -32,12 +32,14 @@ final class HttpConnector: HttpConnectorType {
         configuration: Configuration,
         sessionConfiguration: URLSessionConfiguration,
         decoder: JSONDecoder,
-        encoder: JSONEncoder
+        encoder: JSONEncoder,
+        deviceMetadataProvider: DeviceMetadataProviderType
     ) {
         self.configuration = configuration
         self.session = URLSession(configuration: sessionConfiguration)
         self.decoder = decoder
         self.encoder = encoder
+        self.deviceMetadataProvider = deviceMetadataProvider
         workQueue = DispatchQueue(label: "process-out.http-connector", attributes: .concurrent)
     }
 
@@ -65,6 +67,7 @@ final class HttpConnector: HttpConnectorType {
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
     private let workQueue: DispatchQueue
+    private let deviceMetadataProvider: DeviceMetadataProviderType
 
     // MARK: - Private Methods
 
@@ -80,7 +83,15 @@ final class HttpConnector: HttpConnectorType {
         var sessionRequest = URLRequest(url: resourceURL)
         sessionRequest.httpMethod = request.method.rawValue.uppercased()
         if let body = request.body {
-            sessionRequest.httpBody = try encoder.encode(body)
+            if request.includesDeviceMetadata {
+                let decoratedBody = HttpConnectorRequestBodyDecorator(
+                    body: body,
+                    deviceMetadata: deviceMetadataProvider.deviceMetadata
+                )
+                sessionRequest.httpBody = try encoder.encode(decoratedBody)
+            } else {
+                sessionRequest.httpBody = try encoder.encode(body)
+            }
             sessionRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
         authorize(request: &sessionRequest)

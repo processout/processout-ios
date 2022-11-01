@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 public final class ProcessOutApi: ProcessOutApiType {
 
@@ -84,7 +85,8 @@ public final class ProcessOutApi: ProcessOutApiType {
             ),
             sessionConfiguration: sessionConfiguration,
             decoder: createDecoder(),
-            encoder: createEncoder()
+            encoder: createEncoder(),
+            deviceMetadataProvider: DeviceMetadataProvider(screen: UIScreen.main, bundle: Bundle.main)
         )
         let retryStrategy = RetryStrategy.exponential(maximumRetries: 3, interval: 0.1, rate: 3)
         return HttpConnectorRetryDecorator(connector: connector, retryStrategy: retryStrategy)

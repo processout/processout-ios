@@ -33,6 +33,9 @@ struct HttpConnectorRequest<Value: Decodable> {
 
     /// Expected value type.
     let expectedValueType: Value.Type = Value.self
+
+    /// Lets us inject device metadata into requests
+    let includesDeviceMetadata: Bool
 }
 
 extension HttpConnectorRequest {
@@ -40,14 +43,48 @@ extension HttpConnectorRequest {
     static func get(
         path: String, query: [String: CustomStringConvertible] = [:], headers: [String: String] = [:]
     ) -> Self {
-        .init(id: UUID().uuidString, method: .get, path: path, query: query, body: nil, headers: headers)
+        .init(
+            id: UUID().uuidString,
+            method: .get,
+            path: path,
+            query: query,
+            body: nil,
+            headers: headers,
+            includesDeviceMetadata: false
+        )
     }
 
-    static func post<E: Encodable>(path: String, body: E?, headers: [String: String] = [:]) -> Self {
-        .init(id: UUID().uuidString, method: .post, path: path, query: [:], body: AnyEncodable(body), headers: headers)
+    static func post<E: Encodable>(
+        path: String,
+        body: E?,
+        headers: [String: String] = [:],
+        includesDeviceMetadata: Bool = false
+    ) -> Self {
+        .init(
+            id: UUID().uuidString,
+            method: .post,
+            path: path,
+            query: [:],
+            body: AnyEncodable(body),
+            headers: headers,
+            includesDeviceMetadata: includesDeviceMetadata
+        )
     }
 
-    static func put<E: Encodable>(path: String, body: E?, headers: [String: String] = [:]) -> Self {
-        .init(id: UUID().uuidString, method: .put, path: path, query: [:], body: AnyEncodable(body), headers: headers)
+    static func put<E: Encodable>(
+        path: String,
+        body: E?,
+        headers: [String: String] = [:],
+        includesDeviceMetadata: Bool = false
+    ) -> Self {
+        .init(
+            id: UUID().uuidString,
+            method: .put,
+            path: path,
+            query: [:],
+            body: AnyEncodable(body),
+            headers: headers,
+            includesDeviceMetadata: includesDeviceMetadata
+        )
     }
 }

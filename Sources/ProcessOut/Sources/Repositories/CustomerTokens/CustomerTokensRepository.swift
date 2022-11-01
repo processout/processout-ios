@@ -26,7 +26,9 @@ final class CustomerTokensRepository: POCustomerTokensRepositoryType {
             let customerAction: POCustomerAction?
         }
         let httpRequest = HttpConnectorRequest<Response>.put(
-            path: "/customers/\(request.customerId)/tokens/\(request.tokenId)", body: request
+            path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",
+            body: request,
+            includesDeviceMetadata: true
         )
         connector.execute(request: httpRequest) { [failureFactory] result in
             completion(result.map(\.customerAction).mapError(failureFactory.repositoryFailure))
