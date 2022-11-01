@@ -42,7 +42,7 @@ final class GatewayConfigurationsRepository: POGatewayConfigurationsRepositoryTy
         let httpRequest = HttpConnectorRequest<Response>.get(
             path: "/gateway-configurations/" + request.id,
             query: [
-                "expand": request.expands.map(\.rawValue).joined(separator: ",")
+                "expand": request.expand.map(\.rawValue).joined(separator: ",")
             ]
         )
         connector.execute(request: httpRequest) { [failureFactory] result in

@@ -33,7 +33,7 @@ final class NativeAlternativePaymentMethodInteractor:
             return
         }
         state = .starting
-        let request = POFindGatewayConfigurationRequest(id: gatewayConfigurationId)
+        let request = POFindGatewayConfigurationRequest(id: gatewayConfigurationId, expands: .gateway)
         gatewayConfigurationsRepository.find(request: request) { [weak self] result in
             switch result {
             case let .success(gatewayConfiguration):

@@ -139,7 +139,8 @@ final class HttpConnector: HttpConnectorType {
                 case let .success(value):
                     completeRequest(with: .success(value), completion: completion)
                 case let .failure(serverFailure):
-                    throw Failure.server(serverFailure, statusCode: urlResponse.statusCode)
+                    let failure = Failure.server(serverFailure, statusCode: urlResponse.statusCode)
+                    completeRequest(with: .failure(failure), completion: completion)
                 }
             } catch {
                 Logger.connectors.error("Did fail to decode response: '\(error.localizedDescription)'.")

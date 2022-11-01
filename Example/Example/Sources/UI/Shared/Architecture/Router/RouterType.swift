@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 23.10.2022.
 //
 
-protocol RouterType: AnyObject {
+protocol RouterType<RouteType>: AnyObject {
 
     /// `RouteType` defines which routes can be triggered in a certain implementation.
     associatedtype RouteType: Example.RouteType

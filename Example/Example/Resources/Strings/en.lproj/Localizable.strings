@@ -5,3 +5,10 @@
   Created by Andrii Vysotskyi on 17.07.2022.
   
 */
+
+"features.title" = "Available Features";
+"features.native-alternative-payment.title" = "Native Alternative Payment";
+
+"alternative-payment-methods.title" = "Alternative Payment Methods";
+"alternative-payment-methods.gateway.unknown" = "<Unknown>";
+"alternative-payment-methods.failure.unknown" = "Something went wrong...";

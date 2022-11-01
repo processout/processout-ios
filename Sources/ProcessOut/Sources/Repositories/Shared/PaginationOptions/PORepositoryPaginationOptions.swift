@@ -30,7 +30,7 @@ public struct PORepositoryPaginationOptions {
     /// Entities are sorted in ascending order by default.
     public let order: Order
 
-    public init(position: Position?, limit: Int = 10, order: Order = .descending) {
+    public init(position: Position? = nil, limit: Int = 10, order: Order = .descending) {
         self.position = position
         self.limit = limit
         self.order = order

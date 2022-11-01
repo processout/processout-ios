@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 25.08.2022.
 //
 
-protocol InteractorType: AnyObject {
+protocol InteractorType<State>: AnyObject {
 
     associatedtype State
 

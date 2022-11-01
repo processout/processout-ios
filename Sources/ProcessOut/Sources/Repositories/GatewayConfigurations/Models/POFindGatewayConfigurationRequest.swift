@@ -17,10 +17,10 @@ public struct POFindGatewayConfigurationRequest {
     public let id: String
 
     /// Configuration properties that should be expanded in a response.
-    public let expands: Set<ExpandedProperty>
+    public let expand: Set<ExpandedProperty>
 
     public init(id: String, expands: ExpandedProperty...) {
         self.id = id
-        self.expands = Set(expands)
+        self.expand = Set(expands)
     }
 }
