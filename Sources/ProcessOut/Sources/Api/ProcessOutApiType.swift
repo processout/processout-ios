@@ -10,14 +10,14 @@ public protocol ProcessOutApiType {
     /// Returns gateway configurations repository.
     var gatewayConfigurations: POGatewayConfigurationsRepositoryType { get }
 
-    /// Returns invoices repository.
-    var invoices: POInvoicesRepositoryType { get }
+    /// Returns invoices service.
+    var invoices: POInvoicesServiceType { get }
 
     /// Return cards repository.
     var cards: POCardsRepositoryType { get }
 
-    /// Return customer tokens repository.
-    var customerTokens: POCustomerTokensRepositoryType { get }
+    /// Return customer tokens service.
+    var customerTokens: POCustomerTokensServiceType { get }
 
     /// Return Alternative Payment Methods service.
     var alternativePaymentMethods: POAlternativePaymentMethodsServiceType { get }

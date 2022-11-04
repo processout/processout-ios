@@ -1,11 +1,11 @@
 //
-//  POInvoicesRepositoryType.swift
+//  InvoicesRepositoryType.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 17.10.2022.
 //
 
-public protocol POInvoicesRepositoryType: PORepositoryType {
+protocol InvoicesRepositoryType: PORepositoryType {
 
     /// Initiates native alternative payment with a given request.
     ///
@@ -18,10 +18,9 @@ public protocol POInvoicesRepositoryType: PORepositoryType {
 
     /// Performs invoice authorization with given request.
     func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest, completion: @escaping (Result<POCustomerAction?, Failure>) -> Void
+        request: POInvoiceAuthorizationRequest, completion: @escaping (Result<CustomerAction?, Failure>) -> Void
     )
 
     /// Creates invoice with given parameters.
-    @_spi(PO)
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void)
 }

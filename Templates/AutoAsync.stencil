@@ -24,7 +24,7 @@ extension {{ type.name }} {
         {% for parameter in method.parameters %}{% if forloop.last %}{% continue %}{% endif %}{%- if not forloop.first %}, {% endif %}{{ parameter.asSource }}{% endfor %}
     ) async throws -> {{ resultGeneric.typeParameters.first.typeName.name }} {
     {% endif %}
-        try await withUnsafeThrowingContinuation { continuation in
+        return try await withUnsafeThrowingContinuation { continuation in
             {{ method.callName }}({% for parameter in method.parameters %}{% if forloop.last %}{% continue %}{% endif %}{{ parameter.argumentLabel }}: {{ parameter.argumentLabel }}, {% endfor %}{{ method.parameters.last.argumentLabel }}: continuation.resume)
         }
     }

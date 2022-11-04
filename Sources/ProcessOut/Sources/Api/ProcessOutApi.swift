@@ -25,13 +25,19 @@ public final class ProcessOutApi: ProcessOutApiType {
             gatewayConfigurations: GatewayConfigurationsRepository(
                 connector: connector, failureMapper: failureMapper
             ),
-            invoices: InvoicesRepository(connector: connector, failureMapper: failureMapper),
+            invoices: InvoicesService(
+                repository: InvoicesRepository(connector: connector, failureMapper: failureMapper),
+                customerActionHandler: customerActionHandler
+            ),
             cards: CardsRepository(
                 connector: connector,
                 failureMapper: failureMapper,
                 applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper(decoder: decoder)
             ),
-            customerTokens: CustomerTokensRepository(connector: connector, failureMapper: failureMapper),
+            customerTokens: CustomerTokensService(
+                repository: CustomerTokensRepository(connector: connector, failureMapper: failureMapper),
+                customerActionHandler: customerActionHandler
+            ),
             alternativePaymentMethods: createAlternativePaymentMethodsService(configuration: configuration)
         )
     }
@@ -39,18 +45,18 @@ public final class ProcessOutApi: ProcessOutApiType {
     // MARK: - ProcessOutApiType
 
     public let gatewayConfigurations: POGatewayConfigurationsRepositoryType
-    public let invoices: POInvoicesRepositoryType
+    public let invoices: POInvoicesServiceType
     public let cards: POCardsRepositoryType
-    public let customerTokens: POCustomerTokensRepositoryType
+    public let customerTokens: POCustomerTokensServiceType
     public let alternativePaymentMethods: POAlternativePaymentMethodsServiceType
 
     // MARK: -
 
     private init(
         gatewayConfigurations: POGatewayConfigurationsRepositoryType,
-        invoices: POInvoicesRepositoryType,
+        invoices: POInvoicesServiceType,
         cards: POCardsRepositoryType,
-        customerTokens: POCustomerTokensRepositoryType,
+        customerTokens: POCustomerTokensServiceType,
         alternativePaymentMethods: POAlternativePaymentMethodsServiceType
     ) {
         self.gatewayConfigurations = gatewayConfigurations
@@ -105,6 +111,15 @@ public final class ProcessOutApi: ProcessOutApiType {
         let baseUrl = URL(string: baseUrlString)!
         return AlternativePaymentMethodsService(projectId: configuration.projectId, baseUrl: baseUrl)
     }
+
+    private static let customerActionHandler: CustomerActionHandlerType = {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .useDefaultKeys
+        let encoder = JSONEncoder()
+        encoder.dataEncodingStrategy = .base64
+        encoder.keyEncodingStrategy = .useDefaultKeys
+        return CustomerActionHandler(decoder: decoder, encoder: encoder)
+    }()
 
     private static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()

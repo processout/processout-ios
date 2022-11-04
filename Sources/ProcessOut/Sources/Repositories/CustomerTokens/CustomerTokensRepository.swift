@@ -7,20 +7,20 @@
 
 import Foundation
 
-final class CustomerTokensRepository: POCustomerTokensRepositoryType {
+final class CustomerTokensRepository: CustomerTokensRepositoryType {
 
     init(connector: HttpConnectorType, failureMapper: RepositoryFailureMapperType) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
 
-    // MARK: - POCustomerTokensRepositoryType
+    // MARK: - CustomerTokensRepositoryType
 
     func assignCustomerToken(
-        request: POCustomerTokensRequest, completion: @escaping (Result<POCustomerAction?, Failure>) -> Void
+        request: POAssignCustomerTokenRequest, completion: @escaping (Result<CustomerAction?, Failure>) -> Void
     ) {
         struct Response: Decodable {
-            let customerAction: POCustomerAction?
+            let customerAction: CustomerAction?
         }
         let httpRequest = HttpConnectorRequest<Response>.put(
             path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",

@@ -13,11 +13,11 @@ final class AlternativePaymentMethodsInteractor:
 
     init(
         gatewayConfigurationsRepository: POGatewayConfigurationsRepositoryType,
-        invoicesRepository: POInvoicesRepositoryType,
+        invoicesService: POInvoicesServiceType,
         filter: POAllGatewayConfigurationsRequest.Filter?
     ) {
         self.gatewayConfigurationsRepository = gatewayConfigurationsRepository
-        self.invoicesRepository = invoicesRepository
+        self.invoicesService = invoicesService
         self.filter = filter
         super.init(state: .idle)
     }
@@ -97,7 +97,7 @@ final class AlternativePaymentMethodsInteractor:
         let request = POInvoiceCreationRequest(
             name: UUID().uuidString, amount: "150.0", currency: "USD"
         )
-        invoicesRepository.createInvoice(request: request) { [weak self] result in
+        invoicesService.createInvoice(request: request) { [weak self] result in
             self?.state = .started(startedState)
             if case .success(let invoice) = result {
                 success(invoice.id)
@@ -114,7 +114,7 @@ final class AlternativePaymentMethodsInteractor:
     // MARK: - Private Properties
 
     private let gatewayConfigurationsRepository: POGatewayConfigurationsRepositoryType
-    private let invoicesRepository: POInvoicesRepositoryType
+    private let invoicesService: POInvoicesServiceType
     private let filter: POAllGatewayConfigurationsRequest.Filter?
 
     // MARK: - State Management

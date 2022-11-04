@@ -12,12 +12,12 @@ final class NativeAlternativePaymentMethodInteractor:
 
     init(
         gatewayConfigurationsRepository: POGatewayConfigurationsRepositoryType,
-        invoicesRepository: POInvoicesRepositoryType,
+        invoicesService: POInvoicesServiceType,
         gatewayConfigurationId: String,
         invoiceId: String
     ) {
         self.gatewayConfigurationsRepository = gatewayConfigurationsRepository
-        self.invoicesRepository = invoicesRepository
+        self.invoicesService = invoicesService
         self.gatewayConfigurationId = gatewayConfigurationId
         self.invoiceId = invoiceId
         super.init(state: .idle)
@@ -87,7 +87,7 @@ final class NativeAlternativePaymentMethodInteractor:
             parameters: startedState.values.compactMapValues(\.value)
         )
         state = .submitting(snapshot: startedState)
-        invoicesRepository.initiatePayment(request: request) { [weak self] result in
+        invoicesService.initiatePayment(request: request) { [weak self] result in
             switch result {
             case let .success(response):
                 self?.trySetSubmittedStateUnchecked(startedState: startedState, response: response)
@@ -100,7 +100,7 @@ final class NativeAlternativePaymentMethodInteractor:
     // MARK: - Private Properties
 
     private let gatewayConfigurationsRepository: POGatewayConfigurationsRepositoryType
-    private let invoicesRepository: POInvoicesRepositoryType
+    private let invoicesService: POInvoicesServiceType
     private let gatewayConfigurationId: String
     private let invoiceId: String
 

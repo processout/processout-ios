@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class InvoicesRepository: POInvoicesRepositoryType {
+final class InvoicesRepository: InvoicesRepositoryType {
 
     init(connector: HttpConnectorType, failureMapper: RepositoryFailureMapperType) {
         self.connector = connector
@@ -33,10 +33,10 @@ final class InvoicesRepository: POInvoicesRepositoryType {
     }
 
     func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest, completion: @escaping (Result<POCustomerAction?, Failure>) -> Void
+        request: POInvoiceAuthorizationRequest, completion: @escaping (Result<CustomerAction?, Failure>) -> Void
     ) {
         struct Response: Decodable {
-            let customerAction: POCustomerAction?
+            let customerAction: CustomerAction?
         }
         let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/invoices/\(request.invoiceId)/authorize", body: request, includesDeviceMetadata: true

@@ -1,5 +1,5 @@
 //
-//  POCustomerTokensRequest.swift
+//  POAssignCustomerTokenRequest.swift
 //  ProcessOut
 //
 //  Created by Julien.Rodrigues on 27/10/2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct POCustomerTokensRequest: Encodable {
+public struct POAssignCustomerTokenRequest: Encodable {
 
     /// Invoice identifier to to perform authorization for.
     @ImmutableExcludedCodable

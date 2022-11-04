@@ -37,7 +37,7 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         let api: ProcessOutApiType = self.api ?? ProcessOutApi.shared
         let interactor = NativeAlternativePaymentMethodInteractor(
             gatewayConfigurationsRepository: api.gatewayConfigurations,
-            invoicesRepository: api.invoices,
+            invoicesService: api.invoices,
             gatewayConfigurationId: gatewayConfigurationId,
             invoiceId: invoiceId
         )
