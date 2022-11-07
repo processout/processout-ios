@@ -33,6 +33,14 @@ final class CustomerActionHandler: CustomerActionHandlerType {
         }
     }
 
+    // MARK: - Private Nested Types
+
+    private struct FingerprintResponse: Encodable {
+        let url: URL?
+        let headers: [String: String]?
+        let body: String
+    }
+
     // MARK: - Private Properties
 
     private let decoder: JSONDecoder
@@ -59,7 +67,7 @@ final class CustomerActionHandler: CustomerActionHandlerType {
             case let .success(fingerprint):
                 do {
                     let fingerprintDataString = String(decoding: try self.encoder.encode(fingerprint), as: UTF8.self)
-                    let response = ["body": fingerprintDataString]
+                    let response = FingerprintResponse(url: nil, headers: nil, body: fingerprintDataString)
                     let responseDataString = String(
                         decoding: try encoder.encode(response).base64EncodedData(), as: UTF8.self
                     )
@@ -106,8 +114,30 @@ final class CustomerActionHandler: CustomerActionHandlerType {
         url: String, delegate: Delegate, completion: @escaping (Result<String, PORepositoryFailure>) -> Void
     ) {
         if let url = URL(string: url) {
-            delegate.fingerprint(url: url) { result in
-                self.complete(with: result, completion: completion)
+            let timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: false) { [encoder] _ in
+                do {
+                    let response = FingerprintResponse(
+                        url: url,
+                        headers: ["Content-Type": "application/json"],
+                        body: #"{ "threeDS2FingerprintTimeout": true }"#
+                    )
+                    let responseDataString = String(
+                        decoding: try encoder.encode(response).base64EncodedData(), as: UTF8.self
+                    )
+                    let newSource = "gway_req_" + responseDataString
+                    completion(.success(newSource))
+                } catch {
+                    Logger.services.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
+                    completion(.failure(.init(message: nil, code: .internal, underlyingError: error)))
+                }
+                delegate.fingerprintDidTimeout()
+            }
+            delegate.fingerprint(url: url) { [self] result in
+                guard timer.isValid else {
+                    return
+                }
+                timer.invalidate()
+                complete(with: result, completion: completion)
             }
         } else {
             let failure = PORepositoryFailure(message: nil, code: .internal, underlyingError: nil)

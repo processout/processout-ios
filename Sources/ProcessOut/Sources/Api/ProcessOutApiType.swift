@@ -7,6 +7,9 @@
 
 public protocol ProcessOutApiType {
 
+    /// Current configuration.
+    var configuration: ProcessOutApiConfiguration { get }
+
     /// Returns gateway configurations repository.
     var gatewayConfigurations: POGatewayConfigurationsRepositoryType { get }
 

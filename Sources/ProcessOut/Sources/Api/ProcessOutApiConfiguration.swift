@@ -5,13 +5,9 @@
 //  Created by Andrii Vysotskyi on 10.10.2022.
 //
 
+import Foundation
+
 public struct ProcessOutApiConfiguration {
-
-    public enum Environment {
-        case production, staging
-    }
-
-    // MARK: -
 
     /// Project id.
     public let projectId: String
@@ -21,22 +17,31 @@ public struct ProcessOutApiConfiguration {
     /// inside application is extremely dangerous and is highly discouraged.
     @_spi(PO) public let password: String?
 
-    /// Environment to use.
-    /// - NOTE: `Environment.staging` is intented ONLY for internal use.
-    @_spi(PO) public let environment: Environment
+    /// Api base URL.
+    let apiBaseUrl: URL
 
-    /// Creates configuration instance.
-    public init(projectId: String) {
-        self.projectId = projectId
-        self.password = nil
-        self.environment = .production
+    /// Checkout base URL.
+    let checkoutBaseUrl: URL
+}
+
+extension ProcessOutApiConfiguration {
+
+    /// Creates production configuration.
+    public static func production(projectId: String) -> Self {
+        // swiftlint:disable force_unwrapping
+        let apiBaseUrl = URL(string: "https://api.processout.com")!
+        let checkoutBaseUrl = URL(string: "https://checkout.processout.com")!
+        // swiftlint:enable force_unwrapping
+        return Self(projectId: projectId, password: nil, apiBaseUrl: apiBaseUrl, checkoutBaseUrl: checkoutBaseUrl)
     }
 
-    /// Creates configuration instance.
+    /// Creates staging configuration.
     @_spi(PO)
-    public init(projectId: String, password: String, environment: Environment) {
-        self.projectId = projectId
-        self.password = password
-        self.environment = environment
+    public static func staging(projectId: String, password: String?) -> Self {
+        // swiftlint:disable force_unwrapping
+        let apiBaseUrl = URL(string: "https://api.processout.ninja")!
+        let checkoutBaseUrl = URL(string: "https://checkout.processout.ninja")!
+        // swiftlint:enable force_unwrapping
+        return Self(projectId: projectId, password: password, apiBaseUrl: apiBaseUrl, checkoutBaseUrl: checkoutBaseUrl)
     }
 }

@@ -21,4 +21,7 @@ public protocol POCustomerActionHandlerDelegate: AnyObject {
     /// Asks delegate for device fingeprint that could be done by redirecting to given url using
     /// browser in a "headless" mode.
     func fingerprint(url: URL, completion: @escaping (Result<String, Error>) -> Void)
+
+    /// Notifies delegate that fingerprinting operation timed out.
+    func fingerprintDidTimeout()
 }

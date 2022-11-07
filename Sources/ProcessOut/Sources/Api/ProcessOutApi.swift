@@ -22,6 +22,7 @@ public final class ProcessOutApi: ProcessOutApiType {
         let connector = createHttpConnector(configuration: configuration)
         let failureMapper = RepositoryFailureMapper()
         shared = ProcessOutApi(
+            configuration: configuration,
             gatewayConfigurations: GatewayConfigurationsRepository(
                 connector: connector, failureMapper: failureMapper
             ),
@@ -38,12 +39,15 @@ public final class ProcessOutApi: ProcessOutApiType {
                 repository: CustomerTokensRepository(connector: connector, failureMapper: failureMapper),
                 customerActionHandler: customerActionHandler
             ),
-            alternativePaymentMethods: createAlternativePaymentMethodsService(configuration: configuration)
+            alternativePaymentMethods: AlternativePaymentMethodsService(
+                projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl
+            )
         )
     }
 
     // MARK: - ProcessOutApiType
 
+    public let configuration: ProcessOutApiConfiguration
     public let gatewayConfigurations: POGatewayConfigurationsRepositoryType
     public let invoices: POInvoicesServiceType
     public let cards: POCardsRepositoryType
@@ -53,12 +57,14 @@ public final class ProcessOutApi: ProcessOutApiType {
     // MARK: -
 
     private init(
+        configuration: ProcessOutApiConfiguration,
         gatewayConfigurations: POGatewayConfigurationsRepositoryType,
         invoices: POInvoicesServiceType,
         cards: POCardsRepositoryType,
         customerTokens: POCustomerTokensServiceType,
         alternativePaymentMethods: POAlternativePaymentMethodsServiceType
     ) {
+        self.configuration = configuration
         self.gatewayConfigurations = gatewayConfigurations
         self.invoices = invoices
         self.cards = cards
@@ -74,16 +80,9 @@ public final class ProcessOutApi: ProcessOutApiType {
         sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
         sessionConfiguration.waitsForConnectivity = true
         sessionConfiguration.timeoutIntervalForRequest = 30
-        let baseUrlString: String
-        switch configuration.environment {
-        case .production:
-            baseUrlString = "https://api.processout.com"
-        case .staging:
-            baseUrlString = "https://api.processout.ninja"
-        }
         let connector = HttpConnector(
             configuration: .init(
-                baseUrl: URL(string: baseUrlString)!, // swiftlint:disable:this force_unwrapping
+                baseUrl: configuration.apiBaseUrl,
                 projectId: configuration.projectId,
                 password: configuration.password,
                 version: Self.version
@@ -95,21 +94,6 @@ public final class ProcessOutApi: ProcessOutApiType {
         )
         let retryStrategy = RetryStrategy.exponential(maximumRetries: 3, interval: 0.1, rate: 3)
         return HttpConnectorRetryDecorator(connector: connector, retryStrategy: retryStrategy)
-    }
-
-    private static func createAlternativePaymentMethodsService(
-        configuration: ProcessOutApiConfiguration
-    ) -> POAlternativePaymentMethodsServiceType {
-        let baseUrlString: String
-        switch configuration.environment {
-        case .production:
-            baseUrlString = "https://checkout.processout.com"
-        case .staging:
-            baseUrlString = "https://checkout.processout.ninja"
-        }
-        // swiftlint:disable:next force_unwrapping
-        let baseUrl = URL(string: baseUrlString)!
-        return AlternativePaymentMethodsService(projectId: configuration.projectId, baseUrl: baseUrl)
     }
 
     private static let customerActionHandler: CustomerActionHandlerType = {

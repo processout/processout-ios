@@ -32,8 +32,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Private Methods
 
     private func configureProcessOut() {
-        let configuration = ProcessOutApiConfiguration(
-            projectId: Constants.projectId, password: Constants.projectPassword, environment: .staging
+        let configuration = ProcessOutApiConfiguration.staging(
+            projectId: Constants.projectId, password: Constants.projectPassword
         )
         ProcessOutApi.configure(configuration: configuration)
     }
