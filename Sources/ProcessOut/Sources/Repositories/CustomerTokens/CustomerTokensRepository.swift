@@ -32,6 +32,21 @@ final class CustomerTokensRepository: CustomerTokensRepositoryType {
         }
     }
 
+    func createCustomerToken(
+        request: POCustomerTokenCreationRequest,
+        completion: @escaping (Result<POCustomerToken, Failure>) -> Void
+    ) {
+        struct Response: Decodable {
+            let token: POCustomerToken
+        }
+        let httpRequest = HttpConnectorRequest<Response>.post(
+            path: "/customers/\(request.customerId)/tokens", body: request, includesDeviceMetadata: true
+        )
+        connector.execute(request: httpRequest) { [failureMapper] result in
+            completion(result.map(\.token).mapError(failureMapper.repositoryFailure))
+        }
+    }
+
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType

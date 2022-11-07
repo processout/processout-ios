@@ -11,4 +11,10 @@ protocol CustomerTokensRepositoryType: PORepositoryType {
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest, completion: @escaping (Result<CustomerAction?, Failure>) -> Void
     )
+
+    /// Create customer token.
+    func createCustomerToken(
+        request: POCustomerTokenCreationRequest,
+        completion: @escaping (Result<POCustomerToken, Failure>) -> Void
+    )
 }

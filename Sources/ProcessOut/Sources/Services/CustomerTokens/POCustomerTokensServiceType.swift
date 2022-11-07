@@ -13,4 +13,11 @@ public protocol POCustomerTokensServiceType: POServiceType {
         customerActionHandlerDelegate: POCustomerActionHandlerDelegate,
         completion: @escaping (Result<Void, PORepositoryFailure>) -> Void
     )
+
+    /// Create customer token.
+    @_spi(PO)
+    func createCustomerToken(
+        request: POCustomerTokenCreationRequest,
+        completion: @escaping (Result<POCustomerToken, Failure>) -> Void
+    )
 }

@@ -14,6 +14,15 @@ extension CustomerTokensRepositoryType {
             assignCustomerToken(request: request, completion: continuation.resume)
         }
     }
+
+    @MainActor
+    public func createCustomerToken(
+        request: POCustomerTokenCreationRequest
+    ) async throws -> POCustomerToken {
+        return try await withUnsafeThrowingContinuation { continuation in
+            createCustomerToken(request: request, completion: continuation.resume)
+        }
+    }
 }
 
 @available(iOS 13.0, *)
@@ -87,6 +96,16 @@ extension POCustomerTokensServiceType {
     ) async throws -> Void {
         return try await withUnsafeThrowingContinuation { continuation in
             assignCustomerToken(request: request, customerActionHandlerDelegate: customerActionHandlerDelegate, completion: continuation.resume)
+        }
+    }
+
+    @MainActor
+    @_spi(PO)
+    public func createCustomerToken(
+        request: POCustomerTokenCreationRequest
+    ) async throws -> POCustomerToken {
+        return try await withUnsafeThrowingContinuation { continuation in
+            createCustomerToken(request: request, completion: continuation.resume)
         }
     }
 }
