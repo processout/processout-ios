@@ -14,8 +14,8 @@ enum FeaturesViewModelState {
         /// Feature name.
         let name: String
 
-        /// Starts feature flow.
-        let start: () -> Void
+        /// Invoked when this feature is selected.
+        let select: () -> Void
     }
 
     struct Started {

@@ -20,13 +20,17 @@ public struct POInvoiceCreationRequest: Encodable {
     /// ISO 4217 currency code with 3 characters.
     public let currency: String
 
+    /// For APM, link for the screen you want to return to after the payment page closes.
+    public let returnUrl: URL?
+
     /// Device information.
     public let device: [String: String]
 
-    public init(name: String, amount: String, currency: String) {
+    public init(name: String, amount: String, currency: String, returnUrl: URL? = nil) {
         self.name = name
         self.amount = amount
         self.currency = currency
+        self.returnUrl = returnUrl
         self.device = ["channel": "ios"]
     }
 }

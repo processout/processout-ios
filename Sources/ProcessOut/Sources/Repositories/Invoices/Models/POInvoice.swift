@@ -12,4 +12,7 @@ public struct POInvoice: Decodable {
 
     /// String value that uniquely identifies this invoice.
     public let id: String
+
+    /// Application will be redirected to this URL in case of success. Useful for web based operations. 
+    public let returnUrl: URL?
 }

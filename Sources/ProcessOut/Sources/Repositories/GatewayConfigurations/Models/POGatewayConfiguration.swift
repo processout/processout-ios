@@ -63,6 +63,9 @@ public struct POGatewayConfiguration: Decodable {
     /// Country code of merchant's account.
     public let merchantAccountCountryCode: String?
 
+    /// Enabled sub accounts.
+    public let subAccountsEnabled: [String]?
+
     /// Boolean flag indicates whether configuration is currently enabled or not.
     public let enabled: Bool
 

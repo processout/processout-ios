@@ -36,7 +36,7 @@ final class AlternativePaymentMethodsViewController<ViewModel: AlternativePaymen
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let item = collectionViewDataSource.itemIdentifier(for: indexPath)
         if case .configuration(let item) = item {
-            item.pay()
+            item.select()
         }
         collectionView.deselectItem(at: indexPath, animated: true)
     }

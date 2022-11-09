@@ -40,10 +40,7 @@ final class AlternativePaymentMethodsService: POAlternativePaymentMethodsService
         return url
     }
 
-    func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse? {
-        guard url.host == "processout.return" else {
-            return nil
-        }
+    func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
               let queryItems = components.queryItems,
               let gatewayToken = queryItems.queryItemValue(name: "token") else {

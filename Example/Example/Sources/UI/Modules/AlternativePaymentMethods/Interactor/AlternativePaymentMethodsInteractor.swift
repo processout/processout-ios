@@ -89,19 +89,23 @@ final class AlternativePaymentMethodsInteractor:
         }
     }
 
-    func createInvoice(success: @escaping (String) -> Void) {
+    func createInvoice(currencyCode: String, success: @escaping (POInvoice) -> Void) {
         guard case .started(let startedState) = state else {
             return
         }
         state = .creatingInvoice(snapshot: startedState)
         let request = POInvoiceCreationRequest(
-            name: UUID().uuidString, amount: "150.0", currency: "USD"
+            name: UUID().uuidString,
+            amount: "150.0",
+            currency: currencyCode,
+            returnUrl: URL(string: "example://processout.return")! // swiftlint:disable:this force_unwrapping
         )
         invoicesService.createInvoice(request: request) { [weak self] result in
             self?.state = .started(startedState)
-            if case .success(let invoice) = result {
-                success(invoice.id)
+            guard case .success(let invoice) = result else {
+                return
             }
+            success(invoice)
         }
     }
 

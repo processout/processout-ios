@@ -5,15 +5,15 @@
 //  Created by Andrii Vysotskyi on 28.10.2022.
 //
 
-import ProcessOut
+@_spi(PO) import ProcessOut
 
 protocol AlternativePaymentMethodsInteractorType: InteractorType<AlternativePaymentMethodsInteractorState> {
 
     /// Restarts interactor.
     func restart()
 
-    /// Creates invoice and calls success closure when completes with success.
-    func createInvoice(success: @escaping (_ invoiceId: String) -> Void)
+    /// Creates invoice and calls success closure if operation completes with success.
+    func createInvoice(currencyCode: String, success: @escaping (_ invoice: POInvoice) -> Void)
 
     /// Loads more data if possible.
     func loadMore()

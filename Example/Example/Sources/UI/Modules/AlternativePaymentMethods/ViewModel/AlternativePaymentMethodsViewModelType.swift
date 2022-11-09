@@ -20,11 +20,14 @@ enum AlternativePaymentMethodsViewModelState {
 
     struct ConfigurationItem {
 
+        /// Item identifier.
+        let id: AnyHashable
+
         /// Configuration name.
         let name: String
 
-        /// Triggers payment flow using given configuration.
-        let pay: () -> Void
+        /// Invoked when this configuration item is selected.
+        let select: () -> Void
     }
 
     struct FailureItem: Hashable {
@@ -52,10 +55,11 @@ enum AlternativePaymentMethodsViewModelState {
 extension AlternativePaymentMethodsViewModelState.ConfigurationItem: Hashable {
 
     static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.name == rhs.name
+        lhs.id == rhs.id && lhs.name == rhs.name
     }
 
     func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
         hasher.combine(name)
     }
 }

@@ -15,5 +15,6 @@ final class FeaturesFeatureCell: UICollectionViewListCell {
         var configuration = cell.defaultContentConfiguration()
         configuration.text = model.name
         cell.contentConfiguration = configuration
+        cell.accessories = [.disclosureIndicator(displayed: .always)]
     }
 }

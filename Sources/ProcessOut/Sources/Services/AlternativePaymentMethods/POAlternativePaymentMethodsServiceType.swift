@@ -18,5 +18,5 @@ public protocol POAlternativePaymentMethodsServiceType {
     ///
     /// - Parameter url: url response that our checkout service sends back when the customer gets redirected.
     /// - Returns: response parsed from given url.
-    func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse?
+    func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse
 }

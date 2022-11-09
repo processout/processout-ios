@@ -19,7 +19,15 @@ final class AlternativePaymentMethodsRouter: RouterType {
                 .with(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId)
                 .build()
             self.viewController?.present(viewController, animated: true)
-            return true
+        case let .alternativePayment(request, returnUrl):
+            let viewController = POAlternativePaymentMethodViewControllerBuilder
+                .with(request: request, returnUrl: returnUrl)
+                .with { [weak viewController] _ in
+                    viewController?.presentedViewController?.dismiss(animated: true)
+                }
+                .build()
+            self.viewController?.present(viewController, animated: true)
         }
+        return true
     }
 }

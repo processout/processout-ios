@@ -33,7 +33,7 @@ final class FeaturesViewController<ViewModel: FeaturesViewModelType>:
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let item = collectionViewDataSource.itemIdentifier(for: indexPath)
-        item?.start()
+        item?.select()
         collectionView.deselectItem(at: indexPath, animated: true)
     }
 

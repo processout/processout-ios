@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import ProcessOut
+@_spi(PO) import ProcessOut
 
 final class AlternativePaymentMethodsViewModel:
     BaseViewModel<AlternativePaymentMethodsViewModelState>, AlternativePaymentMethodsViewModelType {
@@ -87,15 +87,41 @@ final class AlternativePaymentMethodsViewModel:
     }
 
     private func convertToItem(gatewayConfiguration: POGatewayConfiguration) -> State.Item {
-        let gatewayName = gatewayConfiguration.gateway?.displayName ?? Strings.AlternativePaymentMethods.Gateway.unknown
-        let item = State.ConfigurationItem(name: gatewayName) { [weak self] in
-            self?.interactor.createInvoice { invoiceId in
-                let route = AlternativePaymentMethodsRoute.nativeAlternativePayment(
-                    gatewayConfigurationId: gatewayConfiguration.id, invoiceId: invoiceId
-                )
-                self?.router.trigger(route: route)
+        let item = State.ConfigurationItem(
+            id: AnyHashable(gatewayConfiguration.id),
+            name: gatewayConfiguration.gateway?.displayName ?? Strings.AlternativePaymentMethods.Gateway.unknown,
+            select: { [weak self] in
+                self?.createAndAuthorizeInvoice(gatewayConfiguration: gatewayConfiguration)
             }
-        }
+        )
         return State.Item.configuration(item)
+    }
+
+    // MARK: -
+
+    private func createAndAuthorizeInvoice(gatewayConfiguration: POGatewayConfiguration) {
+        interactor.createInvoice(currencyCode: gatewayConfiguration.defaultCurrency) { [weak self] invoice in
+            let route: AlternativePaymentMethodsRoute
+            let isSubaccount = gatewayConfiguration
+                .subAccountsEnabled?
+                .contains(gatewayConfiguration.gatewayName ?? "") ?? false
+            if !isSubaccount {
+                return
+            } else if gatewayConfiguration.gateway?.nativeApmConfig != nil {
+                route = .nativeAlternativePayment(
+                    gatewayConfigurationId: gatewayConfiguration.id, invoiceId: invoice.id
+                )
+            } else {
+                guard let returnUrl = invoice.returnUrl else {
+                    assertionFailure("Invalid invoice.")
+                    return
+                }
+                let request = POAlternativePaymentMethodRequest(
+                    invoiceId: invoice.id, gatewayConfigurationId: gatewayConfiguration.id
+                )
+                route = .alternativePayment(request: request, returnUrl: returnUrl)
+            }
+            self?.router.trigger(route: route)
+        }
     }
 }
