@@ -1,6 +1,6 @@
 PODS:
   - Alamofire (4.8.2)
-  - ProcessOut (2.15.0)
+  - ProcessOut (2.15.4)
 
 DEPENDENCIES:
   - Alamofire (~> 4.8.2)
@@ -16,8 +16,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
-  ProcessOut: ed5c3dcfd177a6b3f84a4ae8d587035d3d2885b1
+  ProcessOut: b70d9113c7ff468c67abb5f11097fd7bf55284d2
 
 PODFILE CHECKSUM: 06d3d269806a41b2f36a6489b9f2762f4c06d9b8
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3

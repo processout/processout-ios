@@ -13,8 +13,8 @@ public class TokenRequest: Encodable {
     var source: String = ""
     var verify = true
     var enable3DS2 = true
-    var thirdPartySDKVersion: String = ""
-    var preferredScheme: String = ""
+    public var thirdPartySDKVersion: String = ""
+    public var preferredScheme: String = ""
     enum CodingKeys: String, CodingKey {
         case customerID = "customer_id"
         case tokenID = "token_id"
@@ -25,7 +25,7 @@ public class TokenRequest: Encodable {
         case preferredScheme = "preferred_scheme"
     }
     
-    init(source: String, customerID: String, tokenID: String) {
+    public init(source: String, customerID: String, tokenID: String) {
         self.source = source
         self.customerID = customerID
         self.tokenID = tokenID
