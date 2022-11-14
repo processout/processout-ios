@@ -112,14 +112,10 @@ final class AlternativePaymentMethodsViewModel:
                     gatewayConfigurationId: gatewayConfiguration.id, invoiceId: invoice.id
                 )
             } else {
-                guard let returnUrl = invoice.returnUrl else {
-                    assertionFailure("Invalid invoice.")
-                    return
-                }
                 let request = POAlternativePaymentMethodRequest(
                     invoiceId: invoice.id, gatewayConfigurationId: gatewayConfiguration.id
                 )
-                route = .alternativePayment(request: request, returnUrl: returnUrl)
+                route = .alternativePayment(request: request)
             }
             self?.router.trigger(route: route)
         }

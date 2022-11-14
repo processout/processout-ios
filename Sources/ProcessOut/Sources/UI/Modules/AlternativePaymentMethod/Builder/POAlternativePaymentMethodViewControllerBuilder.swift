@@ -9,8 +9,8 @@ import UIKit
 
 public final class POAlternativePaymentMethodViewControllerBuilder {
 
-    public static func with(request: POAlternativePaymentMethodRequest, returnUrl: URL) -> Self {
-        Self(request: request, returnUrl: returnUrl)
+    public static func with(request: POAlternativePaymentMethodRequest) -> Self {
+        Self(request: request)
     }
 
     /// Completion to invoke when authorization ends.
@@ -31,10 +31,13 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
     /// Creates and returns view controller that is capable of handling alternative payment request.
     public func build() -> UIViewController {
         let api: ProcessOutApiType = self.api ?? ProcessOutApi.shared
-        let viewController = AlternativePaymentMethodViewController(
-            alternativePaymentMethodsService: api.alternativePaymentMethods,
-            request: request,
-            returnUrl: returnUrl,
+        let delegate = AlternativePaymentMethodWebViewControllerDelegate(
+            alternativePaymentMethodsService: api.alternativePaymentMethods, request: request
+        )
+        let viewController = WebViewController(
+            delegate: delegate,
+            baseReturnUrl: api.configuration.checkoutBaseUrl,
+            version: type(of: api).version,
             completion: completion
         )
         return viewController
@@ -42,16 +45,13 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
 
     // MARK: -
 
-    init(request: POAlternativePaymentMethodRequest, returnUrl: URL) {
+    init(request: POAlternativePaymentMethodRequest) {
         self.request = request
-        self.returnUrl = returnUrl
     }
 
     // MARK: - Private Properties
 
     private let request: POAlternativePaymentMethodRequest
-    private let returnUrl: URL
-
     private var api: ProcessOutApiType?
     private var completion: ((Result<POAlternativePaymentMethodResponse, PORepositoryFailure>) -> Void)?
 }

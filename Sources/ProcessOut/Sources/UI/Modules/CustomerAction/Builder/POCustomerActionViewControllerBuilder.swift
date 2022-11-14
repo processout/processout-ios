@@ -9,11 +9,19 @@ import UIKit
 
 public final class POCustomerActionViewControllerBuilder {
 
+    public typealias Completion = (Result<String, PORepositoryFailure>) -> Void
+
     /// - Parameters:
     ///   - url: customer action url.
     ///   - completion: completion to invoke when action handling completes.
-    public static func with(url: URL, completion: @escaping (Result<String, Error>) -> Void) -> Self {
-        Self(url: url, completion: completion)
+    public static func with(url: URL) -> Self {
+        Self(url: url)
+    }
+
+    /// Completion to invoke when authorization ends.
+    public func with(completion: @escaping Completion) -> Self {
+        self.completion = completion
+        return self
     }
 
     /// Api that will be used by created module to communicate with BE. By default ``ProcessOutApi/shared``
@@ -29,25 +37,24 @@ public final class POCustomerActionViewControllerBuilder {
     /// - NOTE: Caller should dismiss view controller after completion is called.
     public func build() -> UIViewController {
         let api: ProcessOutApiType = self.api ?? ProcessOutApi.shared
-        return CustomerActionViewController(
-            checkoutBaseUrl: api.configuration.checkoutBaseUrl,
-            customerActionUrl: url,
+        let viewController = WebViewController(
+            delegate: CustomerActionWebViewControllerDelegate(url: url),
+            baseReturnUrl: api.configuration.checkoutBaseUrl,
             version: type(of: api).version,
             completion: completion
         )
+        return viewController
     }
 
     // MARK: -
 
-    init(url: URL, completion: @escaping (Result<String, Error>) -> Void) {
+    init(url: URL) {
         self.url = url
-        self.completion = completion
     }
 
     // MARK: - Private Properties
 
     private let url: URL
-    private let completion: (Result<String, Error>) -> Void
-
+    private var completion: Completion?
     private var api: ProcessOutApiType?
 }
