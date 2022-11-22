@@ -21,9 +21,6 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
         let startedState = State.Started(features: [
             .init(name: Strings.Features.NativeAlternativePayment.title) { [weak self] in
                 self?.router.trigger(route: .gatewayConfigurations(filter: .nativeAlternativePaymentMethods))
-            },
-            .init(name: Strings.Features.AlternativePayment.title) { [weak self] in
-                self?.router.trigger(route: .gatewayConfigurations(filter: .alternativePaymentMethods))
             }
         ])
         state = .started(startedState)

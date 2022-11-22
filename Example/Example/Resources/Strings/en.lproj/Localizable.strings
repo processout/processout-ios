@@ -13,3 +13,8 @@
 "alternative-payment-methods.title" = "Alternative Payment Methods";
 "alternative-payment-methods.gateway.unknown" = "<Unknown>";
 "alternative-payment-methods.failure.unknown" = "Something went wrong...";
+
+"authorization-amount.message" = "Please select amount and currency.";
+"authorization-amount.amount.placeholder" = "Amount";
+"authorization-amount.currency.placeholder" = "Currency Code";
+"authorization-amount.confirm" = "Confirm";

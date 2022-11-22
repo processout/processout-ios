@@ -89,14 +89,14 @@ final class AlternativePaymentMethodsInteractor:
         }
     }
 
-    func createInvoice(currencyCode: String, success: @escaping (POInvoice) -> Void) {
+    func createInvoice(amount: Decimal, currencyCode: String, success: @escaping (POInvoice) -> Void) {
         guard case .started(let startedState) = state else {
             return
         }
         state = .creatingInvoice(snapshot: startedState)
         let request = POInvoiceCreationRequest(
             name: UUID().uuidString,
-            amount: "150.0",
+            amount: amount.description,
             currency: currencyCode,
             returnUrl: URL(string: "example://processout.return")! // swiftlint:disable:this force_unwrapping
         )

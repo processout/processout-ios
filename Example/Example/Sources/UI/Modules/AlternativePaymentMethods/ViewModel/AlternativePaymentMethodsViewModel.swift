@@ -91,7 +91,12 @@ final class AlternativePaymentMethodsViewModel:
             id: AnyHashable(gatewayConfiguration.id),
             name: gatewayConfiguration.gateway?.displayName ?? Strings.AlternativePaymentMethods.Gateway.unknown,
             select: { [weak self] in
-                self?.createAndAuthorizeInvoice(gatewayConfiguration: gatewayConfiguration)
+                let route = AlternativePaymentMethodsRoute.authorizationtAmount { amount, currencyCode in
+                    self?.startNativeAlternativePayment(
+                        amount: amount, currencyCode: currencyCode, gatewayConfiguration: gatewayConfiguration
+                    )
+                }
+                self?.router.trigger(route: route)
             }
         )
         return State.Item.configuration(item)
@@ -99,24 +104,19 @@ final class AlternativePaymentMethodsViewModel:
 
     // MARK: -
 
-    private func createAndAuthorizeInvoice(gatewayConfiguration: POGatewayConfiguration) {
-        interactor.createInvoice(currencyCode: gatewayConfiguration.defaultCurrency) { [weak self] invoice in
-            let route: AlternativePaymentMethodsRoute
+    private func startNativeAlternativePayment(
+        amount: Decimal, currencyCode: String, gatewayConfiguration: POGatewayConfiguration
+    ) {
+        interactor.createInvoice(amount: amount, currencyCode: currencyCode) { [weak self] invoice in
             let isSubaccount = gatewayConfiguration
                 .subAccountsEnabled?
                 .contains(gatewayConfiguration.gatewayName ?? "") ?? false
-            if !isSubaccount {
+            guard isSubaccount, gatewayConfiguration.gateway?.nativeApmConfig != nil else {
                 return
-            } else if gatewayConfiguration.gateway?.nativeApmConfig != nil {
-                route = .nativeAlternativePayment(
-                    gatewayConfigurationId: gatewayConfiguration.id, invoiceId: invoice.id
-                )
-            } else {
-                let request = POAlternativePaymentMethodRequest(
-                    invoiceId: invoice.id, gatewayConfigurationId: gatewayConfiguration.id
-                )
-                route = .alternativePayment(request: request)
             }
+            let route = AlternativePaymentMethodsRoute.nativeAlternativePayment(
+                gatewayConfigurationId: gatewayConfiguration.id, invoiceId: invoice.id
+            )
             self?.router.trigger(route: route)
         }
     }

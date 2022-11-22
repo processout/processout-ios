@@ -10,7 +10,7 @@ import UIKit
 final class AlternativePaymentMethodsConfigurationCell: UICollectionViewListCell {
 
     typealias CellRegistration = UICollectionView.CellRegistration<
-        AlternativePaymentMethodsFailureCell, AlternativePaymentMethodsViewModelState.ConfigurationItem
+        AlternativePaymentMethodsConfigurationCell, AlternativePaymentMethodsViewModelState.ConfigurationItem
     >
 
     static let registration = CellRegistration { cell, _, model in
