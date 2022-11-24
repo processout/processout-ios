@@ -29,6 +29,16 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         return self
     }
 
+    public func with(configuration: PONativeAlternativePaymentMethodConfiguration) -> Self {
+        self.configuration = configuration
+        return self
+    }
+
+    public func with(style: PONativeAlternativePaymentMethodStyle) -> Self {
+        self.style = style
+        return self
+    }
+
     /// Returns view controller that caller should encorporate into view controllers hierarchy.
     /// If instance can't be created assertion failure is triggered.
     ///
@@ -64,4 +74,6 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
 
     private var api: ProcessOutApiType?
     private var completion: (() -> Void)?
+    private var configuration: PONativeAlternativePaymentMethodConfiguration?
+    private var style: PONativeAlternativePaymentMethodStyle?
 }

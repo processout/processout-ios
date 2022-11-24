@@ -29,6 +29,11 @@ final class AttributedStringBuilder {
         return self
     }
 
+    func textColor(_ color: UIColor) -> AttributedStringBuilder {
+        attributes[.foregroundColor] = color
+        return self
+    }
+
     func typography(_ typography: POTypography) -> AttributedStringBuilder {
         self.typography = typography
         return self

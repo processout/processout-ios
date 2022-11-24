@@ -31,6 +31,11 @@ internal enum Asset {
       internal static let error = ColorAsset(name: "Border/Error")
       internal static let primary = ColorAsset(name: "Border/Primary")
     }
+    internal enum Button {
+      internal static let disabled = ColorAsset(name: "Button/Disabled")
+      internal static let highlighted = ColorAsset(name: "Button/Highlighted")
+      internal static let primary = ColorAsset(name: "Button/Primary")
+    }
     internal enum Icon {
       internal static let primary = ColorAsset(name: "Icon/Primary")
     }
