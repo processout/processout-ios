@@ -32,9 +32,18 @@ internal enum Asset {
       internal static let primary = ColorAsset(name: "Border/Primary")
     }
     internal enum Button {
+      internal static let border = ColorAsset(name: "Button/Border")
       internal static let disabled = ColorAsset(name: "Button/Disabled")
       internal static let highlighted = ColorAsset(name: "Button/Highlighted")
       internal static let primary = ColorAsset(name: "Button/Primary")
+      internal enum Text {
+        internal static let primary = ColorAsset(name: "Button/Text/Primary")
+        internal static let secondary = ColorAsset(name: "Button/Text/Secondary")
+      }
+    }
+    internal enum Generic {
+      internal static let black = ColorAsset(name: "Generic/Black")
+      internal static let white = ColorAsset(name: "Generic/White")
     }
     internal enum Icon {
       internal static let primary = ColorAsset(name: "Icon/Primary")
