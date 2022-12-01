@@ -12,6 +12,7 @@ final class CodeTextField: UIControl, UIKeyInput {
     init(length: Int, style: POTextFieldStyle) {
         self.length = length
         self.style = style
+        groupViews = []
         carretPosition = .before
         carretPositionIndex = 0
         characters = Array(repeating: nil, count: length)
@@ -26,16 +27,24 @@ final class CodeTextField: UIControl, UIKeyInput {
         fatalError("init(coder:) has not been implemented")
     }
 
-    let length: Int
+    weak var delegate: CodeTextFieldDelegate?
 
     var style: POTextFieldStyle {
         didSet { configureWithCurrentState() }
     }
 
-    var text: String {
+    var text: String? {
         get { String(characters.compactMap { $0 }) }
         set { setText(newValue) }
     }
+
+    var length: Int {
+        didSet { didUpdateLength(oldValue: oldValue) }
+    }
+
+    var keyboardType: UIKeyboardType
+    var returnKeyType: UIReturnKeyType
+    var textContentType: UITextContentType! // swiftlint:disable:this implicitly_unwrapped_optional
 
     // MARK: - UIControl
 
@@ -45,6 +54,9 @@ final class CodeTextField: UIControl, UIKeyInput {
 
     @discardableResult
     override func becomeFirstResponder() -> Bool {
+        if delegate?.codeTextFieldShouldBeginEditing(self) == false {
+            return false
+        }
         let didBecomeResponder = super.becomeFirstResponder()
         configureWithCurrentState()
         return didBecomeResponder
@@ -57,6 +69,12 @@ final class CodeTextField: UIControl, UIKeyInput {
     }
 
     func insertText(_ text: String) {
+        if let character = text.last, character.isNewline {
+            if delegate?.codeTextFieldShouldReturn(self) != false {
+                resignFirstResponder()
+            }
+            return
+        }
         let insertionIndex: Int
         if case .after = carretPosition, characters[carretPositionIndex] != nil {
             insertionIndex = carretPositionIndex + 1
@@ -67,6 +85,13 @@ final class CodeTextField: UIControl, UIKeyInput {
             return
         }
         let insertedText = Array(text.prefix(length - insertionIndex))
+        let updatedRange = NSRange(
+            location: max(insertionIndex - characters.prefix(insertionIndex).filter { $0 == nil }.count, 0),
+            length: 0
+        )
+        if delegate?.codeTextField(self, shouldChangeCharactersIn: updatedRange, replacementString: text) == false {
+            return
+        }
         characters.replaceSubrange(insertionIndex ..< insertionIndex + insertedText.count, with: insertedText)
         carretPositionIndex += insertedText.count
         if carretPositionIndex > length - 1 {
@@ -89,16 +114,19 @@ final class CodeTextField: UIControl, UIKeyInput {
         guard characters.indices.contains(removalIndex) else {
             return
         }
+        let updatedRange = NSRange(
+            location: removalIndex - characters.prefix(removalIndex + 1).filter { $0 == nil }.count, length: 1
+        )
+        if updatedRange.location >= 0,
+           delegate?.codeTextField(self, shouldChangeCharactersIn: updatedRange, replacementString: "") == false {
+            return
+        }
         characters[removalIndex] = nil
         carretPosition = .before
         carretPositionIndex = removalIndex
         configureWithCurrentState()
         sendActions(for: .editingChanged)
     }
-
-    var keyboardType: UIKeyboardType
-    var returnKeyType: UIReturnKeyType
-    var textContentType: UITextContentType! // swiftlint:disable:this implicitly_unwrapped_optional
 
     // MARK: - Private Nested Types
 
@@ -110,17 +138,14 @@ final class CodeTextField: UIControl, UIKeyInput {
 
     // MARK: - Private Properties
 
-    private lazy var groupViews: [CodeTextFieldComponentView] = {
-        let views = stride(from: 0, to: length, by: 1).map { offset in
-            let view = CodeTextFieldComponentView(style: style) { [weak self] position in
-                self?.setCarretPosition(position: position, index: offset)
-                self?.becomeFirstResponder()
-            }
-            return view
-        }
-        return views
+    private lazy var contentView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
 
+    private var groupViews: [CodeTextFieldComponentView]
     private var carretPosition: CodeTextFieldCarretPosition
     private var carretPositionIndex: Int
     private var characters: [Character?]
@@ -129,16 +154,36 @@ final class CodeTextField: UIControl, UIKeyInput {
 
     private func commonInit() {
         translatesAutoresizingMaskIntoConstraints = false
+        addSubview(contentView)
+        let fixedLeadingConstraint = contentView.leadingAnchor.constraint(equalTo: leadingAnchor)
+        fixedLeadingConstraint.priority = .defaultLow
+        let constraints = [
+            contentView.heightAnchor.constraint(equalToConstant: Constants.height),
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            contentView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            contentView.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor),
+            fixedLeadingConstraint
+        ]
+        NSLayoutConstraint.activate(constraints)
+        recreateGroupViews()
+        configureWithCurrentState()
+    }
+
+    private func recreateGroupViews() {
+        groupViews.forEach { view in
+            view.removeFromSuperview()
+        }
+        groupViews = stride(from: 0, to: length, by: 1).map(createCodeTextFieldComponentView)
         var constraints = [
-            groupViews[0].leadingAnchor.constraint(equalTo: leadingAnchor),
-            groupViews[groupViews.count - 1].trailingAnchor.constraint(equalTo: trailingAnchor),
-            heightAnchor.constraint(equalToConstant: Constants.height)
+            groupViews[0].leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            groupViews[groupViews.count - 1].trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
         ]
         groupViews.enumerated().forEach { offset, groupView in
-            addSubview(groupView)
+            contentView.addSubview(groupView)
             var viewConstraints = [
-                groupView.topAnchor.constraint(equalTo: topAnchor),
-                groupView.centerYAnchor.constraint(equalTo: centerYAnchor)
+                groupView.topAnchor.constraint(equalTo: contentView.topAnchor),
+                groupView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
             ]
             if groupViews.indices.contains(offset + 1) {
                 let nextView = groupViews[offset + 1]
@@ -154,7 +199,6 @@ final class CodeTextField: UIControl, UIKeyInput {
             constraints.append(contentsOf: viewConstraints)
         }
         NSLayoutConstraint.activate(constraints)
-        configureWithCurrentState()
     }
 
     private func setCarretPosition(position: CodeTextFieldCarretPosition, index: Int) {
@@ -171,15 +215,44 @@ final class CodeTextField: UIControl, UIKeyInput {
         configureWithCurrentState()
     }
 
-    private func setText(_ text: String) {
+    private func setText(_ text: String?) {
         characters = Array(repeating: nil, count: length)
-        if !text.isEmpty {
+        if let text, !text.isEmpty {
             let insertedTextCharacters = Array(text.prefix(length))
             characters.replaceSubrange(0 ..< insertedTextCharacters.count, with: insertedTextCharacters)
         }
         carretPosition = .before
         carretPositionIndex = 0
         configureWithCurrentState()
+    }
+
+    private func didUpdateLength(oldValue: Int) {
+        assert(length > 0, "Length must be greater than zero.")
+        guard length != oldValue else {
+            return
+        }
+        if length > oldValue {
+            let difference = length - oldValue
+            characters.append(contentsOf: Array(repeating: nil, count: difference))
+            recreateGroupViews()
+        } else {
+            if carretPositionIndex >= length {
+                carretPositionIndex = length - 1
+                carretPosition = characters[carretPositionIndex] != nil ? .after : .before
+            }
+            let difference = oldValue - length
+            characters.removeLast(difference)
+            groupViews.removeLast(difference)
+        }
+        configureWithCurrentState()
+    }
+
+    private func createCodeTextFieldComponentView(index: Int) -> CodeTextFieldComponentView {
+        let view = CodeTextFieldComponentView(style: style) { [weak self] position in
+            self?.setCarretPosition(position: position, index: index)
+            self?.becomeFirstResponder()
+        }
+        return view
     }
 
     private func configureWithCurrentState() {

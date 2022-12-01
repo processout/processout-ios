@@ -1,5 +1,5 @@
 //
-//  ActivityIndicatorViewType.swift
+//  POActivityIndicatorViewType.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 23.11.2022.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-public protocol ActivityIndicatorViewType: UIView {
+public protocol POActivityIndicatorViewType: UIView {
 
     /// Changes animation state.
     func setAnimating(_ isAnimating: Bool)

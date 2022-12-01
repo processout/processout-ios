@@ -1,5 +1,5 @@
 //
-//  UIActivityIndicatorView+ActivityIndicatorViewType.swift
+//  UIActivityIndicatorView+Extensions.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 28.11.2022.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension UIActivityIndicatorView: ActivityIndicatorViewType {
+extension UIActivityIndicatorView: POActivityIndicatorViewType {
 
     public func setAnimating(_ isAnimating: Bool) {
         if isAnimating {

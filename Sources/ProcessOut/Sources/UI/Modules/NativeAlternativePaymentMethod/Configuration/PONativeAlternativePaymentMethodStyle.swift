@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// Defines style for payment method module.
+/// Defines style for native alternative payment method module.
 public struct PONativeAlternativePaymentMethodStyle {
 
     public struct BackgroundDecorationStyle {

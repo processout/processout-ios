@@ -41,6 +41,7 @@ final class CodeTextFieldComponentView: UIView {
         static let carretSize = CGSize(width: 2, height: 28)
         static let carretOffset: CGFloat = 11
         static let carretAnimationDuration: TimeInterval = 0.4
+        static let carretAnimationKey = "CarretAnimation"
     }
 
     // MARK: - Private Properties
@@ -59,6 +60,7 @@ final class CodeTextFieldComponentView: UIView {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.isUserInteractionEnabled = false
+        view.alpha = 1
         return view
     }()
 
@@ -95,15 +97,6 @@ final class CodeTextFieldComponentView: UIView {
     }
 
     private func addCarretSubview() {
-        UIView.animate(
-            withDuration: Constants.carretAnimationDuration,
-            delay: 0.0,
-            options: [.curveEaseInOut, .autoreverse, .repeat],
-            animations: {
-                self.carretView.alpha = 0
-            },
-            completion: nil
-        )
         addSubview(carretView)
         let constraints = [
             carretView.widthAnchor.constraint(equalToConstant: Constants.carretSize.width),
@@ -128,10 +121,13 @@ final class CodeTextFieldComponentView: UIView {
         switch carretPosition {
         case .none:
             carretView.isHidden = true
+            removeCarretAnimation()
         case .before:
+            addCarretAnimation()
             carretView.isHidden = false
             carretCenterConstraint.constant = -Constants.carretOffset
         case .after:
+            addCarretAnimation()
             carretView.isHidden = false
             carretCenterConstraint.constant = Constants.carretOffset
         }
@@ -139,6 +135,20 @@ final class CodeTextFieldComponentView: UIView {
         apply(style: style.shadow)
         backgroundColor = style.backgroundColor
         carretView.backgroundColor = style.tintColor
+    }
+
+    private func addCarretAnimation() {
+        let animation = CABasicAnimation(keyPath: "opacity")
+        animation.fromValue = 1
+        animation.toValue = 0
+        animation.duration = Constants.carretAnimationDuration
+        animation.autoreverses = true
+        animation.repeatCount = .greatestFiniteMagnitude
+        carretView.layer.add(animation, forKey: Constants.carretAnimationKey)
+    }
+
+    private func removeCarretAnimation() {
+        carretView.layer.removeAnimation(forKey: Constants.carretAnimationKey)
     }
 
     // MARK: - Actions

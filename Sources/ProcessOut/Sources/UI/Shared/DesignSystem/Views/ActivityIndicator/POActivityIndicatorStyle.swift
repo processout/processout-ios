@@ -10,7 +10,7 @@ import UIKit
 public enum POActivityIndicatorStyle {
 
     /// Custom actvity indicator.
-    case custom(ActivityIndicatorViewType)
+    case custom(POActivityIndicatorViewType)
 
     /// System activity indicator.
     case system(UIActivityIndicatorView.Style)

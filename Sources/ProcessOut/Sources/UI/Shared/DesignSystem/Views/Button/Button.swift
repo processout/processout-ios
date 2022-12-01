@@ -98,8 +98,8 @@ final class Button: UIControl {
         return label
     }()
 
-    private lazy var activityIndicatorView: ActivityIndicatorViewType = {
-        let view: ActivityIndicatorViewType
+    private lazy var activityIndicatorView: POActivityIndicatorViewType = {
+        let view: POActivityIndicatorViewType
         switch style.activityIndicator {
         case .custom(let customView):
             view = customView
@@ -107,6 +107,7 @@ final class Button: UIControl {
             let indicatorView = UIActivityIndicatorView(style: style)
             view = indicatorView
         }
+        view.translatesAutoresizingMaskIntoConstraints = false
         view.hidesWhenStopped = false
         view.setAnimating(true)
         return view

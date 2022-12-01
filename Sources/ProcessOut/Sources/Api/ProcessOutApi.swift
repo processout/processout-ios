@@ -8,11 +8,13 @@
 import Foundation
 import UIKit
 
+/// Class that provides access to shared api instance and a way to configure it.
 public final class ProcessOutApi: ProcessOutApiType {
 
     /// Shared instance.
     public private(set) static var shared: ProcessOutApiType! // swiftlint:disable:this implicitly_unwrapped_optional
 
+    /// Configures ``ProcessOutApi/shared`` instance.
     public static func configure(configuration: ProcessOutApiConfiguration) {
         assert(Thread.isMainThread)
         guard shared == nil else {
