@@ -7,10 +7,6 @@
 
 public struct PONativeAlternativePaymentMethodResponse: Decodable {
 
-    public enum NativeAlternativePaymentMethodState: String, Decodable {
-        case customerInput = "CUSTOMER_INPUT", pendingCapture = "PENDING_CAPTURE"
-    }
-
     public struct NativeAlternativePaymentMethodParameterValues: Decodable {
 
         /// Message.

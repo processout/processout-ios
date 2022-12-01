@@ -7,6 +7,15 @@
 
 enum HttpConnectorFailure: Error {
 
+    struct InvalidField: Decodable {
+
+        /// Field name.
+        let name: String
+
+        /// Message describing an error.
+        let message: String
+    }
+
     struct Server: Decodable {
 
         /// Error type.
@@ -14,6 +23,9 @@ enum HttpConnectorFailure: Error {
 
         /// Failure message.
         let message: String?
+
+        /// Invalid fields if any.
+        let invalidFields: [InvalidField]?
     }
 
     /// Unable to code data. Supplied error is going to be `DecodingError` or `EncodingError`.

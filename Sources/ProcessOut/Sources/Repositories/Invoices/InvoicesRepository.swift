@@ -16,6 +16,22 @@ final class InvoicesRepository: InvoicesRepositoryType {
 
     // MARK: - POInvoicesRepositoryType
 
+    func nativeAlternativePaymentMethodTransactionDetails(
+        invoiceId: String,
+        gatewayConfigurationId: String,
+        completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, Failure>) -> Void
+    ) {
+        struct Response: Decodable {
+            let nativeApm: PONativeAlternativePaymentMethodTransactionDetails
+        }
+        let httpRequest = HttpConnectorRequest<Response>.get(
+            path: "/invoices/\(invoiceId)/native-payment/\(gatewayConfigurationId)"
+        )
+        connector.execute(request: httpRequest) { [failureMapper] result in
+            completion(result.map(\.nativeApm).mapError(failureMapper.repositoryFailure))
+        }
+    }
+
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest,
         completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, Failure>) -> Void
@@ -43,6 +59,15 @@ final class InvoicesRepository: InvoicesRepositoryType {
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
             completion(result.map(\.customerAction).mapError(failureMapper.repositoryFailure))
+        }
+    }
+
+    func capture(invoiceId: String, completion: @escaping (Result<Void, Failure>) -> Void) {
+        let httpRequest = HttpConnectorRequest<VoidCodable>.post(
+            path: "/invoices/\(invoiceId)/capture", body: nil as AnyEncodable?
+        )
+        connector.execute(request: httpRequest) { [failureMapper] result in
+            completion(result.map { _ in () }.mapError(failureMapper.repositoryFailure))
         }
     }
 

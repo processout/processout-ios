@@ -9,6 +9,15 @@ import Foundation
 
 public struct PORepositoryFailure: Error {
 
+    public struct InvalidField: Decodable {
+
+        /// Field name.
+        public let name: String
+
+        /// Message describing an error.
+        public let message: String
+    }
+
     public enum ValidationCode: String {
         case general                   = "request.validation.error"
         case invalidAddress            = "request.validation.invalid-address"
@@ -16,6 +25,7 @@ public struct PORepositoryFailure: Error {
         case invalidChallengeIndicator = "request.validation.invalid-challenge-indicator"
         case invalidCountry            = "request.validation.invalid-country"
         case invalidCurrency           = "request.validation.invalid-currency"
+        case invalidCustomerInput      = "gateway.invalid-customer-input"
         case invalidDate               = "request.validation.invalid-date"
         case invalidDescription        = "request.validation.invalid-description"
         case invalidDetailCategory     = "request.validation.invalid-detail-category"
@@ -42,6 +52,7 @@ public struct PORepositoryFailure: Error {
         case invalidSex                = "request.validation.invalid-sex"
         case invalidShippingDelay      = "request.validation.invalid-shipping-delay"
         case invalidShippingMethod     = "request.validation.invalid-shipping-method"
+        case invalidState              = "gateway.invalid-state"
         case invalidSubAccount         = "request.validation.invalid-subaccount"
         case invalidTaxAmount          = "request.validation.invalid-tax-amount"
         case invalidTaxRate            = "request.validation.invalid-tax-rate"
@@ -49,6 +60,7 @@ public struct PORepositoryFailure: Error {
         case invalidUrl                = "request.validation.invalid-url"
         case invalidUser               = "request.validation.invalid-user"
         case missingCurrency           = "request.validation.missing-currency"
+        case missingCustomerInput      = "gateway.missing-customer-input"
         case missingDescription        = "request.validation.missing-description"
         case missingEmail              = "request.validation.missing-email"
         case missingInvoice            = "request.validation.missing-invoice"
@@ -153,6 +165,16 @@ public struct PORepositoryFailure: Error {
     /// Failure code.
     public let code: Code
 
+    /// Invalid fields if any.
+    public let invalidFields: [InvalidField]?
+
     /// Underlying error for inspection.
     public let underlyingError: Error?
+
+    init(message: String? = nil, code: Code, invalidFields: [InvalidField]? = nil, underlyingError: Error? = nil) {
+        self.message = message
+        self.code = code
+        self.invalidFields = invalidFields
+        self.underlyingError = underlyingError
+    }
 }

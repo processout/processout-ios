@@ -37,4 +37,7 @@ public struct PONativeAlternativePaymentMethodParameter: Decodable {
     /// - NOTE: If the length field is null, that means there is no length requirement for that specific
     /// parameter and no length validation will be performed.
     public let length: Int?
+
+    /// Parameter's localized name that could be displayed to user.
+    public let displayName: String
 }

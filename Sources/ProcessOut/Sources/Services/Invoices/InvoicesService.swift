@@ -16,6 +16,16 @@ final class InvoicesService: POInvoicesServiceType {
 
     // MARK: - POCustomerTokensServiceType
 
+    func nativeAlternativePaymentMethodTransactionDetails(
+        invoiceId: String,
+        gatewayConfigurationId: String,
+        completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, Failure>) -> Void
+    ) {
+        repository.nativeAlternativePaymentMethodTransactionDetails(
+            invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId, completion: completion
+        )
+    }
+
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest,
         completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, Failure>) -> Void
@@ -50,6 +60,10 @@ final class InvoicesService: POInvoicesServiceType {
                 completion(.failure(failure))
             }
         }
+    }
+
+    func capture(invoiceId: String, completion: @escaping (Result<Void, Failure>) -> Void) {
+        repository.capture(invoiceId: invoiceId, completion: completion)
     }
 
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void) {

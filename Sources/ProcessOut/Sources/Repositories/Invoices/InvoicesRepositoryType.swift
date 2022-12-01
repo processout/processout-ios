@@ -7,6 +7,13 @@
 
 protocol InvoicesRepositoryType: PORepositoryType {
 
+    /// Requests information needed to continue existing payment or start new one.
+    func nativeAlternativePaymentMethodTransactionDetails(
+        invoiceId: String,
+        gatewayConfigurationId: String,
+        completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, Failure>) -> Void
+    )
+
     /// Initiates native alternative payment with a given request.
     ///
     /// Some Native APMs require further information to be collected back from the customer. You can inspect
@@ -20,6 +27,9 @@ protocol InvoicesRepositoryType: PORepositoryType {
     func authorizeInvoice(
         request: POInvoiceAuthorizationRequest, completion: @escaping (Result<CustomerAction?, Failure>) -> Void
     )
+
+    /// Captures previously authorized invoice.
+    func capture(invoiceId: String, completion: @escaping (Result<Void, Failure>) -> Void)
 
     /// Creates invoice with given parameters.
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void)

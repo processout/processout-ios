@@ -29,6 +29,15 @@ extension CustomerTokensRepositoryType {
 extension InvoicesRepositoryType {
 
     @MainActor
+    public func nativeAlternativePaymentMethodTransactionDetails(
+        invoiceId: String, gatewayConfigurationId: String
+    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
+        return try await withUnsafeThrowingContinuation { continuation in
+            nativeAlternativePaymentMethodTransactionDetails(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId, completion: continuation.resume)
+        }
+    }
+
+    @MainActor
     public func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
     ) async throws -> PONativeAlternativePaymentMethodResponse {
@@ -43,6 +52,15 @@ extension InvoicesRepositoryType {
     ) async throws -> CustomerAction? {
         return try await withUnsafeThrowingContinuation { continuation in
             authorizeInvoice(request: request, completion: continuation.resume)
+        }
+    }
+
+    @MainActor
+    public func capture(
+        invoiceId: String
+    ) async throws -> Void {
+        return try await withUnsafeThrowingContinuation { continuation in
+            capture(invoiceId: invoiceId, completion: continuation.resume)
         }
     }
 
@@ -143,6 +161,15 @@ extension POGatewayConfigurationsRepositoryType {
 extension POInvoicesServiceType {
 
     @MainActor
+    public func nativeAlternativePaymentMethodTransactionDetails(
+        invoiceId: String, gatewayConfigurationId: String
+    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
+        return try await withUnsafeThrowingContinuation { continuation in
+            nativeAlternativePaymentMethodTransactionDetails(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId, completion: continuation.resume)
+        }
+    }
+
+    @MainActor
     public func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
     ) async throws -> PONativeAlternativePaymentMethodResponse {
@@ -157,6 +184,15 @@ extension POInvoicesServiceType {
     ) async throws -> Void {
         return try await withUnsafeThrowingContinuation { continuation in
             authorizeInvoice(request: request, customerActionHandlerDelegate: customerActionHandlerDelegate, completion: continuation.resume)
+        }
+    }
+
+    @MainActor
+    public func capture(
+        invoiceId: String
+    ) async throws -> Void {
+        return try await withUnsafeThrowingContinuation { continuation in
+            capture(invoiceId: invoiceId, completion: continuation.resume)
         }
     }
 
