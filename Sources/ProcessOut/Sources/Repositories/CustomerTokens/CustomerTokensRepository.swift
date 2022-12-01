@@ -9,7 +9,7 @@ import Foundation
 
 final class CustomerTokensRepository: CustomerTokensRepositoryType {
 
-    init(connector: HttpConnectorType, failureMapper: RepositoryFailureMapperType) {
+    init(connector: HttpConnectorType, failureMapper: FailureMapperType) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
@@ -28,7 +28,7 @@ final class CustomerTokensRepository: CustomerTokensRepositoryType {
             includesDeviceMetadata: true
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.customerAction).mapError(failureMapper.repositoryFailure))
+            completion(result.map(\.customerAction).mapError(failureMapper.failure))
         }
     }
 
@@ -43,12 +43,12 @@ final class CustomerTokensRepository: CustomerTokensRepositoryType {
             path: "/customers/\(request.customerId)/tokens", body: request, includesDeviceMetadata: true
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.token).mapError(failureMapper.repositoryFailure))
+            completion(result.map(\.token).mapError(failureMapper.failure))
         }
     }
 
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType
-    private let failureMapper: RepositoryFailureMapperType
+    private let failureMapper: FailureMapperType
 }

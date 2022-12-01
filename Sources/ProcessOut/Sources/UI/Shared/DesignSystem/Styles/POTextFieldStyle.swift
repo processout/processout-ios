@@ -9,37 +9,37 @@ import UIKit
 
 public struct POTextFieldStyle {
 
-    /// Button's background color.
+    /// Text style.
     public let text: POTextStyle
+
+    /// Placeholder text style.
+    public let placeholder: POTextStyle
 
     /// Button's background color.
     public let backgroundColor: UIColor
 
-    /// Corner radius.
-    public let cornerRadius: CGFloat
+    /// Border style.
+    public let border: POBorderStyle
 
-    /// Border color.
-    public let borderColor: UIColor?
+    /// Shadow style.
+    public let shadow: POShadowStyle
 
-    /// Border width.
-    public let borderWidth: CGFloat
-
-    /// Carret color.
-    public let carretColor: UIColor
+    /// Tint color that is used by text field.
+    public let tintColor: UIColor
 
     public init(
         text: POTextStyle,
+        placeholder: POTextStyle,
         backgroundColor: UIColor,
-        cornerRadius: CGFloat,
-        borderColor: UIColor?,
-        borderWidth: CGFloat,
-        carretColor: UIColor
+        border: POBorderStyle,
+        shadow: POShadowStyle,
+        tintColor: UIColor
     ) {
         self.text = text
+        self.placeholder = placeholder
         self.backgroundColor = backgroundColor
-        self.cornerRadius = cornerRadius
-        self.borderColor = borderColor
-        self.borderWidth = borderWidth
-        self.carretColor = carretColor
+        self.border = border
+        self.shadow = shadow
+        self.tintColor = tintColor
     }
 }

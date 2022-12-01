@@ -19,7 +19,7 @@ final class CustomerActionHandler: CustomerActionHandlerType {
     func handle(
         customerAction: CustomerAction,
         delegate: Delegate,
-        completion: @escaping (Result<String, PORepositoryFailure>) -> Void
+        completion: @escaping (Result<String, POFailure>) -> Void
     ) {
         switch customerAction.type {
         case .fingerprintMobile:
@@ -51,7 +51,7 @@ final class CustomerActionHandler: CustomerActionHandlerType {
     private func fingerprint(
         encodedDirectoryServerData: String,
         delegate: Delegate,
-        completion: @escaping (Result<String, PORepositoryFailure>) -> Void
+        completion: @escaping (Result<String, POFailure>) -> Void
     ) {
         let directoryServerData: PODirectoryServerData
         switch decode(PODirectoryServerData.self, from: encodedDirectoryServerData) {
@@ -86,7 +86,7 @@ final class CustomerActionHandler: CustomerActionHandlerType {
     private func challenge(
         encodedChallengeData: String,
         delegate: Delegate,
-        completion: @escaping (Result<String, PORepositoryFailure>) -> Void
+        completion: @escaping (Result<String, POFailure>) -> Void
     ) {
         let challenge: POAuthentificationChallengeData
         switch decode(POAuthentificationChallengeData.self, from: encodedChallengeData) {
@@ -111,7 +111,7 @@ final class CustomerActionHandler: CustomerActionHandlerType {
     }
 
     private func fingerprint(
-        url: String, delegate: Delegate, completion: @escaping (Result<String, PORepositoryFailure>) -> Void
+        url: String, delegate: Delegate, completion: @escaping (Result<String, POFailure>) -> Void
     ) {
         if let url = URL(string: url) {
             let timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: false) { [encoder] _ in
@@ -140,20 +140,20 @@ final class CustomerActionHandler: CustomerActionHandlerType {
                 complete(with: result, completion: completion)
             }
         } else {
-            let failure = PORepositoryFailure(message: nil, code: .internal, underlyingError: nil)
+            let failure = POFailure(message: nil, code: .internal, underlyingError: nil)
             completion(.failure(failure))
         }
     }
 
     private func redirect(
-        url: String, delegate: Delegate, completion: @escaping (Result<String, PORepositoryFailure>) -> Void
+        url: String, delegate: Delegate, completion: @escaping (Result<String, POFailure>) -> Void
     ) {
         if let url = URL(string: url) {
             delegate.redirect(url: url) { result in
                 self.complete(with: result, completion: completion)
             }
         } else {
-            let failure = PORepositoryFailure(message: nil, code: .internal, underlyingError: nil)
+            let failure = POFailure(message: nil, code: .internal, underlyingError: nil)
             completion(.failure(failure))
         }
     }
@@ -161,16 +161,16 @@ final class CustomerActionHandler: CustomerActionHandlerType {
     // MARK: - Utils
 
     private func complete(
-        with result: Result<String, Error>, completion: @escaping (Result<String, PORepositoryFailure>) -> Void
+        with result: Result<String, Error>, completion: @escaping (Result<String, POFailure>) -> Void
     ) {
         assert(Thread.isMainThread)
         let result = result.mapError { error in
-            PORepositoryFailure(message: nil, code: .unknown, underlyingError: error)
+            POFailure(message: nil, code: .unknown, underlyingError: error)
         }
         completion(result)
     }
 
-    private func decode<T: Decodable>(_ type: T.Type, from string: String) -> Result<T, PORepositoryFailure> {
+    private func decode<T: Decodable>(_ type: T.Type, from string: String) -> Result<T, POFailure> {
         let paddedString = string.padding(
             toLength: string.count + (4 - string.count % 4) % 4, withPad: "=", startingAt: 0
         )

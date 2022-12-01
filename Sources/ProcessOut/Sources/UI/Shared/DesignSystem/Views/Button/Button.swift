@@ -101,10 +101,11 @@ final class Button: UIControl {
     private lazy var activityIndicatorView: ActivityIndicatorViewType = {
         let view: ActivityIndicatorViewType
         switch style.activityIndicator {
-        case .circle(let color):
-            view = CircularActivityIndicatorView(color: color)
         case .custom(let customView):
             view = customView
+        case .system(let style):
+            let indicatorView = UIActivityIndicatorView(style: style)
+            view = indicatorView
         }
         view.hidesWhenStopped = false
         view.setAnimating(true)
@@ -112,7 +113,7 @@ final class Button: UIControl {
     }()
 
     /// Style that is valid for current control's state.
-    private var currentStyle: POButtonStyle.Style {
+    private var currentStyle: POButtonStateStyle {
         if !isEnabled {
             return style.disabled
         }
@@ -147,8 +148,6 @@ final class Button: UIControl {
         ]
         NSLayoutConstraint.activate(constraints)
         clipsToBounds = true
-        layer.cornerRadius = style.cornerRadius
-        layer.borderWidth = style.borderWidth
         addTarget(self, action: #selector(didTouchUpInside), for: .touchUpInside)
     }
 
@@ -159,14 +158,15 @@ final class Button: UIControl {
             titleLabel.isHidden = true
         } else {
             titleLabel.attributedText = AttributedStringBuilder()
-                .typography(style.typography)
+                .typography(currentStyle.title.typography)
                 .maximumFontSize(Constants.maximumFontSize)
-                .textColor(currentStyle.titleColor)
+                .textColor(currentStyle.title.color)
                 .string(state.title)
                 .build()
             titleLabel.isHidden = false
         }
-        layer.borderColor = currentStyle.borderColor?.cgColor
+        apply(style: currentStyle.border)
+        apply(style: currentStyle.shadow)
         backgroundColor = currentStyle.backgroundColor
     }
 

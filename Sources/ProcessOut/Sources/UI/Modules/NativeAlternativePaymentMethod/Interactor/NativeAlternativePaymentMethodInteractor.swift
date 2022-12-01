@@ -140,7 +140,7 @@ final class NativeAlternativePaymentMethodInteractor:
         state = .started(updatedStartedState)
     }
 
-    private func setSubmissionFailureState(startedState: State.Started, failure: PORepositoryFailure) {
+    private func setSubmissionFailureState(startedState: State.Started, failure: POFailure) {
         state = .submissionFailure(snapshot: startedState, failure: failure)
     }
 

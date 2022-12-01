@@ -18,7 +18,7 @@ final class CustomerActionWebViewControllerDelegate: WebViewControllerDelegate {
     func mapToSuccessValue(url: URL) throws -> String {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
               let token = components.queryItems?.first(where: { $0.name == "token" }) else {
-            throw PORepositoryFailure(message: nil, code: .internal, underlyingError: nil)
+            throw POFailure(message: nil, code: .internal, underlyingError: nil)
         }
         return token.value ?? ""
     }

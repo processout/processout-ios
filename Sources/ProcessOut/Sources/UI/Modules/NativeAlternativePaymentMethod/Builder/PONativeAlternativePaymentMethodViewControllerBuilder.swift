@@ -23,19 +23,35 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         return self
     }
 
-    /// Completion to invoke after authorization is completed successfully.
-    public func with(completion: @escaping () -> Void) -> Self {
+    /// Completion to invoke after authorization is completed.
+    public func with(completion: @escaping (Result<Void, POFailure>) -> Void) -> Self {
         self.completion = completion
         return self
     }
 
-    public func with(configuration: PONativeAlternativePaymentMethodConfiguration) -> Self {
+    /// Sets UI configuration.
+    public func with(configuration: PONativeAlternativePaymentMethodUiConfiguration) -> Self {
         self.configuration = configuration
         return self
     }
 
+    /// Sets UI style.
     public func with(style: PONativeAlternativePaymentMethodStyle) -> Self {
         self.style = style
+        return self
+    }
+
+    /// Boolean value that specifies whether module should wait for payment confirmation from PSP or will
+    /// complete right after all user's input is submitted. Default value is `true`.
+    public func with(waitsPaymentConfirmation: Bool) -> Self {
+        self.waitsPaymentConfirmation = waitsPaymentConfirmation
+        return self
+    }
+
+    /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
+    /// Maximum value is 180 seconds.
+    public func with(paymentConfirmationTimeout: TimeInterval) -> Self {
+        self.paymentConfirmationTimeout = paymentConfirmationTimeout
         return self
     }
 
@@ -65,6 +81,8 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
     init(invoiceId: String, gatewayConfigurationId: String) {
         self.invoiceId = invoiceId
         self.gatewayConfigurationId = gatewayConfigurationId
+        waitsPaymentConfirmation = true
+        paymentConfirmationTimeout = 180
     }
 
     // MARK: - Private Properties
@@ -73,7 +91,9 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
     private let invoiceId: String
 
     private var api: ProcessOutApiType?
-    private var completion: (() -> Void)?
-    private var configuration: PONativeAlternativePaymentMethodConfiguration?
+    private var completion: ((Result<Void, POFailure>) -> Void)?
+    private var waitsPaymentConfirmation: Bool
+    private var paymentConfirmationTimeout: TimeInterval
+    private var configuration: PONativeAlternativePaymentMethodUiConfiguration?
     private var style: PONativeAlternativePaymentMethodStyle?
 }

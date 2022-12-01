@@ -22,7 +22,7 @@ final class CodeTextFieldComponentView: UIView {
     }
 
     var value: Character? {
-        didSet { setNeedsDisplay() }
+        didSet { configureWithCurrentState() }
     }
 
     var carretPosition: CodeTextFieldCarretPosition? {
@@ -135,11 +135,10 @@ final class CodeTextFieldComponentView: UIView {
             carretView.isHidden = false
             carretCenterConstraint.constant = Constants.carretOffset
         }
-        layer.borderWidth = style.borderWidth
-        layer.borderColor = style.borderColor?.cgColor
-        layer.cornerRadius = style.cornerRadius
+        apply(style: style.border)
+        apply(style: style.shadow)
         backgroundColor = style.backgroundColor
-        carretView.backgroundColor = style.carretColor
+        carretView.backgroundColor = style.tintColor
     }
 
     // MARK: - Actions

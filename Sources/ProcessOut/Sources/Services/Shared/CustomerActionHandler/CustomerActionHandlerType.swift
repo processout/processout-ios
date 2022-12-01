@@ -17,6 +17,6 @@ protocol CustomerActionHandlerType {
     func handle(
         customerAction: CustomerAction,
         delegate: Delegate,
-        completion: @escaping (Result<String, PORepositoryFailure>) -> Void
+        completion: @escaping (Result<String, POFailure>) -> Void
     )
 }

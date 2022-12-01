@@ -26,12 +26,15 @@ final class CodeTextField: UIControl, UIKeyInput {
         fatalError("init(coder:) has not been implemented")
     }
 
+    let length: Int
+
     var style: POTextFieldStyle {
         didSet { configureWithCurrentState() }
     }
 
     var text: String {
-        String(characters.compactMap { $0 })
+        get { String(characters.compactMap { $0 }) }
+        set { setText(newValue) }
     }
 
     // MARK: - UIControl
@@ -107,12 +110,11 @@ final class CodeTextField: UIControl, UIKeyInput {
 
     // MARK: - Private Properties
 
-    private let length: Int
-
     private lazy var groupViews: [CodeTextFieldComponentView] = {
         let views = stride(from: 0, to: length, by: 1).map { offset in
             let view = CodeTextFieldComponentView(style: style) { [weak self] position in
                 self?.setCarretPosition(position: position, index: offset)
+                self?.becomeFirstResponder()
             }
             return view
         }
@@ -156,7 +158,6 @@ final class CodeTextField: UIControl, UIKeyInput {
     }
 
     private func setCarretPosition(position: CodeTextFieldCarretPosition, index: Int) {
-        becomeFirstResponder()
         guard characters.indices.contains(index) else {
             assertionFailure("Invalid index.")
             return
@@ -167,6 +168,17 @@ final class CodeTextField: UIControl, UIKeyInput {
         } else {
             carretPosition = .before
         }
+        configureWithCurrentState()
+    }
+
+    private func setText(_ text: String) {
+        characters = Array(repeating: nil, count: length)
+        if !text.isEmpty {
+            let insertedTextCharacters = Array(text.prefix(length))
+            characters.replaceSubrange(0 ..< insertedTextCharacters.count, with: insertedTextCharacters)
+        }
+        carretPosition = .before
+        carretPositionIndex = 0
         configureWithCurrentState()
     }
 

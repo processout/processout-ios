@@ -8,5 +8,5 @@
 public protocol PORepositoryType: POAutoAsync {
 
     /// Repository's failure type.
-    typealias Failure = PORepositoryFailure
+    typealias Failure = POFailure
 }

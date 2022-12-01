@@ -9,9 +9,9 @@ import UIKit
 
 public enum POActivityIndicatorStyle {
 
-    /// Circular activity indicator.
-    case circle(UIColor)
-
     /// Custom actvity indicator.
     case custom(ActivityIndicatorViewType)
+
+    /// System activity indicator.
+    case system(UIActivityIndicatorView.Style)
 }

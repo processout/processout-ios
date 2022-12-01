@@ -47,9 +47,15 @@ final class AttributedStringBuilder {
     }
 
     func string(_ string: String) -> AttributedStringBuilder {
+        attributes = buildAttributes()
+        attributedString.append(NSAttributedString(string: string, attributes: attributes))
+        return self
+    }
+
+    func buildAttributes() -> [NSAttributedString.Key: Any] {
         guard let typography else {
             assertionFailure("Typography must be set.")
-            return self
+            return [:]
         }
         let scaledFont = scaledFont(
             typography: typography, dynamicTypeEnabled: dynamicTypeEnabled, maximumFontSize: maximumFontSize
@@ -62,8 +68,7 @@ final class AttributedStringBuilder {
         if #available(iOS 14.0, *) {
             attributes[.tracking] = typography.tracking
         }
-        attributedString.append(NSAttributedString(string: string, attributes: attributes))
-        return self
+        return attributes
     }
 
     func build() -> NSAttributedString {

@@ -23,8 +23,17 @@ internal typealias AssetImageTypeAlias = ImageAsset.Image
 internal enum Asset {
   internal enum Colors {
     internal enum Background {
+      internal enum Grey {
+        internal static let dark = ColorAsset(name: "Background/Grey/Dark")
+        internal static let light = ColorAsset(name: "Background/Grey/Light")
+      }
       internal static let input = ColorAsset(name: "Background/Input")
       internal static let primary = ColorAsset(name: "Background/Primary")
+      internal enum Success {
+        internal static let dark = ColorAsset(name: "Background/Success/Dark")
+        internal static let darker = ColorAsset(name: "Background/Success/Darker")
+        internal static let light = ColorAsset(name: "Background/Success/Light")
+      }
     }
     internal enum Border {
       internal static let active = ColorAsset(name: "Border/Active")
@@ -54,6 +63,7 @@ internal enum Asset {
       internal static let link = ColorAsset(name: "Text/Link")
       internal static let primary = ColorAsset(name: "Text/Primary")
       internal static let secondary = ColorAsset(name: "Text/Secondary")
+      internal static let success = ColorAsset(name: "Text/Success")
     }
   }
   internal enum Images {

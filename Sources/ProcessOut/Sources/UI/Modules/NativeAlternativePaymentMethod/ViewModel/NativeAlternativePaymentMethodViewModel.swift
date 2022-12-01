@@ -13,7 +13,7 @@ final class NativeAlternativePaymentMethodViewModel:
     init(
         interactor: any NativeAlternativePaymentMethodInteractorType,
         router: any RouterType<NativeAlternativePaymentMethodRoute>,
-        completion: (() -> Void)?
+        completion: ((Result<Void, POFailure>) -> Void)?
     ) {
         self.interactor = interactor
         self.router = router
@@ -38,13 +38,12 @@ final class NativeAlternativePaymentMethodViewModel:
 
     private let interactor: any NativeAlternativePaymentMethodInteractorType
     private let router: any RouterType<NativeAlternativePaymentMethodRoute>
-    private let completion: (() -> Void)?
+    private let completion: ((Result<Void, POFailure>) -> Void)?
 
     // MARK: - Private Methods
 
     private func observeInteractorStateChanges() {
-        // swiftlint:disable:next closure_spacing
-        interactor.didChange = { [weak self] in self?.configureWithInteractorState()  }
+        interactor.didChange = { [weak self] in self?.configureWithInteractorState() }
     }
 
     private func configureWithInteractorState() {
@@ -61,7 +60,6 @@ final class NativeAlternativePaymentMethodViewModel:
             state = convertToState(startedState: stateSnapshot, failureMessage: failure.message)
         case let .submitted(stateSnapshot):
             state = convertToState(startedState: stateSnapshot)
-            router.trigger(route: .close(completion: completion))
         case .failure:
             state = .failure
         }

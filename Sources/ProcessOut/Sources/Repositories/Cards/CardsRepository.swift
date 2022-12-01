@@ -11,7 +11,7 @@ final class CardsRepository: POCardsRepositoryType {
 
     init(
         connector: HttpConnectorType,
-        failureMapper: RepositoryFailureMapperType,
+        failureMapper: FailureMapperType,
         applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapperType
     ) {
         self.connector = connector
@@ -26,7 +26,7 @@ final class CardsRepository: POCardsRepositoryType {
             path: "/cards", body: request, includesDeviceMetadata: true
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.card).mapError(failureMapper.repositoryFailure))
+            completion(result.map(\.card).mapError(failureMapper.failure))
         }
     }
 
@@ -38,7 +38,7 @@ final class CardsRepository: POCardsRepositoryType {
             path: "/cards/" + cardId, body: parameters, includesDeviceMetadata: true
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.card).mapError(failureMapper.repositoryFailure))
+            completion(result.map(\.card).mapError(failureMapper.failure))
         }
     }
 
@@ -49,10 +49,10 @@ final class CardsRepository: POCardsRepositoryType {
                 path: "/cards", body: request, includesDeviceMetadata: true
             )
             connector.execute(request: httpRequest) { [failureMapper] result in
-                completion(result.map(\.card).mapError(failureMapper.repositoryFailure))
+                completion(result.map(\.card).mapError(failureMapper.failure))
             }
         } catch {
-            let failure = PORepositoryFailure(message: nil, code: .internal, underlyingError: error)
+            let failure = POFailure(message: nil, code: .internal, underlyingError: error)
             completion(.failure(failure))
         }
     }
@@ -60,6 +60,6 @@ final class CardsRepository: POCardsRepositoryType {
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType
-    private let failureMapper: RepositoryFailureMapperType
+    private let failureMapper: FailureMapperType
     private let applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapperType
 }

@@ -11,7 +11,7 @@ public protocol POCustomerTokensServiceType: POServiceType {
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
         customerActionHandlerDelegate: POCustomerActionHandlerDelegate,
-        completion: @escaping (Result<Void, PORepositoryFailure>) -> Void
+        completion: @escaping (Result<Void, POFailure>) -> Void
     )
 
     /// Create customer token.

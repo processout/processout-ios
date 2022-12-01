@@ -31,8 +31,11 @@ enum HttpConnectorFailure: Error {
     /// Unable to code data. Supplied error is going to be `DecodingError` or `EncodingError`.
     case coding(Error)
 
-    /// Either there's no network connection, or request didn't finish in time.
+    /// No network connection.
     case networkUnreachable
+
+    /// Request didn't finish in time.
+    case timeout
 
     /// Server error.
     case server(Server, statusCode: Int)

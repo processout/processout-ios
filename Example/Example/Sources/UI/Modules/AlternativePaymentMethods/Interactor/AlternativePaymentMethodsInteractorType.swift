@@ -56,5 +56,5 @@ enum AlternativePaymentMethodsInteractorState {
     case creatingInvoice(snapshot: Started)
 
     /// Interactor did fail to start.
-    case failure(PORepositoryFailure)
+    case failure(POFailure)
 }

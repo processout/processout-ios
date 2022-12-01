@@ -9,7 +9,7 @@ import UIKit
 
 public final class POCustomerActionViewControllerBuilder {
 
-    public typealias Completion = (Result<String, PORepositoryFailure>) -> Void
+    public typealias Completion = (Result<String, POFailure>) -> Void
 
     /// - Parameters:
     ///   - url: customer action url.

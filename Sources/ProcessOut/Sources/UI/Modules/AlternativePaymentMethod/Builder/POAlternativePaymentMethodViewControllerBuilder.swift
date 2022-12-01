@@ -15,7 +15,7 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
 
     /// Completion to invoke when authorization ends.
     public func with(
-        completion: @escaping (Result<POAlternativePaymentMethodResponse, PORepositoryFailure>) -> Void
+        completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
     ) -> Self {
         self.completion = completion
         return self
@@ -53,5 +53,5 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
 
     private let request: POAlternativePaymentMethodRequest
     private var api: ProcessOutApiType?
-    private var completion: ((Result<POAlternativePaymentMethodResponse, PORepositoryFailure>) -> Void)?
+    private var completion: ((Result<POAlternativePaymentMethodResponse, POFailure>) -> Void)?
 }

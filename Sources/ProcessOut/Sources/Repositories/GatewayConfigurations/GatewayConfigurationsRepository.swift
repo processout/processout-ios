@@ -9,7 +9,7 @@ import Foundation
 
 final class GatewayConfigurationsRepository: POGatewayConfigurationsRepositoryType {
 
-    init(connector: HttpConnectorType, failureMapper: RepositoryFailureMapperType) {
+    init(connector: HttpConnectorType, failureMapper: FailureMapperType) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
@@ -28,7 +28,7 @@ final class GatewayConfigurationsRepository: POGatewayConfigurationsRepositoryTy
             path: "/gateway-configurations", query: query
         )
         connector.execute(request: request) { [failureMapper] result in
-            completion(result.mapError(failureMapper.repositoryFailure))
+            completion(result.mapError(failureMapper.failure))
         }
     }
 
@@ -46,12 +46,12 @@ final class GatewayConfigurationsRepository: POGatewayConfigurationsRepositoryTy
             ]
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.gatewayConfiguration).mapError(failureMapper.repositoryFailure))
+            completion(result.map(\.gatewayConfiguration).mapError(failureMapper.failure))
         }
     }
 
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType
-    private let failureMapper: RepositoryFailureMapperType
+    private let failureMapper: FailureMapperType
 }

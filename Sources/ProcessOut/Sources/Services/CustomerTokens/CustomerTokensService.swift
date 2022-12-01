@@ -17,7 +17,7 @@ final class CustomerTokensService: POCustomerTokensServiceType {
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
         customerActionHandlerDelegate: POCustomerActionHandlerDelegate,
-        completion: @escaping (Result<Void, PORepositoryFailure>) -> Void
+        completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         repository.assignCustomerToken(request: request) { [customerActionHandler] result in
             switch result {

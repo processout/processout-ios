@@ -45,7 +45,7 @@ final class AlternativePaymentMethodsService: POAlternativePaymentMethodsService
               let queryItems = components.queryItems,
               let gatewayToken = queryItems.queryItemValue(name: "token") else {
             let message = "Invalid or malformed Alternative Payment Mehod URL response provided."
-            throw PORepositoryFailure(message: message, code: .internal, underlyingError: nil)
+            throw POFailure(message: message, code: .internal, underlyingError: nil)
         }
         guard let customerId = queryItems.queryItemValue(name: "customer_id"),
               let tokenId = queryItems.queryItemValue(name: "token_id") else {

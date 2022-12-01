@@ -1,5 +1,5 @@
 //
-//  PORepositoryFailure.swift
+//  POFailure.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 12.10.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PORepositoryFailure: Error {
+public struct POFailure: Error {
 
     public struct InvalidField: Decodable {
 
@@ -137,8 +137,11 @@ public struct PORepositoryFailure: Error {
 
     public enum Code {
 
-        /// Either there's no network connection, or request didn't finish in time.
+        /// No network connection.
         case networkUnreachable
+
+        /// Request didn't finish in time.
+        case timeout
 
         /// Something went wrong on the ProcessOut side. This is extremely rare.
         case `internal`

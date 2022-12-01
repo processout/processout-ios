@@ -9,7 +9,7 @@ import Foundation
 
 final class InvoicesRepository: InvoicesRepositoryType {
 
-    init(connector: HttpConnectorType, failureMapper: RepositoryFailureMapperType) {
+    init(connector: HttpConnectorType, failureMapper: FailureMapperType) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
@@ -28,7 +28,7 @@ final class InvoicesRepository: InvoicesRepositoryType {
             path: "/invoices/\(invoiceId)/native-payment/\(gatewayConfigurationId)"
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.nativeApm).mapError(failureMapper.repositoryFailure))
+            completion(result.map(\.nativeApm).mapError(failureMapper.failure))
         }
     }
 
@@ -44,7 +44,7 @@ final class InvoicesRepository: InvoicesRepositoryType {
             path: "/invoices/\(request.invoiceId)/native-payment", body: requestBox
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.mapError(failureMapper.repositoryFailure))
+            completion(result.mapError(failureMapper.failure))
         }
     }
 
@@ -58,7 +58,7 @@ final class InvoicesRepository: InvoicesRepositoryType {
             path: "/invoices/\(request.invoiceId)/authorize", body: request, includesDeviceMetadata: true
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.customerAction).mapError(failureMapper.repositoryFailure))
+            completion(result.map(\.customerAction).mapError(failureMapper.failure))
         }
     }
 
@@ -67,7 +67,7 @@ final class InvoicesRepository: InvoicesRepositoryType {
             path: "/invoices/\(invoiceId)/capture", body: nil as AnyEncodable?
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map { _ in () }.mapError(failureMapper.repositoryFailure))
+            completion(result.map { _ in () }.mapError(failureMapper.failure))
         }
     }
 
@@ -77,7 +77,7 @@ final class InvoicesRepository: InvoicesRepositoryType {
         }
         let httpRequest = HttpConnectorRequest<Response>.post(path: "/invoices", body: request)
         connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.invoice).mapError(failureMapper.repositoryFailure))
+            completion(result.map(\.invoice).mapError(failureMapper.failure))
         }
     }
 
@@ -94,5 +94,5 @@ final class InvoicesRepository: InvoicesRepositoryType {
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType
-    private let failureMapper: RepositoryFailureMapperType
+    private let failureMapper: FailureMapperType
 }

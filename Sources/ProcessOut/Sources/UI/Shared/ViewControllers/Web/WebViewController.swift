@@ -13,7 +13,7 @@ final class WebViewController<Success>: UIViewController, WKNavigationDelegate, 
         delegate: any WebViewControllerDelegate<Success>,
         baseReturnUrl: URL,
         version: String,
-        completion: ((Result<Success, PORepositoryFailure>) -> Void)?
+        completion: ((Result<Success, POFailure>) -> Void)?
     ) {
         self.delegate = delegate
         self.baseReturnUrl = baseReturnUrl
@@ -106,7 +106,7 @@ final class WebViewController<Success>: UIViewController, WKNavigationDelegate, 
     private let delegate: any WebViewControllerDelegate<Success>
     private let baseReturnUrl: URL
     private let version: String
-    private let completion: ((Result<Success, PORepositoryFailure>) -> Void)?
+    private let completion: ((Result<Success, POFailure>) -> Void)?
 
     private lazy var contentViewConfiguration: WKWebViewConfiguration = {
         let preferences = WKPreferences()
@@ -141,7 +141,7 @@ final class WebViewController<Success>: UIViewController, WKNavigationDelegate, 
         }
         let request = URLRequest(url: delegate.url)
         guard let navigation = contentView.load(request) else {
-            let failure = PORepositoryFailure(message: nil, code: .internal, underlyingError: nil)
+            let failure = POFailure(message: nil, code: .internal, underlyingError: nil)
             setCompletedState(with: failure)
             return
         }
@@ -173,11 +173,11 @@ final class WebViewController<Success>: UIViewController, WKNavigationDelegate, 
             Logger.ui.error("Can't change state to completed because already in sink state.")
             return
         }
-        let failure: PORepositoryFailure
-        if let error = error as? PORepositoryFailure {
+        let failure: POFailure
+        if let error = error as? POFailure {
             failure = error
         } else {
-            failure = PORepositoryFailure(message: nil, code: .unknown, underlyingError: error)
+            failure = POFailure(message: nil, code: .unknown, underlyingError: error)
         }
         contentView.stopLoading()
         state = .completed

@@ -20,7 +20,7 @@ public final class ProcessOutApi: ProcessOutApiType {
             return
         }
         let connector = createHttpConnector(configuration: configuration)
-        let failureMapper = RepositoryFailureMapper()
+        let failureMapper = FailureMapper()
         shared = ProcessOutApi(
             configuration: configuration,
             gatewayConfigurations: GatewayConfigurationsRepository(

@@ -164,8 +164,10 @@ final class HttpConnector: HttpConnectorType {
                 return .coding(error)
             case URLError.cancelled:
                 return .cancelled
-            case URLError.notConnectedToInternet, URLError.networkConnectionLost, URLError.timedOut:
+            case URLError.notConnectedToInternet, URLError.networkConnectionLost:
                 return .networkUnreachable
+            case URLError.timedOut:
+                return .timeout
             default:
                 return .internal
             }
