@@ -40,5 +40,5 @@ public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable {
     public let invoice: Invoice
 
     /// Parameters that are expected from user.
-    public let nativeApmPparameters: [PONativeAlternativePaymentMethodParameter]
+    public let parameters: [PONativeAlternativePaymentMethodParameter]
 }

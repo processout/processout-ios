@@ -7,11 +7,10 @@
 
 import UIKit
 
-final class CodeTextField: UIControl, UIKeyInput {
+final class CodeTextField: UIControl, UIKeyInput, InputFormTextFieldType {
 
-    init(length: Int, style: POTextFieldStyle) {
+    init(length: Int) {
         self.length = length
-        self.style = style
         groupViews = []
         carretPosition = .before
         carretPositionIndex = 0
@@ -29,22 +28,19 @@ final class CodeTextField: UIControl, UIKeyInput {
 
     weak var delegate: CodeTextFieldDelegate?
 
-    var style: POTextFieldStyle {
-        didSet { configureWithCurrentState() }
-    }
-
     var text: String? {
         get { String(characters.compactMap { $0 }) }
         set { setText(newValue) }
     }
 
-    var length: Int {
-        didSet { didUpdateLength(oldValue: oldValue) }
+    func configure(style: POTextFieldStyle, animated: Bool) {
+        self.style = style
+        configureWithCurrentState(animated: animated)
     }
 
-    var keyboardType: UIKeyboardType
-    var returnKeyType: UIReturnKeyType
-    var textContentType: UITextContentType! // swiftlint:disable:this implicitly_unwrapped_optional
+    var control: UIControl {
+        self
+    }
 
     // MARK: - UIControl
 
@@ -58,8 +54,15 @@ final class CodeTextField: UIControl, UIKeyInput {
             return false
         }
         let didBecomeResponder = super.becomeFirstResponder()
-        configureWithCurrentState()
+        configureWithCurrentState(animated: true)
         return didBecomeResponder
+    }
+
+    @discardableResult
+    override func resignFirstResponder() -> Bool {
+        let didResignResponder = super.resignFirstResponder()
+        configureWithCurrentState(animated: true)
+        return didResignResponder
     }
 
     // MARK: - UIKeyInput
@@ -85,13 +88,6 @@ final class CodeTextField: UIControl, UIKeyInput {
             return
         }
         let insertedText = Array(text.prefix(length - insertionIndex))
-        let updatedRange = NSRange(
-            location: max(insertionIndex - characters.prefix(insertionIndex).filter { $0 == nil }.count, 0),
-            length: 0
-        )
-        if delegate?.codeTextField(self, shouldChangeCharactersIn: updatedRange, replacementString: text) == false {
-            return
-        }
         characters.replaceSubrange(insertionIndex ..< insertionIndex + insertedText.count, with: insertedText)
         carretPositionIndex += insertedText.count
         if carretPositionIndex > length - 1 {
@@ -100,7 +96,7 @@ final class CodeTextField: UIControl, UIKeyInput {
         } else {
             carretPosition = .before
         }
-        configureWithCurrentState()
+        configureWithCurrentState(animated: false)
         sendActions(for: .editingChanged)
     }
 
@@ -114,19 +110,19 @@ final class CodeTextField: UIControl, UIKeyInput {
         guard characters.indices.contains(removalIndex) else {
             return
         }
-        let updatedRange = NSRange(
-            location: removalIndex - characters.prefix(removalIndex + 1).filter { $0 == nil }.count, length: 1
-        )
-        if updatedRange.location >= 0,
-           delegate?.codeTextField(self, shouldChangeCharactersIn: updatedRange, replacementString: "") == false {
-            return
-        }
         characters[removalIndex] = nil
         carretPosition = .before
         carretPositionIndex = removalIndex
-        configureWithCurrentState()
+        configureWithCurrentState(animated: false)
         sendActions(for: .editingChanged)
     }
+
+    var keyboardType: UIKeyboardType
+    var returnKeyType: UIReturnKeyType
+
+    /// The semantic meaning for a text input area.
+    /// Default value is `oneTimeCode` on iOS >= 12 and `nil` otherwise.
+    var textContentType: UITextContentType?
 
     // MARK: - Private Nested Types
 
@@ -137,6 +133,8 @@ final class CodeTextField: UIControl, UIKeyInput {
     }
 
     // MARK: - Private Properties
+
+    private let length: Int
 
     private lazy var contentView: UIView = {
         let view = UIView()
@@ -149,11 +147,15 @@ final class CodeTextField: UIControl, UIKeyInput {
     private var carretPosition: CodeTextFieldCarretPosition
     private var carretPositionIndex: Int
     private var characters: [Character?]
+    private var style: POTextFieldStyle?
 
     // MARK: - Private Methods
 
     private func commonInit() {
         translatesAutoresizingMaskIntoConstraints = false
+        if #available(iOS 12.0, *) {
+            textContentType = .oneTimeCode
+        }
         addSubview(contentView)
         let fixedLeadingConstraint = contentView.leadingAnchor.constraint(equalTo: leadingAnchor)
         fixedLeadingConstraint.priority = .defaultLow
@@ -167,7 +169,7 @@ final class CodeTextField: UIControl, UIKeyInput {
         ]
         NSLayoutConstraint.activate(constraints)
         recreateGroupViews()
-        configureWithCurrentState()
+        configureWithCurrentState(animated: false)
     }
 
     private func recreateGroupViews() {
@@ -212,58 +214,45 @@ final class CodeTextField: UIControl, UIKeyInput {
         } else {
             carretPosition = .before
         }
-        configureWithCurrentState()
+        configureWithCurrentState(animated: true)
     }
 
     private func setText(_ text: String?) {
+        guard self.text != text else {
+            return
+        }
         characters = Array(repeating: nil, count: length)
         if let text, !text.isEmpty {
             let insertedTextCharacters = Array(text.prefix(length))
             characters.replaceSubrange(0 ..< insertedTextCharacters.count, with: insertedTextCharacters)
-        }
-        carretPosition = .before
-        carretPositionIndex = 0
-        configureWithCurrentState()
-    }
-
-    private func didUpdateLength(oldValue: Int) {
-        assert(length > 0, "Length must be greater than zero.")
-        guard length != oldValue else {
-            return
-        }
-        if length > oldValue {
-            let difference = length - oldValue
-            characters.append(contentsOf: Array(repeating: nil, count: difference))
-            recreateGroupViews()
+            carretPositionIndex = min(insertedTextCharacters.count, length - 1)
+            carretPosition = insertedTextCharacters.count == length ? .after : .before
         } else {
-            if carretPositionIndex >= length {
-                carretPositionIndex = length - 1
-                carretPosition = characters[carretPositionIndex] != nil ? .after : .before
-            }
-            let difference = oldValue - length
-            characters.removeLast(difference)
-            groupViews.removeLast(difference)
+            carretPositionIndex = 0
+            carretPosition = .before
         }
-        configureWithCurrentState()
+        configureWithCurrentState(animated: false)
     }
 
     private func createCodeTextFieldComponentView(index: Int) -> CodeTextFieldComponentView {
-        let view = CodeTextFieldComponentView(style: style) { [weak self] position in
+        let view = CodeTextFieldComponentView { [weak self] position in
             self?.setCarretPosition(position: position, index: index)
             self?.becomeFirstResponder()
         }
         return view
     }
 
-    private func configureWithCurrentState() {
-        characters.enumerated().forEach { offset, character in
-            let groupView = groupViews[offset]
-            groupView.carretPosition = nil
-            groupView.value = character
-            groupView.style = style
+    private func configureWithCurrentState(animated: Bool) {
+        guard let style else {
+            return
         }
-        if isFirstResponder {
-            groupViews[carretPositionIndex].carretPosition = carretPosition
+        characters.enumerated().forEach { offset, character in
+            let viewModel = CodeTextFieldComponentView.ViewModel(
+                value: character,
+                carretPosition: isFirstResponder && carretPositionIndex == offset ? carretPosition : nil,
+                style: style
+            )
+            groupViews[offset].configure(viewModel: viewModel, animated: animated)
         }
     }
 }

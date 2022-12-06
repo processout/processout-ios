@@ -7,10 +7,9 @@
 
 import UIKit
 
-final class TextField: UITextField {
+final class TextFieldContainerView: UIView, InputFormTextFieldType {
 
-    init(style: POTextFieldStyle) {
-        self.style = style
+    init() {
         super.init(frame: .zero)
         commonInit()
     }
@@ -20,61 +19,79 @@ final class TextField: UITextField {
         fatalError("init(coder:) has not been implemented")
     }
 
-    var style: POTextFieldStyle {
-        didSet { configure() }
+    func configure(style: POTextFieldStyle, animated: Bool) {
+        self.style = style
+        configureWithCurrentState(animated: animated)
     }
 
-    override var placeholder: String? {
-        didSet { configure() }
+    var control: UIControl {
+        textField
     }
 
-    override func textRect(forBounds bounds: CGRect) -> CGRect {
-        bounds.insetBy(dx: Constants.horizontalInset, dy: 0)
-    }
-
-    override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
-        bounds.insetBy(dx: Constants.horizontalInset, dy: 0)
-    }
-
-    override func editingRect(forBounds bounds: CGRect) -> CGRect {
-        bounds.insetBy(dx: Constants.horizontalInset, dy: 0)
-    }
-
-    override var intrinsicContentSize: CGSize {
-        CGSize(width: super.intrinsicContentSize.width, height: Constants.height)
-    }
+    private(set) lazy var textField: UITextField = {
+        let textField = UITextField()
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.borderStyle = .none
+        return textField
+    }()
 
     // MARK: - Private Nested Types
 
     private enum Constants {
+        static let animationDuration: TimeInterval = 0.35
         static let height: CGFloat = 48
         static let horizontalInset: CGFloat = 12
     }
+
+    // MARK: - Private Properties
+
+    private var style: POTextFieldStyle?
+    private var placeholderObservation: NSKeyValueObservation?
 
     // MARK: - Private Methods
 
     private func commonInit() {
         translatesAutoresizingMaskIntoConstraints = false
-        configure()
+        addSubview(textField)
+        let constraints = [
+            heightAnchor.constraint(equalToConstant: Constants.height),
+            textField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.horizontalInset),
+            textField.centerXAnchor.constraint(equalTo: centerXAnchor),
+            textField.centerYAnchor.constraint(equalTo: centerYAnchor)
+        ]
+        NSLayoutConstraint.activate(constraints)
+        placeholderObservation = textField.observe(\.placeholder) { [weak self] _, _ in
+            self?.configureWithCurrentState(animated: false)
+        }
+        configureWithCurrentState(animated: false)
     }
 
-    private func configure() {
-        let excludedTextAttributes: Set<NSAttributedString.Key> = [.paragraphStyle, .baselineOffset]
-        let textAttributes = AttributedStringBuilder()
-            .typography(style.text.typography)
-            .textColor(style.text.color)
-            .buildAttributes()
-            .filter { !excludedTextAttributes.contains($0.key) }
-        defaultTextAttributes = textAttributes
-        typingAttributes = textAttributes
-        attributedPlaceholder = AttributedStringBuilder()
-            .typography(style.placeholder.typography)
-            .textColor(style.placeholder.color)
-            .string(placeholder ?? "")
-            .build()
-        backgroundColor = style.backgroundColor
-        apply(style: style.border)
-        apply(style: style.shadow)
-        tintColor = style.tintColor
+    private func configureWithCurrentState(animated: Bool) {
+        guard let style else {
+            return
+        }
+        UIView.performWithoutAnimation {
+            textField.attributedPlaceholder = AttributedStringBuilder()
+                .typography(style.placeholder.typography)
+                .textColor(style.placeholder.color)
+                .string(textField.placeholder ?? "")
+                .build()
+            let excludedTextAttributes: Set<NSAttributedString.Key> = [.paragraphStyle, .baselineOffset]
+            let textAttributes = AttributedStringBuilder()
+                .typography(style.text.typography)
+                .textColor(style.text.color)
+                .buildAttributes()
+                .filter { !excludedTextAttributes.contains($0.key) }
+            textField.defaultTextAttributes = textAttributes
+        }
+        UIView.animate(withDuration: Constants.animationDuration) { [self] in
+            CATransaction.begin()
+            CATransaction.setDisableActions(!animated)
+            apply(style: style.border)
+            apply(style: style.shadow)
+            tintColor = style.tintColor
+            backgroundColor = style.backgroundColor
+            CATransaction.commit()
+        }
     }
 }

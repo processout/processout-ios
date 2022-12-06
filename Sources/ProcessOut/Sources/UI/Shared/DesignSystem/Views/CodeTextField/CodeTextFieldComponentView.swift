@@ -9,8 +9,19 @@ import UIKit
 
 final class CodeTextFieldComponentView: UIView {
 
-    init(style: POTextFieldStyle, didSelect: @escaping (CodeTextFieldCarretPosition) -> Void) {
-        self.style = style
+    struct ViewModel {
+
+        /// Components value.
+        let value: Character?
+
+        /// Carret position if any.
+        let carretPosition: CodeTextFieldCarretPosition?
+
+        /// Style.
+        let style: POTextFieldStyle
+    }
+
+    init(didSelect: @escaping (CodeTextFieldCarretPosition) -> Void) {
         self.didSelect = didSelect
         super.init(frame: .zero)
         commonInit()
@@ -21,16 +32,46 @@ final class CodeTextFieldComponentView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    var value: Character? {
-        didSet { configureWithCurrentState() }
-    }
-
-    var carretPosition: CodeTextFieldCarretPosition? {
-        didSet { configureWithCurrentState() }
-    }
-
-    var style: POTextFieldStyle {
-        didSet { configureWithCurrentState() }
+    func configure(viewModel: ViewModel, animated: Bool) {
+        UIView.performWithoutAnimation {
+            switch viewModel.carretPosition {
+            case .none:
+                carretView.setHidden(true)
+                removeCarretAnimation()
+            case .before:
+                animateCarretBlinking()
+                carretView.setHidden(false)
+                carretCenterConstraint.constant = -Constants.carretOffset
+            case .after:
+                animateCarretBlinking()
+                carretView.setHidden(false)
+                carretCenterConstraint.constant = Constants.carretOffset
+            }
+            setNeedsLayout()
+            layoutIfNeeded()
+        }
+        UIView.animate(withDuration: Constants.animationDuration) { [self] in
+            CATransaction.begin()
+            CATransaction.setDisableActions(!animated)
+            let previousAttributedText = valueLabel.attributedText
+            valueLabel.attributedText = AttributedStringBuilder()
+                .typography(viewModel.style.text.typography)
+                .alignment(.center)
+                .textColor(viewModel.style.text.color)
+                .string(viewModel.value.map(String.init) ?? "")
+                .build()
+            if animated,
+               valueLabel.attributedText != previousAttributedText,
+               valueLabel.attributedText?.string == previousAttributedText?.string {
+                animateValueLabelTransition()
+            }
+            apply(style: viewModel.style.border)
+            apply(style: viewModel.style.shadow)
+            backgroundColor = viewModel.style.backgroundColor
+            carretView.backgroundColor = viewModel.style.tintColor
+            CATransaction.commit()
+        }
+        currentViewModel = viewModel
     }
 
     // MARK: - Private Nested Types
@@ -40,8 +81,9 @@ final class CodeTextFieldComponentView: UIView {
         static let minimumWidth: CGFloat = 42
         static let carretSize = CGSize(width: 2, height: 28)
         static let carretOffset: CGFloat = 11
+        static let animationDuration: TimeInterval = 0.25
         static let carretAnimationDuration: TimeInterval = 0.4
-        static let carretAnimationKey = "CarretAnimation"
+        static let carretAnimationKey = "BlinkingAnimation"
     }
 
     // MARK: - Private Properties
@@ -68,6 +110,8 @@ final class CodeTextFieldComponentView: UIView {
         carretView.centerXAnchor.constraint(equalTo: centerXAnchor)
     }()
 
+    private var currentViewModel: ViewModel?
+
     // MARK: - Private Methods
 
     private func commonInit() {
@@ -84,14 +128,14 @@ final class CodeTextFieldComponentView: UIView {
         addValueLabelSubview()
         addCarretSubview()
         configureGestures()
-        configureWithCurrentState()
     }
 
     private func addValueLabelSubview() {
         addSubview(valueLabel)
         let constraints = [
             valueLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            valueLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
+            valueLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            valueLabel.leadingAnchor.constraint(equalTo: leadingAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
     }
@@ -112,32 +156,7 @@ final class CodeTextFieldComponentView: UIView {
         addGestureRecognizer(tapGesture)
     }
 
-    private func configureWithCurrentState() {
-        valueLabel.attributedText = AttributedStringBuilder()
-            .typography(style.text.typography)
-            .textColor(style.text.color)
-            .string(value.map(String.init) ?? "")
-            .build()
-        switch carretPosition {
-        case .none:
-            carretView.isHidden = true
-            removeCarretAnimation()
-        case .before:
-            addCarretAnimation()
-            carretView.isHidden = false
-            carretCenterConstraint.constant = -Constants.carretOffset
-        case .after:
-            addCarretAnimation()
-            carretView.isHidden = false
-            carretCenterConstraint.constant = Constants.carretOffset
-        }
-        apply(style: style.border)
-        apply(style: style.shadow)
-        backgroundColor = style.backgroundColor
-        carretView.backgroundColor = style.tintColor
-    }
-
-    private func addCarretAnimation() {
+    private func animateCarretBlinking() {
         let animation = CABasicAnimation(keyPath: "opacity")
         animation.fromValue = 1
         animation.toValue = 0
@@ -151,12 +170,22 @@ final class CodeTextFieldComponentView: UIView {
         carretView.layer.removeAnimation(forKey: Constants.carretAnimationKey)
     }
 
+    private func animateValueLabelTransition() {
+        let transition = CATransition()
+        transition.type = .fade
+        if let backgroundAnimation = layer.action(forKey: "backgroundColor") as? CAAnimation {
+            transition.duration = backgroundAnimation.duration
+            transition.timingFunction = backgroundAnimation.timingFunction
+        }
+        valueLabel.layer.add(transition, forKey: "transition")
+    }
+
     // MARK: - Actions
 
     @objc
     private func didRecognizeTapGesture(gesture: UITapGestureRecognizer) {
         let desiredCarretPosition: CodeTextFieldCarretPosition
-        if value != nil, gesture.location(in: self).x > bounds.midX {
+        if currentViewModel?.value != nil, gesture.location(in: self).x > bounds.midX {
             desiredCarretPosition = .after
         } else {
             desiredCarretPosition = .before

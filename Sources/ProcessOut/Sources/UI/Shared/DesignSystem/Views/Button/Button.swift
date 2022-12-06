@@ -35,38 +35,40 @@ final class Button: UIControl {
     }
 
     func configure(viewModel: ViewModel, animated: Bool) {
-        if animated {
-            let options: UIView.AnimationOptions = [
-                .beginFromCurrentState, .curveEaseOut, .allowAnimatedContent, .transitionCrossDissolve
-            ]
-            UIView.transition(
-                with: self,
-                duration: Constants.animationDuration,
-                options: options,
-                animations: {
-                    self.configure(state: viewModel)
-                },
-                completion: nil
-            )
-        } else {
-            UIView.performWithoutAnimation {
-                configure(state: viewModel)
+        UIView.animate(withDuration: Constants.animationDuration) { [self] in
+            CATransaction.begin()
+            CATransaction.setDisableActions(!animated)
+            activityIndicatorView.alpha = viewModel.isLoading ? 1 : 0
+            let currentStyle = self.currentStyle
+            if viewModel.isLoading {
+                titleLabel.alpha = 0
+            } else {
+                let currentAttributedText = titleLabel.attributedText
+                titleLabel.attributedText = AttributedStringBuilder()
+                    .typography(currentStyle.title.typography)
+                    .maximumFontSize(Constants.maximumFontSize)
+                    .textColor(currentStyle.title.color)
+                    .string(viewModel.title)
+                    .build()
+                titleLabel.alpha = 1
+                if animated, currentAttributedText != titleLabel.attributedText {
+                    addTitleLabelTransition()
+                }
             }
+            apply(style: currentStyle.border)
+            apply(style: currentStyle.shadow)
+            backgroundColor = currentStyle.backgroundColor
+            CATransaction.commit()
         }
         currentViewModel = viewModel
     }
 
     override var isEnabled: Bool {
-        didSet { configureWithCurrentViewModel() }
+        didSet { configureWithCurrentViewModel(animated: true) }
     }
 
     override var isHighlighted: Bool {
-        didSet { configureWithCurrentViewModel() }
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        configureWithCurrentViewModel(animated: false)
+        didSet { configureWithCurrentViewModel(animated: true) }
     }
 
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
@@ -103,8 +105,9 @@ final class Button: UIControl {
         switch style.activityIndicator {
         case .custom(let customView):
             view = customView
-        case .system(let style):
+        case let .system(style, color):
             let indicatorView = UIActivityIndicatorView(style: style)
+            indicatorView.color = color
             view = indicatorView
         }
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -129,6 +132,7 @@ final class Button: UIControl {
     // MARK: - Private Methods
 
     private func commonInit() {
+        translatesAutoresizingMaskIntoConstraints = false
         addSubview(titleLabel)
         addSubview(activityIndicatorView)
         let constraints = [
@@ -152,30 +156,21 @@ final class Button: UIControl {
         addTarget(self, action: #selector(didTouchUpInside), for: .touchUpInside)
     }
 
-    private func configure(state: ViewModel) {
-        activityIndicatorView.isHidden = !state.isLoading
-        let currentStyle = self.currentStyle
-        if state.isLoading {
-            titleLabel.isHidden = true
-        } else {
-            titleLabel.attributedText = AttributedStringBuilder()
-                .typography(currentStyle.title.typography)
-                .maximumFontSize(Constants.maximumFontSize)
-                .textColor(currentStyle.title.color)
-                .string(state.title)
-                .build()
-            titleLabel.isHidden = false
-        }
-        apply(style: currentStyle.border)
-        apply(style: currentStyle.shadow)
-        backgroundColor = currentStyle.backgroundColor
-    }
-
-    private func configureWithCurrentViewModel(animated: Bool = true) {
+    private func configureWithCurrentViewModel(animated: Bool) {
         guard let currentViewModel else {
             return
         }
-        configure(viewModel: currentViewModel, animated: true)
+        configure(viewModel: currentViewModel, animated: animated)
+    }
+
+    private func addTitleLabelTransition() {
+        let transition = CATransition()
+        transition.type = .fade
+        if let backgroundAnimation = layer.action(forKey: "backgroundColor") as? CAAnimation {
+            transition.duration = backgroundAnimation.duration
+            transition.timingFunction = backgroundAnimation.timingFunction
+        }
+        titleLabel.layer.add(transition, forKey: "transition")
     }
 
     // MARK: - Actions

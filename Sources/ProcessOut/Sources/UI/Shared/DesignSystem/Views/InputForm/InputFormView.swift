@@ -17,19 +17,14 @@ final class InputFormView: UIView {
         /// Description.
         let description: String?
 
-        /// Placeholder.
-        let placeholder: String?
-
-        /// Inputs length limit.
-        let length: Int?
-
         /// Boolean flag indicating whether input is currently in error state.
         let isInError: Bool
     }
 
     // MARK: -
 
-    init(style: POInputFormStyle) {
+    init(textField: InputFormTextFieldType, style: POInputFormStyle) {
+        self.textField = textField
         self.style = style
         super.init(frame: .zero)
         commonInit()
@@ -40,41 +35,44 @@ final class InputFormView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override var forLastBaselineLayout: UIView {
-        inputContainerView
-    }
-
-    /// - NOTE: If view model's length is different from previously set value, `textField` will be replaced
-    /// with different value so make sure to configure it appropriately after method completes.
     func configure(viewModel: ViewModel, animated: Bool) {
-        if animated {
-            UIView.transition(
-                with: self,
-                duration: Constants.animationDuration,
-                options: [.transitionCrossDissolve],
-                animations: {
-                    UIView.performWithoutAnimation {
-                        // Disabled animations of individual properties.
-                        self.configure(viewModel: viewModel)
-                    }
-                }
-            )
-        } else {
-            UIView.performWithoutAnimation {
-                configure(viewModel: viewModel)
+        UIView.animate(withDuration: Constants.animationDuration) { [self] in
+            CATransaction.begin()
+            CATransaction.setDisableActions(!animated)
+            let style = viewModel.isInError ? style.error : style.normal
+            titleLabel.attributedText = AttributedStringBuilder()
+                .typography(style.title.typography)
+                .textColor(style.title.color)
+                .alignment(.center)
+                .string(viewModel.title)
+                .build()
+            textField.configure(style: style.field, animated: animated)
+            if let description = viewModel.description, !description.isEmpty {
+                descriptionLabel.attributedText = AttributedStringBuilder()
+                    .typography(style.description.typography)
+                    .textColor(style.description.color)
+                    .alignment(.center)
+                    .string(description)
+                    .build()
+                descriptionLabel.alpha = 1
+                descriptionLabel.setHidden(false)
+            } else {
+                descriptionLabel.alpha = 0
+                descriptionLabel.setHidden(true)
             }
+            contentView.setNeedsLayout()
+            contentView.layoutIfNeeded()
+            CATransaction.commit()
         }
     }
 
-    weak var delegate: InputFormViewDelegate?
-
-    /// Current text field.
-    private(set) var textField: TextFieldType?
+    let textField: InputFormTextFieldType
 
     // MARK: - Constants
 
     private enum Constants {
         static let animationDuration: TimeInterval = 0.25
+        static let verticalSpacing: CGFloat = 8
     }
 
     // MARK: - Private Properties
@@ -87,6 +85,8 @@ final class InputFormView: UIView {
         label.adjustsFontForContentSizeCategory = false
         label.numberOfLines = 0
         label.contentMode = .top
+        label.setContentHuggingPriority(.required, for: .vertical)
+        label.setContentCompressionResistancePriority(.required, for: .vertical)
         return label
     }()
 
@@ -96,23 +96,18 @@ final class InputFormView: UIView {
         label.adjustsFontForContentSizeCategory = false
         label.numberOfLines = 0
         label.contentMode = .top
+        label.setContentHuggingPriority(.required, for: .vertical)
+        label.setContentCompressionResistancePriority(.required, for: .vertical)
         return label
     }()
 
-    private lazy var inputContainerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-
     private lazy var contentView: UIStackView = {
-        let view = UIStackView(arrangedSubviews: [titleLabel, inputContainerView, descriptionLabel])
+        let view = UIStackView(arrangedSubviews: [titleLabel, textField, descriptionLabel])
         view.translatesAutoresizingMaskIntoConstraints = false
         view.axis = .vertical
         view.alignment = .fill
         view.distribution = .fill
-        view.spacing = 8
+        view.spacing = Constants.verticalSpacing
         return view
     }()
 
@@ -125,111 +120,8 @@ final class InputFormView: UIView {
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            inputContainerView.heightAnchor.constraint(equalToConstant: 48)
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
-    }
-
-    private func configure(viewModel: ViewModel) {
-        let style = viewModel.isInError ? style.error : style.normal
-        titleLabel.attributedText = AttributedStringBuilder()
-            .typography(style.title.typography)
-            .textColor(style.title.color)
-            .alignment(.center)
-            .string(viewModel.title)
-            .build()
-        if let length = viewModel.length {
-            configureCodeTextField(length: length, style: style.field)
-        } else {
-            configureNormalTextField(placeholder: viewModel.placeholder, style: style.field)
-        }
-        if let description = viewModel.description, !description.isEmpty {
-            descriptionLabel.attributedText = AttributedStringBuilder()
-                .typography(style.description.typography)
-                .textColor(style.description.color)
-                .alignment(.center)
-                .string(description)
-                .build()
-            descriptionLabel.isHidden = false
-            descriptionLabel.alpha = 1
-        } else {
-            descriptionLabel.isHidden = true
-            descriptionLabel.alpha = 0
-        }
-    }
-
-    private func configureCodeTextField(length: Int, style: POTextFieldStyle) {
-        if let textField = textField as? CodeTextField {
-            textField.length = length
-            textField.style = style
-        } else {
-            let textField = CodeTextField(length: length, style: style)
-            textField.delegate = self
-            replaceCurrentTextField(with: textField)
-        }
-    }
-
-    private func configureNormalTextField(placeholder: String?, style: POTextFieldStyle) {
-        if let textField = textField as? TextField {
-            textField.style = style
-            textField.placeholder = placeholder
-        } else {
-            let textField = TextField(style: style)
-            textField.delegate = self
-            replaceCurrentTextField(with: textField)
-        }
-    }
-
-    private func replaceCurrentTextField(with replacementTextField: TextFieldType) {
-        replacementTextField.text = textField?.text
-        inputContainerView.addSubview(replacementTextField)
-        let constraints = [
-            replacementTextField.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor),
-            replacementTextField.trailingAnchor.constraint(equalTo: inputContainerView.trailingAnchor),
-            replacementTextField.topAnchor.constraint(equalTo: inputContainerView.topAnchor),
-            replacementTextField.bottomAnchor.constraint(equalTo: inputContainerView.bottomAnchor)
-        ]
-        NSLayoutConstraint.activate(constraints)
-        textField?.removeFromSuperview()
-        textField = replacementTextField
-    }
-}
-
-extension InputFormView: CodeTextFieldDelegate {
-
-    func codeTextFieldShouldBeginEditing(_ textField: CodeTextField) -> Bool {
-        delegate?.inputFormTextFieldShouldBeginEditing(textField) ?? true
-    }
-
-    func codeTextField(
-        _ textField: CodeTextField,
-        shouldChangeCharactersIn range: NSRange,
-        replacementString string: String
-    ) -> Bool {
-        delegate?.inputFormTextField(textField, shouldChangeCharactersIn: range, replacementString: string) ?? true
-    }
-
-    func codeTextFieldShouldReturn(_ textField: CodeTextField) -> Bool {
-        delegate?.inputFormTextFieldShouldReturn(textField) ?? true
-    }
-}
-
-extension InputFormView: UITextFieldDelegate {
-
-    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        delegate?.inputFormTextFieldShouldBeginEditing(textField) ?? true
-    }
-
-    func textField(
-        _ textField: UITextField,
-        shouldChangeCharactersIn range: NSRange,
-        replacementString string: String
-    ) -> Bool {
-        delegate?.inputFormTextField(textField, shouldChangeCharactersIn: range, replacementString: string) ?? true
-    }
-
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        delegate?.inputFormTextFieldShouldReturn(textField) ?? true
     }
 }
