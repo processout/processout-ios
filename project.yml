@@ -8,7 +8,7 @@ targets:
   ProcessOut:
     type: framework
     platform: iOS
-    deploymentTarget: "11.0"
+    deploymentTarget: "11.1"
     settings:
       CURRENT_PROJECT_VERSION: ${CURRENT_VERSION}
     preBuildScripts:

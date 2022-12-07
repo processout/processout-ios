@@ -61,17 +61,22 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
     /// - NOTE: Caller should dismiss view controller after completion is called.
     public func build() -> UIViewController {
         let api: ProcessOutApiType = self.api ?? ProcessOutApi.shared
-        let interactor = NativeAlternativePaymentMethodInteractor(
-            gatewayConfigurationsRepository: api.gatewayConfigurations,
-            invoicesService: api.invoices,
+        let interactorConfiguration = NativeAlternativePaymentMethodInteractor.Configuration(
             gatewayConfigurationId: gatewayConfigurationId,
-            invoiceId: invoiceId
+            invoiceId: invoiceId,
+            waitsPaymentConfirmation: waitsPaymentConfirmation,
+            paymentConfirmationTimeout: paymentConfirmationTimeout
+        )
+        let interactor = NativeAlternativePaymentMethodInteractor(
+            invoicesService: api.invoices, configuration: interactorConfiguration
         )
         let router = NativeAlternativePaymentMethodRouter()
         let viewModel = NativeAlternativePaymentMethodViewModel(
-            interactor: interactor, router: router, completion: completion
+            interactor: interactor, router: router, uiConfiguration: configuration, completion: completion
         )
-        let viewController = NativeAlternativePaymentMethodViewController(viewModel: viewModel)
+        let viewController = NativeAlternativePaymentMethodViewController(
+            viewModel: viewModel, customStyle: style
+        )
         router.viewController = viewController
         return viewController
     }

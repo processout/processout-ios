@@ -9,8 +9,13 @@ import UIKit
 
 final class NativeAlternativePaymentMethodViewController: UIViewController {
 
-    init(viewModel: any NativeAlternativePaymentMethodViewModelType) {
+    init(
+        viewModel: any NativeAlternativePaymentMethodViewModelType,
+        customStyle: PONativeAlternativePaymentMethodStyle?
+    ) {
+        notificationObservers = []
         self.viewModel = viewModel
+        self.customStyle = customStyle
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -21,173 +26,161 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
 
     override func loadView() {
         let view = UIView()
-        view.backgroundColor = .white
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(contentView)
+        view.backgroundColor = Asset.Colors.Background.primary.color
+        view.addSubview(startedView)
+        view.addSubview(backgroundDecorationView)
+        view.addSubview(activityIndicatorView)
         let constraints = [
-            contentView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            contentView.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
-            contentView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            activityIndicatorView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicatorView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            backgroundDecorationView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            backgroundDecorationView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            backgroundDecorationView.topAnchor.constraint(equalTo: view.topAnchor),
+            backgroundDecorationView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            startedView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            startedView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            startedView.topAnchor.constraint(equalTo: view.topAnchor),
+            startedView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ]
-        NSLayoutConstraint.activate(constraints)
         self.view = view
+        NSLayoutConstraint.activate(constraints)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        observeKeyboardNotifications()
         viewModel.start()
         viewModel.didChange = { [weak self] in self?.configureWithViewModelState() }
+    }
+
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        .portrait
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let animationDuration: TimeInterval = 0.35
+        static let backgroundDecorationLoadingHeight: CGFloat = 476
     }
 
     // MARK: - Private Properties
 
     private let viewModel: any NativeAlternativePaymentMethodViewModelType
+    private let customStyle: PONativeAlternativePaymentMethodStyle?
 
-    private lazy var contentView: UIStackView = {
-        let view = UIStackView(arrangedSubviews: [
-            titleLabel, inputsContainerView, failureLabel, submitButton
-        ])
+    private lazy var activityIndicatorView: POActivityIndicatorViewType = {
+        let style: POActivityIndicatorStyle
+        if #available(iOS 13.0, *) {
+            style = customStyle?.activityIndicator ?? .system(.large, color: Asset.Colors.Generic.white.color)
+        } else {
+            style = customStyle?.activityIndicator ?? .system(.whiteLarge, color: Asset.Colors.Generic.white.color)
+        }
+        let view: POActivityIndicatorViewType
+        switch style {
+        case .custom(let customView):
+            view = customView
+        case let .system(style, color):
+            let indicatorView = UIActivityIndicatorView(style: style)
+            view = indicatorView
+        }
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.alignment = .fill
-        view.spacing = 16
-        view.axis = .vertical
+        view.setAnimating(true)
         return view
     }()
 
-    private lazy var inputsContainerView: UIStackView = {
-        let view = UIStackView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.alignment = .fill
-        view.spacing = 16
-        view.axis = .vertical
-        return view
+    private lazy var backgroundDecorationView: BackgroundDecorationView = {
+        BackgroundDecorationView(style: customStyle?.backgroundDecoration ?? .default)
     }()
 
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .black
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .preferredFont(forTextStyle: .title2)
-        label.numberOfLines = 0
-        label.textAlignment = .center
-        return label
+    private lazy var startedView: NativeAlternativePaymentMethodStartedView = {
+        let style = NativeAlternativePaymentMethodStartedViewStyle(
+            title: customStyle?.title ?? .init(color: Asset.Colors.Text.primary.color, typography: .title),
+            input: customStyle?.input ?? .default,
+            codeInput: customStyle?.codeInput ?? .code,
+            primaryButton: customStyle?.primaryButton ?? .primary
+        )
+        return NativeAlternativePaymentMethodStartedView(style: style)
     }()
 
-    private lazy var failureLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .orange
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .preferredFont(forTextStyle: .body)
-        label.numberOfLines = 0
-        return label
-    }()
-
-    private lazy var submitButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Submit", for: .normal)
-        button.addTarget(self, action: #selector(didTouchSubmitButton), for: .touchUpInside)
-        button.setTitleColor(.black, for: .normal)
-        button.setTitleColor(.gray, for: .disabled)
-        return button
-    }()
-
-    private var parameterTextFields: [UITextField] = []
-    private var parameters: [NativeAlternativePaymentMethodViewModelState.Parameter] = []
+    private var notificationObservers: [NSObjectProtocol]
+    private var previousState: NativeAlternativePaymentMethodViewModelState?
 
     // MARK: - State Management
 
     private func configureWithViewModelState() {
         switch viewModel.state {
         case .idle:
-            configureWithIdleState()
-        case .starting:
-            configureWithStartingState()
+            break
+        case .loading:
+            configureWithLoadingState()
         case .started(let startedState):
-            configureWithStartedState(startedState: startedState)
-        case .failure:
-            configureWithFailureState()
+            configure(with: startedState)
+        default:
+            break
         }
+        previousState = viewModel.state
     }
 
-    private func configureWithIdleState() {
-        contentView.isHidden = true
-    }
-
-    private func configureWithStartingState() {
-        contentView.isHidden = true
-    }
-
-    private func configureWithStartedState(startedState: NativeAlternativePaymentMethodViewModelState.Started) {
-        contentView.isHidden = false
-        titleLabel.text = startedState.message
-        titleLabel.isHidden = startedState.message == nil
-        failureLabel.text = startedState.failureMessage
-        failureLabel.isHidden = startedState.failureMessage == nil
-        submitButton.isEnabled = startedState.isSubmitAllowed
-        configureParameterTextFields(startedState: startedState)
-    }
-
-    private func configureWithFailureState() {
-        contentView.isHidden = true
-    }
-
-    // MARK: -
-
-    private func configureParameterTextFields(startedState: NativeAlternativePaymentMethodViewModelState.Started) {
-        if parameterTextFields.count < startedState.parameters.count {
-            let count = startedState.parameters.count - parameterTextFields.count
-            stride(from: 0, to: count, by: 1).forEach { _ in
-                let textField = UITextField()
-                textField.borderStyle = .roundedRect
-                textField.textColor = .black
-                textField.translatesAutoresizingMaskIntoConstraints = false
-                textField.addTarget(self, action: #selector(textFieldValueChanged(textField:)), for: .editingChanged)
-                parameterTextFields.append(textField)
-                inputsContainerView.addArrangedSubview(textField)
+    private func configureWithLoadingState() {
+        if backgroundDecorationView.alpha < 0.01 {
+            UIView.performWithoutAnimation {
+                let height = Constants.backgroundDecorationLoadingHeight
+                backgroundDecorationView.configure(coveredHeight: height, isSuccess: false, animated: false)
+                backgroundDecorationView.layoutIfNeeded()
             }
         } else {
-            let count = parameterTextFields.count - startedState.parameters.count
-            parameterTextFields.suffix(count).forEach { textField in
-                textField.removeFromSuperview()
+            let height = Constants.backgroundDecorationLoadingHeight
+            backgroundDecorationView.configure(coveredHeight: height, isSuccess: false, animated: true)
+        }
+        UIView.animate(withDuration: Constants.animationDuration) { [self] in
+            activityIndicatorView.alpha = 1
+            backgroundDecorationView.alpha = 1
+            startedView.alpha = 0
+        }
+    }
+
+    private func configure(with startedState: NativeAlternativePaymentMethodViewModelState.Started) {
+        if startedView.alpha < 0.01 {
+            UIView.performWithoutAnimation {
+                startedView.configure(with: startedState, animated: false)
+                startedView.layoutIfNeeded()
             }
+        } else {
+            startedView.configure(with: startedState, animated: true)
         }
-        startedState.parameters.enumerated().forEach { parameter in
-            let textField = parameterTextFields[parameter.offset]
-            configureTextField(textField, parameter: parameter.element)
-        }
-        parameters = startedState.parameters
-    }
-
-    private func configureTextField(
-        _ textField: UITextField, parameter: NativeAlternativePaymentMethodViewModelState.Parameter
-    ) {
-        textField.placeholder = parameter.placeholder
-        textField.text = parameter.value
-        switch parameter.type {
-        case .numeric:
-            textField.keyboardType = .numberPad
-        case .text:
-            textField.keyboardType = .asciiCapable
-        case .email:
-            textField.keyboardType = .emailAddress
-        case .phone:
-            textField.keyboardType = .phonePad
+        UIView.animate(withDuration: Constants.animationDuration) { [self] in
+            activityIndicatorView.alpha = 0
+            backgroundDecorationView.configure(coveredHeight: nil, isSuccess: false, animated: true)
+            backgroundDecorationView.alpha = 0
+            startedView.alpha = 1
         }
     }
 
-    // MARK: - Actions
+    // MARK: - Keyboard Handling
 
-    @objc
-    private func didTouchSubmitButton() {
-        viewModel.submit()
+    private func observeKeyboardNotifications() {
+        let willChangeFrameObserver = NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillChangeFrameNotification,
+            object: nil,
+            queue: nil,
+            using: { [weak self] notification in
+                self?.keyboardWillChangeFrame(notification: notification)
+            }
+        )
+        notificationObservers = [willChangeFrameObserver]
     }
 
-    @objc
-    private func textFieldValueChanged(textField: UITextField) {
-        guard let index = parameterTextFields.firstIndex(of: textField) else {
+    private func keyboardWillChangeFrame(notification: Notification) {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
             return
         }
-        _ = parameters[index].update(textField.text ?? "")
+        let coveredSafeAreaHeight = view.bounds.height
+            - view.convert(keyboardFrame, from: nil).minY
+            - view.safeAreaInsets.bottom
+            + additionalSafeAreaInsets.bottom
+        additionalSafeAreaInsets.bottom = max(coveredSafeAreaHeight, 0)
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
     }
 }

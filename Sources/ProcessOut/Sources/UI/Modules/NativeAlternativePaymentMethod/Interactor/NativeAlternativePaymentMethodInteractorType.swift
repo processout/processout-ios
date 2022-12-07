@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import class UIKit.UIImage
 
 protocol NativeAlternativePaymentMethodInteractorType: InteractorType
     where State == NativeAlternativePaymentMethodInteractorState {
@@ -26,23 +27,50 @@ enum NativeAlternativePaymentMethodInteractorState {
         /// Actual parameter value.
         let value: String?
 
-        /// Boolean value indicating if parameter value is valid.
-        let isValid: Bool
+        /// The most recent error message associated with this parameter value.
+        let recentErrorMessage: String?
     }
 
     struct Started {
 
-        /// Message with details about what's expected from user.
-        let message: String?
+        /// Name of the payment gateway that can be displayed.
+        let gatewayDisplayName: String
 
-        /// Parameters that expected from user.
+        /// Gateway's logo URL.
+        let gatewayLogo: UIImage?
+
+        /// Invoice amount.
+        let amount: Decimal
+
+        /// Invoice currency code.
+        let currencyCode: String
+
+        /// Parameters that are expected from user.
         let parameters: [PONativeAlternativePaymentMethodParameter]
 
         /// Parameter values.
         let values: [String: ParameterValue]
 
+        /// The most recent error message.
+        let recentErrorMessage: String?
+
         /// Boolean value indicating whether submit it currently allowed.
         let isSubmitAllowed: Bool
+    }
+
+    struct AwaitingCapture {
+
+        /// Gateway logo.
+        let gatewayLogo: UIImage?
+
+        /// Messaged describing additional actions that are needed from user in order to capture payment.
+        let expectedActionMessage: String?
+    }
+
+    struct Captured {
+
+        /// Gateway logo.
+        let gatewayLogo: UIImage?
     }
 
     /// Initial interactor state.
@@ -54,15 +82,22 @@ enum NativeAlternativePaymentMethodInteractorState {
     /// Interactor is started and awaits for parameters values.
     case started(Started)
 
+    /// Starting failure.
+    case failure(POFailure)
+
     /// Parameter values are being submitted.
     case submitting(snapshot: Started)
 
-    /// Submit operation did fail.
-    case submissionFailure(snapshot: Started, failure: POFailure)
+    /// Parameter values were submitted.
+    /// - NOTE: This is a sink state and it's only set if user opted out from awaiting capture.
+    case submitted
 
     /// Parameters were submitted and accepted. This is a sink state.
-    case submitted(snapshot: Started)
+    case awaitingCapture(AwaitingCapture)
 
-    /// Starting failure.
-    case failure
+    /// Payment is completed.
+    case captured(Captured)
+
+    /// Payment still may be captured in future but implementation rejects to wait longer due to specified time out.
+    case captureTimeout
 }

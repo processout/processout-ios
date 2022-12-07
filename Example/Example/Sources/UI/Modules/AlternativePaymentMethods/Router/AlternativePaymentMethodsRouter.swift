@@ -17,8 +17,13 @@ final class AlternativePaymentMethodsRouter: RouterType {
         case let .nativeAlternativePayment(gatewayConfigurationId, invoiceId):
             let viewController = PONativeAlternativePaymentMethodViewControllerBuilder
                 .with(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId)
+                .with(completion: { [weak self] _ in
+                    self?.viewController?.dismiss(animated: true)
+                })
                 .build()
-            self.viewController?.present(viewController, animated: true)
+            let navigationController = UINavigationController(rootViewController: viewController)
+            navigationController.navigationBar.prefersLargeTitles = false
+            self.viewController?.present(navigationController, animated: true)
         case let .authorizationtAmount(completion):
             let viewController = AuthorizationAmountBuilder(completion: completion).build()
             self.viewController?.present(viewController, animated: true)

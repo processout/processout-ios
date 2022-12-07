@@ -9,8 +9,7 @@ protocol InvoicesRepositoryType: PORepositoryType {
 
     /// Requests information needed to continue existing payment or start new one.
     func nativeAlternativePaymentMethodTransactionDetails(
-        invoiceId: String,
-        gatewayConfigurationId: String,
+        request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
         completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, Failure>) -> Void
     )
 

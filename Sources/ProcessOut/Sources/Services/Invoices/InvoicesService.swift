@@ -17,13 +17,10 @@ final class InvoicesService: POInvoicesServiceType {
     // MARK: - POCustomerTokensServiceType
 
     func nativeAlternativePaymentMethodTransactionDetails(
-        invoiceId: String,
-        gatewayConfigurationId: String,
+        request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
         completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, Failure>) -> Void
     ) {
-        repository.nativeAlternativePaymentMethodTransactionDetails(
-            invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId, completion: completion
-        )
+        repository.nativeAlternativePaymentMethodTransactionDetails(request: request, completion: completion)
     }
 
     func initiatePayment(

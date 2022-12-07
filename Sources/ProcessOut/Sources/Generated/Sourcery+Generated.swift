@@ -30,10 +30,10 @@ extension InvoicesRepositoryType {
 
     @MainActor
     public func nativeAlternativePaymentMethodTransactionDetails(
-        invoiceId: String, gatewayConfigurationId: String
+        request: PONativeAlternativePaymentMethodTransactionDetailsRequest
     ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
         return try await withUnsafeThrowingContinuation { continuation in
-            nativeAlternativePaymentMethodTransactionDetails(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId, completion: continuation.resume)
+            nativeAlternativePaymentMethodTransactionDetails(request: request, completion: continuation.resume)
         }
     }
 
@@ -162,10 +162,10 @@ extension POInvoicesServiceType {
 
     @MainActor
     public func nativeAlternativePaymentMethodTransactionDetails(
-        invoiceId: String, gatewayConfigurationId: String
+        request: PONativeAlternativePaymentMethodTransactionDetailsRequest
     ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
         return try await withUnsafeThrowingContinuation { continuation in
-            nativeAlternativePaymentMethodTransactionDetails(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId, completion: continuation.resume)
+            nativeAlternativePaymentMethodTransactionDetails(request: request, completion: continuation.resume)
         }
     }
 

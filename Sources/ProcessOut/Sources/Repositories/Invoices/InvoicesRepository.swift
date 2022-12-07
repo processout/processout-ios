@@ -17,15 +17,14 @@ final class InvoicesRepository: InvoicesRepositoryType {
     // MARK: - POInvoicesRepositoryType
 
     func nativeAlternativePaymentMethodTransactionDetails(
-        invoiceId: String,
-        gatewayConfigurationId: String,
+        request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
         completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, Failure>) -> Void
     ) {
         struct Response: Decodable {
             let nativeApm: PONativeAlternativePaymentMethodTransactionDetails
         }
         let httpRequest = HttpConnectorRequest<Response>.get(
-            path: "/invoices/\(invoiceId)/native-payment/\(gatewayConfigurationId)"
+            path: "/invoices/\(request.invoiceId)/native-payment/\(request.gatewayConfigurationId)"
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
             completion(result.map(\.nativeApm).mapError(failureMapper.failure))

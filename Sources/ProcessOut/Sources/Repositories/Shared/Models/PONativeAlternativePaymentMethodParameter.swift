@@ -9,7 +9,7 @@ import Foundation
 
 public struct PONativeAlternativePaymentMethodParameter: Decodable {
 
-    public enum ParameterType: String, Decodable {
+    public enum ParameterType: String, Decodable, Hashable {
 
         /// For numeric only fields.
         case numeric

@@ -6,20 +6,29 @@
 //
 
 import Foundation
+import class UIKit.UIImage
 
 final class NativeAlternativePaymentMethodInteractor:
     BaseInteractor<NativeAlternativePaymentMethodInteractorState>, NativeAlternativePaymentMethodInteractorType {
 
-    init(
-        gatewayConfigurationsRepository: POGatewayConfigurationsRepositoryType,
-        invoicesService: POInvoicesServiceType,
-        gatewayConfigurationId: String,
-        invoiceId: String
-    ) {
-        self.gatewayConfigurationsRepository = gatewayConfigurationsRepository
+    struct Configuration {
+
+        /// Gateway configuration id.
+        let gatewayConfigurationId: String
+
+        /// Invoice identifier.
+        let invoiceId: String
+
+        /// Indicates whether interactor should wait for payment confirmation or not.
+        let waitsPaymentConfirmation: Bool
+
+        /// Maximum amount of time to wait for payment confirmation if it is enabled.
+        let paymentConfirmationTimeout: TimeInterval
+    }
+
+    init(invoicesService: POInvoicesServiceType, configuration: Configuration) {
         self.invoicesService = invoicesService
-        self.gatewayConfigurationId = gatewayConfigurationId
-        self.invoiceId = invoiceId
+        self.configuration = configuration
         super.init(state: .idle)
     }
 
@@ -33,115 +42,181 @@ final class NativeAlternativePaymentMethodInteractor:
             return
         }
         state = .starting
-        let request = POFindGatewayConfigurationRequest(id: gatewayConfigurationId, expands: .gateway)
-        gatewayConfigurationsRepository.find(request: request) { [weak self] result in
+        let request = PONativeAlternativePaymentMethodTransactionDetailsRequest(
+            invoiceId: configuration.invoiceId, gatewayConfigurationId: configuration.gatewayConfigurationId
+        )
+        invoicesService.nativeAlternativePaymentMethodTransactionDetails(request: request) { [weak self] result in
             switch result {
-            case let .success(gatewayConfiguration):
-                self?.setStartedStateUnchecked(gatewayConfiguration: gatewayConfiguration)
-            case .failure:
-                self?.state = .failure
+            case let .success(details):
+                self?.setStartedStateUnchecked(details: details)
+            case .failure(let failure):
+                self?.state = .failure(failure)
             }
         }
     }
 
     func updateValue(_ value: String?, for key: String) -> Bool {
-        let startedState: State.Started
-        switch state {
-        case let .started(state), let .submissionFailure(state, _):
-            startedState = state
-        default:
-            return false
-        }
-        guard let parameter = startedState.parameters.first(where: { $0.key == key }) else {
-            Logger.ui.error("Parameter is not available for key '\(key)'.")
+        guard case let .started(startedState) = state, startedState.values[key]?.value != value else {
             return false
         }
         var updatedValues = startedState.values
-        updatedValues[key] = .init(
-            value: value, isValid: isValid(value: value, for: parameter)
-        )
+        updatedValues[key] = .init(value: value, recentErrorMessage: nil)
+        let isSubmitAllowed = startedState.parameters
+            .map { isValid(value: updatedValues[$0.key]?.value, for: $0) }
+            .allSatisfy { $0 }
         let updatedStartedState = State.Started(
-            message: startedState.message,
+            gatewayDisplayName: startedState.gatewayDisplayName,
+            gatewayLogo: startedState.gatewayLogo,
+            amount: startedState.amount,
+            currencyCode: startedState.currencyCode,
             parameters: startedState.parameters,
             values: updatedValues,
-            isSubmitAllowed: areValuesValid(updatedValues, parameters: startedState.parameters)
+            recentErrorMessage: nil,
+            isSubmitAllowed: isSubmitAllowed
         )
         state = .started(updatedStartedState)
         return true
     }
 
     func submit() {
-        let startedState: State.Started
-        switch state {
-        case let .started(state), let .submissionFailure(state, _):
-            startedState = state
-        default:
-            return
-        }
-        guard startedState.isSubmitAllowed else {
+        guard case let .started(startedState) = state, startedState.isSubmitAllowed else {
             return
         }
         let request = PONativeAlternativePaymentMethodRequest(
-            invoiceId: invoiceId,
-            gatewayConfigurationId: gatewayConfigurationId,
+            invoiceId: configuration.invoiceId,
+            gatewayConfigurationId: configuration.gatewayConfigurationId,
             parameters: startedState.values.compactMapValues(\.value)
         )
         state = .submitting(snapshot: startedState)
         invoicesService.initiatePayment(request: request) { [weak self] result in
             switch result {
+            case let .success(response) where response.nativeApm.state == .pendingCapture:
+                self?.trySetAwaitingCaptureStateUnchecked(
+                    gatewayLogo: startedState.gatewayLogo,
+                    expectedActionMessage: response.nativeApm.parameterValues?.message
+                )
             case let .success(response):
-                self?.trySetSubmittedStateUnchecked(startedState: startedState, response: response)
+                self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
             case let .failure(failure):
-                self?.setSubmissionFailureState(startedState: startedState, failure: failure)
+                self?.restoreStartedStateAfterSubmissionFailure(failure)
             }
         }
     }
 
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let maximumCaptureTimeout: TimeInterval = 180
+        static let emailRegex = #"^\S+@\S+$"#
+    }
+
     // MARK: - Private Properties
 
-    private let gatewayConfigurationsRepository: POGatewayConfigurationsRepositoryType
     private let invoicesService: POInvoicesServiceType
-    private let gatewayConfigurationId: String
-    private let invoiceId: String
+    private let configuration: Configuration
 
     // MARK: - State Management
 
-    private func setStartedStateUnchecked(gatewayConfiguration: POGatewayConfiguration) {
-        guard let configuration = gatewayConfiguration.gateway?.nativeApmConfig else {
-            state = .failure
+    private func setStartedStateUnchecked(details: PONativeAlternativePaymentMethodTransactionDetails) {
+        switch details.state {
+        case .customerInput, nil:
+            break
+        case .pendingCapture:
+            trySetAwaitingCaptureStateUnchecked(gatewayLogo: nil, expectedActionMessage: nil)
             return
         }
+        if details.parameters.isEmpty {
+            Logger.ui.debug("Will set started state without empty inputs, this may be unexpected.")
+        }
         let startedState = State.Started(
-            message: nil,
-            parameters: configuration.parameters,
+            gatewayDisplayName: details.gateway.displayName,
+            gatewayLogo: nil,
+            amount: details.invoice.amount,
+            currencyCode: details.invoice.currencyCode,
+            parameters: details.parameters,
             values: [:],
-            isSubmitAllowed: areValuesValid(nil, parameters: configuration.parameters)
+            recentErrorMessage: nil,
+            isSubmitAllowed: details.parameters.map { isValid(value: nil, for: $0) }.allSatisfy { $0 }
         )
         state = .started(startedState)
     }
 
-    private func trySetSubmittedStateUnchecked(
-        startedState: State.Started, response: PONativeAlternativePaymentMethodResponse
-    ) {
-        if case .pendingCapture = response.nativeApm.state {
-            state = .submitted(snapshot: startedState)
+    private func trySetAwaitingCaptureStateUnchecked(gatewayLogo: UIImage?, expectedActionMessage: String?) {
+        guard configuration.waitsPaymentConfirmation else {
+            state = .submitted
             return
         }
-        guard let parameters = response.nativeApm.parameterDefinitions, !parameters.isEmpty else {
-            state = .failure
-            return
-        }
-        let updatedStartedState = State.Started(
-            message: response.nativeApm.parameterValues?.message,
-            parameters: parameters,
-            values: [:],
-            isSubmitAllowed: areValuesValid(nil, parameters: parameters)
+        let awaitingCaptureState = State.AwaitingCapture(
+            gatewayLogo: gatewayLogo, expectedActionMessage: nil
         )
-        state = .started(updatedStartedState)
+        state = .awaitingCapture(awaitingCaptureState)
+        let captureTimeout = min(Constants.maximumCaptureTimeout, configuration.paymentConfirmationTimeout)
+        let timer = Timer.scheduledTimer(withTimeInterval: captureTimeout, repeats: false) { [weak self] _ in
+            self?.state = .captureTimeout
+        }
+        var completion: ((Result<Void, POFailure>) -> Void)! // swiftlint:disable:this implicitly_unwrapped_optional
+        completion = { [weak self, invoicesService, configuration] result in
+            guard let self, timer.isValid else {
+                return
+            }
+            switch result {
+            case .success:
+                timer.invalidate()
+                self.setCapturedState()
+            case .failure:
+                invoicesService.capture(invoiceId: configuration.invoiceId, completion: completion)
+            }
+        }
+        invoicesService.capture(invoiceId: configuration.invoiceId, completion: completion)
     }
 
-    private func setSubmissionFailureState(startedState: State.Started, failure: POFailure) {
-        state = .submissionFailure(snapshot: startedState, failure: failure)
+    private func setCapturedState() {
+        guard case let .awaitingCapture(awaitingCaptureState) = state else {
+            Logger.ui.error("Can't change state to captured from current state.")
+            return
+        }
+        let capturedState = State.Captured(gatewayLogo: awaitingCaptureState.gatewayLogo)
+        self.state = .captured(capturedState)
+    }
+
+    private func restoreStartedStateAfterSubmissionFailure(_ failure: POFailure) {
+        guard case let .submitting(startedState) = state else {
+            return
+        }
+        var updatedValues: [String: State.ParameterValue] = [:]
+        startedState.values.forEach { key, value in
+            let errorMessage = failure.invalidFields?.first { $0.name == key }?.message
+            updatedValues[key] = State.ParameterValue(value: value.value, recentErrorMessage: errorMessage)
+        }
+        let updatedStartedState = State.Started(
+            gatewayDisplayName: startedState.gatewayDisplayName,
+            gatewayLogo: startedState.gatewayLogo,
+            amount: startedState.amount,
+            currencyCode: startedState.currencyCode,
+            parameters: startedState.parameters,
+            values: updatedValues,
+            recentErrorMessage: failure.message,
+            isSubmitAllowed: false
+        )
+        self.state = .started(updatedStartedState)
+    }
+
+    private func restoreStartedStateAfterSubmission(nativeApm: PONativeAlternativePaymentMethodResponse.NativeApm) {
+        guard case let .submitting(startedState) = state else {
+            return
+        }
+        let parameters = nativeApm.parameterDefinitions ?? []
+        let updatedStartedState = State.Started(
+            gatewayDisplayName: startedState.gatewayDisplayName,
+            gatewayLogo: startedState.gatewayLogo,
+            amount: startedState.amount,
+            currencyCode: startedState.currencyCode,
+            parameters: parameters,
+            values: [:],
+            recentErrorMessage: nil,
+            isSubmitAllowed: parameters.map { isValid(value: nil, for: $0) }.allSatisfy { $0 }
+        )
+        state = .started(updatedStartedState)
     }
 
     // MARK: - Utils
@@ -159,15 +234,9 @@ final class NativeAlternativePaymentMethodInteractor:
         case .text:
             return CharacterSet(charactersIn: value).isSubset(of: .alphanumerics)
         case .email:
-            return value.range(of: #"^\S+@\S+$"#, options: .regularExpression) != nil
+            return value.range(of: Constants.emailRegex, options: .regularExpression) != nil
         case .phone:
             return true
         }
-    }
-
-    private func areValuesValid(
-        _ values: [String: State.ParameterValue]?, parameters: [PONativeAlternativePaymentMethodParameter]
-    ) -> Bool {
-         parameters.map { values?[$0.key]?.isValid ?? isValid(value: nil, for: $0) }.allSatisfy { $0 }
     }
 }
