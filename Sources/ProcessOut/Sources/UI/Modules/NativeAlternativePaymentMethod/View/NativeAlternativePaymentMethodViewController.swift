@@ -30,6 +30,7 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
         view.addSubview(startedView)
         view.addSubview(backgroundDecorationView)
         view.addSubview(activityIndicatorView)
+        view.addSubview(successView)
         let constraints = [
             activityIndicatorView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicatorView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -40,7 +41,11 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             startedView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             startedView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             startedView.topAnchor.constraint(equalTo: view.topAnchor),
-            startedView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            startedView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            successView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            successView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            successView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            successView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor)
         ]
         self.view = view
         NSLayoutConstraint.activate(constraints)
@@ -61,7 +66,6 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
 
     private enum Constants {
         static let animationDuration: TimeInterval = 0.35
-        static let backgroundDecorationLoadingHeight: CGFloat = 476
     }
 
     // MARK: - Private Properties
@@ -90,7 +94,9 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
     }()
 
     private lazy var backgroundDecorationView: BackgroundDecorationView = {
-        BackgroundDecorationView(style: customStyle?.backgroundDecoration ?? .default)
+        let view = BackgroundDecorationView(style: customStyle?.backgroundDecoration ?? .default)
+        view.alpha = 0
+        return view
     }()
 
     private lazy var startedView: NativeAlternativePaymentMethodStartedView = {
@@ -100,7 +106,18 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             codeInput: customStyle?.codeInput ?? .code,
             primaryButton: customStyle?.primaryButton ?? .primary
         )
-        return NativeAlternativePaymentMethodStartedView(style: style)
+        let view = NativeAlternativePaymentMethodStartedView(style: style)
+        view.alpha = 0
+        return view
+    }()
+
+    private lazy var successView: NativeAlternativePaymentMethodSuccessView = {
+        let style = NativeAlternativePaymentMethodSuccessViewStyle(
+            message: customStyle?.successMessage ?? .init(color: Asset.Colors.Text.success.color, typography: .headline)
+        )
+        let view = NativeAlternativePaymentMethodSuccessView(style: style)
+        view.alpha = 0
+        return view
     }()
 
     private var notificationObservers: [NSObjectProtocol]
@@ -116,6 +133,8 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             configureWithLoadingState()
         case .started(let startedState):
             configure(with: startedState)
+        case .success(let successState):
+            configure(with: successState)
         default:
             break
         }
@@ -123,37 +142,40 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
     }
 
     private func configureWithLoadingState() {
-        if backgroundDecorationView.alpha < 0.01 {
-            UIView.performWithoutAnimation {
-                let height = Constants.backgroundDecorationLoadingHeight
-                backgroundDecorationView.configure(coveredHeight: height, isSuccess: false, animated: false)
-                backgroundDecorationView.layoutIfNeeded()
-            }
-        } else {
-            let height = Constants.backgroundDecorationLoadingHeight
-            backgroundDecorationView.configure(coveredHeight: height, isSuccess: false, animated: true)
-        }
         UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            activityIndicatorView.alpha = 1
+            backgroundDecorationView.configure(
+                isExpanded: false, isSuccess: false, animated: backgroundDecorationView.isVisible
+            )
             backgroundDecorationView.alpha = 1
+            activityIndicatorView.alpha = 1
             startedView.alpha = 0
+            successView.alpha = 0
         }
     }
 
     private func configure(with startedState: NativeAlternativePaymentMethodViewModelState.Started) {
-        if startedView.alpha < 0.01 {
-            UIView.performWithoutAnimation {
-                startedView.configure(with: startedState, animated: false)
-                startedView.layoutIfNeeded()
-            }
-        } else {
-            startedView.configure(with: startedState, animated: true)
-        }
         UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            activityIndicatorView.alpha = 0
-            backgroundDecorationView.configure(coveredHeight: nil, isSuccess: false, animated: true)
+            backgroundDecorationView.configure(
+                isExpanded: true, isSuccess: false, animated: backgroundDecorationView.isVisible
+            )
             backgroundDecorationView.alpha = 0
+            activityIndicatorView.alpha = 0
+            startedView.configure(with: startedState, animated: startedView.isVisible)
             startedView.alpha = 1
+            successView.alpha = 0
+        }
+    }
+
+    private func configure(with successState: NativeAlternativePaymentMethodViewModelState.Success) {
+        UIView.animate(withDuration: Constants.animationDuration) { [self] in
+            backgroundDecorationView.configure(
+                isExpanded: false, isSuccess: true, animated: backgroundDecorationView.isVisible
+            )
+            backgroundDecorationView.alpha = 1
+            activityIndicatorView.alpha = 0
+            startedView.alpha = 0
+            successView.configure(with: successState, animated: successView.isVisible)
+            successView.alpha = 1
         }
     }
 
@@ -182,5 +204,12 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
         additionalSafeAreaInsets.bottom = max(coveredSafeAreaHeight, 0)
         view.setNeedsLayout()
         view.layoutIfNeeded()
+    }
+}
+
+private extension UIView { // swiftlint:disable:this no_extension_access_modifier
+
+    var isVisible: Bool {
+        window != nil && !isHidden && alpha > 0.01
     }
 }

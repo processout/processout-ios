@@ -24,4 +24,7 @@ public protocol ProcessOutApiType {
 
     /// Return Alternative Payment Methods service.
     var alternativePaymentMethods: POAlternativePaymentMethodsServiceType { get }
+
+    /// Images repository.
+    var images: POImagesRepositoryType { get }
 }

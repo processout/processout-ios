@@ -41,6 +41,8 @@ final class NativeAlternativePaymentMethodStartedView: UIView { // swiftlint:dis
             )
             primaryButton.configure(viewModel: primaryButtonViewModel, animated: animated)
             primaryButton.isEnabled = state.action.isEnabled
+            setNeedsLayout()
+            layoutIfNeeded()
             CATransaction.commit()
         }
         currentState = state

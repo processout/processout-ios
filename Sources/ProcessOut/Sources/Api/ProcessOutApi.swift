@@ -43,7 +43,8 @@ public final class ProcessOutApi: ProcessOutApiType {
             ),
             alternativePaymentMethods: AlternativePaymentMethodsService(
                 projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl
-            )
+            ),
+            images: ImagesRepository(session: .shared)
         )
     }
 
@@ -55,6 +56,7 @@ public final class ProcessOutApi: ProcessOutApiType {
     public let cards: POCardsRepositoryType
     public let customerTokens: POCustomerTokensServiceType
     public let alternativePaymentMethods: POAlternativePaymentMethodsServiceType
+    public let images: POImagesRepositoryType
 
     // MARK: -
 
@@ -64,7 +66,8 @@ public final class ProcessOutApi: ProcessOutApiType {
         invoices: POInvoicesServiceType,
         cards: POCardsRepositoryType,
         customerTokens: POCustomerTokensServiceType,
-        alternativePaymentMethods: POAlternativePaymentMethodsServiceType
+        alternativePaymentMethods: POAlternativePaymentMethodsServiceType,
+        images: POImagesRepositoryType
     ) {
         self.configuration = configuration
         self.gatewayConfigurations = gatewayConfigurations
@@ -72,6 +75,7 @@ public final class ProcessOutApi: ProcessOutApiType {
         self.cards = cards
         self.customerTokens = customerTokens
         self.alternativePaymentMethods = alternativePaymentMethods
+        self.images = images
     }
 
     // MARK: - Private Methods

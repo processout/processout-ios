@@ -11,6 +11,7 @@ final class BackgroundDecorationView: UIView {
 
     init(style: POBackgroundDecorationStyle) {
         self.style = style
+        isExpanded = false
         isSuccess = false
         super.init(frame: .zero)
         commonInit()
@@ -24,20 +25,20 @@ final class BackgroundDecorationView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         let isAnimated = UIView.inheritedAnimationDuration > 0.01
-        configure(coveredHeight: coveredHeight, isSuccess: isSuccess, animated: isAnimated)
+        configure(isExpanded: isExpanded, isSuccess: isSuccess, animated: isAnimated)
     }
 
     /// Safe vertical area height that is guaranteed to be fully covered by this decoration.
-    private(set) var coveredHeight: CGFloat?
+    private(set) var isExpanded: Bool
 
     /// Boolean value indicating whether decoration used in success scenario.
     private(set) var isSuccess: Bool
 
-    func configure(coveredHeight: CGFloat?, isSuccess: Bool, animated: Bool) {
-        UIView.animate(withDuration: Constants.defaultAnimationDuration, delay: 0) { [self] in
+    func configure(isExpanded: Bool, isSuccess: Bool, animated: Bool) {
+        UIView.animate(withDuration: Constants.animationDuration) { [self] in
             CATransaction.begin()
             CATransaction.setDisableActions(!animated)
-            let baseHeight = coveredHeight ?? bounds.height
+            let baseHeight = isExpanded ? bounds.height : Constants.baseHeight
             let spacing: CGFloat = isSuccess ? Constants.successSpacing : Constants.normalSpacing
             animateShapeLayerPath(innerShapeLayer, height: baseHeight, capHeight: Constants.innerCapHeight)
             animateShapeLayerPath(outerShapeLayer, height: baseHeight + spacing, capHeight: Constants.outerCapHeight)
@@ -50,18 +51,19 @@ final class BackgroundDecorationView: UIView {
             outerShapeLayer.fillColor = currentStyle.secondaryColor.cgColor
             CATransaction.commit()
         }
-        self.coveredHeight = coveredHeight
+        self.isExpanded = isExpanded
         self.isSuccess = isSuccess
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
+        static let baseHeight: CGFloat = 471
         static let innerCapHeight: CGFloat = 59
         static let outerCapHeight: CGFloat = 46
         static let normalSpacing: CGFloat = 83
         static let successSpacing: CGFloat = 113
-        static let defaultAnimationDuration: TimeInterval = 0.3
+        static let animationDuration: TimeInterval = 0.3
     }
 
     // MARK: - Private Properties
@@ -78,7 +80,7 @@ final class BackgroundDecorationView: UIView {
         layer.addSublayer(outerShapeLayer)
         layer.addSublayer(innerShapeLayer)
         backgroundColor = .clear
-        configure(coveredHeight: coveredHeight, isSuccess: isSuccess, animated: false)
+        configure(isExpanded: isExpanded, isSuccess: isSuccess, animated: false)
     }
 
     private func createSheetPath(height: CGFloat, capHeight: CGFloat) -> CGPath {

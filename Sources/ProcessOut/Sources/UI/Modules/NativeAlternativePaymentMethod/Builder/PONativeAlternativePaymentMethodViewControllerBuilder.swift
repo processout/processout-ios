@@ -68,7 +68,7 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
             paymentConfirmationTimeout: paymentConfirmationTimeout
         )
         let interactor = NativeAlternativePaymentMethodInteractor(
-            invoicesService: api.invoices, configuration: interactorConfiguration
+            invoicesService: api.invoices, imagesRepository: api.images, configuration: interactorConfiguration
         )
         let router = NativeAlternativePaymentMethodRouter()
         let viewModel = NativeAlternativePaymentMethodViewModel(

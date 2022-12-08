@@ -26,8 +26,11 @@ final class NativeAlternativePaymentMethodInteractor:
         let paymentConfirmationTimeout: TimeInterval
     }
 
-    init(invoicesService: POInvoicesServiceType, configuration: Configuration) {
+    init(
+        invoicesService: POInvoicesServiceType, imagesRepository: POImagesRepositoryType, configuration: Configuration
+    ) {
         self.invoicesService = invoicesService
+        self.imagesRepository = imagesRepository
         self.configuration = configuration
         super.init(state: .idle)
     }
@@ -48,7 +51,9 @@ final class NativeAlternativePaymentMethodInteractor:
         invoicesService.nativeAlternativePaymentMethodTransactionDetails(request: request) { [weak self] result in
             switch result {
             case let .success(details):
-                self?.setStartedStateUnchecked(details: details)
+                self?.imagesRepository.image(url: details.gateway.logoUrl) { [weak self] image in
+                    self?.setStartedStateUnchecked(details: details, gatewayLogo: image)
+                }
             case .failure(let failure):
                 self?.state = .failure(failure)
             }
@@ -113,16 +118,19 @@ final class NativeAlternativePaymentMethodInteractor:
     // MARK: - Private Properties
 
     private let invoicesService: POInvoicesServiceType
+    private let imagesRepository: POImagesRepositoryType
     private let configuration: Configuration
 
     // MARK: - State Management
 
-    private func setStartedStateUnchecked(details: PONativeAlternativePaymentMethodTransactionDetails) {
+    private func setStartedStateUnchecked(
+        details: PONativeAlternativePaymentMethodTransactionDetails, gatewayLogo: UIImage?
+    ) {
         switch details.state {
         case .customerInput, nil:
             break
         case .pendingCapture:
-            trySetAwaitingCaptureStateUnchecked(gatewayLogo: nil, expectedActionMessage: nil)
+            trySetAwaitingCaptureStateUnchecked(gatewayLogo: gatewayLogo, expectedActionMessage: nil)
             return
         }
         if details.parameters.isEmpty {
@@ -130,7 +138,7 @@ final class NativeAlternativePaymentMethodInteractor:
         }
         let startedState = State.Started(
             gatewayDisplayName: details.gateway.displayName,
-            gatewayLogo: nil,
+            gatewayLogo: gatewayLogo,
             amount: details.invoice.amount,
             currencyCode: details.invoice.currencyCode,
             parameters: details.parameters,
