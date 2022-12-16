@@ -67,6 +67,12 @@ final class Button: UIControl {
         }
         _isEnabled = isEnabled
         currentViewModel = viewModel
+        if isEnabled {
+            accessibilityTraits = [.button]
+        } else {
+            accessibilityTraits = [.button, .notEnabled]
+        }
+        accessibilityLabel = viewModel.title
     }
 
     func setEnabled(_ enabled: Bool, animated: Bool) {
@@ -164,6 +170,7 @@ final class Button: UIControl {
         ]
         NSLayoutConstraint.activate(constraints)
         addTarget(self, action: #selector(didTouchUpInside), for: .touchUpInside)
+        isAccessibilityElement = true
     }
 
     private func configureWithCurrentViewModel(animated: Bool) {

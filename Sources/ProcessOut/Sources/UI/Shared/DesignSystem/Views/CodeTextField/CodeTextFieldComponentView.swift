@@ -77,6 +77,7 @@ final class CodeTextFieldComponentView: UIView {
             CATransaction.commit()
         }
         currentViewModel = viewModel
+        accessibilityValue = viewModel.value.map(String.init)
     }
 
     // MARK: - Private Nested Types

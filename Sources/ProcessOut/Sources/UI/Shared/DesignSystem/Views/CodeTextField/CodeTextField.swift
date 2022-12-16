@@ -371,6 +371,7 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
         ]
         NSLayoutConstraint.activate(constraints)
         createGroupViews()
+        isAccessibilityElement = true
     }
 
     private func createGroupViews() {
@@ -458,5 +459,6 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
             )
             groupViews[offset].configure(viewModel: viewModel, animated: animated)
         }
+        accessibilityValue = text
     }
 }
