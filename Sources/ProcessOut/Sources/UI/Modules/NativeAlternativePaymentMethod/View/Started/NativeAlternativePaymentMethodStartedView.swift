@@ -26,6 +26,7 @@ final class NativeAlternativePaymentMethodStartedView: UIView { // swiftlint:dis
             CATransaction.setDisableActions(!animated)
             titleLabel.attributedText = AttributedStringBuilder()
                 .typography(style.title.typography)
+                .textStyle(textStyle: .title1)
                 .alignment(.center)
                 .lineBreakMode(.byWordWrapping)
                 .textColor(style.title.color)
@@ -35,13 +36,17 @@ final class NativeAlternativePaymentMethodStartedView: UIView { // swiftlint:dis
                 configureExistingInputFormViews(parameters: state.parameters, animated: animated)
             } else {
                 createNewInputFormViews(parameters: state.parameters)
+                if animated {
+                    UIView.performWithoutAnimation(inputsContainerView.layoutIfNeeded)
+                    inputsContainerView.addTransitionAnimation()
+                }
             }
             let primaryButtonViewModel = Button.ViewModel(
                 title: state.action.title, isLoading: state.isSubmitting, handler: state.action.handler
             )
-            primaryButton.configure(viewModel: primaryButtonViewModel, animated: animated)
-            primaryButton.isEnabled = state.action.isEnabled
-            setNeedsLayout()
+            primaryButton.configure(
+                viewModel: primaryButtonViewModel, isEnabled: state.action.isEnabled, animated: animated
+            )
             layoutIfNeeded()
             CATransaction.commit()
         }
@@ -134,7 +139,7 @@ final class NativeAlternativePaymentMethodStartedView: UIView { // swiftlint:dis
             contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
             contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.safeAreaLayoutGuide.widthAnchor),
             contentView.heightAnchor
                 .constraint(
                     equalTo: scrollView.safeAreaLayoutGuide.heightAnchor,
@@ -150,7 +155,7 @@ final class NativeAlternativePaymentMethodStartedView: UIView { // swiftlint:dis
         contentView.addSubview(inputsContainerView)
         let constraints = [
             titleLabel.leadingAnchor.constraint(
-                greaterThanOrEqualTo: contentView.leadingAnchor, constant: Constants.horizontalContentInset
+                equalTo: contentView.leadingAnchor, constant: Constants.horizontalContentInset
             ),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -178,16 +183,13 @@ final class NativeAlternativePaymentMethodStartedView: UIView { // swiftlint:dis
     private func areInputFormViewsValid(
         for parameters: [NativeAlternativePaymentMethodViewModelState.Parameter]
     ) -> Bool {
-        currentState?.parameters.map(shouldUseCodeTextField) == parameters.map(shouldUseCodeTextField)
-    }
-
-    private func shouldUseCodeTextField(for parameter: NativeAlternativePaymentMethodViewModelState.Parameter) -> Bool {
-        if let length = parameter.length,
-           length <= Constants.maximumCodeLength,
-           [.numeric, .text].contains(parameter.type) {
-            return true
+        let valid = currentState?.parameters.elementsEqual(parameters) { lhs, rhs in
+            lhs.name == rhs.name
+                && lhs.placeholder == rhs.placeholder
+                && lhs.type == rhs.type
+                && lhs.length == rhs.length
         }
-        return false
+        return valid ?? false
     }
 
     private func createNewInputFormViews(parameters: [NativeAlternativePaymentMethodViewModelState.Parameter]) {
@@ -197,7 +199,7 @@ final class NativeAlternativePaymentMethodStartedView: UIView { // swiftlint:dis
         parameters.enumerated().forEach { offset, parameter in
             let isLastParameter = offset + 1 == parameters.count
             let inputFormView: InputFormView
-            if let length = parameter.length, shouldUseCodeTextField(for: parameter) {
+            if let length = parameter.length, length <= Constants.maximumCodeLength, parameter.type == .numeric {
                 let codeTextField = CodeTextField(length: length)
                 codeTextField.delegate = self
                 codeTextField.returnKeyType = isLastParameter ? .done : .next

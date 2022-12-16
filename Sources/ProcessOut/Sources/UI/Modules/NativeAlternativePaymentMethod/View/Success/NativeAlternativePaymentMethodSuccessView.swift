@@ -37,12 +37,15 @@ final class NativeAlternativePaymentMethodSuccessView: UIView {
             }
             descriptionLabel.attributedText = AttributedStringBuilder()
                 .typography(style.message.typography)
+                .textStyle(textStyle: .headline)
                 .textColor(style.message.color)
                 .alignment(.center)
                 .string(state.message)
                 .build()
-            setNeedsLayout()
-            layoutIfNeeded()
+            if animated {
+                UIView.performWithoutAnimation(layoutIfNeeded)
+                addTransitionAnimation()
+            }
             CATransaction.commit()
         }
     }
@@ -54,8 +57,8 @@ final class NativeAlternativePaymentMethodSuccessView: UIView {
         static let iconHeight: CGFloat = 32
         static let verticalSpacing: CGFloat = 16
         static let descriptionBottomSpacing: CGFloat = 48
-        static let topContentInset: CGFloat = 30
-        static let minimumHorizontalContentInset: CGFloat = 24
+        static let verticalContentInset: CGFloat = 30
+        static let horizontalContentInset: CGFloat = 24
     }
 
     // MARK: - Private Properties
@@ -106,13 +109,15 @@ final class NativeAlternativePaymentMethodSuccessView: UIView {
         addSubview(containerView)
         let constraints = [
             containerView.topAnchor.constraint(
-                equalTo: safeAreaLayoutGuide.topAnchor, constant: Constants.topContentInset
+                equalTo: safeAreaLayoutGuide.topAnchor, constant: Constants.verticalContentInset
             ),
             containerView.centerXAnchor.constraint(equalTo: centerXAnchor),
             containerView.leadingAnchor.constraint(
-                greaterThanOrEqualTo: leadingAnchor, constant: Constants.minimumHorizontalContentInset
+                equalTo: leadingAnchor, constant: Constants.horizontalContentInset
             ),
-            containerView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+            containerView.bottomAnchor.constraint(
+                lessThanOrEqualTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.verticalContentInset
+            ),
             iconImageView.heightAnchor.constraint(lessThanOrEqualToConstant: Constants.iconHeight)
         ]
         NSLayoutConstraint.activate(constraints)

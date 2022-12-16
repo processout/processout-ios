@@ -67,7 +67,7 @@ final class NativeAlternativePaymentMethodInteractor:
         var updatedValues = startedState.values
         updatedValues[key] = .init(value: value, recentErrorMessage: nil)
         let isSubmitAllowed = startedState.parameters
-            .map { isValid(value: updatedValues[$0.key]?.value, for: $0) }
+            .map { isValid(value: updatedValues[$0.key], for: $0) }
             .allSatisfy { $0 }
         let updatedStartedState = State.Started(
             gatewayDisplayName: startedState.gatewayDisplayName,
@@ -229,9 +229,14 @@ final class NativeAlternativePaymentMethodInteractor:
 
     // MARK: - Utils
 
-    private func isValid(value: String?, for parameter: PONativeAlternativePaymentMethodParameter) -> Bool {
-        guard let value, !value.isEmpty else {
+    private func isValid(
+        value parameterValue: State.ParameterValue?, for parameter: PONativeAlternativePaymentMethodParameter
+    ) -> Bool {
+        guard let parameterValue, let value = parameterValue.value, !value.isEmpty else {
             return !parameter.required
+        }
+        if parameterValue.recentErrorMessage != nil {
+            return false
         }
         if let length = parameter.length, value.count != length {
             return false

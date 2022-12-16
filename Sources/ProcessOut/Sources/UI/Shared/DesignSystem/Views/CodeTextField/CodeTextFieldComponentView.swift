@@ -32,8 +32,18 @@ final class CodeTextFieldComponentView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if let currentViewModel, traitCollection.isColorAppearanceDifferent(to: previousTraitCollection) {
+            layer.borderColor = currentViewModel.style.border.color.cgColor
+            layer.shadowColor = currentViewModel.style.shadow.color.cgColor
+        }
+    }
+
     func configure(viewModel: ViewModel, animated: Bool) {
-        UIView.performWithoutAnimation {
+        UIView.animate(withDuration: Constants.animationDuration) { [self] in
+            CATransaction.begin()
+            CATransaction.setDisableActions(!animated)
             switch viewModel.carretPosition {
             case .none:
                 carretView.setHidden(true)
@@ -47,28 +57,23 @@ final class CodeTextFieldComponentView: UIView {
                 carretView.setHidden(false)
                 carretCenterConstraint.constant = Constants.carretOffset
             }
-            setNeedsLayout()
-            layoutIfNeeded()
-        }
-        UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            CATransaction.begin()
-            CATransaction.setDisableActions(!animated)
             let previousAttributedText = valueLabel.attributedText
             valueLabel.attributedText = AttributedStringBuilder()
                 .typography(viewModel.style.text.typography)
+                .textStyle(textStyle: .largeTitle)
+                .maximumFontSize(Constants.maximumFontSize)
                 .alignment(.center)
                 .textColor(viewModel.style.text.color)
                 .string(viewModel.value.map(String.init) ?? "")
                 .build()
-            if animated,
-               valueLabel.attributedText != previousAttributedText,
-               valueLabel.attributedText?.string == previousAttributedText?.string {
-                animateValueLabelTransition()
+            if animated, valueLabel.attributedText != previousAttributedText {
+                valueLabel.addTransitionAnimation()
             }
             apply(style: viewModel.style.border)
             apply(style: viewModel.style.shadow)
             backgroundColor = viewModel.style.backgroundColor
             carretView.backgroundColor = viewModel.style.tintColor
+            UIView.performWithoutAnimation(layoutIfNeeded)
             CATransaction.commit()
         }
         currentViewModel = viewModel
@@ -77,6 +82,7 @@ final class CodeTextFieldComponentView: UIView {
     // MARK: - Private Nested Types
 
     private enum Constants {
+        static let maximumFontSize: CGFloat = 32
         static let size = CGSize(width: 48, height: 48)
         static let minimumWidth: CGFloat = 42
         static let carretSize = CGSize(width: 2, height: 28)
@@ -116,15 +122,12 @@ final class CodeTextFieldComponentView: UIView {
 
     private func commonInit() {
         translatesAutoresizingMaskIntoConstraints = false
-        let widthConstraint = widthAnchor.constraint(equalToConstant: Constants.size.width)
-        widthConstraint.priority = .defaultHigh
         let constraints = [
             heightAnchor.constraint(equalToConstant: Constants.size.height),
             widthAnchor.constraint(greaterThanOrEqualToConstant: Constants.minimumWidth),
-            widthConstraint
+            widthAnchor.constraint(equalToConstant: Constants.size.width).with(priority: .defaultHigh)
         ]
         NSLayoutConstraint.activate(constraints)
-        clipsToBounds = true
         addValueLabelSubview()
         addCarretSubview()
         configureGestures()
@@ -133,9 +136,8 @@ final class CodeTextFieldComponentView: UIView {
     private func addValueLabelSubview() {
         addSubview(valueLabel)
         let constraints = [
-            valueLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             valueLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-            valueLabel.leadingAnchor.constraint(equalTo: leadingAnchor)
+            valueLabel.centerXAnchor.constraint(equalTo: centerXAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
     }
@@ -168,16 +170,6 @@ final class CodeTextFieldComponentView: UIView {
 
     private func removeCarretAnimation() {
         carretView.layer.removeAnimation(forKey: Constants.carretAnimationKey)
-    }
-
-    private func animateValueLabelTransition() {
-        let transition = CATransition()
-        transition.type = .fade
-        if let backgroundAnimation = layer.action(forKey: "backgroundColor") as? CAAnimation {
-            transition.duration = backgroundAnimation.duration
-            transition.timingFunction = backgroundAnimation.timingFunction
-        }
-        valueLabel.layer.add(transition, forKey: "transition")
     }
 
     // MARK: - Actions

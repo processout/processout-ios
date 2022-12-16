@@ -25,6 +25,7 @@ final class Button: UIControl {
 
     init(style: POButtonStyle) {
         self.style = style
+        _isEnabled = true
         super.init(frame: .zero)
         commonInit()
     }
@@ -34,37 +35,48 @@ final class Button: UIControl {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(viewModel: ViewModel, animated: Bool) {
+    func configure(viewModel: ViewModel, isEnabled: Bool, animated: Bool) {
         UIView.animate(withDuration: Constants.animationDuration) { [self] in
             CATransaction.begin()
             CATransaction.setDisableActions(!animated)
-            activityIndicatorView.alpha = viewModel.isLoading ? 1 : 0
-            let currentStyle = self.currentStyle
+            let currentStyle = style(isEnabled: isEnabled, isHighlighted: isHighlighted)
             if viewModel.isLoading {
                 titleLabel.alpha = 0
+                activityIndicatorView.alpha = 1
             } else {
                 let currentAttributedText = titleLabel.attributedText
                 titleLabel.attributedText = AttributedStringBuilder()
                     .typography(currentStyle.title.typography)
+                    .textStyle(textStyle: .body)
                     .maximumFontSize(Constants.maximumFontSize)
                     .textColor(currentStyle.title.color)
+                    .alignment(.center)
                     .string(viewModel.title)
                     .build()
                 titleLabel.alpha = 1
                 if animated, currentAttributedText != titleLabel.attributedText {
-                    addTitleLabelTransition()
+                    titleLabel.addTransitionAnimation()
                 }
+                activityIndicatorView.alpha = 0
             }
             apply(style: currentStyle.border)
             apply(style: currentStyle.shadow)
             backgroundColor = currentStyle.backgroundColor
+            UIView.performWithoutAnimation(layoutIfNeeded)
             CATransaction.commit()
         }
+        _isEnabled = isEnabled
         currentViewModel = viewModel
     }
 
+    func setEnabled(_ enabled: Bool, animated: Bool) {
+        _isEnabled = enabled
+        configureWithCurrentViewModel(animated: animated)
+    }
+
     override var isEnabled: Bool {
-        didSet { configureWithCurrentViewModel(animated: true) }
+        get { _isEnabled }
+        set { setEnabled(newValue, animated: false) }
     }
 
     override var isHighlighted: Bool {
@@ -78,13 +90,22 @@ final class Button: UIControl {
         return super.hitTest(point, with: event)
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if traitCollection.isColorAppearanceDifferent(to: previousTraitCollection) {
+            let style = style(isEnabled: isEnabled, isHighlighted: isHighlighted)
+            layer.borderColor = style.border.color.cgColor
+            layer.shadowColor = style.shadow.color.cgColor
+        }
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {
         static let height: CGFloat = 48
         static let minimumEdgesSpacing: CGFloat = 4
         static let maximumFontSize: CGFloat = 32
-        static let animationDuration: TimeInterval = 0.2
+        static let animationDuration: TimeInterval = 0.25
     }
 
     // MARK: - Private Properties
@@ -116,18 +137,8 @@ final class Button: UIControl {
         return view
     }()
 
-    /// Style that is valid for current control's state.
-    private var currentStyle: POButtonStateStyle {
-        if !isEnabled {
-            return style.disabled
-        }
-        if isHighlighted {
-            return style.highlighted
-        }
-        return style.normal
-    }
-
     private var currentViewModel: ViewModel?
+    private var _isEnabled: Bool
 
     // MARK: - Private Methods
 
@@ -152,25 +163,23 @@ final class Button: UIControl {
             heightAnchor.constraint(equalToConstant: Constants.height)
         ]
         NSLayoutConstraint.activate(constraints)
-        clipsToBounds = true
         addTarget(self, action: #selector(didTouchUpInside), for: .touchUpInside)
     }
 
     private func configureWithCurrentViewModel(animated: Bool) {
-        guard let currentViewModel else {
-            return
+        if let currentViewModel {
+            configure(viewModel: currentViewModel, isEnabled: isEnabled, animated: animated)
         }
-        configure(viewModel: currentViewModel, animated: animated)
     }
 
-    private func addTitleLabelTransition() {
-        let transition = CATransition()
-        transition.type = .fade
-        if let backgroundAnimation = layer.action(forKey: "backgroundColor") as? CAAnimation {
-            transition.duration = backgroundAnimation.duration
-            transition.timingFunction = backgroundAnimation.timingFunction
+    private func style(isEnabled: Bool, isHighlighted: Bool) -> POButtonStateStyle {
+        if !isEnabled {
+            return style.disabled
         }
-        titleLabel.layer.add(transition, forKey: "transition")
+        if isHighlighted {
+            return style.highlighted
+        }
+        return style.normal
     }
 
     // MARK: - Actions

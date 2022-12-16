@@ -19,6 +19,14 @@ final class TextFieldContainerView: UIView, InputFormTextFieldType {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if let style, traitCollection.isColorAppearanceDifferent(to: previousTraitCollection) {
+            layer.borderColor = style.border.color.cgColor
+            layer.shadowColor = style.shadow.color.cgColor
+        }
+    }
+
     func configure(style: POTextFieldStyle, animated: Bool) {
         self.style = style
         configureWithCurrentState(animated: animated)
@@ -32,6 +40,7 @@ final class TextFieldContainerView: UIView, InputFormTextFieldType {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.borderStyle = .none
+        textField.adjustsFontForContentSizeCategory = false
         return textField
     }()
 
@@ -39,6 +48,7 @@ final class TextFieldContainerView: UIView, InputFormTextFieldType {
 
     private enum Constants {
         static let animationDuration: TimeInterval = 0.35
+        static let maximumFontSize: CGFloat = 30
         static let height: CGFloat = 48
         static let horizontalInset: CGFloat = 12
     }
@@ -60,37 +70,41 @@ final class TextFieldContainerView: UIView, InputFormTextFieldType {
             textField.centerYAnchor.constraint(equalTo: centerYAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
-        placeholderObservation = textField.observe(\.placeholder) { [weak self] _, _ in
-            self?.configureWithCurrentState(animated: false)
+        placeholderObservation = textField.observe(\.placeholder, options: .old) { [weak self] textField, value in
+            if textField.placeholder != value.oldValue {
+                self?.configureWithCurrentState(animated: false)
+            }
         }
-        configureWithCurrentState(animated: false)
     }
 
     private func configureWithCurrentState(animated: Bool) {
         guard let style else {
             return
         }
-        UIView.performWithoutAnimation {
+        UIView.animate(withDuration: Constants.animationDuration) { [self] in
+            CATransaction.begin()
+            CATransaction.setDisableActions(!animated)
             textField.attributedPlaceholder = AttributedStringBuilder()
                 .typography(style.placeholder.typography)
+                .textStyle(textStyle: .body)
+                .maximumFontSize(Constants.maximumFontSize)
                 .textColor(style.placeholder.color)
                 .string(textField.placeholder ?? "")
                 .build()
             let excludedTextAttributes: Set<NSAttributedString.Key> = [.paragraphStyle, .baselineOffset]
             let textAttributes = AttributedStringBuilder()
                 .typography(style.text.typography)
+                .textStyle(textStyle: .body)
+                .maximumFontSize(Constants.maximumFontSize)
                 .textColor(style.text.color)
                 .buildAttributes()
                 .filter { !excludedTextAttributes.contains($0.key) }
             textField.defaultTextAttributes = textAttributes
-        }
-        UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            CATransaction.begin()
-            CATransaction.setDisableActions(!animated)
             apply(style: style.border)
             apply(style: style.shadow)
             tintColor = style.tintColor
             backgroundColor = style.backgroundColor
+            UIView.performWithoutAnimation(layoutIfNeeded)
             CATransaction.commit()
         }
     }

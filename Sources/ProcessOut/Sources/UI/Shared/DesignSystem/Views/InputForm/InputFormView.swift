@@ -40,28 +40,39 @@ final class InputFormView: UIView {
             CATransaction.begin()
             CATransaction.setDisableActions(!animated)
             let style = viewModel.isInError ? style.error : style.normal
-            titleLabel.attributedText = AttributedStringBuilder()
-                .typography(style.title.typography)
-                .textColor(style.title.color)
-                .alignment(.center)
-                .string(viewModel.title)
-                .build()
-            textField.configure(style: style.field, animated: animated)
             if let description = viewModel.description, !description.isEmpty {
                 descriptionLabel.attributedText = AttributedStringBuilder()
                     .typography(style.description.typography)
+                    .textStyle(textStyle: .footnote)
                     .textColor(style.description.color)
                     .alignment(.center)
                     .string(description)
                     .build()
+                if animated {
+                    UIView.performWithoutAnimation(layoutIfNeeded)
+                    if alpha > 0.01 {
+                        descriptionLabel.addTransitionAnimation()
+                    }
+                }
                 descriptionLabel.alpha = 1
-                descriptionLabel.setHidden(false)
+                textFieldBottomConstraint.isActive = false
+                descriptionLabelBottomConstraint.isActive = true
             } else {
                 descriptionLabel.alpha = 0
-                descriptionLabel.setHidden(true)
+                descriptionLabelBottomConstraint.isActive = false
+                textFieldBottomConstraint.isActive = true
             }
-            contentView.setNeedsLayout()
-            contentView.layoutIfNeeded()
+            titleLabel.attributedText = AttributedStringBuilder()
+                .typography(style.title.typography)
+                .textStyle(textStyle: .body)
+                .textColor(style.title.color)
+                .alignment(.center)
+                .string(viewModel.title)
+                .build()
+            if animated {
+                titleLabel.addTransitionAnimation()
+            }
+            textField.configure(style: style.field, animated: animated)
             CATransaction.commit()
         }
     }
@@ -101,26 +112,27 @@ final class InputFormView: UIView {
         return label
     }()
 
-    private lazy var contentView: UIStackView = {
-        let view = UIStackView(arrangedSubviews: [titleLabel, textField, descriptionLabel])
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.axis = .vertical
-        view.alignment = .fill
-        view.distribution = .fill
-        view.spacing = Constants.verticalSpacing
-        return view
-    }()
+    private lazy var textFieldBottomConstraint = textField.bottomAnchor.constraint(equalTo: bottomAnchor)
+    private lazy var descriptionLabelBottomConstraint = descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
 
     // MARK: - Private Methods
 
     private func commonInit() {
         translatesAutoresizingMaskIntoConstraints = false
-        addSubview(contentView)
+        addSubview(titleLabel)
+        addSubview(textField)
+        addSubview(descriptionLabel)
         let constraints = [
-            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
+            titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            titleLabel.topAnchor.constraint(equalTo: topAnchor),
+            textField.leadingAnchor.constraint(equalTo: leadingAnchor),
+            textField.centerXAnchor.constraint(equalTo: centerXAnchor),
+            textField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: Constants.verticalSpacing),
+            descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
+            descriptionLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            descriptionLabel.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: Constants.verticalSpacing),
+            descriptionLabelBottomConstraint
         ]
         NSLayoutConstraint.activate(constraints)
     }

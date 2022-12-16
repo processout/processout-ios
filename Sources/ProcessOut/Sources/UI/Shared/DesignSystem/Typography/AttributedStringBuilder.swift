@@ -10,7 +10,6 @@ import UIKit
 final class AttributedStringBuilder {
 
     init() {
-        dynamicTypeEnabled = true
         attributedString = NSMutableAttributedString()
     }
 
@@ -39,6 +38,11 @@ final class AttributedStringBuilder {
         return self
     }
 
+    func textStyle(textStyle: UIFont.TextStyle?) -> AttributedStringBuilder {
+        self.textStyle = textStyle
+        return self
+    }
+
     /// The maximum point size allowed for the font. Use this value to constrain the font to the specified size
     /// when your interface cannot accommodate text that is any larger.
     func maximumFontSize(_ maximumSize: CGFloat?) -> AttributedStringBuilder {
@@ -58,7 +62,7 @@ final class AttributedStringBuilder {
             return [:]
         }
         let scaledFont = scaledFont(
-            typography: typography, dynamicTypeEnabled: dynamicTypeEnabled, maximumFontSize: maximumFontSize
+            typography: typography, textStyle: textStyle, maximumFontSize: maximumFontSize
         )
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
         let scaledLineHeight = scaledFont.lineHeight * lineHeightMultiple
@@ -90,9 +94,9 @@ final class AttributedStringBuilder {
         .paragraphStyle: paragraphStyle
     ]
 
-    private var dynamicTypeEnabled: Bool
     private var maximumFontSize: CGFloat?
     private var typography: POTypography?
+    private var textStyle: UIFont.TextStyle?
 
     // MARK: - Private Methods
 
@@ -103,8 +107,10 @@ final class AttributedStringBuilder {
         return offset < 0 ? offset : offset / 2
     }
 
-    private func scaledFont(typography: POTypography, dynamicTypeEnabled: Bool, maximumFontSize: CGFloat?) -> UIFont {
-        guard dynamicTypeEnabled, let textStyle = typography.textStyle else {
+    private func scaledFont(
+        typography: POTypography, textStyle: UIFont.TextStyle?, maximumFontSize: CGFloat?
+    ) -> UIFont {
+        guard let textStyle else {
             return typography.font
         }
         let fontMetrics = UIFontMetrics(forTextStyle: textStyle)

@@ -25,7 +25,7 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
     }
 
     override func loadView() {
-        let view = UIView()
+        view = UIView()
         view.backgroundColor = Asset.Colors.Background.primary.color
         view.addSubview(startedView)
         view.addSubview(backgroundDecorationView)
@@ -45,7 +45,7 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             successView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             successView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             successView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            successView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor)
+            successView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
         self.view = view
         NSLayoutConstraint.activate(constraints)
@@ -53,9 +53,9 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        observeKeyboardNotifications()
+        observeNotifications()
         viewModel.start()
-        viewModel.didChange = { [weak self] in self?.configureWithViewModelState() }
+        viewModel.didChange = { [weak self] in self?.configureWithViewModelState(animated: true) }
     }
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -65,7 +65,7 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let animationDuration: TimeInterval = 0.35
+        static let animationDuration: TimeInterval = 0.25
     }
 
     // MARK: - Private Properties
@@ -89,14 +89,12 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             view = indicatorView
         }
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.setAnimating(true)
+        view.hidesWhenStopped = true
         return view
     }()
 
     private lazy var backgroundDecorationView: BackgroundDecorationView = {
-        let view = BackgroundDecorationView(style: customStyle?.backgroundDecoration ?? .default)
-        view.alpha = 0
-        return view
+        BackgroundDecorationView(style: customStyle?.backgroundDecoration ?? .default)
     }()
 
     private lazy var startedView: NativeAlternativePaymentMethodStartedView = {
@@ -106,82 +104,97 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             codeInput: customStyle?.codeInput ?? .code,
             primaryButton: customStyle?.primaryButton ?? .primary
         )
-        let view = NativeAlternativePaymentMethodStartedView(style: style)
-        view.alpha = 0
-        return view
+        return NativeAlternativePaymentMethodStartedView(style: style)
     }()
 
     private lazy var successView: NativeAlternativePaymentMethodSuccessView = {
         let style = NativeAlternativePaymentMethodSuccessViewStyle(
             message: customStyle?.successMessage ?? .init(color: Asset.Colors.Text.success.color, typography: .headline)
         )
-        let view = NativeAlternativePaymentMethodSuccessView(style: style)
-        view.alpha = 0
-        return view
+        return NativeAlternativePaymentMethodSuccessView(style: style)
     }()
 
     private var notificationObservers: [NSObjectProtocol]
-    private var previousState: NativeAlternativePaymentMethodViewModelState?
+    private var currentState: NativeAlternativePaymentMethodViewModelState?
 
     // MARK: - State Management
 
-    private func configureWithViewModelState() {
-        switch viewModel.state {
+    private func configureWithViewModelState(animated: Bool) {
+        let state = viewModel.state
+        switch state {
         case .idle:
             break
         case .loading:
-            configureWithLoadingState()
+            configureWithLoadingState(animated: animated)
         case .started(let startedState):
-            configure(with: startedState)
+            configure(with: startedState, animated: animated)
         case .success(let successState):
-            configure(with: successState)
+            configure(with: successState, animated: animated)
         default:
             break
         }
-        previousState = viewModel.state
+        currentState = state
     }
 
-    private func configureWithLoadingState() {
+    private func configureWithLoadingState(animated: Bool) {
+        backgroundDecorationView.configure(
+            isExpanded: false, isSuccess: false, animated: !backgroundDecorationView.isHidden && animated
+        )
         UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            backgroundDecorationView.configure(
-                isExpanded: false, isSuccess: false, animated: backgroundDecorationView.isVisible
-            )
-            backgroundDecorationView.alpha = 1
-            activityIndicatorView.alpha = 1
-            startedView.alpha = 0
-            successView.alpha = 0
+            CATransaction.begin()
+            CATransaction.setDisableActions(!animated)
+            backgroundDecorationView.isHidden = false
+            activityIndicatorView.setAnimating(true)
+            startedView.isHidden = true
+            successView.isHidden = true
+            if case .loading = currentState { } else {
+                view.addTransitionAnimation()
+            }
+            CATransaction.commit()
         }
     }
 
-    private func configure(with startedState: NativeAlternativePaymentMethodViewModelState.Started) {
+    private func configure(with startedState: NativeAlternativePaymentMethodViewModelState.Started, animated: Bool) {
+        startedView.configure(with: startedState, animated: !startedView.isHidden && animated)
+        backgroundDecorationView.configure(
+            isExpanded: true, isSuccess: false, animated: !backgroundDecorationView.isHidden && animated
+        )
         UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            backgroundDecorationView.configure(
-                isExpanded: true, isSuccess: false, animated: backgroundDecorationView.isVisible
-            )
-            backgroundDecorationView.alpha = 0
-            activityIndicatorView.alpha = 0
-            startedView.configure(with: startedState, animated: startedView.isVisible)
-            startedView.alpha = 1
-            successView.alpha = 0
+            CATransaction.begin()
+            CATransaction.setDisableActions(!animated)
+            backgroundDecorationView.isHidden = true
+            activityIndicatorView.setAnimating(false)
+            startedView.isHidden = false
+            successView.isHidden = true
+            if case .started = currentState { } else {
+                view.addTransitionAnimation()
+            }
+            CATransaction.commit()
         }
     }
 
-    private func configure(with successState: NativeAlternativePaymentMethodViewModelState.Success) {
+    private func configure(with successState: NativeAlternativePaymentMethodViewModelState.Success, animated: Bool) {
+        successView.configure(with: successState, animated: !successView.isHidden && animated)
+        backgroundDecorationView.configure(
+            isExpanded: false, isSuccess: true, animated: animated && !backgroundDecorationView.isHidden && animated
+        )
         UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            backgroundDecorationView.configure(
-                isExpanded: false, isSuccess: true, animated: backgroundDecorationView.isVisible
-            )
-            backgroundDecorationView.alpha = 1
-            activityIndicatorView.alpha = 0
-            startedView.alpha = 0
-            successView.configure(with: successState, animated: successView.isVisible)
-            successView.alpha = 1
+            CATransaction.begin()
+            CATransaction.setDisableActions(!animated)
+            backgroundDecorationView.isHidden = false
+            activityIndicatorView.setAnimating(false)
+            startedView.isHidden = true
+            successView.isHidden = false
+            if case .success = currentState { } else {
+                view.addTransitionAnimation()
+            }
+            CATransaction.commit()
         }
     }
 
-    // MARK: - Keyboard Handling
+    // MARK: - Notifications
 
-    private func observeKeyboardNotifications() {
+    private func observeNotifications() {
         let willChangeFrameObserver = NotificationCenter.default.addObserver(
             forName: UIResponder.keyboardWillChangeFrameNotification,
             object: nil,
@@ -190,8 +203,18 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
                 self?.keyboardWillChangeFrame(notification: notification)
             }
         )
-        notificationObservers = [willChangeFrameObserver]
+        let didChangeContentSizeCategoryObserver = NotificationCenter.default.addObserver(
+            forName: UIContentSizeCategory.didChangeNotification,
+            object: nil,
+            queue: nil,
+            using: { [weak self] _ in
+                self?.configureWithViewModelState(animated: false)
+            }
+        )
+        notificationObservers = [willChangeFrameObserver, didChangeContentSizeCategoryObserver]
     }
+
+    // MARK: - Keyboard Handling
 
     private func keyboardWillChangeFrame(notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
@@ -202,14 +225,6 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             - view.safeAreaInsets.bottom
             + additionalSafeAreaInsets.bottom
         additionalSafeAreaInsets.bottom = max(coveredSafeAreaHeight, 0)
-        view.setNeedsLayout()
         view.layoutIfNeeded()
-    }
-}
-
-private extension UIView { // swiftlint:disable:this no_extension_access_modifier
-
-    var isVisible: Bool {
-        window != nil && !isHidden && alpha > 0.01
     }
 }
