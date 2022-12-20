@@ -30,7 +30,7 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
         view.addSubview(startedView)
         view.addSubview(backgroundDecorationView)
         view.addSubview(activityIndicatorView)
-        view.addSubview(successView)
+        view.addSubview(submittedView)
         let constraints = [
             activityIndicatorView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicatorView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -42,10 +42,10 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             startedView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             startedView.topAnchor.constraint(equalTo: view.topAnchor),
             startedView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            successView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            successView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            successView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            successView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            submittedView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            submittedView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            submittedView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            submittedView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
         self.view = view
         NSLayoutConstraint.activate(constraints)
@@ -54,8 +54,8 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         observeNotifications()
-        viewModel.start()
         viewModel.didChange = { [weak self] in self?.configureWithViewModelState(animated: true) }
+        viewModel.start()
     }
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -89,7 +89,8 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             view = indicatorView
         }
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.hidesWhenStopped = true
+        view.hidesWhenStopped = false
+        view.setAnimating(true)
         return view
     }()
 
@@ -107,11 +108,14 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
         return NativeAlternativePaymentMethodStartedView(style: style)
     }()
 
-    private lazy var successView: NativeAlternativePaymentMethodSuccessView = {
-        let style = NativeAlternativePaymentMethodSuccessViewStyle(
-            message: customStyle?.successMessage ?? .init(color: Asset.Colors.Text.success.color, typography: .headline)
+    private lazy var submittedView: NativeAlternativePaymentMethodSubmittedView = {
+        let style = NativeAlternativePaymentMethodSubmittedViewStyle(
+            message: customStyle?.message ?? .init(color: Asset.Colors.Text.primary.color, typography: .headline),
+            successMessage: customStyle?.successMessage ?? .init(
+                color: Asset.Colors.Text.success.color, typography: .headline
+            )
         )
-        return NativeAlternativePaymentMethodSuccessView(style: style)
+        return NativeAlternativePaymentMethodSubmittedView(style: style)
     }()
 
     private var notificationObservers: [NSObjectProtocol]
@@ -123,71 +127,69 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
         let state = viewModel.state
         switch state {
         case .idle:
-            break
+            configureWithIdleState()
         case .loading:
             configureWithLoadingState(animated: animated)
         case .started(let startedState):
             configure(with: startedState, animated: animated)
-        case .success(let successState):
-            configure(with: successState, animated: animated)
-        default:
-            break
+        case .submitted(let submittedState):
+            configure(with: submittedState, animated: animated)
         }
         currentState = state
     }
 
+    private func configureWithIdleState() {
+        backgroundDecorationView.alpha = 0
+        activityIndicatorView.alpha = 0
+        startedView.alpha = 0
+        submittedView.alpha = 0
+    }
+
     private func configureWithLoadingState(animated: Bool) {
         backgroundDecorationView.configure(
-            isExpanded: false, isSuccess: false, animated: !backgroundDecorationView.isHidden && animated
+            isExpanded: false, isSuccess: false, animated: backgroundDecorationView.alpha > 0.01 && animated
         )
         UIView.animate(withDuration: Constants.animationDuration) { [self] in
             CATransaction.begin()
             CATransaction.setDisableActions(!animated)
-            backgroundDecorationView.isHidden = false
-            activityIndicatorView.setAnimating(true)
-            startedView.isHidden = true
-            successView.isHidden = true
-            if case .loading = currentState { } else {
-                view.addTransitionAnimation()
-            }
+            backgroundDecorationView.alpha = 1
+            activityIndicatorView.alpha = 1
+            startedView.alpha = 0
+            submittedView.alpha = 0
             CATransaction.commit()
         }
     }
 
     private func configure(with startedState: NativeAlternativePaymentMethodViewModelState.Started, animated: Bool) {
-        startedView.configure(with: startedState, animated: !startedView.isHidden && animated)
+        startedView.configure(with: startedState, animated: startedView.alpha > 0.01 && animated)
         backgroundDecorationView.configure(
-            isExpanded: true, isSuccess: false, animated: !backgroundDecorationView.isHidden && animated
+            isExpanded: true, isSuccess: false, animated: backgroundDecorationView.alpha > 0.01 && animated
         )
         UIView.animate(withDuration: Constants.animationDuration) { [self] in
             CATransaction.begin()
             CATransaction.setDisableActions(!animated)
-            backgroundDecorationView.isHidden = true
-            activityIndicatorView.setAnimating(false)
-            startedView.isHidden = false
-            successView.isHidden = true
-            if case .started = currentState { } else {
-                view.addTransitionAnimation()
-            }
+            backgroundDecorationView.alpha = 0
+            activityIndicatorView.alpha = 0
+            startedView.alpha = 1
+            submittedView.alpha = 0
             CATransaction.commit()
         }
     }
 
-    private func configure(with successState: NativeAlternativePaymentMethodViewModelState.Success, animated: Bool) {
-        successView.configure(with: successState, animated: !successView.isHidden && animated)
+    private func configure(
+        with submittedState: NativeAlternativePaymentMethodViewModelState.Submitted, animated: Bool
+    ) {
+        submittedView.configure(with: submittedState, animated: submittedView.alpha > 0.01 && animated)
         backgroundDecorationView.configure(
-            isExpanded: false, isSuccess: true, animated: animated && !backgroundDecorationView.isHidden && animated
+            isExpanded: false, isSuccess: true, animated: backgroundDecorationView.alpha > 0.01 && animated
         )
         UIView.animate(withDuration: Constants.animationDuration) { [self] in
             CATransaction.begin()
             CATransaction.setDisableActions(!animated)
-            backgroundDecorationView.isHidden = false
-            activityIndicatorView.setAnimating(false)
-            startedView.isHidden = true
-            successView.isHidden = false
-            if case .success = currentState { } else {
-                view.addTransitionAnimation()
-            }
+            backgroundDecorationView.alpha = 1
+            activityIndicatorView.alpha = 0
+            startedView.alpha = 0
+            submittedView.alpha = 1
             CATransaction.commit()
         }
     }

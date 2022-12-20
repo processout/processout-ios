@@ -62,7 +62,7 @@ final class NativeAlternativePaymentMethodViewModel:
             state = .loading
         case .started(let startedState):
             state = convertToState(startedState: startedState)
-        case .failure(let failure):
+        case .failure(let failure), .submissionFailure(let failure), .captureFailure(let failure):
             completion?(.failure(failure))
         case .submitting(let startedStateSnapshot):
             state = convertToState(startedState: startedStateSnapshot, isSubmitting: true)
@@ -72,9 +72,6 @@ final class NativeAlternativePaymentMethodViewModel:
             state = convertToState(awaitingCaptureState: awaitingCaptureState)
         case .captured(let capturedState):
             configure(with: capturedState)
-        case .captureTimeout:
-            let failure = POFailure(code: .timeout)
-            completion?(.failure(failure))
         }
     }
 
@@ -100,7 +97,6 @@ final class NativeAlternativePaymentMethodViewModel:
         let state = State.Started(
             title: uiConfiguration?.title ?? Strings.title(startedState.gatewayDisplayName),
             parameters: parameters,
-            failureMessage: nil,
             isSubmitting: isSubmitting,
             action: .init(title: actionTitle, isEnabled: startedState.isSubmitAllowed) { [weak self] in
                 self?.interactor.submit()
@@ -113,12 +109,13 @@ final class NativeAlternativePaymentMethodViewModel:
         guard let expectedActionMessage = awaitingCaptureState.expectedActionMessage else {
             return .loading
         }
-        let pendingActionState = State.PendingAction(
-            gatewayLogo: awaitingCaptureState.gatewayLogo,
+        let submittedState = State.Submitted(
             message: expectedActionMessage,
-            image: nil
+            logoImage: awaitingCaptureState.gatewayLogoImage,
+            image: awaitingCaptureState.actionImage,
+            isCaptured: false
         )
-        return .pendingAction(pendingActionState)
+        return .submitted(submittedState)
     }
 
     private func configure(with capturedState: InteractorState.Captured) {
@@ -129,10 +126,13 @@ final class NativeAlternativePaymentMethodViewModel:
                 self?.completion?(.success(()))
             }
         )
-        let successState = State.Success(
-            gatewayLogo: capturedState.gatewayLogo, message: Strings.Success.message
+        let submittedState = State.Submitted(
+            message: Strings.Success.message,
+            logoImage: capturedState.gatewayLogo,
+            image: Asset.Images.success.image,
+            isCaptured: true
         )
-        state = .success(successState)
+        state = .submitted(submittedState)
     }
 
     // MARK: - Utils

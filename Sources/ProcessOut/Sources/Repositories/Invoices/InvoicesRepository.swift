@@ -61,12 +61,15 @@ final class InvoicesRepository: InvoicesRepositoryType {
         }
     }
 
-    func capture(invoiceId: String, completion: @escaping (Result<Void, Failure>) -> Void) {
-        let httpRequest = HttpConnectorRequest<VoidCodable>.post(
-            path: "/invoices/\(invoiceId)/capture", body: nil as AnyEncodable?
+    func captureNativeAlternativePayment(
+        request: NativeAlternativePaymentCaptureRequest,
+        completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, Failure>) -> Void
+    ) {
+        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentMethodResponse>.post(
+            path: "/invoices/\(request.invoiceId)/capture", body: request
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map { _ in () }.mapError(failureMapper.failure))
+            completion(result.mapError(failureMapper.failure))
         }
     }
 

@@ -37,11 +37,7 @@ extension ProcessOutApiConfiguration {
 
     /// Creates staging configuration.
     @_spi(PO)
-    public static func staging(projectId: String, password: String?) -> Self {
-        // swiftlint:disable force_unwrapping
-        let apiBaseUrl = URL(string: "https://api.processout.ninja")!
-        let checkoutBaseUrl = URL(string: "https://checkout.processout.ninja")!
-        // swiftlint:enable force_unwrapping
-        return Self(projectId: projectId, password: password, apiBaseUrl: apiBaseUrl, checkoutBaseUrl: checkoutBaseUrl)
+    public static func staging(projectId: String, password: String?, apiBaseUrl: URL, checkoutBaseUrl: URL) -> Self {
+        Self(projectId: projectId, password: password, apiBaseUrl: apiBaseUrl, checkoutBaseUrl: checkoutBaseUrl)
     }
 }

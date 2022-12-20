@@ -27,8 +27,11 @@ protocol InvoicesRepositoryType: PORepositoryType {
         request: POInvoiceAuthorizationRequest, completion: @escaping (Result<CustomerAction?, Failure>) -> Void
     )
 
-    /// Captures previously authorized invoice.
-    func capture(invoiceId: String, completion: @escaping (Result<Void, Failure>) -> Void)
+    /// Captures native alternative payment.
+    func captureNativeAlternativePayment(
+        request: NativeAlternativePaymentCaptureRequest,
+        completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, Failure>) -> Void
+    )
 
     /// Creates invoice with given parameters.
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void)

@@ -9,9 +9,14 @@ import Foundation
 
 final class InvoicesService: POInvoicesServiceType {
 
-    init(repository: InvoicesRepositoryType, customerActionHandler: CustomerActionHandlerType) {
+    init(
+        repository: InvoicesRepositoryType,
+        customerActionHandler: CustomerActionHandlerType,
+        maximumCaptureTimeout: TimeInterval
+    ) {
         self.repository = repository
         self.customerActionHandler = customerActionHandler
+        self.maximumCaptureTimeout = maximumCaptureTimeout
     }
 
     // MARK: - POCustomerTokensServiceType
@@ -59,8 +64,31 @@ final class InvoicesService: POInvoicesServiceType {
         }
     }
 
-    func capture(invoiceId: String, completion: @escaping (Result<Void, Failure>) -> Void) {
-        repository.capture(invoiceId: invoiceId, completion: completion)
+    func captureNativeAlternativePayment(
+        request: PONativeAlternativePaymentCaptureRequest, completion: @escaping (Result<Void, Failure>) -> Void
+    ) {
+        let captureTimeout = min(request.timeout ?? maximumCaptureTimeout, maximumCaptureTimeout)
+        let timer = Timer.scheduledTimer(withTimeInterval: captureTimeout, repeats: false) { _ in
+            let failure = Failure(code: .timeout)
+            completion(.failure(failure))
+        }
+        let request = NativeAlternativePaymentCaptureRequest(
+            invoiceId: request.invoiceId, source: request.gatewayConfigurationId
+        )
+        var repositoryCompletion: ((Result<PONativeAlternativePaymentMethodResponse, POFailure>) -> Void)! // swiftlint:disable:this implicitly_unwrapped_optional line_length
+        repositoryCompletion = { [repository] result in
+            guard timer.isValid else {
+                return
+            }
+            switch result {
+            case let .success(response) where response.nativeApm.state == .captured:
+                timer.invalidate()
+                completion(.success(()))
+            case .success, .failure:
+                repository.captureNativeAlternativePayment(request: request, completion: repositoryCompletion)
+            }
+        }
+        repository.captureNativeAlternativePayment(request: request, completion: repositoryCompletion)
     }
 
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void) {
@@ -71,6 +99,7 @@ final class InvoicesService: POInvoicesServiceType {
 
     private let repository: InvoicesRepositoryType
     private let customerActionHandler: CustomerActionHandlerType
+    private let maximumCaptureTimeout: TimeInterval
 }
 
 private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_extension_access_modifier

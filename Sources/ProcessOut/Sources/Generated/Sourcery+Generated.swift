@@ -56,11 +56,11 @@ extension InvoicesRepositoryType {
     }
 
     @MainActor
-    public func capture(
-        invoiceId: String
-    ) async throws -> Void {
+    public func captureNativeAlternativePayment(
+        request: NativeAlternativePaymentCaptureRequest
+    ) async throws -> PONativeAlternativePaymentMethodResponse {
         return try await withUnsafeThrowingContinuation { continuation in
-            capture(invoiceId: invoiceId, completion: continuation.resume)
+            captureNativeAlternativePayment(request: request, completion: continuation.resume)
         }
     }
 
@@ -188,11 +188,11 @@ extension POInvoicesServiceType {
     }
 
     @MainActor
-    public func capture(
-        invoiceId: String
+    public func captureNativeAlternativePayment(
+        request: PONativeAlternativePaymentCaptureRequest
     ) async throws -> Void {
         return try await withUnsafeThrowingContinuation { continuation in
-            capture(invoiceId: invoiceId, completion: continuation.resume)
+            captureNativeAlternativePayment(request: request, completion: continuation.resume)
         }
     }
 

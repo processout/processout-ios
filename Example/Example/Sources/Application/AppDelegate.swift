@@ -33,7 +33,12 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private func configureProcessOut() {
         let configuration = ProcessOutApiConfiguration.staging(
-            projectId: Constants.projectId, password: Constants.projectPassword
+            projectId: Constants.projectId,
+            password: Constants.projectPassword,
+            // swiftlint:disable force_unwrapping
+            apiBaseUrl: URL(string: Constants.apiBaseUrl)!,
+            checkoutBaseUrl: URL(string: Constants.checkoutBaseUrl)!
+            // swiftlint:enable force_unwrapping
         )
         ProcessOutApi.configure(configuration: configuration)
     }

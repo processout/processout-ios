@@ -63,9 +63,6 @@ enum NativeAlternativePaymentMethodViewModelState {
         /// Available parameters.
         let parameters: [Parameter]
 
-        /// The most recent failure message if any.
-        let failureMessage: String?
-
         /// Boolean value indicating if data is being submitted.
         let isSubmitting: Bool
 
@@ -73,26 +70,20 @@ enum NativeAlternativePaymentMethodViewModelState {
         let action: Action
     }
 
-    struct Success {
+    struct Submitted {
+
+        /// Message.
+        let message: String
 
         /// Gateway's logo image.
-        let gatewayLogo: UIImage?
-
-        /// Success message.
-        let message: String
-    }
-
-    struct PendingAction {
-
-        /// Gateway's logo image.
-        let gatewayLogo: UIImage?
-
-        /// Success message.
-        let message: String
+        let logoImage: UIImage?
 
         /// Image illustrating action.
         let image: UIImage?
+
+        /// Boolean value that indicates whether payment is already captured.
+        let isCaptured: Bool
     }
 
-    case idle, loading, started(Started), pendingAction(PendingAction), success(Success)
+    case idle, loading, started(Started), submitted(Submitted)
 }

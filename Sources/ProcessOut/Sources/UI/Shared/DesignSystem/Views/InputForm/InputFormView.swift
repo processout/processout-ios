@@ -48,12 +48,7 @@ final class InputFormView: UIView {
                     .alignment(.center)
                     .string(description)
                     .build()
-                if animated {
-                    UIView.performWithoutAnimation(layoutIfNeeded)
-                    if alpha > 0.01 {
-                        descriptionLabel.addTransitionAnimation()
-                    }
-                }
+                descriptionLabel.addTransitionAnimation()
                 descriptionLabel.alpha = 1
                 textFieldBottomConstraint.isActive = false
                 descriptionLabelBottomConstraint.isActive = true
@@ -69,9 +64,6 @@ final class InputFormView: UIView {
                 .alignment(.center)
                 .string(viewModel.title)
                 .build()
-            if animated {
-                titleLabel.addTransitionAnimation()
-            }
             textField.configure(style: style.field, animated: animated)
             CATransaction.commit()
         }
@@ -95,7 +87,6 @@ final class InputFormView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = false
         label.numberOfLines = 0
-        label.contentMode = .top
         label.setContentHuggingPriority(.required, for: .vertical)
         label.setContentCompressionResistancePriority(.required, for: .vertical)
         return label

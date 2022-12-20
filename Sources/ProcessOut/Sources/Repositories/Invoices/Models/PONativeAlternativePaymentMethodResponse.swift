@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 17.10.2022.
 //
 
+import Foundation
+
 public struct PONativeAlternativePaymentMethodResponse: Decodable {
 
     public struct NativeAlternativePaymentMethodParameterValues: Decodable {

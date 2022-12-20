@@ -29,8 +29,10 @@ public protocol POInvoicesServiceType: POServiceType {
         completion: @escaping (Result<Void, Failure>) -> Void
     )
 
-    /// Captures previously authorized invoice.
-    func capture(invoiceId: String, completion: @escaping (Result<Void, Failure>) -> Void)
+    /// Captures native alternative payament.
+    func captureNativeAlternativePayment(
+        request: PONativeAlternativePaymentCaptureRequest, completion: @escaping (Result<Void, Failure>) -> Void
+    )
 
     /// Creates invoice with given parameters.
     @_spi(PO)

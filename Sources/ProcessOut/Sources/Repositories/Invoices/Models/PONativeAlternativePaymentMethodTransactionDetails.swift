@@ -17,6 +17,9 @@ public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable {
 
         /// Gateway's logo URL.
         public let logoUrl: URL
+
+        /// Customer action image URL if any.
+        public let customerActionImageUrl: URL?
     }
 
     /// Invoice details.

@@ -39,6 +39,9 @@ enum NativeAlternativePaymentMethodInteractorState {
         /// Gateway's logo URL.
         let gatewayLogo: UIImage?
 
+        /// Customer action image URL if any.
+        let customerActionImageUrl: URL?
+
         /// Invoice amount.
         let amount: Decimal
 
@@ -52,7 +55,7 @@ enum NativeAlternativePaymentMethodInteractorState {
         let values: [String: ParameterValue]
 
         /// The most recent error message.
-        let recentErrorMessage: String?
+        let recentFailure: POFailure?
 
         /// Boolean value indicating whether submit it currently allowed.
         let isSubmitAllowed: Bool
@@ -61,10 +64,13 @@ enum NativeAlternativePaymentMethodInteractorState {
     struct AwaitingCapture {
 
         /// Gateway logo.
-        let gatewayLogo: UIImage?
+        let gatewayLogoImage: UIImage?
 
         /// Messaged describing additional actions that are needed from user in order to capture payment.
         let expectedActionMessage: String?
+
+        /// Action image.
+        let actionImage: UIImage?
     }
 
     struct Captured {
@@ -88,6 +94,9 @@ enum NativeAlternativePaymentMethodInteractorState {
     /// Parameter values are being submitted.
     case submitting(snapshot: Started)
 
+    /// Interactor did fail to submit values and encountered unrecoverable error. This is a sink state.
+    case submissionFailure(POFailure)
+
     /// Parameter values were submitted.
     /// - NOTE: This is a sink state and it's only set if user opted out from awaiting capture.
     case submitted
@@ -98,6 +107,6 @@ enum NativeAlternativePaymentMethodInteractorState {
     /// Payment is completed.
     case captured(Captured)
 
-    /// Payment still may be captured in future but implementation rejects to wait longer due to specified time out.
-    case captureTimeout
+    /// Implementation did fail to capture payment. This is a sink state.
+    case captureFailure(POFailure)
 }

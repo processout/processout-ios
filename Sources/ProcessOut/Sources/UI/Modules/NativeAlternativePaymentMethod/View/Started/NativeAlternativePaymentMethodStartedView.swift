@@ -134,17 +134,16 @@ final class NativeAlternativePaymentMethodStartedView: UIView { // swiftlint:dis
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
             scrollView.topAnchor.constraint(equalTo: topAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            scrollView.bottomAnchor.constraint(
+                equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.additionalBottomScrollContentInset
+            ),
             contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
             contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.safeAreaLayoutGuide.widthAnchor),
             contentView.heightAnchor
-                .constraint(
-                    equalTo: scrollView.safeAreaLayoutGuide.heightAnchor,
-                    constant: -Constants.additionalBottomScrollContentInset
-                )
+                .constraint(equalTo: scrollView.safeAreaLayoutGuide.heightAnchor)
                 .with(priority: .defaultHigh)
         ]
         NSLayoutConstraint.activate(constraints)

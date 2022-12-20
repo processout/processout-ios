@@ -72,11 +72,12 @@ final class NativeAlternativePaymentMethodInteractor:
         let updatedStartedState = State.Started(
             gatewayDisplayName: startedState.gatewayDisplayName,
             gatewayLogo: startedState.gatewayLogo,
+            customerActionImageUrl: startedState.customerActionImageUrl,
             amount: startedState.amount,
             currencyCode: startedState.currencyCode,
             parameters: startedState.parameters,
             values: updatedValues,
-            recentErrorMessage: nil,
+            recentFailure: nil,
             isSubmitAllowed: isSubmitAllowed
         )
         state = .started(updatedStartedState)
@@ -96,10 +97,20 @@ final class NativeAlternativePaymentMethodInteractor:
         invoicesService.initiatePayment(request: request) { [weak self] result in
             switch result {
             case let .success(response) where response.nativeApm.state == .pendingCapture:
-                self?.trySetAwaitingCaptureStateUnchecked(
-                    gatewayLogo: startedState.gatewayLogo,
-                    expectedActionMessage: response.nativeApm.parameterValues?.message
-                )
+                let message = response.nativeApm.parameterValues?.message
+                if let imageUrl = startedState.customerActionImageUrl {
+                    self?.imagesRepository.image(url: imageUrl) { image in
+                        self?.trySetAwaitingCaptureStateUnchecked(
+                            gatewayLogo: startedState.gatewayLogo, expectedActionMessage: message, actionImage: image
+                        )
+                    }
+                } else {
+                    self?.trySetAwaitingCaptureStateUnchecked(
+                        gatewayLogo: startedState.gatewayLogo, expectedActionMessage: message, actionImage: nil
+                    )
+                }
+            case let .success(response) where response.nativeApm.state == .captured:
+                self?.setCapturedState()
             case let .success(response):
                 self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
             case let .failure(failure):
@@ -111,7 +122,6 @@ final class NativeAlternativePaymentMethodInteractor:
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let maximumCaptureTimeout: TimeInterval = 180
         static let emailRegex = #"^\S+@\S+$"#
     }
 
@@ -130,65 +140,81 @@ final class NativeAlternativePaymentMethodInteractor:
         case .customerInput, nil:
             break
         case .pendingCapture:
-            trySetAwaitingCaptureStateUnchecked(gatewayLogo: gatewayLogo, expectedActionMessage: nil)
+            trySetAwaitingCaptureStateUnchecked(gatewayLogo: gatewayLogo, expectedActionMessage: nil, actionImage: nil)
+            return
+        case .captured:
+            setCapturedStateUnchecked(gatewayLogo: gatewayLogo)
             return
         }
         if details.parameters.isEmpty {
-            Logger.ui.debug("Will set started state without empty inputs, this may be unexpected.")
+            Logger.ui.debug("Will set started state with empty inputs, this may be unexpected.")
         }
         let startedState = State.Started(
             gatewayDisplayName: details.gateway.displayName,
             gatewayLogo: gatewayLogo,
+            customerActionImageUrl: details.gateway.customerActionImageUrl,
             amount: details.invoice.amount,
             currencyCode: details.invoice.currencyCode,
             parameters: details.parameters,
             values: [:],
-            recentErrorMessage: nil,
+            recentFailure: nil,
             isSubmitAllowed: details.parameters.map { isValid(value: nil, for: $0) }.allSatisfy { $0 }
         )
         state = .started(startedState)
     }
 
-    private func trySetAwaitingCaptureStateUnchecked(gatewayLogo: UIImage?, expectedActionMessage: String?) {
+    private func trySetAwaitingCaptureStateUnchecked(
+        gatewayLogo: UIImage?, expectedActionMessage: String?, actionImage: UIImage?
+    ) {
         guard configuration.waitsPaymentConfirmation else {
             state = .submitted
             return
         }
         let awaitingCaptureState = State.AwaitingCapture(
-            gatewayLogo: gatewayLogo, expectedActionMessage: nil
+            gatewayLogoImage: gatewayLogo, expectedActionMessage: expectedActionMessage, actionImage: actionImage
         )
         state = .awaitingCapture(awaitingCaptureState)
-        let captureTimeout = min(Constants.maximumCaptureTimeout, configuration.paymentConfirmationTimeout)
-        let timer = Timer.scheduledTimer(withTimeInterval: captureTimeout, repeats: false) { [weak self] _ in
-            self?.state = .captureTimeout
-        }
-        var completion: ((Result<Void, POFailure>) -> Void)! // swiftlint:disable:this implicitly_unwrapped_optional
-        completion = { [weak self, invoicesService, configuration] result in
-            guard let self, timer.isValid else {
-                return
-            }
+        let request = PONativeAlternativePaymentCaptureRequest(
+            invoiceId: configuration.invoiceId,
+            gatewayConfigurationId: configuration.gatewayConfigurationId,
+            timeout: configuration.paymentConfirmationTimeout
+        )
+        invoicesService.captureNativeAlternativePayment(request: request) { [weak self] result in
             switch result {
             case .success:
-                timer.invalidate()
-                self.setCapturedState()
-            case .failure:
-                invoicesService.capture(invoiceId: configuration.invoiceId, completion: completion)
+                self?.setCapturedState()
+            case .failure(let failure):
+                self?.state = .captureFailure(failure)
             }
         }
-        invoicesService.capture(invoiceId: configuration.invoiceId, completion: completion)
     }
 
     private func setCapturedState() {
-        guard case let .awaitingCapture(awaitingCaptureState) = state else {
+        let gatewayLogo: UIImage?
+        switch state {
+        case let .awaitingCapture(awaitingCaptureState):
+            gatewayLogo = awaitingCaptureState.gatewayLogoImage
+        case let .submitting(startedStateSnapshot):
+            gatewayLogo = startedStateSnapshot.gatewayLogo
+        default:
             Logger.ui.error("Can't change state to captured from current state.")
             return
         }
-        let capturedState = State.Captured(gatewayLogo: awaitingCaptureState.gatewayLogo)
+        let capturedState = State.Captured(gatewayLogo: gatewayLogo)
+        self.state = .captured(capturedState)
+    }
+
+    private func setCapturedStateUnchecked(gatewayLogo: UIImage?) {
+        let capturedState = State.Captured(gatewayLogo: gatewayLogo)
         self.state = .captured(capturedState)
     }
 
     private func restoreStartedStateAfterSubmissionFailure(_ failure: POFailure) {
         guard case let .submitting(startedState) = state else {
+            return
+        }
+        guard let invalidFields = failure.invalidFields, !invalidFields.isEmpty else {
+            state = .submissionFailure(failure)
             return
         }
         var updatedValues: [String: State.ParameterValue] = [:]
@@ -199,11 +225,12 @@ final class NativeAlternativePaymentMethodInteractor:
         let updatedStartedState = State.Started(
             gatewayDisplayName: startedState.gatewayDisplayName,
             gatewayLogo: startedState.gatewayLogo,
+            customerActionImageUrl: startedState.customerActionImageUrl,
             amount: startedState.amount,
             currencyCode: startedState.currencyCode,
             parameters: startedState.parameters,
             values: updatedValues,
-            recentErrorMessage: failure.message,
+            recentFailure: failure,
             isSubmitAllowed: false
         )
         self.state = .started(updatedStartedState)
@@ -217,11 +244,12 @@ final class NativeAlternativePaymentMethodInteractor:
         let updatedStartedState = State.Started(
             gatewayDisplayName: startedState.gatewayDisplayName,
             gatewayLogo: startedState.gatewayLogo,
+            customerActionImageUrl: startedState.customerActionImageUrl,
             amount: startedState.amount,
             currencyCode: startedState.currencyCode,
             parameters: parameters,
             values: [:],
-            recentErrorMessage: nil,
+            recentFailure: nil,
             isSubmitAllowed: parameters.map { isValid(value: nil, for: $0) }.allSatisfy { $0 }
         )
         state = .started(updatedStartedState)

@@ -14,4 +14,7 @@ public enum NativeAlternativePaymentMethodState: String, Decodable {
 
     /// Invoice is pending capture.
     case pendingCapture = "PENDING_CAPTURE"
+
+    /// Invoice is captured.
+    case captured = "CAPTURED"
 }
