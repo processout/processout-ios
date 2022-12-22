@@ -18,10 +18,19 @@ public struct POTypography {
     /// Tracking value.
     public let tracking: CGFloat?
 
-    public init(font: UIFont, lineHeight: CGFloat? = nil, tracking: CGFloat? = nil) {
+    /// A Boolean that indicates whether the font should be updated when the device’s content size category changes.
+    public let adjustsFontForContentSizeCategory: Bool
+
+    public init(
+        font: UIFont,
+        lineHeight: CGFloat? = nil,
+        tracking: CGFloat? = nil,
+        adjustsFontForContentSizeCategory: Bool = true
+    ) {
         self.font = font
         self.lineHeight = lineHeight ?? font.lineHeight
         self.tracking = tracking
+        self.adjustsFontForContentSizeCategory = adjustsFontForContentSizeCategory
     }
 }
 

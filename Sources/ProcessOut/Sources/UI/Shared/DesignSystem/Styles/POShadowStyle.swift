@@ -28,6 +28,12 @@ public struct POShadowStyle {
 
 extension POShadowStyle {
 
+    static let `default` = POShadowStyle(
+        color: Asset.Colors.Text.primary.color.withAlphaComponent(0.1),
+        offset: CGSize(width: 0, height: 8),
+        radius: 24
+    )
+
     /// Value represents no shadow.
     public static let clear = Self(color: .clear, offset: .zero, radius: 0)
 }

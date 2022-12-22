@@ -64,11 +64,11 @@ final class InvoicesRepository: InvoicesRepositoryType {
     func captureNativeAlternativePayment(
         request: NativeAlternativePaymentCaptureRequest,
         completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, Failure>) -> Void
-    ) {
+    ) -> POCancellableType {
         let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentMethodResponse>.post(
             path: "/invoices/\(request.invoiceId)/capture", body: request
         )
-        connector.execute(request: httpRequest) { [failureMapper] result in
+        return connector.execute(request: httpRequest) { [failureMapper] result in
             completion(result.mapError(failureMapper.failure))
         }
     }

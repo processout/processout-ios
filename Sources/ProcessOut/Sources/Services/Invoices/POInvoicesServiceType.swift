@@ -30,9 +30,10 @@ public protocol POInvoicesServiceType: POServiceType {
     )
 
     /// Captures native alternative payament.
+    @discardableResult
     func captureNativeAlternativePayment(
         request: PONativeAlternativePaymentCaptureRequest, completion: @escaping (Result<Void, Failure>) -> Void
-    )
+    ) -> POCancellableType
 
     /// Creates invoice with given parameters.
     @_spi(PO)

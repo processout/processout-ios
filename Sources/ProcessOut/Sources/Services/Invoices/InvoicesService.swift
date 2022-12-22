@@ -66,7 +66,8 @@ final class InvoicesService: POInvoicesServiceType {
 
     func captureNativeAlternativePayment(
         request: PONativeAlternativePaymentCaptureRequest, completion: @escaping (Result<Void, Failure>) -> Void
-    ) {
+    ) -> POCancellableType {
+        let cancellable = GroupCancellable()
         let captureTimeout = min(request.timeout ?? maximumCaptureTimeout, maximumCaptureTimeout)
         let timer = Timer.scheduledTimer(withTimeInterval: captureTimeout, repeats: false) { _ in
             let failure = Failure(code: .timeout)
@@ -84,11 +85,19 @@ final class InvoicesService: POInvoicesServiceType {
             case let .success(response) where response.nativeApm.state == .captured:
                 timer.invalidate()
                 completion(.success(()))
+            case let .failure(failrue) where failrue.code == .cancelled:
+                timer.invalidate()
+                completion(.failure(failrue))
             case .success, .failure:
-                repository.captureNativeAlternativePayment(request: request, completion: repositoryCompletion)
+                cancellable.add(
+                    repository.captureNativeAlternativePayment(request: request, completion: repositoryCompletion)
+                )
             }
         }
-        repository.captureNativeAlternativePayment(request: request, completion: repositoryCompletion)
+        cancellable.add(
+            repository.captureNativeAlternativePayment(request: request, completion: repositoryCompletion)
+        )
+        return cancellable
     }
 
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void) {

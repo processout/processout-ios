@@ -17,9 +17,9 @@ extension UIView {
     }
 
     /// Applies given shadow style to view's layer.
-    func apply(style: POShadowStyle) {
+    func apply(style: POShadowStyle, shadowOpacity: CGFloat = 1) {
         layer.shadowColor = style.color.cgColor
-        layer.shadowOpacity = 1
+        layer.shadowOpacity = Float(shadowOpacity)
         layer.shadowOffset = style.offset
         layer.shadowRadius = style.radius
     }

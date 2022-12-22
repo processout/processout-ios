@@ -110,7 +110,7 @@ final class AttributedStringBuilder {
     private func scaledFont(
         typography: POTypography, textStyle: UIFont.TextStyle?, maximumFontSize: CGFloat?
     ) -> UIFont {
-        guard let textStyle else {
+        guard let textStyle, typography.adjustsFontForContentSizeCategory else {
             return typography.font
         }
         let fontMetrics = UIFontMetrics(forTextStyle: textStyle)

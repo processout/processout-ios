@@ -45,7 +45,10 @@ final class HttpConnector: HttpConnectorType {
 
     // MARK: - HttpConnectorType
 
-    func execute<Value>(request: HttpConnectorRequest<Value>, completion: @escaping (Result<Value, Failure>) -> Void) {
+    func execute<Value>(
+        request: HttpConnectorRequest<Value>, completion: @escaping (Result<Value, Failure>) -> Void
+    ) -> POCancellableType {
+        let cancellable = GroupCancellable()
         workQueue.async {
             do {
                 let sessionRequest = try self.createUrlRequest(request: request)
@@ -53,11 +56,13 @@ final class HttpConnector: HttpConnectorType {
                     self.completeRequest(with: data, urlResponse: response, error: error, completion: completion)
                 }
                 dataTask.resume()
+                cancellable.add(dataTask)
             } catch {
                 Logger.connectors.error("Did fail to create a request: '\(error.localizedDescription)'.")
                 self.completeRequest(with: .failure(error), completion: completion)
             }
         }
+        return cancellable
     }
 
     // MARK: - Private Properties

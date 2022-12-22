@@ -18,7 +18,7 @@ public struct PONativeAlternativePaymentMethodResponse: Decodable {
     public struct NativeApm: Decodable {
 
         /// Payment's state.
-        public let state: NativeAlternativePaymentMethodState
+        public let state: PONativeAlternativePaymentMethodState
 
         /// Contains details about the additional information you need to collect from your customer before creating the
         /// payment request.

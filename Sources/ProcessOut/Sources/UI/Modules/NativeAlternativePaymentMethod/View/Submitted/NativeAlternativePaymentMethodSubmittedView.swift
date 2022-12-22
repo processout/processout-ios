@@ -49,7 +49,9 @@ final class NativeAlternativePaymentMethodSubmittedView: UIView {
             state.isCaptured ? Constants.descriptionBottomSpacing : Constants.descriptionBottomSmallSpacing,
             after: descriptionLabel
         )
-        addTransitionAnimation()
+        if animated {
+            addTransitionAnimation()
+        }
     }
 
     // MARK: - Private Nested Types

@@ -35,6 +35,10 @@ final class NativeAlternativePaymentMethodInteractor:
         super.init(state: .idle)
     }
 
+    deinit {
+        captureCancellable?.cancel()
+    }
+
     // MARK: - NativeAlternativePaymentMethodInteractorType
 
     override func start() {
@@ -130,6 +134,7 @@ final class NativeAlternativePaymentMethodInteractor:
     private let invoicesService: POInvoicesServiceType
     private let imagesRepository: POImagesRepositoryType
     private let configuration: Configuration
+    private var captureCancellable: POCancellableType?
 
     // MARK: - State Management
 
@@ -179,7 +184,7 @@ final class NativeAlternativePaymentMethodInteractor:
             gatewayConfigurationId: configuration.gatewayConfigurationId,
             timeout: configuration.paymentConfirmationTimeout
         )
-        invoicesService.captureNativeAlternativePayment(request: request) { [weak self] result in
+        captureCancellable = invoicesService.captureNativeAlternativePayment(request: request) { [weak self] result in
             switch result {
             case .success:
                 self?.setCapturedState()

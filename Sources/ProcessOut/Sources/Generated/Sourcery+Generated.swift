@@ -56,15 +56,6 @@ extension InvoicesRepositoryType {
     }
 
     @MainActor
-    public func captureNativeAlternativePayment(
-        request: NativeAlternativePaymentCaptureRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse {
-        return try await withUnsafeThrowingContinuation { continuation in
-            captureNativeAlternativePayment(request: request, completion: continuation.resume)
-        }
-    }
-
-    @MainActor
     public func createInvoice(
         request: POInvoiceCreationRequest
     ) async throws -> POInvoice {
@@ -184,15 +175,6 @@ extension POInvoicesServiceType {
     ) async throws -> Void {
         return try await withUnsafeThrowingContinuation { continuation in
             authorizeInvoice(request: request, customerActionHandlerDelegate: customerActionHandlerDelegate, completion: continuation.resume)
-        }
-    }
-
-    @MainActor
-    public func captureNativeAlternativePayment(
-        request: PONativeAlternativePaymentCaptureRequest
-    ) async throws -> Void {
-        return try await withUnsafeThrowingContinuation { continuation in
-            captureNativeAlternativePayment(request: request, completion: continuation.resume)
         }
     }
 

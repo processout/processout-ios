@@ -71,7 +71,6 @@ final class AlternativePaymentMethodsViewController<ViewModel: AlternativePaymen
 
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         collectionView.refreshControl = refreshControl
         return collectionView

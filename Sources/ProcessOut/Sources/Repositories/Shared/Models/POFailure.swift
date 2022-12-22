@@ -135,7 +135,7 @@ public struct POFailure: Error {
         case serviceNotSupported                 = "service.not-supported"
     }
 
-    public enum Code {
+    public enum Code: Equatable {
 
         /// No network connection.
         case networkUnreachable
@@ -145,6 +145,9 @@ public struct POFailure: Error {
 
         /// Something went wrong on the ProcessOut side. This is extremely rare.
         case `internal`
+
+        /// Cancellation error.
+        case cancelled
 
         /// The request contained a field that couldn’t be validated.
         case validation(ValidationCode)

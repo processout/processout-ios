@@ -13,5 +13,5 @@ public enum POActivityIndicatorStyle {
     case custom(POActivityIndicatorViewType)
 
     /// System activity indicator.
-    case system(UIActivityIndicatorView.Style, color: UIColor)
+    case system(UIActivityIndicatorView.Style, color: UIColor? = nil)
 }

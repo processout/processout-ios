@@ -26,7 +26,7 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
 
     override func loadView() {
         view = UIView()
-        view.backgroundColor = Asset.Colors.Background.primary.color
+        view.backgroundColor = customStyle?.backgroundColor ?? Asset.Colors.Background.primary.color
         view.addSubview(startedView)
         view.addSubview(backgroundDecorationView)
         view.addSubview(activityIndicatorView)
@@ -76,19 +76,11 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
     private lazy var activityIndicatorView: POActivityIndicatorViewType = {
         let style: POActivityIndicatorStyle
         if #available(iOS 13.0, *) {
-            style = customStyle?.activityIndicator ?? .system(.large, color: Asset.Colors.Generic.white.color)
+            style = customStyle?.activityIndicator ?? .system(.large)
         } else {
-            style = customStyle?.activityIndicator ?? .system(.whiteLarge, color: Asset.Colors.Generic.white.color)
+            style = customStyle?.activityIndicator ?? .system(.whiteLarge)
         }
-        let view: POActivityIndicatorViewType
-        switch style {
-        case .custom(let customView):
-            view = customView
-        case let .system(style, color):
-            let indicatorView = UIActivityIndicatorView(style: style)
-            view = indicatorView
-        }
-        view.translatesAutoresizingMaskIntoConstraints = false
+        let view = ActivityIndicatorViewFactory().create(style: style)
         view.hidesWhenStopped = false
         view.setAnimating(true)
         return view
@@ -103,7 +95,9 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             title: customStyle?.title ?? .init(color: Asset.Colors.Text.primary.color, typography: .title),
             input: customStyle?.input ?? .default,
             codeInput: customStyle?.codeInput ?? .code,
-            primaryButton: customStyle?.primaryButton ?? .primary
+            primaryButton: customStyle?.primaryButton ?? .primary,
+            buttonsContainerShadow: customStyle?.buttonsContainerShadow ?? .`default`,
+            backgroundColor: customStyle?.backgroundColor ?? Asset.Colors.Background.primary.color
         )
         return NativeAlternativePaymentMethodStartedView(style: style)
     }()

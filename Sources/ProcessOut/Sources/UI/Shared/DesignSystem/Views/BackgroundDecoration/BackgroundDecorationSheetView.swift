@@ -37,13 +37,15 @@ final class BackgroundDecorationSheetView: UIView {
     }
 
     override func action(for layer: CALayer, forKey event: String) -> CAAction? {
-        if event == "path" {
+        switch event {
+        case "path", "fillColor": // Fill color is not animated on iOS < 16
             let backgroundAnimation = layer.action(forKey: "backgroundColor") as? CAPropertyAnimation
             let animation = backgroundAnimation?.copy() as? CAPropertyAnimation
-            animation?.keyPath = "path"
+            animation?.keyPath = event
             return animation
+        default:
+            return super.action(for: layer, forKey: event)
         }
-        return super.action(for: layer, forKey: event)
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -67,7 +69,7 @@ final class BackgroundDecorationSheetView: UIView {
     private func createSheetPath(height: CGFloat) -> CGPath {
         let adjustedHeight: CGFloat
         let adjustedCapHeight: CGFloat
-        if safeAreaInsets.top + height + capHeight > bounds.height - safeAreaInsets.bottom {
+        if safeAreaInsets.top + height + capHeight > bounds.height {
             adjustedHeight = bounds.height
             adjustedCapHeight = 0
         } else {

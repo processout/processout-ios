@@ -128,16 +128,7 @@ final class Button: UIControl {
     }()
 
     private lazy var activityIndicatorView: POActivityIndicatorViewType = {
-        let view: POActivityIndicatorViewType
-        switch style.activityIndicator {
-        case .custom(let customView):
-            view = customView
-        case let .system(style, color):
-            let indicatorView = UIActivityIndicatorView(style: style)
-            indicatorView.color = color
-            view = indicatorView
-        }
-        view.translatesAutoresizingMaskIntoConstraints = false
+        let view = ActivityIndicatorViewFactory().create(style: style.activityIndicator)
         view.hidesWhenStopped = false
         view.setAnimating(true)
         return view

@@ -16,7 +16,8 @@ final class HttpConnectorRetryDecorator: HttpConnectorType {
 
     func execute<Value>(
         request: HttpConnectorRequest<Value>, completion: @escaping (Result<Value, HttpConnectorFailure>) -> Void
-    ) {
+    ) -> POCancellableType {
+        let cancellable = GroupCancellable()
         var retriesCount = 0
         var completionTrampoline: ((Result<Value, HttpConnectorFailure>) -> Void)?
         completionTrampoline = { [retryStrategy] result in
@@ -29,10 +30,15 @@ final class HttpConnectorRetryDecorator: HttpConnectorType {
             let delay = self.retryStrategy.interval(for: retriesCount)
             retriesCount += 1
             Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { _ in
-                self.connector.execute(request: request, completion: completionTrampoline ?? completion)
+                cancellable.add(
+                    self.connector.execute(request: request, completion: completionTrampoline ?? completion)
+                )
             }
         }
-        connector.execute(request: request, completion: completionTrampoline ?? completion)
+        cancellable.add(
+            connector.execute(request: request, completion: completionTrampoline ?? completion)
+        )
+        return cancellable
     }
 
     // MARK: - Private Properties

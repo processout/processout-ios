@@ -21,6 +21,17 @@ final class AlternativePaymentMethodsRouter: RouterType {
                     self?.viewController?.dismiss(animated: true)
                 })
                 .build()
+            let cancelBarButtonItem = UIBarButtonItem(
+                systemItem: .cancel,
+                primaryAction: .init(handler: { [weak self] _ in
+                    self?.viewController?.dismiss(animated: true)
+                }),
+                menu: nil
+            )
+            cancelBarButtonItem.tintColor = Asset.Colors.Button.primary.color
+            let spaceBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: self, action: nil)
+            spaceBarButtonItem.width = 18
+            viewController.navigationItem.leftBarButtonItems = [spaceBarButtonItem, cancelBarButtonItem]
             let navigationController = UINavigationController(rootViewController: viewController)
             navigationController.navigationBar.prefersLargeTitles = false
             self.viewController?.present(navigationController, animated: true)

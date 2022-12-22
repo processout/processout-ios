@@ -48,7 +48,9 @@ final class InputFormView: UIView {
                     .alignment(.center)
                     .string(description)
                     .build()
-                descriptionLabel.addTransitionAnimation()
+                if animated {
+                    descriptionLabel.addTransitionAnimation()
+                }
                 descriptionLabel.alpha = 1
                 textFieldBottomConstraint.isActive = false
                 descriptionLabelBottomConstraint.isActive = true

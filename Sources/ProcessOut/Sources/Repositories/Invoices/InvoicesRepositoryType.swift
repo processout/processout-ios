@@ -31,7 +31,7 @@ protocol InvoicesRepositoryType: PORepositoryType {
     func captureNativeAlternativePayment(
         request: NativeAlternativePaymentCaptureRequest,
         completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, Failure>) -> Void
-    )
+    ) -> POCancellableType
 
     /// Creates invoice with given parameters.
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void)

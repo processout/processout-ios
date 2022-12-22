@@ -49,7 +49,6 @@ final class FeaturesViewController<ViewModel: FeaturesViewModelType>:
 
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         return collectionView
     }()

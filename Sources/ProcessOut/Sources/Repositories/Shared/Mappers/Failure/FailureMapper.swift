@@ -14,7 +14,7 @@ final class FailureMapper: FailureMapperType {
         let code: POFailure.Code?
         let invalidFields: [POFailure.InvalidField]?
         switch failure {
-        case .coding, .cancelled, .internal:
+        case .coding, .internal:
             message = "An unexpected error occurred while processing your request."
             code = .internal
             invalidFields = nil
@@ -25,6 +25,10 @@ final class FailureMapper: FailureMapperType {
         case .timeout:
             message = "Request timed out."
             code = .timeout
+            invalidFields = nil
+        case .cancelled:
+            message = "Request was cancelled."
+            code = .cancelled
             invalidFields = nil
         case let .server(error, statusCode):
             code = failureCode(from: error, statusCode: statusCode)

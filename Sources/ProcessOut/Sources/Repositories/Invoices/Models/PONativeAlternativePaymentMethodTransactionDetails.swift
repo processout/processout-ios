@@ -34,7 +34,7 @@ public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable {
     }
 
     /// Payment's state.
-    public let state: NativeAlternativePaymentMethodState?
+    public let state: PONativeAlternativePaymentMethodState?
 
     /// Gateway details.
     public let gateway: Gateway

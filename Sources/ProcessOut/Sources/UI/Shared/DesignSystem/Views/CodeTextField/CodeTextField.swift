@@ -391,14 +391,16 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
             ]
             if groupViews.indices.contains(offset + 1) {
                 let nextView = groupViews[offset + 1]
-                let spacingConstraint = nextView.leadingAnchor.constraint(
-                    equalTo: groupView.trailingAnchor, constant: Constants.spacing
-                )
-                spacingConstraint.priority = .defaultLow
-                let minimumSpacingConstraint = nextView.leadingAnchor.constraint(
-                    greaterThanOrEqualTo: groupView.trailingAnchor, constant: Constants.minimumSpacing
-                )
-                viewConstraints.append(contentsOf: [spacingConstraint, minimumSpacingConstraint])
+                let constraints = [
+                    nextView.leadingAnchor
+                        .constraint(equalTo: groupView.trailingAnchor, constant: Constants.spacing)
+                        .with(priority: .defaultLow),
+                    nextView.leadingAnchor.constraint(
+                        greaterThanOrEqualTo: groupView.trailingAnchor, constant: Constants.minimumSpacing
+                    ),
+                    nextView.widthAnchor.constraint(equalTo: groupView.widthAnchor)
+                ]
+                viewConstraints.append(contentsOf: constraints)
             }
             constraints.append(contentsOf: viewConstraints)
         }

@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 06.12.2022.
 //
 
+import UIKit
+
 struct NativeAlternativePaymentMethodStartedViewStyle {
 
     /// Title style.
@@ -18,4 +20,10 @@ struct NativeAlternativePaymentMethodStartedViewStyle {
 
     /// Style for primary button.
     let primaryButton: POButtonStyle
+
+    /// Style that is applied to buttons container.
+    let buttonsContainerShadow: POShadowStyle
+
+    /// Background color.
+    let backgroundColor: UIColor
 }

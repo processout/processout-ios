@@ -85,7 +85,7 @@ final class CodeTextFieldComponentView: UIView {
     private enum Constants {
         static let maximumFontSize: CGFloat = 32
         static let size = CGSize(width: 48, height: 48)
-        static let minimumWidth: CGFloat = 42
+        static let minimumWidth: CGFloat = 40
         static let carretSize = CGSize(width: 2, height: 28)
         static let carretOffset: CGFloat = 11
         static let animationDuration: TimeInterval = 0.25
