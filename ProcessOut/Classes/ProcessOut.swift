@@ -76,7 +76,7 @@ public class ProcessOut {
         }
     }
 
-    static let ApiVersion: String = "v2.15.4"
+    static let ApiVersion: String = "v2.16.4"
     private static let ApiUrl: String = "https://api.processout.com"
     internal static let CheckoutUrl: String = "https://checkout.processout.com"
     internal static var ProjectId: String?
@@ -756,8 +756,12 @@ public class ProcessOut {
         let additionalDataString = generateAdditionalDataString(additionalData: additionalData)
         let urlString = ProcessOut.CheckoutUrl + "/" + checkout + additionalDataString
         
-        if let url = NSURL(string: urlString) {
-            UIApplication.shared.openURL(url as URL)
+        if let url = URL(string: urlString) {
+            if #available(iOS 10, *) {
+                UIApplication.shared.open(url)
+            } else {
+                UIApplication.shared.openURL(url)
+            }
         }
     }
     
