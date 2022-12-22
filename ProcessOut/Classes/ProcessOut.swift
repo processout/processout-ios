@@ -756,8 +756,12 @@ public class ProcessOut {
         let additionalDataString = generateAdditionalDataString(additionalData: additionalData)
         let urlString = ProcessOut.CheckoutUrl + "/" + checkout + additionalDataString
         
-        if let url = NSURL(string: urlString) {
-            UIApplication.shared.openURL(url as URL)
+        if let url = URL(string: urlString) {
+            if #available(iOS 10, *) {
+                UIApplication.shared.open(url)
+            } else {
+                UIApplication.shared.openURL(url)
+            }
         }
     }
     
