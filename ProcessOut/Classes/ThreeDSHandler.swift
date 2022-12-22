@@ -5,6 +5,8 @@
 //  Created by Jeremy Lejoux on 17/06/2019.
 //
 
+import UIKit
+
 /// Custom protocol which lets you implement a 3DS2 integration
 public protocol ThreeDSHandler {
     /// method called when a device fingerprint is required
