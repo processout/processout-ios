@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// Border style.
+/// Style that defines border appearance. Border is always a solid line.
 public struct POBorderStyle {
 
     /// Corner radius.

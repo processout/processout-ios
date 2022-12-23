@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Information about an error that occurred.
 public struct POFailure: Error {
 
     public struct InvalidField: Decodable {

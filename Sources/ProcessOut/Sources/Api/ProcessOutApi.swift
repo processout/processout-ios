@@ -15,10 +15,11 @@ public final class ProcessOutApi: ProcessOutApiType {
     public private(set) static var shared: ProcessOutApiType! // swiftlint:disable:this implicitly_unwrapped_optional
 
     /// Configures ``ProcessOutApi/shared`` instance.
+    /// - NOTE: Method must be called from main thread. Only the first invocation takes effect, all
+    /// subsequent calls to this method are ignored.
     public static func configure(configuration: ProcessOutApiConfiguration) {
-        assert(Thread.isMainThread)
+        assert(Thread.isMainThread, "Method must be called only from main thread.")
         guard shared == nil else {
-            assertionFailure("Already configured.")
             return
         }
         let connector = createHttpConnector(configuration: configuration)
@@ -54,10 +55,16 @@ public final class ProcessOutApi: ProcessOutApiType {
     public let configuration: ProcessOutApiConfiguration
     public let gatewayConfigurations: POGatewayConfigurationsRepositoryType
     public let invoices: POInvoicesServiceType
-    public let cards: POCardsRepositoryType
-    public let customerTokens: POCustomerTokensServiceType
-    public let alternativePaymentMethods: POAlternativePaymentMethodsServiceType
     public let images: POImagesRepositoryType
+
+    @_spi(PO)
+    public let alternativePaymentMethods: POAlternativePaymentMethodsServiceType
+
+    @_spi(PO)
+    public let cards: POCardsRepositoryType
+
+    @_spi(PO)
+    public let customerTokens: POCustomerTokensServiceType
 
     // MARK: -
 

@@ -170,6 +170,7 @@ extension POInvoicesServiceType {
     }
 
     @MainActor
+    @_spi(PO)
     public func authorizeInvoice(
         request: POInvoiceAuthorizationRequest, customerActionHandlerDelegate: POCustomerActionHandlerDelegate
     ) async throws -> Void {

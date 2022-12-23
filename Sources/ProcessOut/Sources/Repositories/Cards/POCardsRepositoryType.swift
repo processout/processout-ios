@@ -7,6 +7,7 @@
 
 import Foundation
 
+@_spi(PO)
 public protocol POCardsRepositoryType: PORepositoryType {
 
     /// Tokenize a card.

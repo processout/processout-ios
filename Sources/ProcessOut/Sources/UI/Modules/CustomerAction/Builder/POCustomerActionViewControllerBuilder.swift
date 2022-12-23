@@ -7,6 +7,7 @@
 
 import UIKit
 
+@_spi(PO)
 public final class POCustomerActionViewControllerBuilder {
 
     public typealias Completion = (Result<String, POFailure>) -> Void

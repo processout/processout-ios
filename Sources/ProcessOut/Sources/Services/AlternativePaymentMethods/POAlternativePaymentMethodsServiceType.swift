@@ -7,6 +7,7 @@
 
 import Foundation
 
+@_spi(PO)
 public protocol POAlternativePaymentMethodsServiceType {
 
     /// Creates the redirection URL for APM Payments and APM token creation.

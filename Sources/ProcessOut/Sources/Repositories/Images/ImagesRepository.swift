@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import class UIKit.UIImage
+import UIKit
 
 final class ImagesRepository: POImagesRepositoryType {
 

@@ -26,7 +26,7 @@ struct HttpConnectorRequest<Value: Decodable> {
     let query: [String: CustomStringConvertible]
 
     /// Parameters.
-    let body: AnyEncodable?
+    let body: POAnyEncodable?
 
     /// Custom headers.
     let headers: [String: String]
@@ -65,7 +65,7 @@ extension HttpConnectorRequest {
             method: .post,
             path: path,
             query: [:],
-            body: AnyEncodable(body),
+            body: POAnyEncodable(body),
             headers: headers,
             includesDeviceMetadata: includesDeviceMetadata
         )
@@ -82,7 +82,7 @@ extension HttpConnectorRequest {
             method: .put,
             path: path,
             query: [:],
-            body: AnyEncodable(body),
+            body: POAnyEncodable(body),
             headers: headers,
             includesDeviceMetadata: includesDeviceMetadata
         )

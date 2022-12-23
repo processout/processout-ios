@@ -7,6 +7,9 @@
 
 import UIKit
 
+/// Provides an ability to create view controller that could be used to handle Native
+/// Alternative Payment. Call ``PONativeAlternativePaymentMethodViewControllerBuilder/build()``
+/// to create view controller's instance.
 public final class PONativeAlternativePaymentMethodViewControllerBuilder { // swiftlint:disable:this type_name
 
     /// - Parameters:
@@ -18,12 +21,13 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
 
     /// Api that will be used by created module to communicate with BE. By default ``ProcessOutApi/shared``
     /// instance is used.
+    @_spi(PO)
     public func with(api: ProcessOutApiType) -> Self {
         self.api = api
         return self
     }
 
-    /// Completion to invoke after authorization is completed.
+    /// Completion to invoke after flow is completed.
     public func with(completion: @escaping (Result<Void, POFailure>) -> Void) -> Self {
         self.completion = completion
         return self

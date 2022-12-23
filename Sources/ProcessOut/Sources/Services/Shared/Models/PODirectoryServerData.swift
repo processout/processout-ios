@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
+@_spi(PO)
 public struct PODirectoryServerData: Decodable {
 
     /// The identifier of the directory server to use during the transaction creation phase.

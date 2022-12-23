@@ -7,6 +7,7 @@
 
 import Foundation
 
+@_spi(PO)
 public struct POAlternativePaymentMethodRequest {
 
     /// Invoice identifier to to perform apm payment for.

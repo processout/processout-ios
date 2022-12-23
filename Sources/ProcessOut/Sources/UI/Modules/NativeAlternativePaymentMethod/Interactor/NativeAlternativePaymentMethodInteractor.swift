@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import class UIKit.UIImage
+import UIKit
 
 final class NativeAlternativePaymentMethodInteractor:
     BaseInteractor<NativeAlternativePaymentMethodInteractorState>, NativeAlternativePaymentMethodInteractorType {
@@ -77,6 +77,7 @@ final class NativeAlternativePaymentMethodInteractor:
             gatewayDisplayName: startedState.gatewayDisplayName,
             gatewayLogo: startedState.gatewayLogo,
             customerActionImageUrl: startedState.customerActionImageUrl,
+            customerActionMessage: startedState.customerActionMessage,
             amount: startedState.amount,
             currencyCode: startedState.currencyCode,
             parameters: startedState.parameters,
@@ -101,7 +102,7 @@ final class NativeAlternativePaymentMethodInteractor:
         invoicesService.initiatePayment(request: request) { [weak self] result in
             switch result {
             case let .success(response) where response.nativeApm.state == .pendingCapture:
-                let message = response.nativeApm.parameterValues?.message
+                let message = startedState.customerActionMessage
                 if let imageUrl = startedState.customerActionImageUrl {
                     self?.imagesRepository.image(url: imageUrl) { image in
                         self?.trySetAwaitingCaptureStateUnchecked(
@@ -145,7 +146,9 @@ final class NativeAlternativePaymentMethodInteractor:
         case .customerInput, nil:
             break
         case .pendingCapture:
-            trySetAwaitingCaptureStateUnchecked(gatewayLogo: gatewayLogo, expectedActionMessage: nil, actionImage: nil)
+            trySetAwaitingCaptureStateUnchecked(
+                gatewayLogo: gatewayLogo, expectedActionMessage: details.gateway.customerActionMessage, actionImage: nil
+            )
             return
         case .captured:
             setCapturedStateUnchecked(gatewayLogo: gatewayLogo)
@@ -158,6 +161,7 @@ final class NativeAlternativePaymentMethodInteractor:
             gatewayDisplayName: details.gateway.displayName,
             gatewayLogo: gatewayLogo,
             customerActionImageUrl: details.gateway.customerActionImageUrl,
+            customerActionMessage: details.gateway.customerActionMessage,
             amount: details.invoice.amount,
             currencyCode: details.invoice.currencyCode,
             parameters: details.parameters,
@@ -231,6 +235,7 @@ final class NativeAlternativePaymentMethodInteractor:
             gatewayDisplayName: startedState.gatewayDisplayName,
             gatewayLogo: startedState.gatewayLogo,
             customerActionImageUrl: startedState.customerActionImageUrl,
+            customerActionMessage: startedState.customerActionMessage,
             amount: startedState.amount,
             currencyCode: startedState.currencyCode,
             parameters: startedState.parameters,
@@ -250,6 +255,7 @@ final class NativeAlternativePaymentMethodInteractor:
             gatewayDisplayName: startedState.gatewayDisplayName,
             gatewayLogo: startedState.gatewayLogo,
             customerActionImageUrl: startedState.customerActionImageUrl,
+            customerActionMessage: startedState.customerActionMessage,
             amount: startedState.amount,
             currencyCode: startedState.currencyCode,
             parameters: parameters,

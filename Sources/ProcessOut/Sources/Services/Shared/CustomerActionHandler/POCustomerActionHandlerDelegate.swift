@@ -7,6 +7,7 @@
 
 import Foundation
 
+@_spi(PO)
 public protocol POCustomerActionHandlerDelegate: AnyObject {
 
     /// Asks delegate to fingerprint the device.

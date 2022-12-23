@@ -7,10 +7,11 @@
 
 import Foundation
 
+@_spi(PO)
 public struct POAssignCustomerTokenRequest: Encodable {
 
     /// Invoice identifier to to perform authorization for.
-    @ImmutableExcludedCodable
+    @POImmutableExcludedCodable
     public var customerId: String
 
     /// Payment source to use for authorization.
@@ -29,7 +30,7 @@ public struct POAssignCustomerTokenRequest: Encodable {
     public let verify: Bool?
 
     /// Tokens that belong to the customer.
-    @ImmutableExcludedCodable
+    @POImmutableExcludedCodable
     public var tokenId: String
 
     public init(

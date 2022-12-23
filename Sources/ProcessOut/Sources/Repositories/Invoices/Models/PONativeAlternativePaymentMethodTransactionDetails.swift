@@ -20,13 +20,16 @@ public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable {
 
         /// Customer action image URL if any.
         public let customerActionImageUrl: URL?
+
+        /// Customer action description if any.
+        public let customerActionMessage: String?
     }
 
     /// Invoice details.
     public struct Invoice: Decodable {
 
         /// Invoice amount.
-        @ImmutableStringCodableDecimal
+        @POImmutableStringCodableDecimal
         public var amount: Decimal
 
         /// Invoice currency code.

@@ -7,10 +7,11 @@
 
 import Foundation
 
+@_spi(PO)
 public struct POInvoiceAuthorizationRequest: Encodable {
 
     /// Invoice identifier to to perform authorization for.
-    @ImmutableExcludedCodable
+    @POImmutableExcludedCodable
     public var invoiceId: String
 
     /// Payment source to use for authorization.
@@ -43,7 +44,7 @@ public struct POInvoiceAuthorizationRequest: Encodable {
 
     /// Amount of money to capture when partial captures are available. Note that this only applies if you are
     /// also using the `autoCaptureAt` option.
-    @ImmutableStringCodableOptionalDecimal
+    @POImmutableStringCodableOptionalDecimal
     public var captureAmount: Decimal?
 
     public init(

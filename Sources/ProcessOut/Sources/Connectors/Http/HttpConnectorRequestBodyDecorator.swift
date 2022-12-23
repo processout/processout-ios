@@ -10,7 +10,7 @@ import Foundation
 struct HttpConnectorRequestBodyDecorator: Encodable {
 
     /// Primary request body.
-    let body: AnyEncodable
+    let body: POAnyEncodable
 
     /// Device metadata.
     let deviceMetadata: DeviceMetadata

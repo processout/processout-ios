@@ -23,6 +23,7 @@ public protocol POInvoicesServiceType: POServiceType {
     )
 
     /// Performs invoice authorization with given request.
+    @_spi(PO)
     func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
         customerActionHandlerDelegate: POCustomerActionHandlerDelegate,
@@ -38,4 +39,21 @@ public protocol POInvoicesServiceType: POServiceType {
     /// Creates invoice with given parameters.
     @_spi(PO)
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void)
+}
+
+extension POInvoicesServiceType {
+
+    // swiftlint:disable:next unavailable_function
+    func authorizeInvoice(
+        request: POInvoiceAuthorizationRequest,
+        customerActionHandlerDelegate: POCustomerActionHandlerDelegate,
+        completion: @escaping (Result<Void, Failure>) -> Void
+    ) {
+        fatalError("Not available!")
+    }
+
+    // swiftlint:disable:next unavailable_function
+    func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void) {
+        fatalError("Not available!")
+    }
 }

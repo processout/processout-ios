@@ -1,8 +1,8 @@
 //
-//  ImmutableStringCodableOptionalDecimal.swift
+//  POImmutableStringCodableDecimal.swift
 //  ProcessOut
 //
-//  Created by Andrii Vysotskyi on 18.10.2022.
+//  Created by Andrii Vysotskyi on 30.11.2022.
 //
 
 // swiftlint:disable legacy_objc_type
@@ -10,18 +10,14 @@
 import Foundation
 
 @propertyWrapper
-public struct ImmutableStringCodableOptionalDecimal: Codable {
+public struct POImmutableStringCodableDecimal: Codable {
 
-    public let wrappedValue: Decimal?
+    public let wrappedValue: Decimal
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        let value = try container.decode(Optional<String>.self)
-        if let value {
-            wrappedValue = NSDecimalNumber(string: value, locale: Self.locale).decimalValue
-        } else {
-            wrappedValue = nil
-        }
+        let value = try container.decode(String.self)
+        wrappedValue = NSDecimalNumber(string: value, locale: Self.locale).decimalValue
         guard description != value else {
             return
         }
@@ -29,7 +25,7 @@ public struct ImmutableStringCodableOptionalDecimal: Codable {
         throw DecodingError.dataCorrupted(context)
     }
 
-    public init(value: Decimal?) {
+    public init(value: Decimal) {
         self.wrappedValue = value
     }
 
@@ -42,7 +38,7 @@ public struct ImmutableStringCodableOptionalDecimal: Codable {
 
     private static let locale = NSLocale(localeIdentifier: "en_US")
 
-    private var description: String? {
-        wrappedValue.map(NSDecimalNumber.init)?.description(withLocale: Self.locale)
+    private var description: String {
+        NSDecimalNumber(decimal: wrappedValue).description(withLocale: Self.locale)
     }
 }

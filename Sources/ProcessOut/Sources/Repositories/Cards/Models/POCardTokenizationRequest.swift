@@ -7,6 +7,7 @@
 
 import Foundation
 
+@_spi(PO)
 public struct POCardTokenizationRequest: Encodable {
 
     /// Number of the card.
@@ -28,7 +29,7 @@ public struct POCardTokenizationRequest: Encodable {
     public let contact: POContact?
 
     /// Metada related to the card.
-    public let metadata: [String: AnyEncodable]?
+    public let metadata: [String: POAnyEncodable]?
 
     public init(
         number: String,
@@ -37,7 +38,7 @@ public struct POCardTokenizationRequest: Encodable {
         cvc: String? = nil,
         name: String? = nil,
         contact: POContact? = nil,
-        metadata: [String: AnyEncodable]? = nil
+        metadata: [String: POAnyEncodable]? = nil
     ) {
         self.number = number
         self.expMonth = expMonth

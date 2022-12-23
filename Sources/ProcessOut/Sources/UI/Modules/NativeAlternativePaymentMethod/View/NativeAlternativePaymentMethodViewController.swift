@@ -175,7 +175,9 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
     ) {
         submittedView.configure(with: submittedState, animated: submittedView.alpha > 0.01 && animated)
         backgroundDecorationView.configure(
-            isExpanded: false, isSuccess: true, animated: backgroundDecorationView.alpha > 0.01 && animated
+            isExpanded: false,
+            isSuccess: submittedState.isCaptured,
+            animated: backgroundDecorationView.alpha > 0.01 && animated
         )
         UIView.animate(withDuration: Constants.animationDuration) { [self] in
             CATransaction.begin()

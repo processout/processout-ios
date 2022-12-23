@@ -14,16 +14,16 @@ public struct POCustomerTokenCreationRequest: Encodable {
     public let source: String
 
     /// Invoice identifier to to perform authorization for.
-    @ImmutableExcludedCodable
+    @POImmutableExcludedCodable
     public var customerId: String
 
     /// Additional matadata.
-    public let metadata: [String: AnyEncodable]
+    public let metadata: [String: POAnyEncodable]
 
     public init(
         source: String,
         customerId: String,
-        metadata: [String: AnyEncodable]
+        metadata: [String: POAnyEncodable]
     ) {
         self.source = source
         self._customerId = .init(value: customerId)

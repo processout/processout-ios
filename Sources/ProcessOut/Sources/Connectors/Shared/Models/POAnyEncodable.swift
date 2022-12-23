@@ -1,5 +1,5 @@
 //
-//  AnyEncodable.swift
+//  POAnyEncodable.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 10.10.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AnyEncodable: Encodable {
+public struct POAnyEncodable: Encodable {
 
     private let encoding: (Encoder) throws -> Void
 

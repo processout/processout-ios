@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 03.11.2022.
 //
 
+@_spi(PO)
 public struct PODeviceFingerprint: Encodable {
 
     public struct EphemeralPublicKey: Codable {

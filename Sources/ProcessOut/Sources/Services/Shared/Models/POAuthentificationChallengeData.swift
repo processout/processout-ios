@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
+@_spi(PO)
 public struct POAuthentificationChallengeData: Decodable {
 
     /// Unique transaction identifier assigned by the ACS.

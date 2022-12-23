@@ -7,6 +7,7 @@
 
 import UIKit
 
+@_spi(PO)
 public final class POAlternativePaymentMethodViewControllerBuilder {
 
     public static func with(request: POAlternativePaymentMethodRequest) -> Self {

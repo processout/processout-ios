@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import class UIKit.UIImage
+import UIKit
 
 public protocol POImagesRepositoryType {
 

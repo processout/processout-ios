@@ -3,21 +3,18 @@
 set -e
 
 rm -rf .build/framework
+mkdir -p .build/framework
 
 xcodebuild archive \
     -scheme ProcessOut \
     -destination "generic/platform=iOS" \
-    -archivePath .build/framework/ProcessOut-iOS \
-    SKIP_INSTALL=NO \
-    BUILD_LIBRARY_FOR_DISTRIBUTION=YES |
+    -archivePath .build/framework/ProcessOut-iOS |
     bundle exec xcpretty
 
 xcodebuild archive \
     -scheme ProcessOut \
     -destination "generic/platform=iOS Simulator" \
-    -archivePath .build/framework/ProcessOut-Sim \
-    SKIP_INSTALL=NO \
-    BUILD_LIBRARY_FOR_DISTRIBUTION=YES |
+    -archivePath .build/framework/ProcessOut-Sim |
     bundle exec xcpretty
 
 cd .build/framework

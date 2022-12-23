@@ -38,7 +38,7 @@ final class BackgroundDecorationView: UIView {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let baseHeight: CGFloat = 471
+        static let baseHeight: CGFloat = 415
         static let innerCapHeight: CGFloat = 59
         static let outerCapHeight: CGFloat = 46
         static let normalSpacing: CGFloat = 83

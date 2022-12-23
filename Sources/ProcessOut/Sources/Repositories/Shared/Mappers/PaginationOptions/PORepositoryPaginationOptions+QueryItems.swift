@@ -1,5 +1,5 @@
 //
-//  PORepositoryPaginationOptions+QueryItems.swift
+//  POPaginationOptions+QueryItems.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 12.10.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension PORepositoryPaginationOptions {
+extension POPaginationOptions {
 
     /// Returns query items for pagination options.
     var queryItems: [String: CustomStringConvertible] {

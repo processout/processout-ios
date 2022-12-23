@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// Shadow style.
+/// Style that defines shadow appearance.
 public struct POShadowStyle {
 
     /// The color of the shadow.

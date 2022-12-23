@@ -16,15 +16,33 @@ public protocol ProcessOutApiType {
     /// Returns invoices service.
     var invoices: POInvoicesServiceType { get }
 
-    /// Return cards repository.
-    var cards: POCardsRepositoryType { get }
-
-    /// Return customer tokens service.
-    var customerTokens: POCustomerTokensServiceType { get }
-
-    /// Return Alternative Payment Methods service.
-    var alternativePaymentMethods: POAlternativePaymentMethodsServiceType { get }
-
     /// Images repository.
     var images: POImagesRepositoryType { get }
+
+    /// Returns cards repository.
+    @_spi(PO)
+    var cards: POCardsRepositoryType { get }
+
+    /// Returns customer tokens service.
+    @_spi(PO)
+    var customerTokens: POCustomerTokensServiceType { get }
+
+    /// Returns Alternative Payment Methods service.
+    @_spi(PO)
+    var alternativePaymentMethods: POAlternativePaymentMethodsServiceType { get }
+}
+
+extension ProcessOutApiType {
+
+    var cards: POCardsRepositoryType {
+        fatalError("Not available!")
+    }
+
+    var customerTokens: POCustomerTokensServiceType {
+        fatalError("Not available!")
+    }
+
+    var alternativePaymentMethods: POAlternativePaymentMethodsServiceType {
+        fatalError("Not available!")
+    }
 }

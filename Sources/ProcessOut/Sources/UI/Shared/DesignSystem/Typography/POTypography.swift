@@ -46,7 +46,7 @@ extension POTypography {
     // MARK: - Headline
 
     static let headline = POTypography(
-        font: .systemFont(ofSize: 17, weight: .semibold), lineHeight: 22, tracking: -0.44
+        font: .systemFont(ofSize: 17, weight: .medium), lineHeight: 22, tracking: -0.44
     )
 
     // MARK: - Body

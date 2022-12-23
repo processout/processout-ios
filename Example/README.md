@@ -15,6 +15,8 @@ Project demonstrates multiple flows that ProcessOut framework is capable of.
 ```yml
 projectId: test-proj_K3Ur9LQzcKtm4zttWJ7oAKHgqdiwboAw
 projectPassword: key_test_RE14RLcNikkP5ZXMn84BFYApwotD05Kc
+apiBaseUrl: https://api.processout.com
+checkoutBaseUrl: https://checkout.processout.com
 ```
 
 2. Run `./Scripts/BootstrapProject.sh` script.

@@ -8,7 +8,7 @@
 struct NativeAlternativePaymentCaptureRequest: Encodable {
 
     /// Invoice identifier.
-    @ImmutableExcludedCodable
+    @POImmutableExcludedCodable
     var invoiceId: String
 
     /// Source must be set to gateway configuration id that was used to initiate native alternative payment.

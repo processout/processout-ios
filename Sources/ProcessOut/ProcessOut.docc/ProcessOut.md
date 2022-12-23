@@ -19,21 +19,26 @@ ProcessOutApi.configure(configuration: configuration)
 - ``ProcessOutApiConfiguration``
 - ``ProcessOutApiType``
 
-### Native Alternative Payment Method
+### Errors
+
+All errors that could happen as a result of interaction with the SDK are representd by ``POFailure`` type.
+
+- ``POFailure``
+
+### Native Alternative Payment Method UI
 
 - <doc:NativeAlternativePaymentMethod>
 - ``PONativeAlternativePaymentMethodViewControllerBuilder``
 - ``PONativeAlternativePaymentMethodStyle``
 - ``PONativeAlternativePaymentMethodUiConfiguration``
 
-### Alternative Payment Method
-
-- ``POAlternativePaymentMethodViewControllerBuilder``
-
 ### Appearance
 
 Types that describe properties such as shadow and border. And style of higher level components, for example buttons and inputs.
 
+- ``POShadowStyle``
+- ``POBorderStyle``
+- ``POTypography``
 - ``POTextStyle``
 - ``POInputFormStyle``
 - ``POInputFormStateStyle``
@@ -42,6 +47,40 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POButtonStateStyle``
 - ``POActivityIndicatorStyle``
 - ``POActivityIndicatorViewType``
-- ``POShadowStyle``
-- ``POBorderStyle``
-- ``POTypography``
+- ``POBackgroundDecorationStateStyle``
+- ``POBackgroundDecorationStyle``
+
+### Gateway Configurations
+
+- ``POGatewayConfigurationsRepositoryType``
+- ``POAllGatewayConfigurationsResponse``
+- ``POAllGatewayConfigurationsRequest``
+- ``POFindGatewayConfigurationRequest``
+- ``POGatewayConfiguration``
+
+### Invoices
+
+- ``POInvoicesServiceType``
+- ``PONativeAlternativePaymentCaptureRequest``
+- ``PONativeAlternativePaymentMethodParameter``
+- ``PONativeAlternativePaymentMethodRequest``
+- ``PONativeAlternativePaymentMethodResponse``
+- ``PONativeAlternativePaymentMethodTransactionDetails``
+- ``PONativeAlternativePaymentMethodTransactionDetailsRequest``
+- ``PONativeAlternativePaymentMethodState``
+
+### Images
+
+- ``POImagesRepositoryType``
+
+### Utils
+
+- ``POPaginationOptions``
+- ``POCancellableType``
+- ``POAnyEncodable``
+- ``POImmutableExcludedCodable``
+- ``POImmutableStringCodableDecimal``
+- ``POImmutableStringCodableOptionalDecimal``
+- ``PORepositoryType``
+- ``POServiceType``
+- ``POAutoAsync``

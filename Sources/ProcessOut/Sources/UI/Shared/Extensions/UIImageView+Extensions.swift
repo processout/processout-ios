@@ -1,6 +1,6 @@
 //
 //  UIImageView+Extensions.swift
-//  
+//  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 19.12.2022.
 //

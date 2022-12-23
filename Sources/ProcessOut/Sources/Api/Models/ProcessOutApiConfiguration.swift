@@ -7,6 +7,9 @@
 
 import Foundation
 
+/// Defines configuration parameters that are used to create API singleton. In order to create instance
+/// of this structure one should use ``ProcessOutApiConfiguration/production(projectId:)``
+/// method.
 public struct ProcessOutApiConfiguration {
 
     /// Project id.

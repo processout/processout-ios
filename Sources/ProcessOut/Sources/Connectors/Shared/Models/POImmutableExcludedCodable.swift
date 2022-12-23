@@ -1,5 +1,5 @@
 //
-//  ImmutableExcludedCodable.swift
+//  POImmutableExcludedCodable.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 25.10.2022.
@@ -8,7 +8,7 @@
 import Foundation
 
 @propertyWrapper
-public struct ImmutableExcludedCodable<Value>: Encodable {
+public struct POImmutableExcludedCodable<Value>: Encodable {
 
     public let wrappedValue: Value
 

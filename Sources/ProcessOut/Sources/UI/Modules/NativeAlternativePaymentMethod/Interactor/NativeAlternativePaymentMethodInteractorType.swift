@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import class UIKit.UIImage
+import UIKit
 
 protocol NativeAlternativePaymentMethodInteractorType: InteractorType
     where State == NativeAlternativePaymentMethodInteractorState {
@@ -41,6 +41,9 @@ enum NativeAlternativePaymentMethodInteractorState {
 
         /// Customer action image URL if any.
         let customerActionImageUrl: URL?
+
+        /// Customer action message if any.
+        let customerActionMessage: String?
 
         /// Invoice amount.
         let amount: Decimal

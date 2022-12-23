@@ -27,14 +27,14 @@ public struct POAllGatewayConfigurationsRequest {
     public let filter: Filter?
 
     /// Pagination options.
-    public let paginationOptions: PORepositoryPaginationOptions?
+    public let paginationOptions: POPaginationOptions?
 
     /// Flag indicating whether disabled configurations should be returned in response.
     public let includeDisabled: Bool
 
     /// Creates request with given parameters.
     public init(
-        filter: Filter? = nil, paginationOptions: PORepositoryPaginationOptions? = nil, includeDisabled: Bool = false
+        filter: Filter? = nil, paginationOptions: POPaginationOptions? = nil, includeDisabled: Bool = false
     ) {
         self.filter = filter
         self.paginationOptions = paginationOptions

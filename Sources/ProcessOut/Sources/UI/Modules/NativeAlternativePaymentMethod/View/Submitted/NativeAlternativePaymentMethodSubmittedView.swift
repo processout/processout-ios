@@ -50,7 +50,7 @@ final class NativeAlternativePaymentMethodSubmittedView: UIView {
             after: descriptionLabel
         )
         if animated {
-            addTransitionAnimation()
+            UIView.animate(withDuration: Constants.animationDuration) { self.addTransitionAnimation() }
         }
     }
 
@@ -58,6 +58,7 @@ final class NativeAlternativePaymentMethodSubmittedView: UIView {
 
     private enum Constants {
         static let animationDuration: TimeInterval = 0.25
+        static let maximumHeight: CGFloat = 394
         static let maximumLogoImageHeight: CGFloat = 32
         static let maximumDecorationImageHeight: CGFloat = 260
         static let verticalSpacing: CGFloat = 16
@@ -126,6 +127,7 @@ final class NativeAlternativePaymentMethodSubmittedView: UIView {
             containerView.bottomAnchor.constraint(
                 lessThanOrEqualTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.verticalContentInset
             ),
+            containerView.heightAnchor.constraint(lessThanOrEqualToConstant: Constants.maximumHeight),
             iconImageView.heightAnchor.constraint(lessThanOrEqualToConstant: Constants.maximumLogoImageHeight),
             iconImageView.widthAnchor.constraint(lessThanOrEqualTo: containerView.widthAnchor),
             iconImageViewWidthConstraint,

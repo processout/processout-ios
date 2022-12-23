@@ -1,5 +1,5 @@
 //
-//  PORepositoryPaginationOptions.swift
+//  POPaginationOptions.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 12.10.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PORepositoryPaginationOptions {
+public struct POPaginationOptions {
 
     public enum Order: String {
         case ascending = "asc", descending = "desc"
