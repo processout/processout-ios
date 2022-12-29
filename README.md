@@ -2,7 +2,7 @@
 
 ## Requirements
 
-*iOS 11.0+*
+*iOS 12.0+*
 
 ## Contributing
 

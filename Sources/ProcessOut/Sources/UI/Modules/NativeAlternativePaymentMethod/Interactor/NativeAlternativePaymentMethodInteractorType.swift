@@ -91,14 +91,11 @@ enum NativeAlternativePaymentMethodInteractorState {
     /// Interactor is started and awaits for parameters values.
     case started(Started)
 
-    /// Starting failure.
+    /// Starting failure. This is a sink state.
     case failure(POFailure)
 
     /// Parameter values are being submitted.
     case submitting(snapshot: Started)
-
-    /// Interactor did fail to submit values and encountered unrecoverable error. This is a sink state.
-    case submissionFailure(POFailure)
 
     /// Parameter values were submitted.
     /// - NOTE: This is a sink state and it's only set if user opted out from awaiting capture.
@@ -109,7 +106,4 @@ enum NativeAlternativePaymentMethodInteractorState {
 
     /// Payment is completed.
     case captured(Captured)
-
-    /// Implementation did fail to capture payment. This is a sink state.
-    case captureFailure(POFailure)
 }

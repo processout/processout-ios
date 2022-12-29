@@ -10,6 +10,7 @@ targets:
     platform: iOS
     deploymentTarget: "12.0"
     settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-ios
       CURRENT_PROJECT_VERSION: ${CURRENT_VERSION}
       SKIP_INSTALL: NO
       BUILD_LIBRARY_FOR_DISTRIBUTION: YES

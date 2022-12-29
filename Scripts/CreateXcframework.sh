@@ -23,3 +23,5 @@ xcodebuild -create-xcframework \
     -framework ./ProcessOut-iOS.xcarchive/Products/Library/Frameworks/ProcessOut.framework \
     -framework ./ProcessOut-Sim.xcarchive/Products/Library/Frameworks/ProcessOut.framework \
     -output ./ProcessOut.xcframework
+
+zip ProcessOut.xcframework.zip -r ProcessOut.xcframework -x '.*' -x '__MACOSX'

@@ -30,10 +30,13 @@ jobs:
     if: needs.validation.outputs.version_tagged == 'false'
     runs-on: macos-12
     steps:
+      - name: Create XCFramework
+        run: source Scripts/CreateXcframework.sh
       - name: Push Podspec
         run: pod trunk push ProcessOut.podspec
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ needs.validation.outputs.version }}
+          files: .build/framework/ProcessOut.xcframework.zip
           generate_release_notes: true

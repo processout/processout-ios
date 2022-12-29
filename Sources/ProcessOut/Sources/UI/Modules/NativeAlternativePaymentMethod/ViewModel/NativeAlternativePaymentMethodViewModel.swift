@@ -12,12 +12,10 @@ final class NativeAlternativePaymentMethodViewModel:
 
     init(
         interactor: any NativeAlternativePaymentMethodInteractorType,
-        router: any RouterType<NativeAlternativePaymentMethodRoute>,
         uiConfiguration: PONativeAlternativePaymentMethodUiConfiguration?,
         completion: ((Result<Void, POFailure>) -> Void)?
     ) {
         self.interactor = interactor
-        self.router = router
         self.uiConfiguration = uiConfiguration
         self.completion = completion
         super.init(state: .idle)
@@ -44,7 +42,6 @@ final class NativeAlternativePaymentMethodViewModel:
     // MARK: - NativeAlternativePaymentMethodInteractorType
 
     private let interactor: any NativeAlternativePaymentMethodInteractorType
-    private let router: any RouterType<NativeAlternativePaymentMethodRoute>
     private let uiConfiguration: PONativeAlternativePaymentMethodUiConfiguration?
     private let completion: ((Result<Void, POFailure>) -> Void)?
 
@@ -62,7 +59,7 @@ final class NativeAlternativePaymentMethodViewModel:
             state = .loading
         case .started(let startedState):
             state = convertToState(startedState: startedState)
-        case .failure(let failure), .submissionFailure(let failure), .captureFailure(let failure):
+        case .failure(let failure):
             completion?(.failure(failure))
         case .submitting(let startedStateSnapshot):
             state = convertToState(startedState: startedStateSnapshot, isSubmitting: true)

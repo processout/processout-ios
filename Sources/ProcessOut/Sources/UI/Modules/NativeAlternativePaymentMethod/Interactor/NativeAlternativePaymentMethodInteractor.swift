@@ -42,10 +42,7 @@ final class NativeAlternativePaymentMethodInteractor:
     // MARK: - NativeAlternativePaymentMethodInteractorType
 
     override func start() {
-        switch state {
-        case .idle, .failure:
-            break
-        default:
+        guard case .idle = state else {
             return
         }
         state = .starting
@@ -193,7 +190,7 @@ final class NativeAlternativePaymentMethodInteractor:
             case .success:
                 self?.setCapturedState()
             case .failure(let failure):
-                self?.state = .captureFailure(failure)
+                self?.state = .failure(failure)
             }
         }
     }
@@ -223,7 +220,7 @@ final class NativeAlternativePaymentMethodInteractor:
             return
         }
         guard let invalidFields = failure.invalidFields, !invalidFields.isEmpty else {
-            state = .submissionFailure(failure)
+            state = .failure(failure)
             return
         }
         var updatedValues: [String: State.ParameterValue] = [:]

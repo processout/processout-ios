@@ -74,7 +74,7 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
         view.translatesAutoresizingMaskIntoConstraints = false
         view.contentInsetAdjustmentBehavior = .always
         view.contentInset.bottom = Constants.additionalBottomScrollContentInset
-        view.scrollIndicatorInsets.bottom = Constants.additionalBottomScrollContentInset
+        view.verticalScrollIndicatorInsets.bottom = Constants.additionalBottomScrollContentInset
         view.delegate = self
         return view
     }()

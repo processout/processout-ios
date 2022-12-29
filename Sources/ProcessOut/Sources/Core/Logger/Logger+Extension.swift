@@ -18,7 +18,7 @@ extension Logger {
 
     private static func createLogger(for category: String) -> Logger {
         let destinations: [LoggerDestination] = [
-            SystemLoggerDestination(subsystem: "com.processout", category: category)
+            SystemLoggerDestination(subsystem: "com.processout.processout-ios", category: category)
         ]
         return Logger(destinations: destinations)
     }

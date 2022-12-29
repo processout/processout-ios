@@ -74,14 +74,12 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         let interactor = NativeAlternativePaymentMethodInteractor(
             invoicesService: api.invoices, imagesRepository: api.images, configuration: interactorConfiguration
         )
-        let router = NativeAlternativePaymentMethodRouter()
         let viewModel = NativeAlternativePaymentMethodViewModel(
-            interactor: interactor, router: router, uiConfiguration: configuration, completion: completion
+            interactor: interactor, uiConfiguration: configuration, completion: completion
         )
         let viewController = NativeAlternativePaymentMethodViewController(
             viewModel: viewModel, customStyle: style
         )
-        router.viewController = viewController
         return viewController
     }
 
