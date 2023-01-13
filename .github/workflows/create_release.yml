@@ -33,6 +33,8 @@ jobs:
       - name: Create XCFramework
         run: source Scripts/CreateXcframework.sh
       - name: Push Podspec
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
         run: pod trunk push ProcessOut.podspec
       - name: Create Release
         uses: softprops/action-gh-release@v1
