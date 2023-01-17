@@ -31,8 +31,7 @@ public final class ProcessOutApi: ProcessOutApiType {
             ),
             invoices: InvoicesService(
                 repository: InvoicesRepository(connector: connector, failureMapper: failureMapper),
-                customerActionHandler: customerActionHandler,
-                maximumCaptureTimeout: 180
+                customerActionHandler: customerActionHandler
             ),
             cards: CardsRepository(
                 connector: connector,

@@ -9,14 +9,9 @@ import Foundation
 
 final class InvoicesService: POInvoicesServiceType {
 
-    init(
-        repository: InvoicesRepositoryType,
-        customerActionHandler: CustomerActionHandlerType,
-        maximumCaptureTimeout: TimeInterval
-    ) {
+    init(repository: InvoicesRepositoryType, customerActionHandler: CustomerActionHandlerType) {
         self.repository = repository
         self.customerActionHandler = customerActionHandler
-        self.maximumCaptureTimeout = maximumCaptureTimeout
     }
 
     // MARK: - POCustomerTokensServiceType
@@ -68,7 +63,7 @@ final class InvoicesService: POInvoicesServiceType {
         request: PONativeAlternativePaymentCaptureRequest, completion: @escaping (Result<Void, Failure>) -> Void
     ) -> POCancellableType {
         let cancellable = GroupCancellable()
-        let captureTimeout = min(request.timeout ?? maximumCaptureTimeout, maximumCaptureTimeout)
+        let captureTimeout = min(request.timeout ?? Constants.maximumCaptureTimeout, Constants.maximumCaptureTimeout)
         let timer = Timer.scheduledTimer(withTimeInterval: captureTimeout, repeats: false) { _ in
             let failure = Failure(code: .timeout)
             completion(.failure(failure))
@@ -88,15 +83,29 @@ final class InvoicesService: POInvoicesServiceType {
             case let .failure(failrue) where failrue.code == .cancelled:
                 timer.invalidate()
                 completion(.failure(failrue))
-            case .success, .failure:
+            case .success:
                 cancellable.add(
                     repository.captureNativeAlternativePayment(request: request, completion: repositoryCompletion)
                 )
+            case .failure:
+                let timer = Timer.scheduledTimer(
+                    withTimeInterval: Constants.captureRetryDelay,
+                    repeats: false,
+                    block: { [repository] _ in
+                        cancellable.add(
+                            repository.captureNativeAlternativePayment(
+                                request: request, completion: repositoryCompletion
+                            )
+                        )
+                    }
+                )
+                cancellable.add(timer)
             }
         }
         cancellable.add(
             repository.captureNativeAlternativePayment(request: request, completion: repositoryCompletion)
         )
+        cancellable.add(timer)
         return cancellable
     }
 
@@ -104,11 +113,17 @@ final class InvoicesService: POInvoicesServiceType {
         repository.createInvoice(request: request, completion: completion)
     }
 
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let maximumCaptureTimeout: TimeInterval = 180
+        static let captureRetryDelay: TimeInterval = 3
+    }
+
     // MARK: - Private Properties
 
     private let repository: InvoicesRepositoryType
     private let customerActionHandler: CustomerActionHandlerType
-    private let maximumCaptureTimeout: TimeInterval
 }
 
 private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_extension_access_modifier
