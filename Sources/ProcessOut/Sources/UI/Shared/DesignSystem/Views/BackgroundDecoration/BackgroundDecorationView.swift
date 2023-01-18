@@ -29,8 +29,14 @@ final class BackgroundDecorationView: UIView {
             innerShapeView.baseHeight = baseHeight
             outerShapeView.baseHeight = baseHeight + spacing
             let currentStyle = isSuccess ? style.success : style.normal
-            innerShapeView.fillColor = currentStyle.primaryColor
-            outerShapeView.fillColor = currentStyle.secondaryColor
+            switch currentStyle {
+            case .hidden:
+                innerShapeView.fillColor = .clear
+                outerShapeView.fillColor = .clear
+            case let .visible(primaryColor, secondaryColor):
+                innerShapeView.fillColor = primaryColor
+                outerShapeView.fillColor = secondaryColor
+            }
             CATransaction.commit()
         }
     }

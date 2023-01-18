@@ -24,11 +24,11 @@ public struct POBackgroundDecorationStyle {
 extension POBackgroundDecorationStyle {
 
     public static let `default` = Self(
-        normal: .init(
+        normal: .visible(
             primaryColor: Asset.Colors.Background.Grey.dark.color,
             secondaryColor: Asset.Colors.Background.Grey.light.color
         ),
-        success: .init(
+        success: .visible(
             primaryColor: Asset.Colors.Background.Success.dark.color,
             secondaryColor: Asset.Colors.Background.Success.light.color
         )

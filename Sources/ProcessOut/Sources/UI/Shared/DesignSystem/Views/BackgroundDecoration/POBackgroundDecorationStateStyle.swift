@@ -7,16 +7,11 @@
 
 import UIKit
 
-public struct POBackgroundDecorationStateStyle {
+public enum POBackgroundDecorationStateStyle {
 
-    /// Primary color.
-    public let primaryColor: UIColor
+    /// Completly hidden decoration style.
+    case hidden
 
-    /// Secondary color.
-    public let secondaryColor: UIColor
-
-    public init(primaryColor: UIColor, secondaryColor: UIColor) {
-        self.primaryColor = primaryColor
-        self.secondaryColor = secondaryColor
-    }
+    /// Visible decoration style rendered with specified colors.
+    case visible(primaryColor: UIColor, secondaryColor: UIColor)
 }
