@@ -7,7 +7,11 @@
 
 import Foundation
 
-@_spi(PO)
+/// Request describing parameters that are used to creat URL that user can be redirected to initiate
+/// alternative payment.
+///
+/// - NOTE: Make sure to supply proper`additionalData` specific for particular payment
+/// method.
 public struct POAlternativePaymentMethodRequest {
 
     /// Invoice identifier to to perform apm payment for.

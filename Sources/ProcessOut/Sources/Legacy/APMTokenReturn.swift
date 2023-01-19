@@ -7,6 +7,7 @@
 
 import Foundation
 
+@available(*, deprecated, message: "Declaration will be removed in version 4.0.", renamed: "POAlternativePaymentMethodResponse")
 public final class APMTokenReturn {
 
     public enum APMReturnType {

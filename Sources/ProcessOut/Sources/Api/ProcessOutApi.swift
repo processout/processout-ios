@@ -55,8 +55,6 @@ public final class ProcessOutApi: ProcessOutApiType {
     public let gatewayConfigurations: POGatewayConfigurationsRepositoryType
     public let invoices: POInvoicesServiceType
     public let images: POImagesRepositoryType
-
-    @_spi(PO)
     public let alternativePaymentMethods: POAlternativePaymentMethodsServiceType
 
     @_spi(PO)

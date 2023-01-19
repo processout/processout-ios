@@ -57,7 +57,7 @@ public class ProcessOutWebView: WKWebView, WKNavigationDelegate, WKUIDelegate {
 
 extension URL {
 
-    public var queryParameters: [String: String]? {
+    var queryParameters: [String: String]? {
         guard
             let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
             let queryItems = components.queryItems else { return nil }

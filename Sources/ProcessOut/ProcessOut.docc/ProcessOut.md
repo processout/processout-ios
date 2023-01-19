@@ -32,6 +32,12 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``PONativeAlternativePaymentMethodStyle``
 - ``PONativeAlternativePaymentMethodUiConfiguration``
 
+### Alternative Payment Method
+
+- ``POAlternativePaymentMethodsServiceType``
+-  ``POAlternativePaymentMethodRequest``
+-  ``POAlternativePaymentMethodResponse``
+
 ### Appearance
 
 Types that describe properties such as shadow and border. And style of higher level components, for example buttons and inputs.
@@ -93,6 +99,7 @@ full feature parity is reached. See ``ProcessOutLegacyApi`` for possible methods
 - ``ProcessOutLegacyApi``
 - ``TokenRequest``
 - ``AuthorizationRequest``
+- ``GatewayConfiguration``
 - ``APMTokenReturn``
 - ``ThreeDSHandler``
 - ``ThreeDSFingerprintResponse``

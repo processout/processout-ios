@@ -17,7 +17,7 @@ enum HTTPMethod: String {
 }
 
 public final class ProcessOutLegacyApi {
-    
+
     public struct Contact {
         var Address1: String?
         var Address2: String?
@@ -62,6 +62,21 @@ public final class ProcessOutLegacyApi {
         }
     }
 
+    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use POPaginationOptions instead.")
+    public struct PaginationOptions {
+        var StartAfter: String?
+        var EndBefore: String?
+        var Limit: Int?
+        var Order: String?
+        
+        public init(StartAfter: String? = nil, EndBefore: String? = nil, Limit: Int? = nil, Order: String? = nil) {
+            self.StartAfter = StartAfter
+            self.EndBefore = EndBefore
+            self.Limit = Limit
+            self.Order = Order
+        }
+    }
+
     private static var ApiUrl: String {
         ProcessOutApi.shared.configuration.apiBaseUrl.absoluteString
     }
@@ -76,9 +91,9 @@ public final class ProcessOutLegacyApi {
 
     internal static let threeDS2ChallengeSuccess: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ=="
     internal static let threeDS2ChallengeError: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ=="
-    
+
     internal static let requestManager = ProcessOutRequestManager(apiUrl: ApiUrl, apiVersion: ProcessOutApi.version, defaultUserAgent: defaultUserAgent)
-    
+
     // Getting the device user agent
     private static let defaultUserAgent = "iOS/" + UIDevice.current.systemVersion
 
@@ -196,7 +211,7 @@ public final class ProcessOutLegacyApi {
                 "type": paymentMethodType
             ]
             token["paymentMethod"] = paymentMethod
-            
+
             token["transactionIdentifier"] = payment.token.transactionIdentifier
             token["paymentData"] = paymentDataJson
             applepayResponse["token"] = token
@@ -257,7 +272,46 @@ public final class ProcessOutLegacyApi {
             completion(error)
         }
     }
+
+    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use POAllGatewayConfigurationsRequest.Filter instead.")
+    public enum GatewayConfigurationsFilter: String {
+        case All = ""
+        case AlternativePaymentMethods = "alternative-payment-methods"
+        case AlternativePaymentMethodWithTokenization = " alternative-payment-methods-with-tokenization"
+    }
     
+    /// List alternative gateway configurations activated on your account
+    ///
+    /// - Parameters:
+    ///   - completion: Completion callback
+    ///   - paginationOptions: Pagination options to use
+    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOutApi.shared.gatewayConfigurations.all instead.")
+    public static func fetchGatewayConfigurations(filter: GatewayConfigurationsFilter, completion: @escaping ([GatewayConfiguration]?, ProcessOutException?) -> Void, paginationOptions: PaginationOptions? = nil) {
+        let paginationParams = paginationOptions != nil ? "&" + generatePaginationParamsString(paginationOptions: paginationOptions!) : ""
+        
+        HttpRequest(route: "/gateway-configurations?filter=" + filter.rawValue + "&expand_merchant_accounts=true" + paginationParams, method: .get, parameters: nil) { (gateways
+                                                                                                                                                                        , e) in
+            guard gateways != nil else {
+                completion(nil, e)
+                return
+            }
+            
+            var result: GatewayConfigurationResult
+            do {
+                result = try JSONDecoder().decode(GatewayConfigurationResult.self, from: gateways!)
+            } catch {
+                completion(nil, ProcessOutException.GenericError(error: error))
+                return
+            }
+            
+            if let gConfs = result.gatewayConfigurations {
+                completion(gConfs, nil)
+                return
+            }
+            completion(nil, ProcessOutException.InternalError)
+        }
+    }
+
     /// Initiate a payment authorization from a previously generated invoice and card token
     ///
     /// - Parameters:
@@ -632,11 +686,12 @@ public final class ProcessOutLegacyApi {
             handler.onError(error: ProcessOutException.InternalError)
         }
     }
-    
+
     /// Parses an intent uri. Either for an APM payment return or after an makeAPMToken call
     ///
     /// - Parameter url: URI from the deep-link app opening
     /// - Returns: nil if the URL is not a ProcessOut return URL, an APMTokenReturn object otherwise
+    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOutApi.shared.alternativePaymentMethods.alternativePaymentMethodResponse instead.")
     public static func handleAPMURLCallback(url: URL) -> APMTokenReturn? {
         // Check for the URL host
         guard let host = url.host, host == "processout.return" else {
@@ -665,14 +720,15 @@ public final class ProcessOutLegacyApi {
         // Simple APM authorization case
         return APMTokenReturn(token: token)
     }
-    
+
     /// Generates an alternative payment method token
     ///
     /// - Parameters:
     ///   - gateway: The alternative payment method configuration
     ///   - customerId: The customer ID
     ///   - tokenId: The token ID generated on your backend with an empty source
-    public static func makeAPMToken(gateway: POGatewayConfiguration, customerId: String, tokenId: String, additionalData: [String: String] = [:]) {
+    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOutApi.shared.alternativePaymentMethods.alternativePaymentMethodUrl instead.")
+    public static func makeAPMToken(gateway: GatewayConfiguration, customerId: String, tokenId: String, additionalData: [String: String] = [:]) {
         // Generate the redirection URL
         let checkout = ProcessOutLegacyApi.ProjectId + "/" + customerId + "/" + tokenId + "/redirect/" + gateway.id
         let additionalDataString = generateAdditionalDataString(additionalData: additionalData)
@@ -689,7 +745,8 @@ public final class ProcessOutLegacyApi {
     ///   - gateway: Gateway to use (previously fetched)
     ///   - invoiceId: Invoice ID generated on your backend
     /// - Returns: Redirect URL that should be displayed in a webview
-    public static func makeAPMPayment(gateway: POGatewayConfiguration, invoiceId: String, additionalData: [String: String] = [:]) -> String {
+    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOutApi.shared.alternativePaymentMethods.alternativePaymentMethodUrl instead.")
+    public static func makeAPMPayment(gateway: GatewayConfiguration, invoiceId: String, additionalData: [String: String] = [:]) -> String {
         // Generate the redirection URL
         let checkout = ProcessOutLegacyApi.ProjectId + "/" + invoiceId + "/redirect/" + gateway.id
         let additionalDataString = generateAdditionalDataString(additionalData: additionalData)
@@ -697,7 +754,7 @@ public final class ProcessOutLegacyApi {
         
         return urlString
     }
-    
+
     /// Generates an additionalData query parameter string
     ///
     /// - Parameter additionalData: additionalData to send to the APM
@@ -727,7 +784,30 @@ public final class ProcessOutLegacyApi {
             return result + "&" + current
         })
     }
-
+    
+    /// Generates a query parameter string to facilitate pagination on many endpoints.
+    /// For more information, see https://docs.processout.com/refs/#pagination
+    ///
+    /// - Parameter paginationOptions: Pagination options to use
+    /// - Returns: An empty string or a string containing a set of query parameters.
+    /// Note that the returned string is not prefixed or suffixed with ? or &, so you may need to do this yourself depending on where these parameters will appear in your URL
+    @available(*, deprecated)
+    private static func generatePaginationParamsString(paginationOptions: PaginationOptions) -> String {
+        // Construct the individual query params and store them in an array
+        let paginationParams: [String?] = [
+            paginationOptions.StartAfter != nil ? "start_after=" + paginationOptions.StartAfter! : nil,
+            paginationOptions.EndBefore != nil ? "end_before=" + paginationOptions.EndBefore! : nil,
+            paginationOptions.Limit != nil ? "limit=" + String(paginationOptions.Limit!) : nil,
+            paginationOptions.Order != nil ? "order=" + paginationOptions.Order! : nil
+        ]
+        
+        // Remove any nil values from the array
+        let filteredPaginationParams = paginationParams.compactMap {$0}
+        
+        // Join the array into a single string separated by ampersands and return it
+        return filteredPaginationParams.joined(separator: "&")
+    }
+    
     /// Requests an authorization for a specified invoice and initiates web authentication where appropriate.
     ///
     /// - Parameters:

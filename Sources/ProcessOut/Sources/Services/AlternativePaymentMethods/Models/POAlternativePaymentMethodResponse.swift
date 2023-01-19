@@ -7,7 +7,7 @@
 
 import Foundation
 
-@_spi(PO)
+/// Result of alternative payment.
 public struct POAlternativePaymentMethodResponse {
 
     public enum APMReturnType {

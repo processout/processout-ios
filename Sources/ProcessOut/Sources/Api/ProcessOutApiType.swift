@@ -19,6 +19,9 @@ public protocol ProcessOutApiType {
     /// Images repository.
     var images: POImagesRepositoryType { get }
 
+    /// Returns Alternative Payment Methods service.
+    var alternativePaymentMethods: POAlternativePaymentMethodsServiceType { get }
+
     /// Returns cards repository.
     @_spi(PO)
     var cards: POCardsRepositoryType { get }
@@ -26,10 +29,6 @@ public protocol ProcessOutApiType {
     /// Returns customer tokens service.
     @_spi(PO)
     var customerTokens: POCustomerTokensServiceType { get }
-
-    /// Returns Alternative Payment Methods service.
-    @_spi(PO)
-    var alternativePaymentMethods: POAlternativePaymentMethodsServiceType { get }
 }
 
 extension ProcessOutApiType {
@@ -39,10 +38,6 @@ extension ProcessOutApiType {
     }
 
     var customerTokens: POCustomerTokensServiceType {
-        fatalError("Not available!")
-    }
-
-    var alternativePaymentMethods: POAlternativePaymentMethodsServiceType {
         fatalError("Not available!")
     }
 }
