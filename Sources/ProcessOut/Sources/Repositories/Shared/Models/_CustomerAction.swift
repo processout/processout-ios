@@ -1,5 +1,5 @@
 //
-//  AuthorizationResult.swift
+//  _CustomerAction.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 18.10.2022.
@@ -7,7 +7,9 @@
 
 import Foundation
 
-struct CustomerAction: Decodable {
+// swiftlint:disable type_name todo
+// - TODO: Remove underscore when legacy counterpart won't be needed.
+struct _CustomerAction: Decodable {
 
     enum ActionType: String, Decodable {
 

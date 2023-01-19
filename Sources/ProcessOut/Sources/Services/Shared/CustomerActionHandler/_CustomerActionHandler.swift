@@ -1,5 +1,5 @@
 //
-//  CustomerActionHandler.swift
+//  _CustomerActionHandler.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 03.11.2022.
@@ -7,7 +7,9 @@
 
 import Foundation
 
-final class CustomerActionHandler: CustomerActionHandlerType {
+// swiftlint:disable type_name todo
+// - TODO: Remove underscore when legacy counterpart won't be needed.
+final class _CustomerActionHandler: CustomerActionHandlerType {
 
     init(decoder: JSONDecoder, encoder: JSONEncoder) {
         self.decoder = decoder
@@ -17,7 +19,7 @@ final class CustomerActionHandler: CustomerActionHandlerType {
     // MARK: - CustomerActionHandlerType
 
     func handle(
-        customerAction: CustomerAction,
+        customerAction: _CustomerAction,
         delegate: Delegate,
         completion: @escaping (Result<String, POFailure>) -> Void
     ) {

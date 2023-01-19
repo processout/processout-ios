@@ -181,13 +181,10 @@ final class NativeAlternativePaymentMethodParametersView: UIStackView {
         case .email:
             return .emailAddress
         case .numeric:
-            if #available(iOS 12.0, *) {
-                return .oneTimeCode
-            }
+            return .oneTimeCode
         case .phone:
             return .telephoneNumber
         }
-        return nil
     }
 
     // MARK: - Actions

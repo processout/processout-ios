@@ -115,7 +115,7 @@ public final class ProcessOutApi: ProcessOutApiType {
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        return CustomerActionHandler(decoder: decoder, encoder: encoder)
+        return _CustomerActionHandler(decoder: decoder, encoder: encoder)
     }()
 
     private static let decoder: JSONDecoder = {

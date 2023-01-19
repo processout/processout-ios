@@ -2,6 +2,9 @@ included:
   - Sources
   - Tests
 
+excluded:
+  - Sources/ProcessOut/Sources/Legacy
+
 function_parameter_count:
   warning: 5
 

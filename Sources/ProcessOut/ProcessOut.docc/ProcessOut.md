@@ -84,3 +84,21 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``PORepositoryType``
 - ``POServiceType``
 - ``POAutoAsync``
+
+### Legacy Declarations
+
+There are outdated declaration that only exist for backward compatibility with old SDK, they will be removed when
+full feature parity is reached. See ``ProcessOutLegacyApi`` for possible methods.
+
+- ``ProcessOutLegacyApi``
+- ``TokenRequest``
+- ``AuthorizationRequest``
+- ``APMTokenReturn``
+- ``ThreeDSHandler``
+- ``ThreeDSFingerprintResponse``
+- ``CustomerAction``
+- ``DirectoryServerData``
+- ``AuthentificationChallengeData``
+- ``ProcessOutWebView``
+- ``FingerPrintWebViewSchemeHandler``
+- ``ProcessOutException``

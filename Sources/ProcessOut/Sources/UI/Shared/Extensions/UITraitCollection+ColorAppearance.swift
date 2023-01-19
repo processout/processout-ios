@@ -14,9 +14,7 @@ extension UITraitCollection {
     func isColorAppearanceDifferent(to traitCollection: UITraitCollection?) -> Bool {
         var isDifferent = displayGamut != traitCollection?.displayGamut
             || userInterfaceIdiom != traitCollection?.userInterfaceIdiom
-        if #available(iOS 12.0, *) {
-            isDifferent = isDifferent || userInterfaceStyle != traitCollection?.userInterfaceStyle
-        }
+            || userInterfaceStyle != traitCollection?.userInterfaceStyle
         if #available(iOS 13.0, *) {
             isDifferent = isDifferent
                 || accessibilityContrast != traitCollection?.accessibilityContrast

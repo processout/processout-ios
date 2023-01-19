@@ -17,10 +17,10 @@ final class CustomerTokensRepository: CustomerTokensRepositoryType {
     // MARK: - CustomerTokensRepositoryType
 
     func assignCustomerToken(
-        request: POAssignCustomerTokenRequest, completion: @escaping (Result<CustomerAction?, Failure>) -> Void
+        request: POAssignCustomerTokenRequest, completion: @escaping (Result<_CustomerAction?, Failure>) -> Void
     ) {
         struct Response: Decodable {
-            let customerAction: CustomerAction?
+            let customerAction: _CustomerAction?
         }
         let httpRequest = HttpConnectorRequest<Response>.put(
             path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",

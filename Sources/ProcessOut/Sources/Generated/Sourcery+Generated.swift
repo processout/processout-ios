@@ -9,7 +9,7 @@ extension CustomerTokensRepositoryType {
     @MainActor
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest
-    ) async throws -> CustomerAction? {
+    ) async throws -> _CustomerAction? {
         return try await withUnsafeThrowingContinuation { continuation in
             assignCustomerToken(request: request, completion: continuation.resume)
         }
@@ -49,7 +49,7 @@ extension InvoicesRepositoryType {
     @MainActor
     public func authorizeInvoice(
         request: POInvoiceAuthorizationRequest
-    ) async throws -> CustomerAction? {
+    ) async throws -> _CustomerAction? {
         return try await withUnsafeThrowingContinuation { continuation in
             authorizeInvoice(request: request, completion: continuation.resume)
         }
