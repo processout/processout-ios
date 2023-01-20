@@ -11,18 +11,13 @@ import Foundation
 public protocol POCustomerActionHandlerDelegate: AnyObject {
 
     /// Asks delegate to fingerprint the device.
-    func fingerprint(data: PODirectoryServerData, completion: @escaping (Result<PODeviceFingerprint, Error>) -> Void)
+    func fingerprint(
+        data: PODirectoryServerData, completion: @escaping (Result<PODeviceFingerprint, POFailure>) -> Void
+    )
 
     /// Asks delegate to perform given challenge.
-    func challenge(challenge: POAuthentificationChallengeData, completion: @escaping (Result<Bool, Error>) -> Void)
+    func challenge(challenge: POAuthentificationChallengeData, completion: @escaping (Result<Bool, POFailure>) -> Void)
 
-    /// Asks delegate to perform redirection to given url.
-    func redirect(url: URL, completion: @escaping (Result<String, Error>) -> Void)
-
-    /// Asks delegate for device fingeprint that could be done by redirecting to given url using
-    /// browser in a "headless" mode.
-    func fingerprint(url: URL, completion: @escaping (Result<String, Error>) -> Void)
-
-    /// Notifies delegate that fingerprinting operation timed out.
-    func fingerprintDidTimeout()
+    /// Asks delegate to perform redirect.
+    func redirect(context: PORedirectCustomerActionContext, completion: @escaping (Result<String, POFailure>) -> Void)
 }

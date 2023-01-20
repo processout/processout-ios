@@ -18,20 +18,22 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
 
     // MARK: - CustomerActionHandlerType
 
-    func handle(
-        customerAction: _CustomerAction,
-        delegate: Delegate,
-        completion: @escaping (Result<String, POFailure>) -> Void
-    ) {
+    func handle(customerAction: _CustomerAction, delegate: Delegate, completion: @escaping Completion) {
+        let completionTrampoline: Completion = { result in
+            assert(Thread.isMainThread, "Completion must be called on main thread!")
+            completion(result)
+        }
         switch customerAction.type {
         case .fingerprintMobile:
-            fingerprint(encodedDirectoryServerData: customerAction.value, delegate: delegate, completion: completion)
+            fingerprint(
+                encodedDirectoryServerData: customerAction.value, delegate: delegate, completion: completionTrampoline
+            )
         case .challengeMobile:
-            challenge(encodedChallengeData: customerAction.value, delegate: delegate, completion: completion)
+            challenge(encodedChallengeData: customerAction.value, delegate: delegate, completion: completionTrampoline)
         case .fingerprint:
-            fingerprint(url: customerAction.value, delegate: delegate, completion: completion)
+            fingerprint(url: customerAction.value, delegate: delegate, completion: completionTrampoline)
         case .redirect, .url:
-            redirect(url: customerAction.value, delegate: delegate, completion: completion)
+            redirect(url: customerAction.value, delegate: delegate, completion: completionTrampoline)
         }
     }
 
@@ -50,73 +52,69 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
 
     // MARK: - Private Methods
 
-    private func fingerprint(
-        encodedDirectoryServerData: String,
-        delegate: Delegate,
-        completion: @escaping (Result<String, POFailure>) -> Void
-    ) {
-        let directoryServerData: PODirectoryServerData
-        switch decode(PODirectoryServerData.self, from: encodedDirectoryServerData) {
-        case let .success(data):
-            directoryServerData = data
-        case let .failure(failure):
-            completion(.failure(failure))
-            return
-        }
-        delegate.fingerprint(data: directoryServerData) { [encoder] result in
-            assert(Thread.isMainThread)
-            switch result {
-            case let .success(fingerprint):
-                do {
-                    let fingerprintDataString = String(decoding: try self.encoder.encode(fingerprint), as: UTF8.self)
-                    let response = FingerprintResponse(url: nil, headers: nil, body: fingerprintDataString)
-                    let responseDataString = String(
-                        decoding: try encoder.encode(response).base64EncodedData(), as: UTF8.self
-                    )
-                    let newSource = "gway_req_" + responseDataString
-                    completion(.success(newSource))
-                } catch {
-                    Logger.services.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
-                    completion(.failure(.init(message: nil, code: .internal, underlyingError: error)))
+    private func fingerprint(encodedDirectoryServerData: String, delegate: Delegate, completion: @escaping Completion) {
+        do {
+            let directoryServerData = try decode(PODirectoryServerData.self, from: encodedDirectoryServerData)
+            delegate.fingerprint(data: directoryServerData) { [encoder] result in
+                switch result {
+                case let .success(fingerprint):
+                    do {
+                        let response = FingerprintResponse(
+                            url: nil,
+                            headers: nil,
+                            body: String(decoding: try self.encoder.encode(fingerprint), as: UTF8.self)
+                        )
+                        let responseDataString = String(
+                            decoding: try encoder.encode(response).base64EncodedData(), as: UTF8.self
+                        )
+                        completion(.success("gway_req_" + responseDataString))
+                    } catch {
+                        Logger.services.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
+                        completion(.failure(.init(message: nil, code: .internal, underlyingError: error)))
+                    }
+                case let .failure(failure):
+                    completion(.failure(failure))
                 }
-            case let .failure(error):
-                completion(.failure(.init(message: nil, code: .unknown, underlyingError: error)))
             }
+        } catch {
+            Logger.services.error("Did fail to decode DS data: '\(error.localizedDescription)'.")
+            completion(.failure(.init(code: .internal, underlyingError: error)))
         }
     }
 
-    private func challenge(
-        encodedChallengeData: String,
-        delegate: Delegate,
-        completion: @escaping (Result<String, POFailure>) -> Void
-    ) {
-        let challenge: POAuthentificationChallengeData
-        switch decode(POAuthentificationChallengeData.self, from: encodedChallengeData) {
-        case let .success(data):
-            challenge = data
-        case let .failure(failure):
-            completion(.failure(failure))
+    private func challenge(encodedChallengeData: String, delegate: Delegate, completion: @escaping Completion) {
+        do {
+            let challenge = try decode(POAuthentificationChallengeData.self, from: encodedChallengeData)
+            delegate.challenge(challenge: challenge) { result in
+                switch result {
+                case let .success(success):
+                    let newSource = success
+                        ? "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ=="
+                        : "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ=="
+                    completion(.success(newSource))
+                case let .failure(failure):
+                    completion(.failure(failure))
+                }
+            }
+        } catch {
+            Logger.services.error("Did fail to decode challenge data: '\(error.localizedDescription)'.")
+            completion(.failure(.init(code: .internal, underlyingError: error)))
+        }
+    }
+
+    private func fingerprint(url: String, delegate: Delegate, completion: @escaping Completion) {
+        guard let url = URL(string: url) else {
+            Logger.services.error("Did fail to create fingerprint URL from raw value: '\(url)'.")
+            completion(.failure(.init(message: nil, code: .internal, underlyingError: nil)))
             return
         }
-        delegate.challenge(challenge: challenge) { result in
-            assert(Thread.isMainThread)
+        let context = PORedirectCustomerActionContext(url: url, isHeadlessModeAllowed: true, timeout: 10)
+        delegate.redirect(context: context) { [encoder] result in
             switch result {
-            case let .success(success):
-                let newSource = success
-                    ? "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ=="
-                    : "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ=="
+            case let .success(newSource):
                 completion(.success(newSource))
-            case let .failure(error):
-                completion(.failure(.init(message: nil, code: .unknown, underlyingError: error)))
-            }
-        }
-    }
-
-    private func fingerprint(
-        url: String, delegate: Delegate, completion: @escaping (Result<String, POFailure>) -> Void
-    ) {
-        if let url = URL(string: url) {
-            let timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: false) { [encoder] _ in
+            case let .failure(failure) where failure.code == .timeout:
+                // Fingerprinting timeout error is treated differently from other actions.
                 do {
                     let response = FingerprintResponse(
                         url: url,
@@ -126,61 +124,34 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
                     let responseDataString = String(
                         decoding: try encoder.encode(response).base64EncodedData(), as: UTF8.self
                     )
-                    let newSource = "gway_req_" + responseDataString
-                    completion(.success(newSource))
+                    completion(.success("gway_req_" + responseDataString))
                 } catch {
                     Logger.services.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
                     completion(.failure(.init(message: nil, code: .internal, underlyingError: error)))
                 }
-                delegate.fingerprintDidTimeout()
+            case let .failure(failure):
+                completion(.failure(failure))
             }
-            delegate.fingerprint(url: url) { [self] result in
-                guard timer.isValid else {
-                    return
-                }
-                timer.invalidate()
-                complete(with: result, completion: completion)
-            }
-        } else {
-            let failure = POFailure(message: nil, code: .internal, underlyingError: nil)
-            completion(.failure(failure))
         }
     }
 
-    private func redirect(
-        url: String, delegate: Delegate, completion: @escaping (Result<String, POFailure>) -> Void
-    ) {
-        if let url = URL(string: url) {
-            delegate.redirect(url: url) { result in
-                self.complete(with: result, completion: completion)
-            }
-        } else {
-            let failure = POFailure(message: nil, code: .internal, underlyingError: nil)
-            completion(.failure(failure))
+    private func redirect(url: String, delegate: Delegate, completion: @escaping Completion) {
+        guard let url = URL(string: url) else {
+            Logger.services.error("Did fail to create redirect URL from raw value: '\(url)'.")
+            completion(.failure(.init(message: nil, code: .internal, underlyingError: nil)))
+            return
         }
+        let context = PORedirectCustomerActionContext(url: url, isHeadlessModeAllowed: false, timeout: nil)
+        delegate.redirect(context: context, completion: completion)
     }
 
     // MARK: - Utils
 
-    private func complete(
-        with result: Result<String, Error>, completion: @escaping (Result<String, POFailure>) -> Void
-    ) {
-        assert(Thread.isMainThread)
-        let result = result.mapError { error in
-            POFailure(message: nil, code: .unknown, underlyingError: error)
-        }
-        completion(result)
-    }
-
-    private func decode<T: Decodable>(_ type: T.Type, from string: String) -> Result<T, POFailure> {
+    private func decode<T: Decodable>(_ type: T.Type, from string: String) throws -> T {
         let paddedString = string.padding(
             toLength: string.count + (4 - string.count % 4) % 4, withPad: "=", startingAt: 0
         )
         let data = Data(paddedString.utf8).base64EncodedData()
-        do {
-            return .success(try decoder.decode(type, from: data))
-        } catch {
-            return .failure(.init(message: nil, code: .internal, underlyingError: error))
-        }
+        return try decoder.decode(type, from: data)
     }
 }

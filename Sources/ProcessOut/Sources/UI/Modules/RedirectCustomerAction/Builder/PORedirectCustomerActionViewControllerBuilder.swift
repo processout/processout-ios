@@ -1,5 +1,5 @@
 //
-//  POCustomerActionViewControllerBuilder.swift
+//  PORedirectCustomerActionViewControllerBuilder.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 04.11.2022.
@@ -8,19 +8,17 @@
 import UIKit
 
 @_spi(PO)
-public final class POCustomerActionViewControllerBuilder {
-
-    public typealias Completion = (Result<String, POFailure>) -> Void
+public final class PORedirectCustomerActionViewControllerBuilder {
 
     /// - Parameters:
     ///   - url: customer action url.
     ///   - completion: completion to invoke when action handling completes.
-    public static func with(url: URL) -> Self {
-        Self(url: url)
+    public static func with(context: PORedirectCustomerActionContext) -> Self {
+        Self(context: context)
     }
 
     /// Completion to invoke when authorization ends.
-    public func with(completion: @escaping Completion) -> Self {
+    public func with(completion: @escaping (Result<String, POFailure>) -> Void) -> Self {
         self.completion = completion
         return self
     }
@@ -32,30 +30,46 @@ public final class POCustomerActionViewControllerBuilder {
         return self
     }
 
+    /// Return url that was specified when invoice was created.
+    public func with(returnUrl: URL) -> Self {
+        self.returnUrl = returnUrl
+        return self
+    }
+
     /// Returns view controller that caller should encorporate into view controllers hierarchy.
     /// If instance can't be created assertion failure is triggered.
     ///
     /// - NOTE: Caller should dismiss view controller after completion is called.
     public func build() -> UIViewController {
         let api: ProcessOutApiType = self.api ?? ProcessOutApi.shared
+        let delegate = RedirectCustomerActionWebViewControllerDelegate(url: context.url) { [completion] result in
+            completion?(result)
+        }
+        var returnUrls = [api.configuration.checkoutBaseUrl]
+        if let returnUrl {
+            returnUrls.append(returnUrl)
+        }
         let viewController = WebViewController(
-            delegate: CustomerActionWebViewControllerDelegate(url: url),
-            baseReturnUrl: api.configuration.checkoutBaseUrl,
+            eventEmitter: api.eventEmitter,
+            delegate: delegate,
+            returnUrls: returnUrls,
             version: type(of: api).version,
-            completion: completion
+            timeout: context.timeout
         )
         return viewController
     }
 
     // MARK: -
 
-    init(url: URL) {
-        self.url = url
+    init(context: PORedirectCustomerActionContext) {
+        self.context = context
     }
 
     // MARK: - Private Properties
 
-    private let url: URL
-    private var completion: Completion?
+    private let context: PORedirectCustomerActionContext
+
+    private var completion: ((Result<String, POFailure>) -> Void)?
     private var api: ProcessOutApiType?
+    private var returnUrl: URL?
 }

@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 /// Class that provides access to shared api instance and a way to configure it.
-public final class ProcessOutApi: ProcessOutApiType {
+public enum ProcessOutApi {
 
     /// Shared instance.
     public private(set) static var shared: ProcessOutApiType! // swiftlint:disable:this implicitly_unwrapped_optional
@@ -22,70 +22,60 @@ public final class ProcessOutApi: ProcessOutApiType {
         guard shared == nil else {
             return
         }
-        let connector = createHttpConnector(configuration: configuration)
-        let failureMapper = FailureMapper()
-        shared = ProcessOutApi(
-            configuration: configuration,
-            gatewayConfigurations: GatewayConfigurationsRepository(
-                connector: connector, failureMapper: failureMapper
-            ),
-            invoices: InvoicesService(
-                repository: InvoicesRepository(connector: connector, failureMapper: failureMapper),
-                customerActionHandler: customerActionHandler
-            ),
-            cards: CardsRepository(
-                connector: connector,
-                failureMapper: failureMapper,
-                applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper(decoder: decoder)
-            ),
-            customerTokens: CustomerTokensService(
-                repository: CustomerTokensRepository(connector: connector, failureMapper: failureMapper),
-                customerActionHandler: customerActionHandler
-            ),
-            alternativePaymentMethods: AlternativePaymentMethodsService(
-                projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl
-            ),
-            images: ImagesRepository(session: .shared)
-        )
+        shared = SharedProcessOutApi(configuration: configuration)
+    }
+}
+
+private final class SharedProcessOutApi: ProcessOutApiType {
+
+    init(configuration: ProcessOutApiConfiguration) {
+        self.configuration = configuration
     }
 
     // MARK: - ProcessOutApiType
 
-    public let configuration: ProcessOutApiConfiguration
-    public let gatewayConfigurations: POGatewayConfigurationsRepositoryType
-    public let invoices: POInvoicesServiceType
-    public let images: POImagesRepositoryType
-    public let alternativePaymentMethods: POAlternativePaymentMethodsServiceType
+    let configuration: ProcessOutApiConfiguration
 
-    @_spi(PO)
-    public let cards: POCardsRepositoryType
+    private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepositoryType = {
+        GatewayConfigurationsRepository(connector: httpConnector, failureMapper: failureMapper)
+    }()
 
-    @_spi(PO)
-    public let customerTokens: POCustomerTokensServiceType
+    private(set) lazy var invoices: POInvoicesServiceType = {
+        let repository = InvoicesRepository(connector: httpConnector, failureMapper: failureMapper)
+        return InvoicesService(repository: repository, customerActionHandler: customerActionHandler)
+    }()
 
-    // MARK: -
+    private(set) lazy var images: POImagesRepositoryType = {
+        ImagesRepository(session: .shared)
+    }()
 
-    private init(
-        configuration: ProcessOutApiConfiguration,
-        gatewayConfigurations: POGatewayConfigurationsRepositoryType,
-        invoices: POInvoicesServiceType,
-        cards: POCardsRepositoryType,
-        customerTokens: POCustomerTokensServiceType,
-        alternativePaymentMethods: POAlternativePaymentMethodsServiceType,
-        images: POImagesRepositoryType
-    ) {
-        self.configuration = configuration
-        self.gatewayConfigurations = gatewayConfigurations
-        self.invoices = invoices
-        self.cards = cards
-        self.customerTokens = customerTokens
-        self.alternativePaymentMethods = alternativePaymentMethods
-        self.images = images
+    private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsServiceType = {
+        AlternativePaymentMethodsService(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
+    }()
+
+    private(set) lazy var cards: POCardsRepositoryType = {
+        CardsRepository(
+            connector: httpConnector,
+            failureMapper: failureMapper,
+            applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper(decoder: decoder)
+        )
+    }()
+
+    private(set) lazy var customerTokens: POCustomerTokensServiceType = {
+        let repository = CustomerTokensRepository(connector: httpConnector, failureMapper: failureMapper)
+        return CustomerTokensService(repository: repository, customerActionHandler: customerActionHandler)
+    }()
+
+    private(set) lazy var eventEmitter: POEventEmitterType = EventEmitter()
+
+    func processDeepLink(url: URL) -> Bool {
+        let event = DeepLinkReceivedEvent(url: url)
+        return eventEmitter.emit(event: event)
     }
 
-    // MARK: - Private Methods
+    // MARK: - Private Properties
 
-    private static func createHttpConnector(configuration: ProcessOutApiConfiguration) -> HttpConnectorType {
+    private lazy var httpConnector: HttpConnectorType = {
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.urlCache = nil
         sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -105,9 +95,11 @@ public final class ProcessOutApi: ProcessOutApiType {
         )
         let retryStrategy = RetryStrategy.exponential(maximumRetries: 3, interval: 0.1, rate: 3)
         return HttpConnectorRetryDecorator(connector: connector, retryStrategy: retryStrategy)
-    }
+    }()
 
-    private static let customerActionHandler: CustomerActionHandlerType = {
+    private lazy var failureMapper = FailureMapper()
+
+    private lazy var customerActionHandler: CustomerActionHandlerType = {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .useDefaultKeys
         let encoder = JSONEncoder()
@@ -116,21 +108,21 @@ public final class ProcessOutApi: ProcessOutApiType {
         return _CustomerActionHandler(decoder: decoder, encoder: encoder)
     }()
 
-    private static let decoder: JSONDecoder = {
+    private lazy var decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         decoder.dateDecodingStrategy = .formatted(dateFormatter)
         return decoder
     }()
 
-    private static let encoder: JSONEncoder = {
+    private lazy var encoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
         encoder.dateEncodingStrategy = .formatted(dateFormatter)
         return encoder
     }()
 
-    private static let dateFormatter: DateFormatter = {
+    private lazy var dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)

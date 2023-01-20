@@ -178,7 +178,10 @@ public struct POFailure: Error {
     /// Underlying error for inspection.
     public let underlyingError: Error?
 
-    init(message: String? = nil, code: Code, invalidFields: [InvalidField]? = nil, underlyingError: Error? = nil) {
+    /// Creates failure instance.
+    public init(
+        message: String? = nil, code: Code, invalidFields: [InvalidField]? = nil, underlyingError: Error? = nil
+    ) {
         self.message = message
         self.code = code
         self.invalidFields = invalidFields

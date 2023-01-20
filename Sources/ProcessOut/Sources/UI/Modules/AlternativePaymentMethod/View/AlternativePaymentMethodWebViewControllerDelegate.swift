@@ -11,10 +11,12 @@ final class AlternativePaymentMethodWebViewControllerDelegate: WebViewController
 
     init(
         alternativePaymentMethodsService: POAlternativePaymentMethodsServiceType,
-        request: POAlternativePaymentMethodRequest
+        request: POAlternativePaymentMethodRequest,
+        completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
     ) {
         self.alternativePaymentMethodsService = alternativePaymentMethodsService
         self.request = request
+        self.completion = completion
     }
 
     // MARK: - WebViewControllerDelegate
@@ -23,12 +25,18 @@ final class AlternativePaymentMethodWebViewControllerDelegate: WebViewController
         alternativePaymentMethodsService.alternativePaymentMethodUrl(request: request)
     }
 
-    func mapToSuccessValue(url: URL) throws -> POAlternativePaymentMethodResponse {
-        try alternativePaymentMethodsService.alternativePaymentMethodResponse(url: url)
+    func complete(with url: URL) throws {
+        let response = try alternativePaymentMethodsService.alternativePaymentMethodResponse(url: url)
+        completion(.success(response))
+    }
+
+    func complete(with failure: POFailure) {
+        completion(.failure(failure))
     }
 
     // MARK: - Private Properties
 
     private let alternativePaymentMethodsService: POAlternativePaymentMethodsServiceType
     private let request: POAlternativePaymentMethodRequest
+    private let completion: (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
 }

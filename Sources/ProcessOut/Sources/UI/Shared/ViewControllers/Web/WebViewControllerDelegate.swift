@@ -7,14 +7,15 @@
 
 import Foundation
 
-protocol WebViewControllerDelegate<Success>: AnyObject {
-
-    associatedtype Success
+protocol WebViewControllerDelegate: AnyObject {
 
     /// Returns url to use for initial navigation.
     var url: URL { get }
 
-    /// Asks delegate to convert given url into expected success value.
+    /// Asks delegate to complete with given url.
     /// - Throws: error if transform is not possible for some reason.
-    func mapToSuccessValue(url: URL) throws -> Success
+    func complete(with url: URL) throws
+
+    /// Completes with failure.
+    func complete(with failure: POFailure)
 }

@@ -7,18 +7,20 @@
 
 import WebKit
 
-final class WebViewController<Success>: UIViewController, WKNavigationDelegate, WKUIDelegate {
+final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
 
     init(
-        delegate: any WebViewControllerDelegate<Success>,
-        baseReturnUrl: URL,
+        eventEmitter: POEventEmitterType,
+        delegate: WebViewControllerDelegate,
+        returnUrls: [URL],
         version: String,
-        completion: ((Result<Success, POFailure>) -> Void)?
+        timeout: TimeInterval? = nil
     ) {
+        self.eventEmitter = eventEmitter
         self.delegate = delegate
-        self.baseReturnUrl = baseReturnUrl
+        self.returnUrls = returnUrls
         self.version = version
-        self.completion = completion
+        self.timeout = timeout
         state = .idle
         super.init(nibName: nil, bundle: nil)
     }
@@ -103,10 +105,11 @@ final class WebViewController<Success>: UIViewController, WKNavigationDelegate, 
 
     // MARK: - Private Properties
 
-    private let delegate: any WebViewControllerDelegate<Success>
-    private let baseReturnUrl: URL
+    private let eventEmitter: POEventEmitterType
+    private let delegate: WebViewControllerDelegate
+    private let returnUrls: [URL]
     private let version: String
-    private let completion: ((Result<Success, POFailure>) -> Void)?
+    private let timeout: TimeInterval?
 
     private lazy var contentViewConfiguration: WKWebViewConfiguration = {
         let preferences = WKPreferences()
@@ -127,11 +130,9 @@ final class WebViewController<Success>: UIViewController, WKNavigationDelegate, 
         return view
     }()
 
-    private var returnUrl: URL {
-        baseReturnUrl.appendingPathComponent("helpers").appendingPathComponent("mobile-processout-webview-landing")
-    }
-
     private var state: State
+    private var timeoutTimer: Timer?
+    private var deepLinkObserver: AnyObject?
 
     // MARK: - State Management
 
@@ -145,6 +146,14 @@ final class WebViewController<Success>: UIViewController, WKNavigationDelegate, 
             setCompletedState(with: failure)
             return
         }
+        if let timeout {
+            timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
+                self?.setCompletedState(with: POFailure(code: .timeout))
+            }
+        }
+        deepLinkObserver = eventEmitter.on(DeepLinkReceivedEvent.self) { [weak self] event in
+            self?.setCompletedState(with: event.url) ?? false
+        }
         state = .starting(navigation)
     }
 
@@ -154,18 +163,24 @@ final class WebViewController<Success>: UIViewController, WKNavigationDelegate, 
             Logger.ui.error("Can't change state to completed because already in sink state.")
             return false
         }
-        guard url.scheme == returnUrl.scheme, url.host == returnUrl.host, url.path == returnUrl.path else {
+        guard url.path.starts(with: "helpers/mobile-processout-webview-landing") else {
             return false
         }
-        do {
-            let response = try delegate.mapToSuccessValue(url: url)
-            contentView.stopLoading()
-            state = .completed
-            completion?(.success(response))
-        } catch {
-            setCompletedState(with: error)
+        for returnUrl in returnUrls {
+            guard url.scheme == returnUrl.scheme, url.host == returnUrl.host else {
+                continue
+            }
+            do {
+                try delegate.complete(with: url)
+                contentView.stopLoading()
+                timeoutTimer?.invalidate()
+                state = .completed
+            } catch {
+                setCompletedState(with: error)
+            }
+            return true
         }
-        return true
+        return false
     }
 
     private func setCompletedState(with error: Error) {
@@ -180,7 +195,8 @@ final class WebViewController<Success>: UIViewController, WKNavigationDelegate, 
             failure = POFailure(message: nil, code: .unknown, underlyingError: error)
         }
         contentView.stopLoading()
+        timeoutTimer?.invalidate()
         state = .completed
-        completion?(.failure(failure))
+        delegate.complete(with: failure)
     }
 }

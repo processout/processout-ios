@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 10.10.2022.
 //
 
+import Foundation
+
 public protocol ProcessOutApiType {
 
     /// Current configuration.
@@ -29,6 +31,18 @@ public protocol ProcessOutApiType {
     /// Returns customer tokens service.
     @_spi(PO)
     var customerTokens: POCustomerTokensServiceType { get }
+
+    /// Event emitter to use for for events exchange.
+    @_spi(PO)
+    var eventEmitter: POEventEmitterType { get }
+
+    /// Call this method in your app or scene delegate whenever you incoming URL. You can path both custom scheme-based
+    /// deep links and universal links.
+    ///
+    /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
+    @_spi(PO)
+    @discardableResult
+    func processDeepLink(url: URL) -> Bool
 }
 
 extension ProcessOutApiType {
@@ -38,6 +52,14 @@ extension ProcessOutApiType {
     }
 
     var customerTokens: POCustomerTokensServiceType {
+        fatalError("Not available!")
+    }
+
+    var eventEmitter: POEventEmitterType {
+        fatalError("Not available!")
+    }
+
+    func processDeepLink(url: URL) -> Bool { // swiftlint:disable:this unavailable_function
         fatalError("Not available!")
     }
 }

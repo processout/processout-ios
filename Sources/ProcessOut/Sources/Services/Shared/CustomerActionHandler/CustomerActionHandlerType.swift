@@ -8,15 +8,12 @@
 protocol CustomerActionHandlerType {
 
     typealias Delegate = POCustomerActionHandlerDelegate
+    typealias Completion = (Result<String, POFailure>) -> Void
 
     /// Implementation should attempt to handle given customer action.
     /// - Parameters:
     ///   - customerAction: customer action to handle.
     ///   - delegate: delegate that would perform actual action handling.
     ///   - completion: closure to invoke with a result of customer action handling.
-    func handle(
-        customerAction: _CustomerAction,
-        delegate: Delegate,
-        completion: @escaping (Result<String, POFailure>) -> Void
-    )
+    func handle(customerAction: _CustomerAction, delegate: Delegate, completion: @escaping Completion)
 }

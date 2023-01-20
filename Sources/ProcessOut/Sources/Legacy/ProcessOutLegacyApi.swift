@@ -92,7 +92,7 @@ public final class ProcessOutLegacyApi {
     internal static let threeDS2ChallengeSuccess: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ=="
     internal static let threeDS2ChallengeError: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ=="
 
-    internal static let requestManager = ProcessOutRequestManager(apiUrl: ApiUrl, apiVersion: ProcessOutApi.version, defaultUserAgent: defaultUserAgent)
+    internal static let requestManager = ProcessOutRequestManager(apiUrl: ApiUrl, apiVersion: type(of: ProcessOutApi.shared).version, defaultUserAgent: defaultUserAgent)
 
     // Getting the device user agent
     private static let defaultUserAgent = "iOS/" + UIDevice.current.systemVersion

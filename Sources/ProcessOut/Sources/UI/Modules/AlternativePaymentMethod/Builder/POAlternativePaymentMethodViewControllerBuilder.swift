@@ -29,17 +29,28 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
         return self
     }
 
+    /// Return url that was specified when invoice was created.
+    public func with(returnUrl: URL) -> Self {
+        self.returnUrl = returnUrl
+        return self
+    }
+
     /// Creates and returns view controller that is capable of handling alternative payment request.
     public func build() -> UIViewController {
         let api: ProcessOutApiType = self.api ?? ProcessOutApi.shared
         let delegate = AlternativePaymentMethodWebViewControllerDelegate(
-            alternativePaymentMethodsService: api.alternativePaymentMethods, request: request
+            alternativePaymentMethodsService: api.alternativePaymentMethods,
+            request: request,
+            completion: { [completion] result in
+                completion?(result)
+            }
         )
+        var returnUrls = [api.configuration.checkoutBaseUrl]
+        if let returnUrl {
+            returnUrls.append(returnUrl)
+        }
         let viewController = WebViewController(
-            delegate: delegate,
-            baseReturnUrl: api.configuration.checkoutBaseUrl,
-            version: type(of: api).version,
-            completion: completion
+            eventEmitter: api.eventEmitter, delegate: delegate, returnUrls: returnUrls, version: type(of: api).version
         )
         return viewController
     }
@@ -53,6 +64,8 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
     // MARK: - Private Properties
 
     private let request: POAlternativePaymentMethodRequest
+
     private var api: ProcessOutApiType?
     private var completion: ((Result<POAlternativePaymentMethodResponse, POFailure>) -> Void)?
+    private var returnUrl: URL?
 }
