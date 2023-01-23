@@ -38,8 +38,8 @@ All errors that could happen as a result of interaction with the SDK are represe
 ### Alternative Payment Method
 
 - ``POAlternativePaymentMethodsServiceType``
--  ``POAlternativePaymentMethodRequest``
--  ``POAlternativePaymentMethodResponse``
+- ``POAlternativePaymentMethodRequest``
+- ``POAlternativePaymentMethodResponse``
 
 ### Appearance
 
@@ -105,6 +105,7 @@ full feature parity is reached. See ``ProcessOutLegacyApi`` for possible methods
 - ``GatewayConfiguration``
 - ``APMTokenReturn``
 - ``ThreeDSHandler``
+- ``ThreeDSTestHandler``
 - ``ThreeDSFingerprintResponse``
 - ``CustomerAction``
 - ``DirectoryServerData``

@@ -687,6 +687,15 @@ public final class ProcessOutLegacyApi {
         }
     }
 
+    /// Creates a test 3DS2 handler that lets you integrate and test the 3DS2 flow seamlessly. Only use this while using sandbox API keys
+    ///
+    /// - Parameter viewController: UIViewController (needed to display a 3DS2 challenge popup)
+    /// - Returns: Returns a sandbox ready ThreeDS2Handler
+    @available(*, deprecated, message: "Declaration will be removed in version 4.0.")
+    public static func createThreeDSTestHandler(viewController: UIViewController, completion: @escaping (String?, ProcessOutException?) -> Void) -> ThreeDSHandler {
+        return ThreeDSTestHandler(controller: viewController, completion: completion)
+    }
+
     /// Parses an intent uri. Either for an APM payment return or after an makeAPMToken call
     ///
     /// - Parameter url: URI from the deep-link app opening
