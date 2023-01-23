@@ -13,6 +13,9 @@ ProcessOutApi.configure(configuration: configuration)
 
 ## Topics
 
+### Migrating from previous versions
+- <doc:MigratingFromProcessOut2>
+
 ### Framework
 
 - ``ProcessOutApi``
