@@ -47,6 +47,7 @@ final class AlternativePaymentMethodsInteractor:
 
     func restart() {
         guard case .started(let startedState) = state else {
+            start()
             return
         }
         state = .restarting(snapshot: startedState)

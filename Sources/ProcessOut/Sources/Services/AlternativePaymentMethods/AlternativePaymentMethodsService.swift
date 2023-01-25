@@ -42,8 +42,14 @@ final class AlternativePaymentMethodsService: POAlternativePaymentMethodsService
 
     func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-              let queryItems = components.queryItems,
-              let gatewayToken = queryItems.queryItemValue(name: "token") else {
+              let queryItems = components.queryItems else {
+            let message = "Invalid or malformed Alternative Payment Mehod URL response provided."
+            throw POFailure(message: message, code: .internal, underlyingError: nil)
+        }
+        if let errorCode = queryItems.queryItemValue(name: "error_code") {
+            throw POFailure(code: createFailureCode(rawValue: errorCode))
+        }
+        guard let gatewayToken = queryItems.queryItemValue(name: "token") else {
             let message = "Invalid or malformed Alternative Payment Mehod URL response provided."
             throw POFailure(message: message, code: .internal, underlyingError: nil)
         }
@@ -58,6 +64,22 @@ final class AlternativePaymentMethodsService: POAlternativePaymentMethodsService
 
     private let projectId: String
     private let baseUrl: URL
+
+    // MARK: - Private Methods
+
+    private func createFailureCode(rawValue: String) -> POFailure.Code {
+        if let validationCode = POFailure.ValidationCode(rawValue: rawValue) {
+            return .validation(validationCode)
+        } else if let authenticationCode = POFailure.AuthenticationCode(rawValue: rawValue) {
+            return .authentication(authenticationCode)
+        } else if let notFoundCode = POFailure.NotFoundCode(rawValue: rawValue) {
+            return .notFound(notFoundCode)
+        } else if let genericCode = POFailure.GenericCode(rawValue: rawValue) {
+            return .generic(genericCode)
+        }
+        Logger.services.error("Can't create failure code from raw value: '\(rawValue)'.")
+        return .unknown
+    }
 }
 
 private extension Array where Element == URLQueryItem { // swiftlint:disable:this no_extension_access_modifier

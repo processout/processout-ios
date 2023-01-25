@@ -9,7 +9,7 @@ import Foundation
 
 final class InvoicesRepository: InvoicesRepositoryType {
 
-    init(connector: HttpConnectorType, failureMapper: FailureMapperType) {
+    init(connector: HttpConnectorType, failureMapper: HttpConnectorFailureMapperType) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
@@ -96,5 +96,5 @@ final class InvoicesRepository: InvoicesRepositoryType {
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType
-    private let failureMapper: FailureMapperType
+    private let failureMapper: HttpConnectorFailureMapperType
 }

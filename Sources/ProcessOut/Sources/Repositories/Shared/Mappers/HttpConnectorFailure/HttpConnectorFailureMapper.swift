@@ -1,5 +1,5 @@
 //
-//  FailureMapper.swift
+//  HttpConnectorFailureMapper.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 16.10.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class FailureMapper: FailureMapperType {
+final class HttpConnectorFailureMapper: HttpConnectorFailureMapperType {
 
     func failure(from failure: HttpConnectorFailure) -> POFailure {
         let message: String?

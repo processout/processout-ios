@@ -97,7 +97,7 @@ private final class SharedProcessOutApi: ProcessOutApiType {
         return HttpConnectorRetryDecorator(connector: connector, retryStrategy: retryStrategy)
     }()
 
-    private lazy var failureMapper = FailureMapper()
+    private lazy var failureMapper = HttpConnectorFailureMapper()
 
     private lazy var customerActionHandler: CustomerActionHandlerType = {
         let decoder = JSONDecoder()

@@ -11,7 +11,7 @@ final class CardsRepository: POCardsRepositoryType {
 
     init(
         connector: HttpConnectorType,
-        failureMapper: FailureMapperType,
+        failureMapper: HttpConnectorFailureMapperType,
         applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapperType
     ) {
         self.connector = connector
@@ -60,6 +60,6 @@ final class CardsRepository: POCardsRepositoryType {
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType
-    private let failureMapper: FailureMapperType
+    private let failureMapper: HttpConnectorFailureMapperType
     private let applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapperType
 }

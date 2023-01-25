@@ -9,7 +9,7 @@ import Foundation
 
 final class CustomerTokensRepository: CustomerTokensRepositoryType {
 
-    init(connector: HttpConnectorType, failureMapper: FailureMapperType) {
+    init(connector: HttpConnectorType, failureMapper: HttpConnectorFailureMapperType) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
@@ -50,5 +50,5 @@ final class CustomerTokensRepository: CustomerTokensRepositoryType {
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType
-    private let failureMapper: FailureMapperType
+    private let failureMapper: HttpConnectorFailureMapperType
 }

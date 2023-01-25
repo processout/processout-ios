@@ -7,6 +7,7 @@
 
 import Foundation
 
+@_spi(PO)
 public struct PORedirectCustomerActionContext {
 
     /// Redirect url.

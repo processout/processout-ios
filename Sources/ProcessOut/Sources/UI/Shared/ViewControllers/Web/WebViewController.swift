@@ -67,11 +67,15 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation, withError error: Error) {
-        setCompletedState(with: error)
+        if case .started = state {
+            setCompletedState(with: error)
+        }
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation, withError error: Error) {
-        setCompletedState(with: error)
+        if case .started = state {
+            setCompletedState(with: error)
+        }
     }
 
     // MARK: - WKUIDelegate
@@ -163,7 +167,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
             Logger.ui.error("Can't change state to completed because already in sink state.")
             return false
         }
-        guard url.path.starts(with: "helpers/mobile-processout-webview-landing") else {
+        guard url.path.starts(with: "/helpers/mobile-processout-webview-landing") else {
             return false
         }
         for returnUrl in returnUrls {
@@ -172,9 +176,9 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
             }
             do {
                 try delegate.complete(with: url)
+                state = .completed
                 contentView.stopLoading()
                 timeoutTimer?.invalidate()
-                state = .completed
             } catch {
                 setCompletedState(with: error)
             }
@@ -194,9 +198,9 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
         } else {
             failure = POFailure(message: nil, code: .unknown, underlyingError: error)
         }
-        contentView.stopLoading()
-        timeoutTimer?.invalidate()
         state = .completed
         delegate.complete(with: failure)
+        contentView.stopLoading()
+        timeoutTimer?.invalidate()
     }
 }

@@ -11,5 +11,5 @@ SDK ``ProcessOutApi/configure(configuration:)``.
 2. `ProcessOut` was renamed to ``ProcessOutLegacyApi`` to avoid shadowing module name as it may cause issues. For more
 information, see [Swift Issue](https://github.com/apple/swift/issues/56573).
 
-4. `CustomerRequest`, `CustomerTokenRequest`, `Invoice`, `WebViewReturn`, `ApiResponse` and deprecated declarations
+3. `CustomerRequest`, `CustomerTokenRequest`, `Invoice`, `WebViewReturn`, `ApiResponse` and deprecated declarations
 were removed.

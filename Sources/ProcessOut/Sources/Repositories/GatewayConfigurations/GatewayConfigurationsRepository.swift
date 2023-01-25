@@ -9,7 +9,7 @@ import Foundation
 
 final class GatewayConfigurationsRepository: POGatewayConfigurationsRepositoryType {
 
-    init(connector: HttpConnectorType, failureMapper: FailureMapperType) {
+    init(connector: HttpConnectorType, failureMapper: HttpConnectorFailureMapperType) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
@@ -53,5 +53,5 @@ final class GatewayConfigurationsRepository: POGatewayConfigurationsRepositoryTy
     // MARK: - Private Properties
 
     private let connector: HttpConnectorType
-    private let failureMapper: FailureMapperType
+    private let failureMapper: HttpConnectorFailureMapperType
 }
