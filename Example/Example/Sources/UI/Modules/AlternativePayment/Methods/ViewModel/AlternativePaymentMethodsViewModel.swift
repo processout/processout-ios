@@ -13,10 +13,12 @@ final class AlternativePaymentMethodsViewModel:
 
     init(
         interactor: any AlternativePaymentMethodsInteractorType,
-        router: any RouterType<AlternativePaymentMethodsRoute>
+        router: any RouterType<AlternativePaymentMethodsRoute>,
+        prefersNative: Bool
     ) {
         self.interactor = interactor
         self.router = router
+        self.prefersNative = prefersNative
         super.init(state: .idle)
         observeInteractorStateChanges()
     }
@@ -39,6 +41,7 @@ final class AlternativePaymentMethodsViewModel:
 
     private let interactor: any AlternativePaymentMethodsInteractorType
     private let router: any RouterType<AlternativePaymentMethodsRoute>
+    private let prefersNative: Bool
 
     // MARK: - Private Methods
 
@@ -107,16 +110,29 @@ final class AlternativePaymentMethodsViewModel:
     private func startNativeAlternativePayment(
         amount: Decimal, currencyCode: String, gatewayConfiguration: POGatewayConfiguration
     ) {
-        interactor.createInvoice(amount: amount, currencyCode: currencyCode) { [weak self] invoice in
+        // Invoice is created inside application only for demo purposes. Production application should rely on backend
+        // to create invoice. To ensure that customer can't alter such values as amount and currency.
+        interactor.createInvoice(amount: amount, currencyCode: currencyCode) { [weak self, prefersNative] invoice in
+            let route: AlternativePaymentMethodsRoute
             let isSubaccount = gatewayConfiguration
                 .subAccountsEnabled?
                 .contains(gatewayConfiguration.gatewayName ?? "") ?? false
-            guard isSubaccount, gatewayConfiguration.gateway?.nativeApmConfig != nil else {
+            if !isSubaccount {
                 return
+            } else if prefersNative, gatewayConfiguration.gateway?.nativeApmConfig != nil {
+                route = .nativeAlternativePayment(
+                    gatewayConfigurationId: gatewayConfiguration.id, invoiceId: invoice.id
+                )
+            } else {
+                route = AlternativePaymentMethodsRoute.additionalData { [weak self] additionalData in
+                    let request = POAlternativePaymentMethodRequest(
+                        invoiceId: invoice.id,
+                        gatewayConfigurationId: gatewayConfiguration.id,
+                        additionalData: additionalData
+                    )
+                    self?.router.trigger(route: .alternativePayment(request: request))
+                }
             }
-            let route = AlternativePaymentMethodsRoute.nativeAlternativePayment(
-                gatewayConfigurationId: gatewayConfiguration.id, invoiceId: invoice.id
-            )
             self?.router.trigger(route: route)
         }
     }

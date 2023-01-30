@@ -10,5 +10,7 @@ import ProcessOut
 
 enum AlternativePaymentMethodsRoute: RouteType {
     case nativeAlternativePayment(gatewayConfigurationId: String, invoiceId: String)
+    case alternativePayment(request: POAlternativePaymentMethodRequest)
     case authorizationtAmount(completion: (Decimal, String) -> Void)
+    case additionalData(completion: ([String: String]) -> Void)
 }

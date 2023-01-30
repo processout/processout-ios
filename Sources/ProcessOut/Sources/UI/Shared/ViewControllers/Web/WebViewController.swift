@@ -92,6 +92,11 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
 
     // MARK: - Private Nested Types
 
+    private enum Constants {
+        static let userAgentPrefix = "ProcessOut iOS-Webview/"
+        static let returnUrlPathPrefix = "/helpers/mobile-processout-webview-landing"
+    }
+
     private enum State {
 
         /// Controller is currently idle and waiting for start.
@@ -126,7 +131,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
 
     private lazy var contentView: WKWebView = {
         let view = WKWebView(frame: .zero, configuration: contentViewConfiguration)
-        view.customUserAgent = "ProcessOut iOS-Webview/" + version
+        view.customUserAgent = Constants.userAgentPrefix + version
         view.navigationDelegate = self
         view.uiDelegate = self
         view.allowsLinkPreview = false
@@ -167,7 +172,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
             Logger.ui.error("Can't change state to completed because already in sink state.")
             return false
         }
-        guard url.path.starts(with: "/helpers/mobile-processout-webview-landing") else {
+        guard url.path.starts(with: Constants.returnUrlPathPrefix) else {
             return false
         }
         for returnUrl in returnUrls {

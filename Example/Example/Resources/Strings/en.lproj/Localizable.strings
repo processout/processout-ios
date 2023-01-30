@@ -18,3 +18,12 @@
 "authorization-amount.amount.placeholder" = "Amount";
 "authorization-amount.currency.placeholder" = "Currency Code";
 "authorization-amount.confirm" = "Confirm";
+
+"alternative-payment-data.title" = "Additional data";
+"alternative-payment-data.empty-message" = "There is no additional data yet, press add button to add more. Additional data is required only for some payment providers, if it's not the case simply continue.";
+"alternative-payment-data.remove" = "Remove";
+
+"alternative-payment-data-entry.message" = "Please enter additional data details";
+"alternative-payment-data-entry.key.placeholder" = "Key";
+"alternative-payment-data-entry.value.placeholder" = "Value";
+"alternative-payment-data-entry.confirm" = "Confirm";

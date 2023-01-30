@@ -21,7 +21,9 @@ final class AlternativePaymentMethodsBuilder {
             filter: filter
         )
         let router = AlternativePaymentMethodsRouter()
-        let viewModel = AlternativePaymentMethodsViewModel(interactor: interactor, router: router)
+        let viewModel = AlternativePaymentMethodsViewModel(
+            interactor: interactor, router: router, prefersNative: filter == .nativeAlternativePaymentMethods
+        )
         let viewController = AlternativePaymentMethodsViewController(viewModel: viewModel)
         router.viewController = viewController
         return viewController
