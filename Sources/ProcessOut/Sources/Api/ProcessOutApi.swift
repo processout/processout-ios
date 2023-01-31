@@ -23,6 +23,7 @@ public enum ProcessOutApi {
             return
         }
         shared = SharedProcessOutApi(configuration: configuration)
+        shared.logger.debug("Did complete SDK configuration.")
     }
 }
 
@@ -50,14 +51,20 @@ private final class SharedProcessOutApi: ProcessOutApiType {
     }()
 
     private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsServiceType = {
-        AlternativePaymentMethodsService(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
+        AlternativePaymentMethodsService(
+            projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl, logger: serviceLogger
+        )
     }()
+
+    private(set) lazy var logger: POLogger = createLogger(for: "Application")
 
     private(set) lazy var cards: POCardsRepositoryType = {
         CardsRepository(
             connector: httpConnector,
             failureMapper: failureMapper,
-            applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper(decoder: decoder)
+            applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper(
+                decoder: decoder, logger: repositoryLogger
+            )
         )
     }()
 
@@ -75,6 +82,9 @@ private final class SharedProcessOutApi: ProcessOutApiType {
 
     // MARK: - Private Properties
 
+    private lazy var serviceLogger = createLogger(for: "Service")
+    private lazy var repositoryLogger = createLogger(for: "Repository")
+
     private lazy var httpConnector: HttpConnectorType = {
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.urlCache = nil
@@ -91,13 +101,14 @@ private final class SharedProcessOutApi: ProcessOutApiType {
             sessionConfiguration: sessionConfiguration,
             decoder: decoder,
             encoder: encoder,
-            deviceMetadataProvider: DeviceMetadataProvider(screen: UIScreen.main, bundle: Bundle.main)
+            deviceMetadataProvider: DeviceMetadataProvider(screen: UIScreen.main, bundle: Bundle.main),
+            logger: createLogger(for: "Connector")
         )
         let retryStrategy = RetryStrategy.exponential(maximumRetries: 3, interval: 0.1, rate: 3)
         return HttpConnectorRetryDecorator(connector: connector, retryStrategy: retryStrategy)
     }()
 
-    private lazy var failureMapper = HttpConnectorFailureMapper()
+    private lazy var failureMapper = HttpConnectorFailureMapper(logger: repositoryLogger)
 
     private lazy var customerActionHandler: CustomerActionHandlerType = {
         let decoder = JSONDecoder()
@@ -105,7 +116,7 @@ private final class SharedProcessOutApi: ProcessOutApiType {
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        return _CustomerActionHandler(decoder: decoder, encoder: encoder)
+        return _CustomerActionHandler(decoder: decoder, encoder: encoder, logger: serviceLogger)
     }()
 
     private lazy var decoder: JSONDecoder = {
@@ -128,4 +139,14 @@ private final class SharedProcessOutApi: ProcessOutApiType {
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         return dateFormatter
     }()
+
+    // MARK: - Private Methods
+
+    private func createLogger(for category: String) -> POLogger {
+        let destinations: [LoggerDestination] = [
+            SystemLoggerDestination(subsystem: "com.processout.processout-ios", category: category)
+        ]
+        let minimumLevel: LogLevel = configuration.isDebug ? .debug : .info
+        return POLogger(destinations: destinations, minimumLevel: minimumLevel)
+    }
 }

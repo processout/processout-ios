@@ -50,7 +50,11 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
             returnUrls.append(returnUrl)
         }
         let viewController = WebViewController(
-            eventEmitter: api.eventEmitter, delegate: delegate, returnUrls: returnUrls, version: type(of: api).version
+            eventEmitter: api.eventEmitter,
+            delegate: delegate,
+            returnUrls: returnUrls,
+            version: type(of: api).version,
+            logger: api.logger
         )
         return viewController
     }

@@ -54,7 +54,8 @@ public final class PORedirectCustomerActionViewControllerBuilder {
             delegate: delegate,
             returnUrls: returnUrls,
             version: type(of: api).version,
-            timeout: context.timeout
+            timeout: context.timeout,
+            logger: api.logger
         )
         return viewController
     }

@@ -9,6 +9,12 @@ import Foundation
 
 final class HttpConnectorFailureMapper: HttpConnectorFailureMapperType {
 
+    init(logger: POLogger) {
+        self.logger = logger
+    }
+
+    // MARK: - HttpConnectorFailureMapperType
+
     func failure(from failure: HttpConnectorFailure) -> POFailure {
         let message: String?
         let code: POFailure.Code?
@@ -31,18 +37,23 @@ final class HttpConnectorFailureMapper: HttpConnectorFailureMapperType {
             code = .cancelled
             invalidFields = nil
         case let .server(error, statusCode):
-            code = failureCode(from: error, statusCode: statusCode)
             message = error.message
+            code = failureCode(from: error, statusCode: statusCode)
+            if code == nil {
+                logger.info("Unknown error type '\(error.errorType)', code '\(statusCode)'")
+            }
             invalidFields = error.invalidFields?.map { .init(name: $0.name, message: $0.message) }
         }
         return .init(message: message, code: code ?? .unknown, invalidFields: invalidFields, underlyingError: failure)
     }
 
+    // MARK: - Private Properties
+
+    private let logger: POLogger
+
     // MARK: - Private Methods
 
-    private func failureCode(
-        from error: HttpConnectorFailure.Server, statusCode: Int
-    ) -> POFailure.Code? {
+    private func failureCode(from error: HttpConnectorFailure.Server, statusCode: Int) -> POFailure.Code? {
         switch statusCode {
         case 401:
             let authenticationCode = POFailure.AuthenticationCode(rawValue: error.errorType)

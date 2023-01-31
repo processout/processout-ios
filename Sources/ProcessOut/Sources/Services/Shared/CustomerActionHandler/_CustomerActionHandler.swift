@@ -11,9 +11,10 @@ import Foundation
 // - TODO: Remove underscore when legacy counterpart won't be needed.
 final class _CustomerActionHandler: CustomerActionHandlerType {
 
-    init(decoder: JSONDecoder, encoder: JSONEncoder) {
+    init(decoder: JSONDecoder, encoder: JSONEncoder, logger: POLogger) {
         self.decoder = decoder
         self.encoder = encoder
+        self.logger = logger
     }
 
     // MARK: - CustomerActionHandlerType
@@ -49,13 +50,14 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
 
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
+    private let logger: POLogger
 
     // MARK: - Private Methods
 
     private func fingerprint(encodedDirectoryServerData: String, delegate: Delegate, completion: @escaping Completion) {
         do {
             let directoryServerData = try decode(PODirectoryServerData.self, from: encodedDirectoryServerData)
-            delegate.fingerprint(data: directoryServerData) { [encoder] result in
+            delegate.fingerprint(data: directoryServerData) { [encoder, logger] result in
                 switch result {
                 case let .success(fingerprint):
                     do {
@@ -69,7 +71,7 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
                         )
                         completion(.success("gway_req_" + responseDataString))
                     } catch {
-                        Logger.services.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
+                        logger.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
                         completion(.failure(.init(message: nil, code: .internal, underlyingError: error)))
                     }
                 case let .failure(failure):
@@ -77,7 +79,7 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
                 }
             }
         } catch {
-            Logger.services.error("Did fail to decode DS data: '\(error.localizedDescription)'.")
+            logger.error("Did fail to decode DS data: '\(error.localizedDescription)'.")
             completion(.failure(.init(code: .internal, underlyingError: error)))
         }
     }
@@ -97,19 +99,19 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
                 }
             }
         } catch {
-            Logger.services.error("Did fail to decode challenge data: '\(error.localizedDescription)'.")
+            logger.error("Did fail to decode challenge data: '\(error.localizedDescription)'.")
             completion(.failure(.init(code: .internal, underlyingError: error)))
         }
     }
 
     private func fingerprint(url: String, delegate: Delegate, completion: @escaping Completion) {
         guard let url = URL(string: url) else {
-            Logger.services.error("Did fail to create fingerprint URL from raw value: '\(url)'.")
+            logger.error("Did fail to create fingerprint URL from raw value: '\(url)'.")
             completion(.failure(.init(message: nil, code: .internal, underlyingError: nil)))
             return
         }
         let context = PORedirectCustomerActionContext(url: url, isHeadlessModeAllowed: true, timeout: 10)
-        delegate.redirect(context: context) { [encoder] result in
+        delegate.redirect(context: context) { [encoder, logger] result in
             switch result {
             case let .success(newSource):
                 completion(.success(newSource))
@@ -126,7 +128,7 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
                     )
                     completion(.success("gway_req_" + responseDataString))
                 } catch {
-                    Logger.services.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
+                    logger.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
                     completion(.failure(.init(message: nil, code: .internal, underlyingError: error)))
                 }
             case let .failure(failure):
@@ -137,7 +139,7 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
 
     private func redirect(url: String, delegate: Delegate, completion: @escaping Completion) {
         guard let url = URL(string: url) else {
-            Logger.services.error("Did fail to create redirect URL from raw value: '\(url)'.")
+            logger.error("Did fail to create redirect URL from raw value: '\(url)'.")
             completion(.failure(.init(message: nil, code: .internal, underlyingError: nil)))
             return
         }

@@ -50,7 +50,7 @@ final class HttpConnectorRetryDecorator: HttpConnectorType {
 
     private static func shouldRetryRequest(after failure: HttpConnectorFailure) -> Bool {
         switch failure {
-        case .networkUnreachable:
+        case .networkUnreachable, .timeout:
             return true
         case .server(_, let statusCode):
             return (500...599).contains(statusCode)

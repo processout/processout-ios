@@ -27,11 +27,15 @@ final class NativeAlternativePaymentMethodInteractor:
     }
 
     init(
-        invoicesService: POInvoicesServiceType, imagesRepository: POImagesRepositoryType, configuration: Configuration
+        invoicesService: POInvoicesServiceType,
+        imagesRepository: POImagesRepositoryType,
+        configuration: Configuration,
+        logger: POLogger
     ) {
         self.invoicesService = invoicesService
         self.imagesRepository = imagesRepository
         self.configuration = configuration
+        self.logger = logger
         super.init(state: .idle)
     }
 
@@ -132,6 +136,7 @@ final class NativeAlternativePaymentMethodInteractor:
     private let invoicesService: POInvoicesServiceType
     private let imagesRepository: POImagesRepositoryType
     private let configuration: Configuration
+    private let logger: POLogger
     private var captureCancellable: POCancellableType?
 
     // MARK: - State Management
@@ -152,7 +157,7 @@ final class NativeAlternativePaymentMethodInteractor:
             return
         }
         if details.parameters.isEmpty {
-            Logger.ui.debug("Will set started state with empty inputs, this may be unexpected.")
+            logger.debug("Will set started state with empty inputs, this may be unexpected.")
         }
         let startedState = State.Started(
             gatewayDisplayName: details.gateway.displayName,
@@ -203,7 +208,7 @@ final class NativeAlternativePaymentMethodInteractor:
         case let .submitting(startedStateSnapshot):
             gatewayLogo = startedStateSnapshot.gatewayLogo
         default:
-            Logger.ui.error("Can't change state to captured from current state.")
+            logger.error("Can't change state to captured from current state.")
             return
         }
         let capturedState = State.Captured(gatewayLogo: gatewayLogo)

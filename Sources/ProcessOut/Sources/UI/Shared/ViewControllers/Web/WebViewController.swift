@@ -14,13 +14,15 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
         delegate: WebViewControllerDelegate,
         returnUrls: [URL],
         version: String,
-        timeout: TimeInterval? = nil
+        timeout: TimeInterval? = nil,
+        logger: POLogger
     ) {
         self.eventEmitter = eventEmitter
         self.delegate = delegate
         self.returnUrls = returnUrls
         self.version = version
         self.timeout = timeout
+        self.logger = logger
         state = .idle
         super.init(nibName: nil, bundle: nil)
     }
@@ -119,6 +121,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
     private let returnUrls: [URL]
     private let version: String
     private let timeout: TimeInterval?
+    private let logger: POLogger
 
     private lazy var contentViewConfiguration: WKWebViewConfiguration = {
         let preferences = WKPreferences()
@@ -169,7 +172,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
     /// - Returns: `true` if state was set, `false` otherwise.
     private func setCompletedState(with url: URL) -> Bool {
         if case .completed = state {
-            Logger.ui.error("Can't change state to completed because already in sink state.")
+            logger.error("Can't change state to completed because already in sink state.")
             return false
         }
         guard url.path.starts(with: Constants.returnUrlPathPrefix) else {
@@ -194,7 +197,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
 
     private func setCompletedState(with error: Error) {
         if case .completed = state {
-            Logger.ui.error("Can't change state to completed because already in sink state.")
+            logger.error("Can't change state to completed because already in sink state.")
             return
         }
         let failure: POFailure

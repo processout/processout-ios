@@ -33,14 +33,18 @@ final class HttpConnector: HttpConnectorType {
         sessionConfiguration: URLSessionConfiguration,
         decoder: JSONDecoder,
         encoder: JSONEncoder,
-        deviceMetadataProvider: DeviceMetadataProviderType
+        deviceMetadataProvider: DeviceMetadataProviderType,
+        logger: POLogger
     ) {
         self.configuration = configuration
         self.session = URLSession(configuration: sessionConfiguration)
         self.decoder = decoder
         self.encoder = encoder
         self.deviceMetadataProvider = deviceMetadataProvider
+        self.logger = logger
         workQueue = DispatchQueue(label: "process-out.http-connector", attributes: .concurrent)
+        urlRequestFormatter = UrlRequestFormatter()
+        urlResponseFormatter = UrlResponseFormatter(includesHeaders: false)
     }
 
     // MARK: - HttpConnectorType
@@ -49,16 +53,19 @@ final class HttpConnector: HttpConnectorType {
         request: HttpConnectorRequest<Value>, completion: @escaping (Result<Value, Failure>) -> Void
     ) -> POCancellableType {
         let cancellable = GroupCancellable()
-        workQueue.async {
+        workQueue.async { [logger, urlRequestFormatter] in
             do {
                 let sessionRequest = try self.createUrlRequest(request: request)
+                logger.debug("Sending \(urlRequestFormatter.string(from: sessionRequest))")
                 let dataTask = self.session.dataTask(with: sessionRequest) { data, response, error in
-                    self.completeRequest(with: data, urlResponse: response, error: error, completion: completion)
+                    self.completeRequest(
+                        requestId: request.id, with: data, urlResponse: response, error: error, completion: completion
+                    )
                 }
                 dataTask.resume()
                 cancellable.add(dataTask)
             } catch {
-                Logger.connectors.error("Did fail to create a request: '\(error.localizedDescription)'.")
+                self.logger.error("Did fail to create a request: '\(error.localizedDescription)'.")
                 self.completeRequest(with: .failure(error), completion: completion)
             }
         }
@@ -73,6 +80,9 @@ final class HttpConnector: HttpConnectorType {
     private let decoder: JSONDecoder
     private let workQueue: DispatchQueue
     private let deviceMetadataProvider: DeviceMetadataProviderType
+    private let logger: POLogger
+    private let urlRequestFormatter: UrlRequestFormatter
+    private let urlResponseFormatter: UrlResponseFormatter
 
     // MARK: - Private Methods
 
@@ -100,10 +110,13 @@ final class HttpConnector: HttpConnectorType {
             sessionRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
         authorize(request: &sessionRequest)
+        let systemVersion = ProcessInfo.processInfo.operatingSystemVersion
+        let systemVersionString = [systemVersion.majorVersion, systemVersion.minorVersion, systemVersion.patchVersion]
+            .map(\.description).joined(separator: ".")
         let userAgentComponents = [
             "iOS",
             "Version",
-            ProcessInfo.processInfo.operatingSystemVersionString,
+            systemVersionString,
             "ProcessOut iOS-Bindings",
             configuration.version
         ]
@@ -130,14 +143,18 @@ final class HttpConnector: HttpConnectorType {
     }
 
     private func completeRequest<Value: Decodable>(
+        requestId: String,
         with data: Data?,
         urlResponse: URLResponse?,
         error: Error?,
         completion: @escaping (Result<Value, Failure>) -> Void
     ) {
         if let error {
+            logger.debug("Request \(requestId) did fail with error: '\(error.localizedDescription)'.")
             completeRequest(with: .failure(error), completion: completion)
         } else if let data, let urlResponse = urlResponse as? HTTPURLResponse {
+            let responseDescription = urlResponseFormatter.string(from: urlResponse, data: data)
+            logger.debug("Received response for \(requestId): \(responseDescription)")
             do {
                 let response = try decoder.decode(HttpConnectorResponse<Value>.self, from: data)
                 switch response {
@@ -148,10 +165,11 @@ final class HttpConnector: HttpConnectorType {
                     completeRequest(with: .failure(failure), completion: completion)
                 }
             } catch {
-                Logger.connectors.error("Did fail to decode response: '\(error.localizedDescription)'.")
+                logger.error("Did fail to decode response for \(requestId): '\(error.localizedDescription)'.")
                 completeRequest(with: .failure(error), completion: completion)
             }
         } else {
+            logger.error("Invalid url response for \(requestId).")
             completeRequest(with: .failure(Failure.internal), completion: completion)
         }
     }

@@ -1,5 +1,5 @@
 //
-//  Logger.swift
+//  POLogger.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 25.10.2022.
@@ -7,10 +7,11 @@
 
 import Foundation
 
-final class Logger {
+public final class POLogger {
 
-    init(destinations: [LoggerDestination]) {
+    init(destinations: [LoggerDestination], minimumLevel: LogLevel = .debug) {
         self.destinations = destinations
+        self.minimumLevel = minimumLevel
     }
 
     /// Records a message at the specified log level. Use this method when you need to adjust the log level
@@ -21,6 +22,9 @@ final class Logger {
     ///   whether the system persists it to disk. You may specify a constant or variable for this parameter.
     ///   - message: the message you want to add to the logs.
     func log(level: LogLevel, _ message: LogMessage, file: String = #file, line: Int = #line) {
+        guard level.rawValue >= minimumLevel.rawValue else {
+            return
+        }
         // swiftlint:disable:next legacy_objc_type
         let fileName = NSString(string: NSString(string: file).deletingPathExtension).lastPathComponent
         let entry = LogEntry(level: level, message: message, timestamp: Date(), file: fileName, line: line)
@@ -50,4 +54,5 @@ final class Logger {
     // MARK: -
 
     private let destinations: [LoggerDestination]
+    private let minimumLevel: LogLevel
 }

@@ -9,9 +9,10 @@ import Foundation
 
 final class AlternativePaymentMethodsService: POAlternativePaymentMethodsServiceType {
 
-    init(projectId: String, baseUrl: URL) {
+    init(projectId: String, baseUrl: URL, logger: POLogger) {
         self.projectId = projectId
         self.baseUrl = baseUrl
+        self.logger = logger
     }
 
     // MARK: - POAlternativePaymentMethodsServiceType
@@ -19,7 +20,7 @@ final class AlternativePaymentMethodsService: POAlternativePaymentMethodsService
     func alternativePaymentMethodUrl(request: POAlternativePaymentMethodRequest) -> URL {
         guard var components = URLComponents(url: baseUrl, resolvingAgainstBaseURL: true) else {
             let message = "Can't create components from base url."
-            Logger.services.error("\(message)")
+            logger.error("\(message)")
             fatalError(message)
         }
         let pathComponents: [String]
@@ -34,7 +35,7 @@ final class AlternativePaymentMethodsService: POAlternativePaymentMethodsService
         }
         guard let url = components.url else {
             let message = "Failed to create APM redirection URL."
-            Logger.services.error("\(message)")
+            logger.error("\(message)")
             fatalError(message)
         }
         return url
@@ -64,6 +65,7 @@ final class AlternativePaymentMethodsService: POAlternativePaymentMethodsService
 
     private let projectId: String
     private let baseUrl: URL
+    private let logger: POLogger
 
     // MARK: - Private Methods
 
@@ -77,7 +79,7 @@ final class AlternativePaymentMethodsService: POAlternativePaymentMethodsService
         } else if let genericCode = POFailure.GenericCode(rawValue: rawValue) {
             return .generic(genericCode)
         }
-        Logger.services.error("Can't create failure code from raw value: '\(rawValue)'.")
+        logger.info("Unknown error value '\(rawValue)'.")
         return .unknown
     }
 }

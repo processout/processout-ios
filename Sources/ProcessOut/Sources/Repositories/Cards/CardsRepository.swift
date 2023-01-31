@@ -51,6 +51,8 @@ final class CardsRepository: POCardsRepositoryType {
             connector.execute(request: httpRequest) { [failureMapper] result in
                 completion(result.map(\.card).mapError(failureMapper.failure))
             }
+        } catch let failure as POFailure {
+            completion(.failure(failure))
         } catch {
             let failure = POFailure(message: nil, code: .internal, underlyingError: error)
             completion(.failure(failure))

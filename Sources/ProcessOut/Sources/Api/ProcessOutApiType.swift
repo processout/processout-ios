@@ -21,8 +21,11 @@ public protocol ProcessOutApiType {
     /// Images repository.
     var images: POImagesRepositoryType { get }
 
-    /// Returns Alternative Payment Methods service.
+    /// Returns alternative payment methods service.
     var alternativePaymentMethods: POAlternativePaymentMethodsServiceType { get }
+
+    /// Logger with application category.
+    var logger: POLogger { get }
 
     /// Returns cards repository.
     @_spi(PO)

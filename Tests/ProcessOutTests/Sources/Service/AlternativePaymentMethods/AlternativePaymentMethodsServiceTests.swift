@@ -15,7 +15,8 @@ final class AlternativePaymentMethodsServiceTests: XCTestCase {
         super.setUp()
         // swiftlint:disable:next force_unwrapping
         let baseUrl = URL(string: "https://checkout.processout.ninja")!
-        sut = AlternativePaymentMethodsService(projectId: "proj_test", baseUrl: baseUrl)
+        let logger = POLogger(destinations: [])
+        sut = AlternativePaymentMethodsService(projectId: "proj_test", baseUrl: baseUrl, logger: logger)
     }
 
     func test_alternativePaymentMethodUrl_withAdditionalData_succeeds() throws {
