@@ -188,3 +188,31 @@ public struct POFailure: Error {
         self.underlyingError = underlyingError
     }
 }
+
+extension POFailure.Code {
+
+    /// Code raw value.
+    /// - NOTE: Value is consistent with Android counterpart.
+    public var rawValue: String {
+        switch self {
+        case .networkUnreachable:
+            return "processout-mobile.network-unreachable"
+        case .timeout:
+            return "processout-mobile.timeout"
+        case .internal:
+            return "processout-mobile.internal"
+        case .cancelled:
+            return "processout-mobile.cancelled"
+        case .unknown:
+            return "processout-mobile.unknown"
+        case let .validation(validationCode):
+            return validationCode.rawValue
+        case let .authentication(authenticationCode):
+            return authenticationCode.rawValue
+        case let .notFound(notFoundCode):
+            return notFoundCode.rawValue
+        case let .generic(genericCode):
+            return genericCode.rawValue
+        }
+    }
+}
