@@ -34,7 +34,7 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
     }
 
     /// Sets UI configuration.
-    public func with(configuration: PONativeAlternativePaymentMethodUiConfiguration) -> Self {
+    public func with(configuration: PONativeAlternativePaymentMethodConfiguration) -> Self {
         self.configuration = configuration
         return self
     }
@@ -42,20 +42,6 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
     /// Sets UI style.
     public func with(style: PONativeAlternativePaymentMethodStyle) -> Self {
         self.style = style
-        return self
-    }
-
-    /// Boolean value that specifies whether module should wait for payment confirmation from PSP or will
-    /// complete right after all user's input is submitted. Default value is `true`.
-    public func with(waitsPaymentConfirmation: Bool) -> Self {
-        self.waitsPaymentConfirmation = waitsPaymentConfirmation
-        return self
-    }
-
-    /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
-    /// Maximum value is 180 seconds.
-    public func with(paymentConfirmationTimeout: TimeInterval) -> Self {
-        self.paymentConfirmationTimeout = paymentConfirmationTimeout
         return self
     }
 
@@ -68,8 +54,8 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         let interactorConfiguration = NativeAlternativePaymentMethodInteractor.Configuration(
             gatewayConfigurationId: gatewayConfigurationId,
             invoiceId: invoiceId,
-            waitsPaymentConfirmation: waitsPaymentConfirmation,
-            paymentConfirmationTimeout: paymentConfirmationTimeout
+            waitsPaymentConfirmation: configuration.waitsPaymentConfirmation,
+            paymentConfirmationTimeout: configuration.paymentConfirmationTimeout
         )
         let interactor = NativeAlternativePaymentMethodInteractor(
             invoicesService: api.invoices,
@@ -78,12 +64,9 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
             logger: api.logger
         )
         let viewModel = NativeAlternativePaymentMethodViewModel(
-            interactor: interactor, uiConfiguration: configuration, completion: completion
+            interactor: interactor, configuration: configuration, completion: completion
         )
-        let viewController = NativeAlternativePaymentMethodViewController(
-            viewModel: viewModel, customStyle: style
-        )
-        return viewController
+        return NativeAlternativePaymentMethodViewController(viewModel: viewModel, customStyle: style)
     }
 
     // MARK: -
@@ -91,8 +74,7 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
     init(invoiceId: String, gatewayConfigurationId: String) {
         self.invoiceId = invoiceId
         self.gatewayConfigurationId = gatewayConfigurationId
-        waitsPaymentConfirmation = true
-        paymentConfirmationTimeout = 180
+        configuration = .init()
     }
 
     // MARK: - Private Properties
@@ -102,8 +84,6 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
 
     private var api: ProcessOutApiType?
     private var completion: ((Result<Void, POFailure>) -> Void)?
-    private var waitsPaymentConfirmation: Bool
-    private var paymentConfirmationTimeout: TimeInterval
-    private var configuration: PONativeAlternativePaymentMethodUiConfiguration?
+    private var configuration: PONativeAlternativePaymentMethodConfiguration
     private var style: PONativeAlternativePaymentMethodStyle?
 }

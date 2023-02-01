@@ -12,11 +12,11 @@ final class NativeAlternativePaymentMethodViewModel:
 
     init(
         interactor: any NativeAlternativePaymentMethodInteractorType,
-        uiConfiguration: PONativeAlternativePaymentMethodUiConfiguration?,
+        configuration: PONativeAlternativePaymentMethodConfiguration,
         completion: ((Result<Void, POFailure>) -> Void)?
     ) {
         self.interactor = interactor
-        self.uiConfiguration = uiConfiguration
+        self.configuration = configuration
         self.completion = completion
         super.init(state: .idle)
         observeInteractorStateChanges()
@@ -42,7 +42,7 @@ final class NativeAlternativePaymentMethodViewModel:
     // MARK: - NativeAlternativePaymentMethodInteractorType
 
     private let interactor: any NativeAlternativePaymentMethodInteractorType
-    private let uiConfiguration: PONativeAlternativePaymentMethodUiConfiguration?
+    private let configuration: PONativeAlternativePaymentMethodConfiguration
     private let completion: ((Result<Void, POFailure>) -> Void)?
 
     // MARK: - Private Methods
@@ -92,7 +92,7 @@ final class NativeAlternativePaymentMethodViewModel:
         }
         let actionTitle = submitActionTitle(amount: startedState.amount, currencyCode: startedState.currencyCode)
         let state = State.Started(
-            title: uiConfiguration?.title ?? Strings.title(startedState.gatewayDisplayName),
+            title: configuration.title ?? Strings.title(startedState.gatewayDisplayName),
             parameters: parameters,
             isSubmitting: isSubmitting,
             action: .init(title: actionTitle, isEnabled: startedState.isSubmitAllowed) { [weak self] in
@@ -116,20 +116,24 @@ final class NativeAlternativePaymentMethodViewModel:
     }
 
     private func configure(with capturedState: InteractorState.Captured) {
-        Timer.scheduledTimer(
-            withTimeInterval: Constants.captureSuccessCompletionDelay,
-            repeats: false,
-            block: { [weak self] _ in
-                self?.completion?(.success(()))
-            }
-        )
-        let submittedState = State.Submitted(
-            message: Strings.Success.message,
-            logoImage: capturedState.gatewayLogo,
-            image: Asset.Images.success.image,
-            isCaptured: true
-        )
-        state = .submitted(submittedState)
+        if configuration.skipSuccessScreen {
+            completion?(.success(()))
+        } else {
+            Timer.scheduledTimer(
+                withTimeInterval: Constants.captureSuccessCompletionDelay,
+                repeats: false,
+                block: { [weak self] _ in
+                    self?.completion?(.success(()))
+                }
+            )
+            let submittedState = State.Submitted(
+                message: Strings.Success.message,
+                logoImage: capturedState.gatewayLogo,
+                image: Asset.Images.success.image,
+                isCaptured: true
+            )
+            state = .submitted(submittedState)
+        }
     }
 
     // MARK: - Utils
@@ -148,7 +152,7 @@ final class NativeAlternativePaymentMethodViewModel:
     }
 
     private func submitActionTitle(amount: Decimal, currencyCode: String) -> String {
-        if let title = uiConfiguration?.primaryActionTitle {
+        if let title = configuration.primaryActionTitle {
             return title
         }
         let formatter = NumberFormatter()

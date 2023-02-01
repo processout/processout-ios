@@ -51,13 +51,15 @@ let payButtonStyle = POButtonStyle(
     activityIndicator: .system(.medium)
 )
 let style = PONativeAlternativePaymentMethodStyle(primaryButton: payButtonStyle)
-let viewController = builder.with(style: uiConfiguration).build()
+let viewController = builder.with(style: style).build()
 ```
 
 Rather than changing styling you could change displayed data, for example to change screen's title and action button text
 you could do:
 
 ```swift
-let uiConfiguration = PONativeAlternativePaymentMethodUiConfiguration(title: "Pay here", primaryActionTitle: "Submit")
-let viewController = builder.with(configuration: uiConfiguration).build()
+let configuration = PONativeAlternativePaymentMethodConfiguration(
+    title: "Pay here", primaryActionTitle: "Submit"
+)
+let viewController = builder.with(configuration: configuration).build()
 ```
