@@ -18,12 +18,13 @@ public enum ProcessOutApi {
     /// - NOTE: Method must be called from main thread. Only the first invocation takes effect, all
     /// subsequent calls to this method are ignored.
     public static func configure(configuration: ProcessOutApiConfiguration) {
-        assert(Thread.isMainThread, "Method must be called only from main thread.")
-        guard shared == nil else {
+        assert(Thread.isMainThread, "Method must be called only from main thread")
+        if let shared {
+            shared.logger.info("ProcessOutApi can be configured only once, ignored")
             return
         }
         shared = SharedProcessOutApi(configuration: configuration)
-        shared.logger.debug("Did complete SDK configuration.")
+        shared.logger.debug("Did complete ProcessOutApi configuration")
     }
 }
 

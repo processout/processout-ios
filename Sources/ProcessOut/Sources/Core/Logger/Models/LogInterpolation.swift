@@ -31,13 +31,21 @@ struct LogInterpolation: StringInterpolationProtocol {
         value.append(literal)
     }
 
-    mutating func appendInterpolation<Value: CustomStringConvertible>(_ value: Value, privacy: Privacy = .public) {
+    mutating func appendInterpolation(_ value: String, privacy: Privacy = .public) {
         switch privacy {
         case .public:
-            self.value.append(value.description)
+            self.value.append(value)
         case .private:
             self.value.append("<private>")
         }
+    }
+
+    mutating func appendInterpolation<Value: CustomStringConvertible>(_ value: Value, privacy: Privacy = .public) {
+        appendInterpolation(value.description, privacy: privacy)
+    }
+
+    mutating func appendInterpolation(_ error: Error, privacy: Privacy = .public) {
+        appendInterpolation(String(describing: error), privacy: privacy)
     }
 
     init(literalCapacity: Int, interpolationCount: Int) {

@@ -9,6 +9,10 @@ import Foundation
 
 final class UrlRequestFormatter {
 
+    init(prettyPrintedBody: Bool = true) {
+        self.prettyPrintedBody = prettyPrintedBody
+    }
+
     /// Converts given request to string.
     func string(from request: URLRequest) -> String {
         var components: [String] = [
@@ -21,11 +25,26 @@ final class UrlRequestFormatter {
             components.append(description)
         }
         if let body = request.httpBody {
-            let bodyDescription = String(decoding: body, as: UTF8.self)
+            let bodyDescription: String
+            if prettyPrintedBody {
+                do {
+                    let json = try JSONSerialization.jsonObject(with: body, options: .fragmentsAllowed)
+                    let jsonData = try JSONSerialization.data(withJSONObject: json, options: .prettyPrinted)
+                    bodyDescription = String(decoding: jsonData, as: UTF8.self)
+                } catch {
+                    bodyDescription = String(decoding: body, as: UTF8.self)
+                }
+            } else {
+                bodyDescription = String(decoding: body, as: UTF8.self)
+            }
             components.append(bodyDescription)
         }
         return components.filter { !$0.isEmpty }.joined(separator: "\n\n")
     }
+
+    // MARK: - Private Properties
+
+    private let prettyPrintedBody: Bool
 
     // MARK: - Private Methods
 

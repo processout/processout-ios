@@ -9,8 +9,9 @@ import Foundation
 
 final class UrlResponseFormatter {
 
-    init(includesHeaders: Bool) {
+    init(includesHeaders: Bool, prettyPrintedBody: Bool = true) {
         self.includesHeaders = includesHeaders
+        self.prettyPrintedBody = prettyPrintedBody
     }
 
     /// Converts given response to string.
@@ -26,7 +27,18 @@ final class UrlResponseFormatter {
             }
         }
         if let data = data {
-            let dataDescription = String(decoding: data, as: UTF8.self)
+            let dataDescription: String
+            if prettyPrintedBody {
+                do {
+                    let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
+                    let jsonData = try JSONSerialization.data(withJSONObject: json, options: .prettyPrinted)
+                    dataDescription = String(decoding: jsonData, as: UTF8.self)
+                } catch {
+                    dataDescription = String(decoding: data, as: UTF8.self)
+                }
+            } else {
+                dataDescription = String(decoding: data, as: UTF8.self)
+            }
             components.append(dataDescription)
         }
         return components.filter { !$0.isEmpty }.joined(separator: "\n\n")
@@ -35,4 +47,5 @@ final class UrlResponseFormatter {
     // MARK: - Private Properties
 
     private let includesHeaders: Bool
+    private let prettyPrintedBody: Bool
 }
