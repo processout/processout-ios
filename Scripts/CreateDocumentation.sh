@@ -13,5 +13,4 @@ ARCHIVE_NAME=$(basename $ARCHIVE_PATH .doccarchive)
 
 $(xcrun --find docc) process-archive \
     transform-for-static-hosting $ARCHIVE_PATH \
-    --output-path Docs \
-    --hosting-base-path 'ios-v2'
+    --output-path Docs
