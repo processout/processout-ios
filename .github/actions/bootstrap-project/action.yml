@@ -1,0 +1,20 @@
+name: Bootstrap Project
+description: Pulls needed dependencies and bootstraps project
+runs:
+  using: "composite"
+  steps:
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.1.2'
+        bundler-cache: true
+    - name: Install Mint
+      run: brew update && brew install mint
+      shell: bash
+    - name: Cache Mint Packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.mint/packages
+        key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+    - name: Bootstrap Project
+      run: ./Scripts/BootstrapProject.sh --skip-bundle-instal
+      shell: bash
