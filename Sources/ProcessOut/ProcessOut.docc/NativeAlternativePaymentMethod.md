@@ -11,7 +11,7 @@ The most basic implementation may look like following:
 let viewController = PONativeAlternativePaymentMethodViewControllerBuilder
     .with(invoiceId: "invoice_id", gatewayConfigurationId: "gateway_configuration_id")
     .with { result in
-        // TODO: Hide controller
+        // TODO: Handle result and hide controller
     }
     .build()
 ```
@@ -63,3 +63,6 @@ let configuration = PONativeAlternativePaymentMethodConfiguration(
 )
 let viewController = builder.with(configuration: configuration).build()
 ```
+
+You can also pass delegate that conforms to ``PONativeAlternativePaymentMethodDelegate`` to be notified of events and
+alter run-time behaviors, use ``PONativeAlternativePaymentMethodViewControllerBuilder/with(delegate:)`` to do so.

@@ -19,17 +19,16 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         Self(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId)
     }
 
-    /// Api that will be used by created module to communicate with BE. By default ``ProcessOutApi/shared``
-    /// instance is used.
-    @_spi(PO)
-    public func with(api: ProcessOutApiType) -> Self {
-        self.api = api
-        return self
-    }
-
     /// Completion to invoke after flow is completed.
     public func with(completion: @escaping (Result<Void, POFailure>) -> Void) -> Self {
         self.completion = completion
+        return self
+    }
+
+    /// Module's delegate.
+    /// - NOTE: Delegate is weakly referenced.
+    public func with(delegate: PONativeAlternativePaymentMethodDelegate) -> Self {
+        self.delegate = delegate
         return self
     }
 
@@ -50,18 +49,18 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
     ///
     /// - NOTE: Caller should dismiss view controller after completion is called.
     public func build() -> UIViewController {
-        let api: ProcessOutApiType = self.api ?? ProcessOutApi.shared
-        let interactorConfiguration = NativeAlternativePaymentMethodInteractor.Configuration(
-            gatewayConfigurationId: gatewayConfigurationId,
-            invoiceId: invoiceId,
-            waitsPaymentConfirmation: configuration.waitsPaymentConfirmation,
-            paymentConfirmationTimeout: configuration.paymentConfirmationTimeout
-        )
+        let api: ProcessOutApiType = ProcessOutApi.shared
         let interactor = NativeAlternativePaymentMethodInteractor(
             invoicesService: api.invoices,
             imagesRepository: api.images,
-            configuration: interactorConfiguration,
-            logger: api.logger
+            configuration: .init(
+                gatewayConfigurationId: gatewayConfigurationId,
+                invoiceId: invoiceId,
+                waitsPaymentConfirmation: configuration.waitsPaymentConfirmation,
+                paymentConfirmationTimeout: configuration.paymentConfirmationTimeout
+            ),
+            logger: api.logger,
+            delegate: delegate
         )
         let viewModel = NativeAlternativePaymentMethodViewModel(
             interactor: interactor, configuration: configuration, completion: completion
@@ -82,8 +81,8 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
     private let gatewayConfigurationId: String
     private let invoiceId: String
 
-    private var api: ProcessOutApiType?
-    private var completion: ((Result<Void, POFailure>) -> Void)?
     private var configuration: PONativeAlternativePaymentMethodConfiguration
     private var style: PONativeAlternativePaymentMethodStyle?
+    private var completion: ((Result<Void, POFailure>) -> Void)?
+    private weak var delegate: PONativeAlternativePaymentMethodDelegate?
 }

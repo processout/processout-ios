@@ -36,7 +36,7 @@ cat > "Sources/ProcessOut/Sources/Generated/ProcessOutApiType+Version.swift" <<-
 
 extension ProcessOutApiType {
 
-    /// The current version of this library.
+    /// The current version of this library, value is "${VERSION}".
     public static var version: String {
         "${VERSION}"
     }

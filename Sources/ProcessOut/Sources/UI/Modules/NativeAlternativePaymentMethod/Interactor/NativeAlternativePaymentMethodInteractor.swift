@@ -31,12 +31,14 @@ final class NativeAlternativePaymentMethodInteractor:
         invoicesService: POInvoicesServiceType,
         imagesRepository: POImagesRepositoryType,
         configuration: Configuration,
-        logger: POLogger
+        logger: POLogger,
+        delegate: PONativeAlternativePaymentMethodDelegate?
     ) {
         self.invoicesService = invoicesService
         self.imagesRepository = imagesRepository
         self.configuration = configuration
         self.logger = logger
+        self.delegate = delegate
         super.init(state: .idle)
     }
 
@@ -52,6 +54,7 @@ final class NativeAlternativePaymentMethodInteractor:
         }
         // swiftlint:disable:next line_length
         logger.info("Starting invoice \(configuration.invoiceId) payment using configuration \(configuration.gatewayConfigurationId)")
+        send(event: .willStart)
         state = .starting
         let request = PONativeAlternativePaymentMethodTransactionDetailsRequest(
             invoiceId: configuration.invoiceId, gatewayConfigurationId: configuration.gatewayConfigurationId
@@ -64,7 +67,7 @@ final class NativeAlternativePaymentMethodInteractor:
                 }
             case .failure(let failure):
                 self?.logger.error("Failed to start payment: \(failure)")
-                self?.state = .failure(failure)
+                self?.setFailureStateUnchecked(failure: failure)
             }
         }
     }
@@ -91,6 +94,7 @@ final class NativeAlternativePaymentMethodInteractor:
             isSubmitAllowed: isSubmitAllowed
         )
         state = .started(updatedStartedState)
+        send(event: .parametersChanged)
         logger.debug("Did update parameter value '\(value ?? "nil")' for '\(key)' key")
         return true
     }
@@ -100,6 +104,7 @@ final class NativeAlternativePaymentMethodInteractor:
             return
         }
         logger.info("Will submit '\(configuration.invoiceId)' payment parameters")
+        send(event: .willSubmitParameters)
         let request = PONativeAlternativePaymentMethodRequest(
             invoiceId: configuration.invoiceId,
             gatewayConfigurationId: configuration.gatewayConfigurationId,
@@ -109,6 +114,7 @@ final class NativeAlternativePaymentMethodInteractor:
         invoicesService.initiatePayment(request: request) { [weak self] result in
             switch result {
             case let .success(response) where response.nativeApm.state == .pendingCapture:
+                self?.send(event: .didSubmitParameters(additionalParametersExpected: false))
                 let message = startedState.customerActionMessage
                 if let imageUrl = startedState.customerActionImageUrl {
                     self?.imagesRepository.image(url: imageUrl) { image in
@@ -143,6 +149,7 @@ final class NativeAlternativePaymentMethodInteractor:
     private let imagesRepository: POImagesRepositoryType
     private let configuration: Configuration
     private let logger: POLogger
+    private weak var delegate: PONativeAlternativePaymentMethodDelegate?
     private var captureCancellable: POCancellableType?
 
     // MARK: - State Management
@@ -160,8 +167,7 @@ final class NativeAlternativePaymentMethodInteractor:
             )
             return
         case .captured:
-            logger.info("Payment '\(configuration.invoiceId)' is already captured")
-            self.state = .captured(.init(gatewayLogo: gatewayLogo))
+            setCapturedStateUnchecked(gatewayLogo: gatewayLogo)
             return
         }
         if details.parameters.isEmpty {
@@ -180,6 +186,7 @@ final class NativeAlternativePaymentMethodInteractor:
             isSubmitAllowed: details.parameters.map { isValid(value: nil, for: $0) }.allSatisfy { $0 }
         )
         state = .started(startedState)
+        send(event: .didStart)
         logger.debug("Did start \(configuration.invoiceId) payment, waiting for parameters")
     }
 
@@ -191,6 +198,7 @@ final class NativeAlternativePaymentMethodInteractor:
             state = .submitted
             return
         }
+        send(event: .willWaitForCaptureConfirmation(additionalActionExpected: expectedActionMessage != nil))
         let awaitingCaptureState = State.AwaitingCapture(
             gatewayLogoImage: gatewayLogo, expectedActionMessage: expectedActionMessage, actionImage: actionImage
         )
@@ -207,7 +215,7 @@ final class NativeAlternativePaymentMethodInteractor:
                 self?.setCapturedState()
             case .failure(let failure):
                 self?.logger.error("Did fail to capture invoice \(request.invoiceId): \(failure)")
-                self?.state = .failure(failure)
+                self?.setFailureStateUnchecked(failure: failure)
             }
         }
     }
@@ -222,8 +230,12 @@ final class NativeAlternativePaymentMethodInteractor:
         default:
             return
         }
-        let capturedState = State.Captured(gatewayLogo: gatewayLogo)
-        self.state = .captured(capturedState)
+        setCapturedStateUnchecked(gatewayLogo: gatewayLogo)
+    }
+
+    private func setCapturedStateUnchecked(gatewayLogo: UIImage?) {
+        state = .captured(.init(gatewayLogo: gatewayLogo))
+        send(event: .didCompletePayment)
         logger.debug("Did receive invoice '\(configuration.invoiceId)' capture confirmation")
     }
 
@@ -234,7 +246,7 @@ final class NativeAlternativePaymentMethodInteractor:
         }
         guard let invalidFields = failure.invalidFields, !invalidFields.isEmpty else {
             logger.debug("Submission error is not recoverable, aborting")
-            state = .failure(failure)
+            setFailureStateUnchecked(failure: failure)
             return
         }
         var updatedValues: [String: State.ParameterValue] = [:]
@@ -255,6 +267,7 @@ final class NativeAlternativePaymentMethodInteractor:
             isSubmitAllowed: false
         )
         self.state = .started(updatedStartedState)
+        send(event: .didFailToSubmitParameters(failure: failure))
         logger.debug("One or more parameters are not valid: \(invalidFields), waiting for parameters to update")
     }
 
@@ -276,7 +289,13 @@ final class NativeAlternativePaymentMethodInteractor:
             isSubmitAllowed: parameters.map { isValid(value: nil, for: $0) }.allSatisfy { $0 }
         )
         state = .started(updatedStartedState)
+        send(event: .didSubmitParameters(additionalParametersExpected: true))
         logger.debug("More parameters are expected, waiting for parameters to update")
+    }
+
+    private func setFailureStateUnchecked(failure: POFailure) {
+        state = .failure(failure)
+        send(event: .didFail(failure: failure))
     }
 
     // MARK: - Utils
@@ -303,5 +322,10 @@ final class NativeAlternativePaymentMethodInteractor:
         case .phone:
             return true
         }
+    }
+
+    private func send(event: PONativeAlternativePaymentMethodEvent) {
+        logger.debug("Did send event: '\(String(describing: event))'")
+        delegate?.nativeAlternativePaymentMethodDidEmitEvent(event)
     }
 }
