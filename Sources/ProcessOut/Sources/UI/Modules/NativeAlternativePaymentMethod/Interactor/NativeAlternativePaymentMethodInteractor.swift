@@ -63,7 +63,9 @@ final class NativeAlternativePaymentMethodInteractor:
             switch result {
             case let .success(details):
                 self?.imagesRepository.image(url: details.gateway.logoUrl) { [weak self] image in
-                    self?.setStartedStateUnchecked(details: details, gatewayLogo: image)
+                    self?.defaultValues(for: details.parameters) { values in
+                        self?.setStartedStateUnchecked(details: details, gatewayLogo: image, defaultValues: values)
+                    }
                 }
             case .failure(let failure):
                 self?.logger.error("Failed to start payment: \(failure)")
@@ -78,9 +80,6 @@ final class NativeAlternativePaymentMethodInteractor:
         }
         var updatedValues = startedState.values
         updatedValues[key] = .init(value: value, recentErrorMessage: nil)
-        let isSubmitAllowed = startedState.parameters
-            .map { isValid(value: updatedValues[$0.key], for: $0) }
-            .allSatisfy { $0 }
         let updatedStartedState = State.Started(
             gatewayDisplayName: startedState.gatewayDisplayName,
             gatewayLogo: startedState.gatewayLogo,
@@ -91,7 +90,7 @@ final class NativeAlternativePaymentMethodInteractor:
             parameters: startedState.parameters,
             values: updatedValues,
             recentFailure: nil,
-            isSubmitAllowed: isSubmitAllowed
+            isSubmitAllowed: isSubmitAllowed(parameters: startedState.parameters, values: updatedValues)
         )
         state = .started(updatedStartedState)
         send(event: .parametersChanged)
@@ -130,7 +129,9 @@ final class NativeAlternativePaymentMethodInteractor:
             case let .success(response) where response.nativeApm.state == .captured:
                 self?.setCapturedState()
             case let .success(response):
-                self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
+                self?.defaultValues(for: response.nativeApm.parameterDefinitions) { values in
+                    self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm, defaultValues: values)
+                }
             case let .failure(failure):
                 self?.restoreStartedStateAfterSubmissionFailureIfPossible(failure)
             }
@@ -155,7 +156,9 @@ final class NativeAlternativePaymentMethodInteractor:
     // MARK: - State Management
 
     private func setStartedStateUnchecked(
-        details: PONativeAlternativePaymentMethodTransactionDetails, gatewayLogo: UIImage?
+        details: PONativeAlternativePaymentMethodTransactionDetails,
+        gatewayLogo: UIImage?,
+        defaultValues: [String: State.ParameterValue]
     ) {
         switch details.state {
         case .customerInput, nil:
@@ -181,9 +184,9 @@ final class NativeAlternativePaymentMethodInteractor:
             amount: details.invoice.amount,
             currencyCode: details.invoice.currencyCode,
             parameters: details.parameters,
-            values: [:],
+            values: defaultValues,
             recentFailure: nil,
-            isSubmitAllowed: details.parameters.map { isValid(value: nil, for: $0) }.allSatisfy { $0 }
+            isSubmitAllowed: isSubmitAllowed(parameters: details.parameters, values: defaultValues)
         )
         state = .started(startedState)
         send(event: .didStart)
@@ -271,7 +274,9 @@ final class NativeAlternativePaymentMethodInteractor:
         logger.debug("One or more parameters are not valid: \(invalidFields), waiting for parameters to update")
     }
 
-    private func restoreStartedStateAfterSubmission(nativeApm: PONativeAlternativePaymentMethodResponse.NativeApm) {
+    private func restoreStartedStateAfterSubmission(
+        nativeApm: PONativeAlternativePaymentMethodResponse.NativeApm, defaultValues: [String: State.ParameterValue]
+    ) {
         guard case let .submitting(startedState) = state else {
             return
         }
@@ -284,9 +289,9 @@ final class NativeAlternativePaymentMethodInteractor:
             amount: startedState.amount,
             currencyCode: startedState.currencyCode,
             parameters: parameters,
-            values: [:],
+            values: defaultValues,
             recentFailure: nil,
-            isSubmitAllowed: parameters.map { isValid(value: nil, for: $0) }.allSatisfy { $0 }
+            isSubmitAllowed: isSubmitAllowed(parameters: parameters, values: defaultValues)
         )
         state = .started(updatedStartedState)
         send(event: .didSubmitParameters(additionalParametersExpected: true))
@@ -324,8 +329,41 @@ final class NativeAlternativePaymentMethodInteractor:
         }
     }
 
+    private func isSubmitAllowed(
+        parameters: [PONativeAlternativePaymentMethodParameter], values: [String: State.ParameterValue]
+    ) -> Bool {
+        parameters.map { isValid(value: values[$0.key], for: $0) }.allSatisfy { $0 }
+    }
+
     private func send(event: PONativeAlternativePaymentMethodEvent) {
         logger.debug("Did send event: '\(String(describing: event))'")
         delegate?.nativeAlternativePaymentMethodDidEmitEvent(event)
+    }
+
+    private func defaultValues(
+        for parameters: [PONativeAlternativePaymentMethodParameter]?,
+        completion: @escaping ([String: State.ParameterValue]) -> Void
+    ) {
+        if let delegate, let parameters, !parameters.isEmpty {
+            delegate.nativeAlternativePaymentMethodDefaultValues(for: parameters) { values in
+                assert(Thread.isMainThread, "Completion must be called on main thread.")
+                var postprocessedValues: [String: State.ParameterValue] = [:]
+                parameters.forEach { parameter in
+                    guard let value = values[parameter.key] else {
+                        return
+                    }
+                    let postprocessedValue: String
+                    if let length = parameter.length {
+                        postprocessedValue = String(value.prefix(length))
+                    } else {
+                        postprocessedValue = value
+                    }
+                    postprocessedValues[parameter.key] = .init(value: postprocessedValue, recentErrorMessage: nil)
+                }
+                completion(postprocessedValues)
+            }
+        } else {
+            completion([:])
+        }
     }
 }
