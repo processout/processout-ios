@@ -19,3 +19,10 @@ public struct POImmutableExcludedCodable<Value>: Encodable {
 
     public func encode(to encoder: Encoder) throws { }
 }
+
+extension KeyedEncodingContainer {
+
+    public mutating func encode<T>(
+        _ value: POImmutableExcludedCodable<T>, forKey key: KeyedEncodingContainer<K>.Key
+    ) throws { /* Ignored */ }
+}
