@@ -96,7 +96,7 @@ private final class SharedProcessOutApi: ProcessOutApiType {
             configuration: .init(
                 baseUrl: configuration.apiBaseUrl,
                 projectId: configuration.projectId,
-                password: configuration.password,
+                privateKey: configuration.privateKey,
                 version: Self.version
             ),
             sessionConfiguration: sessionConfiguration,

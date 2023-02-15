@@ -20,10 +20,10 @@ public struct ProcessOutApiConfiguration {
     /// - NOTE: Debug logs may contain sensitive data.
     public let isDebug: Bool
 
-    /// Project's password.
+    /// Project's private key.
     /// - Warning: this is only intended to be used for testing purposes storing your private key
     /// inside application is extremely dangerous and is highly discouraged.
-    @_spi(PO) public let password: String?
+    @_spi(PO) public let privateKey: String?
 
     /// Api base URL.
     let apiBaseUrl: URL
@@ -43,7 +43,7 @@ extension ProcessOutApiConfiguration {
         return ProcessOutApiConfiguration(
             projectId: projectId,
             isDebug: isDebug,
-            password: nil,
+            privateKey: nil,
             apiBaseUrl: apiBaseUrl,
             checkoutBaseUrl: checkoutBaseUrl
         )
@@ -51,11 +51,11 @@ extension ProcessOutApiConfiguration {
 
     /// Creates staging configuration.
     @_spi(PO)
-    public static func staging(projectId: String, password: String?, apiBaseUrl: URL, checkoutBaseUrl: URL) -> Self {
+    public static func staging(projectId: String, privateKey: String?, apiBaseUrl: URL, checkoutBaseUrl: URL) -> Self {
         ProcessOutApiConfiguration(
             projectId: projectId,
             isDebug: true,
-            password: password,
+            privateKey: privateKey,
             apiBaseUrl: apiBaseUrl,
             checkoutBaseUrl: checkoutBaseUrl
         )

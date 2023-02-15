@@ -40,7 +40,10 @@ final class CustomerTokensRepository: CustomerTokensRepositoryType {
             let token: POCustomerToken
         }
         let httpRequest = HttpConnectorRequest<Response>.post(
-            path: "/customers/\(request.customerId)/tokens", body: request, includesDeviceMetadata: true
+            path: "/customers/\(request.customerId)/tokens",
+            body: request,
+            includesDeviceMetadata: true,
+            requiresPrivateKey: true
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
             completion(result.map(\.token).mapError(failureMapper.failure))

@@ -77,7 +77,9 @@ final class InvoicesRepository: InvoicesRepositoryType {
         struct Response: Decodable {
             let invoice: POInvoice
         }
-        let httpRequest = HttpConnectorRequest<Response>.post(path: "/invoices", body: request)
+        let httpRequest = HttpConnectorRequest<Response>.post(
+            path: "/invoices", body: request, requiresPrivateKey: true
+        )
         connector.execute(request: httpRequest) { [failureMapper] result in
             completion(result.map(\.invoice).mapError(failureMapper.failure))
         }

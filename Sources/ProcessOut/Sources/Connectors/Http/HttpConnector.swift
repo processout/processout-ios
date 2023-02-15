@@ -19,8 +19,8 @@ final class HttpConnector: HttpConnectorType {
         /// Project id to associate requests with.
         let projectId: String
 
-        /// Project's password.
-        let password: String?
+        /// Project's private key.
+        let privateKey: String?
 
         /// SDK version.
         let version: String
@@ -109,7 +109,7 @@ final class HttpConnector: HttpConnectorType {
             }
             sessionRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
-        authorize(request: &sessionRequest)
+        try authorize(request: &sessionRequest, originalRequest: request)
         let systemVersion = ProcessInfo.processInfo.operatingSystemVersion
         let systemVersionString = [systemVersion.majorVersion, systemVersion.minorVersion, systemVersion.patchVersion]
             .map(\.description).joined(separator: ".")
@@ -133,10 +133,14 @@ final class HttpConnector: HttpConnectorType {
         return sessionRequest
     }
 
-    private func authorize(request: inout URLRequest) {
+    private func authorize(request: inout URLRequest, originalRequest: HttpConnectorRequest<some Decodable>) throws {
         var value = configuration.projectId + ":"
-        if let password = configuration.password {
-            value += password
+        if originalRequest.requiresPrivateKey {
+            if let privateKey = configuration.privateKey {
+                value += privateKey
+            } else {
+                logger.info("Private key is required by '\(originalRequest.id)' request but not set")
+            }
         }
         let authorization = "Basic " + Data(value.utf8).base64EncodedString()
         request.setValue(authorization, forHTTPHeaderField: "Authorization")

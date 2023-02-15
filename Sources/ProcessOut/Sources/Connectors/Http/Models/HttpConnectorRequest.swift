@@ -34,6 +34,9 @@ struct HttpConnectorRequest<Value: Decodable> {
     /// Lets us inject device metadata into requests.
     let includesDeviceMetadata: Bool
 
+    /// Indicates whether private key is required to execute request. Default value is `false`.
+    let requiresPrivateKey: Bool
+
     /// Expected value type.
     let expectedValueType: Value.Type = Value.self
 }
@@ -41,7 +44,10 @@ struct HttpConnectorRequest<Value: Decodable> {
 extension HttpConnectorRequest {
 
     static func get(
-        path: String, query: [String: CustomStringConvertible] = [:], headers: [String: String] = [:]
+        path: String,
+        query: [String: CustomStringConvertible] = [:],
+        headers: [String: String] = [:],
+        requiresPrivateKey: Bool = false
     ) -> Self {
         .init(
             id: UUID().uuidString,
@@ -50,7 +56,8 @@ extension HttpConnectorRequest {
             query: query,
             body: nil,
             headers: headers,
-            includesDeviceMetadata: false
+            includesDeviceMetadata: false,
+            requiresPrivateKey: requiresPrivateKey
         )
     }
 
@@ -58,7 +65,8 @@ extension HttpConnectorRequest {
         path: String,
         body: E?,
         headers: [String: String] = [:],
-        includesDeviceMetadata: Bool = false
+        includesDeviceMetadata: Bool = false,
+        requiresPrivateKey: Bool = false
     ) -> Self {
         .init(
             id: UUID().uuidString,
@@ -67,7 +75,8 @@ extension HttpConnectorRequest {
             query: [:],
             body: POAnyEncodable(body),
             headers: headers,
-            includesDeviceMetadata: includesDeviceMetadata
+            includesDeviceMetadata: includesDeviceMetadata,
+            requiresPrivateKey: requiresPrivateKey
         )
     }
 
@@ -75,7 +84,8 @@ extension HttpConnectorRequest {
         path: String,
         body: E?,
         headers: [String: String] = [:],
-        includesDeviceMetadata: Bool = false
+        includesDeviceMetadata: Bool = false,
+        requiresPrivateKey: Bool = false
     ) -> Self {
         .init(
             id: UUID().uuidString,
@@ -84,7 +94,8 @@ extension HttpConnectorRequest {
             query: [:],
             body: POAnyEncodable(body),
             headers: headers,
-            includesDeviceMetadata: includesDeviceMetadata
+            includesDeviceMetadata: includesDeviceMetadata,
+            requiresPrivateKey: requiresPrivateKey
         )
     }
 }
