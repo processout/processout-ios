@@ -14,11 +14,13 @@ final class AlternativePaymentMethodsRouter: RouterType {
 
     func trigger(route: AlternativePaymentMethodsRoute) -> Bool {
         switch route {
-        case let .nativeAlternativePayment(gatewayConfigurationId, invoiceId):
+        case let .nativeAlternativePayment(route):
             let viewController = PONativeAlternativePaymentMethodViewControllerBuilder
-                .with(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId)
-                .with { [weak self] _ in
-                    self?.viewController?.dismiss(animated: true)
+                .with(invoiceId: route.invoiceId, gatewayConfigurationId: route.gatewayConfigurationId)
+                .with { [weak self] result in
+                    self?.viewController?.dismiss(animated: true) {
+                        route.completion(result)
+                    }
                 }
                 .build()
             let navigationController = createNavigationController(rootViewController: viewController)
@@ -38,6 +40,12 @@ final class AlternativePaymentMethodsRouter: RouterType {
         case let .additionalData(completion):
             let viewController = AlternativePaymentDataBuilder(completion: completion).build()
             self.viewController?.navigationController?.pushViewController(viewController, animated: true)
+        case let .alert(message):
+            let viewController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+            viewController.addAction(
+                UIAlertAction(title: Strings.AlternativePaymentMethods.Result.continue, style: .default)
+            )
+            self.viewController?.present(viewController, animated: true)
         }
         return true
     }

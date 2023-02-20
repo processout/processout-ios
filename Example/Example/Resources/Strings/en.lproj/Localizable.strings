@@ -13,6 +13,9 @@
 "alternative-payment-methods.title" = "Alternative Payment Methods";
 "alternative-payment-methods.gateway.unknown" = "<Unknown>";
 "alternative-payment-methods.failure.unknown" = "Something went wrong...";
+"alternative-payment-methods.result.continue" = "Continue";
+"alternative-payment-methods.result.failure-message" = "Payment did fail with error: '%@'.";
+"alternative-payment-methods.result.default-failure-message" = "Payment did fail.";
 
 "authorization-amount.message" = "Please select amount and currency.";
 "authorization-amount.amount.placeholder" = "Amount";

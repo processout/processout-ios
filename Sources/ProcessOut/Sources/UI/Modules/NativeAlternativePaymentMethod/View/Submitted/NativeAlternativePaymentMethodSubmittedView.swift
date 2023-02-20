@@ -29,7 +29,14 @@ final class NativeAlternativePaymentMethodSubmittedView: UIView {
         } else {
             iconImageView.setHidden(true)
         }
-        let descriptionStyle = state.isCaptured ? style.successMessage : style.message
+        let descriptionStyle: POTextStyle
+        if state.isCaptured {
+            descriptionStyle = style.successMessage
+            descriptionLabel.accessibilityIdentifier = "native-alternative-payment.captured.description"
+        } else {
+            descriptionStyle = style.message
+            descriptionLabel.accessibilityIdentifier = "native-alternative-payment.non-captured.description"
+        }
         descriptionLabel.attributedText = AttributedStringBuilder()
             .typography(descriptionStyle.typography)
             .textStyle(textStyle: .headline)

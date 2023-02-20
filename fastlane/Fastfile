@@ -14,6 +14,10 @@ default_platform(:ios)
 
 platform :ios do
   lane :tests do
-    run_tests(project: "ProcessOut.xcodeproj", scheme: "ProcessOut", device: "iPhone 14", clean: true)
+    run_tests(project: "ProcessOut.xcodeproj", scheme: "ProcessOut", device: "iPhone 14 Pro (16.2)", clean: true)
+  end
+
+  lane :example_tests do
+    run_tests(project: "Example/Example.xcodeproj", scheme: "Example", device: "iPhone 14 Pro (16.2)", clean: true)
   end
 end

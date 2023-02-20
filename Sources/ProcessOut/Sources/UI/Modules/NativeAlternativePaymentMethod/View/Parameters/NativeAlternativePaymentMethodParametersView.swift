@@ -78,11 +78,13 @@ final class NativeAlternativePaymentMethodParametersView: UIStackView {
             let inputFormView: InputFormView
             if let length = parameter.length, length <= maximumCodeLength, parameter.type == .numeric {
                 let codeTextField = CodeTextField(length: length)
+                codeTextField.accessibilityIdentifier = "native-alternative-payment.code-input"
                 codeTextField.delegate = self
                 codeTextField.returnKeyType = isLastParameter ? .done : .next
                 inputFormView = InputFormView(textField: codeTextField, style: style.codeInput)
             } else {
                 let containerView = TextFieldContainerView()
+                containerView.textField.accessibilityIdentifier = "native-alternative-payment.generic-input"
                 containerView.textField.delegate = self
                 containerView.textField.returnKeyType = isLastParameter ? .done : .next
                 inputFormView = InputFormView(textField: containerView, style: style.input)

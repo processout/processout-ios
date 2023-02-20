@@ -1,5 +1,10 @@
 name: Bootstrap Project
 description: Pulls needed dependencies and bootstraps project
+inputs:
+  example-constants:
+    description: 'Content of example project constants file'
+    type: string
+    required: false
 runs:
   using: "composite"
   steps:
@@ -17,4 +22,11 @@ runs:
         key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
     - name: Bootstrap Project
       run: ./Scripts/BootstrapProject.sh --skip-bundle-instal
+      shell: bash
+    - name: Bootstrap Example Project
+      if: ${{ inputs.example-constants != '' }}
+      run: |
+        cd Example
+        echo "${{ inputs.example-constants }}" > Example/Resources/Constants.yml
+        source Scripts/BootstrapProject.sh --skip-mint-bootstrap
       shell: bash

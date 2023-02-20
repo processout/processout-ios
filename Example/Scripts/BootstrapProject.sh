@@ -2,8 +2,10 @@
 
 set -e
 
-# Installs mint dependencies
-mint bootstrap
+# Installs bundler dependencies if needed
+if ! [[ "$@" =~ '--skip-mint-bootstrap' ]]; then
+    mint bootstrap
+fi
 
 # Generates project
 mint run xcodegen generate

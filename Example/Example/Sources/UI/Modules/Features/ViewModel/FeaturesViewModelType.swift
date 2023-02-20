@@ -14,6 +14,9 @@ enum FeaturesViewModelState {
         /// Feature name.
         let name: String
 
+        /// Accessibility identifier.
+        let accessibilityId: String
+
         /// Invoked when this feature is selected.
         let select: () -> Void
     }

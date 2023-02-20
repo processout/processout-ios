@@ -120,9 +120,14 @@ final class AlternativePaymentMethodsViewModel:
             if !isSubaccount {
                 return
             } else if prefersNative, gatewayConfiguration.gateway?.nativeApmConfig != nil {
-                route = .nativeAlternativePayment(
-                    gatewayConfigurationId: gatewayConfiguration.id, invoiceId: invoice.id
+                let paymentRoute = AlternativePaymentMethodsRoute.NativeAlternativePayment(
+                    gatewayConfigurationId: gatewayConfiguration.id,
+                    invoiceId: invoice.id,
+                    completion: { [weak self] result in
+                        self?.didCompleteNativePayment(result: result)
+                    }
                 )
+                route = .nativeAlternativePayment(paymentRoute)
             } else {
                 route = AlternativePaymentMethodsRoute.additionalData { [weak self] additionalData in
                     let request = POAlternativePaymentMethodRequest(
@@ -135,5 +140,19 @@ final class AlternativePaymentMethodsViewModel:
             }
             self?.router.trigger(route: route)
         }
+    }
+
+    private func didCompleteNativePayment(result: Result<Void, POFailure>) {
+        // Success is already a part of native alternative payment module so ignored here.
+        guard case let .failure(failure) = result else {
+            return
+        }
+        let message: String
+        if let failureMessage = failure.message, !failureMessage.isEmpty {
+            message = Strings.AlternativePaymentMethods.Result.failureMessage(failureMessage)
+        } else {
+            message = Strings.AlternativePaymentMethods.Result.defaultFailureMessage
+        }
+        router.trigger(route: .alert(message: message))
     }
 }

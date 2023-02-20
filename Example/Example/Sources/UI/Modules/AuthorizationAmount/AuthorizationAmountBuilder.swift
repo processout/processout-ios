@@ -21,11 +21,13 @@ final class AuthorizationAmountBuilder {
             textField.placeholder = Strings.AuthorizationAmount.Amount.placeholder
             textField.keyboardType = .decimalPad
             textField.autocorrectionType = .no
+            textField.accessibilityIdentifier = "authorization-amount.amount"
         }
         viewController.addTextField { textField in
             textField.placeholder = Strings.AuthorizationAmount.Currency.placeholder
             textField.keyboardType = .alphabet
             textField.autocorrectionType = .no
+            textField.accessibilityIdentifier = "authorization-amount.currency"
         }
         let submitAction = UIAlertAction(
             title: Strings.AuthorizationAmount.confirm,
@@ -37,6 +39,7 @@ final class AuthorizationAmountBuilder {
                 completion(amount, currencyCode)
             }
         )
+        submitAction.accessibilityIdentifier = "authorization-amount.confirm"
         viewController.addAction(submitAction)
         return viewController
     }

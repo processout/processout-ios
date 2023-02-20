@@ -16,5 +16,6 @@ final class FeaturesFeatureCell: UICollectionViewListCell {
         configuration.text = model.name
         cell.contentConfiguration = configuration
         cell.accessories = [.disclosureIndicator(displayed: .always)]
+        cell.accessibilityIdentifier = model.accessibilityId
     }
 }

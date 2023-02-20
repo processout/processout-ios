@@ -115,7 +115,11 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
         return view
     }()
 
-    private lazy var primaryButton = Button(style: style.primaryButton)
+    private lazy var primaryButton: Button = {
+        let button = Button(style: style.primaryButton)
+        button.accessibilityIdentifier = "native-alternative-payment.primary-button"
+        return button
+    }()
 
     private var currentState: NativeAlternativePaymentMethodViewModelState.Started?
     private var scrollViewContentSizeObservation: NSKeyValueObservation?
