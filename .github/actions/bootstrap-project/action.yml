@@ -20,6 +20,8 @@ runs:
       with:
         path: ~/.mint/packages
         key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+        restore-keys: |
+          ${{ runner.os }}-mint-
     - name: Bootstrap Project
       run: ./Scripts/BootstrapProject.sh --skip-bundle-instal
       shell: bash
