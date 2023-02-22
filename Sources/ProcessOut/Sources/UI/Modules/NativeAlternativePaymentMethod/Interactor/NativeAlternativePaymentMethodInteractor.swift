@@ -52,8 +52,7 @@ final class NativeAlternativePaymentMethodInteractor:
         guard case .idle = state else {
             return
         }
-        // swiftlint:disable:next line_length
-        logger.info("Starting invoice \(configuration.invoiceId) payment using configuration \(configuration.gatewayConfigurationId)")
+        logger.info("Starting payment using configuration: \(String(describing: configuration))")
         send(event: .willStart)
         state = .starting
         let request = PONativeAlternativePaymentMethodTransactionDetailsRequest(
@@ -190,7 +189,7 @@ final class NativeAlternativePaymentMethodInteractor:
         )
         state = .started(startedState)
         send(event: .didStart)
-        logger.debug("Did start \(configuration.invoiceId) payment, waiting for parameters")
+        logger.info("Did start \(configuration.invoiceId) payment, waiting for parameters")
     }
 
     private func trySetAwaitingCaptureStateUnchecked(
@@ -206,7 +205,7 @@ final class NativeAlternativePaymentMethodInteractor:
             gatewayLogoImage: gatewayLogo, expectedActionMessage: expectedActionMessage, actionImage: actionImage
         )
         state = .awaitingCapture(awaitingCaptureState)
-        logger.debug("Waiting for invoice \(configuration.invoiceId) capture confirmation")
+        logger.info("Waiting for invoice \(configuration.invoiceId) capture confirmation")
         let request = PONativeAlternativePaymentCaptureRequest(
             invoiceId: configuration.invoiceId,
             gatewayConfigurationId: configuration.gatewayConfigurationId,
@@ -239,7 +238,7 @@ final class NativeAlternativePaymentMethodInteractor:
     private func setCapturedStateUnchecked(gatewayLogo: UIImage?) {
         state = .captured(.init(gatewayLogo: gatewayLogo))
         send(event: .didCompletePayment)
-        logger.debug("Did receive invoice '\(configuration.invoiceId)' capture confirmation")
+        logger.info("Did receive invoice '\(configuration.invoiceId)' capture confirmation")
     }
 
     private func restoreStartedStateAfterSubmissionFailureIfPossible(_ failure: POFailure) {

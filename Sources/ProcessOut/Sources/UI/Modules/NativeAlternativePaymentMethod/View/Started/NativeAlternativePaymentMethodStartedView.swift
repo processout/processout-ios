@@ -9,8 +9,9 @@ import UIKit
 
 final class NativeAlternativePaymentMethodStartedView: UIView {
 
-    init(style: NativeAlternativePaymentMethodStartedViewStyle) {
+    init(style: NativeAlternativePaymentMethodStartedViewStyle, logger: POLogger) {
         self.style = style
+        self.logger = logger
         super.init(frame: .zero)
         commonInit()
     }
@@ -68,6 +69,7 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
     // MARK: - Private Properties
 
     private let style: NativeAlternativePaymentMethodStartedViewStyle
+    private let logger: POLogger
 
     private lazy var scrollView: UIScrollView = {
         let view = UIScrollView()
@@ -237,6 +239,7 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
             return
         }
         if currentState.isSubmitting {
+            logger.debug("Currently submitting, will end editing")
             endEditing(true)
         } else {
             parametersView.configureFirstResponder()
@@ -247,10 +250,17 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
 extension NativeAlternativePaymentMethodStartedView: NativeAlternativePaymentMethodParametersViewDelegate {
 
     func shouldBeginEditing(view: NativeAlternativePaymentMethodParametersView) -> Bool {
-        currentState?.isSubmitting == false
+        let shouldBeginEditing = currentState?.isSubmitting == false
+        if shouldBeginEditing {
+            logger.debug("Will begin parameters editing")
+        } else {
+            logger.debug("Currently submitting, won't begin editing")
+        }
+        return shouldBeginEditing
     }
 
     func didCompleteParametersEditing(view: NativeAlternativePaymentMethodParametersView) {
+        logger.debug("Did complete parameters editing, will submit")
         currentState?.action.handler()
     }
 }

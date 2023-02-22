@@ -11,11 +11,13 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
 
     init(
         viewModel: any NativeAlternativePaymentMethodViewModelType,
-        customStyle: PONativeAlternativePaymentMethodStyle?
+        customStyle: PONativeAlternativePaymentMethodStyle?,
+        logger: POLogger
     ) {
         notificationObservers = []
         self.viewModel = viewModel
         self.customStyle = customStyle
+        self.logger = logger
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -72,6 +74,7 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
 
     private let viewModel: any NativeAlternativePaymentMethodViewModelType
     private let customStyle: PONativeAlternativePaymentMethodStyle?
+    private let logger: POLogger
 
     private lazy var activityIndicatorView: POActivityIndicatorViewType = {
         let style: POActivityIndicatorStyle
@@ -99,7 +102,7 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             buttonsContainerShadow: customStyle?.buttonsContainerShadow ?? .`default`,
             backgroundColor: customStyle?.backgroundColor ?? Asset.Colors.Background.primary.color
         )
-        return NativeAlternativePaymentMethodStartedView(style: style)
+        return NativeAlternativePaymentMethodStartedView(style: style, logger: logger)
     }()
 
     private lazy var submittedView: NativeAlternativePaymentMethodSubmittedView = {
@@ -119,6 +122,7 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
 
     private func configureWithViewModelState(animated: Bool) {
         let state = viewModel.state
+        logger.debug("Will update with new state: \(String(describing: state))")
         switch state {
         case .idle:
             configureWithIdleState()

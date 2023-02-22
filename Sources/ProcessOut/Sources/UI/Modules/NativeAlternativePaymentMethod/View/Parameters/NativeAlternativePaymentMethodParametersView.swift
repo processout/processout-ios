@@ -47,7 +47,7 @@ final class NativeAlternativePaymentMethodParametersView: UIStackView {
 
     weak var delegate: NativeAlternativePaymentMethodParametersViewDelegate?
 
-    /// Layout guide that encloses primary contentent.
+    /// Layout guide that encloses primary content.
     private(set) lazy var primaryContentLayoutGuide = UILayoutGuide()
 
     // MARK: - Private Properties
