@@ -37,7 +37,7 @@ final class ApplePayCardTokenizationRequestMapper: ApplePayCardTokenizationReque
             return tokenizationRequest
         } catch {
             logger.error("Did fail to decode payment data: '\(error.localizedDescription)'.")
-            throw POFailure(message: nil, code: .internal, underlyingError: error)
+            throw POFailure(message: nil, code: .internal(.mobile), underlyingError: error)
         }
     }
 

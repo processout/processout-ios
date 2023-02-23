@@ -54,7 +54,7 @@ final class CardsRepository: POCardsRepositoryType {
         } catch let failure as POFailure {
             completion(.failure(failure))
         } catch {
-            let failure = POFailure(message: nil, code: .internal, underlyingError: error)
+            let failure = POFailure(message: nil, code: .internal(.mobile), underlyingError: error)
             completion(.failure(failure))
         }
     }

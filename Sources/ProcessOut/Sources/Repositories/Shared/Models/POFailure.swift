@@ -19,6 +19,16 @@ public struct POFailure: Error {
         public let message: String
     }
 
+    public enum InternalCode: String {
+        case gateway = "gateway-internal-error"
+        case mobile = "processout-mobile.internal"
+    }
+
+    public enum TimeoutCode: String {
+        case gateway = "gateway.timeout"
+        case mobile = "processout-mobile.timeout"
+    }
+
     public enum ValidationCode: String {
         case general                   = "request.validation.error"
         case invalidAddress            = "request.validation.invalid-address"
@@ -140,16 +150,21 @@ public struct POFailure: Error {
         case serviceNotSupported                 = "service.not-supported"
     }
 
+    public enum UnknownCode: String {
+        case gateway = "gateway.unknown-error"
+        case mobile = "processout-mobile.unknown"
+    }
+
     public enum Code: Equatable {
 
         /// No network connection.
         case networkUnreachable
 
         /// Request didn't finish in time.
-        case timeout
+        case timeout(TimeoutCode)
 
         /// Something went wrong on the ProcessOut side. This is extremely rare.
-        case `internal`
+        case `internal`(InternalCode)
 
         /// Cancellation error.
         case cancelled
@@ -167,7 +182,7 @@ public struct POFailure: Error {
         case generic(GenericCode)
 
         /// Unknown error that can't be interpreted. Inspect `underlyingError` object for additional details.
-        case unknown
+        case unknown(UnknownCode)
     }
 
     /// Failure message. Not intented to be used as a user facing string.
@@ -201,14 +216,14 @@ extension POFailure.Code {
         switch self {
         case .networkUnreachable:
             return "processout-mobile.network-unreachable"
-        case .timeout:
-            return "processout-mobile.timeout"
-        case .internal:
-            return "processout-mobile.internal"
+        case let .timeout(timeoutCode):
+            return timeoutCode.rawValue
+        case let .internal(internalCode):
+            return internalCode.rawValue
         case .cancelled:
             return "processout-mobile.cancelled"
-        case .unknown:
-            return "processout-mobile.unknown"
+        case let .unknown(unknownCode):
+            return unknownCode.rawValue
         case let .validation(validationCode):
             return validationCode.rawValue
         case let .authentication(authenticationCode):

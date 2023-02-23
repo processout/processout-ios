@@ -65,7 +65,7 @@ final class InvoicesService: POInvoicesServiceType {
         let cancellable = GroupCancellable()
         let captureTimeout = min(request.timeout ?? Constants.maximumCaptureTimeout, Constants.maximumCaptureTimeout)
         let timer = Timer.scheduledTimer(withTimeInterval: captureTimeout, repeats: false) { _ in
-            let failure = Failure(code: .timeout)
+            let failure = Failure(code: .timeout(.mobile))
             completion(.failure(failure))
         }
         let request = NativeAlternativePaymentCaptureRequest(

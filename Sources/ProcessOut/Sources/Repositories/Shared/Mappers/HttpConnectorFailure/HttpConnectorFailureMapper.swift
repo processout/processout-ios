@@ -22,7 +22,7 @@ final class HttpConnectorFailureMapper: HttpConnectorFailureMapperType {
         switch failure {
         case .coding, .internal:
             message = "An unexpected error occurred while processing your request."
-            code = .internal
+            code = .internal(.mobile)
             invalidFields = nil
         case .networkUnreachable:
             message = "Request can't be processed because there is no network connection."
@@ -30,7 +30,7 @@ final class HttpConnectorFailureMapper: HttpConnectorFailureMapperType {
             invalidFields = nil
         case .timeout:
             message = "Request timed out."
-            code = .timeout
+            code = .timeout(.mobile)
             invalidFields = nil
         case .cancelled:
             message = "Request was cancelled."
@@ -44,7 +44,10 @@ final class HttpConnectorFailureMapper: HttpConnectorFailureMapperType {
             }
             invalidFields = error.invalidFields?.map { .init(name: $0.name, message: $0.message) }
         }
-        return .init(message: message, code: code ?? .unknown, invalidFields: invalidFields, underlyingError: failure)
+        let failure = POFailure(
+            message: message, code: code ?? .unknown(.mobile), invalidFields: invalidFields, underlyingError: failure
+        )
+        return failure
     }
 
     // MARK: - Private Properties
@@ -68,14 +71,20 @@ final class HttpConnectorFailureMapper: HttpConnectorFailureMapperType {
             if let genericCode = POFailure.GenericCode(rawValue: error.errorType) {
                 return .generic(genericCode)
             }
-            let codes: [String: POFailure.Code] = [
-                "gateway.timeout": .timeout, "gateway-internal-error": .internal, "gateway.unknown-error": .unknown
-            ]
-            return codes[error.errorType]
+            if let unknownCode = POFailure.UnknownCode(rawValue: error.errorType) {
+                return .unknown(unknownCode)
+            }
+            if let internalCode = POFailure.InternalCode(rawValue: error.errorType) {
+                return .internal(internalCode)
+            }
+            if let timeoutCode = POFailure.TimeoutCode(rawValue: error.errorType) {
+                return .timeout(timeoutCode)
+            }
         case 500...599:
-            return .internal
+            return .internal(.mobile)
         default:
             return nil
         }
+        return nil
     }
 }

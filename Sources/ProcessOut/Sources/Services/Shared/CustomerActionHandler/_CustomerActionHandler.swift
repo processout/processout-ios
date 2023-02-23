@@ -72,7 +72,7 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
                         completion(.success("gway_req_" + responseDataString))
                     } catch {
                         logger.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
-                        completion(.failure(.init(message: nil, code: .internal, underlyingError: error)))
+                        completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: error)))
                     }
                 case let .failure(failure):
                     completion(.failure(failure))
@@ -80,7 +80,7 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
             }
         } catch {
             logger.error("Did fail to decode DS data: '\(error.localizedDescription)'.")
-            completion(.failure(.init(code: .internal, underlyingError: error)))
+            completion(.failure(.init(code: .internal(.mobile), underlyingError: error)))
         }
     }
 
@@ -100,14 +100,14 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
             }
         } catch {
             logger.error("Did fail to decode challenge data: '\(error.localizedDescription)'.")
-            completion(.failure(.init(code: .internal, underlyingError: error)))
+            completion(.failure(.init(code: .internal(.mobile), underlyingError: error)))
         }
     }
 
     private func fingerprint(url: String, delegate: Delegate, completion: @escaping Completion) {
         guard let url = URL(string: url) else {
             logger.error("Did fail to create fingerprint URL from raw value: '\(url)'.")
-            completion(.failure(.init(message: nil, code: .internal, underlyingError: nil)))
+            completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
             return
         }
         let context = PORedirectCustomerActionContext(url: url, isHeadlessModeAllowed: true, timeout: 10)
@@ -115,7 +115,7 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
             switch result {
             case let .success(newSource):
                 completion(.success(newSource))
-            case let .failure(failure) where failure.code == .timeout:
+            case let .failure(failure) where failure.code == .timeout(.mobile):
                 // Fingerprinting timeout error is treated differently from other actions.
                 do {
                     let response = FingerprintResponse(
@@ -129,7 +129,7 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
                     completion(.success("gway_req_" + responseDataString))
                 } catch {
                     logger.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
-                    completion(.failure(.init(message: nil, code: .internal, underlyingError: error)))
+                    completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: error)))
                 }
             case let .failure(failure):
                 completion(.failure(failure))
@@ -140,7 +140,7 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
     private func redirect(url: String, delegate: Delegate, completion: @escaping Completion) {
         guard let url = URL(string: url) else {
             logger.error("Did fail to create redirect URL from raw value: '\(url)'.")
-            completion(.failure(.init(message: nil, code: .internal, underlyingError: nil)))
+            completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
             return
         }
         let context = PORedirectCustomerActionContext(url: url, isHeadlessModeAllowed: false, timeout: nil)

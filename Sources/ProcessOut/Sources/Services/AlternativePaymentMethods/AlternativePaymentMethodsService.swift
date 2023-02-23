@@ -45,14 +45,14 @@ final class AlternativePaymentMethodsService: POAlternativePaymentMethodsService
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
               let queryItems = components.queryItems else {
             let message = "Invalid or malformed Alternative Payment Mehod URL response provided."
-            throw POFailure(message: message, code: .internal, underlyingError: nil)
+            throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
         if let errorCode = queryItems.queryItemValue(name: "error_code") {
             throw POFailure(code: createFailureCode(rawValue: errorCode))
         }
         guard let gatewayToken = queryItems.queryItemValue(name: "token") else {
             let message = "Invalid or malformed Alternative Payment Mehod URL response provided."
-            throw POFailure(message: message, code: .internal, underlyingError: nil)
+            throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
         guard let customerId = queryItems.queryItemValue(name: "customer_id"),
               let tokenId = queryItems.queryItemValue(name: "token_id") else {
@@ -80,7 +80,7 @@ final class AlternativePaymentMethodsService: POAlternativePaymentMethodsService
             return .generic(genericCode)
         }
         logger.info("Unknown error value '\(rawValue)'.")
-        return .unknown
+        return .unknown(.mobile)
     }
 }
 

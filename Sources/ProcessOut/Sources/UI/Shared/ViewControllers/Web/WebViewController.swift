@@ -154,13 +154,13 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
         }
         let request = URLRequest(url: delegate.url)
         guard let navigation = contentView.load(request) else {
-            let failure = POFailure(message: nil, code: .internal, underlyingError: nil)
+            let failure = POFailure(message: nil, code: .internal(.mobile), underlyingError: nil)
             setCompletedState(with: failure)
             return
         }
         if let timeout {
             timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
-                self?.setCompletedState(with: POFailure(code: .timeout))
+                self?.setCompletedState(with: POFailure(code: .timeout(.mobile)))
             }
         }
         deepLinkObserver = eventEmitter.on(DeepLinkReceivedEvent.self) { [weak self] event in
@@ -204,7 +204,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
         if let error = error as? POFailure {
             failure = error
         } else {
-            failure = POFailure(message: nil, code: .unknown, underlyingError: error)
+            failure = POFailure(message: nil, code: .unknown(.mobile), underlyingError: error)
         }
         state = .completed
         delegate.complete(with: failure)

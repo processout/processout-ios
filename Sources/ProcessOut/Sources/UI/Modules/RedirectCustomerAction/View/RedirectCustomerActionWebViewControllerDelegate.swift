@@ -21,7 +21,7 @@ final class RedirectCustomerActionWebViewControllerDelegate: WebViewControllerDe
     func complete(with url: URL) throws {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
               let token = components.queryItems?.first(where: { $0.name == "token" }) else {
-            throw POFailure(message: nil, code: .internal, underlyingError: nil)
+            throw POFailure(message: nil, code: .internal(.mobile), underlyingError: nil)
         }
         let tokenValue = token.value ?? ""
         completion(.success(tokenValue))
