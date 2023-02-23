@@ -63,16 +63,19 @@ final class HttpConnectorFailureMapper: HttpConnectorFailureMapperType {
             return notFoundCode.map(POFailure.Code.notFound)
         case 400...499:
             if let validationCode = POFailure.ValidationCode(rawValue: error.errorType) {
-                return POFailure.Code.validation(validationCode)
+                return .validation(validationCode)
             }
             if let genericCode = POFailure.GenericCode(rawValue: error.errorType) {
-                return POFailure.Code.generic(genericCode)
+                return .generic(genericCode)
             }
+            let codes: [String: POFailure.Code] = [
+                "gateway.timeout": .timeout, "gateway-internal-error": .internal, "gateway.unknown-error": .unknown
+            ]
+            return codes[error.errorType]
         case 500...599:
             return .internal
         default:
             return nil
         }
-        return nil
     }
 }

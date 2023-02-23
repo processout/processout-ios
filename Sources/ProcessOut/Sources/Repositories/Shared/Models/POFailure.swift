@@ -115,6 +115,10 @@ public struct POFailure: Error {
     }
 
     public enum GenericCode: String {
+        case cardExceededLimits                  = "card.exceeded-limits"
+        case cardIssuerFailed                    = "card.issuer-failed"
+        case cardNoMoney                         = "card.no-money"
+        case cardNotAuthorized                   = "card.not-authorized"
         case gatewayDeclined                     = "gateway.declined"
         case requestBadFormat                    = "request.bad-format"
         case requestCardAlreadyUsed              = "request.source.card-already-used"
