@@ -41,9 +41,7 @@ final class CodeTextFieldComponentView: UIView {
     }
 
     func configure(viewModel: ViewModel, animated: Bool) {
-        UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            CATransaction.begin()
-            CATransaction.setDisableActions(!animated)
+        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             switch viewModel.carretPosition {
             case .none:
                 carretView.setHidden(true)
@@ -74,7 +72,6 @@ final class CodeTextFieldComponentView: UIView {
             backgroundColor = viewModel.style.backgroundColor
             carretView.backgroundColor = viewModel.style.tintColor
             UIView.performWithoutAnimation(layoutIfNeeded)
-            CATransaction.commit()
         }
         currentViewModel = viewModel
         accessibilityValue = viewModel.value.map(String.init)

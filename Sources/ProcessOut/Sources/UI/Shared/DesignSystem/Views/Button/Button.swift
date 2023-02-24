@@ -36,9 +36,7 @@ final class Button: UIControl {
     }
 
     func configure(viewModel: ViewModel, isEnabled: Bool, animated: Bool) {
-        UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            CATransaction.begin()
-            CATransaction.setDisableActions(!animated)
+        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             let currentStyle = style(isEnabled: isEnabled, isHighlighted: isHighlighted)
             if viewModel.isLoading {
                 titleLabel.alpha = 0
@@ -63,7 +61,6 @@ final class Button: UIControl {
             apply(style: currentStyle.shadow)
             backgroundColor = currentStyle.backgroundColor
             UIView.performWithoutAnimation(layoutIfNeeded)
-            CATransaction.commit()
         }
         _isEnabled = isEnabled
         currentViewModel = viewModel

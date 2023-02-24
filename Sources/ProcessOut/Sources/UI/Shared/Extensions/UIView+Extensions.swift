@@ -9,6 +9,16 @@ import UIKit
 
 extension UIView {
 
+    /// If `withAnimation` is set to `true` runs given actions inside UIKit animation block otherwise performs
+    /// without animation.
+    static func perform(withAnimation animated: Bool, duration: TimeInterval, actions: @escaping () -> Void) {
+        if animated {
+            UIView.animate(withDuration: duration, animations: actions)
+        } else {
+            UIView.performWithoutAnimation(actions)
+        }
+    }
+
     /// Setting the value of this property to true hides the receiver and setting it to false shows
     /// the receiver. The default value is false.
     ///

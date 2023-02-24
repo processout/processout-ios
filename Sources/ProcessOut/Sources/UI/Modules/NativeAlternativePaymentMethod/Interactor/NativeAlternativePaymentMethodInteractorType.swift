@@ -18,6 +18,9 @@ protocol NativeAlternativePaymentMethodInteractorType: InteractorType
 
     /// Submits parameters.
     func submit()
+
+    /// Cancells payment if possible.
+    func cancel()
 }
 
 enum NativeAlternativePaymentMethodInteractorState {

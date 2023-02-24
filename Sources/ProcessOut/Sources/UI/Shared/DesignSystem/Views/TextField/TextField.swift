@@ -81,9 +81,7 @@ final class TextFieldContainerView: UIView, InputFormTextFieldType {
         guard let style else {
             return
         }
-        UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            CATransaction.begin()
-            CATransaction.setDisableActions(!animated)
+        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             textField.attributedPlaceholder = AttributedStringBuilder()
                 .typography(style.placeholder.typography)
                 .textStyle(textStyle: .body)
@@ -105,7 +103,6 @@ final class TextFieldContainerView: UIView, InputFormTextFieldType {
             tintColor = style.tintColor
             backgroundColor = style.backgroundColor
             UIView.performWithoutAnimation(layoutIfNeeded)
-            CATransaction.commit()
         }
     }
 }

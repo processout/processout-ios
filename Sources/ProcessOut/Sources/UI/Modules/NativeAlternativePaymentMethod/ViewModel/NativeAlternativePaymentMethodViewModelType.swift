@@ -27,6 +27,9 @@ enum NativeAlternativePaymentMethodViewModelState {
         /// Boolean value indicating whether action is enabled.
         let isEnabled: Bool
 
+        /// Boolean value indicating whether action associated with button is currently running.
+        let isExecuting: Bool
+
         /// Action handler.
         let handler: () -> Void
     }
@@ -66,8 +69,11 @@ enum NativeAlternativePaymentMethodViewModelState {
         /// Boolean value indicating if data is being submitted.
         let isSubmitting: Bool
 
-        /// Action information.
-        let action: Action
+        /// Primary action.
+        let primaryAction: Action
+
+        /// Secondary action.
+        let secondaryAction: Action?
     }
 
     struct Submitted {

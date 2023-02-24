@@ -27,9 +27,7 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
     }
 
     func configure(with state: NativeAlternativePaymentMethodViewModelState.Started, animated: Bool) {
-        UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            CATransaction.begin()
-            CATransaction.setDisableActions(!animated)
+        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             titleLabel.attributedText = AttributedStringBuilder()
                 .typography(style.title.typography)
                 .textStyle(textStyle: .title1)
@@ -39,14 +37,10 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
                 .string(state.title)
                 .build()
             parametersView.configure(with: state.parameters, animated: animated)
-            let primaryButtonViewModel = Button.ViewModel(
-                title: state.action.title, isLoading: state.isSubmitting, handler: state.action.handler
-            )
-            primaryButton.configure(
-                viewModel: primaryButtonViewModel, isEnabled: state.action.isEnabled, animated: animated
+            buttonsContainerView.configure(
+                primaryAction: state.primaryAction, secondaryAction: state.secondaryAction, animated: animated
             )
             layoutIfNeeded()
-            CATransaction.commit()
         }
         currentState = state
         updateFirstResponder()
@@ -55,11 +49,9 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let additionalBottomScrollContentInset: CGFloat = 48 + verticalButtonInset * 2
         static let inputsVerticalSpacing: CGFloat = 24
         static let maximumCodeLength = 6
         static let titleTopInset: CGFloat = 4
-        static let verticalButtonInset: CGFloat = 24
         static let horizontalContentInset: CGFloat = 24
         static let minimumVerticalInputsInset: CGFloat = 8
         static let animationDuration: TimeInterval = 0.25
@@ -75,8 +67,7 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
         let view = UIScrollView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.contentInsetAdjustmentBehavior = .always
-        view.contentInset.bottom = Constants.additionalBottomScrollContentInset
-        view.verticalScrollIndicatorInsets.bottom = Constants.additionalBottomScrollContentInset
+        view.showsVerticalScrollIndicator = false
         view.delegate = self
         return view
     }()
@@ -97,8 +88,6 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
         return label
     }()
 
-    private lazy var parametersContainerLayoutGuide = UILayoutGuide()
-
     private lazy var parametersView: NativeAlternativePaymentMethodParametersView = {
         let style = NativeAlternativePaymentMethodParametersViewStyle(input: style.input, codeInput: style.codeInput)
         let view = NativeAlternativePaymentMethodParametersView(
@@ -110,17 +99,15 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
         return view
     }()
 
-    private lazy var buttonsContainerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = style.backgroundColor
+    private lazy var buttonsContainerView: NativeAlternativePaymentMethodButtonsView = {
+        let style = NativeAlternativePaymentMethodButtonsViewStyle(
+            primaryButton: style.primaryButton, secondaryButton: style.secondaryButton
+        )
+        let view = NativeAlternativePaymentMethodButtonsView(
+            style: style, horizontalInset: Constants.horizontalContentInset
+        )
+        view.backgroundColor = self.style.backgroundColor
         return view
-    }()
-
-    private lazy var primaryButton: Button = {
-        let button = Button(style: style.primaryButton)
-        button.accessibilityIdentifier = "native-alternative-payment.primary-button"
-        return button
     }()
 
     private var currentState: NativeAlternativePaymentMethodViewModelState.Started?
@@ -130,9 +117,9 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
 
     private func commonInit() {
         translatesAutoresizingMaskIntoConstraints = false
+        initButtons()
         initScrollView()
         initScrollViewContentView()
-        initButtons()
     }
 
     private func initScrollView() {
@@ -142,17 +129,14 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
             scrollView.topAnchor.constraint(equalTo: topAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: buttonsContainerView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
             contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.safeAreaLayoutGuide.widthAnchor),
             contentView.heightAnchor
-                .constraint(
-                    equalTo: scrollView.safeAreaLayoutGuide.heightAnchor,
-                    constant: -Constants.additionalBottomScrollContentInset
-                )
+                .constraint(equalTo: scrollView.safeAreaLayoutGuide.heightAnchor)
                 .with(priority: .defaultHigh)
         ]
         NSLayoutConstraint.activate(constraints)
@@ -162,6 +146,7 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
     private func initScrollViewContentView() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(parametersView)
+        let parametersContainerLayoutGuide = UILayoutGuide()
         contentView.addLayoutGuide(parametersContainerLayoutGuide)
         let constraints = [
             titleLabel.leadingAnchor.constraint(
@@ -169,10 +154,6 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
             ),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.titleTopInset),
-            parametersContainerLayoutGuide.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
-            parametersContainerLayoutGuide.bottomAnchor.constraint(
-                equalTo: contentView.bottomAnchor, constant: Constants.verticalButtonInset
-            ),
             parametersView.topAnchor.constraint(
                 greaterThanOrEqualTo: titleLabel.bottomAnchor, constant: Constants.minimumVerticalInputsInset
             ),
@@ -180,35 +161,24 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
                 equalTo: contentView.leadingAnchor, constant: Constants.horizontalContentInset
             ),
             parametersView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            parametersView.primaryContentLayoutGuide.centerYAnchor
-                .constraint(equalTo: parametersContainerLayoutGuide.centerYAnchor)
-                .with(priority: .init(rawValue: 500)),
             parametersView.bottomAnchor.constraint(
                 lessThanOrEqualTo: contentView.bottomAnchor, constant: -Constants.minimumVerticalInputsInset
-            )
+            ),
+            parametersContainerLayoutGuide.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
+            parametersContainerLayoutGuide.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            parametersView.primaryContentLayoutGuide.centerYAnchor
+                .constraint(equalTo: parametersContainerLayoutGuide.centerYAnchor)
+                .with(priority: .init(rawValue: 500))
         ]
         NSLayoutConstraint.activate(constraints)
     }
 
     private func initButtons() {
         addSubview(buttonsContainerView)
-        buttonsContainerView.addSubview(primaryButton)
         let constraints = [
             buttonsContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             buttonsContainerView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            buttonsContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            primaryButton.leadingAnchor.constraint(
-                equalTo: buttonsContainerView.leadingAnchor, constant: Constants.horizontalContentInset
-            ),
-            primaryButton.centerXAnchor.constraint(equalTo: buttonsContainerView.centerXAnchor),
-            primaryButton.bottomAnchor
-                .constraint(
-                    equalTo: buttonsContainerView.safeAreaLayoutGuide.bottomAnchor,
-                    constant: -Constants.verticalButtonInset
-                ),
-            primaryButton.topAnchor.constraint(
-                equalTo: buttonsContainerView.topAnchor, constant: Constants.verticalButtonInset
-            )
+            buttonsContainerView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
     }
@@ -261,7 +231,7 @@ extension NativeAlternativePaymentMethodStartedView: NativeAlternativePaymentMet
 
     func didCompleteParametersEditing(view: NativeAlternativePaymentMethodParametersView) {
         logger.debug("Did complete parameters editing, will submit")
-        currentState?.action.handler()
+        currentState?.primaryAction.handler()
     }
 }
 

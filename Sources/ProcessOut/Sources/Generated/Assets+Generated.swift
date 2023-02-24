@@ -57,6 +57,24 @@ internal enum Asset {
     internal enum Icon {
       internal static let primary = ColorAsset(name: "Icon/Primary")
     }
+    internal enum New {
+      internal enum Action {
+        internal enum Border {
+          internal static let disabled = ColorAsset(name: "New/Action/Border/Disabled")
+        }
+        internal enum Secondary {
+          internal static let `default` = ColorAsset(name: "New/Action/Secondary/Default")
+          internal static let pressed = ColorAsset(name: "New/Action/Secondary/Pressed")
+        }
+      }
+      internal enum Border {
+        internal static let `default` = ColorAsset(name: "New/Border/Default")
+      }
+      internal enum Text {
+        internal static let disabled = ColorAsset(name: "New/Text/Disabled")
+        internal static let secondary = ColorAsset(name: "New/Text/Secondary")
+      }
+    }
     internal enum Text {
       internal static let disabled = ColorAsset(name: "Text/Disabled")
       internal static let error = ColorAsset(name: "Text/Error")

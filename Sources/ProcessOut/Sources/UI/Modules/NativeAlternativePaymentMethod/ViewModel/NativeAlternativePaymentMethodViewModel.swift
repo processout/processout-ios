@@ -45,6 +45,14 @@ final class NativeAlternativePaymentMethodViewModel:
     private let configuration: PONativeAlternativePaymentMethodConfiguration
     private let completion: ((Result<Void, POFailure>) -> Void)?
 
+    private lazy var priceFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }()
+
     // MARK: - Private Methods
 
     private func observeInteractorStateChanges() {
@@ -90,14 +98,12 @@ final class NativeAlternativePaymentMethodViewModel:
             )
             return viewModel
         }
-        let actionTitle = submitActionTitle(amount: startedState.amount, currencyCode: startedState.currencyCode)
         let state = State.Started(
             title: configuration.title ?? Strings.title(startedState.gatewayDisplayName),
             parameters: parameters,
             isSubmitting: isSubmitting,
-            action: .init(title: actionTitle, isEnabled: startedState.isSubmitAllowed) { [weak self] in
-                self?.interactor.submit()
-            }
+            primaryAction: submitAction(startedState: startedState, isSubmitting: isSubmitting),
+            secondaryAction: cancelAction(isEnabled: !isSubmitting)
         )
         return .started(state)
     }
@@ -151,18 +157,42 @@ final class NativeAlternativePaymentMethodViewModel:
         }
     }
 
-    private func submitActionTitle(amount: Decimal, currencyCode: String) -> String {
-        if let title = configuration.primaryActionTitle {
-            return title
+    private func submitAction(startedState: InteractorState.Started, isSubmitting: Bool) -> State.Action {
+        let title: String
+        if let customTitle = configuration.primaryActionTitle {
+            title = customTitle
+        } else {
+            priceFormatter.currencyCode = startedState.currencyCode
+            // swiftlint:disable:next legacy_objc_type
+            if let formattedAmount = priceFormatter.string(from: startedState.amount as NSDecimalNumber) {
+                title = Strings.SubmitButton.title(formattedAmount)
+            } else {
+                title = Strings.SubmitButton.defaultTitle
+            }
         }
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencyCode = currencyCode
-        formatter.minimumFractionDigits = 0
-        // swiftlint:disable:next legacy_objc_type
-        if let formattedAmount = formatter.string(from: amount as NSDecimalNumber) {
-            return Strings.SubmitButton.title(formattedAmount)
+        let action = State.Action(
+            title: title,
+            isEnabled: startedState.isSubmitAllowed,
+            isExecuting: isSubmitting,
+            handler: { [weak self] in
+                self?.interactor.submit()
+            }
+        )
+        return action
+    }
+
+    private func cancelAction(isEnabled: Bool) -> State.Action? {
+        guard case let .cancel(title) = configuration.secondaryAction else {
+            return nil
         }
-        return Strings.SubmitButton.defaultTitle
+        let action = State.Action(
+            title: title ?? Strings.CancelButton.title,
+            isEnabled: isEnabled,
+            isExecuting: false,
+            handler: { [weak self] in
+                self?.interactor.cancel()
+            }
+        )
+        return action
     }
 }

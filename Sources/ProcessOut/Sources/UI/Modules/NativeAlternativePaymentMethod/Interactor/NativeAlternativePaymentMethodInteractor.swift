@@ -137,6 +137,15 @@ final class NativeAlternativePaymentMethodInteractor:
         }
     }
 
+    func cancel() {
+        guard case .started = state else {
+            logger.info("Ignored cancellation attempt from unsupported state: \(String(describing: state))")
+            return
+        }
+        logger.debug("Will cancel payment \(configuration.invoiceId)")
+        setFailureStateUnchecked(failure: POFailure(code: .cancelled))
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {

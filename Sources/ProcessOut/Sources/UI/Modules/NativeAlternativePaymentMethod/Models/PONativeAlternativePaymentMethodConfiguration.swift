@@ -11,14 +11,23 @@ import Foundation
 /// Use `nil` to indicate that default value should be used.
 public struct PONativeAlternativePaymentMethodConfiguration {
 
+    public enum SecondaryAction {
+
+        /// Cancel action. Use `nil` for default title.
+        case cancel(title: String? = nil)
+    }
+
     /// Custom title.
     public let title: String?
 
     /// Custom success message to display user when payment completes.
     public let successMessage: String?
 
-    /// Primary action text. Such as "Pay".
+    /// Primary action text, such as "Pay".
     public let primaryActionTitle: String?
+
+    /// Secondary action. To remove secondary action use `nil`, this is default behaviour.
+    public let secondaryAction: SecondaryAction?
 
     /// Boolean value that indicates whether capture success screen should be skipped. Default value is `false`.
     public let skipSuccessScreen: Bool
@@ -35,6 +44,7 @@ public struct PONativeAlternativePaymentMethodConfiguration {
         title: String? = nil,
         successMessage: String? = nil,
         primaryActionTitle: String? = nil,
+        secondaryAction: SecondaryAction? = nil,
         skipSuccessScreen: Bool = false,
         waitsPaymentConfirmation: Bool = true,
         paymentConfirmationTimeout: TimeInterval = 180
@@ -42,6 +52,7 @@ public struct PONativeAlternativePaymentMethodConfiguration {
         self.title = title
         self.successMessage = successMessage
         self.primaryActionTitle = primaryActionTitle
+        self.secondaryAction = secondaryAction
         self.skipSuccessScreen = skipSuccessScreen
         self.waitsPaymentConfirmation = waitsPaymentConfirmation
         self.paymentConfirmationTimeout = paymentConfirmationTimeout

@@ -15,6 +15,9 @@ final class AlternativePaymentMethodsRouter: RouterType {
     func trigger(route: AlternativePaymentMethodsRoute) -> Bool {
         switch route {
         case let .nativeAlternativePayment(route):
+            let configuration = PONativeAlternativePaymentMethodConfiguration(
+                secondaryAction: .cancel()
+            )
             let viewController = PONativeAlternativePaymentMethodViewControllerBuilder
                 .with(invoiceId: route.invoiceId, gatewayConfigurationId: route.gatewayConfigurationId)
                 .with { [weak self] result in
@@ -22,6 +25,7 @@ final class AlternativePaymentMethodsRouter: RouterType {
                         route.completion(result)
                     }
                 }
+                .with(configuration: configuration)
                 .build()
             let navigationController = createNavigationController(rootViewController: viewController)
             self.viewController?.present(navigationController, animated: true)

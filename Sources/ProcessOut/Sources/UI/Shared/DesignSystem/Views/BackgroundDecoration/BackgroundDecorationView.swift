@@ -21,9 +21,7 @@ final class BackgroundDecorationView: UIView {
     }
 
     func configure(isExpanded: Bool, isSuccess: Bool, animated: Bool) {
-        UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            CATransaction.begin()
-            CATransaction.setDisableActions(!animated)
+        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             let baseHeight = isExpanded ? bounds.height : Constants.baseHeight
             let spacing: CGFloat = isSuccess ? Constants.successSpacing : Constants.normalSpacing
             innerShapeView.baseHeight = baseHeight
@@ -37,7 +35,6 @@ final class BackgroundDecorationView: UIView {
                 innerShapeView.fillColor = primaryColor
                 outerShapeView.fillColor = secondaryColor
             }
-            CATransaction.commit()
         }
     }
 

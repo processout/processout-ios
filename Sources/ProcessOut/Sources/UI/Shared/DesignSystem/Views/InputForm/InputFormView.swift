@@ -36,9 +36,7 @@ final class InputFormView: UIView {
     }
 
     func configure(viewModel: ViewModel, animated: Bool) {
-        UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            CATransaction.begin()
-            CATransaction.setDisableActions(!animated)
+        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             let style = viewModel.isInError ? style.error : style.normal
             if let description = viewModel.description, !description.isEmpty {
                 descriptionLabel.attributedText = AttributedStringBuilder()
@@ -67,7 +65,6 @@ final class InputFormView: UIView {
                 .string(viewModel.title)
                 .build()
             textField.configure(style: style.field, animated: animated)
-            CATransaction.commit()
         }
     }
 

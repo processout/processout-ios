@@ -21,6 +21,9 @@ struct NativeAlternativePaymentMethodStartedViewStyle {
     /// Style for primary button.
     let primaryButton: POButtonStyle
 
+    /// Style for secondary button.
+    let secondaryButton: POButtonStyle
+
     /// Style that is applied to buttons container.
     let buttonsContainerShadow: POShadowStyle
 

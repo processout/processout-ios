@@ -99,6 +99,7 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             input: customStyle?.input ?? .default,
             codeInput: customStyle?.codeInput ?? .code,
             primaryButton: customStyle?.primaryButton ?? .primary,
+            secondaryButton: customStyle?.secondaryButton ?? .secondary,
             buttonsContainerShadow: customStyle?.buttonsContainerShadow ?? .`default`,
             backgroundColor: customStyle?.backgroundColor ?? Asset.Colors.Background.primary.color
         )
@@ -147,14 +148,11 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
         backgroundDecorationView.configure(
             isExpanded: false, isSuccess: false, animated: backgroundDecorationView.alpha > 0.01 && animated
         )
-        UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            CATransaction.begin()
-            CATransaction.setDisableActions(!animated)
+        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             backgroundDecorationView.alpha = 1
             activityIndicatorView.alpha = 1
             startedView.alpha = 0
             submittedView.alpha = 0
-            CATransaction.commit()
         }
     }
 
@@ -163,14 +161,11 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
         backgroundDecorationView.configure(
             isExpanded: true, isSuccess: false, animated: backgroundDecorationView.alpha > 0.01 && animated
         )
-        UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            CATransaction.begin()
-            CATransaction.setDisableActions(!animated)
+        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             backgroundDecorationView.alpha = 0
             activityIndicatorView.alpha = 0
             startedView.alpha = 1
             submittedView.alpha = 0
-            CATransaction.commit()
         }
     }
 
@@ -183,14 +178,11 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             isSuccess: submittedState.isCaptured,
             animated: backgroundDecorationView.alpha > 0.01 && animated
         )
-        UIView.animate(withDuration: Constants.animationDuration) { [self] in
-            CATransaction.begin()
-            CATransaction.setDisableActions(!animated)
+        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             backgroundDecorationView.alpha = 1
             activityIndicatorView.alpha = 0
             startedView.alpha = 0
             submittedView.alpha = 1
-            CATransaction.commit()
         }
     }
 

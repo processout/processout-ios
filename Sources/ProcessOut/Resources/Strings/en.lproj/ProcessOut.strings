@@ -13,3 +13,4 @@
 "native-alternative-payment.phone.placeholder" = "Your phone number...";
 "native-alternative-payment.submit-button.title" = "Pay %@";
 "native-alternative-payment.submit-button.default-title" = "Pay";
+"native-alternative-payment.cancel-button.title" = "Cancel";

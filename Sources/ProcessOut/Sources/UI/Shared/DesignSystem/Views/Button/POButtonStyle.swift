@@ -56,13 +56,36 @@ extension POButtonStyle {
             shadow: .clear,
             backgroundColor: Asset.Colors.Button.disabled.color
         ),
-        activityIndicator: activityIndicatorStyle
+        activityIndicator: activityIndicatorStyle(color: Asset.Colors.Button.Text.primary.color)
     )
 
-    private static var activityIndicatorStyle: POActivityIndicatorStyle {
+    /// Default style for secondary button.
+    public static let secondary = POButtonStyle(
+        normal: .init(
+            title: .init(color: Asset.Colors.New.Text.secondary.color, typography: .bodyDefault2),
+            border: .init(radius: 8, width: 1, color: Asset.Colors.New.Border.default.color),
+            shadow: .clear,
+            backgroundColor: Asset.Colors.New.Action.Secondary.default.color
+        ),
+        highlighted: .init(
+            title: .init(color: Asset.Colors.New.Text.secondary.color, typography: .bodyDefault2),
+            border: .init(radius: 8, width: 1, color: Asset.Colors.New.Border.default.color),
+            shadow: .clear,
+            backgroundColor: Asset.Colors.New.Action.Secondary.pressed.color
+        ),
+        disabled: .init(
+            title: .init(color: Asset.Colors.New.Text.disabled.color, typography: .bodyDefault2),
+            border: .init(radius: 8, width: 1, color: Asset.Colors.New.Action.Border.disabled.color),
+            shadow: .clear,
+            backgroundColor: .clear
+        ),
+        activityIndicator: activityIndicatorStyle(color: Asset.Colors.New.Text.secondary.color)
+    )
+
+    private static func activityIndicatorStyle(color: UIColor) -> POActivityIndicatorStyle {
         if #available(iOS 13.0, *) {
-            return .system(.medium, color: Asset.Colors.Button.Text.primary.color)
+            return .system(.medium, color: color)
         }
-        return .system(.white, color: Asset.Colors.Button.Text.primary.color)
+        return .system(.white, color: color)
     }
 }
