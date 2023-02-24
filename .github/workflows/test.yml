@@ -14,5 +14,7 @@ jobs:
         uses: ./.github/actions/bootstrap-project
         with:
           example-constants: ${{ secrets.EXAMPLE_PROJECT_CONSTANTS }}
-      - name: Run Tests
-        run: bundle exec fastlane tests && bundle exec fastlane example_tests
+      - name: Run Unit Tests
+        run: bundle exec fastlane tests
+      - name: Run Example Tests
+        run: bundle exec fastlane example_tests
