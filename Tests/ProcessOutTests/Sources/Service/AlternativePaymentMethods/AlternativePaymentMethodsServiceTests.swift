@@ -14,7 +14,7 @@ final class AlternativePaymentMethodsServiceTests: XCTestCase {
     override func setUp() {
         super.setUp()
         // swiftlint:disable:next force_unwrapping
-        let baseUrl = URL(string: "https://checkout.processout.ninja")!
+        let baseUrl = URL(string: "https://example.com")!
         let logger = POLogger(destinations: [])
         sut = AlternativePaymentMethodsService(projectId: "proj_test", baseUrl: baseUrl, logger: logger)
     }
@@ -32,8 +32,8 @@ final class AlternativePaymentMethodsServiceTests: XCTestCase {
         // Then
         let expectedUrls = [
             // swiftlint:disable line_length
-            "https://checkout.processout.ninja/proj_test/iv_test/redirect/gway_conf_test?additional_data%5Bfield1%5D=test&additional_data%5Bfield2%5D=test2",
-            "https://checkout.processout.ninja/proj_test/iv_test/redirect/gway_conf_test?additional_data%5Bfield2%5D=test2&additional_data%5Bfield1%5D=test"
+            "https://example.com/proj_test/iv_test/redirect/gway_conf_test?additional_data%5Bfield1%5D=test&additional_data%5Bfield2%5D=test2",
+            "https://example.com/proj_test/iv_test/redirect/gway_conf_test?additional_data%5Bfield2%5D=test2&additional_data%5Bfield1%5D=test"
             // swiftlint:enable line_length
         ]
         let isUrlExpected = expectedUrls.contains { $0 == url.absoluteString }
@@ -52,7 +52,7 @@ final class AlternativePaymentMethodsServiceTests: XCTestCase {
         let url = sut.alternativePaymentMethodUrl(request: request)
 
         // Then
-        let expectedUrl = "https://checkout.processout.ninja/proj_test/cust_test/tok_test/redirect/gway_conf_test"
+        let expectedUrl = "https://example.com/proj_test/cust_test/tok_test/redirect/gway_conf_test"
         XCTAssertEqual(url.absoluteString, expectedUrl)
     }
 

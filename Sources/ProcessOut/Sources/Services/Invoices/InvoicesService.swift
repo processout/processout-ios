@@ -62,51 +62,33 @@ final class InvoicesService: POInvoicesServiceType {
     func captureNativeAlternativePayment(
         request: PONativeAlternativePaymentCaptureRequest, completion: @escaping (Result<Void, Failure>) -> Void
     ) -> POCancellableType {
-        let cancellable = GroupCancellable()
         let captureTimeout = min(request.timeout ?? Constants.maximumCaptureTimeout, Constants.maximumCaptureTimeout)
-        let timer = Timer.scheduledTimer(withTimeInterval: captureTimeout, repeats: false) { _ in
-            let failure = Failure(code: .timeout(.mobile))
-            completion(.failure(failure))
-        }
         let request = NativeAlternativePaymentCaptureRequest(
             invoiceId: request.invoiceId, source: request.gatewayConfigurationId
         )
-        var repositoryCompletion: ((Result<PONativeAlternativePaymentMethodResponse, POFailure>) -> Void)! // swiftlint:disable:this implicitly_unwrapped_optional line_length
-        repositoryCompletion = { [repository] result in
-            guard timer.isValid else {
-                return
+        let pollingOperation = PollingOperation(
+            timeout: captureTimeout,
+            executeDelay: Constants.captureRetryDelay,
+            execute: { [repository] completion in
+                repository.captureNativeAlternativePayment(request: request, completion: completion)
+            },
+            shouldContinue: { result in
+                switch result {
+                case let .success(response):
+                    return response.nativeApm.state != .captured
+                case let .failure(failure):
+                    let retriableCodes: [POFailure.Code] = [
+                        .networkUnreachable, .timeout(.mobile), .internal(.mobile), .unknown(.mobile)
+                    ]
+                    return retriableCodes.contains(failure.code)
+                }
+            },
+            completion: { result in
+                completion(result.map { _ in () })
             }
-            switch result {
-            case let .success(response) where response.nativeApm.state == .captured:
-                timer.invalidate()
-                completion(.success(()))
-            case let .failure(failrue) where failrue.code == .cancelled:
-                timer.invalidate()
-                completion(.failure(failrue))
-            case .success:
-                cancellable.add(
-                    repository.captureNativeAlternativePayment(request: request, completion: repositoryCompletion)
-                )
-            case .failure:
-                let timer = Timer.scheduledTimer(
-                    withTimeInterval: Constants.captureRetryDelay,
-                    repeats: false,
-                    block: { [repository] _ in
-                        cancellable.add(
-                            repository.captureNativeAlternativePayment(
-                                request: request, completion: repositoryCompletion
-                            )
-                        )
-                    }
-                )
-                cancellable.add(timer)
-            }
-        }
-        cancellable.add(
-            repository.captureNativeAlternativePayment(request: request, completion: repositoryCompletion)
         )
-        cancellable.add(timer)
-        return cancellable
+        pollingOperation.start()
+        return pollingOperation
     }
 
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void) {
