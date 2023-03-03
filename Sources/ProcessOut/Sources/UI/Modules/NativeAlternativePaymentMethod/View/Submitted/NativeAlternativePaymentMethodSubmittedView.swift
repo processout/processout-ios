@@ -56,8 +56,8 @@ final class NativeAlternativePaymentMethodSubmittedView: UIView {
             state.isCaptured ? Constants.descriptionBottomSpacing : Constants.descriptionBottomSmallSpacing,
             after: descriptionLabel
         )
-        if animated {
-            UIView.animate(withDuration: Constants.animationDuration) { self.addTransitionAnimation() }
+        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
+            containerView.addTransitionAnimation()
         }
     }
 

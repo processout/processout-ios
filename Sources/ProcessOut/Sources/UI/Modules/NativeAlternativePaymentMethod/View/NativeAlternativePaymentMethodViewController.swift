@@ -194,7 +194,11 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
             object: nil,
             queue: nil,
             using: { [weak self] notification in
-                self?.keyboardWillChangeFrame(notification: notification)
+                // Keyboard updates are not always animated so changes are wrapped in default animation block
+                // for smoother UI.
+                UIView.animate(withDuration: Constants.animationDuration) {
+                    self?.keyboardWillChangeFrame(notification: notification)
+                }
             }
         )
         let didChangeContentSizeCategoryObserver = NotificationCenter.default.addObserver(

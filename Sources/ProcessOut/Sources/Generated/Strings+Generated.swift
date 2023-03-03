@@ -25,19 +25,19 @@ internal enum Strings {
       internal static var placeholder: String { return Strings.tr("ProcessOut", "native-alternative-payment.email.placeholder") }
     }
     internal enum Error {
-      /// Email is invalid.
+      /// Email is not valid
       internal static var invalidEmail: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-email") }
       /// Plural format key: "%#@length@"
       internal static func invalidLength(_ p1: Int) -> String {
         return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-length", p1)
       }
-      /// Number is invalid.
+      /// Number is not valid
       internal static var invalidNumber: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-number") }
-      /// Phone number is invalid.
+      /// Phone number is not valid
       internal static var invalidPhone: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-phone") }
-      /// Value is invalid.
+      /// Value is not valid
       internal static var invalidText: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-text") }
-      /// Parameter is required.
+      /// Parameter is required
       internal static var requiredParameter: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.required-parameter") }
     }
     internal enum Phone {

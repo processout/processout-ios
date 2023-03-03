@@ -13,7 +13,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Invalid length, expected %d characters</string>
+			<string>Invalid length, expected %d character</string>
 			<key>other</key>
 			<string>Invalid length, expected %d characters</string>
 		</dict>
