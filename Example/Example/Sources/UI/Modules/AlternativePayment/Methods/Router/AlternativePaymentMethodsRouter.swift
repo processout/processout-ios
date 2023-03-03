@@ -27,8 +27,8 @@ final class AlternativePaymentMethodsRouter: RouterType {
                 }
                 .with(configuration: configuration)
                 .build()
-            let navigationController = createNavigationController(rootViewController: viewController)
-            self.viewController?.present(navigationController, animated: true)
+            viewController.additionalSafeAreaInsets.top = 12
+            self.viewController?.present(viewController, animated: true)
         case let .alternativePayment(request):
             let viewController = POAlternativePaymentMethodViewControllerBuilder
                 .with(request: request)

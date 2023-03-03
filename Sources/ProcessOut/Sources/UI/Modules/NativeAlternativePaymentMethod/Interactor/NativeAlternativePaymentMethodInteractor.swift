@@ -5,32 +5,18 @@
 //  Created by Andrii Vysotskyi on 19.10.2022.
 //
 
+// swiftlint:disable file_length type_body_length
+
 import Foundation
 import UIKit
 
-// swiftlint:disable:next type_body_length
 final class NativeAlternativePaymentMethodInteractor:
     BaseInteractor<NativeAlternativePaymentMethodInteractorState>, NativeAlternativePaymentMethodInteractorType {
-
-    struct Configuration {
-
-        /// Gateway configuration id.
-        let gatewayConfigurationId: String
-
-        /// Invoice identifier.
-        let invoiceId: String
-
-        /// Indicates whether interactor should wait for payment confirmation or not.
-        let waitsPaymentConfirmation: Bool
-
-        /// Maximum amount of time to wait for payment confirmation if it is enabled.
-        let paymentConfirmationTimeout: TimeInterval
-    }
 
     init(
         invoicesService: POInvoicesServiceType,
         imagesRepository: POImagesRepositoryType,
-        configuration: Configuration,
+        configuration: NativeAlternativePaymentMethodInteractorConfiguration,
         logger: POLogger,
         delegate: PONativeAlternativePaymentMethodDelegate?
     ) {
@@ -73,28 +59,35 @@ final class NativeAlternativePaymentMethodInteractor:
         }
     }
 
-    func updateValue(_ value: String?, for key: String) -> Bool {
-        guard case let .started(startedState) = state, startedState.values[key]?.value != value else {
-            return false
+    func formatted(value: String, type: PONativeAlternativePaymentMethodParameter.ParameterType) -> String {
+        switch type {
+        case .phone:
+            return phoneNumberFormatter.formattedNumber(from: value)
+        default:
+            return value
+        }
+    }
+
+    func updateValue(_ value: String?, for key: String) {
+        guard case let .started(startedState) = state,
+              let parameter = startedState.parameters.first(where: { $0.key == key }) else {
+            return
+        }
+        let formattedValue = formatted(value: value ?? "", type: parameter.type)
+        guard startedState.values[key]?.value != formattedValue else {
+            logger.debug("Ignored the same value for key: \(key)")
+            return
         }
         var updatedValues = startedState.values
-        updatedValues[key] = .init(value: value, recentErrorMessage: nil)
-        let updatedStartedState = State.Started(
-            gatewayDisplayName: startedState.gatewayDisplayName,
-            gatewayLogo: startedState.gatewayLogo,
-            customerActionImageUrl: startedState.customerActionImageUrl,
-            customerActionMessage: startedState.customerActionMessage,
-            amount: startedState.amount,
-            currencyCode: startedState.currencyCode,
+        updatedValues[key] = .init(value: formattedValue, recentErrorMessage: nil)
+        let updatedStartedState = startedState.replacing(
             parameters: startedState.parameters,
             values: updatedValues,
-            recentFailure: nil,
-            isSubmitAllowed: isSubmitAllowed(parameters: startedState.parameters, values: updatedValues)
+            isSubmitAllowed: isSubmitAllowed(values: updatedValues)
         )
         state = .started(updatedStartedState)
         send(event: .parametersChanged)
         logger.debug("Did update parameter value '\(value ?? "nil")' for '\(key)' key")
-        return true
     }
 
     func submit() {
@@ -103,6 +96,10 @@ final class NativeAlternativePaymentMethodInteractor:
         }
         logger.info("Will submit '\(configuration.invoiceId)' payment parameters")
         send(event: .willSubmitParameters)
+        if let failure = validate(values: startedState.values, for: startedState.parameters) {
+            restoreStartedStateAfterSubmissionFailureIfPossible(failure)
+            return
+        }
         let request = PONativeAlternativePaymentMethodRequest(
             invoiceId: configuration.invoiceId,
             gatewayConfigurationId: configuration.gatewayConfigurationId,
@@ -150,15 +147,21 @@ final class NativeAlternativePaymentMethodInteractor:
 
     private enum Constants {
         static let emailRegex = #"^\S+@\S+$"#
+        static let phoneRegex = #"^\+?\d{1,3}\d*$"#
     }
 
     // MARK: - Private Properties
 
     private let invoicesService: POInvoicesServiceType
     private let imagesRepository: POImagesRepositoryType
-    private let configuration: Configuration
+    private let configuration: NativeAlternativePaymentMethodInteractorConfiguration
     private let logger: POLogger
     private weak var delegate: PONativeAlternativePaymentMethodDelegate?
+
+    private lazy var phoneNumberFormatter: PhoneNumberFormatter = {
+        PhoneNumberFormatter()
+    }()
+
     private var captureCancellable: POCancellableType?
 
     // MARK: - State Management
@@ -193,8 +196,7 @@ final class NativeAlternativePaymentMethodInteractor:
             currencyCode: details.invoice.currencyCode,
             parameters: details.parameters,
             values: defaultValues,
-            recentFailure: nil,
-            isSubmitAllowed: isSubmitAllowed(parameters: details.parameters, values: defaultValues)
+            isSubmitAllowed: isSubmitAllowed(values: defaultValues)
         )
         state = .started(startedState)
         send(event: .didStart)
@@ -245,14 +247,23 @@ final class NativeAlternativePaymentMethodInteractor:
     }
 
     private func setCapturedStateUnchecked(gatewayLogo: UIImage?) {
-        state = .captured(.init(gatewayLogo: gatewayLogo))
-        send(event: .didCompletePayment)
         logger.info("Did receive invoice '\(configuration.invoiceId)' capture confirmation")
+        if configuration.waitsPaymentConfirmation {
+            state = .captured(.init(gatewayLogo: gatewayLogo))
+            send(event: .didCompletePayment)
+        } else {
+            logger.info("Should't wait for confirmation, so setting submitted state instead of captured.")
+            state = .submitted
+        }
     }
 
     private func restoreStartedStateAfterSubmissionFailureIfPossible(_ failure: POFailure) {
         logger.error("Did fail to submit parameters: \(failure)")
-        guard case let .submitting(startedState) = state else {
+        let startedState: State.Started
+        switch state {
+        case let .submitting(state), let .started(state):
+            startedState = state
+        default:
             return
         }
         guard let invalidFields = failure.invalidFields, !invalidFields.isEmpty else {
@@ -265,17 +276,8 @@ final class NativeAlternativePaymentMethodInteractor:
             let errorMessage = failure.invalidFields?.first { $0.name == key }?.message
             updatedValues[key] = State.ParameterValue(value: value.value, recentErrorMessage: errorMessage)
         }
-        let updatedStartedState = State.Started(
-            gatewayDisplayName: startedState.gatewayDisplayName,
-            gatewayLogo: startedState.gatewayLogo,
-            customerActionImageUrl: startedState.customerActionImageUrl,
-            customerActionMessage: startedState.customerActionMessage,
-            amount: startedState.amount,
-            currencyCode: startedState.currencyCode,
-            parameters: startedState.parameters,
-            values: updatedValues,
-            recentFailure: failure,
-            isSubmitAllowed: false
+        let updatedStartedState = startedState.replacing(
+            parameters: startedState.parameters, values: updatedValues, isSubmitAllowed: false
         )
         self.state = .started(updatedStartedState)
         send(event: .didFailToSubmitParameters(failure: failure))
@@ -289,17 +291,8 @@ final class NativeAlternativePaymentMethodInteractor:
             return
         }
         let parameters = nativeApm.parameterDefinitions ?? []
-        let updatedStartedState = State.Started(
-            gatewayDisplayName: startedState.gatewayDisplayName,
-            gatewayLogo: startedState.gatewayLogo,
-            customerActionImageUrl: startedState.customerActionImageUrl,
-            customerActionMessage: startedState.customerActionMessage,
-            amount: startedState.amount,
-            currencyCode: startedState.currencyCode,
-            parameters: parameters,
-            values: defaultValues,
-            recentFailure: nil,
-            isSubmitAllowed: isSubmitAllowed(parameters: parameters, values: defaultValues)
+        let updatedStartedState = startedState.replacing(
+            parameters: parameters, values: defaultValues, isSubmitAllowed: isSubmitAllowed(values: defaultValues)
         )
         state = .started(updatedStartedState)
         send(event: .didSubmitParameters(additionalParametersExpected: true))
@@ -313,34 +306,8 @@ final class NativeAlternativePaymentMethodInteractor:
 
     // MARK: - Utils
 
-    private func isValid(
-        value parameterValue: State.ParameterValue?, for parameter: PONativeAlternativePaymentMethodParameter
-    ) -> Bool {
-        guard let parameterValue, let value = parameterValue.value, !value.isEmpty else {
-            return !parameter.required
-        }
-        if parameterValue.recentErrorMessage != nil {
-            return false
-        }
-        if let length = parameter.length, value.count != length {
-            return false
-        }
-        switch parameter.type {
-        case .numeric:
-            return CharacterSet(charactersIn: value).isSubset(of: .decimalDigits)
-        case .text:
-            return CharacterSet(charactersIn: value).isSubset(of: .alphanumerics)
-        case .email:
-            return value.range(of: Constants.emailRegex, options: .regularExpression) != nil
-        case .phone:
-            return true
-        }
-    }
-
-    private func isSubmitAllowed(
-        parameters: [PONativeAlternativePaymentMethodParameter], values: [String: State.ParameterValue]
-    ) -> Bool {
-        parameters.map { isValid(value: values[$0.key], for: $0) }.allSatisfy { $0 }
+    private func isSubmitAllowed(values: [String: State.ParameterValue]) -> Bool {
+        values.values.allSatisfy { $0.recentErrorMessage == nil }
     }
 
     private func send(event: PONativeAlternativePaymentMethodEvent) {
@@ -352,26 +319,97 @@ final class NativeAlternativePaymentMethodInteractor:
         for parameters: [PONativeAlternativePaymentMethodParameter]?,
         completion: @escaping ([String: State.ParameterValue]) -> Void
     ) {
-        if let delegate, let parameters, !parameters.isEmpty {
-            delegate.nativeAlternativePaymentMethodDefaultValues(for: parameters) { values in
+        guard let parameters, !parameters.isEmpty else {
+            completion([:])
+            return
+        }
+        if let delegate {
+            delegate.nativeAlternativePaymentMethodDefaultValues(for: parameters) { [weak self] values in
                 assert(Thread.isMainThread, "Completion must be called on main thread.")
                 var postprocessedValues: [String: State.ParameterValue] = [:]
                 parameters.forEach { parameter in
                     guard let value = values[parameter.key] else {
                         return
                     }
-                    let postprocessedValue: String
-                    if let length = parameter.length {
-                        postprocessedValue = String(value.prefix(length))
-                    } else {
-                        postprocessedValue = value
-                    }
-                    postprocessedValues[parameter.key] = .init(value: postprocessedValue, recentErrorMessage: nil)
+                    let trimmedValue = parameter.length
+                        .map(value.prefix)
+                        .map(String.init) ?? value
+                    let formattedValue = self?.formatted(value: trimmedValue, type: parameter.type) ?? trimmedValue
+                    postprocessedValues[parameter.key] = .init(value: formattedValue, recentErrorMessage: nil)
                 }
                 completion(postprocessedValues)
             }
         } else {
-            completion([:])
+            var defaultValues: [String: State.ParameterValue] = [:]
+            parameters.forEach { parameter in
+                let formattedValue = formatted(value: "", type: parameter.type)
+                defaultValues[parameter.key] = .init(value: formattedValue, recentErrorMessage: nil)
+            }
+            completion(defaultValues)
         }
+    }
+
+    private func validate(
+        values: [String: State.ParameterValue], for parameters: [PONativeAlternativePaymentMethodParameter]
+    ) -> POFailure? {
+        let invalidFields = parameters.compactMap { parameter in
+            validate(value: values[parameter.key]?.value ?? "", for: parameter)
+        }
+        guard !invalidFields.isEmpty else {
+            return nil
+        }
+        return POFailure(code: .validation(.general), invalidFields: invalidFields)
+    }
+
+    private func validate(
+        value: String, for parameter: PONativeAlternativePaymentMethodParameter
+    ) -> POFailure.InvalidField? {
+        let message: String?
+        if value.isEmpty {
+            if parameter.required {
+                message = Strings.NativeAlternativePayment.Error.requiredParameter
+            } else {
+                message = nil
+            }
+        } else if let length = parameter.length, value.count != length {
+            message = Strings.NativeAlternativePayment.Error.invalidLength(length)
+        } else {
+            switch parameter.type {
+            case .numeric where !CharacterSet(charactersIn: value).isSubset(of: .decimalDigits):
+                message = Strings.NativeAlternativePayment.Error.invalidNumber
+            case .text where !CharacterSet(charactersIn: value).isSubset(of: .alphanumerics):
+                message = Strings.NativeAlternativePayment.Error.invalidText
+            case .email where value.range(of: Constants.emailRegex, options: .regularExpression) == nil:
+                message = Strings.NativeAlternativePayment.Error.invalidEmail
+            case .phone where value.range(of: Constants.phoneRegex, options: .regularExpression) == nil:
+                message = Strings.NativeAlternativePayment.Error.invalidPhone
+            default:
+                message = nil
+            }
+        }
+        return message.map { POFailure.InvalidField(name: parameter.key, message: $0) }
+    }
+}
+
+// swiftlint:disable:next no_extension_access_modifier
+private extension NativeAlternativePaymentMethodInteractorState.Started {
+
+    func replacing(
+        parameters: [PONativeAlternativePaymentMethodParameter],
+        values: [String: NativeAlternativePaymentMethodInteractorState.ParameterValue],
+        isSubmitAllowed: Bool
+    ) -> Self {
+        let updatedState = Self(
+            gatewayDisplayName: gatewayDisplayName,
+            gatewayLogo: gatewayLogo,
+            customerActionImageUrl: customerActionImageUrl,
+            customerActionMessage: customerActionMessage,
+            amount: amount,
+            currencyCode: currencyCode,
+            parameters: parameters,
+            values: values,
+            isSubmitAllowed: isSubmitAllowed
+        )
+        return updatedState
     }
 }

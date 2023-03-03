@@ -94,6 +94,9 @@ final class NativeAlternativePaymentMethodViewModel:
                 errorMessage: value?.recentErrorMessage,
                 update: { [weak self] newValue in
                     _ = self?.interactor.updateValue(newValue, for: parameter.key)
+                },
+                formatted: { [weak self] value in
+                    self?.interactor.formatted(value: value, type: parameter.type) ?? ""
                 }
             )
             return viewModel

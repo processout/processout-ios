@@ -21,11 +21,6 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        configureButtonsContainerShadow()
-    }
-
     func configure(with state: NativeAlternativePaymentMethodViewModelState.Started, animated: Bool) {
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             titleLabel.attributedText = AttributedStringBuilder()
@@ -194,9 +189,7 @@ final class NativeAlternativePaymentMethodStartedView: UIView {
     }
 
     private func configureButtonsContainerShadow() {
-        let minimumContentOffset = scrollView.contentSize.height
-            - scrollView.bounds.size.height
-            + scrollView.adjustedContentInset.bottom
+        let minimumContentOffset = scrollView.contentSize.height - scrollView.bounds.size.height
         let threshold = Constants.buttonsContainerShadowVisibilityThreshold
         let shadowOpacity = max(min(1, (minimumContentOffset - scrollView.contentOffset.y) / threshold), 0)
         buttonsContainerView.apply(style: style.buttonsContainerShadow, shadowOpacity: shadowOpacity)
@@ -238,10 +231,6 @@ extension NativeAlternativePaymentMethodStartedView: NativeAlternativePaymentMet
 extension NativeAlternativePaymentMethodStartedView: UIScrollViewDelegate {
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        configureButtonsContainerShadow()
-    }
-
-    func scrollViewDidChangeAdjustedContentInset(_ scrollView: UIScrollView) {
         configureButtonsContainerShadow()
     }
 }

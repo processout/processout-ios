@@ -12,9 +12,10 @@ protocol NativeAlternativePaymentMethodInteractorType: InteractorType
     where State == NativeAlternativePaymentMethodInteractorState {
 
     /// Updates value for given key.
-    /// - Returns: `true` if value was updated, `false` otherwise.
-    @discardableResult
-    func updateValue(_ value: String?, for key: String) -> Bool
+    func updateValue(_ value: String?, for key: String)
+
+    /// Formats value of given type.
+    func formatted(value: String, type: PONativeAlternativePaymentMethodParameter.ParameterType) -> String
 
     /// Submits parameters.
     func submit()
@@ -59,9 +60,6 @@ enum NativeAlternativePaymentMethodInteractorState {
 
         /// Parameter values.
         let values: [String: ParameterValue]
-
-        /// The most recent error message.
-        let recentFailure: POFailure?
 
         /// Boolean value indicating whether submit it currently allowed.
         let isSubmitAllowed: Bool

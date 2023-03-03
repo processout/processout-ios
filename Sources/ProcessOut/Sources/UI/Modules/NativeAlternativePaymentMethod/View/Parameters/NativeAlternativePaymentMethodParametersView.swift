@@ -232,4 +232,23 @@ extension NativeAlternativePaymentMethodParametersView: UITextFieldDelegate {
         advanceFirstResponderToNextInput(control: textField)
         return true
     }
+
+    func textField(
+        _ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String
+    ) -> Bool {
+        let text = textField.text ?? ""
+        guard let index = inputFormViews.map(\.textField.control).firstIndex(of: textField),
+              let parameter = currentParameters?[index],
+              let replacementRange = Range(range, in: text) else {
+            return true
+        }
+        let updatedText = text.replacingCharacters(in: replacementRange, with: string)
+        let formattedText = parameter.formatted(updatedText)
+        if formattedText != updatedText {
+            textField.text = formattedText
+            textField.sendActions(for: .editingChanged)
+            return false
+        }
+        return true
+    }
 }

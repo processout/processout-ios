@@ -78,7 +78,7 @@ final class InvoicesService: POInvoicesServiceType {
                     return response.nativeApm.state != .captured
                 case let .failure(failure):
                     let retriableCodes: [POFailure.Code] = [
-                        .networkUnreachable, .timeout(.mobile), .internal(.mobile), .unknown(.mobile)
+                        .networkUnreachable, .timeout(.mobile), .internal(.mobile)
                     ]
                     return retriableCodes.contains(failure.code)
                 }

@@ -67,6 +67,12 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
         return didResignResponder
     }
 
+    override func paste(_ sender: Any?) {
+        if let string = UIPasteboard.general.string {
+            insertText(string)
+        }
+    }
+
     // MARK: - UITextInput
 
     var inputDelegate: UITextInputDelegate?
@@ -371,6 +377,7 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
         ]
         NSLayoutConstraint.activate(constraints)
         createGroupViews()
+        addContextMenuGesture()
         isAccessibilityElement = true
     }
 
@@ -462,5 +469,23 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
             groupViews[offset].configure(viewModel: viewModel, animated: animated)
         }
         accessibilityValue = text
+    }
+
+    // MARK: - Context Menu
+
+    private func addContextMenuGesture() {
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(didRecognizeLongPressGesture))
+        contentView.addGestureRecognizer(gesture)
+    }
+
+    @objc
+    private func didRecognizeLongPressGesture() {
+        let controller = UIMenuController.shared
+        if #available(iOS 13.0, *) {
+            controller.showMenu(from: self, rect: contentView.frame)
+        } else {
+            controller.setTargetRect(contentView.frame, in: self)
+            controller.setMenuVisible(true, animated: true)
+        }
     }
 }

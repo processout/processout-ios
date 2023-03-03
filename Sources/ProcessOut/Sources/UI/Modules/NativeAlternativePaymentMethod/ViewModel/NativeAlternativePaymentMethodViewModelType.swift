@@ -56,6 +56,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Updates parameter value.
         let update: (_ value: String) -> Void
+
+        /// Returns formatted version of value.
+        let formatted: (_ value: String) -> String
     }
 
     struct Started {

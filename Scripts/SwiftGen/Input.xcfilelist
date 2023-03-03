@@ -1,4 +1,5 @@
 $PROJECT_DIR/swiftgen.yml
 $PROJECT_DIR/Sources/$TARGET_NAME/Resources/Strings/en.lproj/ProcessOut.strings
+$PROJECT_DIR/Sources/$TARGET_NAME/Resources/Strings/en.lproj/ProcessOut.stringsdict
 $PROJECT_DIR/Sources/$TARGET_NAME/Resources/Images.xcassets
 $PROJECT_DIR/Sources/$TARGET_NAME/Resources/Colors.xcassets

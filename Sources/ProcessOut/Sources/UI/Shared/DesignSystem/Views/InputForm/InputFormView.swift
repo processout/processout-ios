@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class InputFormView: UIView {
+final class InputFormView: UIStackView {
 
     struct ViewModel {
 
@@ -31,7 +31,7 @@ final class InputFormView: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -50,12 +50,10 @@ final class InputFormView: UIView {
                     descriptionLabel.addTransitionAnimation()
                 }
                 descriptionLabel.alpha = 1
-                textFieldBottomConstraint.isActive = false
-                descriptionLabelBottomConstraint.isActive = true
+                descriptionLabel.setHidden(false)
             } else {
                 descriptionLabel.alpha = 0
-                descriptionLabelBottomConstraint.isActive = false
-                textFieldBottomConstraint.isActive = true
+                descriptionLabel.setHidden(true)
             }
             titleLabel.attributedText = AttributedStringBuilder()
                 .typography(style.title.typography)
@@ -102,28 +100,14 @@ final class InputFormView: UIView {
         return label
     }()
 
-    private lazy var textFieldBottomConstraint = textField.bottomAnchor.constraint(equalTo: bottomAnchor)
-    private lazy var descriptionLabelBottomConstraint = descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
-
     // MARK: - Private Methods
 
     private func commonInit() {
         translatesAutoresizingMaskIntoConstraints = false
-        addSubview(titleLabel)
-        addSubview(textField)
-        addSubview(descriptionLabel)
-        let constraints = [
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
-            titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            titleLabel.topAnchor.constraint(equalTo: topAnchor),
-            textField.leadingAnchor.constraint(equalTo: leadingAnchor),
-            textField.centerXAnchor.constraint(equalTo: centerXAnchor),
-            textField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: Constants.verticalSpacing),
-            descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
-            descriptionLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            descriptionLabel.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: Constants.verticalSpacing),
-            descriptionLabelBottomConstraint
-        ]
-        NSLayoutConstraint.activate(constraints)
+        addArrangedSubview(titleLabel)
+        addArrangedSubview(textField)
+        addArrangedSubview(descriptionLabel)
+        spacing = Constants.verticalSpacing
+        axis = .vertical
     }
 }
