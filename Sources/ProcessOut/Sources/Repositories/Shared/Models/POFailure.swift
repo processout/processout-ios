@@ -31,6 +31,7 @@ public struct POFailure: Error {
 
     public enum ValidationCode: String {
         case general                   = "request.validation.error"
+        case gateway                   = "gateway.validation-error"
         case invalidAddress            = "request.validation.invalid-address"
         case invalidAmount             = "request.validation.invalid-amount"
         case invalidChallengeIndicator = "request.validation.invalid-challenge-indicator"
@@ -126,10 +127,13 @@ public struct POFailure: Error {
 
     public enum GenericCode: String {
         case cardExceededLimits                  = "card.exceeded-limits"
+        case cardIssuerDown                      = "card.issuer-down"
         case cardIssuerFailed                    = "card.issuer-failed"
         case cardNoMoney                         = "card.no-money"
         case cardNotAuthorized                   = "card.not-authorized"
         case gatewayDeclined                     = "gateway.declined"
+        case gatewayUnknownError                 = "gateway.unknown-error"
+        case mobile                              = "processout-mobile.generic.error"
         case requestBadFormat                    = "request.bad-format"
         case requestCardAlreadyUsed              = "request.source.card-already-used"
         case requestGatewayNotAvailable          = "request.gateway.not-available"
@@ -150,12 +154,7 @@ public struct POFailure: Error {
         case serviceNotSupported                 = "service.not-supported"
     }
 
-    public enum UnknownCode: String {
-        case gateway = "gateway.unknown-error"
-        case mobile = "processout-mobile.unknown"
-    }
-
-    public enum Code: Equatable {
+    public enum Code: Hashable {
 
         /// No network connection.
         case networkUnreachable
@@ -181,8 +180,8 @@ public struct POFailure: Error {
         /// Generic error that can't be classified as one of the errors above.
         case generic(GenericCode)
 
-        /// Unknown error that can't be interpreted. Inspect `underlyingError` object for additional details.
-        case unknown(UnknownCode)
+        /// Unknown error that can't be interpreted. Inspect associated `rawValue` for additional info.
+        case unknown(rawValue: String)
     }
 
     /// Failure message. Not intented to be used as a user facing string.
@@ -223,7 +222,7 @@ extension POFailure.Code {
         case .cancelled:
             return "processout-mobile.cancelled"
         case let .unknown(unknownCode):
-            return unknownCode.rawValue
+            return unknownCode
         case let .validation(validationCode):
             return validationCode.rawValue
         case let .authentication(authenticationCode):

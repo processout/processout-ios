@@ -204,7 +204,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
         if let error = error as? POFailure {
             failure = error
         } else {
-            failure = POFailure(message: nil, code: .unknown(.mobile), underlyingError: error)
+            failure = POFailure(message: nil, code: .generic(.mobile), underlyingError: error)
         }
         state = .completed
         delegate.complete(with: failure)

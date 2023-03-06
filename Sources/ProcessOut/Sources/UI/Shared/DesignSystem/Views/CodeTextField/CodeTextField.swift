@@ -69,7 +69,8 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
 
     override func paste(_ sender: Any?) {
         if let string = UIPasteboard.general.string {
-            insertText(string)
+            setText(string)
+            sendActions(for: .editingChanged)
         }
     }
 

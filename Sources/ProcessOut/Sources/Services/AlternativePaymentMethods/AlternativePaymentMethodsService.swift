@@ -70,17 +70,20 @@ final class AlternativePaymentMethodsService: POAlternativePaymentMethodsService
     // MARK: - Private Methods
 
     private func createFailureCode(rawValue: String) -> POFailure.Code {
-        if let validationCode = POFailure.ValidationCode(rawValue: rawValue) {
-            return .validation(validationCode)
-        } else if let authenticationCode = POFailure.AuthenticationCode(rawValue: rawValue) {
-            return .authentication(authenticationCode)
-        } else if let notFoundCode = POFailure.NotFoundCode(rawValue: rawValue) {
-            return .notFound(notFoundCode)
-        } else if let genericCode = POFailure.GenericCode(rawValue: rawValue) {
-            return .generic(genericCode)
+        if let code = POFailure.AuthenticationCode(rawValue: rawValue) {
+            return .authentication(code)
+        } else if let code = POFailure.NotFoundCode(rawValue: rawValue) {
+            return .notFound(code)
+        } else if let code = POFailure.ValidationCode(rawValue: rawValue) {
+            return .validation(code)
+        } else if let code = POFailure.GenericCode(rawValue: rawValue) {
+            return .generic(code)
+        } else if let code = POFailure.TimeoutCode(rawValue: rawValue) {
+            return .timeout(code)
+        } else if let code = POFailure.InternalCode(rawValue: rawValue) {
+            return .internal(code)
         }
-        logger.info("Unknown error value '\(rawValue)'.")
-        return .unknown(.mobile)
+        return .unknown(rawValue: rawValue)
     }
 }
 
