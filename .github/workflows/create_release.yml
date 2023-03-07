@@ -13,13 +13,12 @@ jobs:
       - name: Create XCFramework
         run: source Scripts/CreateXcframework.sh
       - name: Set Version
-        id: version-reader
         run: |
-          echo "RELEASE_VERSION=$(cat Version.resolved)" >> $GITHUB_OUTPUT
+          echo "RELEASE_VERSION=$(cat Version.resolved)" >> $GITHUB_ENV
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.version-reader.outputs.RELEASE_VERSION }}
+          tag_name: ${{ env.RELEASE_VERSION }}
           files: .build/framework/ProcessOut.xcframework.zip
           generate_release_notes: true
   push-podspec:
