@@ -9,7 +9,8 @@ on:
         type: choice
         options:
           - minor
-          - patch 
+          - patch
+          - major
 jobs:
   update-version:
     runs-on: macos-12
