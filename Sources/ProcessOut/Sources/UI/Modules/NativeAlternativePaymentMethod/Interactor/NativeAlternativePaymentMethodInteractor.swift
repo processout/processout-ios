@@ -213,7 +213,12 @@ final class NativeAlternativePaymentMethodInteractor:
         }
         send(event: .willWaitForCaptureConfirmation(additionalActionExpected: expectedActionMessage != nil))
         let awaitingCaptureState = State.AwaitingCapture(
-            gatewayLogoImage: gatewayLogo, expectedActionMessage: expectedActionMessage, actionImage: actionImage
+            gatewayLogoImage: gatewayLogo,
+            expectedActionMessage: expectedActionMessage.map { _ in
+                // Server doesn't support localizing action messages, so local generic message is used instead.
+                Strings.NativeAlternativePayment.AwaitingCapture.message
+            },
+            actionImage: actionImage
         )
         state = .awaitingCapture(awaitingCaptureState)
         logger.info("Waiting for invoice \(configuration.invoiceId) capture confirmation")
@@ -272,9 +277,26 @@ final class NativeAlternativePaymentMethodInteractor:
             return
         }
         var updatedValues: [String: State.ParameterValue] = [:]
-        startedState.values.forEach { key, value in
-            let errorMessage = failure.invalidFields?.first { $0.name == key }?.message
-            updatedValues[key] = State.ParameterValue(value: value.value, recentErrorMessage: errorMessage)
+        startedState.parameters.forEach { parameter in
+            let errorMessage: String?
+            if invalidFields.map(\.name).contains(parameter.key) {
+                // Server doesn't support localized error messages, so local generic error
+                // description is used instead in case particular field is invalid.
+                switch parameter.type {
+                case .numeric:
+                    errorMessage = Strings.NativeAlternativePayment.Error.invalidNumber
+                case .text:
+                    errorMessage = Strings.NativeAlternativePayment.Error.invalidText
+                case .email:
+                    errorMessage = Strings.NativeAlternativePayment.Error.invalidEmail
+                case .phone:
+                    errorMessage = Strings.NativeAlternativePayment.Error.invalidPhone
+                }
+            } else {
+                errorMessage = nil
+            }
+            let value = startedState.values[parameter.key]?.value ?? ""
+            updatedValues[parameter.key] = .init(value: value, recentErrorMessage: errorMessage)
         }
         let updatedStartedState = startedState.replacing(
             parameters: startedState.parameters, values: updatedValues, isSubmitAllowed: false

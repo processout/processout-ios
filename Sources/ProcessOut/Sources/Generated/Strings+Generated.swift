@@ -16,6 +16,10 @@ internal enum Strings {
     internal static func title(_ p1: Any) -> String {
       return Strings.tr("ProcessOut", "native-alternative-payment.title", String(describing: p1))
     }
+    internal enum AwaitingCapture {
+      /// To complete the payment please confirm it from your banking app.
+      internal static var message: String { return Strings.tr("ProcessOut", "native-alternative-payment.awaiting-capture.message") }
+    }
     internal enum CancelButton {
       /// Cancel
       internal static var title: String { return Strings.tr("ProcessOut", "native-alternative-payment.cancel-button.title") }

@@ -102,7 +102,7 @@ enum NativeAlternativePaymentMethodInteractorState {
     /// - NOTE: This is a sink state and it's only set if user opted out from awaiting capture.
     case submitted
 
-    /// Parameters were submitted and accepted. This is a sink state.
+    /// Parameters were submitted and accepted.
     case awaitingCapture(AwaitingCapture)
 
     /// Payment is completed.

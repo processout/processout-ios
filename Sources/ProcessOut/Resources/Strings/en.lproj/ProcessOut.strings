@@ -8,6 +8,7 @@
 
 "native-alternative-payment.title" = "Pay with %@";
 "native-alternative-payment.success.message" = "Success!\nPayment approved";
+"native-alternative-payment.awaiting-capture.message" = "To complete the payment please confirm it from your banking app.";
 "native-alternative-payment.text.placeholder" = "Lorem Ipsum...";
 "native-alternative-payment.email.placeholder" = "example@domain.com";
 "native-alternative-payment.phone.placeholder" = "Your phone number...";
