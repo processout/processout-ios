@@ -1,46 +1,33 @@
 name: Create Release
 on: 
-  push:
-    branches:
-      - 'master'
+  workflow_dispatch:
 jobs:
-  validation:
-    name: Validate Applicability
+  create-release:
+    name: Create Release
     runs-on: macos-12
-    outputs:
-      version_tagged: ${{ steps.validation.outputs.version_tagged }}
-      version: ${{ steps.validation.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Validate Version
-        id: validation
-        run: |
-          VERSION=$(cat Version.resolved)
-          git fetch --tags
-          if [ $(git tag --list "$VERSION") ]; then
-            echo "::set-output name=version_tagged::true"
-          else
-            echo "::set-output name=version_tagged::false"
-          fi
-          echo "::set-output name=version::$VERSION"
-  release:
-    name: Create Release
-    needs: [validation]
-    if: needs.validation.outputs.version_tagged == 'false'
-    runs-on: macos-12
-    steps:
-      - uses: actions/checkout@v3
       - name: Bootstrap Project
         uses: ./.github/actions/bootstrap-project
       - name: Create XCFramework
         run: source Scripts/CreateXcframework.sh
+      - name: Set Version
+        run: |
+          echo "RELEASE_VERSION=$(cat Version.resolved)" >> $GITHUB_ENV
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ needs.validation.outputs.version }}
+          tag_name: ${{ env.RELEASE_VERSION }}
           files: .build/framework/ProcessOut.xcframework.zip
           generate_release_notes: true
+  push-podspec:
+    name: Push Podspec
+    needs: [create-release]
+    runs-on: macos-12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Push Podspec
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}

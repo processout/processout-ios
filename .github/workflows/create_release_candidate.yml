@@ -9,7 +9,8 @@ on:
         type: choice
         options:
           - minor
-          - patch 
+          - patch
+          - major
 jobs:
   update-version:
     runs-on: macos-12
@@ -22,7 +23,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
-          token: ${{ secrets.PO_GITHUB_USER }}
+          token: ${{ secrets.PO_GITHUB_TOKEN }}
           add-paths:
             - ProcessOut.podspec
             - Version.resolved
