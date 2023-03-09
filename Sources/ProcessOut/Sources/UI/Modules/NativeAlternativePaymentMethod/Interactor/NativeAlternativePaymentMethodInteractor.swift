@@ -406,7 +406,7 @@ final class NativeAlternativePaymentMethodInteractor:
             if let invalidField = validate(value: updatedValue, for: parameter) {
                 invalidFields.append(invalidField)
             } else {
-                validatedValues[parameter.key] = value
+                validatedValues[parameter.key] = updatedValue
             }
         }
         if invalidFields.isEmpty {
