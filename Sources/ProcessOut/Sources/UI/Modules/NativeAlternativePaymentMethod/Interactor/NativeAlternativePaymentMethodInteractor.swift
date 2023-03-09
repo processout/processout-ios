@@ -391,19 +391,14 @@ final class NativeAlternativePaymentMethodInteractor:
         var validatedValues: [String: String] = [:]
         var invalidFields: [POFailure.InvalidField] = []
         parameters.forEach { parameter in
-            let value = values[parameter.key]?.value ?? ""
-            let updatedValue: String
-            switch parameter.type {
-            case .phone:
-                updatedValue = String(
-                    String.UnicodeScalarView(
-                        value.unicodeScalars.filter(Constants.phoneFormattingCharacters.inverted.contains)
-                    )
-                )
-            default:
-                updatedValue = value
-            }
-            if let invalidField = validate(value: updatedValue, for: parameter) {
+            let updatedValue: String? = {
+                let value = values[parameter.key]?.value
+                if case .phone = parameter.type, let value {
+                    return value.removingCharacters(in: Constants.phoneFormattingCharacters)
+                }
+                return value
+            }()
+            if let invalidField = validate(value: updatedValue ?? "", for: parameter) {
                 invalidFields.append(invalidField)
             } else {
                 validatedValues[parameter.key] = updatedValue
