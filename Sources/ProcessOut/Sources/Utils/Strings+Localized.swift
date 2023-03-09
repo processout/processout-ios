@@ -26,14 +26,44 @@ extension Strings {
         if Bundle.main.preferredLocalizations.first == BundleLocator.bundle.preferredLocalizations.first {
             return BundleLocator.bundle.localizedString(forKey: key, value: nil, table: table)
         }
-        let string = Bundle.main.localizedString(forKey: key, value: Self.unknownString, table: table)
-        if string != Self.unknownString {
+        let string = Bundle.main.localizedString(forKey: key, value: Constants.unknownString, table: table)
+        if string != Constants.unknownString {
             return string
         }
         return BundleLocator.bundle.localizedString(forKey: key, value: nil, table: table)
     }
 
-    // MARK: - Private Properties
+    static var preferredLocalization: String {
+        let bundle: Bundle
+        if Bundle.main.preferredLocalizations.first == BundleLocator.bundle.preferredLocalizations.first {
+            bundle = BundleLocator.bundle
+        } else if hasStringsPreferredLocalization(ofType: "strings", in: .main) {
+            bundle = Bundle.main
+        } else if hasStringsPreferredLocalization(ofType: "stringsdict", in: .main) {
+            bundle = Bundle.main
+        } else {
+            bundle = BundleLocator.bundle
+        }
+        // swiftlint:disable:next force_unwrapping
+        return bundle.preferredLocalizations.first!
+    }
 
-    private static let unknownString = UUID().uuidString
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let unknownString = UUID().uuidString
+        static let stringTable = "ProcessOut"
+    }
+
+    // MARK: - Private Methods
+
+    private static func hasStringsPreferredLocalization(ofType type: String, in bundle: Bundle) -> Bool {
+        let path = bundle.path(
+            forResource: Constants.stringTable,
+            ofType: type,
+            inDirectory: nil,
+            forLocalization: bundle.preferredLocalizations.first
+        )
+        return path != nil
+    }
 }
