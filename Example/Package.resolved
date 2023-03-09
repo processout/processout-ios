@@ -1,15 +1,6 @@
 {
   "pins" : [
     {
-      "identity" : "atlantis",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ProxymanApp/atlantis",
-      "state" : {
-        "revision" : "a7b496f4fe0e01709442c775605754e7f209f958",
-        "version" : "1.21.0"
-      }
-    },
-    {
       "identity" : "snapkit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SnapKit/SnapKit",

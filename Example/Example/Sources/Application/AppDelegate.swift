@@ -7,7 +7,6 @@
 
 import UIKit
 @_spi(PO) import ProcessOut
-import Atlantis
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,7 +15,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        Atlantis.start()
         configureProcessOut()
         return true
     }
