@@ -96,41 +96,47 @@ final class NativeAlternativePaymentMethodInteractor:
         }
         logger.info("Will submit '\(configuration.invoiceId)' payment parameters")
         send(event: .willSubmitParameters)
-        if let failure = validate(values: startedState.values, for: startedState.parameters) {
-            restoreStartedStateAfterSubmissionFailureIfPossible(failure)
-            return
-        }
-        let request = PONativeAlternativePaymentMethodRequest(
-            invoiceId: configuration.invoiceId,
-            gatewayConfigurationId: configuration.gatewayConfigurationId,
-            parameters: startedState.values.compactMapValues(\.value)
-        )
-        state = .submitting(snapshot: startedState)
-        invoicesService.initiatePayment(request: request) { [weak self] result in
-            switch result {
-            case let .success(response) where response.nativeApm.state == .pendingCapture:
-                self?.send(event: .didSubmitParameters(additionalParametersExpected: false))
-                let message = startedState.customerActionMessage
-                if let imageUrl = startedState.customerActionImageUrl {
-                    self?.imagesRepository.image(url: imageUrl) { image in
+        do {
+            let values = try validated(values: startedState.values, for: startedState.parameters)
+            let request = PONativeAlternativePaymentMethodRequest(
+                invoiceId: configuration.invoiceId,
+                gatewayConfigurationId: configuration.gatewayConfigurationId,
+                parameters: values
+            )
+            state = .submitting(snapshot: startedState)
+            invoicesService.initiatePayment(request: request) { [weak self] result in
+                switch result {
+                case let .success(response) where response.nativeApm.state == .pendingCapture:
+                    self?.send(event: .didSubmitParameters(additionalParametersExpected: false))
+                    let message = startedState.customerActionMessage
+                    if let imageUrl = startedState.customerActionImageUrl {
+                        self?.imagesRepository.image(url: imageUrl) { image in
+                            self?.trySetAwaitingCaptureStateUnchecked(
+                                gatewayLogo: startedState.gatewayLogo,
+                                expectedActionMessage: message,
+                                actionImage: image
+                            )
+                        }
+                    } else {
                         self?.trySetAwaitingCaptureStateUnchecked(
-                            gatewayLogo: startedState.gatewayLogo, expectedActionMessage: message, actionImage: image
+                            gatewayLogo: startedState.gatewayLogo, expectedActionMessage: message, actionImage: nil
                         )
                     }
-                } else {
-                    self?.trySetAwaitingCaptureStateUnchecked(
-                        gatewayLogo: startedState.gatewayLogo, expectedActionMessage: message, actionImage: nil
-                    )
+                case let .success(response) where response.nativeApm.state == .captured:
+                    self?.setCapturedState()
+                case let .success(response):
+                    self?.defaultValues(for: response.nativeApm.parameterDefinitions) { values in
+                        self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm, defaultValues: values)
+                    }
+                case let .failure(failure):
+                    self?.restoreStartedStateAfterSubmissionFailureIfPossible(failure)
                 }
-            case let .success(response) where response.nativeApm.state == .captured:
-                self?.setCapturedState()
-            case let .success(response):
-                self?.defaultValues(for: response.nativeApm.parameterDefinitions) { values in
-                    self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm, defaultValues: values)
-                }
-            case let .failure(failure):
-                self?.restoreStartedStateAfterSubmissionFailureIfPossible(failure)
             }
+        } catch let error as POFailure {
+            restoreStartedStateAfterSubmissionFailureIfPossible(error)
+        } catch {
+            let failure = POFailure(code: .internal(.mobile), underlyingError: error)
+            restoreStartedStateAfterSubmissionFailureIfPossible(failure)
         }
     }
 
@@ -371,16 +377,33 @@ final class NativeAlternativePaymentMethodInteractor:
         }
     }
 
-    private func validate(
+    private func validated(
         values: [String: State.ParameterValue], for parameters: [PONativeAlternativePaymentMethodParameter]
-    ) -> POFailure? {
-        let invalidFields = parameters.compactMap { parameter in
-            validate(value: values[parameter.key]?.value ?? "", for: parameter)
+    ) throws -> [String: String] {
+        var validatedValues: [String: String] = [:]
+        var invalidFields: [POFailure.InvalidField] = []
+        parameters.forEach { parameter in
+            let value = values[parameter.key]?.value ?? ""
+            let updatedValue: String
+            switch parameter.type {
+            case .phone:
+                let formattingCharacters = CharacterSet(charactersIn: "-() ")
+                updatedValue = String(
+                    String.UnicodeScalarView(value.unicodeScalars.filter(formattingCharacters.inverted.contains))
+                )
+            default:
+                updatedValue = value
+            }
+            if let invalidField = validate(value: updatedValue, for: parameter) {
+                invalidFields.append(invalidField)
+            } else {
+                validatedValues[parameter.key] = value
+            }
         }
-        guard !invalidFields.isEmpty else {
-            return nil
+        if invalidFields.isEmpty {
+            return validatedValues
         }
-        return POFailure(code: .validation(.general), invalidFields: invalidFields)
+        throw POFailure(code: .validation(.general), invalidFields: invalidFields)
     }
 
     private func validate(
