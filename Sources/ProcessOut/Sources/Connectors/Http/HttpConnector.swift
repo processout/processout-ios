@@ -122,7 +122,8 @@ final class HttpConnector: HttpConnectorType {
         ]
         let headers = [
             "Idempotency-Key": request.id,
-            "User-Agent": userAgentComponents.joined(separator: "/")
+            "User-Agent": userAgentComponents.joined(separator: "/"),
+            "Accept-Language": Strings.preferredLocalization
         ]
         headers.forEach { field, value in
             sessionRequest.setValue(value, forHTTPHeaderField: field)
