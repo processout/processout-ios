@@ -18,6 +18,9 @@ packages:
     from: 5.6.0
   ProcessOut:
     path: ../
+  Atlantis:
+    url: https://github.com/ProxymanApp/atlantis
+    from: 1.21.0
 
 targets:
   Example:
@@ -47,6 +50,7 @@ targets:
     dependencies:
       - package: SnapKit
       - package: ProcessOut
+      - package: Atlantis
   ExampleUiTests:
     type: bundle.ui-testing
     sources: ExampleUiTests
