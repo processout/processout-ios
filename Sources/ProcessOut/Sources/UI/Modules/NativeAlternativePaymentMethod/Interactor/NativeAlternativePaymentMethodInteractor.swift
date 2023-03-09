@@ -129,7 +129,7 @@ final class NativeAlternativePaymentMethodInteractor:
                         self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm, defaultValues: values)
                     }
                 case let .failure(failure):
-                    self?.restoreStartedStateAfterSubmissionFailureIfPossible(failure)
+                    self?.restoreStartedStateAfterSubmissionFailureIfPossible(failure, replaceErrorMessages: true)
                 }
             }
         } catch let error as POFailure {
@@ -269,7 +269,9 @@ final class NativeAlternativePaymentMethodInteractor:
         }
     }
 
-    private func restoreStartedStateAfterSubmissionFailureIfPossible(_ failure: POFailure) {
+    private func restoreStartedStateAfterSubmissionFailureIfPossible(
+        _ failure: POFailure, replaceErrorMessages: Bool = false
+    ) {
         logger.error("Did fail to submit parameters: \(failure)")
         let startedState: State.Started
         switch state {
@@ -278,7 +280,10 @@ final class NativeAlternativePaymentMethodInteractor:
         default:
             return
         }
-        guard let invalidFields = failure.invalidFields, !invalidFields.isEmpty else {
+        let invalidFields = failure.invalidFields.map { invalidFields in
+            Dictionary(grouping: invalidFields, by: \.name).compactMapValues(\.first)
+        }
+        guard let invalidFields = invalidFields, !invalidFields.isEmpty else {
             logger.debug("Submission error is not recoverable, aborting")
             setFailureStateUnchecked(failure: failure)
             return
@@ -286,7 +291,9 @@ final class NativeAlternativePaymentMethodInteractor:
         var updatedValues: [String: State.ParameterValue] = [:]
         startedState.parameters.forEach { parameter in
             let errorMessage: String?
-            if invalidFields.map(\.name).contains(parameter.key) {
+            if !replaceErrorMessages {
+                errorMessage = invalidFields[parameter.key]?.message
+            } else if invalidFields[parameter.key] != nil {
                 // Server doesn't support localized error messages, so local generic error
                 // description is used instead in case particular field is invalid.
                 switch parameter.type {
