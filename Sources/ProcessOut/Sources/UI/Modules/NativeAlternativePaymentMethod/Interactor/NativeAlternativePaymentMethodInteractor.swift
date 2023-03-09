@@ -152,6 +152,7 @@ final class NativeAlternativePaymentMethodInteractor:
     // MARK: - Private Nested Types
 
     private enum Constants {
+        static let phoneFormattingCharacters = CharacterSet(charactersIn: "-() ")
         static let emailRegex = #"^\S+@\S+$"#
         static let phoneRegex = #"^\+?\d{1,3}\d*$"#
     }
@@ -387,9 +388,10 @@ final class NativeAlternativePaymentMethodInteractor:
             let updatedValue: String
             switch parameter.type {
             case .phone:
-                let formattingCharacters = CharacterSet(charactersIn: "-() ")
                 updatedValue = String(
-                    String.UnicodeScalarView(value.unicodeScalars.filter(formattingCharacters.inverted.contains))
+                    String.UnicodeScalarView(
+                        value.unicodeScalars.filter(Constants.phoneFormattingCharacters.inverted.contains)
+                    )
                 )
             default:
                 updatedValue = value
