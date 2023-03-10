@@ -9,4 +9,5 @@ import ProcessOut
 
 enum FeaturesRoute: RouteType {
     case gatewayConfigurations(filter: POAllGatewayConfigurationsRequest.Filter)
+    case cardDetails
 }

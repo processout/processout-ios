@@ -9,6 +9,7 @@
 "features.title" = "Available Features";
 "features.native-alternative-payment.title" = "Native Alternative Payment";
 "features.alternative-payment.title" = "Alternative Payment";
+"features.card-payment.title" = "Card payment";
 
 "alternative-payment-methods.title" = "Alternative Payment Methods";
 "alternative-payment-methods.gateway.unknown" = "<Unknown>";

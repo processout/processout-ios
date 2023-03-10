@@ -18,7 +18,9 @@ final class FeaturesRouter: RouterType {
             viewController?.navigationController?.pushViewController(
                 AlternativePaymentMethodsBuilder(filter: filter).build(), animated: true
             )
-            return true
+        case .cardDetails:
+            return false
         }
+        return true
     }
 }
