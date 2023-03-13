@@ -7,7 +7,7 @@
 
 final class CustomerTokensService: POCustomerTokensServiceType {
 
-    init(repository: CustomerTokensRepositoryType, customerActionHandler: CustomerActionHandlerType) {
+    init(repository: CustomerTokensRepositoryType, customerActionHandler: ThreeDSCustomerActionHandlerType) {
         self.repository = repository
         self.customerActionHandler = customerActionHandler
     }
@@ -16,19 +16,18 @@ final class CustomerTokensService: POCustomerTokensServiceType {
 
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
-        customerActionHandlerDelegate: POCustomerActionHandlerDelegate,
+        threeDSHandler: POThreeDSHandlerType,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         repository.assignCustomerToken(request: request) { [customerActionHandler] result in
             switch result {
             case let .success(customerAction?):
-                let delegate = customerActionHandlerDelegate
-                customerActionHandler.handle(customerAction: customerAction, delegate: delegate) { result in
+                customerActionHandler.handle(customerAction: customerAction, handler: threeDSHandler) { result in
                     switch result {
                     case let .success(newSource):
                         self.assignCustomerToken(
                             request: request.replacing(source: newSource),
-                            customerActionHandlerDelegate: customerActionHandlerDelegate,
+                            threeDSHandler: threeDSHandler,
                             completion: completion
                         )
                     case let .failure(failure):
@@ -53,7 +52,7 @@ final class CustomerTokensService: POCustomerTokensServiceType {
     // MARK: - Private Properties
 
     private let repository: CustomerTokensRepositoryType
-    private let customerActionHandler: CustomerActionHandlerType
+    private let customerActionHandler: ThreeDSCustomerActionHandlerType
 }
 
 private extension POAssignCustomerTokenRequest { // swiftlint:disable:this no_extension_access_modifier

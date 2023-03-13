@@ -1,5 +1,5 @@
 //
-//  POCustomerActionHandlerDelegate.swift
+//  POThreeDSHandlerType.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 03.11.2022.
@@ -8,7 +8,7 @@
 import Foundation
 
 @_spi(PO)
-public protocol POCustomerActionHandlerDelegate: AnyObject {
+public protocol POThreeDSHandlerType: AnyObject {
 
     /// Asks delegate to fingerprint the device.
     func fingerprint(
