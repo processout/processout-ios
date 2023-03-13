@@ -17,5 +17,5 @@ Packages
 *.xcodeproj
 xcuserdata/
 
-## Temporary (remove before merge)
+## Frameworks
 Sources/ProcessOutCheckout/Frameworks/**/*
