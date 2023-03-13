@@ -31,7 +31,7 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
             }
             print(cardId)
             let invoiceRequest = POInvoiceCreationRequest(
-                name: "Name", amount: "150", currency: "USD"
+                name: "Name", amount: "50", currency: "USD"
             )
             ProcessOutApi.shared.invoices.createInvoice(request: invoiceRequest) { [weak self] result in
                 guard case let .success(invoice) = result, let self else {
