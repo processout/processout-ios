@@ -24,12 +24,19 @@ final class CheckoutThreeDSHandler: POThreeDSHandlerType {
         state = .idle
     }
 
+    deinit {
+        setIdleState()
+    }
+
     // MARK: - POThreeDSHandlerType
 
     func fingerprint(
         data: PODirectoryServerData, completion: @escaping (Result<PODeviceFingerprint, POFailure>) -> Void
     ) {
-        guard case .idle = state else {
+        switch state {
+        case .idle, .fingerprinted:
+            break
+        default:
             let failure = POFailure(code: .generic(.mobile))
             completion(.failure(failure))
             return

@@ -1,6 +1,6 @@
 //
 //  AuthenticationRequestMapper.swift
-//  ProcessOut
+//  ProcessOutCheckout
 //
 //  Created by Andrii Vysotskyi on 06.03.2023.
 //

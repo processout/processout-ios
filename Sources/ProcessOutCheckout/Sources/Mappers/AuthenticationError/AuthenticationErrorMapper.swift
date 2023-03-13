@@ -1,6 +1,6 @@
 //
 //  AuthenticationErrorMapper.swift
-//  ProcessOut
+//  ProcessOutCheckout
 //
 //  Created by Andrii Vysotskyi on 06.03.2023.
 //
@@ -23,17 +23,7 @@ final class AuthenticationErrorMapper: AuthenticationErrorMapperType {
              .internationalRoamingOff,
              .unknownNetworkError:
             code = .networkUnreachable
-        case .invalidSessionID,
-             .unauthorizedSessionsRequest,
-             .authenticationVerificationUnsuccessful,
-             .duplicateAuthenticationRequest,
-             .concurrentAuthenticationRequest,
-             .sdkNotInitialised,
-             .certificateTransparencyChecksFailed:
-            code = .internal(.mobile)
-        case .sdkPListModified, .certificateTransparencyOverriddenByApp, .duplicateSDKInitialised:
-            code = .generic(.mobile)
-        default: // threeDS2ProtocolErrorXXXX and internalErrorXXXX
+        default:
             code = .generic(.mobile)
         }
         return POFailure(code: code, underlyingError: error)
