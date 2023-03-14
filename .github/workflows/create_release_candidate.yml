@@ -24,10 +24,10 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.PO_GITHUB_TOKEN }}
-          add-paths:
-            - ProcessOut.podspec
-            - Version.resolved
-            - Sources/**/*.swift
+          add-paths: |
+            ProcessOut.podspec
+            Version.resolved
+            Sources/**/*.swift
           commit-message: Update version
           branch: release/${{ env.UPDATED_VERSION }}
           delete-branch: true
