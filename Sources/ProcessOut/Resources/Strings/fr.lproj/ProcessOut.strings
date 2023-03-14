@@ -1,0 +1,22 @@
+/* 
+ ProcessOut.strings
+  
+
+  Created by Andrii Vysotskyi on 07.10.2022.
+  
+*/
+
+"native-alternative-payment.title" = "Payer avec %@";
+"native-alternative-payment.success.message" = "Succès ! Paiement confirmé.";
+"native-alternative-payment.awaiting-capture.message" = "Pour vérifier le paiement, veuillez le confimer depuis votre application bancaire.";
+"native-alternative-payment.text.placeholder" = "";
+"native-alternative-payment.email.placeholder" = "exemple@domaine.fr";
+"native-alternative-payment.phone.placeholder" = "Votre numéro de téléphone…";
+"native-alternative-payment.submit-button.title" = "Payer %@";
+"native-alternative-payment.submit-button.default-title" = "Payer";
+"native-alternative-payment.cancel-button.title" = "Annuler";
+"native-alternative-payment.error.required-parameter" = "Paramètre requis";
+"native-alternative-payment.error.invalid-number" = "Numéro invalide";
+"native-alternative-payment.error.invalid-text" = "Valeur invalide";
+"native-alternative-payment.error.invalid-email" = "Votre adresse e-mail est invalide";
+"native-alternative-payment.error.invalid-phone" = "Votre numéro de téléphone est invalide";
