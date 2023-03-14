@@ -11,7 +11,7 @@ public protocol POCustomerTokensServiceType: POServiceType {
     /// Assigns new source to existing customer token using given request.
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
-        customerActionHandlerDelegate: POCustomerActionHandlerDelegate,
+        threeDSHandler: POThreeDSHandlerType,
         completion: @escaping (Result<Void, POFailure>) -> Void
     )
 

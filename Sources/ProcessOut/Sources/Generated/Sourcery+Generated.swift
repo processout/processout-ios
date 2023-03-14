@@ -9,7 +9,7 @@ extension CustomerTokensRepositoryType {
     @MainActor
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest
-    ) async throws -> _CustomerAction? {
+    ) async throws -> ThreeDSCustomerAction? {
         return try await withUnsafeThrowingContinuation { continuation in
             assignCustomerToken(request: request, completion: continuation.resume)
         }
@@ -49,7 +49,7 @@ extension InvoicesRepositoryType {
     @MainActor
     public func authorizeInvoice(
         request: POInvoiceAuthorizationRequest
-    ) async throws -> _CustomerAction? {
+    ) async throws -> ThreeDSCustomerAction? {
         return try await withUnsafeThrowingContinuation { continuation in
             authorizeInvoice(request: request, completion: continuation.resume)
         }
@@ -101,10 +101,10 @@ extension POCustomerTokensServiceType {
 
     @MainActor
     public func assignCustomerToken(
-        request: POAssignCustomerTokenRequest, customerActionHandlerDelegate: POCustomerActionHandlerDelegate
+        request: POAssignCustomerTokenRequest, threeDSHandler: POThreeDSHandlerType
     ) async throws -> Void {
         return try await withUnsafeThrowingContinuation { continuation in
-            assignCustomerToken(request: request, customerActionHandlerDelegate: customerActionHandlerDelegate, completion: continuation.resume)
+            assignCustomerToken(request: request, threeDSHandler: threeDSHandler, completion: continuation.resume)
         }
     }
 
@@ -172,10 +172,10 @@ extension POInvoicesServiceType {
     @MainActor
     @_spi(PO)
     public func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest, customerActionHandlerDelegate: POCustomerActionHandlerDelegate
+        request: POInvoiceAuthorizationRequest, threeDSHandler: POThreeDSHandlerType
     ) async throws -> Void {
         return try await withUnsafeThrowingContinuation { continuation in
-            authorizeInvoice(request: request, customerActionHandlerDelegate: customerActionHandlerDelegate, completion: continuation.resume)
+            authorizeInvoice(request: request, threeDSHandler: threeDSHandler, completion: continuation.resume)
         }
     }
 

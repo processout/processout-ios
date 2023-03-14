@@ -9,7 +9,7 @@ import Foundation
 
 final class InvoicesService: POInvoicesServiceType {
 
-    init(repository: InvoicesRepositoryType, customerActionHandler: CustomerActionHandlerType) {
+    init(repository: InvoicesRepositoryType, customerActionHandler: ThreeDSCustomerActionHandlerType) {
         self.repository = repository
         self.customerActionHandler = customerActionHandler
     }
@@ -32,19 +32,18 @@ final class InvoicesService: POInvoicesServiceType {
 
     func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
-        customerActionHandlerDelegate: POCustomerActionHandlerDelegate,
+        threeDSHandler: POThreeDSHandlerType,
         completion: @escaping (Result<Void, Failure>) -> Void
     ) {
         repository.authorizeInvoice(request: request) { [customerActionHandler] result in
             switch result {
             case let .success(customerAction?):
-                let delegate = customerActionHandlerDelegate
-                customerActionHandler.handle(customerAction: customerAction, delegate: delegate) { result in
+                customerActionHandler.handle(customerAction: customerAction, handler: threeDSHandler) { result in
                     switch result {
                     case let .success(newSource):
                         self.authorizeInvoice(
                             request: request.replacing(source: newSource),
-                            customerActionHandlerDelegate: customerActionHandlerDelegate,
+                            threeDSHandler: threeDSHandler,
                             completion: completion
                         )
                     case let .failure(failure):
@@ -105,7 +104,7 @@ final class InvoicesService: POInvoicesServiceType {
     // MARK: - Private Properties
 
     private let repository: InvoicesRepositoryType
-    private let customerActionHandler: CustomerActionHandlerType
+    private let customerActionHandler: ThreeDSCustomerActionHandlerType
 }
 
 private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_extension_access_modifier
