@@ -8,8 +8,8 @@
 
 "features.title" = "Available Features";
 "features.native-alternative-payment.title" = "Native Alternative Payment";
-"features.alternative-payment.title" = "Alternative Payment";
-"features.card-payment.title" = "Card payment";
+"features.alternative-payment.title" = "Alternative Payment [BETA]";
+"features.card-payment.title" = "Card payment [BETA]";
 
 "alternative-payment-methods.title" = "Alternative Payment Methods";
 "alternative-payment-methods.gateway.unknown" = "<Unknown>";
@@ -31,3 +31,14 @@
 "alternative-payment-data-entry.key.placeholder" = "Key";
 "alternative-payment-data-entry.value.placeholder" = "Value";
 "alternative-payment-data-entry.confirm" = "Confirm";
+
+"card-payment.title" = "Card Payment";
+"card-payment.card.title" = "Card Details";
+"card-payment.card.number" = "Number";
+"card-payment.card.expiration-month" = "Expiration Month";
+"card-payment.card.expiration-year" = "Expiration Year";
+"card-payment.card.cvc" = "CVC";
+"card-payment.invoice.title" = "Invoice Details";
+"card-payment.invoice.amount" = "Amount";
+"card-payment.invoice.currency" = "Currency Code";
+"card-payment.pay-button.title" = "Pay";
