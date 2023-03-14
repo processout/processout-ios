@@ -149,10 +149,8 @@ final class NativeAlternativePaymentMethodViewModel:
 
     private func placeholder(for parameter: PONativeAlternativePaymentMethodParameter) -> String? {
         switch parameter.type {
-        case .numeric:
+        case .numeric, .text:
             return nil
-        case .text:
-            return Strings.Text.placeholder
         case .email:
             return Strings.Email.placeholder
         case .phone:
