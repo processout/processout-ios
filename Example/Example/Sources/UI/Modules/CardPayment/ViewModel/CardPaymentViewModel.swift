@@ -6,51 +6,55 @@
 //
 
 import Foundation
-@_spi(PO) import ProcessOut
 import UIKit
+@_spi(PO) import ProcessOut
 
 final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, CardPaymentViewModelType {
 
+    init(invoicesService: POInvoicesServiceType, cardsRepository: POCardsRepositoryType) {
+        self.invoicesService = invoicesService
+        self.cardsRepository = cardsRepository
+        super.init(state: .idle)
+    }
+
     // MARK: - CardPaymentViewModelType
 
-    unowned var viewController: UIViewController! // swiftlint:disable:this implicitly_unwrapped_optional
-
     func pay() {
-        let cardTokenizationRequest = ProcessOutLegacyApi.Card(
-            cardNumber: "4242424242424242",
-            expMonth: 12,
-            expYear: 2025,
-            cvc: "123",
-            name: "Andrii"
+        let cardTokenizationRequest = POCardTokenizationRequest(
+            number: "4242424242424242", expMonth: 12, expYear: 2025, cvc: "123"
         )
-        ProcessOutLegacyApi.Tokenize(card: cardTokenizationRequest, metadata: nil) { cardId, exception in
-            print(exception)
-            guard let cardId else {
-                assertionFailure("Something went wrong")
-                return
-            }
-            print(cardId)
-            let invoiceRequest = POInvoiceCreationRequest(
-                name: "Name", amount: "50", currency: "USD"
-            )
-            ProcessOutApi.shared.invoices.createInvoice(request: invoiceRequest) { [weak self] result in
-                guard case let .success(invoice) = result, let self else {
-                    return
-                }
-                let authorizationRequest = AuthorizationRequest(
-                    source: cardId, incremental: false, invoiceID: invoice.id
-                )
-                let handler = ProcessOutLegacyApi.createThreeDSTestHandler(
-                    viewController: self.viewController,
-                    completion: { source, exception in
-                        print(source)
-                        print(exception)
-                    }
-                )
-                ProcessOutLegacyApi.makeCardPayment(
-                    AuthorizationRequest: authorizationRequest, handler: handler, with: self.viewController
-                )
+        cardsRepository.tokenize(request: cardTokenizationRequest) { result in
+            switch result {
+            case .success(let card):
+                print(card.id)
+            case .failure(let failure):
+                print(failure)
             }
         }
+        let invoiceCreationRequest = POInvoiceCreationRequest(
+            name: UUID().uuidString, amount: "150", currency: "USD"
+        )
+        invoicesService.createInvoice(request: invoiceCreationRequest) { result in
+            switch result {
+            case .success(let invoice):
+                print(invoice.id)
+            case .failure(let failure):
+                print(failure)
+            }
+        }
+        let invoiceAuthorizationRequest = POInvoiceAuthorizationRequest(
+            invoiceId: "invoice.id",
+            source: "card.id",
+            enableThreeDS2: true,
+            thirdPartySdkVersion: "3.0.0"
+        )
+        print(invoiceAuthorizationRequest)
     }
+
+    // MARK: - Private Properties
+
+    private let invoicesService: POInvoicesServiceType
+    private let cardsRepository: POCardsRepositoryType
+
+    // MARK: - Private Methods
 }

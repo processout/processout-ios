@@ -6,13 +6,13 @@
 //
 
 import UIKit
+@_spi(PO) import ProcessOut
 
 final class CardPaymentBuilder {
 
     func build() -> UIViewController {
-        let viewModel = CardPaymentViewModel(state: .idle)
-        let viewController = CardPaymentViewController(viewModel: viewModel)
-        viewModel.viewController = viewController
-        return viewController
+        let api: ProcessOutApiType = ProcessOutApi.shared
+        let viewModel = CardPaymentViewModel(invoicesService: api.invoices, cardsRepository: api.cards)
+        return CardPaymentViewController(viewModel: viewModel)
     }
 }
