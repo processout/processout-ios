@@ -24,7 +24,7 @@ protocol InvoicesRepositoryType: PORepositoryType {
 
     /// Performs invoice authorization with given request.
     func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest, completion: @escaping (Result<_CustomerAction?, Failure>) -> Void
+        request: POInvoiceAuthorizationRequest, completion: @escaping (Result<ThreeDSCustomerAction?, Failure>) -> Void
     )
 
     /// Captures native alternative payment.

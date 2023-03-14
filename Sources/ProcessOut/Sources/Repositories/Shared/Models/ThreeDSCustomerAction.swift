@@ -1,5 +1,5 @@
 //
-//  _CustomerAction.swift
+//  ThreeDSCustomerAction.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 18.10.2022.
@@ -7,9 +7,7 @@
 
 import Foundation
 
-// swiftlint:disable type_name todo
-// - TODO: Remove underscore when legacy counterpart won't be needed.
-struct _CustomerAction: Decodable {
+struct ThreeDSCustomerAction: Decodable {
 
     enum ActionType: String, Decodable {
 

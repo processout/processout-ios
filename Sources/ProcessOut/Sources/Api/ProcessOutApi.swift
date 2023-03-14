@@ -111,13 +111,13 @@ private final class SharedProcessOutApi: ProcessOutApiType {
 
     private lazy var failureMapper = HttpConnectorFailureMapper(logger: repositoryLogger)
 
-    private lazy var customerActionHandler: CustomerActionHandlerType = {
+    private lazy var customerActionHandler: ThreeDSCustomerActionHandlerType = {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .useDefaultKeys
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        return _CustomerActionHandler(decoder: decoder, encoder: encoder, logger: serviceLogger)
+        return ThreeDSCustomerActionHandler(decoder: decoder, encoder: encoder, logger: serviceLogger)
     }()
 
     private lazy var decoder: JSONDecoder = {

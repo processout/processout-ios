@@ -48,10 +48,10 @@ final class InvoicesRepository: InvoicesRepositoryType {
     }
 
     func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest, completion: @escaping (Result<_CustomerAction?, Failure>) -> Void
+        request: POInvoiceAuthorizationRequest, completion: @escaping (Result<ThreeDSCustomerAction?, Failure>) -> Void
     ) {
         struct Response: Decodable {
-            let customerAction: _CustomerAction?
+            let customerAction: ThreeDSCustomerAction?
         }
         let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/invoices/\(request.invoiceId)/authorize", body: request, includesDeviceMetadata: true

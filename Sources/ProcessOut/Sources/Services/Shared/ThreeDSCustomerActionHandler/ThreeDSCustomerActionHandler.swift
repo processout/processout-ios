@@ -1,5 +1,5 @@
 //
-//  _CustomerActionHandler.swift
+//  ThreeDSHandler.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 03.11.2022.
@@ -7,9 +7,7 @@
 
 import Foundation
 
-// swiftlint:disable type_name todo
-// - TODO: Remove underscore when legacy counterpart won't be needed.
-final class _CustomerActionHandler: CustomerActionHandlerType {
+final class ThreeDSCustomerActionHandler: ThreeDSCustomerActionHandlerType {
 
     init(decoder: JSONDecoder, encoder: JSONEncoder, logger: POLogger) {
         self.decoder = decoder
@@ -17,9 +15,11 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
         self.logger = logger
     }
 
-    // MARK: - CustomerActionHandlerType
+    // MARK: - ThreeDSCustomerActionHandlerType
 
-    func handle(customerAction: _CustomerAction, delegate: Delegate, completion: @escaping Completion) {
+    func handle(
+        customerAction: ThreeDSCustomerAction, handler: POThreeDSHandlerType, completion: @escaping Completion
+    ) {
         let completionTrampoline: Completion = { result in
             assert(Thread.isMainThread, "Completion must be called on main thread!")
             completion(result)
@@ -27,14 +27,14 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
         switch customerAction.type {
         case .fingerprintMobile:
             fingerprint(
-                encodedDirectoryServerData: customerAction.value, delegate: delegate, completion: completionTrampoline
+                encodedDirectoryServerData: customerAction.value, handler: handler, completion: completionTrampoline
             )
         case .challengeMobile:
-            challenge(encodedChallengeData: customerAction.value, delegate: delegate, completion: completionTrampoline)
+            challenge(encodedChallengeData: customerAction.value, handler: handler, completion: completionTrampoline)
         case .fingerprint:
-            fingerprint(url: customerAction.value, delegate: delegate, completion: completionTrampoline)
+            fingerprint(url: customerAction.value, handler: handler, completion: completionTrampoline)
         case .redirect, .url:
-            redirect(url: customerAction.value, delegate: delegate, completion: completionTrampoline)
+            redirect(url: customerAction.value, handler: handler, completion: completionTrampoline)
         }
     }
 
@@ -54,10 +54,12 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
 
     // MARK: - Private Methods
 
-    private func fingerprint(encodedDirectoryServerData: String, delegate: Delegate, completion: @escaping Completion) {
+    private func fingerprint(
+        encodedDirectoryServerData: String, handler: POThreeDSHandlerType, completion: @escaping Completion
+    ) {
         do {
             let directoryServerData = try decode(PODirectoryServerData.self, from: encodedDirectoryServerData)
-            delegate.fingerprint(data: directoryServerData) { [encoder, logger] result in
+            handler.fingerprint(data: directoryServerData) { [encoder, logger] result in
                 switch result {
                 case let .success(fingerprint):
                     do {
@@ -84,10 +86,12 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
         }
     }
 
-    private func challenge(encodedChallengeData: String, delegate: Delegate, completion: @escaping Completion) {
+    private func challenge(
+        encodedChallengeData: String, handler: POThreeDSHandlerType, completion: @escaping Completion
+    ) {
         do {
             let challenge = try decode(POAuthentificationChallengeData.self, from: encodedChallengeData)
-            delegate.challenge(challenge: challenge) { result in
+            handler.challenge(challenge: challenge) { result in
                 switch result {
                 case let .success(success):
                     let newSource = success
@@ -104,14 +108,14 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
         }
     }
 
-    private func fingerprint(url: String, delegate: Delegate, completion: @escaping Completion) {
+    private func fingerprint(url: String, handler: POThreeDSHandlerType, completion: @escaping Completion) {
         guard let url = URL(string: url) else {
             logger.error("Did fail to create fingerprint URL from raw value: '\(url)'.")
             completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
             return
         }
         let context = PORedirectCustomerActionContext(url: url, isHeadlessModeAllowed: true, timeout: 10)
-        delegate.redirect(context: context) { [encoder, logger] result in
+        handler.redirect(context: context) { [encoder, logger] result in
             switch result {
             case let .success(newSource):
                 completion(.success(newSource))
@@ -137,14 +141,14 @@ final class _CustomerActionHandler: CustomerActionHandlerType {
         }
     }
 
-    private func redirect(url: String, delegate: Delegate, completion: @escaping Completion) {
+    private func redirect(url: String, handler: POThreeDSHandlerType, completion: @escaping Completion) {
         guard let url = URL(string: url) else {
             logger.error("Did fail to create redirect URL from raw value: '\(url)'.")
             completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
             return
         }
         let context = PORedirectCustomerActionContext(url: url, isHeadlessModeAllowed: false, timeout: nil)
-        delegate.redirect(context: context, completion: completion)
+        handler.redirect(context: context, completion: completion)
     }
 
     // MARK: - Utils
