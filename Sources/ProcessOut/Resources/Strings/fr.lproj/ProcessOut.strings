@@ -9,9 +9,8 @@
 "native-alternative-payment.title" = "Payer avec %@";
 "native-alternative-payment.success.message" = "Succès ! Paiement confirmé.";
 "native-alternative-payment.awaiting-capture.message" = "Pour vérifier le paiement, veuillez le confimer depuis votre application bancaire.";
-"native-alternative-payment.text.placeholder" = "";
-"native-alternative-payment.email.placeholder" = "exemple@domaine.fr";
-"native-alternative-payment.phone.placeholder" = "Votre numéro de téléphone…";
+"native-alternative-payment.email.placeholder" = "nom@exemple.fr";
+"native-alternative-payment.phone.placeholder" = "Entrez votre numéro de téléphone";
 "native-alternative-payment.submit-button.title" = "Payer %@";
 "native-alternative-payment.submit-button.default-title" = "Payer";
 "native-alternative-payment.cancel-button.title" = "Annuler";
