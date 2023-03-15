@@ -42,3 +42,7 @@
 "card-payment.invoice.amount" = "Amount";
 "card-payment.invoice.currency" = "Currency Code";
 "card-payment.pay-button.title" = "Pay";
+"card-payment.result.continue" = "Continue";
+"card-payment.result.error-message" = "Did fail to authorize invoice with error: '%@'";
+"card-payment.result.default-error-message" = "Did fail to authorize invoice";
+"card-payment.result.success-message" = "Did authorize invoice '%@' with card '%@'";

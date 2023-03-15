@@ -12,10 +12,12 @@ import UIKit
 final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, CardPaymentViewModelType {
 
     init(
+        router: any RouterType<CardPaymentRoute>,
         invoicesService: POInvoicesServiceType,
         cardsRepository: POCardsRepositoryType,
         threeDSHandler: POThreeDSHandlerType
     ) {
+        self.router = router
         self.invoicesService = invoicesService
         self.cardsRepository = cardsRepository
         self.threeDSHandler = threeDSHandler
@@ -43,17 +45,17 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
 
     // MARK: - Private Properties
 
+    private let router: any RouterType<CardPaymentRoute>
     private let invoicesService: POInvoicesServiceType
     private let cardsRepository: POCardsRepositoryType
     private let threeDSHandler: POThreeDSHandlerType
 
-    private lazy var cardNumber = ReferenceTypeBox(value: "")
-    private lazy var expirationMonth = ReferenceTypeBox(value: "")
-    private lazy var expirationYear = ReferenceTypeBox(value: "")
-    private lazy var cvc = ReferenceTypeBox(value: "")
-
-    private lazy var amount = ReferenceTypeBox(value: "")
-    private lazy var currencyCode = ReferenceTypeBox(value: "")
+    private let cardNumber = ReferenceTypeBox(value: "")
+    private let expirationMonth = ReferenceTypeBox(value: "")
+    private let expirationYear = ReferenceTypeBox(value: "")
+    private let cvc = ReferenceTypeBox(value: "")
+    private let amount = ReferenceTypeBox(value: "")
+    private let currencyCode = ReferenceTypeBox(value: "")
 
     // MARK: - Private Methods
 
@@ -128,9 +130,23 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
             try await invoicesService.authorizeInvoice(
                 request: invoiceAuthorizationRequest, threeDSHandler: threeDSHandler
             )
-            print("Show success alert")
+            router.trigger(route: .alert(message: Strings.Result.successMessage(invoice.id, card.id)))
         } catch {
-            print(error)
+            didFailToAuthorizeInvoice(error: error)
         }
+    }
+
+    private func didFailToAuthorizeInvoice(error: Error) {
+        let errorDescription: String
+        if let failure = error as? POFailure {
+            if let message = failure.message {
+                errorDescription = Strings.Result.errorMessage(message)
+            } else {
+                errorDescription = Strings.Result.defaultErrorMessage
+            }
+        } else {
+            errorDescription = Strings.Result.defaultErrorMessage
+        }
+        router.trigger(route: .alert(message: errorDescription))
     }
 }
