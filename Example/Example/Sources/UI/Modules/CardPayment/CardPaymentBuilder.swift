@@ -12,7 +12,12 @@ final class CardPaymentBuilder {
 
     func build() -> UIViewController {
         let api: ProcessOutApiType = ProcessOutApi.shared
-        let viewModel = CardPaymentViewModel(invoicesService: api.invoices, cardsRepository: api.cards)
-        return CardPaymentViewController(viewModel: viewModel)
+        let threeDSHandler = TestThreeDSHandler()
+        let viewModel = CardPaymentViewModel(
+            invoicesService: api.invoices, cardsRepository: api.cards, threeDSHandler: threeDSHandler
+        )
+        let viewController = CardPaymentViewController(viewModel: viewModel)
+        threeDSHandler.viewController = viewController
+        return viewController
     }
 }

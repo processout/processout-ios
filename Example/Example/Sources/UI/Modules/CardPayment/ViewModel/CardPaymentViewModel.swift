@@ -11,9 +11,14 @@ import UIKit
 
 final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, CardPaymentViewModelType {
 
-    init(invoicesService: POInvoicesServiceType, cardsRepository: POCardsRepositoryType) {
+    init(
+        invoicesService: POInvoicesServiceType,
+        cardsRepository: POCardsRepositoryType,
+        threeDSHandler: POThreeDSHandlerType
+    ) {
         self.invoicesService = invoicesService
         self.cardsRepository = cardsRepository
+        self.threeDSHandler = threeDSHandler
         super.init(state: .idle)
     }
 
@@ -40,6 +45,7 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
 
     private let invoicesService: POInvoicesServiceType
     private let cardsRepository: POCardsRepositoryType
+    private let threeDSHandler: POThreeDSHandlerType
 
     private lazy var cardNumber = ReferenceTypeBox(value: "")
     private lazy var expirationMonth = ReferenceTypeBox(value: "")
@@ -119,7 +125,10 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
             let invoiceAuthorizationRequest = POInvoiceAuthorizationRequest(
                 invoiceId: invoice.id, source: card.id, enableThreeDS2: true, thirdPartySdkVersion: nil
             )
-            print(invoiceAuthorizationRequest)
+            try await invoicesService.authorizeInvoice(
+                request: invoiceAuthorizationRequest, threeDSHandler: threeDSHandler
+            )
+            print("Show success alert")
         } catch {
             print(error)
         }
