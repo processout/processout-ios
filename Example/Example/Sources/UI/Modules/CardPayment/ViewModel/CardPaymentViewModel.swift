@@ -41,60 +41,70 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
     private let invoicesService: POInvoicesServiceType
     private let cardsRepository: POCardsRepositoryType
 
-    private lazy var cardNumber = ValueMutableReferenceBox(value: "")
-    private lazy var expirationMonth = ValueMutableReferenceBox(value: "")
-    private lazy var expirationYear = ValueMutableReferenceBox(value: "")
-    private lazy var cvc = ValueMutableReferenceBox(value: "")
+    private lazy var cardNumber = ReferenceTypeBox(value: "")
+    private lazy var expirationMonth = ReferenceTypeBox(value: "")
+    private lazy var expirationYear = ReferenceTypeBox(value: "")
+    private lazy var cvc = ReferenceTypeBox(value: "")
 
-    private lazy var amount = ValueMutableReferenceBox(value: "")
-    private lazy var currencyCode = ValueMutableReferenceBox(value: "")
+    private lazy var amount = ReferenceTypeBox(value: "")
+    private lazy var currencyCode = ReferenceTypeBox(value: "")
 
     // MARK: - Private Methods
 
     private func setStartedStateUnchecked() {
         let cardParamters = [
             State.Parameter(
-                value: cardNumber, placeholder: Strings.Card.number, accessibilityId: "card-payment.card.number"
+                value: cardNumber,
+                placeholder: Strings.Card.number,
+                parameterType: .number,
+                accessibilityId: "card-payment.card.number"
             ),
             State.Parameter(
                 value: expirationMonth,
                 placeholder: Strings.Card.expirationMonth,
+                parameterType: .number,
                 accessibilityId: "card-payment.card.month"
             ),
             State.Parameter(
                 value: expirationYear,
                 placeholder: Strings.Card.expirationYear,
+                parameterType: .number,
                 accessibilityId: "card-payment.card.year"
             ),
-            State.Parameter(value: cvc, placeholder: Strings.Card.cvc, accessibilityId: "card-payment.card.cvc")
+            State.Parameter(
+                value: cvc,
+                placeholder: Strings.Card.cvc,
+                parameterType: .number,
+                accessibilityId: "card-payment.card.cvc"
+            )
         ]
         let cardDetailsSection = State.Section(
             identifier: .init(title: Strings.Card.title), parameters: cardParamters
         )
-//        let invoiceParameters: [State.Parameter] = [
-//            .init(
-//                value: "",
-//                placeholder: Strings.Invoice.amount,
-//                accessibilityId: "card-payment.invoice.amount",
-//                didChange: { }
-//            ),
-//            .init(
-//                value: "",
-//                placeholder: Strings.Invoice.currency,
-//                accessibilityId: "card-payment.invoice.currency",
-//                didChange: { }
-//            )
-//        ]
-//        let invoiceSection = State.Section(
-//            identifier: .init(title: Strings.Invoice.title), parameters: invoiceParameters
-//        )
-        let startedState = State.Started(sections: [cardDetailsSection])
+        let invoiceParameters: [State.Parameter] = [
+            .init(
+                value: amount,
+                placeholder: Strings.Invoice.amount,
+                parameterType: .number,
+                accessibilityId: "card-payment.invoice.amount"
+            ),
+            .init(
+                value: currencyCode,
+                placeholder: Strings.Invoice.currency,
+                parameterType: .text,
+                accessibilityId: "card-payment.invoice.currency"
+            )
+        ]
+        let invoiceSection = State.Section(
+            identifier: .init(title: Strings.Invoice.title), parameters: invoiceParameters
+        )
+        let startedState = State.Started(sections: [cardDetailsSection, invoiceSection])
         state = .started(startedState)
     }
 
     @MainActor private func setPayingStateUnchecked() async {
-        guard let expMonth = Int(expirationMonth.wrappedValue, radix: 10),
-              let expYear = Int(expirationYear.wrappedValue, radix: 10) else {
+        guard let expMonth = Int(expirationMonth.wrappedValue),
+              let expYear = Int(expirationYear.wrappedValue) else {
             return
         }
         do {
@@ -103,7 +113,7 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
             )
             let card = try await cardsRepository.tokenize(request: cardTokenizationRequest)
             let invoiceCreationRequest = POInvoiceCreationRequest(
-                name: UUID().uuidString, amount: "150", currency: "USD"
+                name: UUID().uuidString, amount: amount.wrappedValue, currency: currencyCode.wrappedValue
             )
             let invoice = try await invoicesService.createInvoice(request: invoiceCreationRequest)
             let invoiceAuthorizationRequest = POInvoiceAuthorizationRequest(

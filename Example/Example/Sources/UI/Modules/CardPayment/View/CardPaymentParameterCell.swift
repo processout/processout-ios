@@ -66,6 +66,12 @@ private final class ContentView: UIView, UIContentView {
                     self?.textField.text = newValue
                 }
             }
+            switch configuration.model.parameterType {
+            case .text:
+                textField.keyboardType = .default
+            case .number:
+                textField.keyboardType = .decimalPad
+            }
             textField.text = configuration.model.value
             textField.placeholder = configuration.model.placeholder
             textField.accessibilityIdentifier = configuration.model.accessibilityId
