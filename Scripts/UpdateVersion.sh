@@ -50,6 +50,3 @@ EOF
 
 # Updates version in podspec
 sed -Ei "" "s|(s[.]version *= *)'(.*)'|\1'$VERSION'|" ProcessOut.podspec
-
-# Triggers project bootstrap to ensure that version is updated
-source Scripts/BootstrapProject.sh
