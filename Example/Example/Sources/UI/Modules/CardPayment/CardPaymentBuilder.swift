@@ -11,7 +11,7 @@ import UIKit
 final class CardPaymentBuilder {
 
     func build() -> UIViewController {
-        let threeDSHandler = TestThreeDSHandler()
+        let threeDSHandler = CardPaymentTestThreeDSHandler()
         let router = CardPaymentRouter()
         let viewModel = CardPaymentViewModel(
             router: router,

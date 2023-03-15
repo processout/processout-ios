@@ -1,5 +1,5 @@
 //
-//  TestThreeDSHandler.swift
+//  CardPaymentTestThreeDSHandler.swift
 //  Example
 //
 //  Created by Andrii Vysotskyi on 15.03.2023.
@@ -8,7 +8,7 @@
 import UIKit
 @_spi(PO) import ProcessOut
 
-final class TestThreeDSHandler: POThreeDSHandlerType {
+final class CardPaymentTestThreeDSHandler: POThreeDSHandlerType {
 
     /// View controller to use for presentations.
     unowned var viewController: UIViewController! // swiftlint:disable:this implicitly_unwrapped_optional
@@ -32,13 +32,13 @@ final class TestThreeDSHandler: POThreeDSHandlerType {
         challenge: POAuthentificationChallengeData, completion: @escaping (Result<Bool, POFailure>) -> Void
     ) {
         let alertController = UIAlertController(
-            title: "Do you want to accept the 3DS2 challenge", message: "", preferredStyle: .alert
+            title: Strings.CardPayment.Challenge.title, message: "", preferredStyle: .alert
         )
-        let acceptAction = UIAlertAction(title: "Accept", style: .default) { _ in
+        let acceptAction = UIAlertAction(title: Strings.CardPayment.Challenge.accept, style: .default) { _ in
             completion(.success(true))
         }
         alertController.addAction(acceptAction)
-        let rejectAction = UIAlertAction(title: "Reject", style: .default) { _ in
+        let rejectAction = UIAlertAction(title: Strings.CardPayment.Challenge.reject, style: .default) { _ in
             completion(.success(false))
         }
         alertController.addAction(rejectAction)
