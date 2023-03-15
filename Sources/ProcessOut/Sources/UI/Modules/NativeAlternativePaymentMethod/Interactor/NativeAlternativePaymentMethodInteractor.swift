@@ -429,8 +429,6 @@ final class NativeAlternativePaymentMethodInteractor:
             switch parameter.type {
             case .numeric where !CharacterSet(charactersIn: value).isSubset(of: .decimalDigits):
                 message = Strings.NativeAlternativePayment.Error.invalidNumber
-            case .text where !CharacterSet(charactersIn: value).isSubset(of: .alphanumerics):
-                message = Strings.NativeAlternativePayment.Error.invalidText
             case .email where value.range(of: Constants.emailRegex, options: .regularExpression) == nil:
                 message = Strings.NativeAlternativePayment.Error.invalidEmail
             case .phone where value.range(of: Constants.phoneRegex, options: .regularExpression) == nil:
