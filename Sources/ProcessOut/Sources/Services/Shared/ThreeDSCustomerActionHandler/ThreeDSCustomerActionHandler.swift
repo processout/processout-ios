@@ -80,6 +80,9 @@ final class ThreeDSCustomerActionHandler: ThreeDSCustomerActionHandlerType {
                     completion(.failure(failure))
                 }
             }
+        } catch let error as POFailure {
+            logger.error("Did fail to decode DS data: '\(error.message ?? "")'.")
+            completion(.failure(error))
         } catch {
             logger.error("Did fail to decode DS data: '\(error.localizedDescription)'.")
             completion(.failure(.init(code: .internal(.mobile), underlyingError: error)))
@@ -157,7 +160,9 @@ final class ThreeDSCustomerActionHandler: ThreeDSCustomerActionHandlerType {
         let paddedString = string.padding(
             toLength: string.count + (4 - string.count % 4) % 4, withPad: "=", startingAt: 0
         )
-        let data = Data(paddedString.utf8).base64EncodedData()
+        guard let data = Data(base64Encoded: paddedString) else {
+            throw POFailure(message: "Invalid base64 encoding.", code: .internal(.mobile))
+        }
         return try decoder.decode(type, from: data)
     }
 }

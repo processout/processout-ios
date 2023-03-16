@@ -13,12 +13,14 @@ final class FeaturesRouter: RouterType {
     weak var viewController: UIViewController?
 
     func trigger(route: FeaturesRoute) -> Bool {
+        let viewController: UIViewController
         switch route {
         case .gatewayConfigurations(let filter):
-            viewController?.navigationController?.pushViewController(
-                AlternativePaymentMethodsBuilder(filter: filter).build(), animated: true
-            )
-            return true
+            viewController = AlternativePaymentMethodsBuilder(filter: filter).build()
+        case .cardDetails:
+            viewController = CardPaymentBuilder().build()
         }
+        self.viewController?.navigationController?.pushViewController(viewController, animated: true)
+        return true
     }
 }

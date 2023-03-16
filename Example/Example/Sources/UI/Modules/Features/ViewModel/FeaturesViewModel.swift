@@ -32,6 +32,13 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
                 select: { [weak self] in
                     self?.router.trigger(route: .gatewayConfigurations(filter: .alternativePaymentMethods))
                 }
+            ),
+            .init(
+                name: Strings.Features.CardPayment.title,
+                accessibilityId: "features.card-payment",
+                select: { [weak self] in
+                    self?.router.trigger(route: .cardDetails)
+                }
             )
         ])
         state = .started(startedState)
