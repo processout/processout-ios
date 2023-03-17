@@ -29,7 +29,7 @@ public protocol ProcessOutApiType {
 
     /// Returns cards repository.
     @_spi(PO)
-    var cards: POCardsRepositoryType { get }
+    var cards: POCardsServiceType { get }
 
     /// Returns customer tokens service.
     @_spi(PO)
@@ -50,7 +50,7 @@ public protocol ProcessOutApiType {
 
 extension ProcessOutApiType {
 
-    var cards: POCardsRepositoryType {
+    var cards: POCardsServiceType {
         fatalError("Not available!")
     }
 

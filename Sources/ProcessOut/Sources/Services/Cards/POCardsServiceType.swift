@@ -1,13 +1,14 @@
 //
-//  POCardsRepositoryType.swift
+//  POCardsServiceType.swift
 //  ProcessOut
 //
-//  Created by Julien.Rodrigues on 20/10/2022.
+//  Created by Andrii Vysotskyi on 17.03.2023.
 //
 
 import Foundation
 
-protocol POCardsRepositoryType: PORepositoryType {
+@_spi(PO)
+public protocol POCardsServiceType: POServiceType {
 
     /// Tokenize a card.
     func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void)
@@ -16,5 +17,5 @@ protocol POCardsRepositoryType: PORepositoryType {
     func updateCard(request: POCardUpdateRequest, completion: @escaping (Result<POCard, Failure>) -> Void)
 
     /// Tokenize a card via ApplePay.
-    func tokenize(request: ApplePayCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void)
+    func tokenize(request: POApplePayCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void)
 }

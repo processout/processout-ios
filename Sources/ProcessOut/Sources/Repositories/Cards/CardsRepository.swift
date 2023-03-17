@@ -9,14 +9,9 @@ import Foundation
 
 final class CardsRepository: POCardsRepositoryType {
 
-    init(
-        connector: HttpConnectorType,
-        failureMapper: HttpConnectorFailureMapperType,
-        applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapperType
-    ) {
+    init(connector: HttpConnectorType, failureMapper: HttpConnectorFailureMapperType) {
         self.connector = connector
         self.failureMapper = failureMapper
-        self.applePayCardTokenizationRequestMapper = applePayCardTokenizationRequestMapper
     }
 
     // MARK: - POCardsRepositoryType
@@ -30,32 +25,21 @@ final class CardsRepository: POCardsRepositoryType {
         }
     }
 
-    func updateCvc(cardId: String, newCvc: String, completion: @escaping (Result<POCard, Failure>) -> Void) {
-        let parameters: [String: String] = [
-            "cvc": newCvc
-        ]
+    func updateCard(request: POCardUpdateRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.put(
-            path: "/cards/" + cardId, body: parameters, includesDeviceMetadata: true
+            path: "/cards/" + request.cardId, body: request, includesDeviceMetadata: true
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
             completion(result.map(\.card).mapError(failureMapper.failure))
         }
     }
 
-    func tokenize(request: POApplePayCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
-        do {
-            let request = try applePayCardTokenizationRequestMapper.tokenizationRequest(from: request)
-            let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
-                path: "/cards", body: request, includesDeviceMetadata: true
-            )
-            connector.execute(request: httpRequest) { [failureMapper] result in
-                completion(result.map(\.card).mapError(failureMapper.failure))
-            }
-        } catch let failure as POFailure {
-            completion(.failure(failure))
-        } catch {
-            let failure = POFailure(message: nil, code: .internal(.mobile), underlyingError: error)
-            completion(.failure(failure))
+    func tokenize(request: ApplePayCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
+        let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
+            path: "/cards", body: request, includesDeviceMetadata: true
+        )
+        connector.execute(request: httpRequest) { [failureMapper] result in
+            completion(result.map(\.card).mapError(failureMapper.failure))
         }
     }
 
@@ -63,5 +47,4 @@ final class CardsRepository: POCardsRepositoryType {
 
     private let connector: HttpConnectorType
     private let failureMapper: HttpConnectorFailureMapperType
-    private let applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapperType
 }

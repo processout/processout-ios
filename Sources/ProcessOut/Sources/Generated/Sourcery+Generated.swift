@@ -78,11 +78,42 @@ extension POCardsRepositoryType {
     }
 
     @MainActor
-    public func updateCvc(
-        cardId: String, newCvc: String
+    public func updateCard(
+        request: POCardUpdateRequest
     ) async throws -> POCard {
         return try await withUnsafeThrowingContinuation { continuation in
-            updateCvc(cardId: cardId, newCvc: newCvc, completion: continuation.resume)
+            updateCard(request: request, completion: continuation.resume)
+        }
+    }
+
+    @MainActor
+    public func tokenize(
+        request: ApplePayCardTokenizationRequest
+    ) async throws -> POCard {
+        return try await withUnsafeThrowingContinuation { continuation in
+            tokenize(request: request, completion: continuation.resume)
+        }
+    }
+}
+
+@available(iOS 13.0, *)
+extension POCardsServiceType {
+
+    @MainActor
+    public func tokenize(
+        request: POCardTokenizationRequest
+    ) async throws -> POCard {
+        return try await withUnsafeThrowingContinuation { continuation in
+            tokenize(request: request, completion: continuation.resume)
+        }
+    }
+
+    @MainActor
+    public func updateCard(
+        request: POCardUpdateRequest
+    ) async throws -> POCard {
+        return try await withUnsafeThrowingContinuation { continuation in
+            updateCard(request: request, completion: continuation.resume)
         }
     }
 

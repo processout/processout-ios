@@ -59,14 +59,14 @@ private final class SharedProcessOutApi: ProcessOutApiType {
 
     private(set) lazy var logger: POLogger = createLogger(for: "Application")
 
-    private(set) lazy var cards: POCardsRepositoryType = {
-        CardsRepository(
-            connector: httpConnector,
-            failureMapper: failureMapper,
+    private(set) lazy var cards: POCardsServiceType = {
+        let service = CardsService(
+            repository: CardsRepository(connector: httpConnector, failureMapper: failureMapper),
             applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper(
                 decoder: decoder, logger: repositoryLogger
             )
         )
+        return service
     }()
 
     private(set) lazy var customerTokens: POCustomerTokensServiceType = {
