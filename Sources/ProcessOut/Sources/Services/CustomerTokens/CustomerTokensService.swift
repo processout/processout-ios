@@ -43,7 +43,7 @@ final class CustomerTokensService: POCustomerTokensServiceType {
     }
 
     func createCustomerToken(
-        request: POCustomerTokenCreationRequest,
+        request: POCreateCustomerTokenRequest,
         completion: @escaping (Result<POCustomerToken, Failure>) -> Void
     ) {
         repository.createCustomerToken(request: request, completion: completion)

@@ -18,7 +18,7 @@ public protocol POCustomerTokensServiceType: POServiceType {
     /// Create customer token.
     @_spi(PO)
     func createCustomerToken(
-        request: POCustomerTokenCreationRequest,
+        request: POCreateCustomerTokenRequest,
         completion: @escaping (Result<POCustomerToken, Failure>) -> Void
     )
 }

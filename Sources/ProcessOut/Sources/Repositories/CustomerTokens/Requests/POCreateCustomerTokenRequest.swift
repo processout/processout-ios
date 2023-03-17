@@ -1,5 +1,5 @@
 //
-//  POCustomerTokenCreationRequest.swift
+//  POCreateCustomerTokenRequest.swift
 //  ProcessOut
 //
 //  Created by Julien.Rodrigues on 02/11/2022.
@@ -8,7 +8,7 @@
 import Foundation
 
 @_spi(PO)
-public struct POCustomerTokenCreationRequest {
+public struct POCreateCustomerTokenRequest {
 
     /// Customer id to associate created token with.
     public let customerId: String

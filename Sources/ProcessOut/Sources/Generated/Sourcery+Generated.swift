@@ -17,7 +17,7 @@ extension CustomerTokensRepositoryType {
 
     @MainActor
     public func createCustomerToken(
-        request: POCustomerTokenCreationRequest
+        request: POCreateCustomerTokenRequest
     ) async throws -> POCustomerToken {
         return try await withUnsafeThrowingContinuation { continuation in
             createCustomerToken(request: request, completion: continuation.resume)
@@ -111,7 +111,7 @@ extension POCustomerTokensServiceType {
     @MainActor
     @_spi(PO)
     public func createCustomerToken(
-        request: POCustomerTokenCreationRequest
+        request: POCreateCustomerTokenRequest
     ) async throws -> POCustomerToken {
         return try await withUnsafeThrowingContinuation { continuation in
             createCustomerToken(request: request, completion: continuation.resume)

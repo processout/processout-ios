@@ -33,7 +33,7 @@ final class CustomerTokensRepository: CustomerTokensRepositoryType {
     }
 
     func createCustomerToken(
-        request: POCustomerTokenCreationRequest,
+        request: POCreateCustomerTokenRequest,
         completion: @escaping (Result<POCustomerToken, Failure>) -> Void
     ) {
         struct Response: Decodable {
