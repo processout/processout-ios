@@ -17,11 +17,11 @@ public struct POInvoiceAuthorizationRequest: Encodable {
     /// Payment source to use for authorization.
     public let source: String
 
-    /// Boolean value indicating if authorization is incremental.
-    public let incremental: Bool?
+    /// Boolean value indicating if authorization is incremental. Default value is `false`.
+    public let incremental: Bool
 
-    /// Boolean value indicating whether 3DS2 is enabled.
-    public let enableThreeDS2: Bool?
+    /// Boolean value indicating whether 3DS2 is enabled. Default value is `true`.
+    public let enableThreeDS2: Bool
 
     /// Card scheme or co-scheme that should get priority if it is available.
     public let preferredScheme: String?
@@ -34,7 +34,8 @@ public struct POInvoiceAuthorizationRequest: Encodable {
     public let invoiceDetailIds: [String]?
 
     /// Allows to specify if transaction blocking due to MasterCard Merchant Advice Code should be applied or not.
-    public let overrideMacBlocking: Bool?
+    /// Default is `false`.
+    public let overrideMacBlocking: Bool
 
     /// Allows to specify which scheme ID to use for subsequent CIT/MITs if applicable.
     public let initialSchemeTransactionId: String?
@@ -50,12 +51,12 @@ public struct POInvoiceAuthorizationRequest: Encodable {
     public init(
         invoiceId: String,
         source: String,
-        incremental: Bool? = nil,
-        enableThreeDS2: Bool? = nil,
+        incremental: Bool = false,
+        enableThreeDS2: Bool = true,
         preferredScheme: String? = nil,
         thirdPartySdkVersion: String? = nil,
         invoiceDetailIds: [String]? = nil,
-        overrideMacBlocking: Bool? = nil,
+        overrideMacBlocking: Bool = false,
         initialSchemeTransactionId: String? = nil,
         autoCaptureAt: Date? = nil,
         captureAmount: Decimal? = nil
