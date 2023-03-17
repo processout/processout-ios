@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-/// Class that provides access to shared api instance and a way to configure it.
+/// Provides access to shared api instance and a way to configure it.
 public enum ProcessOutApi {
 
     /// Shared instance.
