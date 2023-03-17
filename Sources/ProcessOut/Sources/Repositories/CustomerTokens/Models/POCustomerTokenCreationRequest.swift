@@ -8,25 +8,12 @@
 import Foundation
 
 @_spi(PO)
-public struct POCustomerTokenCreationRequest: Encodable {
+public struct POCustomerTokenCreationRequest {
 
-    /// Payment source to use for authorization.
-    public let source: String
+    /// Customer id to associate created token with.
+    public let customerId: String
 
-    /// Invoice identifier to to perform authorization for.
-    @POImmutableExcludedCodable
-    public var customerId: String
-
-    /// Additional matadata.
-    public let metadata: [String: POAnyEncodable]
-
-    public init(
-        source: String,
-        customerId: String,
-        metadata: [String: POAnyEncodable]
-    ) {
-        self.source = source
-        self._customerId = .init(value: customerId)
-        self.metadata = metadata
+    public init(customerId: String) {
+        self.customerId = customerId
     }
 }
