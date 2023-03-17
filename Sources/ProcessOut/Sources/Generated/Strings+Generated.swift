@@ -25,7 +25,7 @@ internal enum Strings {
       internal static var title: String { return Strings.tr("ProcessOut", "native-alternative-payment.cancel-button.title") }
     }
     internal enum Email {
-      /// example@domain.com
+      /// name@example.com
       internal static var placeholder: String { return Strings.tr("ProcessOut", "native-alternative-payment.email.placeholder") }
     }
     internal enum Error {
@@ -45,7 +45,7 @@ internal enum Strings {
       internal static var requiredParameter: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.required-parameter") }
     }
     internal enum Phone {
-      /// Your phone number...
+      /// Enter phone number
       internal static var placeholder: String { return Strings.tr("ProcessOut", "native-alternative-payment.phone.placeholder") }
     }
     internal enum SubmitButton {
@@ -60,10 +60,6 @@ internal enum Strings {
       /// Success!
       /// Payment approved
       internal static var message: String { return Strings.tr("ProcessOut", "native-alternative-payment.success.message") }
-    }
-    internal enum Text {
-      /// Lorem Ipsum...
-      internal static var placeholder: String { return Strings.tr("ProcessOut", "native-alternative-payment.text.placeholder") }
     }
   }
 }
