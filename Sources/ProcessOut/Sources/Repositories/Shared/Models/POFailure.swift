@@ -126,28 +126,66 @@ public struct POFailure: Error {
     }
 
     public enum GenericCode: String {
-        case cardExceededLimits                  = "card.exceeded-limits"
-        case cardIssuerDown                      = "card.issuer-down"
-        case cardIssuerFailed                    = "card.issuer-failed"
-        case cardNoMoney                         = "card.no-money"
-        case cardNotAuthorized                   = "card.not-authorized"
-        case gatewayDeclined                     = "gateway.declined"
-        case gatewayUnknownError                 = "gateway.unknown-error"
-        case mobile                              = "processout-mobile.generic.error"
-        case requestBadFormat                    = "request.bad-format"
-        case requestCardAlreadyUsed              = "request.source.card-already-used"
+
+        /// The card limits were reached (ex: amounts, transactions volume) and the customer should contact its bank.
+        case cardExceededLimits = "card.exceeded-limits"
+
+        /// The card CVC check failed
+        case cardFailedCvc = "card.failed-cvc"
+
+        /// The card holder bank could not process the payment
+        case cardIssuerDown = "card.issuer-down"
+
+        /// The card holder bank failed to process the transaction.
+        case cardIssuerFailed = "card.issuer-failed"
+
+        /// The card has no money left in its bank account, the customer should add more funds.
+        case cardNoMoney = "card.no-money"
+
+        /// The card is not authorized to make the payment.
+        case cardNotAuthorized = "card.not-authorized"
+
+        /// The gateway that attempted to process the payment returned a generic decline. This can be caused by
+        /// validation errors, fraud prevention tool or other specific errors.
+        case gatewayDeclined = "gateway.declined"
+
+        /// Gateway encountered an unknown error.
+        case gatewayUnknownError = "gateway.unknown-error"
+
+        /// Some error happend on SDK's side while processing request.
+        case mobile = "processout-mobile.generic.error"
+
+        /// Something is wrong with request (for example malformed request syntax). Seeing this error usually means that
+        /// something is wrong with SDK's implementation.
+        case requestBadFormat = "request.bad-format"
+
+        /// The card provided as a source was already used elsewhere (to create a token or capture a payment) and
+        /// cannot be used twice. If you want to be able to re-use a card token, you must create a customer token
+        /// with the card specified as the source.
+        case requestCardAlreadyUsed = "request.source.card-already-used"
+
+        /// The card was invalid (invalid number/expiration date/CVC).
+        case requestInvalidCard = "request.card.invalid"
+
+        /// Requested resource details could not be expanded.
+        case requestInvalidExpand = "request.expand.invalid"
+
+        /// Specified filter is not supported.
+        case requestInvalidFilter = "request.filter.invalid"
+
+        /// The request has been accepted for processing, but the processing has not been completed.
+        case requestStillProcessing = "request.still-processing"
+
+        /// The user has sent too many requests in a given amount of time.
+        case requestTooMuch = "request.too-much"
+
         case requestGatewayNotAvailable          = "request.gateway.not-available"
         case requestGatewayOperationNotSupported = "request.gateway.operation-not-supported"
-        case requestInvalidCard                  = "request.card.invalid"
-        case requestInvalidExpand                = "request.expand.invalid"
-        case requestInvalidFilter                = "request.filter.invalid"
         case requestInvalidIdempotency           = "request.idempotency-key.invalid"
         case requestInvalidPagination            = "request.pagination.invalid"
         case requestInvalidSource                = "request.source.invalid"
         case requestNoGatewayConfiguration       = "request.configuration.missing-gateway-configuration"
         case requestRateExceeded                 = "request.rate.exceeded"
-        case requestStillProcessing              = "request.still-processing"
-        case requestTooMuch                      = "request.too-much"
         case resourceNotLinked                   = "resource.not-linked"
         case routingRulesTransactionBlocked      = "routing-rules.transaction-blocked"
         case sandboxNotSupported                 = "sandbox.not-supported"
