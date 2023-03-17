@@ -16,13 +16,13 @@ final class AuthenticationRequestMapper: AuthenticationRequestMapperType {
 
     // MARK: - MapperType
 
-    func convert(request: AuthenticationRequestParameters) -> Result<PODeviceFingerprint, POFailure> {
+    func convert(request: AuthenticationRequestParameters) -> Result<PO3DSAuthenticationRequest, POFailure> {
         do {
-            let fingerprint = PODeviceFingerprint(
+            let fingerprint = PO3DSAuthenticationRequest(
                 deviceInformation: request.deviceData,
                 applicationId: request.sdkAppID,
                 sdkEphemeralPublicKey: try decoder.decode(
-                    PODeviceFingerprint.EphemeralPublicKey.self, from: Data(request.sdkEphemeralPublicKey.utf8)
+                    PO3DSAuthenticationRequest.EphemeralPublicKey.self, from: Data(request.sdkEphemeralPublicKey.utf8)
                 ),
                 sdkReferenceNumber: request.sdkReferenceNumber,
                 sdkTransactionId: request.sdkTransactionID

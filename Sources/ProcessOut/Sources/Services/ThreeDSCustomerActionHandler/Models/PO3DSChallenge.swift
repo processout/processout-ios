@@ -1,12 +1,14 @@
 //
-//  POAuthentificationChallengeData.swift
+//  PO3DSChallenge.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
+/// Information from the 3DS Server's authentication response that could be used by the 3DS2 SDK to initiate
+/// the challenge flow.
 @_spi(PO)
-public struct POAuthentificationChallengeData: Decodable {
+public struct PO3DSChallenge: Decodable {
 
     /// Unique transaction identifier assigned by the ACS.
     public let acsTransactionId: String
@@ -14,7 +16,8 @@ public struct POAuthentificationChallengeData: Decodable {
     /// Unique identifier that identifies the ACS service provider.
     public let acsReferenceNumber: String
 
-    /// JWS object (represented as a string) containing, among other data, the ACS Ephemeral Public Key.
+    /// The encrypted message containing the ACS information (including Ephemeral Public Key) and
+    /// the 3DS2 SDK ephemeral public key.
     public let acsSignedContent: String
 
     /// Unique identifier for the authentication assigned by the DS (Card Scheme).

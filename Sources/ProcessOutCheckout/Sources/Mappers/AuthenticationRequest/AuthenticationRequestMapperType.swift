@@ -11,5 +11,5 @@ import Checkout3DS
 protocol AuthenticationRequestMapperType {
 
     /// Converts given request to fingerprint.
-    func convert(request: AuthenticationRequestParameters) -> Result<PODeviceFingerprint, POFailure>
+    func convert(request: AuthenticationRequestParameters) -> Result<PO3DSAuthenticationRequest, POFailure>
 }

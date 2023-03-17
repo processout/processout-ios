@@ -16,7 +16,7 @@ final class CustomerTokensService: POCustomerTokensServiceType {
 
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
-        threeDSHandler: POThreeDSHandlerType,
+        threeDSHandler: PO3DSHandlerType,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         repository.assignCustomerToken(request: request) { [customerActionHandler] result in

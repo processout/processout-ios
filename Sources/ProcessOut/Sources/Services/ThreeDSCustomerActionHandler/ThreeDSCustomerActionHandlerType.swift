@@ -14,5 +14,5 @@ protocol ThreeDSCustomerActionHandlerType {
     ///   - customerAction: customer action to handle.
     ///   - delegate: delegate that would perform actual action handling.
     ///   - completion: closure to invoke with a result of customer action handling.
-    func handle(customerAction: ThreeDSCustomerAction, handler: POThreeDSHandlerType, completion: @escaping Completion)
+    func handle(customerAction: ThreeDSCustomerAction, handler: PO3DSHandlerType, completion: @escaping Completion)
 }

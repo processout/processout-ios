@@ -1,12 +1,12 @@
 //
-//  PODeviceFingerprint.swift
+//  PO3DSAuthenticationRequest.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 03.11.2022.
 //
 
 @_spi(PO)
-public struct PODeviceFingerprint: Encodable {
+public struct PO3DSAuthenticationRequest: Encodable {
 
     public struct EphemeralPublicKey: Codable {
 
@@ -35,7 +35,7 @@ public struct PODeviceFingerprint: Encodable {
     public let deviceChannel: String
 
     /// A unique string identifying the application.
-    public let applicationId: String
+    public let sdkApplicationId: String
 
     /// The public key component of the ephemeral keypair generated for the transaction, represented as a JWK.
     public let sdkEphemeralPublicKey: EphemeralPublicKey?
@@ -55,7 +55,7 @@ public struct PODeviceFingerprint: Encodable {
     ) {
         self.deviceInformation = deviceInformation
         self.deviceChannel = "app"
-        self.applicationId = applicationId
+        self.sdkApplicationId = applicationId
         self.sdkEphemeralPublicKey = sdkEphemeralPublicKey
         self.sdkReferenceNumber = sdkReferenceNumber
         self.sdkTransactionId = sdkTransactionId
@@ -66,7 +66,7 @@ public struct PODeviceFingerprint: Encodable {
     private enum CodingKeys: String, CodingKey {
         case deviceInformation = "sdkEncData"
         case deviceChannel
-        case applicationId = "sdkAppID"
+        case sdkApplicationId = "sdkAppID"
         case sdkEphemeralPublicKey = "sdkEphemPubKey"
         case sdkReferenceNumber
         case sdkTransactionId = "sdkTransID"

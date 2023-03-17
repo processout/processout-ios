@@ -10,7 +10,7 @@
 @_spi(PO) import ProcessOut
 import Checkout3DS
 
-final class CheckoutThreeDSHandler: POThreeDSHandlerType {
+final class CheckoutThreeDSHandler: PO3DSHandlerType {
 
     init(
         errorMapper: AuthenticationErrorMapperType,
@@ -28,10 +28,10 @@ final class CheckoutThreeDSHandler: POThreeDSHandlerType {
         setIdleState()
     }
 
-    // MARK: - POThreeDSHandlerType
+    // MARK: - PO3DSHandlerType
 
-    func fingerprint(
-        data: PODirectoryServerData, completion: @escaping (Result<PODeviceFingerprint, POFailure>) -> Void
+    func authenticationRequest(
+        data: PODirectoryServerData, completion: @escaping (Result<PO3DSAuthenticationRequest, POFailure>) -> Void
     ) {
         switch state {
         case .idle, .fingerprinted:
@@ -80,8 +80,8 @@ final class CheckoutThreeDSHandler: POThreeDSHandlerType {
         }
     }
 
-    func challenge(
-        challenge: POAuthentificationChallengeData, completion: @escaping (Result<Bool, POFailure>) -> Void
+    func perform(
+        challenge: PO3DSChallenge, completion: @escaping (Result<Bool, POFailure>) -> Void
     ) {
         guard case let .fingerprinted(context) = state else {
             let failure = POFailure(code: .generic(.mobile))
@@ -143,7 +143,7 @@ final class CheckoutThreeDSHandler: POThreeDSHandlerType {
         return .init(directoryServerData: directoryServerData, messageVersion: data.messageVersion, scheme: "")
     }
 
-    private func convertToChallengeParameters(data: POAuthentificationChallengeData) -> ChallengeParameters {
+    private func convertToChallengeParameters(data: PO3DSChallenge) -> ChallengeParameters {
         let challengeParameters = ChallengeParameters(
             threeDSServerTransactionID: data.threeDSServerTransactionId,
             acsTransactionID: data.acsTransactionId,

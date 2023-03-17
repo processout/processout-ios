@@ -29,3 +29,4 @@ public struct PODirectoryServerData: Decodable {
         case messageVersion
     }
 }
+

@@ -32,7 +32,7 @@ final class InvoicesService: POInvoicesServiceType {
 
     func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
-        threeDSHandler: POThreeDSHandlerType,
+        threeDSHandler: PO3DSHandlerType,
         completion: @escaping (Result<Void, Failure>) -> Void
     ) {
         repository.authorizeInvoice(request: request) { [customerActionHandler] result in
