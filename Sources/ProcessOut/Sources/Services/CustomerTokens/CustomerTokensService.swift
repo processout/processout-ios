@@ -60,12 +60,13 @@ private extension POAssignCustomerTokenRequest { // swiftlint:disable:this no_ex
     func replacing(source newSource: String) -> Self {
         let updatedRequest = POAssignCustomerTokenRequest(
             customerId: customerId,
+            tokenId: tokenId,
             source: newSource,
-            enableThreeDS2: enableThreeDS2,
             preferredScheme: preferredScheme,
-            thirdPartySdkVersion: thirdPartySdkVersion,
             verify: verify,
-            tokenId: tokenId
+            invoiceId: invoiceId,
+            enableThreeDS2: enableThreeDS2,
+            thirdPartySdkVersion: thirdPartySdkVersion
         )
         return updatedRequest
     }
