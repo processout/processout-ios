@@ -8,29 +8,28 @@
 import UIKit
 @_spi(PO) import ProcessOut
 
-final class CardPaymentTestThreeDSHandler: POThreeDSHandlerType {
+final class CardPaymentTestThreeDSHandler: PO3DSServiceType {
 
     /// View controller to use for presentations.
     unowned var viewController: UIViewController! // swiftlint:disable:this implicitly_unwrapped_optional
 
     // MARK: - POThreeDSHandlerType
 
-    func fingerprint(
-        data: PODirectoryServerData, completion: @escaping (Result<PODeviceFingerprint, POFailure>) -> Void
+    func authenticationRequest(
+        configuration: PO3DS2Configuration,
+        completion: @escaping (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
     ) {
-        let deviceFingerprint = PODeviceFingerprint(
-            deviceInformation: "",
-            applicationId: "",
-            sdkEphemeralPublicKey: nil,
+        let request = PO3DS2AuthenticationRequest(
+            deviceData: "",
+            sdkAppId: "",
+            sdkEphemeralPublicKey: "",
             sdkReferenceNumber: "",
             sdkTransactionId: ""
         )
-        completion(.success(deviceFingerprint))
+        completion(.success(request))
     }
 
-    func challenge(
-        challenge: POAuthentificationChallengeData, completion: @escaping (Result<Bool, POFailure>) -> Void
-    ) {
+    func perform(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
         let alertController = UIAlertController(
             title: Strings.CardPayment.Challenge.title, message: "", preferredStyle: .alert
         )
@@ -45,7 +44,7 @@ final class CardPaymentTestThreeDSHandler: POThreeDSHandlerType {
         self.viewController.present(alertController, animated: true)
     }
 
-    func redirect(context: PORedirectCustomerActionContext, completion: @escaping (Result<String, POFailure>) -> Void) {
+    func redirect(context: PO3DSRedirectContext, completion: @escaping (Result<String, POFailure>) -> Void) {
         let viewController = PORedirectCustomerActionViewControllerBuilder
             .with(context: context)
             .with { [weak self] result in
