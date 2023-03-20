@@ -24,9 +24,6 @@ public struct PO3DS2Configuration: Decodable {
     /// 3DS protocol version identifier.
     public let messageVersion: String
 
-    /// Card scheme from the card used to initiate the payment
-    public let cardScheme: String
-
     // MARK: - Private Nested Types
 
     private enum CodingKeys: String, CodingKey {
@@ -35,6 +32,5 @@ public struct PO3DS2Configuration: Decodable {
         case directoryServerRootCertificate
         case directoryServerTransactionId = "threeDSServerTransID"
         case messageVersion
-        case cardScheme
     }
 }

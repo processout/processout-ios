@@ -59,16 +59,13 @@ final class ThreeDSService: ThreeDSServiceType {
                 switch result {
                 case let .success(request):
                     do {
-                        let authenticationRequest = try self.convertAuthenticationRequest(request: request)
                         let response = FingerprintResponse(
-                            url: nil,
-                            headers: nil,
-                            body: String(decoding: try self.encoder.encode(authenticationRequest), as: UTF8.self)
+                            url: nil, headers: nil, body: try self.encode(request: request)
                         )
-                        let responseDataString = String(
+                        let encodedResponse = String(
                             decoding: try encoder.encode(response).base64EncodedData(), as: UTF8.self
                         )
-                        completion(.success("gway_req_" + responseDataString))
+                        completion(.success("gway_req_" + encodedResponse))
                     } catch {
                         logger.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
                         completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: error)))
@@ -163,20 +160,20 @@ final class ThreeDSService: ThreeDSServiceType {
         return try decoder.decode(type, from: data)
     }
 
-    private func convertAuthenticationRequest(
-        request: PO3DS2AuthenticationRequest
-    ) throws -> ThreeDS2AuthenticationRequest {
-        let sdkPublicKeyData = Data(request.sdkEphemeralPublicKey.utf8)
-        guard let sdkPublicKey = try JSONSerialization.jsonObject(with: sdkPublicKeyData) as? [String: String] else {
-            throw POFailure(message: "Unexpected public key format.", code: .generic(.mobile))
-        }
-        let request = ThreeDS2AuthenticationRequest(
-            deviceData: request.deviceData,
-            sdkAppId: request.sdkAppId,
-            sdkEphemeralPublicKey: sdkPublicKey,
-            sdkReferenceNumber: request.sdkReferenceNumber,
-            sdkTransactionId: request.sdkTransactionId
+    private func encode(request: PO3DS2AuthenticationRequest) throws -> String {
+        // Using JSONSerialization helps avoid creating boilerplate objects for JSON Web Key coding. Implementation
+        // doesn't validate JWK correctness and simply re-encodes given value.
+        let sdkEphemeralPublicKey = try JSONSerialization.jsonObject(
+            with: Data(request.sdkEphemeralPublicKey.utf8)
         )
-        return request
+        var requestParameters = [
+            "deviceChannel": "app",
+            "sdkAppID": request.sdkAppId,
+            "sdkEphemPubKey": sdkEphemeralPublicKey,
+            "sdkReferenceNumber": request.sdkReferenceNumber,
+            "sdkTransID": request.sdkTransactionId
+        ]
+        requestParameters["sdkEncData"] = request.deviceData
+        return try JSONSerialization.data(withJSONObject: requestParameters).base64EncodedString()
     }
 }

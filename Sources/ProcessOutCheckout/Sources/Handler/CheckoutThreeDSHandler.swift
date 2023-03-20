@@ -134,7 +134,7 @@ final class CheckoutThreeDSHandler: PO3DSServiceType {
         let configParameters = ThreeDS2ServiceConfiguration.ConfigParameters(
             directoryServerData: directoryServerData,
             messageVersion: configuration.messageVersion,
-            scheme: configuration.cardScheme
+            scheme: ""
         )
         return configParameters
     }
