@@ -10,7 +10,7 @@
 @_spi(PO) import ProcessOut
 import Checkout3DS
 
-final class CheckoutThreeDSHandler: PO3DSHandlerType {
+final class CheckoutThreeDSHandler: PO3DSServiceType {
 
     init(
         errorMapper: AuthenticationErrorMapperType,
@@ -31,7 +31,7 @@ final class CheckoutThreeDSHandler: PO3DSHandlerType {
     // MARK: - PO3DSHandlerType
 
     func authenticationRequest(
-        data: PODirectoryServerData, completion: @escaping (Result<PO3DSAuthenticationRequest, POFailure>) -> Void
+        data: PO3DS2Configuration, completion: @escaping (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
     ) {
         switch state {
         case .idle, .fingerprinted:
@@ -80,8 +80,8 @@ final class CheckoutThreeDSHandler: PO3DSHandlerType {
         }
     }
 
-    func perform(
-        challenge: PO3DSChallenge, completion: @escaping (Result<Bool, POFailure>) -> Void
+    func do(
+        challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void
     ) {
         guard case let .fingerprinted(context) = state else {
             let failure = POFailure(code: .generic(.mobile))
@@ -97,7 +97,7 @@ final class CheckoutThreeDSHandler: PO3DSHandlerType {
     }
 
     func redirect(
-        context: PORedirectCustomerActionContext, completion: @escaping (Result<String, POFailure>) -> Void
+        context: PO3DSRedirectContext, completion: @escaping (Result<String, POFailure>) -> Void
     ) {
         // Redirection is simply forwarded to delegate without additional validations.
         delegate.redirect(context: context, completion: completion)
@@ -132,18 +132,18 @@ final class CheckoutThreeDSHandler: PO3DSHandlerType {
     // MARK: - Utils
 
     private func convertToConfigParameters(
-        data: PODirectoryServerData
+        data: PO3DS2Configuration
     ) -> ThreeDS2ServiceConfiguration.ConfigParameters {
         // TODO: replace certificate with proper values when available
         let directoryServerData = ThreeDS2ServiceConfiguration.DirectoryServerData(
-            directoryServerID: data.id,
-            directoryServerPublicKey: data.publicKey,
+            directoryServerID: data.directoryServerId,
+            directoryServerPublicKey: data.directoryServerPublicKey,
             directoryServerRootCertificate: "???"
         )
         return .init(directoryServerData: directoryServerData, messageVersion: data.messageVersion, scheme: "")
     }
 
-    private func convertToChallengeParameters(data: PO3DSChallenge) -> ChallengeParameters {
+    private func convertToChallengeParameters(data: PO3DS2Challenge) -> ChallengeParameters {
         let challengeParameters = ChallengeParameters(
             threeDSServerTransactionID: data.threeDSServerTransactionId,
             acsTransactionID: data.acsTransactionId,

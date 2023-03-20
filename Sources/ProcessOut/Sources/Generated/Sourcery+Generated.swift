@@ -132,7 +132,7 @@ extension POCustomerTokensServiceType {
 
     @MainActor
     public func assignCustomerToken(
-        request: POAssignCustomerTokenRequest, threeDSHandler: PO3DSHandlerType
+        request: POAssignCustomerTokenRequest, threeDSHandler: PO3DSServiceType
     ) async throws -> Void {
         return try await withUnsafeThrowingContinuation { continuation in
             assignCustomerToken(request: request, threeDSHandler: threeDSHandler, completion: continuation.resume)
@@ -203,7 +203,7 @@ extension POInvoicesServiceType {
     @MainActor
     @_spi(PO)
     public func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest, threeDSHandler: PO3DSHandlerType
+        request: POInvoiceAuthorizationRequest, threeDSHandler: PO3DSServiceType
     ) async throws -> Void {
         return try await withUnsafeThrowingContinuation { continuation in
             authorizeInvoice(request: request, threeDSHandler: threeDSHandler, completion: continuation.resume)

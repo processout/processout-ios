@@ -1,5 +1,5 @@
 //
-//  PORedirectCustomerActionContext.swift
+//  PO3DSRedirectContext.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 17.01.2023.
@@ -8,7 +8,7 @@
 import Foundation
 
 @_spi(PO)
-public struct PORedirectCustomerActionContext {
+public struct PO3DSRedirectContext {
 
     /// Redirect url.
     public let url: URL

@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class ThreeDSCustomerActionHandler: ThreeDSCustomerActionHandlerType {
+final class ThreeDSService: ThreeDSServiceType {
 
     init(decoder: JSONDecoder, encoder: JSONEncoder, logger: POLogger) {
         self.decoder = decoder
@@ -17,24 +17,20 @@ final class ThreeDSCustomerActionHandler: ThreeDSCustomerActionHandlerType {
 
     // MARK: - ThreeDSCustomerActionHandlerType
 
-    func handle(
-        customerAction: ThreeDSCustomerAction, handler: PO3DSHandlerType, completion: @escaping Completion
-    ) {
+    func handle(action: ThreeDSCustomerAction, handler: PO3DSServiceType, completion: @escaping Completion) {
         let completionTrampoline: Completion = { result in
             assert(Thread.isMainThread, "Completion must be called on main thread!")
             completion(result)
         }
-        switch customerAction.type {
+        switch action.type {
         case .fingerprintMobile:
-            fingerprint(
-                encodedDirectoryServerData: customerAction.value, handler: handler, completion: completionTrampoline
-            )
+            fingerprint(encodedDirectoryServerData: action.value, handler: handler, completion: completionTrampoline)
         case .challengeMobile:
-            challenge(encodedChallengeData: customerAction.value, handler: handler, completion: completionTrampoline)
+            challenge(encodedChallengeData: action.value, handler: handler, completion: completionTrampoline)
         case .fingerprint:
-            fingerprint(url: customerAction.value, handler: handler, completion: completionTrampoline)
+            fingerprint(url: action.value, handler: handler, completion: completionTrampoline)
         case .redirect, .url:
-            redirect(url: customerAction.value, handler: handler, completion: completionTrampoline)
+            redirect(url: action.value, handler: handler, completion: completionTrampoline)
         }
     }
 
@@ -55,11 +51,11 @@ final class ThreeDSCustomerActionHandler: ThreeDSCustomerActionHandlerType {
     // MARK: - Private Methods
 
     private func fingerprint(
-        encodedDirectoryServerData: String, handler: PO3DSHandlerType, completion: @escaping Completion
+        encodedDirectoryServerData: String, handler: PO3DSServiceType, completion: @escaping Completion
     ) {
         do {
-            let directoryServerData = try decode(PODirectoryServerData.self, from: encodedDirectoryServerData)
-            handler.fingerprint(data: directoryServerData) { [encoder, logger] result in
+            let configuration = try decode(PO3DS2Configuration.self, from: encodedDirectoryServerData)
+            handler.authenticationRequest(configuration: configuration) { [encoder, logger] result in
                 switch result {
                 case let .success(fingerprint):
                     do {
@@ -90,10 +86,10 @@ final class ThreeDSCustomerActionHandler: ThreeDSCustomerActionHandlerType {
     }
 
     private func challenge(
-        encodedChallengeData: String, handler: PO3DSHandlerType, completion: @escaping Completion
+        encodedChallengeData: String, handler: PO3DSServiceType, completion: @escaping Completion
     ) {
         do {
-            let challenge = try decode(PO3DSChallenge.self, from: encodedChallengeData)
+            let challenge = try decode(PO3DS2Challenge.self, from: encodedChallengeData)
             handler.perform(challenge: challenge) { result in
                 switch result {
                 case let .success(success):
@@ -111,13 +107,13 @@ final class ThreeDSCustomerActionHandler: ThreeDSCustomerActionHandlerType {
         }
     }
 
-    private func fingerprint(url: String, handler: PO3DSHandlerType, completion: @escaping Completion) {
+    private func fingerprint(url: String, handler: PO3DSServiceType, completion: @escaping Completion) {
         guard let url = URL(string: url) else {
             logger.error("Did fail to create fingerprint URL from raw value: '\(url)'.")
             completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
             return
         }
-        let context = PORedirectCustomerActionContext(url: url, isHeadlessModeAllowed: true, timeout: 10)
+        let context = PO3DSRedirectContext(url: url, isHeadlessModeAllowed: true, timeout: 10)
         handler.redirect(context: context) { [encoder, logger] result in
             switch result {
             case let .success(newSource):
@@ -144,13 +140,13 @@ final class ThreeDSCustomerActionHandler: ThreeDSCustomerActionHandlerType {
         }
     }
 
-    private func redirect(url: String, handler: PO3DSHandlerType, completion: @escaping Completion) {
+    private func redirect(url: String, handler: PO3DSServiceType, completion: @escaping Completion) {
         guard let url = URL(string: url) else {
             logger.error("Did fail to create redirect URL from raw value: '\(url)'.")
             completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
             return
         }
-        let context = PORedirectCustomerActionContext(url: url, isHeadlessModeAllowed: false, timeout: nil)
+        let context = PO3DSRedirectContext(url: url, isHeadlessModeAllowed: false, timeout: nil)
         handler.redirect(context: context, completion: completion)
     }
 

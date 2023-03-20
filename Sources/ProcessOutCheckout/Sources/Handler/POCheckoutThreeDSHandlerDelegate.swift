@@ -9,7 +9,7 @@
 import Checkout3DS
 
 @_spi(PO)
-public protocol POCheckoutThreeDSHandlerDelegate: AnyObject {
+public protocol POCheckoutThreeDSHandlerDelegate: AnyObject { // POCheckout3DS2ServiceDelegate
 
     /// Notifies delegate that handler is about to fingerprint device. Implementation should create
     /// `ThreeDS2ServiceConfiguration` using `configParameters` and return it.
@@ -24,7 +24,7 @@ public protocol POCheckoutThreeDSHandlerDelegate: AnyObject {
     func shouldContinueFingerprinting(warnings: Set<Checkout3DS.Warning>, completion: @escaping (Bool) -> Void)
 
     /// Asks delegate to redirect user using given context.
-    func redirect(context: PORedirectCustomerActionContext, completion: @escaping (Result<String, POFailure>) -> Void)
+    func redirect(context: PO3DSRedirectContext, completion: @escaping (Result<String, POFailure>) -> Void)
 }
 
 extension POCheckoutThreeDSHandlerDelegate {

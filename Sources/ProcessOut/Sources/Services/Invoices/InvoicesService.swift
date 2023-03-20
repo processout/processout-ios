@@ -9,9 +9,9 @@ import Foundation
 
 final class InvoicesService: POInvoicesServiceType {
 
-    init(repository: InvoicesRepositoryType, customerActionHandler: ThreeDSCustomerActionHandlerType) {
+    init(repository: InvoicesRepositoryType, threeDSService: ThreeDSServiceType) {
         self.repository = repository
-        self.customerActionHandler = customerActionHandler
+        self.threeDSService = threeDSService
     }
 
     // MARK: - POCustomerTokensServiceType
@@ -32,13 +32,13 @@ final class InvoicesService: POInvoicesServiceType {
 
     func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
-        threeDSHandler: PO3DSHandlerType,
+        threeDSHandler: PO3DSServiceType,
         completion: @escaping (Result<Void, Failure>) -> Void
     ) {
-        repository.authorizeInvoice(request: request) { [customerActionHandler] result in
+        repository.authorizeInvoice(request: request) { [threeDSService] result in
             switch result {
             case let .success(customerAction?):
-                customerActionHandler.handle(customerAction: customerAction, handler: threeDSHandler) { result in
+                threeDSService.handle(action: customerAction, handler: threeDSHandler) { result in
                     switch result {
                     case let .success(newSource):
                         self.authorizeInvoice(
@@ -104,7 +104,7 @@ final class InvoicesService: POInvoicesServiceType {
     // MARK: - Private Properties
 
     private let repository: InvoicesRepositoryType
-    private let customerActionHandler: ThreeDSCustomerActionHandlerType
+    private let threeDSService: ThreeDSServiceType
 }
 
 private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_extension_access_modifier

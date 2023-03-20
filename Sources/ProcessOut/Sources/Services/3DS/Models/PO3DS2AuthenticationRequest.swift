@@ -1,14 +1,15 @@
 //
-//  PO3DSAuthenticationRequest.swift
+//  PO3DS2AuthenticationRequest.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 03.11.2022.
 //
 
+/// Holds ransaction data that the 3DS Server requires to create the AReq.
 @_spi(PO)
-public struct PO3DSAuthenticationRequest: Encodable {
+public struct PO3DS2AuthenticationRequest: Encodable {
 
-    public struct EphemeralPublicKey: Codable {
+    public struct EphemeralPublicKey: Codable { // extract this away from request itself
 
         /// The crv member identifies the cryptographic curve used with the key. Values defined by this specification
         /// are P-256, P-384 and P-521. Additional crv values MAY be used, provided they are understood by
@@ -28,17 +29,17 @@ public struct PO3DSAuthenticationRequest: Encodable {
         public let y: String // swiftlint:disable:this identifier_name
     }
 
-    /// The device information, encrypted using JSON Web Encryption.
-    public let deviceInformation: String
+    /// Encrypted device data as a JWE string.
+    public let deviceData: String // must be optional
 
     /// Device type, defaults to "app".
     public let deviceChannel: String
 
     /// A unique string identifying the application.
-    public let sdkApplicationId: String
+    public let sdkAppId: String
 
     /// The public key component of the ephemeral keypair generated for the transaction, represented as a JWK.
-    public let sdkEphemeralPublicKey: EphemeralPublicKey?
+    public let sdkEphemeralPublicKey: EphemeralPublicKey? // must be mandatory, todo: change this to string
 
     /// A string identifying the SDK, assigned by EMVCo.
     public let sdkReferenceNumber: String
@@ -53,9 +54,9 @@ public struct PO3DSAuthenticationRequest: Encodable {
         sdkReferenceNumber: String,
         sdkTransactionId: String
     ) {
-        self.deviceInformation = deviceInformation
+        self.deviceData = deviceInformation
         self.deviceChannel = "app"
-        self.sdkApplicationId = applicationId
+        self.sdkAppId = applicationId
         self.sdkEphemeralPublicKey = sdkEphemeralPublicKey
         self.sdkReferenceNumber = sdkReferenceNumber
         self.sdkTransactionId = sdkTransactionId
@@ -64,9 +65,9 @@ public struct PO3DSAuthenticationRequest: Encodable {
     // MARK: - Private Nested Types
 
     private enum CodingKeys: String, CodingKey {
-        case deviceInformation = "sdkEncData"
+        case deviceData = "sdkEncData"
         case deviceChannel
-        case sdkApplicationId = "sdkAppID"
+        case sdkAppId = "sdkAppID"
         case sdkEphemeralPublicKey = "sdkEphemPubKey"
         case sdkReferenceNumber
         case sdkTransactionId = "sdkTransID"

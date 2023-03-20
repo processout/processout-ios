@@ -1,21 +1,22 @@
 //
-//  PODirectoryServerData.swift
+//  PO3DS2Configuration.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
+/// Represent the configuration parameters that are required by the 3DS SDK for initialization.
 @_spi(PO)
-public struct PODirectoryServerData: Decodable {
+public struct PO3DS2Configuration: Decodable {
 
     /// The identifier of the directory server to use during the transaction creation phase.
-    public let id: String
+    public let directoryServerId: String
 
     /// The public key of the directory server to use during the transaction creation phase.
-    public let publicKey: String
+    public let directoryServerPublicKey: String
 
     /// Unique identifier for the authentication assigned by the DS (Card Scheme).
-    public let transactionId: String
+    public let directoryServerTransactionId: String
 
     /// 3DS protocol version identifier.
     public let messageVersion: String
@@ -23,10 +24,9 @@ public struct PODirectoryServerData: Decodable {
     // MARK: - Private Nested Types
 
     private enum CodingKeys: String, CodingKey {
-        case id = "directoryServerID"
-        case publicKey = "directoryServerPublicKey"
-        case transactionId = "threeDSServerTransID"
+        case directoryServerId = "directoryServerID"
+        case directoryServerPublicKey = "directoryServerPublicKey"
+        case directoryServerTransactionId = "threeDSServerTransID"
         case messageVersion
     }
 }
-
