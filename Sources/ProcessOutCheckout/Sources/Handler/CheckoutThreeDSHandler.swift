@@ -5,20 +5,13 @@
 //  Created by Andrii Vysotskyi on 28.02.2023.
 //
 
-// swiftlint:disable todo
-
 @_spi(PO) import ProcessOut
 import Checkout3DS
 
 final class CheckoutThreeDSHandler: PO3DSServiceType {
 
-    init(
-        errorMapper: AuthenticationErrorMapperType,
-        authenticationRequestMapper: AuthenticationRequestMapperType,
-        delegate: POCheckoutThreeDSHandlerDelegate
-    ) {
+    init(errorMapper: AuthenticationErrorMapperType, delegate: POCheckoutThreeDSHandlerDelegate) {
         self.errorMapper = errorMapper
-        self.authenticationRequestMapper = authenticationRequestMapper
         self.delegate = delegate
         queue = DispatchQueue.global()
         state = .idle
@@ -31,7 +24,8 @@ final class CheckoutThreeDSHandler: PO3DSServiceType {
     // MARK: - PO3DSHandlerType
 
     func authenticationRequest(
-        data: PO3DS2Configuration, completion: @escaping (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
+        configuration: PO3DS2Configuration,
+        completion: @escaping (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
     ) {
         switch state {
         case .idle, .fingerprinted:
@@ -41,32 +35,33 @@ final class CheckoutThreeDSHandler: PO3DSServiceType {
             completion(.failure(failure))
             return
         }
-        let configurationParameters = convertToConfigParameters(data: data)
+
+        let configurationParameters = convertToConfigParameters(configuration: configuration)
         let configuration = delegate.willFingerprintDevice(parameters: configurationParameters)
         do {
             let service = try Standalone3DSService.initialize(with: configuration)
             let context = State.Context(service: service, transaction: service.createTransaction())
             state = .fingerprinting(context)
-            queue.async { [weak self, errorMapper, authenticationRequestMapper] in
+            queue.async { [unowned self, errorMapper] in
                 let warnings = service.getWarnings()
                 DispatchQueue.main.async {
-                    self?.delegate.shouldContinueFingerprinting(warnings: warnings) { shouldContinue in
+                    self.delegate.shouldContinueFingerprinting(warnings: warnings) { shouldContinue in
                         assert(Thread.isMainThread, "Completion must be called on main thread.")
                         if shouldContinue {
                             context.transaction.getAuthenticationRequestParameters { result in
                                 let mappedResult = result
                                     .mapError(errorMapper.convert)
-                                    .flatMap(authenticationRequestMapper.convert)
+                                    .map(self.convertToAuthenticationRequest)
                                 switch mappedResult {
                                 case .success:
-                                    self?.state = .fingerprinted(context)
+                                    self.state = .fingerprinted(context)
                                 case .failure:
-                                    self?.setIdleState()
+                                    self.setIdleState()
                                 }
                                 completion(mappedResult)
                             }
                         } else {
-                            self?.setIdleState()
+                            self.setIdleState()
                             completion(.failure(POFailure(code: .cancelled)))
                         }
                     }
@@ -80,9 +75,7 @@ final class CheckoutThreeDSHandler: PO3DSServiceType {
         }
     }
 
-    func do(
-        challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void
-    ) {
+    func perform(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
         guard case let .fingerprinted(context) = state else {
             let failure = POFailure(code: .generic(.mobile))
             completion(.failure(failure))
@@ -110,7 +103,6 @@ final class CheckoutThreeDSHandler: PO3DSServiceType {
     // MARK: - Private Properties
 
     private let errorMapper: AuthenticationErrorMapperType
-    private let authenticationRequestMapper: AuthenticationRequestMapperType
     private let queue: DispatchQueue
     private unowned let delegate: POCheckoutThreeDSHandlerDelegate
 
@@ -132,15 +124,32 @@ final class CheckoutThreeDSHandler: PO3DSServiceType {
     // MARK: - Utils
 
     private func convertToConfigParameters(
-        data: PO3DS2Configuration
+        configuration: PO3DS2Configuration
     ) -> ThreeDS2ServiceConfiguration.ConfigParameters {
-        // TODO: replace certificate with proper values when available
         let directoryServerData = ThreeDS2ServiceConfiguration.DirectoryServerData(
-            directoryServerID: data.directoryServerId,
-            directoryServerPublicKey: data.directoryServerPublicKey,
-            directoryServerRootCertificate: "???"
+            directoryServerID: configuration.directoryServerId,
+            directoryServerPublicKey: configuration.directoryServerPublicKey,
+            directoryServerRootCertificate: configuration.directoryServerRootCertificate
         )
-        return .init(directoryServerData: directoryServerData, messageVersion: data.messageVersion, scheme: "")
+        let configParameters = ThreeDS2ServiceConfiguration.ConfigParameters(
+            directoryServerData: directoryServerData,
+            messageVersion: configuration.messageVersion,
+            scheme: configuration.cardScheme
+        )
+        return configParameters
+    }
+
+    private func convertToAuthenticationRequest(
+        request: AuthenticationRequestParameters
+    ) -> PO3DS2AuthenticationRequest {
+        let authenticationRequest = PO3DS2AuthenticationRequest(
+            deviceData: request.deviceData,
+            sdkAppId: request.sdkAppID,
+            sdkEphemeralPublicKey: request.sdkEphemeralPublicKey,
+            sdkReferenceNumber: request.sdkReferenceNumber,
+            sdkTransactionId: request.sdkTransactionID
+        )
+        return authenticationRequest
     }
 
     private func convertToChallengeParameters(data: PO3DS2Challenge) -> ChallengeParameters {

@@ -7,39 +7,16 @@
 
 /// Holds ransaction data that the 3DS Server requires to create the AReq.
 @_spi(PO)
-public struct PO3DS2AuthenticationRequest: Encodable {
-
-    public struct EphemeralPublicKey: Codable { // extract this away from request itself
-
-        /// The crv member identifies the cryptographic curve used with the key. Values defined by this specification
-        /// are P-256, P-384 and P-521. Additional crv values MAY be used, provided they are understood by
-        /// implementations using that Elliptic Curve key. The crv value is case sensitive.
-        public let crv: String
-
-        /// The "kty" (key type) parameter identifies the cryptographic algorithm family used with the key,
-        /// such as "RSA" or "EC".
-        public let kty: String
-
-        /// The x member contains the x coordinate for the elliptic curve point. It is represented as the base64url
-        /// encoding of the coordinate's big endian representation.
-        public let x: String // swiftlint:disable:this identifier_name
-
-        /// The y member contains the y coordinate for the elliptic curve point. It is represented as the base64url
-        /// encoding of the coordinate's big endian representation.
-        public let y: String // swiftlint:disable:this identifier_name
-    }
+public struct PO3DS2AuthenticationRequest {
 
     /// Encrypted device data as a JWE string.
-    public let deviceData: String // must be optional
-
-    /// Device type, defaults to "app".
-    public let deviceChannel: String
+    public let deviceData: String?
 
     /// A unique string identifying the application.
     public let sdkAppId: String
 
-    /// The public key component of the ephemeral keypair generated for the transaction, represented as a JWK.
-    public let sdkEphemeralPublicKey: EphemeralPublicKey? // must be mandatory, todo: change this to string
+    /// The public key component of the ephemeral keypair generated for the transaction, represented as a JWK string.
+    public let sdkEphemeralPublicKey: String
 
     /// A string identifying the SDK, assigned by EMVCo.
     public let sdkReferenceNumber: String
@@ -48,28 +25,16 @@ public struct PO3DS2AuthenticationRequest: Encodable {
     public let sdkTransactionId: String
 
     public init(
-        deviceInformation: String,
-        applicationId: String,
-        sdkEphemeralPublicKey: EphemeralPublicKey?,
+        deviceData: String?,
+        sdkAppId: String,
+        sdkEphemeralPublicKey: String,
         sdkReferenceNumber: String,
         sdkTransactionId: String
     ) {
-        self.deviceData = deviceInformation
-        self.deviceChannel = "app"
-        self.sdkAppId = applicationId
+        self.deviceData = deviceData
+        self.sdkAppId = sdkAppId
         self.sdkEphemeralPublicKey = sdkEphemeralPublicKey
         self.sdkReferenceNumber = sdkReferenceNumber
         self.sdkTransactionId = sdkTransactionId
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum CodingKeys: String, CodingKey {
-        case deviceData = "sdkEncData"
-        case deviceChannel
-        case sdkAppId = "sdkAppID"
-        case sdkEphemeralPublicKey = "sdkEphemPubKey"
-        case sdkReferenceNumber
-        case sdkTransactionId = "sdkTransID"
     }
 }

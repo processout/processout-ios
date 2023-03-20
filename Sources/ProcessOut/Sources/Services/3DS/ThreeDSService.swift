@@ -57,12 +57,13 @@ final class ThreeDSService: ThreeDSServiceType {
             let configuration = try decode(PO3DS2Configuration.self, from: encodedDirectoryServerData)
             handler.authenticationRequest(configuration: configuration) { [encoder, logger] result in
                 switch result {
-                case let .success(fingerprint):
+                case let .success(request):
                     do {
+                        let authenticationRequest = try self.convertAuthenticationRequest(request: request)
                         let response = FingerprintResponse(
                             url: nil,
                             headers: nil,
-                            body: String(decoding: try self.encoder.encode(fingerprint), as: UTF8.self)
+                            body: String(decoding: try self.encoder.encode(authenticationRequest), as: UTF8.self)
                         )
                         let responseDataString = String(
                             decoding: try encoder.encode(response).base64EncodedData(), as: UTF8.self
@@ -160,5 +161,22 @@ final class ThreeDSService: ThreeDSServiceType {
             throw POFailure(message: "Invalid base64 encoding.", code: .internal(.mobile))
         }
         return try decoder.decode(type, from: data)
+    }
+
+    private func convertAuthenticationRequest(
+        request: PO3DS2AuthenticationRequest
+    ) throws -> ThreeDS2AuthenticationRequest {
+        let sdkPublicKeyData = Data(request.sdkEphemeralPublicKey.utf8)
+        guard let sdkPublicKey = try JSONSerialization.jsonObject(with: sdkPublicKeyData) as? [String: String] else {
+            throw POFailure(message: "Unexpected public key format.", code: .generic(.mobile))
+        }
+        let request = ThreeDS2AuthenticationRequest(
+            deviceData: request.deviceData,
+            sdkAppId: request.sdkAppId,
+            sdkEphemeralPublicKey: sdkPublicKey,
+            sdkReferenceNumber: request.sdkReferenceNumber,
+            sdkTransactionId: request.sdkTransactionId
+        )
+        return request
     }
 }

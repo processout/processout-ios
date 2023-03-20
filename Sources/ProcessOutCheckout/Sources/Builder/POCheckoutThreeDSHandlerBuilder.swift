@@ -15,15 +15,8 @@ public final class POCheckoutThreeDSHandlerBuilder {
         Self(delegate: delegate)
     }
 
-    public func build() -> POThreeDSHandlerType {
-        let handler = CheckoutThreeDSHandler(
-            errorMapper: AuthenticationErrorMapper(),
-            authenticationRequestMapper: AuthenticationRequestMapper(
-                decoder: JSONDecoder()
-            ),
-            delegate: delegate
-        )
-        return handler
+    public func build() -> PO3DSServiceType {
+        CheckoutThreeDSHandler(errorMapper: AuthenticationErrorMapper(), delegate: delegate)
     }
 
     // MARK: -

@@ -17,21 +17,14 @@ final class AuthenticationRequestMapper: AuthenticationRequestMapperType {
     // MARK: - MapperType
 
     func convert(request: AuthenticationRequestParameters) -> Result<PO3DS2AuthenticationRequest, POFailure> {
-        do {
-            let fingerprint = PO3DS2AuthenticationRequest(
-                deviceInformation: request.deviceData,
-                applicationId: request.sdkAppID,
-                sdkEphemeralPublicKey: try decoder.decode(
-                    PO3DS2AuthenticationRequest.EphemeralPublicKey.self, from: Data(request.sdkEphemeralPublicKey.utf8)
-                ),
-                sdkReferenceNumber: request.sdkReferenceNumber,
-                sdkTransactionId: request.sdkTransactionID
-            )
-            return .success(fingerprint)
-        } catch {
-            let failure = POFailure(code: .internal(.mobile), underlyingError: error)
-            return .failure(failure)
-        }
+        let authenticationRequest = PO3DS2AuthenticationRequest(
+            deviceData: request.deviceData,
+            sdkAppId: request.sdkAppID,
+            sdkEphemeralPublicKey: request.sdkEphemeralPublicKey,
+            sdkReferenceNumber: request.sdkReferenceNumber,
+            sdkTransactionId: request.sdkTransactionID
+        )
+        return .success(authenticationRequest)
     }
 
     // MARK: - Private Properties

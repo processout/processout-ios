@@ -18,15 +18,23 @@ public struct PO3DS2Configuration: Decodable {
     /// Unique identifier for the authentication assigned by the DS (Card Scheme).
     public let directoryServerTransactionId: String
 
+    /// A public certificate provided by the DS for encryption of device data.
+    public let directoryServerRootCertificate: String
+
     /// 3DS protocol version identifier.
     public let messageVersion: String
+
+    /// Card scheme from the card used to initiate the payment
+    public let cardScheme: String
 
     // MARK: - Private Nested Types
 
     private enum CodingKeys: String, CodingKey {
         case directoryServerId = "directoryServerID"
-        case directoryServerPublicKey = "directoryServerPublicKey"
+        case directoryServerPublicKey
+        case directoryServerRootCertificate
         case directoryServerTransactionId = "threeDSServerTransID"
         case messageVersion
+        case cardScheme
     }
 }
