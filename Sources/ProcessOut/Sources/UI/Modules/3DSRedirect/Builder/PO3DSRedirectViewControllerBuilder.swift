@@ -1,5 +1,5 @@
 //
-//  PORedirectCustomerActionViewControllerBuilder.swift
+//  PO3DSRedirectViewControllerBuilder.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 04.11.2022.
@@ -8,25 +8,18 @@
 import UIKit
 
 @_spi(PO)
-public final class PORedirectCustomerActionViewControllerBuilder {
+public final class PO3DSRedirectViewControllerBuilder {
 
     /// - Parameters:
     ///   - url: customer action url.
     ///   - completion: completion to invoke when action handling completes.
-    public static func with(context: PO3DSRedirect) -> Self {
-        Self(context: context)
+    public static func with(redirect: PO3DSRedirect) -> Self {
+        Self(redirect: redirect)
     }
 
     /// Completion to invoke when authorization ends.
     public func with(completion: @escaping (Result<String, POFailure>) -> Void) -> Self {
         self.completion = completion
-        return self
-    }
-
-    /// Api that will be used by created module to communicate with BE. By default ``ProcessOutApi/shared``
-    /// instance is used.
-    public func with(api: ProcessOutApiType) -> Self {
-        self.api = api
         return self
     }
 
@@ -41,36 +34,33 @@ public final class PORedirectCustomerActionViewControllerBuilder {
     ///
     /// - NOTE: Caller should dismiss view controller after completion is called.
     public func build() -> UIViewController {
-        let api: ProcessOutApiType = self.api ?? ProcessOutApi.shared
-        let delegate = RedirectCustomerActionWebViewControllerDelegate(url: context.url) { [completion] result in
-            completion?(result)
-        }
+        let api: ProcessOutApiType = ProcessOutApi.shared
         var returnUrls = [api.configuration.checkoutBaseUrl]
         if let returnUrl {
             returnUrls.append(returnUrl)
         }
         let viewController = WebViewController(
             eventEmitter: api.eventEmitter,
-            delegate: delegate,
+            delegate: WebViewControllerDelegate3DS(url: redirect.url) { [completion] result in
+                completion?(result)
+            },
             returnUrls: returnUrls,
             version: type(of: api).version,
-            timeout: context.timeout,
+            timeout: redirect.timeout,
             logger: api.logger
         )
         return viewController
     }
 
-    // MARK: -
+    // MARK: - Private Methods
 
-    init(context: PO3DSRedirect) {
-        self.context = context
+    private init(redirect: PO3DSRedirect) {
+        self.redirect = redirect
     }
 
     // MARK: - Private Properties
 
-    private let context: PO3DSRedirect
-
+    private let redirect: PO3DSRedirect
     private var completion: ((Result<String, POFailure>) -> Void)?
-    private var api: ProcessOutApiType?
     private var returnUrl: URL?
 }
