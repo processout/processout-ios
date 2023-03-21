@@ -57,7 +57,7 @@ private final class SharedProcessOutApi: ProcessOutApiType {
         )
     }()
 
-    private(set) lazy var logger: POLogger = createLogger(for: "Application")
+    private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
 
     private(set) lazy var cards: POCardsServiceType = {
         let service = CardsService(
@@ -81,10 +81,21 @@ private final class SharedProcessOutApi: ProcessOutApiType {
         return eventEmitter.emit(event: event)
     }
 
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let applicationLoggerCategory = "Application"
+        static let serviceLoggerCategory = "Service"
+        static let repositoryLoggerCategory = "Repository"
+        static let connectorLoggerCategory = "Connector"
+        static let codingDateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        static let systemLoggerSubsystem = "com.processout.processout-ios"
+    }
+
     // MARK: - Private Properties
 
-    private lazy var serviceLogger = createLogger(for: "Service")
-    private lazy var repositoryLogger = createLogger(for: "Repository")
+    private lazy var serviceLogger = createLogger(for: Constants.serviceLoggerCategory)
+    private lazy var repositoryLogger = createLogger(for: Constants.repositoryLoggerCategory)
 
     private lazy var httpConnector: HttpConnectorType = {
         let sessionConfiguration = URLSessionConfiguration.default
@@ -103,7 +114,7 @@ private final class SharedProcessOutApi: ProcessOutApiType {
             decoder: decoder,
             encoder: encoder,
             deviceMetadataProvider: DeviceMetadataProvider(screen: UIScreen.main, bundle: Bundle.main),
-            logger: createLogger(for: "Connector")
+            logger: createLogger(for: Constants.connectorLoggerCategory)
         )
         let retryStrategy = RetryStrategy.exponential(maximumRetries: 3, interval: 0.1, rate: 3)
         return HttpConnectorRetryDecorator(connector: connector, retryStrategy: retryStrategy)
@@ -136,7 +147,7 @@ private final class SharedProcessOutApi: ProcessOutApiType {
 
     private lazy var dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        dateFormatter.dateFormat = Constants.codingDateFormat
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         return dateFormatter
     }()
@@ -145,7 +156,7 @@ private final class SharedProcessOutApi: ProcessOutApiType {
 
     private func createLogger(for category: String) -> POLogger {
         let destinations: [LoggerDestination] = [
-            SystemLoggerDestination(subsystem: "com.processout.processout-ios", category: category)
+            SystemLoggerDestination(subsystem: Constants.systemLoggerSubsystem, category: category)
         ]
         let minimumLevel: LogLevel = configuration.isDebug ? .debug : .info
         return POLogger(destinations: destinations, minimumLevel: minimumLevel)
