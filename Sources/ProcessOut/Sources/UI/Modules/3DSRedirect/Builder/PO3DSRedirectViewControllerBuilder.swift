@@ -22,12 +22,6 @@ public final class PO3DSRedirectViewControllerBuilder {
         return self
     }
 
-    /// Return url that was specified when invoice was created.
-    public func with(returnUrl: URL) -> Self {
-        self.returnUrl = returnUrl
-        return self
-    }
-
     /// Returns view controller that caller should encorporate into view controllers hierarchy.
     /// If instance can't be created assertion failure is triggered.
     ///
@@ -35,7 +29,7 @@ public final class PO3DSRedirectViewControllerBuilder {
     public func build() -> UIViewController {
         let api: ProcessOutApiType = ProcessOutApi.shared
         let configuration = WebViewControllerConfiguration(
-            returnUrls: [api.configuration.checkoutBaseUrl, returnUrl].compactMap { $0 },
+            returnUrls: [api.configuration.checkoutBaseUrl],
             version: type(of: api).version,
             timeout: redirect.timeout
         )
@@ -44,7 +38,6 @@ public final class PO3DSRedirectViewControllerBuilder {
             delegate: WebViewControllerDelegate3DS(url: redirect.url) { [completion] result in
                 completion?(result)
             },
-            eventEmitter: api.eventEmitter,
             logger: api.logger
         )
         return viewController
@@ -60,5 +53,4 @@ public final class PO3DSRedirectViewControllerBuilder {
 
     private let redirect: PO3DSRedirect
     private var completion: ((Result<String, POFailure>) -> Void)?
-    private var returnUrl: URL?
 }

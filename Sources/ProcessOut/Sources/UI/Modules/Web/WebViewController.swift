@@ -9,15 +9,9 @@ import WebKit
 
 final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
 
-    init(
-        configuration: WebViewControllerConfiguration,
-        delegate: WebViewControllerDelegate,
-        eventEmitter: POEventEmitterType,
-        logger: POLogger
-    ) {
+    init(configuration: WebViewControllerConfiguration, delegate: WebViewControllerDelegate, logger: POLogger) {
         self.configuration = configuration
         self.delegate = delegate
-        self.eventEmitter = eventEmitter
         self.logger = logger
         state = .idle
         super.init(nibName: nil, bundle: nil)
@@ -114,7 +108,6 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
 
     private let configuration: WebViewControllerConfiguration
     private let delegate: WebViewControllerDelegate
-    private let eventEmitter: POEventEmitterType
     private let logger: POLogger
 
     private lazy var contentViewConfiguration: WKWebViewConfiguration = {
@@ -138,7 +131,6 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
 
     private var state: State
     private var timeoutTimer: Timer?
-    private var deepLinkObserver: AnyObject?
 
     // MARK: - State Management
 
@@ -156,9 +148,6 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
             timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
                 self?.setCompletedState(with: POFailure(code: .timeout(.mobile)))
             }
-        }
-        deepLinkObserver = eventEmitter.on(DeepLinkReceivedEvent.self) { [weak self] event in
-            self?.setCompletedState(with: event.url) ?? false
         }
         state = .starting(navigation)
     }

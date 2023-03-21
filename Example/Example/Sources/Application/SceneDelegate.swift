@@ -22,16 +22,4 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = FeaturesBuilder().build()
         window?.makeKeyAndVisible()
     }
-
-    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        if let url = userActivity.webpageURL {
-            _ = ProcessOutApi.shared.processDeepLink(url: url)
-        }
-    }
-
-    func scene(_ scene: UIScene, openURLContexts urlContexts: Set<UIOpenURLContext>) {
-        if let url = urlContexts.first?.url {
-            _ = ProcessOutApi.shared.processDeepLink(url: url)
-        }
-    }
 }
