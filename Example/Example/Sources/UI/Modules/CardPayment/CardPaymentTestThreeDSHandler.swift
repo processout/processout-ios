@@ -22,7 +22,7 @@ final class CardPaymentTestThreeDSHandler: PO3DSServiceType {
         let request = PO3DS2AuthenticationRequest(
             deviceData: "",
             sdkAppId: "",
-            sdkEphemeralPublicKey: "",
+            sdkEphemeralPublicKey: "{}",
             sdkReferenceNumber: "",
             sdkTransactionId: ""
         )
