@@ -1,5 +1,5 @@
 //
-//  ThreeDSHandler.swift
+//  ThreeDSService.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 03.11.2022.
@@ -40,9 +40,17 @@ final class ThreeDSService: ThreeDSServiceType {
 
     // MARK: - Private Nested Types
 
-    private struct FingerprintResponse: Encodable {
+    private enum Constants {
+        static let deviceChannel = "app"
+        static let tokenPrefix = "gway_req_"
+        static let challengeSuccessResponseBody = #"{ "transStatus": "Y" }"#
+        static let challengeFailureResponseBody = #"{ "transStatus": "N" }"#
+        static let fingerprintTimeoutResponseBody = #"{ "threeDS2FingerprintTimeout": true }"#
+        static let webFingerprintTimeout: TimeInterval = 10
+    }
+
+    private struct ChallengeResponse: Encodable {
         let url: URL?
-        let headers: [String: String]?
         let body: String
     }
 
@@ -57,21 +65,13 @@ final class ThreeDSService: ThreeDSServiceType {
     private func fingerprint(encodedConfiguration: String, delegate: Delegate, completion: @escaping Completion) {
         do {
             let configuration = try decode(PO3DS2Configuration.self, from: encodedConfiguration)
-            delegate.authenticationRequest(configuration: configuration) { [encoder, logger] result in
+            delegate.authenticationRequest(configuration: configuration) { result in
                 switch result {
                 case let .success(request):
-                    do {
-                        let response = FingerprintResponse(
-                            url: nil, headers: nil, body: try self.encode(request: request)
-                        )
-                        let encodedResponse = String(
-                            decoding: try encoder.encode(response).base64EncodedData(), as: UTF8.self
-                        )
-                        completion(.success("gway_req_" + encodedResponse))
-                    } catch {
-                        logger.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
-                        completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: error)))
+                    let response = {
+                        ChallengeResponse(url: nil, body: try self.encode(request: request))
                     }
+                    self.complete(with: response, completion: completion)
                 case let .failure(failure):
                     completion(.failure(failure))
                 }
@@ -91,10 +91,13 @@ final class ThreeDSService: ThreeDSServiceType {
             delegate.handle(challenge: challenge) { result in
                 switch result {
                 case let .success(success):
-                    let newSource = success
-                        ? "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ=="
-                        : "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ=="
-                    completion(.success(newSource))
+                    let response = {
+                        let body = success
+                            ? Constants.challengeSuccessResponseBody
+                            : Constants.challengeFailureResponseBody
+                        return ChallengeResponse(url: nil, body: body)
+                    }
+                    self.complete(with: response, completion: completion)
                 case let .failure(failure):
                     completion(.failure(failure))
                 }
@@ -111,27 +114,17 @@ final class ThreeDSService: ThreeDSServiceType {
             completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
             return
         }
-        let context = PO3DSRedirect(url: url, isHeadlessModeAllowed: true, timeout: 10)
-        delegate.handle(redirect: context) { [encoder, logger] result in
+        let context = PO3DSRedirect(url: url, isHeadlessModeAllowed: true, timeout: Constants.webFingerprintTimeout)
+        delegate.handle(redirect: context) { result in
             switch result {
             case let .success(newSource):
                 completion(.success(newSource))
             case let .failure(failure) where failure.code == .timeout(.mobile):
-                // Fingerprinting timeout error is treated differently from other actions.
-                do {
-                    let response = FingerprintResponse(
-                        url: url,
-                        headers: ["Content-Type": "application/json"],
-                        body: #"{ "threeDS2FingerprintTimeout": true }"#
-                    )
-                    let responseDataString = String(
-                        decoding: try encoder.encode(response).base64EncodedData(), as: UTF8.self
-                    )
-                    completion(.success("gway_req_" + responseDataString))
-                } catch {
-                    logger.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
-                    completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: error)))
+                // Fingerprinting timeout is treated differently from other errors.
+                let response = {
+                    ChallengeResponse(url: url, body: Constants.fingerprintTimeoutResponseBody)
                 }
+                self.complete(with: response, completion: completion)
             case let .failure(failure):
                 completion(.failure(failure))
             }
@@ -167,7 +160,7 @@ final class ThreeDSService: ThreeDSServiceType {
             with: Data(request.sdkEphemeralPublicKey.utf8)
         )
         var requestParameters = [
-            "deviceChannel": "app",
+            "deviceChannel": Constants.deviceChannel,
             "sdkAppID": request.sdkAppId,
             "sdkEphemPubKey": sdkEphemeralPublicKey,
             "sdkReferenceNumber": request.sdkReferenceNumber,
@@ -175,5 +168,20 @@ final class ThreeDSService: ThreeDSServiceType {
         ]
         requestParameters["sdkEncData"] = request.deviceData
         return String(decoding: try JSONSerialization.data(withJSONObject: requestParameters), as: UTF8.self)
+    }
+
+    private func complete(with response: () throws -> ChallengeResponse, completion: @escaping Completion) {
+        let result: Result<String, POFailure>
+        do {
+            /// Encodes given response and creates token with it.
+            let fingerprintResponse = try response()
+            let token = try Constants.tokenPrefix + encoder.encode(fingerprintResponse).base64EncodedString()
+            result = .success(token)
+        } catch {
+            logger.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
+            let failure = POFailure(message: nil, code: .internal(.mobile), underlyingError: error)
+            result = .failure(failure)
+        }
+        completion(result)
     }
 }
