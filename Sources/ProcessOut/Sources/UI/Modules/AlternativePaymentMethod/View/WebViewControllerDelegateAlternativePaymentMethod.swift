@@ -1,5 +1,5 @@
 //
-//  AlternativePaymentMethodWebViewControllerDelegate.swift
+//  WebViewControllerDelegateAlternativePaymentMethod.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 07.11.2022.
@@ -7,7 +7,7 @@
 
 import WebKit
 
-final class AlternativePaymentMethodWebViewControllerDelegate: WebViewControllerDelegate {
+final class WebViewControllerDelegateAlternativePaymentMethod: WebViewControllerDelegate {
 
     init(
         alternativePaymentMethodsService: POAlternativePaymentMethodsServiceType,

@@ -30,7 +30,7 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
     /// Creates and returns view controller that is capable of handling alternative payment request.
     public func build() -> UIViewController {
         let api: ProcessOutApiType = ProcessOutApi.shared
-        let delegate = AlternativePaymentMethodWebViewControllerDelegate(
+        let delegate = WebViewControllerDelegateAlternativePaymentMethod(
             alternativePaymentMethodsService: api.alternativePaymentMethods,
             request: request,
             completion: { [completion] result in
