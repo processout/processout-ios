@@ -6,7 +6,6 @@
 //
 
 /// This interface provides methods to process 3-D Secure transactions.
-@_spi(PO)
 public protocol PO3DSServiceType: AnyObject {
 
     /// Asks implementation to create request that will be passed to 3DS Server to create the AReq.

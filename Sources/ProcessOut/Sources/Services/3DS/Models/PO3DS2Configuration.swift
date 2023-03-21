@@ -6,7 +6,6 @@
 //
 
 /// Represents the configuration parameters that are required by the 3DS SDK for initialization.
-@_spi(PO)
 public struct PO3DS2Configuration: Decodable {
 
     /// The identifier of the directory server to use during the transaction creation phase.

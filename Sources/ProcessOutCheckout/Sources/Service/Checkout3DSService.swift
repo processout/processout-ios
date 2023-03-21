@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 28.02.2023.
 //
 
-@_spi(PO) import ProcessOut
+import ProcessOut
 import Checkout3DS
 
 // swiftlint:disable todo

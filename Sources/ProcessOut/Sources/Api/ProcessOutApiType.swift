@@ -49,10 +49,6 @@ public protocol ProcessOutApiType {
 
 extension ProcessOutApiType {
 
-    var cards: POCardsServiceType {
-        fatalError("Not available!")
-    }
-
     var customerTokens: POCustomerTokensServiceType {
         fatalError("Not available!")
     }

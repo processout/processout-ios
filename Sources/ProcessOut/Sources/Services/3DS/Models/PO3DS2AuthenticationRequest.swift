@@ -6,7 +6,6 @@
 //
 
 /// Holds transaction data that the 3DS Server requires to create the AReq.
-@_spi(PO)
 public struct PO3DS2AuthenticationRequest {
 
     /// Encrypted device data as a JWE string.

@@ -7,7 +7,6 @@
 
 import Foundation
 
-@_spi(PO)
 public struct PO3DSRedirect {
 
     /// Redirect url.
