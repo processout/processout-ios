@@ -102,6 +102,9 @@ final class ThreeDSService: ThreeDSServiceType {
                     completion(.failure(failure))
                 }
             }
+        } catch let error as POFailure {
+            logger.error("Did fail to decode challenge: '\(error.message ?? "")'.")
+            completion(.failure(error))
         } catch {
             logger.error("Did fail to decode challenge: '\(error.localizedDescription)'.")
             completion(.failure(.init(code: .internal(.mobile), underlyingError: error)))
