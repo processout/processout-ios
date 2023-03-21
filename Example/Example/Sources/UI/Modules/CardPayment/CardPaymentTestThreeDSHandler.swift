@@ -45,8 +45,8 @@ final class CardPaymentTestThreeDSHandler: PO3DSServiceType {
     }
 
     func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        let viewController = PORedirectCustomerActionViewControllerBuilder
-            .with(context: redirect)
+        let viewController = PO3DSRedirectViewControllerBuilder
+            .with(redirect: redirect)
             .with { [weak self] result in
                 self?.viewController.dismiss(animated: true) {
                     completion(result)

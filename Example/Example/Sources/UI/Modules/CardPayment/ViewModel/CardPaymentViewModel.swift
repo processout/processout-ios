@@ -128,7 +128,7 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
                 invoiceId: invoice.id, source: card.id, enableThreeDS2: true, thirdPartySdkVersion: nil
             )
             try await invoicesService.authorizeInvoice(
-                request: invoiceAuthorizationRequest, threeDSHandler: threeDSService
+                request: invoiceAuthorizationRequest, threeDSService: threeDSService
             )
             router.trigger(route: .alert(message: Strings.Result.successMessage(invoice.id, card.id)))
         } catch {
