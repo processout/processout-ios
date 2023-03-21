@@ -42,8 +42,8 @@ public protocol POInvoicesServiceType: POServiceType {
 
 extension POInvoicesServiceType {
 
-    // swiftlint:disable:next unavailable_function
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void) {
-        fatalError("Not available!")
+        let failure = POFailure(code: .generic(.mobile))
+        completion(.failure(failure))
     }
 }
