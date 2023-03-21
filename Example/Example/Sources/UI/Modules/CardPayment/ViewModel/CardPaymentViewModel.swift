@@ -14,13 +14,13 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
     init(
         router: any RouterType<CardPaymentRoute>,
         invoicesService: POInvoicesServiceType,
-        cardsRepository: POCardsRepositoryType,
-        threeDSHandler: POThreeDSHandlerType
+        cardsService: POCardsServiceType,
+        threeDSService: PO3DSServiceType
     ) {
         self.router = router
         self.invoicesService = invoicesService
-        self.cardsRepository = cardsRepository
-        self.threeDSHandler = threeDSHandler
+        self.cardsService = cardsService
+        self.threeDSService = threeDSService
         super.init(state: .idle)
     }
 
@@ -47,8 +47,8 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
 
     private let router: any RouterType<CardPaymentRoute>
     private let invoicesService: POInvoicesServiceType
-    private let cardsRepository: POCardsRepositoryType
-    private let threeDSHandler: POThreeDSHandlerType
+    private let cardsService: POCardsServiceType
+    private let threeDSService: PO3DSServiceType
 
     private let cardNumber = ReferenceTypeBox(value: "")
     private let expirationMonth = ReferenceTypeBox(value: "")
@@ -119,7 +119,7 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
             let cardTokenizationRequest = POCardTokenizationRequest(
                 number: cardNumber.wrappedValue, expMonth: expMonth, expYear: expYear, cvc: cvc.wrappedValue
             )
-            let card = try await cardsRepository.tokenize(request: cardTokenizationRequest)
+            let card = try await cardsService.tokenize(request: cardTokenizationRequest)
             let invoiceCreationRequest = POInvoiceCreationRequest(
                 name: UUID().uuidString, amount: amount.wrappedValue, currency: currencyCode.wrappedValue
             )
@@ -128,7 +128,7 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
                 invoiceId: invoice.id, source: card.id, enableThreeDS2: true, thirdPartySdkVersion: nil
             )
             try await invoicesService.authorizeInvoice(
-                request: invoiceAuthorizationRequest, threeDSHandler: threeDSHandler
+                request: invoiceAuthorizationRequest, threeDSService: threeDSService
             )
             router.trigger(route: .alert(message: Strings.Result.successMessage(invoice.id, card.id)))
         } catch {

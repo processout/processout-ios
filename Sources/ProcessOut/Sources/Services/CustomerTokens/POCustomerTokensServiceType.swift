@@ -11,14 +11,14 @@ public protocol POCustomerTokensServiceType: POServiceType {
     /// Assigns new source to existing customer token using given request.
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
-        threeDSHandler: POThreeDSHandlerType,
+        threeDSService: PO3DSServiceType,
         completion: @escaping (Result<Void, POFailure>) -> Void
     )
 
     /// Create customer token.
     @_spi(PO)
     func createCustomerToken(
-        request: POCustomerTokenCreationRequest,
+        request: POCreateCustomerTokenRequest,
         completion: @escaping (Result<POCustomerToken, Failure>) -> Void
     )
 }

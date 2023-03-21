@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-/// Class that provides access to shared api instance and a way to configure it.
+/// Provides access to shared api instance and a way to configure it.
 public enum ProcessOutApi {
 
     /// Shared instance.
@@ -44,7 +44,7 @@ private final class SharedProcessOutApi: ProcessOutApiType {
 
     private(set) lazy var invoices: POInvoicesServiceType = {
         let repository = InvoicesRepository(connector: httpConnector, failureMapper: failureMapper)
-        return InvoicesService(repository: repository, customerActionHandler: customerActionHandler)
+        return InvoicesService(repository: repository, threeDSService: threeDSService)
     }()
 
     private(set) lazy var images: POImagesRepositoryType = {
@@ -59,19 +59,19 @@ private final class SharedProcessOutApi: ProcessOutApiType {
 
     private(set) lazy var logger: POLogger = createLogger(for: "Application")
 
-    private(set) lazy var cards: POCardsRepositoryType = {
-        CardsRepository(
-            connector: httpConnector,
-            failureMapper: failureMapper,
+    private(set) lazy var cards: POCardsServiceType = {
+        let service = CardsService(
+            repository: CardsRepository(connector: httpConnector, failureMapper: failureMapper),
             applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper(
                 decoder: decoder, logger: repositoryLogger
             )
         )
+        return service
     }()
 
     private(set) lazy var customerTokens: POCustomerTokensServiceType = {
         let repository = CustomerTokensRepository(connector: httpConnector, failureMapper: failureMapper)
-        return CustomerTokensService(repository: repository, customerActionHandler: customerActionHandler)
+        return CustomerTokensService(repository: repository, threeDSService: threeDSService)
     }()
 
     private(set) lazy var eventEmitter: POEventEmitterType = EventEmitter()
@@ -111,13 +111,13 @@ private final class SharedProcessOutApi: ProcessOutApiType {
 
     private lazy var failureMapper = HttpConnectorFailureMapper(logger: repositoryLogger)
 
-    private lazy var customerActionHandler: ThreeDSCustomerActionHandlerType = {
+    private lazy var threeDSService: ThreeDSServiceType = {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .useDefaultKeys
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        return ThreeDSCustomerActionHandler(decoder: decoder, encoder: encoder, logger: serviceLogger)
+        return ThreeDSService(decoder: decoder, encoder: encoder, logger: serviceLogger)
     }()
 
     private lazy var decoder: JSONDecoder = {

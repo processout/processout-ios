@@ -17,7 +17,7 @@ extension CustomerTokensRepositoryType {
 
     @MainActor
     public func createCustomerToken(
-        request: POCustomerTokenCreationRequest
+        request: POCreateCustomerTokenRequest
     ) async throws -> POCustomerToken {
         return try await withUnsafeThrowingContinuation { continuation in
             createCustomerToken(request: request, completion: continuation.resume)
@@ -78,11 +78,42 @@ extension POCardsRepositoryType {
     }
 
     @MainActor
-    public func updateCvc(
-        cardId: String, newCvc: String
+    public func updateCard(
+        request: POCardUpdateRequest
     ) async throws -> POCard {
         return try await withUnsafeThrowingContinuation { continuation in
-            updateCvc(cardId: cardId, newCvc: newCvc, completion: continuation.resume)
+            updateCard(request: request, completion: continuation.resume)
+        }
+    }
+
+    @MainActor
+    public func tokenize(
+        request: ApplePayCardTokenizationRequest
+    ) async throws -> POCard {
+        return try await withUnsafeThrowingContinuation { continuation in
+            tokenize(request: request, completion: continuation.resume)
+        }
+    }
+}
+
+@available(iOS 13.0, *)
+extension POCardsServiceType {
+
+    @MainActor
+    public func tokenize(
+        request: POCardTokenizationRequest
+    ) async throws -> POCard {
+        return try await withUnsafeThrowingContinuation { continuation in
+            tokenize(request: request, completion: continuation.resume)
+        }
+    }
+
+    @MainActor
+    public func updateCard(
+        request: POCardUpdateRequest
+    ) async throws -> POCard {
+        return try await withUnsafeThrowingContinuation { continuation in
+            updateCard(request: request, completion: continuation.resume)
         }
     }
 
@@ -101,17 +132,17 @@ extension POCustomerTokensServiceType {
 
     @MainActor
     public func assignCustomerToken(
-        request: POAssignCustomerTokenRequest, threeDSHandler: POThreeDSHandlerType
+        request: POAssignCustomerTokenRequest, threeDSService: PO3DSServiceType
     ) async throws -> Void {
         return try await withUnsafeThrowingContinuation { continuation in
-            assignCustomerToken(request: request, threeDSHandler: threeDSHandler, completion: continuation.resume)
+            assignCustomerToken(request: request, threeDSService: threeDSService, completion: continuation.resume)
         }
     }
 
     @MainActor
     @_spi(PO)
     public func createCustomerToken(
-        request: POCustomerTokenCreationRequest
+        request: POCreateCustomerTokenRequest
     ) async throws -> POCustomerToken {
         return try await withUnsafeThrowingContinuation { continuation in
             createCustomerToken(request: request, completion: continuation.resume)
@@ -172,10 +203,10 @@ extension POInvoicesServiceType {
     @MainActor
     @_spi(PO)
     public func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest, threeDSHandler: POThreeDSHandlerType
+        request: POInvoiceAuthorizationRequest, threeDSService: PO3DSServiceType
     ) async throws -> Void {
         return try await withUnsafeThrowingContinuation { continuation in
-            authorizeInvoice(request: request, threeDSHandler: threeDSHandler, completion: continuation.resume)
+            authorizeInvoice(request: request, threeDSService: threeDSService, completion: continuation.resume)
         }
     }
 

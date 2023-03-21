@@ -7,27 +7,27 @@
 
 final class CustomerTokensService: POCustomerTokensServiceType {
 
-    init(repository: CustomerTokensRepositoryType, customerActionHandler: ThreeDSCustomerActionHandlerType) {
+    init(repository: CustomerTokensRepositoryType, threeDSService: ThreeDSServiceType) {
         self.repository = repository
-        self.customerActionHandler = customerActionHandler
+        self.threeDSService = threeDSService
     }
 
     // MARK: - POCustomerTokensServiceType
 
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
-        threeDSHandler: POThreeDSHandlerType,
+        threeDSService threeDSServiceDelegate: PO3DSServiceType,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
-        repository.assignCustomerToken(request: request) { [customerActionHandler] result in
+        repository.assignCustomerToken(request: request) { [threeDSService] result in
             switch result {
             case let .success(customerAction?):
-                customerActionHandler.handle(customerAction: customerAction, handler: threeDSHandler) { result in
+                threeDSService.handle(action: customerAction, delegate: threeDSServiceDelegate) { result in
                     switch result {
                     case let .success(newSource):
                         self.assignCustomerToken(
                             request: request.replacing(source: newSource),
-                            threeDSHandler: threeDSHandler,
+                            threeDSService: threeDSServiceDelegate,
                             completion: completion
                         )
                     case let .failure(failure):
@@ -43,7 +43,7 @@ final class CustomerTokensService: POCustomerTokensServiceType {
     }
 
     func createCustomerToken(
-        request: POCustomerTokenCreationRequest,
+        request: POCreateCustomerTokenRequest,
         completion: @escaping (Result<POCustomerToken, Failure>) -> Void
     ) {
         repository.createCustomerToken(request: request, completion: completion)
@@ -52,7 +52,7 @@ final class CustomerTokensService: POCustomerTokensServiceType {
     // MARK: - Private Properties
 
     private let repository: CustomerTokensRepositoryType
-    private let customerActionHandler: ThreeDSCustomerActionHandlerType
+    private let threeDSService: ThreeDSServiceType
 }
 
 private extension POAssignCustomerTokenRequest { // swiftlint:disable:this no_extension_access_modifier
@@ -60,12 +60,13 @@ private extension POAssignCustomerTokenRequest { // swiftlint:disable:this no_ex
     func replacing(source newSource: String) -> Self {
         let updatedRequest = POAssignCustomerTokenRequest(
             customerId: customerId,
+            tokenId: tokenId,
             source: newSource,
-            enableThreeDS2: enableThreeDS2,
             preferredScheme: preferredScheme,
-            thirdPartySdkVersion: thirdPartySdkVersion,
             verify: verify,
-            tokenId: tokenId
+            invoiceId: invoiceId,
+            enableThreeDS2: enableThreeDS2,
+            thirdPartySdkVersion: thirdPartySdkVersion
         )
         return updatedRequest
     }

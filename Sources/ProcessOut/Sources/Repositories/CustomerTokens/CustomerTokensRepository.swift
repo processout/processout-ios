@@ -33,7 +33,7 @@ final class CustomerTokensRepository: CustomerTokensRepositoryType {
     }
 
     func createCustomerToken(
-        request: POCustomerTokenCreationRequest,
+        request: POCreateCustomerTokenRequest,
         completion: @escaping (Result<POCustomerToken, Failure>) -> Void
     ) {
         struct Response: Decodable {
@@ -41,7 +41,7 @@ final class CustomerTokensRepository: CustomerTokensRepositoryType {
         }
         let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/customers/\(request.customerId)/tokens",
-            body: request,
+            body: nil as POAnyEncodable?,
             includesDeviceMetadata: true,
             requiresPrivateKey: true
         )
