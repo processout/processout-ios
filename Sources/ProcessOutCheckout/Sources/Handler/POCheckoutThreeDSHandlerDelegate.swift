@@ -24,7 +24,7 @@ public protocol POCheckoutThreeDSHandlerDelegate: AnyObject { // POCheckout3DS2S
     func shouldContinueFingerprinting(warnings: Set<Checkout3DS.Warning>, completion: @escaping (Bool) -> Void)
 
     /// Asks delegate to redirect user using given context.
-    func redirect(context: PO3DSRedirectContext, completion: @escaping (Result<String, POFailure>) -> Void)
+    func redirect(context: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void)
 }
 
 extension POCheckoutThreeDSHandlerDelegate {

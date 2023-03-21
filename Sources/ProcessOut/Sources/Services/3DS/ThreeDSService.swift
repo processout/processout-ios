@@ -24,9 +24,9 @@ final class ThreeDSService: ThreeDSServiceType {
         }
         switch action.type {
         case .fingerprintMobile:
-            fingerprint(encodedDirectoryServerData: action.value, handler: handler, completion: completionTrampoline)
+            fingerprint(encodedConfiguration: action.value, handler: handler, completion: completionTrampoline)
         case .challengeMobile:
-            challenge(encodedChallengeData: action.value, handler: handler, completion: completionTrampoline)
+            challenge(encodedChallenge: action.value, handler: handler, completion: completionTrampoline)
         case .fingerprint:
             fingerprint(url: action.value, handler: handler, completion: completionTrampoline)
         case .redirect, .url:
@@ -51,10 +51,10 @@ final class ThreeDSService: ThreeDSServiceType {
     // MARK: - Private Methods
 
     private func fingerprint(
-        encodedDirectoryServerData: String, handler: PO3DSServiceType, completion: @escaping Completion
+        encodedConfiguration: String, handler: PO3DSServiceType, completion: @escaping Completion
     ) {
         do {
-            let configuration = try decode(PO3DS2Configuration.self, from: encodedDirectoryServerData)
+            let configuration = try decode(PO3DS2Configuration.self, from: encodedConfiguration)
             handler.authenticationRequest(configuration: configuration) { [encoder, logger] result in
                 switch result {
                 case let .success(request):
@@ -75,20 +75,18 @@ final class ThreeDSService: ThreeDSServiceType {
                 }
             }
         } catch let error as POFailure {
-            logger.error("Did fail to decode DS data: '\(error.message ?? "")'.")
+            logger.error("Did fail to decode configuration: '\(error.message ?? "")'.")
             completion(.failure(error))
         } catch {
-            logger.error("Did fail to decode DS data: '\(error.localizedDescription)'.")
+            logger.error("Did fail to decode configuration: '\(error.localizedDescription)'.")
             completion(.failure(.init(code: .internal(.mobile), underlyingError: error)))
         }
     }
 
-    private func challenge(
-        encodedChallengeData: String, handler: PO3DSServiceType, completion: @escaping Completion
-    ) {
+    private func challenge(encodedChallenge: String, handler: PO3DSServiceType, completion: @escaping Completion) {
         do {
-            let challenge = try decode(PO3DS2Challenge.self, from: encodedChallengeData)
-            handler.perform(challenge: challenge) { result in
+            let challenge = try decode(PO3DS2Challenge.self, from: encodedChallenge)
+            handler.handle(challenge: challenge) { result in
                 switch result {
                 case let .success(success):
                     let newSource = success
@@ -100,7 +98,7 @@ final class ThreeDSService: ThreeDSServiceType {
                 }
             }
         } catch {
-            logger.error("Did fail to decode challenge data: '\(error.localizedDescription)'.")
+            logger.error("Did fail to decode challenge: '\(error.localizedDescription)'.")
             completion(.failure(.init(code: .internal(.mobile), underlyingError: error)))
         }
     }
@@ -111,8 +109,8 @@ final class ThreeDSService: ThreeDSServiceType {
             completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
             return
         }
-        let context = PO3DSRedirectContext(url: url, isHeadlessModeAllowed: true, timeout: 10)
-        handler.redirect(context: context) { [encoder, logger] result in
+        let context = PO3DSRedirect(url: url, isHeadlessModeAllowed: true, timeout: 10)
+        handler.handle(redirect: context) { [encoder, logger] result in
             switch result {
             case let .success(newSource):
                 completion(.success(newSource))
@@ -144,8 +142,8 @@ final class ThreeDSService: ThreeDSServiceType {
             completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
             return
         }
-        let context = PO3DSRedirectContext(url: url, isHeadlessModeAllowed: false, timeout: nil)
-        handler.redirect(context: context, completion: completion)
+        let context = PO3DSRedirect(url: url, isHeadlessModeAllowed: false, timeout: nil)
+        handler.handle(redirect: context, completion: completion)
     }
 
     // MARK: - Utils
@@ -161,7 +159,7 @@ final class ThreeDSService: ThreeDSServiceType {
     }
 
     private func encode(request: PO3DS2AuthenticationRequest) throws -> String {
-        // Using JSONSerialization helps avoid creating boilerplate objects for JSON Web Key coding. Implementation
+        // Using JSONSerialization helps avoid creating boilerplate objects for JSON Web Key for coding. Implementation
         // doesn't validate JWK correctness and simply re-encodes given value.
         let sdkEphemeralPublicKey = try JSONSerialization.jsonObject(
             with: Data(request.sdkEphemeralPublicKey.utf8)
@@ -174,6 +172,6 @@ final class ThreeDSService: ThreeDSServiceType {
             "sdkTransID": request.sdkTransactionId
         ]
         requestParameters["sdkEncData"] = request.deviceData
-        return try JSONSerialization.data(withJSONObject: requestParameters).base64EncodedString()
+        return String(decoding: try JSONSerialization.data(withJSONObject: requestParameters), as: UTF8.self)
     }
 }

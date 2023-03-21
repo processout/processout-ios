@@ -13,7 +13,7 @@ public final class PORedirectCustomerActionViewControllerBuilder {
     /// - Parameters:
     ///   - url: customer action url.
     ///   - completion: completion to invoke when action handling completes.
-    public static func with(context: PO3DSRedirectContext) -> Self {
+    public static func with(context: PO3DSRedirect) -> Self {
         Self(context: context)
     }
 
@@ -62,13 +62,13 @@ public final class PORedirectCustomerActionViewControllerBuilder {
 
     // MARK: -
 
-    init(context: PO3DSRedirectContext) {
+    init(context: PO3DSRedirect) {
         self.context = context
     }
 
     // MARK: - Private Properties
 
-    private let context: PO3DSRedirectContext
+    private let context: PO3DSRedirect
 
     private var completion: ((Result<String, POFailure>) -> Void)?
     private var api: ProcessOutApiType?

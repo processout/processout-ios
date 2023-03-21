@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
-/// Represent the configuration parameters that are required by the 3DS SDK for initialization.
+/// Represents the configuration parameters that are required by the 3DS SDK for initialization.
 @_spi(PO)
 public struct PO3DS2Configuration: Decodable {
 
@@ -19,6 +19,7 @@ public struct PO3DS2Configuration: Decodable {
     public let directoryServerTransactionId: String
 
     /// A public certificate provided by the DS for encryption of device data.
+    /// - NOTE: Implementation is not yet ready on server.
     public let directoryServerRootCertificate: String
 
     /// 3DS protocol version identifier.

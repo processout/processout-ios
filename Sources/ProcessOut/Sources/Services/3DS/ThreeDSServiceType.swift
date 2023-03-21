@@ -11,8 +11,8 @@ protocol ThreeDSServiceType {
 
     /// Implementation should attempt to handle given customer action.
     /// - Parameters:
-    ///   - customerAction: customer action to handle.
-    ///   - delegate: delegate that would perform actual action handling.
+    ///   - action: customer action to handle.
+    ///   - handler: delegate that would perform actual action handling.
     ///   - completion: closure to invoke with a result of customer action handling.
     func handle(action: ThreeDSCustomerAction, handler: PO3DSServiceType, completion: @escaping Completion)
 }

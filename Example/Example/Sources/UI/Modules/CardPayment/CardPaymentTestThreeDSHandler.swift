@@ -13,7 +13,7 @@ final class CardPaymentTestThreeDSHandler: PO3DSServiceType {
     /// View controller to use for presentations.
     unowned var viewController: UIViewController! // swiftlint:disable:this implicitly_unwrapped_optional
 
-    // MARK: - POThreeDSHandlerType
+    // MARK: - PO3DSServiceType
 
     func authenticationRequest(
         configuration: PO3DS2Configuration,
@@ -29,7 +29,7 @@ final class CardPaymentTestThreeDSHandler: PO3DSServiceType {
         completion(.success(request))
     }
 
-    func perform(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
+    func handle(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
         let alertController = UIAlertController(
             title: Strings.CardPayment.Challenge.title, message: "", preferredStyle: .alert
         )
@@ -44,9 +44,9 @@ final class CardPaymentTestThreeDSHandler: PO3DSServiceType {
         self.viewController.present(alertController, animated: true)
     }
 
-    func redirect(context: PO3DSRedirectContext, completion: @escaping (Result<String, POFailure>) -> Void) {
+    func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
         let viewController = PORedirectCustomerActionViewControllerBuilder
-            .with(context: context)
+            .with(context: redirect)
             .with { [weak self] result in
                 self?.viewController.dismiss(animated: true) {
                     completion(result)

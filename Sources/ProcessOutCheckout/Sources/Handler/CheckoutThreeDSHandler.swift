@@ -35,7 +35,6 @@ final class CheckoutThreeDSHandler: PO3DSServiceType {
             completion(.failure(failure))
             return
         }
-
         let configurationParameters = convertToConfigParameters(configuration: configuration)
         let configuration = delegate.willFingerprintDevice(parameters: configurationParameters)
         do {
@@ -75,7 +74,7 @@ final class CheckoutThreeDSHandler: PO3DSServiceType {
         }
     }
 
-    func perform(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
+    func handle(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
         guard case let .fingerprinted(context) = state else {
             let failure = POFailure(code: .generic(.mobile))
             completion(.failure(failure))
@@ -89,11 +88,11 @@ final class CheckoutThreeDSHandler: PO3DSServiceType {
         }
     }
 
-    func redirect(
-        context: PO3DSRedirectContext, completion: @escaping (Result<String, POFailure>) -> Void
+    func handle(
+        redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void
     ) {
         // Redirection is simply forwarded to delegate without additional validations.
-        delegate.redirect(context: context, completion: completion)
+        delegate.redirect(context: redirect, completion: completion)
     }
 
     // MARK: - Private Nested Types

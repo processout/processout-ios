@@ -1,5 +1,5 @@
 //
-//  PO3DSRedirectContext.swift
+//  PO3DSRedirect.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 17.01.2023.
@@ -8,7 +8,7 @@
 import Foundation
 
 @_spi(PO)
-public struct PO3DSRedirectContext {
+public struct PO3DSRedirect {
 
     /// Redirect url.
     public let url: URL
