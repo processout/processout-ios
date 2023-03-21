@@ -1,5 +1,5 @@
 //
-//  CheckoutThreeDSHandlerState.swift
+//  Checkout3DSServiceState.swift
 //  ProcessOutCheckout
 //
 //  Created by Andrii Vysotskyi on 01.03.2023.
@@ -8,7 +8,7 @@
 import Foundation
 import Checkout3DS
 
-enum CheckoutThreeDSHandlerState {
+enum Checkout3DSServiceState {
 
     struct Context {
 

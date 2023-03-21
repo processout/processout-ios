@@ -1,5 +1,5 @@
 //
-//  CheckoutThreeDSHandler.swift
+//  Checkout3DSService.swift
 //  ProcessOutCheckout
 //
 //  Created by Andrii Vysotskyi on 28.02.2023.
@@ -8,9 +8,9 @@
 @_spi(PO) import ProcessOut
 import Checkout3DS
 
-final class CheckoutThreeDSHandler: PO3DSServiceType {
+final class Checkout3DSService: PO3DSServiceType {
 
-    init(errorMapper: AuthenticationErrorMapperType, delegate: POCheckoutThreeDSHandlerDelegate) {
+    init(errorMapper: AuthenticationErrorMapperType, delegate: POCheckout3DSServiceDelegate) {
         self.errorMapper = errorMapper
         self.delegate = delegate
         queue = DispatchQueue.global()
@@ -21,7 +21,7 @@ final class CheckoutThreeDSHandler: PO3DSServiceType {
         setIdleState()
     }
 
-    // MARK: - PO3DSHandlerType
+    // MARK: - PO3DSServiceType
 
     func authenticationRequest(
         configuration: PO3DS2Configuration,
@@ -44,7 +44,7 @@ final class CheckoutThreeDSHandler: PO3DSServiceType {
             queue.async { [unowned self, errorMapper] in
                 let warnings = service.getWarnings()
                 DispatchQueue.main.async {
-                    self.delegate.shouldContinueFingerprinting(warnings: warnings) { shouldContinue in
+                    self.delegate.shouldContinue(with: warnings) { shouldContinue in
                         assert(Thread.isMainThread, "Completion must be called on main thread.")
                         if shouldContinue {
                             context.transaction.getAuthenticationRequestParameters { result in
@@ -88,22 +88,20 @@ final class CheckoutThreeDSHandler: PO3DSServiceType {
         }
     }
 
-    func handle(
-        redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void
-    ) {
+    func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
         // Redirection is simply forwarded to delegate without additional validations.
-        delegate.redirect(context: redirect, completion: completion)
+        delegate.handle(redirect: redirect, completion: completion)
     }
 
     // MARK: - Private Nested Types
 
-    private typealias State = CheckoutThreeDSHandlerState
+    private typealias State = Checkout3DSServiceState
 
     // MARK: - Private Properties
 
     private let errorMapper: AuthenticationErrorMapperType
     private let queue: DispatchQueue
-    private unowned let delegate: POCheckoutThreeDSHandlerDelegate
+    private let delegate: POCheckout3DSServiceDelegate
 
     private var state: State
 
