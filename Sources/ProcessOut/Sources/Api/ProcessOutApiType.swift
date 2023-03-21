@@ -27,15 +27,14 @@ public protocol ProcessOutApiType {
     /// Returns cards repository.
     var cards: POCardsServiceType { get }
 
-    /// Logger with application category.
-    var logger: POLogger { get }
-
     /// Returns customer tokens service.
     var customerTokens: POCustomerTokensServiceType { get }
 
     /// Event emitter to use for for events exchange.
-    @_spi(PO)
     var eventEmitter: POEventEmitterType { get }
+
+    /// Logger with application category.
+    var logger: POLogger { get }
 
     /// Call this method in your app or scene delegate whenever you incoming URL. You can path both custom scheme-based
     /// deep links and universal links.
@@ -47,10 +46,6 @@ public protocol ProcessOutApiType {
 }
 
 extension ProcessOutApiType {
-
-    var eventEmitter: POEventEmitterType {
-        fatalError("Not available!")
-    }
 
     func processDeepLink(url: URL) -> Bool { // swiftlint:disable:this unavailable_function
         fatalError("Not available!")

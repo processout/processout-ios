@@ -5,7 +5,6 @@
 //  Created by Andrii Vysotskyi on 19.01.2023.
 //
 
-@_spi(PO)
 public protocol POEventEmitterType: Sendable {
 
     /// Emits given event.
