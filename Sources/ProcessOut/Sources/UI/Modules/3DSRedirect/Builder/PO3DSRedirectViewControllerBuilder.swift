@@ -7,7 +7,6 @@
 
 import UIKit
 
-@_spi(PO)
 public final class PO3DSRedirectViewControllerBuilder {
 
     /// - Parameters:
