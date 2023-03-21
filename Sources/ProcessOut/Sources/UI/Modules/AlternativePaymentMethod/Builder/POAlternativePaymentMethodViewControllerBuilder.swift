@@ -7,7 +7,6 @@
 
 import UIKit
 
-@_spi(PO)
 public final class POAlternativePaymentMethodViewControllerBuilder {
 
     public static func with(request: POAlternativePaymentMethodRequest) -> Self {
@@ -22,13 +21,6 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
         return self
     }
 
-    /// Api that will be used by created module to communicate with BE. By default ``ProcessOutApi/shared``
-    /// instance is used.
-    public func with(api: ProcessOutApiType) -> Self {
-        self.api = api
-        return self
-    }
-
     /// Return url that was specified when invoice was created.
     public func with(returnUrl: URL) -> Self {
         self.returnUrl = returnUrl
@@ -37,7 +29,7 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
 
     /// Creates and returns view controller that is capable of handling alternative payment request.
     public func build() -> UIViewController {
-        let api: ProcessOutApiType = self.api ?? ProcessOutApi.shared
+        let api: ProcessOutApiType = ProcessOutApi.shared
         let delegate = AlternativePaymentMethodWebViewControllerDelegate(
             alternativePaymentMethodsService: api.alternativePaymentMethods,
             request: request,
@@ -68,8 +60,6 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
     // MARK: - Private Properties
 
     private let request: POAlternativePaymentMethodRequest
-
-    private var api: ProcessOutApiType?
     private var completion: ((Result<POAlternativePaymentMethodResponse, POFailure>) -> Void)?
     private var returnUrl: URL?
 }
