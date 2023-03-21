@@ -7,7 +7,6 @@
 
 import Foundation
 
-@_spi(PO)
 public struct POCardTokenizationRequest: Encodable {
 
     /// Number of the card.

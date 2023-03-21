@@ -5,7 +5,6 @@
 //  Created by Andrii Vysotskyi on 17.03.2023.
 //
 
-@_spi(PO)
 public struct POCardUpdateRequest: Encodable {
 
     /// Card id.

@@ -8,7 +8,6 @@
 import Foundation
 import PassKit
 
-@_spi(PO)
 public struct POApplePayCardTokenizationRequest {
 
     /// Payment information.

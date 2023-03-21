@@ -24,12 +24,11 @@ public protocol ProcessOutApiType {
     /// Returns alternative payment methods service.
     var alternativePaymentMethods: POAlternativePaymentMethodsServiceType { get }
 
+    /// Returns cards repository.
+    var cards: POCardsServiceType { get }
+
     /// Logger with application category.
     var logger: POLogger { get }
-
-    /// Returns cards repository.
-    @_spi(PO)
-    var cards: POCardsServiceType { get }
 
     /// Returns customer tokens service.
     @_spi(PO)
