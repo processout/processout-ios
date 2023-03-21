@@ -20,7 +20,7 @@ final class Checkout3DSService: PO3DSServiceType {
     }
 
     deinit {
-        setIdleState()
+        clean()
     }
 
     // MARK: - PO3DSServiceType
@@ -31,7 +31,7 @@ final class Checkout3DSService: PO3DSServiceType {
     ) {
         switch state {
         case .idle, .fingerprinted:
-            break
+            clean()
         default:
             let failure = POFailure(code: .generic(.mobile))
             completion(.failure(failure))
@@ -57,12 +57,12 @@ final class Checkout3DSService: PO3DSServiceType {
                                 case .success:
                                     self.state = .fingerprinted(context)
                                 case .failure:
-                                    self.setIdleState()
+                                    self.setIdleStateUnchecked()
                                 }
                                 completion(mappedResult)
                             }
                         } else {
-                            self.setIdleState()
+                            self.setIdleStateUnchecked()
                             completion(.failure(POFailure(code: .cancelled)))
                         }
                     }
@@ -85,7 +85,7 @@ final class Checkout3DSService: PO3DSServiceType {
         state = .challenging(context)
         let challengeParameters = convertToChallengeParameters(data: challenge)
         context.transaction.doChallenge(challengeParameters: challengeParameters) { [weak self, errorMapper] result in
-            self?.setIdleState()
+            self?.setIdleStateUnchecked()
             completion(result.mapError(errorMapper.convert))
         }
     }
@@ -109,15 +109,21 @@ final class Checkout3DSService: PO3DSServiceType {
 
     // MARK: - Private Methods
 
-    private func setIdleState() {
-        switch state {
-        case .idle:
-            return
-        case let .fingerprinting(context), let .fingerprinted(context), let .challenging(context):
-            context.transaction.close()
-            context.service.cleanUp()
-        }
+    private func setIdleStateUnchecked() {
+        clean()
         state = .idle
+    }
+
+    private func clean() {
+        let currentContext: Checkout3DSServiceState.Context
+        switch state {
+        case let .fingerprinting(context), let .fingerprinted(context), let .challenging(context):
+            currentContext = context
+        default:
+            return
+        }
+        currentContext.transaction.close()
+        currentContext.service.cleanUp()
     }
 
     // MARK: - Utils

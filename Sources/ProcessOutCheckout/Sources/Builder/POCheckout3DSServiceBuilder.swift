@@ -11,7 +11,7 @@ import Foundation
 @_spi(PO)
 public final class POCheckout3DSServiceBuilder {
 
-    /// - NOTE: Delegate will be strongly referenced by create service.
+    /// - NOTE: Delegate will be strongly referenced by created service.
     public static func with(delegate: POCheckout3DSServiceDelegate) -> POCheckout3DSServiceBuilder {
         Self(delegate: delegate)
     }
