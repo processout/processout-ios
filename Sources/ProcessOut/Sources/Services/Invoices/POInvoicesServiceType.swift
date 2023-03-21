@@ -26,7 +26,7 @@ public protocol POInvoicesServiceType: POServiceType {
     @_spi(PO)
     func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
-        threeDSHandler: PO3DSServiceType,
+        threeDSService: PO3DSServiceType,
         completion: @escaping (Result<Void, Failure>) -> Void
     )
 
@@ -46,7 +46,7 @@ extension POInvoicesServiceType {
     // swiftlint:disable:next unavailable_function
     func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
-        threeDSHandler: PO3DSServiceType,
+        threeDSService: PO3DSServiceType,
         completion: @escaping (Result<Void, Failure>) -> Void
     ) {
         fatalError("Not available!")

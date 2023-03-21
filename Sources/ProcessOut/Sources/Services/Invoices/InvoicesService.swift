@@ -32,18 +32,18 @@ final class InvoicesService: POInvoicesServiceType {
 
     func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
-        threeDSHandler: PO3DSServiceType,
+        threeDSService threeDSServiceDelegate: PO3DSServiceType,
         completion: @escaping (Result<Void, Failure>) -> Void
     ) {
         repository.authorizeInvoice(request: request) { [threeDSService] result in
             switch result {
             case let .success(customerAction?):
-                threeDSService.handle(action: customerAction, delegate: threeDSHandler) { result in
+                threeDSService.handle(action: customerAction, delegate: threeDSServiceDelegate) { result in
                     switch result {
                     case let .success(newSource):
                         self.authorizeInvoice(
                             request: request.replacing(source: newSource),
-                            threeDSHandler: threeDSHandler,
+                            threeDSService: threeDSServiceDelegate,
                             completion: completion
                         )
                     case let .failure(failure):
