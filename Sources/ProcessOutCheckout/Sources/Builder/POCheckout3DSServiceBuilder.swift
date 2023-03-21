@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@_spi(PO) import ProcessOut
+import ProcessOut
 
 @_spi(PO)
 public final class POCheckout3DSServiceBuilder {

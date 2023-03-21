@@ -6,7 +6,7 @@
 //
 
 import UIKit
-@_spi(PO) import ProcessOut
+import ProcessOut
 
 final class CardPaymentTest3DSService: PO3DSServiceType {
 

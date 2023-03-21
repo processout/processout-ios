@@ -40,14 +40,6 @@ public protocol ProcessOutApiType {
     /// deep links and universal links.
     ///
     /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
-    @_spi(PO)
     @discardableResult
     func processDeepLink(url: URL) -> Bool
-}
-
-extension ProcessOutApiType {
-
-    func processDeepLink(url: URL) -> Bool { // swiftlint:disable:this unavailable_function
-        fatalError("Not available!")
-    }
 }

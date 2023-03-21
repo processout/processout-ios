@@ -7,7 +7,7 @@
 
 import Foundation
 import XCTest
-@testable @_spi(PO) import ProcessOut
+@testable import ProcessOut
 
 final class AlternativePaymentMethodsServiceTests: XCTestCase {
 
