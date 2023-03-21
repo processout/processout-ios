@@ -35,18 +35,17 @@ public final class PO3DSRedirectViewControllerBuilder {
     /// - NOTE: Caller should dismiss view controller after completion is called.
     public func build() -> UIViewController {
         let api: ProcessOutApiType = ProcessOutApi.shared
-        var returnUrls = [api.configuration.checkoutBaseUrl]
-        if let returnUrl {
-            returnUrls.append(returnUrl)
-        }
+        let configuration = WebViewControllerConfiguration(
+            returnUrls: [api.configuration.checkoutBaseUrl, returnUrl].compactMap { $0 },
+            version: type(of: api).version,
+            timeout: redirect.timeout
+        )
         let viewController = WebViewController(
-            eventEmitter: api.eventEmitter,
+            configuration: configuration,
             delegate: WebViewControllerDelegate3DS(url: redirect.url) { [completion] result in
                 completion?(result)
             },
-            returnUrls: returnUrls,
-            version: type(of: api).version,
-            timeout: redirect.timeout,
+            eventEmitter: api.eventEmitter,
             logger: api.logger
         )
         return viewController

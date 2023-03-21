@@ -45,15 +45,15 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
                 completion?(result)
             }
         )
-        var returnUrls = [api.configuration.checkoutBaseUrl]
-        if let returnUrl {
-            returnUrls.append(returnUrl)
-        }
-        let viewController = WebViewController(
-            eventEmitter: api.eventEmitter,
-            delegate: delegate,
-            returnUrls: returnUrls,
+        let configuration = WebViewControllerConfiguration(
+            returnUrls: [api.configuration.checkoutBaseUrl, returnUrl].compactMap { $0 },
             version: type(of: api).version,
+            timeout: nil
+        )
+        let viewController = WebViewController(
+            configuration: configuration,
+            delegate: delegate,
+            eventEmitter: api.eventEmitter,
             logger: api.logger
         )
         return viewController

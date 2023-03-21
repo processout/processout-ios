@@ -10,18 +10,14 @@ import WebKit
 final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
 
     init(
-        eventEmitter: POEventEmitterType,
+        configuration: WebViewControllerConfiguration,
         delegate: WebViewControllerDelegate,
-        returnUrls: [URL],
-        version: String,
-        timeout: TimeInterval? = nil,
+        eventEmitter: POEventEmitterType,
         logger: POLogger
     ) {
-        self.eventEmitter = eventEmitter
+        self.configuration = configuration
         self.delegate = delegate
-        self.returnUrls = returnUrls
-        self.version = version
-        self.timeout = timeout
+        self.eventEmitter = eventEmitter
         self.logger = logger
         state = .idle
         super.init(nibName: nil, bundle: nil)
@@ -116,11 +112,9 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
 
     // MARK: - Private Properties
 
-    private let eventEmitter: POEventEmitterType
+    private let configuration: WebViewControllerConfiguration
     private let delegate: WebViewControllerDelegate
-    private let returnUrls: [URL]
-    private let version: String
-    private let timeout: TimeInterval?
+    private let eventEmitter: POEventEmitterType
     private let logger: POLogger
 
     private lazy var contentViewConfiguration: WKWebViewConfiguration = {
@@ -134,7 +128,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
 
     private lazy var contentView: WKWebView = {
         let view = WKWebView(frame: .zero, configuration: contentViewConfiguration)
-        view.customUserAgent = Constants.userAgentPrefix + version
+        view.customUserAgent = Constants.userAgentPrefix + configuration.version
         view.navigationDelegate = self
         view.uiDelegate = self
         view.allowsLinkPreview = false
@@ -158,7 +152,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
             setCompletedState(with: failure)
             return
         }
-        if let timeout {
+        if let timeout = configuration.timeout {
             timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
                 self?.setCompletedState(with: POFailure(code: .timeout(.mobile)))
             }
@@ -178,7 +172,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
         guard url.path.starts(with: Constants.returnUrlPathPrefix) else {
             return false
         }
-        for returnUrl in returnUrls {
+        for returnUrl in configuration.returnUrls {
             guard url.scheme == returnUrl.scheme, url.host == returnUrl.host else {
                 continue
             }
