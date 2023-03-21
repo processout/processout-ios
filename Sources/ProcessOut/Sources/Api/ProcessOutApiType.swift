@@ -31,7 +31,6 @@ public protocol ProcessOutApiType {
     var logger: POLogger { get }
 
     /// Returns customer tokens service.
-    @_spi(PO)
     var customerTokens: POCustomerTokensServiceType { get }
 
     /// Event emitter to use for for events exchange.
@@ -48,10 +47,6 @@ public protocol ProcessOutApiType {
 }
 
 extension ProcessOutApiType {
-
-    var customerTokens: POCustomerTokensServiceType {
-        fatalError("Not available!")
-    }
 
     var eventEmitter: POEventEmitterType {
         fatalError("Not available!")

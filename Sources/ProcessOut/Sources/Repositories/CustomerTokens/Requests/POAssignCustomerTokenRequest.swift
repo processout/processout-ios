@@ -7,7 +7,6 @@
 
 import Foundation
 
-@_spi(PO)
 public struct POAssignCustomerTokenRequest: Encodable {
 
     /// Id of the customer who token belongs to.
