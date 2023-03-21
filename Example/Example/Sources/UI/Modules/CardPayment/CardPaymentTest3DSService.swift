@@ -1,5 +1,5 @@
 //
-//  CardPaymentTestThreeDSHandler.swift
+//  CardPaymentTest3DSService.swift
 //  Example
 //
 //  Created by Andrii Vysotskyi on 15.03.2023.
@@ -8,7 +8,7 @@
 import UIKit
 @_spi(PO) import ProcessOut
 
-final class CardPaymentTestThreeDSHandler: PO3DSServiceType {
+final class CardPaymentTest3DSService: PO3DSServiceType {
 
     /// View controller to use for presentations.
     unowned var viewController: UIViewController! // swiftlint:disable:this implicitly_unwrapped_optional
