@@ -9,7 +9,7 @@
 public struct PO3DS2AuthenticationRequest {
 
     /// Encrypted device data as a JWE string.
-    public let deviceData: String?
+    public let deviceData: String
 
     /// A unique string identifying the application.
     public let sdkAppId: String
@@ -24,7 +24,7 @@ public struct PO3DS2AuthenticationRequest {
     public let sdkTransactionId: String
 
     public init(
-        deviceData: String?,
+        deviceData: String,
         sdkAppId: String,
         sdkEphemeralPublicKey: String,
         sdkReferenceNumber: String,
