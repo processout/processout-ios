@@ -32,7 +32,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Private Methods
 
     private func configureProcessOut() {
-        let configuration = ProcessOutApiConfiguration.staging(
+        let configuration = ProcessOutApiConfiguration.test(
             projectId: Constants.projectId,
             privateKey: Constants.projectPrivateKey,
             // swiftlint:disable force_unwrapping
