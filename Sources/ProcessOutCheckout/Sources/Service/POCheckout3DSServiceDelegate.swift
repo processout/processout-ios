@@ -13,8 +13,8 @@ public protocol POCheckout3DSServiceDelegate: AnyObject {
 
     /// Notifies delegate that service is about to fingerprint device. Implementation should create
     /// `ThreeDS2ServiceConfiguration` using `configParameters` and return it.
-    func willFingerprintDevice(
-        parameters: Checkout3DS.ThreeDS2ServiceConfiguration.ConfigParameters
+    func configuration(
+        with parameters: Checkout3DS.ThreeDS2ServiceConfiguration.ConfigParameters
     ) -> Checkout3DS.ThreeDS2ServiceConfiguration
 
     /// Asks delegate whether service should continue with given warnings. Default implementation
@@ -30,8 +30,8 @@ public protocol POCheckout3DSServiceDelegate: AnyObject {
 
 extension POCheckout3DSServiceDelegate {
 
-    func willFingerprintDevice(
-        parameters: Checkout3DS.ThreeDS2ServiceConfiguration.ConfigParameters
+    func configuration(
+        with parameters: Checkout3DS.ThreeDS2ServiceConfiguration.ConfigParameters
     ) -> Checkout3DS.ThreeDS2ServiceConfiguration {
         ThreeDS2ServiceConfiguration(configParameters: parameters)
     }

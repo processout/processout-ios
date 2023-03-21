@@ -38,7 +38,7 @@ final class Checkout3DSService: PO3DSServiceType {
             return
         }
         let configurationParameters = convertToConfigParameters(configuration: configuration)
-        let configuration = delegate.willFingerprintDevice(parameters: configurationParameters)
+        let configuration = delegate.configuration(with: configurationParameters)
         do {
             let service = try Standalone3DSService.initialize(with: configuration)
             let context = State.Context(service: service, transaction: service.createTransaction())
