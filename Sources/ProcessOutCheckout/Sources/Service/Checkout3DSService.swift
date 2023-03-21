@@ -8,6 +8,8 @@
 @_spi(PO) import ProcessOut
 import Checkout3DS
 
+// swiftlint:disable todo
+
 final class Checkout3DSService: PO3DSServiceType {
 
     init(errorMapper: AuthenticationErrorMapperType, delegate: POCheckout3DSServiceDelegate) {
@@ -123,10 +125,11 @@ final class Checkout3DSService: PO3DSServiceType {
     private func convertToConfigParameters(
         configuration: PO3DS2Configuration
     ) -> ThreeDS2ServiceConfiguration.ConfigParameters {
+        // TODO(andrii-vysotskyi): replace with proper values when available
         let directoryServerData = ThreeDS2ServiceConfiguration.DirectoryServerData(
             directoryServerID: configuration.directoryServerId,
             directoryServerPublicKey: configuration.directoryServerPublicKey,
-            directoryServerRootCertificate: configuration.directoryServerRootCertificate
+            directoryServerRootCertificate: ""
         )
         let configParameters = ThreeDS2ServiceConfiguration.ConfigParameters(
             directoryServerData: directoryServerData,
