@@ -22,7 +22,7 @@ final class CustomerTokensService: POCustomerTokensServiceType {
         repository.assignCustomerToken(request: request) { [threeDSService] result in
             switch result {
             case let .success(customerAction?):
-                threeDSService.handle(action: customerAction, handler: threeDSHandler) { result in
+                threeDSService.handle(action: customerAction, delegate: threeDSHandler) { result in
                     switch result {
                     case let .success(newSource):
                         self.assignCustomerToken(

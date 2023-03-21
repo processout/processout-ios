@@ -5,8 +5,6 @@
 //  Created by Andrii Vysotskyi on 03.11.2022.
 //
 
-import Foundation
-
 /// This interface provides methods to process 3-D Secure transactions.
 @_spi(PO)
 public protocol PO3DSServiceType: AnyObject {
@@ -24,6 +22,6 @@ public protocol PO3DSServiceType: AnyObject {
 
     /// Asks implementation to handle redirect. If value of ``PO3DSRedirect/timeout`` is present it must be
     /// respected, meaning if timeout is reached `completion` should be called with instance of ``POFailure`` with
-    /// `code` set to ``POFailure/TimeoutCode/mobile``.
+    /// ``POFailure/code`` set to ``POFailure/TimeoutCode/mobile``.
     func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void)
 }

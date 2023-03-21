@@ -7,12 +7,14 @@
 
 protocol ThreeDSServiceType {
 
-    typealias Completion = (Result<String, POFailure>) -> Void
+    typealias Delegate = PO3DSServiceType
 
     /// Implementation should attempt to handle given customer action.
     /// - Parameters:
     ///   - action: customer action to handle.
-    ///   - handler: delegate that would perform actual action handling.
+    ///   - delegate: delegate that would perform actual action handling.
     ///   - completion: closure to invoke with a result of customer action handling.
-    func handle(action: ThreeDSCustomerAction, handler: PO3DSServiceType, completion: @escaping Completion)
+    func handle(
+        action: ThreeDSCustomerAction, delegate: Delegate, completion: @escaping (Result<String, POFailure>) -> Void
+    )
 }
