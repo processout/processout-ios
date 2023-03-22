@@ -6,7 +6,6 @@
 //
 
 /// This interface provides methods to process 3-D Secure transactions.
-@_spi(PO)
 public protocol PO3DSServiceType: AnyObject {
 
     /// Asks implementation to create request that will be passed to 3DS Server to create the AReq.
@@ -22,6 +21,6 @@ public protocol PO3DSServiceType: AnyObject {
 
     /// Asks implementation to handle redirect. If value of ``PO3DSRedirect/timeout`` is present it must be
     /// respected, meaning if timeout is reached `completion` should be called with instance of ``POFailure`` with
-    /// ``POFailure/code`` set to ``POFailure/TimeoutCode/mobile``.
+    /// ``POFailure/code-swift.property`` set to ``POFailure/TimeoutCode/mobile``.
     func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void)
 }

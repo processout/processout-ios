@@ -7,7 +7,6 @@
 
 import Foundation
 
-@_spi(PO)
 public struct POInvoiceAuthorizationRequest: Encodable {
 
     /// Invoice identifier to to perform authorization for.

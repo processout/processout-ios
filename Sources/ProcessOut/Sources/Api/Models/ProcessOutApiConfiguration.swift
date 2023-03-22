@@ -49,9 +49,9 @@ extension ProcessOutApiConfiguration {
         )
     }
 
-    /// Creates staging configuration.
+    /// Creates test configuration.
     @_spi(PO)
-    public static func staging(projectId: String, privateKey: String?, apiBaseUrl: URL, checkoutBaseUrl: URL) -> Self {
+    public static func test(projectId: String, privateKey: String?, apiBaseUrl: URL, checkoutBaseUrl: URL) -> Self {
         ProcessOutApiConfiguration(
             projectId: projectId,
             isDebug: true,

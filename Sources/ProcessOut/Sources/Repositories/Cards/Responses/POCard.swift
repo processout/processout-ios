@@ -7,7 +7,6 @@
 
 import Foundation
 
-@_spi(PO)
 public struct POCard: Decodable {
 
     /// Value that uniquely identifies the card.

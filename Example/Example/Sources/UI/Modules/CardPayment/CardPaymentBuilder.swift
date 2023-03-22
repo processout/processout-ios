@@ -6,21 +6,21 @@
 //
 
 import UIKit
-@_spi(PO) import ProcessOut
+import ProcessOut
 
 final class CardPaymentBuilder {
 
     func build() -> UIViewController {
-        let threeDSHandler = CardPaymentTestThreeDSHandler()
+        let threeDSService = CardPaymentTest3DSService()
         let router = CardPaymentRouter()
         let viewModel = CardPaymentViewModel(
             router: router,
             invoicesService: ProcessOutApi.shared.invoices,
             cardsService: ProcessOutApi.shared.cards,
-            threeDSService: threeDSHandler
+            threeDSService: threeDSService
         )
         let viewController = CardPaymentViewController(viewModel: viewModel)
-        threeDSHandler.viewController = viewController
+        threeDSService.viewController = viewController
         router.viewController = viewController
         return viewController
     }

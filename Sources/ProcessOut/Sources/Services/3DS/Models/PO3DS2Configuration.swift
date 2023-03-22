@@ -6,7 +6,6 @@
 //
 
 /// Represents the configuration parameters that are required by the 3DS SDK for initialization.
-@_spi(PO)
 public struct PO3DS2Configuration: Decodable {
 
     /// The identifier of the directory server to use during the transaction creation phase.
@@ -18,10 +17,6 @@ public struct PO3DS2Configuration: Decodable {
     /// Unique identifier for the authentication assigned by the DS (Card Scheme).
     public let directoryServerTransactionId: String
 
-    /// A public certificate provided by the DS for encryption of device data.
-    /// - NOTE: Implementation is not yet ready on server.
-    public let directoryServerRootCertificate: String
-
     /// 3DS protocol version identifier.
     public let messageVersion: String
 
@@ -30,7 +25,6 @@ public struct PO3DS2Configuration: Decodable {
     private enum CodingKeys: String, CodingKey {
         case directoryServerId = "directoryServerID"
         case directoryServerPublicKey
-        case directoryServerRootCertificate
         case directoryServerTransactionId = "threeDSServerTransID"
         case messageVersion
     }

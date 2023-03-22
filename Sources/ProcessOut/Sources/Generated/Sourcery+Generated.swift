@@ -201,7 +201,6 @@ extension POInvoicesServiceType {
     }
 
     @MainActor
-    @_spi(PO)
     public func authorizeInvoice(
         request: POInvoiceAuthorizationRequest, threeDSService: PO3DSServiceType
     ) async throws -> Void {

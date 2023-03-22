@@ -7,7 +7,6 @@
 
 import Foundation
 
-@_spi(PO)
 public struct POContact: Encodable {
 
     /// First line of cardholder’s address.

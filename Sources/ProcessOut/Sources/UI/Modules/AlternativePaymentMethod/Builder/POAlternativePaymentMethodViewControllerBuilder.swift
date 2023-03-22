@@ -7,7 +7,6 @@
 
 import UIKit
 
-@_spi(PO)
 public final class POAlternativePaymentMethodViewControllerBuilder {
 
     public static func with(request: POAlternativePaymentMethodRequest) -> Self {
@@ -22,38 +21,24 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
         return self
     }
 
-    /// Api that will be used by created module to communicate with BE. By default ``ProcessOutApi/shared``
-    /// instance is used.
-    public func with(api: ProcessOutApiType) -> Self {
-        self.api = api
-        return self
-    }
-
-    /// Return url that was specified when invoice was created.
-    public func with(returnUrl: URL) -> Self {
-        self.returnUrl = returnUrl
-        return self
-    }
-
     /// Creates and returns view controller that is capable of handling alternative payment request.
     public func build() -> UIViewController {
-        let api: ProcessOutApiType = self.api ?? ProcessOutApi.shared
-        let delegate = AlternativePaymentMethodWebViewControllerDelegate(
+        let api: ProcessOutApiType = ProcessOutApi.shared
+        let delegate = WebViewControllerDelegateAlternativePaymentMethod(
             alternativePaymentMethodsService: api.alternativePaymentMethods,
             request: request,
             completion: { [completion] result in
                 completion?(result)
             }
         )
-        var returnUrls = [api.configuration.checkoutBaseUrl]
-        if let returnUrl {
-            returnUrls.append(returnUrl)
-        }
-        let viewController = WebViewController(
-            eventEmitter: api.eventEmitter,
-            delegate: delegate,
-            returnUrls: returnUrls,
+        let configuration = WebViewControllerConfiguration(
+            returnUrls: [api.configuration.checkoutBaseUrl],
             version: type(of: api).version,
+            timeout: nil
+        )
+        let viewController = WebViewController(
+            configuration: configuration,
+            delegate: delegate,
             logger: api.logger
         )
         return viewController
@@ -68,8 +53,5 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
     // MARK: - Private Properties
 
     private let request: POAlternativePaymentMethodRequest
-
-    private var api: ProcessOutApiType?
     private var completion: ((Result<POAlternativePaymentMethodResponse, POFailure>) -> Void)?
-    private var returnUrl: URL?
 }

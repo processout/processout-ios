@@ -5,8 +5,10 @@
 //  Created by Andrii Vysotskyi on 28.02.2023.
 //
 
-@_spi(PO) import ProcessOut
+import ProcessOut
 import Checkout3DS
+
+// swiftlint:disable todo
 
 final class Checkout3DSService: PO3DSServiceType {
 
@@ -18,7 +20,7 @@ final class Checkout3DSService: PO3DSServiceType {
     }
 
     deinit {
-        setIdleState()
+        clean()
     }
 
     // MARK: - PO3DSServiceType
@@ -29,14 +31,14 @@ final class Checkout3DSService: PO3DSServiceType {
     ) {
         switch state {
         case .idle, .fingerprinted:
-            break
+            clean()
         default:
             let failure = POFailure(code: .generic(.mobile))
             completion(.failure(failure))
             return
         }
         let configurationParameters = convertToConfigParameters(configuration: configuration)
-        let configuration = delegate.willFingerprintDevice(parameters: configurationParameters)
+        let configuration = delegate.configuration(with: configurationParameters)
         do {
             let service = try Standalone3DSService.initialize(with: configuration)
             let context = State.Context(service: service, transaction: service.createTransaction())
@@ -55,12 +57,12 @@ final class Checkout3DSService: PO3DSServiceType {
                                 case .success:
                                     self.state = .fingerprinted(context)
                                 case .failure:
-                                    self.setIdleState()
+                                    self.setIdleStateUnchecked()
                                 }
                                 completion(mappedResult)
                             }
                         } else {
-                            self.setIdleState()
+                            self.setIdleStateUnchecked()
                             completion(.failure(POFailure(code: .cancelled)))
                         }
                     }
@@ -83,7 +85,7 @@ final class Checkout3DSService: PO3DSServiceType {
         state = .challenging(context)
         let challengeParameters = convertToChallengeParameters(data: challenge)
         context.transaction.doChallenge(challengeParameters: challengeParameters) { [weak self, errorMapper] result in
-            self?.setIdleState()
+            self?.setIdleStateUnchecked()
             completion(result.mapError(errorMapper.convert))
         }
     }
@@ -107,15 +109,21 @@ final class Checkout3DSService: PO3DSServiceType {
 
     // MARK: - Private Methods
 
-    private func setIdleState() {
-        switch state {
-        case .idle:
-            return
-        case let .fingerprinting(context), let .fingerprinted(context), let .challenging(context):
-            context.transaction.close()
-            context.service.cleanUp()
-        }
+    private func setIdleStateUnchecked() {
+        clean()
         state = .idle
+    }
+
+    private func clean() {
+        let currentContext: Checkout3DSServiceState.Context
+        switch state {
+        case let .fingerprinting(context), let .fingerprinted(context), let .challenging(context):
+            currentContext = context
+        default:
+            return
+        }
+        currentContext.transaction.close()
+        currentContext.service.cleanUp()
     }
 
     // MARK: - Utils
@@ -123,10 +131,11 @@ final class Checkout3DSService: PO3DSServiceType {
     private func convertToConfigParameters(
         configuration: PO3DS2Configuration
     ) -> ThreeDS2ServiceConfiguration.ConfigParameters {
+        // TODO(andrii-vysotskyi): replace with proper values when available
         let directoryServerData = ThreeDS2ServiceConfiguration.DirectoryServerData(
             directoryServerID: configuration.directoryServerId,
             directoryServerPublicKey: configuration.directoryServerPublicKey,
-            directoryServerRootCertificate: configuration.directoryServerRootCertificate
+            directoryServerRootCertificate: ""
         )
         let configParameters = ThreeDS2ServiceConfiguration.ConfigParameters(
             directoryServerData: directoryServerData,

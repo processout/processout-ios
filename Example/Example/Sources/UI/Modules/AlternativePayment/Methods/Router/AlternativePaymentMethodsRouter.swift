@@ -6,7 +6,7 @@
 //
 
 import UIKit
-@_spi(PO) import ProcessOut
+import ProcessOut
 
 final class AlternativePaymentMethodsRouter: RouterType {
 
