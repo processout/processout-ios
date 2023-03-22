@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Card details that should be tokenized.
 public struct POCardTokenizationRequest: Encodable {
 
     /// Number of the card.
