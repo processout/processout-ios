@@ -31,7 +31,16 @@ All errors that could happen as a result of interaction with the SDK are represe
 
 - ``POFailure``
 
-### Native Alternative Payment Method UI
+### 3DS
+
+- ``PO3DSServiceType``
+- ``PO3DS2Configuration``
+- ``PO3DS2AuthenticationRequest``
+- ``PO3DS2Challenge``
+- ``PO3DSRedirect``
+- ``PO3DSRedirectViewControllerBuilder``
+
+### Native Alternative Payment Method
 
 - <doc:NativeAlternativePaymentMethod>
 - ``PONativeAlternativePaymentMethodViewControllerBuilder``
@@ -42,9 +51,48 @@ All errors that could happen as a result of interaction with the SDK are represe
 
 ### Alternative Payment Method
 
+- ``POAlternativePaymentMethodViewControllerBuilder``
 - ``POAlternativePaymentMethodsServiceType``
 - ``POAlternativePaymentMethodRequest``
 - ``POAlternativePaymentMethodResponse``
+
+### Cards
+
+- ``POCardsServiceType``
+- ``POCardTokenizationRequest``
+- ``POApplePayCardTokenizationRequest``
+- ``POCard``
+- ``POContact``
+- ``POCardUpdateRequest``
+
+### Customer Tokens
+
+- ``POCustomerTokensServiceType``
+- ``POAssignCustomerTokenRequest``
+
+### Gateway Configurations
+
+- ``POGatewayConfigurationsRepositoryType``
+- ``POAllGatewayConfigurationsResponse``
+- ``POAllGatewayConfigurationsRequest``
+- ``POFindGatewayConfigurationRequest``
+- ``POGatewayConfiguration``
+
+### Invoices
+
+- ``POInvoicesServiceType``
+- ``POInvoiceAuthorizationRequest``
+- ``PONativeAlternativePaymentCaptureRequest``
+- ``PONativeAlternativePaymentMethodParameter``
+- ``PONativeAlternativePaymentMethodRequest``
+- ``PONativeAlternativePaymentMethodResponse``
+- ``PONativeAlternativePaymentMethodTransactionDetails``
+- ``PONativeAlternativePaymentMethodTransactionDetailsRequest``
+- ``PONativeAlternativePaymentMethodState``
+
+### Images
+
+- ``POImagesRepositoryType``
 
 ### Appearance
 
@@ -63,29 +111,6 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POActivityIndicatorViewType``
 - ``POBackgroundDecorationStateStyle``
 - ``POBackgroundDecorationStyle``
-
-### Gateway Configurations
-
-- ``POGatewayConfigurationsRepositoryType``
-- ``POAllGatewayConfigurationsResponse``
-- ``POAllGatewayConfigurationsRequest``
-- ``POFindGatewayConfigurationRequest``
-- ``POGatewayConfiguration``
-
-### Invoices
-
-- ``POInvoicesServiceType``
-- ``PONativeAlternativePaymentCaptureRequest``
-- ``PONativeAlternativePaymentMethodParameter``
-- ``PONativeAlternativePaymentMethodRequest``
-- ``PONativeAlternativePaymentMethodResponse``
-- ``PONativeAlternativePaymentMethodTransactionDetails``
-- ``PONativeAlternativePaymentMethodTransactionDetailsRequest``
-- ``PONativeAlternativePaymentMethodState``
-
-### Images
-
-- ``POImagesRepositoryType``
 
 ### Utils
 
