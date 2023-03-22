@@ -8,7 +8,6 @@
 import ProcessOut
 import Checkout3DS
 
-@_spi(PO)
 public protocol POCheckout3DSServiceDelegate: AnyObject {
 
     /// Notifies delegate that service is about to fingerprint device. Implementation should create
