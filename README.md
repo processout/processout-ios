@@ -22,6 +22,10 @@ Before going further please make sure that you have installed all dependencies s
 
 To run tests locally use `bundle exec fastlane tests` command. It is also possible to run them directly in Xcode from the ProcessOut target in `ProcessOut.xcodeproj`.
 
+### Documentation
+
+SDK documentation can be found in artifacts alongside every release.
+
 ## License
 
 ProcessOut is available under the MIT license. See the [LICENSE](LICENSE) file for more info.
