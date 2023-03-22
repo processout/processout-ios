@@ -13,14 +13,10 @@ ProcessOutApi.configure(configuration: configuration)
 
 ## Topics
 
-### Migrating from previous versions
-- <doc:MigratingFromProcessOut2>
-
-### Supported Localizations
-- <doc:Localizations>
-
 ### Framework
 
+- <doc:MigratingFromProcessOut2>
+- <doc:Localizations>
 - ``ProcessOutApi``
 - ``ProcessOutApiConfiguration``
 - ``ProcessOutApiType``
@@ -33,6 +29,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 
 ### 3DS
 
+- <doc:3DS>
 - ``PO3DSServiceType``
 - ``PO3DS2Configuration``
 - ``PO3DS2AuthenticationRequest``
@@ -61,8 +58,8 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``POCardsServiceType``
 - ``POCardTokenizationRequest``
 - ``POApplePayCardTokenizationRequest``
-- ``POCard``
 - ``POContact``
+- ``POCard``
 - ``POCardUpdateRequest``
 
 ### Customer Tokens
