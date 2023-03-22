@@ -8,6 +8,7 @@
 import Foundation
 import ProcessOut
 
+/// Builder to configure and create service capable of handling 3DS challenges using Checkout3DS SDK.
 public final class POCheckout3DSServiceBuilder {
 
     /// - NOTE: Delegate will be strongly referenced by created service.
@@ -15,6 +16,7 @@ public final class POCheckout3DSServiceBuilder {
         Self(delegate: delegate)
     }
 
+    /// Creates service instance.
     public func build() -> PO3DSServiceType {
         Checkout3DSService(errorMapper: AuthenticationErrorMapper(), delegate: delegate)
     }
