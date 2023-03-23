@@ -1,0 +1,18 @@
+//
+//  PhoneNumberFormat.swift
+//  ProcessOut
+//
+//  Created by Andrii Vysotskyi on 16.03.2023.
+//
+
+struct PhoneNumberFormat: Decodable {
+
+    /// Formatting patern.
+    let pattern: String
+
+    /// Leading digits pattern.
+    let leadingDigits: [String]
+
+    /// Format to use for number.
+    let format: String
+}
