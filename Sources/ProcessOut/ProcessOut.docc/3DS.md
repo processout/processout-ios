@@ -33,7 +33,7 @@ any additional UI to user. One way to implement such presentation could be like 
 ```swift
 func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
     if redirect.isHeadlessModeAllowed {
-        var viewController: UIViewController! // swiftlint:disable:this implicitly_unwrapped_optional
+        var viewController: UIViewController!
         viewController = PO3DSRedirectViewControllerBuilder
             .with(redirect: redirect)
             .with(completion: { result in
@@ -46,7 +46,14 @@ func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFai
         viewController.view.frame = .zero
         viewController.didMove(toParent: sourceViewController)
     } else {
-        ...
+        let viewController = PO3DSRedirectViewControllerBuilder 
+            .with(redirect: redirect)
+            .with(completion: { result in
+                sourceViewController.dismiss(animated: true)
+                completion(result) 
+            })
+            .build()
+        sourceViewController.present(viewController, animated: true)
     }
 }
 ```
