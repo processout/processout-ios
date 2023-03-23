@@ -154,7 +154,8 @@ final class PhoneNumberFormatter {
             // swiftlint:disable:next legacy_objc_type
             return (nationalNumber as NSString).substring(with: range)
         }
-        let formattedNationalNumber = String(format: format.format, arguments: groups) // avoid using printf
+        // TODO(andrii-vysotskyi): parse format and use proper groups
+        let formattedNationalNumber = String(format: format.format, arguments: groups)
         return "+\(countryCode) \(formattedNationalNumber)"
     }
 }
