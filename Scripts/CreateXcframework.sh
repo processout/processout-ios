@@ -1,6 +1,8 @@
 #!/bin/bash
 
-function build_framework() {(
+OUTPUT_DIR=".build/framework"
+
+function build_framework {(
     set -e
 
     xcodebuild archive \
@@ -27,8 +29,8 @@ function build_framework() {(
 
 set -e
 
-rm -rf .build/framework
-mkdir -p .build/framework
+rm -rf $OUTPUT_DIR
+mkdir -p $OUTPUT_DIR
 
 # TODO(andrii-vysotskyi): Add "ProcessOutCheckout" when CheckoutSDK release is public
 for PRODUCT in "ProcessOut"; do
