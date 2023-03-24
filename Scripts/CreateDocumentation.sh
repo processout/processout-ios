@@ -1,16 +1,30 @@
 #!/bin/bash
 
+OUTPUT_DIR=".build/documentation"
+
+function build_doc {(
+    set -e
+
+    xcodebuild docbuild \
+        -project ProcessOut.xcodeproj \
+        -derivedDataPath '.build/derived-data' \
+        -scheme $1 \
+        -destination 'generic/platform=iOS' |
+        bundle exec xcpretty
+
+    ARCHIVE_PATH=$(find '.build/derived-data' -type d -name "$1.doccarchive")
+
+    cp -R $ARCHIVE_PATH $OUTPUT_DIR
+
+    cd $OUTPUT_DIR
+    zip $1.doccarchive.zip -r $1.doccarchive -x '.*' -x '__MACOSX'
+)}
+
 set -e
 
-xcodebuild docbuild \
-    -project ProcessOut.xcodeproj \
-    -derivedDataPath '.build/derived-data' \
-    -scheme ProcessOut \
-    -destination 'generic/platform=iOS'
+rm -rf $OUTPUT_DIR
+mkdir -p $OUTPUT_DIR
 
-ARCHIVE_PATH=$(find '.build/derived-data' -type d -name '*.doccarchive')
-ARCHIVE_NAME=$(basename $ARCHIVE_PATH .doccarchive)
-
-$(xcrun --find docc) process-archive \
-    transform-for-static-hosting $ARCHIVE_PATH \
-    --output-path Docs
+for PRODUCT in "ProcessOut" "ProcessOutCheckout" ; do
+    build_doc $PRODUCT
+done

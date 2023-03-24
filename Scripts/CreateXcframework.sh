@@ -1,27 +1,38 @@
 #!/bin/bash
 
+OUTPUT_DIR=".build/framework"
+
+function build_framework {(
+    set -e
+
+    xcodebuild archive \
+        -scheme $1 \
+        -destination "generic/platform=iOS" \
+        -archivePath .build/framework/$1-iOS |
+        bundle exec xcpretty
+
+    xcodebuild archive \
+        -scheme $1 \
+        -destination "generic/platform=iOS Simulator" \
+        -archivePath .build/framework/$1-Sim |
+        bundle exec xcpretty
+
+    cd .build/framework
+
+    xcodebuild -create-xcframework \
+        -framework ./$1-iOS.xcarchive/Products/Library/Frameworks/$1.framework \
+        -framework ./$1-Sim.xcarchive/Products/Library/Frameworks/$1.framework \
+        -output ./$1.xcframework
+
+    zip $1.xcframework.zip -r $1.xcframework -x '.*' -x '__MACOSX'
+)}
+
 set -e
 
-rm -rf .build/framework
-mkdir -p .build/framework
+rm -rf $OUTPUT_DIR
+mkdir -p $OUTPUT_DIR
 
-xcodebuild archive \
-    -scheme ProcessOut \
-    -destination "generic/platform=iOS" \
-    -archivePath .build/framework/ProcessOut-iOS |
-    bundle exec xcpretty
-
-xcodebuild archive \
-    -scheme ProcessOut \
-    -destination "generic/platform=iOS Simulator" \
-    -archivePath .build/framework/ProcessOut-Sim |
-    bundle exec xcpretty
-
-cd .build/framework
-
-xcodebuild -create-xcframework \
-    -framework ./ProcessOut-iOS.xcarchive/Products/Library/Frameworks/ProcessOut.framework \
-    -framework ./ProcessOut-Sim.xcarchive/Products/Library/Frameworks/ProcessOut.framework \
-    -output ./ProcessOut.xcframework
-
-zip ProcessOut.xcframework.zip -r ProcessOut.xcframework -x '.*' -x '__MACOSX'
+# TODO(andrii-vysotskyi): Add "ProcessOutCheckout" when CheckoutSDK release is public
+for PRODUCT in "ProcessOut"; do
+    build_framework $PRODUCT
+done

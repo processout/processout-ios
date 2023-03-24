@@ -8,7 +8,7 @@
 import ProcessOut
 import Checkout3DS
 
-@_spi(PO)
+/// Checkout 3DS service delegate.
 public protocol POCheckout3DSServiceDelegate: AnyObject {
 
     /// Notifies delegate that service is about to fingerprint device. Implementation should create
@@ -21,10 +21,8 @@ public protocol POCheckout3DSServiceDelegate: AnyObject {
     /// ignores warnings and completes with `true`.
     func shouldContinue(with warnings: Set<Checkout3DS.Warning>, completion: @escaping (Bool) -> Void)
 
-    /// Asks delegate to handle 3DS redirect.
-    /// - NOTE: If value of ``PO3DSRedirect/timeout`` is present it must be respected, meaning if timeout is reached
-    /// `completion` should be called with instance of ``POFailure`` with  ``POFailure/code`` set to
-    /// ``POFailure/TimeoutCode/mobile``.
+    /// Asks delegate to handle 3DS redirect. See documentation of `PO3DSServiceType/handle(redirect:completion:)`
+    /// for more details.
     func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void)
 }
 
