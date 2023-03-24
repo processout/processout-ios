@@ -39,11 +39,12 @@ final class PhoneNumberFormatter {
 
     // TODO(andrii-vysotskyi): migrate to `format(partialNumber:)`
     func formattedNumber(from string: String) -> String {
-        let trimmedString = string.trimmingCharacters(in: .whitespacesAndNewlines)
-        if string.isEmpty || trimmedString.prefix(1) == "+" {
-            return string
-        }
-        return "+" + trimmedString
+        format(partialNumber: string)
+//        let trimmedString = string.trimmingCharacters(in: .whitespacesAndNewlines)
+//        if string.isEmpty || trimmedString.prefix(1) == "+" {
+//            return string
+//        }
+//        return "+" + trimmedString
     }
 
     func normalized(number: String) -> String {
@@ -93,9 +94,7 @@ final class PhoneNumberFormatter {
                   match.range.length >= partialNationalNumber.count else {
                 continue
             }
-            let formattedNumber = formatted(
-                nationalNumber: nationalNumber, match: match, format: format, countryCode: countryCode
-            )
+            let formattedNumber = formatted(nationalNumber: nationalNumber, countryCode: countryCode, format: format)
             return removingPlaceholderSuffix(
                 number: formattedNumber, expectedSignificantLength: partialNationalNumber.count + countryCode.count
             )
@@ -125,9 +124,7 @@ final class PhoneNumberFormatter {
             }
             if let match = regex.firstMatch(in: nationalNumber, options: .anchored, range: range),
                match.range == range {
-                return formatted(
-                    nationalNumber: nationalNumber, match: match, format: format, countryCode: metadata.countryCode
-                )
+                return formatted(nationalNumber: nationalNumber, countryCode: metadata.countryCode, format: format)
             }
             potentialFormats.append(format)
         }
@@ -146,16 +143,16 @@ final class PhoneNumberFormatter {
         return false
     }
 
-    private func formatted(
-        nationalNumber: String, match: NSTextCheckingResult, format: PhoneNumberFormat, countryCode: String
-    ) -> String {
-        let groups = stride(from: 1, to: match.numberOfRanges, by: 1).map { index in
-            let range = match.range(at: index)
-            // swiftlint:disable:next legacy_objc_type
-            return (nationalNumber as NSString).substring(with: range)
+    private func formatted(nationalNumber: String, countryCode: String, format: PhoneNumberFormat) -> String {
+        let formattedNationalNumber: String
+        if let formatRegex = regexProvider.regex(with: format.pattern) {
+            let range = NSRange(nationalNumber.startIndex ..< nationalNumber.endIndex, in: nationalNumber)
+            formattedNationalNumber = formatRegex.stringByReplacingMatches(
+                in: nationalNumber, range: range, withTemplate: format.format
+            )
+        } else {
+            formattedNationalNumber = nationalNumber
         }
-        // TODO(andrii-vysotskyi): parse format and use proper groups
-        let formattedNationalNumber = String(format: format.format, arguments: groups)
         return "+\(countryCode) \(formattedNationalNumber)"
     }
 }
