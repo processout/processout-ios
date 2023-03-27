@@ -17,6 +17,9 @@ public struct PO3DS2Configuration: Decodable {
     /// Unique identifier for the authentication assigned by the DS (Card Scheme).
     public let directoryServerTransactionId: String
 
+    /// Card scheme from the card used to initiate the payment.
+    public let scheme: POCardScheme?
+
     /// 3DS protocol version identifier.
     public let messageVersion: String
 
@@ -26,6 +29,7 @@ public struct PO3DS2Configuration: Decodable {
         case directoryServerId = "directoryServerID"
         case directoryServerPublicKey
         case directoryServerTransactionId = "threeDSServerTransID"
+        case scheme
         case messageVersion
     }
 }
