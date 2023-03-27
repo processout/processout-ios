@@ -11,7 +11,7 @@ public protocol POCustomerTokensServiceType: POServiceType {
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
         threeDSService: PO3DSServiceType,
-        completion: @escaping (Result<Void, POFailure>) -> Void
+        completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
     )
 
     /// Create customer token.

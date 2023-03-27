@@ -31,7 +31,8 @@ struct HttpConnectorRequest<Value: Decodable> {
     /// Custom headers.
     let headers: [String: String]
 
-    /// Lets us inject device metadata into requests.
+    /// Lets us inject device metadata into requests. If you set this property to `true` make sure that request
+    /// body is valid key pair object (could be empty object as well).
     let includesDeviceMetadata: Bool
 
     /// Indicates whether private key is required to execute request. Default value is `false`.

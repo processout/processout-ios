@@ -47,6 +47,9 @@ public struct POInvoiceAuthorizationRequest: Encodable {
     @POImmutableStringCodableOptionalDecimal
     public var captureAmount: Decimal?
 
+    /// Operation metadata.
+    public let metadata: [String: String]?
+
     public init(
         invoiceId: String,
         source: String,
@@ -58,7 +61,8 @@ public struct POInvoiceAuthorizationRequest: Encodable {
         overrideMacBlocking: Bool = false,
         initialSchemeTransactionId: String? = nil,
         autoCaptureAt: Date? = nil,
-        captureAmount: Decimal? = nil
+        captureAmount: Decimal? = nil,
+        metadata: [String: String]? = nil
     ) {
         self._invoiceId = .init(value: invoiceId)
         self.source = source
@@ -71,5 +75,6 @@ public struct POInvoiceAuthorizationRequest: Encodable {
         self.initialSchemeTransactionId = initialSchemeTransactionId
         self.autoCaptureAt = autoCaptureAt
         self._captureAmount = .init(value: captureAmount)
+        self.metadata = metadata
     }
 }

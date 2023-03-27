@@ -9,7 +9,7 @@ extension CustomerTokensRepositoryType {
     @MainActor
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest
-    ) async throws -> ThreeDSCustomerAction? {
+    ) async throws -> AssignCustomerTokenResponse {
         return try await withUnsafeThrowingContinuation { continuation in
             assignCustomerToken(request: request, completion: continuation.resume)
         }
@@ -133,7 +133,7 @@ extension POCustomerTokensServiceType {
     @MainActor
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DSServiceType
-    ) async throws -> Void {
+    ) async throws -> POCustomerToken {
         return try await withUnsafeThrowingContinuation { continuation in
             assignCustomerToken(request: request, threeDSService: threeDSService, completion: continuation.resume)
         }
