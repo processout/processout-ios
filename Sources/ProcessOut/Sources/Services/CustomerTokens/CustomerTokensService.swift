@@ -17,25 +17,30 @@ final class CustomerTokensService: POCustomerTokensServiceType {
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
         threeDSService threeDSServiceDelegate: PO3DSServiceType,
-        completion: @escaping (Result<Void, POFailure>) -> Void
+        completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
     ) {
         repository.assignCustomerToken(request: request) { [threeDSService] result in
             switch result {
-            case let .success(customerAction?):
-                threeDSService.handle(action: customerAction, delegate: threeDSServiceDelegate) { result in
-                    switch result {
-                    case let .success(newSource):
-                        self.assignCustomerToken(
-                            request: request.replacing(source: newSource),
-                            threeDSService: threeDSServiceDelegate,
-                            completion: completion
-                        )
-                    case let .failure(failure):
-                        completion(.failure(failure))
+            case let .success(response):
+                if let customerAction = response.customerAction {
+                    threeDSService.handle(action: customerAction, delegate: threeDSServiceDelegate) { result in
+                        switch result {
+                        case let .success(newSource):
+                            self.assignCustomerToken(
+                                request: request.replacing(source: newSource),
+                                threeDSService: threeDSServiceDelegate,
+                                completion: completion
+                            )
+                        case let .failure(failure):
+                            completion(.failure(failure))
+                        }
                     }
+                } else if let token = response.token {
+                    completion(.success(token))
+                } else {
+                    let failure = POFailure(code: .internal(.mobile))
+                    completion(.failure(failure))
                 }
-            case .success:
-                completion(.success(()))
             case .failure(let failure):
                 completion(.failure(failure))
             }

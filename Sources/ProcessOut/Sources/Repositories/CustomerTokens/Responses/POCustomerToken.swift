@@ -7,7 +7,7 @@
 
 import Foundation
 
-@_spi(PO)
+/// Customer token information.
 public struct POCustomerToken: Decodable {
 
     /// String value that uniquely identifies this customer's token.

@@ -17,18 +17,16 @@ final class CustomerTokensRepository: CustomerTokensRepositoryType {
     // MARK: - CustomerTokensRepositoryType
 
     func assignCustomerToken(
-        request: POAssignCustomerTokenRequest, completion: @escaping (Result<ThreeDSCustomerAction?, Failure>) -> Void
+        request: POAssignCustomerTokenRequest,
+        completion: @escaping (Result<AssignCustomerTokenResponse, Failure>) -> Void
     ) {
-        struct Response: Decodable {
-            let customerAction: ThreeDSCustomerAction?
-        }
-        let httpRequest = HttpConnectorRequest<Response>.put(
+        let httpRequest = HttpConnectorRequest<AssignCustomerTokenResponse>.put(
             path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",
             body: request,
             includesDeviceMetadata: true
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.customerAction).mapError(failureMapper.failure))
+            completion(result.mapError(failureMapper.failure))
         }
     }
 
