@@ -24,9 +24,19 @@ final class ConfigurationMapper: ConfigurationMapperType {
         return configParameters
     }
 
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let visa = "visa"
+        static let mastercard = "mastercard"
+    }
+
     // MARK: - Private Methods
 
     private func convert(scheme: PO3DS2ConfigurationCardScheme) -> String {
-        scheme.rawValue
+        let schemes: [PO3DS2ConfigurationCardScheme: String] = [
+            .visa: Constants.visa, .mastercard: Constants.mastercard
+        ]
+        return schemes[scheme] ?? ""
     }
 }
