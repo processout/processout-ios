@@ -1,12 +1,12 @@
 //
-//  POCardScheme.swift
+//  PO3DS2ConfigurationCardScheme.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 27.03.2023.
 //
 
 /// Available card schemes.
-public enum POCardScheme: RawRepresentable, Decodable, Hashable {
+public enum PO3DS2ConfigurationCardScheme: RawRepresentable, Decodable, Hashable {
 
     /// Known card schemes.
     case visa, mastercard, europay, carteBancaire, jcb, diners, discover, unionpay, americanExpress
@@ -59,7 +59,7 @@ public enum POCardScheme: RawRepresentable, Decodable, Hashable {
 
     // MARK: - Private Properties
 
-    private static let knownSchemes: [String: POCardScheme] = [
+    private static let knownSchemes: [String: Self] = [
         Constants.visa: .visa,
         Constants.mastercard: .mastercard,
         Constants.europay: .europay,
