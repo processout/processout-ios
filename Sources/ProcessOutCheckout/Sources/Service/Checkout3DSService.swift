@@ -8,12 +8,15 @@
 import ProcessOut
 import Checkout3DS
 
-// swiftlint:disable todo
-
 final class Checkout3DSService: PO3DSServiceType {
 
-    init(errorMapper: AuthenticationErrorMapperType, delegate: POCheckout3DSServiceDelegate) {
+    init(
+        errorMapper: AuthenticationErrorMapperType,
+        configurationMapper: ConfigurationMapperType,
+        delegate: POCheckout3DSServiceDelegate
+    ) {
         self.errorMapper = errorMapper
+        self.configurationMapper = configurationMapper
         self.delegate = delegate
         queue = DispatchQueue.global()
         state = .idle
@@ -37,7 +40,7 @@ final class Checkout3DSService: PO3DSServiceType {
             completion(.failure(failure))
             return
         }
-        let configurationParameters = convertToConfigParameters(configuration: configuration)
+        let configurationParameters = configurationMapper.convert(configuration: configuration)
         let configuration = delegate.configuration(with: configurationParameters)
         do {
             let service = try Standalone3DSService.initialize(with: configuration)
@@ -102,6 +105,7 @@ final class Checkout3DSService: PO3DSServiceType {
     // MARK: - Private Properties
 
     private let errorMapper: AuthenticationErrorMapperType
+    private let configurationMapper: ConfigurationMapperType
     private let queue: DispatchQueue
     private let delegate: POCheckout3DSServiceDelegate
 
@@ -127,23 +131,6 @@ final class Checkout3DSService: PO3DSServiceType {
     }
 
     // MARK: - Utils
-
-    private func convertToConfigParameters(
-        configuration: PO3DS2Configuration
-    ) -> ThreeDS2ServiceConfiguration.ConfigParameters {
-        // TODO(andrii-vysotskyi): replace with proper values when available
-        let directoryServerData = ThreeDS2ServiceConfiguration.DirectoryServerData(
-            directoryServerID: configuration.directoryServerId,
-            directoryServerPublicKey: configuration.directoryServerPublicKey,
-            directoryServerRootCertificate: ""
-        )
-        let configParameters = ThreeDS2ServiceConfiguration.ConfigParameters(
-            directoryServerData: directoryServerData,
-            messageVersion: configuration.messageVersion,
-            scheme: ""
-        )
-        return configParameters
-    }
 
     private func convertToAuthenticationRequest(
         request: AuthenticationRequestParameters
