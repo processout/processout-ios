@@ -14,6 +14,11 @@ public struct PO3DS2Configuration: Decodable {
     /// The public key of the directory server to use during the transaction creation phase.
     public let directoryServerPublicKey: String
 
+    /// An array of DER-encoded x509 certificate strings containing the DS root certificate used for signature checks.
+    /// If there is more than one certificate, each subsequent certificate is being the one used to certify the
+    /// previous one.
+    public let directoryServerRootCertificates: [String]
+
     /// Unique identifier for the authentication assigned by the DS (Card Scheme).
     public let directoryServerTransactionId: String
 
@@ -28,6 +33,7 @@ public struct PO3DS2Configuration: Decodable {
     private enum CodingKeys: String, CodingKey {
         case directoryServerId = "directoryServerID"
         case directoryServerPublicKey
+        case directoryServerRootCertificates = "directoryServerRootCAs"
         case directoryServerTransactionId = "threeDSServerTransID"
         case scheme
         case messageVersion
