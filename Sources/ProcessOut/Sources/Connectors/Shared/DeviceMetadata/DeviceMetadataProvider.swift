@@ -22,7 +22,8 @@ final class DeviceMetadataProvider: DeviceMetadataProviderType {
             appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
             appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
             appScreenHeight: Int(screen.nativeBounds.height),
-            appTimeZoneOffset: timeZone.secondsFromGMT() / 60
+            appTimeZoneOffset: timeZone.secondsFromGMT() / 60,
+            channel: "ios"
         )
     }
 
