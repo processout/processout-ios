@@ -77,8 +77,31 @@ final class CardsRepositoryTestsTests: XCTestCase {
             createdAt: Date(timeIntervalSince1970: 1680009558.1),
             updateType: nil
         )
-        print(card.createdAt.timeIntervalSince1970)
         XCTAssertEqual(card, expectedCard)
+    }
+
+    func test_tokenizeRequest_whenNumberIsInvalid_throwsError() async throws {
+        // Given
+        MockUrlProtocol.register(path: "/cards") { request in
+            XCTAssertEqual(request.httpMethod, "POST")
+            if let queryParameters = request.url?.queryParameters {
+                XCTAssertEqual(queryParameters.isEmpty, true)
+            }
+            let response = try MockUrlProtocolResponseBuilder()
+                .with(url: request.url)
+                .with(contentsOf: "CardsRepositoryTokenize400", extension: "json")
+                .build()
+            return response
+        }
+
+        // When
+        do {
+            let request = POCardTokenizationRequest(number: "", expMonth: 3, expYear: 2030)
+            _ = try await sut.tokenize(request: request)
+        } catch let failure as POFailure {
+            // Then
+            XCTAssertEqual(failure.code, POFailure.Code.unknown(rawValue: "card.invalid-number"))
+        }
     }
 
     // MARK: - Private Nested Types
