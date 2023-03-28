@@ -117,6 +117,7 @@ final class CardsRepositoryTestsTests: XCTestCase {
 
     // MARK: - Private Methods
 
+    // todo(andrii-vysotskyi): make this reusable from other test cases
     private func createHttpConnector() -> HttpConnectorType {
         let sessionConfiguration = URLSessionConfiguration.ephemeral
         sessionConfiguration.protocolClasses = [MockUrlProtocol.self]
@@ -138,6 +139,7 @@ final class CardsRepositoryTestsTests: XCTestCase {
             sessionConfiguration: sessionConfiguration,
             decoder: decoder,
             encoder: encoder,
+            // todo(andrii-vysotskyi): replace with mock or stub to avoid unpredictable dynamic data
             deviceMetadataProvider: DeviceMetadataProvider(screen: .main, bundle: .main),
             logger: POLogger()
         )
