@@ -9,6 +9,8 @@
 
 import Foundation
 
+/// Property wrapper that allows to encode and decode optional `Decimal` to/from string representation. Value is coded
+/// in en_US locale.
 @propertyWrapper
 public struct POImmutableStringCodableOptionalDecimal: Codable {
 
@@ -46,3 +48,21 @@ public struct POImmutableStringCodableOptionalDecimal: Codable {
         wrappedValue.map(NSDecimalNumber.init)?.description(withLocale: Self.locale)
     }
 }
+
+extension KeyedEncodingContainer {
+
+    mutating func encode(
+        _ value: POImmutableStringCodableOptionalDecimal, forKey key: KeyedEncodingContainer<K>.Key
+    ) throws {
+        try value.encode(to: superEncoder(forKey: key))
+    }
+}
+
+ extension KeyedDecodingContainer {
+
+    func decode(
+        _ type: POImmutableStringCodableOptionalDecimal.Type, forKey key: KeyedDecodingContainer<K>.Key
+    ) throws -> POImmutableStringCodableOptionalDecimal {
+        try type.init(from: try superDecoder(forKey: key))
+    }
+ }
