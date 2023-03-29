@@ -7,6 +7,8 @@
 
 import UIKit
 
+/// Provides an ability to create view controller that could be used to handle Alternative Payment. Call build() to
+/// create view controller’s instance.
 public final class POAlternativePaymentMethodViewControllerBuilder {
 
     public static func with(request: POAlternativePaymentMethodRequest) -> Self {
