@@ -6,6 +6,7 @@
 @available(iOS 13.0, *)
 extension CustomerTokensRepositoryType {
 
+    /// Assigns a token to a customer.
     @MainActor
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest
@@ -15,6 +16,7 @@ extension CustomerTokensRepositoryType {
         }
     }
 
+    /// Create customer token.
     @MainActor
     public func createCustomerToken(
         request: POCreateCustomerTokenRequest
@@ -28,6 +30,7 @@ extension CustomerTokensRepositoryType {
 @available(iOS 13.0, *)
 extension InvoicesRepositoryType {
 
+    /// Requests information needed to continue existing payment or start new one.
     @MainActor
     public func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest
@@ -37,6 +40,10 @@ extension InvoicesRepositoryType {
         }
     }
 
+    /// Initiates native alternative payment with a given request.
+    /// 
+    /// Some Native APMs require further information to be collected back from the customer. You can inspect
+    /// `nativeApm` in response object to understand if additional data is required.
     @MainActor
     public func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
@@ -46,6 +53,7 @@ extension InvoicesRepositoryType {
         }
     }
 
+    /// Performs invoice authorization with given request.
     @MainActor
     public func authorizeInvoice(
         request: POInvoiceAuthorizationRequest
@@ -55,6 +63,7 @@ extension InvoicesRepositoryType {
         }
     }
 
+    /// Creates invoice with given parameters.
     @MainActor
     public func createInvoice(
         request: POInvoiceCreationRequest
@@ -68,6 +77,7 @@ extension InvoicesRepositoryType {
 @available(iOS 13.0, *)
 extension POCardsRepositoryType {
 
+    /// Tokenize a card.
     @MainActor
     public func tokenize(
         request: POCardTokenizationRequest
@@ -77,6 +87,7 @@ extension POCardsRepositoryType {
         }
     }
 
+    /// Updates card information.
     @MainActor
     public func updateCard(
         request: POCardUpdateRequest
@@ -86,6 +97,7 @@ extension POCardsRepositoryType {
         }
     }
 
+    /// Tokenize a card via ApplePay.
     @MainActor
     public func tokenize(
         request: ApplePayCardTokenizationRequest
@@ -99,6 +111,10 @@ extension POCardsRepositoryType {
 @available(iOS 13.0, *)
 extension POCardsServiceType {
 
+    /// Tokenizes a card. You can use the card for a single payment by creating a card token with it. If you want
+    /// to use the card for multiple payments then you can use the card token to create a reusable customer token.
+    /// Note that once you have used the card token either for a payment or to create a customer token, the card
+    /// token becomes invalid and you cannot use it for any further actions.
     @MainActor
     public func tokenize(
         request: POCardTokenizationRequest
@@ -108,6 +124,7 @@ extension POCardsServiceType {
         }
     }
 
+    /// Updates card information.
     @MainActor
     public func updateCard(
         request: POCardUpdateRequest
@@ -117,6 +134,7 @@ extension POCardsServiceType {
         }
     }
 
+    /// Tokenize a card via ApplePay. You can use the card for a single payment by creating a card token with it.
     @MainActor
     public func tokenize(
         request: POApplePayCardTokenizationRequest
@@ -130,6 +148,7 @@ extension POCardsServiceType {
 @available(iOS 13.0, *)
 extension POCustomerTokensServiceType {
 
+    /// Assigns new source to existing customer token using given request.
     @MainActor
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DSServiceType
@@ -153,6 +172,7 @@ extension POCustomerTokensServiceType {
 @available(iOS 13.0, *)
 extension POGatewayConfigurationsRepositoryType {
 
+    /// Returns available gateway configurations.
     @MainActor
     public func all(
         request: POAllGatewayConfigurationsRequest
@@ -162,6 +182,7 @@ extension POGatewayConfigurationsRepositoryType {
         }
     }
 
+    /// Searches configuration with given request.
     @MainActor
     public func find(
         request: POFindGatewayConfigurationRequest
@@ -171,6 +192,7 @@ extension POGatewayConfigurationsRepositoryType {
         }
     }
 
+    /// Returns available gateway configurations.
     @MainActor
     public func all() async throws -> POAllGatewayConfigurationsResponse {
         return try await withUnsafeThrowingContinuation { continuation in
@@ -182,6 +204,7 @@ extension POGatewayConfigurationsRepositoryType {
 @available(iOS 13.0, *)
 extension POInvoicesServiceType {
 
+    /// Requests information needed to continue existing payment or start new one.
     @MainActor
     public func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest
@@ -191,6 +214,10 @@ extension POInvoicesServiceType {
         }
     }
 
+    /// Initiates native alternative payment with a given request.
+    /// 
+    /// Some Native APMs require further information to be collected back from the customer. You can inspect
+    /// `nativeApm` in response object to understand if additional data is required.
     @MainActor
     public func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
@@ -200,6 +227,7 @@ extension POInvoicesServiceType {
         }
     }
 
+    /// Performs invoice authorization with given request.
     @MainActor
     public func authorizeInvoice(
         request: POInvoiceAuthorizationRequest, threeDSService: PO3DSServiceType
