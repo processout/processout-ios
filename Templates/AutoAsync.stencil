@@ -13,6 +13,9 @@ extension {{ type.name }} {
             {% continue %}
         {% endif %}
 
+    {% for documentation in method.documentation %}
+    /// {{ documentation }}
+    {% endfor %}
     @MainActor
     {% for key, value in method.attributes %}
     {{ value.first }}
