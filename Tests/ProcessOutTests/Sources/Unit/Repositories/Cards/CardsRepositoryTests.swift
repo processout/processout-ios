@@ -15,9 +15,17 @@ final class CardsRepositoryTestsTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
+        // todo(andrii-vysotskyi): use mocks or stubs for failure mapper and device metadata provider
+        let sessionConfiguration = URLSessionConfiguration.ephemeral
+        sessionConfiguration.protocolClasses = [MockUrlProtocol.self]
         let logger = POLogger()
-        let failureMapper = HttpConnectorFailureMapper(logger: logger)
-        sut = CardsRepository(connector: createHttpConnector(), failureMapper: failureMapper)
+        let connector = HttpConnectorBuilder()
+            .with(configuration: .init(baseUrl: Constants.baseUrl, projectId: "", privateKey: "", version: ""))
+            .with(retryStrategy: nil)
+            .with(sessionConfiguration: sessionConfiguration)
+            .with(logger: logger)
+            .build()
+        sut = CardsRepository(connector: connector, failureMapper: HttpConnectorFailureMapper(logger: logger))
     }
 
     override func tearDown() {
@@ -94,55 +102,25 @@ final class CardsRepositoryTestsTests: XCTestCase {
             return response
         }
 
-        // When
         do {
+            // When
             let request = POCardTokenizationRequest(number: "", expMonth: 3, expYear: 2030)
             _ = try await sut.tokenize(request: request)
-        } catch let failure as POFailure {
+
             // Then
-            XCTAssertEqual(failure.code, POFailure.Code.unknown(rawValue: "card.invalid-number"))
+            XCTFail("Tokenization is expected to fail.")
+        } catch {
+            XCTAssertTrue(error is POFailure)
         }
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         static let baseUrl = URL(string: "https://example.com")! // swiftlint:disable:this force_unwrapping
     }
 
     // MARK: - Private Properties
 
     private var sut: CardsRepository! // swiftlint:disable:this implicitly_unwrapped_optional
-
-    // MARK: - Private Methods
-
-    // todo(andrii-vysotskyi): make this reusable from other test cases
-    private func createHttpConnector() -> HttpConnectorType {
-        let sessionConfiguration = URLSessionConfiguration.ephemeral
-        sessionConfiguration.protocolClasses = [MockUrlProtocol.self]
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = Constants.dateFormat
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        decoder.dateDecodingStrategy = .formatted(dateFormatter)
-
-        let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
-        encoder.dateEncodingStrategy = .formatted(dateFormatter)
-
-        let connector = HttpConnector(
-            configuration: .init(baseUrl: Constants.baseUrl, projectId: "", privateKey: "", version: ""),
-            sessionConfiguration: sessionConfiguration,
-            decoder: decoder,
-            encoder: encoder,
-            // todo(andrii-vysotskyi): replace with mock or stub to avoid unpredictable dynamic data
-            deviceMetadataProvider: DeviceMetadataProvider(screen: .main, bundle: .main),
-            logger: POLogger()
-        )
-        return connector
-    }
 }
