@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Request to use to assign new source to existing customer token and potentially verify it.
 public struct POAssignCustomerTokenRequest: Encodable {
 
     /// Id of the customer who token belongs to.

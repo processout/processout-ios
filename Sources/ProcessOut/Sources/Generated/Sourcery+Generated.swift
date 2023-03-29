@@ -148,7 +148,7 @@ extension POCardsServiceType {
 @available(iOS 13.0, *)
 extension POCustomerTokensServiceType {
 
-    /// Assigns new source to existing customer token using given request.
+    /// Assigns new source to existing customer token and optionaly verifies it.
     @MainActor
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DSServiceType
