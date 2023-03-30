@@ -32,7 +32,7 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
 
     var text: String? {
         get { String(characters.compactMap { $0 }) }
-        set { setText(newValue) }
+        set { setText(newValue, sendActions: false) }
     }
 
     func configure(style: POTextFieldStyle, animated: Bool) {
@@ -69,8 +69,7 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
 
     override func paste(_ sender: Any?) {
         if let string = UIPasteboard.general.string {
-            setText(string)
-            sendActions(for: .editingChanged)
+            setText(string, sendActions: true)
         }
     }
 
@@ -282,7 +281,7 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
             carretPosition = .before
         }
         configureWithCurrentState(animated: false)
-        sendActions(for: .editingChanged)
+        didChangeEditing()
     }
 
     func deleteBackward() {
@@ -299,7 +298,7 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
         carretPosition = .before
         carretPositionIndex = removalIndex
         configureWithCurrentState(animated: false)
-        sendActions(for: .editingChanged)
+        didChangeEditing()
     }
 
     var keyboardType: UIKeyboardType
@@ -437,7 +436,7 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
         }
     }
 
-    private func setText(_ text: String?) {
+    private func setText(_ text: String?, sendActions: Bool) {
         guard self.text != text else {
             return
         }
@@ -452,6 +451,7 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
             carretPosition = .before
         }
         configureWithCurrentState(animated: false)
+        didChangeEditing(sendActions: sendActions)
     }
 
     private func createCodeTextFieldComponentView(index: Int) -> CodeTextFieldComponentView {
@@ -474,6 +474,13 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
             groupViews[offset].configure(viewModel: viewModel, animated: animated)
         }
         accessibilityValue = text
+    }
+
+    private func didChangeEditing(sendActions: Bool = true) {
+        if sendActions {
+            self.sendActions(for: .editingChanged)
+        }
+        UIMenuController.shared.setMenuVisible(false, animated: true)
     }
 
     // MARK: - Context Menu
