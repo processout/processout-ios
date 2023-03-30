@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Holds information about 3DS redirect.
 public struct PO3DSRedirect {
 
     /// Redirect url.

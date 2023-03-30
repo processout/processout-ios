@@ -78,7 +78,7 @@ final class InvoicesRepository: InvoicesRepositoryType {
             let invoice: POInvoice
         }
         let httpRequest = HttpConnectorRequest<Response>.post(
-            path: "/invoices", body: request, requiresPrivateKey: true
+            path: "/invoices", body: request, includesDeviceMetadata: true, requiresPrivateKey: true
         )
         connector.execute(request: httpRequest) { [failureMapper] result in
             completion(result.map(\.invoice).mapError(failureMapper.failure))

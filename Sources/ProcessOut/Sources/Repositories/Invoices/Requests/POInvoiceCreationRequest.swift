@@ -23,14 +23,14 @@ public struct POInvoiceCreationRequest: Encodable {
     /// For APM, link for the screen you want to return to after the payment page closes.
     public let returnUrl: URL?
 
-    /// Device information.
-    public let device: [String: String]
+    /// Customer linked to the invoice (generally the one making the purchase).
+    public let customerId: String?
 
-    public init(name: String, amount: String, currency: String, returnUrl: URL? = nil) {
+    public init(name: String, amount: String, currency: String, returnUrl: URL? = nil, customerId: String? = nil) {
         self.name = name
         self.amount = amount
         self.currency = currency
         self.returnUrl = returnUrl
-        self.device = ["channel": "ios"]
+        self.customerId = customerId
     }
 }

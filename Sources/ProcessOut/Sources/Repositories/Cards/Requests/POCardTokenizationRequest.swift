@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Card details that should be tokenized.
 public struct POCardTokenizationRequest: Encodable {
 
     /// Number of the card.
@@ -28,7 +29,7 @@ public struct POCardTokenizationRequest: Encodable {
     public let contact: POContact?
 
     /// Metada related to the card.
-    public let metadata: [String: POAnyEncodable]?
+    public let metadata: [String: String]?
 
     public init(
         number: String,
@@ -37,7 +38,7 @@ public struct POCardTokenizationRequest: Encodable {
         cvc: String? = nil,
         name: String? = nil,
         contact: POContact? = nil,
-        metadata: [String: POAnyEncodable]? = nil
+        metadata: [String: String]? = nil
     ) {
         self.number = number
         self.expMonth = expMonth

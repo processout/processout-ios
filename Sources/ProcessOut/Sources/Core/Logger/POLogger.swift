@@ -7,9 +7,10 @@
 
 import Foundation
 
+/// An object for writing interpolated string messages to the processout logging system.
 public final class POLogger {
 
-    init(destinations: [LoggerDestination], minimumLevel: LogLevel = .debug) {
+    init(destinations: [LoggerDestination] = [], minimumLevel: LogLevel = .debug) {
         self.destinations = destinations
         self.minimumLevel = minimumLevel
     }

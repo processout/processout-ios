@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 17.03.2023.
 //
 
+/// Updated card details.
 public struct POCardUpdateRequest: Encodable {
 
     /// Card id.

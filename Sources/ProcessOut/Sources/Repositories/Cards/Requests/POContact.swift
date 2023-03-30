@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Cardholder information.
 public struct POContact: Encodable {
 
     /// First line of cardholder’s address.
