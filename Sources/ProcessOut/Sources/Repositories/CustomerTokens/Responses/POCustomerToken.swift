@@ -7,11 +7,12 @@
 
 import Foundation
 
-/// Customer token information.
+/// Customer tokens (usually just called tokens for short) are objects that associate a payment source such as a
+/// card or APM token with a customer.
 public struct POCustomerToken: Decodable {
 
     /// Customer token verification status.
-    public enum VerificationStatus: String {
+    public enum VerificationStatus: String, Decodable {
         case success, pending, failed, notRequested = "not-requested", unknown
     }
 
@@ -37,7 +38,7 @@ public struct POCustomerToken: Decodable {
     public let description: String?
 
     /// If you request verification for the token then this field tracks its status.
-    public let verificationStatus: String
+    public let verificationStatus: VerificationStatus
 
     /// Denotes whether or not this is the customer’s default token (the token used when capturing a payment using
     /// the customer’s ID as the source).

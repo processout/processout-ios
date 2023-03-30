@@ -7,6 +7,10 @@
 
 import Foundation
 
+/// Property wrapper that allows to exclude property from being encoded without forcing owning parent to define
+/// custom `CodingKeys`.
+///
+/// - NOTE: Wrapped value is immutable.
 @propertyWrapper
 public struct POImmutableExcludedCodable<Value>: Encodable {
 

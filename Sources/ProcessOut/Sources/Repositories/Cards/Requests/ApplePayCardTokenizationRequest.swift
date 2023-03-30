@@ -58,7 +58,7 @@ struct ApplePayCardTokenizationRequest: Encodable {
     let contact: POContact?
 
     /// Additional metadata.
-    let metadata: [String: POAnyEncodable]?
+    let metadata: [String: String]?
 
     /// Payment information.
     let applepayResponse: ApplePay
