@@ -416,17 +416,25 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
     }
 
     private func setCarretPosition(position: CodeTextFieldCarretPosition, index: Int) {
-        guard characters.indices.contains(index) else {
-            assertionFailure("Invalid index.")
-            return
-        }
-        carretPositionIndex = index
-        if characters[index] != nil {
-            carretPosition = position
+        if !isFirstResponder {
+            becomeFirstResponder()
+        } else if characters.indices.contains(index) {
+            let updatedCarretPosition: CodeTextFieldCarretPosition
+            if characters[index] != nil {
+                updatedCarretPosition = position
+            } else {
+                updatedCarretPosition = .before
+            }
+            if carretPositionIndex == index, carretPosition == updatedCarretPosition {
+                showContextMenu()
+            } else {
+                carretPositionIndex = index
+                carretPosition = updatedCarretPosition
+            }
+            configureWithCurrentState(animated: true)
         } else {
-            carretPosition = .before
+            assertionFailure("Invalid index.")
         }
-        configureWithCurrentState(animated: true)
     }
 
     private func setText(_ text: String?) {
@@ -448,11 +456,7 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
 
     private func createCodeTextFieldComponentView(index: Int) -> CodeTextFieldComponentView {
         let view = CodeTextFieldComponentView { [weak self] position in
-            if let self, self.isFirstResponder {
-                self.setCarretPosition(position: position, index: index)
-            } else {
-                self?.becomeFirstResponder()
-            }
+            self?.setCarretPosition(position: position, index: index)
         }
         return view
     }
@@ -475,12 +479,12 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextFieldType {
     // MARK: - Context Menu
 
     private func addContextMenuGesture() {
-        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(didRecognizeLongPressGesture))
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(showContextMenu))
         contentView.addGestureRecognizer(gesture)
     }
 
     @objc
-    private func didRecognizeLongPressGesture() {
+    private func showContextMenu() {
         let controller = UIMenuController.shared
         if #available(iOS 13.0, *) {
             controller.showMenu(from: self, rect: contentView.frame)
