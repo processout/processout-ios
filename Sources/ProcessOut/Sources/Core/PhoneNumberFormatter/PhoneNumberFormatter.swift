@@ -5,8 +5,6 @@
 //  Created by Andrii Vysotskyi on 16.03.2023.
 //
 
-// swiftlint:disable:todo todo
-
 import Foundation
 
 final class PhoneNumberFormatter {
@@ -35,16 +33,6 @@ final class PhoneNumberFormatter {
             return formatted
         }
         return partialNumber
-    }
-
-    // TODO(andrii-vysotskyi): migrate to `format(partialNumber:)`
-    func formattedNumber(from string: String) -> String {
-        format(partialNumber: string)
-//        let trimmedString = string.trimmingCharacters(in: .whitespacesAndNewlines)
-//        if string.isEmpty || trimmedString.prefix(1) == "+" {
-//            return string
-//        }
-//        return "+" + trimmedString
     }
 
     func normalized(number: String) -> String {

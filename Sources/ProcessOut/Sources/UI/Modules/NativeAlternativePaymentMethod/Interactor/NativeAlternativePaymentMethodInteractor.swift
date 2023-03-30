@@ -62,7 +62,7 @@ final class NativeAlternativePaymentMethodInteractor:
     func formatted(value: String, type: PONativeAlternativePaymentMethodParameter.ParameterType) -> String {
         switch type {
         case .phone:
-            return phoneNumberFormatter.formattedNumber(from: value)
+            return phoneNumberFormatter.format(partialNumber: value)
         default:
             return value
         }
