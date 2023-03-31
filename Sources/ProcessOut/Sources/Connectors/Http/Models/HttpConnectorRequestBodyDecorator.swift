@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// - NOTE: encoding only works if body is encoded into keyed container.
 struct HttpConnectorRequestBodyDecorator: Encodable {
 
     /// Primary request body.
