@@ -10,21 +10,8 @@ import UIKit.UIDevice
 
 final class HttpConnector: HttpConnectorType {
 
-    // MARK: - Public Nested Types
-
-    struct Configuration {
-
-        /// Base url to use to send requests to.
-        let baseUrl: URL
-
-        /// SDK version.
-        let version: String
-    }
-
-    // MARK: -
-
     init(
-        configuration: Configuration,
+        configuration: HttpConnectorConfiguration,
         sessionConfiguration: URLSessionConfiguration,
         decoder: JSONDecoder,
         encoder: JSONEncoder,
@@ -69,7 +56,7 @@ final class HttpConnector: HttpConnectorType {
 
     // MARK: - Private Properties
 
-    private let configuration: Configuration
+    private let configuration: HttpConnectorConfiguration
     private let session: URLSession
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
@@ -180,27 +167,5 @@ final class HttpConnector: HttpConnectorType {
             }
         }
         DispatchQueue.main.async { completion(result) }
-    }
-}
-
-private enum HttpConnectorResponse<Value: Decodable>: Decodable {
-
-    case success(Value), failure(HttpConnectorFailure.Server)
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        if try container.decode(Bool.self, forKey: .success) {
-            let value = try decoder.singleValueContainer().decode(Value.self)
-            self = .success(value)
-        } else {
-            let failure = try decoder.singleValueContainer().decode(HttpConnectorFailure.Server.self)
-            self = .failure(failure)
-        }
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum CodingKeys: String, CodingKey {
-        case success
     }
 }

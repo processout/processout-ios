@@ -9,7 +9,7 @@ import Foundation
 
 final class HttpConnectorBuilder {
 
-    func with(configuration: HttpConnector.Configuration) -> Self {
+    func with(configuration: HttpConnectorConfiguration) -> Self {
         self.configuration = configuration
         return self
     }
@@ -70,7 +70,7 @@ final class HttpConnectorBuilder {
     // MARK: - Private Properties
 
     /// Connector configuration.
-    private var configuration: HttpConnector.Configuration?
+    private var configuration: HttpConnectorConfiguration?
 
     /// Credentials to use to authenticate requests if any.
     private var authCredentials: HttpConnectorAuthCredentials?
