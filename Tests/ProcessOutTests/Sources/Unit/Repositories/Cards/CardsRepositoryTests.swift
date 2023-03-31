@@ -20,7 +20,7 @@ final class CardsRepositoryTestsTests: XCTestCase {
         sessionConfiguration.protocolClasses = [MockUrlProtocol.self]
         let logger = POLogger()
         let connector = HttpConnectorBuilder()
-            .with(configuration: .init(baseUrl: Constants.baseUrl, projectId: "", privateKey: "", version: ""))
+            .with(configuration: .init(baseUrl: Constants.baseUrl, version: ""))
             .with(retryStrategy: nil)
             .with(sessionConfiguration: sessionConfiguration)
             .with(logger: logger)

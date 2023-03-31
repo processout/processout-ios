@@ -29,6 +29,11 @@ final class HttpConnectorBuilder {
         return self
     }
 
+    func with(authCredentials: HttpConnectorAuthCredentials?) -> Self {
+        self.authCredentials = authCredentials
+        return self
+    }
+
     func with(logger: POLogger) -> Self {
         self.logger = logger
         return self
@@ -49,6 +54,9 @@ final class HttpConnectorBuilder {
         if let retryStrategy {
             connector = HttpConnectorRetryDecorator(connector: connector, retryStrategy: retryStrategy)
         }
+        if let credentials = authCredentials {
+            connector = HttpConnectorAuthDecorator(connector: connector, logger: logger, credentials: credentials)
+        }
         return connector
     }
 
@@ -63,6 +71,9 @@ final class HttpConnectorBuilder {
 
     /// Connector configuration.
     private var configuration: HttpConnector.Configuration?
+
+    /// Credentials to use to authenticate requests if any.
+    private var authCredentials: HttpConnectorAuthCredentials?
 
     /// Retry strategy to use for failing requests.
     private var retryStrategy: RetryStrategy? = {

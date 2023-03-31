@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit.UIDevice
 
 final class HttpConnector: HttpConnectorType {
 
@@ -15,12 +16,6 @@ final class HttpConnector: HttpConnectorType {
 
         /// Base url to use to send requests to.
         let baseUrl: URL
-
-        /// Project id to associate requests with.
-        let projectId: String
-
-        /// Project's private key.
-        let privateKey: String?
 
         /// SDK version.
         let version: String
@@ -109,14 +104,11 @@ final class HttpConnector: HttpConnectorType {
             }
             sessionRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
-        try authorize(request: &sessionRequest, originalRequest: request)
-        let systemVersion = ProcessInfo.processInfo.operatingSystemVersion
-        let systemVersionString = [systemVersion.majorVersion, systemVersion.minorVersion, systemVersion.patchVersion]
-            .map(\.description).joined(separator: ".")
+
         let userAgentComponents = [
-            "iOS",
+            UIDevice.current.systemName,
             "Version",
-            systemVersionString,
+            UIDevice.current.systemVersion,
             "ProcessOut iOS-Bindings",
             configuration.version
         ]
@@ -132,19 +124,6 @@ final class HttpConnector: HttpConnectorType {
             sessionRequest.setValue(value, forHTTPHeaderField: field)
         }
         return sessionRequest
-    }
-
-    private func authorize(request: inout URLRequest, originalRequest: HttpConnectorRequest<some Decodable>) throws {
-        var value = configuration.projectId + ":"
-        if originalRequest.requiresPrivateKey {
-            if let privateKey = configuration.privateKey {
-                value += privateKey
-            } else {
-                logger.info("Private key is required by '\(originalRequest.id)' request but not set")
-            }
-        }
-        let authorization = "Basic " + Data(value.utf8).base64EncodedString()
-        request.setValue(authorization, forHTTPHeaderField: "Authorization")
     }
 
     private func completeRequest<Value: Decodable>(
