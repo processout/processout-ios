@@ -91,7 +91,6 @@ final class HttpConnector: HttpConnectorType {
             }
             sessionRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
-
         let userAgentComponents = [
             UIDevice.current.systemName,
             "Version",
@@ -167,5 +166,96 @@ final class HttpConnector: HttpConnectorType {
             }
         }
         DispatchQueue.main.async { completion(result) }
+    }
+}
+
+protocol HttpConnectorRequestMapperType {
+
+    /// Converts given request instance to URLRequest.
+    func convert(request: HttpConnectorRequest<some Decodable>) throws -> URLRequest
+}
+
+final class HttpConnectorRequestMapper: HttpConnectorRequestMapperType {
+
+    init(
+        configuration: HttpConnectorConfiguration,
+        encoder: JSONEncoder,
+        deviceMetadataProvider: DeviceMetadataProviderType,
+        logger: POLogger
+    ) {
+        self.configuration = configuration
+        self.encoder = encoder
+        self.deviceMetadataProvider = deviceMetadataProvider
+        self.logger = logger
+    }
+
+    func convert(request: HttpConnectorRequest<some Decodable>) throws -> URLRequest {
+        var components = URLComponents()
+        components.path = request.path
+        components.queryItems = request.query.map { item in
+            URLQueryItem(name: item.key, value: item.value.description)
+        }
+        guard let resourceURL = components.url(relativeTo: configuration.baseUrl) else {
+            throw HttpConnectorFailure.internal
+        }
+        var sessionRequest = URLRequest(url: resourceURL)
+        sessionRequest.httpMethod = request.method.rawValue.uppercased()
+        if let encodedBody = try encodedRequestBody(request) {
+            sessionRequest.httpBody = encodedBody
+        }
+        let defaultHeaders = [
+            "Idempotency-Key": request.id,
+            "User-Agent": userAgent,
+            "Accept-Language": Strings.preferredLocalization,
+            "Content-Type": "application/json"
+        ]
+        headers.forEach { field, value in
+            sessionRequest.setValue(value, forHTTPHeaderField: field)
+        }
+        request.headers.forEach { field, value in
+            sessionRequest.setValue(value, forHTTPHeaderField: field)
+        }
+        return sessionRequest
+    }
+
+    // MARK: - Private Properties
+
+    private let configuration: HttpConnectorConfiguration
+    private let encoder: JSONEncoder
+    private let deviceMetadataProvider: DeviceMetadataProviderType
+    private let logger: POLogger
+
+    private lazy var userAgent: String = {
+        let components = [
+            UIDevice.current.systemName,
+            "Version",
+            UIDevice.current.systemVersion,
+            "ProcessOut iOS-Bindings",
+            configuration.version
+        ]
+        return components.joined(separator: "/")
+    }()
+
+    // MARK: - Private Methods
+
+    private func encodedRequestBody(_ request: HttpConnectorRequest<some Decodable>) throws -> Data? {
+        if let body = request.body {
+            do {
+                if request.includesDeviceMetadata {
+                    let decoratedBody = HttpConnectorRequestBodyDecorator(
+                        body: body,
+                        deviceMetadata: deviceMetadataProvider.deviceMetadata
+                    )
+                    return try encoder.encode(decoratedBody)
+                }
+                return try encoder.encode(body)
+            } catch {
+                throw HttpConnectorFailure.coding(error)
+            }
+        } else if request.includesDeviceMetadata {
+            logger.error("Can't include metadata in a bodiless request.")
+            throw HttpConnectorFailure.internal
+        }
+        return nil
     }
 }
