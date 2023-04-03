@@ -14,7 +14,7 @@ final class ConfigurationMapper: ConfigurationMapperType {
         let directoryServerData = ThreeDS2ServiceConfiguration.DirectoryServerData(
             directoryServerID: configuration.directoryServerId,
             directoryServerPublicKey: configuration.directoryServerPublicKey,
-            directoryServerRootCertificate: configuration.directoryServerRootCertificates.last ?? ""
+            directoryServerRootCertificates: configuration.directoryServerRootCertificates
         )
         let configParameters = ThreeDS2ServiceConfiguration.ConfigParameters(
             directoryServerData: directoryServerData,

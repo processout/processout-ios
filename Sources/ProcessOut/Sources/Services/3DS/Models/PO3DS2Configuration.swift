@@ -15,8 +15,6 @@ public struct PO3DS2Configuration: Decodable {
     public let directoryServerPublicKey: String
 
     /// An array of DER-encoded x509 certificate strings containing the DS root certificate used for signature checks.
-    /// If there is more than one certificate, each subsequent certificate is being the one used to certify the
-    /// previous one.
     public let directoryServerRootCertificates: [String]
 
     /// Unique identifier for the authentication assigned by the DS (Card Scheme).
