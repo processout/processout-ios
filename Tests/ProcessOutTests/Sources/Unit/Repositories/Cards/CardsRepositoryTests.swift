@@ -19,8 +19,8 @@ final class CardsRepositoryTestsTests: XCTestCase {
         let sessionConfiguration = URLSessionConfiguration.ephemeral
         sessionConfiguration.protocolClasses = [MockUrlProtocol.self]
         let logger = POLogger()
-        let connector = HttpConnectorBuilder()
-            .with(configuration: .init(baseUrl: Constants.baseUrl, version: ""))
+        let connector = ProcessOutHttpConnectorBuilder()
+            .with(configuration: .init(baseUrl: Constants.baseUrl, projectId: "", privateKey: nil, version: ""))
             .with(retryStrategy: nil)
             .with(sessionConfiguration: sessionConfiguration)
             .with(logger: logger)
