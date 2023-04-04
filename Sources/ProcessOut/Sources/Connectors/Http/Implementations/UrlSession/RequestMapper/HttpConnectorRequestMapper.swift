@@ -75,21 +75,21 @@ final class HttpConnectorRequestMapper: HttpConnectorRequestMapperType {
     // MARK: - Private Methods
 
     private func encodedRequestBody(_ request: HttpConnectorRequest<some Decodable>) throws -> Data? {
-        if var body = request.body {
-            if request.includesDeviceMetadata {
-                let metadata = deviceMetadataProvider.deviceMetadata
-                body = POAnyEncodable(DecoratedBody(body: body, deviceMetadata: metadata))
-            }
-            do {
-                return try encoder.encode(body)
-            } catch {
-                throw HttpConnectorFailure.coding(error)
-            }
-        } else if request.includesDeviceMetadata {
-            logger.error("Can't include metadata in a bodiless request")
-            throw HttpConnectorFailure.internal
+        let decoratedBody: Encodable?
+        if request.includesDeviceMetadata {
+            let metadata = deviceMetadataProvider.deviceMetadata
+            decoratedBody = DecoratedBody(body: request.body, deviceMetadata: metadata)
+        } else {
+            decoratedBody = request.body
         }
-        return nil
+        guard let decoratedBody else {
+            return nil
+        }
+        do {
+            return try encoder.encode(decoratedBody)
+        } catch {
+            throw HttpConnectorFailure.coding(error)
+        }
     }
 
     private func authorization(request: HttpConnectorRequest<some Decodable>) throws -> String {
@@ -110,13 +110,15 @@ final class HttpConnectorRequestMapper: HttpConnectorRequestMapperType {
 private struct DecoratedBody: Encodable {
 
     /// Primary request body.
-    let body: POAnyEncodable
+    let body: Encodable?
 
     /// Device metadata.
     let deviceMetadata: DeviceMetadata
 
     func encode(to encoder: Encoder) throws {
-        try body.encode(to: encoder)
+        // It allows to encode device metadata when there is no body,
+        // because `encode` is called only if body is not nil.
+        try body?.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(deviceMetadata, forKey: .device)
     }
