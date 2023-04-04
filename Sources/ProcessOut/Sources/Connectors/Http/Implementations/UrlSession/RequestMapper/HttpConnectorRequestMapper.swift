@@ -23,12 +23,14 @@ final class HttpConnectorRequestMapper: HttpConnectorRequestMapperType {
     }
 
     func urlRequest(from request: HttpConnectorRequest<some Decodable>) throws -> URLRequest {
-        var components = URLComponents()
+        guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
+            throw HttpConnectorFailure.internal
+        }
         components.path = request.path
         components.queryItems = request.query.map { item in
             URLQueryItem(name: item.key, value: item.value.description)
         }
-        guard let resourceURL = components.url(relativeTo: configuration.baseUrl) else {
+        guard let resourceURL = components.url else {
             throw HttpConnectorFailure.internal
         }
         var sessionRequest = URLRequest(url: resourceURL)
@@ -41,7 +43,7 @@ final class HttpConnectorRequestMapper: HttpConnectorRequestMapperType {
             "User-Agent": userAgent,
             "Accept-Language": Strings.preferredLocalization,
             "Content-Type": "application/json",
-            "Authorization": authorization(request: request)
+            "Authorization": try authorization(request: request)
         ]
         defaultHeaders.forEach { field, value in
             sessionRequest.setValue(value, forHTTPHeaderField: field)
@@ -90,13 +92,14 @@ final class HttpConnectorRequestMapper: HttpConnectorRequestMapperType {
         return nil
     }
 
-    private func authorization(request: HttpConnectorRequest<some Decodable>) -> String {
+    private func authorization(request: HttpConnectorRequest<some Decodable>) throws -> String {
         var value = configuration.projectId + ":"
         if request.requiresPrivateKey {
             if let privateKey = configuration.privateKey {
                 value += privateKey
             } else {
                 logger.info("Private key is required by '\(request.id)' request but not set")
+                throw HttpConnectorFailure.internal
             }
         }
         return "Basic " + Data(value.utf8).base64EncodedString()

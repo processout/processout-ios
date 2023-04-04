@@ -1,19 +1,12 @@
 //
-//  HttpConnectorResponseTests.swift
-//  ProcessOutTests
+//  UrlSessionHttpConnectorTests.swift
+//  ProcessOut
 //
-//  Created by Andrii Vysotskyi on 31.03.2023.
+//  Created by Andrii Vysotskyi on 03.04.2023.
 //
 
-// import XCTest
-// @testable import ProcessOut
-//
-// final class HttpConnectorResponseTests: XCTestCase {
-//
-//    override func setUp() {
-//        super.setUp()
-//    }
-//
+import Foundation
+
 //    func test_decode_whenSuccessIsNotPresent_fails() throws {
 //        // Given
 //        let decoder = JSONDecoder()
