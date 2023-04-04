@@ -19,6 +19,7 @@ import Foundation
 /// let array = [AnyEncodable(123), AnyEncodable("456")]
 /// try JSONEncoder().encode(array)
 /// ```
+@available(*, deprecated)
 public struct POAnyEncodable: Encodable {
 
     private let encoding: (Encoder) throws -> Void
