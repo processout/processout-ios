@@ -51,7 +51,25 @@ final class HttpConnectorRequestMapperTests: XCTestCase {
         XCTAssertEqual(urlRequest.url?.path(), request.path)
     }
 
-    func test_urlRequest_whenRequestIncludesDeviceMetadataButBodyIsNotSet_fails() throws {
+    // MARK: - Body
+
+    func test_urlRequest_whenBodyIsSet_encodesBody() throws {
+        // Given
+        let configuration = HttpConnectorRequestMapperConfiguration(
+            baseUrl: Constants.baseUrl, projectId: "", privateKey: nil, version: ""
+        )
+        let sut = createMapper(configuration: configuration)
+        let body = "body"
+        let request = HttpConnectorRequest<VoidCodable>.post(path: "", body: body)
+
+        // When
+        let urlRequest = try sut.urlRequest(from: request)
+
+        // Then
+        XCTAssertEqual(urlRequest.httpBody, Data(#""body""#.utf8))
+    }
+
+    func test_urlRequest_whenRequestIncludesDeviceMetadataButBodyIsNotSet_encodesBody() throws {
         // Given
         let configuration = HttpConnectorRequestMapperConfiguration(
             baseUrl: Constants.baseUrl, projectId: "", privateKey: nil, version: ""
@@ -60,14 +78,30 @@ final class HttpConnectorRequestMapperTests: XCTestCase {
         let request = HttpConnectorRequest<VoidCodable>.post(path: "", includesDeviceMetadata: true)
 
         // When
-        do {
-            _ = try sut.urlRequest(from: request)
-        } catch HttpConnectorFailure.internal {
-            // Then
-            return
-        } catch {
-            XCTFail("Unexpected error")
-        }
+        let urlRequest = try sut.urlRequest(from: request)
+
+        // Then
+        // swiftlint:disable:next line_length
+        let expectedBody = #"{"device":{"appLanguage":"language","appScreenHeight":2,"appScreenWidth":1,"appTimeZoneOffset":3,"channel":"test"}}"#
+        XCTAssertEqual(urlRequest.httpBody, Data(expectedBody.utf8))
+    }
+
+    func test_urlRequest_whenBodyIsSetAndRequestIncludesDeviceMetadata_encodesBody() throws {
+        // Given
+        let configuration = HttpConnectorRequestMapperConfiguration(
+            baseUrl: Constants.baseUrl, projectId: "", privateKey: nil, version: ""
+        )
+        let sut = createMapper(configuration: configuration)
+        let body = ["key": "value"]
+        let request = HttpConnectorRequest<VoidCodable>.post(path: "", body: body, includesDeviceMetadata: true)
+
+        // When
+        let urlRequest = try sut.urlRequest(from: request)
+
+        // Then
+        // swiftlint:disable:next line_length
+        let expectedBody = #"{"device":{"appLanguage":"language","appScreenHeight":2,"appScreenWidth":1,"appTimeZoneOffset":3,"channel":"test"},"key":"value"}"#
+        XCTAssertEqual(urlRequest.httpBody, Data(expectedBody.utf8))
     }
 
     func test_urlRequest_whenBodyIsNotSet_returnsRequestWithoutBody() throws {
@@ -76,7 +110,7 @@ final class HttpConnectorRequestMapperTests: XCTestCase {
             baseUrl: Constants.baseUrl, projectId: "", privateKey: nil, version: ""
         )
         let sut = createMapper(configuration: configuration)
-        let request = HttpConnectorRequest<VoidCodable>.post(path: "")
+        let request = HttpConnectorRequest<VoidCodable>.get(path: "")
 
         // When
         let urlRequest = try sut.urlRequest(from: request)
@@ -84,6 +118,27 @@ final class HttpConnectorRequestMapperTests: XCTestCase {
         // Then
         XCTAssertNil(urlRequest.httpBody)
     }
+
+    func test_urlRequest_whenBodyIsInvalid_fails() throws {
+        // Given
+        let configuration = HttpConnectorRequestMapperConfiguration(
+            baseUrl: Constants.baseUrl, projectId: "", privateKey: nil, version: ""
+        )
+        let sut = createMapper(configuration: configuration)
+        let request = HttpConnectorRequest<VoidCodable>.post(path: "", body: Float.infinity)
+
+        // Then
+        XCTAssertThrowsError(try sut.urlRequest(from: request)) { error in
+            switch error {
+            case HttpConnectorFailure.coding:
+                break
+            default:
+                XCTFail("Unexpected failure")
+            }
+        }
+    }
+
+    // MARK: - Query
 
     func test_urlRequest_whenQueryIsSet_returnsRequestWithQuery() throws {
         // Given
@@ -99,6 +154,8 @@ final class HttpConnectorRequestMapperTests: XCTestCase {
         // Then
         XCTAssertEqual(urlRequest.url?.query(), "key=value")
     }
+
+    // MARK: - Headers
 
     func test_urlRequest_returnsRequestWithValidUserAgent() throws {
         // Given
@@ -211,7 +268,7 @@ final class HttpConnectorRequestMapperTests: XCTestCase {
         XCTAssertEqual(idempotencyKey, "application/json")
     }
 
-    func test_urlRequest_whenAdditionalHeaderIsSet_addsIt() throws {
+    func test_urlRequest_whenRequestHeaderIsSet_addsIt() throws {
         // Given
         let configuration = HttpConnectorRequestMapperConfiguration(
             baseUrl: Constants.baseUrl, projectId: "", privateKey: nil, version: ""
@@ -226,31 +283,6 @@ final class HttpConnectorRequestMapperTests: XCTestCase {
         XCTAssertEqual(urlRequest.value(forHTTPHeaderField: "key"), "value")
     }
 
-    // when body is set and adds metadata encodes it
-    // when body is set encodes it (without metadata)
-    // when body encoding fails, it fails
-
-//    func test_urlRequest_whenRequestIncludesDeviceMetadata_encodesDeviceMetadata() throws {
-//        // Given
-//        let encoder = JSONEncoder()
-//        encoder.outputFormatting = .sortedKeys
-//        let deviceMetadata = DeviceMetadata(
-//            appLanguage: "en", appScreenWidth: 1, appScreenHeight: 2, appTimeZoneOffset: 0, channel: "ios"
-//        )
-//        let body = ["key": 1]
-//        let decoratedBody = HttpConnectorDecoratedRequestBody(
-//            body: POAnyEncodable(body), deviceMetadata: deviceMetadata
-//        )
-//
-//        // When
-//        let encodedData = try encoder.encode(decoratedBody)
-//
-//        // Then
-//        // swiftlint:disable:next line_length
-//        let expectedValue = #"{"device":{"appLanguage":"en","appScreenHeight":2,"appScreenWidth":1,"appTimeZoneOffset":0,"channel":"ios"},"key":1}"#
-//        XCTAssertEqual(Data(expectedValue.utf8), encodedData)
-//    }
-
     // MARK: - Private Nested Types
 
     private enum Constants {
@@ -262,10 +294,17 @@ final class HttpConnectorRequestMapperTests: XCTestCase {
     private func createMapper(configuration: HttpConnectorRequestMapperConfiguration) -> HttpConnectorRequestMapper {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys
+        let mockDeviceMetadata = DeviceMetadata(
+            appLanguage: "language",
+            appScreenWidth: 1,
+            appScreenHeight: 2,
+            appTimeZoneOffset: 3,
+            channel: "test"
+        )
         let mapper = HttpConnectorRequestMapper(
             configuration: configuration,
-            encoder: JSONEncoder(),
-            deviceMetadataProvider: DeviceMetadataProvider(screen: .main, bundle: .main),
+            encoder: encoder,
+            deviceMetadataProvider: MockDeviceMetadataProvider(deviceMetadata: mockDeviceMetadata),
             logger: POLogger()
         )
         return mapper
