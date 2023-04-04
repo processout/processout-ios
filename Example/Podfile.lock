@@ -1,0 +1,33 @@
+PODS:
+  - CheckoutEventLoggerKit (1.2.1)
+  - JOSESwift (2.2.1)
+  - ProcessOut (3.1.0)
+  - ProcessOutCheckout (3.1.0):
+    - CheckoutEventLoggerKit (= 1.2.1)
+    - JOSESwift (= 2.2.1)
+    - ProcessOut
+
+DEPENDENCIES:
+  - ProcessOut (from `../`)
+  - ProcessOutCheckout (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - CheckoutEventLoggerKit
+    - JOSESwift
+
+EXTERNAL SOURCES:
+  ProcessOut:
+    :path: "../"
+  ProcessOutCheckout:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  CheckoutEventLoggerKit: d49d49b65284bf1e352f7582e9dd81110969a47f
+  JOSESwift: d65ba32c7bceae9982e85e62d35de1f8d135cc89
+  ProcessOut: 8ffca8bbbcb0d0bb26d7c733b418cc03b8d86336
+  ProcessOutCheckout: 11f9ae9ac47e76707bb79c62751321e03c28d5b8
+
+PODFILE CHECKSUM: 36bd5b844a932b8aa90bf212cdb0b4d50c1c6681
+
+COCOAPODS: 1.11.3
