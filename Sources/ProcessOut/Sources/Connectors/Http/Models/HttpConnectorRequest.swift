@@ -26,7 +26,7 @@ struct HttpConnectorRequest<Value: Decodable> {
     let query: [String: CustomStringConvertible]
 
     /// Parameters.
-    let body: POAnyEncodable?
+    let body: Encodable?
 
     /// Custom headers.
     let headers: [String: String]
@@ -64,7 +64,7 @@ extension HttpConnectorRequest {
 
     static func post(
         path: String,
-        body: (some Encodable)? = (nil as POAnyEncodable?),
+        body: Encodable? = nil,
         headers: [String: String] = [:],
         includesDeviceMetadata: Bool = false,
         requiresPrivateKey: Bool = false
@@ -74,7 +74,7 @@ extension HttpConnectorRequest {
             method: .post,
             path: path,
             query: [:],
-            body: body.map(POAnyEncodable.init),
+            body: body,
             headers: headers,
             includesDeviceMetadata: includesDeviceMetadata,
             requiresPrivateKey: requiresPrivateKey
@@ -83,7 +83,7 @@ extension HttpConnectorRequest {
 
     static func put(
         path: String,
-        body: (some Encodable)? = (nil as POAnyEncodable?),
+        body: Encodable? = nil,
         headers: [String: String] = [:],
         includesDeviceMetadata: Bool = false,
         requiresPrivateKey: Bool = false
@@ -93,7 +93,7 @@ extension HttpConnectorRequest {
             method: .put,
             path: path,
             query: [:],
-            body: body.map(POAnyEncodable.init),
+            body: body,
             headers: headers,
             includesDeviceMetadata: includesDeviceMetadata,
             requiresPrivateKey: requiresPrivateKey
