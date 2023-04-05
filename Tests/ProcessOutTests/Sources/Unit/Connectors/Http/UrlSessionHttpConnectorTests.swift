@@ -6,6 +6,36 @@
 //
 
 import Foundation
+import XCTest
+@testable import ProcessOut
+
+final class UrlSessionHttpConnectorTests: XCTestCase {
+
+    override func setUp() {
+        super.setUp()
+        // todo(andrii-vysotskyi): use mock or stub for failure mapper
+        let sessionConfiguration = URLSessionConfiguration.ephemeral
+        sessionConfiguration.protocolClasses = [MockUrlProtocol.self]
+        let logger = POLogger()
+        let connector = ProcessOutHttpConnectorBuilder()
+            .with(configuration: .init(baseUrl: Constants.baseUrl, projectId: "", privateKey: nil, version: ""))
+            .with(retryStrategy: nil)
+            .with(sessionConfiguration: sessionConfiguration)
+            .with(logger: logger)
+            .build()
+        sut = CardsRepository(connector: connector, failureMapper: HttpConnectorFailureMapper(logger: logger))
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let baseUrl = URL(string: "https://example.com")! // swiftlint:disable:this force_unwrapping
+    }
+
+    // MARK: - Private Properties
+
+    private var sut: UrlSessionHttpConnector! // swiftlint:disable:this implicitly_unwrapped_optional
+}
 
 //    func test_decode_whenSuccessIsNotPresent_fails() throws {
 //        // Given
