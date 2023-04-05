@@ -16,5 +16,5 @@ Pod::Spec.new do |s|
   s.dependency 'ProcessOut'
   s.dependency 'JOSESwift', '2.2.1'
   s.dependency 'CheckoutEventLoggerKit', '1.2.1'
-  s.vendored_frameworks = 'Sources/ProcessOutCheckout/Frameworks/Checkout3DS.xcframework'
+  s.vendored_frameworks = 'Sources/ProcessOutCheckout/Frameworks/Checkout3DS.framework'
 end

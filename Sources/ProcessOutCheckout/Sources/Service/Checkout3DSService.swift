@@ -43,7 +43,7 @@ final class Checkout3DSService: PO3DSServiceType {
         let configurationParameters = configurationMapper.convert(configuration: configuration)
         let configuration = delegate.configuration(with: configurationParameters)
         do {
-            let service = try Standalone3DSService.initialize(with: configuration, environment: .production)
+            let service = try Standalone3DSService.initialize(with: configuration, environment: .sandbox)
             let context = State.Context(service: service, transaction: service.createTransaction())
             state = .fingerprinting(context)
             queue.async { [unowned self, errorMapper] in
