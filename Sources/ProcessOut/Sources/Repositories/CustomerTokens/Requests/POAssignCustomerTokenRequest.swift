@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Request to use to assign new source to existing customer token and potentially verify it.
 public struct POAssignCustomerTokenRequest: Encodable {
 
     /// Id of the customer who token belongs to.
@@ -38,6 +39,9 @@ public struct POAssignCustomerTokenRequest: Encodable {
     /// Can be used for a 3DS2 request to indicate which third party SDK is used for the call.
     public let thirdPartySdkVersion: String?
 
+    /// Additional matadata.
+    public let metadata: [String: String]?
+
     /// Creates request instance.
     public init(
         customerId: String,
@@ -47,7 +51,8 @@ public struct POAssignCustomerTokenRequest: Encodable {
         verify: Bool = false,
         invoiceId: String? = nil,
         enableThreeDS2: Bool = true,
-        thirdPartySdkVersion: String? = nil
+        thirdPartySdkVersion: String? = nil,
+        metadata: [String: String]? = nil
     ) {
         self._customerId = .init(value: customerId)
         self._tokenId = .init(value: tokenId)
@@ -57,5 +62,6 @@ public struct POAssignCustomerTokenRequest: Encodable {
         self.invoiceId = invoiceId
         self.enableThreeDS2 = enableThreeDS2
         self.thirdPartySdkVersion = thirdPartySdkVersion
+        self.metadata = metadata
     }
 }

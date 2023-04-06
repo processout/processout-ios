@@ -9,7 +9,7 @@ import Foundation
 
 /// A card object represents a credit or debit card. It contains many useful pieces of information about the card but
 /// it does not contain the full card number and CVC (which are kept securely in the ProcessOut Vault).
-public struct POCard: Decodable {
+public struct POCard: Decodable, Hashable {
 
     /// Value that uniquely identifies the card.
     public let id: String

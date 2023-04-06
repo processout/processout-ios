@@ -9,7 +9,8 @@ protocol CustomerTokensRepositoryType: PORepositoryType {
 
     /// Assigns a token to a customer.
     func assignCustomerToken(
-        request: POAssignCustomerTokenRequest, completion: @escaping (Result<ThreeDSCustomerAction?, Failure>) -> Void
+        request: POAssignCustomerTokenRequest,
+        completion: @escaping (Result<AssignCustomerTokenResponse, Failure>) -> Void
     )
 
     /// Create customer token.

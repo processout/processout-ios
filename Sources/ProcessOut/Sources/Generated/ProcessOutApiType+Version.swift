@@ -7,8 +7,8 @@
 
 extension ProcessOutApiType {
 
-    /// The current version of this library, value is "3.1.0".
+    /// The current version of this library, value is "3.2.0".
     public static var version: String {
-        "3.1.0"
+        "3.2.0"
     }
 }

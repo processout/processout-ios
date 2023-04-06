@@ -60,11 +60,12 @@ private final class SharedProcessOutApi: ProcessOutApiType {
     private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
 
     private(set) lazy var cards: POCardsServiceType = {
+        let requestMapper = ApplePayCardTokenizationRequestMapper(
+            decoder: JSONDecoder(), logger: repositoryLogger
+        )
         let service = CardsService(
             repository: CardsRepository(connector: httpConnector, failureMapper: failureMapper),
-            applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper(
-                decoder: decoder, logger: repositoryLogger
-            )
+            applePayCardTokenizationRequestMapper: requestMapper
         )
         return service
     }()
@@ -81,7 +82,6 @@ private final class SharedProcessOutApi: ProcessOutApiType {
         static let serviceLoggerCategory = "Service"
         static let repositoryLoggerCategory = "Repository"
         static let connectorLoggerCategory = "Connector"
-        static let codingDateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         static let systemLoggerSubsystem = "com.processout.processout-ios"
     }
 
@@ -91,26 +91,17 @@ private final class SharedProcessOutApi: ProcessOutApiType {
     private lazy var repositoryLogger = createLogger(for: Constants.repositoryLoggerCategory)
 
     private lazy var httpConnector: HttpConnectorType = {
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.urlCache = nil
-        sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        sessionConfiguration.waitsForConnectivity = true
-        sessionConfiguration.timeoutIntervalForRequest = 30
-        let connector = HttpConnector(
-            configuration: .init(
-                baseUrl: configuration.apiBaseUrl,
-                projectId: configuration.projectId,
-                privateKey: configuration.privateKey,
-                version: Self.version
-            ),
-            sessionConfiguration: sessionConfiguration,
-            decoder: decoder,
-            encoder: encoder,
-            deviceMetadataProvider: DeviceMetadataProvider(screen: UIScreen.main, bundle: Bundle.main),
-            logger: createLogger(for: Constants.connectorLoggerCategory)
+        let connectorConfiguration = HttpConnectorRequestMapperConfiguration(
+            baseUrl: configuration.apiBaseUrl,
+            projectId: configuration.projectId,
+            privateKey: configuration.privateKey,
+            version: Self.version
         )
-        let retryStrategy = RetryStrategy.exponential(maximumRetries: 3, interval: 0.1, rate: 3)
-        return HttpConnectorRetryDecorator(connector: connector, retryStrategy: retryStrategy)
+        let connector = ProcessOutHttpConnectorBuilder()
+            .with(configuration: connectorConfiguration)
+            .with(logger: logger)
+            .build()
+        return connector
     }()
 
     private lazy var failureMapper = HttpConnectorFailureMapper(logger: repositoryLogger)
@@ -122,27 +113,6 @@ private final class SharedProcessOutApi: ProcessOutApiType {
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
         return ThreeDSService(decoder: decoder, encoder: encoder, logger: serviceLogger)
-    }()
-
-    private lazy var decoder: JSONDecoder = {
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        decoder.dateDecodingStrategy = .formatted(dateFormatter)
-        return decoder
-    }()
-
-    private lazy var encoder: JSONEncoder = {
-        let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
-        encoder.dateEncodingStrategy = .formatted(dateFormatter)
-        return encoder
-    }()
-
-    private lazy var dateFormatter: DateFormatter = {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = Constants.codingDateFormat
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        return dateFormatter
     }()
 
     // MARK: - Private Methods
