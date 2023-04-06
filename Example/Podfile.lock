@@ -1,9 +1,9 @@
 PODS:
-  - CheckoutEventLoggerKit (1.2.1)
+  - CheckoutEventLoggerKit (1.2.3)
   - JOSESwift (2.2.1)
   - ProcessOut (3.1.0)
   - ProcessOutCheckout (3.1.0):
-    - CheckoutEventLoggerKit (= 1.2.1)
+    - CheckoutEventLoggerKit (= 1.2.3)
     - JOSESwift (= 2.2.1)
     - ProcessOut
 
@@ -23,10 +23,10 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  CheckoutEventLoggerKit: d49d49b65284bf1e352f7582e9dd81110969a47f
+  CheckoutEventLoggerKit: ee1f9732728fceb25960bb2f6d424f9e99bac7eb
   JOSESwift: d65ba32c7bceae9982e85e62d35de1f8d135cc89
   ProcessOut: 8ffca8bbbcb0d0bb26d7c733b418cc03b8d86336
-  ProcessOutCheckout: 8926f4a01bacfd3a2b42b580249d8caa051308d9
+  ProcessOutCheckout: 4558eead28eedcd8b29f7beba61aeec6a0e42bde
 
 PODFILE CHECKSUM: 36bd5b844a932b8aa90bf212cdb0b4d50c1c6681
 

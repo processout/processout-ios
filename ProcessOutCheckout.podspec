@@ -15,6 +15,6 @@ Pod::Spec.new do |s|
   # todo(andrii-vysotskyi): remove before merge
   s.dependency 'ProcessOut'
   s.dependency 'JOSESwift', '2.2.1'
-  s.dependency 'CheckoutEventLoggerKit', '1.2.1'
-  s.vendored_frameworks = 'Sources/ProcessOutCheckout/Frameworks/Checkout3DS.framework'
+  s.dependency 'CheckoutEventLoggerKit', '1.2.3'
+  s.vendored_frameworks = 'Sources/ProcessOutCheckout/Frameworks/Checkout3DS.xcframework'
 end
