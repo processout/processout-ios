@@ -86,10 +86,10 @@ final class Checkout3DSService: PO3DSServiceType {
             return
         }
         state = .challenging(context)
-        let challengeParameters = convertToChallengeParameters(data: challenge)
-        context.transaction.doChallenge(challengeParameters: challengeParameters) { [weak self, errorMapper] result in
-            self?.setIdleStateUnchecked()
-            completion(result.mapError(errorMapper.convert))
+        let parameters = convertToChallengeParameters(data: challenge)
+        context.transaction.doChallenge(challengeParameters: parameters) { [unowned self, errorMapper] result in
+            self.setIdleStateUnchecked()
+            completion(result.map(extractStatus(challengeResult:)).mapError(errorMapper.convert))
         }
     }
 
@@ -153,5 +153,9 @@ final class Checkout3DSService: PO3DSServiceType {
             acsSignedContent: data.acsSignedContent
         )
         return challengeParameters
+    }
+
+    private func extractStatus(challengeResult: ChallengeResult) -> Bool {
+        challengeResult.transactionStatus.uppercased() == "Y"
     }
 }
