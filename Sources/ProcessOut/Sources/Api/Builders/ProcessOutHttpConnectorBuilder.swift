@@ -1,5 +1,5 @@
 //
-//  HttpConnectorBuilder.swift
+//  ProcessOutHttpConnectorBuilder.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 29.03.2023.
@@ -7,9 +7,10 @@
 
 import Foundation
 
-final class HttpConnectorBuilder {
+/// Builds http connector suitable for communications with ProcessOut API.
+final class ProcessOutHttpConnectorBuilder {
 
-    func with(configuration: HttpConnector.Configuration) -> Self {
+    func with(configuration: HttpConnectorRequestMapperConfiguration) -> Self {
         self.configuration = configuration
         return self
     }
@@ -38,12 +39,16 @@ final class HttpConnectorBuilder {
         guard let configuration, let logger else {
             fatalError("Unable to create connector without required parameters set.")
         }
-        var connector: HttpConnectorType = HttpConnector(
+        let requestMapper = HttpConnectorRequestMapper(
             configuration: configuration,
-            sessionConfiguration: sessionConfiguration,
-            decoder: decoder,
             encoder: encoder,
             deviceMetadataProvider: deviceMetadataProvider,
+            logger: logger
+        )
+        var connector: HttpConnectorType = UrlSessionHttpConnector(
+            sessionConfiguration: sessionConfiguration,
+            requestMapper: requestMapper,
+            decoder: decoder,
             logger: logger
         )
         if let retryStrategy {
@@ -62,12 +67,10 @@ final class HttpConnectorBuilder {
     // MARK: - Private Properties
 
     /// Connector configuration.
-    private var configuration: HttpConnector.Configuration?
+    private var configuration: HttpConnectorRequestMapperConfiguration?
 
     /// Retry strategy to use for failing requests.
-    private var retryStrategy: RetryStrategy? = {
-        .exponential(maximumRetries: 3, interval: 0.1, rate: 3)
-    }()
+    private var retryStrategy: RetryStrategy? = .exponential(maximumRetries: 3, interval: 0.1, rate: 3)
 
     /// Logger.
     private var logger: POLogger?

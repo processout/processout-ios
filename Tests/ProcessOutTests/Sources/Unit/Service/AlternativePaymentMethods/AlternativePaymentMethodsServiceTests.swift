@@ -13,7 +13,6 @@ final class AlternativePaymentMethodsServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        // swiftlint:disable:next force_unwrapping
         let baseUrl = URL(string: "https://example.com")!
         let logger = POLogger(destinations: [])
         sut = AlternativePaymentMethodsService(projectId: "proj_test", baseUrl: baseUrl, logger: logger)
@@ -58,7 +57,6 @@ final class AlternativePaymentMethodsServiceTests: XCTestCase {
 
     func test_alternativePaymentMethodResponse_withOnlyGatewayToken_succeeds() throws {
         let result: POAlternativePaymentMethodResponse? = try sut.alternativePaymentMethodResponse(
-            // swiftlint:disable:next force_unwrapping
             url: URL(string: "https://processout.return?token=gway_req_test")!
         )
 
@@ -67,7 +65,6 @@ final class AlternativePaymentMethodsServiceTests: XCTestCase {
 
     func test_alternativePaymentMethodResponse_withCustomerToken_succeeds() throws {
         let result: POAlternativePaymentMethodResponse? = try sut.alternativePaymentMethodResponse(
-            // swiftlint:disable:next force_unwrapping
             url: URL(string: "https://processout.return?token=gway_req_test&token_id=tok_test&customer_id=cust_test")!
         )
 
@@ -76,5 +73,5 @@ final class AlternativePaymentMethodsServiceTests: XCTestCase {
         XCTAssertEqual(result?.customerId, "cust_test")
     }
 
-    private var sut: AlternativePaymentMethodsService! // swiftlint:disable:this implicitly_unwrapped_optional
+    private var sut: AlternativePaymentMethodsService!
 }

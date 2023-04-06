@@ -39,7 +39,6 @@ final class CustomerTokensRepository: CustomerTokensRepositoryType {
         }
         let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/customers/\(request.customerId)/tokens",
-            body: VoidCodable(),
             includesDeviceMetadata: true,
             requiresPrivateKey: true
         )

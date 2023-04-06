@@ -91,13 +91,13 @@ private final class SharedProcessOutApi: ProcessOutApiType {
     private lazy var repositoryLogger = createLogger(for: Constants.repositoryLoggerCategory)
 
     private lazy var httpConnector: HttpConnectorType = {
-        let connectorConfiguration = HttpConnector.Configuration(
+        let connectorConfiguration = HttpConnectorRequestMapperConfiguration(
             baseUrl: configuration.apiBaseUrl,
             projectId: configuration.projectId,
             privateKey: configuration.privateKey,
             version: Self.version
         )
-        let connector = HttpConnectorBuilder()
+        let connector = ProcessOutHttpConnectorBuilder()
             .with(configuration: connectorConfiguration)
             .with(logger: logger)
             .build()

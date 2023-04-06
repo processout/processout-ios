@@ -91,8 +91,8 @@ final class ImmutableStringCodableOptionalDecimalTests: XCTestCase {
 
     // MARK: - Private Properties
 
-    private var encoder: JSONEncoder! // swiftlint:disable:this implicitly_unwrapped_optional
-    private var decoder: JSONDecoder! // swiftlint:disable:this implicitly_unwrapped_optional
+    private var encoder: JSONEncoder!
+    private var decoder: JSONDecoder!
 }
 
 private struct Container: Codable {
