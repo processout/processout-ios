@@ -5,8 +5,6 @@
 //  Created by Andrii Vysotskyi on 03.04.2023.
 //
 
-// swiftlint:disable implicitly_unwrapped_optional force_unwrapping
-
 import Foundation
 import XCTest
 @testable import ProcessOut
@@ -44,7 +42,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         _ = sut.execute(request: defaultRequest) { result in
             // Then
             if case .success = result {
-                XCTFail()
+                XCTFail("Unexpected success")
             }
             XCTAssertTrue(Thread.isMainThread)
             expectation.fulfill()
@@ -228,7 +226,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let baseUrl = URL(string: "https://example.com")! // swiftlint:disable:this force_unwrapping
+        static let baseUrl = URL(string: "https://example.com")!
     }
 
     // MARK: - Private Properties

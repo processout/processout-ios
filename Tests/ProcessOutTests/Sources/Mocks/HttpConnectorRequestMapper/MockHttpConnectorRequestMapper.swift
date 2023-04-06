@@ -5,8 +5,6 @@
 //  Created by Andrii Vysotskyi on 05.04.2023.
 //
 
-// swiftlint:disable implicitly_unwrapped_optional
-
 import Foundation
 @testable import ProcessOut
 

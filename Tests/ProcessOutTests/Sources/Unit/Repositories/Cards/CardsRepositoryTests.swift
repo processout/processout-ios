@@ -5,8 +5,6 @@
 //  Created by Andrii Vysotskyi on 28.03.2023.
 //
 
-// swiftlint:disable function_body_length
-
 import Foundation
 import XCTest
 @testable import ProcessOut
@@ -117,10 +115,10 @@ final class CardsRepositoryTestsTests: XCTestCase {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let baseUrl = URL(string: "https://example.com")! // swiftlint:disable:this force_unwrapping
+        static let baseUrl = URL(string: "https://example.com")!
     }
 
     // MARK: - Private Properties
 
-    private var sut: CardsRepository! // swiftlint:disable:this implicitly_unwrapped_optional
+    private var sut: CardsRepository!
 }

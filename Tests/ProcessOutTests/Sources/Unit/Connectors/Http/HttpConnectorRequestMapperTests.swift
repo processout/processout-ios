@@ -16,7 +16,6 @@ final class HttpConnectorRequestMapperTests: XCTestCase {
     func test_urlRequest_whenBaseUrlIsMalformed_fails() throws {
         // Given
         let configuration = HttpConnectorRequestMapperConfiguration(
-            // swiftlint:disable:next force_unwrapping
             baseUrl: URL(string: "http://example.com:-80")!, projectId: "", privateKey: nil, version: ""
         )
         let sut = createMapper(configuration: configuration)
@@ -238,7 +237,7 @@ final class HttpConnectorRequestMapperTests: XCTestCase {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let baseUrl = URL(string: "https://example.com")! // swiftlint:disable:this force_unwrapping
+        static let baseUrl = URL(string: "https://example.com")!
     }
 
     // MARK: - Private Methods
