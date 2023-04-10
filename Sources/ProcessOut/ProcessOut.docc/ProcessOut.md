@@ -70,7 +70,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 
 ### Gateway Configurations
 
-- ``POGatewayConfigurationsRepositoryType``
+- ``POGatewayConfigurationsRepository``
 - ``POAllGatewayConfigurationsResponse``
 - ``POAllGatewayConfigurationsRequest``
 - ``POFindGatewayConfigurationRequest``
@@ -90,7 +90,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 
 ### Images
 
-- ``POImagesRepositoryType``
+- ``POImagesRepository``
 
 ### Appearance
 
@@ -106,19 +106,19 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POButtonStyle``
 - ``POButtonStateStyle``
 - ``POActivityIndicatorStyle``
-- ``POActivityIndicatorViewType``
+- ``POActivityIndicatorView``
 - ``POBackgroundDecorationStateStyle``
 - ``POBackgroundDecorationStyle``
 
 ### Utils
 
 - ``POPaginationOptions``
-- ``POCancellableType``
+- ``POCancellable``
 - ``POAnyEncodable``
 - ``POImmutableExcludedCodable``
 - ``POImmutableStringCodableDecimal``
 - ``POImmutableStringCodableOptionalDecimal``
-- ``PORepositoryType``
+- ``PORepository``
 - ``POService``
 - ``POAutoAsync``
 - ``POLogger``
