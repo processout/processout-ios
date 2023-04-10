@@ -12,7 +12,7 @@ enum HttpConnectorRetryDecoratorOperationState {
     struct Executing {
 
         /// Operation cancellable.
-        let cancellable: POCancellableType
+        let cancellable: POCancellable
 
         /// Total retries count.
         let retryCount: Int

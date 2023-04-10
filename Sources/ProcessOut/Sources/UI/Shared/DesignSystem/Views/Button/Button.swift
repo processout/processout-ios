@@ -124,7 +124,7 @@ final class Button: UIControl {
         return label
     }()
 
-    private lazy var activityIndicatorView: POActivityIndicatorViewType = {
+    private lazy var activityIndicatorView: POActivityIndicatorView = {
         let view = ActivityIndicatorViewFactory().create(style: style.activityIndicator)
         view.hidesWhenStopped = false
         view.setAnimating(true)

@@ -8,11 +8,11 @@
 import Foundation
 import UIKit.UIDevice
 
-final class UrlSessionHttpConnector: HttpConnectorType {
+final class UrlSessionHttpConnector: HttpConnector {
 
     init(
         sessionConfiguration: URLSessionConfiguration,
-        requestMapper: HttpConnectorRequestMapperType,
+        requestMapper: HttpConnectorRequestMapper,
         decoder: JSONDecoder,
         logger: POLogger
     ) {
@@ -29,7 +29,7 @@ final class UrlSessionHttpConnector: HttpConnectorType {
 
     func execute<Value>(
         request: HttpConnectorRequest<Value>, completion: @escaping (Result<Value, Failure>) -> Void
-    ) -> POCancellableType {
+    ) -> POCancellable {
         let cancellable = GroupCancellable()
         workQueue.async { [self] in
             do {
@@ -58,7 +58,7 @@ final class UrlSessionHttpConnector: HttpConnectorType {
     // MARK: - Private Properties
 
     private let session: URLSession
-    private let requestMapper: HttpConnectorRequestMapperType
+    private let requestMapper: HttpConnectorRequestMapper
     private let decoder: JSONDecoder
     private let workQueue: DispatchQueue
     private let logger: POLogger

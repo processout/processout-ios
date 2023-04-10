@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 19.10.2022.
 //
 
-class BaseInteractor<State>: InteractorType {
+class BaseInteractor<State>: Interactor {
 
     init(state: State) {
         self.state = state

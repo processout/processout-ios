@@ -7,16 +7,16 @@
 
 import Foundation
 
-final class HttpConnectorRetryDecorator: HttpConnectorType {
+final class HttpConnectorRetryDecorator: HttpConnector {
 
-    init(connector: HttpConnectorType, retryStrategy: RetryStrategy) {
+    init(connector: HttpConnector, retryStrategy: RetryStrategy) {
         self.connector = connector
         self.retryStrategy = retryStrategy
     }
 
     func execute<Value>(
         request: HttpConnectorRequest<Value>, completion: @escaping (Result<Value, HttpConnectorFailure>) -> Void
-    ) -> POCancellableType {
+    ) -> POCancellable {
         let operation = HttpConnectorRetryDecoratorOperation(
             connector: connector, retryStrategy: retryStrategy, request: request, completion: completion
         )
@@ -26,6 +26,6 @@ final class HttpConnectorRetryDecorator: HttpConnectorType {
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnectorType
+    private let connector: HttpConnector
     private let retryStrategy: RetryStrategy
 }

@@ -7,10 +7,10 @@
 
 import Foundation
 
-final class HttpConnectorRetryDecoratorOperation<Value: Decodable>: POCancellableType {
+final class HttpConnectorRetryDecoratorOperation<Value: Decodable>: POCancellable {
 
     init(
-        connector: HttpConnectorType,
+        connector: HttpConnector,
         retryStrategy: RetryStrategy,
         request: HttpConnectorRequest<Value>,
         completion: @escaping (Result<Value, HttpConnectorFailure>) -> Void
@@ -40,7 +40,7 @@ final class HttpConnectorRetryDecoratorOperation<Value: Decodable>: POCancellabl
 
     // MARK: - Private Nested Types
 
-    private let connector: HttpConnectorType
+    private let connector: HttpConnector
     private let retryStrategy: RetryStrategy
     private let request: HttpConnectorRequest<Value>
     private let completion: (Result<Value, HttpConnectorFailure>) -> Void

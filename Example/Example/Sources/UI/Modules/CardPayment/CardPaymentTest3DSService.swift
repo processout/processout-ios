@@ -8,7 +8,7 @@
 import UIKit
 import ProcessOut
 
-final class CardPaymentTest3DSService: PO3DSServiceType {
+final class CardPaymentTest3DSService: PO3DSService {
 
     /// View controller to use for presentations.
     unowned var viewController: UIViewController! // swiftlint:disable:this implicitly_unwrapped_optional

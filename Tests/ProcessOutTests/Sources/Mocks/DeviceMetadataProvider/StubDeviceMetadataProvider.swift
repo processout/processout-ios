@@ -7,7 +7,7 @@
 
 @testable import ProcessOut
 
-struct StubDeviceMetadataProvider: DeviceMetadataProviderType {
+struct StubDeviceMetadataProvider: DeviceMetadataProvider {
 
     var deviceMetadata: DeviceMetadata {
         DeviceMetadata(appLanguage: "en", appScreenWidth: 1, appScreenHeight: 2, appTimeZoneOffset: 3, channel: "test")
