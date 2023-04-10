@@ -1,5 +1,5 @@
 //
-//  HttpConnectorRequestMapper.swift
+//  DefaultHttpConnectorRequestMapper.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 03.04.2023.
@@ -8,12 +8,12 @@
 import Foundation
 import UIKit.UIDevice
 
-final class HttpConnectorRequestMapper: HttpConnectorRequestMapperType {
+final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     init(
         configuration: HttpConnectorRequestMapperConfiguration,
         encoder: JSONEncoder,
-        deviceMetadataProvider: DeviceMetadataProviderType,
+        deviceMetadataProvider: DeviceMetadataProvider,
         logger: POLogger
     ) {
         self.configuration = configuration
@@ -58,7 +58,7 @@ final class HttpConnectorRequestMapper: HttpConnectorRequestMapperType {
 
     private let configuration: HttpConnectorRequestMapperConfiguration
     private let encoder: JSONEncoder
-    private let deviceMetadataProvider: DeviceMetadataProviderType
+    private let deviceMetadataProvider: DeviceMetadataProvider
     private let logger: POLogger
 
     private var userAgent: String {

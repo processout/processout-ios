@@ -15,7 +15,7 @@ enum PollingOperationState {
         let timeoutTimer: Timer
 
         /// Operation cancellable.
-        let cancellable: POCancellableType
+        let cancellable: POCancellable
     }
 
     struct Waiting {

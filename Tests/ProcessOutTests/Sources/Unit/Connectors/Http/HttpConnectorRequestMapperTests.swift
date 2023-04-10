@@ -242,10 +242,12 @@ final class HttpConnectorRequestMapperTests: XCTestCase {
 
     // MARK: - Private Methods
 
-    private func createMapper(configuration: HttpConnectorRequestMapperConfiguration) -> HttpConnectorRequestMapper {
+    private func createMapper(
+        configuration: HttpConnectorRequestMapperConfiguration
+    ) -> DefaultHttpConnectorRequestMapper {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys
-        let mapper = HttpConnectorRequestMapper(
+        let mapper = DefaultHttpConnectorRequestMapper(
             configuration: configuration,
             encoder: encoder,
             deviceMetadataProvider: StubDeviceMetadataProvider(),

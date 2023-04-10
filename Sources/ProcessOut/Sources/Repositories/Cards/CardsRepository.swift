@@ -1,5 +1,5 @@
 //
-//  CardsRepository.swift
+//  HttpCardsRepository.swift
 //  ProcessOut
 //
 //  Created by Julien.Rodrigues on 20/10/2022.
@@ -7,14 +7,14 @@
 
 import Foundation
 
-final class CardsRepository: POCardsRepositoryType {
+final class HttpCardsRepository: POCardsRepository {
 
-    init(connector: HttpConnectorType, failureMapper: HttpConnectorFailureMapperType) {
+    init(connector: HttpConnector, failureMapper: HttpConnectorFailureMapper) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
 
-    // MARK: - POCardsRepositoryType
+    // MARK: - POCardsRepository
 
     func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
@@ -45,6 +45,6 @@ final class CardsRepository: POCardsRepositoryType {
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnectorType
-    private let failureMapper: HttpConnectorFailureMapperType
+    private let connector: HttpConnector
+    private let failureMapper: HttpConnectorFailureMapper
 }

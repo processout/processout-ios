@@ -9,8 +9,8 @@ import UIKit
 
 final class ActivityIndicatorViewFactory {
 
-    func create(style: POActivityIndicatorStyle) -> POActivityIndicatorViewType {
-        let view: POActivityIndicatorViewType
+    func create(style: POActivityIndicatorStyle) -> POActivityIndicatorView {
+        let view: POActivityIndicatorView
         switch style {
         case .custom(let customView):
             view = customView

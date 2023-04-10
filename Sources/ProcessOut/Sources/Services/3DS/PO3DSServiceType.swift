@@ -1,12 +1,15 @@
 //
-//  PO3DSServiceType.swift
+//  PO3DSService.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 03.11.2022.
 //
 
+@available(*, deprecated, renamed: "PO3DSService")
+public typealias PO3DSServiceType = PO3DSService
+
 /// This interface provides methods to process 3-D Secure transactions.
-public protocol PO3DSServiceType: AnyObject {
+public protocol PO3DSService: AnyObject {
 
     /// Asks implementation to create request that will be passed to 3DS Server to create the AReq.
     func authenticationRequest(

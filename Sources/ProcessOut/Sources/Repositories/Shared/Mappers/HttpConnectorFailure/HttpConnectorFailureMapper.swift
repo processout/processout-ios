@@ -1,5 +1,5 @@
 //
-//  HttpConnectorFailureMapper.swift
+//  DefaultHttpConnectorFailureMapper.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 16.10.2022.
@@ -7,13 +7,13 @@
 
 import Foundation
 
-final class HttpConnectorFailureMapper: HttpConnectorFailureMapperType {
+final class DefaultHttpConnectorFailureMapper: HttpConnectorFailureMapper {
 
     init(logger: POLogger) {
         self.logger = logger
     }
 
-    // MARK: - HttpConnectorFailureMapperType
+    // MARK: - HttpConnectorFailureMapper
 
     func failure(from failure: HttpConnectorFailure) -> POFailure {
         let message: String?

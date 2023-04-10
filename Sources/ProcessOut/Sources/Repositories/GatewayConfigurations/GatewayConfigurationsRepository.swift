@@ -7,14 +7,14 @@
 
 import Foundation
 
-final class GatewayConfigurationsRepository: POGatewayConfigurationsRepositoryType {
+final class HttpGatewayConfigurationsRepository: POGatewayConfigurationsRepository {
 
-    init(connector: HttpConnectorType, failureMapper: HttpConnectorFailureMapperType) {
+    init(connector: HttpConnector, failureMapper: HttpConnectorFailureMapper) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
 
-    // MARK: - POGatewayConfigurationsRepositoryType
+    // MARK: - POGatewayConfigurationsRepository
 
     func all(
         request: POAllGatewayConfigurationsRequest,
@@ -52,6 +52,6 @@ final class GatewayConfigurationsRepository: POGatewayConfigurationsRepositoryTy
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnectorType
-    private let failureMapper: HttpConnectorFailureMapperType
+    private let connector: HttpConnector
+    private let failureMapper: HttpConnectorFailureMapper
 }

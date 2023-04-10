@@ -1,5 +1,5 @@
 //
-//  NativeAlternativePaymentMethodViewModel.swift
+//  DefaultNativeAlternativePaymentMethodViewModel.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 19.10.2022.
@@ -7,11 +7,11 @@
 
 import Foundation
 
-final class NativeAlternativePaymentMethodViewModel:
-    BaseViewModel<NativeAlternativePaymentMethodViewModelState>, NativeAlternativePaymentMethodViewModelType {
+final class DefaultNativeAlternativePaymentMethodViewModel:
+    BaseViewModel<NativeAlternativePaymentMethodViewModelState>, NativeAlternativePaymentMethodViewModel {
 
     init(
-        interactor: any NativeAlternativePaymentMethodInteractorType,
+        interactor: any NativeAlternativePaymentMethodInteractor,
         configuration: PONativeAlternativePaymentMethodConfiguration,
         completion: ((Result<Void, POFailure>) -> Void)?
     ) {
@@ -39,9 +39,9 @@ final class NativeAlternativePaymentMethodViewModel:
         static let captureSuccessCompletionDelay: TimeInterval = 3
     }
 
-    // MARK: - NativeAlternativePaymentMethodInteractorType
+    // MARK: - NativeAlternativePaymentMethodInteractor
 
-    private let interactor: any NativeAlternativePaymentMethodInteractorType
+    private let interactor: any NativeAlternativePaymentMethodInteractor
     private let configuration: PONativeAlternativePaymentMethodConfiguration
     private let completion: ((Result<Void, POFailure>) -> Void)?
 

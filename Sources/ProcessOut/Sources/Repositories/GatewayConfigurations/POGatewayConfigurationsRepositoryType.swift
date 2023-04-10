@@ -1,5 +1,5 @@
 //
-//  POGatewayConfigurationsRepositoryType.swift
+//  POGatewayConfigurationsRepository.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 12.10.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol POGatewayConfigurationsRepositoryType: PORepositoryType {
+public protocol POGatewayConfigurationsRepository: PORepository {
 
     /// Returns available gateway configurations.
     func all(
@@ -22,7 +22,7 @@ public protocol POGatewayConfigurationsRepositoryType: PORepositoryType {
     )
 }
 
-extension POGatewayConfigurationsRepositoryType {
+extension POGatewayConfigurationsRepository {
 
     /// Returns available gateway configurations.
     public func all(completion: @escaping (Result<POAllGatewayConfigurationsResponse, Failure>) -> Void) {

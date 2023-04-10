@@ -1,5 +1,5 @@
 //
-//  DeviceMetadataProvider.swift
+//  DefaultDeviceMetadataProvider.swift
 //  ProcessOut
 //
 //  Created by Simeon Kostadinov on 31/10/2022.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class DeviceMetadataProvider: DeviceMetadataProviderType {
+final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
     init(screen: UIScreen, bundle: Bundle) {
         self.screen = screen
@@ -15,7 +15,7 @@ final class DeviceMetadataProvider: DeviceMetadataProviderType {
         timeZone = .autoupdatingCurrent
     }
 
-    // MARK: - DeviceMetadataProviderType
+    // MARK: - DeviceMetadataProvider
 
     var deviceMetadata: DeviceMetadata {
         DeviceMetadata(

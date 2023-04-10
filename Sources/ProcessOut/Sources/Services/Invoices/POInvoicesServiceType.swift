@@ -1,11 +1,14 @@
 //
-//  POInvoicesServiceType.swift
+//  POInvoicesService.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
-public protocol POInvoicesServiceType: POServiceType {
+@available(*, deprecated, renamed: "POInvoicesService")
+public typealias POInvoicesServiceType = POInvoicesService
+
+public protocol POInvoicesService: POService {
 
     /// Requests information needed to continue existing payment or start new one.
     func nativeAlternativePaymentMethodTransactionDetails(
@@ -25,7 +28,7 @@ public protocol POInvoicesServiceType: POServiceType {
     /// Performs invoice authorization with given request.
     func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
-        threeDSService: PO3DSServiceType,
+        threeDSService: PO3DSService,
         completion: @escaping (Result<Void, Failure>) -> Void
     )
 
@@ -33,14 +36,14 @@ public protocol POInvoicesServiceType: POServiceType {
     @discardableResult
     func captureNativeAlternativePayment(
         request: PONativeAlternativePaymentCaptureRequest, completion: @escaping (Result<Void, Failure>) -> Void
-    ) -> POCancellableType
+    ) -> POCancellable
 
     /// Creates invoice with given parameters.
     @_spi(PO)
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void)
 }
 
-extension POInvoicesServiceType {
+extension POInvoicesService {
 
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void) {
         let failure = POFailure(code: .generic(.mobile))

@@ -1,11 +1,11 @@
 //
-//  ViewModelType.swift
+//  ViewModel.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 19.10.2022.
 //
 
-protocol ViewModelType<State>: AnyObject {
+protocol ViewModel<State>: AnyObject {
 
     associatedtype State
 

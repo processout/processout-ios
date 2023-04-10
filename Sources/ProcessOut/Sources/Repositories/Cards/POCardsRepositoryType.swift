@@ -1,5 +1,5 @@
 //
-//  POCardsRepositoryType.swift
+//  POCardsRepository.swift
 //  ProcessOut
 //
 //  Created by Julien.Rodrigues on 20/10/2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol POCardsRepositoryType: PORepositoryType {
+protocol POCardsRepository: PORepository {
 
     /// Tokenize a card.
     func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void)

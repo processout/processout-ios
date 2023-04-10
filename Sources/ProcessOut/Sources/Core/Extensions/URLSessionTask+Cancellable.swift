@@ -7,4 +7,4 @@
 
 import Foundation
 
-extension URLSessionTask: POCancellableType { }
+extension URLSessionTask: POCancellable { }

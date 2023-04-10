@@ -1,11 +1,11 @@
 //
-//  HttpConnectorType.swift
+//  HttpConnector.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 10.10.2022.
 //
 
-protocol HttpConnectorType: AnyObject {
+protocol HttpConnector: AnyObject {
 
     typealias Failure = HttpConnectorFailure
 
@@ -17,5 +17,5 @@ protocol HttpConnectorType: AnyObject {
     @discardableResult
     func execute<Value>(
         request: HttpConnectorRequest<Value>, completion: @escaping (Result<Value, Failure>) -> Void
-    ) -> POCancellableType
+    ) -> POCancellable
 }

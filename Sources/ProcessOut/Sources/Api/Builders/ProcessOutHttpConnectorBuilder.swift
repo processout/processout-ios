@@ -25,7 +25,7 @@ final class ProcessOutHttpConnectorBuilder {
         return self
     }
 
-    func with(deviceMetadataProvider: DeviceMetadataProviderType) -> Self {
+    func with(deviceMetadataProvider: DeviceMetadataProvider) -> Self {
         self.deviceMetadataProvider = deviceMetadataProvider
         return self
     }
@@ -35,17 +35,17 @@ final class ProcessOutHttpConnectorBuilder {
         return self
     }
 
-    func build() -> HttpConnectorType {
+    func build() -> HttpConnector {
         guard let configuration, let logger else {
             fatalError("Unable to create connector without required parameters set.")
         }
-        let requestMapper = HttpConnectorRequestMapper(
+        let requestMapper = DefaultHttpConnectorRequestMapper(
             configuration: configuration,
             encoder: encoder,
             deviceMetadataProvider: deviceMetadataProvider,
             logger: logger
         )
-        var connector: HttpConnectorType = UrlSessionHttpConnector(
+        var connector: HttpConnector = UrlSessionHttpConnector(
             sessionConfiguration: sessionConfiguration,
             requestMapper: requestMapper,
             decoder: decoder,
@@ -86,8 +86,8 @@ final class ProcessOutHttpConnectorBuilder {
     }()
 
     /// Device metadata provider.
-    private lazy var deviceMetadataProvider: DeviceMetadataProviderType = {
-        DeviceMetadataProvider(screen: .main, bundle: .main)
+    private lazy var deviceMetadataProvider: DeviceMetadataProvider = {
+        DefaultDeviceMetadataProvider(screen: .main, bundle: .main)
     }()
 
     private lazy var dateFormatter: DateFormatter = {

@@ -1,5 +1,5 @@
 //
-//  ApplePayCardTokenizationRequestMapper.swift
+//  DefaultApplePayCardTokenizationRequestMapper.swift
 //  ProcessOut
 //
 //  Created by Julien.Rodrigues on 26/10/2022.
@@ -8,14 +8,14 @@
 import Foundation
 import PassKit
 
-final class ApplePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapperType {
+final class DefaultApplePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper {
 
     init(decoder: JSONDecoder, logger: POLogger) {
         self.decoder = decoder
         self.logger = logger
     }
 
-    // MARK: - ApplePayCardTokenizationRequestMapperType
+    // MARK: - ApplePayCardTokenizationRequestMapper
 
     /// - Throws: `POFailure` instance in case of error.
     func tokenizationRequest(

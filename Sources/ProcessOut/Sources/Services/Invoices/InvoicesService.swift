@@ -1,5 +1,5 @@
 //
-//  InvoicesService.swift
+//  DefaultInvoicesService.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 02.11.2022.
@@ -7,14 +7,14 @@
 
 import Foundation
 
-final class InvoicesService: POInvoicesServiceType {
+final class DefaultInvoicesService: POInvoicesService {
 
-    init(repository: InvoicesRepositoryType, threeDSService: ThreeDSServiceType) {
+    init(repository: InvoicesRepository, threeDSService: ThreeDSService) {
         self.repository = repository
         self.threeDSService = threeDSService
     }
 
-    // MARK: - POCustomerTokensServiceType
+    // MARK: - POCustomerTokensService
 
     func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
@@ -32,7 +32,7 @@ final class InvoicesService: POInvoicesServiceType {
 
     func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
-        threeDSService threeDSServiceDelegate: PO3DSServiceType,
+        threeDSService threeDSServiceDelegate: PO3DSService,
         completion: @escaping (Result<Void, Failure>) -> Void
     ) {
         repository.authorizeInvoice(request: request) { [threeDSService] result in
@@ -60,7 +60,7 @@ final class InvoicesService: POInvoicesServiceType {
 
     func captureNativeAlternativePayment(
         request: PONativeAlternativePaymentCaptureRequest, completion: @escaping (Result<Void, Failure>) -> Void
-    ) -> POCancellableType {
+    ) -> POCancellable {
         let captureTimeout = min(request.timeout ?? Constants.maximumCaptureTimeout, Constants.maximumCaptureTimeout)
         let request = NativeAlternativePaymentCaptureRequest(
             invoiceId: request.invoiceId, source: request.gatewayConfigurationId
@@ -103,8 +103,8 @@ final class InvoicesService: POInvoicesServiceType {
 
     // MARK: - Private Properties
 
-    private let repository: InvoicesRepositoryType
-    private let threeDSService: ThreeDSServiceType
+    private let repository: InvoicesRepository
+    private let threeDSService: ThreeDSService
 }
 
 private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_extension_access_modifier

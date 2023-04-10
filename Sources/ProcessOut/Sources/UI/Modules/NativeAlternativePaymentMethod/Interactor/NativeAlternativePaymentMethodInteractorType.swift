@@ -1,5 +1,5 @@
 //
-//  NativeAlternativePaymentMethodInteractorType.swift
+//  NativeAlternativePaymentMethodInteractor.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 19.10.2022.
@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-protocol NativeAlternativePaymentMethodInteractorType: InteractorType
+protocol NativeAlternativePaymentMethodInteractor: Interactor
     where State == NativeAlternativePaymentMethodInteractorState {
 
     /// Updates value for given key.

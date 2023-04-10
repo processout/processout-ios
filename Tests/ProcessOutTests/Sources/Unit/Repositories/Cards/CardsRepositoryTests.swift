@@ -23,7 +23,9 @@ final class CardsRepositoryTestsTests: XCTestCase {
             .with(sessionConfiguration: sessionConfiguration)
             .with(logger: logger)
             .build()
-        sut = CardsRepository(connector: connector, failureMapper: HttpConnectorFailureMapper(logger: logger))
+        sut = HttpCardsRepository(
+            connector: connector, failureMapper: DefaultHttpConnectorFailureMapper(logger: logger)
+        )
     }
 
     override func tearDown() {
@@ -120,5 +122,5 @@ final class CardsRepositoryTestsTests: XCTestCase {
 
     // MARK: - Private Properties
 
-    private var sut: CardsRepository!
+    private var sut: HttpCardsRepository!
 }

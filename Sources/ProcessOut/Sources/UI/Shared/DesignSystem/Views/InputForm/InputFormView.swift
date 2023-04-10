@@ -23,7 +23,7 @@ final class InputFormView: UIStackView {
 
     // MARK: -
 
-    init(textField: InputFormTextFieldType, style: POInputFormStyle) {
+    init(textField: InputFormTextField, style: POInputFormStyle) {
         self.textField = textField
         self.style = style
         super.init(frame: .zero)
@@ -66,7 +66,7 @@ final class InputFormView: UIStackView {
         }
     }
 
-    let textField: InputFormTextFieldType
+    let textField: InputFormTextField
 
     // MARK: - Constants
 

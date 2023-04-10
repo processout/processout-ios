@@ -1,5 +1,5 @@
 //
-//  POAlternativePaymentMethodsServiceType.swift
+//  POAlternativePaymentMethodsService.swift
 //  ProcessOut
 //
 //  Created by Simeon Kostadinov on 27/10/2022.
@@ -7,8 +7,11 @@
 
 import Foundation
 
+@available(*, deprecated, renamed: "POAlternativePaymentMethodsService")
+public typealias POAlternativePaymentMethodsServiceType = POAlternativePaymentMethodsService
+
 /// Service that provides set of methods to work with alternative payments.
-public protocol POAlternativePaymentMethodsServiceType {
+public protocol POAlternativePaymentMethodsService {
 
     /// Creates the redirection URL for APM Payments and APM token creation.
     ///

@@ -1,11 +1,11 @@
 //
-//  CustomerTokensRepositoryType.swift
+//  CustomerTokensRepository.swift
 //  ProcessOut
 //
 //  Created by Julien.Rodrigues on 27/10/2022.
 //
 
-protocol CustomerTokensRepositoryType: PORepositoryType {
+protocol CustomerTokensRepository: PORepository {
 
     /// Assigns a token to a customer.
     func assignCustomerToken(

@@ -1,5 +1,5 @@
 //
-//  ThreeDSService.swift
+//  DefaultThreeDSService.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 03.11.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class ThreeDSService: ThreeDSServiceType {
+final class DefaultThreeDSService: ThreeDSService {
 
     typealias Completion = (Result<String, POFailure>) -> Void
 
@@ -19,7 +19,7 @@ final class ThreeDSService: ThreeDSServiceType {
         self.logger = logger
     }
 
-    // MARK: - ThreeDSServiceType
+    // MARK: - ThreeDSService
 
     func handle(action: ThreeDSCustomerAction, delegate: Delegate, completion: @escaping Completion) {
         let completionTrampoline: Completion = { result in

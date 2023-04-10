@@ -15,7 +15,7 @@ final class AlternativePaymentMethodsServiceTests: XCTestCase {
         super.setUp()
         let baseUrl = URL(string: "https://example.com")!
         let logger = POLogger(destinations: [])
-        sut = AlternativePaymentMethodsService(projectId: "proj_test", baseUrl: baseUrl, logger: logger)
+        sut = DefaultAlternativePaymentMethodsService(projectId: "proj_test", baseUrl: baseUrl, logger: logger)
     }
 
     func test_alternativePaymentMethodUrl_withAdditionalData_succeeds() throws {
@@ -73,5 +73,5 @@ final class AlternativePaymentMethodsServiceTests: XCTestCase {
         XCTAssertEqual(result?.customerId, "cust_test")
     }
 
-    private var sut: AlternativePaymentMethodsService!
+    private var sut: DefaultAlternativePaymentMethodsService!
 }

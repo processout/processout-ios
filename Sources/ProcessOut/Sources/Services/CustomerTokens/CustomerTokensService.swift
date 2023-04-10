@@ -1,22 +1,22 @@
 //
-//  POCustomerTokensService.swift
+//  DefaultCustomerTokensService.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
-final class CustomerTokensService: POCustomerTokensServiceType {
+final class DefaultCustomerTokensService: POCustomerTokensService {
 
-    init(repository: CustomerTokensRepositoryType, threeDSService: ThreeDSServiceType) {
+    init(repository: CustomerTokensRepository, threeDSService: ThreeDSService) {
         self.repository = repository
         self.threeDSService = threeDSService
     }
 
-    // MARK: - POCustomerTokensServiceType
+    // MARK: - POCustomerTokensService
 
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
-        threeDSService threeDSServiceDelegate: PO3DSServiceType,
+        threeDSService threeDSServiceDelegate: PO3DSService,
         completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
     ) {
         repository.assignCustomerToken(request: request) { [threeDSService] result in
@@ -56,8 +56,8 @@ final class CustomerTokensService: POCustomerTokensServiceType {
 
     // MARK: - Private Properties
 
-    private let repository: CustomerTokensRepositoryType
-    private let threeDSService: ThreeDSServiceType
+    private let repository: CustomerTokensRepository
+    private let threeDSService: ThreeDSService
 }
 
 private extension POAssignCustomerTokenRequest { // swiftlint:disable:this no_extension_access_modifier

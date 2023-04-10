@@ -21,7 +21,7 @@ public protocol POCheckout3DSServiceDelegate: AnyObject {
     /// ignores warnings and completes with `true`.
     func shouldContinue(with warnings: Set<Checkout3DS.Warning>, completion: @escaping (Bool) -> Void)
 
-    /// Asks delegate to handle 3DS redirect. See documentation of `PO3DSServiceType/handle(redirect:completion:)`
+    /// Asks delegate to handle 3DS redirect. See documentation of `PO3DSService/handle(redirect:completion:)`
     /// for more details.
     func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void)
 }

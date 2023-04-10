@@ -1,5 +1,5 @@
 //
-//  NativeAlternativePaymentMethodInteractor.swift
+//  DefaultNativeAlternativePaymentMethodInteractor.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 19.10.2022.
@@ -10,12 +10,12 @@
 import Foundation
 import UIKit
 
-final class NativeAlternativePaymentMethodInteractor:
-    BaseInteractor<NativeAlternativePaymentMethodInteractorState>, NativeAlternativePaymentMethodInteractorType {
+final class DefaultNativeAlternativePaymentMethodInteractor:
+    BaseInteractor<NativeAlternativePaymentMethodInteractorState>, NativeAlternativePaymentMethodInteractor {
 
     init(
-        invoicesService: POInvoicesServiceType,
-        imagesRepository: POImagesRepositoryType,
+        invoicesService: POInvoicesService,
+        imagesRepository: POImagesRepository,
         configuration: NativeAlternativePaymentMethodInteractorConfiguration,
         logger: POLogger,
         delegate: PONativeAlternativePaymentMethodDelegate?
@@ -32,7 +32,7 @@ final class NativeAlternativePaymentMethodInteractor:
         captureCancellable?.cancel()
     }
 
-    // MARK: - NativeAlternativePaymentMethodInteractorType
+    // MARK: - NativeAlternativePaymentMethodInteractor
 
     override func start() {
         guard case .idle = state else {
@@ -159,8 +159,8 @@ final class NativeAlternativePaymentMethodInteractor:
 
     // MARK: - Private Properties
 
-    private let invoicesService: POInvoicesServiceType
-    private let imagesRepository: POImagesRepositoryType
+    private let invoicesService: POInvoicesService
+    private let imagesRepository: POImagesRepository
     private let configuration: NativeAlternativePaymentMethodInteractorConfiguration
     private let logger: POLogger
     private weak var delegate: PONativeAlternativePaymentMethodDelegate?
@@ -169,7 +169,7 @@ final class NativeAlternativePaymentMethodInteractor:
         PhoneNumberFormatter()
     }()
 
-    private var captureCancellable: POCancellableType?
+    private var captureCancellable: POCancellable?
 
     // MARK: - State Management
 

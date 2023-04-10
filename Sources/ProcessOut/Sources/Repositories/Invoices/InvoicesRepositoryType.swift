@@ -1,11 +1,11 @@
 //
-//  InvoicesRepositoryType.swift
+//  InvoicesRepository.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 17.10.2022.
 //
 
-protocol InvoicesRepositoryType: PORepositoryType {
+protocol InvoicesRepository: PORepository {
 
     /// Requests information needed to continue existing payment or start new one.
     func nativeAlternativePaymentMethodTransactionDetails(
@@ -31,7 +31,7 @@ protocol InvoicesRepositoryType: PORepositoryType {
     func captureNativeAlternativePayment(
         request: NativeAlternativePaymentCaptureRequest,
         completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, Failure>) -> Void
-    ) -> POCancellableType
+    ) -> POCancellable
 
     /// Creates invoice with given parameters.
     func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void)

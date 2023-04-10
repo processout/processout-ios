@@ -1,5 +1,5 @@
 //
-//  AlternativePaymentMethodsService.swift
+//  DefaultAlternativePaymentMethodsService.swift
 //  ProcessOut
 //
 //  Created by Simeon Kostadinov on 27/10/2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class AlternativePaymentMethodsService: POAlternativePaymentMethodsServiceType {
+final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethodsService {
 
     init(projectId: String, baseUrl: URL, logger: POLogger) {
         self.projectId = projectId
@@ -15,7 +15,7 @@ final class AlternativePaymentMethodsService: POAlternativePaymentMethodsService
         self.logger = logger
     }
 
-    // MARK: - POAlternativePaymentMethodsServiceType
+    // MARK: - POAlternativePaymentMethodsService
 
     func alternativePaymentMethodUrl(request: POAlternativePaymentMethodRequest) -> URL {
         guard var components = URLComponents(url: baseUrl, resolvingAgainstBaseURL: true) else {

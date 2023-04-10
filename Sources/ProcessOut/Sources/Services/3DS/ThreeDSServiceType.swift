@@ -1,13 +1,13 @@
 //
-//  ThreeDSServiceType.swift
+//  ThreeDSService.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
-protocol ThreeDSServiceType {
+protocol ThreeDSService {
 
-    typealias Delegate = PO3DSServiceType
+    typealias Delegate = PO3DSService
 
     /// Implementation should attempt to handle given customer action.
     /// - Parameters:

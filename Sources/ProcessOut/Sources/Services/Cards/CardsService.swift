@@ -1,5 +1,5 @@
 //
-//  CardsService.swift
+//  DefaultCardsService.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 17.03.2023.
@@ -7,17 +7,17 @@
 
 import Foundation
 
-final class CardsService: POCardsServiceType {
+final class DefaultCardsService: POCardsService {
 
     init(
-        repository: POCardsRepositoryType,
-        applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapperType
+        repository: POCardsRepository,
+        applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
     ) {
         self.repository = repository
         self.applePayCardTokenizationRequestMapper = applePayCardTokenizationRequestMapper
     }
 
-    // MARK: - POCardsServiceType
+    // MARK: - POCardsService
 
     func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
         repository.tokenize(request: request, completion: completion)
@@ -41,6 +41,6 @@ final class CardsService: POCardsServiceType {
 
     // MARK: - Private Properties
 
-    private let repository: POCardsRepositoryType
-    private let applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapperType
+    private let repository: POCardsRepository
+    private let applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
 }

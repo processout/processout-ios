@@ -1,5 +1,5 @@
 //
-//  InvoicesRepository.swift
+//  HttpInvoicesRepository.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 17.10.2022.
@@ -7,14 +7,14 @@
 
 import Foundation
 
-final class InvoicesRepository: InvoicesRepositoryType {
+final class HttpInvoicesRepository: InvoicesRepository {
 
-    init(connector: HttpConnectorType, failureMapper: HttpConnectorFailureMapperType) {
+    init(connector: HttpConnector, failureMapper: HttpConnectorFailureMapper) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
 
-    // MARK: - POInvoicesRepositoryType
+    // MARK: - POInvoicesRepository
 
     func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
@@ -64,7 +64,7 @@ final class InvoicesRepository: InvoicesRepositoryType {
     func captureNativeAlternativePayment(
         request: NativeAlternativePaymentCaptureRequest,
         completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, Failure>) -> Void
-    ) -> POCancellableType {
+    ) -> POCancellable {
         let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentMethodResponse>.post(
             path: "/invoices/\(request.invoiceId)/capture", body: request
         )
@@ -97,6 +97,6 @@ final class InvoicesRepository: InvoicesRepositoryType {
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnectorType
-    private let failureMapper: HttpConnectorFailureMapperType
+    private let connector: HttpConnector
+    private let failureMapper: HttpConnectorFailureMapper
 }

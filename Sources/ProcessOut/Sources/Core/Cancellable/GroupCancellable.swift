@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class GroupCancellable: POCancellableType {
+final class GroupCancellable: POCancellable {
 
     init() {
         isCancelled = false
@@ -15,7 +15,7 @@ final class GroupCancellable: POCancellableType {
         cancellables = []
     }
 
-    func add(_ cancellable: POCancellableType) {
+    func add(_ cancellable: POCancellable) {
         if isCancelled {
             cancellable.cancel()
         } else {
@@ -40,5 +40,5 @@ final class GroupCancellable: POCancellableType {
 
     private let lock: NSLock
     private var isCancelled: Bool
-    private var cancellables: [POCancellableType]
+    private var cancellables: [POCancellable]
 }

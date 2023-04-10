@@ -17,7 +17,7 @@ public final class POCheckout3DSServiceBuilder {
     }
 
     /// Creates service instance.
-    public func build() -> PO3DSServiceType {
+    public func build() -> PO3DSService {
         Checkout3DSService(errorMapper: AuthenticationErrorMapper(), delegate: delegate)
     }
 

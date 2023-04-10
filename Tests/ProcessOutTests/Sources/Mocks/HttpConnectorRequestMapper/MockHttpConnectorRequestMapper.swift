@@ -8,7 +8,7 @@
 import Foundation
 @testable import ProcessOut
 
-final class MockHttpConnectorRequestMapper: HttpConnectorRequestMapperType {
+final class MockHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     var urlRequestFromCallsCount = 0
     var urlRequestFromClosure: (() throws -> URLRequest)!

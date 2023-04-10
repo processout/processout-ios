@@ -1,14 +1,15 @@
 //
-//  POCardsServiceType.swift
+//  POCardsService.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 17.03.2023.
 //
 
-import Foundation
+@available(*, deprecated, renamed: "POCardsService")
+public typealias POCardsServiceType = POCardsService
 
 /// Provides set of methods to tokenize and manipulate cards.
-public protocol POCardsServiceType: POServiceType {
+public protocol POCardsService: POService {
 
     /// Tokenizes a card. You can use the card for a single payment by creating a card token with it. If you want
     /// to use the card for multiple payments then you can use the card token to create a reusable customer token.

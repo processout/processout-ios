@@ -1,5 +1,5 @@
 //
-//  NativeAlternativePaymentMethodViewModelType.swift
+//  NativeAlternativePaymentMethodViewModel.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 19.10.2022.
@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-protocol NativeAlternativePaymentMethodViewModelType: ViewModelType
+protocol NativeAlternativePaymentMethodViewModel: ViewModel
     where State == NativeAlternativePaymentMethodViewModelState {
 
     /// Submits parameter values.

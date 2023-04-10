@@ -1,11 +1,11 @@
 //
-//  InteractorType.swift
+//  Interactor.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 19.10.2022.
 //
 
-protocol InteractorType<State>: AnyObject {
+protocol Interactor<State>: AnyObject {
 
     associatedtype State
 

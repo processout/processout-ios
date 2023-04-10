@@ -1,5 +1,5 @@
 //
-//  ImagesRepository.swift
+//  UrlSessionImagesRepository.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 07.12.2022.
@@ -8,13 +8,13 @@
 import Foundation
 import UIKit
 
-final class ImagesRepository: POImagesRepositoryType {
+final class UrlSessionImagesRepository: POImagesRepository {
 
     init(session: URLSession) {
         self.session = session
     }
 
-    // MARK: - POImagesRepositoryType
+    // MARK: - POImagesRepository
 
     func image(url: URL, completion: @escaping (UIImage?) -> Void) {
         let request = URLRequest(url: url)

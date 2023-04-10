@@ -1,5 +1,5 @@
 //
-//  CustomerTokensRepository.swift
+//  HttpCustomerTokensRepository.swift
 //  ProcessOut
 //
 //  Created by Julien.Rodrigues on 27/10/2022.
@@ -7,14 +7,14 @@
 
 import Foundation
 
-final class CustomerTokensRepository: CustomerTokensRepositoryType {
+final class HttpCustomerTokensRepository: CustomerTokensRepository {
 
-    init(connector: HttpConnectorType, failureMapper: HttpConnectorFailureMapperType) {
+    init(connector: HttpConnector, failureMapper: HttpConnectorFailureMapper) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
 
-    // MARK: - CustomerTokensRepositoryType
+    // MARK: - CustomerTokensRepository
 
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
@@ -49,6 +49,6 @@ final class CustomerTokensRepository: CustomerTokensRepositoryType {
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnectorType
-    private let failureMapper: HttpConnectorFailureMapperType
+    private let connector: HttpConnector
+    private let failureMapper: HttpConnectorFailureMapper
 }

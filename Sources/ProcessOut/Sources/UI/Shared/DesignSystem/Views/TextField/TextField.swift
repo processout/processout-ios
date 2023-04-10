@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TextFieldContainerView: UIView, InputFormTextFieldType {
+final class TextFieldContainerView: UIView, InputFormTextField {
 
     init() {
         super.init(frame: .zero)
