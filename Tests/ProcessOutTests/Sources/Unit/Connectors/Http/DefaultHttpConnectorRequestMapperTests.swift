@@ -1,5 +1,5 @@
 //
-//  HttpConnectorRequestMapperTests.swift
+//  DefaultHttpConnectorRequestMapperTests.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 03.04.2023.
@@ -9,7 +9,7 @@ import Foundation
 import XCTest
 @testable import ProcessOut
 
-final class HttpConnectorRequestMapperTests: XCTestCase {
+final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
 
     // MARK: - URL
 

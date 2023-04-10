@@ -1,5 +1,5 @@
 //
-//  AlternativePaymentMethodsServiceTests.swift
+//  DefaultAlternativePaymentMethodsServiceTests.swift
 //  ProcessOut
 //
 //  Created by Simeon Kostadinov on 28/10/2022.
@@ -9,7 +9,7 @@ import Foundation
 import XCTest
 @testable import ProcessOut
 
-final class AlternativePaymentMethodsServiceTests: XCTestCase {
+final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()

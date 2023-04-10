@@ -1,5 +1,5 @@
 //
-//  CardsRepositoryTests.swift
+//  HttpCardsRepositoryTests.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 28.03.2023.
@@ -9,7 +9,7 @@ import Foundation
 import XCTest
 @testable import ProcessOut
 
-final class CardsRepositoryTestsTests: XCTestCase {
+final class HttpCardsRepositoryTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
