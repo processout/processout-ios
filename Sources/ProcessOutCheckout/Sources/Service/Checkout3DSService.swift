@@ -11,8 +11,8 @@ import Checkout3DS
 final class Checkout3DSService: PO3DSService {
 
     init(
-        errorMapper: AuthenticationErrorMapperType,
-        configurationMapper: ConfigurationMapperType,
+        errorMapper: AuthenticationErrorMapper,
+        configurationMapper: ConfigurationMapper,
         delegate: POCheckout3DSServiceDelegate
     ) {
         self.errorMapper = errorMapper
@@ -104,8 +104,8 @@ final class Checkout3DSService: PO3DSService {
 
     // MARK: - Private Properties
 
-    private let errorMapper: AuthenticationErrorMapperType
-    private let configurationMapper: ConfigurationMapperType
+    private let errorMapper: AuthenticationErrorMapper
+    private let configurationMapper: ConfigurationMapper
     private let queue: DispatchQueue
     private let delegate: POCheckout3DSServiceDelegate
 

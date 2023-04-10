@@ -8,24 +8,8 @@
 import ProcessOut
 import Checkout3DS
 
-final class AuthenticationErrorMapper: AuthenticationErrorMapperType {
+protocol AuthenticationErrorMapper {
 
-    func convert(error: AuthenticationError) -> POFailure {
-        let code: POFailure.Code
-        switch error {
-        case .challengeCancelled:
-            code = .cancelled
-        case .challengeTimeout, .connectionTimeout:
-            code = .timeout(.mobile)
-        case .noInternetConnectivity,
-             .connectionFailed,
-             .connectionLost,
-             .internationalRoamingOff,
-             .unknownNetworkError:
-            code = .networkUnreachable
-        default:
-            code = .generic(.mobile)
-        }
-        return POFailure(code: code, underlyingError: error)
-    }
+    /// Converts given authentication error to processout error.
+    func convert(error: Checkout3DS.AuthenticationError) -> POFailure
 }

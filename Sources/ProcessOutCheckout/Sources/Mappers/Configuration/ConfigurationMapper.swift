@@ -8,35 +8,8 @@
 import ProcessOut
 import Checkout3DS
 
-final class ConfigurationMapper: ConfigurationMapperType {
+protocol ConfigurationMapper {
 
-    func convert(configuration: PO3DS2Configuration) -> ThreeDS2ServiceConfiguration.ConfigParameters {
-        let directoryServerData = ThreeDS2ServiceConfiguration.DirectoryServerData(
-            directoryServerID: configuration.directoryServerId,
-            directoryServerPublicKey: configuration.directoryServerPublicKey,
-            directoryServerRootCertificates: configuration.directoryServerRootCertificates
-        )
-        let configParameters = ThreeDS2ServiceConfiguration.ConfigParameters(
-            directoryServerData: directoryServerData,
-            messageVersion: configuration.messageVersion,
-            scheme: configuration.scheme.map(self.convert) ?? ""
-        )
-        return configParameters
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let visa = "visa"
-        static let mastercard = "mastercard"
-    }
-
-    // MARK: - Private Methods
-
-    private func convert(scheme: PO3DS2ConfigurationCardScheme) -> String {
-        let schemes: [PO3DS2ConfigurationCardScheme: String] = [
-            .visa: Constants.visa, .mastercard: Constants.mastercard
-        ]
-        return schemes[scheme] ?? ""
-    }
+    /// Converts given processout configuration to Checkout config parameters.
+    func convert(configuration: PO3DS2Configuration) -> ThreeDS2ServiceConfiguration.ConfigParameters
 }
