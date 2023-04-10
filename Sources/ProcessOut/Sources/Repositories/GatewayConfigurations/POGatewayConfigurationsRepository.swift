@@ -7,6 +7,9 @@
 
 import Foundation
 
+@available(*, deprecated, renamed: "POGatewayConfigurationsRepository")
+public typealias POGatewayConfigurationsRepositoryType = POGatewayConfigurationsRepository
+
 public protocol POGatewayConfigurationsRepository: PORepository {
 
     /// Returns available gateway configurations.

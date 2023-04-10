@@ -7,6 +7,9 @@
 
 import UIKit
 
+@available(*, deprecated, renamed: "POActivityIndicatorView")
+public typealias POActivityIndicatorViewType = POActivityIndicatorView
+
 public protocol POActivityIndicatorView: UIView {
 
     /// Changes animation state.
