@@ -13,9 +13,9 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
 
     init(
         router: any RouterType<CardPaymentRoute>,
-        invoicesService: POInvoicesServiceType,
-        cardsService: POCardsServiceType,
-        threeDSService: PO3DSServiceType
+        invoicesService: POInvoicesService,
+        cardsService: POCardsService,
+        threeDSService: PO3DSService
     ) {
         self.router = router
         self.invoicesService = invoicesService
@@ -46,9 +46,9 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
     // MARK: - Private Properties
 
     private let router: any RouterType<CardPaymentRoute>
-    private let invoicesService: POInvoicesServiceType
-    private let cardsService: POCardsServiceType
-    private let threeDSService: PO3DSServiceType
+    private let invoicesService: POInvoicesService
+    private let cardsService: POCardsService
+    private let threeDSService: PO3DSService
 
     private let cardNumber = ReferenceTypeBox(value: "")
     private let expirationMonth = ReferenceTypeBox(value: "")

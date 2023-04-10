@@ -10,7 +10,7 @@ import UIKit
 final class NativeAlternativePaymentMethodViewController: UIViewController {
 
     init(
-        viewModel: any NativeAlternativePaymentMethodViewModelType,
+        viewModel: any NativeAlternativePaymentMethodViewModel,
         customStyle: PONativeAlternativePaymentMethodStyle?,
         logger: POLogger
     ) {
@@ -72,11 +72,11 @@ final class NativeAlternativePaymentMethodViewController: UIViewController {
 
     // MARK: - Private Properties
 
-    private let viewModel: any NativeAlternativePaymentMethodViewModelType
+    private let viewModel: any NativeAlternativePaymentMethodViewModel
     private let customStyle: PONativeAlternativePaymentMethodStyle?
     private let logger: POLogger
 
-    private lazy var activityIndicatorView: POActivityIndicatorViewType = {
+    private lazy var activityIndicatorView: POActivityIndicatorView = {
         let style: POActivityIndicatorStyle
         if #available(iOS 13.0, *) {
             style = customStyle?.activityIndicator ?? .system(.large)

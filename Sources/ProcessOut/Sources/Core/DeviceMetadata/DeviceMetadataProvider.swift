@@ -2,34 +2,11 @@
 //  DeviceMetadataProvider.swift
 //  ProcessOut
 //
-//  Created by Simeon Kostadinov on 31/10/2022.
+//  Created by Simeon Kostadinov on 01/11/2022.
 //
 
-import UIKit
+protocol DeviceMetadataProvider {
 
-final class DeviceMetadataProvider: DeviceMetadataProviderType {
-
-    init(screen: UIScreen, bundle: Bundle) {
-        self.screen = screen
-        self.bundle = bundle
-        timeZone = .autoupdatingCurrent
-    }
-
-    // MARK: - DeviceMetadataProviderType
-
-    var deviceMetadata: DeviceMetadata {
-        DeviceMetadata(
-            appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
-            appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
-            appScreenHeight: Int(screen.nativeBounds.height),
-            appTimeZoneOffset: timeZone.secondsFromGMT() / 60,
-            channel: "ios"
-        )
-    }
-
-    // MARK: - Private Properties
-
-    private let screen: UIScreen
-    private let bundle: Bundle
-    private let timeZone: TimeZone
+    /// Returns device metadata.
+    var deviceMetadata: DeviceMetadata { get }
 }

@@ -7,28 +7,29 @@
 
 import Foundation
 
+// todo(andrii-vysotskyi): remove suffix before releasing version 4.0.0
 public protocol ProcessOutApiType {
 
     /// Current configuration.
     var configuration: ProcessOutApiConfiguration { get }
 
     /// Returns gateway configurations repository.
-    var gatewayConfigurations: POGatewayConfigurationsRepositoryType { get }
+    var gatewayConfigurations: POGatewayConfigurationsRepository { get }
 
     /// Returns invoices service.
-    var invoices: POInvoicesServiceType { get }
+    var invoices: POInvoicesService { get }
 
     /// Images repository.
-    var images: POImagesRepositoryType { get }
+    var images: POImagesRepository { get }
 
     /// Returns alternative payment methods service.
-    var alternativePaymentMethods: POAlternativePaymentMethodsServiceType { get }
+    var alternativePaymentMethods: POAlternativePaymentMethodsService { get }
 
     /// Returns cards repository.
-    var cards: POCardsServiceType { get }
+    var cards: POCardsService { get }
 
     /// Returns customer tokens service.
-    var customerTokens: POCustomerTokensServiceType { get }
+    var customerTokens: POCustomerTokensService { get }
 
     /// Logger with application category.
     var logger: POLogger { get }

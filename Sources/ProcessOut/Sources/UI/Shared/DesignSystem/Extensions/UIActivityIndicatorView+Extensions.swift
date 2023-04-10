@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension UIActivityIndicatorView: POActivityIndicatorViewType {
+extension UIActivityIndicatorView: POActivityIndicatorView {
 
     public func setAnimating(_ isAnimating: Bool) {
         if isAnimating {

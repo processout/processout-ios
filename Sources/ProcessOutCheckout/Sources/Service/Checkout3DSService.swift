@@ -8,7 +8,7 @@
 import ProcessOut
 import Checkout3DS
 
-final class Checkout3DSService: PO3DSServiceType {
+final class Checkout3DSService: PO3DSService {
 
     init(
         errorMapper: AuthenticationErrorMapperType,
@@ -26,7 +26,7 @@ final class Checkout3DSService: PO3DSServiceType {
         clean()
     }
 
-    // MARK: - PO3DSServiceType
+    // MARK: - PO3DSService
 
     func authenticationRequest(
         configuration: PO3DS2Configuration,

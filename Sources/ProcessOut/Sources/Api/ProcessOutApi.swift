@@ -38,41 +38,41 @@ private final class SharedProcessOutApi: ProcessOutApiType {
 
     let configuration: ProcessOutApiConfiguration
 
-    private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepositoryType = {
-        GatewayConfigurationsRepository(connector: httpConnector, failureMapper: failureMapper)
+    private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepository = {
+        HttpGatewayConfigurationsRepository(connector: httpConnector, failureMapper: failureMapper)
     }()
 
-    private(set) lazy var invoices: POInvoicesServiceType = {
-        let repository = InvoicesRepository(connector: httpConnector, failureMapper: failureMapper)
-        return InvoicesService(repository: repository, threeDSService: threeDSService)
+    private(set) lazy var invoices: POInvoicesService = {
+        let repository = HttpInvoicesRepository(connector: httpConnector, failureMapper: failureMapper)
+        return DefaultInvoicesService(repository: repository, threeDSService: threeDSService)
     }()
 
-    private(set) lazy var images: POImagesRepositoryType = {
-        ImagesRepository(session: .shared)
+    private(set) lazy var images: POImagesRepository = {
+        UrlSessionImagesRepository(session: .shared)
     }()
 
-    private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsServiceType = {
-        AlternativePaymentMethodsService(
+    private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
+        DefaultAlternativePaymentMethodsService(
             projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl, logger: serviceLogger
         )
     }()
 
     private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
 
-    private(set) lazy var cards: POCardsServiceType = {
-        let requestMapper = ApplePayCardTokenizationRequestMapper(
+    private(set) lazy var cards: POCardsService = {
+        let requestMapper = DefaultApplePayCardTokenizationRequestMapper(
             decoder: JSONDecoder(), logger: repositoryLogger
         )
-        let service = CardsService(
-            repository: CardsRepository(connector: httpConnector, failureMapper: failureMapper),
+        let service = DefaultCardsService(
+            repository: HttpCardsRepository(connector: httpConnector, failureMapper: failureMapper),
             applePayCardTokenizationRequestMapper: requestMapper
         )
         return service
     }()
 
-    private(set) lazy var customerTokens: POCustomerTokensServiceType = {
-        let repository = CustomerTokensRepository(connector: httpConnector, failureMapper: failureMapper)
-        return CustomerTokensService(repository: repository, threeDSService: threeDSService)
+    private(set) lazy var customerTokens: POCustomerTokensService = {
+        let repository = HttpCustomerTokensRepository(connector: httpConnector, failureMapper: failureMapper)
+        return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService)
     }()
 
     // MARK: - Private Nested Types
@@ -90,7 +90,7 @@ private final class SharedProcessOutApi: ProcessOutApiType {
     private lazy var serviceLogger = createLogger(for: Constants.serviceLoggerCategory)
     private lazy var repositoryLogger = createLogger(for: Constants.repositoryLoggerCategory)
 
-    private lazy var httpConnector: HttpConnectorType = {
+    private lazy var httpConnector: HttpConnector = {
         let connectorConfiguration = HttpConnectorRequestMapperConfiguration(
             baseUrl: configuration.apiBaseUrl,
             projectId: configuration.projectId,
@@ -104,15 +104,15 @@ private final class SharedProcessOutApi: ProcessOutApiType {
         return connector
     }()
 
-    private lazy var failureMapper = HttpConnectorFailureMapper(logger: repositoryLogger)
+    private lazy var failureMapper = DefaultHttpConnectorFailureMapper(logger: repositoryLogger)
 
-    private lazy var threeDSService: ThreeDSServiceType = {
+    private lazy var threeDSService: ThreeDSService = {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .useDefaultKeys
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        return ThreeDSService(decoder: decoder, encoder: encoder, logger: serviceLogger)
+        return DefaultThreeDSService(decoder: decoder, encoder: encoder, logger: serviceLogger)
     }()
 
     // MARK: - Private Methods

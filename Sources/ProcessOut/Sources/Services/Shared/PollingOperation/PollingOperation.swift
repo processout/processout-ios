@@ -7,14 +7,14 @@
 
 import Foundation
 
-final class PollingOperation<Value>: POCancellableType {
+final class PollingOperation<Value>: POCancellable {
 
     typealias Completion = (Result<Value, POFailure>) -> Void
 
     init(
         timeout: TimeInterval,
         executeDelay: TimeInterval,
-        execute: @escaping (_ completion: @escaping Completion) -> POCancellableType,
+        execute: @escaping (_ completion: @escaping Completion) -> POCancellable,
         shouldContinue: @escaping (Result<Value, POFailure>) -> Bool,
         completion: @escaping Completion
     ) {
@@ -49,7 +49,7 @@ final class PollingOperation<Value>: POCancellableType {
 
     private let timeout: TimeInterval
     private let executeDelay: TimeInterval
-    private let execute: (_ completion: @escaping Completion) -> POCancellableType
+    private let execute: (_ completion: @escaping Completion) -> POCancellable
     private let shouldContinue: (Result<Value, POFailure>) -> Bool
     private let completion: Completion
     private var state: PollingOperationState
