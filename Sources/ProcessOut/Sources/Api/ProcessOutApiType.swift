@@ -7,6 +7,7 @@
 
 import Foundation
 
+// todo(andrii-vysotskyi): remove suffix before releasing version 4.0.0
 public protocol ProcessOutApiType {
 
     /// Current configuration.
