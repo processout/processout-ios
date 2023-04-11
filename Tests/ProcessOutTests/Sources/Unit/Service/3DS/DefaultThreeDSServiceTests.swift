@@ -18,15 +18,14 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         sut = DefaultThreeDSService(
             decoder: JSONDecoder(), encoder: encoder, jsonWritingOptions: [.sortedKeys], logger: POLogger()
         )
+        delegate = Mock3DSService()
     }
 
     // MARK: - Fingerprint Mobile
 
     func test_handle_whenFingerprintMobileValueIsNotBase64EncodedConfiguration_complatesWithFailure() {
         // Given
-        let delegate = Mock3DSService()
         let values = ["%", "{}", "e10="]
-
         let expectation = XCTestExpectation()
         expectation.expectedFulfillmentCount = values.count
 
@@ -60,7 +59,6 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             directoryServerTransactionId: "3",
             messageVersion: "4"
         )
-        let delegate = Mock3DSService()
         let expectation = XCTestExpectation()
         expectation.expectedFulfillmentCount = customerActions.count
 
@@ -79,7 +77,6 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
     func test_handle_whenDelegateAuthenticationRequestFails_propagatesFailure() {
         // Given
-        let delegate = Mock3DSService()
         let error = POFailure(code: .unknown(rawValue: "test-error"))
         delegate.authenticationRequestFromClosure = { _, completion in
             completion(.failure(error))
@@ -103,7 +100,6 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
     func test_handle_whenAuthenticationRequestPublicKeyIsEmpty_fails() {
         // Given
-        let delegate = Mock3DSService()
         let expectation = XCTestExpectation()
         expectation.expectedFulfillmentCount = 2
         delegate.authenticationRequestFromClosure = { _, completion in
@@ -132,7 +128,6 @@ final class DefaultThreeDSServiceTests: XCTestCase {
     func test_handle_whenAuthenticationRequestIsValid_succeeds() {
         // Given
         let customerAction = defaultFingerprintMobileCustomerAction()
-        let delegate = Mock3DSService()
         delegate.authenticationRequestFromClosure = { _, completion in
             let authenticationRequest = PO3DS2AuthenticationRequest(
                 deviceData: "1",
@@ -164,7 +159,6 @@ final class DefaultThreeDSServiceTests: XCTestCase {
     func test_handle_whenDelegateCompletesOnBackground_completesOnMainThread() {
         // Given
         let customerAction = defaultFingerprintMobileCustomerAction()
-        let delegate = Mock3DSService()
         delegate.authenticationRequestFromClosure = { _, completion in
             let failure = POFailure(code: .cancelled)
             DispatchQueue.global().async {
@@ -182,8 +176,114 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    // MARK: - Challenge Mobile
+
+    func test_handle_whenChallengeMobileValueIsNotValid_complatesWithFailure() {
+        // Given
+        let expectation = XCTestExpectation()
+        let customerAction = ThreeDSCustomerAction(type: .fingerprintMobile, value: "")
+
+        // When
+        sut.handle(action: customerAction, delegate: delegate) { result in
+            // Then
+            switch result {
+            case let .failure(failure):
+                XCTAssertEqual(failure.code, .internal(.mobile))
+            default:
+                XCTFail("Unexpected result")
+            }
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func test_handle_whenChallengeMobileValueIsValid_callsDelegateDoChallenge() {
+        // Given
+        let expectedChallenge = PO3DS2Challenge(
+            acsTransactionId: "1",
+            acsReferenceNumber: "2",
+            acsSignedContent: "3",
+            threeDSServerTransactionId: "4"
+        )
+        let expectation = XCTestExpectation()
+        delegate.handleChallengeFromClosure = { challenge, _ in
+            // Then
+            XCTAssertEqual(challenge, expectedChallenge)
+            expectation.fulfill()
+        }
+
+        // When
+        sut.handle(action: defaultChallengeMobileCustomerAction, delegate: delegate) { _ in }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func test_handle_whenDelegateDoChallengeFails_propagatesFailure() {
+        // Given
+        let error = POFailure(code: .unknown(rawValue: "test-error"))
+        delegate.handleChallengeFromClosure = { _, completion in
+            completion(.failure(error))
+        }
+        let expectation = XCTestExpectation()
+
+        // When
+        sut.handle(action: defaultChallengeMobileCustomerAction, delegate: delegate) { result in
+            // Then
+            switch result {
+            case .failure(let failure):
+                XCTAssertEqual(failure.code, error.code)
+            default:
+                XCTFail("Unexpected result")
+            }
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func test_handle_whenChallengeResultIsTrue_succeeds() {
+        // Given
+        delegate.handleChallengeFromClosure = { _, completion in
+            completion(.success(true))
+        }
+        let expectation = XCTestExpectation()
+
+        // When
+        sut.handle(action: defaultChallengeMobileCustomerAction, delegate: delegate) { result in
+            // Then
+            switch result {
+            case .success(let token):
+                XCTAssertEqual(token, "gway_req_eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiWVwiIH0ifQ==")
+            default:
+                XCTFail("Unexpected result")
+            }
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func test_handle_whenChallengeResultIsFalse_succeeds() {
+        // Given
+        delegate.handleChallengeFromClosure = { _, completion in
+            completion(.success(false))
+        }
+        let expectation = XCTestExpectation()
+
+        // When
+        sut.handle(action: defaultChallengeMobileCustomerAction, delegate: delegate) { result in
+            // Then
+            switch result {
+            case .success(let token):
+                XCTAssertEqual(token, "gway_req_eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiTlwiIH0ifQ==")
+            default:
+                XCTFail("Unexpected result")
+            }
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
     // MARK: - Private Properties
 
+    private var delegate: Mock3DSService!
     private var sut: DefaultThreeDSService!
 
     // MARK: - Private Methods
@@ -195,5 +295,11 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             value += "="
         }
         return ThreeDSCustomerAction(type: .fingerprintMobile, value: value)
+    }
+
+    private var defaultChallengeMobileCustomerAction: ThreeDSCustomerAction {
+        // swiftlint:disable:next line_length
+        let value = "eyJhY3NUcmFuc0lEIjoiMSIsImFjc1JlZmVyZW5jZU51bWJlciI6IjIiLCJhY3NTaWduZWRDb250ZW50IjoiMyIsInRocmVlRFNTZXJ2ZXJUcmFuc0lEIjoiNCJ9"
+        return ThreeDSCustomerAction(type: .challengeMobile, value: value)
     }
 }
