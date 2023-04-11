@@ -15,7 +15,4 @@ jobs:
         with:
           example-constants: ${{ secrets.EXAMPLE_PROJECT_CONSTANTS }}
       - name: Run Unit Tests
-        run: bundle exec fastlane tests
-      # See issue POM-144
-      # - name: Run Example Tests
-      #   run: bundle exec fastlane example_tests
+        run: source Scripts/Test.sh

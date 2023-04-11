@@ -38,7 +38,8 @@ targets:
   ProcessOutTests:
     type: bundle.unit-test
     platform: iOS
-    depencencies:
+    deploymentTarget: "16.0"
+    dependencies:
       - target: ProcessOut
     sources: Tests/ProcessOutTests
   ProcessOutCheckout:

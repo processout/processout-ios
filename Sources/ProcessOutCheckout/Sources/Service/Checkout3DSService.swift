@@ -8,8 +8,6 @@
 import ProcessOut
 import Checkout3DS
 
-// swiftlint:disable todo
-
 final class Checkout3DSService: PO3DSService {
 
     init(errorMapper: AuthenticationErrorMapperType, delegate: POCheckout3DSServiceDelegate) {

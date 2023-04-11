@@ -463,3 +463,5 @@ private extension NativeAlternativePaymentMethodInteractorState.Started {
         return updatedState
     }
 }
+
+// swiftlint:enable file_length type_body_length
