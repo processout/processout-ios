@@ -79,26 +79,20 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
     func test_handle_whenDelegateAuthenticationRequestFails_propagatesFailure() {
         // Given
-        let customerAction = defaultFingerprintMobileCustomerAction()
-
         let delegate = Mock3DSService()
-
-        let unknownFailure = POFailure(code: .unknown(rawValue: "unknown-error"))
-
-        let expectation = XCTestExpectation()
-        expectation.expectedFulfillmentCount = 2
-
+        let error = POFailure(code: .unknown(rawValue: "test-error"))
         delegate.authenticationRequestFromClosure = { _, completion in
-            expectation.fulfill()
-            completion(.failure(unknownFailure))
+            completion(.failure(error))
         }
+        let customerAction = defaultFingerprintMobileCustomerAction()
+        let expectation = XCTestExpectation()
 
         // When
         sut.handle(action: customerAction, delegate: delegate) { result in
             // Then
             switch result {
             case .failure(let failure):
-                XCTAssertEqual(failure.code, unknownFailure.code)
+                XCTAssertEqual(failure.code, error.code)
             default:
                 XCTFail("Unexpected result")
             }
@@ -107,15 +101,11 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    func test_handle_whenAuthenticationRequestPublicKeyIsInvalid_fails() {
+    func test_handle_whenAuthenticationRequestPublicKeyIsEmpty_fails() {
         // Given
-        let customerAction = defaultFingerprintMobileCustomerAction()
-
         let delegate = Mock3DSService()
-
         let expectation = XCTestExpectation()
         expectation.expectedFulfillmentCount = 2
-
         delegate.authenticationRequestFromClosure = { _, completion in
             let invalidAuthenticationRequest = PO3DS2AuthenticationRequest(
                 deviceData: "", sdkAppId: "", sdkEphemeralPublicKey: "", sdkReferenceNumber: "", sdkTransactionId: ""
@@ -123,6 +113,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             expectation.fulfill()
             completion(.success(invalidAuthenticationRequest))
         }
+        let customerAction = defaultFingerprintMobileCustomerAction()
 
         // When
         sut.handle(action: customerAction, delegate: delegate) { result in

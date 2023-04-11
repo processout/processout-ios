@@ -39,3 +39,5 @@ final class Mock3DSService: PO3DSService {
         handleRedirectFromClosure(redirect, completion)
     }
 }
+
+// swiftlint:enable line_length
