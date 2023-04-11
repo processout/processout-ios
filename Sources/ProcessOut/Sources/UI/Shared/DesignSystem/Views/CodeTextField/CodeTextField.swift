@@ -501,3 +501,5 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextField {
         }
     }
 }
+
+// swiftlint:enable file_length type_body_length unused_setter_value

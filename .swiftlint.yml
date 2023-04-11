@@ -4,6 +4,7 @@ included:
 
 excluded:
   - Sources/ProcessOut/Sources/Legacy
+  - Sources/ProcessOut/Sources/Generated
 
 function_parameter_count:
   warning: 5
@@ -21,7 +22,6 @@ type_name:
 opt_in_rules:
   - anonymous_argument_in_multiline_closure
   - anyobject_protocol
-  - attributes
   - closure_end_indentation
   - closure_spacing
   - collection_alignment
@@ -83,5 +83,8 @@ opt_in_rules:
   - vertical_parameter_alignment_on_call
   - vertical_whitespace_closing_braces
   - yoda_condition
+
+disabled_rules:
+  - todo
 
 reporter: "xcode"
