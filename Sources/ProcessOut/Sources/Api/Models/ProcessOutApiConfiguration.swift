@@ -23,7 +23,8 @@ public struct ProcessOutApiConfiguration {
     /// Project's private key.
     /// - Warning: this is only intended to be used for testing purposes storing your private key
     /// inside application is extremely dangerous and is highly discouraged.
-    @_spi(PO) public let privateKey: String?
+    @_spi(PO)
+    public let privateKey: String?
 
     /// Api base URL.
     let apiBaseUrl: URL

@@ -45,6 +45,8 @@ public struct POImmutableStringCodableDecimal: Codable {
     }
 }
 
+// swiftlint:enable legacy_objc_type
+
 extension KeyedEncodingContainer {
 
     mutating func encode(

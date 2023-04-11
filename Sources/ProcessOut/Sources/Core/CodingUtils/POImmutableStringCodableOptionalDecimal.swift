@@ -45,9 +45,11 @@ public struct POImmutableStringCodableOptionalDecimal: Codable {
     private static let locale = NSLocale(localeIdentifier: "en_US")
 
     private var description: String? {
-        wrappedValue.map(NSDecimalNumber.init)?.description(withLocale: Self.locale)
+        wrappedValue.map { NSDecimalNumber(decimal: $0) }?.description(withLocale: Self.locale)
     }
 }
+
+// swiftlint:enable legacy_objc_type
 
 extension KeyedEncodingContainer {
 
