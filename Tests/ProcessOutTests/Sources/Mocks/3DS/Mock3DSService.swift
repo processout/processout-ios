@@ -13,11 +13,11 @@ import Foundation
 final class Mock3DSService: PO3DSService {
 
     var authenticationRequestCallsCount = 0
-    var authenticationRequestFromClosure: ((PO3DS2Configuration, (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void) -> Void)!
+    var authenticationRequestFromClosure: ((PO3DS2Configuration, @escaping (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void) -> Void)!
     var handleChallengeCallsCount = 0
-    var handleChallengeFromClosure: ((PO3DS2Challenge, (Result<Bool, POFailure>) -> Void) -> Void)!
+    var handleChallengeFromClosure: ((PO3DS2Challenge, @escaping (Result<Bool, POFailure>) -> Void) -> Void)!
     var handleRedirectCallsCount = 0
-    var handleRedirectFromClosure: ((PO3DSRedirect, (Result<String, POFailure>) -> Void) -> Void)!
+    var handleRedirectFromClosure: ((PO3DSRedirect, @escaping (Result<String, POFailure>) -> Void) -> Void)!
 
     // MARK: - PO3DSService
 
