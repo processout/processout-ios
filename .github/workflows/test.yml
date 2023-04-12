@@ -6,6 +6,9 @@ on:
     branches:
       - 'master'
   workflow_call:
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
 jobs:
   run-tests:
     runs-on: macos-12
