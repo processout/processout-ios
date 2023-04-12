@@ -82,13 +82,6 @@ final class TextFieldContainerView: UIView, InputFormTextField {
             return
         }
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
-            textField.attributedPlaceholder = AttributedStringBuilder()
-                .typography(style.placeholder.typography)
-                .textStyle(textStyle: .body)
-                .maximumFontSize(Constants.maximumFontSize)
-                .textColor(style.placeholder.color)
-                .string(textField.placeholder ?? "")
-                .build()
             let excludedTextAttributes: Set<NSAttributedString.Key> = [.paragraphStyle, .baselineOffset]
             let textAttributes = AttributedStringBuilder()
                 .typography(style.text.typography)
@@ -98,6 +91,14 @@ final class TextFieldContainerView: UIView, InputFormTextField {
                 .buildAttributes()
                 .filter { !excludedTextAttributes.contains($0.key) }
             textField.defaultTextAttributes = textAttributes
+            // `defaultTextAttributes` overwrites placeholder attributes so `attributedPlaceholder` must be set after.
+            textField.attributedPlaceholder = AttributedStringBuilder()
+                .typography(style.placeholder.typography)
+                .textStyle(textStyle: .body)
+                .maximumFontSize(Constants.maximumFontSize)
+                .textColor(style.placeholder.color)
+                .string(textField.placeholder ?? "")
+                .build()
             apply(style: style.border)
             apply(style: style.shadow)
             tintColor = style.tintColor
