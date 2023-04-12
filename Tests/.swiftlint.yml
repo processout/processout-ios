@@ -2,3 +2,5 @@ disabled_rules:
   - implicitly_unwrapped_optional
   - force_unwrapping
   - function_body_length
+  - type_body_length
+  - file_length
