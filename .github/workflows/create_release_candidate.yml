@@ -21,6 +21,7 @@ jobs:
           source Scripts/UpdateVersion.sh --${{ inputs.release_type }}
           echo "UPDATED_VERSION=$(cat Version.resolved)" >> $GITHUB_ENV
       - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v5
         with:
           add-paths: |
@@ -33,6 +34,6 @@ jobs:
           title: 'feat(release): ${{ env.UPDATED_VERSION }}'
           assignees: ${{ github.actor }}
   run-tests:
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/test.yml@${{ steps.cpr.outputs.pull-request-head-sha }}
     secrets: inherit
     needs: update-version
