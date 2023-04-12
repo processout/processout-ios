@@ -14,8 +14,6 @@ on:
 jobs:
   update-version:
     runs-on: macos-12
-    outputs:
-      pull-request-head-sha: ${{ steps.cpr.outputs.pull-request-head-sha }}
     steps:
       - uses: actions/checkout@v3
       - name: Update Version
@@ -23,7 +21,6 @@ jobs:
           source Scripts/UpdateVersion.sh --${{ inputs.release_type }}
           echo "UPDATED_VERSION=$(cat Version.resolved)" >> $GITHUB_ENV
       - name: Create Pull Request
-        id: cpr
         uses: peter-evans/create-pull-request@v5
         with:
           add-paths: |
@@ -35,9 +32,3 @@ jobs:
           delete-branch: true
           title: 'feat(release): ${{ env.UPDATED_VERSION }}'
           assignees: ${{ github.actor }}
-  run-tests:
-    uses: ./.github/workflows/test.yml
-    secrets: inherit
-    with:
-      reference: ${{ needs.update-version.outputs.pull-request-head-sha }}
-    needs: update-version

@@ -5,18 +5,12 @@ on:
   push:
     branches:
       - 'master'
-  workflow_call:
-    inputs:
-      reference:
-        required: false
-        type: string
+  workflow_dispatch:
 jobs:
   run-tests:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ inputs.reference }}
       - name: Bootstrap Project
         uses: ./.github/actions/bootstrap-project
         with:
