@@ -50,8 +50,8 @@ final class DefaultThreeDSService: ThreeDSService {
     private enum Constants {
         static let deviceChannel = "app"
         static let tokenPrefix = "gway_req_"
-        static let challengeSuccessResponseBody = #"{ "transStatus": "Y" }"#
-        static let challengeFailureResponseBody = #"{ "transStatus": "N" }"#
+        static let challengeSuccessEncodedResponse = "eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiWVwiIH0ifQ=="
+        static let challengeFailureEncodedResponse = "eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiTlwiIH0ifQ=="
         static let fingerprintTimeoutResponseBody = #"{ "threeDS2FingerprintTimeout": true }"#
         static let webFingerprintTimeout: TimeInterval = 10
     }
@@ -99,13 +99,10 @@ final class DefaultThreeDSService: ThreeDSService {
             delegate.handle(challenge: challenge) { result in
                 switch result {
                 case let .success(success):
-                    let response = {
-                        let body = success
-                            ? Constants.challengeSuccessResponseBody
-                            : Constants.challengeFailureResponseBody
-                        return ChallengeResponse(url: nil, body: body)
-                    }
-                    self.complete(with: response, completion: completion)
+                    let encodedResponse = success
+                        ? Constants.challengeSuccessEncodedResponse
+                        : Constants.challengeFailureEncodedResponse
+                    completion(.success(Constants.tokenPrefix + encodedResponse))
                 case let .failure(failure):
                     completion(.failure(failure))
                 }
