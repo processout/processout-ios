@@ -181,7 +181,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
     func test_handle_whenChallengeMobileValueIsNotValid_fails() {
         // Given
         let expectation = XCTestExpectation()
-        let customerAction = ThreeDSCustomerAction(type: .fingerprintMobile, value: "")
+        let customerAction = ThreeDSCustomerAction(type: .challengeMobile, value: "")
 
         // When
         sut.handle(action: customerAction, delegate: delegate) { result in
@@ -302,21 +302,26 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    func test_handle_whenRedirectValueIsNotValidUrl_fails() {
+    func test_handle_whenRedirectOrFingerprintValueIsNotValidUrl_fails() {
         // Given
         let expectation = XCTestExpectation()
-        let action = ThreeDSCustomerAction(type: .redirect, value: " ")
+        let actionTypes: [ThreeDSCustomerAction.ActionType] = [.redirect, .url, .fingerprint]
+        expectation.expectedFulfillmentCount = actionTypes.count
 
-        // When
-        sut.handle(action: action, delegate: delegate) { result in
-            // Then
-            switch result {
-            case let .failure(failure):
-                XCTAssertEqual(failure.code, .internal(.mobile))
-            default:
-                XCTFail("Unexpected result")
+        for actionType in actionTypes {
+            let action = ThreeDSCustomerAction(type: actionType, value: " ")
+
+            // When
+            sut.handle(action: action, delegate: delegate) { result in
+                // Then
+                switch result {
+                case let .failure(failure):
+                    XCTAssertEqual(failure.code, .internal(.mobile))
+                default:
+                    XCTFail("Unexpected result")
+                }
+                expectation.fulfill()
             }
-            expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1)
     }
