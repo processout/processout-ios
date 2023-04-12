@@ -339,7 +339,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    func test_handle_whenDelegateRedirectCompletesWithNewToken_propagatesToken() {
+    func test_handle_whenRedirectCompletesWithNewToken_propagatesToken() {
         // Given
         delegate.handleRedirectFromClosure = { _, completion in
             completion(.success("test"))
@@ -353,6 +353,118 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             switch result {
             case .success(let value):
                 XCTAssertEqual(value, "test")
+            default:
+                XCTFail("Unexpected result")
+            }
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func test_handle_whenRedirectFails_propagatesError() {
+        // Given
+        delegate.handleRedirectFromClosure = { _, completion in
+            let failure = POFailure(code: .unknown(rawValue: "test-error"))
+            completion(.failure(failure))
+        }
+        let expectation = XCTestExpectation()
+        let customerAction = ThreeDSCustomerAction(type: .redirect, value: "example.com")
+
+        // When
+        sut.handle(action: customerAction, delegate: delegate) { result in
+            // Then
+            switch result {
+            case .failure(let failure):
+                XCTAssertEqual(failure.code, .unknown(rawValue: "test-error"))
+            default:
+                XCTFail("Unexpected result")
+            }
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    // MARK: - Fingerprint
+
+    func test_handle_whenFingerprintValueIsValidUrl_callsDelegateRedirect() {
+        // Given
+        let expectedRedirect = PO3DSRedirect(
+            url: URL(string: "example.com")!, isHeadlessModeAllowed: true, timeout: 10
+        )
+        let expectation = XCTestExpectation()
+        delegate.handleRedirectFromClosure = { redirect, _ in
+            // Then
+            XCTAssertEqual(redirect, expectedRedirect)
+            expectation.fulfill()
+        }
+        let customerAction = ThreeDSCustomerAction(type: .fingerprint, value: "example.com")
+
+        // When
+        sut.handle(action: customerAction, delegate: delegate) { _ in }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func test_handle_whenFingerprintCompletesWithNewToken_propagatesToken() {
+        // Given
+        delegate.handleRedirectFromClosure = { _, completion in
+            completion(.success("test"))
+        }
+        let expectation = XCTestExpectation()
+        let customerAction = ThreeDSCustomerAction(type: .fingerprint, value: "example.com")
+
+        // When
+        sut.handle(action: customerAction, delegate: delegate) { result in
+            // Then
+            switch result {
+            case .success(let value):
+                XCTAssertEqual(value, "test")
+            default:
+                XCTFail("Unexpected result")
+            }
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func test_handle_whenFingerprintFails_propagatesError() {
+        // Given
+        delegate.handleRedirectFromClosure = { _, completion in
+            let failure = POFailure(code: .unknown(rawValue: "test-error"))
+            completion(.failure(failure))
+        }
+        let expectation = XCTestExpectation()
+        let customerAction = ThreeDSCustomerAction(type: .fingerprint, value: "example.com")
+
+        // When
+        sut.handle(action: customerAction, delegate: delegate) { result in
+            // Then
+            switch result {
+            case .failure(let failure):
+                XCTAssertEqual(failure.code, .unknown(rawValue: "test-error"))
+            default:
+                XCTFail("Unexpected result")
+            }
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func test_handle_whenFingerprintFailsWithTimeoutError_succeeds() {
+        // Given
+        delegate.handleRedirectFromClosure = { _, completion in
+            let failure = POFailure(code: .timeout(.mobile))
+            completion(.failure(failure))
+        }
+        let expectation = XCTestExpectation()
+        let customerAction = ThreeDSCustomerAction(type: .fingerprint, value: "example.com")
+
+        // When
+        sut.handle(action: customerAction, delegate: delegate) { result in
+            // Then
+            switch result {
+            case .success(let value):
+                // swiftlint:disable:next line_length
+                XCTAssertEqual(value, "gway_req_eyJib2R5IjoieyBcInRocmVlRFMyRmluZ2VycHJpbnRUaW1lb3V0XCI6IHRydWUgfSIsInVybCI6ImV4YW1wbGUuY29tIn0=")
             default:
                 XCTFail("Unexpected result")
             }
