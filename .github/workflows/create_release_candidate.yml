@@ -21,9 +21,8 @@ jobs:
           source Scripts/UpdateVersion.sh --${{ inputs.release_type }}
           echo "UPDATED_VERSION=$(cat Version.resolved)" >> $GITHUB_ENV
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ secrets.PO_GITHUB_TOKEN }}
           add-paths: |
             ProcessOut.podspec
             Version.resolved
@@ -33,3 +32,7 @@ jobs:
           delete-branch: true
           title: 'feat(release): ${{ env.UPDATED_VERSION }}'
           assignees: ${{ github.actor }}
+  run-tests:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+    needs: update-version
