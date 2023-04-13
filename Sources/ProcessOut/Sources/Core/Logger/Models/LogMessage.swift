@@ -1,25 +1,24 @@
 //
-//  POLogMessage.swift
+//  LogMessage.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 25.10.2022.
 //
 
-@_spi(PO)
-public struct POLogMessage: ExpressibleByStringInterpolation {
+struct LogMessage: ExpressibleByStringInterpolation {
 
-    public let interpolation: POLogInterpolation
+    let interpolation: LogInterpolation
 
     /// Creates an instance from a string interpolation.
-    public init(stringInterpolation: POLogInterpolation) {
+    init(stringInterpolation: LogInterpolation) {
         self.interpolation = stringInterpolation
     }
 
     /// Creates an instance initialized to the given string value.
     ///
     /// - Parameter value: The value of the new instance.
-    public init(stringLiteral value: String) {
-        var interpolation = POLogInterpolation(literalCapacity: value.count, interpolationCount: 0)
+    init(stringLiteral value: String) {
+        var interpolation = LogInterpolation(literalCapacity: value.count, interpolationCount: 0)
         interpolation.appendLiteral(value)
         self.interpolation = interpolation
     }

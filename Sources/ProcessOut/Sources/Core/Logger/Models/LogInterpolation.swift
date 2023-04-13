@@ -1,16 +1,15 @@
 //
-//  POLogInterpolation.swift
+//  LogInterpolation.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 25.10.2022.
 //
 
-@_spi(PO)
-public struct POLogInterpolation: StringInterpolationProtocol {
+struct LogInterpolation: StringInterpolationProtocol {
 
     /// Privacy options for specifying privacy level of the interpolated expressions
     /// in the string interpolations passed to the log APIs.
-    public enum Privacy {
+    enum Privacy {
 
         /// Sets the privacy level of an interpolated value to public.
         ///
@@ -26,13 +25,13 @@ public struct POLogInterpolation: StringInterpolationProtocol {
     }
 
     /// Interpolation's content.
-    public private(set) var value: String
+    private(set) var value: String
 
-    public mutating func appendLiteral(_ literal: String) {
+    mutating func appendLiteral(_ literal: String) {
         value.append(literal)
     }
 
-    public mutating func appendInterpolation(_ value: String, privacy: Privacy = .public) {
+    mutating func appendInterpolation(_ value: String, privacy: Privacy = .public) {
         switch privacy {
         case .public:
             self.value.append(value)
@@ -41,17 +40,15 @@ public struct POLogInterpolation: StringInterpolationProtocol {
         }
     }
 
-    public mutating func appendInterpolation<Value: CustomStringConvertible>(
-        _ value: Value, privacy: Privacy = .public
-    ) {
+    mutating func appendInterpolation<Value: CustomStringConvertible>(_ value: Value, privacy: Privacy = .public) {
         appendInterpolation(value.description, privacy: privacy)
     }
 
-    public mutating func appendInterpolation(_ error: Error, privacy: Privacy = .public) {
+    mutating func appendInterpolation(_ error: Error, privacy: Privacy = .public) {
         appendInterpolation(String(describing: error), privacy: privacy)
     }
 
-    public init(literalCapacity: Int, interpolationCount: Int) {
+    init(literalCapacity: Int, interpolationCount: Int) {
         value = String()
         value.reserveCapacity(literalCapacity)
     }
