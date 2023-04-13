@@ -21,8 +21,7 @@ public final class POCheckout3DSServiceBuilder {
         Checkout3DSService(
             errorMapper: DefaultAuthenticationErrorMapper(),
             configurationMapper: DefaultConfigurationMapper(),
-            delegate: delegate,
-            logger: ProcessOutApi.shared.logger
+            delegate: delegate
         )
     }
 
