@@ -8,7 +8,7 @@
 import Foundation
 
 /// Holds information about 3DS redirect.
-public struct PO3DSRedirect {
+public struct PO3DSRedirect: Hashable {
 
     /// Redirect url.
     public let url: URL

@@ -13,9 +13,15 @@ final class DefaultThreeDSService: ThreeDSService {
 
     // MARK: -
 
-    init(decoder: JSONDecoder, encoder: JSONEncoder, logger: POLogger) {
+    init(
+        decoder: JSONDecoder,
+        encoder: JSONEncoder,
+        jsonWritingOptions: JSONSerialization.WritingOptions = [],
+        logger: POLogger
+    ) {
         self.decoder = decoder
         self.encoder = encoder
+        self.jsonWritingOptions = jsonWritingOptions
         self.logger = logger
     }
 
@@ -23,8 +29,9 @@ final class DefaultThreeDSService: ThreeDSService {
 
     func handle(action: ThreeDSCustomerAction, delegate: Delegate, completion: @escaping Completion) {
         let completionTrampoline: Completion = { result in
-            assert(Thread.isMainThread, "Completion must be called on main thread!")
-            completion(result)
+            DispatchQueue.main.async {
+                completion(result)
+            }
         }
         switch action.type {
         case .fingerprintMobile:
@@ -43,8 +50,8 @@ final class DefaultThreeDSService: ThreeDSService {
     private enum Constants {
         static let deviceChannel = "app"
         static let tokenPrefix = "gway_req_"
-        static let challengeSuccessResponseBody = #"{ "transStatus": "Y" }"#
-        static let challengeFailureResponseBody = #"{ "transStatus": "N" }"#
+        static let challengeSuccessEncodedResponse = "eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiWVwiIH0ifQ=="
+        static let challengeFailureEncodedResponse = "eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiTlwiIH0ifQ=="
         static let fingerprintTimeoutResponseBody = #"{ "threeDS2FingerprintTimeout": true }"#
         static let webFingerprintTimeout: TimeInterval = 10
     }
@@ -58,6 +65,7 @@ final class DefaultThreeDSService: ThreeDSService {
 
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
+    private let jsonWritingOptions: JSONSerialization.WritingOptions
     private let logger: POLogger
 
     // MARK: - Private Methods
@@ -91,13 +99,10 @@ final class DefaultThreeDSService: ThreeDSService {
             delegate.handle(challenge: challenge) { result in
                 switch result {
                 case let .success(success):
-                    let response = {
-                        let body = success
-                            ? Constants.challengeSuccessResponseBody
-                            : Constants.challengeFailureResponseBody
-                        return ChallengeResponse(url: nil, body: body)
-                    }
-                    self.complete(with: response, completion: completion)
+                    let encodedResponse = success
+                        ? Constants.challengeSuccessEncodedResponse
+                        : Constants.challengeFailureEncodedResponse
+                    completion(.success(Constants.tokenPrefix + encodedResponse))
                 case let .failure(failure):
                     completion(.failure(failure))
                 }
@@ -162,15 +167,18 @@ final class DefaultThreeDSService: ThreeDSService {
         let sdkEphemeralPublicKey = try JSONSerialization.jsonObject(
             with: Data(request.sdkEphemeralPublicKey.utf8)
         )
-        var requestParameters = [
+        let requestParameters = [
             "deviceChannel": Constants.deviceChannel,
             "sdkAppID": request.sdkAppId,
             "sdkEphemPubKey": sdkEphemeralPublicKey,
             "sdkReferenceNumber": request.sdkReferenceNumber,
-            "sdkTransID": request.sdkTransactionId
+            "sdkTransID": request.sdkTransactionId,
+            "sdkEncData": request.deviceData
         ]
-        requestParameters["sdkEncData"] = request.deviceData
-        return String(decoding: try JSONSerialization.data(withJSONObject: requestParameters), as: UTF8.self)
+        let requestParametersData = try JSONSerialization.data(
+            withJSONObject: requestParameters, options: jsonWritingOptions
+        )
+        return String(decoding: requestParametersData, as: UTF8.self)
     }
 
     private func complete(with response: () throws -> ChallengeResponse, completion: @escaping Completion) {
