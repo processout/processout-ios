@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 28.02.2023.
 //
 
-import ProcessOut
+@_spi(PO) import ProcessOut
 import Checkout3DS
 
 final class Checkout3DSService: PO3DSService {
@@ -13,11 +13,13 @@ final class Checkout3DSService: PO3DSService {
     init(
         errorMapper: AuthenticationErrorMapper,
         configurationMapper: ConfigurationMapper,
-        delegate: POCheckout3DSServiceDelegate
+        delegate: POCheckout3DSServiceDelegate,
+        logger: POLogger
     ) {
         self.errorMapper = errorMapper
         self.configurationMapper = configurationMapper
         self.delegate = delegate
+        self.logger = logger
         queue = DispatchQueue.global()
         state = .idle
     }
@@ -108,6 +110,7 @@ final class Checkout3DSService: PO3DSService {
     private let configurationMapper: ConfigurationMapper
     private let queue: DispatchQueue
     private let delegate: POCheckout3DSServiceDelegate
+    private let logger: POLogger
 
     private var state: State
 
