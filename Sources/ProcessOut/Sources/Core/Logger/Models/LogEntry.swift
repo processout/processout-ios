@@ -10,10 +10,10 @@ import Foundation
 struct LogEntry {
 
     /// Logging level.
-    let level: LogLevel
+    let level: POLogLevel
 
     /// Actual log message.
-    let message: LogMessage
+    let message: POLogMessage
 
     /// Date associated with message.
     let timestamp: Date

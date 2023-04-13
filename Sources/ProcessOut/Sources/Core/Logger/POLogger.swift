@@ -10,7 +10,7 @@ import Foundation
 /// An object for writing interpolated string messages to the processout logging system.
 public final class POLogger {
 
-    init(destinations: [LoggerDestination] = [], minimumLevel: LogLevel = .debug) {
+    init(destinations: [LoggerDestination] = [], minimumLevel: POLogLevel = .debug) {
         self.destinations = destinations
         self.minimumLevel = minimumLevel
     }
@@ -22,7 +22,7 @@ public final class POLogger {
     ///   - level: The log level at which to store the message. This value determines the severity of the message and
     ///   whether the system persists it to disk. You may specify a constant or variable for this parameter.
     ///   - message: the message you want to add to the logs.
-    func log(level: LogLevel, _ message: LogMessage, file: String = #file, line: Int = #line) {
+    func log(level: POLogLevel, _ message: POLogMessage, file: String = #file, line: Int = #line) {
         guard level.rawValue >= minimumLevel.rawValue else {
             return
         }
@@ -33,27 +33,31 @@ public final class POLogger {
     }
 
     /// Logs a message at the `debug` level.
-    func debug(_ message: LogMessage, file: String = #file, line: Int = #line) {
+    @_spi(PO)
+    public func debug(_ message: POLogMessage, file: String = #file, line: Int = #line) {
         log(level: .debug, message, file: file, line: line)
     }
 
     /// Logs a message at the `info` level.
-    func info(_ message: LogMessage, file: String = #file, line: Int = #line) {
+    @_spi(PO)
+    public func info(_ message: POLogMessage, file: String = #file, line: Int = #line) {
         log(level: .info, message, file: file, line: line)
     }
 
     /// Logs a message at the `error` level.
-    func error(_ message: LogMessage, file: String = #file, line: Int = #line) {
+    @_spi(PO)
+    public func error(_ message: POLogMessage, file: String = #file, line: Int = #line) {
         log(level: .error, message, file: file, line: line)
     }
 
     /// Logs a message at the `fault` level.
-    func fault(_ message: LogMessage, file: String = #file, line: Int = #line) {
+    @_spi(PO)
+    public func fault(_ message: POLogMessage, file: String = #file, line: Int = #line) {
         log(level: .fault, message, file: file, line: line)
     }
 
     // MARK: -
 
     private let destinations: [LoggerDestination]
-    private let minimumLevel: LogLevel
+    private let minimumLevel: POLogLevel
 }

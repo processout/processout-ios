@@ -121,7 +121,7 @@ private final class SharedProcessOutApi: ProcessOutApiType {
         let destinations: [LoggerDestination] = [
             SystemLoggerDestination(subsystem: Constants.systemLoggerSubsystem, category: category)
         ]
-        let minimumLevel: LogLevel = configuration.isDebug ? .debug : .info
+        let minimumLevel: POLogLevel = configuration.isDebug ? .debug : .info
         return POLogger(destinations: destinations, minimumLevel: minimumLevel)
     }
 }

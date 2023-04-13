@@ -26,7 +26,7 @@ final class SystemLoggerDestination: LoggerDestination {
 
     // MARK: -
 
-    private func convertToLogType(_ level: LogLevel) -> OSLogType {
+    private func convertToLogType(_ level: POLogLevel) -> OSLogType {
         switch level {
         case .info:
             return .info

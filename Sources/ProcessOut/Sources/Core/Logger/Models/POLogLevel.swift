@@ -1,11 +1,12 @@
 //
-//  LogLevel.swift
+//  POLogLevel.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 25.10.2022.
 //
 
-enum LogLevel: Int {
+@_spi(PO)
+public enum POLogLevel: Int {
 
     /// The debug log level. Use this level to capture information that may be useful during development or while
     /// troubleshooting a specific problem.
