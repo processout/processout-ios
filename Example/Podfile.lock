@@ -1,8 +1,8 @@
 PODS:
   - CheckoutEventLoggerKit (1.2.3)
   - JOSESwift (2.2.1)
-  - ProcessOut (3.2.0)
-  - ProcessOutCheckout (3.1.0):
+  - ProcessOut (3.3.0)
+  - ProcessOutCheckout (3.2.0):
     - CheckoutEventLoggerKit (= 1.2.3)
     - JOSESwift (= 2.2.1)
     - ProcessOut
@@ -25,9 +25,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   CheckoutEventLoggerKit: ee1f9732728fceb25960bb2f6d424f9e99bac7eb
   JOSESwift: d65ba32c7bceae9982e85e62d35de1f8d135cc89
-  ProcessOut: 7fbe8bb68f1d055547020226958584d7fc3290fb
-  ProcessOutCheckout: bf36458121c18a7223efe72afb0d6d24e8233ecc
+  ProcessOut: 8172a75abd4dcbc78b5cb072acc412e72ec787f1
+  ProcessOutCheckout: 0030a654d3b63f1695deeae81f0cf9071a3acd1d
 
 PODFILE CHECKSUM: 36bd5b844a932b8aa90bf212cdb0b4d50c1c6681
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.0
