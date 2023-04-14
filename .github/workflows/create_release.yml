@@ -12,6 +12,8 @@ jobs:
         uses: ./.github/actions/bootstrap-project
       - name: Create XCFramework
         run: source Scripts/CreateXcframework.sh
+      - name: Create Documentation
+        run: source Scripts/CreateDocumentation.sh
       - name: Set Version
         run: |
           echo "RELEASE_VERSION=$(cat Version.resolved)" >> $GITHUB_ENV
