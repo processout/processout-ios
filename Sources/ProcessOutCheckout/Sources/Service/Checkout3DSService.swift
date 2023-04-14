@@ -13,11 +13,13 @@ final class Checkout3DSService: PO3DSService {
     init(
         errorMapper: AuthenticationErrorMapper,
         configurationMapper: ConfigurationMapper,
-        delegate: POCheckout3DSServiceDelegate
+        delegate: POCheckout3DSServiceDelegate,
+        environment: Checkout3DS.Environment
     ) {
         self.errorMapper = errorMapper
         self.configurationMapper = configurationMapper
         self.delegate = delegate
+        self.environment = environment
         queue = DispatchQueue.global()
         state = .idle
     }
@@ -43,7 +45,7 @@ final class Checkout3DSService: PO3DSService {
         let configurationParameters = configurationMapper.convert(configuration: configuration)
         let configuration = delegate.configuration(with: configurationParameters)
         do {
-            let service = try Standalone3DSService.initialize(with: configuration, environment: .sandbox)
+            let service = try Standalone3DSService.initialize(with: configuration, environment: environment)
             let context = State.Context(service: service, transaction: service.createTransaction())
             state = .fingerprinting(context)
             queue.async { [unowned self, errorMapper] in
@@ -108,6 +110,7 @@ final class Checkout3DSService: PO3DSService {
     private let configurationMapper: ConfigurationMapper
     private let queue: DispatchQueue
     private let delegate: POCheckout3DSServiceDelegate
+    private let environment: Checkout3DS.Environment
 
     private var state: State
 
