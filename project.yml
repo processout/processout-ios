@@ -42,7 +42,7 @@ targets:
     dependencies:
       - target: ProcessOut
     sources: Tests/ProcessOutTests
-  ProcessOutCheckout:
+  ProcessOutCheckout3DS:
     type: framework
     platform: iOS
     deploymentTarget: "12.0"
@@ -58,7 +58,7 @@ targets:
       - package: CheckoutEventLoggerKit
       - package: JOSESwift
       - target: ProcessOut
-    sources: Sources/ProcessOutCheckout
+    sources: Sources/ProcessOutCheckout3DS
 schemes:
   ProcessOut:
     build:
@@ -68,7 +68,7 @@ schemes:
     test:
       gatherCoverageData: true
       targets: [ProcessOutTests]
-  ProcessOutCheckout:
+  ProcessOutCheckout3DS:
     build:
       targets:
-        ProcessOutCheckout: all
+        ProcessOutCheckout3DS: all

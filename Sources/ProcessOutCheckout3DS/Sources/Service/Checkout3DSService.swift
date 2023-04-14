@@ -1,6 +1,6 @@
 //
 //  Checkout3DSService.swift
-//  ProcessOutCheckout
+//  ProcessOutCheckout3DS
 //
 //  Created by Andrii Vysotskyi on 28.02.2023.
 //

@@ -1,6 +1,6 @@
 //
 //  DefaultConfigurationMapper.swift
-//  ProcessOutCheckout
+//  ProcessOutCheckout3DS
 //
 //  Created by Andrii Vysotskyi on 27.03.2023.
 //

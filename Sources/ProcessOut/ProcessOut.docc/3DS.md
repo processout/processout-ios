@@ -12,7 +12,7 @@ Most PSPs have their own certified SDKs for 3DS2 in mobile apps but they all hav
 allows to abstract the details of 3DS handling and supply functionality in a consistent way. 
 
 We officially support our own implementation of `PO3DSService` to use with [Checkout](https://checkout.com) service.
-Check `ProcessOutCheckout` target for details. 
+Check `ProcessOutCheckout3DS` target for details. 
 
 There is also `CardPaymentTest3DSService` defined in Example application that emulates the normal 3DS authentication
 flow but does not actually make any calls to a real Access Control Server (ACS). It is mainly useful during development

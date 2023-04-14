@@ -1,6 +1,6 @@
 //
 //  POCheckout3DSServiceBuilder.swift
-//  ProcessOutCheckout
+//  ProcessOutCheckout3DS
 //
 //  Created by Andrii Vysotskyi on 01.03.2023.
 //
@@ -17,6 +17,7 @@ public final class POCheckout3DSServiceBuilder {
         Self(delegate: delegate)
     }
 
+    /// Sets environment used to initialize `Standalone3DSService`.
     public func with(environment: Checkout3DS.Environment) -> POCheckout3DSServiceBuilder {
         self.environment = environment
         return self
