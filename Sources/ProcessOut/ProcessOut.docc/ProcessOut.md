@@ -32,6 +32,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 - <doc:3DS>
 - ``PO3DSService``
 - ``PO3DS2Configuration``
+- ``PO3DS2ConfigurationCardScheme``
 - ``PO3DS2AuthenticationRequest``
 - ``PO3DS2Challenge``
 - ``PO3DSRedirect``

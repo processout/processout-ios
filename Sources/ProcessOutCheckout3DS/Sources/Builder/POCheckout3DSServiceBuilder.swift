@@ -17,7 +17,7 @@ public final class POCheckout3DSServiceBuilder {
         Self(delegate: delegate)
     }
 
-    /// Sets environment used to initialize `Standalone3DSService`.
+    /// Sets environment used to initialize `Standalone3DSService`. Default value is `production`.
     public func with(environment: Checkout3DS.Environment) -> POCheckout3DSServiceBuilder {
         self.environment = environment
         return self
