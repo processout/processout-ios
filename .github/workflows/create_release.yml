@@ -11,6 +11,7 @@ jobs:
       - name: Bootstrap Project
         uses: ./.github/actions/bootstrap-project
       - name: Create XCFramework
+<<<<<<< Updated upstream
         run: source Scripts/CreateXcframework.sh
       - name: Set Version
         run: |
@@ -23,6 +24,9 @@ jobs:
             .build/framework/*.xcframework.zip
             .build/documentation/*.doccarchive.zip
           generate_release_notes: true
+=======
+        run: source Scripts/CreateGitHubRelease.sh
+>>>>>>> Stashed changes
   push-podspec:
     name: Push Podspec
     needs: [create-release]
