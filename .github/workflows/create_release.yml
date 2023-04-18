@@ -35,4 +35,6 @@ jobs:
       - name: Push Podspec
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
-        run: pod trunk push ProcessOut.podspec
+        run: |
+          pod trunk push ProcessOut.podspec
+          pod trunk push ProcessOutCheckout3DS.podspec
