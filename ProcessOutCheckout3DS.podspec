@@ -13,4 +13,9 @@ Pod::Spec.new do |s|
   s.source_files          = 'Sources/ProcessOutCheckout3DS/**/*.swift'
   s.dependency            'ProcessOut', s.version.to_s
   s.dependency            'Checkout3DS', '~> 3.0'
+
+  s.test_spec 'Tests' do |test_spec|
+    test_spec.requires_app_host = true
+    test_spec.source_files = 'Tests/ProcessOutCheckout3DSTests/**/*.swift'
+  end
 end
