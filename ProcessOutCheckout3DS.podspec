@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.license               = { :type => 'MIT', :file => 'LICENSE' }
   s.homepage              = 'https://github.com/processout/processout-ios'
   s.author                = 'ProcessOut'
-  s.summary               = 'Integration with Checkout.com 3D Secure (3DS) mobile SDK .'
+  s.summary               = 'Integration with Checkout.com 3D Secure (3DS) mobile SDK.'
   s.source                = { :git => 'https://github.com/processout/processout-ios.git', :tag => s.version.to_s }
   s.frameworks            = 'Foundation'
   s.requires_arc          = true
