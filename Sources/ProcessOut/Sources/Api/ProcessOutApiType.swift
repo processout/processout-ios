@@ -11,7 +11,7 @@ import Foundation
 public protocol ProcessOutApiType {
 
     /// Current configuration.
-    var configuration: ProcessOutConfiguration { get }
+    var configuration: ProcessOutApiConfiguration { get }
 
     /// Returns gateway configurations repository.
     var gatewayConfigurations: POGatewayConfigurationsRepository { get }

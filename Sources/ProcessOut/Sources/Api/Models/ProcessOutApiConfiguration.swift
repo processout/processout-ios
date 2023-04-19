@@ -1,5 +1,5 @@
 //
-//  ProcessOutConfiguration.swift
+//  ProcessOutApiConfiguration.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 10.10.2022.
@@ -7,13 +7,10 @@
 
 import Foundation
 
-@available(*, deprecated, renamed: "ProcessOutConfiguration")
-public typealias ProcessOutApiConfiguration = ProcessOutConfiguration
-
 /// Defines configuration parameters that are used to create API singleton. In order to create instance
-/// of this structure one should use ``ProcessOutConfiguration/production(projectId:isDebug:)``
+/// of this structure one should use ``ProcessOutApiConfiguration/production(projectId:isDebug:)``
 /// method.
-public struct ProcessOutConfiguration {
+public struct ProcessOutApiConfiguration {
 
     /// Project id.
     public let projectId: String
@@ -36,7 +33,7 @@ public struct ProcessOutConfiguration {
     let checkoutBaseUrl: URL
 }
 
-extension ProcessOutConfiguration {
+extension ProcessOutApiConfiguration {
 
     /// Creates production configuration.
     public static func production(projectId: String, isDebug: Bool = false) -> Self {
@@ -44,7 +41,7 @@ extension ProcessOutConfiguration {
         let apiBaseUrl = URL(string: "https://api.processout.com")!
         let checkoutBaseUrl = URL(string: "https://checkout.processout.com")!
         // swiftlint:enable force_unwrapping
-        return ProcessOutConfiguration(
+        return ProcessOutApiConfiguration(
             projectId: projectId,
             isDebug: isDebug,
             privateKey: nil,
@@ -56,7 +53,7 @@ extension ProcessOutConfiguration {
     /// Creates test configuration.
     @_spi(PO)
     public static func test(projectId: String, privateKey: String?, apiBaseUrl: URL, checkoutBaseUrl: URL) -> Self {
-        ProcessOutConfiguration(
+        ProcessOutApiConfiguration(
             projectId: projectId,
             isDebug: true,
             privateKey: privateKey,
