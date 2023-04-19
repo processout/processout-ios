@@ -11,6 +11,11 @@ import UIKit
 /// Control Server (ACS). Should be used only for testing purposes in sandbox environment.
 public final class POTest3DSService: PO3DSService {
 
+    /// Creates service instance.
+    public init() {
+        // NOP
+    }
+
     /// View controller to use for presentations.
     public unowned var viewController: UIViewController! // swiftlint:disable:this implicitly_unwrapped_optional
 
