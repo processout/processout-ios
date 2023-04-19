@@ -32,7 +32,7 @@ set -e
 rm -rf $OUTPUT_DIR
 mkdir -p $OUTPUT_DIR
 
-# TODO(andrii-vysotskyi): Add "ProcessOutCheckout" when CheckoutSDK release is public
+# TODO(andrii-vysotskyi): Add "ProcessOutCheckout3DS" when Checkout3DS is available via SPM
 for PRODUCT in "ProcessOut"; do
     build_framework $PRODUCT
 done

@@ -25,6 +25,7 @@ set -e
 rm -rf $OUTPUT_DIR
 mkdir -p $OUTPUT_DIR
 
-for PRODUCT in "ProcessOut" "ProcessOutCheckout" ; do
+# TODO(andrii-vysotskyi): Add "ProcessOutCheckout3DS" when Checkout3DS is available via SPM
+for PRODUCT in "ProcessOut" ; do
     build_doc $PRODUCT
 done

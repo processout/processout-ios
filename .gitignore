@@ -16,6 +16,3 @@ fastlane/test_output
 Packages
 *.xcodeproj
 xcuserdata/
-
-## Frameworks
-Sources/ProcessOutCheckout/Frameworks/**/*

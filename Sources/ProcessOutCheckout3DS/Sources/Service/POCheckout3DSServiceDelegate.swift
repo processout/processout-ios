@@ -1,6 +1,6 @@
 //
 //  POCheckout3DSServiceDelegate.swift
-//  ProcessOutCheckout
+//  ProcessOutCheckout3DS
 //
 //  Created by Andrii Vysotskyi on 01.03.2023.
 //
@@ -28,13 +28,13 @@ public protocol POCheckout3DSServiceDelegate: AnyObject {
 
 extension POCheckout3DSServiceDelegate {
 
-    func configuration(
+    public func configuration(
         with parameters: Checkout3DS.ThreeDS2ServiceConfiguration.ConfigParameters
     ) -> Checkout3DS.ThreeDS2ServiceConfiguration {
         ThreeDS2ServiceConfiguration(configParameters: parameters)
     }
 
-    func shouldContinue(with warnings: Set<Checkout3DS.Warning>, completion: @escaping (Bool) -> Void) {
+    public func shouldContinue(with warnings: Set<Checkout3DS.Warning>, completion: @escaping (Bool) -> Void) {
         completion(true)
     }
 }

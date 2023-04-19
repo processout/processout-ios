@@ -4,6 +4,13 @@
 
 *iOS 12.0+*
 
+## Modules
+
+| Module                | Description                                                                  |
+| --------------------- | ---------------------------------------------------------------------------- |
+| ProcessOut            | Allows to interact with ProcessOut API and provides a UI to handle payments. |
+| ProcessOutCheckout3DS | Integration with Checkout.com 3D Secure (3DS) mobile SDK.                    |
+
 ## Contributing
 
 We welcome contributions of any kind including new features, bug fixes, and general improvements.

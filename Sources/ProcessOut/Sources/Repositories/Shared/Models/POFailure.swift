@@ -272,3 +272,23 @@ extension POFailure.Code {
         }
     }
 }
+
+extension POFailure: CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        let parameters = [
+            ("code", code.rawValue),
+            ("message", message),
+            ("underlyingError", underlyingError?.localizedDescription)
+        ]
+        let parametersDescription = parameters
+            .compactMap { name, value -> String? in
+                guard let value else {
+                    return nil
+                }
+                return "\(name): '\(value)'"
+            }
+            .joined(separator: ", ")
+        return "POFailure(\(parametersDescription))"
+    }
+}

@@ -1,4 +1,4 @@
-# ``ProcessOutCheckout``
+# ``ProcessOutCheckout3DS``
 
 ## Overview
 
