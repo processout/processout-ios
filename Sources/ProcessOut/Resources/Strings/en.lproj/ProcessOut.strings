@@ -19,3 +19,7 @@
 "native-alternative-payment.error.invalid-text" = "Value is not valid";
 "native-alternative-payment.error.invalid-email" = "Email is not valid";
 "native-alternative-payment.error.invalid-phone" = "Phone number is not valid";
+
+"test-3-d-s.challenge.title" = "Do you want to accept the 3DS2 challenge?";
+"test-3-d-s.challenge.accept" = "Accept";
+"test-3-d-s.challenge.reject" = "Reject";

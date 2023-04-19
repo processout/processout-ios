@@ -19,3 +19,7 @@
 "native-alternative-payment.error.invalid-text" = "Texto inválido";
 "native-alternative-payment.error.invalid-email" = "Endereço de e-mail inválido";
 "native-alternative-payment.error.invalid-phone" = "Número de telemóvel inválido";
+
+"test-3-d-s.challenge.title" = "Você quer aceitar o desafio 3DS2?";
+"test-3-d-s.challenge.accept" = "Aceitar";
+"test-3-d-s.challenge.reject" = "Rejeitar";
