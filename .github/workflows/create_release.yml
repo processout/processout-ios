@@ -12,6 +12,8 @@ jobs:
         uses: ./.github/actions/bootstrap-project
       - name: Create XCFramework
         run: source Scripts/CreateXcframework.sh
+      - name: Create Documentation
+        run: source Scripts/CreateDocumentation.sh
       - name: Set Version
         run: |
           echo "RELEASE_VERSION=$(cat Version.resolved)" >> $GITHUB_ENV
@@ -33,4 +35,6 @@ jobs:
       - name: Push Podspec
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
-        run: pod trunk push ProcessOut.podspec
+        run: |
+          pod trunk push ProcessOut.podspec
+          pod trunk push ProcessOutCheckout3DS.podspec

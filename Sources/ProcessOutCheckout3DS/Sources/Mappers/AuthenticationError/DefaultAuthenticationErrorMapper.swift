@@ -1,6 +1,6 @@
 //
-//  AuthenticationErrorMapper.swift
-//  ProcessOutCheckout
+//  DefaultAuthenticationErrorMapper.swift
+//  ProcessOutCheckout3DS
 //
 //  Created by Andrii Vysotskyi on 06.03.2023.
 //
@@ -8,7 +8,7 @@
 import ProcessOut
 import Checkout3DS
 
-final class AuthenticationErrorMapper: AuthenticationErrorMapperType {
+final class DefaultAuthenticationErrorMapper: AuthenticationErrorMapper {
 
     func convert(error: AuthenticationError) -> POFailure {
         let code: POFailure.Code

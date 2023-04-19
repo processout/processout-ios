@@ -1,6 +1,6 @@
 //
 //  Checkout3DSService.swift
-//  ProcessOutCheckout
+//  ProcessOutCheckout3DS
 //
 //  Created by Andrii Vysotskyi on 28.02.2023.
 //
@@ -10,9 +10,16 @@ import Checkout3DS
 
 final class Checkout3DSService: PO3DSService {
 
-    init(errorMapper: AuthenticationErrorMapperType, delegate: POCheckout3DSServiceDelegate) {
+    init(
+        errorMapper: AuthenticationErrorMapper,
+        configurationMapper: ConfigurationMapper,
+        delegate: POCheckout3DSServiceDelegate,
+        environment: Checkout3DS.Environment
+    ) {
         self.errorMapper = errorMapper
+        self.configurationMapper = configurationMapper
         self.delegate = delegate
+        self.environment = environment
         queue = DispatchQueue.global()
         state = .idle
     }
@@ -35,10 +42,10 @@ final class Checkout3DSService: PO3DSService {
             completion(.failure(failure))
             return
         }
-        let configurationParameters = convertToConfigParameters(configuration: configuration)
+        let configurationParameters = configurationMapper.convert(configuration: configuration)
         let configuration = delegate.configuration(with: configurationParameters)
         do {
-            let service = try Standalone3DSService.initialize(with: configuration)
+            let service = try Standalone3DSService.initialize(with: configuration, environment: environment)
             let context = State.Context(service: service, transaction: service.createTransaction())
             state = .fingerprinting(context)
             queue.async { [unowned self, errorMapper] in
@@ -81,10 +88,10 @@ final class Checkout3DSService: PO3DSService {
             return
         }
         state = .challenging(context)
-        let challengeParameters = convertToChallengeParameters(data: challenge)
-        context.transaction.doChallenge(challengeParameters: challengeParameters) { [weak self, errorMapper] result in
-            self?.setIdleStateUnchecked()
-            completion(result.mapError(errorMapper.convert))
+        let parameters = convertToChallengeParameters(data: challenge)
+        context.transaction.doChallenge(challengeParameters: parameters) { [unowned self, errorMapper] result in
+            self.setIdleStateUnchecked()
+            completion(result.map(extractStatus(challengeResult:)).mapError(errorMapper.convert))
         }
     }
 
@@ -99,9 +106,11 @@ final class Checkout3DSService: PO3DSService {
 
     // MARK: - Private Properties
 
-    private let errorMapper: AuthenticationErrorMapperType
+    private let errorMapper: AuthenticationErrorMapper
+    private let configurationMapper: ConfigurationMapper
     private let queue: DispatchQueue
     private let delegate: POCheckout3DSServiceDelegate
+    private let environment: Checkout3DS.Environment
 
     private var state: State
 
@@ -126,23 +135,6 @@ final class Checkout3DSService: PO3DSService {
 
     // MARK: - Utils
 
-    private func convertToConfigParameters(
-        configuration: PO3DS2Configuration
-    ) -> ThreeDS2ServiceConfiguration.ConfigParameters {
-        // TODO(andrii-vysotskyi): replace with proper values when available
-        let directoryServerData = ThreeDS2ServiceConfiguration.DirectoryServerData(
-            directoryServerID: configuration.directoryServerId,
-            directoryServerPublicKey: configuration.directoryServerPublicKey,
-            directoryServerRootCertificate: ""
-        )
-        let configParameters = ThreeDS2ServiceConfiguration.ConfigParameters(
-            directoryServerData: directoryServerData,
-            messageVersion: configuration.messageVersion,
-            scheme: ""
-        )
-        return configParameters
-    }
-
     private func convertToAuthenticationRequest(
         request: AuthenticationRequestParameters
     ) -> PO3DS2AuthenticationRequest {
@@ -164,5 +156,9 @@ final class Checkout3DSService: PO3DSService {
             acsSignedContent: data.acsSignedContent
         )
         return challengeParameters
+    }
+
+    private func extractStatus(challengeResult: ChallengeResult) -> Bool {
+        challengeResult.transactionStatus.uppercased() == "Y"
     }
 }

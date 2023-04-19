@@ -73,7 +73,7 @@ final class DefaultThreeDSService: ThreeDSService {
     private func fingerprint(encodedConfiguration: String, delegate: Delegate, completion: @escaping Completion) {
         do {
             let configuration = try decode(PO3DS2Configuration.self, from: encodedConfiguration)
-            delegate.authenticationRequest(configuration: configuration) { result in
+            delegate.authenticationRequest(configuration: configuration) { [logger] result in
                 switch result {
                 case let .success(request):
                     let response = {
@@ -81,6 +81,7 @@ final class DefaultThreeDSService: ThreeDSService {
                     }
                     self.complete(with: response, completion: completion)
                 case let .failure(failure):
+                    logger.error("Failed to create authentication request: \(failure)")
                     completion(.failure(failure))
                 }
             }
@@ -96,7 +97,7 @@ final class DefaultThreeDSService: ThreeDSService {
     private func challenge(encodedChallenge: String, delegate: Delegate, completion: @escaping Completion) {
         do {
             let challenge = try decode(PO3DS2Challenge.self, from: encodedChallenge)
-            delegate.handle(challenge: challenge) { result in
+            delegate.handle(challenge: challenge) { [logger] result in
                 switch result {
                 case let .success(success):
                     let encodedResponse = success
@@ -104,6 +105,7 @@ final class DefaultThreeDSService: ThreeDSService {
                         : Constants.challengeFailureEncodedResponse
                     completion(.success(Constants.tokenPrefix + encodedResponse))
                 case let .failure(failure):
+                    logger.error("Failed to handle challenge: \(failure)")
                     completion(.failure(failure))
                 }
             }
@@ -134,6 +136,7 @@ final class DefaultThreeDSService: ThreeDSService {
                 }
                 self.complete(with: response, completion: completion)
             case let .failure(failure):
+                self.logger.error("Failed to handle url fingeprint: \(failure)")
                 completion(.failure(failure))
             }
         }

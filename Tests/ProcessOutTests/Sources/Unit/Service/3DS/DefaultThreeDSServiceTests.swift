@@ -56,8 +56,10 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         let expectedConfiguration = PO3DS2Configuration(
             directoryServerId: "1",
             directoryServerPublicKey: "2",
-            directoryServerTransactionId: "3",
-            messageVersion: "4"
+            directoryServerRootCertificates: ["3"],
+            directoryServerTransactionId: "4",
+            scheme: .unknown("5"),
+            messageVersion: "6"
         )
         let expectation = XCTestExpectation()
         expectation.expectedFulfillmentCount = customerActions.count
@@ -145,8 +147,11 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             // Then
             switch result {
             case .success(let token):
-                // swiftlint:disable:next line_length
-                let expectedToken = "gway_req_eyJib2R5Ijoie1wiZGV2aWNlQ2hhbm5lbFwiOlwiYXBwXCIsXCJzZGtBcHBJRFwiOlwiMlwiLFwic2RrRW5jRGF0YVwiOlwiMVwiLFwic2RrRXBoZW1QdWJLZXlcIjp7XCJrdHlcIjpcIkVDXCJ9LFwic2RrUmVmZXJlbmNlTnVtYmVyXCI6XCIzXCIsXCJzZGtUcmFuc0lEXCI6XCI0XCJ9In0="
+                let expectedToken = """
+                    gway_req_eyJib2R5Ijoie1wiZGV2aWNlQ2hhbm5lbFwiOlwiYXBwXCIsXCJzZGtBcHBJRFwiOlwiMlwiLFwic2RrR\
+                    W5jRGF0YVwiOlwiMVwiLFwic2RrRXBoZW1QdWJLZXlcIjp7XCJrdHlcIjpcIkVDXCJ9LFwic2RrUmVmZXJlbmNlTnV\
+                    tYmVyXCI6XCIzXCIsXCJzZGtUcmFuc0lEXCI6XCI0XCJ9In0=
+                    """
                 XCTAssertEqual(token, expectedToken)
             default:
                 XCTFail("Unexpected result")
@@ -468,8 +473,11 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             // Then
             switch result {
             case .success(let value):
-                // swiftlint:disable:next line_length
-                XCTAssertEqual(value, "gway_req_eyJib2R5IjoieyBcInRocmVlRFMyRmluZ2VycHJpbnRUaW1lb3V0XCI6IHRydWUgfSIsInVybCI6ImV4YW1wbGUuY29tIn0=")
+                let expectedValue = """
+                    gway_req_eyJib2R5IjoieyBcInRocmVlRFMyRmluZ2VycHJpbnRUaW1\
+                    lb3V0XCI6IHRydWUgfSIsInVybCI6ImV4YW1wbGUuY29tIn0=
+                    """
+                XCTAssertEqual(value, expectedValue)
             default:
                 XCTFail("Unexpected result")
             }
@@ -486,17 +494,21 @@ final class DefaultThreeDSServiceTests: XCTestCase {
     // MARK: - Private Methods
 
     private func defaultFingerprintMobileCustomerAction(padded: Bool = false) -> ThreeDSCustomerAction {
-        // swiftlint:disable:next line_length
-        var value = "eyJkaXJlY3RvcnlTZXJ2ZXJJRCI6IjEiLCJkaXJlY3RvcnlTZXJ2ZXJQdWJsaWNLZXkiOiIyIiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiIzIiwibWVzc2FnZVZlcnNpb24iOiI0In0"
+        var value = """
+            eyJkaXJlY3RvcnlTZXJ2ZXJJRCI6IjEiLCJkaXJlY3RvcnlTZXJ2ZXJQdWJsaWNLZXkiOiIyIiwiZGlyZWN0b3J5U2VydmVyUm9vd\
+            ENBcyI6WyIzIl0sInRocmVlRFNTZXJ2ZXJUcmFuc0lEIjoiNCIsInNjaGVtZSI6IjUiLCJtZXNzYWdlVmVyc2lvbiI6IjYifQ
+            """
         if padded {
-            value += "="
+            value += "=="
         }
         return ThreeDSCustomerAction(type: .fingerprintMobile, value: value)
     }
 
     private var defaultChallengeMobileCustomerAction: ThreeDSCustomerAction {
-        // swiftlint:disable:next line_length
-        let value = "eyJhY3NUcmFuc0lEIjoiMSIsImFjc1JlZmVyZW5jZU51bWJlciI6IjIiLCJhY3NTaWduZWRDb250ZW50IjoiMyIsInRocmVlRFNTZXJ2ZXJUcmFuc0lEIjoiNCJ9"
+        let value = """
+            eyJhY3NUcmFuc0lEIjoiMSIsImFjc1JlZmVyZW5jZU51bWJlciI6IjIiL\
+            CJhY3NTaWduZWRDb250ZW50IjoiMyIsInRocmVlRFNTZXJ2ZXJUcmFuc0lEIjoiNCJ9
+            """
         return ThreeDSCustomerAction(type: .challengeMobile, value: value)
     }
 }
