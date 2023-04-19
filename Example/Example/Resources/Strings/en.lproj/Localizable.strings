@@ -46,6 +46,3 @@
 "card-payment.result.error-message" = "Did fail to authorize invoice with error: '%@'";
 "card-payment.result.default-error-message" = "Did fail to authorize invoice";
 "card-payment.result.success-message" = "Did authorize invoice '%@' with card '%@'";
-"card-payment.challenge.title" = "Do you want to accept the 3DS2 challenge";
-"card-payment.challenge.accept" = "Accept";
-"card-payment.challenge.reject" = "Reject";
