@@ -7,7 +7,7 @@
 
 import Foundation
 
-@available(*, deprecated, message: "Declaration will be removed in version 4.0.", renamed: "POAlternativePaymentMethodResponse")
+@available(*, deprecated, message: "Use ProcessOutApi.shared.customerTokens.assignCustomerToken() instead.")
 public final class APMTokenReturn {
 
     public enum APMReturnType {
