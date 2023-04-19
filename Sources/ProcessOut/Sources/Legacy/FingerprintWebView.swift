@@ -7,6 +7,7 @@
 
 import Foundation
 
+@available(*, deprecated)
 final class FingerprintWebView: ProcessOutWebView {
 
     private var timeOutTimer: Timer?

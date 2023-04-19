@@ -16,6 +16,7 @@ enum HTTPMethod: String {
     case connect = "CONNECT"
 }
 
+@available(*, deprecated, message: "Use ProcessOutApi instead.")
 public final class ProcessOutLegacyApi {
 
     public struct Contact {
