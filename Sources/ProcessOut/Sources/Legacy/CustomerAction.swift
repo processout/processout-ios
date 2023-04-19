@@ -7,6 +7,7 @@
 
 import Foundation
 
+@available(*, deprecated, message: "Use PO3DSService instead.")
 public final class CustomerAction: Codable {
     
     public enum CustomerActionType: String, Codable {

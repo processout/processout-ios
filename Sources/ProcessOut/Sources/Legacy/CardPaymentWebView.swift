@@ -7,6 +7,7 @@
 
 import Foundation
 
+@available(*, deprecated)
 final class CardPaymentWebView: ProcessOutWebView {
     
     override func onRedirect(url: URL) {

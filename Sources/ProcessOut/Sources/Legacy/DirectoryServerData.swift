@@ -6,6 +6,7 @@
 //
 
 /// Object passed to the doFingerprint function
+@available(*, deprecated, message: "Use PO3DSService instead.")
 public final class DirectoryServerData: Codable {
 
     public var directoryServerID: String = ""

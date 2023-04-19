@@ -9,13 +9,14 @@ import Foundation
 import UIKit
 import WebKit
 
+@available(*, deprecated)
 final class CustomerActionHandler {
     
     var handler: ThreeDSHandler
     var with: UIViewController
     var processOutWebView: ProcessOutWebView
     
-    public init(handler: ThreeDSHandler, processOutWebView: ProcessOutWebView, with: UIViewController) {
+    init(handler: ThreeDSHandler, processOutWebView: ProcessOutWebView, with: UIViewController) {
         self.handler = handler
         self.with = with
         self.processOutWebView = processOutWebView
@@ -27,7 +28,7 @@ final class CustomerActionHandler {
     /// - Parameters:
     ///   - customerAction: the customerAction returned by the auth request
     ///   - completion: completion callback
-    public func handleCustomerAction(customerAction: CustomerAction, completion: @escaping (String) -> Void) {
+    func handleCustomerAction(customerAction: CustomerAction, completion: @escaping (String) -> Void) {
         switch customerAction.type{
             // 3DS2 fingerprint request
         case .fingerPrintMobile:
