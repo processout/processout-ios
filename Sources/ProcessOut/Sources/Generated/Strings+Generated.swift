@@ -62,6 +62,17 @@ internal enum Strings {
       internal static var message: String { return Strings.tr("ProcessOut", "native-alternative-payment.success.message") }
     }
   }
+
+  internal enum Test3DS {
+    internal enum Challenge {
+      /// Accept
+      internal static var accept: String { return Strings.tr("ProcessOut", "test-3-d-s.challenge.accept") }
+      /// Reject
+      internal static var reject: String { return Strings.tr("ProcessOut", "test-3-d-s.challenge.reject") }
+      /// Do you want to accept the 3DS2 challenge?
+      internal static var title: String { return Strings.tr("ProcessOut", "test-3-d-s.challenge.title") }
+    }
+  }
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:enable nesting type_body_length type_name vertical_whitespace_opening_braces

@@ -37,6 +37,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``PO3DS2Challenge``
 - ``PO3DSRedirect``
 - ``PO3DSRedirectViewControllerBuilder``
+- ``POTest3DSService``
 
 ### Native Alternative Payment Method
 
