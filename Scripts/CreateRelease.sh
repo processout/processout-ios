@@ -14,7 +14,6 @@ RELEASE_VERSION=$(cat Version.resolved)
 # Creates release
 gh release create $RELEASE_VERSION \
   --generate-notes \
-  --verify-tag \
   .build/framework/*.xcframework.zip \
   .build/documentation/*.doccarchive.zip
 
