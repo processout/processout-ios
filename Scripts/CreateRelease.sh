@@ -22,5 +22,5 @@ for PRODUCT in "ProcessOut" "ProcessOutCheckout3DS"; do
   # Workaround to ignore false-negative [errors](https://github.com/CocoaPods/CocoaPods/issues/11621)
   # that could happen when pushing podspecs.
   set +e
-  pod trunk push $PRODUCT.podspec --allow-warnings
+  bundle exec pod trunk push $PRODUCT.podspec --allow-warnings
 done
