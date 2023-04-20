@@ -14,8 +14,7 @@ xcodebuild clean test \
 
 # Checkout3DS dependency is only available via cocoapods now, so target is tested
 # using `pod lib lint`.
-# Uncomment code below when 3.4.0 is released.
-# bundle exec pod repo update
-# bundle exec pod lib lint ProcessOutCheckout3DS.podspec --allow-warnings
+bundle exec pod repo update
+bundle exec pod lib lint ProcessOutCheckout3DS.podspec --allow-warnings
 
 # todo(andrii-vysotskyi): run example target tests when POM-144 is resolved
