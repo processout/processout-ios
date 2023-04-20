@@ -19,5 +19,8 @@ gh release create $RELEASE_VERSION \
 
 # Push Podspecs
 for PRODUCT in "ProcessOut" "ProcessOutCheckout3DS"; do
-    pod trunk push $PRODUCT.podspec --allow-warnings
+  # Workaround to ignore false-negative [errors](https://github.com/CocoaPods/CocoaPods/issues/11621)
+  # that could happen when pushing podspecs.
+  set +e
+  pod trunk push $PRODUCT.podspec --allow-warnings
 done
