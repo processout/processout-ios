@@ -24,7 +24,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           add-paths: |
-            ProcessOut.podspec
+            *.podspec
             Version.resolved
             Sources/**/*.swift
           commit-message: Update version
