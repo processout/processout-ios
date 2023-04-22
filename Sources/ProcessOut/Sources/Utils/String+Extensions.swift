@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension String {
+extension StringProtocol {
 
     /// A new string made from the string by removing all character in given `characterSet`.
     func removingCharacters(in characterSet: CharacterSet) -> String {

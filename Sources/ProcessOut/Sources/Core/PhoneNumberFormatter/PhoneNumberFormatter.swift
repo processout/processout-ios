@@ -16,8 +16,11 @@ final class PhoneNumberFormatter {
 
     func format(partialNumber: String) -> String {
         var normalizedNumber = normalized(number: partialNumber)
-        guard let metadata = extractMetadata(number: &normalizedNumber), !normalizedNumber.isEmpty else {
-            return "+ \(normalizedNumber)"
+        guard let metadata = extractMetadata(number: &normalizedNumber) else {
+            return partialNumber
+        }
+        guard !normalizedNumber.isEmpty else {
+            return "+\(metadata.countryCode) "
         }
         var potentialFormats: [PhoneNumberFormat] = []
         if let formatted = attemptToFormat(

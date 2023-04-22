@@ -236,19 +236,88 @@ extension NativeAlternativePaymentMethodParametersView: UITextFieldDelegate {
     func textField(
         _ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String
     ) -> Bool {
-        let text = textField.text ?? ""
         guard let index = inputFormViews.map(\.textField.control).firstIndex(of: textField),
-              let parameter = currentParameters?[index],
-              let replacementRange = Range(range, in: text) else {
+              let parameter = currentParameters?[index] else {
             return true
         }
-        let updatedText = text.replacingCharacters(in: replacementRange, with: string)
+        // swiftlint:disable:next legacy_objc_type
+        let updatedText = (textField.text as? NSString)?.replacingCharacters(in: range, with: string) ?? ""
         let formattedText = parameter.formatted(updatedText)
-        if formattedText != updatedText {
-            textField.text = formattedText
-            textField.sendActions(for: .editingChanged)
-            return false
+        guard formattedText != updatedText, #available(iOS 13.0, *) else {
+            return true
         }
-        return true
+        textField.text = formattedText
+        let adjustedOffset = adjustedCursorOffset(
+            in: formattedText,
+            source: updatedText,
+            sourceCursorOffset: range.lowerBound + string.count,
+            ignoredCharacters: .decimalDigits.inverted,
+            greedy: !string.isEmpty
+        )
+        if let position = textField.position(from: textField.beginningOfDocument, offset: adjustedOffset) {
+            textField.selectedTextRange = textField.textRange(from: position, to: position)
+        }
+        textField.sendActions(for: .editingChanged)
+        return false
     }
+}
+
+@available(iOS 13.0, *)
+/// Returns index in formatted string that matches index in `string`.
+private func formattedStringIndex(
+    offset: Int, string: String, formattedString: String, formattingCharacterSet: CharacterSet = .decimalDigits.inverted
+) -> Int {
+    let offsetIndex = string.index(string.startIndex, offsetBy: offset)
+
+    let lhs = String(string.prefix(upTo: offsetIndex)).removingCharacters(in: formattingCharacterSet)
+    let rhs = String(string.suffix(from: offsetIndex)).removingCharacters(in: formattingCharacterSet)
+
+    var bestIndex: String.Index?
+    var bestDifference = Int.max
+
+    for tOffset in 0 ... formattedString.count {
+        let tIndex = formattedString.index(formattedString.startIndex, offsetBy: tOffset)
+        let tLhs = String(formattedString.prefix(upTo: tIndex)).removingCharacters(in: formattingCharacterSet)
+        let tRhs = String(formattedString.suffix(from: tIndex)).removingCharacters(in: formattingCharacterSet)
+
+        let difference = tLhs.difference(from: lhs).count + tRhs.difference(from: rhs).count
+        if difference < bestDifference {
+            bestIndex = tIndex
+            bestDifference = difference
+        }
+    }
+    // todo: shift to the right if adding new characters
+    return formattedString.distance(from: formattedString.startIndex, to: bestIndex ?? formattedString.endIndex)
+}
+
+/// Returns index in formatted string that matches index in `string`.
+@available(iOS 13.0, *)
+func adjustedCursorOffset(
+    in target: String,
+    source: String,
+    sourceCursorOffset: Int,
+    ignoredCharacters: CharacterSet = [],
+    greedy: Bool = true
+) -> Int {
+    let sourceCursorIndex = source.index(source.startIndex, offsetBy: sourceCursorOffset)
+
+    let sourceLhs = source.prefix(upTo: sourceCursorIndex).removingCharacters(in: ignoredCharacters)
+    let sourceRhs = source.suffix(from: sourceCursorIndex).removingCharacters(in: ignoredCharacters)
+
+    var minimumDistance: Int = .max
+    var adjustedCursorIndex = target.endIndex
+
+    for offset in 0 ... target.count {
+        let index = target.index(target.startIndex, offsetBy: offset)
+        let targetLhs = target.prefix(upTo: index).removingCharacters(in: ignoredCharacters)
+        let targetRhs = target.suffix(from: index).removingCharacters(in: ignoredCharacters)
+
+        let distance = targetLhs.difference(from: sourceLhs).count + targetRhs.difference(from: sourceRhs).count
+
+        if distance < minimumDistance || (greedy && distance <= minimumDistance) {
+            adjustedCursorIndex = index
+            minimumDistance = distance
+        }
+    }
+    return target.distance(from: target.startIndex, to: adjustedCursorIndex)
 }
