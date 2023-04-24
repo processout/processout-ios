@@ -178,7 +178,7 @@ final class NativeAlternativePaymentMethodParametersView: UIStackView {
         for parameterType: NativeAlternativePaymentMethodViewModelState.ParameterType
     ) -> UITextContentType? {
         switch parameterType {
-        case .text:
+        case .text, .singleChoice:
             return nil
         case .email:
             return .emailAddress

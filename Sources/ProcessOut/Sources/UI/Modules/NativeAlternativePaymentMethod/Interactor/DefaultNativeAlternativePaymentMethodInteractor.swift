@@ -305,6 +305,9 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                     errorMessage = Strings.NativeAlternativePayment.Error.invalidEmail
                 case .phone:
                     errorMessage = Strings.NativeAlternativePayment.Error.invalidPhone
+                case .singleChoice:
+                    // TODO(andrii-vysotskyi): replace with proper error message when available.
+                    errorMessage = "Invalid choise value"
                 }
             } else {
                 errorMessage = nil
