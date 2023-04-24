@@ -91,6 +91,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 value: value?.value ?? "",
                 type: parameter.type,
                 length: parameter.length,
+                availableValues: parameter.availableValues?.map(\.displayName) ?? [],
                 errorMessage: value?.recentErrorMessage,
                 update: { [weak self] newValue in
                     _ = self?.interactor.updateValue(newValue, for: parameter.key)

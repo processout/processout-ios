@@ -51,6 +51,9 @@ enum NativeAlternativePaymentMethodViewModelState {
         /// Required parameter's length.
         let length: Int?
 
+        /// Available values.
+        let availableValues: [String]
+
         /// Error message associated with this parameter if any.
         let errorMessage: String?
 
