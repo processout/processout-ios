@@ -436,6 +436,9 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 message = Strings.NativeAlternativePayment.Error.invalidEmail
             case .phone where value.range(of: Constants.phoneRegex, options: .regularExpression) == nil:
                 message = Strings.NativeAlternativePayment.Error.invalidPhone
+            case .singleChoice where parameter.availableValues?.map(\.displayName).contains(value) == false:
+                // TODO(andrii-vysotskyi): replace with proper error message when available.
+                message = "Unsuppored choice"
             default:
                 message = nil
             }
