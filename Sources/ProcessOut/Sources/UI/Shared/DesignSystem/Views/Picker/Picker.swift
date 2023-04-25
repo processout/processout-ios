@@ -160,16 +160,19 @@ final class Picker: UIControl, InputFormTextField {
             }
             actionSheetController.addAction(action)
         }
-        var viewController: UIViewController?
-        while next != nil {
-            if let nextViewController = next as? UIViewController {
-                viewController = nextViewController
-                break
+        let viewController: UIViewController? = {
+            var nextResponder = next
+            while nextResponder != nil {
+                if let viewController = nextResponder as? UIViewController {
+                    return viewController
+                }
+                nextResponder = nextResponder?.next
             }
-        }
+            return nil
+        }()
         guard let viewController else {
             return
         }
-        viewController.present(viewController, animated: true)
+        viewController.present(actionSheetController, animated: true)
     }
 }
