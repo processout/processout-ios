@@ -7,7 +7,7 @@
 
 import UIKit
 
-// todo(andrii-vysotskyi): add icon
+// todo(andrii-vysotskyi): add icon and placeholder
 final class Picker: UIControl, InputFormTextField {
 
     init() {
