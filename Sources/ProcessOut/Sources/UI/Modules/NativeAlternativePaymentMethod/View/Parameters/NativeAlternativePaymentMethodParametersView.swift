@@ -76,7 +76,12 @@ final class NativeAlternativePaymentMethodParametersView: UIStackView {
         parameters.enumerated().forEach { offset, parameter in
             let isLastParameter = offset + 1 == parameters.count
             let inputFormView: InputFormView
-            if let length = parameter.length, length <= maximumCodeLength, parameter.type == .numeric {
+            if !parameter.availableValues.isEmpty {
+                let picker = Picker()
+                picker.accessibilityIdentifier = "native-alternative-payment.picker"
+                picker.configure(viewModel: pickerViewModel(for: parameter), animated: false)
+                inputFormView = InputFormView(textField: picker, style: style.input)
+            } else if let length = parameter.length, length <= maximumCodeLength, parameter.type == .numeric {
                 let codeTextField = CodeTextField(length: length)
                 codeTextField.accessibilityIdentifier = "native-alternative-payment.code-input"
                 codeTextField.delegate = self
@@ -116,7 +121,9 @@ final class NativeAlternativePaymentMethodParametersView: UIStackView {
     ) {
         inputFormViews.enumerated().forEach { offset, inputFormView in
             let parameter = parameters[offset]
-            if let textField = inputFormView.textField as? CodeTextField {
+            if let picker = inputFormView.textField as? Picker {
+                picker.configure(viewModel: pickerViewModel(for: parameter), animated: animated)
+            } else if let textField = inputFormView.textField as? CodeTextField {
                 if textField.text != parameter.value {
                     textField.text = parameter.value
                 }
@@ -129,6 +136,8 @@ final class NativeAlternativePaymentMethodParametersView: UIStackView {
                 containerView.textField.placeholder = parameter.placeholder
                 containerView.textField.keyboardType = keyboardType(for: parameter.type)
                 containerView.textField.textContentType = textContentType(for: parameter.type)
+            } else {
+                assertionFailure("Unexpected input type.")
             }
             let inputFormViewModel = InputFormView.ViewModel(
                 title: parameter.name, description: parameter.errorMessage, isInError: parameter.errorMessage != nil
@@ -161,6 +170,7 @@ final class NativeAlternativePaymentMethodParametersView: UIStackView {
                 && lhs.placeholder == rhs.placeholder
                 && lhs.type == rhs.type
                 && lhs.length == rhs.length
+                && lhs.availableValues == rhs.availableValues
         }
         return valid ?? false
     }
@@ -189,6 +199,17 @@ final class NativeAlternativePaymentMethodParametersView: UIStackView {
         }
     }
 
+    private func pickerViewModel(
+        for parameter: NativeAlternativePaymentMethodViewModelState.Parameter
+    ) -> PickerViewModel {
+        let options = parameter.availableValues.map { value in
+            PickerViewModel.Option(title: value, isSelected: value == parameter.value) {
+                parameter.update(value)
+            }
+        }
+        return PickerViewModel(title: parameter.value, options: options)
+    }
+
     // MARK: - Actions
 
     @objc
@@ -198,6 +219,7 @@ final class NativeAlternativePaymentMethodParametersView: UIStackView {
               parameters.indices.contains(index) else {
             return
         }
+        // Never called when input is Picker
         let text: String?
         if let codeTextField = control as? CodeTextField {
             text = codeTextField.text
