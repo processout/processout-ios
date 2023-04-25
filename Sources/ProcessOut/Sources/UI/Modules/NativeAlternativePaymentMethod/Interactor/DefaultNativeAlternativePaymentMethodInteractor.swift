@@ -299,15 +299,12 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 switch parameter.type {
                 case .numeric:
                     errorMessage = Strings.NativeAlternativePayment.Error.invalidNumber
-                case .text:
-                    errorMessage = Strings.NativeAlternativePayment.Error.invalidText
+                case .text, .singleChoice:
+                    errorMessage = Strings.NativeAlternativePayment.Error.invalidValue
                 case .email:
                     errorMessage = Strings.NativeAlternativePayment.Error.invalidEmail
                 case .phone:
                     errorMessage = Strings.NativeAlternativePayment.Error.invalidPhone
-                case .singleChoice:
-                    // TODO(andrii-vysotskyi): replace with proper error message when available.
-                    errorMessage = "Invalid choise value"
                 }
             } else {
                 errorMessage = nil
@@ -456,8 +453,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             case .phone where value.range(of: Constants.phoneRegex, options: .regularExpression) == nil:
                 message = Strings.NativeAlternativePayment.Error.invalidPhone
             case .singleChoice where parameter.availableValues?.map(\.displayName).contains(value) == false:
-                // TODO(andrii-vysotskyi): replace with proper error message when available.
-                message = "Unsuppored choice"
+                message = Strings.NativeAlternativePayment.Error.invalidValue
             default:
                 message = nil
             }
