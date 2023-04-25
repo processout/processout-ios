@@ -132,7 +132,7 @@ final class Picker: UIControl, InputFormTextField {
                 .textStyle(textStyle: .body)
                 .maximumFontSize(Constants.maximumFontSize)
                 .textColor(currentStyle.text.color)
-                .alignment(.center)
+                .alignment(.natural)
                 .string(currentViewModel.title)
                 .build()
             if animated, currentAttributedText != titleLabel.attributedText {
