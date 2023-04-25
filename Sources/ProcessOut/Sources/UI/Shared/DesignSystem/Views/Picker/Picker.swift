@@ -7,7 +7,7 @@
 
 import UIKit
 
-// todo(andrii-vysotskyi): add icon and placeholder
+// todo(andrii-vysotskyi): add placeholder
 final class Picker: UIControl, InputFormTextField {
 
     init() {
@@ -83,6 +83,14 @@ final class Picker: UIControl, InputFormTextField {
         return label
     }()
 
+    private lazy var iconImageView: UIImageView = {
+        let imageView = UIImageView(image: Asset.Images.chevronDown.image)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.setContentHuggingPriority(.required, for: .horizontal)
+        imageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+        return imageView
+    }()
+
     private var currentStyle: POTextFieldStyle?
     private var currentViewModel: PickerViewModel?
 
@@ -92,12 +100,15 @@ final class Picker: UIControl, InputFormTextField {
         accessibilityTraits = [.button]
         translatesAutoresizingMaskIntoConstraints = false
         addSubview(titleLabel)
+        addSubview(iconImageView)
         let constraints = [
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.horizontalInset),
-            titleLabel.trailingAnchor.constraint(
-                lessThanOrEqualTo: trailingAnchor, constant: Constants.horizontalInset
-            ),
             titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            titleLabel.trailingAnchor.constraint(
+                equalTo: iconImageView.leadingAnchor, constant: -Constants.horizontalInset
+            ),
+            iconImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            iconImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.horizontalInset),
             heightAnchor.constraint(equalToConstant: Constants.height)
         ]
         NSLayoutConstraint.activate(constraints)
