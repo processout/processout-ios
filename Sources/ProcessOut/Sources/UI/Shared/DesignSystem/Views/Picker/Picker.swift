@@ -67,7 +67,7 @@ final class Picker: UIControl, InputFormTextField {
 
     private enum Constants {
         static let height: CGFloat = 48
-        static let minimumEdgesSpacing: CGFloat = 4
+        static let horizontalInset: CGFloat = 12
         static let maximumFontSize: CGFloat = 32
         static let animationDuration: TimeInterval = 0.25
     }
@@ -93,9 +93,9 @@ final class Picker: UIControl, InputFormTextField {
         translatesAutoresizingMaskIntoConstraints = false
         addSubview(titleLabel)
         let constraints = [
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.minimumEdgesSpacing),
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.horizontalInset),
             titleLabel.trailingAnchor.constraint(
-                lessThanOrEqualTo: trailingAnchor, constant: Constants.minimumEdgesSpacing
+                lessThanOrEqualTo: trailingAnchor, constant: Constants.horizontalInset
             ),
             titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
             heightAnchor.constraint(equalToConstant: Constants.height)
