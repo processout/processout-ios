@@ -150,6 +150,7 @@ final class Picker: UIControl, InputFormTextField {
 
     @objc
     private func didTouchUpInside() {
+        // Fallback for iOS < 14
         guard let currentViewModel else {
             return
         }
