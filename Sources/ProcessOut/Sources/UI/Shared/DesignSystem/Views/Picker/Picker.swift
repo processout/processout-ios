@@ -7,11 +7,10 @@
 
 import UIKit
 
-// todo: add icon
-final class Picker: UIControl {
+// todo(andrii-vysotskyi): add icon
+final class Picker: UIControl, InputFormTextField {
 
-    init(style: POPickerStyle) {
-        self.style = style
+    init() {
         super.init(frame: .zero)
         commonInit()
     }
@@ -22,40 +21,26 @@ final class Picker: UIControl {
     }
 
     func configure(viewModel: PickerViewModel, animated: Bool) {
-        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
-            let currentStyle = style(isHighlighted: isHighlighted)
-            let currentAttributedText = titleLabel.attributedText
-            titleLabel.attributedText = AttributedStringBuilder()
-                .typography(currentStyle.title.typography)
-                .textStyle(textStyle: .body)
-                .maximumFontSize(Constants.maximumFontSize)
-                .textColor(currentStyle.title.color)
-                .alignment(.center)
-                .string(viewModel.title)
-                .build()
-            if animated, currentAttributedText != titleLabel.attributedText {
-                titleLabel.addTransitionAnimation()
-            }
-            apply(style: currentStyle.border)
-            apply(style: currentStyle.shadow)
-            backgroundColor = currentStyle.backgroundColor
-            UIView.performWithoutAnimation(layoutIfNeeded)
-        }
         currentViewModel = viewModel
-        accessibilityLabel = viewModel.title
+        configureWithCurrentState(animated: animated)
+    }
+
+    func configure(style: POTextFieldStyle, animated: Bool) {
+        currentStyle = style
+        configureWithCurrentState(animated: animated)
     }
 
     override var isHighlighted: Bool {
-        didSet { configureWithCurrentViewModel(animated: true) }
+        didSet { configureWithCurrentState(animated: true) }
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        if traitCollection.isColorAppearanceDifferent(to: previousTraitCollection) {
-            let style = style(isHighlighted: isHighlighted)
-            layer.borderColor = style.border.color.cgColor
-            layer.shadowColor = style.shadow.color.cgColor
+        guard traitCollection.isColorAppearanceDifferent(to: previousTraitCollection), let currentStyle else {
+            return
         }
+        layer.borderColor = currentStyle.border.color.cgColor
+        layer.shadowColor = currentStyle.shadow.color.cgColor
     }
 
     // MARK: - UIContextMenuInteractionDelegate
@@ -89,8 +74,6 @@ final class Picker: UIControl {
 
     // MARK: - Private Properties
 
-    private let style: POPickerStyle
-
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -100,6 +83,7 @@ final class Picker: UIControl {
         return label
     }()
 
+    private var currentStyle: POTextFieldStyle?
     private var currentViewModel: PickerViewModel?
 
     // MARK: - Private Methods
@@ -126,14 +110,29 @@ final class Picker: UIControl {
         isAccessibilityElement = true
     }
 
-    private func configureWithCurrentViewModel(animated: Bool) {
-        if let currentViewModel {
-            configure(viewModel: currentViewModel, animated: animated)
+    private func configureWithCurrentState(animated: Bool) {
+        guard let currentViewModel, let currentStyle else {
+            return
         }
-    }
-
-    private func style(isHighlighted: Bool) -> POPickerStateStyle {
-        isHighlighted ? style.highlighted : style.normal
+        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
+            let currentAttributedText = titleLabel.attributedText
+            titleLabel.attributedText = AttributedStringBuilder()
+                .typography(currentStyle.text.typography)
+                .textStyle(textStyle: .body)
+                .maximumFontSize(Constants.maximumFontSize)
+                .textColor(currentStyle.text.color)
+                .alignment(.center)
+                .string(currentViewModel.title)
+                .build()
+            if animated, currentAttributedText != titleLabel.attributedText {
+                titleLabel.addTransitionAnimation()
+            }
+            apply(style: currentStyle.border)
+            apply(style: currentStyle.shadow)
+            backgroundColor = currentStyle.backgroundColor
+            UIView.performWithoutAnimation(layoutIfNeeded)
+        }
+        accessibilityLabel = currentViewModel.title
     }
 
     // MARK: - Actions
