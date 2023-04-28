@@ -6,15 +6,8 @@ on:
       - edited
       - synchronize
 jobs:
-  verify-pr-title:
-    name: Verify Pull Request Title
-    runs-on: ubuntu-latest
-    steps:
-      - name: Validate Pull Request title
-        uses: amannn/action-semantic-pull-request@v5.2.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          scopes: |
-            .+
-          requireScope: true
+  verify:
+    name: Verify Conventions
+    uses: processout/actions/.github/workflows/github-conventions.yaml@master
+    secrets:
+      GH_TOKEN: ${{ secrets.PO_GITHUB_TOKEN }}
