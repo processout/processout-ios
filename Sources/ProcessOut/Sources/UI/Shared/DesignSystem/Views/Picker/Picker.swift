@@ -84,7 +84,7 @@ final class Picker: UIControl, InputFormTextField {
     }()
 
     private lazy var iconImageView: UIImageView = {
-        let imageView = UIImageView(image: Asset.Images.chevronDown.image)
+        let imageView = UIImageView(image: Asset.Images.chevronDown.image.withRenderingMode(.alwaysTemplate))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.setContentHuggingPriority(.required, for: .horizontal)
         imageView.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -140,6 +140,7 @@ final class Picker: UIControl, InputFormTextField {
             }
             apply(style: currentStyle.border)
             apply(style: currentStyle.shadow)
+            iconImageView.tintColor = currentStyle.tintColor
             backgroundColor = currentStyle.backgroundColor
             UIView.performWithoutAnimation(layoutIfNeeded)
         }
