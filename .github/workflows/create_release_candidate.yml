@@ -20,12 +20,6 @@ jobs:
         run: |
           source Scripts/UpdateVersion.sh --${{ inputs.release_type }}
           echo "UPDATED_VERSION=$(cat Version.resolved)" >> $GITHUB_ENV
-      - name: Configure Git
-        env:
-          PO_GITHUB_TOKEN: ${{ secrets.PO_GITHUB_TOKEN }}
-          PO_GITHUB_USER: ${{ secrets.PO_GITHUB_USER }}
-        run: |
-          git config --global url."https://${PO_GITHUB_USER}:${PO_GITHUB_TOKEN}@github.com".insteadOf "https://github.com"
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
