@@ -150,7 +150,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     private func placeholder(for parameter: PONativeAlternativePaymentMethodParameter) -> String? {
         switch parameter.type {
-        case .numeric, .text, .singleChoice:
+        case .numeric, .text, .singleSelect:
             return nil
         case .email:
             return Strings.Email.placeholder

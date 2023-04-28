@@ -24,7 +24,7 @@ public struct PONativeAlternativePaymentMethodParameter: Decodable {
         case phone
 
         /// For fields where user needs to select one of available values.
-        case singleChoice = "single-choice"
+        case singleSelect = "single-select"
     }
 
     /// Describes available value.

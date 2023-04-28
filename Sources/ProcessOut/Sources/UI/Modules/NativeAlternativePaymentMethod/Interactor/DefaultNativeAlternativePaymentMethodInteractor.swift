@@ -299,7 +299,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 switch parameter.type {
                 case .numeric:
                     errorMessage = Strings.NativeAlternativePayment.Error.invalidNumber
-                case .text, .singleChoice:
+                case .text, .singleSelect:
                     errorMessage = Strings.NativeAlternativePayment.Error.invalidValue
                 case .email:
                     errorMessage = Strings.NativeAlternativePayment.Error.invalidEmail
@@ -372,7 +372,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                                 precondition(value.count == length, "Unexpected parameter length.")
                             }
                             defaultValue = self.formatted(value: value, type: parameter.type)
-                        case .singleChoice:
+                        case .singleSelect:
                             precondition(
                                 parameter.availableValues?.map(\.displayName).contains(value) == true,
                                 "Unknown choice parameter value."
@@ -399,7 +399,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         switch parameter.type {
         case .email, .numeric, .phone, .text:
             return formatted(value: "", type: parameter.type)
-        case .singleChoice:
+        case .singleSelect:
             return parameter.availableValues?.first { $0.default == true }?.displayName ?? ""
         }
     }
@@ -452,7 +452,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 message = Strings.NativeAlternativePayment.Error.invalidEmail
             case .phone where value.range(of: Constants.phoneRegex, options: .regularExpression) == nil:
                 message = Strings.NativeAlternativePayment.Error.invalidPhone
-            case .singleChoice where parameter.availableValues?.map(\.displayName).contains(value) == false:
+            case .singleSelect where parameter.availableValues?.map(\.displayName).contains(value) == false:
                 message = Strings.NativeAlternativePayment.Error.invalidValue
             default:
                 message = nil
