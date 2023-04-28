@@ -1,5 +1,5 @@
 //
-//  ReferenceTypeWrapper.swift
+//  ReferenceWrapper.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 27.04.2023.
@@ -8,7 +8,7 @@
 import Foundation
 
 @propertyWrapper
-final class ReferenceTypeWrapper<Value> {
+final class ReferenceWrapper<Value> {
 
     typealias Observer = (_ value: Value) -> Void
 
@@ -21,7 +21,7 @@ final class ReferenceTypeWrapper<Value> {
         didSet { wrappedValueDidChange() }
     }
 
-    var projectedValue: ReferenceTypeWrapper<Value> {
+    var projectedValue: ReferenceWrapper<Value> {
         self
     }
 
@@ -58,9 +58,9 @@ final class ReferenceTypeWrapper<Value> {
     }
 }
 
-extension ReferenceTypeWrapper: Hashable, Equatable where Value: Hashable {
+extension ReferenceWrapper: Hashable, Equatable where Value: Hashable {
 
-    static func == (lhs: ReferenceTypeWrapper, rhs: ReferenceTypeWrapper) -> Bool {
+    static func == (lhs: ReferenceWrapper, rhs: ReferenceWrapper) -> Bool {
         lhs.wrappedValue == rhs.wrappedValue && lhs.observerIds == rhs.observerIds
     }
 
