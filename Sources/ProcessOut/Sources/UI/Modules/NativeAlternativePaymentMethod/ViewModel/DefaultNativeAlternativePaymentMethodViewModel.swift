@@ -85,13 +85,26 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
     ) -> State {
         let parameters = startedState.parameters.map { parameter -> State.Parameter in
             let value = startedState.values[parameter.key]
+            let parameterValue: String
+            if case .singleSelect = parameter.type {
+                // Value of single select parameter is not user friendly instead display name should be used
+                parameterValue = parameter.availableValues?.first { $0.value == value?.value }?.displayName ?? ""
+            } else {
+                parameterValue = value?.value ?? ""
+            }
             let viewModel = State.Parameter(
                 name: parameter.displayName,
                 placeholder: placeholder(for: parameter),
-                value: value?.value ?? "",
+                value: parameterValue,
                 type: parameter.type,
                 length: parameter.length,
-                availableValues: parameter.availableValues?.map(\.displayName) ?? [],
+                availableValues: parameter.availableValues?.map { availableValue in
+                    State.AvailableParameterValue(
+                        name: availableValue.displayName,
+                        value: availableValue.value,
+                        isSelected: availableValue.value == value?.value
+                    )
+                } ?? [],
                 errorMessage: value?.recentErrorMessage,
                 update: { [weak self] newValue in
                     _ = self?.interactor.updateValue(newValue, for: parameter.key)

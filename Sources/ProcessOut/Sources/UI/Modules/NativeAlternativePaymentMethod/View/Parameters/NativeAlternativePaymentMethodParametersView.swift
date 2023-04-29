@@ -202,9 +202,9 @@ final class NativeAlternativePaymentMethodParametersView: UIStackView {
     private func pickerViewModel(
         for parameter: NativeAlternativePaymentMethodViewModelState.Parameter
     ) -> PickerViewModel {
-        let options = parameter.availableValues.map { value in
-            PickerViewModel.Option(title: value, isSelected: value == parameter.value) {
-                parameter.update(value)
+        let options = parameter.availableValues.map { availableValue in
+            PickerViewModel.Option(title: availableValue.name, isSelected: availableValue.isSelected) {
+                parameter.update(availableValue.value)
             }
         }
         return PickerViewModel(title: parameter.value, options: options)
