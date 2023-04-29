@@ -33,6 +33,9 @@ public struct PONativeAlternativePaymentMethodParameter: Decodable {
         /// Display name of value.
         let displayName: String
 
+        /// Actual value that should be sent to backend if selected.
+        let value: String
+
         /// Indicates whether value is selected by default.
         let `default`: Bool?
     }
