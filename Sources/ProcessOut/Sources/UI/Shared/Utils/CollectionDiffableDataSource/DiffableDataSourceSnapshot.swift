@@ -14,11 +14,18 @@ struct DiffableDataSourceSnapshot<SectionIdentifier: Hashable, ItemIdentifier: H
     }
 
     mutating func appendItems(_ identifiers: [ItemIdentifier], toSection sectionIdentifier: SectionIdentifier) {
+        assert(sectionIdentifiers.contains(sectionIdentifier))
         if let itemIdentifiers = self._itemIdentifiers[sectionIdentifier] {
             self._itemIdentifiers[sectionIdentifier] = itemIdentifiers + identifiers
         } else {
             self._itemIdentifiers[sectionIdentifier] = identifiers
         }
+    }
+
+    private(set) var reloadedSectionIdentifiers: Set<SectionIdentifier> = []
+
+    mutating func reloadSections(_ identifiers: [SectionIdentifier]) {
+        reloadedSectionIdentifiers.formUnion(identifiers)
     }
 
     var numberOfSections: Int {

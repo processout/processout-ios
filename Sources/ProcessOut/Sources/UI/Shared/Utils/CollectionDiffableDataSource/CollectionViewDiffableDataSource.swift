@@ -51,6 +51,11 @@ final class CollectionViewDiffableDataSource<SectionIdentifier: Hashable, ItemId
         }
     }
 
+    func applySnapshotUsingReloadData(_ snapshot: DiffableDataSourceSnapshot<SectionIdentifier, ItemIdentifier>) {
+        currentSnapshot = snapshot
+        collectionView.reloadData()
+    }
+
     /// Returns an identifier for the section at the index you specify in the collection view.
     func sectionIdentifier(for index: Int) -> SectionIdentifier? {
         currentSnapshot.sectionIdentifier(for: index)
@@ -126,6 +131,9 @@ final class CollectionViewDiffableDataSource<SectionIdentifier: Hashable, ItemId
         /// Removals in descending order.
         let removals: [Index]
 
+        /// Reload operations.
+        let reloads: [Index]
+
         /// Insertions in ascending order.
         let insertions: [Index]
 
@@ -156,7 +164,8 @@ final class CollectionViewDiffableDataSource<SectionIdentifier: Hashable, ItemId
             from: itemElements(
                 snapshot: currentSnapshot, excludedSections: IndexSet(sectionUpdates.removals)
             ),
-            to: itemElements(snapshot: snapshot)
+            to: itemElements(snapshot: snapshot),
+            reloadedIdentifiers: []
         )
         collectionView.deleteItems(at: itemUpdates.removals)
         collectionView.insertItems(at: itemUpdates.insertions)
@@ -169,9 +178,11 @@ final class CollectionViewDiffableDataSource<SectionIdentifier: Hashable, ItemId
     private func updateSections(with snapshot: Snapshot) -> Updates<Int> {
         let sectionUpdates = updates(
             from: sectionElements(snapshot: currentSnapshot),
-            to: sectionElements(snapshot: snapshot)
+            to: sectionElements(snapshot: snapshot),
+            reloadedIdentifiers: snapshot.reloadedSectionIdentifiers
         )
         collectionView.deleteSections(IndexSet(sectionUpdates.removals))
+        collectionView.reloadSections(IndexSet(sectionUpdates.reloads))
         collectionView.insertSections(IndexSet(sectionUpdates.insertions))
         for move in sectionUpdates.moves {
             collectionView.moveSection(move.from, toSection: move.to)
@@ -191,7 +202,7 @@ final class CollectionViewDiffableDataSource<SectionIdentifier: Hashable, ItemId
         var itemElements: [Element<ItemIdentifier, IndexPath>] = []
         for (section, sectionIdentifier) in snapshot.sectionIdentifiers.enumerated() {
             guard !excludedSections.contains(section) else {
-                break
+                continue
             }
             let elements = snapshot.itemIdentifiers(inSection: sectionIdentifier).enumerated().map { offset, element in
                 let indexPath = IndexPath(row: offset, section: section)
@@ -204,16 +215,22 @@ final class CollectionViewDiffableDataSource<SectionIdentifier: Hashable, ItemId
 
     /// Calculates needed updates to apply to collection view to transform initial elements into final.
     private func updates<Identifier: Hashable, Index: Equatable>(
-        from initial: [Element<Identifier, Index>], to final: [Element<Identifier, Index>]
+        from initial: [Element<Identifier, Index>],
+        to final: [Element<Identifier, Index>],
+        reloadedIdentifiers: Set<Identifier>
     ) -> Updates<Index> {
         var finalIndices = [Identifier: Index](minimumCapacity: final.count)
         for element in final {
             finalIndices[element.identifier] = element.index
         }
         var removals: [Index] = []
+        var reloads: [Index] = []
         var initialIndices = [Identifier: Index](minimumCapacity: initial.count)
         for element in initial.reversed() {
             if finalIndices.keys.contains(element.identifier) {
+                if reloadedIdentifiers.contains(element.identifier) {
+                    reloads.append(element.index)
+                }
                 // Store element index to it can be used later used to deduce move.
                 initialIndices[element.identifier] = element.index
             } else {
@@ -231,6 +248,6 @@ final class CollectionViewDiffableDataSource<SectionIdentifier: Hashable, ItemId
                 insertions.append(element.index)
             }
         }
-        return Updates(removals: removals, insertions: insertions, moves: moves)
+        return Updates(removals: removals, reloads: reloads, insertions: insertions, moves: moves)
     }
 }
