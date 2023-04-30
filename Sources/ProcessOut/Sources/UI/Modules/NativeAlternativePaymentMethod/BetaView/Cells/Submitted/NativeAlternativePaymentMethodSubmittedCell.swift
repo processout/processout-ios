@@ -1,5 +1,5 @@
 //
-//  BetaNativeAlternativePaymentMethodSubmittedCell.swift
+//  NativeAlternativePaymentMethodSubmittedCell.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 27.04.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class BetaNativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
+final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -21,7 +21,7 @@ final class BetaNativeAlternativePaymentMethodSubmittedCell: UICollectionViewCel
 
     func configure(
         item: BetaNativeAlternativePaymentMethodViewModelState.SubmittedItem,
-        style: BetaNativeAlternativePaymentMethodSubmittedCellStyle
+        style: NativeAlternativePaymentMethodSubmittedCellStyle
     ) {
         if let image = item.logoImage {
             iconImageView.image = image

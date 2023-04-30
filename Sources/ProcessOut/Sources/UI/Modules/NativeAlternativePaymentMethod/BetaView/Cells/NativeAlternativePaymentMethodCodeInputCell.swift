@@ -1,5 +1,5 @@
 //
-//  BetaNativeAlternativePaymentMethodCodeInputCell.swift
+//  NativeAlternativePaymentMethodCodeInputCell.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 26.04.2023.
@@ -7,8 +7,7 @@
 
 import UIKit
 
-final class BetaNativeAlternativePaymentMethodCodeInputCell:
-    UICollectionViewCell, BetaNativeAlternativePaymentMethodCell {
+final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, NativeAlternativePaymentMethodCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
@@ -31,7 +30,7 @@ final class BetaNativeAlternativePaymentMethodCodeInputCell:
         self.item = item
     }
 
-    // MARK: - BetaNativeAlternativePaymentMethodCell
+    // MARK: - NativeAlternativePaymentMethodCell
 
     var inputResponder: UIResponder? {
         codeTextField
@@ -94,7 +93,7 @@ final class BetaNativeAlternativePaymentMethodCodeInputCell:
     }
 }
 
-extension BetaNativeAlternativePaymentMethodCodeInputCell: CodeTextFieldDelegate {
+extension NativeAlternativePaymentMethodCodeInputCell: CodeTextFieldDelegate {
 
     func codeTextFieldShouldBeginEditing(_ textField: CodeTextField) -> Bool {
         item?.isEditingAllowed ?? false

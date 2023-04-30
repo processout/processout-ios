@@ -1,5 +1,5 @@
 //
-//  BetaNativeAlternativePaymentMethodLoaderCell.swift
+//  NativeAlternativePaymentMethodLoaderCell.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 25.04.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class BetaNativeAlternativePaymentMethodLoaderCell: UICollectionViewCell {
+final class NativeAlternativePaymentMethodLoaderCell: UICollectionViewCell {
 
     /// Implementation ignores 2nd and all subsequent calls to this method.
     func initialize(style: POActivityIndicatorStyle?) {

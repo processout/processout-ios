@@ -1,5 +1,5 @@
 //
-//  BetaNativeAlternativePaymentMethodErrorCell.swift
+//  NativeAlternativePaymentMethodErrorCell.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 26.04.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class BetaNativeAlternativePaymentMethodErrorCell: UICollectionViewCell {
+final class NativeAlternativePaymentMethodErrorCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)

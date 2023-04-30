@@ -1,12 +1,11 @@
 //
-//  BetaNativeAlternativePaymentMethodSubmittedCellStyle.swift
+//  NativeAlternativePaymentMethodSubmittedCellStyle.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 27.04.2023.
 //
 
-// swiftlint:disable:next type_name
-struct BetaNativeAlternativePaymentMethodSubmittedCellStyle {
+struct NativeAlternativePaymentMethodSubmittedCellStyle {
 
     /// Message style.
     let message: POTextStyle?
