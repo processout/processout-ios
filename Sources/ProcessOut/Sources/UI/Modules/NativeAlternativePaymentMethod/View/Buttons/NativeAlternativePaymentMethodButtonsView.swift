@@ -35,6 +35,10 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         }
     }
 
+    var contentSize: CGSize {
+        contentView.bounds.size
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {
@@ -75,8 +79,10 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         let constraints = [
             contentView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: horizontalInset),
             contentView.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
-            contentView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Constants.verticalInset),
-            contentView.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor)
+            contentView.topAnchor.constraint(equalTo: topAnchor, constant: Constants.verticalInset),
+            contentView.bottomAnchor.constraint(
+                equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.verticalInset
+            )
         ]
         NSLayoutConstraint.activate(constraints)
     }
