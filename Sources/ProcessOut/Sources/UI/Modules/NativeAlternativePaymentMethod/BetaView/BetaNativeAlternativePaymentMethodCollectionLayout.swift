@@ -36,15 +36,22 @@ final class BetaNativeAlternativePaymentMethodCollectionLayout: UICollectionView
 
     override func prepare() {
         super.prepare()
-        prepareCenteredItemsIfNeeded()
+        contentSize = super.collectionViewContentSize
+        guard let collectionView, let section = delegate.centeredSection(in: collectionView, layout: self) else {
+            return
+        }
+        let updatedHeight = collectionView.bounds.inset(by: collectionView.adjustedContentInset).height
+        let offset = (updatedHeight - contentSize.height) / 2
+        guard offset > 0 else {
+            return
+        }
+        centeredSection = section
+        centeringOffset = offset
+        contentSize.height = updatedHeight
     }
 
     override var collectionViewContentSize: CGSize {
-        var size = super.collectionViewContentSize
-        if let collectionView {
-            size.height = max(size.height, collectionView.bounds.inset(by: collectionView.adjustedContentInset).height)
-        }
-        return size
+        contentSize
     }
 
     override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
@@ -65,6 +72,7 @@ final class BetaNativeAlternativePaymentMethodCollectionLayout: UICollectionView
 
     private var centeredSection: Int?
     private var centeringOffset: CGFloat = 0
+    private var contentSize: CGSize = .zero
 
     private var delegate: BetaNativeAlternativePaymentMethodCollectionLayoutDelegate {
         // swiftlint:disable:next force_cast force_unwrapping
@@ -72,18 +80,6 @@ final class BetaNativeAlternativePaymentMethodCollectionLayout: UICollectionView
     }
 
     // MARK: - Centered Items
-
-    private func prepareCenteredItemsIfNeeded() {
-        guard let collectionView, let section = delegate.centeredSection(in: collectionView, layout: self) else {
-            return
-        }
-        let offset = (collectionViewContentSize.height - super.collectionViewContentSize.height) / 2
-        guard offset > 0 else {
-            return
-        }
-        centeredSection = section
-        centeringOffset = offset
-    }
 
     private func centered(attributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes? {
         switch attributes.representedElementCategory {
