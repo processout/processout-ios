@@ -11,7 +11,7 @@ import UIKit
 
 final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNativeAlternativePaymentMethodViewModel>:
     BaseViewController<ViewModel>,
-    BetaNativeAlternativePaymentMethodCollectionLayoutDelegate,
+    NativeAlternativePaymentMethodCollectionLayoutDelegate,
     BetaNativeAlternativePaymentMethodCellDelegate {
 
     init(viewModel: ViewModel, style: PONativeAlternativePaymentMethodStyle?, logger: POLogger) {
@@ -59,7 +59,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
     // MARK: - CollectionViewDelegateBetaNativeAlternativePaymentMethodLayout
 
     func centeredSection(
-        in collectionView: UICollectionView, layout: BetaNativeAlternativePaymentMethodCollectionLayout
+        in collectionView: UICollectionView, layout: NativeAlternativePaymentMethodCollectionLayout
     ) -> Int? {
         let snapshot = collectionViewDataSource.snapshot()
         for (section, sectionId) in snapshot.sectionIdentifiers.enumerated() {
@@ -221,7 +221,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         return collectionView
     }()
 
-    private lazy var collectionViewLayout = BetaNativeAlternativePaymentMethodCollectionLayout()
+    private lazy var collectionViewLayout = NativeAlternativePaymentMethodCollectionLayout()
     private lazy var collectionCellSizeProvider = CollectionReusableViewSizeProvider()
 
     private lazy var collectionViewDataSource: CollectionViewDiffableDataSource<SectionIdentifier, ItemIdentifier> = {
@@ -255,9 +255,10 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
     // MARK: - State Management
 
     private func configureWithIdleState() {
+        buttonsContainerView.alpha = 0
+        collectionView.contentInset.bottom = 0
         let snapshot = DiffableDataSourceSnapshot<SectionIdentifier, ItemIdentifier>()
         collectionViewDataSource.apply(snapshot, animatingDifferences: false)
-        buttonsContainerView.alpha = 0
     }
 
     /// - Parameters:
@@ -297,16 +298,14 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         let bottomInset: CGFloat
         if let actions = state.actions {
             if actions.secondary != nil {
-                bottomInset = 160 + 16
+                bottomInset = 176
             } else {
-                bottomInset = 96 + 16
+                bottomInset = 112
             }
         } else {
             bottomInset = 16
         }
-        if bottomInset != collectionView.contentInset.bottom {
-            collectionView.contentInset.bottom = bottomInset
-        }
+        collectionView.contentInset.bottom = bottomInset
     }
 
     // MARK: - Current Responder Handling
@@ -377,21 +376,15 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
     private func cell(for item: ItemIdentifier, at indexPath: IndexPath) -> UICollectionViewCell? {
         switch item {
         case .loader:
-            let cell = collectionView.dequeueReusableCell(
-                NativeAlternativePaymentMethodLoaderCell.self, for: indexPath
-            )
+            let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodLoaderCell.self, for: indexPath)
             cell.initialize(style: style?.activityIndicator)
             return cell
         case .title(let item):
-            let cell = collectionView.dequeueReusableCell(
-                NativeAlternativePaymentMethodTitleCell.self, for: indexPath
-            )
+            let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodTitleCell.self, for: indexPath)
             cell.configure(item: item, style: style?.title)
             return cell
         case .input(let item):
-            let cell = collectionView.dequeueReusableCell(
-                NativeAlternativePaymentMethodInputCell.self, for: indexPath
-            )
+            let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodInputCell.self, for: indexPath)
             cell.configure(item: item, style: style?.input)
             cell.delegate = self
             return cell
@@ -403,24 +396,22 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
             cell.delegate = self
             return cell
         case .error(let item):
-            let cell = collectionView.dequeueReusableCell(
-                NativeAlternativePaymentMethodErrorCell.self, for: indexPath
-            )
+            let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodErrorCell.self, for: indexPath)
             cell.configure(item: item, style: style?.input?.error.description)
             return cell
         case .submitted(let item):
             let cell = collectionView.dequeueReusableCell(
                 NativeAlternativePaymentMethodSubmittedCell.self, for: indexPath
             )
-            cell.configure(
-                item: item, style: .init(message: style?.message, successMessage: style?.successMessage)
-            )
+            cell.configure(item: item, style: .init(message: style?.message, successMessage: style?.successMessage))
             return cell
         }
     }
 
     private func supplementaryView(ofKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView? {
-        let sectionIdentifier = collectionViewDataSource.snapshot().sectionIdentifiers[indexPath.section]
+        guard let sectionIdentifier = collectionViewDataSource.sectionIdentifier(for: indexPath.section) else {
+            return nil
+        }
         let view = collectionView.dequeueReusableSupplementaryView(
             NativeAlternativePaymentMethodSectionHeaderView.self, kind: kind, indexPath: indexPath
         )
@@ -428,7 +419,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         return view
     }
 
-    // MARK: - Notifications
+    // MARK: - Keyboard Handling
 
     private func observeNotifications() {
         let willChangeFrameObserver = NotificationCenter.default.addObserver(
@@ -444,22 +435,36 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         notificationObservers = [willChangeFrameObserver]
     }
 
-    // MARK: - Keyboard Handling
-
     private func keyboardWillChangeFrame(notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
             return
         }
+        // it seems that we need to avoid calling layoutIfNeeded, alternative is to add method to layout
+        // delegate to query inset, and in order to keep proper actions animation add sepparate
+        // wrapper view and layout it instead.
+
         let coveredSafeAreaHeight = view.bounds.height
             - view.convert(keyboardFrame, from: nil).minY
             - view.safeAreaInsets.bottom
             + additionalSafeAreaInsets.bottom
         additionalSafeAreaInsets.bottom = max(coveredSafeAreaHeight, 0)
-        view.layoutIfNeeded()
-        collectionView.performBatchUpdates { } // Allows to update collection view with animation
+
+//        let layout = NativeAlternativePaymentMethodCollectionLayout()
+//        layout.minimumLineSpacing = Constants.lineSpacing
+//        collectionView.setCollectionViewLayout(layout, animated: true)
+
+//        view.layoutIfNeeded() // layout if needed calls invalidateLayout :)
+        //collectionView.performBatchUpdates { } // Ensures that layout updates centering as keyboard appears.
+
+//            let context = NativeAlternativePaymentMethodCollectionLayoutInvalidationContext()
+//            context.biba = true
+//            context.invalidateFlowLayoutAttributes = false
+//            collectionViewLayout.invalidateLayout(with: context) // broken layout on iOS 16
+            // calling invalidateLayout from here doesn't prepare layout if thereare pending updates already
+//        }
     }
 
-    // MARK: - Action Buttons
+    // MARK: - Action Buttons Shadow
 
     private func observeScrollViewContentSizeChanges() {
         let observation = collectionView.observe(\.contentSize, options: [.old]) { [weak self] scrollView, value in
@@ -492,5 +497,7 @@ private enum Constants {
 
 // todo: add background decoration to loader and submitted cells
 // todo: move needed classes from legacy to new view
+// todo: validate on older iOS versions
+// todo: refactor buttons inset calculation
 
 // swiftlint:enable type_body_length file_length
