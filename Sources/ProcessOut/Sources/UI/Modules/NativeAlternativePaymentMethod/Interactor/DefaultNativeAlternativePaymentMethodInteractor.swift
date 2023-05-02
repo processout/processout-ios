@@ -293,6 +293,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             } else if invalidFields[parameter.key] != nil {
                 // Server doesn't support localized error messages, so local generic error
                 // description is used instead in case particular field is invalid.
+                // todo(andrii-vysotskyi): remove when backend is updated
                 switch parameter.type {
                 case .numeric:
                     errorMessage = Strings.NativeAlternativePayment.Error.invalidNumber
