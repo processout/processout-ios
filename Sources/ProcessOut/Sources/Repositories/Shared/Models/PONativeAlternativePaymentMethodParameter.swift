@@ -57,6 +57,6 @@ public struct PONativeAlternativePaymentMethodParameter: Decodable {
     /// Parameter's localized name that could be displayed to user.
     public let displayName: String
 
-    /// This property should be non-empty array of available values when `type` is `singleChoice`.
+    /// This property should be non-empty array of available values when `type` is `singleSelect`.
     public let availableValues: [AvailableValue]?
 }
