@@ -221,10 +221,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         send(event: .willWaitForCaptureConfirmation(additionalActionExpected: expectedActionMessage != nil))
         let awaitingCaptureState = State.AwaitingCapture(
             gatewayLogoImage: gatewayLogo,
-            expectedActionMessage: expectedActionMessage.map { _ in
-                // Server doesn't support localizing action messages, so local generic message is used instead.
-                Strings.NativeAlternativePayment.AwaitingCapture.message
-            },
+            expectedActionMessage: expectedActionMessage,
             actionImage: actionImage
         )
         state = .awaitingCapture(awaitingCaptureState)
@@ -296,6 +293,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             } else if invalidFields[parameter.key] != nil {
                 // Server doesn't support localized error messages, so local generic error
                 // description is used instead in case particular field is invalid.
+                // todo(andrii-vysotskyi): remove when backend is updated
                 switch parameter.type {
                 case .numeric:
                     errorMessage = Strings.NativeAlternativePayment.Error.invalidNumber

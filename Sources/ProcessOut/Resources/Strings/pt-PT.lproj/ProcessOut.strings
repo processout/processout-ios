@@ -8,7 +8,6 @@
 
 "native-alternative-payment.title" = "Pagar com %@";
 "native-alternative-payment.success.message" = "Successo!\nPagamento aprovado.";
-"native-alternative-payment.awaiting-capture.message" = "Para completar o pagamento, por favor confirme-o na aplicação bancária.";
 "native-alternative-payment.email.placeholder" = "nome@exemplo.pt";
 "native-alternative-payment.phone.placeholder" = "Insira o seu número de telemóvel";
 "native-alternative-payment.submit-button.title" = "Pagar %@";
