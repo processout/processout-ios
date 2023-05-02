@@ -221,10 +221,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         send(event: .willWaitForCaptureConfirmation(additionalActionExpected: expectedActionMessage != nil))
         let awaitingCaptureState = State.AwaitingCapture(
             gatewayLogoImage: gatewayLogo,
-            expectedActionMessage: expectedActionMessage.map { _ in
-                // Server doesn't support localizing action messages, so local generic message is used instead.
-                Strings.NativeAlternativePayment.AwaitingCapture.message
-            },
+            expectedActionMessage: expectedActionMessage,
             actionImage: actionImage
         )
         state = .awaitingCapture(awaitingCaptureState)
