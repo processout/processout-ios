@@ -41,7 +41,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         let defaultHeaders = [
             "Idempotency-Key": request.id,
             "User-Agent": userAgent,
-            "Accept-Language": "pl"/*Strings.preferredLocalization*/,
+            "Accept-Language": Strings.preferredLocalization,
             "Content-Type": "application/json",
             "Authorization": try authorization(request: request)
         ]
