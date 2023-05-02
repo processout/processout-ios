@@ -375,7 +375,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                         case .singleSelect:
                             precondition(
                                 parameter.availableValues?.map(\.displayName).contains(value) == true,
-                                "Unknown choice parameter value."
+                                "Unknown `singleSelect` parameter value."
                             )
                             defaultValue = value
                         }
