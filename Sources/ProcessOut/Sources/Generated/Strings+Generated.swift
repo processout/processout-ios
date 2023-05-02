@@ -36,7 +36,7 @@ internal enum Strings {
       /// Phone number is not valid
       internal static var invalidPhone: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-phone") }
       /// Value is not valid
-      internal static var invalidText: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-text") }
+      internal static var invalidValue: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-value") }
       /// Parameter is required
       internal static var requiredParameter: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.required-parameter") }
     }

@@ -22,6 +22,22 @@ public struct PONativeAlternativePaymentMethodParameter: Decodable {
 
         /// For phone fields.
         case phone
+
+        /// For fields where user needs to select one of available values.
+        case singleSelect = "single-select"
+    }
+
+    /// Describes available value.
+    public struct AvailableValue: Decodable, Hashable {
+
+        /// Display name of value.
+        let displayName: String
+
+        /// Actual value that should be sent to backend if selected.
+        let value: String
+
+        /// Indicates whether value is selected by default.
+        let `default`: Bool?
     }
 
     /// Name of the field that needs to be collected for the request e.g. blik_code.
@@ -40,4 +56,7 @@ public struct PONativeAlternativePaymentMethodParameter: Decodable {
 
     /// Parameter's localized name that could be displayed to user.
     public let displayName: String
+
+    /// This property should be non-empty array of available values when `type` is `singleSelect`.
+    public let availableValues: [AvailableValue]?
 }

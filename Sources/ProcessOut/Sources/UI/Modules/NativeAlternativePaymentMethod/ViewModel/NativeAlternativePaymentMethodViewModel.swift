@@ -34,6 +34,18 @@ enum NativeAlternativePaymentMethodViewModelState {
         let handler: () -> Void
     }
 
+    struct AvailableParameterValue: Hashable {
+
+        /// User friendly value name.
+        let name: String
+
+        /// Real parameter value.
+        let value: String
+
+        /// Boolean value indicating whether this value is selected.
+        let isSelected: Bool
+    }
+
     struct Parameter {
 
         /// Parameter's name.
@@ -50,6 +62,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Required parameter's length.
         let length: Int?
+
+        /// Available values.
+        let availableValues: [AvailableParameterValue]
 
         /// Error message associated with this parameter if any.
         let errorMessage: String?

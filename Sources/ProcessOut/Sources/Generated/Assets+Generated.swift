@@ -85,6 +85,7 @@ internal enum Asset {
     }
   }
   internal enum Images {
+    internal static let chevronDown = ImageAsset(name: "ChevronDown")
     internal static let success = ImageAsset(name: "Success")
   }
 }

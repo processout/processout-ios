@@ -15,7 +15,7 @@
 "native-alternative-payment.cancel-button.title" = "Cancelar";
 "native-alternative-payment.error.required-parameter" = "Campo obrigatório";
 "native-alternative-payment.error.invalid-number" = "Número inválido";
-"native-alternative-payment.error.invalid-text" = "Texto inválido";
+"native-alternative-payment.error.invalid-value" = "Texto inválido";
 "native-alternative-payment.error.invalid-email" = "Endereço de e-mail inválido";
 "native-alternative-payment.error.invalid-phone" = "Número de telemóvel inválido";
 

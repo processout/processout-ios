@@ -15,7 +15,7 @@
 "native-alternative-payment.cancel-button.title" = "Anuluj";
 "native-alternative-payment.error.required-parameter" = "Parametr jest wmagany";
 "native-alternative-payment.error.invalid-number" = "Niepoprawny numer";
-"native-alternative-payment.error.invalid-text" = "Niepoprawna wartość";
+"native-alternative-payment.error.invalid-value" = "Niepoprawna wartość";
 "native-alternative-payment.error.invalid-email" = "Niepoprawny adres email";
 "native-alternative-payment.error.invalid-phone" = "Niepoprawny numer telefonu";
 

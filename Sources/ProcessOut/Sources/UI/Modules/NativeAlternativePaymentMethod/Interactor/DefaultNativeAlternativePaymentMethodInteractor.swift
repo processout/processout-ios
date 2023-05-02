@@ -297,8 +297,8 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 switch parameter.type {
                 case .numeric:
                     errorMessage = Strings.NativeAlternativePayment.Error.invalidNumber
-                case .text:
-                    errorMessage = Strings.NativeAlternativePayment.Error.invalidText
+                case .text, .singleSelect:
+                    errorMessage = Strings.NativeAlternativePayment.Error.invalidValue
                 case .email:
                     errorMessage = Strings.NativeAlternativePayment.Error.invalidEmail
                 case .phone:
@@ -358,28 +358,47 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             return
         }
         if let delegate {
-            delegate.nativeAlternativePaymentMethodDefaultValues(for: parameters) { [weak self] values in
+            delegate.nativeAlternativePaymentMethodDefaultValues(for: parameters) { [self] values in
                 assert(Thread.isMainThread, "Completion must be called on main thread.")
-                var postprocessedValues: [String: State.ParameterValue] = [:]
+                var defaultValues: [String: State.ParameterValue] = [:]
                 parameters.forEach { parameter in
-                    guard let value = values[parameter.key] else {
-                        return
+                    let defaultValue: String
+                    if let value = values[parameter.key] {
+                        switch parameter.type {
+                        case .email, .numeric, .phone, .text:
+                            if let length = parameter.length {
+                                precondition(value.count == length, "Unexpected parameter length.")
+                            }
+                            defaultValue = self.formatted(value: value, type: parameter.type)
+                        case .singleSelect:
+                            precondition(
+                                parameter.availableValues?.map(\.displayName).contains(value) == true,
+                                "Unknown `singleSelect` parameter value."
+                            )
+                            defaultValue = value
+                        }
+                    } else {
+                        defaultValue = self.defaultValue(for: parameter)
                     }
-                    let trimmedValue = parameter.length
-                        .map(value.prefix)
-                        .map(String.init) ?? value
-                    let formattedValue = self?.formatted(value: trimmedValue, type: parameter.type) ?? trimmedValue
-                    postprocessedValues[parameter.key] = .init(value: formattedValue, recentErrorMessage: nil)
+                    defaultValues[parameter.key] = .init(value: defaultValue, recentErrorMessage: nil)
                 }
-                completion(postprocessedValues)
+                completion(defaultValues)
             }
         } else {
             var defaultValues: [String: State.ParameterValue] = [:]
             parameters.forEach { parameter in
-                let formattedValue = formatted(value: "", type: parameter.type)
-                defaultValues[parameter.key] = .init(value: formattedValue, recentErrorMessage: nil)
+                defaultValues[parameter.key] = .init(value: defaultValue(for: parameter), recentErrorMessage: nil)
             }
             completion(defaultValues)
+        }
+    }
+
+    private func defaultValue(for parameter: PONativeAlternativePaymentMethodParameter) -> String {
+        switch parameter.type {
+        case .email, .numeric, .phone, .text:
+            return formatted(value: "", type: parameter.type)
+        case .singleSelect:
+            return parameter.availableValues?.first { $0.default == true }?.displayName ?? ""
         }
     }
 
@@ -431,6 +450,8 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 message = Strings.NativeAlternativePayment.Error.invalidEmail
             case .phone where value.range(of: Constants.phoneRegex, options: .regularExpression) == nil:
                 message = Strings.NativeAlternativePayment.Error.invalidPhone
+            case .singleSelect where parameter.availableValues?.map(\.displayName).contains(value) == false:
+                message = Strings.NativeAlternativePayment.Error.invalidValue
             default:
                 message = nil
             }
