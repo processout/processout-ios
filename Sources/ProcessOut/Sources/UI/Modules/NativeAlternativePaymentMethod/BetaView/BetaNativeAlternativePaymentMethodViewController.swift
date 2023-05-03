@@ -17,7 +17,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
     init(viewModel: ViewModel, style: PONativeAlternativePaymentMethodStyle?, logger: POLogger) {
         self.style = style
         self.logger = logger
-        notificationObservers = []
+        keyboardHeight = 0
         super.init(viewModel: viewModel)
     }
 
@@ -26,7 +26,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
     override func viewDidLoad() {
         configureCollectionView()
         super.viewDidLoad()
-        observeNotifications()
+        observeKeyboardChanges()
         observeScrollViewContentSizeChanges()
     }
 
@@ -34,15 +34,20 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         view = UIView()
         view.backgroundColor = style?.backgroundColor ?? Constants.defaultBackgroundColor
         view.addSubview(collectionView)
-        view.addSubview(buttonsContainerView)
+        view.addSubview(collectionOverlayView)
+        collectionOverlayView.addSubview(buttonsContainerView)
         let constraints = [
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             collectionView.topAnchor.constraint(equalTo: view.topAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            buttonsContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            buttonsContainerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            buttonsContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            collectionOverlayView.topAnchor.constraint(equalTo: view.topAnchor),
+            collectionOverlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionOverlayView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            collectionOverlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            buttonsContainerView.leadingAnchor.constraint(equalTo: collectionOverlayView.leadingAnchor),
+            buttonsContainerView.centerXAnchor.constraint(equalTo: collectionOverlayView.centerXAnchor),
+            buttonsContainerView.bottomAnchor.constraint(equalTo: collectionOverlayView.bottomAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
     }
@@ -54,6 +59,11 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
             return
         }
         configure(with: startedState, reload: true, animated: false)
+    }
+
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        collectionViewLayout.invalidateLayout()
     }
 
     // MARK: - CollectionViewDelegateBetaNativeAlternativePaymentMethodLayout
@@ -88,7 +98,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         case .loader:
             height = adjustedBounds.height
         case .title(let item):
-            height = collectionCellSizeProvider.systemLayoutSize(
+            height = collectionReusableViewSizeProvider.systemLayoutSize(
                 viewType: NativeAlternativePaymentMethodTitleCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
@@ -96,7 +106,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
                 }
             ).height
         case .error(let item):
-            height = collectionCellSizeProvider.systemLayoutSize(
+            height = collectionReusableViewSizeProvider.systemLayoutSize(
                 viewType: NativeAlternativePaymentMethodErrorCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
@@ -104,7 +114,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
                 }
             ).height
         case .submitted(let item):
-            height = collectionCellSizeProvider.systemLayoutSize(
+            height = collectionReusableViewSizeProvider.systemLayoutSize(
                 viewType: NativeAlternativePaymentMethodSubmittedCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
@@ -115,6 +125,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
                 }
             ).height
         case .input, .codeInput:
+            // todo(andrii-vysotskyi): move to constants
             height = 48
         case nil:
             height = .zero
@@ -132,7 +143,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
             return .zero
         }
         let width = collectionView.bounds.inset(by: collectionView.adjustedContentInset).width
-        return collectionCellSizeProvider.systemLayoutSize(
+        return collectionReusableViewSizeProvider.systemLayoutSize(
             viewType: NativeAlternativePaymentMethodSectionHeaderView.self,
             preferredWidth: width,
             configure: { [self] view in
@@ -149,9 +160,13 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         let snapshot = collectionViewDataSource.snapshot()
         var sectionInset = Constants.sectionInset
         if snapshot.sectionIdentifiers[section].title == nil {
+            // Top inset purpose is to add spacing between header and items,
+            // for sections without header instead is 0
             sectionInset.top = 0
         }
         if section + 1 == snapshot.numberOfSections {
+            // Bottom inset purpose is to add spacing between sections, it's
+            // not needed in last section.
             sectionInset.bottom = 0
         }
         return sectionInset
@@ -195,6 +210,8 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
 
     override func configure(with state: ViewModel.State) {
         logger.debug("Will update with new state: \(String(describing: state))")
+
+        updateCollectionViewBottomInset(state: state)
         switch state {
         case .idle:
             configureWithIdleState()
@@ -213,28 +230,10 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
     private let style: PONativeAlternativePaymentMethodStyle?
     private let logger: POLogger
 
-    private lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
-        collectionView.delegate = self
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = style?.backgroundColor ?? Constants.defaultBackgroundColor
-        return collectionView
-    }()
-
-    private lazy var collectionViewLayout = NativeAlternativePaymentMethodCollectionLayout()
-    private lazy var collectionCellSizeProvider = CollectionReusableViewSizeProvider()
-
-    private lazy var collectionViewDataSource: CollectionViewDiffableDataSource<SectionIdentifier, ItemIdentifier> = {
-        let dataSource = CollectionViewDiffableDataSource<SectionIdentifier, ItemIdentifier>(
-            collectionView: collectionView,
-            cellProvider: { [unowned self] _, indexPath, itemIdentifier in
-                cell(for: itemIdentifier, at: indexPath)
-            }
-        )
-        dataSource.supplementaryViewProvider = { [unowned self] _, kind, indexPath in
-            supplementaryView(ofKind: kind, at: indexPath)
-        }
-        return dataSource
+    private lazy var collectionOverlayView: UIView = {
+        let view = PassthroughView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
 
     private lazy var buttonsContainerView: NativeAlternativePaymentMethodButtonsView = {
@@ -249,14 +248,38 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         return view
     }()
 
+    private lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
+        collectionView.delegate = self
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = nil
+        return collectionView
+    }()
+
+    private lazy var collectionViewLayout = NativeAlternativePaymentMethodCollectionLayout()
+    private lazy var collectionReusableViewSizeProvider = CollectionReusableViewSizeProvider()
+
+    private lazy var collectionViewDataSource: CollectionViewDiffableDataSource<SectionIdentifier, ItemIdentifier> = {
+        let dataSource = CollectionViewDiffableDataSource<SectionIdentifier, ItemIdentifier>(
+            collectionView: collectionView,
+            cellProvider: { [unowned self] _, indexPath, itemIdentifier in
+                cell(for: itemIdentifier, at: indexPath)
+            }
+        )
+        dataSource.supplementaryViewProvider = { [unowned self] _, kind, indexPath in
+            supplementaryView(ofKind: kind, at: indexPath)
+        }
+        return dataSource
+    }()
+
     private var scrollViewContentSizeObservation: NSKeyValueObservation?
-    private var notificationObservers: [NSObjectProtocol]
+    private var keyboardChangesObserver: NSObjectProtocol?
+    private var keyboardHeight: CGFloat
 
     // MARK: - State Management
 
     private func configureWithIdleState() {
         buttonsContainerView.alpha = 0
-        collectionView.contentInset.bottom = 0
         let snapshot = DiffableDataSourceSnapshot<SectionIdentifier, ItemIdentifier>()
         collectionViewDataSource.apply(snapshot, animatingDifferences: false)
     }
@@ -274,16 +297,16 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         if reload {
             snapshot.reloadSections(collectionViewDataSource.snapshot().sectionIdentifiers)
         }
-
-        updateCollectionInset(state: state) // apply bellow will trigger what we want
-
         collectionViewDataSource.apply(snapshot, animatingDifferences: animated) { [weak self] in
             if !reload {
+                // When sections are reloaded first responder is resigned if any, to avoid ugly
+                // animation implementation doesn't attempt to find new one in such case.
                 self?.updateFirstResponder()
             }
         }
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             if let actions = state.actions {
+                // todo(andrii-vysotskyi): rework buttons container to accept actions view model
                 buttonsContainerView.configure(
                     primaryAction: actions.primary, secondaryAction: actions.secondary, animated: animated
                 )
@@ -294,18 +317,27 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         }
     }
 
-    private func updateCollectionInset(state: ViewModel.State.Started) {
-        let bottomInset: CGFloat
-        if let actions = state.actions {
-            if actions.secondary != nil {
-                bottomInset = 176
+    /// Adjusts bottom inset based based on current state actions and keyboard height. It also invalidates layout
+    /// if new inset is different from current value.
+    private func updateCollectionViewBottomInset(state: ViewModel.State) {
+        switch state {
+        case .idle:
+            collectionView.contentInset.bottom = 0
+        case .started(let startedState):
+            // todo(andrii-vysotskyi): move values to constants
+            let bottomInset: CGFloat
+            if let actions = startedState.actions {
+                if actions.secondary != nil {
+                    bottomInset = 176
+                } else {
+                    bottomInset = 112
+                }
             } else {
-                bottomInset = 112
+                bottomInset = 16
             }
-        } else {
-            bottomInset = 16
+            collectionView.contentInset.bottom = bottomInset + keyboardHeight
         }
-        collectionView.contentInset.bottom = bottomInset
+        collectionView.collectionViewLayout.invalidateLayout()
     }
 
     // MARK: - Current Responder Handling
@@ -421,47 +453,35 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
 
     // MARK: - Keyboard Handling
 
-    private func observeNotifications() {
-        let willChangeFrameObserver = NotificationCenter.default.addObserver(
+    private func observeKeyboardChanges() {
+        keyboardChangesObserver = NotificationCenter.default.addObserver(
             forName: UIResponder.keyboardWillChangeFrameNotification,
             object: nil,
             queue: nil,
             using: { [weak self] notification in
                 // Keyboard updates are not always animated so changes are wrapped
                 // in default animation block for smoother UI.
-                self?.keyboardWillChangeFrame(notification: notification)
+                UIView.animate(withDuration: Constants.animationDuration) {
+                    self?.keyboardWillChangeFrame(notification: notification)
+                }
             }
         )
-        notificationObservers = [willChangeFrameObserver]
     }
 
     private func keyboardWillChangeFrame(notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
             return
         }
-        // it seems that we need to avoid calling layoutIfNeeded, alternative is to add method to layout
-        // delegate to query inset, and in order to keep proper actions animation add sepparate
-        // wrapper view and layout it instead.
-
         let coveredSafeAreaHeight = view.bounds.height
             - view.convert(keyboardFrame, from: nil).minY
             - view.safeAreaInsets.bottom
-            + additionalSafeAreaInsets.bottom
-        additionalSafeAreaInsets.bottom = max(coveredSafeAreaHeight, 0)
-
-//        let layout = NativeAlternativePaymentMethodCollectionLayout()
-//        layout.minimumLineSpacing = Constants.lineSpacing
-//        collectionView.setCollectionViewLayout(layout, animated: true)
-
-//        view.layoutIfNeeded() // layout if needed calls invalidateLayout :)
-        //collectionView.performBatchUpdates { } // Ensures that layout updates centering as keyboard appears.
-
-//            let context = NativeAlternativePaymentMethodCollectionLayoutInvalidationContext()
-//            context.biba = true
-//            context.invalidateFlowLayoutAttributes = false
-//            collectionViewLayout.invalidateLayout(with: context) // broken layout on iOS 16
-            // calling invalidateLayout from here doesn't prepare layout if thereare pending updates already
-//        }
+        let keyboardHeight = max(coveredSafeAreaHeight, 0)
+        collectionView.performBatchUpdates {
+            self.keyboardHeight = keyboardHeight
+            updateCollectionViewBottomInset(state: viewModel.state)
+        }
+        buttonsContainerView.additionalBottomSafeAreaInset = keyboardHeight
+        collectionOverlayView.layoutIfNeeded()
     }
 
     // MARK: - Action Buttons Shadow
@@ -498,6 +518,7 @@ private enum Constants {
 // todo: add background decoration to loader and submitted cells
 // todo: move needed classes from legacy to new view
 // todo: validate on older iOS versions
-// todo: refactor buttons inset calculation
+
+
 
 // swiftlint:enable type_body_length file_length

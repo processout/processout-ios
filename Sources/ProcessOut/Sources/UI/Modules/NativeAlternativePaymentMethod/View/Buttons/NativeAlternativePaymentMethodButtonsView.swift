@@ -35,8 +35,8 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         }
     }
 
-    var contentSize: CGSize {
-        contentView.bounds.size
+    var additionalBottomSafeAreaInset: CGFloat = 0 {
+        didSet { bottomConstraint.constant = -(additionalBottomSafeAreaInset + Constants.verticalInset) }
     }
 
     // MARK: - Private Nested Types
@@ -71,6 +71,10 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         return button
     }()
 
+    private lazy var bottomConstraint = contentView.bottomAnchor.constraint(
+        equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.verticalInset
+    )
+
     // MARK: - Private Methods
 
     private func commonInit() {
@@ -80,9 +84,7 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
             contentView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: horizontalInset),
             contentView.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
             contentView.topAnchor.constraint(equalTo: topAnchor, constant: Constants.verticalInset),
-            contentView.bottomAnchor.constraint(
-                equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.verticalInset
-            )
+            bottomConstraint
         ]
         NSLayoutConstraint.activate(constraints)
     }
