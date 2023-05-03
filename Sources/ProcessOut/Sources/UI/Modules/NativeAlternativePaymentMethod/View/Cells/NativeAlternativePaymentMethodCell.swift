@@ -13,10 +13,10 @@ protocol NativeAlternativePaymentMethodCell: UICollectionViewCell {
     var inputResponder: UIResponder? { get }
 
     /// Cell delegate.
-    var delegate: BetaNativeAlternativePaymentMethodCellDelegate? { get set }
+    var delegate: NativeAlternativePaymentMethodCellDelegate? { get set }
 }
 
-protocol BetaNativeAlternativePaymentMethodCellDelegate: AnyObject {
+protocol NativeAlternativePaymentMethodCellDelegate: AnyObject {
 
     /// Should return boolean value indicating whether cells input should return ie resign first responder.
     func nativeAlternativePaymentMethodCellShouldReturn(_ cell: NativeAlternativePaymentMethodCell) -> Bool

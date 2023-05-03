@@ -25,7 +25,7 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
         observations = []
     }
 
-    func configure(item: BetaNativeAlternativePaymentMethodViewModelState.InputItem, style: POInputFormStyle?) {
+    func configure(item: NativeAlternativePaymentMethodViewModelState.InputItem, style: POInputFormStyle?) {
         let style = style ?? Constants.defaultStyle
         textFieldContainer.configure(
             style: item.isInvalid ? style.error.field : style.normal.field,
@@ -49,7 +49,7 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
         textFieldContainer.textField
     }
 
-    weak var delegate: BetaNativeAlternativePaymentMethodCellDelegate?
+    weak var delegate: NativeAlternativePaymentMethodCellDelegate?
 
     // MARK: - Private Nested Types
 
@@ -68,7 +68,7 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
         return view
     }()
 
-    private var item: BetaNativeAlternativePaymentMethodViewModelState.InputItem?
+    private var item: NativeAlternativePaymentMethodViewModelState.InputItem?
     private var observations: [AnyObject]
 
     // MARK: - Private Methods
@@ -107,7 +107,7 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
     }
 
     private func observeChanges(
-        item: BetaNativeAlternativePaymentMethodViewModelState.InputItem, style: POInputFormStyle
+        item: NativeAlternativePaymentMethodViewModelState.InputItem, style: POInputFormStyle
     ) {
         let isInvalidObserver = item.$isInvalid.addObserver { [weak self] isInvalid in
             self?.textFieldContainer.configure(

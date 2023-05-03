@@ -1,5 +1,5 @@
 //
-//  BetaNativeAlternativePaymentMethodViewModelState.swift
+//  NativeAlternativePaymentMethodViewModelState.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 27.04.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum BetaNativeAlternativePaymentMethodViewModelState {
+enum NativeAlternativePaymentMethodViewModelState {
 
     typealias ParameterType = PONativeAlternativePaymentMethodParameter.ParameterType
 

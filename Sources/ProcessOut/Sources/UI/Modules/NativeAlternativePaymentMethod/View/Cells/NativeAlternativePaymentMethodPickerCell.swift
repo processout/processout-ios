@@ -19,7 +19,7 @@ final class NativeAlternativePaymentMethodPickerCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: BetaNativeAlternativePaymentMethodViewModelState.PickerItem, style: POInputFormStyle?) {
+    func configure(item: NativeAlternativePaymentMethodViewModelState.PickerItem, style: POInputFormStyle?) {
         let options = item.options.map { option in
             PickerViewModel.Option(title: option.name, isSelected: option.isSelected, select: option.select)
         }

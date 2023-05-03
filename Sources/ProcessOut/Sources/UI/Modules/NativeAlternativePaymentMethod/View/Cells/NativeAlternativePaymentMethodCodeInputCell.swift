@@ -14,7 +14,7 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
         observations = []
     }
 
-    func configure(item: BetaNativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputFormStyle?) {
+    func configure(item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputFormStyle?) {
         initialize(length: item.length)
         let style = style ?? Constants.defaultStyle
         codeTextField.configure(
@@ -36,7 +36,7 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
         codeTextField
     }
 
-    var delegate: BetaNativeAlternativePaymentMethodCellDelegate?
+    var delegate: NativeAlternativePaymentMethodCellDelegate?
 
     // MARK: - Private Nested Types
 
@@ -48,7 +48,7 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
     // MARK: - Private Properties
 
     private var codeTextField: CodeTextField! // swiftlint:disable:this implicitly_unwrapped_optional
-    private var item: BetaNativeAlternativePaymentMethodViewModelState.CodeInputItem?
+    private var item: NativeAlternativePaymentMethodViewModelState.CodeInputItem?
     private var observations: [AnyObject] = []
 
     // MARK: - Private Methods
@@ -77,7 +77,7 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
     }
 
     private func observeChanges(
-        item: BetaNativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputFormStyle
+        item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputFormStyle
     ) {
         let isInvalidObserver = item.$isInvalid.addObserver { [weak self] isInvalid in
             self?.codeTextField.configure(

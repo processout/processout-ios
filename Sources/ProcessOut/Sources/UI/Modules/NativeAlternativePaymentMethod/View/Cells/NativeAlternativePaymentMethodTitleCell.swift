@@ -1,17 +1,17 @@
 //
-//  NativeAlternativePaymentMethodSectionHeaderView.swift
+//  NativeAlternativePaymentMethodTitleCell.swift
 //  ProcessOut
 //
-//  Created by Andrii Vysotskyi on 26.04.2023.
+//  Created by Andrii Vysotskyi on 20.04.2023.
 //
 
 import UIKit
 
-final class NativeAlternativePaymentMethodSectionHeaderView: UICollectionReusableView {
+final class NativeAlternativePaymentMethodTitleCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.commonInit()
+        commonInit()
     }
 
     @available(*, unavailable)
@@ -19,21 +19,22 @@ final class NativeAlternativePaymentMethodSectionHeaderView: UICollectionReusabl
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: BetaNativeAlternativePaymentMethodViewModelState.SectionIdentifier, style: POTextStyle?) {
+    func configure(item: NativeAlternativePaymentMethodViewModelState.TitleItem, style: POTextStyle?) {
         let style = style ?? Constants.defaultStyle
         titleLabel.attributedText = AttributedStringBuilder()
             .typography(style.typography)
-            .textStyle(textStyle: .body)
-            .textColor(style.color)
+            .textStyle(textStyle: .title1)
             .alignment(.center)
-            .string(item.title ?? "")
+            .lineBreakMode(.byWordWrapping)
+            .textColor(style.color)
+            .string(item.text)
             .build()
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultStyle = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .bodyLarge)
+        static let defaultStyle = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .title)
     }
 
     // MARK: - Private Properties
@@ -43,20 +44,20 @@ final class NativeAlternativePaymentMethodSectionHeaderView: UICollectionReusabl
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = false
         label.numberOfLines = 0
-        label.setContentHuggingPriority(.required, for: .vertical)
         label.setContentCompressionResistancePriority(.required, for: .vertical)
+        label.setContentHuggingPriority(.required, for: .vertical)
         return label
     }()
 
     // MARK: - Private Methods
 
     private func commonInit() {
-        addSubview(titleLabel)
+        contentView.addSubview(titleLabel)
         let constraints = [
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
-            titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            titleLabel.topAnchor.constraint(equalTo: topAnchor),
-            titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
     }

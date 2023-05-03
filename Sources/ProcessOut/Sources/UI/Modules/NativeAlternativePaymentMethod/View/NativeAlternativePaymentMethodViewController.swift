@@ -1,5 +1,5 @@
 //
-//  BetaNativeAlternativePaymentMethodViewController.swift
+//  NativeAlternativePaymentMethodViewController.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 20.04.2023.
@@ -9,10 +9,10 @@
 
 import UIKit
 
-final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNativeAlternativePaymentMethodViewModel>:
+final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAlternativePaymentMethodViewModel>:
     BaseViewController<ViewModel>,
     NativeAlternativePaymentMethodCollectionLayoutDelegate,
-    BetaNativeAlternativePaymentMethodCellDelegate {
+    NativeAlternativePaymentMethodCellDelegate {
 
     init(viewModel: ViewModel, style: PONativeAlternativePaymentMethodStyle?, logger: POLogger) {
         self.style = style
@@ -182,7 +182,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         updateFirstResponder()
     }
 
-    // MARK: - BetaNativeAlternativePaymentMethodInputCellDelegate
+    // MARK: - NativeAlternativePaymentMethodCellDelegate
 
     func nativeAlternativePaymentMethodCellShouldReturn(_ cell: NativeAlternativePaymentMethodCell) -> Bool {
         let visibleIndexPaths = collectionView.indexPathsForVisibleItems.sorted()

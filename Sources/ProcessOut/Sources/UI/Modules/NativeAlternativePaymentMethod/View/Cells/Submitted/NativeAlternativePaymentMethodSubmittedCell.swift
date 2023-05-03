@@ -20,7 +20,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
     }
 
     func configure(
-        item: BetaNativeAlternativePaymentMethodViewModelState.SubmittedItem,
+        item: NativeAlternativePaymentMethodViewModelState.SubmittedItem,
         style: NativeAlternativePaymentMethodSubmittedCellStyle
     ) {
         if let image = item.logoImage {

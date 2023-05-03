@@ -22,8 +22,8 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
     }
 
     func configure(
-        primaryAction: BetaNativeAlternativePaymentMethodViewModelState.Action,
-        secondaryAction: BetaNativeAlternativePaymentMethodViewModelState.Action?,
+        primaryAction: NativeAlternativePaymentMethodViewModelState.Action,
+        secondaryAction: NativeAlternativePaymentMethodViewModelState.Action?,
         animated: Bool
     ) {
         configure(button: primaryButton, action: primaryAction, animated: animated)
@@ -90,7 +90,7 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
     }
 
     private func configure(
-        button: Button, action: BetaNativeAlternativePaymentMethodViewModelState.Action, animated: Bool
+        button: Button, action: NativeAlternativePaymentMethodViewModelState.Action, animated: Bool
     ) {
         let viewModel = Button.ViewModel(title: action.title, isLoading: action.isExecuting, handler: action.handler)
         button.configure(viewModel: viewModel, isEnabled: action.isEnabled, animated: animated)

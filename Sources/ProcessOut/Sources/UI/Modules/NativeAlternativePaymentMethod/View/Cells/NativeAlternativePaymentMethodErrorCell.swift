@@ -19,7 +19,7 @@ final class NativeAlternativePaymentMethodErrorCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: BetaNativeAlternativePaymentMethodViewModelState.ErrorItem, style: POTextStyle?) {
+    func configure(item: NativeAlternativePaymentMethodViewModelState.ErrorItem, style: POTextStyle?) {
         let style = style ?? Constants.defaultStyle
         descriptionLabel.attributedText = AttributedStringBuilder()
             .typography(style.typography)
