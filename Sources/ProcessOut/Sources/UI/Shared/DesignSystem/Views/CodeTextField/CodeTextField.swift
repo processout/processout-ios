@@ -40,10 +40,6 @@ final class CodeTextField: UIControl, UITextInput, InputFormTextField {
         configureWithCurrentState(animated: animated)
     }
 
-    var control: UIControl {
-        self
-    }
-
     // MARK: - UIControl
 
     override var canBecomeFirstResponder: Bool {

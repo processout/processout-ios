@@ -17,3 +17,10 @@ protocol InputFormTextField: UIView {
     /// Configures text field appearance.
     func configure(style: POTextFieldStyle, animated: Bool)
 }
+
+extension InputFormTextField where Self: UIControl {
+
+    var control: UIControl {
+        self
+    }
+}
