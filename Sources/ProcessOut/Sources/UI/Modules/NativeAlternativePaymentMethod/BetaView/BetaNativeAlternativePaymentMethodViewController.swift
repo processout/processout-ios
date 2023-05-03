@@ -63,10 +63,11 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
 
     override func viewSafeAreaInsetsDidChange() {
         super.viewSafeAreaInsetsDidChange()
+        updateCollectionViewBottomInset(state: viewModel.state)
         collectionViewLayout.invalidateLayout()
     }
 
-    // MARK: - CollectionViewDelegateBetaNativeAlternativePaymentMethodLayout
+    // MARK: - NativeAlternativePaymentMethodCollectionLayoutDelegate
 
     func centeredSection(
         in collectionView: UICollectionView, layout: NativeAlternativePaymentMethodCollectionLayout
@@ -125,8 +126,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
                 }
             ).height
         case .input, .codeInput:
-            // todo(andrii-vysotskyi): move to constants
-            height = 48
+            height = Constants.inputHeight
         case nil:
             height = .zero
         }
@@ -210,7 +210,6 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
 
     override func configure(with state: ViewModel.State) {
         logger.debug("Will update with new state: \(String(describing: state))")
-
         updateCollectionViewBottomInset(state: state)
         switch state {
         case .idle:
@@ -324,27 +323,21 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         }
     }
 
-    /// Adjusts bottom inset based based on current state actions and keyboard height. It also invalidates layout
-    /// if new inset is different from current value.
+    /// Adjusts bottom inset based on current state actions and keyboard height.
     private func updateCollectionViewBottomInset(state: ViewModel.State) {
-        switch state {
-        case .idle:
-            collectionView.contentInset.bottom = 0
-        case .started(let startedState):
-            // todo(andrii-vysotskyi): move values to constants
-            let bottomInset: CGFloat
+        var bottomInset = Constants.contentInset.bottom + keyboardHeight
+        if case .started(let startedState) = state {
             if let actions = startedState.actions {
                 if actions.secondary != nil {
-                    bottomInset = 176
+                    bottomInset += Constants.overlayLargeContentHeight
                 } else {
-                    bottomInset = 112
+                    bottomInset += Constants.overlaySmallContentHeight
                 }
-            } else {
-                bottomInset = 16
             }
-            collectionView.contentInset.bottom = bottomInset + keyboardHeight
         }
-        collectionView.collectionViewLayout.invalidateLayout()
+        if bottomInset != collectionView.contentInset.bottom {
+            collectionView.contentInset.bottom = bottomInset
+        }
     }
 
     // MARK: - Current Responder Handling
@@ -365,9 +358,8 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         if collectionView.indexPathsForVisibleItems.contains(indexPath) {
             let cell = collectionView.cellForItem(at: indexPath) as? NativeAlternativePaymentMethodCell
             cell?.inputResponder?.becomeFirstResponder()
-        } else {
-            collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
         }
+        collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
     }
 
     private func indexPathForFutureFirstResponderCell() -> IndexPath? {
@@ -480,6 +472,9 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
             - view.convert(keyboardFrame, from: nil).minY
             - view.safeAreaInsets.bottom
         let keyboardHeight = max(coveredSafeAreaHeight, 0)
+        guard self.keyboardHeight != keyboardHeight else {
+            return
+        }
         collectionView.performBatchUpdates {
             self.keyboardHeight = keyboardHeight
             updateCollectionViewBottomInset(state: viewModel.state)
@@ -504,7 +499,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         let minimumContentOffset = collectionView.contentSize.height
             - collectionView.bounds.height
             + collectionView.adjustedContentInset.bottom
-        let threshold = Constants.buttonsContainerShadowVisibilityThreshold
+        let threshold = Constants.contentInset.bottom
         let shadowOpacity = max(min(1, (minimumContentOffset - collectionView.contentOffset.y) / threshold), 0)
         buttonsContainerView.apply(style: style?.buttonsContainerShadow ?? .`default`, shadowOpacity: shadowOpacity)
     }
@@ -513,14 +508,18 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
 private enum Constants {
     static let defaultBackgroundColor = Asset.Colors.Background.primary.color
     static let animationDuration: TimeInterval = 0.25
-    static let buttonsContainerShadowVisibilityThreshold: CGFloat = 32 // swiftlint:disable:this identifier_name
+    static let overlayLargeContentHeight: CGFloat = 160
+    static let overlaySmallContentHeight: CGFloat = 96
     static let lineSpacing: CGFloat = 8
     static let sectionInset = UIEdgeInsets(top: 8, left: 0, bottom: 24, right: 0)
-    static let contentInset = UIEdgeInsets(top: 4, left: 24, bottom: 0, right: 24)
+    static let contentInset = UIEdgeInsets(top: 4, left: 24, bottom: 16, right: 24)
+    static let inputHeight: CGFloat = 48
 }
 
 // todo: add background decoration to loader and submitted cells
 // todo: move needed classes from legacy to new view
 // todo: validate on older iOS versions
+// todo: merge master to populate picker
+// todo: when inputs is submitter centing index returns nil :)
 
 // swiftlint:enable type_body_length file_length
