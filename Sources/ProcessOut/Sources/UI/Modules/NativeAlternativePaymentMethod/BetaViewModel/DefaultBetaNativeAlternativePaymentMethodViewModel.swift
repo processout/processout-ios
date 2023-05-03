@@ -7,6 +7,7 @@
 
 import Foundation
 
+// swiftlint:disable:next type_body_length
 final class DefaultBetaNativeAlternativePaymentMethodViewModel:
     BaseViewModel<BetaNativeAlternativePaymentMethodViewModelState>, BetaNativeAlternativePaymentMethodViewModel {
 
@@ -262,6 +263,8 @@ final class DefaultBetaNativeAlternativePaymentMethodViewModel:
                 isEditingAllowed: isEditingAllowed
             )
             return .codeInput(inputItem)
+        case .singleSelect:
+            return createPickerItem(parameter: parameter, value: inputValue)
         default:
             let inputItem = State.InputItem(
                 type: parameter.type,
@@ -278,9 +281,27 @@ final class DefaultBetaNativeAlternativePaymentMethodViewModel:
         }
     }
 
+    private func createPickerItem(
+        parameter: PONativeAlternativePaymentMethodParameter, value: InputValue
+    ) -> State.Item {
+        assert(parameter.type == .singleSelect)
+        let options = parameter.availableValues?.map { option in
+            State.PickerOption(name: option.displayName, isSelected: option.value == value.value) { [weak self] in
+                self?.interactor.updateValue(option.value, for: parameter.key)
+            }
+        }
+        let item = State.PickerItem(
+            // Value of single select parameter is not user friendly instead display name should be used.
+            value: parameter.availableValues?.first { $0.value == value.value }?.displayName ?? "",
+            isInvalid: value.isInvalid,
+            options: options ?? []
+        )
+        return .picker(item)
+    }
+
     private func placeholder(for parameter: PONativeAlternativePaymentMethodParameter) -> String? {
         switch parameter.type {
-        case .numeric, .text:
+        case .numeric, .text, .singleSelect:
             return nil
         case .email:
             return Strings.Email.placeholder

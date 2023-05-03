@@ -125,7 +125,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
                     )
                 }
             ).height
-        case .input, .codeInput:
+        case .input, .codeInput, .picker:
             height = Constants.inputHeight
         case nil:
             height = .zero
@@ -399,6 +399,7 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         collectionView.registerCell(NativeAlternativePaymentMethodCodeInputCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodErrorCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodSubmittedCell.self)
+        collectionView.registerCell(NativeAlternativePaymentMethodPickerCell.self)
     }
 
     private func cell(for item: ItemIdentifier, at indexPath: IndexPath) -> UICollectionViewCell? {
@@ -432,6 +433,10 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
                 NativeAlternativePaymentMethodSubmittedCell.self, for: indexPath
             )
             cell.configure(item: item, style: .init(message: style?.message, successMessage: style?.successMessage))
+            return cell
+        case .picker(let item):
+            let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodPickerCell.self, for: indexPath)
+            cell.configure(item: item, style: style?.input)
             return cell
         }
     }
@@ -519,7 +524,6 @@ private enum Constants {
 // todo: add background decoration to loader and submitted cells
 // todo: move needed classes from legacy to new view
 // todo: validate on older iOS versions
-// todo: merge master to populate picker
 // todo: when inputs is submitter centing index returns nil :)
 
 // swiftlint:enable type_body_length file_length

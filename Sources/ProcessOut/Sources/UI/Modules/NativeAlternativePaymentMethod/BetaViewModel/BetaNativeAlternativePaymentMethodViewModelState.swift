@@ -11,10 +11,35 @@ enum BetaNativeAlternativePaymentMethodViewModelState {
 
     typealias ParameterType = PONativeAlternativePaymentMethodParameter.ParameterType
 
+    struct PickerOption: Hashable {
+
+        /// Option name.
+        let name: String
+
+        /// Indicates whether option is currently selected.
+        let isSelected: Bool
+
+        /// Closure to invoke when option is selected.
+        @ImmutableNullHashable
+        var select: () -> Void
+    }
+
     struct TitleItem: Hashable {
 
         /// Title text.
         let text: String
+    }
+
+    struct PickerItem: Hashable {
+
+        /// Current value.
+        let value: String
+
+        /// Boolean value indicating whether value is valid.
+        let isInvalid: Bool
+
+        /// Available options.
+        let options: [PickerOption]
     }
 
     struct CodeInputItem: Hashable {
@@ -87,6 +112,7 @@ enum BetaNativeAlternativePaymentMethodViewModelState {
         case title(TitleItem)
         case input(InputItem)
         case codeInput(CodeInputItem)
+        case picker(PickerItem)
         case error(ErrorItem)
         case submitted(SubmittedItem)
     }
