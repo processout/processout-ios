@@ -135,8 +135,20 @@ enum BetaNativeAlternativePaymentMethodViewModelState {
         let items: [Item]
     }
 
-    // todo(andrii-vysotskyi): replace with inline type when legacy view is removed.
-    typealias Action = NativeAlternativePaymentMethodViewModelState.Action
+    struct Action {
+
+        /// Action title.
+        let title: String
+
+        /// Boolean value indicating whether action is enabled.
+        let isEnabled: Bool
+
+        /// Boolean value indicating whether action associated with button is currently running.
+        let isExecuting: Bool
+
+        /// Action handler.
+        let handler: () -> Void
+    }
 
     struct Actions {
 
