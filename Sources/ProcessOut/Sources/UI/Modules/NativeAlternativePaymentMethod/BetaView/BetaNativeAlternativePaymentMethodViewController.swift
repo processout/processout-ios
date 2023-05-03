@@ -253,10 +253,17 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         collectionView.delegate = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = nil
+        collectionView.contentInset = Constants.contentInset
+        collectionView.showsVerticalScrollIndicator = false
         return collectionView
     }()
 
-    private lazy var collectionViewLayout = NativeAlternativePaymentMethodCollectionLayout()
+    private lazy var collectionViewLayout: UICollectionViewLayout = {
+        let layout = NativeAlternativePaymentMethodCollectionLayout()
+        layout.minimumLineSpacing = Constants.lineSpacing
+        return layout
+    }()
+
     private lazy var collectionReusableViewSizeProvider = CollectionReusableViewSizeProvider()
 
     private lazy var collectionViewDataSource: CollectionViewDiffableDataSource<SectionIdentifier, ItemIdentifier> = {
@@ -400,9 +407,6 @@ final class BetaNativeAlternativePaymentMethodViewController<ViewModel: BetaNati
         collectionView.registerCell(NativeAlternativePaymentMethodCodeInputCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodErrorCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodSubmittedCell.self)
-        collectionView.contentInset = Constants.contentInset
-        collectionView.showsVerticalScrollIndicator = false
-        collectionViewLayout.minimumLineSpacing = Constants.lineSpacing
     }
 
     private func cell(for item: ItemIdentifier, at indexPath: IndexPath) -> UICollectionViewCell? {
@@ -518,7 +522,5 @@ private enum Constants {
 // todo: add background decoration to loader and submitted cells
 // todo: move needed classes from legacy to new view
 // todo: validate on older iOS versions
-
-
 
 // swiftlint:enable type_body_length file_length
