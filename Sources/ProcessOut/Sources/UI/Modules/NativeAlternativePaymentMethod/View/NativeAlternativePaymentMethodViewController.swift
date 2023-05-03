@@ -312,10 +312,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         }
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             if let actions = state.actions {
-                // todo(andrii-vysotskyi): rework buttons container to accept actions view model
-                buttonsContainerView.configure(
-                    primaryAction: actions.primary, secondaryAction: actions.secondary, animated: animated
-                )
+                buttonsContainerView.configure(actions: actions, animated: animated)
                 buttonsContainerView.alpha = 1
             } else {
                 buttonsContainerView.alpha = 0
@@ -522,7 +519,6 @@ private enum Constants {
 }
 
 // todo: add background decoration to loader and submitted cells
-// todo: move needed classes from legacy to new view
 // todo: validate on older iOS versions
 // todo: when inputs is submitter centing index returns nil :)
 

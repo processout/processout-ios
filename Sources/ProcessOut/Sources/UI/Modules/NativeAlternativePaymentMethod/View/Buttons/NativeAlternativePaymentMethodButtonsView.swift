@@ -21,14 +21,10 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(
-        primaryAction: NativeAlternativePaymentMethodViewModelState.Action,
-        secondaryAction: NativeAlternativePaymentMethodViewModelState.Action?,
-        animated: Bool
-    ) {
-        configure(button: primaryButton, action: primaryAction, animated: animated)
-        if let secondaryAction {
-            configure(button: secondaryButton, action: secondaryAction, animated: animated)
+    func configure(actions: NativeAlternativePaymentMethodViewModelState.Actions, animated: Bool) {
+        configure(button: primaryButton, action: actions.primary, animated: animated)
+        if let action = actions.secondary {
+            configure(button: secondaryButton, action: action, animated: animated)
             secondaryButton.setHidden(false)
         } else {
             secondaryButton.setHidden(true)
