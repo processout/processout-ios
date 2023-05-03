@@ -14,8 +14,4 @@ protocol NativeAlternativePaymentMethodCollectionLayoutDelegate: AnyObject, UICo
     func centeredSection(
         in collectionView: UICollectionView, layout: NativeAlternativePaymentMethodCollectionLayout
     ) -> Int?
-
-    func centeringInset() -> UIEdgeInsets
-
-    // todo: add something to delegate to
 }

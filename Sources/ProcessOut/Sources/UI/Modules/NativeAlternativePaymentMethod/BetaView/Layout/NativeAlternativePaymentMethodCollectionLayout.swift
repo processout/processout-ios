@@ -9,10 +9,6 @@ import UIKit
 
 final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlowLayout {
 
-//    override class var invalidationContextClass: AnyClass {
-//        NativeAlternativePaymentMethodCollectionLayoutInvalidationContext.self
-//    }
-
     override func invalidateLayout(with context: UICollectionViewLayoutInvalidationContext) {
         super.invalidateLayout(with: context)
         centeredSection = nil
@@ -91,11 +87,4 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
         attributesCopy.frame.origin.y += centeringOffset
         return attributesCopy
     }
-}
-
-// swiftlint:disable:next type_name
-final class NativeAlternativePaymentMethodCollectionLayoutInvalidationContext:
-    UICollectionViewFlowLayoutInvalidationContext {
-
-    var biba = false
 }
