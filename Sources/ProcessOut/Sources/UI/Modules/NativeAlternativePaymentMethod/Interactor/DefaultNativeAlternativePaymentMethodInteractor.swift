@@ -366,9 +366,6 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                     if let value = values[parameter.key] {
                         switch parameter.type {
                         case .email, .numeric, .phone, .text:
-                            if let length = parameter.length {
-                                precondition(value.count == length, "Unexpected parameter length.")
-                            }
                             defaultValue = self.formatted(value: value, type: parameter.type)
                         case .singleSelect:
                             precondition(
