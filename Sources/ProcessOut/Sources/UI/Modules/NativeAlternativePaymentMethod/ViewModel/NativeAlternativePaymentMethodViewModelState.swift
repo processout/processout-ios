@@ -51,7 +51,7 @@ enum NativeAlternativePaymentMethodViewModelState {
         @ReferenceWrapper
         var isInvalid: Bool
 
-        /// Current parameter's value. This value won't be modified by view model.
+        /// Current parameter's value.
         @ReferenceWrapper
         var value: String
 
@@ -71,7 +71,7 @@ enum NativeAlternativePaymentMethodViewModelState {
         @ReferenceWrapper
         var isInvalid: Bool
 
-        /// Current parameter's value. This value won't be modified by view model.
+        /// Current parameter's value.
         @ReferenceWrapper
         var value: String
 
@@ -159,6 +159,10 @@ enum NativeAlternativePaymentMethodViewModelState {
         let secondary: Action?
     }
 
+    enum Decoration: Hashable {
+        case normal, success
+    }
+
     struct Started {
 
         /// Available items.
@@ -169,6 +173,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Boolean value indicating whether editing is allowed.
         let isEditingAllowed: Bool
+
+        /// Decoration state if any.
+        let decorationState: Decoration?
     }
 
     case idle, started(Started)
