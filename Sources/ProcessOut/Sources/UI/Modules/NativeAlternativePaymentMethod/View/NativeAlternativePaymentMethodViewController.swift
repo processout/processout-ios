@@ -9,6 +9,7 @@
 
 import UIKit
 
+// todo: test on older iOS versions
 final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAlternativePaymentMethodViewModel>:
     BaseViewController<ViewModel>,
     NativeAlternativePaymentMethodCollectionLayoutDelegate,
@@ -72,6 +73,8 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
     func centeredSection(
         in collectionView: UICollectionView, layout: NativeAlternativePaymentMethodCollectionLayout
     ) -> Int? {
+        // fixme(andrii-vysotskyi): implementation returns nil shortly after parameters are submitted, because
+        // of this inputs are not centered
         let snapshot = collectionViewDataSource.snapshot()
         for (section, sectionId) in snapshot.sectionIdentifiers.enumerated() {
             for item in snapshot.itemIdentifiers(inSection: sectionId) {
@@ -517,35 +520,5 @@ private enum Constants {
     static let contentInset = UIEdgeInsets(top: 4, left: 24, bottom: 16, right: 24)
     static let inputHeight: CGFloat = 48
 }
-
-// todo: add background decoration to loader and submitted cells
-// todo: validate on older iOS versions
-// todo: when inputs is submitter centing index returns nil :)
-
-// private func configureWithIdleState() {
-//     backgroundDecorationView.alpha = 0
-// }
-//
-// private func configureWithLoadingState(animated: Bool) {
-//     backgroundDecorationView.configure(
-//         isExpanded: false, isSuccess: false, animated: backgroundDecorationView.alpha > 0.01 && animated
-//     )
-// }
-//
-// private func configure(with startedState: NativeAlternativePaymentMethodViewModelState.Started, animated: Bool) {
-//     backgroundDecorationView.configure(
-//         isExpanded: true, isSuccess: false, animated: backgroundDecorationView.alpha > 0.01 && animated
-//     )
-// }
-//
-// private func configure(
-//     with submittedState: NativeAlternativePaymentMethodViewModelState.Submitted, animated: Bool
-// ) {
-//     backgroundDecorationView.configure(
-//         isExpanded: false,
-//         isSuccess: submittedState.isCaptured,
-//         animated: backgroundDecorationView.alpha > 0.01 && animated
-//     )
-// }
 
 // swiftlint:enable type_body_length file_length
