@@ -9,8 +9,7 @@ import UIKit
 
 final class BackgroundDecorationView: UIView {
 
-    init(style: POBackgroundDecorationStyle) {
-        self.style = style
+    init() {
         super.init(frame: .zero)
         commonInit()
     }
@@ -20,28 +19,22 @@ final class BackgroundDecorationView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(isExpanded: Bool, isSuccess: Bool, animated: Bool) {
-        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
-            let baseHeight = isExpanded ? bounds.height : Constants.baseHeight
-            let spacing: CGFloat = isSuccess ? Constants.successSpacing : Constants.normalSpacing
-            innerShapeView.baseHeight = baseHeight
-            outerShapeView.baseHeight = baseHeight + spacing
-            let currentStyle = isSuccess ? style.success : style.normal
-            switch currentStyle {
-            case .hidden:
-                innerShapeView.fillColor = .clear
-                outerShapeView.fillColor = .clear
-            case let .visible(primaryColor, secondaryColor):
-                innerShapeView.fillColor = primaryColor
-                outerShapeView.fillColor = secondaryColor
-            }
+    func configure(isSuccess: Bool, style: POBackgroundDecorationStyle) {
+        let currentStyle = isSuccess ? style.success : style.normal
+        switch currentStyle {
+        case .hidden:
+            innerShapeView.fillColor = .clear
+            outerShapeView.fillColor = .clear
+        case let .visible(primaryColor, secondaryColor):
+            innerShapeView.fillColor = primaryColor
+            outerShapeView.fillColor = secondaryColor
         }
+        innerShapeViewBottomConstraint.constant = -(isSuccess ? Constants.successSpacing : Constants.normalSpacing)
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let baseHeight: CGFloat = 415
         static let innerCapHeight: CGFloat = 59
         static let outerCapHeight: CGFloat = 46
         static let normalSpacing: CGFloat = 83
@@ -51,10 +44,9 @@ final class BackgroundDecorationView: UIView {
 
     // MARK: - Private Properties
 
-    private let style: POBackgroundDecorationStyle
-
     private lazy var innerShapeView = BackgroundDecorationSheetView(capHeight: Constants.innerCapHeight)
     private lazy var outerShapeView = BackgroundDecorationSheetView(capHeight: Constants.outerCapHeight)
+    private lazy var innerShapeViewBottomConstraint = innerShapeView.bottomAnchor.constraint(equalTo: bottomAnchor)
 
     // MARK: - Private Methods
 
@@ -66,7 +58,7 @@ final class BackgroundDecorationView: UIView {
             innerShapeView.leadingAnchor.constraint(equalTo: leadingAnchor),
             innerShapeView.trailingAnchor.constraint(equalTo: trailingAnchor),
             innerShapeView.topAnchor.constraint(equalTo: topAnchor),
-            innerShapeView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            innerShapeViewBottomConstraint,
             outerShapeView.leadingAnchor.constraint(equalTo: leadingAnchor),
             outerShapeView.trailingAnchor.constraint(equalTo: trailingAnchor),
             outerShapeView.topAnchor.constraint(equalTo: topAnchor),
