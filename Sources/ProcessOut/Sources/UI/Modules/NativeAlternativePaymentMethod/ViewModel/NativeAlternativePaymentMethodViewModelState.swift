@@ -159,10 +159,6 @@ enum NativeAlternativePaymentMethodViewModelState {
         let secondary: Action?
     }
 
-    enum Decoration: Hashable {
-        case normal, success
-    }
-
     struct Started {
 
         /// Available items.
@@ -173,9 +169,6 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Boolean value indicating whether editing is allowed.
         let isEditingAllowed: Bool
-
-        /// Decoration state if any.
-        let decorationState: Decoration?
     }
 
     case idle, started(Started)

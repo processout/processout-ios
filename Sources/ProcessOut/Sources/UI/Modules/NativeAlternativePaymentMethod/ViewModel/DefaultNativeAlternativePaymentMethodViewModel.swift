@@ -85,9 +85,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             let sections = [
                 State.Section(id: .init(id: nil, title: nil), items: [.loader])
             ]
-            let startedState = State.Started(
-                sections: sections, actions: nil, isEditingAllowed: false, decorationState: .normal
-            )
+            let startedState = State.Started(sections: sections, actions: nil, isEditingAllowed: false)
             state = .started(startedState)
         case .started(let startedState):
             state = convertToState(startedState: startedState, isSubmitting: false)
@@ -135,8 +133,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 primary: submitAction(startedState: startedState, isSubmitting: isSubmitting),
                 secondary: cancelAction(isEnabled: !isSubmitting)
             ),
-            isEditingAllowed: !isSubmitting,
-            decorationState: nil
+            isEditingAllowed: !isSubmitting
         )
         return .started(startedState)
     }
@@ -159,8 +156,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 .init(id: .init(id: nil, title: nil), items: [item])
             ],
             actions: nil,
-            isEditingAllowed: false,
-            decorationState: .normal
+            isEditingAllowed: false
         )
         return .started(startedState)
     }
@@ -187,8 +183,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                     .init(id: .init(id: nil, title: nil), items: [.submitted(submittedItem)])
                 ],
                 actions: nil,
-                isEditingAllowed: false,
-                decorationState: .success
+                isEditingAllowed: false
             )
             state = .started(startedState)
         }
