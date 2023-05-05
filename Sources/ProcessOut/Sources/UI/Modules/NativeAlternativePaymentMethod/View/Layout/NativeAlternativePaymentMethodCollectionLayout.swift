@@ -9,6 +9,24 @@ import UIKit
 
 final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlowLayout {
 
+    override init() {
+        centeringOffset = 0
+        super.init()
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override var sectionHeadersPinToVisibleBounds: Bool {
+        didSet { assert(!sectionHeadersPinToVisibleBounds) }
+    }
+
+    override var sectionFootersPinToVisibleBounds: Bool {
+        didSet { assert(!sectionFootersPinToVisibleBounds) }
+    }
+
     override func invalidateLayout(with context: UICollectionViewLayoutInvalidationContext) {
         super.invalidateLayout(with: context)
         centeredSection = nil
@@ -26,7 +44,7 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
 
     override var collectionViewContentSize: CGSize {
         var size = super.collectionViewContentSize
-        size.height += 2 * centeringOffset
+        size.height += centeringOffset
         return size
     }
 
@@ -47,7 +65,7 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
     // MARK: - Private Properties
 
     private var centeredSection: Int?
-    private var centeringOffset: CGFloat = 0
+    private var centeringOffset: CGFloat
 
     private var delegate: NativeAlternativePaymentMethodCollectionLayoutDelegate {
         // swiftlint:disable:next force_cast force_unwrapping
@@ -60,7 +78,7 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
         guard centeredSection == nil else {
             return
         }
-        guard let collectionView, let section = delegate.centeredSection(in: collectionView, layout: self) else {
+        guard let collectionView, let section = delegate.centeredSection(layout: self) else {
             return
         }
         let updatedHeight = collectionView.bounds.inset(by: collectionView.adjustedContentInset).height
