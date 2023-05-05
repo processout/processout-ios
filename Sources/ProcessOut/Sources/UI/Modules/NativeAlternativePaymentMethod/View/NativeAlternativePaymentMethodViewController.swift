@@ -77,7 +77,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         for (section, sectionId) in snapshot.sectionIdentifiers.enumerated() {
             for item in snapshot.itemIdentifiers(inSection: sectionId) {
                 switch item {
-                case .codeInput, .input, .loader:
+                case .codeInput, .input, .loader, .picker:
                     return section
                 default:
                     break
