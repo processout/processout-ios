@@ -70,9 +70,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
 
     // MARK: - NativeAlternativePaymentMethodCollectionLayoutDelegate
 
-    func centeredSection(
-        in collectionView: UICollectionView, layout: NativeAlternativePaymentMethodCollectionLayout
-    ) -> Int? {
+    func centeredSection(layout: NativeAlternativePaymentMethodCollectionLayout) -> Int? {
         // fixme(andrii-vysotskyi): implementation returns nil shortly after parameters are submitted, because
         // of this inputs are not centered
         let snapshot = collectionViewDataSource.snapshot()
@@ -315,7 +313,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         }
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             if let actions = state.actions {
-                buttonsContainerView.configure(actions: actions, animated: animated)
+                buttonsContainerView.configure(actions: actions, animated: buttonsContainerView.alpha > 0 && animated)
                 buttonsContainerView.alpha = 1
             } else {
                 buttonsContainerView.alpha = 0
