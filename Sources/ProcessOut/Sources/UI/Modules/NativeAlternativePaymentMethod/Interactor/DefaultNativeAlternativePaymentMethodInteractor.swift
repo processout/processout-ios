@@ -369,7 +369,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                             defaultValue = self.formatted(value: value, type: parameter.type)
                         case .singleSelect:
                             precondition(
-                                parameter.availableValues?.map(\.displayName).contains(value) == true,
+                                parameter.availableValues?.map(\.value).contains(value) == true,
                                 "Unknown `singleSelect` parameter value."
                             )
                             defaultValue = value
