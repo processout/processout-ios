@@ -123,7 +123,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
             containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.topContentInset),
             containerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).with(priority: .defaultHigh),
             iconImageView.heightAnchor.constraint(lessThanOrEqualToConstant: Constants.maximumLogoImageHeight),
             iconImageView.widthAnchor.constraint(lessThanOrEqualTo: containerView.widthAnchor),
             iconImageViewWidthConstraint,

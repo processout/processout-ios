@@ -77,7 +77,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         for (section, sectionId) in snapshot.sectionIdentifiers.enumerated() {
             for item in snapshot.itemIdentifiers(inSection: sectionId) {
                 switch item {
-                case .codeInput, .input:
+                case .codeInput, .input, .loader:
                     return section
                 default:
                     break
@@ -98,7 +98,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         let height: CGFloat
         switch collectionViewDataSource.itemIdentifier(for: indexPath) {
         case .loader:
-            height = adjustedBounds.height
+            height = Constants.loaderHeight
         case .title(let item):
             height = collectionReusableViewSizeProvider.systemLayoutSize(
                 viewType: NativeAlternativePaymentMethodTitleCell.self,
@@ -288,7 +288,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
     private func configureWithIdleState() {
         buttonsContainerView.alpha = 0
         let snapshot = DiffableDataSourceSnapshot<SectionIdentifier, ItemIdentifier>()
-        collectionViewDataSource.apply(snapshot, animatingDifferences: false)
+        collectionViewDataSource.applySnapshotUsingReloadData(snapshot)
     }
 
     /// - Parameters:
@@ -517,6 +517,7 @@ private enum Constants {
     static let sectionInset = UIEdgeInsets(top: 8, left: 0, bottom: 24, right: 0)
     static let contentInset = UIEdgeInsets(top: 4, left: 24, bottom: 16, right: 24)
     static let inputHeight: CGFloat = 48
+    static let loaderHeight: CGFloat = 128
 }
 
 // swiftlint:enable type_body_length file_length

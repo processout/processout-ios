@@ -56,7 +56,7 @@ final class NativeAlternativePaymentMethodTitleCell: UICollectionViewCell {
         let constraints = [
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).with(priority: .defaultHigh),
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor)
         ]
         NSLayoutConstraint.activate(constraints)

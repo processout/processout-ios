@@ -56,7 +56,7 @@ final class NativeAlternativePaymentMethodSectionHeaderView: UICollectionReusabl
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
             titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: topAnchor),
-            titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
+            titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor).with(priority: .defaultHigh)
         ]
         NSLayoutConstraint.activate(constraints)
     }
