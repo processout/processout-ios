@@ -366,9 +366,6 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                     if let value = values[parameter.key] {
                         switch parameter.type {
                         case .email, .numeric, .phone, .text:
-                            if let length = parameter.length {
-                                precondition(value.count == length, "Unexpected parameter length.")
-                            }
                             defaultValue = self.formatted(value: value, type: parameter.type)
                         case .singleSelect:
                             precondition(
@@ -398,7 +395,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         case .email, .numeric, .phone, .text:
             return formatted(value: "", type: parameter.type)
         case .singleSelect:
-            return parameter.availableValues?.first { $0.default == true }?.displayName ?? ""
+            return parameter.availableValues?.first { $0.default == true }?.value ?? ""
         }
     }
 
@@ -450,7 +447,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 message = Strings.NativeAlternativePayment.Error.invalidEmail
             case .phone where value.range(of: Constants.phoneRegex, options: .regularExpression) == nil:
                 message = Strings.NativeAlternativePayment.Error.invalidPhone
-            case .singleSelect where parameter.availableValues?.map(\.displayName).contains(value) == false:
+            case .singleSelect where parameter.availableValues?.map(\.value).contains(value) == false:
                 message = Strings.NativeAlternativePayment.Error.invalidValue
             default:
                 message = nil
