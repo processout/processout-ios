@@ -87,7 +87,6 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
         }
         attributes.append(contentsOf: visibleLayoutAttributes)
         return attributes
-        UIViewController().additionalSafeAreaInsets
     }
 
     // MARK: - Private Nested Types
