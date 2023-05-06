@@ -12,4 +12,7 @@ protocol NativeAlternativePaymentMethodCollectionLayoutDelegate: AnyObject, UICo
 
     /// Should return index of the section that should be centered.
     func centeredSection(layout: NativeAlternativePaymentMethodCollectionLayout) -> Int?
+
+    /// Asks delegate whether section at given index should be decorated.
+    func shouldDecorateSection(at index: Int) -> Bool
 }

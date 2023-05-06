@@ -117,6 +117,10 @@ enum NativeAlternativePaymentMethodViewModelState {
         case submitted(SubmittedItem)
     }
 
+    enum SectionDecoration {
+        case normal, success
+    }
+
     struct SectionIdentifier: Hashable {
 
         /// Section id.
@@ -124,6 +128,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Section title if any.
         let title: String?
+
+        /// Section decoration.
+        let decoration: SectionDecoration?
     }
 
     struct Section {

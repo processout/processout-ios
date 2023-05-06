@@ -87,6 +87,10 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         return nil
     }
 
+    func shouldDecorateSection(at index: Int) -> Bool {
+        collectionViewDataSource.sectionIdentifier(for: index)?.decoration != nil
+    }
+
     // MARK: - UICollectionViewDelegateFlowLayout
 
     func collectionView(
@@ -391,6 +395,10 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         collectionView.registerSupplementaryView(
             NativeAlternativePaymentMethodSectionHeaderView.self, kind: UICollectionView.elementKindSectionHeader
         )
+        collectionView.registerSupplementaryView(
+            NativeAlternativePaymentMethodSectionDecorationView.self,
+            kind: NativeAlternativePaymentMethodCollectionLayout.elementKindSectionBackground
+        )
         collectionView.registerCell(NativeAlternativePaymentMethodTitleCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodLoaderCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodInputCell.self)
@@ -443,11 +451,25 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         guard let sectionIdentifier = collectionViewDataSource.sectionIdentifier(for: indexPath.section) else {
             return nil
         }
-        let view = collectionView.dequeueReusableSupplementaryView(
-            NativeAlternativePaymentMethodSectionHeaderView.self, kind: kind, indexPath: indexPath
-        )
-        view.configure(item: sectionIdentifier, style: style?.input?.normal.title)
-        return view
+        switch kind {
+        case NativeAlternativePaymentMethodCollectionLayout.elementKindSectionBackground:
+            guard let decoration = sectionIdentifier.decoration else {
+                return nil
+            }
+            let view = collectionView.dequeueReusableSupplementaryView(
+                NativeAlternativePaymentMethodSectionDecorationView.self, kind: kind, indexPath: indexPath
+            )
+            view.configure(item: decoration, style: style?.backgroundDecoration)
+            return view
+        case UICollectionView.elementKindSectionHeader:
+            let view = collectionView.dequeueReusableSupplementaryView(
+                NativeAlternativePaymentMethodSectionHeaderView.self, kind: kind, indexPath: indexPath
+            )
+            view.configure(item: sectionIdentifier, style: style?.input?.normal.title)
+            return view
+        default:
+            return nil
+        }
     }
 
     // MARK: - Keyboard Handling

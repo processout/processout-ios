@@ -82,11 +82,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         case .idle:
             state = .idle
         case .starting:
-            let sections = [
-                State.Section(id: .init(id: nil, title: nil), items: [.loader])
-            ]
-            let startedState = State.Started(sections: sections, actions: nil, isEditingAllowed: false)
-            state = .started(startedState)
+            configureWithStartingState()
         case .started(let startedState):
             state = convertToState(startedState: startedState, isSubmitting: false)
         case .failure(let failure):
@@ -102,12 +98,20 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         }
     }
 
+    private func configureWithStartingState() {
+        let sections = [
+            State.Section(id: .init(id: nil, title: nil, decoration: .normal), items: [.loader])
+        ]
+        let startedState = State.Started(sections: sections, actions: nil, isEditingAllowed: false)
+        state = .started(startedState)
+    }
+
     private func convertToState(startedState: InteractorState.Started, isSubmitting: Bool) -> State {
         let titleItem = State.TitleItem(
             text: configuration.title ?? Strings.title(startedState.gatewayDisplayName)
         )
         var sections = [
-            State.Section(id: .init(id: nil, title: nil), items: [.title(titleItem)])
+            State.Section(id: .init(id: nil, title: nil, decoration: nil), items: [.title(titleItem)])
         ]
         for (offset, parameter) in startedState.parameters.enumerated() {
             let value = startedState.values[parameter.key] ?? .init(value: nil, recentErrorMessage: nil)
@@ -123,7 +127,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 items.append(.error(State.ErrorItem(description: message)))
             }
             let section = State.Section(
-                id: .init(id: parameter.key, title: parameter.displayName), items: items
+                id: .init(id: parameter.key, title: parameter.displayName, decoration: nil), items: items
             )
             sections.append(section)
         }
@@ -153,7 +157,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         }
         let startedState = State.Started(
             sections: [
-                .init(id: .init(id: nil, title: nil), items: [item])
+                .init(id: .init(id: nil, title: nil, decoration: .normal), items: [item])
             ],
             actions: nil,
             isEditingAllowed: false
@@ -180,7 +184,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             )
             let startedState = State.Started(
                 sections: [
-                    .init(id: .init(id: nil, title: nil), items: [.submitted(submittedItem)])
+                    .init(id: .init(id: nil, title: nil, decoration: .success), items: [.submitted(submittedItem)])
                 ],
                 actions: nil,
                 isEditingAllowed: false
