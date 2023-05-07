@@ -28,12 +28,12 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
     func configure(item: NativeAlternativePaymentMethodViewModelState.InputItem, style: POInputFormStyle?) {
         let style = style ?? Constants.defaultStyle
         textFieldContainer.configure(
-            style: item.isInvalid ? style.error.field : style.normal.field,
+            style: item.value.isInvalid ? style.error.field : style.normal.field,
             animated: false
         )
         let textField = textFieldContainer.textField
-        if textField.text != item.value {
-            textField.text = item.value
+        if textField.text != item.value.text {
+            textField.text = item.value.text
         }
         textField.placeholder = item.placeholder
         textField.returnKeyType = item.isLast ? .done : .next
@@ -103,20 +103,20 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
 
     @objc
     private func textFieldEditingChanged() {
-        item?.value = textFieldContainer.textField.text ?? ""
+        item?.value.text = textFieldContainer.textField.text ?? ""
     }
 
     private func observeChanges(
         item: NativeAlternativePaymentMethodViewModelState.InputItem, style: POInputFormStyle
     ) {
-        let isInvalidObserver = item.$isInvalid.addObserver { [weak self] isInvalid in
+        let isInvalidObserver = item.value.$isInvalid.addObserver { [weak self] isInvalid in
             self?.textFieldContainer.configure(
                 style: isInvalid ? style.error.field : style.normal.field, animated: true
             )
         }
-        let valueObserver = item.$value.addObserver { [weak self] updatedValue in
+        let valueObserver = item.value.$text.addObserver { [weak self] updatedValue in
             if self?.textFieldContainer.textField.text != updatedValue {
-                self?.textFieldContainer.textField.text = item.value
+                self?.textFieldContainer.textField.text = updatedValue
             }
         }
         self.observations = [isInvalidObserver, valueObserver]
@@ -126,7 +126,7 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
 extension NativeAlternativePaymentMethodInputCell: UITextFieldDelegate {
 
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        item?.isEditingAllowed ?? false
+        item?.value.isEditingAllowed ?? false
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

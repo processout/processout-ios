@@ -11,6 +11,12 @@ enum NativeAlternativePaymentMethodViewModelState {
 
     typealias ParameterType = PONativeAlternativePaymentMethodParameter.ParameterType
 
+    struct TitleItem: Hashable {
+
+        /// Title text.
+        let text: String
+    }
+
     struct PickerOption: Hashable {
 
         /// Option name.
@@ -22,12 +28,6 @@ enum NativeAlternativePaymentMethodViewModelState {
         /// Closure to invoke when option is selected.
         @ImmutableNullHashable
         var select: () -> Void
-    }
-
-    struct TitleItem: Hashable {
-
-        /// Title text.
-        let text: String
     }
 
     struct PickerItem: Hashable {
@@ -42,21 +42,28 @@ enum NativeAlternativePaymentMethodViewModelState {
         let options: [PickerOption]
     }
 
-    struct CodeInputItem: Hashable {
+    struct InputValue: Hashable {
 
-        /// Code input length.
-        let length: Int
+        /// Current parameter's value text.
+        @ReferenceWrapper
+        var text: String
 
         /// Boolean value indicating whether value is valid.
         @ReferenceWrapper
         var isInvalid: Bool
 
-        /// Current parameter's value.
-        @ReferenceWrapper
-        var value: String
-
         /// Boolean value indicating whether editing is allowed.
-        let isEditingAllowed: Bool
+        @ReferenceWrapper
+        var isEditingAllowed: Bool
+    }
+
+    struct CodeInputItem: Hashable {
+
+        /// Code input length.
+        let length: Int
+
+        /// Value details.
+        let value: InputValue
     }
 
     struct InputItem: Hashable {
@@ -67,16 +74,8 @@ enum NativeAlternativePaymentMethodViewModelState {
         /// Parameter's placeholder.
         let placeholder: String?
 
-        /// Boolean value indicating whether value is valid.
-        @ReferenceWrapper
-        var isInvalid: Bool
-
-        /// Current parameter's value.
-        @ReferenceWrapper
-        var value: String
-
-        /// Boolean value indicating whether editing is allowed.
-        let isEditingAllowed: Bool
+        /// Value details.
+        let value: InputValue
 
         /// Boolean value indicating whether parameter is last in a chain.
         let isLast: Bool

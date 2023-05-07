@@ -349,9 +349,9 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
                 let isInvalid: Bool
                 switch item {
                 case .input(let inputItem):
-                    isInvalid = inputItem.isInvalid
+                    isInvalid = inputItem.value.isInvalid
                 case .codeInput(let inputItem):
-                    isInvalid = inputItem.isInvalid
+                    isInvalid = inputItem.value.isInvalid
                 default:
                     continue
                 }

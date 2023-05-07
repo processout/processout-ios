@@ -43,17 +43,6 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         static let maximumCodeLength = 6
     }
 
-    private struct InputValue {
-
-        /// Indicates whether parameter is invalid.
-        @ReferenceWrapper
-        var isInvalid: Bool
-
-        /// Current parameter's value. This value won't be modified by view model.
-        @ReferenceWrapper
-        var value: String
-    }
-
     // MARK: - NativeAlternativePaymentMethodInteractor
 
     private let interactor: any NativeAlternativePaymentMethodInteractor
@@ -68,7 +57,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         return formatter
     }()
 
-    private var inputValuesCache: [String: InputValue]
+    private var inputValuesCache: [String: State.InputValue]
     private var inputValuesObservations: [AnyObject]
 
     // MARK: - Private Methods
@@ -242,30 +231,28 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         isEditingAllowed: Bool,
         isLast: Bool
     ) -> State.Item {
-        let inputValue: InputValue
+        let inputValue: State.InputValue
         if let value = inputValuesCache[parameter.key] {
             inputValue = value
-            inputValue.value = parameterValue.value ?? ""
+            inputValue.text = parameterValue.value ?? ""
             inputValue.isInvalid = parameterValue.recentErrorMessage != nil
+            inputValue.isEditingAllowed = isEditingAllowed
         } else {
-            inputValue = InputValue(
+            inputValue = State.InputValue(
+                text: .init(value: parameterValue.value ?? ""),
                 isInvalid: .init(value: parameterValue.recentErrorMessage != nil),
-                value: .init(value: parameterValue.value ?? "")
+                isEditingAllowed: .init(value: isEditingAllowed)
             )
             inputValuesCache[parameter.key] = inputValue
-            let observer = inputValue.$value.addObserver { [weak self] updatedValue in
+            let observer = inputValue.$text.addObserver { [weak self] updatedValue in
                 self?.interactor.updateValue(updatedValue, for: parameter.key)
             }
             inputValuesObservations.append(observer)
         }
         switch parameter.type {
         case .numeric where (parameter.length ?? .max) <= Constants.maximumCodeLength:
-            let inputItem = State.CodeInputItem(
-                length: parameter.length!, // swiftlint:disable:this force_unwrapping
-                isInvalid: inputValue.$isInvalid,
-                value: inputValue.$value,
-                isEditingAllowed: isEditingAllowed
-            )
+            // swiftlint:disable:next force_unwrapping
+            let inputItem = State.CodeInputItem(length: parameter.length!, value: inputValue)
             return .codeInput(inputItem)
         case .singleSelect:
             return createPickerItem(parameter: parameter, value: inputValue)
@@ -273,9 +260,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             let inputItem = State.InputItem(
                 type: parameter.type,
                 placeholder: placeholder(for: parameter),
-                isInvalid: inputValue.$isInvalid,
-                value: inputValue.$value,
-                isEditingAllowed: isEditingAllowed,
+                value: inputValue,
                 isLast: isLast,
                 formatted: { [weak self] value in
                     self?.interactor.formatted(value: value, type: parameter.type) ?? ""
@@ -286,17 +271,17 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
     }
 
     private func createPickerItem(
-        parameter: PONativeAlternativePaymentMethodParameter, value: InputValue
+        parameter: PONativeAlternativePaymentMethodParameter, value: State.InputValue
     ) -> State.Item {
         assert(parameter.type == .singleSelect)
         let options = parameter.availableValues?.map { option in
-            State.PickerOption(name: option.displayName, isSelected: option.value == value.value) { [weak self] in
+            State.PickerOption(name: option.displayName, isSelected: option.value == value.text) { [weak self] in
                 self?.interactor.updateValue(option.value, for: parameter.key)
             }
         }
         let item = State.PickerItem(
             // Value of single select parameter is not user friendly instead display name should be used.
-            value: parameter.availableValues?.first { $0.value == value.value }?.displayName ?? "",
+            value: parameter.availableValues?.first { $0.value == value.text }?.displayName ?? "",
             isInvalid: value.isInvalid,
             options: options ?? []
         )
