@@ -7,7 +7,6 @@
 
 import UIKit
 
-// todo(andrii-vysotskyo): consider migrating to self-sizing to evict boilerplate sizing code.
 final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlowLayout {
 
     override init() {

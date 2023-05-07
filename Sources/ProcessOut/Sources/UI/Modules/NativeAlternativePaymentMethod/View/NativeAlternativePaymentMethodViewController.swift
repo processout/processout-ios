@@ -9,7 +9,6 @@
 
 import UIKit
 
-// todo: test on older iOS versions
 final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAlternativePaymentMethodViewModel>:
     BaseViewController<ViewModel>,
     NativeAlternativePaymentMethodCollectionLayoutDelegate,
@@ -109,6 +108,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
+        // todo(andrii-vysotskyo): consider migrating to self-sizing to evict boilerplate sizing code
         let adjustedBounds = collectionView.bounds.inset(by: collectionView.adjustedContentInset)
         let height: CGFloat
         switch collectionViewDataSource.itemIdentifier(for: indexPath) {
