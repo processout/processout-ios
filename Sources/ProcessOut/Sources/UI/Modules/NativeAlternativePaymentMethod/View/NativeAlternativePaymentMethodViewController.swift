@@ -19,7 +19,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         self.style = style
         self.logger = logger
         keyboardHeight = 0
-        super.init(viewModel: viewModel)
+        super.init(viewModel: viewModel, logger: logger)
     }
 
     // MARK: - UIViewController
@@ -68,11 +68,22 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         collectionViewLayout.invalidateLayout()
     }
 
+    // MARK: - BaseViewController
+
+    override func configure(with state: ViewModel.State) {
+        super.configure(with: state)
+        updateCollectionViewBottomInset(state: state)
+        switch state {
+        case .idle:
+            configureWithIdleState()
+        case .started(let startedState):
+            configure(with: startedState)
+        }
+    }
+
     // MARK: - NativeAlternativePaymentMethodCollectionLayoutDelegate
 
     func centeredSection(layout: NativeAlternativePaymentMethodCollectionLayout) -> Int? {
-        // fixme(andrii-vysotskyi): implementation returns nil shortly after parameters are submitted, because
-        // of this inputs are not centered
         let snapshot = collectionViewDataSource.snapshot()
         for (section, sectionId) in snapshot.sectionIdentifiers.enumerated() {
             for item in snapshot.itemIdentifiers(inSection: sectionId) {
@@ -211,19 +222,6 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         return true
     }
 
-    // MARK: - BaseViewController
-
-    override func configure(with state: ViewModel.State) {
-        logger.debug("Will update with new state: \(String(describing: state))")
-        updateCollectionViewBottomInset(state: state)
-        switch state {
-        case .idle:
-            configureWithIdleState()
-        case .started(let startedState):
-            configure(with: startedState)
-        }
-    }
-
     // MARK: - Private Nested Types
 
     private typealias SectionIdentifier = ViewModel.State.SectionIdentifier
@@ -309,11 +307,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             snapshot.reloadSections(collectionViewDataSource.snapshot().sectionIdentifiers)
         }
         collectionViewDataSource.apply(snapshot, animatingDifferences: animated) { [weak self] in
-            if !reload {
-                // When sections are reloaded first responder is resigned if any, to avoid ugly
-                // animation implementation doesn't attempt to find new one in such case.
-                self?.updateFirstResponder()
-            }
+            self?.updateFirstResponder()
         }
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             if let actions = state.actions {
@@ -480,32 +474,43 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             object: nil,
             queue: nil,
             using: { [weak self] notification in
-                // Keyboard updates are not always animated so changes are wrapped
-                // in default animation block for smoother UI.
-                UIView.animate(withDuration: Constants.animationDuration) {
-                    self?.keyboardWillChangeFrame(notification: notification)
-                }
+                self?.keyboardWillChangeFrame(notification: notification)
             }
         )
     }
 
     private func keyboardWillChangeFrame(notification: Notification) {
-        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
+        guard let notification = KeyboardNotification(notification: notification) else {
             return
         }
-        let coveredSafeAreaHeight = view.bounds.height
-            - view.convert(keyboardFrame, from: nil).minY
-            - view.safeAreaInsets.bottom
-        let keyboardHeight = max(coveredSafeAreaHeight, 0)
-        guard self.keyboardHeight != keyboardHeight else {
-            return
-        }
-        collectionView.performBatchUpdates {
-            self.keyboardHeight = keyboardHeight
-            updateCollectionViewBottomInset(state: viewModel.state)
-        }
-        buttonsContainerView.additionalBottomSafeAreaInset = keyboardHeight
-        collectionOverlayView.layoutIfNeeded()
+        // Keyboard updates are not always animated so defaults are provided for smoother UI.
+        let animator = UIViewPropertyAnimator(
+            duration: notification.animationDuration ?? Constants.animationDuration,
+            curve: notification.animationCurve ?? .easeInOut,
+            animations: { [self] in
+                let coveredSafeAreaHeight = view.bounds.height
+                    - view.convert(notification.frameEnd, from: nil).minY
+                    - view.safeAreaInsets.bottom
+                let keyboardHeight = max(coveredSafeAreaHeight, 0)
+                guard self.keyboardHeight != keyboardHeight else {
+                    return
+                }
+                collectionView.performBatchUpdates {
+                    self.keyboardHeight = keyboardHeight
+                    self.updateCollectionViewBottomInset(state: self.viewModel.state)
+                }
+                buttonsContainerView.additionalBottomSafeAreaInset = keyboardHeight
+                collectionOverlayView.layoutIfNeeded()
+            }
+        )
+        // An implementation of `UICollectionView.performBatchUpdates` resigns first responder if item associated
+        // with a cell containing it is invalidated, for example moved, deleted or reloaded. And since keyboard
+        // notification is sent as part of resign operation, we shouldn't call `performBatchUpdates` directly here
+        // to avoid recursion which causes weird artifacts and inconsistency. To break it, keyboard animation info
+        // is extracted from notification and update is scheduled for next run loop iteration. Collection layout
+        // update is needed here in a first place because layout depends on inset, which transitively depends on
+        // keyboard visibility.
+        RunLoop.current.perform(animator.startAnimation)
     }
 
     // MARK: - Action Buttons Shadow
