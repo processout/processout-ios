@@ -64,7 +64,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
 
     override func viewSafeAreaInsetsDidChange() {
         super.viewSafeAreaInsetsDidChange()
-        updateCollectionViewBottomInset(state: viewModel.state)
+        configureCollectionViewBottomInset(state: viewModel.state)
         collectionViewLayout.invalidateLayout()
     }
 
@@ -72,7 +72,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
 
     override func configure(with state: ViewModel.State) {
         super.configure(with: state)
-        updateCollectionViewBottomInset(state: state)
+        configureCollectionViewBottomInset(state: state)
         switch state {
         case .idle:
             configureWithIdleState()
@@ -88,7 +88,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         for (section, sectionId) in snapshot.sectionIdentifiers.enumerated() {
             for item in snapshot.itemIdentifiers(inSection: sectionId) {
                 switch item {
-                case .codeInput, .input, .loader, .picker:
+                case .codeInput, .input, .picker, .loader:
                     return section
                 default:
                     break
@@ -319,23 +319,6 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         }
     }
 
-    /// Adjusts bottom inset based on current state actions and keyboard height.
-    private func updateCollectionViewBottomInset(state: ViewModel.State) {
-        var bottomInset = Constants.contentInset.bottom + keyboardHeight
-        if case .started(let startedState) = state {
-            if let actions = startedState.actions {
-                if actions.secondary != nil {
-                    bottomInset += Constants.overlayLargeContentHeight
-                } else {
-                    bottomInset += Constants.overlaySmallContentHeight
-                }
-            }
-        }
-        if bottomInset != collectionView.contentInset.bottom {
-            collectionView.contentInset.bottom = bottomInset
-        }
-    }
-
     // MARK: - Current Responder Handling
 
     private func updateFirstResponder() {
@@ -497,7 +480,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
                 }
                 collectionView.performBatchUpdates {
                     self.keyboardHeight = keyboardHeight
-                    self.updateCollectionViewBottomInset(state: self.viewModel.state)
+                    self.configureCollectionViewBottomInset(state: self.viewModel.state)
                 }
                 buttonsContainerView.additionalBottomSafeAreaInset = keyboardHeight
                 collectionOverlayView.layoutIfNeeded()
@@ -511,6 +494,24 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         // update is needed here in a first place because layout depends on inset, which transitively depends on
         // keyboard visibility.
         RunLoop.current.perform(animator.startAnimation)
+    }
+
+    /// Adjusts bottom inset based on current state actions and keyboard height.
+    private func configureCollectionViewBottomInset(state: ViewModel.State) {
+        // todo(andrii-vysotskyi): consider observing overlay content height instead for better flexibility in future
+        var bottomInset = Constants.contentInset.bottom + keyboardHeight
+        if case .started(let startedState) = state {
+            if let actions = startedState.actions {
+                if actions.secondary != nil {
+                    bottomInset += Constants.overlayLargeContentHeight
+                } else {
+                    bottomInset += Constants.overlaySmallContentHeight
+                }
+            }
+        }
+        if bottomInset != collectionView.contentInset.bottom {
+            collectionView.contentInset.bottom = bottomInset
+        }
     }
 
     // MARK: - Action Buttons Shadow
