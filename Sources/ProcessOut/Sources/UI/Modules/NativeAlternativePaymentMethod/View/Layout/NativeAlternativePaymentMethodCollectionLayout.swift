@@ -36,7 +36,7 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
     }
 
     override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
-        let isWidthDifferent = (collectionView().bounds.width - newBounds.width) > 0.001
+        let isWidthDifferent = abs(collectionView().bounds.width - newBounds.width) > 0.001
         return isWidthDifferent || super.shouldInvalidateLayout(forBoundsChange: newBounds)
     }
 
@@ -162,7 +162,8 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
         guard numberOfSections != 0 else {
             return
         }
-        for section in 0 ..< numberOfSections where delegate().shouldDecorateSection(at: section) {
+        // swiftlint:disable:next line_length
+        for section in 0 ..< numberOfSections where delegate().collectionViewLayout(self, shouldDecorateSectionAt: section) {
             let numberOfItemsInSection = collectionView().numberOfItems(inSection: section)
             guard numberOfItemsInSection > 0 else {
                 assertionFailure("Attempted to decorate empty section which is not supported.")

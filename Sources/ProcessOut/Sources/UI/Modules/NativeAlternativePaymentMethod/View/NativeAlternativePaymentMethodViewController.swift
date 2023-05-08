@@ -82,7 +82,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
 
     // MARK: - NativeAlternativePaymentMethodCollectionLayoutDelegate
 
-    func centeredSection(layout: NativeAlternativePaymentMethodCollectionLayout) -> Int? {
+    func centeredSection(layout: UICollectionViewLayout) -> Int? {
         let snapshot = collectionViewDataSource.snapshot()
         for (section, sectionId) in snapshot.sectionIdentifiers.enumerated() {
             for item in snapshot.itemIdentifiers(inSection: sectionId) {
@@ -97,7 +97,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         return nil
     }
 
-    func shouldDecorateSection(at index: Int) -> Bool {
+    func collectionViewLayout(_ layout: UICollectionViewLayout, shouldDecorateSectionAt index: Int) -> Bool {
         collectionViewDataSource.sectionIdentifier(for: index)?.decoration != nil
     }
 

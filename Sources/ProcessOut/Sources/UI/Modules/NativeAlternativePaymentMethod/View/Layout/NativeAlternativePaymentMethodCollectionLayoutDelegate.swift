@@ -11,8 +11,8 @@ import UIKit
 protocol NativeAlternativePaymentMethodCollectionLayoutDelegate: AnyObject, UICollectionViewDelegateFlowLayout {
 
     /// Should return index of the section that should be centered.
-    func centeredSection(layout: NativeAlternativePaymentMethodCollectionLayout) -> Int?
+    func centeredSection(layout: UICollectionViewLayout) -> Int?
 
     /// Asks delegate whether section at given index should be decorated.
-    func shouldDecorateSection(at index: Int) -> Bool
+    func collectionViewLayout(_ layout: UICollectionViewLayout, shouldDecorateSectionAt index: Int) -> Bool
 }
