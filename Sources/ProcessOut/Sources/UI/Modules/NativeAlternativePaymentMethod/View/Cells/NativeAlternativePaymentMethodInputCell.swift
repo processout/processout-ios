@@ -22,6 +22,7 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        item = nil
         observations = []
     }
 
