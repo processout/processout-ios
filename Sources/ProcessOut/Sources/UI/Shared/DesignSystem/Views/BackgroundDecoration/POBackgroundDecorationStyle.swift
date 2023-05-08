@@ -7,7 +7,7 @@
 
 import UIKit
 
-public struct POBackgroundDecorationStyle: Equatable {
+public struct POBackgroundDecorationStyle {
 
     /// Primary color.
     public let normal: POBackgroundDecorationStateStyle

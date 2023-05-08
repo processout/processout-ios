@@ -7,7 +7,7 @@
 
 import UIKit
 
-public enum POBackgroundDecorationStateStyle: Equatable {
+public enum POBackgroundDecorationStateStyle {
 
     /// Completly hidden decoration style.
     case hidden
