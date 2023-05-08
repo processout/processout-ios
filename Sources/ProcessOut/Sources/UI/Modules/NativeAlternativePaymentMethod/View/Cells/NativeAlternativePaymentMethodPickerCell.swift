@@ -23,12 +23,12 @@ final class NativeAlternativePaymentMethodPickerCell: UICollectionViewCell {
         let options = item.options.map { option in
             PickerViewModel.Option(title: option.name, isSelected: option.isSelected, select: option.select)
         }
+        let style = style ?? Constants.defaultStyle
         picker.configure(
             viewModel: PickerViewModel(title: item.value, options: options),
+            style: item.isInvalid ? style.error.field : style.normal.field,
             animated: false
         )
-        let style = style ?? Constants.defaultStyle
-        picker.configure(style: item.isInvalid ? style.error.field : style.normal.field, animated: false)
     }
 
     // MARK: - Private Nested Types

@@ -9,7 +9,7 @@ import UIKit
 
 // swiftlint:disable file_length type_body_length unused_setter_value
 
-final class CodeTextField: UIControl, UITextInput, InputFormTextField {
+final class CodeTextField: UIControl, UITextInput {
 
     init(length: Int) {
         self.length = length

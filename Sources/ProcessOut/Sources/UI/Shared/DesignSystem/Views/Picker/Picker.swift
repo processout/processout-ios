@@ -8,7 +8,7 @@
 import UIKit
 
 // todo(andrii-vysotskyi): add placeholder
-final class Picker: UIControl, InputFormTextField {
+final class Picker: UIControl {
 
     init() {
         super.init(frame: .zero)
@@ -20,12 +20,8 @@ final class Picker: UIControl, InputFormTextField {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(viewModel: PickerViewModel, animated: Bool) {
+    func configure(viewModel: PickerViewModel, style: POTextFieldStyle, animated: Bool) {
         currentViewModel = viewModel
-        configureWithCurrentState(animated: animated)
-    }
-
-    func configure(style: POTextFieldStyle, animated: Bool) {
         currentStyle = style
         configureWithCurrentState(animated: animated)
     }
