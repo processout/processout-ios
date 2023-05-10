@@ -15,7 +15,7 @@ public typealias ProcessOutApi = ProcessOut
 public enum ProcessOut {
 
     /// Shared instance.
-    public private(set) static var shared: ProcessOutApiType! // swiftlint:disable:this implicitly_unwrapped_optional
+    public private(set) static var shared: ProcessOutType! // swiftlint:disable:this implicitly_unwrapped_optional
 
     /// Configures ``ProcessOutApi/shared`` instance.
     /// - NOTE: Method must be called from main thread. Only the first invocation takes effect, all
@@ -31,7 +31,7 @@ public enum ProcessOut {
     }
 }
 
-private final class SharedProcessOutApi: ProcessOutApiType {
+private final class SharedProcessOutApi: ProcessOutType {
 
     init(configuration: ProcessOutConfiguration) {
         self.configuration = configuration
@@ -98,7 +98,7 @@ private final class SharedProcessOutApi: ProcessOutApiType {
             baseUrl: configuration.apiBaseUrl,
             projectId: configuration.projectId,
             privateKey: configuration.privateKey,
-            version: Self.version
+            version: ProcessOut.version
         )
         let connector = ProcessOutHttpConnectorBuilder()
             .with(configuration: connectorConfiguration)
