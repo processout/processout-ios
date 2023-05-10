@@ -107,7 +107,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
         } catch {
             setCompletedState(with: error)
         }
-        return false
+        return true
     }
 
     private func setCompletedState(with error: Error) {
