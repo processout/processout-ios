@@ -17,7 +17,7 @@ public enum ProcessOutApi {
     /// Configures ``ProcessOutApi/shared`` instance.
     /// - NOTE: Method must be called from main thread. Only the first invocation takes effect, all
     /// subsequent calls to this method are ignored.
-    public static func configure(configuration: ProcessOutApiConfiguration) {
+    public static func configure(configuration: ProcessOutConfiguration) {
         assert(Thread.isMainThread, "Method must be called only from main thread")
         if let shared {
             shared.logger.info("ProcessOutApi can be configured only once, ignored")
@@ -30,13 +30,13 @@ public enum ProcessOutApi {
 
 private final class SharedProcessOutApi: ProcessOutApiType {
 
-    init(configuration: ProcessOutApiConfiguration) {
+    init(configuration: ProcessOutConfiguration) {
         self.configuration = configuration
     }
 
     // MARK: - ProcessOutApiType
 
-    let configuration: ProcessOutApiConfiguration
+    let configuration: ProcessOutConfiguration
 
     private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepository = {
         HttpGatewayConfigurationsRepository(connector: httpConnector, failureMapper: failureMapper)
