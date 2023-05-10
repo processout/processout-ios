@@ -16,7 +16,7 @@ enum HTTPMethod: String {
     case connect = "CONNECT"
 }
 
-@available(*, deprecated, message: "Use ProcessOutApi instead.")
+@available(*, deprecated, message: "Use ProcessOut instead.")
 public final class ProcessOutLegacyApi {
 
     public struct Contact {
@@ -286,7 +286,7 @@ public final class ProcessOutLegacyApi {
     /// - Parameters:
     ///   - completion: Completion callback
     ///   - paginationOptions: Pagination options to use
-    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOutApi.shared.gatewayConfigurations.all instead.")
+    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOut.shared.gatewayConfigurations.all instead.")
     public static func fetchGatewayConfigurations(filter: GatewayConfigurationsFilter, completion: @escaping ([GatewayConfiguration]?, ProcessOutException?) -> Void, paginationOptions: PaginationOptions? = nil) {
         let paginationParams = paginationOptions != nil ? "&" + generatePaginationParamsString(paginationOptions: paginationOptions!) : ""
         
@@ -701,7 +701,7 @@ public final class ProcessOutLegacyApi {
     ///
     /// - Parameter url: URI from the deep-link app opening
     /// - Returns: nil if the URL is not a ProcessOut return URL, an APMTokenReturn object otherwise
-    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOutApi.shared.alternativePaymentMethods.alternativePaymentMethodResponse instead.")
+    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodResponse instead.")
     public static func handleAPMURLCallback(url: URL) -> APMTokenReturn? {
         // Check for the URL host
         guard let host = url.host, host == "processout.return" else {
@@ -737,7 +737,7 @@ public final class ProcessOutLegacyApi {
     ///   - gateway: The alternative payment method configuration
     ///   - customerId: The customer ID
     ///   - tokenId: The token ID generated on your backend with an empty source
-    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOutApi.shared.alternativePaymentMethods.alternativePaymentMethodUrl instead.")
+    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodUrl instead.")
     public static func makeAPMToken(gateway: GatewayConfiguration, customerId: String, tokenId: String, additionalData: [String: String] = [:]) {
         // Generate the redirection URL
         let checkout = ProcessOutLegacyApi.ProjectId + "/" + customerId + "/" + tokenId + "/redirect/" + gateway.id
@@ -755,7 +755,7 @@ public final class ProcessOutLegacyApi {
     ///   - gateway: Gateway to use (previously fetched)
     ///   - invoiceId: Invoice ID generated on your backend
     /// - Returns: Redirect URL that should be displayed in a webview
-    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOutApi.shared.alternativePaymentMethods.alternativePaymentMethodUrl instead.")
+    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodUrl instead.")
     public static func makeAPMPayment(gateway: GatewayConfiguration, invoiceId: String, additionalData: [String: String] = [:]) -> String {
         // Generate the redirection URL
         let checkout = ProcessOutLegacyApi.ProjectId + "/" + invoiceId + "/redirect/" + gateway.id

@@ -8,7 +8,7 @@
 import Foundation
 
 @available(*, deprecated, renamed: "ProcessOutType")
-typealias ProcessOutApiType = ProcessOutType
+public typealias ProcessOutApiType = ProcessOutType
 
 // todo(andrii-vysotskyi): remove suffix before releasing version 4.0.0
 public protocol ProcessOutType {

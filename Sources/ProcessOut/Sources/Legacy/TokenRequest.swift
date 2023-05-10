@@ -7,7 +7,7 @@
 
 import Foundation
 
-@available(*, deprecated, message: "Use ProcessOutApi.shared.customerTokens.assignCustomerToken() with POAssignCustomerTokenRequest instead.")
+@available(*, deprecated, message: "Use ProcessOut.shared.customerTokens.assignCustomerToken() with POAssignCustomerTokenRequest instead.")
 public final class TokenRequest: Encodable {
 
     var customerID: String = ""

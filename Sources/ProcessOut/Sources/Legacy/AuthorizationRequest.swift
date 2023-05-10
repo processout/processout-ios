@@ -5,7 +5,7 @@
 //  Created by Jeremy Lejoux on 17/06/2019.
 //
 
-@available(*, deprecated, message: "Use ProcessOutApi.shared.invoices.authorizeInvoice() instead.")
+@available(*, deprecated, message: "Use ProcessOut.shared.invoices.authorizeInvoice() instead.")
 public final class AuthorizationRequest: Codable {
 
     var invoiceID: String = ""

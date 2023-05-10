@@ -6,7 +6,7 @@ Version 3 is not backward compatible with previous versions, although migration 
 straightforward. There are some changes that should be addressed when migrating:
 
 1. Instead of `ProcessOut.Setup(projectId: String)` there is new method that should be used to configure
-SDK ``ProcessOutApi/configure(configuration:)``.
+SDK ``ProcessOut/configure(configuration:)``.
 
 2. `ProcessOut` was renamed to ``ProcessOutLegacyApi`` to avoid shadowing module name as it may cause issues. For more
 information, see [Swift Issue](https://github.com/apple/swift/issues/56573).

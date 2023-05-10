@@ -17,7 +17,7 @@ public enum ProcessOut {
     /// Shared instance.
     public private(set) static var shared: ProcessOutType! // swiftlint:disable:this implicitly_unwrapped_optional
 
-    /// Configures ``ProcessOutApi/shared`` instance.
+    /// Configures ``ProcessOut/shared`` instance.
     /// - NOTE: Method must be called from main thread. Only the first invocation takes effect, all
     /// subsequent calls to this method are ignored.
     public static func configure(configuration: ProcessOutConfiguration) {
@@ -26,18 +26,18 @@ public enum ProcessOut {
             shared.logger.info("ProcessOut can be configured only once, ignored")
             return
         }
-        shared = SharedProcessOutApi(configuration: configuration)
+        shared = SharedProcessOut(configuration: configuration)
         shared.logger.debug("Did complete ProcessOut configuration")
     }
 }
 
-private final class SharedProcessOutApi: ProcessOutType {
+private final class SharedProcessOut: ProcessOutType {
 
     init(configuration: ProcessOutConfiguration) {
         self.configuration = configuration
     }
 
-    // MARK: - ProcessOutApiType
+    // MARK: - ProcessOutType
 
     let configuration: ProcessOutConfiguration
 
