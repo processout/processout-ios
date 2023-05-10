@@ -22,7 +22,7 @@ Method ``PO3DSService/handle(redirect:completion:)`` is a part of 3DS service th
 based redirects.
 
 ``PO3DSRedirectViewControllerBuilder`` allows you to create a view controller that will automatically
-redirect user to expected url and collect result. Please note that return url and completion are required parameters.
+redirect user to expected url and collect result.
 
 Please note that some redirects can be handled silently to user, in order to understand whether it is possible inspect
 ``PO3DSRedirect/isHeadlessModeAllowed``. If value of this property is `true` redirect can be handled without showing
@@ -34,7 +34,7 @@ func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFai
         var viewController: UIViewController!
         viewController = PO3DSRedirectViewControllerBuilder
             .with(redirect: redirect)
-            .with(returnUrl: returnUrl)
+            .with(returnUrl: Constants.returnUrl)
             .with(completion: { result in
                 // TODO: remove view controller and its view from parent
                 completion(result) 
@@ -47,7 +47,7 @@ func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFai
     } else {
         let viewController = PO3DSRedirectViewControllerBuilder 
             .with(redirect: redirect)
-            .with(returnUrl: returnUrl)
+            .with(returnUrl: Constants.returnUrl)
             .with(completion: { result in
                 sourceViewController.dismiss(animated: true)
                 completion(result) 
