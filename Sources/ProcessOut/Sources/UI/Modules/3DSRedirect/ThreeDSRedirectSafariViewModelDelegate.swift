@@ -1,5 +1,5 @@
 //
-//  WebViewControllerDelegate3DS.swift
+//  ThreeDSRedirectSafariViewModelDelegate.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 04.11.2022.
@@ -7,16 +7,15 @@
 
 import WebKit
 
-final class WebViewControllerDelegate3DS: WebViewControllerDelegate {
+final class ThreeDSRedirectSafariViewModelDelegate: DefaultSafariViewModelDelegate {
 
-    init(url: URL, completion: @escaping (Result<String, POFailure>) -> Void) {
-        self.url = url
+    typealias Completion = (Result<String, POFailure>) -> Void
+
+    init(completion: @escaping Completion) {
         self.completion = completion
     }
 
-    // MARK: - WebViewControllerDelegate
-
-    let url: URL
+    // MARK: - DefaultSafariViewModelDelegate
 
     func complete(with url: URL) throws {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
@@ -38,5 +37,5 @@ final class WebViewControllerDelegate3DS: WebViewControllerDelegate {
 
     // MARK: - Private Properties
 
-    private let completion: (Result<String, POFailure>) -> Void
+    private let completion: Completion
 }
