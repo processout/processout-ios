@@ -28,7 +28,7 @@ public final class PO3DSRedirectViewControllerBuilder {
     ///
     /// - NOTE: Caller should dismiss view controller after completion is called.
     public func build() -> UIViewController {
-        let api: ProcessOutApiType = ProcessOutApi.shared
+        let api: ProcessOutApiType = ProcessOut.shared
         let configuration = WebViewControllerConfiguration(
             returnUrls: [api.configuration.checkoutBaseUrl],
             version: type(of: api).version,

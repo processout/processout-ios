@@ -79,21 +79,21 @@ public final class ProcessOutLegacyApi {
     }
 
     private static var ApiUrl: String {
-        ProcessOutApi.shared.configuration.apiBaseUrl.absoluteString
+        ProcessOut.shared.configuration.apiBaseUrl.absoluteString
     }
 
     internal static var CheckoutUrl: String {
-        ProcessOutApi.shared.configuration.checkoutBaseUrl.absoluteString
+        ProcessOut.shared.configuration.checkoutBaseUrl.absoluteString
     }
 
     internal static var ProjectId: String {
-        ProcessOutApi.shared.configuration.projectId
+        ProcessOut.shared.configuration.projectId
     }
 
     internal static let threeDS2ChallengeSuccess: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ=="
     internal static let threeDS2ChallengeError: String = "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ=="
 
-    internal static let requestManager = ProcessOutRequestManager(apiUrl: ApiUrl, apiVersion: type(of: ProcessOutApi.shared).version, defaultUserAgent: defaultUserAgent)
+    internal static let requestManager = ProcessOutRequestManager(apiUrl: ApiUrl, apiVersion: type(of: ProcessOut.shared).version, defaultUserAgent: defaultUserAgent)
 
     // Getting the device user agent
     private static let defaultUserAgent = "iOS/" + UIDevice.current.systemVersion

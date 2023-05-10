@@ -1,5 +1,5 @@
 //
-//  ProcessOutApi.swift
+//  ProcessOut.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 07.10.2022.
@@ -8,8 +8,11 @@
 import Foundation
 import UIKit
 
+@available(*, deprecated, renamed: "ProcessOut")
+public typealias ProcessOutApi = ProcessOut
+
 /// Provides access to shared api instance and a way to configure it.
-public enum ProcessOutApi {
+public enum ProcessOut {
 
     /// Shared instance.
     public private(set) static var shared: ProcessOutApiType! // swiftlint:disable:this implicitly_unwrapped_optional
@@ -20,11 +23,11 @@ public enum ProcessOutApi {
     public static func configure(configuration: ProcessOutConfiguration) {
         assert(Thread.isMainThread, "Method must be called only from main thread")
         if let shared {
-            shared.logger.info("ProcessOutApi can be configured only once, ignored")
+            shared.logger.info("ProcessOut can be configured only once, ignored")
             return
         }
         shared = SharedProcessOutApi(configuration: configuration)
-        shared.logger.debug("Did complete ProcessOutApi configuration")
+        shared.logger.debug("Did complete ProcessOut configuration")
     }
 }
 

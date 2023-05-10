@@ -49,7 +49,7 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
     ///
     /// - NOTE: Caller should dismiss view controller after completion is called.
     public func build() -> UIViewController {
-        let api: ProcessOutApiType = ProcessOutApi.shared
+        let api: ProcessOutApiType = ProcessOut.shared
         let interactor = DefaultNativeAlternativePaymentMethodInteractor(
             invoicesService: api.invoices,
             imagesRepository: api.images,
