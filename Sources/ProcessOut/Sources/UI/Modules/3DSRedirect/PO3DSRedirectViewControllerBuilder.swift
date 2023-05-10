@@ -39,13 +39,14 @@ public final class PO3DSRedirectViewControllerBuilder {
     }
 
     /// Returns view controller that caller should encorporate into view controllers hierarchy.
-    /// If instance can't be created precondition failure is triggered.
     ///
-    /// - NOTE: Caller should dismiss view controller after completion is called.
-    /// - NOTE: Returned object's delegate shouldn't be modified.
+    /// - Note: Caller should dismiss view controller after completion is called.
+    /// - Note: Returned object's delegate shouldn't be modified.
+    /// - Warning: Make sure that `completion` and `returnUrl` are set before calling
+    /// this method. Otherwise precondition failure is raised.
     public func build() -> SFSafariViewController {
         guard let completion, let returnUrl else {
-            preconditionFailure("Completion and return url must be set.")
+            preconditionFailure("Required parameters are not set.")
         }
         let api: ProcessOutApiType = ProcessOutApi.shared
         let viewController = SFSafariViewController(

@@ -40,7 +40,10 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
     /// Creates and returns view controller that is capable of handling alternative payment request.
     /// If instance can't be created precondition failure is triggered.
     /// 
-    /// - NOTE: Returned object's delegate shouldn't be modified.
+    /// - Note: Returned object's delegate shouldn't be modified.
+    /// - Note: Returned object's delegate shouldn't be modified.
+    /// - Warning: Make sure that `completion` and `returnUrl` are set before calling
+    /// this method. Otherwise precondition failure is raised.
     public func build() -> SFSafariViewController {
         guard let completion, let returnUrl else {
             preconditionFailure("Completion and return url must be set.")

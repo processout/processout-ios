@@ -92,7 +92,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
             logger.error("Can't change state to completed because already in sink state.")
             return false
         }
-        // todo(andrii-vysotskyi): validate whether url is related to initial request if possible
+        // todo(andrii-vysotskyi): consider validating whether url is related to initial request if possible
         guard url.scheme == configuration.returnUrl.scheme,
               url.host == configuration.returnUrl.host,
               url.path == configuration.returnUrl.path else {

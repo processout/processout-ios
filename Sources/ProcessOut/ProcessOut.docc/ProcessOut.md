@@ -124,6 +124,8 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POService``
 - ``POAutoAsync``
 - ``POLogger``
+- ``POEventEmitter``
+- ``POEventEmitterEvent``
 
 ### Legacy Declarations
 
