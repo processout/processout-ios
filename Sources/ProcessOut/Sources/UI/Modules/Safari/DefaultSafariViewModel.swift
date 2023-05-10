@@ -42,6 +42,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
         if state != .completed {
+            logger.debug("Safari did finish, but state is not completed, handling as cancelation")
             let failure = POFailure(code: .cancelled)
             setCompletedState(with: failure)
         }
@@ -49,13 +50,14 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     func safariViewController(_ controller: SFSafariViewController, didCompleteInitialLoad didLoadSuccessfully: Bool) {
         if !didLoadSuccessfully {
+            logger.debug("Safari failed to load initial url, aborting")
             let failure = POFailure(code: .generic(.mobile))
             setCompletedState(with: failure)
         }
     }
 
     func safariViewController(_ controller: SFSafariViewController, initialLoadDidRedirectTo url: URL) {
-        // Ignored
+        logger.debug("Safari did redirect to url: \(url)")
     }
 
     // MARK: - Private Nested Types
@@ -91,13 +93,17 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
             return false
         }
         // todo(andrii-vysotskyi): validate whether url is related to initial request if possible
-        guard url.scheme == configuration.returnUrl.scheme, url.host == configuration.returnUrl.host else {
+        guard url.scheme == configuration.returnUrl.scheme,
+              url.host == configuration.returnUrl.host,
+              url.path == configuration.returnUrl.path else {
+            logger.debug("Ignoring unrelated url: \(url)")
             return false
         }
         do {
             try delegate.complete(with: url)
             invalidateObservers()
             state = .completed
+            logger.info("Did complete with url: \(url)")
         } catch {
             setCompletedState(with: error)
         }
@@ -117,6 +123,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
         }
         invalidateObservers()
         state = .completed
+        logger.debug("Did complete with error: \(failure)")
         delegate.complete(with: failure)
     }
 

@@ -45,7 +45,7 @@ public final class PO3DSRedirectViewControllerBuilder {
     /// - NOTE: Returned object's delegate shouldn't be modified.
     public func build() -> SFSafariViewController {
         guard let completion, let returnUrl else {
-            preconditionFailure("Completion must be set.")
+            preconditionFailure("Completion and return url must be set.")
         }
         let api: ProcessOutApiType = ProcessOutApi.shared
         let viewController = SFSafariViewController(
