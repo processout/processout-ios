@@ -36,8 +36,7 @@ final class AlternativePaymentMethodsRouter: RouterType {
                     self?.viewController?.dismiss(animated: true)
                 }
                 .build()
-            let navigationController = createNavigationController(rootViewController: viewController)
-            self.viewController?.present(navigationController, animated: true)
+            self.viewController?.present(viewController, animated: true)
         case let .authorizationtAmount(completion):
             let viewController = AuthorizationAmountBuilder(completion: completion).build()
             self.viewController?.present(viewController, animated: true)
@@ -52,24 +51,5 @@ final class AlternativePaymentMethodsRouter: RouterType {
             self.viewController?.present(viewController, animated: true)
         }
         return true
-    }
-
-    // MARK: - Private Methods
-
-    private func createNavigationController(rootViewController: UIViewController) -> UIViewController {
-        let cancelBarButtonItem = UIBarButtonItem(
-            systemItem: .cancel,
-            primaryAction: .init(handler: { [weak self] _ in
-                self?.viewController?.dismiss(animated: true)
-            }),
-            menu: nil
-        )
-        cancelBarButtonItem.tintColor = Asset.Colors.Button.primary.color
-        let spaceBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: self, action: nil)
-        spaceBarButtonItem.width = 18
-        rootViewController.navigationItem.leftBarButtonItems = [spaceBarButtonItem, cancelBarButtonItem]
-        let navigationController = UINavigationController(rootViewController: rootViewController)
-        navigationController.navigationBar.prefersLargeTitles = false
-        return navigationController
     }
 }
