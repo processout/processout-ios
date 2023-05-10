@@ -19,7 +19,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>processout</string>
+				<string>processout-example</string>
 			</array>
 		</dict>
 	</array>

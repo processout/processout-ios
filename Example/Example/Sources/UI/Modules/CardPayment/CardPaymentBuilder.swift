@@ -11,7 +11,8 @@ import ProcessOut
 final class CardPaymentBuilder {
 
     func build() -> UIViewController {
-        let threeDSService = POTest3DSService()
+        // swiftlint:disable:next force_unwrapping
+        let threeDSService = POTest3DSService(returnUrl: URL(string: "processout-example://return")!)
         let router = CardPaymentRouter()
         let viewModel = CardPaymentViewModel(
             router: router,
