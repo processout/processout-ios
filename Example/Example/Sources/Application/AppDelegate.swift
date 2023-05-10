@@ -6,7 +6,7 @@
 //
 
 import UIKit
-@_spi(PO) import ProcessOutKit
+@_spi(PO) import ProcessOut
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
