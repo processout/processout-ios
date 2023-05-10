@@ -34,7 +34,7 @@ public protocol ProcessOutApiType {
     /// Logger with application category.
     var logger: POLogger { get }
 
-    /// Event emitter to use for for events exchange.
+    /// Event emitter to use for events exchange.
     var eventEmitter: POEventEmitter { get }
 
     /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. You can pass
