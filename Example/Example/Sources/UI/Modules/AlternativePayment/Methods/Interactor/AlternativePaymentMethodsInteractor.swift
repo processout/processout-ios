@@ -99,7 +99,7 @@ final class AlternativePaymentMethodsInteractor:
             name: UUID().uuidString,
             amount: amount.description,
             currency: currencyCode,
-            returnUrl: URL(string: "processout-example://return")! // swiftlint:disable:this force_unwrapping
+            returnUrl: Example.Constants.returnUrl
         )
         invoicesService.createInvoice(request: request) { [weak self] result in
             self?.state = .started(startedState)

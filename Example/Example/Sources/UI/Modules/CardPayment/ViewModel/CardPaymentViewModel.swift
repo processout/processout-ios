@@ -124,7 +124,7 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
                 name: UUID().uuidString,
                 amount: amount.wrappedValue,
                 currency: currencyCode.wrappedValue,
-                returnUrl: URL(string: "processout-example://return")
+                returnUrl: Constants.returnUrl
             )
             let invoice = try await invoicesService.createInvoice(request: invoiceCreationRequest)
             let invoiceAuthorizationRequest = POInvoiceAuthorizationRequest(

@@ -32,8 +32,7 @@ final class AlternativePaymentMethodsRouter: RouterType {
         case let .alternativePayment(request):
             let viewController = POAlternativePaymentMethodViewControllerBuilder
                 .with(request: request)
-                // swiftlint:disable:next force_unwrapping
-                .with(returnUrl: URL(string: "processout-example://return")!)
+                .with(returnUrl: Constants.returnUrl)
                 .with { [weak self] _ in
                     self?.viewController?.dismiss(animated: true)
                 }
