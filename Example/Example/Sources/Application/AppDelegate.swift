@@ -6,7 +6,7 @@
 //
 
 import UIKit
-@_spi(PO) import ProcessOut
+@_spi(PO) import ProcessOutKit
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -32,7 +32,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Private Methods
 
     private func configureProcessOut() {
-        let configuration = ProcessOutApiConfiguration.test(
+        let configuration = ProcessOutConfiguration.test(
             projectId: Constants.projectId,
             privateKey: Constants.projectPrivateKey,
             // swiftlint:disable force_unwrapping
@@ -40,6 +40,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             checkoutBaseUrl: URL(string: Constants.checkoutBaseUrl)!
             // swiftlint:enable force_unwrapping
         )
-        ProcessOutApi.configure(configuration: configuration)
+        ProcessOut.configure(configuration: configuration)
     }
 }
