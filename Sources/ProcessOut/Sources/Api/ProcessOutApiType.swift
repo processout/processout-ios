@@ -33,4 +33,14 @@ public protocol ProcessOutApiType {
 
     /// Logger with application category.
     var logger: POLogger { get }
+
+    /// Event emitter to use for for events exchange.
+    var eventEmitter: POEventEmitter { get }
+
+    /// Call this method in your app or scene delegate whenever you incoming URL. You can path both custom scheme-based
+    /// deep links and universal links.
+    ///
+    /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
+    @discardableResult
+    func processDeepLink(url: URL) -> Bool
 }

@@ -75,6 +75,13 @@ private final class SharedProcessOutApi: ProcessOutApiType {
         return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService)
     }()
 
+    private(set) lazy var eventEmitter: POEventEmitter = LocalEventEmitter()
+
+    func processDeepLink(url: URL) -> Bool {
+        let event = DeepLinkReceivedEvent(url: url)
+        return eventEmitter.emit(event: event)
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {
