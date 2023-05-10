@@ -37,8 +37,8 @@ public protocol ProcessOutApiType {
     /// Event emitter to use for for events exchange.
     var eventEmitter: POEventEmitter { get }
 
-    /// Call this method in your app or scene delegate whenever you incoming URL. You can path both custom scheme-based
-    /// deep links and universal links.
+    /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. You can pass
+    /// both custom scheme-based deep links and universal links.
     ///
     /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
     @discardableResult
