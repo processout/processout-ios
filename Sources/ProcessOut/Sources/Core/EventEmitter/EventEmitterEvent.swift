@@ -1,17 +1,17 @@
 //
-//  POEventEmitterEvent.swift
+//  EventEmitterEvent.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 10.05.2023.
 //
 
-public protocol POEventEmitterEvent: Sendable {
+protocol EventEmitterEvent: Sendable {
 
     /// Event name.
     static var name: String { get }
 }
 
-extension POEventEmitterEvent {
+extension EventEmitterEvent {
 
     public static var name: String {
         String(describing: self)

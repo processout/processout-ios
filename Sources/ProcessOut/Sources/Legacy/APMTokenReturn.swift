@@ -7,7 +7,7 @@
 
 import Foundation
 
-@available(*, deprecated, message: "Use ProcessOutApi.shared.customerTokens.assignCustomerToken() instead.")
+@available(*, deprecated, message: "Use ProcessOut.shared.customerTokens.assignCustomerToken() instead.")
 public final class APMTokenReturn {
 
     public enum APMReturnType {

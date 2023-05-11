@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct DeepLinkReceivedEvent: POEventEmitterEvent {
+struct DeepLinkReceivedEvent: EventEmitterEvent {
 
     /// Url representing deep link or universal link.
     let url: URL

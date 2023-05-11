@@ -12,4 +12,5 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '12.0'
   s.ios.resource_bundle   = { 'ProcessOut' => 'Sources/ProcessOut/Resources/**/*' }
   s.source_files          = 'Sources/ProcessOut/**/*.swift'
+  s.pod_target_xcconfig   = { 'OTHER_SWIFT_FLAGS' => '-Xfrontend -module-interface-preserve-types-as-written' }
 end

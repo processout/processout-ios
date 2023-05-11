@@ -48,7 +48,7 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
         guard let completion, let returnUrl else {
             preconditionFailure("Completion and return url must be set.")
         }
-        let api: ProcessOutApiType = ProcessOutApi.shared
+        let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         let viewController = SFSafariViewController(
             url: api.alternativePaymentMethods.alternativePaymentMethodUrl(request: request),
             configuration: safariConfiguration

@@ -7,16 +7,16 @@
 
 import Foundation
 
-final class LocalEventEmitter: POEventEmitter, @unchecked Sendable {
+final class LocalEventEmitter: EventEmitter, @unchecked Sendable {
 
     init() {
         lock = NSLock()
         subscriptions = [:]
     }
 
-    // MARK: - POEventEmitter
+    // MARK: - EventEmitter
 
-    func emit<Event: POEventEmitterEvent>(event: Event) -> Bool {
+    func emit<Event: EventEmitterEvent>(event: Event) -> Bool {
         lock.lock()
         guard let eventSubscriptions = subscriptions[Event.name]?.values else {
             lock.unlock()
@@ -34,7 +34,7 @@ final class LocalEventEmitter: POEventEmitter, @unchecked Sendable {
         return isHandled
     }
 
-    func on<Event: POEventEmitterEvent>(_ eventType: Event.Type, listener: @escaping (Event) -> Bool) -> AnyObject {
+    func on<Event: EventEmitterEvent>(_ eventType: Event.Type, listener: @escaping (Event) -> Bool) -> AnyObject {
         let subscription = Subscription { event in
             guard let event = event as? Event else {
                 return false

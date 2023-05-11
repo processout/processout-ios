@@ -48,7 +48,7 @@ public final class PO3DSRedirectViewControllerBuilder {
         guard let completion, let returnUrl else {
             preconditionFailure("Required parameters are not set.")
         }
-        let api: ProcessOutApiType = ProcessOutApi.shared
+        let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         let viewController = SFSafariViewController(
             url: redirect.url, configuration: safariConfiguration
         )

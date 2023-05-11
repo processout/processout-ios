@@ -7,11 +7,11 @@
 
 import Foundation
 
-// todo(andrii-vysotskyi): remove suffix before releasing version 4.0.0
+@available(*, deprecated)
 public protocol ProcessOutApiType {
 
     /// Current configuration.
-    var configuration: ProcessOutApiConfiguration { get }
+    var configuration: ProcessOutConfiguration { get }
 
     /// Returns gateway configurations repository.
     var gatewayConfigurations: POGatewayConfigurationsRepository { get }
@@ -33,14 +33,14 @@ public protocol ProcessOutApiType {
 
     /// Logger with application category.
     var logger: POLogger { get }
+}
 
-    /// Event emitter to use for events exchange.
-    var eventEmitter: POEventEmitter { get }
+@available(*, deprecated)
+extension ProcessOutApiType {
 
-    /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. You can pass
-    /// both custom scheme-based deep links and universal links.
-    ///
-    /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
-    @discardableResult
-    func processDeepLink(url: URL) -> Bool
+    /// The current version of this library.
+    @available(*, deprecated, message: "Use ProcessOut.version instead")
+    public static var version: String {
+        ProcessOut.version
+    }
 }

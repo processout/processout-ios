@@ -12,7 +12,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     init(
         configuration: DefaultSafariViewModelConfiguration,
-        eventEmitter: POEventEmitter,
+        eventEmitter: EventEmitter,
         logger: POLogger,
         delegate: DefaultSafariViewModelDelegate
     ) {
@@ -77,7 +77,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
     // MARK: - Private Properties
 
     private let configuration: DefaultSafariViewModelConfiguration
-    private let eventEmitter: POEventEmitter
+    private let eventEmitter: EventEmitter
     private let logger: POLogger
     private let delegate: DefaultSafariViewModelDelegate
 

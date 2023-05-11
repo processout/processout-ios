@@ -7,8 +7,8 @@ Before using ProcessOut SDK make sure to configure it.
 ```swift
 import ProcessOut
 
-let configuration = ProcessOutApiConfiguration.production(projectId: "your_project_id")
-ProcessOutApi.configure(configuration: configuration)
+let configuration = ProcessOutConfiguration.production(projectId: "your_project_id")
+ProcessOut.configure(configuration: configuration)
 ```
 
 ## Topics
@@ -17,9 +17,8 @@ ProcessOutApi.configure(configuration: configuration)
 
 - <doc:MigratingFromProcessOut2>
 - <doc:Localizations>
-- ``ProcessOutApi``
-- ``ProcessOutApiConfiguration``
-- ``ProcessOutApiType``
+- ``ProcessOut/ProcessOut``
+- ``ProcessOutConfiguration``
 
 ### Errors
 
@@ -124,8 +123,6 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POService``
 - ``POAutoAsync``
 - ``POLogger``
-- ``POEventEmitter``
-- ``POEventEmitterEvent``
 
 ### Legacy Declarations
 

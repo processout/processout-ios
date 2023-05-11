@@ -16,8 +16,8 @@ final class AlternativePaymentMethodsBuilder {
 
     func build() -> UIViewController {
         let interactor = AlternativePaymentMethodsInteractor(
-            gatewayConfigurationsRepository: ProcessOutApi.shared.gatewayConfigurations,
-            invoicesService: ProcessOutApi.shared.invoices,
+            gatewayConfigurationsRepository: ProcessOut.shared.gatewayConfigurations,
+            invoicesService: ProcessOut.shared.invoices,
             filter: filter
         )
         let router = AlternativePaymentMethodsRouter()

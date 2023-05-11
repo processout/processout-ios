@@ -15,8 +15,8 @@ final class CardPaymentBuilder {
         let router = CardPaymentRouter()
         let viewModel = CardPaymentViewModel(
             router: router,
-            invoicesService: ProcessOutApi.shared.invoices,
-            cardsService: ProcessOutApi.shared.cards,
+            invoicesService: ProcessOut.shared.invoices,
+            cardsService: ProcessOut.shared.cards,
             threeDSService: threeDSService
         )
         let viewController = CardPaymentViewController(viewModel: viewModel)

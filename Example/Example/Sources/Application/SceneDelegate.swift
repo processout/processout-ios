@@ -25,13 +25,13 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         if let url = userActivity.webpageURL {
-            ProcessOutApi.shared.processDeepLink(url: url)
+            ProcessOut.shared.processDeepLink(url: url)
         }
     }
 
     func scene(_ scene: UIScene, openURLContexts urlContexts: Set<UIOpenURLContext>) {
         if let url = urlContexts.first?.url {
-            ProcessOutApi.shared.processDeepLink(url: url)
+            ProcessOut.shared.processDeepLink(url: url)
         }
     }
 }
