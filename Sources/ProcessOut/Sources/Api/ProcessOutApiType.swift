@@ -7,11 +7,11 @@
 
 import Foundation
 
-// todo(andrii-vysotskyi): remove suffix before releasing version 4.0.0
+@available(*, deprecated)
 public protocol ProcessOutApiType {
 
     /// Current configuration.
-    var configuration: ProcessOutApiConfiguration { get }
+    var configuration: ProcessOutConfiguration { get }
 
     /// Returns gateway configurations repository.
     var gatewayConfigurations: POGatewayConfigurationsRepository { get }
@@ -33,4 +33,14 @@ public protocol ProcessOutApiType {
 
     /// Logger with application category.
     var logger: POLogger { get }
+}
+
+@available(*, deprecated)
+extension ProcessOutApiType {
+
+    /// The current version of this library.
+    @available(*, deprecated, message: "Use ProcessOut.version instead")
+    public static var version: String {
+        ProcessOut.version
+    }
 }

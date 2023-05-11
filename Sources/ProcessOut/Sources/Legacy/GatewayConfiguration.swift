@@ -7,7 +7,7 @@
 
 import Foundation
 
-@available(*, deprecated, message: "Use ProcessOutApi.shared.gatewayConfigurations instead.")
+@available(*, deprecated, message: "Use ProcessOut.shared.gatewayConfigurations instead.")
 public class GatewayConfiguration: Decodable {
     
     enum CodingKeys: String, CodingKey {

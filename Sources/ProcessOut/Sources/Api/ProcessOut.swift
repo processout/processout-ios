@@ -1,5 +1,5 @@
 //
-//  ProcessOutApi.swift
+//  ProcessOut.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 07.10.2022.
@@ -8,58 +8,58 @@
 import Foundation
 import UIKit
 
+@available(*, deprecated, renamed: "ProcessOut")
+public typealias ProcessOutApi = ProcessOut
+
 /// Provides access to shared api instance and a way to configure it.
-public enum ProcessOutApi {
+public final class ProcessOut {
 
     /// Shared instance.
-    public private(set) static var shared: ProcessOutApiType! // swiftlint:disable:this implicitly_unwrapped_optional
+    public private(set) static var shared: ProcessOut! // swiftlint:disable:this implicitly_unwrapped_optional
 
-    /// Configures ``ProcessOutApi/shared`` instance.
+    /// Configures ``ProcessOut/shared`` instance.
     /// - NOTE: Method must be called from main thread. Only the first invocation takes effect, all
     /// subsequent calls to this method are ignored.
-    public static func configure(configuration: ProcessOutApiConfiguration) {
+    public static func configure(configuration: ProcessOutConfiguration) {
         assert(Thread.isMainThread, "Method must be called only from main thread")
         if let shared {
-            shared.logger.info("ProcessOutApi can be configured only once, ignored")
+            shared.logger.info("ProcessOut can be configured only once, ignored")
             return
         }
-        shared = SharedProcessOutApi(configuration: configuration)
-        shared.logger.debug("Did complete ProcessOutApi configuration")
-    }
-}
-
-private final class SharedProcessOutApi: ProcessOutApiType {
-
-    init(configuration: ProcessOutApiConfiguration) {
-        self.configuration = configuration
+        shared = ProcessOut(configuration: configuration)
+        shared.logger.debug("Did complete ProcessOut configuration")
     }
 
-    // MARK: - ProcessOutApiType
+    // MARK: - ProcessOutType
 
-    let configuration: ProcessOutApiConfiguration
+    /// Current configuration.
+    public let configuration: ProcessOutConfiguration
 
-    private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepository = {
+    /// Returns gateway configurations repository.
+    public private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepository = {
         HttpGatewayConfigurationsRepository(connector: httpConnector, failureMapper: failureMapper)
     }()
 
-    private(set) lazy var invoices: POInvoicesService = {
+    /// Returns invoices service.
+    public private(set) lazy var invoices: POInvoicesService = {
         let repository = HttpInvoicesRepository(connector: httpConnector, failureMapper: failureMapper)
         return DefaultInvoicesService(repository: repository, threeDSService: threeDSService)
     }()
 
-    private(set) lazy var images: POImagesRepository = {
+    /// Images repository.
+    public private(set) lazy var images: POImagesRepository = {
         UrlSessionImagesRepository(session: .shared)
     }()
 
-    private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
+    /// Returns alternative payment methods service.
+    public private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
         DefaultAlternativePaymentMethodsService(
             projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl, logger: serviceLogger
         )
     }()
 
-    private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
-
-    private(set) lazy var cards: POCardsService = {
+    /// Returns cards repository.
+    public private(set) lazy var cards: POCardsService = {
         let requestMapper = DefaultApplePayCardTokenizationRequestMapper(
             decoder: JSONDecoder(), logger: repositoryLogger
         )
@@ -70,10 +70,14 @@ private final class SharedProcessOutApi: ProcessOutApiType {
         return service
     }()
 
-    private(set) lazy var customerTokens: POCustomerTokensService = {
+    /// Returns customer tokens service.
+    public private(set) lazy var customerTokens: POCustomerTokensService = {
         let repository = HttpCustomerTokensRepository(connector: httpConnector, failureMapper: failureMapper)
         return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService)
     }()
+
+    /// Logger with application category.
+    public private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
 
     // MARK: - Private Nested Types
 
@@ -95,7 +99,7 @@ private final class SharedProcessOutApi: ProcessOutApiType {
             baseUrl: configuration.apiBaseUrl,
             projectId: configuration.projectId,
             privateKey: configuration.privateKey,
-            version: Self.version
+            version: ProcessOut.version
         )
         let connector = ProcessOutHttpConnectorBuilder()
             .with(configuration: connectorConfiguration)
@@ -117,6 +121,10 @@ private final class SharedProcessOutApi: ProcessOutApiType {
 
     // MARK: - Private Methods
 
+    private init(configuration: ProcessOutConfiguration) {
+        self.configuration = configuration
+    }
+
     private func createLogger(for category: String) -> POLogger {
         let destinations: [LoggerDestination] = [
             SystemLoggerDestination(subsystem: Constants.systemLoggerSubsystem, category: category)
@@ -125,3 +133,6 @@ private final class SharedProcessOutApi: ProcessOutApiType {
         return POLogger(destinations: destinations, minimumLevel: minimumLevel)
     }
 }
+
+@available(*, deprecated, message: "Use ProcessOut directly")
+extension ProcessOut: ProcessOutApiType { }
