@@ -7,9 +7,9 @@
 
 import UIKit
 
-class BaseViewController<ViewModel>: UIViewController where ViewModel: ProcessOut.ViewModel {
+class BaseViewController<Model>: UIViewController where Model: ViewModel {
 
-    init(viewModel: ViewModel, logger: POLogger) {
+    init(viewModel: Model, logger: POLogger) {
         self.viewModel = viewModel
         self.logger = logger
         super.init(nibName: nil, bundle: nil)
@@ -28,11 +28,11 @@ class BaseViewController<ViewModel>: UIViewController where ViewModel: ProcessOu
 
     // MARK: -
 
-    func configure(with state: ViewModel.State) {
+    func configure(with state: Model.State) {
         logger.debug("Will update view with new state: \(String(describing: state))")
     }
 
-    let viewModel: ViewModel
+    let viewModel: Model
 
     // MARK: - Private Properties
 
