@@ -19,7 +19,6 @@ ProcessOut.configure(configuration: configuration)
 - <doc:Localizations>
 - ``ProcessOut/ProcessOut``
 - ``ProcessOutConfiguration``
-- ``ProcessOutType``
 
 ### Errors
 

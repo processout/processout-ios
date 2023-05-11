@@ -12,10 +12,10 @@ import UIKit
 public typealias ProcessOutApi = ProcessOut
 
 /// Provides access to shared api instance and a way to configure it.
-public enum ProcessOut {
+public final class ProcessOut {
 
     /// Shared instance.
-    public private(set) static var shared: ProcessOutType! // swiftlint:disable:this implicitly_unwrapped_optional
+    public private(set) static var shared: ProcessOut! // swiftlint:disable:this implicitly_unwrapped_optional
 
     /// Configures ``ProcessOut/shared`` instance.
     /// - NOTE: Method must be called from main thread. Only the first invocation takes effect, all
@@ -26,43 +26,40 @@ public enum ProcessOut {
             shared.logger.info("ProcessOut can be configured only once, ignored")
             return
         }
-        shared = SharedProcessOut(configuration: configuration)
+        shared = ProcessOut(configuration: configuration)
         shared.logger.debug("Did complete ProcessOut configuration")
-    }
-}
-
-private final class SharedProcessOut: ProcessOutType {
-
-    init(configuration: ProcessOutConfiguration) {
-        self.configuration = configuration
     }
 
     // MARK: - ProcessOutType
 
-    let configuration: ProcessOutConfiguration
+    /// Current configuration.
+    public let configuration: ProcessOutConfiguration
 
-    private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepository = {
+    /// Returns gateway configurations repository.
+    public private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepository = {
         HttpGatewayConfigurationsRepository(connector: httpConnector, failureMapper: failureMapper)
     }()
 
-    private(set) lazy var invoices: POInvoicesService = {
+    /// Returns invoices service.
+    public private(set) lazy var invoices: POInvoicesService = {
         let repository = HttpInvoicesRepository(connector: httpConnector, failureMapper: failureMapper)
         return DefaultInvoicesService(repository: repository, threeDSService: threeDSService)
     }()
 
-    private(set) lazy var images: POImagesRepository = {
+    /// Images repository.
+    public private(set) lazy var images: POImagesRepository = {
         UrlSessionImagesRepository(session: .shared)
     }()
 
-    private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
+    /// Returns alternative payment methods service.
+    public private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
         DefaultAlternativePaymentMethodsService(
             projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl, logger: serviceLogger
         )
     }()
 
-    private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
-
-    private(set) lazy var cards: POCardsService = {
+    /// Returns cards repository.
+    public private(set) lazy var cards: POCardsService = {
         let requestMapper = DefaultApplePayCardTokenizationRequestMapper(
             decoder: JSONDecoder(), logger: repositoryLogger
         )
@@ -73,10 +70,14 @@ private final class SharedProcessOut: ProcessOutType {
         return service
     }()
 
-    private(set) lazy var customerTokens: POCustomerTokensService = {
+    /// Returns customer tokens service.
+    public private(set) lazy var customerTokens: POCustomerTokensService = {
         let repository = HttpCustomerTokensRepository(connector: httpConnector, failureMapper: failureMapper)
         return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService)
     }()
+
+    /// Logger with application category.
+    public private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
 
     // MARK: - Private Nested Types
 
@@ -120,6 +121,10 @@ private final class SharedProcessOut: ProcessOutType {
 
     // MARK: - Private Methods
 
+    private init(configuration: ProcessOutConfiguration) {
+        self.configuration = configuration
+    }
+
     private func createLogger(for category: String) -> POLogger {
         let destinations: [LoggerDestination] = [
             SystemLoggerDestination(subsystem: Constants.systemLoggerSubsystem, category: category)
@@ -128,3 +133,6 @@ private final class SharedProcessOut: ProcessOutType {
         return POLogger(destinations: destinations, minimumLevel: minimumLevel)
     }
 }
+
+@available(*, deprecated, message: "Use ProcessOut directly")
+extension ProcessOut: ProcessOutApiType { }

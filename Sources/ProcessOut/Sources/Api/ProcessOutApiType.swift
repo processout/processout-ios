@@ -1,5 +1,5 @@
 //
-//  ProcessOutType.swift
+//  ProcessOutApiType.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 10.10.2022.
@@ -7,11 +7,8 @@
 
 import Foundation
 
-@available(*, deprecated, renamed: "ProcessOutType")
-public typealias ProcessOutApiType = ProcessOutType
-
-// todo(andrii-vysotskyi): remove suffix before releasing version 4.0.0
-public protocol ProcessOutType {
+@available(*, deprecated)
+public protocol ProcessOutApiType {
 
     /// Current configuration.
     var configuration: ProcessOutConfiguration { get }
@@ -38,7 +35,8 @@ public protocol ProcessOutType {
     var logger: POLogger { get }
 }
 
-extension ProcessOutType {
+@available(*, deprecated)
+extension ProcessOutApiType {
 
     /// The current version of this library, value is "3.5.0".
     @available(*, deprecated, message: "Use ProcessOut.version instead")

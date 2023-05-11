@@ -28,7 +28,7 @@ public final class PO3DSRedirectViewControllerBuilder {
     ///
     /// - NOTE: Caller should dismiss view controller after completion is called.
     public func build() -> UIViewController {
-        let api: ProcessOutType = ProcessOut.shared
+        let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         let configuration = WebViewControllerConfiguration(
             returnUrls: [api.configuration.checkoutBaseUrl],
             version: ProcessOut.version,
