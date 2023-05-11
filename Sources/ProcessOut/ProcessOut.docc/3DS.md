@@ -22,7 +22,19 @@ Method ``PO3DSService/handle(redirect:completion:)`` is a part of 3DS service th
 based redirects.
 
 ``PO3DSRedirectViewControllerBuilder`` allows you to create a view controller that will automatically
-redirect user to expected url and collect result.
+redirect user to expected url and collect result. When using `PO3DSRedirectViewControllerBuilder` your application
+should support deep and/or universal links. When application receives incoming URL you should allow ProcessOut SDK to
+handle it. For example if you are using scene delegate and universal links it may look like following:
+
+```swift
+func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+    guard let url = userActivity.webpageURL else {
+        return
+    }
+    let isHandled = ProcessOut.shared.processDeepLink(url: url)
+    print(isHandled)
+}
+```
 
 Please note that some redirects can be handled silently to user, in order to understand whether it is possible inspect
 ``PO3DSRedirect/isHeadlessModeAllowed``. If value of this property is `true` redirect can be handled without showing
