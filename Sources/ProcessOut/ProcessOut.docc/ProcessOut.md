@@ -17,7 +17,7 @@ ProcessOut.configure(configuration: configuration)
 
 - <doc:MigratingFromProcessOut2>
 - <doc:Localizations>
-- ``ProcessOut``
+- ``ProcessOut/ProcessOut``
 - ``ProcessOutConfiguration``
 - ``ProcessOutType``
 
