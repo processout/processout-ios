@@ -38,7 +38,7 @@ public protocol ProcessOutApiType {
 @available(*, deprecated)
 extension ProcessOutApiType {
 
-    /// The current version of this library, value is "3.5.0".
+    /// The current version of this library.
     @available(*, deprecated, message: "Use ProcessOut.version instead")
     public static var version: String {
         ProcessOut.version
