@@ -9,7 +9,7 @@ import Foundation
 
 final class PhoneNumberFormatter {
 
-    init(metadataProvider: PhoneNumberMetadataProviderType = PhoneNumberMetadataProvider.shared) {
+    init(metadataProvider: PhoneNumberMetadataProvider = DefaultPhoneNumberMetadataProvider.shared) {
         regexProvider = RegexProvider.shared
         self.metadataProvider = metadataProvider
     }
@@ -53,7 +53,7 @@ final class PhoneNumberFormatter {
     // MARK: - Private Properties
 
     private let regexProvider: RegexProvider
-    private let metadataProvider: PhoneNumberMetadataProviderType
+    private let metadataProvider: PhoneNumberMetadataProvider
 
     // MARK: - Private Methods
 
