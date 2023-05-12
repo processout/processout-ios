@@ -72,6 +72,9 @@ final class PhoneNumberFormatter {
     private func attemptToFormat(
         partialNationalNumber: String, formats: [PhoneNumberFormat], countryCode: String
     ) -> String? {
+        guard partialNationalNumber.count <= Constants.maxNationalNumberLength else {
+            return nil
+        }
         let nationalNumber = partialNationalNumber.appending(
             String(
                 repeating: Constants.placeholderDigit,
