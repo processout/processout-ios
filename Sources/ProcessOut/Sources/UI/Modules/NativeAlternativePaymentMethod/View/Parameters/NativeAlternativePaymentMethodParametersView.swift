@@ -265,14 +265,14 @@ extension NativeAlternativePaymentMethodParametersView: UITextFieldDelegate {
         // swiftlint:disable:next legacy_objc_type
         let updatedText = (textField.text as? NSString)?.replacingCharacters(in: range, with: string) ?? ""
         let formattedText = parameter.formatted(updatedText)
-        guard formattedText != updatedText, #available(iOS 13.0, *) else {
+        guard formattedText != updatedText else {
             return true
         }
         textField.text = formattedText
-        let adjustedOffset = adjustedIndexOffset(
+        let adjustedOffset = FormattingUtils.adjustedCursorOffset(
             in: formattedText,
             source: updatedText,
-            sourceIndexOffset: range.lowerBound + string.count,
+            sourceCursorOffset: range.lowerBound + string.count,
             ignoredCharacters: .decimalDigits.inverted,
             greedy: !string.isEmpty
         )
@@ -282,38 +282,4 @@ extension NativeAlternativePaymentMethodParametersView: UITextFieldDelegate {
         textField.sendActions(for: .editingChanged)
         return false
     }
-}
-
-/// Returns index in formatted string that matches index in `string`.
-@available(iOS 13.0, *)
-func adjustedIndexOffset(
-    in target: String,
-    source: String,
-    sourceIndexOffset: Int,
-    ignoredCharacters: CharacterSet = [],
-    greedy: Bool = true
-) -> Int {
-    let (sourceLhs, sourceRhs) = split(string: source, by: sourceIndexOffset, ignoredCharacters: ignoredCharacters)
-
-    var minimumDistance: Int = .max
-    var adjustedCursorIndex = target.count
-
-    for offset in 0 ... target.count {
-        let (targetLhs, targetRhs) = split(string: target, by: offset, ignoredCharacters: ignoredCharacters)
-
-        let distance = targetLhs.difference(from: sourceLhs).count + targetRhs.difference(from: sourceRhs).count
-
-        if distance < minimumDistance || (greedy && distance <= minimumDistance) {
-            adjustedCursorIndex = offset
-            minimumDistance = distance
-        }
-    }
-    return adjustedCursorIndex
-}
-
-func split(string: String, by indexOffset: Int, ignoredCharacters: CharacterSet) -> (String, String) {
-    let index = string.index(string.startIndex, offsetBy: indexOffset)
-    let lhs = string.prefix(upTo: index).removingCharacters(in: ignoredCharacters)
-    let rhs = string.suffix(from: index).removingCharacters(in: ignoredCharacters)
-    return (lhs, rhs)
 }
