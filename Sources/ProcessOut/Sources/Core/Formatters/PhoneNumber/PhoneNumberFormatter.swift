@@ -47,7 +47,7 @@ final class PhoneNumberFormatter {
     private enum Constants {
         static let maxCountryPrefixLength = 3
         static let maxNationalNumberLength = 14
-        static let placeholderNumber = "0"
+        static let placeholderDigit = "0"
     }
 
     // MARK: - Private Properties
@@ -74,7 +74,7 @@ final class PhoneNumberFormatter {
     ) -> String? {
         let nationalNumber = partialNationalNumber.appending(
             String(
-                repeating: Constants.placeholderNumber,
+                repeating: Constants.placeholderDigit,
                 count: Constants.maxNationalNumberLength - partialNationalNumber.count
             )
         )
