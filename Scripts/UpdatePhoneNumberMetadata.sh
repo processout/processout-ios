@@ -19,7 +19,7 @@ mkdir -p $OUTPUT_DIR
 "$SCRIPT_DIR/ConvertPhoneNumberMetadata.swift" "libphonenumber/resources/PhoneNumberMetadata.xml" "$OUTPUT_DIR/PhoneNumberMetadata.json"
 
 # Write metadata
-echo $1 >> "$OUTPUT_DIR/PhoneNumberMetadata.version"
+echo $1 > "$OUTPUT_DIR/PhoneNumberMetadata.version"
 
 function cleanup {
   rm -rf $WORK_DIR
