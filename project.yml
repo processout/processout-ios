@@ -21,6 +21,7 @@ targets:
       CURRENT_PROJECT_VERSION: ${CURRENT_VERSION}
       SKIP_INSTALL: NO
       BUILD_LIBRARY_FOR_DISTRIBUTION: YES
+      OTHER_SWIFT_FLAGS: "-Xfrontend -module-interface-preserve-types-as-written"
     preBuildScripts:
       - path: Scripts/Lint.sh
         name: Swiftlint
@@ -38,10 +39,11 @@ targets:
   ProcessOutTests:
     type: bundle.unit-test
     platform: iOS
-    depencencies:
+    deploymentTarget: "16.0"
+    dependencies:
       - target: ProcessOut
     sources: Tests/ProcessOutTests
-  ProcessOutCheckout:
+  ProcessOutCheckout3DS:
     type: framework
     platform: iOS
     deploymentTarget: "12.0"
@@ -57,7 +59,7 @@ targets:
       - package: CheckoutEventLoggerKit
       - package: JOSESwift
       - target: ProcessOut
-    sources: Sources/ProcessOutCheckout
+    sources: Sources/ProcessOutCheckout3DS
 schemes:
   ProcessOut:
     build:
@@ -67,7 +69,7 @@ schemes:
     test:
       gatherCoverageData: true
       targets: [ProcessOutTests]
-  ProcessOutCheckout:
+  ProcessOutCheckout3DS:
     build:
       targets:
-        ProcessOutCheckout: all
+        ProcessOutCheckout3DS: all

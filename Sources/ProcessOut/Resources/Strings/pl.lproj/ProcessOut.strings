@@ -8,7 +8,6 @@
 
 "native-alternative-payment.title" = "Zapłać przy pomocy %@";
 "native-alternative-payment.success.message" = "Sukces!\nPłatność przyjęta";
-"native-alternative-payment.awaiting-capture.message" = "Aby dokończyć transakcję zatwierdź ją w aplikacji swojego banku.";
 "native-alternative-payment.email.placeholder" = "imię@przykład.pl";
 "native-alternative-payment.phone.placeholder" = "Twój numer telefonu";
 "native-alternative-payment.submit-button.title" = "Zapłać %@";
@@ -16,6 +15,10 @@
 "native-alternative-payment.cancel-button.title" = "Anuluj";
 "native-alternative-payment.error.required-parameter" = "Parametr jest wmagany";
 "native-alternative-payment.error.invalid-number" = "Niepoprawny numer";
-"native-alternative-payment.error.invalid-text" = "Niepoprawna wartość";
+"native-alternative-payment.error.invalid-value" = "Niepoprawna wartość";
 "native-alternative-payment.error.invalid-email" = "Niepoprawny adres email";
 "native-alternative-payment.error.invalid-phone" = "Niepoprawny numer telefonu";
+
+"test-3-d-s.challenge.title" = "Czy chcesz przyjąć wyzwanie 3DS2?";
+"test-3-d-s.challenge.accept" = "Zaakceptować";
+"test-3-d-s.challenge.reject" = "Odrzucić";

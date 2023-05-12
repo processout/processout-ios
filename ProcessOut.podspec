@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name                  = 'ProcessOut'
-  s.version               = '3.1.0'
+  s.version               = '3.5.0'
   s.swift_versions        = ['5.7']
   s.license               = { :type => 'MIT', :file => 'LICENSE' }
   s.homepage              = 'https://github.com/processout/processout-ios'
@@ -12,4 +12,5 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '12.0'
   s.ios.resource_bundle   = { 'ProcessOut' => 'Sources/ProcessOut/Resources/**/*' }
   s.source_files          = 'Sources/ProcessOut/**/*.swift'
+  s.pod_target_xcconfig   = { 'OTHER_SWIFT_FLAGS' => '-Xfrontend -module-interface-preserve-types-as-written' }
 end

@@ -11,12 +11,12 @@ import ProcessOut
 final class CardPaymentBuilder {
 
     func build() -> UIViewController {
-        let threeDSService = CardPaymentTest3DSService()
+        let threeDSService = POTest3DSService()
         let router = CardPaymentRouter()
         let viewModel = CardPaymentViewModel(
             router: router,
-            invoicesService: ProcessOutApi.shared.invoices,
-            cardsService: ProcessOutApi.shared.cards,
+            invoicesService: ProcessOut.shared.invoices,
+            cardsService: ProcessOut.shared.cards,
             threeDSService: threeDSService
         )
         let viewController = CardPaymentViewController(viewModel: viewModel)

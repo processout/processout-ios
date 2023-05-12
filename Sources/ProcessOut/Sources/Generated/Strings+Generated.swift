@@ -16,10 +16,6 @@ internal enum Strings {
     internal static func title(_ p1: Any) -> String {
       return Strings.tr("ProcessOut", "native-alternative-payment.title", String(describing: p1))
     }
-    internal enum AwaitingCapture {
-      /// To complete the payment please confirm it from your banking app.
-      internal static var message: String { return Strings.tr("ProcessOut", "native-alternative-payment.awaiting-capture.message") }
-    }
     internal enum CancelButton {
       /// Cancel
       internal static var title: String { return Strings.tr("ProcessOut", "native-alternative-payment.cancel-button.title") }
@@ -40,7 +36,7 @@ internal enum Strings {
       /// Phone number is not valid
       internal static var invalidPhone: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-phone") }
       /// Value is not valid
-      internal static var invalidText: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-text") }
+      internal static var invalidValue: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-value") }
       /// Parameter is required
       internal static var requiredParameter: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.required-parameter") }
     }
@@ -60,6 +56,17 @@ internal enum Strings {
       /// Success!
       /// Payment approved
       internal static var message: String { return Strings.tr("ProcessOut", "native-alternative-payment.success.message") }
+    }
+  }
+
+  internal enum Test3DS {
+    internal enum Challenge {
+      /// Accept
+      internal static var accept: String { return Strings.tr("ProcessOut", "test-3-d-s.challenge.accept") }
+      /// Reject
+      internal static var reject: String { return Strings.tr("ProcessOut", "test-3-d-s.challenge.reject") }
+      /// Do you want to accept the 3DS2 challenge?
+      internal static var title: String { return Strings.tr("ProcessOut", "test-3-d-s.challenge.title") }
     }
   }
 }

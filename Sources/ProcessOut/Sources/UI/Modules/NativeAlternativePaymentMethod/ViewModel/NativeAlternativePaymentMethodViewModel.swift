@@ -6,194 +6,108 @@
 //
 
 import Foundation
+import UIKit
 
-final class NativeAlternativePaymentMethodViewModel:
-    BaseViewModel<NativeAlternativePaymentMethodViewModelState>, NativeAlternativePaymentMethodViewModelType {
+protocol NativeAlternativePaymentMethodViewModel: ViewModel
+    where State == NativeAlternativePaymentMethodViewModelState {
 
-    init(
-        interactor: any NativeAlternativePaymentMethodInteractorType,
-        configuration: PONativeAlternativePaymentMethodConfiguration,
-        completion: ((Result<Void, POFailure>) -> Void)?
-    ) {
-        self.interactor = interactor
-        self.configuration = configuration
-        self.completion = completion
-        super.init(state: .idle)
-        observeInteractorStateChanges()
-    }
+    /// Submits parameter values.
+    func submit()
+}
 
-    override func start() {
-        interactor.start()
-    }
+enum NativeAlternativePaymentMethodViewModelState {
 
-    func submit() {
-        interactor.submit()
-    }
+    typealias ParameterType = PONativeAlternativePaymentMethodParameter.ParameterType
 
-    // MARK: - Private Nested Types
+    struct Action {
 
-    private typealias InteractorState = NativeAlternativePaymentMethodInteractorState
-    private typealias Strings = ProcessOut.Strings.NativeAlternativePayment
-
-    private enum Constants {
-        static let captureSuccessCompletionDelay: TimeInterval = 3
-    }
-
-    // MARK: - NativeAlternativePaymentMethodInteractorType
-
-    private let interactor: any NativeAlternativePaymentMethodInteractorType
-    private let configuration: PONativeAlternativePaymentMethodConfiguration
-    private let completion: ((Result<Void, POFailure>) -> Void)?
-
-    private lazy var priceFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 2
-        return formatter
-    }()
-
-    // MARK: - Private Methods
-
-    private func observeInteractorStateChanges() {
-        interactor.didChange = { [weak self] in self?.configureWithInteractorState() }
-    }
-
-    private func configureWithInteractorState() {
-        switch interactor.state {
-        case .idle:
-            state = .idle
-        case .starting:
-            state = .loading
-        case .started(let startedState):
-            state = convertToState(startedState: startedState)
-        case .failure(let failure):
-            completion?(.failure(failure))
-        case .submitting(let startedStateSnapshot):
-            state = convertToState(startedState: startedStateSnapshot, isSubmitting: true)
-        case .submitted:
-            completion?(.success(()))
-        case .awaitingCapture(let awaitingCaptureState):
-            state = convertToState(awaitingCaptureState: awaitingCaptureState)
-        case .captured(let capturedState):
-            configure(with: capturedState)
-        }
-    }
-
-    private func convertToState(
-        startedState: InteractorState.Started, isSubmitting: Bool = false
-    ) -> State {
-        let parameters = startedState.parameters.map { parameter -> State.Parameter in
-            let value = startedState.values[parameter.key]
-            let viewModel = State.Parameter(
-                name: parameter.displayName,
-                placeholder: placeholder(for: parameter),
-                value: value?.value ?? "",
-                type: parameter.type,
-                length: parameter.length,
-                errorMessage: value?.recentErrorMessage,
-                update: { [weak self] newValue in
-                    _ = self?.interactor.updateValue(newValue, for: parameter.key)
-                },
-                formatted: { [weak self] value in
-                    self?.interactor.formatted(value: value, type: parameter.type) ?? ""
-                }
-            )
-            return viewModel
-        }
-        let state = State.Started(
-            title: configuration.title ?? Strings.title(startedState.gatewayDisplayName),
-            parameters: parameters,
-            isSubmitting: isSubmitting,
-            primaryAction: submitAction(startedState: startedState, isSubmitting: isSubmitting),
-            secondaryAction: cancelAction(isEnabled: !isSubmitting)
-        )
-        return .started(state)
-    }
-
-    private func convertToState(awaitingCaptureState: InteractorState.AwaitingCapture) -> State {
-        guard let expectedActionMessage = awaitingCaptureState.expectedActionMessage else {
-            return .loading
-        }
-        let submittedState = State.Submitted(
-            message: expectedActionMessage,
-            logoImage: awaitingCaptureState.gatewayLogoImage,
-            image: awaitingCaptureState.actionImage,
-            isCaptured: false
-        )
-        return .submitted(submittedState)
-    }
-
-    private func configure(with capturedState: InteractorState.Captured) {
-        if configuration.skipSuccessScreen {
-            completion?(.success(()))
-        } else {
-            Timer.scheduledTimer(
-                withTimeInterval: Constants.captureSuccessCompletionDelay,
-                repeats: false,
-                block: { [weak self] _ in
-                    self?.completion?(.success(()))
-                }
-            )
-            let submittedState = State.Submitted(
-                message: Strings.Success.message,
-                logoImage: capturedState.gatewayLogo,
-                image: Asset.Images.success.image,
-                isCaptured: true
-            )
-            state = .submitted(submittedState)
-        }
-    }
-
-    // MARK: - Utils
-
-    private func placeholder(for parameter: PONativeAlternativePaymentMethodParameter) -> String? {
-        switch parameter.type {
-        case .numeric, .text:
-            return nil
-        case .email:
-            return Strings.Email.placeholder
-        case .phone:
-            return Strings.Phone.placeholder
-        }
-    }
-
-    private func submitAction(startedState: InteractorState.Started, isSubmitting: Bool) -> State.Action {
+        /// Action title.
         let title: String
-        if let customTitle = configuration.primaryActionTitle {
-            title = customTitle
-        } else {
-            priceFormatter.currencyCode = startedState.currencyCode
-            // swiftlint:disable:next legacy_objc_type
-            if let formattedAmount = priceFormatter.string(from: startedState.amount as NSDecimalNumber) {
-                title = Strings.SubmitButton.title(formattedAmount)
-            } else {
-                title = Strings.SubmitButton.defaultTitle
-            }
-        }
-        let action = State.Action(
-            title: title,
-            isEnabled: startedState.isSubmitAllowed,
-            isExecuting: isSubmitting,
-            handler: { [weak self] in
-                self?.interactor.submit()
-            }
-        )
-        return action
+
+        /// Boolean value indicating whether action is enabled.
+        let isEnabled: Bool
+
+        /// Boolean value indicating whether action associated with button is currently running.
+        let isExecuting: Bool
+
+        /// Action handler.
+        let handler: () -> Void
     }
 
-    private func cancelAction(isEnabled: Bool) -> State.Action? {
-        guard case let .cancel(title) = configuration.secondaryAction else {
-            return nil
-        }
-        let action = State.Action(
-            title: title ?? Strings.CancelButton.title,
-            isEnabled: isEnabled,
-            isExecuting: false,
-            handler: { [weak self] in
-                self?.interactor.cancel()
-            }
-        )
-        return action
+    struct AvailableParameterValue: Hashable {
+
+        /// User friendly value name.
+        let name: String
+
+        /// Real parameter value.
+        let value: String
+
+        /// Boolean value indicating whether this value is selected.
+        let isSelected: Bool
     }
+
+    struct Parameter {
+
+        /// Parameter's name.
+        let name: String
+
+        /// Parameter's placeholder.
+        let placeholder: String?
+
+        /// Current parameter's value.
+        let value: String
+
+        /// Parameter type.
+        let type: ParameterType
+
+        /// Required parameter's length.
+        let length: Int?
+
+        /// Available values.
+        let availableValues: [AvailableParameterValue]
+
+        /// Error message associated with this parameter if any.
+        let errorMessage: String?
+
+        /// Updates parameter value.
+        let update: (_ value: String) -> Void
+
+        /// Returns formatted version of value.
+        let formatted: (_ value: String) -> String
+    }
+
+    struct Started {
+
+        /// Title.
+        let title: String
+
+        /// Available parameters.
+        let parameters: [Parameter]
+
+        /// Boolean value indicating if data is being submitted.
+        let isSubmitting: Bool
+
+        /// Primary action.
+        let primaryAction: Action
+
+        /// Secondary action.
+        let secondaryAction: Action?
+    }
+
+    struct Submitted {
+
+        /// Message.
+        let message: String
+
+        /// Gateway's logo image.
+        let logoImage: UIImage?
+
+        /// Image illustrating action.
+        let image: UIImage?
+
+        /// Boolean value that indicates whether payment is already captured.
+        let isCaptured: Bool
+    }
+
+    case idle, loading, started(Started), submitted(Submitted)
 }

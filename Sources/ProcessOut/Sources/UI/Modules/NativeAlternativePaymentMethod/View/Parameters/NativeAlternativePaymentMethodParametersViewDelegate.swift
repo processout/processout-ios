@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 21.12.2022.
 //
 
+// swiftlint:disable:next type_name
 protocol NativeAlternativePaymentMethodParametersViewDelegate: AnyObject {
 
     /// Asks delegate if editing should begin.

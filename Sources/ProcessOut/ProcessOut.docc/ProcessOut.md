@@ -7,8 +7,8 @@ Before using ProcessOut SDK make sure to configure it.
 ```swift
 import ProcessOut
 
-let configuration = ProcessOutApiConfiguration.production(projectId: "your_project_id")
-ProcessOutApi.configure(configuration: configuration)
+let configuration = ProcessOutConfiguration.production(projectId: "your_project_id")
+ProcessOut.configure(configuration: configuration)
 ```
 
 ## Topics
@@ -17,9 +17,8 @@ ProcessOutApi.configure(configuration: configuration)
 
 - <doc:MigratingFromProcessOut2>
 - <doc:Localizations>
-- ``ProcessOutApi``
-- ``ProcessOutApiConfiguration``
-- ``ProcessOutApiType``
+- ``ProcessOut/ProcessOut``
+- ``ProcessOutConfiguration``
 
 ### Errors
 
@@ -30,12 +29,14 @@ All errors that could happen as a result of interaction with the SDK are represe
 ### 3DS
 
 - <doc:3DS>
-- ``PO3DSServiceType``
+- ``PO3DSService``
 - ``PO3DS2Configuration``
+- ``PO3DS2ConfigurationCardScheme``
 - ``PO3DS2AuthenticationRequest``
 - ``PO3DS2Challenge``
 - ``PO3DSRedirect``
 - ``PO3DSRedirectViewControllerBuilder``
+- ``POTest3DSService``
 
 ### Native Alternative Payment Method
 
@@ -49,13 +50,13 @@ All errors that could happen as a result of interaction with the SDK are represe
 ### Alternative Payment Method
 
 - ``POAlternativePaymentMethodViewControllerBuilder``
-- ``POAlternativePaymentMethodsServiceType``
+- ``POAlternativePaymentMethodsService``
 - ``POAlternativePaymentMethodRequest``
 - ``POAlternativePaymentMethodResponse``
 
 ### Cards
 
-- ``POCardsServiceType``
+- ``POCardsService``
 - ``POCardTokenizationRequest``
 - ``POApplePayCardTokenizationRequest``
 - ``POContact``
@@ -64,13 +65,13 @@ All errors that could happen as a result of interaction with the SDK are represe
 
 ### Customer Tokens
 
-- ``POCustomerTokensServiceType``
+- ``POCustomerTokensService``
 - ``POAssignCustomerTokenRequest``
 - ``POCustomerToken``
 
 ### Gateway Configurations
 
-- ``POGatewayConfigurationsRepositoryType``
+- ``POGatewayConfigurationsRepository``
 - ``POAllGatewayConfigurationsResponse``
 - ``POAllGatewayConfigurationsRequest``
 - ``POFindGatewayConfigurationRequest``
@@ -78,7 +79,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 
 ### Invoices
 
-- ``POInvoicesServiceType``
+- ``POInvoicesService``
 - ``POInvoiceAuthorizationRequest``
 - ``PONativeAlternativePaymentCaptureRequest``
 - ``PONativeAlternativePaymentMethodParameter``
@@ -90,7 +91,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 
 ### Images
 
-- ``POImagesRepositoryType``
+- ``POImagesRepository``
 
 ### Appearance
 
@@ -106,20 +107,20 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POButtonStyle``
 - ``POButtonStateStyle``
 - ``POActivityIndicatorStyle``
-- ``POActivityIndicatorViewType``
+- ``POActivityIndicatorView``
 - ``POBackgroundDecorationStateStyle``
 - ``POBackgroundDecorationStyle``
 
 ### Utils
 
 - ``POPaginationOptions``
-- ``POCancellableType``
+- ``POCancellable``
 - ``POAnyEncodable``
 - ``POImmutableExcludedCodable``
 - ``POImmutableStringCodableDecimal``
 - ``POImmutableStringCodableOptionalDecimal``
-- ``PORepositoryType``
-- ``POServiceType``
+- ``PORepository``
+- ``POService``
 - ``POAutoAsync``
 - ``POLogger``
 

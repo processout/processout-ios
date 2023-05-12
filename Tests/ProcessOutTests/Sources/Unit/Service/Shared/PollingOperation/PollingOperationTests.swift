@@ -9,8 +9,6 @@ import Foundation
 import XCTest
 @testable import ProcessOut
 
-// swiftlint:disable implicitly_unwrapped_optional
-
 final class PollingOperationTests: XCTestCase {
 
     func test_start_whenExecutingTooLong_failsWithTimeout() {

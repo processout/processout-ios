@@ -12,8 +12,8 @@ final class AlternativePaymentMethodsInteractor:
     BaseInteractor<AlternativePaymentMethodsInteractorState>, AlternativePaymentMethodsInteractorType {
 
     init(
-        gatewayConfigurationsRepository: POGatewayConfigurationsRepositoryType,
-        invoicesService: POInvoicesServiceType,
+        gatewayConfigurationsRepository: POGatewayConfigurationsRepository,
+        invoicesService: POInvoicesService,
         filter: POAllGatewayConfigurationsRequest.Filter?
     ) {
         self.gatewayConfigurationsRepository = gatewayConfigurationsRepository
@@ -118,8 +118,8 @@ final class AlternativePaymentMethodsInteractor:
 
     // MARK: - Private Properties
 
-    private let gatewayConfigurationsRepository: POGatewayConfigurationsRepositoryType
-    private let invoicesService: POInvoicesServiceType
+    private let gatewayConfigurationsRepository: POGatewayConfigurationsRepository
+    private let invoicesService: POInvoicesService
     private let filter: POAllGatewayConfigurationsRequest.Filter?
 
     // MARK: - State Management

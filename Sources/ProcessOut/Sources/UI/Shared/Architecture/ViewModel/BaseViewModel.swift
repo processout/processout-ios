@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 19.10.2022.
 //
 
-class BaseViewModel<State>: ViewModelType {
+class BaseViewModel<State>: ViewModel {
 
     init(state: State) {
         self.state = state

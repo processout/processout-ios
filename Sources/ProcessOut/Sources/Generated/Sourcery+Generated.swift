@@ -1,10 +1,10 @@
-// Generated using Sourcery 1.9.0 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 2.0.2 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 // swiftlint:disable all
 
 @available(iOS 13.0, *)
-extension CustomerTokensRepositoryType {
+extension CustomerTokensRepository {
 
     /// Assigns a token to a customer.
     @MainActor
@@ -28,7 +28,7 @@ extension CustomerTokensRepositoryType {
 }
 
 @available(iOS 13.0, *)
-extension InvoicesRepositoryType {
+extension InvoicesRepository {
 
     /// Requests information needed to continue existing payment or start new one.
     @MainActor
@@ -75,7 +75,7 @@ extension InvoicesRepositoryType {
 }
 
 @available(iOS 13.0, *)
-extension POCardsRepositoryType {
+extension POCardsRepository {
 
     /// Tokenize a card.
     @MainActor
@@ -109,7 +109,7 @@ extension POCardsRepositoryType {
 }
 
 @available(iOS 13.0, *)
-extension POCardsServiceType {
+extension POCardsService {
 
     /// Tokenizes a card. You can use the card for a single payment by creating a card token with it. If you want
     /// to use the card for multiple payments then you can use the card token to create a reusable customer token.
@@ -146,12 +146,12 @@ extension POCardsServiceType {
 }
 
 @available(iOS 13.0, *)
-extension POCustomerTokensServiceType {
+extension POCustomerTokensService {
 
     /// Assigns new source to existing customer token and optionaly verifies it.
     @MainActor
     public func assignCustomerToken(
-        request: POAssignCustomerTokenRequest, threeDSService: PO3DSServiceType
+        request: POAssignCustomerTokenRequest, threeDSService: PO3DSService
     ) async throws -> POCustomerToken {
         return try await withUnsafeThrowingContinuation { continuation in
             assignCustomerToken(request: request, threeDSService: threeDSService, completion: continuation.resume)
@@ -170,7 +170,7 @@ extension POCustomerTokensServiceType {
 }
 
 @available(iOS 13.0, *)
-extension POGatewayConfigurationsRepositoryType {
+extension POGatewayConfigurationsRepository {
 
     /// Returns available gateway configurations.
     @MainActor
@@ -202,7 +202,7 @@ extension POGatewayConfigurationsRepositoryType {
 }
 
 @available(iOS 13.0, *)
-extension POInvoicesServiceType {
+extension POInvoicesService {
 
     /// Requests information needed to continue existing payment or start new one.
     @MainActor
@@ -230,7 +230,7 @@ extension POInvoicesServiceType {
     /// Performs invoice authorization with given request.
     @MainActor
     public func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest, threeDSService: PO3DSServiceType
+        request: POInvoiceAuthorizationRequest, threeDSService: PO3DSService
     ) async throws -> Void {
         return try await withUnsafeThrowingContinuation { continuation in
             authorizeInvoice(request: request, threeDSService: threeDSService, completion: continuation.resume)
@@ -249,9 +249,9 @@ extension POInvoicesServiceType {
 }
 
 @available(iOS 13.0, *)
-extension PORepositoryType {
+extension PORepository {
 }
 
 @available(iOS 13.0, *)
-extension POServiceType {
+extension POService {
 }

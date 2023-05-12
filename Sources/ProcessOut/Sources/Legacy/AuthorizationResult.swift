@@ -5,9 +5,10 @@
 //  Created by Jeremy Lejoux on 17/06/2019.
 //
 
+@available(*, deprecated)
 final class AuthorizationResult: ApiResponse {    
 
-    public var customerAction: CustomerAction?
+    var customerAction: CustomerAction?
     
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

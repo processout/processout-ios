@@ -5,6 +5,7 @@
 //  Created by Jeremy Lejoux on 18/06/2019.
 //
 
+@available(*, deprecated, message: "Use PO3DSService instead.")
 public final class ThreeDSFingerprintResponse: Codable {
     
     public final class SDKEphemPubKey: Codable {

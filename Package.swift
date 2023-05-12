@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 5.8
 
 import PackageDescription
 
@@ -20,8 +20,10 @@ let package = Package(
             exclude: ["ProcessOut.docc"],
             resources: [
                 .process("Resources/PhoneNumberMetadata/PhoneNumberMetadata.json")
+            ],
+            swiftSettings: [
+                .unsafeFlags(["-Xfrontend", "-module-interface-preserve-types-as-written"])
             ]
-        ),
-        .testTarget(name: "ProcessOutTests", dependencies: ["ProcessOut"]),
+        )
     ]
 )

@@ -5,9 +5,9 @@
 //  Created by Andrii Vysotskyi on 16.03.2023.
 //
 
-// swiftlint:disable legacy_objc_type
-
 import Foundation
+
+// swiftlint:disable legacy_objc_type
 
 final class RegexProvider {
 
@@ -37,3 +37,5 @@ final class RegexProvider {
 
     private let cache: NSCache<NSString, NSRegularExpression>
 }
+
+// swiftlint:enable legacy_objc_type

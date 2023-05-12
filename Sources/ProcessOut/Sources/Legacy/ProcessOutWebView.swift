@@ -8,6 +8,7 @@
 import Foundation
 import WebKit
 
+@available(*, deprecated, message: "Use PO3DSRedirectViewControllerBuilder or POAlternativePaymentMethodViewControllerBuilder instead.")
 public class ProcessOutWebView: WKWebView, WKNavigationDelegate, WKUIDelegate {
 
     private let REDIRECT_URL_PATTERN = "https:\\/\\/checkout\\.processout\\.(ninja|com)\\/helpers\\/mobile-processout-webview-landing.*"
@@ -25,7 +26,7 @@ public class ProcessOutWebView: WKWebView, WKNavigationDelegate, WKUIDelegate {
         self.onResult = onResult
         self.onAuthenticationError = onAuthenticationError
         super.init(frame: frame, configuration: config)
-        self.customUserAgent = "ProcessOut iOS-Webview/" + type(of: ProcessOutApi.shared).version
+        self.customUserAgent = "ProcessOut iOS-Webview/" + type(of: ProcessOut.shared).version
         self.navigationDelegate = self
         self.uiDelegate = self
     }

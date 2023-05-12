@@ -7,7 +7,7 @@
 
 /// Information from the 3DS Server's authentication response that could be used by the 3DS2 SDK to initiate
 /// the challenge flow.
-public struct PO3DS2Challenge: Decodable {
+public struct PO3DS2Challenge: Decodable, Hashable {
 
     /// Unique transaction identifier assigned by the ACS.
     public let acsTransactionId: String

@@ -7,7 +7,7 @@
 
 import Foundation
 
-@available(*, deprecated, message: "Declaration will be removed in version 4.0.", renamed: "POGatewayConfiguration")
+@available(*, deprecated, message: "Use ProcessOut.shared.gatewayConfigurations instead.")
 public class GatewayConfiguration: Decodable {
     
     enum CodingKeys: String, CodingKey {

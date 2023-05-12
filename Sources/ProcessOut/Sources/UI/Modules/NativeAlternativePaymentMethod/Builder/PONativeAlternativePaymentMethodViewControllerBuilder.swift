@@ -49,8 +49,8 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
     ///
     /// - NOTE: Caller should dismiss view controller after completion is called.
     public func build() -> UIViewController {
-        let api: ProcessOutApiType = ProcessOutApi.shared
-        let interactor = NativeAlternativePaymentMethodInteractor(
+        let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
+        let interactor = DefaultNativeAlternativePaymentMethodInteractor(
             invoicesService: api.invoices,
             imagesRepository: api.images,
             configuration: .init(
@@ -62,7 +62,7 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
             logger: api.logger,
             delegate: delegate
         )
-        let viewModel = NativeAlternativePaymentMethodViewModel(
+        let viewModel = DefaultNativeAlternativePaymentMethodViewModel(
             interactor: interactor, configuration: configuration, completion: completion
         )
         let viewController = NativeAlternativePaymentMethodViewController(

@@ -8,6 +8,7 @@
 import UIKit
 
 /// Custom protocol which lets you implement a 3DS2 integration
+@available(*, deprecated, message: "Use PO3DSService instead.")
 public protocol ThreeDSHandler {
 
     /// method called when a device fingerprint is required

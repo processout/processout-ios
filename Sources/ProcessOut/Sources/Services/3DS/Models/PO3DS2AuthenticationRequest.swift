@@ -6,7 +6,7 @@
 //
 
 /// Holds transaction data that the 3DS Server requires to create the AReq.
-public struct PO3DS2AuthenticationRequest {
+public struct PO3DS2AuthenticationRequest: Hashable {
 
     /// Encrypted device data as a JWE string.
     public let deviceData: String

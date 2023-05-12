@@ -8,7 +8,6 @@
 
 "native-alternative-payment.title" = "Pagar com %@";
 "native-alternative-payment.success.message" = "Successo!\nPagamento aprovado.";
-"native-alternative-payment.awaiting-capture.message" = "Para completar o pagamento, por favor confirme-o na aplicação bancária.";
 "native-alternative-payment.email.placeholder" = "nome@exemplo.pt";
 "native-alternative-payment.phone.placeholder" = "Insira o seu número de telemóvel";
 "native-alternative-payment.submit-button.title" = "Pagar %@";
@@ -16,6 +15,10 @@
 "native-alternative-payment.cancel-button.title" = "Cancelar";
 "native-alternative-payment.error.required-parameter" = "Campo obrigatório";
 "native-alternative-payment.error.invalid-number" = "Número inválido";
-"native-alternative-payment.error.invalid-text" = "Texto inválido";
+"native-alternative-payment.error.invalid-value" = "Texto inválido";
 "native-alternative-payment.error.invalid-email" = "Endereço de e-mail inválido";
 "native-alternative-payment.error.invalid-phone" = "Número de telemóvel inválido";
+
+"test-3-d-s.challenge.title" = "Você quer aceitar o desafio 3DS2?";
+"test-3-d-s.challenge.accept" = "Aceitar";
+"test-3-d-s.challenge.reject" = "Rejeitar";

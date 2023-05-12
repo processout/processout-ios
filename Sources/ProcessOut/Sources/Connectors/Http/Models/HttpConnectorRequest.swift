@@ -26,13 +26,13 @@ struct HttpConnectorRequest<Value: Decodable> {
     let query: [String: CustomStringConvertible]
 
     /// Parameters.
-    let body: POAnyEncodable?
+    let body: Encodable?
 
     /// Custom headers.
     let headers: [String: String]
 
     /// Lets us inject device metadata into requests. If you set this property to `true` make sure that request
-    /// body is valid key pair object (could be empty object as well).
+    /// body is valid key pair object or `nil`.
     let includesDeviceMetadata: Bool
 
     /// Indicates whether private key is required to execute request. Default value is `false`.
@@ -62,9 +62,9 @@ extension HttpConnectorRequest {
         )
     }
 
-    static func post<E: Encodable>(
+    static func post(
         path: String,
-        body: E?,
+        body: Encodable? = nil,
         headers: [String: String] = [:],
         includesDeviceMetadata: Bool = false,
         requiresPrivateKey: Bool = false
@@ -74,16 +74,16 @@ extension HttpConnectorRequest {
             method: .post,
             path: path,
             query: [:],
-            body: POAnyEncodable(body),
+            body: body,
             headers: headers,
             includesDeviceMetadata: includesDeviceMetadata,
             requiresPrivateKey: requiresPrivateKey
         )
     }
 
-    static func put<E: Encodable>(
+    static func put(
         path: String,
-        body: E?,
+        body: Encodable? = nil,
         headers: [String: String] = [:],
         includesDeviceMetadata: Bool = false,
         requiresPrivateKey: Bool = false
@@ -93,7 +93,7 @@ extension HttpConnectorRequest {
             method: .put,
             path: path,
             query: [:],
-            body: POAnyEncodable(body),
+            body: body,
             headers: headers,
             includesDeviceMetadata: includesDeviceMetadata,
             requiresPrivateKey: requiresPrivateKey
