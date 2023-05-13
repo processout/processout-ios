@@ -273,7 +273,7 @@ extension NativeAlternativePaymentMethodParametersView: UITextFieldDelegate {
             in: formattedText,
             source: updatedText,
             sourceCursorOffset: range.lowerBound + string.count,
-            ignoredCharacters: .decimalDigits.inverted,
+            significantCharacters: .decimalDigits, // todo(andrii-vysotskyi): remove hardcode
             greedy: !string.isEmpty
         )
         if let position = textField.position(from: textField.beginningOfDocument, offset: adjustedOffset) {

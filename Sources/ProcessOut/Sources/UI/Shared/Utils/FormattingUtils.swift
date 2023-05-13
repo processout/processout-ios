@@ -10,66 +10,46 @@ import Foundation
 enum FormattingUtils {
 
     /// Returns index in formatted string that matches index in `string`.
+    ///
+    /// Implementation of this method assumes that significant symbols before cursor are not modified otherwise
+    /// it returns cursor positioned at the end of the `target` string. This approach has linear time complexity.
+    ///
+    /// Alternative solution would be to compare all substrings starting from beginning of `target` with prefix
+    /// before cursor in `source` and finding substring with least possible difference (using for example Levenshtein
+    /// distance). Downside of it would be almost cubic complexity.
     static func adjustedCursorOffset(
         in target: String,
         source: String,
         sourceCursorOffset: Int,
-        ignoredCharacters: CharacterSet = [],
+        significantCharacters: CharacterSet,
         greedy: Bool = true
     ) -> Int {
-        let (sourceLhs, sourceRhs) = split(
-            string: source, by: sourceCursorOffset, ignoring: ignoredCharacters
-        )
-        var targetOffset = target.count
-        var minimumDistance = Int.max
-        for offset in 0 ... target.count {
-            let (targetLhs, targetRhs) = split(
-                string: target, by: offset, ignoring: ignoredCharacters
-            )
-            let distance =
-                editDistance(source: sourceLhs, target: targetLhs) +
-                editDistance(source: sourceRhs, target: targetRhs)
-            guard distance < minimumDistance || (greedy && distance == minimumDistance) else {
-                continue
+        let sourceSignificantPrefix = source
+            .prefix(sourceCursorOffset)
+            .removingCharacters(in: significantCharacters.inverted)
+        var targetOffset = 0
+        var targetSignificantPrefixLength = 0
+        for (offset, character) in target.enumerated() {
+            if character.unicodeScalars.allSatisfy(significantCharacters.contains) {
+                if targetSignificantPrefixLength < sourceSignificantPrefix.count {
+                    let sourceSignificantPrefixIndex = sourceSignificantPrefix.index(
+                        sourceSignificantPrefix.startIndex,
+                        offsetBy: targetSignificantPrefixLength,
+                        limitedBy: sourceSignificantPrefix.endIndex
+                    )
+                    guard let sourceSignificantPrefixIndex,
+                          character == sourceSignificantPrefix[sourceSignificantPrefixIndex] else {
+                        return target.count
+                    }
+                    targetOffset = offset + 1
+                    targetSignificantPrefixLength += 1
+                } else {
+                    return targetOffset
+                }
+            } else if greedy {
+                targetOffset = offset + 1
             }
-            targetOffset = offset
-            minimumDistance = distance
         }
         return targetOffset
-    }
-
-    // MARK: - Private Methods
-
-    private static func split(
-        string: String, by indexOffset: Int, ignoring ignoredCharacters: CharacterSet
-    ) -> (String, String) {
-        let index = string.index(string.startIndex, offsetBy: indexOffset)
-        let lhs = string.prefix(upTo: index).removingCharacters(in: ignoredCharacters)
-        let rhs = string.suffix(from: index).removingCharacters(in: ignoredCharacters)
-        return (lhs, rhs)
-    }
-
-    /// Calculates minimum number of operations required to transform one string into the other.
-    private static func editDistance(source: String, target: String) -> Int {
-        if #available(iOS 13.0, *) {
-            return target.difference(from: source).count
-        }
-        // Fallback to Levenshtein distance for iOS < 13
-        var current  = Array(repeating: 0, count: target.count + 1)
-        var previous = Array(0...target.count)
-        for (sourceOffset, sourceCharacter) in source.enumerated() {
-            current[0] = sourceOffset + 1
-            for (targetOffset, targetCharacter) in target.enumerated() {
-                var substitutionCost = previous[targetOffset]
-                if sourceCharacter != targetCharacter {
-                    substitutionCost += 1
-                }
-                current[targetOffset + 1] = min(
-                    previous[targetOffset + 1] + 1, current[targetOffset] + 1, substitutionCost
-                )
-            }
-            swap(&previous, &current)
-        }
-        return previous.last! // swiftlint:disable:this force_unwrapping
     }
 }
