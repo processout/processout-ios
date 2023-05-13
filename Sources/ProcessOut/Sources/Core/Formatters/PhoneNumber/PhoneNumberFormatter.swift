@@ -15,12 +15,15 @@ final class PhoneNumberFormatter {
     }
 
     func format(partialNumber: String) -> String {
-        var normalizedNumber = normalized(number: partialNumber)
-        guard let metadata = extractMetadata(number: &normalizedNumber) else {
+        guard !partialNumber.isEmpty else {
             return partialNumber
         }
+        var normalizedNumber = normalized(number: partialNumber)
+        guard let metadata = extractMetadata(number: &normalizedNumber) else {
+            return "\(Constants.plus)\(normalizedNumber)"
+        }
         guard !normalizedNumber.isEmpty else {
-            return "+\(metadata.countryCode) "
+            return "\(Constants.plus)\(metadata.countryCode)"
         }
         var potentialFormats: [PhoneNumberFormat] = []
         if let formatted = attemptToFormat(
@@ -39,15 +42,17 @@ final class PhoneNumberFormatter {
     }
 
     func normalized(number: String) -> String {
-        number.removingCharacters(in: .decimalDigits.inverted)
+        number.removingCharacters(in: Constants.significantCharacters.inverted)
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
+        static let significantCharacters = CharacterSet.decimalDigits
         static let maxCountryPrefixLength = 3
         static let maxNationalNumberLength = 14
         static let placeholderDigit = "0"
+        static let plus = "+"
     }
 
     // MARK: - Private Properties
@@ -104,7 +109,7 @@ final class PhoneNumberFormatter {
             }
             return significantDigitsCount <= expectedSignificantLength
         }
-        return String(cleanedNumber)
+        return String(cleanedNumber).trimmingSuffixCharacters(in: Constants.significantCharacters.inverted)
     }
 
     private func attemptToFormat(
@@ -147,6 +152,6 @@ final class PhoneNumberFormatter {
         } else {
             formattedNationalNumber = nationalNumber
         }
-        return "+\(countryCode) \(formattedNationalNumber)"
+        return "\(Constants.plus)\(countryCode) \(formattedNationalNumber)"
     }
 }
