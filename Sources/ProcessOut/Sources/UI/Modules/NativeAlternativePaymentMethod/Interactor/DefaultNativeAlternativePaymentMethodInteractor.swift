@@ -152,7 +152,6 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let phoneFormattingCharacters = CharacterSet(charactersIn: "-() ")
         static let emailRegex = #"^\S+@\S+$"#
         static let phoneRegex = #"^\+?\d{1,3}\d*$"#
     }
@@ -408,7 +407,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             let value = values[parameter.key]?.value
             let updatedValue: String? = {
                 if case .phone = parameter.type, let value {
-                    return value.removingCharacters(in: Constants.phoneFormattingCharacters)
+                    return phoneNumberFormatter.normalized(number: value)
                 }
                 return value
             }()

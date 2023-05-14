@@ -21,26 +21,27 @@ final class PhoneNumberFormatter: Formatter {
     }
 
     func string(from partialNumber: String) -> String {
-        var normalizedNumber = normalized(number: partialNumber)
-        guard !partialNumber.isEmpty else {
-            return partialNumber
-        }
-        guard let metadata = extractMetadata(number: &normalizedNumber) else {
-            return "\(Constants.plus)\(normalizedNumber)"
-        }
+        let normalizedNumber = normalized(number: partialNumber)
         guard !normalizedNumber.isEmpty else {
+            return ""
+        }
+        var number = normalizedNumber.removingCharacters(in: Constants.significantCharactersWithoutPlus.inverted)
+        guard let metadata = extractMetadata(number: &number) else {
+            return "\(Constants.plus)\(number)"
+        }
+        guard !number.isEmpty else {
             return "\(Constants.plus)\(metadata.countryCode)"
         }
         var potentialFormats: [PhoneNumberFormat] = []
         if let formatted = attemptToFormat(
-            nationalNumber: normalizedNumber, metadata: metadata, potentialFormats: &potentialFormats
+            nationalNumber: number, metadata: metadata, potentialFormats: &potentialFormats
         ) {
             return formatted
         }
         // Implementation failed to format national number. This may be caused by number being only
         // partial so attempting to format number as partial instead.
         if let formatted = attemptToFormat(
-            partialNationalNumber: normalizedNumber, formats: potentialFormats, countryCode: metadata.countryCode
+            partialNationalNumber: number, formats: potentialFormats, countryCode: metadata.countryCode
         ) {
             return formatted
         }
@@ -60,33 +61,33 @@ final class PhoneNumberFormatter: Formatter {
         return string(from: phoneNumber)
     }
 
-    // swiftlint:disable legacy_objc_type
     override func isPartialStringValid(
-        _ partialStringPtr: AutoreleasingUnsafeMutablePointer<NSString>,
+        _ partialStringPtr: AutoreleasingUnsafeMutablePointer<NSString>, // swiftlint:disable:this legacy_objc_type
         proposedSelectedRange proposedSelRangePtr: NSRangePointer?,
         originalString origString: String,
         originalSelectedRange origSelRange: NSRange,
-        errorDescription error: AutoreleasingUnsafeMutablePointer<NSString?>?
+        errorDescription error: AutoreleasingUnsafeMutablePointer<NSString?>? // swiftlint:disable:this legacy_objc_type
     ) -> Bool {
         let partialString = partialStringPtr.pointee as String
         let formatted = string(from: partialString)
         let adjustedOffset = FormattingUtils.adjustedCursorOffset(
             in: formatted,
             source: partialString,
-            sourceCursorOffset: origSelRange.lowerBound + max(partialString.count - origString.count, 0),
-            significantCharacters: Constants.significantCharacters.union(CharacterSet(charactersIn: Constants.plus)),
+            // swiftlint:disable:next line_length
+            sourceCursorOffset: origSelRange.lowerBound + origSelRange.length + (partialString.count - origString.count),
+            significantCharacters: Constants.significantCharacters,
             greedy: partialString.count >= origString.count
         )
-        partialStringPtr.pointee = formatted as NSString
+        partialStringPtr.pointee = formatted as NSString // swiftlint:disable:this legacy_objc_type
         proposedSelRangePtr?.pointee = NSRange(location: adjustedOffset, length: 0)
         return true
     }
-    // swiftlint:enable legacy_objc_type
 
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let significantCharacters = CharacterSet.decimalDigits
+        static let significantCharacters = CharacterSet(charactersIn: "+").union(.decimalDigits)
+        static let significantCharactersWithoutPlus = CharacterSet.decimalDigits
         static let maxCountryPrefixLength = 3
         static let maxNationalNumberLength = 14
         static let placeholderDigit = "0"
