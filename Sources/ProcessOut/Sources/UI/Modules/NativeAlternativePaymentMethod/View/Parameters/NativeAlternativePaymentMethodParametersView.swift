@@ -259,24 +259,27 @@ extension NativeAlternativePaymentMethodParametersView: UITextFieldDelegate {
         _ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String
     ) -> Bool {
         guard let index = inputFormViews.map(\.textField.control).firstIndex(of: textField),
-              let parameter = currentParameters?[index] else {
+              let formatter = currentParameters?[index].formatter else {
             return true
         }
-        // swiftlint:disable:next legacy_objc_type
-        let updatedText = (textField.text as? NSString)?.replacingCharacters(in: range, with: string) ?? ""
-        let formattedText = parameter.formatted(updatedText)
-        guard formattedText != updatedText else {
-            return true
-        }
-        textField.text = formattedText
-        let adjustedOffset = FormattingUtils.adjustedCursorOffset(
-            in: formattedText,
-            source: updatedText,
-            sourceCursorOffset: range.lowerBound + string.count,
-            significantCharacters: .decimalDigits, // todo(andrii-vysotskyi): remove hardcode
-            greedy: !string.isEmpty
+        // swiftlint:disable legacy_objc_type
+        let originalString = (textField.text ?? "") as NSString
+        var updatedString = originalString.replacingCharacters(in: range, with: string) as NSString
+        // swiftlint:enable legacy_objc_type
+        var proposedSelectedRange = NSRange(location: updatedString.length, length: 0)
+        let isReplacementValid = formatter.isPartialStringValid(
+            &updatedString,
+            proposedSelectedRange: &proposedSelectedRange,
+            originalString: originalString as String,
+            originalSelectedRange: range,
+            errorDescription: nil
         )
-        if let position = textField.position(from: textField.beginningOfDocument, offset: adjustedOffset) {
+        guard isReplacementValid else {
+            return false
+        }
+        textField.text = updatedString as String
+        // swiftlint:disable:next line_length
+        if let position = textField.position(from: textField.beginningOfDocument, offset: proposedSelectedRange.lowerBound) {
             textField.selectedTextRange = textField.textRange(from: position, to: position)
         }
         textField.sendActions(for: .editingChanged)

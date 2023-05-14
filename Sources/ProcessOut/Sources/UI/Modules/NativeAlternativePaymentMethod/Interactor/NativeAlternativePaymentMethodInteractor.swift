@@ -14,8 +14,8 @@ protocol NativeAlternativePaymentMethodInteractor: Interactor
     /// Updates value for given key.
     func updateValue(_ value: String?, for key: String)
 
-    /// Formats value of given type.
-    func formatted(value: String, type: PONativeAlternativePaymentMethodParameter.ParameterType) -> String
+    /// Returns formatter that could be used to format given value type if any.
+    func formatter(type: PONativeAlternativePaymentMethodParameter.ParameterType) -> Formatter?
 
     /// Submits parameters.
     func submit()

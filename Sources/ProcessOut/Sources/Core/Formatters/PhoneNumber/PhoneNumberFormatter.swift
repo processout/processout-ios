@@ -7,18 +7,24 @@
 
 import Foundation
 
-final class PhoneNumberFormatter {
+final class PhoneNumberFormatter: Formatter {
 
     init(metadataProvider: PhoneNumberMetadataProvider = DefaultPhoneNumberMetadataProvider.shared) {
         regexProvider = RegexProvider.shared
         self.metadataProvider = metadataProvider
+        super.init()
     }
 
-    func format(partialNumber: String) -> String {
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func string(from partialNumber: String) -> String {
+        var normalizedNumber = normalized(number: partialNumber)
         guard !partialNumber.isEmpty else {
             return partialNumber
         }
-        var normalizedNumber = normalized(number: partialNumber)
         guard let metadata = extractMetadata(number: &normalizedNumber) else {
             return "\(Constants.plus)\(normalizedNumber)"
         }
@@ -44,6 +50,38 @@ final class PhoneNumberFormatter {
     func normalized(number: String) -> String {
         number.removingCharacters(in: Constants.significantCharacters.inverted)
     }
+
+    // MARK: - Formatter
+
+    override func string(for obj: Any?) -> String? {
+        guard let phoneNumber = obj as? String else {
+            return nil
+        }
+        return string(from: phoneNumber)
+    }
+
+    // swiftlint:disable legacy_objc_type
+    override func isPartialStringValid(
+        _ partialStringPtr: AutoreleasingUnsafeMutablePointer<NSString>,
+        proposedSelectedRange proposedSelRangePtr: NSRangePointer?,
+        originalString origString: String,
+        originalSelectedRange origSelRange: NSRange,
+        errorDescription error: AutoreleasingUnsafeMutablePointer<NSString?>?
+    ) -> Bool {
+        let partialString = partialStringPtr.pointee as String
+        let formatted = string(from: partialString)
+        let adjustedOffset = FormattingUtils.adjustedCursorOffset(
+            in: formatted,
+            source: partialString,
+            sourceCursorOffset: origSelRange.lowerBound + max(partialString.count - origString.count, 0),
+            significantCharacters: Constants.significantCharacters.union(CharacterSet(charactersIn: Constants.plus)),
+            greedy: partialString.count >= origString.count
+        )
+        partialStringPtr.pointee = formatted as NSString
+        proposedSelRangePtr?.pointee = NSRange(location: adjustedOffset, length: 0)
+        return true
+    }
+    // swiftlint:enable legacy_objc_type
 
     // MARK: - Private Nested Types
 

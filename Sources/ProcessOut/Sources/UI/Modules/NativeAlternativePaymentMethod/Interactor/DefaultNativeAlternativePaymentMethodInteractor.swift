@@ -59,12 +59,12 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         }
     }
 
-    func formatted(value: String, type: PONativeAlternativePaymentMethodParameter.ParameterType) -> String {
+    func formatter(type: PONativeAlternativePaymentMethodParameter.ParameterType) -> Formatter? {
         switch type {
         case .phone:
-            return phoneNumberFormatter.format(partialNumber: value)
+            return phoneNumberFormatter
         default:
-            return value
+            return nil
         }
     }
 
@@ -454,6 +454,15 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             }
         }
         return message.map { POFailure.InvalidField(name: parameter.key, message: $0) }
+    }
+
+    private func formatted(value: String, type: PONativeAlternativePaymentMethodParameter.ParameterType) -> String {
+        switch type {
+        case .phone:
+            return phoneNumberFormatter.string(from: value)
+        default:
+            return value
+        }
     }
 }
 
