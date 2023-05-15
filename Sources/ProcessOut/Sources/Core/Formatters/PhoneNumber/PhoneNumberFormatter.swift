@@ -45,7 +45,7 @@ final class PhoneNumberFormatter: Formatter {
         ) {
             return formatted
         }
-        return partialNumber
+        return "\(Constants.plus)\(metadata.countryCode) \(number)"
     }
 
     func normalized(number: String) -> String {
