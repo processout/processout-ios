@@ -170,7 +170,7 @@ final class PhoneNumberFormatter: Formatter {
     }
 
     private func shouldAttemptUsing(format: PhoneNumberFormat, nationalNumber: String, range: NSRange) -> Bool {
-        for pattern in format.leadingDigits {
+        for pattern in format.leading {
             guard let regex = regexProvider.regex(with: pattern) else {
                 continue
             }

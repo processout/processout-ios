@@ -11,7 +11,7 @@ struct PhoneNumberFormat: Decodable {
     let pattern: String
 
     /// Leading digits pattern.
-    let leadingDigits: [String]
+    let leading: [String]
 
     /// Format to use for number.
     let format: String

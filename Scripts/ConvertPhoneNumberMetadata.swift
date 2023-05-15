@@ -6,7 +6,7 @@ let source = URL(filePath: CommandLine.arguments[1])
 let metadata = PhoneNumbersMetadataParser().parse(contentsOf: source) ?? []
 
 let encoder = JSONEncoder()
-encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
+encoder.outputFormatting = [.sortedKeys]
 let encodedMetadata = try encoder.encode(metadata)
 
 let targetPath = CommandLine.arguments[2]
@@ -20,7 +20,7 @@ struct MutablePhoneNumberMetadataFormat: Encodable {
     var pattern: String?
 
     /// Leading digits.
-    var leadingDigits: [String] = []
+    var leading: [String] = []
 
     /// Format.
     var format: String?
@@ -90,7 +90,7 @@ final class PhoneNumbersMetadataParser: NSObject, XMLParserDelegate {
             currentFormat = MutablePhoneNumberMetadataFormat()
         case .leadingDigits:
             let filteredValue = currentValue.replacingOccurrences(of: "\\s", with: "", options: .regularExpression, range: nil)
-            currentFormat.leadingDigits.append(filteredValue)
+            currentFormat.leading.append(filteredValue)
         case .format:
             // We want to use format if international format wasn't set before
             if currentFormat.format == nil {
@@ -128,7 +128,7 @@ final class PhoneNumbersMetadataParser: NSObject, XMLParserDelegate {
     // MARK: - Private Methods
 
     private var isCurrentFormatValid: Bool {
-        currentFormat.format != nil && currentFormat.pattern != nil && !currentFormat.leadingDigits.isEmpty
+        currentFormat.format != nil && currentFormat.pattern != nil && !currentFormat.leading.isEmpty
     }
 
     private var isCurrentMetadataValid: Bool {
