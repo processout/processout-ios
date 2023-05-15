@@ -17,6 +17,10 @@ final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
         metadata[countryCode]
     }
 
+    func prewarm() {
+        _ = metadata
+    }
+
     // MARK: - Private Methods
 
     private init() {
