@@ -280,13 +280,10 @@ extension NativeAlternativePaymentMethodParametersView: UITextFieldDelegate {
         textField.text = updatedString as String
         // swiftlint:disable:next line_length
         if let position = textField.position(from: textField.beginningOfDocument, offset: proposedSelectedRange.lowerBound) {
-            // When called as a result of paste system changes our selection to wrong value based on length of
-            // `replacementString` after call textField(:shouldChangeCharactersIn:replacementString:) returns,
-            // even if this method returns false. As a workaround we are postponing selection change to next run loop
-            // iteration.
-            RunLoop.current.perform {
-                textField.selectedTextRange = textField.textRange(from: position, to: position)
-            }
+            // fixme(andrii-vysotskyi): when called as a result of paste system changes our selection to wrong value
+            // based on length of `replacementString` after call textField(:shouldChangeCharactersIn:replacementString:)
+            // returns, even if this method returns false.
+            textField.selectedTextRange = textField.textRange(from: position, to: position)
         }
         textField.sendActions(for: .editingChanged)
         return false
