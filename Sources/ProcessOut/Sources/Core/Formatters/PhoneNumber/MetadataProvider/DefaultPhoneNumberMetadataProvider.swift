@@ -30,18 +30,16 @@ final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
     // MARK: - Private Properties
 
     private lazy var metadata: [String: PhoneNumberMetadata] = {
-        guard let url = BundleLocator.bundle.url(forResource: "PhoneNumberMetadata", withExtension: "json") else {
-            return [:]
-        }
+        let metadata: [PhoneNumberMetadata]
         do {
-            let data = try Data(contentsOf: url)
-            let metadata = try JSONDecoder().decode([PhoneNumberMetadata].self, from: data)
-            return Dictionary(grouping: metadata, by: \.countryCode).compactMapValues { values in
-                let countryCode = values.first!.countryCode // swiftlint:disable:this force_unwrapping
-                return PhoneNumberMetadata(countryCode: countryCode, formats: values.flatMap(\.formats))
-            }
+            let data = try Data(contentsOf: Files.phoneNumberMetadata.url)
+            metadata = try JSONDecoder().decode([PhoneNumberMetadata].self, from: data)
         } catch {
             return [:]
+        }
+        return Dictionary(grouping: metadata, by: \.countryCode).compactMapValues { values in
+            let countryCode = values.first!.countryCode // swiftlint:disable:this force_unwrapping
+            return PhoneNumberMetadata(countryCode: countryCode, formats: values.flatMap(\.formats))
         }
     }()
 }
