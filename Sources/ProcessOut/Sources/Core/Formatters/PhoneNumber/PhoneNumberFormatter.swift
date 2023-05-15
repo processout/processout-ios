@@ -99,57 +99,7 @@ final class PhoneNumberFormatter: Formatter {
     private let regexProvider: RegexProvider
     private let metadataProvider: PhoneNumberMetadataProvider
 
-    // MARK: - Private Methods
-
-    private func extractMetadata(number: inout String) -> PhoneNumberMetadata? {
-        let length = min(Constants.maxCountryPrefixLength, number.count)
-        for i in stride(from: 1, through: length, by: 1) { // swiftlint:disable:this identifier_name
-            let potentialCountryCode = String(number.prefix(i))
-            if let metadata = metadataProvider.metadata(for: potentialCountryCode) {
-                number.removeFirst(i)
-                return metadata
-            }
-        }
-        return nil
-    }
-
-    private func attemptToFormat(
-        partialNationalNumber: String, formats: [PhoneNumberFormat], countryCode: String
-    ) -> String? {
-        guard partialNationalNumber.count <= Constants.maxNationalNumberLength else {
-            return nil
-        }
-        let nationalNumber = partialNationalNumber.appending(
-            String(
-                repeating: Constants.placeholderDigit,
-                count: Constants.maxNationalNumberLength - partialNationalNumber.count
-            )
-        )
-        let range = NSRange(nationalNumber.startIndex ..< nationalNumber.endIndex, in: nationalNumber)
-        for format in formats {
-            guard let regex = regexProvider.regex(with: format.pattern),
-                  let match = regex.firstMatch(in: nationalNumber, options: .anchored, range: range),
-                  match.range.length >= partialNationalNumber.count else {
-                continue
-            }
-            let formattedNumber = formatted(nationalNumber: nationalNumber, countryCode: countryCode, format: format)
-            return removingPlaceholderSuffix(
-                number: formattedNumber, expectedSignificantLength: partialNationalNumber.count + countryCode.count
-            )
-        }
-        return nil
-    }
-
-    private func removingPlaceholderSuffix(number: String, expectedSignificantLength: Int) -> String {
-        var significantDigitsCount = 0
-        let cleanedNumber = number.prefix { character in
-            if character.isNumber {
-                significantDigitsCount += 1
-            }
-            return significantDigitsCount <= expectedSignificantLength
-        }
-        return String(cleanedNumber).trimmingSuffixCharacters(in: Constants.significantCharacters.inverted)
-    }
+    // MARK: - Full National Number Formatting
 
     private func attemptToFormat(
         nationalNumber: String, metadata: PhoneNumberMetadata, potentialFormats: inout [PhoneNumberFormat]
@@ -192,5 +142,59 @@ final class PhoneNumberFormatter: Formatter {
             formattedNationalNumber = nationalNumber
         }
         return "\(Constants.plus)\(countryCode) \(formattedNationalNumber)"
+    }
+
+    // MARK: - Partial National Number Formatting
+
+    private func attemptToFormat(
+        partialNationalNumber: String, formats: [PhoneNumberFormat], countryCode: String
+    ) -> String? {
+        guard partialNationalNumber.count <= Constants.maxNationalNumberLength else {
+            return nil
+        }
+        let nationalNumber = partialNationalNumber.appending(
+            String(
+                repeating: Constants.placeholderDigit,
+                count: Constants.maxNationalNumberLength - partialNationalNumber.count
+            )
+        )
+        let range = NSRange(nationalNumber.startIndex ..< nationalNumber.endIndex, in: nationalNumber)
+        for format in formats {
+            guard let regex = regexProvider.regex(with: format.pattern),
+                  let match = regex.firstMatch(in: nationalNumber, options: .anchored, range: range),
+                  match.range.length >= partialNationalNumber.count else {
+                continue
+            }
+            let formattedNumber = formatted(nationalNumber: nationalNumber, countryCode: countryCode, format: format)
+            return removingPlaceholderSuffix(
+                number: formattedNumber, expectedSignificantLength: partialNationalNumber.count + countryCode.count
+            )
+        }
+        return nil
+    }
+
+    private func removingPlaceholderSuffix(number: String, expectedSignificantLength: Int) -> String {
+        var significantDigitsCount = 0
+        let cleanedNumber = number.prefix { character in
+            if character.isNumber {
+                significantDigitsCount += 1
+            }
+            return significantDigitsCount <= expectedSignificantLength
+        }
+        return String(cleanedNumber).trimmingSuffixCharacters(in: Constants.significantCharacters.inverted)
+    }
+
+    // MARK: - Utils
+
+    private func extractMetadata(number: inout String) -> PhoneNumberMetadata? {
+        let length = min(Constants.maxCountryPrefixLength, number.count)
+        for i in stride(from: 1, through: length, by: 1) { // swiftlint:disable:this identifier_name
+            let potentialCountryCode = String(number.prefix(i))
+            if let metadata = metadataProvider.metadata(for: potentialCountryCode) {
+                number.removeFirst(i)
+                return metadata
+            }
+        }
+        return nil
     }
 }
