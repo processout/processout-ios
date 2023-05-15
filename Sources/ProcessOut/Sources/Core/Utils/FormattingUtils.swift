@@ -11,11 +11,11 @@ enum FormattingUtils {
 
     /// Returns index in formatted string that matches index in `string`.
     ///
-    /// Implementation of this method assumes that significant symbols before cursor are not modified otherwise
+    /// Implementation of this method assumes that significant symbols after cursor are not modified otherwise
     /// it returns cursor positioned at the end of the `target` string. This approach has linear time complexity.
     ///
-    /// Alternative solution would be to compare all substrings starting from beginning of `target` with prefix
-    /// before cursor in `source` and finding substring with least possible difference (using for example Levenshtein
+    /// Alternative solution would be to compare all substrings starting from end of `target` with suffix
+    /// after cursor in `source` and finding substring with least possible difference (using for example Levenshtein
     /// distance). Downside of it would be almost cubic complexity.
     static func adjustedCursorOffset(
         in target: String,
@@ -24,30 +24,30 @@ enum FormattingUtils {
         significantCharacters: CharacterSet,
         greedy: Bool = true
     ) -> Int {
-        let sourceSignificantPrefix = source
-            .prefix(sourceCursorOffset)
+        let sourceSignificantSuffix = source
+            .suffix(max(source.count - sourceCursorOffset, 0))
             .removingCharacters(in: significantCharacters.inverted)
-        var targetOffset = 0
-        var targetSignificantPrefixLength = 0
-        for (offset, character) in target.enumerated() {
+        var targetOffset = target.count
+        var targetSignificantSuffixLength = 0
+        for (offset, character) in target.enumerated().reversed() {
             if character.unicodeScalars.allSatisfy(significantCharacters.contains) {
-                if targetSignificantPrefixLength < sourceSignificantPrefix.count {
-                    let sourceSignificantPrefixIndex = sourceSignificantPrefix.index(
-                        sourceSignificantPrefix.startIndex,
-                        offsetBy: targetSignificantPrefixLength,
-                        limitedBy: sourceSignificantPrefix.endIndex
+                if targetSignificantSuffixLength < sourceSignificantSuffix.count {
+                    let sourceSignificantSuffixIndex = sourceSignificantSuffix.index(
+                        sourceSignificantSuffix.endIndex,
+                        offsetBy: -(targetSignificantSuffixLength + 1),
+                        limitedBy: sourceSignificantSuffix.startIndex
                     )
-                    guard let sourceSignificantPrefixIndex,
-                          character == sourceSignificantPrefix[sourceSignificantPrefixIndex] else {
+                    guard let sourceSignificantSuffixIndex,
+                          character == sourceSignificantSuffix[sourceSignificantSuffixIndex] else {
                         return target.count
                     }
-                    targetOffset = offset + 1
-                    targetSignificantPrefixLength += 1
+                    targetOffset = offset
+                    targetSignificantSuffixLength += 1
                 } else {
                     return targetOffset
                 }
-            } else if greedy {
-                targetOffset = offset + 1
+            } else if !greedy {
+                targetOffset = offset
             }
         }
         return targetOffset

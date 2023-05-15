@@ -30,33 +30,63 @@ final class FormattingUtilsTests: XCTestCase {
         XCTAssertEqual(offset, 2)
     }
 
-    func test_adjustedCursorOffset_whenCursorPrefixIncreases_returnEndOfTarget() { // should fail
+    func test_adjustedCursorOffset_whenCursorPrefixChanges_returnValidOffset() {
         // When
         let offset = FormattingUtils.adjustedCursorOffset(
-            in: "+1", source: "1", sourceCursorOffset: 1, significantCharacters: .decimalDigits
+            in: "+12", source: "12", sourceCursorOffset: 1, significantCharacters: .decimalDigits
         )
 
         // Then
         XCTAssertEqual(offset, 2)
     }
 
-    func test_adjustedCursorOffset_whenCursorPrefixChanges_returnEndOfTarget() { // should fail
+    func test_adjustedCursorOffset_whenCursorSuffixChanges_returnEndOfTarget() {
         // When
         let offset = FormattingUtils.adjustedCursorOffset(
-            in: "32", source: "12", sourceCursorOffset: 1, significantCharacters: .decimalDigits
-        )
-
-        // Then
-        XCTAssertEqual(offset, 2)
-    }
-
-    func test_adjustedCursorOffset_whenCursorSuffixChanges_returnSameOffset() { // should fail
-        // When
-        let offset = FormattingUtils.adjustedCursorOffset(
-            in: "12", source: "1", sourceCursorOffset: 1, significantCharacters: .decimalDigits
+            in: "2", source: "1", sourceCursorOffset: 0, significantCharacters: .decimalDigits
         )
 
         // Then
         XCTAssertEqual(offset, 1)
+    }
+
+    func test_adjustedCursorOffset_whenNewCharacterIsAddedToCursorSuffix_returnEndOfTarget() {
+        // When
+        let offset = FormattingUtils.adjustedCursorOffset(
+            in: "123", source: "12", sourceCursorOffset: 1, significantCharacters: .decimalDigits
+        )
+
+        // Then
+        XCTAssertEqual(offset, 3)
+    }
+
+    func test_adjustedCursorOffset_whenSourceIsSameAsTarget_returnsSameOffset() {
+        // When
+        let offset = FormattingUtils.adjustedCursorOffset(
+            in: "1", source: "1", sourceCursorOffset: 0, significantCharacters: .decimalDigits
+        )
+
+        // Then
+        XCTAssertEqual(offset, 0)
+    }
+
+    func test_adjustedCursorOffset_whenSourceIsEmpty_returnEndOfTarget() {
+        // When
+        let offset = FormattingUtils.adjustedCursorOffset(
+            in: "1", source: "", sourceCursorOffset: 0, significantCharacters: .decimalDigits
+        )
+
+        // Then
+        XCTAssertEqual(offset, 1)
+    }
+
+    func test_adjustedCursorOffset_whenTargetIsEmpty_returnStartOfTarget() {
+        // When
+        let offset = FormattingUtils.adjustedCursorOffset(
+            in: "", source: "0", sourceCursorOffset: 1, significantCharacters: .decimalDigits
+        )
+
+        // Then
+        XCTAssertEqual(offset, 0)
     }
 }
