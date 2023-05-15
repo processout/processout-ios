@@ -27,10 +27,12 @@ final class PhoneNumberFormatter: Formatter {
         }
         var number = normalizedNumber.removingCharacters(in: Constants.significantCharactersWithoutPlus.inverted)
         guard let metadata = extractMetadata(number: &number) else {
-            return "\(Constants.plus)\(number)"
+            return formatted(countryCode: number, formattedNationalNumber: "")
         }
-        guard !number.isEmpty else {
-            return "\(Constants.plus)\(metadata.countryCode)"
+        // swiftlint:disable:next line_length
+        guard number.count <= min(Constants.maxNationalNumberLength, Constants.maxNumberLength - metadata.countryCode.count),
+              !number.isEmpty else {
+            return formatted(countryCode: metadata.countryCode, formattedNationalNumber: number)
         }
         var potentialFormats: [PhoneNumberFormat] = []
         if let formatted = attemptToFormat(
@@ -45,7 +47,7 @@ final class PhoneNumberFormatter: Formatter {
         ) {
             return formatted
         }
-        return "\(Constants.plus)\(metadata.countryCode) \(number)"
+        return formatted(countryCode: metadata.countryCode, formattedNationalNumber: number)
     }
 
     func normalized(number: String) -> String {
@@ -90,8 +92,10 @@ final class PhoneNumberFormatter: Formatter {
         static let significantCharactersWithoutPlus = CharacterSet.decimalDigits
         static let maxCountryPrefixLength = 3
         static let maxNationalNumberLength = 14
+        static let maxNumberLength = 15
         static let placeholderDigit = "0"
         static let plus = "+"
+        static let countryCodeSeparator = " "
     }
 
     // MARK: - Private Properties
@@ -141,7 +145,7 @@ final class PhoneNumberFormatter: Formatter {
         } else {
             formattedNationalNumber = nationalNumber
         }
-        return "\(Constants.plus)\(countryCode) \(formattedNationalNumber)"
+        return formatted(countryCode: countryCode, formattedNationalNumber: formattedNationalNumber)
     }
 
     // MARK: - Partial National Number Formatting
@@ -149,9 +153,6 @@ final class PhoneNumberFormatter: Formatter {
     private func attemptToFormat(
         partialNationalNumber: String, formats: [PhoneNumberFormat], countryCode: String
     ) -> String? {
-        guard partialNationalNumber.count <= Constants.maxNationalNumberLength else {
-            return nil
-        }
         let nationalNumber = partialNationalNumber.appending(
             String(
                 repeating: Constants.placeholderDigit,
@@ -196,5 +197,13 @@ final class PhoneNumberFormatter: Formatter {
             }
         }
         return nil
+    }
+
+    private func formatted(countryCode: String, formattedNationalNumber number: String) -> String {
+        var formattedNumber: String = "\(Constants.plus)\(countryCode)"
+        if !number.isEmpty {
+            formattedNumber += "\(Constants.countryCodeSeparator)\(number)"
+        }
+        return formattedNumber
     }
 }
