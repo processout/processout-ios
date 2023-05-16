@@ -14,7 +14,8 @@ final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
     // MARK: - PhoneNumberMetadataProvider
 
     func metadata(for countryCode: String) -> PhoneNumberMetadata? {
-        metadata[countryCode]
+        let transformedCountryCode = countryCode.applyingTransform(.toLatin, reverse: false) ?? countryCode
+        return metadata[transformedCountryCode]
     }
 
     func prewarm() {
