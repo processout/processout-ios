@@ -23,7 +23,7 @@ final class DefaultPhoneNumberMetadataProviderTests: XCTestCase {
         XCTAssertNotNil(metadata)
     }
 
-    func test_metadata_whenCountryCodeContainsEasternArabic_returnValidMetadata() {
+    func test_metadata_whenCountryCodeContainsEasternArabicNumerals_returnValidMetadata() {
         // When
         let metadata = sut.metadata(for: "١")
 

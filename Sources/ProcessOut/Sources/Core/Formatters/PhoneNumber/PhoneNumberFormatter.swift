@@ -204,6 +204,7 @@ final class PhoneNumberFormatter: Formatter {
         if !number.isEmpty {
             formattedNumber += "\(Constants.countryCodeSeparator)\(number)"
         }
-        return formattedNumber
+        // Formatted phone numbers are always converted to latin script for simplicity.
+        return formattedNumber.applyingTransform(.toLatin, reverse: false) ?? formattedNumber
     }
 }

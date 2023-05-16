@@ -104,6 +104,18 @@ final class PhoneNumberFormatterTests: XCTestCase {
         XCTAssertEqual(formattedNumber, "+1 123456789123456")
     }
 
+    func test_string_whenNumberContainsEasternArabicNumerals_returnsFormattedNumberWithLatinNumerals() {
+        // Given
+        let format = PhoneNumberFormat(pattern: "(\\d)(\\d+)", leading: [".*"], format: "$1-$2")
+        metadataProvider.metadata = PhoneNumberMetadata(countryCode: "1", formats: [format])
+
+        // When
+        let formattedNumber = sut.string(from: "١٢٣")
+
+        // Then
+        XCTAssertEqual(formattedNumber, "+1 2-3")
+    }
+
     func test_string_whenNumberIsPartial_returnsFormattedNumberWithoutTrailingSeparators() {
         // Given
         let format = PhoneNumberFormat(pattern: "(\\d)(\\d)(\\d)", leading: [".*"], format: "$1-$2-$3")
