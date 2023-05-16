@@ -13,10 +13,19 @@ final class PhoneNumberFormatterTests: XCTestCase {
     override func setUp() {
         super.setUp()
         metadataProvider = MockPhoneNumberMetadataProvider()
+        metadataProvider.metadata = nil
         sut = PhoneNumberFormatter(metadataProvider: metadataProvider)
     }
 
-    func test_string_whenInputIsEmpty_returnsEmptyString() {
+    func test_normalized_ratainsDigitsAndPlus() {
+        // When
+        let normalizedNumber = sut.normalized(number: "+1#")
+
+        // Then
+        XCTAssertEqual(normalizedNumber, "+1")
+    }
+
+    func test_string_whenNumberIsEmpty_returnsEmptyString() {
         // When
         let formattedNumber = sut.string(from: "")
 
@@ -24,7 +33,7 @@ final class PhoneNumberFormatterTests: XCTestCase {
         XCTAssertEqual(formattedNumber, "")
     }
 
-    func test_string_whenInputDoesNotContainDigitsNorPlus_returnsEmptyString() {
+    func test_string_whenNumberDoesNotHaveDigitsNorPlus_returnsEmptyString() {
         // When
         let formattedNumber = sut.string(from: "#")
 
@@ -32,18 +41,15 @@ final class PhoneNumberFormatterTests: XCTestCase {
         XCTAssertEqual(formattedNumber, "")
     }
 
-    func test_string_whenInputContainsOnlyPlus_preservesIt() {
+    func test_string_whenNumberHasOnlyPluses_returnsSinglePlus() {
         // When
-        let formattedNumber = sut.string(from: "+")
+        let formattedNumber = sut.string(from: "++")
 
         // Then
         XCTAssertEqual(formattedNumber, "+")
     }
 
-    func test_string_whenInputStartsWithUnknownCountryCode_returnsDigitsPrefixedWithPlus() {
-        // Given
-        metadataProvider.metadata = nil
-
+    func test_string_whenNumbersCountryCodeIsUnknown_returnsDigitsPrefixedWithPlus() {
         // When
         let formattedNumber = sut.string(from: "1")
 
@@ -51,7 +57,7 @@ final class PhoneNumberFormatterTests: XCTestCase {
         XCTAssertEqual(formattedNumber, "+1")
     }
 
-    func test_string_whenInputHasOnlyCountryCode_returnsCountryCodePrefixedWithPlus() {
+    func test_string_whenNumberHasOnlyCountryCode_returnsCountryCodePrefixedWithPlus() {
         // Given
         metadataProvider.metadata = .init(countryCode: "0", formats: [])
 
@@ -62,7 +68,7 @@ final class PhoneNumberFormatterTests: XCTestCase {
         XCTAssertEqual(formattedNumber, "+0")
     }
 
-    func test_string_whenInputIsFull_returnsFormattedNumber() {
+    func test_string_whenNumberIsComplete_returnsFormattedNumber() {
         // Given
         let format = PhoneNumberFormat(pattern: "(\\d)(\\d)", leading: [".*"], format: "$1-$2")
         metadataProvider.metadata = PhoneNumberMetadata(countryCode: "1", formats: [format])
@@ -74,18 +80,94 @@ final class PhoneNumberFormatterTests: XCTestCase {
         XCTAssertEqual(formattedNumber, "+1 2-3")
     }
 
-    func test_string_whenNationalNumberLeadingDigitsAreUnknown_returnsNationalNumberPrefixWithPlusAndCountryCode() {
+    func test_string_whenNationalNumberLeadingDigitsAreUnknown_formatsCountryCode() {
         // Given
-        let formats: [PhoneNumberFormat] = [
-            PhoneNumberFormat(pattern: "", leading: [""], format: "")
-        ]
-        metadataProvider.metadata = PhoneNumberMetadata(countryCode: "1", formats: formats)
+        let format = PhoneNumberFormat(pattern: "", leading: [""], format: "")
+        metadataProvider.metadata = PhoneNumberMetadata(countryCode: "1", formats: [format])
 
         // When
-        let formattedNumber = sut.string(from: "12")
+        let formattedNumber = sut.string(from: "123")
 
         // Then
-        XCTAssertEqual(formattedNumber, "+1 2")
+        XCTAssertEqual(formattedNumber, "+1 23")
+    }
+
+    func test_string_whenNationalNumberLengthExceedsMaximumLength_formatsCountryCode() {
+        // Given
+        let format = PhoneNumberFormat(pattern: "", leading: [], format: "")
+        metadataProvider.metadata = PhoneNumberMetadata(countryCode: "1", formats: [format])
+
+        // When
+        let formattedNumber = sut.string(from: "1123456789123456")
+
+        // Then
+        XCTAssertEqual(formattedNumber, "+1 123456789123456")
+    }
+
+    func test_string_whenNumberIsPartial_returnsFormattedNumberWithoutTrailingSeparators() {
+        // Given
+        let format = PhoneNumberFormat(pattern: "(\\d)(\\d)(\\d)", leading: [".*"], format: "$1-$2-$3")
+        metadataProvider.metadata = PhoneNumberMetadata(countryCode: "1", formats: [format])
+
+        // When
+        let formattedNumber = sut.string(from: "123")
+
+        // Then
+        XCTAssertEqual(formattedNumber, "+1 2-3")
+    }
+
+    func test_isPartialStringValid_formatsPartialString() {
+        // Given
+        var partialString = "1" as NSString // swiftlint:disable:this legacy_objc_type
+
+        // When
+        let isValid = sut.isPartialStringValid(
+            &partialString,
+            proposedSelectedRange: nil,
+            originalString: "1",
+            originalSelectedRange: NSRange(location: 0, length: 0),
+            errorDescription: nil
+        )
+
+        // Then
+        XCTAssert(isValid)
+        XCTAssertEqual(partialString, "+1")
+    }
+
+    func test_isPartialStringValid_whenAddingText_updatesSelectedRange() {
+        // Given
+        var partialString = "001" as NSString // swiftlint:disable:this legacy_objc_type
+        var proposedSelectedRange = NSRange(location: -1, length: -1)
+
+        // When
+        _ = sut.isPartialStringValid(
+            &partialString,
+            proposedSelectedRange: &proposedSelectedRange,
+            originalString: "1",
+            originalSelectedRange: NSRange(location: 0, length: 0),
+            errorDescription: nil
+        )
+
+        // Then
+        XCTAssertEqual(proposedSelectedRange, NSRange(location: 3, length: 0))
+    }
+
+    func test_isPartialStringValid_whenRemovingText_updatesSelectedRange() {
+        // Given
+        var partialString = "14" as NSString // swiftlint:disable:this legacy_objc_type
+        var proposedSelectedRange = NSRange(location: -1, length: -1)
+
+        // When
+        _ = sut.isPartialStringValid(
+            &partialString,
+            proposedSelectedRange: &proposedSelectedRange,
+            originalString: "1234",
+            originalSelectedRange: NSRange(location: 1, length: 2),
+            errorDescription: nil
+        )
+
+        // Then
+        XCTAssertEqual(proposedSelectedRange, NSRange(location: 2, length: 0))
     }
 
     // MARK: - Private Properties
