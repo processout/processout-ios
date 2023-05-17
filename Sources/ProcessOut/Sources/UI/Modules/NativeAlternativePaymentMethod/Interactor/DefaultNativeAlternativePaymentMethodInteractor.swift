@@ -141,17 +141,15 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     }
 
     func cancel() {
+        logger.debug("Will attempt to cancel payment \(configuration.invoiceId)")
         switch state {
         case .started:
-            break
-        case let .awaitingCapture(awaitingCaptureState):
-            break
+            setFailureStateUnchecked(failure: POFailure(code: .cancelled))
+        case .awaitingCapture:
+            captureCancellable?.cancel()
         default:
             logger.info("Ignored cancellation attempt from unsupported state: \(String(describing: state))")
-            return
         }
-        logger.debug("Will cancel payment \(configuration.invoiceId)")
-        setFailureStateUnchecked(failure: POFailure(code: .cancelled))
     }
 
     // MARK: - Private Nested Types
