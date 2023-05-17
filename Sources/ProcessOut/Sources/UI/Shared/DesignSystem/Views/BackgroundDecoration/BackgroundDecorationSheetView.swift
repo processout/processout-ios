@@ -20,10 +20,6 @@ final class BackgroundDecorationSheetView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    var baseHeight: CGFloat? {
-        didSet { layer.path = baseHeight.map(createSheetPath) }
-    }
-
     var fillColor: UIColor? {
         didSet { layer.fillColor = fillColor?.cgColor }
     }
@@ -57,7 +53,7 @@ final class BackgroundDecorationSheetView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        layer.path = baseHeight.map(createSheetPath)
+        updateLayerPath()
     }
 
     // MARK: - Private Properties
@@ -66,14 +62,14 @@ final class BackgroundDecorationSheetView: UIView {
 
     // MARK: - Private Methods
 
-    private func createSheetPath(height: CGFloat) -> CGPath {
+    private func updateLayerPath() {
         let adjustedHeight: CGFloat
         let adjustedCapHeight: CGFloat
-        if safeAreaInsets.top + height + capHeight > bounds.height {
+        if capHeight > bounds.height {
             adjustedHeight = bounds.height
             adjustedCapHeight = 0
         } else {
-            adjustedHeight = safeAreaInsets.top + height
+            adjustedHeight = bounds.height - capHeight
             adjustedCapHeight = capHeight
         }
         let path = CGMutablePath()
@@ -87,6 +83,6 @@ final class BackgroundDecorationSheetView: UIView {
             to: CGPoint(x: bounds.maxX, y: adjustedHeight),
             control: CGPoint(x: bounds.midX, y: adjustedHeight + adjustedCapHeight * 2)
         )
-        return path
+        layer.path = path
     }
 }
