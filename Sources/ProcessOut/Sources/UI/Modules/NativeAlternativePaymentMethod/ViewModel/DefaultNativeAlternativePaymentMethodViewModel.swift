@@ -21,6 +21,8 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         self.completion = completion
         inputValuesObservations = []
         inputValuesCache = [:]
+        shouldDisablePaymentCancelAction = false
+        shouldDisableCaptureCancelAction = false
         super.init(state: .idle)
         observeInteractorStateChanges()
     }
@@ -60,6 +62,11 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
     private var inputValuesCache: [String: State.InputValue]
     private var inputValuesObservations: [AnyObject]
 
+    private var shouldDisablePaymentCancelAction: Bool
+    private var shouldDisableCaptureCancelAction: Bool
+    private var paymentCancelEnableTimer: Timer?
+    private var captureCancelEnableTimer: Timer?
+
     // MARK: - Private Methods
 
     private func observeInteractorStateChanges() {
@@ -73,6 +80,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         case .starting:
             configureWithStartingState()
         case .started(let startedState):
+            schedulePaymentCancelEnabling()
             state = convertToState(startedState: startedState, isSubmitting: false)
         case .failure(let failure):
             completion?(.failure(failure))
@@ -81,6 +89,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         case .submitted:
             completion?(.success(()))
         case .awaitingCapture(let awaitingCaptureState):
+            scheduleCaptureCancelEnabling()
             state = convertToState(awaitingCaptureState: awaitingCaptureState)
         case .captured(let capturedState):
             configure(with: capturedState)
@@ -124,7 +133,10 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             sections: sections,
             actions: .init(
                 primary: submitAction(startedState: startedState, isSubmitting: isSubmitting),
-                secondary: cancelAction(isEnabled: !isSubmitting)
+                secondary: cancelAction(
+                    configuration: configuration.secondaryAction,
+                    isEnabled: !isSubmitting && !shouldDisablePaymentCancelAction
+                )
             ),
             isEditingAllowed: !isSubmitting
         )
@@ -208,8 +220,10 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         return action
     }
 
-    private func cancelAction(isEnabled: Bool) -> State.Action? {
-        guard case let .cancel(title, _) = configuration.secondaryAction else {
+    private func cancelAction(
+        configuration: PONativeAlternativePaymentMethodConfiguration.SecondaryAction?, isEnabled: Bool
+    ) -> State.Action? {
+        guard case let .cancel(title, _) = configuration else {
             return nil
         }
         let action = State.Action(
@@ -294,6 +308,34 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             return Text.Email.placeholder
         case .phone:
             return Text.Phone.placeholder
+        }
+    }
+
+    // MARK: -
+
+    private func schedulePaymentCancelEnabling() {
+        guard paymentCancelEnableTimer == nil,
+              case .cancel(_, let interval) = configuration.secondaryAction,
+              interval > 0 else {
+            return
+        }
+        shouldDisablePaymentCancelAction = true
+        paymentCancelEnableTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
+            self?.shouldDisablePaymentCancelAction = false
+            self?.configureWithInteractorState()
+        }
+    }
+
+    private func scheduleCaptureCancelEnabling() {
+        guard captureCancelEnableTimer == nil,
+              case .cancel(_, let interval) = configuration.paymentConfirmationAction,
+              interval > 0 else {
+            return
+        }
+        shouldDisableCaptureCancelAction = true
+        captureCancelEnableTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
+            self?.shouldDisableCaptureCancelAction = false
+            self?.configureWithInteractorState()
         }
     }
 }
