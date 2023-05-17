@@ -89,6 +89,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         case .submitted:
             completion?(.success(()))
         case .awaitingCapture(let awaitingCaptureState):
+            interactor.cancel()
             scheduleCaptureCancelEnabling()
             state = convertToState(awaitingCaptureState: awaitingCaptureState)
         case .captured(let capturedState):

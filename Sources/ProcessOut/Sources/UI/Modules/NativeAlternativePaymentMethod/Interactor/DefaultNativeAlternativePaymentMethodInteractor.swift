@@ -221,13 +221,6 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             return
         }
         send(event: .willWaitForCaptureConfirmation(additionalActionExpected: expectedActionMessage != nil))
-        let awaitingCaptureState = State.AwaitingCapture(
-            gatewayLogoImage: gatewayLogo,
-            expectedActionMessage: expectedActionMessage,
-            actionImage: actionImage
-        )
-        state = .awaitingCapture(awaitingCaptureState)
-        logger.info("Waiting for invoice \(configuration.invoiceId) capture confirmation")
         let request = PONativeAlternativePaymentCaptureRequest(
             invoiceId: configuration.invoiceId,
             gatewayConfigurationId: configuration.gatewayConfigurationId,
@@ -242,6 +235,13 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 self?.setFailureStateUnchecked(failure: failure)
             }
         }
+        let awaitingCaptureState = State.AwaitingCapture(
+            gatewayLogoImage: gatewayLogo,
+            expectedActionMessage: expectedActionMessage,
+            actionImage: actionImage
+        )
+        state = .awaitingCapture(awaitingCaptureState)
+        logger.info("Waiting for invoice \(configuration.invoiceId) capture confirmation")
     }
 
     private func setCapturedState() {
