@@ -22,7 +22,12 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
     }
 
     func configure(actions: NativeAlternativePaymentMethodViewModelState.Actions, animated: Bool) {
-        configure(button: primaryButton, action: actions.primary, animated: animated)
+        if let action = actions.primary {
+            configure(button: primaryButton, action: action, animated: animated)
+            primaryButton.setHidden(false)
+        } else {
+            primaryButton.setHidden(true)
+        }
         if let action = actions.secondary {
             configure(button: secondaryButton, action: action, animated: animated)
             secondaryButton.setHidden(false)

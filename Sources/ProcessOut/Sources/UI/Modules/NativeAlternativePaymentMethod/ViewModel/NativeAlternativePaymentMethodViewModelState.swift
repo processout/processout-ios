@@ -158,7 +158,7 @@ enum NativeAlternativePaymentMethodViewModelState {
     struct Actions {
 
         /// Primary action.
-        let primary: Action
+        let primary: Action?
 
         /// Secondary action.
         let secondary: Action?

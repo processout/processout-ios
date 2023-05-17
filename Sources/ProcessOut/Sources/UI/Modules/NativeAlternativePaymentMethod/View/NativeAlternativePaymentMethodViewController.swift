@@ -502,9 +502,9 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         var bottomInset = Constants.contentInset.bottom + keyboardHeight
         if case .started(let startedState) = state {
             if let actions = startedState.actions {
-                if actions.secondary != nil {
+                if actions.primary != nil, actions.secondary != nil {
                     bottomInset += Constants.overlayLargeContentHeight
-                } else {
+                } else if actions.primary != nil || actions.secondary != nil {
                     bottomInset += Constants.overlaySmallContentHeight
                 }
             }
