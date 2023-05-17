@@ -147,7 +147,6 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     private func convertToState(awaitingCaptureState: InteractorState.AwaitingCapture) -> State {
         let item: State.Item
-        let secondaryAction: State.Action?
         if let expectedActionMessage = awaitingCaptureState.expectedActionMessage {
             let submittedItem = State.SubmittedItem(
                 message: expectedActionMessage,
@@ -156,14 +155,13 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 isCaptured: false
             )
             item = .submitted(submittedItem)
-            secondaryAction = cancelAction(
-                configuration: configuration.paymentConfirmationSecondaryAction,
-                isEnabled: !shouldDisableCaptureCancelAction
-            )
         } else {
             item = .loader
-            secondaryAction = nil
         }
+        let secondaryAction = cancelAction(
+            configuration: configuration.paymentConfirmationSecondaryAction,
+            isEnabled: !shouldDisableCaptureCancelAction
+        )
         let startedState = State.Started(
             sections: [
                 .init(id: .init(id: nil, title: nil, decoration: .normal), items: [item])
