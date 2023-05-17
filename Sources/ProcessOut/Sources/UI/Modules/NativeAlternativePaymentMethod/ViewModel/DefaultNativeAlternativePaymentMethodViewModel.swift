@@ -100,7 +100,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         let sections = [
             State.Section(id: .init(id: nil, title: nil, decoration: .normal), items: [.loader])
         ]
-        let startedState = State.Started(sections: sections, actions: nil, isEditingAllowed: false)
+        let startedState = State.Started(
+            sections: sections, actions: .init(primary: nil, secondary: nil), isEditingAllowed: false
+        )
         state = .started(startedState)
     }
 
@@ -145,7 +147,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     private func convertToState(awaitingCaptureState: InteractorState.AwaitingCapture) -> State {
         let item: State.Item
-        let actions: State.Actions?
+        let secondaryAction: State.Action?
         if let expectedActionMessage = awaitingCaptureState.expectedActionMessage {
             let submittedItem = State.SubmittedItem(
                 message: expectedActionMessage,
@@ -154,20 +156,19 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 isCaptured: false
             )
             item = .submitted(submittedItem)
-            let secondaryAction = cancelAction(
+            secondaryAction = cancelAction(
                 configuration: configuration.paymentConfirmationAction,
                 isEnabled: !shouldDisableCaptureCancelAction
             )
-            actions = .init(primary: nil, secondary: secondaryAction)
         } else {
             item = .loader
-            actions = nil
+            secondaryAction = nil
         }
         let startedState = State.Started(
             sections: [
                 .init(id: .init(id: nil, title: nil, decoration: .normal), items: [item])
             ],
-            actions: actions,
+            actions: .init(primary: nil, secondary: secondaryAction),
             isEditingAllowed: false
         )
         return .started(startedState)
@@ -194,7 +195,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 sections: [
                     .init(id: .init(id: nil, title: nil, decoration: .success), items: [.submitted(submittedItem)])
                 ],
-                actions: nil,
+                actions: .init(primary: nil, secondary: nil),
                 isEditingAllowed: false
             )
             state = .started(startedState)

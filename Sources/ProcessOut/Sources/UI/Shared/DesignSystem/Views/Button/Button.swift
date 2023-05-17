@@ -121,6 +121,7 @@ final class Button: UIControl {
         label.adjustsFontForContentSizeCategory = false
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
+        label.alpha = 0
         return label
     }()
 
@@ -128,6 +129,7 @@ final class Button: UIControl {
         let view = ActivityIndicatorViewFactory().create(style: style.activityIndicator)
         view.hidesWhenStopped = false
         view.setAnimating(true)
+        view.alpha = 0
         return view
     }()
 
