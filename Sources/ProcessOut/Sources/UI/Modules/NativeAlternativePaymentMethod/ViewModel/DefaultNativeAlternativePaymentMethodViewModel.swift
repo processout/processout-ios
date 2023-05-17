@@ -209,7 +209,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
     }
 
     private func cancelAction(isEnabled: Bool) -> State.Action? {
-        guard case let .cancel(title) = configuration.secondaryAction else {
+        guard case let .cancel(title, _) = configuration.secondaryAction else {
             return nil
         }
         let action = State.Action(

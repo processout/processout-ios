@@ -13,8 +13,13 @@ public struct PONativeAlternativePaymentMethodConfiguration {
 
     public enum SecondaryAction {
 
-        /// Cancel action. Use `nil` for default title.
-        case cancel(title: String? = nil)
+        /// Cancel action.
+        ///
+        /// - Parameters:
+        ///   - title: Action title. Pass `nil` title to use default value.
+        ///   - disabledFor: By default user can interact with action immediately after it becomes visible, it is
+        ///   possible to make it initialy disabled for given amount of time.
+        case cancel(title: String? = nil, disabledFor: TimeInterval = 0)
     }
 
     /// Custom title.
@@ -40,6 +45,10 @@ public struct PONativeAlternativePaymentMethodConfiguration {
     /// Maximum value is 180 seconds.
     public let paymentConfirmationTimeout: TimeInterval
 
+    /// Action that could be optionally presented to user during payment confirmation stage. To remove action
+    /// use `nil`, this is default behaviour.
+    public let paymentConfirmationAction: SecondaryAction?
+
     public init(
         title: String? = nil,
         successMessage: String? = nil,
@@ -47,7 +56,8 @@ public struct PONativeAlternativePaymentMethodConfiguration {
         secondaryAction: SecondaryAction? = nil,
         skipSuccessScreen: Bool = false,
         waitsPaymentConfirmation: Bool = true,
-        paymentConfirmationTimeout: TimeInterval = 180
+        paymentConfirmationTimeout: TimeInterval = 180,
+        paymentConfirmationAction: SecondaryAction? = nil
     ) {
         self.title = title
         self.successMessage = successMessage
@@ -56,5 +66,6 @@ public struct PONativeAlternativePaymentMethodConfiguration {
         self.skipSuccessScreen = skipSuccessScreen
         self.waitsPaymentConfirmation = waitsPaymentConfirmation
         self.paymentConfirmationTimeout = paymentConfirmationTimeout
+        self.paymentConfirmationAction = paymentConfirmationAction
     }
 }
