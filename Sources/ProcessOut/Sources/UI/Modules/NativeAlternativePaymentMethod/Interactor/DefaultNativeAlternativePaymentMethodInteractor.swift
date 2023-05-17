@@ -141,7 +141,12 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     }
 
     func cancel() {
-        guard case .started = state else {
+        switch state {
+        case .started:
+            break
+        case let .awaitingCapture(awaitingCaptureState) where awaitingCaptureState.expectedActionMessage != nil:
+            break
+        default:
             logger.info("Ignored cancellation attempt from unsupported state: \(String(describing: state))")
             return
         }
