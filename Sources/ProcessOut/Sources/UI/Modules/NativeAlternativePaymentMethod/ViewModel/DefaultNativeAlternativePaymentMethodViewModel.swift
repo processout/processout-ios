@@ -262,9 +262,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 placeholder: placeholder(for: parameter),
                 value: inputValue,
                 isLast: isLast,
-                formatted: { [weak self] value in
-                    self?.interactor.formatted(value: value, type: parameter.type) ?? ""
-                }
+                formatter: interactor.formatter(type: parameter.type)
             )
             return .input(inputItem)
         }

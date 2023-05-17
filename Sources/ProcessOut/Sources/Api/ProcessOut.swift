@@ -27,6 +27,7 @@ public final class ProcessOut {
             return
         }
         shared = ProcessOut(configuration: configuration)
+        shared.prewarm()
         shared.logger.debug("Did complete ProcessOut configuration")
     }
 
@@ -131,6 +132,10 @@ public final class ProcessOut {
         ]
         let minimumLevel: LogLevel = configuration.isDebug ? .debug : .info
         return POLogger(destinations: destinations, minimumLevel: minimumLevel)
+    }
+
+    private func prewarm() {
+        DefaultPhoneNumberMetadataProvider.shared.prewarm()
     }
 }
 

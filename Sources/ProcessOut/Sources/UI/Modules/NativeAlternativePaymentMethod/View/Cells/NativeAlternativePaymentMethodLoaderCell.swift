@@ -30,7 +30,9 @@ final class NativeAlternativePaymentMethodLoaderCell: UICollectionViewCell {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultStyle = POActivityIndicatorStyle.system(.whiteLarge)
+        static let defaultStyle = POActivityIndicatorStyle.system(
+            .whiteLarge, color: Asset.Colors.New.Text.secondary.color
+        )
     }
 
     // MARK: - Private Properties

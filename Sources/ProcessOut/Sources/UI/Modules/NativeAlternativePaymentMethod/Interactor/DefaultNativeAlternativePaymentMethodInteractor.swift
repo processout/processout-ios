@@ -59,12 +59,12 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         }
     }
 
-    func formatted(value: String, type: PONativeAlternativePaymentMethodParameter.ParameterType) -> String {
+    func formatter(type: PONativeAlternativePaymentMethodParameter.ParameterType) -> Formatter? {
         switch type {
         case .phone:
-            return phoneNumberFormatter.formattedNumber(from: value)
+            return phoneNumberFormatter
         default:
-            return value
+            return nil
         }
     }
 
@@ -152,7 +152,6 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let phoneFormattingCharacters = CharacterSet(charactersIn: "-() ")
         static let emailRegex = #"^\S+@\S+$"#
         static let phoneRegex = #"^\+?\d{1,3}\d*$"#
     }
@@ -408,7 +407,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             let value = values[parameter.key]?.value
             let updatedValue: String? = {
                 if case .phone = parameter.type, let value {
-                    return value.removingCharacters(in: Constants.phoneFormattingCharacters)
+                    return phoneNumberFormatter.normalized(number: value)
                 }
                 return value
             }()
@@ -454,6 +453,15 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             }
         }
         return message.map { POFailure.InvalidField(name: parameter.key, message: $0) }
+    }
+
+    private func formatted(value: String, type: PONativeAlternativePaymentMethodParameter.ParameterType) -> String {
+        switch type {
+        case .phone:
+            return phoneNumberFormatter.string(from: value)
+        default:
+            return value
+        }
     }
 }
 

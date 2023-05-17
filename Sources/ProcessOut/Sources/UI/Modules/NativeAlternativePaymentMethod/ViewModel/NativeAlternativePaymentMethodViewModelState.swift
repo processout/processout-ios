@@ -80,9 +80,8 @@ enum NativeAlternativePaymentMethodViewModelState {
         /// Boolean value indicating whether parameter is last in a chain.
         let isLast: Bool
 
-        /// Returns formatted version of value.
-        @ImmutableNullHashable
-        var formatted: (_ value: String) -> String
+        /// Formatter to use to format value if any.
+        let formatter: Formatter?
     }
 
     struct ErrorItem: Hashable {

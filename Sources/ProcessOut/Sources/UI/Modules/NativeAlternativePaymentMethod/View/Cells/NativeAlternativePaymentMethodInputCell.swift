@@ -137,16 +137,32 @@ extension NativeAlternativePaymentMethodInputCell: UITextFieldDelegate {
     func textField(
         _ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String
     ) -> Bool {
-        // swiftlint:disable:next legacy_objc_type
-        let updatedText = (textField.text as? NSString)?.replacingCharacters(in: range, with: string)
-        guard let updatedText, let item else {
+        guard let formatter = item?.formatter else {
             return true
         }
-        let formattedText = item.formatted(updatedText)
-        guard formattedText != updatedText else {
-            return true
+        // swiftlint:disable legacy_objc_type
+        let originalString = (textField.text ?? "") as NSString
+        var updatedString = originalString.replacingCharacters(in: range, with: string) as NSString
+        // swiftlint:enable legacy_objc_type
+        var proposedSelectedRange = NSRange(location: updatedString.length, length: 0)
+        let isReplacementValid = formatter.isPartialStringValid(
+            &updatedString,
+            proposedSelectedRange: &proposedSelectedRange,
+            originalString: originalString as String,
+            originalSelectedRange: range,
+            errorDescription: nil
+        )
+        guard isReplacementValid else {
+            return false
         }
-        textField.text = formattedText
+        textField.text = updatedString as String
+        // swiftlint:disable:next line_length
+        if let position = textField.position(from: textField.beginningOfDocument, offset: proposedSelectedRange.lowerBound) {
+            // fixme(andrii-vysotskyi): when called as a result of paste system changes our selection to wrong value
+            // based on length of `replacementString` after call textField(:shouldChangeCharactersIn:replacementString:)
+            // returns, even if this method returns false.
+            textField.selectedTextRange = textField.textRange(from: position, to: position)
+        }
         textField.sendActions(for: .editingChanged)
         return false
     }

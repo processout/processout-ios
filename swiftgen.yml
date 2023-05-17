@@ -27,3 +27,15 @@ strings:
         bundle: BundleLocator.bundle
         lookupFunction: Strings.localized
       output: Strings+Generated.swift
+
+## Files
+files:
+  inputs:
+    - PhoneNumberMetadata/
+  filter: .+[.]json$
+  outputs:
+    - templateName: flat-swift5
+      params:
+        bundle: BundleLocator.bundle
+        useExtension: false
+      output: Files+Generated.swift
