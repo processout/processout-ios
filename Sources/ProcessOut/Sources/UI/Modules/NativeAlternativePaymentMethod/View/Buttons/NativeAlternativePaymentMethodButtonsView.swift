@@ -21,18 +21,18 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(
-        primaryAction: NativeAlternativePaymentMethodViewModelState.Action,
-        secondaryAction: NativeAlternativePaymentMethodViewModelState.Action?,
-        animated: Bool
-    ) {
-        configure(button: primaryButton, action: primaryAction, animated: animated)
-        if let secondaryAction {
-            configure(button: secondaryButton, action: secondaryAction, animated: animated)
+    func configure(actions: NativeAlternativePaymentMethodViewModelState.Actions, animated: Bool) {
+        configure(button: primaryButton, action: actions.primary, animated: animated)
+        if let action = actions.secondary {
+            configure(button: secondaryButton, action: action, animated: animated)
             secondaryButton.setHidden(false)
         } else {
             secondaryButton.setHidden(true)
         }
+    }
+
+    var additionalBottomSafeAreaInset: CGFloat = 0 {
+        didSet { bottomConstraint.constant = -(additionalBottomSafeAreaInset + Constants.verticalInset) }
     }
 
     // MARK: - Private Nested Types
@@ -67,6 +67,10 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         return button
     }()
 
+    private lazy var bottomConstraint = contentView.bottomAnchor.constraint(
+        equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.verticalInset
+    )
+
     // MARK: - Private Methods
 
     private func commonInit() {
@@ -75,8 +79,8 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         let constraints = [
             contentView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: horizontalInset),
             contentView.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
-            contentView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Constants.verticalInset),
-            contentView.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor)
+            contentView.topAnchor.constraint(equalTo: topAnchor, constant: Constants.verticalInset),
+            bottomConstraint
         ]
         NSLayoutConstraint.activate(constraints)
     }

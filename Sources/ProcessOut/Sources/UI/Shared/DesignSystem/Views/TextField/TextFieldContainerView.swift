@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TextFieldContainerView: UIView, InputFormTextField {
+final class TextFieldContainerView: UIView {
 
     init() {
         super.init(frame: .zero)
@@ -30,10 +30,6 @@ final class TextFieldContainerView: UIView, InputFormTextField {
     func configure(style: POTextFieldStyle, animated: Bool) {
         self.style = style
         configureWithCurrentState(animated: animated)
-    }
-
-    var control: UIControl {
-        textField
     }
 
     private(set) lazy var textField: UITextField = {

@@ -18,6 +18,9 @@ let package = Package(
             // Having DocC in sources may cause build failures so excluded until issue is resolved by Apple. See
             // https://forums.swift.org/t/xcode-and-swift-package-manager/44704 for details.
             exclude: ["ProcessOut.docc"],
+            resources: [
+                .process("Resources/PhoneNumberMetadata/PhoneNumberMetadata.json")
+            ],
             swiftSettings: [
                 .unsafeFlags(["-Xfrontend", "-module-interface-preserve-types-as-written"])
             ]
