@@ -157,7 +157,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             )
             item = .submitted(submittedItem)
             secondaryAction = cancelAction(
-                configuration: configuration.paymentConfirmationAction,
+                configuration: configuration.paymentConfirmationSecondaryAction,
                 isEnabled: !shouldDisableCaptureCancelAction
             )
         } else {
@@ -336,7 +336,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     private func scheduleCaptureCancelEnabling() {
         guard captureCancelEnableTimer == nil,
-              case .cancel(_, let interval) = configuration.paymentConfirmationAction,
+              case .cancel(_, let interval) = configuration.paymentConfirmationSecondaryAction,
               interval > 0 else {
             return
         }

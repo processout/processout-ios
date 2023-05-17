@@ -47,7 +47,7 @@ public struct PONativeAlternativePaymentMethodConfiguration {
 
     /// Action that could be optionally presented to user during payment confirmation stage. To remove action
     /// use `nil`, this is default behaviour.
-    public let paymentConfirmationAction: SecondaryAction?
+    public let paymentConfirmationSecondaryAction: SecondaryAction?
 
     public init(
         title: String? = nil,
@@ -57,7 +57,7 @@ public struct PONativeAlternativePaymentMethodConfiguration {
         skipSuccessScreen: Bool = false,
         waitsPaymentConfirmation: Bool = true,
         paymentConfirmationTimeout: TimeInterval = 180,
-        paymentConfirmationAction: SecondaryAction? = nil
+        paymentConfirmationSecondaryAction: SecondaryAction? = nil
     ) {
         self.title = title
         self.successMessage = successMessage
@@ -66,6 +66,6 @@ public struct PONativeAlternativePaymentMethodConfiguration {
         self.skipSuccessScreen = skipSuccessScreen
         self.waitsPaymentConfirmation = waitsPaymentConfirmation
         self.paymentConfirmationTimeout = paymentConfirmationTimeout
-        self.paymentConfirmationAction = paymentConfirmationAction
+        self.paymentConfirmationSecondaryAction = paymentConfirmationSecondaryAction
     }
 }
