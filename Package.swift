@@ -20,9 +20,6 @@ let package = Package(
             exclude: ["ProcessOut.docc"],
             resources: [
                 .process("Resources/PhoneNumberMetadata/PhoneNumberMetadata.json")
-            ],
-            swiftSettings: [
-                .unsafeFlags(["-Xfrontend", "-module-interface-preserve-types-as-written"])
             ]
         )
     ]
