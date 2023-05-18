@@ -80,7 +80,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             configureWithStartingState()
         case .started(let startedState):
             scheduleCancelActionEnabling(
-                configuration: configuration.paymentConfirmationSecondaryAction, isDisabled: \.isPaymentCancelDisabled
+                configuration: configuration.secondaryAction, isDisabled: \.isPaymentCancelDisabled
             )
             state = convertToState(startedState: startedState, isSubmitting: false)
         case .failure(let failure):
