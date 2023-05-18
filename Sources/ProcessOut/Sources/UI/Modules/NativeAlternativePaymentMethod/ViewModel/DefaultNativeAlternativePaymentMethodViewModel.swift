@@ -23,7 +23,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         inputValuesCache = [:]
         isPaymentCancelDisabled = false
         isCaptureCancelDisabled = false
-        timers = [:]
+        cancelActionTimers = [:]
         super.init(state: .idle)
         observeInteractorStateChanges()
     }
@@ -62,7 +62,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     private var inputValuesCache: [String: State.InputValue]
     private var inputValuesObservations: [AnyObject]
-    private var timers: [AnyHashable: Timer]
+    private var cancelActionTimers: [AnyHashable: Timer]
     private var isPaymentCancelDisabled: Bool
     private var isCaptureCancelDisabled: Bool
 
@@ -97,6 +97,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         case .captured(let capturedState):
             configure(with: capturedState)
         }
+        invalidateCancelActionTimersIfNeeded(state: interactor.state)
     }
 
     private func configureWithStartingState() {
@@ -327,7 +328,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         isDisabled: ReferenceWritableKeyPath<DefaultNativeAlternativePaymentMethodViewModel, Bool>
     ) {
         let timerKey = AnyHashable(isDisabled)
-        guard !timers.keys.contains(timerKey), case .cancel(_, let interval) = configuration, interval > 0 else {
+        guard !cancelActionTimers.keys.contains(timerKey),
+              case .cancel(_, let interval) = configuration,
+              interval > 0 else {
             return
         }
         self[keyPath: isDisabled] = true
@@ -335,6 +338,19 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             self?[keyPath: isDisabled] = false
             self?.configureWithInteractorState()
         }
-        timers[timerKey] = timer
+        cancelActionTimers[timerKey] = timer
+    }
+
+    private func invalidateCancelActionTimersIfNeeded(state interactorState: InteractorState) {
+        // If interactor is in a sink state timers should be invalidated to ensure that completion
+        // won't be called multiple times.
+        switch interactorState {
+        case .failure, .captured, .submitted:
+            break
+        default:
+            return
+        }
+        cancelActionTimers.values.forEach { $0.invalidate() }
+        cancelActionTimers = [:]
     }
 }
