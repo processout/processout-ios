@@ -21,8 +21,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         self.completion = completion
         inputValuesObservations = []
         inputValuesCache = [:]
-        shouldDisablePaymentCancelAction = false
-        shouldDisableCaptureCancelAction = false
+        isPaymentCancelDisabled = false
+        isCaptureCancelDisabled = false
+        timers = [:]
         super.init(state: .idle)
         observeInteractorStateChanges()
     }
@@ -61,11 +62,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     private var inputValuesCache: [String: State.InputValue]
     private var inputValuesObservations: [AnyObject]
-
-    private var shouldDisablePaymentCancelAction: Bool
-    private var shouldDisableCaptureCancelAction: Bool
-    private var paymentCancelEnableTimer: Timer?
-    private var captureCancelEnableTimer: Timer?
+    private var timers: [AnyHashable: Timer]
+    private var isPaymentCancelDisabled: Bool
+    private var isCaptureCancelDisabled: Bool
 
     // MARK: - Private Methods
 
@@ -80,7 +79,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         case .starting:
             configureWithStartingState()
         case .started(let startedState):
-            schedulePaymentCancelEnabling()
+            scheduleCancelActionEnabling(
+                configuration: configuration.paymentConfirmationSecondaryAction, isDisabled: \.isPaymentCancelDisabled
+            )
             state = convertToState(startedState: startedState, isSubmitting: false)
         case .failure(let failure):
             completion?(.failure(failure))
@@ -89,7 +90,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         case .submitted:
             completion?(.success(()))
         case .awaitingCapture(let awaitingCaptureState):
-            scheduleCaptureCancelEnabling()
+            scheduleCancelActionEnabling(
+                configuration: configuration.paymentConfirmationSecondaryAction, isDisabled: \.isCaptureCancelDisabled
+            )
             state = convertToState(awaitingCaptureState: awaitingCaptureState)
         case .captured(let capturedState):
             configure(with: capturedState)
@@ -137,7 +140,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 primary: submitAction(startedState: startedState, isSubmitting: isSubmitting),
                 secondary: cancelAction(
                     configuration: configuration.secondaryAction,
-                    isEnabled: !isSubmitting && !shouldDisablePaymentCancelAction
+                    isEnabled: !isSubmitting && !isPaymentCancelDisabled
                 )
             ),
             isEditingAllowed: !isSubmitting
@@ -160,7 +163,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         }
         let secondaryAction = cancelAction(
             configuration: configuration.paymentConfirmationSecondaryAction,
-            isEnabled: !shouldDisableCaptureCancelAction
+            isEnabled: !isCaptureCancelDisabled
         )
         let startedState = State.Started(
             sections: [
@@ -317,31 +320,21 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         }
     }
 
-    // MARK: -
+    // MARK: - Cancel Actions Enabling
 
-    private func schedulePaymentCancelEnabling() {
-        guard paymentCancelEnableTimer == nil,
-              case .cancel(_, let interval) = configuration.secondaryAction,
-              interval > 0 else {
+    private func scheduleCancelActionEnabling(
+        configuration: PONativeAlternativePaymentMethodConfiguration.SecondaryAction?,
+        isDisabled: ReferenceWritableKeyPath<DefaultNativeAlternativePaymentMethodViewModel, Bool>
+    ) {
+        let timerKey = AnyHashable(isDisabled)
+        guard !timers.keys.contains(timerKey), case .cancel(_, let interval) = configuration, interval > 0 else {
             return
         }
-        shouldDisablePaymentCancelAction = true
-        paymentCancelEnableTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
-            self?.shouldDisablePaymentCancelAction = false
+        self[keyPath: isDisabled] = true
+        let timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
+            self?[keyPath: isDisabled] = false
             self?.configureWithInteractorState()
         }
-    }
-
-    private func scheduleCaptureCancelEnabling() {
-        guard captureCancelEnableTimer == nil,
-              case .cancel(_, let interval) = configuration.paymentConfirmationSecondaryAction,
-              interval > 0 else {
-            return
-        }
-        shouldDisableCaptureCancelAction = true
-        captureCancelEnableTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
-            self?.shouldDisableCaptureCancelAction = false
-            self?.configureWithInteractorState()
-        }
+        timers[timerKey] = timer
     }
 }
