@@ -141,12 +141,15 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     }
 
     func cancel() {
-        guard case .started = state else {
+        logger.debug("Will attempt to cancel payment \(configuration.invoiceId)")
+        switch state {
+        case .started:
+            setFailureStateUnchecked(failure: POFailure(code: .cancelled))
+        case .awaitingCapture:
+            captureCancellable?.cancel()
+        default:
             logger.info("Ignored cancellation attempt from unsupported state: \(String(describing: state))")
-            return
         }
-        logger.debug("Will cancel payment \(configuration.invoiceId)")
-        setFailureStateUnchecked(failure: POFailure(code: .cancelled))
     }
 
     // MARK: - Private Nested Types
@@ -218,13 +221,6 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             return
         }
         send(event: .willWaitForCaptureConfirmation(additionalActionExpected: expectedActionMessage != nil))
-        let awaitingCaptureState = State.AwaitingCapture(
-            gatewayLogoImage: gatewayLogo,
-            expectedActionMessage: expectedActionMessage,
-            actionImage: actionImage
-        )
-        state = .awaitingCapture(awaitingCaptureState)
-        logger.info("Waiting for invoice \(configuration.invoiceId) capture confirmation")
         let request = PONativeAlternativePaymentCaptureRequest(
             invoiceId: configuration.invoiceId,
             gatewayConfigurationId: configuration.gatewayConfigurationId,
@@ -239,6 +235,13 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 self?.setFailureStateUnchecked(failure: failure)
             }
         }
+        let awaitingCaptureState = State.AwaitingCapture(
+            gatewayLogoImage: gatewayLogo,
+            expectedActionMessage: expectedActionMessage,
+            actionImage: actionImage
+        )
+        state = .awaitingCapture(awaitingCaptureState)
+        logger.info("Waiting for invoice \(configuration.invoiceId) capture confirmation")
     }
 
     private func setCapturedState() {

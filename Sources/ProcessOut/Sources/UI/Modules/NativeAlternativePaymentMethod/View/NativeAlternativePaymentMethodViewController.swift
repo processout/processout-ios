@@ -288,7 +288,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
     // MARK: - State Management
 
     private func configureWithIdleState() {
-        buttonsContainerView.alpha = 0
+        buttonsContainerView.configure(actions: .init(primary: nil, secondary: nil), animated: false)
         let snapshot = DiffableDataSourceSnapshot<SectionIdentifier, ItemIdentifier>()
         collectionViewDataSource.applySnapshotUsingReloadData(snapshot)
     }
@@ -310,12 +310,8 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             self?.updateFirstResponder()
         }
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
-            if let actions = state.actions {
-                buttonsContainerView.configure(actions: actions, animated: buttonsContainerView.alpha > 0 && animated)
-                buttonsContainerView.alpha = 1
-            } else {
-                buttonsContainerView.alpha = 0
-            }
+            buttonsContainerView.configure(actions: state.actions, animated: animated)
+            collectionOverlayView.layoutIfNeeded()
         }
     }
 
@@ -501,12 +497,11 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         // todo(andrii-vysotskyi): consider observing overlay content height instead for better flexibility in future
         var bottomInset = Constants.contentInset.bottom + keyboardHeight
         if case .started(let startedState) = state {
-            if let actions = startedState.actions {
-                if actions.secondary != nil {
-                    bottomInset += Constants.overlayLargeContentHeight
-                } else {
-                    bottomInset += Constants.overlaySmallContentHeight
-                }
+            let actions = startedState.actions
+            if actions.primary != nil, actions.secondary != nil {
+                bottomInset += Constants.overlayLargeContentHeight
+            } else if actions.primary != nil || actions.secondary != nil {
+                bottomInset += Constants.overlaySmallContentHeight
             }
         }
         if bottomInset != collectionView.contentInset.bottom {

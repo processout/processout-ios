@@ -22,12 +22,13 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
     }
 
     func configure(actions: NativeAlternativePaymentMethodViewModelState.Actions, animated: Bool) {
-        configure(button: primaryButton, action: actions.primary, animated: animated)
-        if let action = actions.secondary {
-            configure(button: secondaryButton, action: action, animated: animated)
-            secondaryButton.setHidden(false)
+        if actions.primary != nil || actions.secondary != nil {
+            let animated = animated && alpha > 0
+            configure(button: primaryButton, withAction: actions.primary, animated: animated)
+            configure(button: secondaryButton, withAction: actions.secondary, animated: animated)
+            alpha = 1
         } else {
-            secondaryButton.setHidden(true)
+            alpha = 0
         }
     }
 
@@ -52,6 +53,7 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         view.translatesAutoresizingMaskIntoConstraints = false
         view.spacing = Constants.spacing
         view.axis = .vertical
+        view.alignment = .fill
         return view
     }()
 
@@ -80,15 +82,25 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
             contentView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: horizontalInset),
             contentView.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
             contentView.topAnchor.constraint(equalTo: topAnchor, constant: Constants.verticalInset),
+            contentView.heightAnchor.constraint(equalToConstant: 0).with(priority: .defaultLow),
             bottomConstraint
         ]
         NSLayoutConstraint.activate(constraints)
     }
 
     private func configure(
-        button: Button, action: NativeAlternativePaymentMethodViewModelState.Action, animated: Bool
+        button: Button, withAction action: NativeAlternativePaymentMethodViewModelState.Action?, animated: Bool
     ) {
-        let viewModel = Button.ViewModel(title: action.title, isLoading: action.isExecuting, handler: action.handler)
+        guard let action else {
+            button.setHidden(true)
+            button.alpha = 0
+            return
+        }
+        let viewModel = Button.ViewModel(
+            title: action.title, isLoading: action.isExecuting, handler: action.handler
+        )
         button.configure(viewModel: viewModel, isEnabled: action.isEnabled, animated: animated)
+        button.setHidden(false)
+        button.alpha = 1
     }
 }

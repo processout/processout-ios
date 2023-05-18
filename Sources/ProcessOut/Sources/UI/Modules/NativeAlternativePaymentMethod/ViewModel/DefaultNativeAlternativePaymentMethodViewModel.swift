@@ -21,6 +21,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         self.completion = completion
         inputValuesObservations = []
         inputValuesCache = [:]
+        isPaymentCancelDisabled = false
+        isCaptureCancelDisabled = false
+        timers = [:]
         super.init(state: .idle)
         observeInteractorStateChanges()
     }
@@ -59,6 +62,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     private var inputValuesCache: [String: State.InputValue]
     private var inputValuesObservations: [AnyObject]
+    private var timers: [AnyHashable: Timer]
+    private var isPaymentCancelDisabled: Bool
+    private var isCaptureCancelDisabled: Bool
 
     // MARK: - Private Methods
 
@@ -73,6 +79,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         case .starting:
             configureWithStartingState()
         case .started(let startedState):
+            scheduleCancelActionEnabling(
+                configuration: configuration.secondaryAction, isDisabled: \.isPaymentCancelDisabled
+            )
             state = convertToState(startedState: startedState, isSubmitting: false)
         case .failure(let failure):
             completion?(.failure(failure))
@@ -81,6 +90,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         case .submitted:
             completion?(.success(()))
         case .awaitingCapture(let awaitingCaptureState):
+            scheduleCancelActionEnabling(
+                configuration: configuration.paymentConfirmationSecondaryAction, isDisabled: \.isCaptureCancelDisabled
+            )
             state = convertToState(awaitingCaptureState: awaitingCaptureState)
         case .captured(let capturedState):
             configure(with: capturedState)
@@ -91,7 +103,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         let sections = [
             State.Section(id: .init(id: nil, title: nil, decoration: .normal), items: [.loader])
         ]
-        let startedState = State.Started(sections: sections, actions: nil, isEditingAllowed: false)
+        let startedState = State.Started(
+            sections: sections, actions: .init(primary: nil, secondary: nil), isEditingAllowed: false
+        )
         state = .started(startedState)
     }
 
@@ -124,7 +138,10 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             sections: sections,
             actions: .init(
                 primary: submitAction(startedState: startedState, isSubmitting: isSubmitting),
-                secondary: cancelAction(isEnabled: !isSubmitting)
+                secondary: cancelAction(
+                    configuration: configuration.secondaryAction,
+                    isEnabled: !isSubmitting && !isPaymentCancelDisabled
+                )
             ),
             isEditingAllowed: !isSubmitting
         )
@@ -144,11 +161,15 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         } else {
             item = .loader
         }
+        let secondaryAction = cancelAction(
+            configuration: configuration.paymentConfirmationSecondaryAction,
+            isEnabled: !isCaptureCancelDisabled
+        )
         let startedState = State.Started(
             sections: [
                 .init(id: .init(id: nil, title: nil, decoration: .normal), items: [item])
             ],
-            actions: nil,
+            actions: .init(primary: nil, secondary: secondaryAction),
             isEditingAllowed: false
         )
         return .started(startedState)
@@ -175,7 +196,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 sections: [
                     .init(id: .init(id: nil, title: nil, decoration: .success), items: [.submitted(submittedItem)])
                 ],
-                actions: nil,
+                actions: .init(primary: nil, secondary: nil),
                 isEditingAllowed: false
             )
             state = .started(startedState)
@@ -208,8 +229,10 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         return action
     }
 
-    private func cancelAction(isEnabled: Bool) -> State.Action? {
-        guard case let .cancel(title) = configuration.secondaryAction else {
+    private func cancelAction(
+        configuration: PONativeAlternativePaymentMethodConfiguration.SecondaryAction?, isEnabled: Bool
+    ) -> State.Action? {
+        guard case let .cancel(title, _) = configuration else {
             return nil
         }
         let action = State.Action(
@@ -295,5 +318,23 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         case .phone:
             return Text.Phone.placeholder
         }
+    }
+
+    // MARK: - Cancel Actions Enabling
+
+    private func scheduleCancelActionEnabling(
+        configuration: PONativeAlternativePaymentMethodConfiguration.SecondaryAction?,
+        isDisabled: ReferenceWritableKeyPath<DefaultNativeAlternativePaymentMethodViewModel, Bool>
+    ) {
+        let timerKey = AnyHashable(isDisabled)
+        guard !timers.keys.contains(timerKey), case .cancel(_, let interval) = configuration, interval > 0 else {
+            return
+        }
+        self[keyPath: isDisabled] = true
+        let timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
+            self?[keyPath: isDisabled] = false
+            self?.configureWithInteractorState()
+        }
+        timers[timerKey] = timer
     }
 }
