@@ -33,7 +33,7 @@ final class NativeAlternativePaymentMethodSectionHeaderView: UICollectionReusabl
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultStyle = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .bodyLarge)
+        static let defaultStyle = POInputFormStyle.default.normal.title
     }
 
     // MARK: - Private Properties

@@ -33,7 +33,7 @@ final class NativeAlternativePaymentMethodErrorCell: UICollectionViewCell {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultStyle = POTextStyle(color: Asset.Colors.Text.error.color, typography: .bodySmall2)
+        static let defaultStyle = POInputFormStyle.default.error.description
     }
 
     // MARK: - Private Properties
