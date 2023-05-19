@@ -36,6 +36,60 @@ public struct POTypography {
 
 extension POTypography {
 
+    enum Fixed {
+
+        /// Use for captions, status labels and tags.
+        static let caption = POTypography(font: FontFamily.WorkSans.regular.font(size: 12), lineHeight: 16)
+
+        /// Use for captions, status labels and tags.
+        static let tag = POTypography(font: FontFamily.WorkSans.medium.font(size: 12), lineHeight: 16)
+
+        /// Use for buttons.
+        static let button = POTypography(font: FontFamily.WorkSans.medium.font(size: 14), lineHeight: 14)
+
+        /// Use in tables, when information density is important.
+        static let tabular = POTypography(font: FontFamily.WorkSans.regular.font(size: 14), lineHeight: 20)
+
+        /// Use for body copy on larger screens, or smaller blocks of text.
+        static let body = POTypography(font: FontFamily.WorkSans.regular.font(size: 16), lineHeight: 24)
+
+        /// Use for form components, error text and key value data.
+        static let label = POTypography(font: FontFamily.WorkSans.regular.font(size: 14), lineHeight: 18)
+
+        /// Use for form components, error text and key value data.
+        static let labelHeading = POTypography(font: FontFamily.WorkSans.medium.font(size: 14), lineHeight: 18)
+    }
+
+    enum Medium {
+
+        /// Use for section headings.
+        static let subtitle = POTypography(font: FontFamily.WorkSans.medium.font(size: 18), lineHeight: 24)
+
+        /// Use for page titles.
+        static let title = POTypography(font: FontFamily.WorkSans.medium.font(size: 20), lineHeight: 28)
+
+        /// Use for page headlines.
+        static let headline = POTypography(font: FontFamily.WorkSans.medium.font(size: 24), lineHeight: 32)
+
+        /// Use for display text
+        static let display = POTypography(font: FontFamily.WorkSans.medium.font(size: 36), lineHeight: 44)
+    }
+
+    enum Large {
+
+        /// Use for section headings.
+        static let subtitle = POTypography(font: FontFamily.WorkSans.medium.font(size: 20), lineHeight: 28)
+
+        /// Use for page titles.
+        static let title = POTypography(font: FontFamily.WorkSans.medium.font(size: 24), lineHeight: 32)
+
+        /// Use for page headlines.
+        static let headline = POTypography(font: FontFamily.WorkSans.medium.font(size: 32), lineHeight: 40)
+
+        /// Use for display text
+        static let display = POTypography(font: FontFamily.WorkSans.medium.font(size: 48), lineHeight: 48)
+    }
+
     // MARK: - Title
 
     /// Title/Title2
