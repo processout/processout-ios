@@ -11,31 +11,34 @@ import UIKit
 public struct PONativeAlternativePaymentMethodStyle {
 
     /// Title style.
-    public let title: POTextStyle?
+    public let title: POTextStyle
 
     /// Input style.
-    public let input: POInputFormStyle?
+    public let input: POInputFormStyle
 
     /// Input style.
-    public let codeInput: POInputFormStyle?
+    public let codeInput: POInputFormStyle
 
     /// Buttons style.
     public let buttons: PONativeAlternativePaymentMethodButtonsStyle
 
     /// Background color.
-    public let backgroundColor: UIColor?
+    public let backgroundColor: UIColor
 
     /// Activity indicator style.
-    public let activityIndicator: POActivityIndicatorStyle?
+    public let activityIndicator: POActivityIndicatorStyle
 
     /// Message style.
-    public let message: POTextStyle?
+    public let message: POTextStyle
 
     /// Success message style.
-    public let successMessage: POTextStyle?
+    public let successMessage: POTextStyle
 
     /// Background decoration style.
-    public let backgroundDecoration: POBackgroundDecorationStyle?
+    public let backgroundDecoration: POBackgroundDecorationStyle
+
+    /// Separator color.
+    public let separatorColor: UIColor
 
     public init(
         title: POTextStyle? = nil,
@@ -46,16 +49,20 @@ public struct PONativeAlternativePaymentMethodStyle {
         activityIndicator: POActivityIndicatorStyle? = nil,
         message: POTextStyle? = nil,
         successMessage: POTextStyle? = nil,
-        backgroundDecoration: POBackgroundDecorationStyle? = nil
+        backgroundDecoration: POBackgroundDecorationStyle? = nil,
+        separatorColor: UIColor? = nil
     ) {
-        self.title = title
-        self.input = input
-        self.codeInput = codeInput
+        self.title = title ?? POTextStyle(color: Asset.Colors.New.Text.primary.color, typography: .Medium.title)
+        self.input = input ?? .default
+        self.codeInput = codeInput ?? .code
         self.buttons = buttons ?? .init()
-        self.backgroundColor = backgroundColor
-        self.activityIndicator = activityIndicator
-        self.message = message
-        self.successMessage = successMessage
-        self.backgroundDecoration = backgroundDecoration
+        self.backgroundColor = backgroundColor ?? Asset.Colors.New.Surface.level1.color
+        self.activityIndicator = activityIndicator ?? .system(.whiteLarge, color: Asset.Colors.New.Text.secondary.color)
+        self.message = message ?? POTextStyle(color: Asset.Colors.New.Text.primary.color, typography: .Fixed.body)
+        self.successMessage = successMessage ?? POTextStyle(
+            color: Asset.Colors.New.Text.success.color, typography: .Fixed.body
+        )
+        self.backgroundDecoration = .default
+        self.separatorColor = separatorColor ?? Asset.Colors.New.Border.subtle.color
     }
 }

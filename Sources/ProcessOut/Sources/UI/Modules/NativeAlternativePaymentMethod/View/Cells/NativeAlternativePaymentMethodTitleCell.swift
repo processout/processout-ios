@@ -19,8 +19,7 @@ final class NativeAlternativePaymentMethodTitleCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.TitleItem, style: POTextStyle?) {
-        let style = style ?? Constants.defaultStyle
+    func configure(item: NativeAlternativePaymentMethodViewModelState.TitleItem, style: POTextStyle) {
         titleLabel.attributedText = AttributedStringBuilder()
             .typography(style.typography)
             .textStyle(textStyle: .largeTitle)
@@ -29,12 +28,6 @@ final class NativeAlternativePaymentMethodTitleCell: UICollectionViewCell {
             .textColor(style.color)
             .string(item.text)
             .build()
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let defaultStyle = POTextStyle(color: Asset.Colors.New.Text.primary.color, typography: .Medium.title)
     }
 
     // MARK: - Private Properties

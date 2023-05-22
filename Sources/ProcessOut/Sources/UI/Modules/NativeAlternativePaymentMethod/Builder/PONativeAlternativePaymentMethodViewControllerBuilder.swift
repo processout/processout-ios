@@ -65,7 +65,9 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         let viewModel = DefaultNativeAlternativePaymentMethodViewModel(
             interactor: interactor, configuration: configuration, completion: completion
         )
-        return NativeAlternativePaymentMethodViewController(viewModel: viewModel, style: style, logger: api.logger)
+        return NativeAlternativePaymentMethodViewController(
+            viewModel: viewModel, style: style ?? .init(), logger: api.logger
+        )
     }
 
     // MARK: -

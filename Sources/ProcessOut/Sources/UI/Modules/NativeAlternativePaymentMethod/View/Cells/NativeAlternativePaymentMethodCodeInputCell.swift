@@ -15,13 +15,9 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
         observations = []
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputFormStyle?) {
+    func configure(item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputFormStyle) {
         initialize(length: item.length)
-        let style = style ?? Constants.defaultStyle
-        codeTextField.configure(
-            style: item.value.isInvalid ? style.error.field : style.normal.field,
-            animated: false
-        )
+        codeTextField.configure(style: item.value.isInvalid ? style.error.field : style.normal.field, animated: false)
         if codeTextField.text != item.value.text {
             codeTextField.text = item.value.text
         }
@@ -42,7 +38,6 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultStyle = POInputFormStyle.code
         static let accessibilityIdentifier = "native-alternative-payment.code-input"
     }
 

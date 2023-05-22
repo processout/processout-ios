@@ -26,8 +26,7 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
         observations = []
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.InputItem, style: POInputFormStyle?) {
-        let style = style ?? Constants.defaultStyle
+    func configure(item: NativeAlternativePaymentMethodViewModelState.InputItem, style: POInputFormStyle) {
         textFieldContainer.configure(
             style: item.value.isInvalid ? style.error.field : style.normal.field,
             animated: false
@@ -55,7 +54,6 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultStyle = POInputFormStyle.default
         static let accessibilityIdentifier = "native-alternative-payment.generic-input"
     }
 

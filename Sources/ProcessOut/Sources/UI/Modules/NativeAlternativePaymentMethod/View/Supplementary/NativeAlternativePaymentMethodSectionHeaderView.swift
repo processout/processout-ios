@@ -19,8 +19,7 @@ final class NativeAlternativePaymentMethodSectionHeaderView: UICollectionReusabl
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.SectionIdentifier, style: POTextStyle?) {
-        let style = style ?? Constants.defaultStyle
+    func configure(item: NativeAlternativePaymentMethodViewModelState.SectionIdentifier, style: POTextStyle) {
         titleLabel.attributedText = AttributedStringBuilder()
             .typography(style.typography)
             .textStyle(textStyle: .title3)
@@ -28,12 +27,6 @@ final class NativeAlternativePaymentMethodSectionHeaderView: UICollectionReusabl
             .alignment(.natural)
             .string(item.title ?? "")
             .build()
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let defaultStyle = POInputFormStyle.default.normal.title
     }
 
     // MARK: - Private Properties

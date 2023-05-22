@@ -19,8 +19,7 @@ final class NativeAlternativePaymentMethodErrorCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.ErrorItem, style: POTextStyle?) {
-        let style = style ?? Constants.defaultStyle
+    func configure(item: NativeAlternativePaymentMethodViewModelState.ErrorItem, style: POTextStyle) {
         descriptionLabel.attributedText = AttributedStringBuilder()
             .typography(style.typography)
             .textStyle(textStyle: .body)
@@ -28,12 +27,6 @@ final class NativeAlternativePaymentMethodErrorCell: UICollectionViewCell {
             .alignment(.natural)
             .string(item.description)
             .build()
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let defaultStyle = POInputFormStyle.default.error.description
     }
 
     // MARK: - Private Properties

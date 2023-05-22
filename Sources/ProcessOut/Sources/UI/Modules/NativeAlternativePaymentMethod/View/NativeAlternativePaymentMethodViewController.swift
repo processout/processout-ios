@@ -14,7 +14,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
     NativeAlternativePaymentMethodCollectionLayoutDelegate,
     NativeAlternativePaymentMethodCellDelegate {
 
-    init(viewModel: ViewModel, style: PONativeAlternativePaymentMethodStyle?, logger: POLogger) {
+    init(viewModel: ViewModel, style: PONativeAlternativePaymentMethodStyle, logger: POLogger) {
         self.style = style
         self.logger = logger
         keyboardHeight = 0
@@ -31,7 +31,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
 
     override func loadView() {
         view = UIView()
-        view.backgroundColor = style?.backgroundColor ?? Constants.defaultBackgroundColor
+        view.backgroundColor = style.backgroundColor
         view.addSubview(collectionView)
         view.addSubview(collectionOverlayView)
         collectionOverlayView.addSubview(buttonsContainerView)
@@ -127,7 +127,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
                 viewType: NativeAlternativePaymentMethodTitleCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(item: item, style: self.style?.title)
+                    cell.configure(item: item, style: self.style.title)
                 }
             ).height
         case .error(let item):
@@ -135,7 +135,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
                 viewType: NativeAlternativePaymentMethodErrorCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(item: item, style: self.style?.input?.error.description)
+                    cell.configure(item: item, style: self.style.input.error.description)
                 }
             ).height
         case .submitted(let item):
@@ -145,7 +145,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
                 configure: { cell in
                     cell.configure(
                         item: item,
-                        style: .init(message: self.style?.message, successMessage: self.style?.successMessage)
+                        style: .init(message: self.style.message, successMessage: self.style.successMessage)
                     )
                 }
             ).height
@@ -171,7 +171,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             viewType: NativeAlternativePaymentMethodSectionHeaderView.self,
             preferredWidth: width,
             configure: { [self] view in
-                view.configure(item: sectionIdentifier, style: style?.input?.normal.title)
+                view.configure(item: sectionIdentifier, style: style.input.normal.title)
             }
         )
     }
@@ -233,7 +233,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
 
     // MARK: - Private Properties
 
-    private let style: PONativeAlternativePaymentMethodStyle?
+    private let style: PONativeAlternativePaymentMethodStyle
     private let logger: POLogger
 
     private lazy var collectionOverlayView: UIView = {
@@ -243,7 +243,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
     }()
 
     private lazy var buttonsContainerView = NativeAlternativePaymentMethodButtonsView(
-        style: style?.buttons ?? .init(), horizontalInset: Constants.contentInset.left
+        style: style.buttons, horizontalInset: Constants.contentInset.left
     )
 
     private lazy var collectionView: UICollectionView = {
@@ -384,37 +384,37 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         switch item {
         case .loader:
             let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodLoaderCell.self, for: indexPath)
-            cell.initialize(style: style?.activityIndicator)
+            cell.initialize(style: style.activityIndicator)
             return cell
         case .title(let item):
             let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodTitleCell.self, for: indexPath)
-            cell.configure(item: item, style: style?.title)
+            cell.configure(item: item, style: style.title)
             return cell
         case .input(let item):
             let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodInputCell.self, for: indexPath)
-            cell.configure(item: item, style: style?.input)
+            cell.configure(item: item, style: style.input)
             cell.delegate = self
             return cell
         case .codeInput(let item):
             let cell = collectionView.dequeueReusableCell(
                 NativeAlternativePaymentMethodCodeInputCell.self, for: indexPath
             )
-            cell.configure(item: item, style: style?.codeInput)
+            cell.configure(item: item, style: style.codeInput)
             cell.delegate = self
             return cell
         case .error(let item):
             let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodErrorCell.self, for: indexPath)
-            cell.configure(item: item, style: style?.input?.error.description)
+            cell.configure(item: item, style: style.input.error.description)
             return cell
         case .submitted(let item):
             let cell = collectionView.dequeueReusableCell(
                 NativeAlternativePaymentMethodSubmittedCell.self, for: indexPath
             )
-            cell.configure(item: item, style: .init(message: style?.message, successMessage: style?.successMessage))
+            cell.configure(item: item, style: .init(message: style.message, successMessage: style.successMessage))
             return cell
         case .picker(let item):
             let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodPickerCell.self, for: indexPath)
-            cell.configure(item: item, style: style?.input)
+            cell.configure(item: item, style: style.input)
             return cell
         }
     }
@@ -431,19 +431,19 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             let view = collectionView.dequeueReusableSupplementaryView(
                 NativeAlternativePaymentMethodSectionDecorationView.self, kind: kind, indexPath: indexPath
             )
-            view.configure(item: decoration, style: style?.backgroundDecoration)
+            view.configure(item: decoration, style: style.backgroundDecoration)
             return view
         case NativeAlternativePaymentMethodCollectionLayout.elementKindSeparator:
             let view = collectionView.dequeueReusableSupplementaryView(
                 NativeAlternativePaymentMethodSeparatorView.self, kind: kind, indexPath: indexPath
             )
-            view.configure(color: nil) // todo(andrii-vysotskyi): pass customized color if any
+            view.configure(color: style.separatorColor)
             return view
         case UICollectionView.elementKindSectionHeader:
             let view = collectionView.dequeueReusableSupplementaryView(
                 NativeAlternativePaymentMethodSectionHeaderView.self, kind: kind, indexPath: indexPath
             )
-            view.configure(item: sectionIdentifier, style: style?.input?.normal.title)
+            view.configure(item: sectionIdentifier, style: style.input.normal.title)
             return view
         default:
             return nil
@@ -511,7 +511,6 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
 }
 
 private enum Constants {
-    static let defaultBackgroundColor = Asset.Colors.New.Surface.level1.color
     static let animationDuration: TimeInterval = 0.25
     static let lineSpacing: CGFloat = 8
     static let sectionInset = UIEdgeInsets(top: 8, left: 0, bottom: 32, right: 0)

@@ -21,15 +21,10 @@ final class NativeAlternativePaymentMethodSectionDecorationView: UICollectionReu
     }
 
     func configure(
-        item: NativeAlternativePaymentMethodViewModelState.SectionDecoration, style: POBackgroundDecorationStyle?
+        item: NativeAlternativePaymentMethodViewModelState.SectionDecoration,
+        style: POBackgroundDecorationStyle
     ) {
-        decorationView.configure(isSuccess: item == .success, style: style ?? Constants.defaultStyle)
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let defaultStyle = POBackgroundDecorationStyle.default
+        decorationView.configure(isSuccess: item == .success, style: style)
     }
 
     // MARK: - Private Properties
