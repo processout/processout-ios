@@ -64,8 +64,8 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
         codeTextField.addTarget(self, action: #selector(textFieldEditingChanged), for: .editingChanged)
         contentView.addSubview(codeTextField)
         let constraints = [
-            codeTextField.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor),
-            codeTextField.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            codeTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            codeTextField.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor),
             codeTextField.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
