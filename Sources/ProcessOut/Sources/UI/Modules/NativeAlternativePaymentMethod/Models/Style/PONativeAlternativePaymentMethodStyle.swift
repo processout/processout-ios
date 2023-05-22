@@ -19,14 +19,8 @@ public struct PONativeAlternativePaymentMethodStyle {
     /// Input style.
     public let codeInput: POInputFormStyle?
 
-    /// Style for primary button.
-    public let primaryButton: POButtonStyle?
-
-    /// Style for secondary button.
-    public let secondaryButton: POButtonStyle?
-
-    /// Style that is applied to buttons container when it overlaps primary content.
-    public let buttonsContainerShadow: POShadowStyle?
+    /// Buttons style.
+    public let buttons: PONativeAlternativePaymentMethodButtonsStyle
 
     /// Background color.
     public let backgroundColor: UIColor?
@@ -47,9 +41,7 @@ public struct PONativeAlternativePaymentMethodStyle {
         title: POTextStyle? = nil,
         input: POInputFormStyle? = nil,
         codeInput: POInputFormStyle? = nil,
-        primaryButton: POButtonStyle? = nil,
-        secondaryButton: POButtonStyle? = nil,
-        buttonsContainerShadow: POShadowStyle? = nil,
+        buttons: PONativeAlternativePaymentMethodButtonsStyle? = nil,
         backgroundColor: UIColor? = nil,
         activityIndicator: POActivityIndicatorStyle? = nil,
         message: POTextStyle? = nil,
@@ -59,9 +51,7 @@ public struct PONativeAlternativePaymentMethodStyle {
         self.title = title
         self.input = input
         self.codeInput = codeInput
-        self.primaryButton = primaryButton
-        self.secondaryButton = secondaryButton
-        self.buttonsContainerShadow = buttonsContainerShadow
+        self.buttons = buttons ?? .init()
         self.backgroundColor = backgroundColor
         self.activityIndicator = activityIndicator
         self.message = message
