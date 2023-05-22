@@ -63,9 +63,11 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultMessageStyle = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .headline)
+        static let defaultMessageStyle = POTextStyle(
+            color: Asset.Colors.New.Text.primary.color, typography: .Fixed.body
+        )
         static let defaultSuccessMessageStyle = POTextStyle(
-            color: Asset.Colors.Text.success.color, typography: .headline
+            color: Asset.Colors.New.Text.success.color, typography: .Fixed.body
         )
         static let maximumLogoImageHeight: CGFloat = 32
         static let maximumDecorationImageHeight: CGFloat = 260

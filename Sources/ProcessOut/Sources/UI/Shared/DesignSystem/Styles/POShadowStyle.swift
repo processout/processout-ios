@@ -31,12 +31,6 @@ extension POShadowStyle {
     /// Value represents no shadow.
     public static let clear = Self(color: .clear, offset: .zero, radius: 0)
 
-    static let `default` = POShadowStyle(
-        color: Asset.Colors.Text.primary.color.withAlphaComponent(0.1),
-        offset: CGSize(width: 0, height: 8),
-        radius: 24
-    )
-
     static let level1 = POShadowStyle(
         color: shadowColor, offset: CGSize(width: 0, height: 4), radius: 16
     )
