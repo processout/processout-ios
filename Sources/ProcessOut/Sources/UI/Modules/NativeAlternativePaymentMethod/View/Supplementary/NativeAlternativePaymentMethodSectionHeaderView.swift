@@ -23,9 +23,9 @@ final class NativeAlternativePaymentMethodSectionHeaderView: UICollectionReusabl
         let style = style ?? Constants.defaultStyle
         titleLabel.attributedText = AttributedStringBuilder()
             .typography(style.typography)
-            .textStyle(textStyle: .body)
+            .textStyle(textStyle: .title3)
             .textColor(style.color)
-            .alignment(.center)
+            .alignment(.natural)
             .string(item.title ?? "")
             .build()
     }
