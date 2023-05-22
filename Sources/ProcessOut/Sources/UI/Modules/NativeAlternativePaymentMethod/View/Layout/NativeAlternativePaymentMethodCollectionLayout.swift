@@ -44,6 +44,7 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
         super.prepare()
         prepareCentering()
         prepareSectionBackgroundAttributes()
+        prepareCellSeparatorAttributes()
     }
 
     override var collectionViewContentSize: CGSize {
@@ -92,6 +93,7 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
 
     private enum Constants {
         static let additionalSectionBackgroundBottomOffset: CGFloat = 160
+        static let separatorHeight: CGFloat = 1
     }
 
     private struct LayoutAttributesKey: Hashable {
@@ -199,10 +201,61 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
         )
         layoutAttributes[layoutAttributesKey] = attributes
     }
+
+    // MARK: - Cell Separators
+
+    private func prepareCellSeparatorAttributes() {
+        for section in stride(from: 0, to: collectionView().numberOfSections, by: 1) {
+            let numberOfItems = collectionView().numberOfItems(inSection: section)
+            for row in stride(from: 0, to: numberOfItems, by: 1) {
+                let indexPath = IndexPath(row: row, section: section)
+                guard delegate().collectionViewLayout(self, shouldSeparateCellAt: indexPath) else {
+                    continue
+                }
+                let verticalOffset: CGFloat
+                if row == numberOfItems - 1 {
+                    let inset = delegate().collectionView?(collectionView(), layout: self, insetForSectionAt: section)
+                    verticalOffset = (inset ?? sectionInset).bottom / 2
+                } else {
+                    let spacing = delegate().collectionView?(
+                        collectionView(), layout: self, minimumLineSpacingForSectionAt: section
+                    ) ?? minimumLineSpacing
+                    verticalOffset = spacing / 2
+                }
+                prepareCellSeparatorAttributes(at: indexPath, verticalOffset: verticalOffset)
+            }
+        }
+    }
+
+    private func prepareCellSeparatorAttributes(at indexPath: IndexPath, verticalOffset: CGFloat) {
+        guard let cellAttributes = layoutAttributesForItem(at: indexPath) else {
+            assertionFailure("Can't find attributes for item.")
+            return
+        }
+        let attributes = UICollectionViewLayoutAttributes(
+            forSupplementaryViewOfKind: Self.elementKindSeparator, with: indexPath
+        )
+        attributes.frame = CGRect(
+            x: -collectionView().adjustedContentInset.left,
+            y: cellAttributes.frame.maxY - Constants.separatorHeight + verticalOffset,
+            width: collectionView().bounds.width,
+            height: Constants.separatorHeight
+        )
+        attributes.zIndex = 1
+        let layoutAttributesKey = LayoutAttributesKey(
+            indexPath: attributes.indexPath,
+            category: attributes.representedElementCategory,
+            kind: attributes.representedElementKind
+        )
+        layoutAttributes[layoutAttributesKey] = attributes
+    }
 }
 
 extension NativeAlternativePaymentMethodCollectionLayout {
 
     /// Section background element kind.
     static let elementKindSectionBackground = "ElementKindSectionBackground"
+
+    /// Section background element kind.
+    static let elementKindSeparator = "ElementKindSeparator"
 }
