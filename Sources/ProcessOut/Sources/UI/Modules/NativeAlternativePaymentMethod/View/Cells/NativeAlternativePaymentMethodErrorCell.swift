@@ -23,9 +23,9 @@ final class NativeAlternativePaymentMethodErrorCell: UICollectionViewCell {
         let style = style ?? Constants.defaultStyle
         descriptionLabel.attributedText = AttributedStringBuilder()
             .typography(style.typography)
-            .textStyle(textStyle: .footnote)
+            .textStyle(textStyle: .body)
             .textColor(style.color)
-            .alignment(.center)
+            .alignment(.natural)
             .string(item.description)
             .build()
     }
