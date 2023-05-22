@@ -57,7 +57,7 @@ extension POInputFormStyle {
                 text: .init(color: Asset.Colors.New.Text.primary.color, typography: fieldTypography),
                 placeholder: .init(color: Asset.Colors.New.Text.muted.color, typography: fieldTypography),
                 backgroundColor: Asset.Colors.New.Surface.background.color,
-                border: .init(radius: 8, width: 1, color: Asset.Colors.New.Text.error.color),
+                border: .regular(radius: 8, color: Asset.Colors.New.Text.error.color),
                 shadow: .clear,
                 tintColor: Asset.Colors.New.Text.error.color
             ),

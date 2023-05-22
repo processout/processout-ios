@@ -44,8 +44,8 @@ final class TextFieldContainerView: UIView {
 
     private enum Constants {
         static let animationDuration: TimeInterval = 0.35
-        static let maximumFontSize: CGFloat = 30
-        static let height: CGFloat = 48
+        static let maximumFontSize: CGFloat = 22
+        static let height: CGFloat = 40
         static let horizontalInset: CGFloat = 12
     }
 
