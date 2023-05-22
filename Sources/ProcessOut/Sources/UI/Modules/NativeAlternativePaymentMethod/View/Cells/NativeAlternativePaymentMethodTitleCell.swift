@@ -23,8 +23,8 @@ final class NativeAlternativePaymentMethodTitleCell: UICollectionViewCell {
         let style = style ?? Constants.defaultStyle
         titleLabel.attributedText = AttributedStringBuilder()
             .typography(style.typography)
-            .textStyle(textStyle: .title1)
-            .alignment(.center)
+            .textStyle(textStyle: .largeTitle)
+            .alignment(.natural)
             .lineBreakMode(.byWordWrapping)
             .textColor(style.color)
             .string(item.text)
@@ -34,7 +34,7 @@ final class NativeAlternativePaymentMethodTitleCell: UICollectionViewCell {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultStyle = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .title)
+        static let defaultStyle = POTextStyle(color: Asset.Colors.New.Text.primary.color, typography: .Medium.title)
     }
 
     // MARK: - Private Properties
