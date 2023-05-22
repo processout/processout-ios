@@ -193,7 +193,7 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
             width: collectionView().bounds.width,
             height: height
         )
-        attributes.zIndex = -1
+        attributes.zIndex = -2
         let layoutAttributesKey = LayoutAttributesKey(
             indexPath: attributes.indexPath,
             category: attributes.representedElementCategory,
@@ -241,7 +241,7 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
             width: collectionView().bounds.width,
             height: Constants.separatorHeight
         )
-        attributes.zIndex = 1
+        attributes.zIndex = -1
         let layoutAttributesKey = LayoutAttributesKey(
             indexPath: attributes.indexPath,
             category: attributes.representedElementCategory,
