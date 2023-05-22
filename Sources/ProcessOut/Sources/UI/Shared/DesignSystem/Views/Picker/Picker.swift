@@ -62,9 +62,9 @@ final class Picker: UIControl {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let height: CGFloat = 48
+        static let height: CGFloat = 40
         static let horizontalInset: CGFloat = 12
-        static let maximumFontSize: CGFloat = 32
+        static let maximumFontSize: CGFloat = 22
         static let animationDuration: TimeInterval = 0.25
     }
 
