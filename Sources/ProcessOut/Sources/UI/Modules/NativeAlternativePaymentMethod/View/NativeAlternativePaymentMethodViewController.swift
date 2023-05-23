@@ -86,7 +86,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         for (section, sectionId) in snapshot.sectionIdentifiers.enumerated() {
             for item in snapshot.itemIdentifiers(inSection: sectionId) {
                 switch item {
-                case .loader:
+                case .loader, .codeInput, .input, .picker:
                     return section
                 default:
                     break
@@ -516,7 +516,7 @@ private enum Constants {
     static let sectionInset = UIEdgeInsets(top: 8, left: 0, bottom: 32, right: 0)
     static let contentInset = UIEdgeInsets(top: 24, left: 24, bottom: 24, right: 24)
     static let inputHeight: CGFloat = 40
-    static let loaderHeight: CGFloat = 128
+    static let loaderHeight: CGFloat = 128 // todo(andrii-vysotskyi): revise loader height
 }
 
 // swiftlint:enable type_body_length file_length
