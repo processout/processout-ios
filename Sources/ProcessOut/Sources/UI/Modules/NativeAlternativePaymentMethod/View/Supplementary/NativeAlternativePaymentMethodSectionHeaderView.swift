@@ -19,13 +19,13 @@ final class NativeAlternativePaymentMethodSectionHeaderView: UICollectionReusabl
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.SectionIdentifier, style: POTextStyle) {
+    func configure(item: NativeAlternativePaymentMethodViewModelState.SectionHeader, style: POTextStyle) {
         titleLabel.attributedText = AttributedStringBuilder()
             .typography(style.typography)
             .textStyle(textStyle: .title3)
             .textColor(style.color)
-            .alignment(.natural)
-            .string(item.title ?? "")
+            .alignment(item.isCentered ? .center : .natural)
+            .string(item.title)
             .build()
     }
 

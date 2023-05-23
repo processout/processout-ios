@@ -64,6 +64,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Value details.
         let value: InputValue
+
+        /// Indicates whether input should be centered.
+        let isCentered: Bool
     }
 
     struct InputItem: Hashable {
@@ -119,13 +122,22 @@ enum NativeAlternativePaymentMethodViewModelState {
         case normal, success
     }
 
+    struct SectionHeader: Hashable {
+
+        /// Section title if any.
+        let title: String
+
+        /// Indicates whether section header should be centered.
+        let isCentered: Bool
+    }
+
     struct SectionIdentifier: Hashable {
 
         /// Section id.
         let id: String?
 
-        /// Section title if any.
-        let title: String?
+        /// Section header if any.
+        let header: SectionHeader?
 
         /// Section decoration.
         let decoration: SectionDecoration?

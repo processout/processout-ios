@@ -23,6 +23,7 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
         }
         codeTextField.keyboardType = .numberPad
         codeTextField.textContentType = .oneTimeCode
+        codeTextFieldCenterXConstraint.isActive = item.isCentered
         observeChanges(item: item, style: style)
         self.item = item
     }
@@ -43,7 +44,11 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
 
     // MARK: - Private Properties
 
-    private var codeTextField: CodeTextField! // swiftlint:disable:this implicitly_unwrapped_optional
+    // swiftlint:disable implicitly_unwrapped_optional
+    private var codeTextField: CodeTextField!
+    private var codeTextFieldCenterXConstraint: NSLayoutConstraint!
+    // swiftlint:enable implicitly_unwrapped_optional
+
     private var item: NativeAlternativePaymentMethodViewModelState.CodeInputItem?
     private var observations: [AnyObject] = []
 
@@ -60,12 +65,14 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
         codeTextField.addTarget(self, action: #selector(textFieldEditingChanged), for: .editingChanged)
         contentView.addSubview(codeTextField)
         let constraints = [
-            codeTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            codeTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).with(priority: .defaultHigh),
             codeTextField.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor),
             codeTextField.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
         self.codeTextField = codeTextField
+        // Center constraint is disabled by default
+        self.codeTextFieldCenterXConstraint = codeTextField.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
     }
 
     @objc

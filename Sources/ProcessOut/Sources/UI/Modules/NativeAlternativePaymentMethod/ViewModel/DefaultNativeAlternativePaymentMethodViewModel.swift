@@ -102,7 +102,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     private func configureWithStartingState() {
         let sections = [
-            State.Section(id: .init(id: nil, title: nil, decoration: .normal), items: [.loader])
+            State.Section(id: .init(id: nil, header: nil, decoration: .normal), items: [.loader])
         ]
         let startedState = State.Started(
             sections: sections, actions: .init(primary: nil, secondary: nil), isEditingAllowed: false
@@ -115,23 +115,31 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             text: configuration.title ?? Text.title(startedState.gatewayDisplayName)
         )
         var sections = [
-            State.Section(id: .init(id: nil, title: nil, decoration: nil), items: [.title(titleItem)])
+            State.Section(id: .init(id: nil, header: nil, decoration: nil), items: [.title(titleItem)])
         ]
         for (offset, parameter) in startedState.parameters.enumerated() {
             let value = startedState.values[parameter.key] ?? .init(value: nil, recentErrorMessage: nil)
-            var items = [
-                createItem(
-                    parameter: parameter,
-                    value: value,
-                    isEditingAllowed: !isSubmitting,
-                    isLast: offset == startedState.parameters.indices.last
-                )
-            ]
+            let shouldCenterCodeInput = startedState.parameters.count == 1
+            let parameterItem = createItem(
+                parameter: parameter,
+                value: value,
+                isEditingAllowed: !isSubmitting,
+                isLast: offset == startedState.parameters.indices.last,
+                shouldCenterCodeInput: shouldCenterCodeInput
+            )
+            var items = [parameterItem]
             if let message = value.recentErrorMessage {
                 items.append(.error(State.ErrorItem(description: message)))
             }
+            var isCodeInputItem = false
+            if case .codeInput = parameterItem {
+                isCodeInputItem = true
+            }
+            let sectionHeader = State.SectionHeader(
+                title: parameter.displayName, isCentered: isCodeInputItem && shouldCenterCodeInput
+            )
             let section = State.Section(
-                id: .init(id: parameter.key, title: parameter.displayName, decoration: nil), items: items
+                id: .init(id: parameter.key, header: sectionHeader, decoration: nil), items: items
             )
             sections.append(section)
         }
@@ -168,7 +176,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         )
         let startedState = State.Started(
             sections: [
-                .init(id: .init(id: nil, title: nil, decoration: .normal), items: [item])
+                .init(id: .init(id: nil, header: nil, decoration: .normal), items: [item])
             ],
             actions: .init(primary: nil, secondary: secondaryAction),
             isEditingAllowed: false
@@ -195,7 +203,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             )
             let startedState = State.Started(
                 sections: [
-                    .init(id: .init(id: nil, title: nil, decoration: .success), items: [.submitted(submittedItem)])
+                    .init(id: .init(id: nil, header: nil, decoration: .success), items: [.submitted(submittedItem)])
                 ],
                 actions: .init(primary: nil, secondary: nil),
                 isEditingAllowed: false
@@ -253,7 +261,8 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         parameter: PONativeAlternativePaymentMethodParameter,
         value parameterValue: InteractorState.ParameterValue,
         isEditingAllowed: Bool,
-        isLast: Bool
+        isLast: Bool,
+        shouldCenterCodeInput: Bool
     ) -> State.Item {
         let inputValue: State.InputValue
         if let value = inputValuesCache[parameter.key] {
@@ -275,8 +284,10 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         }
         switch parameter.type {
         case .numeric where (parameter.length ?? .max) <= Constants.maximumCodeLength:
-            // swiftlint:disable:next force_unwrapping
-            let inputItem = State.CodeInputItem(length: parameter.length!, value: inputValue)
+            let inputItem = State.CodeInputItem(
+                // swiftlint:disable:next force_unwrapping
+                length: parameter.length!, value: inputValue, isCentered: shouldCenterCodeInput
+            )
             return .codeInput(inputItem)
         case .singleSelect:
             return createPickerItem(parameter: parameter, value: inputValue)

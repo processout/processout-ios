@@ -163,7 +163,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         referenceSizeForHeaderInSection section: Int
     ) -> CGSize {
         let sectionIdentifier = collectionViewDataSource.snapshot().sectionIdentifiers[section]
-        guard sectionIdentifier.title != nil else {
+        guard let sectionHeader = sectionIdentifier.header else {
             return .zero
         }
         let width = collectionView.bounds.inset(by: collectionView.adjustedContentInset).width
@@ -171,7 +171,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             viewType: NativeAlternativePaymentMethodSectionHeaderView.self,
             preferredWidth: width,
             configure: { [self] view in
-                view.configure(item: sectionIdentifier, style: style.input.normal.title)
+                view.configure(item: sectionHeader, style: style.input.normal.title)
             }
         )
     }
@@ -183,7 +183,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
     ) -> UIEdgeInsets {
         let snapshot = collectionViewDataSource.snapshot()
         var sectionInset = Constants.sectionInset
-        if snapshot.sectionIdentifiers[section].title == nil {
+        if snapshot.sectionIdentifiers[section].header == nil {
             // Top inset purpose is to add spacing between header and items,
             // for sections without header instead is 0
             sectionInset.top = 0
@@ -440,10 +440,13 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             view.configure(color: style.separatorColor)
             return view
         case UICollectionView.elementKindSectionHeader:
+            guard let sectionHeader = sectionIdentifier.header else {
+                return nil
+            }
             let view = collectionView.dequeueReusableSupplementaryView(
                 NativeAlternativePaymentMethodSectionHeaderView.self, kind: kind, indexPath: indexPath
             )
-            view.configure(item: sectionIdentifier, style: style.input.normal.title)
+            view.configure(item: sectionHeader, style: style.input.normal.title)
             return view
         default:
             return nil
