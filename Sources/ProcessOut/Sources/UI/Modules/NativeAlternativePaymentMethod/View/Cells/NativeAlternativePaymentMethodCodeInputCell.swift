@@ -55,9 +55,10 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
     // MARK: - Private Methods
 
     private func initialize(length: Int) {
-        if let item, item.length != length {
-            codeTextField.removeFromSuperview()
+        if let codeTextField, codeTextField.length == length {
+            return
         }
+        codeTextField?.removeFromSuperview()
         let codeTextField = CodeTextField(length: length)
         codeTextField.accessibilityIdentifier = Constants.accessibilityIdentifier
         codeTextField.delegate = self
