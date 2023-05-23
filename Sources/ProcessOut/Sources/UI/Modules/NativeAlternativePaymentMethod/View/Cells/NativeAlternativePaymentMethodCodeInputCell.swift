@@ -11,6 +11,7 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        item = nil
         observations = []
     }
 
@@ -54,7 +55,7 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
     // MARK: - Private Methods
 
     private func initialize(length: Int) {
-        if let item, item.length == length {
+        if let codeTextField, codeTextField.length == length {
             return
         }
         codeTextField?.removeFromSuperview()

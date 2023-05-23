@@ -28,6 +28,9 @@ final class CodeTextField: UIControl, UITextInput {
         fatalError("init(coder:) has not been implemented")
     }
 
+    /// Text field length.
+    let length: Int
+
     weak var delegate: CodeTextFieldDelegate?
 
     var text: String? {
@@ -340,8 +343,6 @@ final class CodeTextField: UIControl, UITextInput {
     }
 
     // MARK: - Private Properties
-
-    private let length: Int
 
     private lazy var contentView: UIView = {
         let view = UIView()
