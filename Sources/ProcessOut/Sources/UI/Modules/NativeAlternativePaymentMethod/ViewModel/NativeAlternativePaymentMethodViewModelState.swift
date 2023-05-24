@@ -118,10 +118,6 @@ enum NativeAlternativePaymentMethodViewModelState {
         case submitted(SubmittedItem)
     }
 
-    enum SectionDecoration {
-        case normal, success
-    }
-
     struct SectionHeader: Hashable {
 
         /// Section title if any.
@@ -138,9 +134,6 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Section header if any.
         let header: SectionHeader?
-
-        /// Section decoration.
-        let decoration: SectionDecoration?
     }
 
     struct Section {
@@ -186,6 +179,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Boolean value indicating whether editing is allowed.
         let isEditingAllowed: Bool
+
+        /// Boolean value that indicates whether payment is already captured.
+        let isCaptured: Bool
     }
 
     case idle, started(Started)

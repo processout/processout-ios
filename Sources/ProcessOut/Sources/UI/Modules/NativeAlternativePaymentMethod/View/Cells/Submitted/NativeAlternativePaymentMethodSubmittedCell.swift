@@ -48,6 +48,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
             .build()
         if let image = item.image {
             decorationImageView.image = image
+            decorationImageView.tintColor = descriptionStyle.color
             decorationImageView.setAspectRatio(image.size.width / image.size.height)
             decorationImageViewWidthConstraint.constant = image.size.width
             decorationImageView.setHidden(false)
@@ -113,7 +114,8 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
     // MARK: - Private Methods
 
     private func commonInit() {
-        // adjust top and bottom spacing (take into account that there is already spacing added by collection
+        // todo(andrii-vysotskyi): adjust top and bottom spacing (take into account that
+        // there is already spacing added by collection
         contentView.addSubview(containerView)
         let constraints = [
             containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.topContentInset),

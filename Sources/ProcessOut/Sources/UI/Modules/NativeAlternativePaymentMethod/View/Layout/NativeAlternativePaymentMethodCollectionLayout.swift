@@ -43,7 +43,6 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
     override func prepare() {
         super.prepare()
         prepareCentering()
-        prepareSectionBackgroundAttributes()
         prepareCellSeparatorAttributes()
     }
 
@@ -157,51 +156,6 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
         return attributesCopy
     }
 
-    // MARK: - Section Background
-
-    private func prepareSectionBackgroundAttributes() {
-        let numberOfSections = collectionView().numberOfSections
-        guard numberOfSections != 0 else {
-            return
-        }
-        // swiftlint:disable:next line_length
-        for section in 0 ..< numberOfSections where delegate().collectionViewLayout(self, shouldDecorateSectionAt: section) {
-            let numberOfItemsInSection = collectionView().numberOfItems(inSection: section)
-            guard numberOfItemsInSection > 0 else {
-                assertionFailure("Attempted to decorate empty section which is not supported.")
-                continue
-            }
-            let lastItemIndexPath = IndexPath(row: numberOfItemsInSection - 1, section: section)
-            guard let lastItemAttributes = layoutAttributesForItem(at: lastItemIndexPath) else {
-                assertionFailure("Can't find attributes for last item in section.")
-                continue
-            }
-            let height = lastItemAttributes.frame.maxY
-                + collectionView().adjustedContentInset.top
-                + Constants.additionalSectionBackgroundBottomOffset
-            prepareSectionBackgroundAttributes(at: section, height: height)
-        }
-    }
-
-    private func prepareSectionBackgroundAttributes(at index: Int, height: CGFloat) {
-        let attributes = UICollectionViewLayoutAttributes(
-            forSupplementaryViewOfKind: Self.elementKindSectionBackground, with: IndexPath(row: 0, section: index)
-        )
-        attributes.frame = CGRect(
-            x: -collectionView().adjustedContentInset.left,
-            y: -collectionView().adjustedContentInset.top,
-            width: collectionView().bounds.width,
-            height: height
-        )
-        attributes.zIndex = -2
-        let layoutAttributesKey = LayoutAttributesKey(
-            indexPath: attributes.indexPath,
-            category: attributes.representedElementCategory,
-            kind: attributes.representedElementKind
-        )
-        layoutAttributes[layoutAttributesKey] = attributes
-    }
-
     // MARK: - Cell Separators
 
     private func prepareCellSeparatorAttributes() {
@@ -252,9 +206,6 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
 }
 
 extension NativeAlternativePaymentMethodCollectionLayout {
-
-    /// Section background element kind.
-    static let elementKindSectionBackground = "ElementKindSectionBackground"
 
     /// Section background element kind.
     static let elementKindSeparator = "ElementKindSeparator"

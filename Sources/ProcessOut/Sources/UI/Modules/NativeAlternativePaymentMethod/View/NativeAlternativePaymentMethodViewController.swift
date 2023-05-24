@@ -31,7 +31,6 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
 
     override func loadView() {
         view = UIView()
-        view.backgroundColor = style.backgroundColor
         view.addSubview(collectionView)
         view.addSubview(collectionOverlayView)
         collectionOverlayView.addSubview(buttonsContainerView)
@@ -94,10 +93,6 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             }
         }
         return nil
-    }
-
-    func collectionViewLayout(_ layout: UICollectionViewLayout, shouldDecorateSectionAt index: Int) -> Bool {
-        collectionViewDataSource.sectionIdentifier(for: index)?.decoration != nil
     }
 
     func collectionViewLayout(_ layout: UICollectionViewLayout, shouldSeparateCellAt indexPath: IndexPath) -> Bool {
@@ -286,6 +281,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         buttonsContainerView.configure(actions: .init(primary: nil, secondary: nil), animated: false)
         let snapshot = DiffableDataSourceSnapshot<SectionIdentifier, ItemIdentifier>()
         collectionViewDataSource.applySnapshotUsingReloadData(snapshot)
+        view.backgroundColor = style.background.regular
     }
 
     /// - Parameters:
@@ -305,6 +301,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             self?.updateFirstResponder()
         }
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
+            view.backgroundColor = state.isCaptured ? style.background.success : style.background.regular
             buttonsContainerView.configure(actions: state.actions, animated: animated)
             collectionOverlayView.layoutIfNeeded()
         }
@@ -364,10 +361,6 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             NativeAlternativePaymentMethodSectionHeaderView.self, kind: UICollectionView.elementKindSectionHeader
         )
         collectionView.registerSupplementaryView(
-            NativeAlternativePaymentMethodSectionDecorationView.self,
-            kind: NativeAlternativePaymentMethodCollectionLayout.elementKindSectionBackground
-        )
-        collectionView.registerSupplementaryView(
             NativeAlternativePaymentMethodSeparatorView.self,
             kind: NativeAlternativePaymentMethodCollectionLayout.elementKindSeparator
         )
@@ -424,15 +417,6 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             return nil
         }
         switch kind {
-        case NativeAlternativePaymentMethodCollectionLayout.elementKindSectionBackground:
-            guard let decoration = sectionIdentifier.decoration else {
-                return nil
-            }
-            let view = collectionView.dequeueReusableSupplementaryView(
-                NativeAlternativePaymentMethodSectionDecorationView.self, kind: kind, indexPath: indexPath
-            )
-            view.configure(item: decoration, style: style.backgroundDecoration)
-            return view
         case NativeAlternativePaymentMethodCollectionLayout.elementKindSeparator:
             let view = collectionView.dequeueReusableSupplementaryView(
                 NativeAlternativePaymentMethodSeparatorView.self, kind: kind, indexPath: indexPath

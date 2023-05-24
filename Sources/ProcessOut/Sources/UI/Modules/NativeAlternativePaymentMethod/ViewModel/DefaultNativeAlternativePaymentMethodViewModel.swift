@@ -102,10 +102,13 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     private func configureWithStartingState() {
         let sections = [
-            State.Section(id: .init(id: nil, header: nil, decoration: .normal), items: [.loader])
+            State.Section(id: .init(id: nil, header: nil), items: [.loader])
         ]
         let startedState = State.Started(
-            sections: sections, actions: .init(primary: nil, secondary: nil), isEditingAllowed: false
+            sections: sections,
+            actions: .init(primary: nil, secondary: nil),
+            isEditingAllowed: false,
+            isCaptured: false
         )
         state = .started(startedState)
     }
@@ -115,7 +118,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             text: configuration.title ?? Text.title(startedState.gatewayDisplayName)
         )
         var sections = [
-            State.Section(id: .init(id: nil, header: nil, decoration: nil), items: [.title(titleItem)])
+            State.Section(id: .init(id: nil, header: nil), items: [.title(titleItem)])
         ]
         for (offset, parameter) in startedState.parameters.enumerated() {
             let value = startedState.values[parameter.key] ?? .init(value: nil, recentErrorMessage: nil)
@@ -139,7 +142,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 title: parameter.displayName, isCentered: isCodeInputItem && shouldCenterCodeInput
             )
             let section = State.Section(
-                id: .init(id: parameter.key, header: sectionHeader, decoration: nil), items: items
+                id: .init(id: parameter.key, header: sectionHeader), items: items
             )
             sections.append(section)
         }
@@ -152,7 +155,8 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                     isEnabled: !isSubmitting && !isPaymentCancelDisabled
                 )
             ),
-            isEditingAllowed: !isSubmitting
+            isEditingAllowed: !isSubmitting,
+            isCaptured: false
         )
         return .started(startedState)
     }
@@ -176,10 +180,11 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         )
         let startedState = State.Started(
             sections: [
-                .init(id: .init(id: nil, header: nil, decoration: .normal), items: [item])
+                .init(id: .init(id: nil, header: nil), items: [item])
             ],
             actions: .init(primary: nil, secondary: secondaryAction),
-            isEditingAllowed: false
+            isEditingAllowed: false,
+            isCaptured: false
         )
         return .started(startedState)
     }
@@ -203,10 +208,11 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             )
             let startedState = State.Started(
                 sections: [
-                    .init(id: .init(id: nil, header: nil, decoration: .success), items: [.submitted(submittedItem)])
+                    .init(id: .init(id: nil, header: nil), items: [.submitted(submittedItem)])
                 ],
                 actions: .init(primary: nil, secondary: nil),
-                isEditingAllowed: false
+                isEditingAllowed: false,
+                isCaptured: true
             )
             state = .started(startedState)
         }
