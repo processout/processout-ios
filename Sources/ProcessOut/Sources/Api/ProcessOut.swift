@@ -47,11 +47,6 @@ public final class ProcessOut {
         return DefaultInvoicesService(repository: repository, threeDSService: threeDSService)
     }()
 
-    /// Images repository.
-    public private(set) lazy var images: POImagesRepository = {
-        UrlSessionImagesRepository(session: .shared)
-    }()
-
     /// Returns alternative payment methods service.
     public private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
         DefaultAlternativePaymentMethodsService(
@@ -77,8 +72,16 @@ public final class ProcessOut {
         return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService)
     }()
 
+    // MARK: - SPI
+
     /// Logger with application category.
+    @_spi(PO)
     public private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
+
+    // MARK: - Internal
+
+    /// Images repository.
+    private(set) lazy var images: POImagesRepository = UrlSessionImagesRepository(session: .shared)
 
     // MARK: - Private Nested Types
 
@@ -138,6 +141,3 @@ public final class ProcessOut {
         DefaultPhoneNumberMetadataProvider.shared.prewarm()
     }
 }
-
-@available(*, deprecated, message: "Use ProcessOut directly")
-extension ProcessOut: ProcessOutApiType { }
