@@ -503,7 +503,7 @@ private enum Constants {
     static let sectionInset = UIEdgeInsets(top: 8, left: 0, bottom: 32, right: 0)
     static let contentInset = UIEdgeInsets(top: 24, left: 24, bottom: 24, right: 24)
     static let inputHeight: CGFloat = 40
-    static let loaderHeight: CGFloat = 128 // todo(andrii-vysotskyi): revise loader height
+    static let loaderHeight: CGFloat = 256
 }
 
 // swiftlint:enable type_body_length file_length

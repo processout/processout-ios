@@ -20,6 +20,8 @@ final class NativeAlternativePaymentMethodLoaderCell: UICollectionViewCell {
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(activityIndicator)
         let constraints = [
+            activityIndicator.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor),
+            activityIndicator.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor),
             activityIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ]

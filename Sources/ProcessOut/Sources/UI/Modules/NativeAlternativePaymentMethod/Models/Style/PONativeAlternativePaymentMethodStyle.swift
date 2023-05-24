@@ -28,7 +28,8 @@ public struct PONativeAlternativePaymentMethodStyle {
     /// Buttons style.
     public let buttons: PONativeAlternativePaymentMethodButtonsStyle
 
-    /// Activity indicator style.
+    /// Activity indicator style. Please note that maximum height of activity indicator
+    /// is limited to 256.
     public let activityIndicator: POActivityIndicatorStyle
 
     /// Message style.
