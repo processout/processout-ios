@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// Native alternative payment method buttons style.
+/// Native alternative payment method actions style.
 public struct PONativeAlternativePaymentMethodActionsStyle {
 
     /// Style for primary button.
@@ -16,7 +16,7 @@ public struct PONativeAlternativePaymentMethodActionsStyle {
     /// Style for secondary button.
     public let secondary: POButtonStyle
 
-    /// The axis along which the buttons lay out.
+    /// The axis along which the buttons lay out. By default actions are positioned vertically.
     public let axis: NSLayoutConstraint.Axis
 
     /// Container separator color.
@@ -35,7 +35,7 @@ public struct PONativeAlternativePaymentMethodActionsStyle {
     ) {
         self.primary = primary ?? .primary
         self.secondary = secondary ?? .secondary
-        self.axis = axis ?? .horizontal
+        self.axis = axis ?? .vertical
         self.separatorColor = separatorColor ?? Asset.Colors.Border.subtle.color
         self.backgroundColor = backgroundColor ?? Asset.Colors.Surface.level1.color
     }

@@ -7,20 +7,23 @@
 
 import UIKit
 
+/// Holds typesetting information that could be applied to displayed text.
 public struct POTypography {
 
     /// Font assosiated with given typography.
     public let font: UIFont
 
-    /// Line height.
+    /// Line height. If not set explicitly equals to font's line height.
     public let lineHeight: CGFloat
 
     /// Tracking value.
     public let tracking: CGFloat?
 
     /// A Boolean that indicates whether the font should be updated when the device’s content size category changes.
+    /// Default value is `true`.
     public let adjustsFontForContentSizeCategory: Bool
 
+    /// Creates typography with provided information.
     public init(
         font: UIFont,
         lineHeight: CGFloat? = nil,

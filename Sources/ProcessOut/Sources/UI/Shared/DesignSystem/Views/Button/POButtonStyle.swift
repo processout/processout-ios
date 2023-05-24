@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Defines button style in all possible states.
 public struct POButtonStyle {
 
     /// Style for normal state.

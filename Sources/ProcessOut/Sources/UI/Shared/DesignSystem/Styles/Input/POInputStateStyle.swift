@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// Input's state style.
+/// Defines input's styling information in a specific state.
 public struct POInputStateStyle {
 
     /// Text style.
@@ -16,7 +16,7 @@ public struct POInputStateStyle {
     /// Placeholder text style.
     public let placeholder: POTextStyle
 
-    /// Button's background color.
+    /// Input's background color.
     public let backgroundColor: UIColor
 
     /// Border style.
@@ -25,9 +25,10 @@ public struct POInputStateStyle {
     /// Shadow style.
     public let shadow: POShadowStyle
 
-    /// Tint color that is used by text field.
+    /// Tint color that is used by input.
     public let tintColor: UIColor
 
+    /// Creates style instance.
     public init(
         text: POTextStyle,
         placeholder: POTextStyle,
