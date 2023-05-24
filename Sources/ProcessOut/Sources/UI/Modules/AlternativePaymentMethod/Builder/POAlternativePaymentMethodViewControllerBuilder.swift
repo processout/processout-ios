@@ -11,20 +11,33 @@ import UIKit
 /// create view controller’s instance.
 public final class POAlternativePaymentMethodViewControllerBuilder {
 
-    public static func with(request: POAlternativePaymentMethodRequest) -> Self {
-        Self(request: request)
+    @available(*, deprecated, message: "Use non static method instead.")
+    public static func with(
+        request: POAlternativePaymentMethodRequest
+    ) -> POAlternativePaymentMethodViewControllerBuilder {
+        POAlternativePaymentMethodViewControllerBuilder().with(request: request)
+    }
+
+    /// Creates builder instance.
+    public init() { }
+
+    /// Request to initiate payment with.
+    public func with(request: POAlternativePaymentMethodRequest) -> Self {
+        self.request = request
+        return self
     }
 
     /// Completion to invoke when authorization ends.
-    public func with(
-        completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
-    ) -> Self {
+    public func with(completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void) -> Self {
         self.completion = completion
         return self
     }
 
     /// Creates and returns view controller that is capable of handling alternative payment request.
     public func build() -> UIViewController {
+        guard let request else {
+            preconditionFailure("Request must be set.")
+        }
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         let delegate = WebViewControllerDelegateAlternativePaymentMethod(
             alternativePaymentMethodsService: api.alternativePaymentMethods,
@@ -46,14 +59,8 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
         return viewController
     }
 
-    // MARK: -
-
-    init(request: POAlternativePaymentMethodRequest) {
-        self.request = request
-    }
-
     // MARK: - Private Properties
 
-    private let request: POAlternativePaymentMethodRequest
+    private var request: POAlternativePaymentMethodRequest?
     private var completion: ((Result<POAlternativePaymentMethodResponse, POFailure>) -> Void)?
 }

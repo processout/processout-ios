@@ -13,8 +13,20 @@ public final class PO3DSRedirectViewControllerBuilder {
     /// Creates builder instance with given redirect information.
     /// - Parameters:
     ///   - redirect: redirect information.
-    public static func with(redirect: PO3DSRedirect) -> Self {
-        Self(redirect: redirect)
+    @available(*, deprecated, message: "Use non static method instead.")
+    public static func with(redirect: PO3DSRedirect) -> PO3DSRedirectViewControllerBuilder {
+        PO3DSRedirectViewControllerBuilder().with(redirect: redirect)
+    }
+
+    /// Creates builder instance.
+    public init() { }
+
+    /// Creates builder instance with given redirect information.
+    /// - Parameters:
+    ///   - redirect: redirect information.
+    public func with(redirect: PO3DSRedirect) -> Self {
+        self.redirect = redirect
+        return self
     }
 
     /// Completion to invoke when authorization ends.
@@ -28,6 +40,9 @@ public final class PO3DSRedirectViewControllerBuilder {
     ///
     /// - NOTE: Caller should dismiss view controller after completion is called.
     public func build() -> UIViewController {
+        guard let redirect else {
+            preconditionFailure("Redirect must be set.")
+        }
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         let configuration = WebViewControllerConfiguration(
             returnUrls: [api.configuration.checkoutBaseUrl],
@@ -44,14 +59,8 @@ public final class PO3DSRedirectViewControllerBuilder {
         return viewController
     }
 
-    // MARK: - Private Methods
-
-    private init(redirect: PO3DSRedirect) {
-        self.redirect = redirect
-    }
-
     // MARK: - Private Properties
 
-    private let redirect: PO3DSRedirect
+    private var redirect: PO3DSRedirect?
     private var completion: ((Result<String, POFailure>) -> Void)?
 }

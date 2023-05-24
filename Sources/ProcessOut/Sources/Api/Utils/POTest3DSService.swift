@@ -51,7 +51,7 @@ public final class POTest3DSService: PO3DSService {
     }
 
     public func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        let viewController = PO3DSRedirectViewControllerBuilder
+        let viewController = PO3DSRedirectViewControllerBuilder()
             .with(redirect: redirect)
             .with { [weak self] result in
                 self?.viewController.dismiss(animated: true) {
