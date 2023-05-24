@@ -25,8 +25,8 @@ public struct PONativeAlternativePaymentMethodStyle {
     /// Error description text style.
     public let errorDescription: POTextStyle
 
-    /// Buttons style.
-    public let buttons: PONativeAlternativePaymentMethodButtonsStyle
+    /// Actions style.
+    public let actions: PONativeAlternativePaymentMethodActionsStyle
 
     /// Activity indicator style. Please note that maximum height of activity indicator
     /// is limited to 256.
@@ -50,7 +50,7 @@ public struct PONativeAlternativePaymentMethodStyle {
         input: POInputStyle? = nil,
         codeInput: POInputStyle? = nil,
         errorDescription: POTextStyle? = nil,
-        buttons: PONativeAlternativePaymentMethodButtonsStyle? = nil,
+        actions: PONativeAlternativePaymentMethodActionsStyle? = nil,
         activityIndicator: POActivityIndicatorStyle? = nil,
         message: POTextStyle? = nil,
         successMessage: POTextStyle? = nil,
@@ -62,7 +62,7 @@ public struct PONativeAlternativePaymentMethodStyle {
         self.input = input ?? Constants.input
         self.codeInput = codeInput ?? Constants.codeInput
         self.errorDescription = errorDescription ?? Constants.errorDescription
-        self.buttons = buttons ?? Constants.buttons
+        self.actions = actions ?? Constants.actions
         self.activityIndicator = activityIndicator ?? Constants.activityIndicator
         self.message = message ?? Constants.message
         self.successMessage = successMessage ?? Constants.successMessage
@@ -78,7 +78,7 @@ public struct PONativeAlternativePaymentMethodStyle {
         static let input = POInputStyle.default()
         static let codeInput = POInputStyle.default(typography: .Medium.title)
         static let errorDescription = POTextStyle(color: Asset.Colors.Text.error.color, typography: .Fixed.label)
-        static let buttons = PONativeAlternativePaymentMethodButtonsStyle()
+        static let actions = PONativeAlternativePaymentMethodActionsStyle()
         static let activityIndicator = POActivityIndicatorStyle.system(
             .whiteLarge, color: Asset.Colors.Text.secondary.color
         )

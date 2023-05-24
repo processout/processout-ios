@@ -1,5 +1,5 @@
 //
-//  PONativeAlternativePaymentMethodButtonsStyle.swift
+//  PONativeAlternativePaymentMethodActionsStyle.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 22.05.2023.
@@ -8,7 +8,7 @@
 import UIKit
 
 /// Native alternative payment method buttons style.
-public struct PONativeAlternativePaymentMethodButtonsStyle {
+public struct PONativeAlternativePaymentMethodActionsStyle {
 
     /// Style for primary button.
     public let primary: POButtonStyle

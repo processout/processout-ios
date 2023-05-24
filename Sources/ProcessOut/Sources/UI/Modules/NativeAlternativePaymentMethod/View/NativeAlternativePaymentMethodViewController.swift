@@ -238,7 +238,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
     }()
 
     private lazy var buttonsContainerView = NativeAlternativePaymentMethodButtonsView(
-        style: style.buttons, horizontalInset: Constants.contentInset.left
+        style: style.actions, horizontalInset: Constants.contentInset.left
     )
 
     private lazy var collectionView: UICollectionView = {

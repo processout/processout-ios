@@ -9,7 +9,7 @@ import UIKit
 
 final class NativeAlternativePaymentMethodButtonsView: UIView {
 
-    init(style: PONativeAlternativePaymentMethodButtonsStyle, horizontalInset: CGFloat) {
+    init(style: PONativeAlternativePaymentMethodActionsStyle, horizontalInset: CGFloat) {
         self.style = style
         self.horizontalInset = horizontalInset
         super.init(frame: .zero)
@@ -65,7 +65,7 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
 
     // MARK: - Private Properties
 
-    private let style: PONativeAlternativePaymentMethodButtonsStyle
+    private let style: PONativeAlternativePaymentMethodActionsStyle
     private let horizontalInset: CGFloat
 
     private lazy var contentView: UIStackView = {
