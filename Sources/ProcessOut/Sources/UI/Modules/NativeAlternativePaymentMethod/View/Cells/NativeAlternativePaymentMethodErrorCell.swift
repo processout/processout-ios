@@ -24,7 +24,7 @@ final class NativeAlternativePaymentMethodErrorCell: UICollectionViewCell {
             .typography(style.typography)
             .textStyle(textStyle: .body)
             .textColor(style.color)
-            .alignment(.natural)
+            .alignment(item.isCentered ? .center : .natural)
             .string(item.description)
             .build()
     }

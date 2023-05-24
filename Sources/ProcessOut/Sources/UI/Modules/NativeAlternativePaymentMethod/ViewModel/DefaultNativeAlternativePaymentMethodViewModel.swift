@@ -130,19 +130,20 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 isLast: offset == startedState.parameters.indices.last,
                 shouldCenterCodeInput: shouldCenterCodeInput
             )
+            var isCentered = false
+            if case .codeInput = parameterItem, shouldCenterCodeInput {
+                isCentered = true
+            }
             var items = [parameterItem]
             if let message = value.recentErrorMessage {
-                items.append(.error(State.ErrorItem(description: message)))
+                items.append(.error(State.ErrorItem(description: message, isCentered: isCentered)))
             }
-            var isCodeInputItem = false
-            if case .codeInput = parameterItem {
-                isCodeInputItem = true
-            }
-            let sectionHeader = State.SectionHeader(
-                title: parameter.displayName, isCentered: isCodeInputItem && shouldCenterCodeInput
-            )
             let section = State.Section(
-                id: .init(id: parameter.key, header: sectionHeader), items: items
+                id: .init(
+                    id: parameter.key,
+                    header: .init(title: parameter.displayName, isCentered: isCentered)
+                ),
+                items: items
             )
             sections.append(section)
         }

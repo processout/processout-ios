@@ -87,11 +87,13 @@ enum NativeAlternativePaymentMethodViewModelState {
         let formatter: Formatter?
     }
 
-    // todo(andrii-vysotskyi): conditionally center error item
     struct ErrorItem: Hashable {
 
         /// Error description.
         let description: String
+
+        /// Indicates whether error should be centered.
+        let isCentered: Bool
     }
 
     struct SubmittedItem: Hashable {
