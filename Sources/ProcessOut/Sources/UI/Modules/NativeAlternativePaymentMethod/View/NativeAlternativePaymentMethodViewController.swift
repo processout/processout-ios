@@ -130,7 +130,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
                 viewType: NativeAlternativePaymentMethodErrorCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(item: item, style: self.style.input.error.description)
+                    cell.configure(item: item, style: self.style.errorDescription)
                 }
             ).height
         case .submitted(let item):
@@ -166,7 +166,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             viewType: NativeAlternativePaymentMethodSectionHeaderView.self,
             preferredWidth: width,
             configure: { [self] view in
-                view.configure(item: sectionHeader, style: style.input.normal.title)
+                view.configure(item: sectionHeader, style: style.sectionTitle)
             }
         )
     }
@@ -397,7 +397,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             return cell
         case .error(let item):
             let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodErrorCell.self, for: indexPath)
-            cell.configure(item: item, style: style.input.error.description)
+            cell.configure(item: item, style: style.errorDescription)
             return cell
         case .submitted(let item):
             let cell = collectionView.dequeueReusableCell(
@@ -430,7 +430,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             let view = collectionView.dequeueReusableSupplementaryView(
                 NativeAlternativePaymentMethodSectionHeaderView.self, kind: kind, indexPath: indexPath
             )
-            view.configure(item: sectionHeader, style: style.input.normal.title)
+            view.configure(item: sectionHeader, style: style.sectionTitle)
             return view
         default:
             return nil
