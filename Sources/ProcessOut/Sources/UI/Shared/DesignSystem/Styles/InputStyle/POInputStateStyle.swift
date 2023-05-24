@@ -1,5 +1,5 @@
 //
-//  POTextFieldStyle.swift
+//  POInputStateStyle.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 24.11.2022.
@@ -7,7 +7,8 @@
 
 import UIKit
 
-public struct POTextFieldStyle {
+/// Input's state style.
+public struct POInputStateStyle {
 
     /// Text style.
     public let text: POTextStyle

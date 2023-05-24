@@ -19,6 +19,7 @@ final class CodeTextField: UIControl, UITextInput {
         characters = Array(repeating: nil, count: length)
         keyboardType = .default
         returnKeyType = .default
+        isInvalid = false
         super.init(frame: .zero)
         commonInit()
     }
@@ -38,8 +39,11 @@ final class CodeTextField: UIControl, UITextInput {
         set { setText(newValue, sendActions: false) }
     }
 
-    func configure(style: POTextFieldStyle, animated: Bool) {
+    private(set) var isInvalid: Bool
+
+    func configure(isInvalid: Bool, style: POInputStyle, animated: Bool) {
         self.style = style
+        self.isInvalid = isInvalid
         configureWithCurrentState(animated: animated)
     }
 
@@ -355,7 +359,7 @@ final class CodeTextField: UIControl, UITextInput {
     private var carretPosition: CodeTextFieldCarretPosition
     private var carretPositionIndex: Int
     private var characters: [Character?]
-    private var style: POTextFieldStyle?
+    private var style: POInputStyle?
 
     // MARK: - Private Methods
 
@@ -463,11 +467,12 @@ final class CodeTextField: UIControl, UITextInput {
         guard let style else {
             return
         }
+        let stateStyle = isInvalid ? style.error : style.normal
         characters.enumerated().forEach { offset, character in
             let viewModel = CodeTextFieldComponentView.ViewModel(
                 value: character,
                 carretPosition: isFirstResponder && carretPositionIndex == offset ? carretPosition : nil,
-                style: style
+                style: stateStyle
             )
             groupViews[offset].configure(viewModel: viewModel, animated: animated)
         }

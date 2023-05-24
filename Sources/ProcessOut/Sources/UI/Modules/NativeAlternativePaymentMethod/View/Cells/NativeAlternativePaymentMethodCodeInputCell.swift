@@ -15,9 +15,9 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
         observations = []
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputFormStyle) {
+    func configure(item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputStyle) {
         initialize(length: item.length)
-        codeTextField.configure(style: item.value.isInvalid ? style.error.field : style.normal.field, animated: false)
+        codeTextField.configure(isInvalid: item.value.isInvalid, style: style, animated: false)
         if codeTextField.text != item.value.text {
             codeTextField.text = item.value.text
         }
@@ -80,13 +80,9 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
         item?.value.text = codeTextField.text ?? ""
     }
 
-    private func observeChanges(
-        item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputFormStyle
-    ) {
+    private func observeChanges(item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputStyle) {
         let isInvalidObserver = item.value.$isInvalid.addObserver { [weak self] isInvalid in
-            self?.codeTextField.configure(
-                style: isInvalid ? style.error.field : style.normal.field, animated: true
-            )
+            self?.codeTextField.configure(isInvalid: isInvalid, style: style, animated: true)
         }
         let valueObserver = item.value.$text.addObserver { [weak self] updatedValue in
             if self?.codeTextField.text != updatedValue {

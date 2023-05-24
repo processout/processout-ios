@@ -18,7 +18,7 @@ final class CodeTextFieldComponentView: UIView {
         let carretPosition: CodeTextFieldCarretPosition?
 
         /// Style.
-        let style: POTextFieldStyle
+        let style: POInputStateStyle
     }
 
     init(size: CGSize, didSelect: @escaping (CodeTextFieldCarretPosition) -> Void) {

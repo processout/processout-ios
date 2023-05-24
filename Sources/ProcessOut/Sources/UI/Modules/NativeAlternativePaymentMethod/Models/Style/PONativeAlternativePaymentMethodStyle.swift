@@ -17,10 +17,10 @@ public struct PONativeAlternativePaymentMethodStyle {
     public let sectionTitle: POTextStyle
 
     /// Input style.
-    public let input: POInputFormStyle
+    public let input: POInputStyle
 
     /// Input style.
-    public let codeInput: POInputFormStyle
+    public let codeInput: POInputStyle
 
     /// Error description text style.
     public let errorDescription: POTextStyle
@@ -46,8 +46,8 @@ public struct PONativeAlternativePaymentMethodStyle {
     public init(
         title: POTextStyle? = nil,
         sectionTitle: POTextStyle? = nil,
-        input: POInputFormStyle? = nil,
-        codeInput: POInputFormStyle? = nil,
+        input: POInputStyle? = nil,
+        codeInput: POInputStyle? = nil,
         errorDescription: POTextStyle? = nil,
         buttons: PONativeAlternativePaymentMethodButtonsStyle? = nil,
         activityIndicator: POActivityIndicatorStyle? = nil,
@@ -74,8 +74,8 @@ public struct PONativeAlternativePaymentMethodStyle {
     private enum Constants {
         static let title = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .Medium.title)
         static let sectionTitle = POTextStyle(color: Asset.Colors.Text.secondary.color, typography: .Fixed.labelHeading)
-        static let input = POInputFormStyle.default
-        static let codeInput = POInputFormStyle.code
+        static let input = POInputStyle.default()
+        static let codeInput = POInputStyle.default(typography: .Medium.title)
         static let errorDescription = POTextStyle(color: Asset.Colors.Text.error.color, typography: .Fixed.label)
         static let buttons = PONativeAlternativePaymentMethodButtonsStyle()
         static let activityIndicator = POActivityIndicatorStyle.system(
