@@ -72,18 +72,18 @@ public struct PONativeAlternativePaymentMethodStyle {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        // swiftlint:disable line_length
-        static let title = POTextStyle(color: Asset.Colors.New.Text.primary.color, typography: .Medium.title)
-        static let sectionTitle = POTextStyle(color: Asset.Colors.New.Text.secondary.color, typography: .Fixed.labelHeading)
+        static let title = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .Medium.title)
+        static let sectionTitle = POTextStyle(color: Asset.Colors.Text.secondary.color, typography: .Fixed.labelHeading)
         static let input = POInputFormStyle.default
         static let codeInput = POInputFormStyle.code
-        static let errorDescription = POTextStyle(color: Asset.Colors.New.Text.error.color, typography: .Fixed.label)
+        static let errorDescription = POTextStyle(color: Asset.Colors.Text.error.color, typography: .Fixed.label)
         static let buttons = PONativeAlternativePaymentMethodButtonsStyle()
-        static let activityIndicator = POActivityIndicatorStyle.system(.whiteLarge, color: Asset.Colors.New.Text.secondary.color)
-        static let message = POTextStyle(color: Asset.Colors.New.Text.primary.color, typography: .Fixed.body)
-        static let successMessage = POTextStyle(color: Asset.Colors.New.Text.success.color, typography: .Fixed.body)
+        static let activityIndicator = POActivityIndicatorStyle.system(
+            .whiteLarge, color: Asset.Colors.Text.secondary.color
+        )
+        static let message = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .Fixed.body)
+        static let successMessage = POTextStyle(color: Asset.Colors.Text.success.color, typography: .Fixed.body)
         static let background = PONativeAlternativePaymentMethodBackgroundStyle()
-        static let separatorColor = Asset.Colors.New.Border.subtle.color
-        // swiftlint:enable line_length
+        static let separatorColor = Asset.Colors.Border.subtle.color
     }
 }

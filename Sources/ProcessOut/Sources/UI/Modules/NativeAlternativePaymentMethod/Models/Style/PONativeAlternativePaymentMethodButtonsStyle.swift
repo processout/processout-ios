@@ -36,7 +36,7 @@ public struct PONativeAlternativePaymentMethodButtonsStyle {
         self.primary = primary ?? .primary
         self.secondary = secondary ?? .secondary
         self.axis = axis ?? .horizontal
-        self.separatorColor = separatorColor ?? Asset.Colors.New.Border.subtle.color
-        self.backgroundColor = backgroundColor ?? Asset.Colors.New.Surface.level1.color
+        self.separatorColor = separatorColor ?? Asset.Colors.Border.subtle.color
+        self.backgroundColor = backgroundColor ?? Asset.Colors.Surface.level1.color
     }
 }

@@ -37,31 +37,31 @@ extension POInputFormStyle {
 
     private static func normal(fieldTypography: POTypography) -> POInputFormStateStyle {
         POInputFormStateStyle(
-            title: .init(color: Asset.Colors.New.Text.secondary.color, typography: .Fixed.labelHeading),
+            title: .init(color: Asset.Colors.Text.secondary.color, typography: .Fixed.labelHeading),
             field: .init(
-                text: .init(color: Asset.Colors.New.Text.primary.color, typography: fieldTypography),
-                placeholder: .init(color: Asset.Colors.New.Text.muted.color, typography: fieldTypography),
-                backgroundColor: Asset.Colors.New.Surface.background.color,
-                border: .regular(radius: 8, color: Asset.Colors.New.Border.default.color),
+                text: .init(color: Asset.Colors.Text.primary.color, typography: fieldTypography),
+                placeholder: .init(color: Asset.Colors.Text.muted.color, typography: fieldTypography),
+                backgroundColor: Asset.Colors.Surface.background.color,
+                border: .regular(radius: 8, color: Asset.Colors.Border.default.color),
                 shadow: .clear,
-                tintColor: Asset.Colors.New.Text.primary.color
+                tintColor: Asset.Colors.Text.primary.color
             ),
-            description: .init(color: Asset.Colors.New.Text.muted.color, typography: .Fixed.label)
+            description: .init(color: Asset.Colors.Text.muted.color, typography: .Fixed.label)
         )
     }
 
     private static func error(fieldTypography: POTypography) -> POInputFormStateStyle {
         POInputFormStateStyle(
-            title: .init(color: Asset.Colors.New.Text.secondary.color, typography: .Fixed.labelHeading),
+            title: .init(color: Asset.Colors.Text.secondary.color, typography: .Fixed.labelHeading),
             field: .init(
-                text: .init(color: Asset.Colors.New.Text.primary.color, typography: fieldTypography),
-                placeholder: .init(color: Asset.Colors.New.Text.muted.color, typography: fieldTypography),
-                backgroundColor: Asset.Colors.New.Surface.background.color,
-                border: .regular(radius: 8, color: Asset.Colors.New.Text.error.color),
+                text: .init(color: Asset.Colors.Text.primary.color, typography: fieldTypography),
+                placeholder: .init(color: Asset.Colors.Text.muted.color, typography: fieldTypography),
+                backgroundColor: Asset.Colors.Surface.background.color,
+                border: .regular(radius: 8, color: Asset.Colors.Text.error.color),
                 shadow: .clear,
-                tintColor: Asset.Colors.New.Text.error.color
+                tintColor: Asset.Colors.Text.error.color
             ),
-            description: .init(color: Asset.Colors.New.Text.error.color, typography: .Fixed.label)
+            description: .init(color: Asset.Colors.Text.error.color, typography: .Fixed.label)
         )
     }
 }
