@@ -68,8 +68,8 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         static let maximumDecorationImageHeight: CGFloat = 260
         static let verticalSpacing: CGFloat = 16
         static let descriptionBottomSpacing: CGFloat = 46
-        static let descriptionBottomSmallSpacing: CGFloat = 40
-        static let topContentInset: CGFloat = 26
+        static let descriptionBottomSmallSpacing: CGFloat = 24
+        static let topContentInset: CGFloat = 68
     }
 
     // MARK: - Private Properties
@@ -114,8 +114,6 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
     // MARK: - Private Methods
 
     private func commonInit() {
-        // todo(andrii-vysotskyi): adjust top and bottom spacing (take into account that
-        // there is already spacing added by collection
         contentView.addSubview(containerView)
         let constraints = [
             containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.topContentInset),

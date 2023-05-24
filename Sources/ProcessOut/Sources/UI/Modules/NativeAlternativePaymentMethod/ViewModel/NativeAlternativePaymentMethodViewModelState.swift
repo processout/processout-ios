@@ -87,6 +87,7 @@ enum NativeAlternativePaymentMethodViewModelState {
         let formatter: Formatter?
     }
 
+    // todo(andrii-vysotskyi): conditionally center error item
     struct ErrorItem: Hashable {
 
         /// Error description.
