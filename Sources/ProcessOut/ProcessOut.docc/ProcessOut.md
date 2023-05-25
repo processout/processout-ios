@@ -15,10 +15,10 @@ ProcessOut.configure(configuration: configuration)
 
 ### Framework
 
-- <doc:MigratingFromProcessOut2>
-- <doc:Localizations>
 - ``ProcessOut/ProcessOut``
 - ``ProcessOutConfiguration``
+- <doc:Localizations>
+- <doc:MigrationGuides>
 
 ### Errors
 
