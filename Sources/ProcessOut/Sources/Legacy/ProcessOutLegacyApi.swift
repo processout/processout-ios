@@ -63,7 +63,7 @@ public final class ProcessOutLegacyApi {
         }
     }
 
-    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use POPaginationOptions instead.")
+    @available(*, deprecated, message: "Use POPaginationOptions instead.")
     public struct PaginationOptions {
         var StartAfter: String?
         var EndBefore: String?
@@ -274,7 +274,7 @@ public final class ProcessOutLegacyApi {
         }
     }
 
-    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use POAllGatewayConfigurationsRequest.Filter instead.")
+    @available(*, deprecated, message: "Use POAllGatewayConfigurationsRequest.Filter instead.")
     public enum GatewayConfigurationsFilter: String {
         case All = ""
         case AlternativePaymentMethods = "alternative-payment-methods"
@@ -286,7 +286,7 @@ public final class ProcessOutLegacyApi {
     /// - Parameters:
     ///   - completion: Completion callback
     ///   - paginationOptions: Pagination options to use
-    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOut.shared.gatewayConfigurations.all instead.")
+    @available(*, deprecated, message: "Use ProcessOut.shared.gatewayConfigurations.all instead.")
     public static func fetchGatewayConfigurations(filter: GatewayConfigurationsFilter, completion: @escaping ([GatewayConfiguration]?, ProcessOutException?) -> Void, paginationOptions: PaginationOptions? = nil) {
         let paginationParams = paginationOptions != nil ? "&" + generatePaginationParamsString(paginationOptions: paginationOptions!) : ""
         
@@ -692,7 +692,7 @@ public final class ProcessOutLegacyApi {
     ///
     /// - Parameter viewController: UIViewController (needed to display a 3DS2 challenge popup)
     /// - Returns: Returns a sandbox ready ThreeDS2Handler
-    @available(*, deprecated, message: "Declaration will be removed in version 4.0.")
+    @available(*, deprecated)
     public static func createThreeDSTestHandler(viewController: UIViewController, completion: @escaping (String?, ProcessOutException?) -> Void) -> ThreeDSHandler {
         return ThreeDSTestHandler(controller: viewController, completion: completion)
     }
@@ -701,7 +701,7 @@ public final class ProcessOutLegacyApi {
     ///
     /// - Parameter url: URI from the deep-link app opening
     /// - Returns: nil if the URL is not a ProcessOut return URL, an APMTokenReturn object otherwise
-    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodResponse instead.")
+    @available(*, deprecated, message: "Use ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodResponse instead.")
     public static func handleAPMURLCallback(url: URL) -> APMTokenReturn? {
         // Check for the URL host
         guard let host = url.host, host == "processout.return" else {
@@ -737,7 +737,7 @@ public final class ProcessOutLegacyApi {
     ///   - gateway: The alternative payment method configuration
     ///   - customerId: The customer ID
     ///   - tokenId: The token ID generated on your backend with an empty source
-    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodUrl instead.")
+    @available(*, deprecated, message: "Use POAlternativePaymentMethodViewControllerBuilder to initiate APM payment.")
     public static func makeAPMToken(gateway: GatewayConfiguration, customerId: String, tokenId: String, additionalData: [String: String] = [:]) {
         // Generate the redirection URL
         let checkout = ProcessOutLegacyApi.ProjectId + "/" + customerId + "/" + tokenId + "/redirect/" + gateway.id
@@ -755,7 +755,7 @@ public final class ProcessOutLegacyApi {
     ///   - gateway: Gateway to use (previously fetched)
     ///   - invoiceId: Invoice ID generated on your backend
     /// - Returns: Redirect URL that should be displayed in a webview
-    @available(*, deprecated, message: "Declaration will be removed in version 4.0 use ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodUrl instead.")
+    @available(*, deprecated, message: "Use POAlternativePaymentMethodViewControllerBuilder to initiate APM payment.")
     public static func makeAPMPayment(gateway: GatewayConfiguration, invoiceId: String, additionalData: [String: String] = [:]) -> String {
         // Generate the redirection URL
         let checkout = ProcessOutLegacyApi.ProjectId + "/" + invoiceId + "/redirect/" + gateway.id
