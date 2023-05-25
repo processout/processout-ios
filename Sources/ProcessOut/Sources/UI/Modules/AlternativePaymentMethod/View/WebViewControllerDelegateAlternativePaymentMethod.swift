@@ -10,7 +10,7 @@ import WebKit
 final class WebViewControllerDelegateAlternativePaymentMethod: WebViewControllerDelegate {
 
     init(
-        alternativePaymentMethodsService: AlternativePaymentMethodsService,
+        alternativePaymentMethodsService: POAlternativePaymentMethodsService,
         request: POAlternativePaymentMethodRequest,
         completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
     ) {
@@ -36,7 +36,7 @@ final class WebViewControllerDelegateAlternativePaymentMethod: WebViewController
 
     // MARK: - Private Properties
 
-    private let alternativePaymentMethodsService: AlternativePaymentMethodsService
+    private let alternativePaymentMethodsService: POAlternativePaymentMethodsService
     private let request: POAlternativePaymentMethodRequest
     private let completion: (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
 }

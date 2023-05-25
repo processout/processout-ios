@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class DefaultAlternativePaymentMethodsService: AlternativePaymentMethodsService {
+final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethodsService {
 
     init(projectId: String, baseUrl: URL, logger: POLogger) {
         self.projectId = projectId
@@ -15,7 +15,7 @@ final class DefaultAlternativePaymentMethodsService: AlternativePaymentMethodsSe
         self.logger = logger
     }
 
-    // MARK: - AlternativePaymentMethodsService
+    // MARK: - POAlternativePaymentMethodsService
 
     func alternativePaymentMethodUrl(request: POAlternativePaymentMethodRequest) -> URL {
         guard var components = URLComponents(url: baseUrl, resolvingAgainstBaseURL: true) else {
