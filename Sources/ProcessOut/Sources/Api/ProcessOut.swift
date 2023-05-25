@@ -47,13 +47,6 @@ public final class ProcessOut {
         return DefaultInvoicesService(repository: repository, threeDSService: threeDSService)
     }()
 
-    /// Returns alternative payment methods service.
-    public private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
-        DefaultAlternativePaymentMethodsService(
-            projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl, logger: serviceLogger
-        )
-    }()
-
     /// Returns cards repository.
     public private(set) lazy var cards: POCardsService = {
         let requestMapper = DefaultApplePayCardTokenizationRequestMapper(
@@ -79,6 +72,13 @@ public final class ProcessOut {
     public private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
 
     // MARK: - Internal
+
+    /// Returns alternative payment methods service.
+    private(set) lazy var alternativePaymentMethods: AlternativePaymentMethodsService = {
+        DefaultAlternativePaymentMethodsService(
+            projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl, logger: serviceLogger
+        )
+    }()
 
     /// Images repository.
     private(set) lazy var images: ImagesRepository = UrlSessionImagesRepository(session: .shared)
