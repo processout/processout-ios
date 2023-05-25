@@ -21,9 +21,7 @@ public final class PO3DSRedirectViewControllerBuilder {
     /// Creates builder instance.
     public init() { }
 
-    /// Creates builder instance with given redirect information.
-    /// - Parameters:
-    ///   - redirect: redirect information.
+    /// Updates redirect information.
     public func with(redirect: PO3DSRedirect) -> Self {
         self.redirect = redirect
         return self
