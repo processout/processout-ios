@@ -25,18 +25,15 @@ internal enum Asset {
     internal enum Action {
       internal enum Border {
         internal static let disabled = ColorAsset(name: "Action/Border/Disabled")
-        internal static let hover = ColorAsset(name: "Action/Border/Hover")
         internal static let selected = ColorAsset(name: "Action/Border/Selected")
       }
       internal enum Primary {
         internal static let `default` = ColorAsset(name: "Action/Primary/Default")
         internal static let disabled = ColorAsset(name: "Action/Primary/Disabled")
-        internal static let hover = ColorAsset(name: "Action/Primary/Hover")
         internal static let pressed = ColorAsset(name: "Action/Primary/Pressed")
       }
       internal enum Secondary {
         internal static let `default` = ColorAsset(name: "Action/Secondary/Default")
-        internal static let hover = ColorAsset(name: "Action/Secondary/Hover")
         internal static let pressed = ColorAsset(name: "Action/Secondary/Pressed")
       }
     }
