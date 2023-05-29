@@ -42,24 +42,6 @@ internal enum Asset {
       internal static let divider = ColorAsset(name: "Border/Divider")
       internal static let subtle = ColorAsset(name: "Border/Subtle")
     }
-    internal enum Interactive {
-      internal static let focus = ColorAsset(name: "Interactive/Focus")
-      internal static let link = ColorAsset(name: "Interactive/Link")
-    }
-    internal enum Navigation {
-      internal enum Background {
-        internal static let hover = ColorAsset(name: "Navigation/Background/Hover")
-        internal static let selected = ColorAsset(name: "Navigation/Background/Selected")
-      }
-    }
-    internal enum ProjectMenu {
-      internal enum Background {
-        internal static let `default` = ColorAsset(name: "ProjectMenu/Background/Default")
-        internal static let list = ColorAsset(name: "ProjectMenu/Background/List")
-      }
-      internal static let hover = ColorAsset(name: "ProjectMenu/Hover")
-      internal static let selected = ColorAsset(name: "ProjectMenu/Selected")
-    }
     internal enum Surface {
       internal static let background = ColorAsset(name: "Surface/Background")
       internal static let error = ColorAsset(name: "Surface/Error")
@@ -67,18 +49,6 @@ internal enum Asset {
       internal static let neutral = ColorAsset(name: "Surface/Neutral")
       internal static let success = ColorAsset(name: "Surface/Success")
       internal static let warning = ColorAsset(name: "Surface/Warning")
-    }
-    internal enum Tables {
-      internal static let highlight = ColorAsset(name: "Tables/Highlight")
-      internal enum RowBorder {
-        internal static let `default` = ColorAsset(name: "Tables/RowBorder/Default")
-        internal static let selected = ColorAsset(name: "Tables/RowBorder/Selected")
-      }
-    }
-    internal enum Tags {
-      internal enum Background {
-        internal static let `default` = ColorAsset(name: "Tags/Background/Default")
-      }
     }
     internal enum Text {
       internal static let disabled = ColorAsset(name: "Text/Disabled")
@@ -90,18 +60,6 @@ internal enum Asset {
       internal static let success = ColorAsset(name: "Text/Success")
       internal static let tertiary = ColorAsset(name: "Text/Tertiary")
       internal static let warning = ColorAsset(name: "Text/Warning")
-    }
-    internal enum Timelines {
-      internal static let error = ColorAsset(name: "Timelines/Error")
-      internal static let neutral = ColorAsset(name: "Timelines/Neutral")
-      internal static let success = ColorAsset(name: "Timelines/Success")
-      internal static let warning = ColorAsset(name: "Timelines/Warning")
-    }
-    internal enum Toggle {
-      internal enum Background {
-        internal static let `default` = ColorAsset(name: "Toggle/Background/Default")
-        internal static let on = ColorAsset(name: "Toggle/Background/On")
-      }
     }
   }
   internal enum Images {
