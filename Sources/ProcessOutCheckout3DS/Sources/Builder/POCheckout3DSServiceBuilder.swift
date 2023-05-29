@@ -15,7 +15,7 @@ public final class POCheckout3DSServiceBuilder {
     /// - NOTE: Delegate will be strongly referenced by created service.
     @available(*, deprecated, message: "Use non static method instead.")
     public static func with(delegate: POCheckout3DSServiceDelegate) -> POCheckout3DSServiceBuilder {
-        Self(delegate: delegate)
+        POCheckout3DSServiceBuilder().with(delegate: delegate)
     }
 
     /// Creates builder instance.
@@ -40,16 +40,17 @@ public final class POCheckout3DSServiceBuilder {
         guard let delegate else {
             preconditionFailure("Delegate must be set.")
         }
-        Checkout3DSService(
+        let service = Checkout3DSService(
             errorMapper: DefaultAuthenticationErrorMapper(),
             configurationMapper: DefaultConfigurationMapper(),
             delegate: delegate,
             environment: environment
         )
+        return service
     }
 
     // MARK: - Private Properties
 
-    private let delegate: POCheckout3DSServiceDelegate?
+    private var delegate: POCheckout3DSServiceDelegate?
     private var environment: Checkout3DS.Environment
 }
