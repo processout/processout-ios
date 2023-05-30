@@ -11,3 +11,7 @@ Packages
 xcuserdata/
 Example/Sources/Generated
 Example/Resources/Constants.yml
+
+## Pods
+Example.xcworkspace
+Pods
