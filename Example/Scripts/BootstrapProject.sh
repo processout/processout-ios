@@ -14,3 +14,6 @@ mint run xcodegen generate
 SWIFTPM_DIR='Example.xcodeproj/project.xcworkspace/xcshareddata/swiftpm'
 mkdir -p $SWIFTPM_DIR
 ln -f Package.resolved $SWIFTPM_DIR/Package.resolved
+
+# Installs pods
+bundle exec pod install
