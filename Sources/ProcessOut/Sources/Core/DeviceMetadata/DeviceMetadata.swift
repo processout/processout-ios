@@ -29,6 +29,6 @@ struct DeviceMetadata: Encodable {
     /// Time zone offset in minutes.
     let appTimeZoneOffset: Int
 
-    /// Device channel.
+    /// Device channel. Holds device system name.
     let channel: String
 }

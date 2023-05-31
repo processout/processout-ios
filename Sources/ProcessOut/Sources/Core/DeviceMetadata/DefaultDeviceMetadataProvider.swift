@@ -9,8 +9,9 @@ import UIKit
 
 final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
-    init(screen: UIScreen, bundle: Bundle, userDefaults: UserDefaults) {
+    init(screen: UIScreen, device: UIDevice, bundle: Bundle, userDefaults: UserDefaults) {
         self.screen = screen
+        self.device = device
         self.bundle = bundle
         self.userDefaults = userDefaults
     }
@@ -25,7 +26,7 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
             appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
             appScreenHeight: Int(screen.nativeBounds.height),
             appTimeZoneOffset: TimeZone.current.secondsFromGMT() / 60,
-            channel: "ios"
+            channel: device.systemName.lowercased()
         )
     }
 
@@ -38,6 +39,7 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
     // MARK: - Private Properties
 
     private let screen: UIScreen
+    private let device: UIDevice
     private let bundle: Bundle
     private let userDefaults: UserDefaults
 

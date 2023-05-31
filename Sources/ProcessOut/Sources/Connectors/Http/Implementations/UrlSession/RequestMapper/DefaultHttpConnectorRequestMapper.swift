@@ -54,18 +54,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
     private let deviceMetadataProvider: DeviceMetadataProvider
     private let logger: POLogger
 
-    private var userAgent: String {
-        let components = [
-            UIDevice.current.systemName,
-            "Version",
-            UIDevice.current.systemVersion,
-            "ProcessOut iOS-Bindings",
-            configuration.version
-        ]
-        return components.joined(separator: "/")
-    }
-
-    // MARK: - Private Methods
+    // MARK: - Request Body Encoding
 
     private func encodedRequestBody(_ request: HttpConnectorRequest<some Decodable>) throws -> Data? {
         let decoratedBody: Encodable?
@@ -85,6 +74,8 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         }
     }
 
+    // MARK: - Request Headers
+
     private func authorization(request: HttpConnectorRequest<some Decodable>) throws -> String {
         var value = configuration.projectId + ":"
         if request.requiresPrivateKey {
@@ -102,18 +93,29 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         let deviceMetadata = deviceMetadataProvider.deviceMetadata
         let headers = [
             "Idempotency-Key": request.id,
-            "User-Agent": userAgent,
+            "User-Agent": userAgent(deviceMetadata: deviceMetadata),
             "Accept-Language": Strings.preferredLocalization,
             "Content-Type": "application/json",
             "Authorization": try authorization(request: request),
             "Installation-Id": deviceMetadata.installationId,
             "Device-Id": deviceMetadata.id,
-            "Device-System-Name": "iOS",
+            "Device-System-Name": deviceMetadata.channel,
             "Device-System-Version": UIDevice.current.systemVersion,
             "Product-Version": configuration.version,
             "Host-Application-Version": configuration.appVersion
         ]
         return headers.compactMapValues { $0 }
+    }
+
+    private func userAgent(deviceMetadata: DeviceMetadata) -> String {
+        let components = [
+            deviceMetadata.channel,
+            "Version",
+            UIDevice.current.systemVersion,
+            "ProcessOut iOS-Bindings",
+            configuration.version
+        ]
+        return components.joined(separator: "/")
     }
 }
 
