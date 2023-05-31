@@ -19,6 +19,8 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
     var deviceMetadata: DeviceMetadata {
         DeviceMetadata(
+            id: .init(value: ""),
+            installationId: .init(value: ""),
             appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
             appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
             appScreenHeight: Int(screen.nativeBounds.height),

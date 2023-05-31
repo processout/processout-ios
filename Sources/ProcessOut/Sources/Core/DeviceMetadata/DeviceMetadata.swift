@@ -9,6 +9,14 @@ import Foundation
 
 struct DeviceMetadata: Encodable {
 
+    /// Current device identifier.
+    @POImmutableExcludedCodable
+    var id: String
+
+    /// Installation identifier. Value changes if host application is reinstalled.
+    @POImmutableExcludedCodable
+    var installationId: String
+
     /// Default app language.
     let appLanguage: String
 

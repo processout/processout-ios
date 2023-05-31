@@ -100,7 +100,8 @@ public final class ProcessOut {
             baseUrl: configuration.apiBaseUrl,
             projectId: configuration.projectId,
             privateKey: configuration.privateKey,
-            version: ProcessOut.version
+            version: ProcessOut.version,
+            appVersion: configuration.appVersion
         )
         let connector = ProcessOutHttpConnectorBuilder()
             .with(configuration: connectorConfiguration)

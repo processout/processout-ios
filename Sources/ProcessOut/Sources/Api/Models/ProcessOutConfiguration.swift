@@ -23,6 +23,10 @@ public struct ProcessOutConfiguration {
     /// - NOTE: Debug logs may contain sensitive data.
     public let isDebug: Bool
 
+    /// Host application version. Providing this value helps ProcessOut to troubleshoot potential
+    /// issues.
+    public let appVersion: String?
+
     /// Project's private key.
     /// - Warning: this is only intended to be used for testing purposes storing your private key
     /// inside application is extremely dangerous and is highly discouraged.
@@ -39,7 +43,7 @@ public struct ProcessOutConfiguration {
 extension ProcessOutConfiguration {
 
     /// Creates production configuration.
-    public static func production(projectId: String, isDebug: Bool = false) -> Self {
+    public static func production(projectId: String, isDebug: Bool = false, appVersion: String? = nil) -> Self {
         // swiftlint:disable force_unwrapping
         let apiBaseUrl = URL(string: "https://api.processout.com")!
         let checkoutBaseUrl = URL(string: "https://checkout.processout.com")!
@@ -47,6 +51,7 @@ extension ProcessOutConfiguration {
         return ProcessOutConfiguration(
             projectId: projectId,
             isDebug: isDebug,
+            appVersion: appVersion,
             privateKey: nil,
             apiBaseUrl: apiBaseUrl,
             checkoutBaseUrl: checkoutBaseUrl
@@ -59,6 +64,7 @@ extension ProcessOutConfiguration {
         ProcessOutConfiguration(
             projectId: projectId,
             isDebug: true,
+            appVersion: nil,
             privateKey: privateKey,
             apiBaseUrl: apiBaseUrl,
             checkoutBaseUrl: checkoutBaseUrl

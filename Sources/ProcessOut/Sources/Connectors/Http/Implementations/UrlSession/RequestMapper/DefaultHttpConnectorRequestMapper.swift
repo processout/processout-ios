@@ -38,14 +38,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         if let encodedBody = try encodedRequestBody(request) {
             sessionRequest.httpBody = encodedBody
         }
-        let defaultHeaders = [
-            "Idempotency-Key": request.id,
-            "User-Agent": userAgent,
-            "Accept-Language": Strings.preferredLocalization,
-            "Content-Type": "application/json",
-            "Authorization": try authorization(request: request)
-        ]
-        defaultHeaders.forEach { field, value in
+        try defaultHeaders(for: request).forEach { field, value in
             sessionRequest.setValue(value, forHTTPHeaderField: field)
         }
         request.headers.forEach { field, value in
@@ -103,6 +96,24 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
             }
         }
         return "Basic " + Data(value.utf8).base64EncodedString()
+    }
+
+    private func defaultHeaders(for request: HttpConnectorRequest<some Decodable>) throws -> [String: String] {
+        let deviceMetadata = deviceMetadataProvider.deviceMetadata
+        let headers = [
+            "Idempotency-Key": request.id,
+            "User-Agent": userAgent,
+            "Accept-Language": Strings.preferredLocalization,
+            "Content-Type": "application/json",
+            "Authorization": try authorization(request: request),
+            "Installation-Id": deviceMetadata.installationId,
+            "Device-Id": deviceMetadata.id,
+            "Device-System-Name": "iOS",
+            "Device-System-Version": UIDevice.current.systemVersion,
+            "Product-Version": configuration.version,
+            "Host-Application-Version": configuration.appVersion
+        ]
+        return headers.compactMapValues { $0 }
     }
 }
 
