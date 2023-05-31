@@ -8,13 +8,13 @@
 import UIKit
 import Security
 
-// todo(andrii-vysotskyi): move keychain interactions to sepparate service
 final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
-    init(screen: UIScreen, device: UIDevice, bundle: Bundle) {
+    init(screen: UIScreen, device: UIDevice, bundle: Bundle, keychain: Keychain) {
         self.screen = screen
         self.device = device
         self.bundle = bundle
+        self.keychain = keychain
     }
 
     // MARK: - DeviceMetadataProvider
@@ -35,8 +35,7 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let keychainDeviceIdKey = "DeviceId"
-        static let keychainService = "com.processout"
+        static let keychainDeviceId = "DeviceId"
     }
 
     // MARK: - Private Properties
@@ -44,38 +43,14 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
     private let screen: UIScreen
     private let device: UIDevice
     private let bundle: Bundle
+    private let keychain: Keychain
 
     private lazy var deviceId: String? = {
-        let query: [CFString: Any] = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrAccount: Constants.keychainDeviceIdKey,
-            kSecAttrService: Constants.keychainService,
-            kSecReturnData: true
-        ]
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-        if status == errSecSuccess, let data = result as? Data {
-            return String(decoding: data, as: UTF8.self)
-        }
-        guard status == errSecItemNotFound else {
-            return nil // Failed to retrieve item
+        if let deviceId = keychain.genericPassword(forAccount: Constants.keychainDeviceId) {
+            return deviceId
         }
         let deviceId = UUID().uuidString
-        addDeviceId(deviceId)
+        keychain.add(genericPassword: deviceId, account: Constants.keychainDeviceId)
         return deviceId
     }()
-
-    // MARK: - Private Methods
-
-    @discardableResult
-    private func addDeviceId(_ deviceId: String) -> Bool {
-        let query: [CFString: Any] = [
-            kSecClass: kSecClassGenericPassword,
-            kSecValueData: Data(deviceId.utf8),
-            kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
-            kSecAttrAccount: Constants.keychainDeviceIdKey,
-            kSecAttrService: Constants.keychainService
-        ]
-        return SecItemAdd(query as CFDictionary, nil) == errSecSuccess
-    }
 }

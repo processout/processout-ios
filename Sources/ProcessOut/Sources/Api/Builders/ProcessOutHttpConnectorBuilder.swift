@@ -62,6 +62,7 @@ final class ProcessOutHttpConnectorBuilder {
     private enum Constants {
         static let dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         static let requestTimeout: TimeInterval = 30
+        static let keychainDeviceMetadataService = "com.processout.device-metadata"
     }
 
     // MARK: - Private Properties
@@ -87,7 +88,8 @@ final class ProcessOutHttpConnectorBuilder {
 
     /// Device metadata provider.
     private lazy var deviceMetadataProvider: DeviceMetadataProvider = {
-        DefaultDeviceMetadataProvider(screen: .main, device: .current, bundle: .main)
+        let keychain = Keychain(service: Constants.keychainDeviceMetadataService)
+        return DefaultDeviceMetadataProvider(screen: .main, device: .current, bundle: .main, keychain: keychain)
     }()
 
     private lazy var dateFormatter: DateFormatter = {
