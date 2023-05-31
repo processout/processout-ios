@@ -8,6 +8,7 @@
 import UIKit
 import Security
 
+// todo(andrii-vysotskyi): move keychain interactions to sepparate service
 final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
     init(screen: UIScreen, device: UIDevice, bundle: Bundle) {
