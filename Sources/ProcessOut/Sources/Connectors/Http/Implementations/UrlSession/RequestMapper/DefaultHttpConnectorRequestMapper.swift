@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import UIKit.UIDevice
 
 final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
@@ -100,7 +99,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
             "Installation-Id": deviceMetadata.installationId,
             "Device-Id": deviceMetadata.id,
             "Device-System-Name": deviceMetadata.channel,
-            "Device-System-Version": UIDevice.current.systemVersion,
+            "Device-System-Version": deviceMetadata.systemVersion,
             "Product-Version": configuration.version,
             "Host-Application-Version": configuration.appVersion
         ]
@@ -111,7 +110,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         let components = [
             deviceMetadata.channel,
             "Version",
-            UIDevice.current.systemVersion,
+            deviceMetadata.systemVersion,
             "ProcessOut iOS-Bindings",
             configuration.version
         ]
