@@ -9,10 +9,10 @@ import UIKit
 
 final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
-    init(screen: UIScreen, bundle: Bundle) {
+    init(screen: UIScreen, bundle: Bundle, userDefaults: UserDefaults) {
         self.screen = screen
         self.bundle = bundle
-        timeZone = .autoupdatingCurrent
+        self.userDefaults = userDefaults
     }
 
     // MARK: - DeviceMetadataProvider
@@ -20,18 +20,35 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
     var deviceMetadata: DeviceMetadata {
         DeviceMetadata(
             id: .init(value: ""),
-            installationId: .init(value: ""),
+            installationId: .init(value: installationId),
             appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
             appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
             appScreenHeight: Int(screen.nativeBounds.height),
-            appTimeZoneOffset: timeZone.secondsFromGMT() / 60,
+            appTimeZoneOffset: TimeZone.current.secondsFromGMT() / 60,
             channel: "ios"
         )
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let installationIdKey = "InstallationId"
     }
 
     // MARK: - Private Properties
 
     private let screen: UIScreen
     private let bundle: Bundle
-    private let timeZone: TimeZone
+    private let userDefaults: UserDefaults
+
+    private lazy var installationId: String = {
+        if let installationId = userDefaults.string(forKey: Constants.installationIdKey) {
+            return installationId
+        }
+        let installationId = UUID().uuidString
+        userDefaults.set(installationId, forKey: Constants.installationIdKey)
+        return installationId
+    }()
+
+    // MARK: - Private Methods
 }
