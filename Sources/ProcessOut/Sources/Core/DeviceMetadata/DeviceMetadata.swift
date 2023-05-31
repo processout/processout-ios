@@ -11,7 +11,7 @@ struct DeviceMetadata: Encodable {
 
     /// Current device identifier.
     @POImmutableExcludedCodable
-    var id: String
+    var id: String?
 
     /// Installation identifier. Value changes if host application is reinstalled.
     @POImmutableExcludedCodable
