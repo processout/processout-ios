@@ -87,7 +87,7 @@ final class ProcessOutHttpConnectorBuilder {
 
     /// Device metadata provider.
     private lazy var deviceMetadataProvider: DeviceMetadataProvider = {
-        DefaultDeviceMetadataProvider(screen: .main, device: .current, bundle: .main, userDefaults: .standard)
+        DefaultDeviceMetadataProvider(screen: .main, device: .current, bundle: .main)
     }()
 
     private lazy var dateFormatter: DateFormatter = {

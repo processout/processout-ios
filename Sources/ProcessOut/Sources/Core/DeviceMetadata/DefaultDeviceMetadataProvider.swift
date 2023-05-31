@@ -9,11 +9,10 @@ import UIKit
 
 final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
-    init(screen: UIScreen, device: UIDevice, bundle: Bundle, userDefaults: UserDefaults) {
+    init(screen: UIScreen, device: UIDevice, bundle: Bundle) {
         self.screen = screen
         self.device = device
         self.bundle = bundle
-        self.userDefaults = userDefaults
     }
 
     // MARK: - DeviceMetadataProvider
@@ -21,7 +20,7 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
     var deviceMetadata: DeviceMetadata {
         DeviceMetadata(
             id: .init(value: ""),
-            installationId: .init(value: installationId),
+            installationId: .init(value: device.identifierForVendor?.uuidString),
             systemVersion: .init(value: device.systemVersion),
             appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
             appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
@@ -31,27 +30,9 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
         )
     }
 
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let installationIdKey = "InstallationId"
-    }
-
     // MARK: - Private Properties
 
     private let screen: UIScreen
     private let device: UIDevice
     private let bundle: Bundle
-    private let userDefaults: UserDefaults
-
-    private lazy var installationId: String = {
-        if let installationId = userDefaults.string(forKey: Constants.installationIdKey) {
-            return installationId
-        }
-        let installationId = UUID().uuidString
-        userDefaults.set(installationId, forKey: Constants.installationIdKey)
-        return installationId
-    }()
-
-    // MARK: - Private Methods
 }
