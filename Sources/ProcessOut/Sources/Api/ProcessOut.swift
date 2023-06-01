@@ -135,7 +135,7 @@ public final class ProcessOut {
             SystemLoggerDestination(subsystem: Constants.systemLoggerSubsystem, category: category)
         ]
         if includeRemoteDestination {
-            let repository = HttpLogsRepository(connector: httpConnector, failureMapper: failureMapper)
+            let repository = HttpLogsRepository(connector: httpConnector)
             let service = DefaultLogsService(repository: repository, category: category, minimumLevel: .error)
             destinations.append(service)
         }

@@ -32,7 +32,7 @@ final class DefaultLogsService: POService, LoggerDestination {
             eventType: category,
             attributes: attributes
         )
-        repository.send(event: logEvent) { _ in /* Ignored */ }
+        repository.send(event: logEvent)
     }
 
     // MARK: - Private Nested Types

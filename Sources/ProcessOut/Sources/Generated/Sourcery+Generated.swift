@@ -75,20 +75,6 @@ extension InvoicesRepository {
 }
 
 @available(iOS 13.0, *)
-extension LogsRepository {
-
-    /// Sends given log event.
-    @MainActor
-    public func send(
-        event: LogEvent
-    ) async throws -> Void {
-        return try await withUnsafeThrowingContinuation { continuation in
-            send(event: event, completion: continuation.resume)
-        }
-    }
-}
-
-@available(iOS 13.0, *)
 extension POCardsRepository {
 
     /// Tokenize a card.
