@@ -7,32 +7,34 @@
 
 import Foundation
 
+/// This service is thread safe.
 final class DefaultLogsService: POService, LoggerDestination {
 
-    init(repository: LogsRepository, category: String, minimumLevel: LogLevel) {
+    init(repository: LogsRepository, minimumLevel: LogLevel) {
         self.repository = repository
-        self.category = category
         self.minimumLevel = minimumLevel
     }
 
     // MARK: - LoggerDestination
 
-    func log(entry: LogEntry) {
-        guard entry.level.rawValue >= minimumLevel.rawValue else {
+    func log(event: LogEvent) {
+        guard event.level.rawValue >= minimumLevel.rawValue else {
             return
         }
-        let attributes = [
-            Constants.attributeFile: entry.file,
-            Constants.attributeLine: entry.line.description
+        var attributes = [
+            Constants.attributeFile: event.file, Constants.attributeLine: event.line.description
         ]
-        let logEvent = LogEvent(
-            level: string(from: entry.level),
-            date: entry.timestamp,
-            message: entry.message.interpolation.value,
-            eventType: category,
+        event.additionalAttributes.forEach { key, value in
+            attributes[key] = value
+        }
+        let request = LogRequest(
+            level: string(from: event.level),
+            date: event.timestamp,
+            message: event.message,
+            eventType: event.category,
             attributes: attributes
         )
-        repository.send(event: logEvent)
+        repository.send(request: request)
     }
 
     // MARK: - Private Nested Types
@@ -46,7 +48,6 @@ final class DefaultLogsService: POService, LoggerDestination {
 
     private let repository: LogsRepository
     private let minimumLevel: LogLevel
-    private let category: String
 
     // MARK: - Private Methods
 

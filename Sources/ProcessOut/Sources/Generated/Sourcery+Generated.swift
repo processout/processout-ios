@@ -75,6 +75,10 @@ extension InvoicesRepository {
 }
 
 @available(iOS 13.0, *)
+extension LogsRepository {
+}
+
+@available(iOS 13.0, *)
 extension POCardsRepository {
 
     /// Tokenize a card.

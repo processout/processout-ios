@@ -8,5 +8,5 @@
 protocol LogsRepository: PORepository {
 
     /// Sends given log event.
-    func send(event: LogEvent)
+    func send(request: LogRequest)
 }

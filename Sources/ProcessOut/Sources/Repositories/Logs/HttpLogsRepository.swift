@@ -15,8 +15,8 @@ final class HttpLogsRepository: LogsRepository {
 
     // MARK: - LogsRepository
 
-    func send(event: LogEvent) {
-        let httpRequest = HttpConnectorRequest<VoidCodable>.post(path: "/logs", body: event)
+    func send(request: LogRequest) {
+        let httpRequest = HttpConnectorRequest<VoidCodable>.post(path: "/logs", body: request)
         connector.execute(request: httpRequest) { _ in }
     }
 

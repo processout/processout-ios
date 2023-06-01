@@ -132,15 +132,15 @@ public final class ProcessOut {
 
     private func createLogger(for category: String, includeRemoteDestination: Bool = true) -> POLogger {
         var destinations: [LoggerDestination] = [
-            SystemLoggerDestination(subsystem: Constants.systemLoggerSubsystem, category: category)
+            SystemLoggerDestination(subsystem: Constants.systemLoggerSubsystem)
         ]
         if includeRemoteDestination {
             let repository = HttpLogsRepository(connector: httpConnector)
-            let service = DefaultLogsService(repository: repository, category: category, minimumLevel: .error)
+            let service = DefaultLogsService(repository: repository, minimumLevel: .error)
             destinations.append(service)
         }
         let minimumLevel: LogLevel = configuration.isDebug ? .debug : .info
-        return POLogger(destinations: destinations, minimumLevel: minimumLevel)
+        return POLogger(destinations: destinations, category: category, minimumLevel: minimumLevel)
     }
 
     private func prewarm() {
