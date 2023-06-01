@@ -9,8 +9,9 @@ import Foundation
 
 final class DefaultLogsService: POService, LoggerDestination {
 
-    init(repository: LogsRepository, minimumLevel: LogLevel) {
+    init(repository: LogsRepository, category: String, minimumLevel: LogLevel) {
         self.repository = repository
+        self.category = category
         self.minimumLevel = minimumLevel
     }
 
@@ -28,7 +29,7 @@ final class DefaultLogsService: POService, LoggerDestination {
             level: string(from: entry.level),
             date: entry.timestamp,
             message: entry.message.interpolation.value,
-            eventType: Constants.defaultEventType, // todo(andrii-vysotskyi): add proper even type
+            eventType: category,
             attributes: attributes
         )
         repository.send(event: logEvent) { _ in /* Ignored */ }
@@ -37,7 +38,6 @@ final class DefaultLogsService: POService, LoggerDestination {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultEventType = "default"
         static let attributeFile = "File"
         static let attributeLine = "Line"
     }
@@ -46,6 +46,7 @@ final class DefaultLogsService: POService, LoggerDestination {
 
     private let repository: LogsRepository
     private let minimumLevel: LogLevel
+    private let category: String
 
     // MARK: - Private Methods
 

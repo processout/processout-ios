@@ -96,16 +96,19 @@ public final class ProcessOut {
     private lazy var repositoryLogger = createLogger(for: Constants.repositoryLoggerCategory)
 
     private lazy var httpConnector: HttpConnector = {
-        let connectorConfiguration = HttpConnectorRequestMapperConfiguration(
+        let configuration = HttpConnectorRequestMapperConfiguration(
             baseUrl: configuration.apiBaseUrl,
             projectId: configuration.projectId,
             privateKey: configuration.privateKey,
             version: ProcessOut.version,
             appVersion: configuration.appVersion
         )
+        // Connector logs are not sent to backend to avoid recursion. This
+        // may be not ideal because we may loose important events, such
+        // as decoding failures so approach may be reconsidered in future.
         let connector = ProcessOutHttpConnectorBuilder()
-            .with(configuration: connectorConfiguration)
-            .with(logger: logger)
+            .with(configuration: configuration)
+            .with(logger: createLogger(for: Constants.connectorLoggerCategory, includeRemoteDestination: false))
             .build()
         return connector
     }()
@@ -127,10 +130,15 @@ public final class ProcessOut {
         self.configuration = configuration
     }
 
-    private func createLogger(for category: String) -> POLogger {
-        let destinations: [LoggerDestination] = [
+    private func createLogger(for category: String, includeRemoteDestination: Bool = true) -> POLogger {
+        var destinations: [LoggerDestination] = [
             SystemLoggerDestination(subsystem: Constants.systemLoggerSubsystem, category: category)
         ]
+        if includeRemoteDestination {
+            let repository = HttpLogsRepository(connector: httpConnector, failureMapper: failureMapper)
+            let service = DefaultLogsService(repository: repository, category: category, minimumLevel: .error)
+            destinations.append(service)
+        }
         let minimumLevel: LogLevel = configuration.isDebug ? .debug : .info
         return POLogger(destinations: destinations, minimumLevel: minimumLevel)
     }
