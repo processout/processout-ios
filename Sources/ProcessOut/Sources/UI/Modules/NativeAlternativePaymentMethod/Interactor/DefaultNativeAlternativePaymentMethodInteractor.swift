@@ -56,7 +56,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                     }
                 }
             case .failure(let failure):
-                self?.logger.error("Failed to start payment: \(failure)")
+                self?.logger.info("Failed to start payment: \(failure)")
                 self?.setFailureStateUnchecked(failure: failure)
             }
         }
@@ -234,7 +234,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             case .success:
                 self?.setCapturedState()
             case .failure(let failure):
-                self?.logger.error("Did fail to capture invoice: \(failure)")
+                self?.logger.info("Did fail to capture invoice: \(failure)")
                 self?.setFailureStateUnchecked(failure: failure)
             }
         }
@@ -274,7 +274,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     private func restoreStartedStateAfterSubmissionFailureIfPossible(
         _ failure: POFailure, replaceErrorMessages: Bool = false
     ) {
-        logger.error("Did fail to submit parameters: \(failure)")
+        logger.info("Did fail to submit parameters: \(failure)")
         let startedState: State.Started
         switch state {
         case let .submitting(state), let .started(state):

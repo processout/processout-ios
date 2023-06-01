@@ -81,7 +81,7 @@ final class DefaultThreeDSService: ThreeDSService {
                     }
                     self.complete(with: response, completion: completion)
                 case let .failure(failure):
-                    logger.error("Failed to create authentication request: \(failure)")
+                    logger.info("Failed to create authentication request: \(failure)")
                     completion(.failure(failure))
                 }
             }
@@ -105,7 +105,7 @@ final class DefaultThreeDSService: ThreeDSService {
                         : Constants.challengeFailureEncodedResponse
                     completion(.success(Constants.tokenPrefix + encodedResponse))
                 case let .failure(failure):
-                    logger.error("Failed to handle challenge: \(failure)")
+                    logger.info("Failed to handle challenge: \(failure)")
                     completion(.failure(failure))
                 }
             }
@@ -136,7 +136,7 @@ final class DefaultThreeDSService: ThreeDSService {
                 }
                 self.complete(with: response, completion: completion)
             case let .failure(failure):
-                self.logger.error("Failed to handle url fingeprint: \(failure)")
+                self.logger.info("Failed to handle url fingeprint: \(failure)")
                 completion(.failure(failure))
             }
         }
