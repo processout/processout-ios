@@ -38,7 +38,10 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         guard case .idle = state else {
             return
         }
-        logger.info("Starting payment using configuration: \(String(describing: configuration))")
+        logger[attributeKey: "InvoiceId"] = configuration.invoiceId
+        logger.info(
+            "Starting native alternative payment", attributes: ["GatewayId": configuration.gatewayConfigurationId]
+        )
         send(event: .willStart)
         state = .starting
         let request = PONativeAlternativePaymentMethodTransactionDetailsRequest(
@@ -94,7 +97,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         guard case let .started(startedState) = state, startedState.isSubmitAllowed else {
             return
         }
-        logger.info("Will submit '\(configuration.invoiceId)' payment parameters")
+        logger.info("Will submit payment parameters")
         send(event: .willSubmitParameters)
         do {
             let values = try validated(values: startedState.values, for: startedState.parameters)
@@ -141,7 +144,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     }
 
     func cancel() {
-        logger.debug("Will attempt to cancel payment \(configuration.invoiceId)")
+        logger.debug("Will attempt to cancel payment.")
         switch state {
         case .started:
             setFailureStateUnchecked(failure: POFailure(code: .cancelled))
@@ -164,7 +167,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     private let invoicesService: POInvoicesService
     private let imagesRepository: POImagesRepository
     private let configuration: NativeAlternativePaymentMethodInteractorConfiguration
-    private let logger: POLogger
+    private var logger: POLogger
     private weak var delegate: PONativeAlternativePaymentMethodDelegate?
 
     private lazy var phoneNumberFormatter: PhoneNumberFormatter = {
@@ -184,7 +187,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         case .customerInput, nil:
             break
         case .pendingCapture:
-            logger.debug("No more parameters to submit for '\(configuration.invoiceId), waiting for capture")
+            logger.debug("No more parameters to submit, waiting for capture")
             trySetAwaitingCaptureStateUnchecked(
                 gatewayLogo: gatewayLogo, expectedActionMessage: details.gateway.customerActionMessage, actionImage: nil
             )
@@ -209,7 +212,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         )
         state = .started(startedState)
         send(event: .didStart)
-        logger.info("Did start \(configuration.invoiceId) payment, waiting for parameters")
+        logger.info("Did start payment, waiting for parameters")
     }
 
     private func trySetAwaitingCaptureStateUnchecked(
@@ -231,7 +234,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             case .success:
                 self?.setCapturedState()
             case .failure(let failure):
-                self?.logger.error("Did fail to capture invoice \(request.invoiceId): \(failure)")
+                self?.logger.error("Did fail to capture invoice: \(failure)")
                 self?.setFailureStateUnchecked(failure: failure)
             }
         }
@@ -241,7 +244,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             actionImage: actionImage
         )
         state = .awaitingCapture(awaitingCaptureState)
-        logger.info("Waiting for invoice \(configuration.invoiceId) capture confirmation")
+        logger.info("Waiting for invoice capture confirmation")
     }
 
     private func setCapturedState() {
@@ -258,7 +261,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     }
 
     private func setCapturedStateUnchecked(gatewayLogo: UIImage?) {
-        logger.info("Did receive invoice '\(configuration.invoiceId)' capture confirmation")
+        logger.info("Did receive invoice capture confirmation")
         if configuration.waitsPaymentConfirmation {
             state = .captured(.init(gatewayLogo: gatewayLogo))
             send(event: .didCompletePayment)
