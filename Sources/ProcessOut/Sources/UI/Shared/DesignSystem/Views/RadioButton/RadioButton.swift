@@ -38,11 +38,18 @@ final class RadioButton: UIControl {
             .string(viewModel.value)
             .build()
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
-            // todo(andrii-vysotskyi): center icon view vertically in first line of icon view
             if animated, valueLabel.attributedText != previousAttributedText {
                 valueLabel.addTransitionAnimation()
             }
             iconView.configure(isSelected: viewModel.isSelected, color: currentStyle.tintColor, animated: animated)
+            if let text = valueLabel.attributedText,
+               let paragraphStyle = text.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle {
+                // Ensures that icon and label's first line are verticaly aligned.
+                iconViewTopConstraint.constant = max(paragraphStyle.maximumLineHeight - Constants.iconSize, 0) / 2
+            } else {
+                iconViewTopConstraint.constant = 0
+                assertionFailure("Paragraph style should be set.")
+            }
         }
         self.isSelected = viewModel.isSelected
     }
@@ -77,15 +84,15 @@ final class RadioButton: UIControl {
         addSubview(iconView)
         addSubview(valueLabel)
         let constraints = [
+            heightAnchor.constraint(equalToConstant: Constants.iconSize).with(priority: .defaultHigh),
             iconView.leadingAnchor.constraint(equalTo: leadingAnchor),
             iconViewTopConstraint,
-            iconView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor),
             valueLabel.leadingAnchor.constraint(
                 equalTo: iconView.trailingAnchor, constant: Constants.horizontalSpacing
             ),
-            valueLabel.topAnchor.constraint(equalTo: topAnchor),
-            valueLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
-            valueLabel.bottomAnchor.constraint(equalTo: bottomAnchor).with(priority: .defaultHigh)
+            valueLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            valueLabel.topAnchor.constraint(greaterThanOrEqualTo: topAnchor),
+            valueLabel.trailingAnchor.constraint(equalTo: trailingAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
     }
