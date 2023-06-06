@@ -119,14 +119,12 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         ]
         for (offset, parameter) in startedState.parameters.enumerated() {
             let value = startedState.values[parameter.key] ?? .init(value: nil, recentErrorMessage: nil)
-            var items = [
-                createItem(
-                    parameter: parameter,
-                    value: value,
-                    isEditingAllowed: !isSubmitting,
-                    isLast: offset == startedState.parameters.indices.last
-                )
-            ]
+            var items = createItems(
+                parameter: parameter,
+                value: value,
+                isEditingAllowed: !isSubmitting,
+                isLast: offset == startedState.parameters.indices.last
+            )
             if let message = value.recentErrorMessage {
                 items.append(.error(State.ErrorItem(description: message)))
             }
@@ -249,12 +247,12 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     // MARK: - Input Items
 
-    private func createItem(
+    private func createItems(
         parameter: PONativeAlternativePaymentMethodParameter,
         value parameterValue: InteractorState.ParameterValue,
         isEditingAllowed: Bool,
         isLast: Bool
-    ) -> State.Item {
+    ) -> [State.Item] {
         let inputValue: State.InputValue
         if let value = inputValuesCache[parameter.key] {
             inputValue = value
@@ -277,9 +275,12 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         case .numeric where (parameter.length ?? .max) <= Constants.maximumCodeLength:
             // swiftlint:disable:next force_unwrapping
             let inputItem = State.CodeInputItem(length: parameter.length!, value: inputValue)
-            return .codeInput(inputItem)
+            return [.codeInput(inputItem)]
+        case .singleSelect where (parameter.availableValues?.count ?? 0) <= 5:
+            // todo(andrii-vysotskyi): instead of hardcoded 5, use value from configuration
+            return createRadioButtonItems(parameter: parameter, value: inputValue)
         case .singleSelect:
-            return createPickerItem(parameter: parameter, value: inputValue)
+            return [createPickerItem(parameter: parameter, value: inputValue)]
         default:
             let inputItem = State.InputItem(
                 type: parameter.type,
@@ -288,8 +289,27 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 isLast: isLast,
                 formatter: interactor.formatter(type: parameter.type)
             )
-            return .input(inputItem)
+            return [.input(inputItem)]
         }
+    }
+
+    private func createRadioButtonItems(
+        parameter: PONativeAlternativePaymentMethodParameter, value: State.InputValue
+    ) -> [State.Item] {
+        assert(parameter.type == .singleSelect)
+        let items = parameter.availableValues?.map { option in
+            let radioItem = State.RadioButtonItem(
+                // Value of single select parameter is not user friendly instead display name should be used.
+                value: option.displayName,
+                isSelected: option.value == value.text,
+                isInvalid: value.isInvalid,
+                select: { [weak self] in
+                    self?.interactor.updateValue(option.value, for: parameter.key)
+                }
+            )
+            return State.Item.radio(radioItem)
+        }
+        return items ?? []
     }
 
     private func createPickerItem(
