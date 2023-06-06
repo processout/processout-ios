@@ -24,7 +24,7 @@ final class RadioButton: UIControl {
         let currentStyle: PORadioButtonStateStyle
         if viewModel.isInError {
             currentStyle = style.error
-        } else if isSelected {
+        } else if viewModel.isSelected {
             currentStyle = style.selected
         } else {
             currentStyle = style.normal
@@ -32,6 +32,7 @@ final class RadioButton: UIControl {
         let previousAttributedText = valueLabel.attributedText
         valueLabel.attributedText = AttributedStringBuilder()
             .typography(currentStyle.value.typography)
+            .textStyle(textStyle: .body)
             .textColor(currentStyle.value.color)
             .alignment(.natural)
             .string(viewModel.value)
@@ -119,7 +120,7 @@ private final class RadioButtonIconView: UIView {
                 circleView.alpha = 0
             }
             circleView.backgroundColor = color
-            innerBorderView.backgroundColor = color
+            innerBorderView.layer.borderColor = color.cgColor
         }
         self.color = color
     }
@@ -148,7 +149,7 @@ private final class RadioButtonIconView: UIView {
     private lazy var innerBorderView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.borderColor = nil
+        view.layer.borderColor = UIColor.clear.cgColor
         view.layer.borderWidth = Constants.innerRingWidth
         view.layer.cornerRadius = size / 2 - Constants.innerRingWidth
         return view
@@ -159,6 +160,7 @@ private final class RadioButtonIconView: UIView {
     // MARK: - Private Methods
 
     private func commonInit() {
+        isUserInteractionEnabled = false
         translatesAutoresizingMaskIntoConstraints = false
         addSubview(innerBorderView)
         addSubview(circleView)
