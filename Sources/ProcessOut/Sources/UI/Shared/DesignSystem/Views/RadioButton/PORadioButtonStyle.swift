@@ -37,5 +37,7 @@ extension PORadioButtonStyle {
 
     // MARK: - Private Properties
 
-    private static let defaultValueStyle = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .bodyLarge)
+    private static let defaultValueStyle = POTextStyle(
+        color: Asset.Colors.Text.primary.color, typography: .bodyDefault1
+    )
 }
