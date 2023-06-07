@@ -295,10 +295,11 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 length: parameter.length!, value: inputValue, isCentered: shouldCenterCodeInput
             )
             return [.codeInput(inputItem)]
-        case .singleSelect where (parameter.availableValues?.count ?? 0) <= 5:
-            // todo(andrii-vysotskyi): instead of hardcoded 5, use value from configuration
-            return createRadioButtonItems(parameter: parameter, value: inputValue)
         case .singleSelect:
+            let optionsCount = parameter.availableValues?.count ?? 0
+            if optionsCount <= configuration.inlineSingleSelectValuesLimit {
+                return createRadioButtonItems(parameter: parameter, value: inputValue)
+            }
             return [createPickerItem(parameter: parameter, value: inputValue)]
         default:
             let inputItem = State.InputItem(
