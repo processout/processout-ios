@@ -15,7 +15,8 @@ public struct PO3DSRedirect: Hashable {
 
     /// Boolean value that indicates whether a given URL can be handled in headless mode, meaning
     /// without showing any UI for the user.
-    public let isHeadlessModeAllowed: Bool
+    @available(*, deprecated)
+    public let isHeadlessModeAllowed = false
 
     /// Optional timeout interval.
     public let timeout: TimeInterval?

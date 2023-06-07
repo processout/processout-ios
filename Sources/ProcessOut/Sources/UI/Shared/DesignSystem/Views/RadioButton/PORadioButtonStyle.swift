@@ -30,14 +30,14 @@ public final class PORadioButtonStyle {
 extension PORadioButtonStyle {
 
     static let `default` = PORadioButtonStyle(
-        normal: .init(tintColor: Asset.Colors.Border.primary.color, value: defaultValueStyle),
-        selected: .init(tintColor: Asset.Colors.Button.primary.color, value: defaultValueStyle),
-        error: .init(tintColor: Asset.Colors.Border.error.color, value: defaultValueStyle)
+        normal: .init(tintColor: Asset.Colors.Border.default.color, value: defaultValueStyle),
+        selected: .init(tintColor: Asset.Colors.Action.Primary.default.color, value: defaultValueStyle),
+        error: .init(tintColor: Asset.Colors.Text.error.color, value: defaultValueStyle)
     )
 
     // MARK: - Private Properties
 
     private static let defaultValueStyle = POTextStyle(
-        color: Asset.Colors.Text.primary.color, typography: .bodyDefault1
+        color: Asset.Colors.Text.primary.color, typography: .Fixed.label
     )
 }

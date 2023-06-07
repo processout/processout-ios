@@ -10,6 +10,8 @@ import UIKit
 @available(*, deprecated, renamed: "POActivityIndicatorView")
 public typealias POActivityIndicatorViewType = POActivityIndicatorView
 
+/// Protocol that activity indicator should conform to in order to be used with
+/// ``POActivityIndicatorStyle`` custom style.
 public protocol POActivityIndicatorView: UIView {
 
     /// Changes animation state.

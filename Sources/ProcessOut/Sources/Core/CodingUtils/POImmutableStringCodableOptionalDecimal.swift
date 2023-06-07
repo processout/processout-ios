@@ -60,11 +60,11 @@ extension KeyedEncodingContainer {
     }
 }
 
- extension KeyedDecodingContainer {
+extension KeyedDecodingContainer {
 
     func decode(
         _ type: POImmutableStringCodableOptionalDecimal.Type, forKey key: KeyedDecodingContainer<K>.Key
     ) throws -> POImmutableStringCodableOptionalDecimal {
         try type.init(from: try superDecoder(forKey: key))
     }
- }
+}

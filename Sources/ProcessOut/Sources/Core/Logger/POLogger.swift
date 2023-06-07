@@ -8,6 +8,7 @@
 import Foundation
 
 /// An object for writing interpolated string messages to the processout logging system.
+@_spi(PO)
 public final class POLogger {
 
     init(destinations: [LoggerDestination] = [], minimumLevel: LogLevel = .debug) {

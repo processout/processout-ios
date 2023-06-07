@@ -80,6 +80,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Value details.
         let value: InputValue
+
+        /// Indicates whether input should be centered.
+        let isCentered: Bool
     }
 
     struct InputItem: Hashable {
@@ -104,6 +107,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Error description.
         let description: String
+
+        /// Indicates whether error should be centered.
+        let isCentered: Bool
     }
 
     struct SubmittedItem: Hashable {
@@ -132,8 +138,13 @@ enum NativeAlternativePaymentMethodViewModelState {
         case submitted(SubmittedItem)
     }
 
-    enum SectionDecoration {
-        case normal, success
+    struct SectionHeader: Hashable {
+
+        /// Section title if any.
+        let title: String
+
+        /// Indicates whether section header should be centered.
+        let isCentered: Bool
     }
 
     struct SectionIdentifier: Hashable {
@@ -141,11 +152,8 @@ enum NativeAlternativePaymentMethodViewModelState {
         /// Section id.
         let id: String?
 
-        /// Section title if any.
-        let title: String?
-
-        /// Section decoration.
-        let decoration: SectionDecoration?
+        /// Section header if any.
+        let header: SectionHeader?
     }
 
     struct Section {
@@ -191,6 +199,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Boolean value indicating whether editing is allowed.
         let isEditingAllowed: Bool
+
+        /// Boolean value that indicates whether payment is already captured.
+        let isCaptured: Bool
     }
 
     case idle, started(Started)

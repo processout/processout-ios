@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Defines button style in all possible states.
 public struct POButtonStyle {
 
     /// Style for normal state.
@@ -39,48 +40,50 @@ extension POButtonStyle {
     /// Default style for primary button.
     public static let primary = POButtonStyle(
         normal: .init(
-            title: .init(color: Asset.Colors.Button.Text.primary.color, typography: .bodyDefault2),
+            title: .init(color: Asset.Colors.Text.onColor.color, typography: .Fixed.button),
             border: .clear(radius: 8),
             shadow: .clear,
-            backgroundColor: Asset.Colors.Button.primary.color
+            backgroundColor: Asset.Colors.Action.Primary.default.color
         ),
         highlighted: .init(
-            title: .init(color: Asset.Colors.Button.Text.primary.color, typography: .bodyDefault2),
+            title: .init(color: Asset.Colors.Text.onColor.color, typography: .Fixed.button),
             border: .clear(radius: 8),
             shadow: .clear,
-            backgroundColor: Asset.Colors.Button.highlighted.color
+            backgroundColor: Asset.Colors.Action.Primary.pressed.color
         ),
         disabled: .init(
-            title: .init(color: Asset.Colors.Text.disabled.color, typography: .bodyDefault2),
+            title: .init(color: Asset.Colors.Text.disabled.color, typography: .Fixed.button),
             border: .clear(radius: 8),
             shadow: .clear,
-            backgroundColor: Asset.Colors.Button.disabled.color
+            backgroundColor: Asset.Colors.Action.Primary.disabled.color
         ),
-        activityIndicator: activityIndicatorStyle(color: Asset.Colors.Button.Text.primary.color)
+        activityIndicator: activityIndicatorStyle(color: Asset.Colors.Text.onColor.color)
     )
 
     /// Default style for secondary button.
     public static let secondary = POButtonStyle(
         normal: .init(
-            title: .init(color: Asset.Colors.New.Text.secondary.color, typography: .bodyDefault2),
-            border: .init(radius: 8, width: 1, color: Asset.Colors.New.Border.default.color),
+            title: .init(color: Asset.Colors.Text.secondary.color, typography: .Fixed.button),
+            border: .regular(radius: 8, color: Asset.Colors.Border.default.color),
             shadow: .clear,
-            backgroundColor: Asset.Colors.New.Action.Secondary.default.color
+            backgroundColor: Asset.Colors.Action.Secondary.default.color
         ),
         highlighted: .init(
-            title: .init(color: Asset.Colors.New.Text.secondary.color, typography: .bodyDefault2),
-            border: .init(radius: 8, width: 1, color: Asset.Colors.New.Border.default.color),
+            title: .init(color: Asset.Colors.Text.secondary.color, typography: .Fixed.button),
+            border: .regular(radius: 8, color: Asset.Colors.Border.default.color),
             shadow: .clear,
-            backgroundColor: Asset.Colors.New.Action.Secondary.pressed.color
+            backgroundColor: Asset.Colors.Action.Secondary.pressed.color
         ),
         disabled: .init(
-            title: .init(color: Asset.Colors.New.Text.disabled.color, typography: .bodyDefault2),
-            border: .init(radius: 8, width: 1, color: Asset.Colors.New.Action.Border.disabled.color),
+            title: .init(color: Asset.Colors.Text.disabled.color, typography: .Fixed.button),
+            border: .regular(radius: 8, color: Asset.Colors.Action.Border.disabled.color),
             shadow: .clear,
             backgroundColor: .clear
         ),
-        activityIndicator: activityIndicatorStyle(color: Asset.Colors.New.Text.secondary.color)
+        activityIndicator: activityIndicatorStyle(color: Asset.Colors.Text.secondary.color)
     )
+
+    // MARK: - Private Methods
 
     private static func activityIndicatorStyle(color: UIColor) -> POActivityIndicatorStyle {
         if #available(iOS 13.0, *) {

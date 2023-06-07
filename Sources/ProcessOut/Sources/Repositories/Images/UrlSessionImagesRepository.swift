@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-final class UrlSessionImagesRepository: POImagesRepository {
+final class UrlSessionImagesRepository: ImagesRepository {
 
     init(session: URLSession) {
         self.session = session
