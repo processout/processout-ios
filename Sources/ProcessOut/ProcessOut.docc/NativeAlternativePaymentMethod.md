@@ -50,7 +50,9 @@ let payButtonStyle = POButtonStyle(
     ),
     activityIndicator: .system(.medium)
 )
-let style = PONativeAlternativePaymentMethodStyle(primaryButton: payButtonStyle)
+let style = PONativeAlternativePaymentMethodStyle(
+    actions: .init(primary: payButtonStyle, axis: .vertical)
+)
 let viewController = builder.with(style: style).build()
 ```
 

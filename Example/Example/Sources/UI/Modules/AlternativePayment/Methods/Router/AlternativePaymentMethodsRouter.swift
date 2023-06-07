@@ -28,7 +28,6 @@ final class AlternativePaymentMethodsRouter: RouterType {
                 }
                 .with(configuration: configuration)
                 .build()
-            viewController.additionalSafeAreaInsets.top = 12
             self.viewController?.present(viewController, animated: true)
         case let .alternativePayment(request):
             let viewController = POAlternativePaymentMethodViewControllerBuilder

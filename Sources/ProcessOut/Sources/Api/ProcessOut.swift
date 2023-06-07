@@ -150,6 +150,7 @@ public final class ProcessOut {
     }
 
     private func prewarm() {
+        FontFamily.registerAllCustomFonts()
         DefaultPhoneNumberMetadataProvider.shared.prewarm()
     }
 }

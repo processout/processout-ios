@@ -33,10 +33,10 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         }
         let descriptionStyle: POTextStyle
         if item.isCaptured {
-            descriptionStyle = style.successMessage ?? Constants.defaultSuccessMessageStyle
+            descriptionStyle = style.successMessage
             descriptionLabel.accessibilityIdentifier = "native-alternative-payment.captured.description"
         } else {
-            descriptionStyle = style.message ?? Constants.defaultMessageStyle
+            descriptionStyle = style.message
             descriptionLabel.accessibilityIdentifier = "native-alternative-payment.non-captured.description"
         }
         descriptionLabel.attributedText = AttributedStringBuilder()
@@ -48,6 +48,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
             .build()
         if let image = item.image {
             decorationImageView.image = image
+            decorationImageView.tintColor = descriptionStyle.color
             decorationImageView.setAspectRatio(image.size.width / image.size.height)
             decorationImageViewWidthConstraint.constant = image.size.width
             decorationImageView.setHidden(false)
@@ -63,16 +64,12 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultMessageStyle = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .headline)
-        static let defaultSuccessMessageStyle = POTextStyle(
-            color: Asset.Colors.Text.success.color, typography: .headline
-        )
         static let maximumLogoImageHeight: CGFloat = 32
         static let maximumDecorationImageHeight: CGFloat = 260
         static let verticalSpacing: CGFloat = 16
         static let descriptionBottomSpacing: CGFloat = 46
-        static let descriptionBottomSmallSpacing: CGFloat = 40
-        static let topContentInset: CGFloat = 26
+        static let descriptionBottomSmallSpacing: CGFloat = 24
+        static let topContentInset: CGFloat = 68
     }
 
     // MARK: - Private Properties
@@ -117,7 +114,6 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
     // MARK: - Private Methods
 
     private func commonInit() {
-        // adjust top and bottom spacing (take into account that there is already spacing added by collection
         contentView.addSubview(containerView)
         let constraints = [
             containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.topContentInset),

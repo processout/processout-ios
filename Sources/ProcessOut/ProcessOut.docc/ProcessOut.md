@@ -43,6 +43,8 @@ All errors that could happen as a result of interaction with the SDK are represe
 - <doc:NativeAlternativePaymentMethod>
 - ``PONativeAlternativePaymentMethodViewControllerBuilder``
 - ``PONativeAlternativePaymentMethodStyle``
+- ``PONativeAlternativePaymentMethodActionsStyle``
+- ``PONativeAlternativePaymentMethodBackgroundStyle``
 - ``PONativeAlternativePaymentMethodConfiguration``
 - ``PONativeAlternativePaymentMethodEvent``
 - ``PONativeAlternativePaymentMethodDelegate``
@@ -101,9 +103,8 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POBorderStyle``
 - ``POTypography``
 - ``POTextStyle``
-- ``POInputFormStyle``
-- ``POInputFormStateStyle``
-- ``POTextFieldStyle``
+- ``POInputStyle``
+- ``POInputStateStyle``
 - ``POButtonStyle``
 - ``POButtonStateStyle``
 - ``POActivityIndicatorStyle``
