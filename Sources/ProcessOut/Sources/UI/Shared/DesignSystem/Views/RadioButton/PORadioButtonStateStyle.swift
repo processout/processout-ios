@@ -8,7 +8,7 @@
 import UIKit
 
 /// Describes radio button style in a particular state, for example when selected.
-public final class PORadioButtonStateStyle {
+public struct PORadioButtonStateStyle {
 
     /// Tint color used primarly
     public let tintColor: UIColor

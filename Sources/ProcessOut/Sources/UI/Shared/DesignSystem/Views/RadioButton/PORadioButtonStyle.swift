@@ -8,7 +8,7 @@
 import Foundation
 
 /// Describes radio button style in different states.
-public final class PORadioButtonStyle {
+public struct PORadioButtonStyle {
 
     /// Style to use when radio button is in default state ie enabled and not selected.
     public let normal: PORadioButtonStateStyle
