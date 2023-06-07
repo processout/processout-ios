@@ -52,6 +52,12 @@ final class RadioButton: UIControl {
                 assertionFailure("Paragraph style should be set.")
             }
         }
+        if viewModel.isSelected {
+            accessibilityTraits = [.button, .selected]
+        } else {
+            accessibilityTraits = [.button]
+        }
+        accessibilityLabel = viewModel.value
         self.isSelected = viewModel.isSelected
     }
 
@@ -97,6 +103,7 @@ final class RadioButton: UIControl {
             valueLabel.trailingAnchor.constraint(equalTo: trailingAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
+        isAccessibilityElement = true
     }
 }
 

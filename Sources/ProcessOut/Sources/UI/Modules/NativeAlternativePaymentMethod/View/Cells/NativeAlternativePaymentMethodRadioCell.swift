@@ -36,7 +36,6 @@ final class NativeAlternativePaymentMethodRadioCell: UICollectionViewCell {
     // MARK: - Private Properties
 
     private lazy var radioButton: RadioButton = {
-        // todo(andrii-vysotskyi): test accessibility
         let radioButton = RadioButton()
         radioButton.addTarget(self, action: #selector(didTouchRadioButton), for: .touchUpInside)
         radioButton.accessibilityIdentifier = Constants.accessibilityIdentifier
