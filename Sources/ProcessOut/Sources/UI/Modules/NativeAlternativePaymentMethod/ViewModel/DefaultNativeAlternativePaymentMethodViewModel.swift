@@ -319,7 +319,6 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         assert(parameter.type == .singleSelect)
         let items = parameter.availableValues?.map { option in
             let radioItem = State.RadioButtonItem(
-                // Value of single select parameter is not user friendly instead display name should be used.
                 value: option.displayName,
                 isSelected: option.value == value.text,
                 isInvalid: value.isInvalid,
