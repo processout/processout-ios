@@ -35,8 +35,7 @@ public struct PONativeAlternativePaymentMethodConfiguration {
     public let secondaryAction: SecondaryAction?
 
     /// For parameters where user should select single option from multiple values defines
-    /// maximum number of options that framework will display inline (e.g. using radio buttons).
-    /// If number of options exceeds specified value 
+    /// maximum number of options that framework will display inline (e.g. using radio buttons). 
     ///
     /// Default value is `5`.
     public let inlineSingleSelectValuesLimit: Int
