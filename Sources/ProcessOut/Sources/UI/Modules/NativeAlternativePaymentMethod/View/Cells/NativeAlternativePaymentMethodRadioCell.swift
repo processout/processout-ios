@@ -19,18 +19,17 @@ final class NativeAlternativePaymentMethodRadioCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.RadioButtonItem, style: PORadioButtonStyle?) {
+    func configure(item: NativeAlternativePaymentMethodViewModelState.RadioButtonItem, style: PORadioButtonStyle) {
         let viewModel = RadioButtonViewModel(
             isSelected: item.isSelected, isInError: item.isInvalid, value: item.value
         )
-        radioButton.configure(viewModel: viewModel, style: style ?? Constants.defaultStyle, animated: false)
+        radioButton.configure(viewModel: viewModel, style: style, animated: false)
         self.item = item
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultStyle = PORadioButtonStyle.default
         static let accessibilityIdentifier = "native-alternative-payment.radio-button"
     }
 

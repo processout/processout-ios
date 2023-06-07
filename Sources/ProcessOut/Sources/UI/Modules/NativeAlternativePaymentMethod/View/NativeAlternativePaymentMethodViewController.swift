@@ -151,7 +151,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
                 viewType: NativeAlternativePaymentMethodRadioCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(item: item, style: nil) // todo(andrii-vysotskyi): use proper style
+                    cell.configure(item: item, style: self.style.radioButton)
                 }
             ).height
         case nil:
@@ -420,7 +420,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             return cell
         case .radio(let item):
             let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodRadioCell.self, for: indexPath)
-            cell.configure(item: item, style: nil) // todo(andrii-vysotskyi): use proper style
+            cell.configure(item: item, style: style.radioButton)
             return cell
         }
     }

@@ -22,6 +22,9 @@ public struct PONativeAlternativePaymentMethodStyle {
     /// Input style.
     public let codeInput: POInputStyle
 
+    /// Radio button style.
+    public let radioButton: PORadioButtonStyle
+
     /// Error description text style.
     public let errorDescription: POTextStyle
 
@@ -49,6 +52,7 @@ public struct PONativeAlternativePaymentMethodStyle {
         sectionTitle: POTextStyle? = nil,
         input: POInputStyle? = nil,
         codeInput: POInputStyle? = nil,
+        radioButton: PORadioButtonStyle? = nil,
         errorDescription: POTextStyle? = nil,
         actions: PONativeAlternativePaymentMethodActionsStyle? = nil,
         activityIndicator: POActivityIndicatorStyle? = nil,
@@ -61,6 +65,7 @@ public struct PONativeAlternativePaymentMethodStyle {
         self.sectionTitle = sectionTitle ?? Constants.sectionTitle
         self.input = input ?? Constants.input
         self.codeInput = codeInput ?? Constants.codeInput
+        self.radioButton = radioButton ?? Constants.radioButton
         self.errorDescription = errorDescription ?? Constants.errorDescription
         self.actions = actions ?? Constants.actions
         self.activityIndicator = activityIndicator ?? Constants.activityIndicator
@@ -77,6 +82,7 @@ public struct PONativeAlternativePaymentMethodStyle {
         static let sectionTitle = POTextStyle(color: Asset.Colors.Text.secondary.color, typography: .Fixed.labelHeading)
         static let input = POInputStyle.default()
         static let codeInput = POInputStyle.default(typography: .Medium.title)
+        static let radioButton = PORadioButtonStyle.default
         static let errorDescription = POTextStyle(color: Asset.Colors.Text.error.color, typography: .Fixed.label)
         static let actions = PONativeAlternativePaymentMethodActionsStyle()
         static let activityIndicator = POActivityIndicatorStyle.system(
