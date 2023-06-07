@@ -11,13 +11,25 @@ import SafariServices
 /// Builder that can be used to create view controller that is capable of handling 3DS web redirects.
 public final class PO3DSRedirectViewControllerBuilder {
 
-    public typealias Completion = (Result<String, POFailure>) -> Void
-
     /// Creates builder instance with given redirect information.
     /// - Parameters:
     ///   - redirect: redirect information.
-    public static func with(redirect: PO3DSRedirect) -> Self {
-        Self(redirect: redirect)
+    @available(*, deprecated, message: "Use non static method instead.")
+    public static func with(redirect: PO3DSRedirect) -> PO3DSRedirectViewControllerBuilder {
+        PO3DSRedirectViewControllerBuilder().with(redirect: redirect)
+    }
+
+    public typealias Completion = (Result<String, POFailure>) -> Void
+
+    /// Creates builder instance.
+    public init() {
+        safariConfiguration = SFSafariViewController.Configuration()
+    }
+
+    /// Changes redirect information.
+    public func with(redirect: PO3DSRedirect) -> Self {
+        self.redirect = redirect
+        return self
     }
 
     /// Completion to invoke when authorization ends.
@@ -42,10 +54,10 @@ public final class PO3DSRedirectViewControllerBuilder {
     ///
     /// - Note: Caller should dismiss view controller after completion is called.
     /// - Note: Returned object's delegate shouldn't be modified.
-    /// - Warning: Make sure that `completion` and `returnUrl` are set before calling
-    /// this method. Otherwise precondition failure is raised.
+    /// - Warning: Make sure that `completion`, `redirect` and `returnUrl`
+    /// are set before calling this method. Otherwise precondition failure is raised.
     public func build() -> SFSafariViewController {
-        guard let completion, let returnUrl else {
+        guard let completion, let returnUrl, let redirect else {
             preconditionFailure("Required parameters are not set.")
         }
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
@@ -65,16 +77,9 @@ public final class PO3DSRedirectViewControllerBuilder {
         return viewController
     }
 
-    // MARK: - Private Methods
-
-    private init(redirect: PO3DSRedirect) {
-        self.redirect = redirect
-        safariConfiguration = SFSafariViewController.Configuration()
-    }
-
     // MARK: - Private Properties
 
-    private let redirect: PO3DSRedirect
+    private var redirect: PO3DSRedirect?
     private var returnUrl: URL?
     private var completion: Completion?
     private var safariConfiguration: SFSafariViewController.Configuration

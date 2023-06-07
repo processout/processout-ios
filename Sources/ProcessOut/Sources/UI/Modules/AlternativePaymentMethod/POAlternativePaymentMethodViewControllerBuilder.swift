@@ -12,11 +12,25 @@ import SafariServices
 /// create view controller’s instance.
 public final class POAlternativePaymentMethodViewControllerBuilder {
 
+    /// Creates builder instance with given request.
+    @available(*, deprecated, message: "Use non static method instead.")
+    public static func with(
+        request: POAlternativePaymentMethodRequest
+    ) -> POAlternativePaymentMethodViewControllerBuilder {
+        POAlternativePaymentMethodViewControllerBuilder().with(request: request)
+    }
+
     public typealias Completion = (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
 
-    /// Creates builder instance with given request.
-    public static func with(request: POAlternativePaymentMethodRequest) -> Self {
-        Self(request: request)
+    /// Creates builder instance.
+    public init() {
+        safariConfiguration = SFSafariViewController.Configuration()
+    }
+
+    /// Changes request.
+    public func with(request: POAlternativePaymentMethodRequest) -> Self {
+        self.request = request
+        return self
     }
 
     /// Completion to invoke when authorization ends.
@@ -42,10 +56,10 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
     /// 
     /// - Note: Caller should dismiss view controller after completion is called.
     /// - Note: Returned object's delegate shouldn't be modified.
-    /// - Warning: Make sure that `completion` and `returnUrl` are set before calling
-    /// this method. Otherwise precondition failure is raised.
+    /// - Warning: Make sure that `completion`, `request` and `returnUrl` are set
+    /// before calling this method. Otherwise precondition failure is raised.
     public func build() -> SFSafariViewController {
-        guard let completion, let returnUrl else {
+        guard let completion, let returnUrl, let request else {
             preconditionFailure("Completion and return url must be set.")
         }
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
@@ -67,16 +81,9 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
         return viewController
     }
 
-    // MARK: -
-
-    init(request: POAlternativePaymentMethodRequest) {
-        self.request = request
-        safariConfiguration = SFSafariViewController.Configuration()
-    }
-
     // MARK: - Private Properties
 
-    private let request: POAlternativePaymentMethodRequest
+    private var request: POAlternativePaymentMethodRequest?
     private var completion: Completion?
     private var returnUrl: URL?
     private var safariConfiguration: SFSafariViewController.Configuration

@@ -13,35 +13,44 @@ import Checkout3DS
 public final class POCheckout3DSServiceBuilder {
 
     /// - NOTE: Delegate will be strongly referenced by created service.
+    @available(*, deprecated, message: "Use non static method instead.")
     public static func with(delegate: POCheckout3DSServiceDelegate) -> POCheckout3DSServiceBuilder {
-        Self(delegate: delegate)
+        POCheckout3DSServiceBuilder().with(delegate: delegate)
+    }
+
+    /// Creates builder instance.
+    public init() {
+        environment = .production
+    }
+
+    /// - NOTE: Delegate will be strongly referenced by created service.
+    public func with(delegate: POCheckout3DSServiceDelegate) -> Self {
+        self.delegate = delegate
+        return self
     }
 
     /// Sets environment used to initialize `Standalone3DSService`. Default value is `production`.
-    public func with(environment: Checkout3DS.Environment) -> POCheckout3DSServiceBuilder {
+    public func with(environment: Checkout3DS.Environment) -> Self {
         self.environment = environment
         return self
     }
 
     /// Creates service instance.
     public func build() -> PO3DSService {
-        Checkout3DSService(
+        guard let delegate else {
+            preconditionFailure("Delegate must be set.")
+        }
+        let service = Checkout3DSService(
             errorMapper: DefaultAuthenticationErrorMapper(),
             configurationMapper: DefaultConfigurationMapper(),
             delegate: delegate,
             environment: environment
         )
-    }
-
-    // MARK: -
-
-    private init(delegate: POCheckout3DSServiceDelegate) {
-        self.delegate = delegate
-        environment = .production
+        return service
     }
 
     // MARK: - Private Properties
 
-    private let delegate: POCheckout3DSServiceDelegate
+    private var delegate: POCheckout3DSServiceDelegate?
     private var environment: Checkout3DS.Environment
 }

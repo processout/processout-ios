@@ -29,7 +29,7 @@ func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFai
         .with(returnUrl: Constants.returnUrl)
         .with(completion: { result in
             sourceViewController.dismiss(animated: true)
-            completion(result) 
+            completion(result)
         })
         .build()
     sourceViewController.present(viewController, animated: true)

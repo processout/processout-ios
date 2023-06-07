@@ -15,10 +15,10 @@ ProcessOut.configure(configuration: configuration)
 
 ### Framework
 
-- <doc:MigratingFromProcessOut2>
-- <doc:Localizations>
 - ``ProcessOut/ProcessOut``
 - ``ProcessOutConfiguration``
+- <doc:Localizations>
+- <doc:MigrationGuides>
 
 ### Errors
 
@@ -91,10 +91,6 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``PONativeAlternativePaymentMethodTransactionDetailsRequest``
 - ``PONativeAlternativePaymentMethodState``
 
-### Images
-
-- ``POImagesRepository``
-
 ### Appearance
 
 Types that describe properties such as shadow and border. And style of higher level components, for example buttons and inputs.
@@ -116,14 +112,12 @@ Types that describe properties such as shadow and border. And style of higher le
 
 - ``POPaginationOptions``
 - ``POCancellable``
-- ``POAnyEncodable``
 - ``POImmutableExcludedCodable``
 - ``POImmutableStringCodableDecimal``
 - ``POImmutableStringCodableOptionalDecimal``
 - ``PORepository``
 - ``POService``
 - ``POAutoAsync``
-- ``POLogger``
 
 ### Legacy Declarations
 

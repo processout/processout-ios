@@ -8,8 +8,9 @@ create a view controller.
 The most basic implementation may look like following:
 
 ```swift
-let viewController = PONativeAlternativePaymentMethodViewControllerBuilder
-    .with(invoiceId: "invoice_id", gatewayConfigurationId: "gateway_configuration_id")
+let viewController = PONativeAlternativePaymentMethodViewControllerBuilder()
+    .with(invoiceId: "invoice_id")
+    .with(gatewayConfigurationId: "gateway_configuration_id")
     .with { result in
         // TODO: Handle result and hide controller
     }

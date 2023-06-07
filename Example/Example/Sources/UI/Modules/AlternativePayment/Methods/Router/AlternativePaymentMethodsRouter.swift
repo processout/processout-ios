@@ -19,8 +19,9 @@ final class AlternativePaymentMethodsRouter: RouterType {
                 secondaryAction: .cancel(),
                 paymentConfirmationSecondaryAction: .cancel(disabledFor: 10)
             )
-            let viewController = PONativeAlternativePaymentMethodViewControllerBuilder
-                .with(invoiceId: route.invoiceId, gatewayConfigurationId: route.gatewayConfigurationId)
+            let viewController = PONativeAlternativePaymentMethodViewControllerBuilder()
+                .with(invoiceId: route.invoiceId)
+                .with(gatewayConfigurationId: route.gatewayConfigurationId)
                 .with { [weak self] result in
                     self?.viewController?.dismiss(animated: true) {
                         route.completion(result)
@@ -30,7 +31,7 @@ final class AlternativePaymentMethodsRouter: RouterType {
                 .build()
             self.viewController?.present(viewController, animated: true)
         case let .alternativePayment(request):
-            let viewController = POAlternativePaymentMethodViewControllerBuilder
+            let viewController = POAlternativePaymentMethodViewControllerBuilder()
                 .with(request: request)
                 .with(returnUrl: Constants.returnUrl)
                 .with { [weak self] _ in

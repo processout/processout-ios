@@ -47,11 +47,6 @@ public final class ProcessOut {
         return DefaultInvoicesService(repository: repository, threeDSService: threeDSService)
     }()
 
-    /// Images repository.
-    public private(set) lazy var images: POImagesRepository = {
-        UrlSessionImagesRepository(session: .shared)
-    }()
-
     /// Returns alternative payment methods service.
     public private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
         DefaultAlternativePaymentMethodsService(
@@ -77,9 +72,6 @@ public final class ProcessOut {
         return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService)
     }()
 
-    /// Logger with application category.
-    public private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
-
     /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. You can pass
     /// both custom scheme-based deep links and universal links.
     ///
@@ -89,6 +81,17 @@ public final class ProcessOut {
         let event = DeepLinkReceivedEvent(url: url)
         return eventEmitter.emit(event: event)
     }
+
+    // MARK: - SPI
+
+    /// Logger with application category.
+    @_spi(PO)
+    public private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
+
+    // MARK: - Internal
+
+    /// Images repository.
+    private(set) lazy var images: ImagesRepository = UrlSessionImagesRepository(session: .shared)
 
     // MARK: - Internal
 
@@ -154,6 +157,3 @@ public final class ProcessOut {
         DefaultPhoneNumberMetadataProvider.shared.prewarm()
     }
 }
-
-@available(*, deprecated, message: "Use ProcessOut directly")
-extension ProcessOut: ProcessOutApiType { }
