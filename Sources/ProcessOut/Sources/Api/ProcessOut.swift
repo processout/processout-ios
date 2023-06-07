@@ -80,6 +80,21 @@ public final class ProcessOut {
     /// Logger with application category.
     public private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
 
+    /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. You can pass
+    /// both custom scheme-based deep links and universal links.
+    ///
+    /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
+    @discardableResult
+    public func processDeepLink(url: URL) -> Bool {
+        let event = DeepLinkReceivedEvent(url: url)
+        return eventEmitter.emit(event: event)
+    }
+
+    // MARK: - Internal
+
+    /// Event emitter to use for events exchange.
+    private(set) lazy var eventEmitter: EventEmitter = LocalEventEmitter()
+
     // MARK: - Private Nested Types
 
     private enum Constants {

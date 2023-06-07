@@ -1,5 +1,5 @@
 //
-//  WebViewControllerDelegate.swift
+//  DefaultSafariViewModelDelegate.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 11.11.2022.
@@ -7,10 +7,7 @@
 
 import Foundation
 
-protocol WebViewControllerDelegate: AnyObject {
-
-    /// Returns url to use for initial navigation.
-    var url: URL { get }
+protocol DefaultSafariViewModelDelegate: AnyObject {
 
     /// Asks delegate to complete with given url.
     /// - Throws: error if transform is not possible for some reason.

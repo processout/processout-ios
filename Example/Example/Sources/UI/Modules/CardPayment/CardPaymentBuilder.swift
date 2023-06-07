@@ -11,7 +11,7 @@ import ProcessOut
 final class CardPaymentBuilder {
 
     func build() -> UIViewController {
-        let threeDSService = POTest3DSService()
+        let threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
         let router = CardPaymentRouter()
         let viewModel = CardPaymentViewModel(
             router: router,
