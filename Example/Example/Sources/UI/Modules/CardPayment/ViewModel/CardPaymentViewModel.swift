@@ -121,7 +121,10 @@ final class CardPaymentViewModel: BaseViewModel<CardPaymentViewModelState>, Card
             )
             let card = try await cardsService.tokenize(request: cardTokenizationRequest)
             let invoiceCreationRequest = POInvoiceCreationRequest(
-                name: UUID().uuidString, amount: amount.wrappedValue, currency: currencyCode.wrappedValue
+                name: UUID().uuidString,
+                amount: amount.wrappedValue,
+                currency: currencyCode.wrappedValue,
+                returnUrl: Constants.returnUrl
             )
             let invoice = try await invoicesService.createInvoice(request: invoiceCreationRequest)
             let invoiceAuthorizationRequest = POInvoiceAuthorizationRequest(

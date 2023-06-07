@@ -12,8 +12,8 @@ import UIKit
 public final class POTest3DSService: PO3DSService {
 
     /// Creates service instance.
-    public init() {
-        // NOP
+    public init(returnUrl: URL) {
+        self.returnUrl = returnUrl
     }
 
     /// View controller to use for presentations.
@@ -53,6 +53,7 @@ public final class POTest3DSService: PO3DSService {
     public func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
         let viewController = PO3DSRedirectViewControllerBuilder()
             .with(redirect: redirect)
+            .with(returnUrl: returnUrl)
             .with { [weak self] result in
                 self?.viewController.dismiss(animated: true) {
                     completion(result)
@@ -61,4 +62,8 @@ public final class POTest3DSService: PO3DSService {
             .build()
         self.viewController.present(viewController, animated: true)
     }
+
+    // MARK: - Private Properties
+
+    private let returnUrl: URL
 }

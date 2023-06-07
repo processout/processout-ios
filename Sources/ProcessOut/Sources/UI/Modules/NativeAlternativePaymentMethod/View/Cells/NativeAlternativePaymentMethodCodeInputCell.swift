@@ -15,18 +15,15 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
         observations = []
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputFormStyle?) {
+    func configure(item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputStyle) {
         initialize(length: item.length)
-        let style = style ?? Constants.defaultStyle
-        codeTextField.configure(
-            style: item.value.isInvalid ? style.error.field : style.normal.field,
-            animated: false
-        )
+        codeTextField.configure(isInvalid: item.value.isInvalid, style: style, animated: false)
         if codeTextField.text != item.value.text {
             codeTextField.text = item.value.text
         }
         codeTextField.keyboardType = .numberPad
         codeTextField.textContentType = .oneTimeCode
+        codeTextFieldCenterXConstraint.isActive = item.isCentered
         observeChanges(item: item, style: style)
         self.item = item
     }
@@ -42,13 +39,16 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultStyle = POInputFormStyle.code
         static let accessibilityIdentifier = "native-alternative-payment.code-input"
     }
 
     // MARK: - Private Properties
 
-    private var codeTextField: CodeTextField! // swiftlint:disable:this implicitly_unwrapped_optional
+    // swiftlint:disable implicitly_unwrapped_optional
+    private var codeTextField: CodeTextField!
+    private var codeTextFieldCenterXConstraint: NSLayoutConstraint!
+    // swiftlint:enable implicitly_unwrapped_optional
+
     private var item: NativeAlternativePaymentMethodViewModelState.CodeInputItem?
     private var observations: [AnyObject] = []
 
@@ -65,12 +65,14 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
         codeTextField.addTarget(self, action: #selector(textFieldEditingChanged), for: .editingChanged)
         contentView.addSubview(codeTextField)
         let constraints = [
-            codeTextField.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor),
-            codeTextField.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            codeTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).with(priority: .defaultHigh),
+            codeTextField.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor),
             codeTextField.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
         self.codeTextField = codeTextField
+        // Center constraint is disabled by default
+        self.codeTextFieldCenterXConstraint = codeTextField.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
     }
 
     @objc
@@ -78,13 +80,9 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
         item?.value.text = codeTextField.text ?? ""
     }
 
-    private func observeChanges(
-        item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputFormStyle
-    ) {
+    private func observeChanges(item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputStyle) {
         let isInvalidObserver = item.value.$isInvalid.addObserver { [weak self] isInvalid in
-            self?.codeTextField.configure(
-                style: isInvalid ? style.error.field : style.normal.field, animated: true
-            )
+            self?.codeTextField.configure(isInvalid: isInvalid, style: style, animated: true)
         }
         let valueObserver = item.value.$text.addObserver { [weak self] updatedValue in
             if self?.codeTextField.text != updatedValue {

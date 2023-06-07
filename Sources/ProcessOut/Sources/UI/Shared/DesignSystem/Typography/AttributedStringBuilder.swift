@@ -101,9 +101,12 @@ final class AttributedStringBuilder {
     // MARK: - Private Methods
 
     private func baselineOffset(font: UIFont, expectedLineHeight: CGFloat) -> CGFloat {
-        // Workaround for bug in UIKit. In order to shift baseline to the top for the text with
-        // the same baseline offset value, offset should be divided by two.
         let offset = (expectedLineHeight - font.capHeight) / 2 + font.descender
+        if #available(iOS 16, *) {
+            return offset
+        }
+        // Workaround for bug in UIKit. In order to shift baseline to the top, offset should be divided
+        // by two on iOS < 16.
         return offset < 0 ? offset : offset / 2
     }
 
