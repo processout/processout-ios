@@ -46,9 +46,9 @@ final class RadioButton: UIControl {
             if let text = valueLabel.attributedText,
                let paragraphStyle = text.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle {
                 // Ensures that icon and label's first line are verticaly aligned.
-                iconViewTopConstraint.constant = max(paragraphStyle.maximumLineHeight - Constants.iconSize, 0) / 2
+                iconViewCenterYConstraint.constant = paragraphStyle.maximumLineHeight / 2
             } else {
-                iconViewTopConstraint.constant = 0
+                iconViewCenterYConstraint.constant = 0
                 assertionFailure("Paragraph style should be set.")
             }
         }
@@ -58,15 +58,13 @@ final class RadioButton: UIControl {
     // MARK: - Private Nested Types
 
     private enum Constants {
+        static let minimumHeight: CGFloat = 40
         static let iconSize: CGFloat = 18
         static let animationDuration: CGFloat = 8
         static let horizontalSpacing: CGFloat = 8
     }
 
     // MARK: - Private Properties
-
-    private lazy var iconView = RadioButtonIconView(size: Constants.iconSize)
-    private lazy var iconViewTopConstraint = iconView.topAnchor.constraint(equalTo: topAnchor)
 
     private lazy var valueLabel: UILabel = {
         let label = UILabel()
@@ -78,6 +76,9 @@ final class RadioButton: UIControl {
         return label
     }()
 
+    private lazy var iconView = RadioButtonIconView(size: Constants.iconSize)
+    private lazy var iconViewCenterYConstraint = iconView.centerYAnchor.constraint(equalTo: valueLabel.topAnchor)
+
     // MARK: - Private Methods
 
     private func commonInit() {
@@ -85,9 +86,9 @@ final class RadioButton: UIControl {
         addSubview(iconView)
         addSubview(valueLabel)
         let constraints = [
-            heightAnchor.constraint(equalToConstant: Constants.iconSize).with(priority: .defaultHigh),
+            heightAnchor.constraint(equalToConstant: Constants.minimumHeight).with(priority: .defaultHigh),
             iconView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            iconViewTopConstraint,
+            iconViewCenterYConstraint,
             valueLabel.leadingAnchor.constraint(
                 equalTo: iconView.trailingAnchor, constant: Constants.horizontalSpacing
             ),
