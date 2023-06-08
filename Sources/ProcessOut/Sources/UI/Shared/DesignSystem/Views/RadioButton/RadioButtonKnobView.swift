@@ -23,7 +23,7 @@ final class RadioButtonKnobView: UIView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if traitCollection.isColorAppearanceDifferent(to: previousTraitCollection), let style {
-            configureInnerBorderViewBorder(style: style.border)
+            configureBorder(style: style.border)
         }
     }
 
@@ -33,8 +33,7 @@ final class RadioButtonKnobView: UIView {
             circleViewWidthConstraint.constant = style.innerCircleRadius * 2
             backgroundColor = style.backgroundColor
             circleView.backgroundColor = style.innerCircleColor
-            configureInnerBorderViewBorder(style: style.border)
-            innerBorderViewWidthConstraint.constant = max(size - 2 * style.border.width, 0)
+            configureBorder(style: style.border)
         }
         self.style = style
     }
@@ -56,44 +55,29 @@ final class RadioButtonKnobView: UIView {
         return view
     }()
 
-    private lazy var innerBorderView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.borderColor = UIColor.clear.cgColor
-        return view
-    }()
-
-    private lazy var innerBorderViewWidthConstraint = innerBorderView.widthAnchor.constraint(equalToConstant: 0)
     private lazy var circleViewWidthConstraint = circleView.widthAnchor.constraint(equalToConstant: 0)
-
     private var style: PORadioButtonKnobStateStyle?
 
     // MARK: - Private Methods
 
     private func commonInit() {
         clipsToBounds = true
-        layer.cornerRadius = size / 2
         isUserInteractionEnabled = false
         translatesAutoresizingMaskIntoConstraints = false
-        addSubview(innerBorderView)
         addSubview(circleView)
         let constraints = [
             circleViewWidthConstraint,
             circleView.heightAnchor.constraint(equalTo: circleView.widthAnchor),
             circleView.centerXAnchor.constraint(equalTo: centerXAnchor),
             circleView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            innerBorderViewWidthConstraint,
-            innerBorderView.heightAnchor.constraint(equalTo: innerBorderView.widthAnchor),
-            innerBorderView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            innerBorderView.centerYAnchor.constraint(equalTo: centerYAnchor),
             widthAnchor.constraint(equalToConstant: size),
             heightAnchor.constraint(equalTo: widthAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
     }
 
-    private func configureInnerBorderViewBorder(style: POBorderStyle) {
-        innerBorderView.apply(style: style)
-        innerBorderView.layer.cornerRadius = size / 2 - style.width
+    private func configureBorder(style: POBorderStyle) {
+        apply(style: style)
+        layer.cornerRadius = size / 2 // Knob shape should be always circular
     }
 }
