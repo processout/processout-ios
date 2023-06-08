@@ -72,6 +72,7 @@ final class RadioButtonKnobView: UIView {
 
     private func commonInit() {
         clipsToBounds = true
+        layer.cornerRadius = size / 2
         isUserInteractionEnabled = false
         translatesAutoresizingMaskIntoConstraints = false
         addSubview(innerBorderView)
