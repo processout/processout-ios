@@ -21,52 +21,22 @@ final class RadioButton: UIControl {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(viewModel: RadioButtonViewModel, style: PORadioButtonStyle = .default, animated: Bool) {
-        let currentStyle: PORadioButtonStateStyle
-        if viewModel.isInError {
-            currentStyle = style.error
-        } else if viewModel.isSelected {
-            currentStyle = style.selected
-        } else {
-            currentStyle = style.normal
-        }
-        let previousAttributedText = valueLabel.attributedText
-        valueLabel.attributedText = AttributedStringBuilder()
-            .typography(currentStyle.value.typography)
-            .textStyle(textStyle: .body)
-            .textColor(currentStyle.value.color)
-            .alignment(.natural)
-            .string(viewModel.value)
-            .build()
-        UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
-            if animated, valueLabel.attributedText != previousAttributedText {
-                valueLabel.addTransitionAnimation()
-            }
-            iconView.configure(isSelected: viewModel.isSelected, color: currentStyle.tintColor, animated: animated)
-            if let text = valueLabel.attributedText,
-               let paragraphStyle = text.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle {
-                // Ensures that icon and label's first line are verticaly aligned.
-                iconViewCenterYConstraint.constant = paragraphStyle.maximumLineHeight / 2
-            } else {
-                iconViewCenterYConstraint.constant = 0
-                assertionFailure("Paragraph style should be set.")
-            }
-        }
-        if viewModel.isSelected {
-            accessibilityTraits = [.button, .selected]
-        } else {
-            accessibilityTraits = [.button]
-        }
-        accessibilityLabel = viewModel.value
-        self.isSelected = viewModel.isSelected
+    override var isHighlighted: Bool {
+        didSet { configureWithCurrentState(animated: true) }
+    }
+
+    func configure(viewModel: RadioButtonViewModel, style: PORadioButtonStyle, animated: Bool) {
+        self.viewModel = viewModel
+        self.style = style
+        configureWithCurrentState(animated: animated)
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
         static let minimumHeight: CGFloat = 40
-        static let iconSize: CGFloat = 18
-        static let animationDuration: CGFloat = 8
+        static let knobSize: CGFloat = 18
+        static let animationDuration: TimeInterval = 0.25
         static let horizontalSpacing: CGFloat = 8
     }
 
@@ -82,21 +52,24 @@ final class RadioButton: UIControl {
         return label
     }()
 
-    private lazy var iconView = RadioButtonIconView(size: Constants.iconSize)
-    private lazy var iconViewCenterYConstraint = iconView.centerYAnchor.constraint(equalTo: valueLabel.topAnchor)
+    private lazy var knobView = RadioButtonKnobView(size: Constants.knobSize)
+    private lazy var knobViewCenterYConstraint = knobView.centerYAnchor.constraint(equalTo: valueLabel.topAnchor)
+
+    private var viewModel: RadioButtonViewModel?
+    private var style: PORadioButtonStyle?
 
     // MARK: - Private Methods
 
     private func commonInit() {
         translatesAutoresizingMaskIntoConstraints = false
-        addSubview(iconView)
+        addSubview(knobView)
         addSubview(valueLabel)
         let constraints = [
             heightAnchor.constraint(equalToConstant: Constants.minimumHeight).with(priority: .defaultHigh),
-            iconView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            iconViewCenterYConstraint,
+            knobView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            knobViewCenterYConstraint,
             valueLabel.leadingAnchor.constraint(
-                equalTo: iconView.trailingAnchor, constant: Constants.horizontalSpacing
+                equalTo: knobView.trailingAnchor, constant: Constants.horizontalSpacing
             ),
             valueLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
             valueLabel.topAnchor.constraint(greaterThanOrEqualTo: topAnchor),
@@ -105,93 +78,54 @@ final class RadioButton: UIControl {
         NSLayoutConstraint.activate(constraints)
         isAccessibilityElement = true
     }
-}
 
-private final class RadioButtonIconView: UIView {
-
-    init(size: CGFloat) {
-        assert(size >= Constants.minimumSize, "Size should be greater than \(Constants.minimumSize)")
-        self.size = size
-        super.init(frame: .zero)
-        commonInit()
-    }
-
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if traitCollection.isColorAppearanceDifferent(to: previousTraitCollection) {
-            innerBorderView.layer.borderColor = color?.cgColor
+    private func configureWithCurrentState(animated: Bool) {
+        guard let viewModel, let style else {
+            return
         }
-    }
-
-    func configure(isSelected: Bool, color: UIColor, animated: Bool) {
+        let currentStyle = currentStyle(style: style, viewModel: viewModel, isHighlighted: isHighlighted)
+        let previousAttributedText = valueLabel.attributedText
+        valueLabel.attributedText = AttributedStringBuilder()
+            .typography(currentStyle.value.typography)
+            .textStyle(textStyle: .body)
+            .textColor(currentStyle.value.color)
+            .alignment(.natural)
+            .string(viewModel.value)
+            .build()
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
-            if isSelected {
-                circleView.alpha = 1
-            } else {
-                circleView.alpha = 0
+            if animated, valueLabel.attributedText != previousAttributedText {
+                valueLabel.addTransitionAnimation()
             }
-            circleView.backgroundColor = color
-            innerBorderView.layer.borderColor = color.cgColor
+            knobView.configure(style: currentStyle.knob, animated: animated)
+            if let text = valueLabel.attributedText,
+               let paragraphStyle = text.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle {
+                // Ensures that knob and label's first line are verticaly aligned.
+                knobViewCenterYConstraint.constant = paragraphStyle.maximumLineHeight / 2
+            } else {
+                knobViewCenterYConstraint.constant = 0
+                assertionFailure("Paragraph style should be set.")
+            }
         }
-        self.color = color
+        if viewModel.isSelected {
+            accessibilityTraits = [.button, .selected]
+        } else {
+            accessibilityTraits = [.button]
+        }
+        accessibilityLabel = viewModel.value
     }
 
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let animationDuration: TimeInterval = 0.25
-        static let minimumSize = circleSize + innerRingWidth * 2
-        static let circleSize: CGFloat = 8
-        static let innerRingWidth: CGFloat = 1
-    }
-
-    // MARK: - Private Properties
-
-    private let size: CGFloat
-
-    private lazy var circleView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.clipsToBounds = true
-        view.layer.cornerRadius = Constants.circleSize / 2
-        return view
-    }()
-
-    private lazy var innerBorderView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.borderColor = UIColor.clear.cgColor
-        view.layer.borderWidth = Constants.innerRingWidth
-        view.layer.cornerRadius = size / 2 - Constants.innerRingWidth
-        return view
-    }()
-
-    private var color: UIColor?
-
-    // MARK: - Private Methods
-
-    private func commonInit() {
-        isUserInteractionEnabled = false
-        translatesAutoresizingMaskIntoConstraints = false
-        addSubview(innerBorderView)
-        addSubview(circleView)
-        let constraints = [
-            circleView.widthAnchor.constraint(equalToConstant: Constants.circleSize),
-            circleView.heightAnchor.constraint(equalTo: circleView.widthAnchor),
-            circleView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            circleView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            innerBorderView.widthAnchor.constraint(equalToConstant: size - Constants.innerRingWidth * 2),
-            innerBorderView.heightAnchor.constraint(equalTo: innerBorderView.widthAnchor),
-            innerBorderView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            innerBorderView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            widthAnchor.constraint(equalToConstant: size),
-            heightAnchor.constraint(equalTo: widthAnchor)
-        ]
-        NSLayoutConstraint.activate(constraints)
+    private func currentStyle(
+        style: PORadioButtonStyle, viewModel: RadioButtonViewModel, isHighlighted: Bool
+    ) -> PORadioButtonStateStyle {
+        if viewModel.isSelected {
+            return style.selected
+        }
+        if isHighlighted {
+            return style.highlighted
+        }
+        if viewModel.isInError {
+            return style.error
+        }
+        return style.normal
     }
 }

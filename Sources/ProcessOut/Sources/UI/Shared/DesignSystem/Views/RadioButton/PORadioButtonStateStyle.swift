@@ -10,15 +10,15 @@ import UIKit
 /// Describes radio button style in a particular state, for example when selected.
 public struct PORadioButtonStateStyle {
 
-    /// Tint color used primarly
-    public let tintColor: UIColor
+    /// Styling of the radio button knob not including value.
+    public let knob: PORadioButtonKnobStateStyle
 
     /// Radio button's value style.
     public let value: POTextStyle
 
     /// Creates state style.
-    public init(tintColor: UIColor, value: POTextStyle) {
-        self.tintColor = tintColor
+    public init(knob: PORadioButtonKnobStateStyle, value: POTextStyle) {
+        self.knob = knob
         self.value = value
     }
 }

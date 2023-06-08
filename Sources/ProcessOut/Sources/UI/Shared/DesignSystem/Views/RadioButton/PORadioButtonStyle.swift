@@ -16,13 +16,23 @@ public struct PORadioButtonStyle {
     /// Style to use when radio button is selected.
     public let selected: PORadioButtonStateStyle
 
+    /// Style to use when radio button is highlighted. Note that radio can transition
+    /// to this state when already selected.
+    public let highlighted: PORadioButtonStateStyle
+
     /// Style to use when radio button is in error state.
     public let error: PORadioButtonStateStyle
 
     /// Creates style instance.
-    public init(normal: PORadioButtonStateStyle, selected: PORadioButtonStateStyle, error: PORadioButtonStateStyle) {
+    public init(
+        normal: PORadioButtonStateStyle,
+        selected: PORadioButtonStateStyle,
+        highlighted: PORadioButtonStateStyle,
+        error: PORadioButtonStateStyle
+    ) {
         self.normal = normal
         self.selected = selected
+        self.highlighted = highlighted
         self.error = error
     }
 }
@@ -30,14 +40,45 @@ public struct PORadioButtonStyle {
 extension PORadioButtonStyle {
 
     static let `default` = PORadioButtonStyle(
-        normal: .init(tintColor: Asset.Colors.Border.default.color, value: defaultValueStyle),
-        selected: .init(tintColor: Asset.Colors.Action.Primary.default.color, value: defaultValueStyle),
-        error: .init(tintColor: Asset.Colors.Text.error.color, value: defaultValueStyle)
+        normal: .init(
+            knob: .init(
+                backgroundColor: .clear,
+                border: .regular(radius: 0, color: Asset.Colors.Border.default.color),
+                innerCircleColor: .clear,
+                innerCircleRadius: 0
+            ),
+            value: valueStyle
+        ),
+        selected: .init(
+            knob: .init(
+                backgroundColor: .clear,
+                border: .regular(radius: 0, color: Asset.Colors.Action.Primary.default.color),
+                innerCircleColor: Asset.Colors.Action.Primary.default.color,
+                innerCircleRadius: 4
+            ),
+            value: valueStyle
+        ),
+        highlighted: .init(
+            knob: .init(
+                backgroundColor: .clear,
+                border: .regular(radius: 0, color: Asset.Colors.Text.muted.color),
+                innerCircleColor: .clear,
+                innerCircleRadius: 0
+            ),
+            value: valueStyle
+        ),
+        error: .init(
+            knob: .init(
+                backgroundColor: .clear,
+                border: .regular(radius: 0, color: Asset.Colors.Text.error.color),
+                innerCircleColor: .clear,
+                innerCircleRadius: 0
+            ),
+            value: valueStyle
+        )
     )
 
     // MARK: - Private Properties
 
-    private static let defaultValueStyle = POTextStyle(
-        color: Asset.Colors.Text.primary.color, typography: .Fixed.label
-    )
+    private static let valueStyle = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .Fixed.label)
 }

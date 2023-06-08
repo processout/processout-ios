@@ -101,8 +101,9 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POTextStyle``
 - ``POInputStyle``
 - ``POInputStateStyle``
-- ``PORadioButtonStateStyle``
 - ``PORadioButtonStyle``
+- ``PORadioButtonStateStyle``
+- ``PORadioButtonKnobStateStyle``
 - ``POButtonStyle``
 - ``POButtonStateStyle``
 - ``POActivityIndicatorStyle``
