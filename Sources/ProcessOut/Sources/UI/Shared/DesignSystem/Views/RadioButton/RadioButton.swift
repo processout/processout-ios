@@ -99,7 +99,7 @@ final class RadioButton: UIControl {
             knobView.configure(style: currentStyle.knob, animated: animated)
             if let text = valueLabel.attributedText,
                let paragraphStyle = text.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle {
-                // Ensures that knob and label's first line are verticaly aligned.
+                // Ensures that knob and label's first line are verticaly center aligned.
                 knobViewCenterYConstraint.constant = paragraphStyle.maximumLineHeight / 2
             } else {
                 knobViewCenterYConstraint.constant = 0
