@@ -1,8 +1,7 @@
-name: Create Documentation
-on: 
-  push:
-    tags:
-      - '*'
+name: Release Documentation
+on:
+  release:
+    types: [published]
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,7 +11,8 @@ concurrency:
   group: "pages"
   cancel-in-progress: true
 jobs:
-  create-documentation:
+  release-documentation:
+    name: Release Documentation
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
