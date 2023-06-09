@@ -17,6 +17,22 @@ enum NativeAlternativePaymentMethodViewModelState {
         let text: String
     }
 
+    struct RadioButtonItem: Hashable {
+
+        /// Current value.
+        let value: String
+
+        /// Indicates whether radio button is selected.
+        let isSelected: Bool
+
+        /// Boolean value indicating whether value is valid.
+        let isInvalid: Bool
+
+        /// Closure to invoke when radio button is selected.
+        @ImmutableNullHashable
+        var select: () -> Void
+    }
+
     struct PickerOption: Hashable {
 
         /// Option name.
@@ -116,6 +132,7 @@ enum NativeAlternativePaymentMethodViewModelState {
         case title(TitleItem)
         case input(InputItem)
         case codeInput(CodeInputItem)
+        case radio(RadioButtonItem)
         case picker(PickerItem)
         case error(ErrorItem)
         case submitted(SubmittedItem)

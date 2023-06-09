@@ -85,7 +85,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         for (section, sectionId) in snapshot.sectionIdentifiers.enumerated() {
             for item in snapshot.itemIdentifiers(inSection: sectionId) {
                 switch item {
-                case .loader, .codeInput, .input, .picker:
+                case .loader, .codeInput, .input, .picker, .radio:
                     return section
                 default:
                     break
@@ -146,6 +146,14 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             ).height
         case .input, .codeInput, .picker:
             height = Constants.inputHeight
+        case .radio(let item):
+            height = collectionReusableViewSizeProvider.systemLayoutSize(
+                viewType: NativeAlternativePaymentMethodRadioCell.self,
+                preferredWidth: adjustedBounds.width,
+                configure: { cell in
+                    cell.configure(item: item, style: self.style.radioButton)
+                }
+            ).height
         case nil:
             height = .zero
         }
@@ -371,6 +379,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         collectionView.registerCell(NativeAlternativePaymentMethodErrorCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodSubmittedCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodPickerCell.self)
+        collectionView.registerCell(NativeAlternativePaymentMethodRadioCell.self)
     }
 
     private func cell(for item: ItemIdentifier, at indexPath: IndexPath) -> UICollectionViewCell? {
@@ -408,6 +417,10 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         case .picker(let item):
             let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodPickerCell.self, for: indexPath)
             cell.configure(item: item, style: style.input)
+            return cell
+        case .radio(let item):
+            let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodRadioCell.self, for: indexPath)
+            cell.configure(item: item, style: style.radioButton)
             return cell
         }
     }

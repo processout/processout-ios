@@ -120,10 +120,10 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         var sections = [
             State.Section(id: .init(id: nil, header: nil), items: [.title(titleItem)])
         ]
+        let shouldCenterCodeInput = startedState.parameters.count == 1
         for (offset, parameter) in startedState.parameters.enumerated() {
             let value = startedState.values[parameter.key] ?? .init(value: nil, recentErrorMessage: nil)
-            let shouldCenterCodeInput = startedState.parameters.count == 1
-            let parameterItem = createItem(
+            var items = createItems(
                 parameter: parameter,
                 value: value,
                 isEditingAllowed: !isSubmitting,
@@ -131,10 +131,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 shouldCenterCodeInput: shouldCenterCodeInput
             )
             var isCentered = false
-            if case .codeInput = parameterItem, shouldCenterCodeInput {
+            if case .codeInput = items.first, shouldCenterCodeInput {
                 isCentered = true
             }
-            var items = [parameterItem]
             if let message = value.recentErrorMessage {
                 items.append(.error(State.ErrorItem(description: message, isCentered: isCentered)))
             }
@@ -264,13 +263,13 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     // MARK: - Input Items
 
-    private func createItem(
+    private func createItems(
         parameter: PONativeAlternativePaymentMethodParameter,
         value parameterValue: InteractorState.ParameterValue,
         isEditingAllowed: Bool,
         isLast: Bool,
         shouldCenterCodeInput: Bool
-    ) -> State.Item {
+    ) -> [State.Item] {
         let inputValue: State.InputValue
         if let value = inputValuesCache[parameter.key] {
             inputValue = value
@@ -295,9 +294,13 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 // swiftlint:disable:next force_unwrapping
                 length: parameter.length!, value: inputValue, isCentered: shouldCenterCodeInput
             )
-            return .codeInput(inputItem)
+            return [.codeInput(inputItem)]
         case .singleSelect:
-            return createPickerItem(parameter: parameter, value: inputValue)
+            let optionsCount = parameter.availableValues?.count ?? 0
+            if optionsCount <= configuration.inlineSingleSelectValuesLimit {
+                return createRadioButtonItems(parameter: parameter, value: inputValue)
+            }
+            return [createPickerItem(parameter: parameter, value: inputValue)]
         default:
             let inputItem = State.InputItem(
                 type: parameter.type,
@@ -306,8 +309,26 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 isLast: isLast,
                 formatter: interactor.formatter(type: parameter.type)
             )
-            return .input(inputItem)
+            return [.input(inputItem)]
         }
+    }
+
+    private func createRadioButtonItems(
+        parameter: PONativeAlternativePaymentMethodParameter, value: State.InputValue
+    ) -> [State.Item] {
+        assert(parameter.type == .singleSelect)
+        let items = parameter.availableValues?.map { option in
+            let radioItem = State.RadioButtonItem(
+                value: option.displayName,
+                isSelected: option.value == value.text,
+                isInvalid: value.isInvalid,
+                select: { [weak self] in
+                    self?.interactor.updateValue(option.value, for: parameter.key)
+                }
+            )
+            return State.Item.radio(radioItem)
+        }
+        return items ?? []
     }
 
     private func createPickerItem(
