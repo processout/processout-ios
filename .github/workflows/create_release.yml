@@ -12,5 +12,5 @@ jobs:
         uses: ./.github/actions/bootstrap-project
       - name: Create Release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PO_GITHUB_TOKEN }}
         run: source Scripts/CreateRelease.sh
