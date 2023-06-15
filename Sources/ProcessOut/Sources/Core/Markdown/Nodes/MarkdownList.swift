@@ -25,7 +25,16 @@ final class MarkdownList: MarkdownNode {
             let marker = Character(Unicode.Scalar(listNode.bullet_char))
             return .bullet(marker: marker)
         case CMARK_ORDERED_LIST.rawValue:
-            let delimiter = Character(Unicode.Scalar(listNode.delimiter))
+            let delimiter: Character
+            switch cmark_node_get_list_delim(rawNode) {
+            case CMARK_PERIOD_DELIM:
+                delimiter = "."
+            case CMARK_PAREN_DELIM:
+                delimiter = ")"
+            default:
+                assertionFailure("Unexpected delimiter type")
+                delimiter = "."
+            }
             let startIndex = Int(listNode.start)
             return .ordered(delimiter: delimiter, startIndex: startIndex)
         default:

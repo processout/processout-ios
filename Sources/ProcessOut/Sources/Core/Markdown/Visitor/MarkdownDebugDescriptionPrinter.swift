@@ -15,18 +15,16 @@ final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
 
     // MARK: - MarkdownVisitor
 
+    func visit(node: MarkdownUnknown) -> String {
+        description(node: node, nodeName: "Unknown")
+    }
+
     func visit(node: MarkdownDocument) -> String {
         description(node: node, nodeName: "Document")
     }
 
-    func visit(node: MarkdownParagraph) -> String {
-        description(node: node, nodeName: "Paragraph")
-    }
-
-    func visit(node: MarkdownText) -> String {
-        // Actual newlines are replaced with newline description for better readability.
-        let content = node.value.replacingOccurrences(of: "\n", with: "\\n")
-        return description(node: node, nodeName: "Text", content: content)
+    func visit(node: MarkdownEmphasis) -> String {
+        description(node: node, nodeName: "Emphasis")
     }
 
     func visit(node: MarkdownList) -> String {
@@ -44,16 +42,56 @@ final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
         description(node: node, nodeName: "Item")
     }
 
+    func visit(node: MarkdownParagraph) -> String {
+        description(node: node, nodeName: "Paragraph")
+    }
+
     func visit(node: MarkdownStrong) -> String {
         description(node: node, nodeName: "Bold")
     }
 
-    func visit(node: MarkdownEmphasis) -> String {
-        description(node: node, nodeName: "Emphasis")
+    func visit(node: MarkdownText) -> String {
+        description(node: node, nodeName: "Text", content: node.value)
     }
 
-    func visit(node: MarkdownUnknown) -> String {
-        description(node: node, nodeName: "Unknown")
+    func visit(node: MarkdownSoftbreak) -> String {
+        description(node: node, nodeName: "Softbreak")
+    }
+
+    func visit(node: MarkdownLinebreak) -> String {
+        description(node: node, nodeName: "Linebreak")
+    }
+
+    func visit(node: MarkdownHeading) -> String {
+        description(node: node, nodeName: "Heading", attributes: ["level": node.level])
+    }
+
+    func visit(node: MarkdownBlockQuote) -> String {
+        description(node: node, nodeName: "Block Quote")
+    }
+
+    func visit(node: MarkdownCodeBlock) -> String {
+        var attributes: [String: CustomStringConvertible] = [:]
+        if let info = node.info {
+            attributes["info"] = info
+        }
+        return description(node: node, nodeName: "Code Block", attributes: attributes, content: node.code)
+    }
+
+    func visit(node: MarkdownThematicBreak) -> String {
+        description(node: node, nodeName: "Thematic Break")
+    }
+
+    func visit(node: MarkdownCodeSpan) -> String {
+        description(node: node, nodeName: "Code Span", content: node.code)
+    }
+
+    func visit(node: MarkdownLink) -> String {
+        var attributes: [String: CustomStringConvertible] = [:]
+        if let title = node.title {
+            attributes["title"] = title
+        }
+        return description(node: node, nodeName: "Link", attributes: attributes, content: node.url)
     }
 
     // MARK: - Private Properties
@@ -72,8 +110,12 @@ final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
         if !attributesDescription.isEmpty {
             description += " (\(attributesDescription))"
         }
-        if let content {
-            description += ": \(content)"
+        if let content, !content.isEmpty {
+            // Newlines and tabs are visualized for better readability.
+            let escapedContent = content
+                .replacingOccurrences(of: "\n", with: "\\n")
+                .replacingOccurrences(of: "\t", with: "\\t")
+            description += ": \(escapedContent)"
         }
         return description
     }

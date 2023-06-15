@@ -23,3 +23,7 @@ final class MarkdownDocument: MarkdownNode {
         visitor.visit(node: self)
     }
 }
+
+public func markdownDebugDescription(string: String) -> String {
+    MarkdownParser().parse(string: string).debugDescription
+}
