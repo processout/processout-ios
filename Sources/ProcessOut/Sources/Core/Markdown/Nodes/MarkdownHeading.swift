@@ -7,13 +7,13 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownHeading: MarkdownNode {
+final class MarkdownHeading: MarkdownBaseNode {
 
     private(set) lazy var level: Int = {
         Int(cmarkNode.pointee.as.heading.level)
     }()
 
-    // MARK: - MarkdownNode
+    // MARK: - MarkdownBaseNode
 
     override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_HEADING

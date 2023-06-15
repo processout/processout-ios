@@ -7,7 +7,7 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownThematicBreak: MarkdownNode {
+final class MarkdownThematicBreak: MarkdownBaseNode {
 
     override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_THEMATIC_BREAK

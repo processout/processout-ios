@@ -7,7 +7,7 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownLink: MarkdownNode {
+final class MarkdownLink: MarkdownBaseNode {
 
     private(set) lazy var title: String? = {
         if let url = cmarkNode.pointee.as.link.title {
@@ -23,7 +23,7 @@ final class MarkdownLink: MarkdownNode {
         return nil
     }()
 
-    // MARK: - MarkdownNode
+    // MARK: - MarkdownBaseNode
 
     override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_LINK

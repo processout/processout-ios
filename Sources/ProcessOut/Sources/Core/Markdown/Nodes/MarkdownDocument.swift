@@ -7,13 +7,13 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownDocument: MarkdownNode {
+final class MarkdownDocument: MarkdownBaseNode {
 
     deinit {
         cmark_node_free(cmarkNode)
     }
 
-    // MARK: - MarkdownNode
+    // MARK: - MarkdownBaseNode
 
     override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_DOCUMENT

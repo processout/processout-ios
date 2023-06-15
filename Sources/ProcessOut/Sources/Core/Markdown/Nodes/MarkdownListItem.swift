@@ -7,9 +7,9 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownListItem: MarkdownNode {
+final class MarkdownListItem: MarkdownBaseNode {
 
-    // MARK: - MarkdownNode
+    // MARK: - MarkdownBaseNode
 
     override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_ITEM

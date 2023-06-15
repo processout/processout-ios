@@ -9,21 +9,21 @@
 
 final class MarkdownNodeFactory {
 
-    init(rawNode: MarkdownNode.CmarkNode) {
-        self.rawNode = rawNode
+    init(rawNode: MarkdownBaseNode.CmarkNode) {
+        self.cmarkNode = rawNode
     }
 
-    func create() -> MarkdownNode {
-        let nodeType = UInt32(rawNode.pointee.type)
+    func create() -> MarkdownBaseNode {
+        let nodeType = UInt32(cmarkNode.pointee.type)
         guard nodeType != CMARK_NODE_NONE.rawValue else {
             preconditionFailure("Invalid node")
         }
         // HTML and images are intentionally not supported.
         guard let nodeInit = Self.nodeInits[nodeType] else {
             assertionFailure("Unknown node type: \(nodeType)")
-            return MarkdownUnknown(cmarkNode: rawNode)
+            return MarkdownUnknown(cmarkNode: cmarkNode)
         }
-        return nodeInit(rawNode, true)
+        return nodeInit(cmarkNode, true)
     }
 
     // MARK: - Private Properties
@@ -46,5 +46,5 @@ final class MarkdownNodeFactory {
         MarkdownLink.cmarkNodeType.rawValue: MarkdownLink.init
     ]
 
-    private let rawNode: MarkdownNode.CmarkNode
+    private let cmarkNode: MarkdownBaseNode.CmarkNode
 }

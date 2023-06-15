@@ -123,7 +123,7 @@ final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
     }
 
     private func description(
-        node: MarkdownNode,
+        node: MarkdownBaseNode,
         nodeName: String,
         attributes: [String: CustomStringConvertible] = [:],
         content: String? = nil
@@ -139,7 +139,7 @@ final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
     }
 }
 
-extension MarkdownNode: CustomDebugStringConvertible {
+extension MarkdownBaseNode: CustomDebugStringConvertible {
 
     var debugDescription: String {
         let visitor = MarkdownDebugDescriptionPrinter()

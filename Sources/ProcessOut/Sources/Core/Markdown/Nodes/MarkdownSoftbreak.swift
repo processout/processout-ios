@@ -7,7 +7,7 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownSoftbreak: MarkdownNode {
+final class MarkdownSoftbreak: MarkdownBaseNode {
 
     override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_SOFTBREAK

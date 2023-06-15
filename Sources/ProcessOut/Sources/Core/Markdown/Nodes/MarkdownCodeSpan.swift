@@ -7,7 +7,7 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownCodeSpan: MarkdownNode {
+final class MarkdownCodeSpan: MarkdownBaseNode {
 
     private(set) lazy var code: String = {
         guard let literal = cmark_node_get_literal(cmarkNode) else {
@@ -17,7 +17,7 @@ final class MarkdownCodeSpan: MarkdownNode {
         return String(cString: literal)
     }()
 
-    // MARK: - MarkdownNode
+    // MARK: - MarkdownBaseNode
 
     override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_CODE

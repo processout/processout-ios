@@ -7,9 +7,9 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownStrong: MarkdownNode {
+final class MarkdownStrong: MarkdownBaseNode {
 
-    // MARK: - MarkdownNode
+    // MARK: - MarkdownBaseNode
 
     override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_STRONG

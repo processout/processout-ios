@@ -1,5 +1,5 @@
 //
-//  MarkdownNode.swift
+//  MarkdownBaseNode.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 12.06.2023.
@@ -7,7 +7,7 @@
 
 @_implementationOnly import cmark
 
-class MarkdownNode {
+class MarkdownBaseNode {
 
     typealias CmarkNode = UnsafeMutablePointer<cmark_node>
 
@@ -23,9 +23,9 @@ class MarkdownNode {
     }
 
     /// Returns node children.
-    private(set) lazy var children: [MarkdownNode] = {
+    private(set) lazy var children: [MarkdownBaseNode] = {
         var rawNextChild = cmarkNode.pointee.first_child
-        var children: [MarkdownNode] = []
+        var children: [MarkdownBaseNode] = []
         while let rawNode = rawNextChild {
             let child = MarkdownNodeFactory(rawNode: rawNode).create()
             children.append(child)

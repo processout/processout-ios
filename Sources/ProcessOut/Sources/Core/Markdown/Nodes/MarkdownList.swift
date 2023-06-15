@@ -7,7 +7,7 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownList: MarkdownNode {
+final class MarkdownList: MarkdownBaseNode {
 
     enum ListType {
 
@@ -46,7 +46,7 @@ final class MarkdownList: MarkdownNode {
         cmarkNode.pointee.as.list.tight
     }()
 
-    // MARK: - MarkdownNode
+    // MARK: - MarkdownBaseNode
 
     override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_LIST

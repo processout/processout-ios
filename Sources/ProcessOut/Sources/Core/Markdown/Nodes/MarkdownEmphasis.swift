@@ -7,9 +7,9 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownEmphasis: MarkdownNode {
+final class MarkdownEmphasis: MarkdownBaseNode {
 
-    // MARK: - MarkdownNode
+    // MARK: - MarkdownBaseNode
 
     override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_EMPH

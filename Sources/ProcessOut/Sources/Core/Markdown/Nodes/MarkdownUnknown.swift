@@ -8,13 +8,13 @@
 import Foundation
 
 /// Unknown node.
-final class MarkdownUnknown: MarkdownNode {
+final class MarkdownUnknown: MarkdownBaseNode {
 
-    init(cmarkNode: MarkdownNode.CmarkNode) {
+    init(cmarkNode: MarkdownBaseNode.CmarkNode) {
         super.init(cmarkNode: cmarkNode, validatesType: false)
     }
 
-    // MARK: - MarkdownNode
+    // MARK: - MarkdownBaseNode
 
     override func accept<V: MarkdownVisitor>(visitor: V) -> V.Result {
         visitor.visit(node: self)

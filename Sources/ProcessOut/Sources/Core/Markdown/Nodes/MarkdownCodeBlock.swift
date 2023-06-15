@@ -7,7 +7,7 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownCodeBlock: MarkdownNode {
+final class MarkdownCodeBlock: MarkdownBaseNode {
 
     /// Returns the info string from a fenced code block.
     private(set) lazy var info: String? = {
@@ -25,7 +25,7 @@ final class MarkdownCodeBlock: MarkdownNode {
         return String(cString: literal)
     }()
 
-    // MARK: - MarkdownNode
+    // MARK: - MarkdownBaseNode
 
     override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_CODE_BLOCK
