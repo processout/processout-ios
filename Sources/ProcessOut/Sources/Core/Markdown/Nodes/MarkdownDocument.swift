@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 11.06.2023.
 //
 
-import cmark
+@_implementationOnly import cmark
 
 final class MarkdownDocument: MarkdownNode {
 
