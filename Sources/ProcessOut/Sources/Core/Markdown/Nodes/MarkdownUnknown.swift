@@ -10,8 +10,8 @@ import Foundation
 /// Unknown node.
 final class MarkdownUnknown: MarkdownNode {
 
-    init(node: MarkdownNode.CmarkNode) {
-        super.init(node: node, validatesType: false)
+    init(cmarkNode: MarkdownNode.CmarkNode) {
+        super.init(cmarkNode: cmarkNode, validatesType: false)
     }
 
     // MARK: - MarkdownNode

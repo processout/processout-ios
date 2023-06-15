@@ -16,6 +16,6 @@ final class MarkdownParser {
         guard let document else {
             preconditionFailure("Failed to parse markdown document")
         }
-        return MarkdownDocument(node: document)
+        return MarkdownDocument(cmarkNode: document)
     }
 }
