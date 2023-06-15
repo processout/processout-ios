@@ -10,7 +10,7 @@
 final class MarkdownCodeSpan: MarkdownNode {
 
     private(set) lazy var code: String = {
-        guard let literal = cmark_node_get_literal(rawNode) else {
+        guard let literal = cmark_node_get_literal(cmarkNode) else {
             assertionFailure("Unable to get text node value")
             return ""
         }
@@ -19,7 +19,7 @@ final class MarkdownCodeSpan: MarkdownNode {
 
     // MARK: - MarkdownNode
 
-    override class var rawType: cmark_node_type {
+    override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_CODE
     }
 

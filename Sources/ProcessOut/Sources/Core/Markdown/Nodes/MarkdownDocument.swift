@@ -10,20 +10,16 @@
 final class MarkdownDocument: MarkdownNode {
 
     deinit {
-        cmark_node_free(rawNode)
+        cmark_node_free(cmarkNode)
     }
 
     // MARK: - MarkdownNode
 
-    override class var rawType: cmark_node_type {
+    override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_DOCUMENT
     }
 
     override func accept<V: MarkdownVisitor>(visitor: V) -> V.Result {
         visitor.visit(node: self)
     }
-}
-
-public func markdownDebugDescription(string: String) -> String {
-    MarkdownParser().parse(string: string).debugDescription
 }

@@ -10,12 +10,12 @@
 final class MarkdownHeading: MarkdownNode {
 
     private(set) lazy var level: Int = {
-        Int(rawNode.pointee.as.heading.level)
+        Int(cmarkNode.pointee.as.heading.level)
     }()
 
     // MARK: - MarkdownNode
 
-    override class var rawType: cmark_node_type {
+    override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_HEADING
     }
 

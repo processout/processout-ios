@@ -9,16 +9,22 @@
 
 class MarkdownNode {
 
-    init(node: NodePointer, validateType: Bool = true) {
-        if validateType {
-            assert(node.pointee.type == Self.rawType.rawValue)
+    typealias CmarkNode = UnsafeMutablePointer<cmark_node>
+
+    class var cmarkNodeType: cmark_node_type {
+        fatalError("Must be implemented by subclass.")
+    }
+
+    init(node: CmarkNode, validatesType: Bool = true) {
+        if validatesType {
+            assert(node.pointee.type == Self.cmarkNodeType.rawValue)
         }
-        self.rawNode = node
+        self.cmarkNode = node
     }
 
     /// Returns node children.
     private(set) lazy var children: [MarkdownNode] = {
-        var rawNextChild = rawNode.pointee.first_child
+        var rawNextChild = cmarkNode.pointee.first_child
         var children: [MarkdownNode] = []
         while let rawNode = rawNextChild {
             let child = MarkdownNodeFactory(rawNode: rawNode).create()
@@ -28,18 +34,10 @@ class MarkdownNode {
         return children
     }()
 
+    let cmarkNode: CmarkNode
+
     /// Accepts given visitor.
     func accept<V: MarkdownVisitor>(visitor: V) -> V.Result { // swiftlint:disable:this unavailable_function
         fatalError("Must be implemented by subclass.")
     }
-
-    // MARK: - Raw Content
-
-    typealias NodePointer = UnsafeMutablePointer<cmark_node>
-
-    class var rawType: cmark_node_type {
-        CMARK_NODE_NONE
-    }
-
-    let rawNode: NodePointer
 }

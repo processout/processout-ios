@@ -11,7 +11,7 @@ final class MarkdownEmphasis: MarkdownNode {
 
     // MARK: - MarkdownNode
 
-    override class var rawType: cmark_node_type {
+    override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_EMPH
     }
 

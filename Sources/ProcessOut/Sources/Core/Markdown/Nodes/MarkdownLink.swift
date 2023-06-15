@@ -10,14 +10,14 @@
 final class MarkdownLink: MarkdownNode {
 
     private(set) lazy var title: String? = {
-        if let url = rawNode.pointee.as.link.title {
+        if let url = cmarkNode.pointee.as.link.title {
             return String(cString: url)
         }
         return nil
     }()
 
     private(set) lazy var url: String? = {
-        if let url = rawNode.pointee.as.link.url {
+        if let url = cmarkNode.pointee.as.link.url {
             return String(cString: url)
         }
         return nil
@@ -25,7 +25,7 @@ final class MarkdownLink: MarkdownNode {
 
     // MARK: - MarkdownNode
 
-    override class var rawType: cmark_node_type {
+    override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_LINK
     }
 

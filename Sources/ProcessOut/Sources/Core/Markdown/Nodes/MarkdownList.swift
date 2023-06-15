@@ -19,14 +19,14 @@ final class MarkdownList: MarkdownNode {
     }
 
     private(set) lazy var type: ListType = {
-        let listNode = rawNode.pointee.as.list
+        let listNode = cmarkNode.pointee.as.list
         switch UInt32(listNode.list_type) {
         case CMARK_BULLET_LIST.rawValue:
             let marker = Character(Unicode.Scalar(listNode.bullet_char))
             return .bullet(marker: marker)
         case CMARK_ORDERED_LIST.rawValue:
             let delimiter: Character
-            switch cmark_node_get_list_delim(rawNode) {
+            switch cmark_node_get_list_delim(cmarkNode) {
             case CMARK_PERIOD_DELIM:
                 delimiter = "."
             case CMARK_PAREN_DELIM:
@@ -43,12 +43,12 @@ final class MarkdownList: MarkdownNode {
     }()
 
     private(set) lazy var isTight: Bool = {
-        rawNode.pointee.as.list.tight
+        cmarkNode.pointee.as.list.tight
     }()
 
     // MARK: - MarkdownNode
 
-    override class var rawType: cmark_node_type {
+    override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_LIST
     }
 

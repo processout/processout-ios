@@ -11,14 +11,14 @@ final class MarkdownCodeBlock: MarkdownNode {
 
     /// Returns the info string from a fenced code block.
     private(set) lazy var info: String? = {
-        guard let info = rawNode.pointee.as.code.info else {
+        guard let info = cmarkNode.pointee.as.code.info else {
             return nil
         }
         return String(cString: info)
     }()
 
     private(set) lazy var code: String = {
-        guard let literal = cmark_node_get_literal(rawNode) else {
+        guard let literal = cmark_node_get_literal(cmarkNode) else {
             assertionFailure("Unable to get text node value")
             return ""
         }
@@ -27,7 +27,7 @@ final class MarkdownCodeBlock: MarkdownNode {
 
     // MARK: - MarkdownNode
 
-    override class var rawType: cmark_node_type {
+    override class var cmarkNodeType: cmark_node_type {
         CMARK_NODE_CODE_BLOCK
     }
 
