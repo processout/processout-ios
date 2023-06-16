@@ -34,16 +34,17 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         let descriptionStyle: POTextStyle
         if item.isCaptured {
             descriptionStyle = style.successMessage
-            descriptionLabel.accessibilityIdentifier = "native-alternative-payment.captured.description"
+            descriptionTextView.accessibilityIdentifier = "native-alternative-payment.captured.description"
         } else {
             descriptionStyle = style.message
-            descriptionLabel.accessibilityIdentifier = "native-alternative-payment.non-captured.description"
+            descriptionTextView.accessibilityIdentifier = "native-alternative-payment.non-captured.description"
         }
-        descriptionLabel.attributedText = AttributedStringBuilder()
+        descriptionTextView.attributedText = AttributedStringBuilder()
             .typography(descriptionStyle.typography)
             .textStyle(textStyle: .headline)
             .textColor(descriptionStyle.color)
-            .alignment(.center)
+            .lineBreakMode(.byWordWrapping)
+            .alignment(.center) // todo: (andrii-vysotskyi): determine alignment base on contents of markdown.
             .string(item.message)
             .build()
         if let image = item.image {
@@ -57,7 +58,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         }
         containerView.setCustomSpacing(
             item.isCaptured ? Constants.descriptionBottomSpacing : Constants.descriptionBottomSmallSpacing,
-            after: descriptionLabel
+            after: descriptionTextView
         )
     }
 
@@ -75,7 +76,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
     // MARK: - Private Properties
 
     private lazy var containerView: UIStackView = {
-        let view = UIStackView(arrangedSubviews: [iconImageView, descriptionLabel, decorationImageView])
+        let view = UIStackView(arrangedSubviews: [iconImageView, descriptionTextView, decorationImageView])
         view.translatesAutoresizingMaskIntoConstraints = false
         view.spacing = Constants.verticalSpacing
         view.axis = .vertical
@@ -89,14 +90,20 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         return imageView
     }()
 
-    private lazy var descriptionLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 0
-        label.setContentHuggingPriority(.required, for: .vertical)
-        label.setContentCompressionResistancePriority(.required, for: .vertical)
-        label.adjustsFontForContentSizeCategory = false
-        return label
+    private lazy var descriptionTextView: UITextView = {
+        let textView = UITextView()
+        textView.backgroundColor = .clear
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.textContainerInset = .zero
+        textView.textContainer.lineFragmentPadding = 0
+        textView.setContentHuggingPriority(.required, for: .vertical)
+        textView.setContentCompressionResistancePriority(.required, for: .vertical)
+        textView.adjustsFontForContentSizeCategory = false
+        textView.isScrollEnabled = false
+        textView.isEditable = false
+        textView.isSelectable = true
+        // todo(andrii-vysotskyi): adjust tint color
+        return textView
     }()
 
     private lazy var decorationImageView: UIImageView = {
