@@ -10,7 +10,7 @@ import UIKit
 final class AttributedStringBuilder {
 
     init() {
-        attributedString = NSMutableAttributedString()
+        string = ""
     }
 
     func alignment(_ alignment: NSTextAlignment) -> AttributedStringBuilder {
@@ -23,46 +23,30 @@ final class AttributedStringBuilder {
         return self
     }
 
-    func textColor(_ color: ColorAsset) -> AttributedStringBuilder {
-        attributes[.foregroundColor] = color.color
-        return self
-    }
-
     func textColor(_ color: UIColor) -> AttributedStringBuilder {
         attributes[.foregroundColor] = color
         return self
     }
 
     func typography(_ typography: POTypography) -> AttributedStringBuilder {
-        self.typography = typography
-        return self
-    }
-
-    func textStyle(textStyle: UIFont.TextStyle?) -> AttributedStringBuilder {
-        self.textStyle = textStyle
-        return self
-    }
-
-    /// The maximum point size allowed for the font. Use this value to constrain the font to the specified size
-    /// when your interface cannot accommodate text that is any larger.
-    func maximumFontSize(_ maximumSize: CGFloat?) -> AttributedStringBuilder {
-        self.maximumFontSize = maximumSize
-        return self
-    }
-
-    func string(_ string: String) -> AttributedStringBuilder {
-        attributes = buildAttributes()
-        attributedString.append(NSAttributedString(string: string, attributes: attributes))
-        return self
-    }
-
-    func buildAttributes() -> [NSAttributedString.Key: Any] {
-        guard let typography else {
-            assertionFailure("Typography must be set.")
-            return [:]
+        let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
+        configureParagraphStyle(lineHeightMultiple: lineHeightMultiple, lineHeight: typography.lineHeight)
+        attributes[.font] = scaledFont
+        attributes[.baselineOffset] = baselineOffset(font: typography.font, expectedLineHeight: typography.lineHeight)
+        if #available(iOS 14.0, *) {
+            attributes[.tracking] = typography.tracking
         }
+        return self
+    }
+
+    /// - Parameters:
+    ///   - maximumSize: The maximum point size allowed for the font. Use this value to constrain
+    ///   the font to the specified size when your interface cannot accommodate text that is any larger.
+    func typography(
+        _ typography: POTypography, style: UIFont.TextStyle, maximumSize: CGFloat? = nil
+    ) -> AttributedStringBuilder {
         let scaledFont = scaledFont(
-            typography: typography, textStyle: textStyle, maximumFontSize: maximumFontSize
+            typography: typography, textStyle: style, maximumFontSize: maximumSize
         )
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
         let scaledLineHeight = scaledFont.lineHeight * lineHeightMultiple
@@ -72,16 +56,24 @@ final class AttributedStringBuilder {
         if #available(iOS 14.0, *) {
             attributes[.tracking] = typography.tracking
         }
-        return attributes
+        return self
+    }
+
+    func string(_ string: String) -> AttributedStringBuilder {
+        self.string = string
+        return self
     }
 
     func build() -> NSAttributedString {
-        attributedString.copy() as! NSAttributedString // swiftlint:disable:this force_cast
+        NSAttributedString(string: string, attributes: attributes)
+    }
+
+    /// - NOTE: Returned value should be used only for inspection.
+    var currentAttributes: [NSAttributedString.Key: Any] {
+        attributes
     }
 
     // MARK: - Private Properties
-
-    private let attributedString: NSMutableAttributedString
 
     private lazy var paragraphStyle: NSMutableParagraphStyle = {
         let style = NSMutableParagraphStyle()
@@ -94,9 +86,7 @@ final class AttributedStringBuilder {
         .paragraphStyle: paragraphStyle
     ]
 
-    private var maximumFontSize: CGFloat?
-    private var typography: POTypography?
-    private var textStyle: UIFont.TextStyle?
+    private var string: String
 
     // MARK: - Private Methods
 
@@ -111,9 +101,9 @@ final class AttributedStringBuilder {
     }
 
     private func scaledFont(
-        typography: POTypography, textStyle: UIFont.TextStyle?, maximumFontSize: CGFloat?
+        typography: POTypography, textStyle: UIFont.TextStyle, maximumFontSize: CGFloat?
     ) -> UIFont {
-        guard let textStyle, typography.adjustsFontForContentSizeCategory else {
+        guard typography.adjustsFontForContentSizeCategory else {
             return typography.font
         }
         let fontMetrics = UIFontMetrics(forTextStyle: textStyle)

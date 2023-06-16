@@ -21,8 +21,7 @@ final class NativeAlternativePaymentMethodSectionHeaderView: UICollectionReusabl
 
     func configure(item: NativeAlternativePaymentMethodViewModelState.SectionHeader, style: POTextStyle) {
         titleLabel.attributedText = AttributedStringBuilder()
-            .typography(style.typography)
-            .textStyle(textStyle: .title3)
+            .typography(style.typography, style: .title3)
             .textColor(style.color)
             .alignment(item.isCentered ? .center : .natural)
             .string(item.title)

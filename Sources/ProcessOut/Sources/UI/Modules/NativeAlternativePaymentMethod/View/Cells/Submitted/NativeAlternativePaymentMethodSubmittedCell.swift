@@ -40,8 +40,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
             descriptionTextView.accessibilityIdentifier = "native-alternative-payment.non-captured.description"
         }
         descriptionTextView.attributedText = AttributedStringBuilder()
-            .typography(descriptionStyle.typography)
-            .textStyle(textStyle: .headline)
+            .typography(descriptionStyle.typography, style: .headline)
             .textColor(descriptionStyle.color)
             .lineBreakMode(.byWordWrapping)
             .alignment(.center) // todo: (andrii-vysotskyi): determine alignment base on contents of markdown.

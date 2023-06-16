@@ -120,9 +120,7 @@ final class Picker: UIControl {
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             let currentAttributedText = titleLabel.attributedText
             titleLabel.attributedText = AttributedStringBuilder()
-                .typography(currentStyle.text.typography)
-                .textStyle(textStyle: .body)
-                .maximumFontSize(Constants.maximumFontSize)
+                .typography(currentStyle.text.typography, style: .body, maximumSize: Constants.maximumFontSize)
                 .textColor(currentStyle.text.color)
                 .alignment(.natural)
                 .string(currentViewModel.title)

@@ -86,8 +86,7 @@ final class RadioButton: UIControl {
         let currentStyle = currentStyle(style: style, viewModel: viewModel, isHighlighted: isHighlighted)
         let previousAttributedText = valueLabel.attributedText
         valueLabel.attributedText = AttributedStringBuilder()
-            .typography(currentStyle.value.typography)
-            .textStyle(textStyle: .body)
+            .typography(currentStyle.value.typography, style: .body)
             .textColor(currentStyle.value.color)
             .alignment(.natural)
             .string(viewModel.value)
