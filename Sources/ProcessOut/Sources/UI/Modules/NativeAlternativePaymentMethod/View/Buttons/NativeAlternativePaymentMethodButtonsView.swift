@@ -36,17 +36,18 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         guard actions.primary != nil || actions.secondary != nil else {
             return 0
         }
-        let buttonsHeight: CGFloat
+        let actionsCount: Int
         switch style.axis {
         case .horizontal:
-            buttonsHeight = Constants.buttonHeight
+            actionsCount = 1
         case .vertical:
-            let numberOfActions = [actions.primary, actions.secondary].compactMap { $0 }.count
-            return CGFloat(numberOfActions) * Constants.buttonHeight + Constants.spacing * CGFloat(numberOfActions - 1)
+            actionsCount = [actions.primary, actions.secondary].compactMap { $0 }.count
         @unknown default:
             assertionFailure("Unexpected axis.")
-            return 0
+            actionsCount = 1
         }
+        let buttonsHeight =
+            Constants.buttonHeight * CGFloat(actionsCount) + Constants.spacing * CGFloat(actionsCount - 1)
         return Constants.verticalInset * 2 + buttonsHeight
     }
 
