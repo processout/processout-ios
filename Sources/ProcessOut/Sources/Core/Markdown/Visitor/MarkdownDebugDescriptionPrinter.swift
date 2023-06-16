@@ -90,10 +90,10 @@ final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
 
     func visit(node: MarkdownLink) -> String {
         var attributes: [String: CustomStringConvertible] = [:]
-        if let title = node.title {
-            attributes["title"] = title
+        if let url = node.url {
+            attributes["url"] = url
         }
-        return description(node: node, nodeName: "Link", attributes: attributes, content: node.url)
+        return description(node: node, nodeName: "Link", attributes: attributes)
     }
 
     // MARK: - Private Properties

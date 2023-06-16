@@ -9,13 +9,6 @@
 
 final class MarkdownLink: MarkdownBaseNode {
 
-    private(set) lazy var title: String? = {
-        if let url = cmarkNode.pointee.as.link.title {
-            return String(cString: url)
-        }
-        return nil
-    }()
-
     private(set) lazy var url: String? = {
         if let url = cmarkNode.pointee.as.link.url {
             return String(cString: url)

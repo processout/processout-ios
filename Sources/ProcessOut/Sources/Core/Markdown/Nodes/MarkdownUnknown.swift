@@ -5,8 +5,6 @@
 //  Created by Andrii Vysotskyi on 15.06.2023.
 //
 
-import Foundation
-
 /// Unknown node.
 final class MarkdownUnknown: MarkdownBaseNode {
 
