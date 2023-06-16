@@ -10,7 +10,12 @@ import UIKit
 final class AttributedStringBuilder {
 
     init() {
+        paragraphStyle = NSMutableParagraphStyle()
+        attributes = [:]
         string = ""
+        paragraphStyle.lineBreakMode = .byTruncatingTail
+        paragraphStyle.alignment = .natural
+        attributes[.paragraphStyle] = paragraphStyle
     }
 
     func alignment(_ alignment: NSTextAlignment) -> AttributedStringBuilder {
@@ -90,22 +95,31 @@ final class AttributedStringBuilder {
         attributes
     }
 
+    // MARK: - Prototype
+
+    func copy() -> AttributedStringBuilder {
+        // swiftlint:disable legacy_objc_type force_cast
+        let attributesCopy = (attributes as NSDictionary).copy() as! [NSAttributedString.Key: Any]
+        let paragraphStyleCopy = attributesCopy[.paragraphStyle] as! NSParagraphStyle
+        // swiftlint:enable legacy_objc_type force_cast
+        return AttributedStringBuilder(attributes: attributesCopy, paragraphStyle: paragraphStyleCopy, string: string)
+    }
+
     // MARK: - Private Properties
 
-    private lazy var paragraphStyle: NSMutableParagraphStyle = {
-        let style = NSMutableParagraphStyle()
-        style.lineBreakMode = .byTruncatingTail
-        style.alignment = .natural
-        return style
-    }()
-
-    private lazy var attributes: [NSAttributedString.Key: Any] = [
-        .paragraphStyle: paragraphStyle
-    ]
-
+    private let paragraphStyle: NSMutableParagraphStyle
+    private var attributes: [NSAttributedString.Key: Any]
     private var string: String
 
     // MARK: - Private Methods
+
+    private init(attributes: [NSAttributedString.Key: Any], paragraphStyle: NSParagraphStyle, string: String) {
+        self.attributes = attributes
+        // swiftlint:disable:next force_cast
+        self.paragraphStyle = paragraphStyle.mutableCopy() as! NSMutableParagraphStyle
+        self.string = string
+        self.attributes[.paragraphStyle] = paragraphStyle
+    }
 
     private func baselineOffset(font: UIFont, expectedLineHeight: CGFloat) -> CGFloat {
         let offset = (expectedLineHeight - font.capHeight) / 2 + font.descender
