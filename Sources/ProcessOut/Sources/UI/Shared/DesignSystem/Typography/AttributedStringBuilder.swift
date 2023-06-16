@@ -59,6 +59,14 @@ final class AttributedStringBuilder {
         return self
     }
 
+    func bold() -> AttributedStringBuilder {
+        withFontSymbolicTraits(.traitBold)
+    }
+
+    func italic() -> AttributedStringBuilder {
+        withFontSymbolicTraits(.traitItalic)
+    }
+
     func string(_ string: String) -> AttributedStringBuilder {
         self.string = string
         return self
@@ -117,5 +125,17 @@ final class AttributedStringBuilder {
         paragraphStyle.lineHeightMultiple = lineHeightMultiple
         paragraphStyle.maximumLineHeight = lineHeight
         paragraphStyle.minimumLineHeight = lineHeight
+    }
+
+    private func withFontSymbolicTraits(_ symbolicTraits: UIFontDescriptor.SymbolicTraits) -> AttributedStringBuilder {
+        guard let font = attributes[.font] as? UIFont else {
+            preconditionFailure("Font must be set to apply different traits")
+        }
+        guard let adjustedFontDescriptor = font.fontDescriptor.withSymbolicTraits(symbolicTraits) else {
+            assertionFailure("Unable to apply traits \(symbolicTraits) to font")
+            return self
+        }
+        attributes[.font] = UIFont(descriptor: adjustedFontDescriptor, size: 0)
+        return self
     }
 }
