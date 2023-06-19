@@ -88,8 +88,8 @@ public struct PONativeAlternativePaymentMethodStyle {
         static let activityIndicator = POActivityIndicatorStyle.system(
             .whiteLarge, color: Asset.Colors.Text.secondary.color
         )
-        static let message = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .Medium.subtitle)
-        static let successMessage = POTextStyle(color: Asset.Colors.Text.success.color, typography: .Medium.subtitle)
+        static let message = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .Fixed.body)
+        static let successMessage = POTextStyle(color: Asset.Colors.Text.success.color, typography: .Fixed.body)
         static let background = PONativeAlternativePaymentMethodBackgroundStyle()
         static let separatorColor = Asset.Colors.Border.subtle.color
     }
