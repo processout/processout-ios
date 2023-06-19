@@ -34,7 +34,7 @@ final class RadioButton: UIControl {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let minimumHeight: CGFloat = 40
+        static let minimumHeight: CGFloat = 44
         static let knobSize: CGFloat = 18
         static let animationDuration: TimeInterval = 0.25
         static let horizontalSpacing: CGFloat = 8

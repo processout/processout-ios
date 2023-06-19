@@ -105,7 +105,7 @@ final class Button: UIControl {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let height: CGFloat = 40
+        static let height: CGFloat = 44
         static let minimumEdgesSpacing: CGFloat = 4
         static let maximumFontSize: CGFloat = 22
         static let animationDuration: TimeInterval = 0.25

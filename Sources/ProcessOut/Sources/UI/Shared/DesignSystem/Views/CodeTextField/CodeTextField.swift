@@ -311,7 +311,7 @@ final class CodeTextField: UIControl, UITextInput {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let height: CGFloat = 40
+        static let height: CGFloat = 44
         static let spacing: CGFloat = 8
         static let minimumSpacing: CGFloat = 6
     }
