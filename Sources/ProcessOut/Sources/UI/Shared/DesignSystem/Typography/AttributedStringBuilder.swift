@@ -12,10 +12,9 @@ final class AttributedStringBuilder {
     init() {
         paragraphStyle = NSMutableParagraphStyle()
         attributes = [:]
-        string = ""
+        text = .plain("")
         paragraphStyle.lineBreakMode = .byTruncatingTail
-        paragraphStyle.alignment = .natural
-        attributes[.paragraphStyle] = paragraphStyle
+        paragraphStyle.tabStops = []
     }
 
     func alignment(_ alignment: NSTextAlignment) -> AttributedStringBuilder {
@@ -33,31 +32,21 @@ final class AttributedStringBuilder {
         return self
     }
 
-    func typography(_ typography: POTypography) -> AttributedStringBuilder {
-        let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
-        configureParagraphStyle(lineHeightMultiple: lineHeightMultiple, lineHeight: typography.lineHeight)
-        attributes[.font] = scaledFont
-        attributes[.baselineOffset] = baselineOffset(font: typography.font, expectedLineHeight: typography.lineHeight)
-        if #available(iOS 14.0, *) {
-            attributes[.tracking] = typography.tracking
-        }
-        return self
-    }
-
     /// - Parameters:
     ///   - maximumSize: The maximum point size allowed for the font. Use this value to constrain
     ///   the font to the specified size when your interface cannot accommodate text that is any larger.
     func typography(
-        _ typography: POTypography, style: UIFont.TextStyle, maximumSize: CGFloat? = nil
+        _ typography: POTypography, style: UIFont.TextStyle? = nil, maximumSize: CGFloat? = nil
     ) -> AttributedStringBuilder {
         let scaledFont = scaledFont(
             typography: typography, textStyle: style, maximumFontSize: maximumSize
         )
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
-        let scaledLineHeight = scaledFont.lineHeight * lineHeightMultiple
-        configureParagraphStyle(lineHeightMultiple: lineHeightMultiple, lineHeight: scaledLineHeight)
+        paragraphStyle.lineHeightMultiple = lineHeightMultiple
+        paragraphStyle.defaultTabInterval = typography.tabInterval
+        paragraphStyle.paragraphSpacing = typography.paragraphSpacing
         attributes[.font] = scaledFont
-        attributes[.baselineOffset] = baselineOffset(font: scaledFont, expectedLineHeight: scaledLineHeight)
+        attributes[.baselineOffset] = baselineOffset(font: scaledFont, lineHeightMultiple: lineHeightMultiple)
         if #available(iOS 14.0, *) {
             attributes[.tracking] = typography.tracking
         }
@@ -76,53 +65,80 @@ final class AttributedStringBuilder {
         return self
     }
 
+    func headIndent(matchingTabs level: Int) -> AttributedStringBuilder {
+        paragraphStyle.headIndent = CGFloat(level) * paragraphStyle.defaultTabInterval
+        return self
+    }
+
     func with(link: String) -> AttributedStringBuilder {
         attributes[.link] = link
         return self
     }
 
     func string(_ string: String) -> AttributedStringBuilder {
-        self.string = string
+        self.text = .plain(string)
+        return self
+    }
+
+    func markdown(_ markdown: String) -> AttributedStringBuilder {
+        self.text = .markdown(markdown)
         return self
     }
 
     func build() -> NSAttributedString {
-        NSAttributedString(string: string, attributes: attributes)
+        defer {
+            // According to documentation paragraph style shouldn't be mutabled after used with attributed string
+            // so in case builder will be used to build more strings we are creating copy of it.
+            // swiftlint:disable:next force_cast
+            paragraphStyle = paragraphStyle.mutableCopy() as! NSMutableParagraphStyle
+        }
+        switch text {
+        case .markdown(let markdown):
+            let builder = copy()
+            let visitor = AttributedStringMarkdownVisitor(stringBuilder: builder)
+            let document = MarkdownParser().parse(string: markdown)
+            return document.accept(visitor: visitor)
+        case .plain(let string):
+            return NSAttributedString(string: string, attributes: currentAttributes)
+        }
     }
 
     /// - NOTE: Returned value should be used only for inspection.
     var currentAttributes: [NSAttributedString.Key: Any] {
-        attributes
+        var attributes = self.attributes
+        attributes[.paragraphStyle] = paragraphStyle.copy() as! NSParagraphStyle // swiftlint:disable:this force_cast
+        return attributes
     }
 
     // MARK: - Prototype
 
     func copy() -> AttributedStringBuilder {
-        // swiftlint:disable legacy_objc_type force_cast
-        let attributesCopy = (attributes as NSDictionary).copy() as! [NSAttributedString.Key: Any]
-        let paragraphStyleCopy = attributesCopy[.paragraphStyle] as! NSParagraphStyle
-        // swiftlint:enable legacy_objc_type force_cast
-        return AttributedStringBuilder(attributes: attributesCopy, paragraphStyle: paragraphStyleCopy, string: string)
+        AttributedStringBuilder(attributes: attributes, paragraphStyle: paragraphStyle, text: text)
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum Text {
+        case plain(String), markdown(String)
     }
 
     // MARK: - Private Properties
 
-    private let paragraphStyle: NSMutableParagraphStyle
-    private var attributes: [NSAttributedString.Key: Any]
-    private var string: String
+    private var paragraphStyle: NSMutableParagraphStyle
+    private var attributes: [NSAttributedString.Key: Any] // Doesn't include paragraph style
+    private var text: Text
 
     // MARK: - Private Methods
 
-    private init(attributes: [NSAttributedString.Key: Any], paragraphStyle: NSParagraphStyle, string: String) {
+    private init(attributes: [NSAttributedString.Key: Any], paragraphStyle: NSParagraphStyle, text: Text) {
         self.attributes = attributes
         // swiftlint:disable:next force_cast
         self.paragraphStyle = paragraphStyle.mutableCopy() as! NSMutableParagraphStyle
-        self.string = string
-        self.attributes[.paragraphStyle] = paragraphStyle
+        self.text = text
     }
 
-    private func baselineOffset(font: UIFont, expectedLineHeight: CGFloat) -> CGFloat {
-        let offset = (expectedLineHeight - font.capHeight) / 2 + font.descender
+    private func baselineOffset(font: UIFont, lineHeightMultiple: CGFloat) -> CGFloat {
+        let offset = (font.lineHeight * lineHeightMultiple - font.capHeight) / 2 + font.descender
         if #available(iOS 16, *) {
             return offset
         }
@@ -132,21 +148,15 @@ final class AttributedStringBuilder {
     }
 
     private func scaledFont(
-        typography: POTypography, textStyle: UIFont.TextStyle, maximumFontSize: CGFloat?
+        typography: POTypography, textStyle: UIFont.TextStyle?, maximumFontSize: CGFloat?
     ) -> UIFont {
-        guard typography.adjustsFontForContentSizeCategory else {
-            return typography.font
+        var scaledFont = typography.font
+        if let textStyle, typography.adjustsFontForContentSizeCategory {
+            scaledFont = UIFontMetrics(forTextStyle: textStyle).scaledFont(for: typography.font)
         }
-        let fontMetrics = UIFontMetrics(forTextStyle: textStyle)
-        let scaledFont = fontMetrics.scaledFont(
-            for: typography.font, maximumPointSize: maximumFontSize ?? .greatestFiniteMagnitude
-        )
+        if let maximumFontSize, scaledFont.pointSize > maximumFontSize {
+            scaledFont = scaledFont.withSize(maximumFontSize)
+        }
         return scaledFont
-    }
-
-    private func configureParagraphStyle(lineHeightMultiple: CGFloat, lineHeight: CGFloat) {
-        paragraphStyle.lineHeightMultiple = lineHeightMultiple
-        paragraphStyle.maximumLineHeight = lineHeight
-        paragraphStyle.minimumLineHeight = lineHeight
     }
 }
