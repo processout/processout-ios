@@ -7,7 +7,8 @@
 
 import Foundation
 
-// swiftlint:disable:next type_body_length
+// swiftlint:disable type_body_length file_length
+
 final class DefaultNativeAlternativePaymentMethodViewModel:
     BaseViewModel<NativeAlternativePaymentMethodViewModelState>, NativeAlternativePaymentMethodViewModel {
 
@@ -102,7 +103,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     private func configureWithStartingState() {
         let sections = [
-            State.Section(id: .init(id: nil, header: nil), items: [.loader])
+            State.Section(id: .init(id: nil, header: nil, isTight: false), items: [.loader])
         ]
         let startedState = State.Started(
             sections: sections,
@@ -113,12 +114,13 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         state = .started(startedState)
     }
 
+    // swiftlint:disable:next function_body_length
     private func convertToState(startedState: InteractorState.Started, isSubmitting: Bool) -> State {
         let titleItem = State.TitleItem(
             text: configuration.title ?? Text.title(startedState.gatewayDisplayName)
         )
         var sections = [
-            State.Section(id: .init(id: nil, header: nil), items: [.title(titleItem)])
+            State.Section(id: .init(id: nil, header: nil, isTight: false), items: [.title(titleItem)])
         ]
         let shouldCenterCodeInput = startedState.parameters.count == 1
         for (offset, parameter) in startedState.parameters.enumerated() {
@@ -137,10 +139,17 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             if let message = value.recentErrorMessage {
                 items.append(.error(State.ErrorItem(description: message, isCentered: isCentered)))
             }
+            let isTight = items.contains { item in
+                if case .radio = item {
+                    return true
+                }
+                return false
+            }
             let section = State.Section(
                 id: .init(
                     id: parameter.key,
-                    header: .init(title: parameter.displayName, isCentered: isCentered)
+                    header: .init(title: parameter.displayName, isCentered: isCentered),
+                    isTight: isTight
                 ),
                 items: items
             )
@@ -180,7 +189,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         )
         let startedState = State.Started(
             sections: [
-                .init(id: .init(id: nil, header: nil), items: [item])
+                .init(id: .init(id: nil, header: nil, isTight: false), items: [item])
             ],
             actions: .init(primary: nil, secondary: secondaryAction),
             isEditingAllowed: false,
@@ -208,7 +217,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             )
             let startedState = State.Started(
                 sections: [
-                    .init(id: .init(id: nil, header: nil), items: [.submitted(submittedItem)])
+                    .init(id: .init(id: nil, header: nil, isTight: false), items: [.submitted(submittedItem)])
                 ],
                 actions: .init(primary: nil, secondary: nil),
                 isEditingAllowed: false,
@@ -393,3 +402,5 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         cancelActionTimers = [:]
     }
 }
+
+// swiftlint:enable type_body_length file_length
