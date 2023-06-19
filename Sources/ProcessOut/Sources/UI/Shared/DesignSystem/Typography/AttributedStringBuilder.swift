@@ -65,8 +65,17 @@ final class AttributedStringBuilder {
         return self
     }
 
-    func headIndent(matchingTabs level: Int) -> AttributedStringBuilder {
-        paragraphStyle.headIndent = CGFloat(level) * paragraphStyle.defaultTabInterval
+    /// Can be used to format list items of kind TAB MARKER TAB CONTENT
+    func listLevel(_ level: Int) -> AttributedStringBuilder {
+        let indentation =
+            CGFloat(level + 1) * paragraphStyle.defaultTabInterval +
+            CGFloat(level) * Constants.listItemContentSpacing
+        let contentLocation = indentation + Constants.listItemContentSpacing
+        paragraphStyle.tabStops = [
+            NSTextTab(textAlignment: .right, location: indentation),
+            NSTextTab(textAlignment: .left, location: contentLocation)
+        ]
+        paragraphStyle.headIndent = contentLocation
         return self
     }
 
@@ -117,6 +126,10 @@ final class AttributedStringBuilder {
     }
 
     // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let listItemContentSpacing: CGFloat = 4
+    }
 
     private enum Text {
         case plain(String), markdown(String)

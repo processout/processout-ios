@@ -34,13 +34,14 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(node: MarkdownList) -> NSAttributedString {
-        let builder = stringBuilder.copy().headIndent(matchingTabs: level + 1)
+        let builder = stringBuilder.copy().listLevel(level)
         let itemsSeparator = builder
             .string(Constants.paragraphSeparator)
             .build()
         let attributedString = node.children
             .enumerated()
             .map { offset, itemNode in
+                // todo(andrii-vysotskyi): when there are multiple paragraphs in list item text is wrongly aligned.
                 let prefix = builder
                     .string(listItemPrefix(list: node, at: offset))
                     .build()
@@ -148,8 +149,8 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     // MARK: - Private Methods
 
     private func listItemPrefix(list: MarkdownList, at index: Int) -> String {
+        var components = [Constants.horizontalTab]
         // Original markers/delimiters are ignored
-        var components = Array(repeating: Constants.horizontalTab, count: level + 1)
         switch list.type {
         case .ordered(_, let startIndex):
             components += [
@@ -158,7 +159,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
         case .bullet:
             components.append(Constants.bulletMarkers[level % Constants.bulletMarkers.count])
         }
-        components.append(Constants.space)
+        components.append(Constants.horizontalTab)
         return components.joined()
     }
 }

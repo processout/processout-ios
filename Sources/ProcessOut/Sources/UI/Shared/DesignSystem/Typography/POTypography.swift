@@ -63,7 +63,7 @@ extension POTypography {
             font: FontFamily.WorkSans.regular.font(size: 16),
             lineHeight: 24,
             paragraphSpacing: 8,
-            tabInterval: 12
+            tabInterval: 24
         )
 
         /// Use for form components, error text and key value data.
