@@ -22,6 +22,9 @@ struct PickerViewModel {
     /// Button's title.
     let title: String
 
+    /// Boolean flag indicating whether input is invalid.
+    let isInvalid: Bool
+
     /// Picker options.
     let options: [Option]
 }

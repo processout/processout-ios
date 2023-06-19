@@ -19,22 +19,20 @@ final class NativeAlternativePaymentMethodPickerCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.PickerItem, style: POInputFormStyle?) {
-        let options = item.options.map { option in
-            PickerViewModel.Option(title: option.name, isSelected: option.isSelected, select: option.select)
-        }
-        let style = style ?? Constants.defaultStyle
-        picker.configure(
-            viewModel: PickerViewModel(title: item.value, options: options),
-            style: item.isInvalid ? style.error.field : style.normal.field,
-            animated: false
+    func configure(item: NativeAlternativePaymentMethodViewModelState.PickerItem, style: POInputStyle) {
+        let viewModel = PickerViewModel(
+            title: item.value,
+            isInvalid: item.isInvalid,
+            options: item.options.map { option in
+                PickerViewModel.Option(title: option.name, isSelected: option.isSelected, select: option.select)
+            }
         )
+        picker.configure(viewModel: viewModel, style: style, animated: false)
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultStyle = POInputFormStyle.default
         static let accessibilityIdentifier = "native-alternative-payment.picker"
     }
 

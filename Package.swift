@@ -19,7 +19,7 @@ let package = Package(
             // https://forums.swift.org/t/xcode-and-swift-package-manager/44704 for details.
             exclude: ["ProcessOut.docc"],
             resources: [
-                .process("Resources/PhoneNumberMetadata/PhoneNumberMetadata.json")
+                .process("Resources")
             ]
         )
     ]

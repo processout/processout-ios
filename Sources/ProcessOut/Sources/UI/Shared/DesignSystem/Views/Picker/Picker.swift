@@ -20,14 +20,10 @@ final class Picker: UIControl {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(viewModel: PickerViewModel, style: POTextFieldStyle, animated: Bool) {
+    func configure(viewModel: PickerViewModel, style: POInputStyle, animated: Bool) {
         currentViewModel = viewModel
-        currentStyle = style
+        currentStyle = viewModel.isInvalid ? style.error : style.normal
         configureWithCurrentState(animated: animated)
-    }
-
-    override var isHighlighted: Bool {
-        didSet { configureWithCurrentState(animated: true) }
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -62,9 +58,9 @@ final class Picker: UIControl {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let height: CGFloat = 48
+        static let height: CGFloat = 40
         static let horizontalInset: CGFloat = 12
-        static let maximumFontSize: CGFloat = 32
+        static let maximumFontSize: CGFloat = 22
         static let animationDuration: TimeInterval = 0.25
     }
 
@@ -74,8 +70,8 @@ final class Picker: UIControl {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = false
-        label.setContentHuggingPriority(.required, for: .horizontal)
-        label.setContentCompressionResistancePriority(.required, for: .horizontal)
+        label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        label.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         return label
     }()
 
@@ -87,7 +83,7 @@ final class Picker: UIControl {
         return imageView
     }()
 
-    private var currentStyle: POTextFieldStyle?
+    private var currentStyle: POInputStateStyle?
     private var currentViewModel: PickerViewModel?
 
     // MARK: - Private Methods

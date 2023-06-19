@@ -26,12 +26,8 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
         observations = []
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.InputItem, style: POInputFormStyle?) {
-        let style = style ?? Constants.defaultStyle
-        textFieldContainer.configure(
-            style: item.value.isInvalid ? style.error.field : style.normal.field,
-            animated: false
-        )
+    func configure(item: NativeAlternativePaymentMethodViewModelState.InputItem, style: POInputStyle) {
+        textFieldContainer.configure(isInvalid: item.value.isInvalid, style: style, animated: false)
         let textField = textFieldContainer.textField
         if textField.text != item.value.text {
             textField.text = item.value.text
@@ -55,7 +51,6 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let defaultStyle = POInputFormStyle.default
         static let accessibilityIdentifier = "native-alternative-payment.generic-input"
     }
 
@@ -107,13 +102,9 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
         item?.value.text = textFieldContainer.textField.text ?? ""
     }
 
-    private func observeChanges(
-        item: NativeAlternativePaymentMethodViewModelState.InputItem, style: POInputFormStyle
-    ) {
+    private func observeChanges(item: NativeAlternativePaymentMethodViewModelState.InputItem, style: POInputStyle) {
         let isInvalidObserver = item.value.$isInvalid.addObserver { [weak self] isInvalid in
-            self?.textFieldContainer.configure(
-                style: isInvalid ? style.error.field : style.normal.field, animated: true
-            )
+            self?.textFieldContainer.configure(isInvalid: isInvalid, style: style, animated: true)
         }
         let valueObserver = item.value.$text.addObserver { [weak self] updatedValue in
             if self?.textFieldContainer.textField.text != updatedValue {

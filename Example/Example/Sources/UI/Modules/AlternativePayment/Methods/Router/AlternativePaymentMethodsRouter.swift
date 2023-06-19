@@ -19,8 +19,9 @@ final class AlternativePaymentMethodsRouter: RouterType {
                 secondaryAction: .cancel(),
                 paymentConfirmationSecondaryAction: .cancel(disabledFor: 10)
             )
-            let viewController = PONativeAlternativePaymentMethodViewControllerBuilder
-                .with(invoiceId: route.invoiceId, gatewayConfigurationId: route.gatewayConfigurationId)
+            let viewController = PONativeAlternativePaymentMethodViewControllerBuilder()
+                .with(invoiceId: route.invoiceId)
+                .with(gatewayConfigurationId: route.gatewayConfigurationId)
                 .with { [weak self] result in
                     self?.viewController?.dismiss(animated: true) {
                         route.completion(result)
@@ -28,17 +29,16 @@ final class AlternativePaymentMethodsRouter: RouterType {
                 }
                 .with(configuration: configuration)
                 .build()
-            viewController.additionalSafeAreaInsets.top = 12
             self.viewController?.present(viewController, animated: true)
         case let .alternativePayment(request):
-            let viewController = POAlternativePaymentMethodViewControllerBuilder
+            let viewController = POAlternativePaymentMethodViewControllerBuilder()
                 .with(request: request)
+                .with(returnUrl: Constants.returnUrl)
                 .with { [weak self] _ in
                     self?.viewController?.dismiss(animated: true)
                 }
                 .build()
-            let navigationController = createNavigationController(rootViewController: viewController)
-            self.viewController?.present(navigationController, animated: true)
+            self.viewController?.present(viewController, animated: true)
         case let .authorizationtAmount(completion):
             let viewController = AuthorizationAmountBuilder(completion: completion).build()
             self.viewController?.present(viewController, animated: true)
@@ -53,24 +53,5 @@ final class AlternativePaymentMethodsRouter: RouterType {
             self.viewController?.present(viewController, animated: true)
         }
         return true
-    }
-
-    // MARK: - Private Methods
-
-    private func createNavigationController(rootViewController: UIViewController) -> UIViewController {
-        let cancelBarButtonItem = UIBarButtonItem(
-            systemItem: .cancel,
-            primaryAction: .init(handler: { [weak self] _ in
-                self?.viewController?.dismiss(animated: true)
-            }),
-            menu: nil
-        )
-        cancelBarButtonItem.tintColor = Asset.Colors.Button.primary.color
-        let spaceBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: self, action: nil)
-        spaceBarButtonItem.width = 18
-        rootViewController.navigationItem.leftBarButtonItems = [spaceBarButtonItem, cancelBarButtonItem]
-        let navigationController = UINavigationController(rootViewController: rootViewController)
-        navigationController.navigationBar.prefersLargeTitles = false
-        return navigationController
     }
 }

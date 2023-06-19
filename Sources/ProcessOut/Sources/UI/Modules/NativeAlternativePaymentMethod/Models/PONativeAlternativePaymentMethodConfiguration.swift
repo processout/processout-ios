@@ -34,6 +34,12 @@ public struct PONativeAlternativePaymentMethodConfiguration {
     /// Secondary action. To remove secondary action use `nil`, this is default behaviour.
     public let secondaryAction: SecondaryAction?
 
+    /// For parameters where user should select single option from multiple values defines
+    /// maximum number of options that framework will display inline (e.g. using radio buttons). 
+    ///
+    /// Default value is `5`.
+    public let inlineSingleSelectValuesLimit: Int
+
     /// Boolean value that indicates whether capture success screen should be skipped. Default value is `false`.
     public let skipSuccessScreen: Bool
 
@@ -54,6 +60,7 @@ public struct PONativeAlternativePaymentMethodConfiguration {
         successMessage: String? = nil,
         primaryActionTitle: String? = nil,
         secondaryAction: SecondaryAction? = nil,
+        inlineSingleSelectValuesLimit: Int = 5,
         skipSuccessScreen: Bool = false,
         waitsPaymentConfirmation: Bool = true,
         paymentConfirmationTimeout: TimeInterval = 180,
@@ -63,6 +70,7 @@ public struct PONativeAlternativePaymentMethodConfiguration {
         self.successMessage = successMessage
         self.primaryActionTitle = primaryActionTitle
         self.secondaryAction = secondaryAction
+        self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.skipSuccessScreen = skipSuccessScreen
         self.waitsPaymentConfirmation = waitsPaymentConfirmation
         self.paymentConfirmationTimeout = paymentConfirmationTimeout

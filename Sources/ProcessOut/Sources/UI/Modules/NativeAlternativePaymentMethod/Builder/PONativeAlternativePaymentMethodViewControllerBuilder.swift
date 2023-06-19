@@ -12,11 +12,31 @@ import UIKit
 /// to create view controller's instance.
 public final class PONativeAlternativePaymentMethodViewControllerBuilder { // swiftlint:disable:this type_name
 
-    /// - Parameters:
-    ///   - invoiceId: Invoice that that user wants to authorize via native APM.
-    ///   - gatewayConfigurationId: Gateway configuration id.
-    public static func with(invoiceId: String, gatewayConfigurationId: String) -> Self {
-        Self(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId)
+    @available(*, deprecated, message: "Use non static method instead.")
+    public static func with(
+        invoiceId: String, gatewayConfigurationId: String
+    ) -> PONativeAlternativePaymentMethodViewControllerBuilder {
+        PONativeAlternativePaymentMethodViewControllerBuilder()
+            .with(invoiceId: invoiceId)
+            .with(gatewayConfigurationId: gatewayConfigurationId)
+    }
+
+    /// Creates builder instance.
+    public init() {
+        configuration = .init()
+        style = PONativeAlternativePaymentMethodStyle()
+    }
+
+    /// Invoice that that user wants to authorize via native APM.
+    public func with(invoiceId: String) -> Self {
+        self.invoiceId = invoiceId
+        return self
+    }
+
+    /// Gateway configuration id.
+    public func with(gatewayConfigurationId: String) -> Self {
+        self.gatewayConfigurationId = gatewayConfigurationId
+        return self
     }
 
     /// Completion to invoke after flow is completed.
@@ -49,6 +69,9 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
     ///
     /// - NOTE: Caller should dismiss view controller after completion is called.
     public func build() -> UIViewController {
+        guard let gatewayConfigurationId, let invoiceId else {
+            preconditionFailure("Gateway configuration id and invoice id must be set.")
+        }
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         let interactor = DefaultNativeAlternativePaymentMethodInteractor(
             invoicesService: api.invoices,
@@ -68,21 +91,12 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         return NativeAlternativePaymentMethodViewController(viewModel: viewModel, style: style, logger: api.logger)
     }
 
-    // MARK: -
-
-    init(invoiceId: String, gatewayConfigurationId: String) {
-        self.invoiceId = invoiceId
-        self.gatewayConfigurationId = gatewayConfigurationId
-        configuration = .init()
-    }
-
     // MARK: - Private Properties
 
-    private let gatewayConfigurationId: String
-    private let invoiceId: String
-
+    private var gatewayConfigurationId: String?
+    private var invoiceId: String?
     private var configuration: PONativeAlternativePaymentMethodConfiguration
-    private var style: PONativeAlternativePaymentMethodStyle?
+    private var style: PONativeAlternativePaymentMethodStyle
     private var completion: ((Result<Void, POFailure>) -> Void)?
     private weak var delegate: PONativeAlternativePaymentMethodDelegate?
 }

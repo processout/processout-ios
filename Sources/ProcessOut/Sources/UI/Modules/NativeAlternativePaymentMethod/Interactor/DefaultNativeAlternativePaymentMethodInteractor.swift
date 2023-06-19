@@ -15,7 +15,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
 
     init(
         invoicesService: POInvoicesService,
-        imagesRepository: POImagesRepository,
+        imagesRepository: ImagesRepository,
         configuration: NativeAlternativePaymentMethodInteractorConfiguration,
         logger: POLogger,
         delegate: PONativeAlternativePaymentMethodDelegate?
@@ -162,7 +162,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     // MARK: - Private Properties
 
     private let invoicesService: POInvoicesService
-    private let imagesRepository: POImagesRepository
+    private let imagesRepository: ImagesRepository
     private let configuration: NativeAlternativePaymentMethodInteractorConfiguration
     private let logger: POLogger
     private weak var delegate: PONativeAlternativePaymentMethodDelegate?

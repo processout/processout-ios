@@ -10,29 +10,23 @@ import UIKit
 final class NativeAlternativePaymentMethodLoaderCell: UICollectionViewCell {
 
     /// Implementation ignores 2nd and all subsequent calls to this method.
-    func initialize(style: POActivityIndicatorStyle?) {
+    func initialize(style: POActivityIndicatorStyle) {
         guard !isInitialized else {
             return
         }
-        let activityIndicator = ActivityIndicatorViewFactory().create(style: style ?? Constants.defaultStyle)
+        let activityIndicator = ActivityIndicatorViewFactory().create(style: style)
         activityIndicator.hidesWhenStopped = false
         activityIndicator.setAnimating(true)
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(activityIndicator)
         let constraints = [
+            activityIndicator.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor),
+            activityIndicator.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor),
             activityIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
         isInitialized = true
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let defaultStyle = POActivityIndicatorStyle.system(
-            .whiteLarge, color: Asset.Colors.New.Text.secondary.color
-        )
     }
 
     // MARK: - Private Properties

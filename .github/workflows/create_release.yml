@@ -12,6 +12,5 @@ jobs:
         uses: ./.github/actions/bootstrap-project
       - name: Create Release
         env:
-          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PO_GITHUB_TOKEN }}
         run: source Scripts/CreateRelease.sh

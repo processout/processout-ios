@@ -28,12 +28,30 @@ public struct POShadowStyle {
 
 extension POShadowStyle {
 
-    static let `default` = POShadowStyle(
-        color: Asset.Colors.Text.primary.color.withAlphaComponent(0.1),
-        offset: CGSize(width: 0, height: 8),
-        radius: 24
-    )
-
     /// Value represents no shadow.
     public static let clear = Self(color: .clear, offset: .zero, radius: 0)
+
+    static let level1 = POShadowStyle(
+        color: shadowColor, offset: CGSize(width: 0, height: 4), radius: 16
+    )
+
+    static let level2 = POShadowStyle(
+        color: shadowColor, offset: CGSize(width: 0, height: 8), radius: 20
+    )
+
+    static let level3 = POShadowStyle(
+        color: shadowColor, offset: CGSize(width: 0, height: 12), radius: 24
+    )
+
+    static let level4 = POShadowStyle(
+        color: shadowColor, offset: CGSize(width: 0, height: 16), radius: 32
+    )
+
+    static let level5 = POShadowStyle(
+        color: shadowColor, offset: CGSize(width: 0, height: 20), radius: 40
+    )
+
+    // MARK: - Private Properties
+
+    private static let shadowColor = UIColor.black.withAlphaComponent(0.08)
 }

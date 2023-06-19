@@ -18,7 +18,7 @@ final class CardPaymentBuilder {
             router: router,
             invoicesService: ProcessOut.shared.invoices,
             cardsService: ProcessOut.shared.cards,
-            threeDSService: POCheckout3DSServiceBuilder.with(delegate: checkoutDelegate).build()
+            threeDSService: POCheckout3DSServiceBuilder().with(delegate: checkoutDelegate).build()
         )
         let viewController = CardPaymentViewController(viewModel: viewModel)
         checkoutDelegate.viewController = viewController
@@ -34,8 +34,9 @@ final class Checkout3DSServiceDelegate: POCheckout3DSServiceDelegate {
     // MARK: - POCheckout3DSServiceDelegate
 
     func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        let viewController = PO3DSRedirectViewControllerBuilder
+        let viewController = PO3DSRedirectViewControllerBuilder()
             .with(redirect: redirect)
+            .with(returnUrl: Constants.returnUrl)
             .with { [weak self] result in
                 self?.viewController.dismiss(animated: true) {
                     completion(result)

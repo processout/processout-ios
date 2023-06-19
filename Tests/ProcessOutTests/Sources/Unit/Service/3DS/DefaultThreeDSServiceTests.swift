@@ -7,7 +7,7 @@
 
 import Foundation
 import XCTest
-@testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 
 final class DefaultThreeDSServiceTests: XCTestCase {
 
@@ -334,7 +334,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
     func test_handle_whenRedirectValueIsValidUrl_callsDelegateRedirect() {
         // Given
         let expectedRedirect = PO3DSRedirect(
-            url: URL(string: "example.com")!, isHeadlessModeAllowed: false, timeout: nil
+            url: URL(string: "example.com")!, timeout: nil
         )
         let expectation = XCTestExpectation()
         delegate.handleRedirectFromClosure = { redirect, _ in
@@ -399,7 +399,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
     func test_handle_whenFingerprintValueIsValidUrl_callsDelegateRedirect() {
         // Given
         let expectedRedirect = PO3DSRedirect(
-            url: URL(string: "example.com")!, isHeadlessModeAllowed: true, timeout: 10
+            url: URL(string: "example.com")!, timeout: 10
         )
         let expectation = XCTestExpectation()
         delegate.handleRedirectFromClosure = { redirect, _ in

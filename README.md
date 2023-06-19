@@ -1,5 +1,7 @@
 # ProcessOut
 
+Get started with our [ProcessOut documentation](https://docs.processout.com/) or browse the [SDK reference](https://processout.github.io/processout-ios/documentation/processout).
+
 ## Requirements
 
 *iOS 12.0+*
@@ -28,10 +30,6 @@ Before going further please make sure that you have installed all dependencies s
 ### Running tests
 
 To run tests locally use `./Scripts/Test.sh` script. It is also possible to run them directly in Xcode from the ProcessOut target in `ProcessOut.xcodeproj`.
-
-### Documentation
-
-SDK documentation can be found in artifacts alongside every release.
 
 ## License
 

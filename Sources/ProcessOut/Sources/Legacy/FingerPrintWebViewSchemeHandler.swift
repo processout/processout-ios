@@ -7,7 +7,7 @@
 import Foundation
 import WebKit
 
-@available(*, deprecated, message: "Declaration will be removed in version 4.0.")
+@available(*, deprecated)
 public final class FingerPrintWebViewSchemeHandler: NSObject, WKURLSchemeHandler {
     
     private var completion: ((String?, String?, ProcessOutException?) -> Void)? = nil

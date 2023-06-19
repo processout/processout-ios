@@ -124,7 +124,7 @@ final class DefaultThreeDSService: ThreeDSService {
             completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
             return
         }
-        let context = PO3DSRedirect(url: url, isHeadlessModeAllowed: true, timeout: Constants.webFingerprintTimeout)
+        let context = PO3DSRedirect(url: url, timeout: Constants.webFingerprintTimeout)
         delegate.handle(redirect: context) { result in
             switch result {
             case let .success(newSource):
@@ -148,7 +148,7 @@ final class DefaultThreeDSService: ThreeDSService {
             completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
             return
         }
-        let context = PO3DSRedirect(url: url, isHeadlessModeAllowed: false, timeout: nil)
+        let context = PO3DSRedirect(url: url, timeout: nil)
         delegate.handle(redirect: context, completion: completion)
     }
 

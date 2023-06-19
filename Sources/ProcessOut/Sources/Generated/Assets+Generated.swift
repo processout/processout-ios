@@ -22,66 +22,44 @@ internal typealias AssetImageTypeAlias = ImageAsset.Image
 // swiftlint:disable identifier_name line_length nesting type_body_length type_name
 internal enum Asset {
   internal enum Colors {
-    internal enum Background {
-      internal enum Grey {
-        internal static let dark = ColorAsset(name: "Background/Grey/Dark")
-        internal static let light = ColorAsset(name: "Background/Grey/Light")
+    internal enum Action {
+      internal enum Border {
+        internal static let disabled = ColorAsset(name: "Action/Border/Disabled")
+        internal static let selected = ColorAsset(name: "Action/Border/Selected")
       }
-      internal static let input = ColorAsset(name: "Background/Input")
-      internal static let primary = ColorAsset(name: "Background/Primary")
-      internal enum Success {
-        internal static let dark = ColorAsset(name: "Background/Success/Dark")
-        internal static let darker = ColorAsset(name: "Background/Success/Darker")
-        internal static let light = ColorAsset(name: "Background/Success/Light")
+      internal enum Primary {
+        internal static let `default` = ColorAsset(name: "Action/Primary/Default")
+        internal static let disabled = ColorAsset(name: "Action/Primary/Disabled")
+        internal static let pressed = ColorAsset(name: "Action/Primary/Pressed")
+      }
+      internal enum Secondary {
+        internal static let `default` = ColorAsset(name: "Action/Secondary/Default")
+        internal static let pressed = ColorAsset(name: "Action/Secondary/Pressed")
       }
     }
     internal enum Border {
-      internal static let active = ColorAsset(name: "Border/Active")
-      internal static let error = ColorAsset(name: "Border/Error")
-      internal static let primary = ColorAsset(name: "Border/Primary")
+      internal static let `default` = ColorAsset(name: "Border/Default")
+      internal static let divider = ColorAsset(name: "Border/Divider")
+      internal static let subtle = ColorAsset(name: "Border/Subtle")
     }
-    internal enum Button {
-      internal static let border = ColorAsset(name: "Button/Border")
-      internal static let disabled = ColorAsset(name: "Button/Disabled")
-      internal static let highlighted = ColorAsset(name: "Button/Highlighted")
-      internal static let primary = ColorAsset(name: "Button/Primary")
-      internal enum Text {
-        internal static let primary = ColorAsset(name: "Button/Text/Primary")
-        internal static let secondary = ColorAsset(name: "Button/Text/Secondary")
-      }
-    }
-    internal enum Generic {
-      internal static let black = ColorAsset(name: "Generic/Black")
-      internal static let white = ColorAsset(name: "Generic/White")
-    }
-    internal enum Icon {
-      internal static let primary = ColorAsset(name: "Icon/Primary")
-    }
-    internal enum New {
-      internal enum Action {
-        internal enum Border {
-          internal static let disabled = ColorAsset(name: "New/Action/Border/Disabled")
-        }
-        internal enum Secondary {
-          internal static let `default` = ColorAsset(name: "New/Action/Secondary/Default")
-          internal static let pressed = ColorAsset(name: "New/Action/Secondary/Pressed")
-        }
-      }
-      internal enum Border {
-        internal static let `default` = ColorAsset(name: "New/Border/Default")
-      }
-      internal enum Text {
-        internal static let disabled = ColorAsset(name: "New/Text/Disabled")
-        internal static let secondary = ColorAsset(name: "New/Text/Secondary")
-      }
+    internal enum Surface {
+      internal static let background = ColorAsset(name: "Surface/Background")
+      internal static let error = ColorAsset(name: "Surface/Error")
+      internal static let level1 = ColorAsset(name: "Surface/Level1")
+      internal static let neutral = ColorAsset(name: "Surface/Neutral")
+      internal static let success = ColorAsset(name: "Surface/Success")
+      internal static let warning = ColorAsset(name: "Surface/Warning")
     }
     internal enum Text {
       internal static let disabled = ColorAsset(name: "Text/Disabled")
       internal static let error = ColorAsset(name: "Text/Error")
-      internal static let link = ColorAsset(name: "Text/Link")
+      internal static let muted = ColorAsset(name: "Text/Muted")
+      internal static let onColor = ColorAsset(name: "Text/OnColor")
       internal static let primary = ColorAsset(name: "Text/Primary")
       internal static let secondary = ColorAsset(name: "Text/Secondary")
       internal static let success = ColorAsset(name: "Text/Success")
+      internal static let tertiary = ColorAsset(name: "Text/Tertiary")
+      internal static let warning = ColorAsset(name: "Text/Warning")
     }
   }
   internal enum Images {

@@ -8,8 +8,8 @@
 struct NativeAlternativePaymentMethodSubmittedCellStyle {
 
     /// Message style.
-    let message: POTextStyle?
+    let message: POTextStyle
 
     /// Success message style.
-    let successMessage: POTextStyle?
+    let successMessage: POTextStyle
 }

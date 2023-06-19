@@ -7,7 +7,7 @@
 
 import UIKit
 
-@available(*, deprecated, message: "Declaration will be removed in version 4.0.")
+@available(*, deprecated)
 public class ThreeDSTestHandler: ThreeDSHandler {
 
     var controller: UIViewController
