@@ -23,7 +23,7 @@ final class HttpCardsRepository: CardsRepository {
         struct Response: Decodable {
             let cardInformation: POCardIssuerInformation
         }
-        let httpRequest = HttpConnectorRequest<Response>.get(path: "/iins")
+        let httpRequest = HttpConnectorRequest<Response>.get(path: "/iins/" + request.iin)
         connector.execute(request: httpRequest) { [failureMapper] result in
             completion(result.map(\.cardInformation).mapError(failureMapper.failure))
         }
