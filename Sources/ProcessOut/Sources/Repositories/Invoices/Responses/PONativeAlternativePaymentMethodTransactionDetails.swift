@@ -59,7 +59,7 @@ extension PONativeAlternativePaymentMethodTransactionDetails.Gateway: Decodable 
         let container = try decoder.container(keyedBy: CodingKeys.self)
         displayName = try container.decode(String.self, forKey: .displayName)
         logoUrl = try container.decode(URL.self, forKey: .logoUrl)
-        customerActionImageUrl = try container.decodeIfPresent(URL.self, forKey: .logoUrl)
+        customerActionImageUrl = try container.decodeIfPresent(URL.self, forKey: .customerActionImageUrl)
         // Escapes plain text action message and stores as a markdown.
         customerActionMessage = try container
             .decodeIfPresent(String.self, forKey: .customerActionMessage)
