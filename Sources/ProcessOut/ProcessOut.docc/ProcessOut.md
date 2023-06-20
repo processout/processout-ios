@@ -64,6 +64,8 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``POContact``
 - ``POCard``
 - ``POCardUpdateRequest``
+- ``POCardIssuerInformationRequest``
+- ``POCardIssuerInformation``
 
 ### Customer Tokens
 
