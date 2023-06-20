@@ -7,14 +7,14 @@
 
 import Foundation
 
-final class HttpCardsRepository: POCardsRepository {
+final class HttpCardsRepository: CardsRepository {
 
     init(connector: HttpConnector, failureMapper: HttpConnectorFailureMapper) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
 
-    // MARK: - POCardsRepository
+    // MARK: - CardsRepository
 
     func issuerInformation(
         request: POCardIssuerInformationRequest,

@@ -4,6 +4,50 @@
 // swiftlint:disable all
 
 @available(iOS 13.0, *)
+extension CardsRepository {
+
+    /// Allows to retrieve card issuer information based on iin.
+    @MainActor
+    public func issuerInformation(
+        request: POCardIssuerInformationRequest
+    ) async throws -> POCardIssuerInformation {
+        return try await withUnsafeThrowingContinuation { continuation in
+            issuerInformation(request: request, completion: continuation.resume)
+        }
+    }
+
+    /// Tokenize a card.
+    @MainActor
+    public func tokenize(
+        request: POCardTokenizationRequest
+    ) async throws -> POCard {
+        return try await withUnsafeThrowingContinuation { continuation in
+            tokenize(request: request, completion: continuation.resume)
+        }
+    }
+
+    /// Updates card information.
+    @MainActor
+    public func updateCard(
+        request: POCardUpdateRequest
+    ) async throws -> POCard {
+        return try await withUnsafeThrowingContinuation { continuation in
+            updateCard(request: request, completion: continuation.resume)
+        }
+    }
+
+    /// Tokenize a card via ApplePay.
+    @MainActor
+    public func tokenize(
+        request: ApplePayCardTokenizationRequest
+    ) async throws -> POCard {
+        return try await withUnsafeThrowingContinuation { continuation in
+            tokenize(request: request, completion: continuation.resume)
+        }
+    }
+}
+
+@available(iOS 13.0, *)
 extension CustomerTokensRepository {
 
     /// Assigns a token to a customer.
@@ -70,50 +114,6 @@ extension InvoicesRepository {
     ) async throws -> POInvoice {
         return try await withUnsafeThrowingContinuation { continuation in
             createInvoice(request: request, completion: continuation.resume)
-        }
-    }
-}
-
-@available(iOS 13.0, *)
-extension POCardsRepository {
-
-    /// Allows to retrieve card issuer information based on iin.
-    @MainActor
-    public func issuerInformation(
-        request: POCardIssuerInformationRequest
-    ) async throws -> POCardIssuerInformation {
-        return try await withUnsafeThrowingContinuation { continuation in
-            issuerInformation(request: request, completion: continuation.resume)
-        }
-    }
-
-    /// Tokenize a card.
-    @MainActor
-    public func tokenize(
-        request: POCardTokenizationRequest
-    ) async throws -> POCard {
-        return try await withUnsafeThrowingContinuation { continuation in
-            tokenize(request: request, completion: continuation.resume)
-        }
-    }
-
-    /// Updates card information.
-    @MainActor
-    public func updateCard(
-        request: POCardUpdateRequest
-    ) async throws -> POCard {
-        return try await withUnsafeThrowingContinuation { continuation in
-            updateCard(request: request, completion: continuation.resume)
-        }
-    }
-
-    /// Tokenize a card via ApplePay.
-    @MainActor
-    public func tokenize(
-        request: ApplePayCardTokenizationRequest
-    ) async throws -> POCard {
-        return try await withUnsafeThrowingContinuation { continuation in
-            tokenize(request: request, completion: continuation.resume)
         }
     }
 }

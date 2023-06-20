@@ -1,5 +1,5 @@
 //
-//  POCardsRepository.swift
+//  CardsRepository.swift
 //  ProcessOut
 //
 //  Created by Julien.Rodrigues on 20/10/2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol POCardsRepository: PORepository {
+protocol CardsRepository: PORepository {
 
     /// Allows to retrieve card issuer information based on iin.
     func issuerInformation(

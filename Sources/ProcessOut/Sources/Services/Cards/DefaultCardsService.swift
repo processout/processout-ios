@@ -10,7 +10,7 @@ import Foundation
 final class DefaultCardsService: POCardsService {
 
     init(
-        repository: POCardsRepository,
+        repository: CardsRepository,
         applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
     ) {
         self.repository = repository
@@ -41,6 +41,6 @@ final class DefaultCardsService: POCardsService {
 
     // MARK: - Private Properties
 
-    private let repository: POCardsRepository
+    private let repository: CardsRepository
     private let applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
 }
