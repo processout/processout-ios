@@ -121,6 +121,16 @@ extension InvoicesRepository {
 @available(iOS 13.0, *)
 extension POCardsService {
 
+    /// Allows to retrieve card issuer information based on iin.
+    @MainActor
+    public func issuerInformation(
+        request: POCardIssuerInformationRequest
+    ) async throws -> POCardIssuerInformation {
+        return try await withUnsafeThrowingContinuation { continuation in
+            issuerInformation(request: request, completion: continuation.resume)
+        }
+    }
+
     /// Tokenizes a card. You can use the card for a single payment by creating a card token with it. If you want
     /// to use the card for multiple payments then you can use the card token to create a reusable customer token.
     /// Note that once you have used the card token either for a payment or to create a customer token, the card
