@@ -7,12 +7,15 @@
 extension CardsRepository {
 
     /// Allows to retrieve card issuer information based on iin.
+    /// 
+    /// - Parameters:
+    ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
     @MainActor
     public func issuerInformation(
-        request: POCardIssuerInformationRequest
+        iin: String
     ) async throws -> POCardIssuerInformation {
         return try await withUnsafeThrowingContinuation { continuation in
-            issuerInformation(request: request, completion: continuation.resume)
+            issuerInformation(iin: iin, completion: continuation.resume)
         }
     }
 
@@ -122,12 +125,15 @@ extension InvoicesRepository {
 extension POCardsService {
 
     /// Allows to retrieve card issuer information based on iin.
+    /// 
+    /// - Parameters:
+    ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
     @MainActor
     public func issuerInformation(
-        request: POCardIssuerInformationRequest
+        iin: String
     ) async throws -> POCardIssuerInformation {
         return try await withUnsafeThrowingContinuation { continuation in
-            issuerInformation(request: request, completion: continuation.resume)
+            issuerInformation(iin: iin, completion: continuation.resume)
         }
     }
 

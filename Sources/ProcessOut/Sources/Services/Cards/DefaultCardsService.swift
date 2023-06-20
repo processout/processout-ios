@@ -19,11 +19,8 @@ final class DefaultCardsService: POCardsService {
 
     // MARK: - POCardsService
 
-    func issuerInformation(
-        request: POCardIssuerInformationRequest,
-        completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void
-    ) {
-        repository.issuerInformation(request: request, completion: completion)
+    func issuerInformation(iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void) {
+        repository.issuerInformation(iin: iin, completion: completion)
     }
 
     func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
