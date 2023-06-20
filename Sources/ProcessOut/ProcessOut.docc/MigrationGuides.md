@@ -13,7 +13,7 @@ shared instance.
 ``POAlternativePaymentMethodViewControllerBuilder`` should be created via init and configured with instance methods.
 Static factory methods were deprecated.
 
-- ``POInputFormStyle`` was replaced with ``POInputStyle``. It no longer holds information about title and description
+- `POInputFormStyle` was replaced with ``POInputStyle``. It no longer holds information about title and description
 and solely describes input field.
 
 - `POBackgroundDecorationStyle` style was removed.

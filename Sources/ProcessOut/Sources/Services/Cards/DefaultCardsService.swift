@@ -10,7 +10,7 @@ import Foundation
 final class DefaultCardsService: POCardsService {
 
     init(
-        repository: POCardsRepository,
+        repository: CardsRepository,
         applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
     ) {
         self.repository = repository
@@ -18,6 +18,10 @@ final class DefaultCardsService: POCardsService {
     }
 
     // MARK: - POCardsService
+
+    func issuerInformation(iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void) {
+        repository.issuerInformation(iin: iin, completion: completion)
+    }
 
     func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
         repository.tokenize(request: request, completion: completion)
@@ -41,6 +45,6 @@ final class DefaultCardsService: POCardsService {
 
     // MARK: - Private Properties
 
-    private let repository: POCardsRepository
+    private let repository: CardsRepository
     private let applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
 }
