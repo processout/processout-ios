@@ -9,6 +9,12 @@ import Foundation
 
 protocol POCardsRepository: PORepository {
 
+    /// Allows to retrieve card issuer information based on iin.
+    func issuerInformation(
+        request: POCardIssuerInformationRequest,
+        completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void
+    )
+
     /// Tokenize a card.
     func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void)
 

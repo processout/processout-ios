@@ -77,6 +77,16 @@ extension InvoicesRepository {
 @available(iOS 13.0, *)
 extension POCardsRepository {
 
+    /// Allows to retrieve card issuer information based on iin.
+    @MainActor
+    public func issuerInformation(
+        request: POCardIssuerInformationRequest
+    ) async throws -> POCardIssuerInformation {
+        return try await withUnsafeThrowingContinuation { continuation in
+            issuerInformation(request: request, completion: continuation.resume)
+        }
+    }
+
     /// Tokenize a card.
     @MainActor
     public func tokenize(

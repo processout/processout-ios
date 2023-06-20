@@ -16,6 +16,19 @@ final class HttpCardsRepository: POCardsRepository {
 
     // MARK: - POCardsRepository
 
+    func issuerInformation(
+        request: POCardIssuerInformationRequest,
+        completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void
+    ) {
+        struct Response: Decodable {
+            let cardInformation: POCardIssuerInformation
+        }
+        let httpRequest = HttpConnectorRequest<Response>.get(path: "/iins")
+        connector.execute(request: httpRequest) { [failureMapper] result in
+            completion(result.map(\.cardInformation).mapError(failureMapper.failure))
+        }
+    }
+
     func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
             path: "/cards", body: request, includesDeviceMetadata: true
