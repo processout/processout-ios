@@ -40,11 +40,11 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
             descriptionTextView.accessibilityIdentifier = "native-alternative-payment.non-captured.description"
         }
         descriptionTextView.attributedText = AttributedStringBuilder()
-            .typography(descriptionStyle.typography, style: .headline)
+            .typography(descriptionStyle.typography, style: .body)
             .textColor(descriptionStyle.color)
             .lineBreakMode(.byWordWrapping)
-            .alignment(.center) // todo: (andrii-vysotskyi): determine alignment base on contents of markdown.
-            .string(item.message)
+            .alignment(item.message.count > Constants.maximumCenterAlignedMessageLength ? .natural : .center)
+            .markdown(item.message)
             .build()
         if let image = item.image {
             decorationImageView.image = image
@@ -70,6 +70,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         static let descriptionBottomSpacing: CGFloat = 46
         static let descriptionBottomSmallSpacing: CGFloat = 24
         static let topContentInset: CGFloat = 68
+        static let maximumCenterAlignedMessageLength = 150
     }
 
     // MARK: - Private Properties
@@ -129,6 +130,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
             iconImageView.heightAnchor.constraint(lessThanOrEqualToConstant: Constants.maximumLogoImageHeight),
             iconImageView.widthAnchor.constraint(lessThanOrEqualTo: containerView.widthAnchor),
             iconImageViewWidthConstraint,
+            descriptionTextView.widthAnchor.constraint(equalTo: containerView.widthAnchor),
             decorationImageView.heightAnchor.constraint(
                 lessThanOrEqualToConstant: Constants.maximumDecorationImageHeight
             ),
