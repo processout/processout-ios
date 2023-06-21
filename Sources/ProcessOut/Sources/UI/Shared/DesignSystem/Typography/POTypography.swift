@@ -23,9 +23,6 @@ public struct POTypography {
     /// it from the following paragraph. This value must be nonnegative. Default value is `0`.
     public let paragraphSpacing: CGFloat
 
-    /// A number used as the document’s default tab spacing. Default value is `16`.
-    public let tabInterval: CGFloat
-
     /// A Boolean that indicates whether the font should be updated when the device’s content size category changes.
     /// Default value is `true`.
     public let adjustsFontForContentSizeCategory: Bool
@@ -36,14 +33,12 @@ public struct POTypography {
         lineHeight: CGFloat? = nil,
         tracking: CGFloat? = nil,
         paragraphSpacing: CGFloat = 0,
-        tabInterval: CGFloat = 16,
         adjustsFontForContentSizeCategory: Bool = true
     ) {
         self.font = font
         self.lineHeight = lineHeight ?? font.lineHeight
         self.tracking = tracking
         self.paragraphSpacing = paragraphSpacing
-        self.tabInterval = tabInterval
         self.adjustsFontForContentSizeCategory = adjustsFontForContentSizeCategory
     }
 }
@@ -60,10 +55,7 @@ extension POTypography {
 
         /// Use for body copy on larger screens, or smaller blocks of text.
         static let body = POTypography(
-            font: FontFamily.WorkSans.regular.font(size: 16),
-            lineHeight: 24,
-            paragraphSpacing: 8,
-            tabInterval: 24
+            font: FontFamily.WorkSans.regular.font(size: 16), lineHeight: 24, paragraphSpacing: 8
         )
 
         /// Use for form components, error text and key value data.

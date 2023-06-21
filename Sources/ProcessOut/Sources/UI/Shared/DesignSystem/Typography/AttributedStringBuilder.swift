@@ -43,7 +43,6 @@ final class AttributedStringBuilder {
         )
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
         paragraphStyle.lineHeightMultiple = lineHeightMultiple
-        paragraphStyle.defaultTabInterval = typography.tabInterval
         paragraphStyle.paragraphSpacing = typography.paragraphSpacing
         attributes[.font] = scaledFont
         attributes[.baselineOffset] = baselineOffset(font: scaledFont, lineHeightMultiple: lineHeightMultiple)
@@ -67,15 +66,12 @@ final class AttributedStringBuilder {
 
     /// Can be used to format list items of kind TAB MARKER TAB CONTENT
     func listLevel(_ level: Int) -> AttributedStringBuilder {
-        let indentation =
-            CGFloat(level + 1) * paragraphStyle.defaultTabInterval +
-            CGFloat(level) * Constants.listItemContentSpacing
-        let contentLocation = indentation + Constants.listItemContentSpacing
+        let contentIndentation = CGFloat(level + 1) * Constants.indentationWidth
         paragraphStyle.tabStops = [
-            NSTextTab(textAlignment: .right, location: indentation),
-            NSTextTab(textAlignment: .left, location: contentLocation)
+            NSTextTab(textAlignment: .right, location: contentIndentation - Constants.listContentSpacing),
+            NSTextTab(textAlignment: .left, location: contentIndentation)
         ]
-        paragraphStyle.headIndent = contentLocation
+        paragraphStyle.headIndent = contentIndentation
         return self
     }
 
@@ -128,7 +124,8 @@ final class AttributedStringBuilder {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let listItemContentSpacing: CGFloat = 4
+        static let indentationWidth: CGFloat = 32
+        static let listContentSpacing: CGFloat = 4
     }
 
     private enum Text {

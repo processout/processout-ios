@@ -40,7 +40,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
             descriptionTextView.accessibilityIdentifier = "native-alternative-payment.non-captured.description"
         }
         descriptionTextView.attributedText = AttributedStringBuilder()
-            .typography(descriptionStyle.typography, style: .body)
+            .typography(descriptionStyle.typography, style: .body, maximumSize: Constants.maximumMessageFontSize)
             .textColor(descriptionStyle.color)
             .lineBreakMode(.byWordWrapping)
             .alignment(item.message.count > Constants.maximumCenterAlignedMessageLength ? .natural : .center)
@@ -71,6 +71,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         static let descriptionBottomSmallSpacing: CGFloat = 24
         static let topContentInset: CGFloat = 68
         static let maximumCenterAlignedMessageLength = 150
+        static let maximumMessageFontSize: CGFloat = 24
     }
 
     // MARK: - Private Properties

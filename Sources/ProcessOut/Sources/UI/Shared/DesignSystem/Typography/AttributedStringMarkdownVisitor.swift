@@ -27,7 +27,6 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(node: MarkdownEmphasis) -> NSAttributedString {
-        // todo(andrii-vysotskyi): add default italic font face variation
         let builder = stringBuilder.copy().with(symbolicTraits: .traitItalic)
         let visitor = AttributedStringMarkdownVisitor(stringBuilder: builder, level: level)
         return node.children.map { $0.accept(visitor: visitor) }.joined()
@@ -41,7 +40,6 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
         let attributedString = node.children
             .enumerated()
             .map { offset, itemNode in
-                // todo(andrii-vysotskyi): when there are multiple paragraphs in list item text is wrongly aligned.
                 let prefix = builder
                     .string(listItemPrefix(list: node, at: offset))
                     .build()
@@ -54,7 +52,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(node: MarkdownListItem) -> NSAttributedString {
-        let separator = stringBuilder.copy().string(Constants.paragraphSeparator).build()
+        let separator = stringBuilder.copy().string(Constants.listItemsSeparator).build()
         return node.children.map { $0.accept(visitor: self) }.joined(separator: separator)
     }
 
@@ -136,6 +134,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
         static let legacyLineSeparator = "\u{2028}"
         static let lineSeparator = "\u{2028}"
         static let paragraphSeparator = "\u{2029}"
+        static let listItemsSeparator = "\u{2029}\t\t"
         static let horizontalTab = "\t"
         static let bulletMarkers = ["•", "◦", "◆", "◇"]
         static let orderedListDelimiter = "."
