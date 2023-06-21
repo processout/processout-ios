@@ -36,6 +36,9 @@ public struct PONativeAlternativePaymentMethodStyle {
     public let activityIndicator: POActivityIndicatorStyle
 
     /// Message style.
+    ///
+    /// - NOTE: This style may be used to render rich attributed text so please make sure that your font's
+    /// typeface supports different variations. Currently framework may use bold, italic and mono space traits.
     public let message: POTextStyle
 
     /// Success message style.
