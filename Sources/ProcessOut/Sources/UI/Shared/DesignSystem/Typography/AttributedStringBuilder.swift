@@ -70,6 +70,8 @@ struct AttributedStringBuilder {
             attributes[.tracking] = typography.tracking
         }
         let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.maximumLineHeight = font.lineHeight * lineHeightMultiple
+        paragraphStyle.minimumLineHeight = font.lineHeight * lineHeightMultiple
         paragraphStyle.lineHeightMultiple = lineHeightMultiple
         paragraphStyle.paragraphSpacing = typography.paragraphSpacing
         paragraphStyle.alignment = alignment
