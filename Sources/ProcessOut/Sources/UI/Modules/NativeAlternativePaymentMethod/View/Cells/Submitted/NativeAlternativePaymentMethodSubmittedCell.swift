@@ -102,7 +102,6 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         textView.isScrollEnabled = false
         textView.isEditable = false
         textView.isSelectable = true
-        // todo(andrii-vysotskyi): adjust tint color
         return textView
     }()
 
