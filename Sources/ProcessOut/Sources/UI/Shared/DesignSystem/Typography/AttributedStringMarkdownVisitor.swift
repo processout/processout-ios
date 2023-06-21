@@ -21,27 +21,27 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
         node.children.map { $0.accept(visitor: self) }.joined()
     }
 
-    func visit(node: MarkdownDocument) -> NSAttributedString {
+    func visit(document: MarkdownDocument) -> NSAttributedString {
         let separator = stringBuilder.copy().string(Constants.paragraphSeparator).build()
-        return node.children.map { $0.accept(visitor: self) }.joined(separator: separator)
+        return document.children.map { $0.accept(visitor: self) }.joined(separator: separator)
     }
 
-    func visit(node: MarkdownEmphasis) -> NSAttributedString {
+    func visit(emphasis: MarkdownEmphasis) -> NSAttributedString {
         let builder = stringBuilder.copy().with(symbolicTraits: .traitItalic)
         let visitor = AttributedStringMarkdownVisitor(stringBuilder: builder, level: level)
-        return node.children.map { $0.accept(visitor: visitor) }.joined()
+        return emphasis.children.map { $0.accept(visitor: visitor) }.joined()
     }
 
-    func visit(node: MarkdownList) -> NSAttributedString {
+    func visit(list: MarkdownList) -> NSAttributedString {
         let builder = stringBuilder.copy().listLevel(level)
         let itemsSeparator = builder
             .string(Constants.paragraphSeparator)
             .build()
-        let attributedString = node.children
+        let attributedString = list.children
             .enumerated()
             .map { offset, itemNode in
                 let prefix = builder
-                    .string(listItemPrefix(list: node, at: offset))
+                    .string(listItemPrefix(list: list, at: offset))
                     .build()
                 let visitor = AttributedStringMarkdownVisitor(stringBuilder: builder, level: self.level + 1)
                 let attributedString = itemNode.accept(visitor: visitor)
@@ -51,76 +51,78 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
         return attributedString
     }
 
-    func visit(node: MarkdownListItem) -> NSAttributedString {
+    func visit(listItem: MarkdownListItem) -> NSAttributedString {
         let separator = stringBuilder.copy().string(Constants.listItemsSeparator).build()
-        return node.children.map { $0.accept(visitor: self) }.joined(separator: separator)
+        return listItem.children.map { $0.accept(visitor: self) }.joined(separator: separator)
     }
 
-    func visit(node: MarkdownParagraph) -> NSAttributedString {
-        node.children.map { $0.accept(visitor: self) }.joined()
+    func visit(paragraph: MarkdownParagraph) -> NSAttributedString {
+        paragraph.children.map { $0.accept(visitor: self) }.joined()
     }
 
-    func visit(node: MarkdownStrong) -> NSAttributedString {
+    func visit(strong: MarkdownStrong) -> NSAttributedString {
         let builder = stringBuilder.copy().with(symbolicTraits: .traitBold)
         let visitor = AttributedStringMarkdownVisitor(stringBuilder: builder, level: level)
-        return node.children.map { $0.accept(visitor: visitor) }.joined()
+        return strong.children.map { $0.accept(visitor: visitor) }.joined()
     }
 
-    func visit(node: MarkdownText) -> NSAttributedString {
-        assert(node.children.isEmpty)
-        return stringBuilder.copy().string(node.value).build()
+    func visit(text: MarkdownText) -> NSAttributedString {
+        assert(text.children.isEmpty)
+        return stringBuilder.copy().string(text.value).build()
     }
 
     /// - NOTE: Softbreak is rendered with line break.
-    func visit(node: MarkdownSoftbreak) -> NSAttributedString {
-        assert(node.children.isEmpty)
+    func visit(softbreak: MarkdownSoftbreak) -> NSAttributedString {
+        assert(softbreak.children.isEmpty)
         return stringBuilder.copy().string(Constants.lineSeparator).build()
     }
 
-    func visit(node: MarkdownLinebreak) -> NSAttributedString {
-        assert(node.children.isEmpty)
+    func visit(linebreak: MarkdownLinebreak) -> NSAttributedString {
+        assert(linebreak.children.isEmpty)
         return stringBuilder.copy().string(Constants.lineSeparator).build()
     }
 
-    func visit(node: MarkdownHeading) -> NSAttributedString {
-        node.children.map { $0.accept(visitor: self) }.joined()
+    func visit(heading: MarkdownHeading) -> NSAttributedString {
+        heading.children.map { $0.accept(visitor: self) }.joined()
     }
 
-    func visit(node: MarkdownBlockQuote) -> NSAttributedString {
+    func visit(blockQuote: MarkdownBlockQuote) -> NSAttributedString {
         let separator = stringBuilder.copy().string(Constants.paragraphSeparator).build()
-        return node.children.map { $0.accept(visitor: self) }.joined(separator: separator)
+        return blockQuote.children.map { $0.accept(visitor: self) }.joined(separator: separator)
     }
 
-    func visit(node: MarkdownCodeBlock) -> NSAttributedString {
-        assert(node.children.isEmpty)
+    func visit(codeBlock: MarkdownCodeBlock) -> NSAttributedString {
+        assert(codeBlock.children.isEmpty)
         let attributedString = stringBuilder
             .copy()
             .with(symbolicTraits: .traitMonoSpace)
-            .string(node.code.replacingOccurrences(of: Constants.legacyLineSeparator, with: Constants.lineSeparator))
+            .string(
+                codeBlock.code.replacingOccurrences(of: Constants.legacyLineSeparator, with: Constants.lineSeparator)
+            )
             .build()
         return attributedString
     }
 
-    func visit(node: MarkdownThematicBreak) -> NSAttributedString {
+    func visit(thematicBreak: MarkdownThematicBreak) -> NSAttributedString {
         stringBuilder.copy().string(Constants.lineSeparator).build()
     }
 
-    func visit(node: MarkdownCodeSpan) -> NSAttributedString {
-        assert(node.children.isEmpty)
+    func visit(codeSpan: MarkdownCodeSpan) -> NSAttributedString {
+        assert(codeSpan.children.isEmpty)
         let attributedString = stringBuilder
             .copy()
             .with(symbolicTraits: .traitMonoSpace)
-            .string(node.code)
+            .string(codeSpan.code)
             .build()
         return attributedString
     }
 
-    func visit(node: MarkdownLink) -> NSAttributedString {
-        let attributedString = node.children
+    func visit(link: MarkdownLink) -> NSAttributedString {
+        let attributedString = link.children
             .map { $0.accept(visitor: self) }
             .joined()
             .mutableCopy() as! NSMutableAttributedString // swiftlint:disable:this force_cast
-        if let url = node.url {
+        if let url = link.url {
             let range = NSRange(location: 0, length: attributedString.length)
             attributedString.addAttribute(.link, value: url, range: range)
         }

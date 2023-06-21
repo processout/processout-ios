@@ -13,47 +13,47 @@ protocol MarkdownVisitor<Result> {
     func visit(node: MarkdownUnknown) -> Result
 
     /// Vists document.
-    func visit(node: MarkdownDocument) -> Result
+    func visit(document: MarkdownDocument) -> Result
 
     /// Vists emphasis node.
-    func visit(node: MarkdownEmphasis) -> Result
+    func visit(emphasis: MarkdownEmphasis) -> Result
 
     /// Vists list node.
-    func visit(node: MarkdownList) -> Result
+    func visit(list: MarkdownList) -> Result
 
     /// Vists list item.
-    func visit(node: MarkdownListItem) -> Result
+    func visit(listItem: MarkdownListItem) -> Result
 
     /// Vists paragraph node.
-    func visit(node: MarkdownParagraph) -> Result
+    func visit(paragraph: MarkdownParagraph) -> Result
 
     /// Vists strong node.
-    func visit(node: MarkdownStrong) -> Result
+    func visit(strong: MarkdownStrong) -> Result
 
     /// Vists text node.
-    func visit(node: MarkdownText) -> Result
+    func visit(text: MarkdownText) -> Result
 
     /// Vists softbreak node.
-    func visit(node: MarkdownSoftbreak) -> Result
+    func visit(softbreak: MarkdownSoftbreak) -> Result
 
     /// Vists linebreak node.
-    func visit(node: MarkdownLinebreak) -> Result
+    func visit(linebreak: MarkdownLinebreak) -> Result
 
     /// Vists heading node.
-    func visit(node: MarkdownHeading) -> Result
+    func visit(heading: MarkdownHeading) -> Result
 
     /// Vists block quote.
-    func visit(node: MarkdownBlockQuote) -> Result
+    func visit(blockQuote: MarkdownBlockQuote) -> Result
 
     /// Vists code block
-    func visit(node: MarkdownCodeBlock) -> Result
+    func visit(codeBlock: MarkdownCodeBlock) -> Result
 
     /// Vists thematic break.
-    func visit(node: MarkdownThematicBreak) -> Result
+    func visit(thematicBreak: MarkdownThematicBreak) -> Result
 
     /// Vists code span.
-    func visit(node: MarkdownCodeSpan) -> Result
+    func visit(codeSpan: MarkdownCodeSpan) -> Result
 
     /// Vists link node.
-    func visit(node: MarkdownLink) -> Result
+    func visit(link: MarkdownLink) -> Result
 }

@@ -21,79 +21,79 @@ final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
         description(node: node, nodeName: "Unknown")
     }
 
-    func visit(node: MarkdownDocument) -> String {
-        description(node: node, nodeName: "Document")
+    func visit(document: MarkdownDocument) -> String {
+        description(node: document, nodeName: "Document")
     }
 
-    func visit(node: MarkdownEmphasis) -> String {
-        description(node: node, nodeName: "Emphasis")
+    func visit(emphasis: MarkdownEmphasis) -> String {
+        description(node: emphasis, nodeName: "Emphasis")
     }
 
-    func visit(node: MarkdownList) -> String {
+    func visit(list: MarkdownList) -> String {
         let attributes: [String: CustomStringConvertible]
-        switch node.type {
+        switch list.type {
         case let .ordered(delimiter, startIndex):
             attributes = ["start": startIndex, "delimiter": delimiter]
         case .bullet(let marker):
             attributes = ["marker": marker]
         }
-        return description(node: node, nodeName: "List", attributes: attributes)
+        return description(node: list, nodeName: "List", attributes: attributes)
     }
 
-    func visit(node: MarkdownListItem) -> String {
-        description(node: node, nodeName: "Item")
+    func visit(listItem: MarkdownListItem) -> String {
+        description(node: listItem, nodeName: "Item")
     }
 
-    func visit(node: MarkdownParagraph) -> String {
-        description(node: node, nodeName: "Paragraph")
+    func visit(paragraph: MarkdownParagraph) -> String {
+        description(node: paragraph, nodeName: "Paragraph")
     }
 
-    func visit(node: MarkdownStrong) -> String {
-        description(node: node, nodeName: "Bold")
+    func visit(strong: MarkdownStrong) -> String {
+        description(node: strong, nodeName: "Bold")
     }
 
-    func visit(node: MarkdownText) -> String {
-        description(node: node, nodeName: "Text", content: node.value)
+    func visit(text: MarkdownText) -> String {
+        description(node: text, nodeName: "Text", content: text.value)
     }
 
-    func visit(node: MarkdownSoftbreak) -> String {
-        description(node: node, nodeName: "Softbreak")
+    func visit(softbreak: MarkdownSoftbreak) -> String {
+        description(node: softbreak, nodeName: "Softbreak")
     }
 
-    func visit(node: MarkdownLinebreak) -> String {
-        description(node: node, nodeName: "Linebreak")
+    func visit(linebreak: MarkdownLinebreak) -> String {
+        description(node: linebreak, nodeName: "Linebreak")
     }
 
-    func visit(node: MarkdownHeading) -> String {
-        description(node: node, nodeName: "Heading", attributes: ["level": node.level])
+    func visit(heading: MarkdownHeading) -> String {
+        description(node: heading, nodeName: "Heading", attributes: ["level": heading.level])
     }
 
-    func visit(node: MarkdownBlockQuote) -> String {
-        description(node: node, nodeName: "Block Quote")
+    func visit(blockQuote: MarkdownBlockQuote) -> String {
+        description(node: blockQuote, nodeName: "Block Quote")
     }
 
-    func visit(node: MarkdownCodeBlock) -> String {
+    func visit(codeBlock: MarkdownCodeBlock) -> String {
         var attributes: [String: CustomStringConvertible] = [:]
-        if let info = node.info {
+        if let info = codeBlock.info {
             attributes["info"] = info
         }
-        return description(node: node, nodeName: "Code Block", attributes: attributes, content: node.code)
+        return description(node: codeBlock, nodeName: "Code Block", attributes: attributes, content: codeBlock.code)
     }
 
-    func visit(node: MarkdownThematicBreak) -> String {
-        description(node: node, nodeName: "Thematic Break")
+    func visit(thematicBreak: MarkdownThematicBreak) -> String {
+        description(node: thematicBreak, nodeName: "Thematic Break")
     }
 
-    func visit(node: MarkdownCodeSpan) -> String {
-        description(node: node, nodeName: "Code Span", content: node.code)
+    func visit(codeSpan: MarkdownCodeSpan) -> String {
+        description(node: codeSpan, nodeName: "Code Span", content: codeSpan.code)
     }
 
-    func visit(node: MarkdownLink) -> String {
+    func visit(link: MarkdownLink) -> String {
         var attributes: [String: CustomStringConvertible] = [:]
-        if let url = node.url {
+        if let url = link.url {
             attributes["url"] = url
         }
-        return description(node: node, nodeName: "Link", attributes: attributes)
+        return description(node: link, nodeName: "Link", attributes: attributes)
     }
 
     // MARK: - Private Properties

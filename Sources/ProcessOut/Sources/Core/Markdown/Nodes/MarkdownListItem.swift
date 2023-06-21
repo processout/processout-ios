@@ -16,6 +16,6 @@ final class MarkdownListItem: MarkdownBaseNode {
     }
 
     override func accept<V: MarkdownVisitor>(visitor: V) -> V.Result {
-        visitor.visit(node: self)
+        visitor.visit(listItem: self)
     }
 }
