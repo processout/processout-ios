@@ -82,11 +82,10 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(codeBlock: MarkdownCodeBlock) -> NSAttributedString {
-        let attributedString = builder
-            .with(symbolicTraits: .traitMonoSpace)
-            .string(codeBlock.code)
-            .build()
-        return attributedString
+        let code = codeBlock.code
+            .replacingOccurrences(of: "\n", with: Constants.lineSeparator)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return builder.with(symbolicTraits: .traitMonoSpace).string(code).build()
     }
 
     func visit(thematicBreak: MarkdownThematicBreak) -> NSAttributedString {
