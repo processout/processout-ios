@@ -38,16 +38,13 @@ struct AttributedStringBuilder {
     /// When builder is used to create an attributed string representing list item value represents list level.
     var listLevel: Int? // todo(andrii-vysotskyi): change to indentationLevel ?
 
-    /// The link for the text.
-    var link: String?
-
     /// Contents of the future attributed string. Defaults to empty string.
     var text: Text = .plain("")
 
     func build() -> NSAttributedString {
         switch text {
         case .markdown(let markdown):
-            let visitor = AttributedStringMarkdownVisitor(stringBuilder: self)
+            let visitor = AttributedStringMarkdownVisitor(builder: self)
             let document = MarkdownParser().parse(string: markdown)
             return document.accept(visitor: visitor)
         case .plain(let string):
@@ -72,7 +69,6 @@ struct AttributedStringBuilder {
         if #available(iOS 14.0, *) {
             attributes[.tracking] = typography.tracking
         }
-        attributes[.link] = link
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineHeightMultiple = lineHeightMultiple
         paragraphStyle.paragraphSpacing = typography.paragraphSpacing
@@ -169,12 +165,6 @@ extension AttributedStringBuilder {
     func listLevel(_ level: Int) -> AttributedStringBuilder {
         var builder = self
         builder.listLevel = level
-        return builder
-    }
-
-    func with(link: String) -> AttributedStringBuilder {
-        var builder = self
-        builder.link = link
         return builder
     }
 

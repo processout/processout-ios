@@ -100,7 +100,7 @@ final class AlternativePaymentMethodsInteractor:
             amount: amount.description,
             currency: currencyCode,
             returnUrl: Example.Constants.returnUrl,
-            customerId: "cust_dJ4CjUEv8Ltrvwfd2v1iZJVkBLU6P62T"
+            customerId: "cust_dJ4CjUEv8Ltrvwfd2v1iZJVkBLU6P62T" // todo(andrii-vysotskyi): remove customer
         )
         invoicesService.createInvoice(request: request) { [weak self] result in
             self?.state = .started(startedState)

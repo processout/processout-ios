@@ -10,8 +10,8 @@ import UIKit
 
 final class AttributedStringMarkdownVisitor: MarkdownVisitor {
 
-    init(stringBuilder: AttributedStringBuilder, level: Int = 0) {
-        self.stringBuilder = stringBuilder
+    init(builder: AttributedStringBuilder, level: Int = 0) {
+        self.builder = builder
         self.level = level
     }
 
@@ -22,28 +22,25 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(document: MarkdownDocument) -> NSAttributedString {
-        let separator = stringBuilder.string(Constants.paragraphSeparator).build()
+        let separator = NSAttributedString(string: Constants.paragraphSeparator)
         return document.children.map { $0.accept(visitor: self) }.joined(separator: separator)
     }
 
     func visit(emphasis: MarkdownEmphasis) -> NSAttributedString {
-        let builder = stringBuilder.with(symbolicTraits: .traitItalic)
-        let visitor = AttributedStringMarkdownVisitor(stringBuilder: builder, level: level)
+        let visitor = AttributedStringMarkdownVisitor(builder: builder.with(symbolicTraits: .traitItalic), level: level)
         return emphasis.children.map { $0.accept(visitor: visitor) }.joined()
     }
 
     func visit(list: MarkdownList) -> NSAttributedString {
-        let builder = stringBuilder.listLevel(level)
-        let itemsSeparator = builder
-            .string(Constants.paragraphSeparator)
-            .build()
+        let builder = builder.listLevel(level)
+        let itemsSeparator = NSAttributedString(string: Constants.paragraphSeparator)
         let attributedString = list.children
             .enumerated()
             .map { offset, itemNode in
                 let prefix = builder
                     .string(listItemPrefix(list: list, at: offset))
                     .build()
-                let visitor = AttributedStringMarkdownVisitor(stringBuilder: builder, level: self.level + 1)
+                let visitor = AttributedStringMarkdownVisitor(builder: builder, level: self.level + 1)
                 let attributedString = itemNode.accept(visitor: visitor)
                 return [prefix, attributedString].joined()
             }
@@ -52,7 +49,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(listItem: MarkdownListItem) -> NSAttributedString {
-        let separator = stringBuilder.string(Constants.listItemsSeparator).build()
+        let separator = NSAttributedString(string: Constants.listItemsSeparator)
         return listItem.children.map { $0.accept(visitor: self) }.joined(separator: separator)
     }
 
@@ -61,25 +58,21 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(strong: MarkdownStrong) -> NSAttributedString {
-        let builder = stringBuilder.with(symbolicTraits: .traitBold)
-        let visitor = AttributedStringMarkdownVisitor(stringBuilder: builder, level: level)
+        let visitor = AttributedStringMarkdownVisitor(builder: builder.with(symbolicTraits: .traitBold), level: level)
         return strong.children.map { $0.accept(visitor: visitor) }.joined()
     }
 
     func visit(text: MarkdownText) -> NSAttributedString {
-        assert(text.children.isEmpty)
-        return stringBuilder.string(text.value).build()
+        builder.string(text.value).build()
     }
 
     /// - NOTE: Softbreak is rendered with line break.
     func visit(softbreak: MarkdownSoftbreak) -> NSAttributedString {
-        assert(softbreak.children.isEmpty)
-        return stringBuilder.string(Constants.lineSeparator).build()
+        NSAttributedString(string: Constants.lineSeparator)
     }
 
     func visit(linebreak: MarkdownLinebreak) -> NSAttributedString {
-        assert(linebreak.children.isEmpty)
-        return stringBuilder.string(Constants.lineSeparator).build()
+        NSAttributedString(string: Constants.lineSeparator)
     }
 
     func visit(heading: MarkdownHeading) -> NSAttributedString {
@@ -87,28 +80,24 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(blockQuote: MarkdownBlockQuote) -> NSAttributedString {
-        let separator = stringBuilder.string(Constants.paragraphSeparator).build()
+        let separator = NSAttributedString(string: Constants.paragraphSeparator)
         return blockQuote.children.map { $0.accept(visitor: self) }.joined(separator: separator)
     }
 
     func visit(codeBlock: MarkdownCodeBlock) -> NSAttributedString {
-        assert(codeBlock.children.isEmpty)
-        let attributedString = stringBuilder
+        let attributedString = builder
             .with(symbolicTraits: .traitMonoSpace)
-            .string(
-                codeBlock.code.replacingOccurrences(of: Constants.legacyLineSeparator, with: Constants.lineSeparator)
-            )
+            .string(codeBlock.code)
             .build()
         return attributedString
     }
 
     func visit(thematicBreak: MarkdownThematicBreak) -> NSAttributedString {
-        stringBuilder.string(Constants.lineSeparator).build()
+        NSAttributedString(string: Constants.lineSeparator)
     }
 
     func visit(codeSpan: MarkdownCodeSpan) -> NSAttributedString {
-        assert(codeSpan.children.isEmpty)
-        let attributedString = stringBuilder
+        let attributedString = builder
             .with(symbolicTraits: .traitMonoSpace)
             .string(codeSpan.code)
             .build()
@@ -130,8 +119,6 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let space = " "
-        static let legacyLineSeparator = "\u{2028}"
         static let lineSeparator = "\u{2028}"
         static let paragraphSeparator = "\u{2029}"
         static let listItemsSeparator = "\u{2029}\t\t"
@@ -142,7 +129,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
 
     // MARK: - Private Properties
 
-    private let stringBuilder: AttributedStringBuilder
+    private let builder: AttributedStringBuilder
     private let level: Int
 
     // MARK: - Private Methods
