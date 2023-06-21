@@ -22,18 +22,18 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(document: MarkdownDocument) -> NSAttributedString {
-        let separator = stringBuilder.copy().string(Constants.paragraphSeparator).build()
+        let separator = stringBuilder.string(Constants.paragraphSeparator).build()
         return document.children.map { $0.accept(visitor: self) }.joined(separator: separator)
     }
 
     func visit(emphasis: MarkdownEmphasis) -> NSAttributedString {
-        let builder = stringBuilder.copy().with(symbolicTraits: .traitItalic)
+        let builder = stringBuilder.with(symbolicTraits: .traitItalic)
         let visitor = AttributedStringMarkdownVisitor(stringBuilder: builder, level: level)
         return emphasis.children.map { $0.accept(visitor: visitor) }.joined()
     }
 
     func visit(list: MarkdownList) -> NSAttributedString {
-        let builder = stringBuilder.copy().listLevel(level)
+        let builder = stringBuilder.listLevel(level)
         let itemsSeparator = builder
             .string(Constants.paragraphSeparator)
             .build()
@@ -52,7 +52,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(listItem: MarkdownListItem) -> NSAttributedString {
-        let separator = stringBuilder.copy().string(Constants.listItemsSeparator).build()
+        let separator = stringBuilder.string(Constants.listItemsSeparator).build()
         return listItem.children.map { $0.accept(visitor: self) }.joined(separator: separator)
     }
 
@@ -61,25 +61,25 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(strong: MarkdownStrong) -> NSAttributedString {
-        let builder = stringBuilder.copy().with(symbolicTraits: .traitBold)
+        let builder = stringBuilder.with(symbolicTraits: .traitBold)
         let visitor = AttributedStringMarkdownVisitor(stringBuilder: builder, level: level)
         return strong.children.map { $0.accept(visitor: visitor) }.joined()
     }
 
     func visit(text: MarkdownText) -> NSAttributedString {
         assert(text.children.isEmpty)
-        return stringBuilder.copy().string(text.value).build()
+        return stringBuilder.string(text.value).build()
     }
 
     /// - NOTE: Softbreak is rendered with line break.
     func visit(softbreak: MarkdownSoftbreak) -> NSAttributedString {
         assert(softbreak.children.isEmpty)
-        return stringBuilder.copy().string(Constants.lineSeparator).build()
+        return stringBuilder.string(Constants.lineSeparator).build()
     }
 
     func visit(linebreak: MarkdownLinebreak) -> NSAttributedString {
         assert(linebreak.children.isEmpty)
-        return stringBuilder.copy().string(Constants.lineSeparator).build()
+        return stringBuilder.string(Constants.lineSeparator).build()
     }
 
     func visit(heading: MarkdownHeading) -> NSAttributedString {
@@ -87,14 +87,13 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(blockQuote: MarkdownBlockQuote) -> NSAttributedString {
-        let separator = stringBuilder.copy().string(Constants.paragraphSeparator).build()
+        let separator = stringBuilder.string(Constants.paragraphSeparator).build()
         return blockQuote.children.map { $0.accept(visitor: self) }.joined(separator: separator)
     }
 
     func visit(codeBlock: MarkdownCodeBlock) -> NSAttributedString {
         assert(codeBlock.children.isEmpty)
         let attributedString = stringBuilder
-            .copy()
             .with(symbolicTraits: .traitMonoSpace)
             .string(
                 codeBlock.code.replacingOccurrences(of: Constants.legacyLineSeparator, with: Constants.lineSeparator)
@@ -104,13 +103,12 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(thematicBreak: MarkdownThematicBreak) -> NSAttributedString {
-        stringBuilder.copy().string(Constants.lineSeparator).build()
+        stringBuilder.string(Constants.lineSeparator).build()
     }
 
     func visit(codeSpan: MarkdownCodeSpan) -> NSAttributedString {
         assert(codeSpan.children.isEmpty)
         let attributedString = stringBuilder
-            .copy()
             .with(symbolicTraits: .traitMonoSpace)
             .string(codeSpan.code)
             .build()
