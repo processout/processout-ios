@@ -35,8 +35,8 @@ struct AttributedStringBuilder {
     /// Allows to alter font with the specified symbolic traits.
     var symbolicTraits: UIFontDescriptor.SymbolicTraits = []
 
-    /// When builder is used to create an attributed string representing list item value represents list level.
-    var listLevel: Int? // todo(andrii-vysotskyi): change to indentationLevel ?
+    /// The text lists that contain text.
+    var textLists: [NSTextList] = []
 
     /// Contents of the future attributed string. Defaults to empty string.
     var text: Text = .plain("")
@@ -76,23 +76,9 @@ struct AttributedStringBuilder {
         paragraphStyle.paragraphSpacing = typography.paragraphSpacing
         paragraphStyle.alignment = alignment
         paragraphStyle.lineBreakMode = lineBreakMode
-        if let listLevel {
-            let contentIndentation = CGFloat(listLevel + 1) * Constants.indentationWidth
-            paragraphStyle.tabStops = [
-                NSTextTab(textAlignment: .right, location: contentIndentation - Constants.listContentSpacing),
-                NSTextTab(textAlignment: .left, location: contentIndentation)
-            ]
-            paragraphStyle.headIndent = contentIndentation
-        }
+        paragraphStyle.textLists = textLists
         attributes[.paragraphStyle] = paragraphStyle
         return attributes
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let indentationWidth: CGFloat = 32
-        static let listContentSpacing: CGFloat = 4
     }
 
     // MARK: - Private Methods
@@ -160,13 +146,6 @@ extension AttributedStringBuilder {
     func with(symbolicTraits: UIFontDescriptor.SymbolicTraits) -> AttributedStringBuilder {
         var builder = self
         builder.symbolicTraits = symbolicTraits
-        return builder
-    }
-
-    /// Can be used to format list items of kind TAB MARKER TAB CONTENT
-    func listLevel(_ level: Int) -> AttributedStringBuilder {
-        var builder = self
-        builder.listLevel = level
         return builder
     }
 

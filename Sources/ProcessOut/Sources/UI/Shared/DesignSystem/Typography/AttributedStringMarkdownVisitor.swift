@@ -32,24 +32,21 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(list: MarkdownList) -> NSAttributedString {
-        let builder = builder.listLevel(level)
         let itemsSeparator = NSAttributedString(string: Constants.paragraphSeparator)
         let attributedString = list.children
             .enumerated()
             .map { offset, itemNode in
-                let prefix = builder
-                    .string(listItemPrefix(list: list, at: offset))
-                    .build()
+                var builder = self.builder
+                builder.textLists.append(textList(list, forItemAt: offset))
                 let visitor = AttributedStringMarkdownVisitor(builder: builder, level: self.level + 1)
-                let attributedString = itemNode.accept(visitor: visitor)
-                return [prefix, attributedString].joined()
+                return itemNode.accept(visitor: visitor)
             }
             .joined(separator: itemsSeparator)
         return attributedString
     }
 
     func visit(listItem: MarkdownListItem) -> NSAttributedString {
-        let separator = NSAttributedString(string: Constants.listItemsSeparator)
+        let separator = NSAttributedString(string: Constants.paragraphSeparator)
         return listItem.children.map { $0.accept(visitor: self) }.joined(separator: separator)
     }
 
@@ -121,10 +118,6 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     private enum Constants {
         static let lineSeparator = "\u{2028}"
         static let paragraphSeparator = "\u{2029}"
-        static let listItemsSeparator = "\u{2029}\t\t"
-        static let horizontalTab = "\t"
-        static let bulletMarkers = ["•", "◦", "◆", "◇"]
-        static let orderedListDelimiter = "."
     }
 
     // MARK: - Private Properties
@@ -134,18 +127,17 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
 
     // MARK: - Private Methods
 
-    private func listItemPrefix(list: MarkdownList, at index: Int) -> String {
-        var components = [Constants.horizontalTab]
-        // Original markers/delimiters are ignored
+    private func textList(_ list: MarkdownList, forItemAt index: Int) -> NSTextList {
+        let textList: NSTextList
         switch list.type {
         case .ordered(_, let startIndex):
-            components += [
-                (startIndex + index).description, Constants.orderedListDelimiter
-            ]
+            let markerFormat = NSTextList.MarkerFormat("{decimal}.")
+            textList = NSTextList(markerFormat: markerFormat, options: 0)
+            textList.startingItemNumber = startIndex + index
         case .bullet:
-            components.append(Constants.bulletMarkers[level % Constants.bulletMarkers.count])
+            let markers: [NSTextList.MarkerFormat] = [.disc, .circle]
+            textList = NSTextList(markerFormat: markers[level % markers.count], options: 0)
         }
-        components.append(Constants.horizontalTab)
-        return components.joined()
+        return textList
     }
 }
