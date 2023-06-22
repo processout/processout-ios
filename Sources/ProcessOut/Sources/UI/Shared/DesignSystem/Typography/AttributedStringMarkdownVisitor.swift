@@ -37,11 +37,9 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
         var builder = self.builder
         let textList = textList(list)
         builder.textLists.append(textList)
-        if #unavailable(iOS 16) {
-            builder.tabStops += listTabStops(textList, itemsCount: list.children.count)
-            if let tabStop = builder.tabStops.last {
-                builder.headIndent += tabStop.location
-            }
+        builder.tabStops += listTabStops(textList, itemsCount: list.children.count)
+        if let tabStop = builder.tabStops.last {
+            builder.headIndent += tabStop.location
         }
         let itemsSeparator = NSAttributedString(string: Constants.paragraphSeparator)
         let attributedString = list.children
@@ -49,9 +47,6 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
             .map { offset, itemNode in
                 let childVisitor = AttributedStringMarkdownVisitor(builder: builder, level: self.level + 1)
                 let attributedItem = itemNode.accept(visitor: childVisitor)
-                guard #unavailable(iOS 16) else {
-                    return attributedItem
-                }
                 let marker =
                     String(repeating: Constants.tab, count: level * 2 + 1) +
                     textList.marker(forItemNumber: textList.startingItemNumber + offset) +
@@ -163,7 +158,6 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
         return textList
     }
 
-    @available(iOS, obsoleted: 16.0)
     private func listTabStops(_ textList: NSTextList, itemsCount: Int) -> [NSTextTab] {
         guard itemsCount > 0 else {
             return []
