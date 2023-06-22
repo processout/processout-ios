@@ -60,7 +60,7 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
     /// before calling this method. Otherwise precondition failure is raised.
     public func build() -> SFSafariViewController {
         guard let completion, let returnUrl, let request else {
-            preconditionFailure("Completion and return url must be set.")
+            preconditionFailure("Completion, return url and request must be set.")
         }
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         let viewController = SFSafariViewController(
