@@ -2,7 +2,7 @@
 
 set -e
 
-# Installs bundler dependencies if needed
+# Installs mint dependencies if needed
 if ! [[ "$@" =~ '--skip-mint-bootstrap' ]]; then
     mint bootstrap
 fi
