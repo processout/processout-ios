@@ -21,7 +21,8 @@ final class NativeAlternativePaymentMethodErrorCell: UICollectionViewCell {
 
     func configure(item: NativeAlternativePaymentMethodViewModelState.ErrorItem, style: POTextStyle) {
         descriptionLabel.attributedText = AttributedStringBuilder()
-            .typography(style.typography, style: .body)
+            .typography(style.typography)
+            .textStyle(textStyle: .body)
             .textColor(style.color)
             .alignment(item.isCentered ? .center : .natural)
             .string(item.description)

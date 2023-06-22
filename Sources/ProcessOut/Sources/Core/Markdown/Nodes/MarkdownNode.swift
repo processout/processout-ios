@@ -24,12 +24,12 @@ class MarkdownBaseNode {
 
     /// Returns node children.
     private(set) lazy var children: [MarkdownBaseNode] = {
-        var rawNextChild = cmarkNode.pointee.first_child
+        var cmarkChild = cmarkNode.pointee.first_child
         var children: [MarkdownBaseNode] = []
-        while let rawNode = rawNextChild {
-            let child = MarkdownNodeFactory(rawNode: rawNode).create()
+        while let cmarkNode = cmarkChild {
+            let child = MarkdownNodeFactory(cmarkNode: cmarkNode).create()
             children.append(child)
-            rawNextChild = rawNode.pointee.next
+            cmarkChild = cmarkNode.pointee.next
         }
         return children
     }()

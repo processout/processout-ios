@@ -58,7 +58,9 @@ final class CodeTextFieldComponentView: UIView {
             }
             let previousAttributedText = valueLabel.attributedText
             valueLabel.attributedText = AttributedStringBuilder()
-                .typography(viewModel.style.text.typography, style: .largeTitle, maximumSize: Constants.maximumFontSize)
+                .typography(viewModel.style.text.typography)
+                .textStyle(textStyle: .largeTitle)
+                .maximumFontSize(Constants.maximumFontSize)
                 .alignment(.center)
                 .textColor(viewModel.style.text.color)
                 .string(viewModel.value.map(String.init) ?? "")

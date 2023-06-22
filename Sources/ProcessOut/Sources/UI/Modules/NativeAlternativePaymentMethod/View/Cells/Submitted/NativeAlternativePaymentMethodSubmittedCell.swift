@@ -40,7 +40,8 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
             descriptionTextView.accessibilityIdentifier = "native-alternative-payment.non-captured.description"
         }
         descriptionTextView.attributedText = AttributedStringBuilder()
-            .typography(descriptionStyle.typography, style: .body)
+            .typography(descriptionStyle.typography)
+            .textStyle(textStyle: .body)
             .textColor(descriptionStyle.color)
             .lineBreakMode(.byWordWrapping)
             .alignment(item.message.count > Constants.maximumCenterAlignedMessageLength ? .natural : .center)

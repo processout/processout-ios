@@ -48,13 +48,13 @@ struct AttributedStringBuilder {
             let document = MarkdownParser().parse(string: markdown)
             return document.accept(visitor: visitor)
         case .plain(let string):
-            return NSAttributedString(string: string, attributes: currentAttributes)
+            return NSAttributedString(string: string, attributes: buildAttributes())
         }
     }
 
     // MARK: - Utils
 
-    var currentAttributes: [NSAttributedString.Key: Any] {
+    func buildAttributes() -> [NSAttributedString.Key: Any] {
         guard let typography else {
             preconditionFailure("Typography must be set.")
         }
@@ -133,13 +133,21 @@ extension AttributedStringBuilder {
         return builder
     }
 
-    func typography(
-        _ typography: POTypography, style: UIFont.TextStyle? = nil, maximumSize: CGFloat? = nil
-    ) -> AttributedStringBuilder {
+    func typography(_ typography: POTypography) -> AttributedStringBuilder {
         var builder = self
         builder.typography = typography
-        builder.style = style
-        builder.maximumSize = maximumSize
+        return builder
+    }
+
+    func textStyle(textStyle: UIFont.TextStyle) -> AttributedStringBuilder {
+        var builder = self
+        builder.style = textStyle
+        return builder
+    }
+
+    func maximumFontSize(_ size: CGFloat) -> AttributedStringBuilder {
+        var builder = self
+        builder.maximumSize = size
         return builder
     }
 

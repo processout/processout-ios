@@ -44,7 +44,9 @@ final class Button: UIControl {
             } else {
                 let currentAttributedText = titleLabel.attributedText
                 titleLabel.attributedText = AttributedStringBuilder()
-                    .typography(currentStyle.title.typography, style: .body, maximumSize: Constants.maximumFontSize)
+                    .typography(currentStyle.title.typography)
+                    .textStyle(textStyle: .body)
+                    .maximumFontSize(Constants.maximumFontSize)
                     .textColor(currentStyle.title.color)
                     .alignment(.center)
                     .string(viewModel.title)

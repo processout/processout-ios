@@ -20,7 +20,7 @@ final class MarkdownParser {
         return MarkdownDocument(cmarkNode: document)
     }
 
-    /// Escapes given plain text so it can be represented as is in markdown.
+    /// Escapes given plain text so it can be represented as is, in markdown.
     static func escaped(plainText: String) -> String {
         var markdown = String()
         markdown.reserveCapacity(plainText.count)

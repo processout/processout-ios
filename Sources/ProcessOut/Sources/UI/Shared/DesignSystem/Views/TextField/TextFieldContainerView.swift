@@ -88,14 +88,18 @@ final class TextFieldContainerView: UIView {
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             let excludedTextAttributes: Set<NSAttributedString.Key> = [.paragraphStyle, .baselineOffset]
             let textAttributes = AttributedStringBuilder()
-                .typography(stateStyle.text.typography, style: .body, maximumSize: Constants.maximumFontSize)
+                .typography(stateStyle.text.typography)
+                .textStyle(textStyle: .body)
+                .maximumFontSize(Constants.maximumFontSize)
                 .textColor(stateStyle.text.color)
-                .currentAttributes
+                .buildAttributes()
                 .filter { !excludedTextAttributes.contains($0.key) }
             textField.defaultTextAttributes = textAttributes
             // `defaultTextAttributes` overwrites placeholder attributes so `attributedPlaceholder` must be set after.
             textField.attributedPlaceholder = AttributedStringBuilder()
-                .typography(stateStyle.placeholder.typography, style: .body, maximumSize: Constants.maximumFontSize)
+                .typography(stateStyle.placeholder.typography)
+                .textStyle(textStyle: .body)
+                .maximumFontSize(Constants.maximumFontSize)
                 .textColor(stateStyle.placeholder.color)
                 .string(textField.placeholder ?? "")
                 .build()

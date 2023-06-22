@@ -84,7 +84,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     func visit(codeBlock: MarkdownCodeBlock) -> NSAttributedString {
         let code = codeBlock.code
             .replacingOccurrences(of: "\n", with: Constants.lineSeparator)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: .newlines)
         return builder.with(symbolicTraits: .traitMonoSpace).string(code).build()
     }
 

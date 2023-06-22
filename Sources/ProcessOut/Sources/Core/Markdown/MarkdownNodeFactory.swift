@@ -9,8 +9,8 @@
 
 final class MarkdownNodeFactory {
 
-    init(rawNode: MarkdownBaseNode.CmarkNode) {
-        self.cmarkNode = rawNode
+    init(cmarkNode: MarkdownBaseNode.CmarkNode) {
+        self.cmarkNode = cmarkNode
     }
 
     func create() -> MarkdownBaseNode {

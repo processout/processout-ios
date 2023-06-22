@@ -11,13 +11,14 @@ extension Array where Element == NSAttributedString {
 
     /// Returns a new attributed string by concatenating the elements of the sequence,
     /// adding the given separator between each element.
-    func joined(separator: NSAttributedString? = nil) -> NSAttributedString {
+    func joined(separator: NSAttributedString = .init()) -> NSAttributedString {
         let mutableAttributedString = NSMutableAttributedString()
-        enumerated().forEach { offset, element in
+        dropLast().forEach { element in
             mutableAttributedString.append(element)
-            if let separator, offset < count - 1 {
-                mutableAttributedString.append(separator)
-            }
+            mutableAttributedString.append(separator)
+        }
+        if let last {
+            mutableAttributedString.append(last)
         }
         return mutableAttributedString
     }
