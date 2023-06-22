@@ -130,7 +130,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let listMarkerWidthMultiplier: CGFloat = 2
+        static let listMarkerWidthIncrement: CGFloat = 12
         static let listMarkerSpacing: CGFloat = 4
         static let lineSeparator = "\u{2028}"
         static let paragraphSeparator = "\u{2029}"
@@ -163,9 +163,9 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
             return []
         }
         // Last item is expected to have the longest marker, but just to be safe,
-        // we will additionally increase calculated width by multiplier.
+        // we are additionally increasing calculated width.
         let marker = textList.marker(forItemNumber: textList.startingItemNumber + itemsCount - 1)
-        let indentation = builder.string(marker).build().size().width * Constants.listMarkerWidthMultiplier
+        let indentation = builder.string(marker).build().size().width + Constants.listMarkerWidthIncrement
         let parentIndentation = builder.tabStops.last?.location ?? 0
         let tabStops = [
             NSTextTab(textAlignment: .right, location: parentIndentation + indentation),
