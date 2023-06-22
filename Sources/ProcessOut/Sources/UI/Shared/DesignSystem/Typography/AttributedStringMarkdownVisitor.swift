@@ -168,7 +168,8 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
         guard itemsCount > 0 else {
             return []
         }
-        // Last item is expected to have longest marker.
+        // Last item is expected to have the longest marker, but just to be safe,
+        // we will additionally increase calculated width by multiplier.
         let marker = textList.marker(forItemNumber: textList.startingItemNumber + itemsCount - 1)
         let indentation = builder.string(marker).build().size().width * Constants.listMarkerWidthMultiplier
         let parentIndentation = builder.tabStops.last?.location ?? 0
