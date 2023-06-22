@@ -5,8 +5,6 @@
 //  Created by Andrii Vysotskyi on 14.06.2023.
 //
 
-#if DEBUG
-
 import Foundation
 
 final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
@@ -146,5 +144,3 @@ extension MarkdownBaseNode: CustomDebugStringConvertible {
         return self.accept(visitor: visitor)
     }
 }
-
-#endif

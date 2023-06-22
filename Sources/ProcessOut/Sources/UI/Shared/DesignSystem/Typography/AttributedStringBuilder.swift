@@ -38,6 +38,12 @@ struct AttributedStringBuilder {
     /// The text lists that contain text.
     var textLists: [NSTextList] = []
 
+    /// The text tab objects that represent the paragraph’s tab stops.
+    var tabStops: [NSTextTab] = []
+
+    /// The indentation of the paragraph’s lines other than the first.
+    var headIndent: CGFloat = 0
+
     /// Contents of the future attributed string. Defaults to empty string.
     var text: Text = .plain("")
 
@@ -77,6 +83,8 @@ struct AttributedStringBuilder {
         paragraphStyle.alignment = alignment
         paragraphStyle.lineBreakMode = lineBreakMode
         paragraphStyle.textLists = textLists
+        paragraphStyle.tabStops = tabStops
+        paragraphStyle.headIndent = headIndent
         attributes[.paragraphStyle] = paragraphStyle
         return attributes
     }
