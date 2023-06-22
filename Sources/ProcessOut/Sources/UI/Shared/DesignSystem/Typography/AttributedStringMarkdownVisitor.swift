@@ -64,7 +64,6 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(listItem: MarkdownListItem) -> NSAttributedString {
-        // todo(andrii-vysotskyi): add tabulation when joining children on iOS < 16
         let separator = NSAttributedString(string: Constants.paragraphSeparator)
         return listItem.children.map { $0.accept(visitor: self) }.joined(separator: separator)
     }
