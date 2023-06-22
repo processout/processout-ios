@@ -117,7 +117,9 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
             separatorView.trailingAnchor.constraint(equalTo: trailingAnchor),
             separatorView.topAnchor.constraint(equalTo: topAnchor),
             separatorView.heightAnchor.constraint(equalToConstant: Constants.separatorHeight),
-            contentView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: horizontalInset),
+            contentView.leadingAnchor
+                .constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: horizontalInset)
+                .with(priority: .defaultHigh),
             contentView.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
             contentView.topAnchor.constraint(equalTo: topAnchor, constant: Constants.verticalInset),
             contentView.heightAnchor.constraint(equalToConstant: 0).with(priority: .defaultLow),
