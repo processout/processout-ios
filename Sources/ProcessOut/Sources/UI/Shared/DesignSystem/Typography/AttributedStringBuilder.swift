@@ -26,14 +26,14 @@ struct AttributedStringBuilder {
     var typography: POTypography?
 
     /// Constants that describe the preferred styles for fonts.
-    var style: UIFont.TextStyle?
+    var textStyle: UIFont.TextStyle?
 
     /// The maximum point size allowed for the font. Use this value to constrain the font to
     /// the specified size when your interface cannot accommodate text that is any larger.
-    var maximumSize: CGFloat?
+    var maximumFontSize: CGFloat?
 
     /// Allows to alter font with the specified symbolic traits.
-    var symbolicTraits: UIFontDescriptor.SymbolicTraits = []
+    var fontSymbolicTraits: UIFontDescriptor.SymbolicTraits = []
 
     /// The text lists that contain text.
     var textLists: [NSTextList] = []
@@ -58,14 +58,15 @@ struct AttributedStringBuilder {
         }
     }
 
-    // MARK: - Utils
-
     func buildAttributes() -> [NSAttributedString.Key: Any] {
         guard let typography else {
             preconditionFailure("Typography must be set.")
         }
         let font = font(
-            typography: typography, symbolicTraits: symbolicTraits, textStyle: style, maximumFontSize: maximumSize
+            typography: typography,
+            symbolicTraits: fontSymbolicTraits,
+            textStyle: textStyle,
+            maximumFontSize: maximumFontSize
         )
         var attributes: [NSAttributedString.Key: Any] = [:]
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
@@ -123,51 +124,9 @@ struct AttributedStringBuilder {
 
 extension AttributedStringBuilder {
 
-    func alignment(_ alignment: NSTextAlignment) -> AttributedStringBuilder {
+    func with(updates: (inout AttributedStringBuilder) -> Void) -> AttributedStringBuilder {
         var builder = self
-        builder.alignment = alignment
-        return builder
-    }
-
-    func lineBreakMode(_ mode: NSLineBreakMode) -> AttributedStringBuilder {
-        var builder = self
-        builder.lineBreakMode = mode
-        return builder
-    }
-
-    func textColor(_ color: UIColor) -> AttributedStringBuilder {
-        var builder = self
-        builder.color = color
-        return builder
-    }
-
-    func typography(_ typography: POTypography) -> AttributedStringBuilder {
-        var builder = self
-        builder.typography = typography
-        return builder
-    }
-
-    func textStyle(textStyle: UIFont.TextStyle) -> AttributedStringBuilder {
-        var builder = self
-        builder.style = textStyle
-        return builder
-    }
-
-    func maximumFontSize(_ size: CGFloat) -> AttributedStringBuilder {
-        var builder = self
-        builder.maximumSize = size
-        return builder
-    }
-
-    func string(_ string: String) -> AttributedStringBuilder {
-        var builder = self
-        builder.text = .plain(string)
-        return builder
-    }
-
-    func markdown(_ markdown: String) -> AttributedStringBuilder {
-        var builder = self
-        builder.text = .markdown(markdown)
+        updates(&builder)
         return builder
     }
 }

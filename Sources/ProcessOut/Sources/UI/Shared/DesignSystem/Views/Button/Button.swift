@@ -44,12 +44,14 @@ final class Button: UIControl {
             } else {
                 let currentAttributedText = titleLabel.attributedText
                 titleLabel.attributedText = AttributedStringBuilder()
-                    .typography(currentStyle.title.typography)
-                    .textStyle(textStyle: .body)
-                    .maximumFontSize(Constants.maximumFontSize)
-                    .textColor(currentStyle.title.color)
-                    .alignment(.center)
-                    .string(viewModel.title)
+                    .with { builder in
+                        builder.typography = currentStyle.title.typography
+                        builder.textStyle = .body
+                        builder.maximumFontSize = Constants.maximumFontSize
+                        builder.color = currentStyle.title.color
+                        builder.alignment = .center
+                        builder.text = .plain(viewModel.title)
+                    }
                     .build()
                 titleLabel.alpha = 1
                 if animated, currentAttributedText != titleLabel.attributedText {

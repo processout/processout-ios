@@ -23,6 +23,12 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         item: NativeAlternativePaymentMethodViewModelState.SubmittedItem,
         style: NativeAlternativePaymentMethodSubmittedCellStyle
     ) {
+        let isMessageCompact = item.message.count <= Constants.maximumCompactMessageLength
+        if isMessageCompact {
+            containerViewTopConstraint.constant = Constants.topContentInset
+        } else {
+            containerViewTopConstraint.constant = Constants.compactTopContentInset
+        }
         if let image = item.logoImage {
             iconImageView.image = image
             iconImageView.setAspectRatio(image.size.width / image.size.height)
@@ -40,12 +46,14 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
             descriptionTextView.accessibilityIdentifier = "native-alternative-payment.non-captured.description"
         }
         descriptionTextView.attributedText = AttributedStringBuilder()
-            .typography(descriptionStyle.typography)
-            .textStyle(textStyle: .body)
-            .textColor(descriptionStyle.color)
-            .lineBreakMode(.byWordWrapping)
-            .alignment(item.message.count > Constants.maximumCenterAlignedMessageLength ? .natural : .center)
-            .markdown(item.message)
+            .with { builder in
+                builder.typography = descriptionStyle.typography
+                builder.textStyle = .body
+                builder.color = descriptionStyle.color
+                builder.lineBreakMode = .byWordWrapping
+                builder.alignment = isMessageCompact ? .center : .natural
+                builder.text = .markdown(item.message)
+            }
             .build()
         if let image = item.image {
             decorationImageView.image = image
@@ -71,7 +79,8 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         static let descriptionBottomSpacing: CGFloat = 46
         static let descriptionBottomSmallSpacing: CGFloat = 24
         static let topContentInset: CGFloat = 68
-        static let maximumCenterAlignedMessageLength = 150
+        static let compactTopContentInset: CGFloat = 24
+        static let maximumCompactMessageLength = 150
     }
 
     // MARK: - Private Properties
@@ -115,15 +124,18 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
     private lazy var iconImageViewWidthConstraint
         = iconImageView.widthAnchor.constraint(equalToConstant: 0).with(priority: .defaultHigh)
 
-    private lazy var decorationImageViewWidthConstraint: NSLayoutConstraint
+    private lazy var decorationImageViewWidthConstraint
         = decorationImageView.widthAnchor.constraint(equalToConstant: 0).with(priority: .defaultHigh)
+
+    private lazy var containerViewTopConstraint
+        = containerView.topAnchor.constraint(equalTo: contentView.topAnchor)
 
     // MARK: - Private Methods
 
     private func commonInit() {
         contentView.addSubview(containerView)
         let constraints = [
-            containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.topContentInset),
+            containerViewTopConstraint,
             containerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).with(priority: .defaultHigh),
