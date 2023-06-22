@@ -36,7 +36,12 @@ public struct POTypography {
         adjustsFontForContentSizeCategory: Bool = true
     ) {
         self.font = font
-        self.lineHeight = lineHeight ?? font.lineHeight
+        if let lineHeight {
+            assert(lineHeight >= font.lineHeight, "Line height less than font's will cause clipping")
+            self.lineHeight = max(lineHeight, font.lineHeight)
+        } else {
+            self.lineHeight = font.lineHeight
+        }
         self.tracking = tracking
         self.paragraphSpacing = paragraphSpacing
         self.adjustsFontForContentSizeCategory = adjustsFontForContentSizeCategory
@@ -51,7 +56,7 @@ extension POTypography {
         static let caption = POTypography(font: FontFamily.WorkSans.regular.font(size: 12), lineHeight: 16)
 
         /// Use for buttons.
-        static let button = POTypography(font: FontFamily.WorkSans.medium.font(size: 14), lineHeight: 14)
+        static let button = POTypography(font: FontFamily.WorkSans.medium.font(size: 14), lineHeight: 18)
 
         /// Use for body copy on larger screens, or smaller blocks of text.
         static let body = POTypography(
