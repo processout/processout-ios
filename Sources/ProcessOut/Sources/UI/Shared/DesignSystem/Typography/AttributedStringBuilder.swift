@@ -159,12 +159,6 @@ extension AttributedStringBuilder {
         return builder
     }
 
-    func with(symbolicTraits: UIFontDescriptor.SymbolicTraits) -> AttributedStringBuilder {
-        var builder = self
-        builder.symbolicTraits = symbolicTraits
-        return builder
-    }
-
     func string(_ string: String) -> AttributedStringBuilder {
         var builder = self
         builder.text = .plain(string)

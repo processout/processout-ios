@@ -27,8 +27,9 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(emphasis: MarkdownEmphasis) -> NSAttributedString {
-        // todo(andrii-vysotskyi): append traits instead of replacing
-        let visitor = AttributedStringMarkdownVisitor(builder: builder.with(symbolicTraits: .traitItalic), level: level)
+        var builder = builder
+        builder.symbolicTraits.formUnion(.traitItalic)
+        let visitor = AttributedStringMarkdownVisitor(builder: builder, level: level)
         return emphasis.children.map { $0.accept(visitor: visitor) }.joined()
     }
 
@@ -73,7 +74,9 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(strong: MarkdownStrong) -> NSAttributedString {
-        let visitor = AttributedStringMarkdownVisitor(builder: builder.with(symbolicTraits: .traitBold), level: level)
+        var builder = builder
+        builder.symbolicTraits.formUnion(.traitBold)
+        let visitor = AttributedStringMarkdownVisitor(builder: builder, level: level)
         return strong.children.map { $0.accept(visitor: visitor) }.joined()
     }
 
@@ -103,7 +106,9 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
         let code = codeBlock.code
             .replacingOccurrences(of: "\n", with: Constants.lineSeparator)
             .trimmingCharacters(in: .newlines)
-        return builder.with(symbolicTraits: .traitMonoSpace).string(code).build()
+        var builder = builder
+        builder.symbolicTraits.formUnion(.traitMonoSpace)
+        return builder.string(code).build()
     }
 
     func visit(thematicBreak: MarkdownThematicBreak) -> NSAttributedString {
@@ -111,11 +116,9 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(codeSpan: MarkdownCodeSpan) -> NSAttributedString {
-        let attributedString = builder
-            .with(symbolicTraits: .traitMonoSpace)
-            .string(codeSpan.code)
-            .build()
-        return attributedString
+        var builder = builder
+        builder.symbolicTraits.formUnion(.traitMonoSpace)
+        return builder.string(codeSpan.code).build()
     }
 
     func visit(link: MarkdownLink) -> NSAttributedString {
