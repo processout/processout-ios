@@ -36,6 +36,8 @@ targets:
         name: Sourcery
         basedOnDependencyAnalysis: false
     sources: Sources/ProcessOut
+    dependencies:
+      - framework: Vendor/cmark.xcframework
   ProcessOutTests:
     type: bundle.unit-test
     platform: iOS

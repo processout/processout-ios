@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name                  = 'ProcessOut'
   s.version               = '4.0.1'
-  s.swift_versions        = ['5.7']
+  s.swift_versions        = ['5.8']
   s.license               = { :type => 'MIT', :file => 'LICENSE' }
   s.homepage              = 'https://github.com/processout/processout-ios'
   s.author                = 'ProcessOut'
@@ -10,6 +10,7 @@ Pod::Spec.new do |s|
   s.frameworks            = 'Foundation'
   s.requires_arc          = true
   s.ios.deployment_target = '12.0'
+  s.vendored_frameworks   = "Vendor/cmark.xcframework"
   s.ios.resource_bundle   = { 'ProcessOut' => 'Sources/ProcessOut/Resources/**/*' }
   s.source_files          = 'Sources/ProcessOut/**/*.swift'
   s.pod_target_xcconfig   = { 'OTHER_SWIFT_FLAGS' => '-Xfrontend -module-interface-preserve-types-as-written' }

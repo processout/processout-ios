@@ -117,7 +117,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
     // swiftlint:disable:next function_body_length
     private func convertToState(startedState: InteractorState.Started, isSubmitting: Bool) -> State {
         let titleItem = State.TitleItem(
-            text: configuration.title ?? Text.title(startedState.gatewayDisplayName)
+            text: configuration.title ?? Text.title(startedState.gateway.displayName)
         )
         var sections = [
             State.Section(id: .init(id: nil, header: nil, isTight: false), items: [.title(titleItem)])
