@@ -19,32 +19,35 @@ final class MarkdownNodeFactory {
             preconditionFailure("Invalid node")
         }
         // HTML and images are intentionally not supported.
-        guard let nodeInit = Self.nodeInits[nodeType] else {
+        guard let nodeClass = Self.supportedNodes[nodeType] else {
             assertionFailure("Unknown node type: \(nodeType)")
             return MarkdownUnknown(cmarkNode: cmarkNode)
         }
-        return nodeInit(cmarkNode, true)
+        return nodeClass.init(cmarkNode: cmarkNode)
     }
 
     // MARK: - Private Properties
 
-    private static let nodeInits = [
-        MarkdownDocument.cmarkNodeType.rawValue: MarkdownDocument.init,
-        MarkdownText.cmarkNodeType.rawValue: MarkdownText.init,
-        MarkdownParagraph.cmarkNodeType.rawValue: MarkdownParagraph.init,
-        MarkdownList.cmarkNodeType.rawValue: MarkdownList.init,
-        MarkdownListItem.cmarkNodeType.rawValue: MarkdownListItem.init,
-        MarkdownStrong.cmarkNodeType.rawValue: MarkdownStrong.init,
-        MarkdownEmphasis.cmarkNodeType.rawValue: MarkdownEmphasis.init,
-        MarkdownBlockQuote.cmarkNodeType.rawValue: MarkdownBlockQuote.init,
-        MarkdownCodeBlock.cmarkNodeType.rawValue: MarkdownCodeBlock.init,
-        MarkdownCodeSpan.cmarkNodeType.rawValue: MarkdownCodeSpan.init,
-        MarkdownHeading.cmarkNodeType.rawValue: MarkdownHeading.init,
-        MarkdownLinebreak.cmarkNodeType.rawValue: MarkdownLinebreak.init,
-        MarkdownSoftbreak.cmarkNodeType.rawValue: MarkdownSoftbreak.init,
-        MarkdownThematicBreak.cmarkNodeType.rawValue: MarkdownThematicBreak.init,
-        MarkdownLink.cmarkNodeType.rawValue: MarkdownLink.init
-    ]
+    private static let supportedNodes: [UInt32: MarkdownBaseNode.Type] = {
+        let supportedNodes = [
+            MarkdownDocument.self,
+            MarkdownText.self,
+            MarkdownParagraph.self,
+            MarkdownList.self,
+            MarkdownListItem.self,
+            MarkdownStrong.self,
+            MarkdownEmphasis.self,
+            MarkdownBlockQuote.self,
+            MarkdownCodeBlock.self,
+            MarkdownCodeSpan.self,
+            MarkdownHeading.self,
+            MarkdownLinebreak.self,
+            MarkdownSoftbreak.self,
+            MarkdownThematicBreak.self,
+            MarkdownLink.self
+        ]
+        return Dictionary(grouping: supportedNodes) { $0.cmarkNodeType.rawValue }.compactMapValues(\.first)
+    }()
 
     private let cmarkNode: MarkdownBaseNode.CmarkNode
 }

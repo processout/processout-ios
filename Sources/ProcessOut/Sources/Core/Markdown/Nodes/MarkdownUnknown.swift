@@ -8,7 +8,7 @@
 /// Unknown node.
 final class MarkdownUnknown: MarkdownBaseNode {
 
-    init(cmarkNode: MarkdownBaseNode.CmarkNode) {
+    required init(cmarkNode: CmarkNode, validatesType: Bool = false) {
         super.init(cmarkNode: cmarkNode, validatesType: false)
     }
 

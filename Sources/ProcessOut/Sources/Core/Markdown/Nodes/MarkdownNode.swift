@@ -15,7 +15,7 @@ class MarkdownBaseNode {
         fatalError("Must be implemented by subclass.")
     }
 
-    init(cmarkNode: CmarkNode, validatesType: Bool = true) {
+    required init(cmarkNode: CmarkNode, validatesType: Bool = true) {
         if validatesType {
             assert(cmarkNode.pointee.type == Self.cmarkNodeType.rawValue)
         }
