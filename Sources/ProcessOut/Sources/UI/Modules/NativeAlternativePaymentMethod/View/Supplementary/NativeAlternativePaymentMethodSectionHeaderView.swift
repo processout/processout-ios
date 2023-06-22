@@ -21,11 +21,13 @@ final class NativeAlternativePaymentMethodSectionHeaderView: UICollectionReusabl
 
     func configure(item: NativeAlternativePaymentMethodViewModelState.SectionHeader, style: POTextStyle) {
         titleLabel.attributedText = AttributedStringBuilder()
-            .typography(style.typography)
-            .textStyle(textStyle: .title3)
-            .textColor(style.color)
-            .alignment(item.isCentered ? .center : .natural)
-            .string(item.title)
+            .with { builder in
+                builder.typography = style.typography
+                builder.textStyle = .title3
+                builder.color = style.color
+                builder.alignment = item.isCentered ? .center : .natural
+                builder.text = .plain(item.title)
+            }
             .build()
     }
 

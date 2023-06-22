@@ -40,12 +40,15 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
             descriptionTextView.accessibilityIdentifier = "native-alternative-payment.non-captured.description"
         }
         descriptionTextView.attributedText = AttributedStringBuilder()
-            .typography(descriptionStyle.typography)
-            .textStyle(textStyle: .body)
-            .textColor(descriptionStyle.color)
-            .lineBreakMode(.byWordWrapping)
-            .alignment(item.message.count > Constants.maximumCenterAlignedMessageLength ? .natural : .center)
-            .markdown(item.message)
+            .with { builder in
+                builder.typography = descriptionStyle.typography
+                builder.textStyle = .body
+                builder.color = descriptionStyle.color
+                builder.lineBreakMode = .byWordWrapping
+                builder.alignment =
+                    item.message.count > Constants.maximumCenterAlignedMessageLength ? .natural : .center
+                builder.text = .markdown(item.message)
+            }
             .build()
         if let image = item.image {
             decorationImageView.image = image

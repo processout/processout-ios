@@ -28,7 +28,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
 
     func visit(emphasis: MarkdownEmphasis) -> NSAttributedString {
         var builder = builder
-        builder.symbolicTraits.formUnion(.traitItalic)
+        builder.fontSymbolicTraits.formUnion(.traitItalic)
         let visitor = AttributedStringMarkdownVisitor(builder: builder, level: level)
         return emphasis.children.map { $0.accept(visitor: visitor) }.joined()
     }
@@ -51,7 +51,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
                     String(repeating: Constants.tab, count: level * 2 + 1) +
                     textList.marker(forItemNumber: textList.startingItemNumber + offset) +
                     Constants.tab
-                let attributedMarker = builder.string(marker).build()
+                let attributedMarker = builder.with { $0.text = .plain(marker) }.build()
                 return [attributedMarker, attributedItem].joined()
             }
             .joined(separator: itemsSeparator)
@@ -69,13 +69,13 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
 
     func visit(strong: MarkdownStrong) -> NSAttributedString {
         var builder = builder
-        builder.symbolicTraits.formUnion(.traitBold)
+        builder.fontSymbolicTraits.formUnion(.traitBold)
         let visitor = AttributedStringMarkdownVisitor(builder: builder, level: level)
         return strong.children.map { $0.accept(visitor: visitor) }.joined()
     }
 
     func visit(text: MarkdownText) -> NSAttributedString {
-        builder.string(text.value).build()
+        builder.with { $0.text = .plain(text.value) }.build()
     }
 
     /// - NOTE: Softbreak is rendered with line break.
@@ -101,8 +101,8 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
             .replacingOccurrences(of: "\n", with: Constants.lineSeparator)
             .trimmingCharacters(in: .newlines)
         var builder = builder
-        builder.symbolicTraits.formUnion(.traitMonoSpace)
-        return builder.string(code).build()
+        builder.fontSymbolicTraits.formUnion(.traitMonoSpace)
+        return builder.with { $0.text = .plain(code) }.build()
     }
 
     func visit(thematicBreak: MarkdownThematicBreak) -> NSAttributedString {
@@ -111,8 +111,8 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
 
     func visit(codeSpan: MarkdownCodeSpan) -> NSAttributedString {
         var builder = builder
-        builder.symbolicTraits.formUnion(.traitMonoSpace)
-        return builder.string(codeSpan.code).build()
+        builder.fontSymbolicTraits.formUnion(.traitMonoSpace)
+        return builder.with { $0.text = .plain(codeSpan.code) }.build()
     }
 
     func visit(link: MarkdownLink) -> NSAttributedString {
@@ -165,7 +165,11 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
         // Last item is expected to have the longest marker, but just to be safe,
         // we are additionally increasing calculated width.
         let marker = textList.marker(forItemNumber: textList.startingItemNumber + itemsCount - 1)
-        let indentation = builder.string(marker).build().size().width + Constants.listMarkerWidthIncrement
+        let indentation = builder
+            .with { $0.text = .plain(marker) }
+            .build()
+            .size()
+            .width + Constants.listMarkerWidthIncrement
         let parentIndentation = builder.tabStops.last?.location ?? 0
         let tabStops = [
             NSTextTab(textAlignment: .right, location: parentIndentation + indentation),
