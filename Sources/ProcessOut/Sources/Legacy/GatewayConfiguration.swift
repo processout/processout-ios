@@ -45,7 +45,7 @@ public class GatewayConfiguration: Decodable {
     }
 }
 
-@available(*, deprecated, message: "Declaration will be removed in version 4.0.")
+@available(*, deprecated)
 class GatewayConfigurationResult: ApiResponse {
     var gatewayConfigurations: [GatewayConfiguration]?
     

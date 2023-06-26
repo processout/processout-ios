@@ -7,7 +7,8 @@
 
 import Foundation
 
-// swiftlint:disable:next type_body_length
+// swiftlint:disable type_body_length file_length
+
 final class DefaultNativeAlternativePaymentMethodViewModel:
     BaseViewModel<NativeAlternativePaymentMethodViewModelState>, NativeAlternativePaymentMethodViewModel {
 
@@ -102,36 +103,55 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     private func configureWithStartingState() {
         let sections = [
-            State.Section(id: .init(id: nil, title: nil, decoration: .normal), items: [.loader])
+            State.Section(id: .init(id: nil, header: nil, isTight: false), items: [.loader])
         ]
         let startedState = State.Started(
-            sections: sections, actions: .init(primary: nil, secondary: nil), isEditingAllowed: false
+            sections: sections,
+            actions: .init(primary: nil, secondary: nil),
+            isEditingAllowed: false,
+            isCaptured: false
         )
         state = .started(startedState)
     }
 
+    // swiftlint:disable:next function_body_length
     private func convertToState(startedState: InteractorState.Started, isSubmitting: Bool) -> State {
         let titleItem = State.TitleItem(
-            text: configuration.title ?? Text.title(startedState.gatewayDisplayName)
+            text: configuration.title ?? Text.title(startedState.gateway.displayName)
         )
         var sections = [
-            State.Section(id: .init(id: nil, title: nil, decoration: nil), items: [.title(titleItem)])
+            State.Section(id: .init(id: nil, header: nil, isTight: false), items: [.title(titleItem)])
         ]
+        let shouldCenterCodeInput = startedState.parameters.count == 1
         for (offset, parameter) in startedState.parameters.enumerated() {
             let value = startedState.values[parameter.key] ?? .init(value: nil, recentErrorMessage: nil)
-            var items = [
-                createItem(
-                    parameter: parameter,
-                    value: value,
-                    isEditingAllowed: !isSubmitting,
-                    isLast: offset == startedState.parameters.indices.last
-                )
-            ]
+            var items = createItems(
+                parameter: parameter,
+                value: value,
+                isEditingAllowed: !isSubmitting,
+                isLast: offset == startedState.parameters.indices.last,
+                shouldCenterCodeInput: shouldCenterCodeInput
+            )
+            var isCentered = false
+            if case .codeInput = items.first, shouldCenterCodeInput {
+                isCentered = true
+            }
             if let message = value.recentErrorMessage {
-                items.append(.error(State.ErrorItem(description: message)))
+                items.append(.error(State.ErrorItem(description: message, isCentered: isCentered)))
+            }
+            let isTight = items.contains { item in
+                if case .radio = item {
+                    return true
+                }
+                return false
             }
             let section = State.Section(
-                id: .init(id: parameter.key, title: parameter.displayName, decoration: nil), items: items
+                id: .init(
+                    id: parameter.key,
+                    header: .init(title: parameter.displayName, isCentered: isCentered),
+                    isTight: isTight
+                ),
+                items: items
             )
             sections.append(section)
         }
@@ -144,7 +164,8 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                     isEnabled: !isSubmitting && !isPaymentCancelDisabled
                 )
             ),
-            isEditingAllowed: !isSubmitting
+            isEditingAllowed: !isSubmitting,
+            isCaptured: false
         )
         return .started(startedState)
     }
@@ -168,10 +189,11 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         )
         let startedState = State.Started(
             sections: [
-                .init(id: .init(id: nil, title: nil, decoration: .normal), items: [item])
+                .init(id: .init(id: nil, header: nil, isTight: false), items: [item])
             ],
             actions: .init(primary: nil, secondary: secondaryAction),
-            isEditingAllowed: false
+            isEditingAllowed: false,
+            isCaptured: false
         )
         return .started(startedState)
     }
@@ -195,10 +217,11 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             )
             let startedState = State.Started(
                 sections: [
-                    .init(id: .init(id: nil, title: nil, decoration: .success), items: [.submitted(submittedItem)])
+                    .init(id: .init(id: nil, header: nil, isTight: false), items: [.submitted(submittedItem)])
                 ],
                 actions: .init(primary: nil, secondary: nil),
-                isEditingAllowed: false
+                isEditingAllowed: false,
+                isCaptured: true
             )
             state = .started(startedState)
         }
@@ -249,12 +272,13 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     // MARK: - Input Items
 
-    private func createItem(
+    private func createItems(
         parameter: PONativeAlternativePaymentMethodParameter,
         value parameterValue: InteractorState.ParameterValue,
         isEditingAllowed: Bool,
-        isLast: Bool
-    ) -> State.Item {
+        isLast: Bool,
+        shouldCenterCodeInput: Bool
+    ) -> [State.Item] {
         let inputValue: State.InputValue
         if let value = inputValuesCache[parameter.key] {
             inputValue = value
@@ -275,11 +299,17 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         }
         switch parameter.type {
         case .numeric where (parameter.length ?? .max) <= Constants.maximumCodeLength:
-            // swiftlint:disable:next force_unwrapping
-            let inputItem = State.CodeInputItem(length: parameter.length!, value: inputValue)
-            return .codeInput(inputItem)
+            let inputItem = State.CodeInputItem(
+                // swiftlint:disable:next force_unwrapping
+                length: parameter.length!, value: inputValue, isCentered: shouldCenterCodeInput
+            )
+            return [.codeInput(inputItem)]
         case .singleSelect:
-            return createPickerItem(parameter: parameter, value: inputValue)
+            let optionsCount = parameter.availableValues?.count ?? 0
+            if optionsCount <= configuration.inlineSingleSelectValuesLimit {
+                return createRadioButtonItems(parameter: parameter, value: inputValue)
+            }
+            return [createPickerItem(parameter: parameter, value: inputValue)]
         default:
             let inputItem = State.InputItem(
                 type: parameter.type,
@@ -288,8 +318,26 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 isLast: isLast,
                 formatter: interactor.formatter(type: parameter.type)
             )
-            return .input(inputItem)
+            return [.input(inputItem)]
         }
+    }
+
+    private func createRadioButtonItems(
+        parameter: PONativeAlternativePaymentMethodParameter, value: State.InputValue
+    ) -> [State.Item] {
+        assert(parameter.type == .singleSelect)
+        let items = parameter.availableValues?.map { option in
+            let radioItem = State.RadioButtonItem(
+                value: option.displayName,
+                isSelected: option.value == value.text,
+                isInvalid: value.isInvalid,
+                select: { [weak self] in
+                    self?.interactor.updateValue(option.value, for: parameter.key)
+                }
+            )
+            return State.Item.radio(radioItem)
+        }
+        return items ?? []
     }
 
     private func createPickerItem(
@@ -354,3 +402,5 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         cancelActionTimers = [:]
     }
 }
+
+// swiftlint:enable type_body_length file_length

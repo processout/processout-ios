@@ -9,7 +9,7 @@ import UIKit
 
 final class NativeAlternativePaymentMethodButtonsView: UIView {
 
-    init(style: NativeAlternativePaymentMethodButtonsViewStyle, horizontalInset: CGFloat) {
+    init(style: PONativeAlternativePaymentMethodActionsStyle, horizontalInset: CGFloat) {
         self.style = style
         self.horizontalInset = horizontalInset
         super.init(frame: .zero)
@@ -32,6 +32,26 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         }
     }
 
+    func contentHeight(actions: NativeAlternativePaymentMethodViewModelState.Actions) -> CGFloat {
+        guard actions.primary != nil || actions.secondary != nil else {
+            return 0
+        }
+        let numberOfActions: Int
+        switch style.axis {
+        case .horizontal:
+            numberOfActions = 1
+        case .vertical:
+            numberOfActions = [actions.primary, actions.secondary].compactMap { $0 }.count
+        @unknown default:
+            assertionFailure("Unexpected axis.")
+            numberOfActions = 1
+        }
+        let buttonsHeight =
+            Constants.buttonHeight * CGFloat(numberOfActions) +
+            Constants.spacing * CGFloat(numberOfActions - 1)
+        return Constants.verticalInset * 2 + buttonsHeight
+    }
+
     var additionalBottomSafeAreaInset: CGFloat = 0 {
         didSet { bottomConstraint.constant = -(additionalBottomSafeAreaInset + Constants.verticalInset) }
     }
@@ -40,31 +60,44 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
 
     private enum Constants {
         static let spacing: CGFloat = 16
-        static let verticalInset: CGFloat = 24
+        static let verticalInset: CGFloat = 16
+        static let buttonHeight: CGFloat = 44
+        static let separatorHeight: CGFloat = 1
     }
 
     // MARK: - Private Properties
 
-    private let style: NativeAlternativePaymentMethodButtonsViewStyle
+    private let style: PONativeAlternativePaymentMethodActionsStyle
     private let horizontalInset: CGFloat
 
     private lazy var contentView: UIStackView = {
-        let view = UIStackView(arrangedSubviews: [primaryButton, secondaryButton])
+        var arrangedSubviews = [primaryButton, secondaryButton]
+        if case .horizontal = style.axis {
+            arrangedSubviews.reverse()
+        }
+        let view = UIStackView(arrangedSubviews: arrangedSubviews)
         view.translatesAutoresizingMaskIntoConstraints = false
         view.spacing = Constants.spacing
-        view.axis = .vertical
-        view.alignment = .fill
+        view.axis = style.axis
+        view.distribution = .fillEqually
+        return view
+    }()
+
+    private lazy var separatorView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = style.separatorColor
         return view
     }()
 
     private lazy var primaryButton: Button = {
-        let button = Button(style: style.primaryButton)
+        let button = Button(style: style.primary)
         button.accessibilityIdentifier = "native-alternative-payment.primary-button"
         return button
     }()
 
     private lazy var secondaryButton: Button = {
-        let button = Button(style: style.secondaryButton)
+        let button = Button(style: style.secondary)
         button.accessibilityIdentifier = "native-alternative-payment.secondary-button"
         return button
     }()
@@ -77,15 +110,23 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
 
     private func commonInit() {
         translatesAutoresizingMaskIntoConstraints = false
+        addSubview(separatorView)
         addSubview(contentView)
         let constraints = [
-            contentView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: horizontalInset),
+            separatorView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            separatorView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            separatorView.topAnchor.constraint(equalTo: topAnchor),
+            separatorView.heightAnchor.constraint(equalToConstant: Constants.separatorHeight),
+            contentView.leadingAnchor
+                .constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: horizontalInset)
+                .with(priority: .defaultHigh),
             contentView.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
             contentView.topAnchor.constraint(equalTo: topAnchor, constant: Constants.verticalInset),
             contentView.heightAnchor.constraint(equalToConstant: 0).with(priority: .defaultLow),
             bottomConstraint
         ]
         NSLayoutConstraint.activate(constraints)
+        backgroundColor = style.backgroundColor
     }
 
     private func configure(

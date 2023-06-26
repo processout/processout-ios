@@ -15,10 +15,10 @@ ProcessOut.configure(configuration: configuration)
 
 ### Framework
 
-- <doc:MigratingFromProcessOut2>
-- <doc:Localizations>
 - ``ProcessOut/ProcessOut``
 - ``ProcessOutConfiguration``
+- <doc:Localizations>
+- <doc:MigrationGuides>
 
 ### Errors
 
@@ -43,6 +43,8 @@ All errors that could happen as a result of interaction with the SDK are represe
 - <doc:NativeAlternativePaymentMethod>
 - ``PONativeAlternativePaymentMethodViewControllerBuilder``
 - ``PONativeAlternativePaymentMethodStyle``
+- ``PONativeAlternativePaymentMethodActionsStyle``
+- ``PONativeAlternativePaymentMethodBackgroundStyle``
 - ``PONativeAlternativePaymentMethodConfiguration``
 - ``PONativeAlternativePaymentMethodEvent``
 - ``PONativeAlternativePaymentMethodDelegate``
@@ -62,6 +64,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``POContact``
 - ``POCard``
 - ``POCardUpdateRequest``
+- ``POCardIssuerInformation``
 
 ### Customer Tokens
 
@@ -87,11 +90,8 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``PONativeAlternativePaymentMethodResponse``
 - ``PONativeAlternativePaymentMethodTransactionDetails``
 - ``PONativeAlternativePaymentMethodTransactionDetailsRequest``
+- ``PONativeAlternativePaymentMethodParameterValues``
 - ``PONativeAlternativePaymentMethodState``
-
-### Images
-
-- ``POImagesRepository``
 
 ### Appearance
 
@@ -101,28 +101,26 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POBorderStyle``
 - ``POTypography``
 - ``POTextStyle``
-- ``POInputFormStyle``
-- ``POInputFormStateStyle``
-- ``POTextFieldStyle``
+- ``POInputStyle``
+- ``POInputStateStyle``
+- ``PORadioButtonStyle``
+- ``PORadioButtonStateStyle``
+- ``PORadioButtonKnobStateStyle``
 - ``POButtonStyle``
 - ``POButtonStateStyle``
 - ``POActivityIndicatorStyle``
 - ``POActivityIndicatorView``
-- ``POBackgroundDecorationStateStyle``
-- ``POBackgroundDecorationStyle``
 
 ### Utils
 
 - ``POPaginationOptions``
 - ``POCancellable``
-- ``POAnyEncodable``
 - ``POImmutableExcludedCodable``
 - ``POImmutableStringCodableDecimal``
 - ``POImmutableStringCodableOptionalDecimal``
 - ``PORepository``
 - ``POService``
 - ``POAutoAsync``
-- ``POLogger``
 
 ### Legacy Declarations
 

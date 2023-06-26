@@ -18,10 +18,11 @@ final class CodeTextFieldComponentView: UIView {
         let carretPosition: CodeTextFieldCarretPosition?
 
         /// Style.
-        let style: POTextFieldStyle
+        let style: POInputStateStyle
     }
 
-    init(didSelect: @escaping (CodeTextFieldCarretPosition) -> Void) {
+    init(size: CGSize, didSelect: @escaping (CodeTextFieldCarretPosition) -> Void) {
+        self.size = size
         self.didSelect = didSelect
         super.init(frame: .zero)
         commonInit()
@@ -57,12 +58,14 @@ final class CodeTextFieldComponentView: UIView {
             }
             let previousAttributedText = valueLabel.attributedText
             valueLabel.attributedText = AttributedStringBuilder()
-                .typography(viewModel.style.text.typography)
-                .textStyle(textStyle: .largeTitle)
-                .maximumFontSize(Constants.maximumFontSize)
-                .alignment(.center)
-                .textColor(viewModel.style.text.color)
-                .string(viewModel.value.map(String.init) ?? "")
+                .with { builder in
+                    builder.typography = viewModel.style.text.typography
+                    builder.textStyle = .largeTitle
+                    builder.maximumFontSize = Constants.maximumFontSize
+                    builder.alignment = .center
+                    builder.color = viewModel.style.text.color
+                    builder.text = .plain(viewModel.value.map(String.init) ?? "")
+                }
                 .build()
             if animated, valueLabel.attributedText != previousAttributedText {
                 valueLabel.addTransitionAnimation()
@@ -80,11 +83,9 @@ final class CodeTextFieldComponentView: UIView {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let maximumFontSize: CGFloat = 32
-        static let size = CGSize(width: 48, height: 48)
-        static let minimumWidth: CGFloat = 40
-        static let carretSize = CGSize(width: 2, height: 28)
-        static let carretOffset: CGFloat = 11
+        static let maximumFontSize: CGFloat = 28
+        static let carretSize = CGSize(width: 2, height: 24)
+        static let carretOffset: CGFloat = 10
         static let animationDuration: TimeInterval = 0.25
         static let carretAnimationDuration: TimeInterval = 0.4
         static let carretAnimationKey = "BlinkingAnimation"
@@ -93,6 +94,7 @@ final class CodeTextFieldComponentView: UIView {
     // MARK: - Private Properties
 
     private let didSelect: (CodeTextFieldCarretPosition) -> Void
+    private let size: CGSize
 
     private lazy var valueLabel: UILabel = {
         let label = UILabel()
@@ -120,35 +122,20 @@ final class CodeTextFieldComponentView: UIView {
 
     private func commonInit() {
         translatesAutoresizingMaskIntoConstraints = false
-        let constraints = [
-            heightAnchor.constraint(equalToConstant: Constants.size.height),
-            widthAnchor.constraint(greaterThanOrEqualToConstant: Constants.minimumWidth),
-            widthAnchor.constraint(equalToConstant: Constants.size.width).with(priority: .defaultHigh)
-        ]
-        NSLayoutConstraint.activate(constraints)
-        addValueLabelSubview()
-        addCarretSubview()
-        configureGestures()
-    }
-
-    private func addValueLabelSubview() {
         addSubview(valueLabel)
-        let constraints = [
-            valueLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-            valueLabel.centerXAnchor.constraint(equalTo: centerXAnchor)
-        ]
-        NSLayoutConstraint.activate(constraints)
-    }
-
-    private func addCarretSubview() {
         addSubview(carretView)
         let constraints = [
+            heightAnchor.constraint(equalToConstant: size.height),
+            widthAnchor.constraint(equalToConstant: size.width),
+            valueLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            valueLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             carretView.widthAnchor.constraint(equalToConstant: Constants.carretSize.width),
             carretView.heightAnchor.constraint(equalToConstant: Constants.carretSize.height),
             carretView.centerYAnchor.constraint(equalTo: centerYAnchor),
             carretCenterConstraint
         ]
         NSLayoutConstraint.activate(constraints)
+        configureGestures()
     }
 
     private func configureGestures() {

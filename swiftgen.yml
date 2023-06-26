@@ -39,3 +39,13 @@ files:
         bundle: BundleLocator.bundle
         useExtension: false
       output: Files+Generated.swift
+
+## Fonts
+fonts:
+  inputs:
+    - Fonts
+  outputs:
+    - templateName: swift5
+      params:
+        bundle: BundleLocator.bundle
+      output: Fonts+Generated.swift

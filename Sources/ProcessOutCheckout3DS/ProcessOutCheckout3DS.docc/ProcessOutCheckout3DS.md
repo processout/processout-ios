@@ -11,3 +11,4 @@ Framework wraps Checkout SDK to make it easy to use with ProcessOut when making 
 
 - ``POCheckout3DSServiceBuilder``
 - ``POCheckout3DSServiceDelegate``
+- <doc:MigrationGuides>

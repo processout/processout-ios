@@ -15,7 +15,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
 
     init(
         invoicesService: POInvoicesService,
-        imagesRepository: POImagesRepository,
+        imagesRepository: ImagesRepository,
         configuration: NativeAlternativePaymentMethodInteractorConfiguration,
         logger: POLogger,
         delegate: PONativeAlternativePaymentMethodDelegate?
@@ -111,8 +111,10 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 switch result {
                 case let .success(response) where response.nativeApm.state == .pendingCapture:
                     self?.send(event: .didSubmitParameters(additionalParametersExpected: false))
-                    let message = startedState.customerActionMessage
-                    if let imageUrl = startedState.customerActionImageUrl {
+                    let message =
+                        response.nativeApm.parameterValues?.customerActionMessage ??
+                        startedState.gateway.customerActionMessage
+                    if let imageUrl = startedState.gateway.customerActionImageUrl {
                         self?.imagesRepository.image(url: imageUrl) { image in
                             self?.trySetAwaitingCaptureStateUnchecked(
                                 gatewayLogo: startedState.gatewayLogo,
@@ -165,7 +167,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     // MARK: - Private Properties
 
     private let invoicesService: POInvoicesService
-    private let imagesRepository: POImagesRepository
+    private let imagesRepository: ImagesRepository
     private let configuration: NativeAlternativePaymentMethodInteractorConfiguration
     private var logger: POLogger
     private weak var delegate: PONativeAlternativePaymentMethodDelegate?
@@ -188,8 +190,9 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             break
         case .pendingCapture:
             logger.debug("No more parameters to submit, waiting for capture")
+            let actionMessage = details.parameterValues?.customerActionMessage ?? details.gateway.customerActionMessage
             trySetAwaitingCaptureStateUnchecked(
-                gatewayLogo: gatewayLogo, expectedActionMessage: details.gateway.customerActionMessage, actionImage: nil
+                gatewayLogo: gatewayLogo, expectedActionMessage: actionMessage, actionImage: nil
             )
             return
         case .captured:
@@ -200,10 +203,8 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             logger.debug("Will set started state with empty inputs, this may be unexpected")
         }
         let startedState = State.Started(
-            gatewayDisplayName: details.gateway.displayName,
+            gateway: details.gateway,
             gatewayLogo: gatewayLogo,
-            customerActionImageUrl: details.gateway.customerActionImageUrl,
-            customerActionMessage: details.gateway.customerActionMessage,
             amount: details.invoice.amount,
             currencyCode: details.invoice.currencyCode,
             parameters: details.parameters,
@@ -480,10 +481,8 @@ private extension NativeAlternativePaymentMethodInteractorState.Started {
         isSubmitAllowed: Bool
     ) -> Self {
         let updatedState = Self(
-            gatewayDisplayName: gatewayDisplayName,
+            gateway: gateway,
             gatewayLogo: gatewayLogo,
-            customerActionImageUrl: customerActionImageUrl,
-            customerActionMessage: customerActionMessage,
             amount: amount,
             currencyCode: currencyCode,
             parameters: parameters,

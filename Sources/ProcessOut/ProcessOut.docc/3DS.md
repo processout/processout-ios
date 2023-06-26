@@ -19,39 +19,33 @@ during development in our sandbox testing environment. Also, there is an integra
 ### 3DS Redirect
 
 Method ``PO3DSService/handle(redirect:completion:)`` is a part of 3DS service that is responsible for handling web
-based redirects.
-
-``PO3DSRedirectViewControllerBuilder`` allows you to create a view controller that will automatically
+based redirects. ``PO3DSRedirectViewControllerBuilder`` allows you to create a view controller that will automatically
 redirect user to expected url and collect result. 
-
-Please note that some redirects can be handled silently to user, in order to understand whether it is possible inspect
-``PO3DSRedirect/isHeadlessModeAllowed``. If value of this property is `true` redirect can be handled without showing
-any additional UI to user. One way to implement such presentation could be like following:
 
 ```swift
 func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-    if redirect.isHeadlessModeAllowed {
-        var viewController: UIViewController!
-        viewController = PO3DSRedirectViewControllerBuilder
-            .with(redirect: redirect)
-            .with(completion: { result in
-                // TODO: remove view controller and its view from parent
-                completion(result) 
-            })
-            .build()
-        sourceViewController.addChild(viewController)
-        sourceViewController.view.addSubview(viewController.view)
-        viewController.view.frame = .zero
-        viewController.didMove(toParent: sourceViewController)
-    } else {
-        let viewController = PO3DSRedirectViewControllerBuilder 
-            .with(redirect: redirect)
-            .with(completion: { result in
-                sourceViewController.dismiss(animated: true)
-                completion(result) 
-            })
-            .build()
-        sourceViewController.present(viewController, animated: true)
+    let viewController = PO3DSRedirectViewControllerBuilder 
+        .with(redirect: redirect)
+        .with(returnUrl: Constants.returnUrl)
+        .with(completion: { result in
+            sourceViewController.dismiss(animated: true)
+            completion(result)
+        })
+        .build()
+    sourceViewController.present(viewController, animated: true)
+}
+```
+
+When using `PO3DSRedirectViewControllerBuilder` your application should support deep and/or universal links. When
+application receives incoming URL you should allow ProcessOut SDK to handle it. For example if you are using scene
+delegate and universal links it may look like following:
+
+```swift
+func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+    guard let url = userActivity.webpageURL else {
+        return
     }
+    let isHandled = ProcessOut.shared.processDeepLink(url: url)
+    print(isHandled)
 }
 ```

@@ -17,6 +17,22 @@ enum NativeAlternativePaymentMethodViewModelState {
         let text: String
     }
 
+    struct RadioButtonItem: Hashable {
+
+        /// Current value.
+        let value: String
+
+        /// Indicates whether radio button is selected.
+        let isSelected: Bool
+
+        /// Boolean value indicating whether value is valid.
+        let isInvalid: Bool
+
+        /// Closure to invoke when radio button is selected.
+        @ImmutableNullHashable
+        var select: () -> Void
+    }
+
     struct PickerOption: Hashable {
 
         /// Option name.
@@ -64,6 +80,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Value details.
         let value: InputValue
+
+        /// Indicates whether input should be centered.
+        let isCentered: Bool
     }
 
     struct InputItem: Hashable {
@@ -88,6 +107,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Error description.
         let description: String
+
+        /// Indicates whether error should be centered.
+        let isCentered: Bool
     }
 
     struct SubmittedItem: Hashable {
@@ -110,13 +132,19 @@ enum NativeAlternativePaymentMethodViewModelState {
         case title(TitleItem)
         case input(InputItem)
         case codeInput(CodeInputItem)
+        case radio(RadioButtonItem)
         case picker(PickerItem)
         case error(ErrorItem)
         case submitted(SubmittedItem)
     }
 
-    enum SectionDecoration {
-        case normal, success
+    struct SectionHeader: Hashable {
+
+        /// Section title if any.
+        let title: String
+
+        /// Indicates whether section header should be centered.
+        let isCentered: Bool
     }
 
     struct SectionIdentifier: Hashable {
@@ -124,11 +152,11 @@ enum NativeAlternativePaymentMethodViewModelState {
         /// Section id.
         let id: String?
 
-        /// Section title if any.
-        let title: String?
+        /// Section header if any.
+        let header: SectionHeader?
 
-        /// Section decoration.
-        let decoration: SectionDecoration?
+        /// Boolean value indicating whether section items should be laid out tightly.
+        let isTight: Bool
     }
 
     struct Section {
@@ -174,6 +202,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Boolean value indicating whether editing is allowed.
         let isEditingAllowed: Bool
+
+        /// Boolean value that indicates whether payment is already captured.
+        let isCaptured: Bool
     }
 
     case idle, started(Started)
