@@ -47,6 +47,15 @@ public struct POInvoiceAuthorizationRequest: Encodable {
     @POImmutableStringCodableOptionalDecimal
     public var captureAmount: Decimal?
 
+    /// Set to true if you want to authorize payment without capturing. Note that you must capture the payment on
+    /// the server if you use this option. Default value is `true`.
+    public let authorizeOnly: Bool
+
+    /// Setting this property to `true` allows to prefer doing an authorization, but to fall back to
+    /// a sale payment if separation between authorization and capture is not available. Default
+    /// value is `false`.
+    public let allowFallbackToSale: Bool
+
     /// Operation metadata.
     public let metadata: [String: String]?
 
@@ -62,6 +71,8 @@ public struct POInvoiceAuthorizationRequest: Encodable {
         initialSchemeTransactionId: String? = nil,
         autoCaptureAt: Date? = nil,
         captureAmount: Decimal? = nil,
+        authorizeOnly: Bool = true,
+        allowFallbackToSale: Bool = false,
         metadata: [String: String]? = nil
     ) {
         self._invoiceId = .init(value: invoiceId)
@@ -75,6 +86,8 @@ public struct POInvoiceAuthorizationRequest: Encodable {
         self.initialSchemeTransactionId = initialSchemeTransactionId
         self.autoCaptureAt = autoCaptureAt
         self._captureAmount = .init(value: captureAmount)
+        self.authorizeOnly = authorizeOnly
+        self.allowFallbackToSale = allowFallbackToSale
         self.metadata = metadata
     }
 }
