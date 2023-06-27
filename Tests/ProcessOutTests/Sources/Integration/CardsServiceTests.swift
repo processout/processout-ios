@@ -47,6 +47,19 @@ final class CardsServiceTests: XCTestCase {
         XCTFail("IIN with length less than 6 symbols should be invalid")
     }
 
+    func test_tokenizeRequest_returnsCard() async throws {
+        // Given
+        let request = POCardTokenizationRequest(number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737")
+
+        // When
+        let card = try await sut.tokenize(request: request)
+
+        // Then
+        XCTAssertEqual(card.last4Digits, "4242")
+        XCTAssertEqual(card.expMonth, 12)
+        XCTAssertEqual(card.expYear, 2040)
+    }
+
     // MARK: - Tests
 
     private var sut: POCardsService!
