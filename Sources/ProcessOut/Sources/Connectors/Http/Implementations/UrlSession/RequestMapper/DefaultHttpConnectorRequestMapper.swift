@@ -37,7 +37,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         if let encodedBody = try encodedRequestBody(request) {
             sessionRequest.httpBody = encodedBody
         }
-        try defaultHeaders(for: request).forEach { field, value in
+        defaultHeaders(for: request).forEach { field, value in
             sessionRequest.setValue(value, forHTTPHeaderField: field)
         }
         request.headers.forEach { field, value in
@@ -75,27 +75,26 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     // MARK: - Request Headers
 
-    private func authorization(request: HttpConnectorRequest<some Decodable>) throws -> String {
+    private func authorization(request: HttpConnectorRequest<some Decodable>) -> String {
         var value = configuration.projectId + ":"
         if request.requiresPrivateKey {
             if let privateKey = configuration.privateKey {
                 value += privateKey
             } else {
-                assertionFailure("Private key is required by '\(request.id)' request but not set")
-                throw HttpConnectorFailure.internal
+                preconditionFailure("Private key is required by '\(request.id)' request but not set")
             }
         }
         return "Basic " + Data(value.utf8).base64EncodedString()
     }
 
-    private func defaultHeaders(for request: HttpConnectorRequest<some Decodable>) throws -> [String: String] {
+    private func defaultHeaders(for request: HttpConnectorRequest<some Decodable>) -> [String: String] {
         let deviceMetadata = deviceMetadataProvider.deviceMetadata
         let headers = [
             "Idempotency-Key": request.id,
             "User-Agent": userAgent(deviceMetadata: deviceMetadata),
             "Accept-Language": Strings.preferredLocalization,
             "Content-Type": "application/json",
-            "Authorization": try authorization(request: request),
+            "Authorization": authorization(request: request),
             "Installation-Id": deviceMetadata.installationId,
             "Device-Id": deviceMetadata.id,
             "Device-System-Name": deviceMetadata.channel,

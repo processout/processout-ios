@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Security
 
 final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 

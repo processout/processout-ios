@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 26.06.2023.
 //
 
-@_spi(PO) @testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 
 extension POLogger {
 

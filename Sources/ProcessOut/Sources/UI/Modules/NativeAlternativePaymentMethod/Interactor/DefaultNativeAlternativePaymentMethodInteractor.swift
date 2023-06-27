@@ -38,7 +38,6 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         guard case .idle = state else {
             return
         }
-        logger[attributeKey: "InvoiceId"] = configuration.invoiceId
         logger.info(
             "Starting native alternative payment", attributes: ["GatewayId": configuration.gatewayConfigurationId]
         )
