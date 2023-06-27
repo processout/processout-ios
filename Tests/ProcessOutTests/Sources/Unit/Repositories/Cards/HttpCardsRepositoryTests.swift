@@ -13,7 +13,7 @@ final class HttpCardsRepositoryTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        // todo(andrii-vysotskyi): use mocks or stubs for failure mapper and device metadata provider
+        // todo(andrii-vysotskyi): use mocks or stubs for failure mapper
         let sessionConfiguration = URLSessionConfiguration.ephemeral
         sessionConfiguration.protocolClasses = [MockUrlProtocol.self]
         let connectorConfiguration = HttpConnectorRequestMapperConfiguration(
@@ -24,6 +24,7 @@ final class HttpCardsRepositoryTests: XCTestCase {
             .with(retryStrategy: nil)
             .with(sessionConfiguration: sessionConfiguration)
             .with(logger: .stub)
+            .with(deviceMetadataProvider: StubDeviceMetadataProvider())
             .build()
         sut = HttpCardsRepository(
             connector: connector, failureMapper: DefaultHttpConnectorFailureMapper(logger: .stub)

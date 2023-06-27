@@ -105,7 +105,7 @@ public final class ProcessOut {
         static let serviceLoggerCategory = "Service"
         static let repositoryLoggerCategory = "Repository"
         static let connectorLoggerCategory = "Connector"
-        static let systemLoggerSubsystem = "com.processout.processout-ios"
+        static let bundleIdentifier = "com.processout.processout-ios"
     }
 
     // MARK: - Private Properties
@@ -121,12 +121,18 @@ public final class ProcessOut {
             version: ProcessOut.version,
             appVersion: configuration.appVersion
         )
+        let keychain = Keychain(service: Constants.bundleIdentifier)
+        let deviceMetadataProvider = DefaultDeviceMetadataProvider(
+            screen: .main, device: .current, bundle: .main, keychain: keychain
+        )
         // Connector logs are not sent to backend to avoid recursion. This
         // may be not ideal because we may loose important events, such
         // as decoding failures so approach may be reconsidered in future.
+        let logger = createLogger(for: Constants.connectorLoggerCategory, includeRemoteDestination: false)
         let connector = ProcessOutHttpConnectorBuilder()
             .with(configuration: configuration)
-            .with(logger: createLogger(for: Constants.connectorLoggerCategory, includeRemoteDestination: false))
+            .with(logger: logger)
+            .with(deviceMetadataProvider: deviceMetadataProvider)
             .build()
         return connector
     }()
@@ -150,7 +156,7 @@ public final class ProcessOut {
 
     private func createLogger(for category: String, includeRemoteDestination: Bool = true) -> POLogger {
         let destinations: [LoggerDestination] = [
-            SystemLoggerDestination(subsystem: Constants.systemLoggerSubsystem)
+            SystemLoggerDestination(subsystem: Constants.bundleIdentifier)
         ]
         // todo(andrii-vysotskyi): uncomment code bellow when backend will support accepting SDK logs.
         // if includeRemoteDestination {
