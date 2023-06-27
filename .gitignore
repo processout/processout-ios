@@ -16,3 +16,5 @@ fastlane/test_output
 Packages
 *.xcodeproj
 xcuserdata/
+Tests/ProcessOutTests/Sources/Generated/*.swift
+Tests/ProcessOutTests/Resources/Constants.yml
