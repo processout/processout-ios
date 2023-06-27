@@ -36,7 +36,6 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     func visit(list: MarkdownList) -> NSAttributedString {
         var builder = self.builder
         let textList = textList(list)
-        builder.textLists.append(textList)
         builder.tabStops += listTabStops(textList, itemsCount: list.children.count)
         if let tabStop = builder.tabStops.last {
             builder.headIndent = tabStop.location
