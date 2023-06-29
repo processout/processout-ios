@@ -16,15 +16,23 @@ final class UrlSessionImagesRepository: ImagesRepository {
 
     // MARK: - POImagesRepository
 
-    func image(url: URL, completion: @escaping (UIImage?) -> Void) {
-        let request = URLRequest(url: url)
-        let task = session.dataTask(with: request) { data, _, _ in
-            let image = data.flatMap(UIImage.init)
-            DispatchQueue.main.async {
-                completion(image)
+    func images(at urls: [URL], completion: @escaping ([URL: UIImage]) -> Void) {
+        let lock = NSLock()
+        let dispatchGroup = DispatchGroup()
+        var images: [URL: UIImage] = [:]
+        urls.forEach { url in
+            dispatchGroup.enter()
+            let request = URLRequest(url: url)
+            let task = session.dataTask(with: request) { data, _, _ in
+                let image = data.flatMap(UIImage.init)
+                lock.withLock {
+                    images[url] = image
+                }
+                dispatchGroup.leave()
             }
+            task.resume()
         }
-        task.resume()
+        dispatchGroup.notify(queue: .main) { completion(images) }
     }
 
     // MARK: - Private Properties
