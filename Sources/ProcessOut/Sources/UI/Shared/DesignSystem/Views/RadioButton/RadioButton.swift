@@ -34,7 +34,7 @@ final class RadioButton: UIControl {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let minimumHeight: CGFloat = 40
+        static let minimumHeight: CGFloat = 44
         static let knobSize: CGFloat = 18
         static let animationDuration: TimeInterval = 0.25
         static let horizontalSpacing: CGFloat = 8
@@ -85,26 +85,23 @@ final class RadioButton: UIControl {
         }
         let currentStyle = currentStyle(style: style, viewModel: viewModel, isHighlighted: isHighlighted)
         let previousAttributedText = valueLabel.attributedText
-        valueLabel.attributedText = AttributedStringBuilder()
-            .typography(currentStyle.value.typography)
-            .textStyle(textStyle: .body)
-            .textColor(currentStyle.value.color)
-            .alignment(.natural)
-            .string(viewModel.value)
+        let attributedText = AttributedStringBuilder()
+            .with { builder in
+                builder.typography = currentStyle.value.typography
+                builder.textStyle = .body
+                builder.color = currentStyle.value.color
+                builder.alignment = .natural
+                builder.text = .plain(viewModel.value)
+            }
             .build()
+        valueLabel.attributedText = attributedText
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             if animated, valueLabel.attributedText != previousAttributedText {
                 valueLabel.addTransitionAnimation()
             }
             knobView.configure(style: currentStyle.knob, animated: animated)
-            if let text = valueLabel.attributedText,
-               let paragraphStyle = text.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle {
-                // Ensures that knob and label's first line are verticaly center aligned.
-                knobViewCenterYConstraint.constant = paragraphStyle.maximumLineHeight / 2
-            } else {
-                knobViewCenterYConstraint.constant = 0
-                assertionFailure("Paragraph style should be set.")
-            }
+            // Ensures that knob and label's first line are verticaly center aligned.
+            knobViewCenterYConstraint.constant = attributedText.size().height / 2
         }
         if viewModel.isSelected {
             accessibilityTraits = [.button, .selected]

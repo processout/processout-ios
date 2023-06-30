@@ -19,7 +19,16 @@ internal typealias Font = FontConvertible.Font
 // swiftlint:disable identifier_name line_length type_body_length
 internal enum FontFamily {
   internal enum WorkSans {
+    internal static let italic = FontConvertible(name: "WorkSans-Italic", family: "Work Sans", path: "WorkSans-Italic.ttf")
     internal static let regular = FontConvertible(name: "WorkSans-Regular", family: "Work Sans", path: "WorkSans.ttf")
+    internal static let blackItalic = FontConvertible(name: "WorkSansItalic-Black", family: "Work Sans", path: "WorkSans-Italic.ttf")
+    internal static let boldItalic = FontConvertible(name: "WorkSansItalic-Bold", family: "Work Sans", path: "WorkSans-Italic.ttf")
+    internal static let extraBoldItalic = FontConvertible(name: "WorkSansItalic-ExtraBold", family: "Work Sans", path: "WorkSans-Italic.ttf")
+    internal static let extraLightItalic = FontConvertible(name: "WorkSansItalic-ExtraLight", family: "Work Sans", path: "WorkSans-Italic.ttf")
+    internal static let lightItalic = FontConvertible(name: "WorkSansItalic-Light", family: "Work Sans", path: "WorkSans-Italic.ttf")
+    internal static let mediumItalic = FontConvertible(name: "WorkSansItalic-Medium", family: "Work Sans", path: "WorkSans-Italic.ttf")
+    internal static let semiBoldItalic = FontConvertible(name: "WorkSansItalic-SemiBold", family: "Work Sans", path: "WorkSans-Italic.ttf")
+    internal static let thinItalic = FontConvertible(name: "WorkSansItalic-Thin", family: "Work Sans", path: "WorkSans-Italic.ttf")
     internal static let black = FontConvertible(name: "WorkSansRoman-Black", family: "Work Sans", path: "WorkSans.ttf")
     internal static let bold = FontConvertible(name: "WorkSansRoman-Bold", family: "Work Sans", path: "WorkSans.ttf")
     internal static let extraBold = FontConvertible(name: "WorkSansRoman-ExtraBold", family: "Work Sans", path: "WorkSans.ttf")
@@ -28,7 +37,7 @@ internal enum FontFamily {
     internal static let medium = FontConvertible(name: "WorkSansRoman-Medium", family: "Work Sans", path: "WorkSans.ttf")
     internal static let semiBold = FontConvertible(name: "WorkSansRoman-SemiBold", family: "Work Sans", path: "WorkSans.ttf")
     internal static let thin = FontConvertible(name: "WorkSansRoman-Thin", family: "Work Sans", path: "WorkSans.ttf")
-    internal static let all: [FontConvertible] = [regular, black, bold, extraBold, extraLight, light, medium, semiBold, thin]
+    internal static let all: [FontConvertible] = [italic, regular, blackItalic, boldItalic, extraBoldItalic, extraLightItalic, lightItalic, mediumItalic, semiBoldItalic, thinItalic, black, bold, extraBold, extraLight, light, medium, semiBold, thin]
   }
   internal static let allCustomFonts: [FontConvertible] = [WorkSans.all].flatMap { $0 }
   internal static func registerAllCustomFonts() {

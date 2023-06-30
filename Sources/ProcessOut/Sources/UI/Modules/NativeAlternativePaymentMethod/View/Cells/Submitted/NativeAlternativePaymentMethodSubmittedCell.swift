@@ -23,6 +23,12 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         item: NativeAlternativePaymentMethodViewModelState.SubmittedItem,
         style: NativeAlternativePaymentMethodSubmittedCellStyle
     ) {
+        let isMessageCompact = item.message.count <= Constants.maximumCompactMessageLength
+        if isMessageCompact {
+            containerViewTopConstraint.constant = Constants.topContentInset
+        } else {
+            containerViewTopConstraint.constant = Constants.compactTopContentInset
+        }
         if let image = item.logoImage {
             iconImageView.image = image
             iconImageView.setAspectRatio(image.size.width / image.size.height)
@@ -34,17 +40,20 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         let descriptionStyle: POTextStyle
         if item.isCaptured {
             descriptionStyle = style.successMessage
-            descriptionLabel.accessibilityIdentifier = "native-alternative-payment.captured.description"
+            descriptionTextView.accessibilityIdentifier = "native-alternative-payment.captured.description"
         } else {
             descriptionStyle = style.message
-            descriptionLabel.accessibilityIdentifier = "native-alternative-payment.non-captured.description"
+            descriptionTextView.accessibilityIdentifier = "native-alternative-payment.non-captured.description"
         }
-        descriptionLabel.attributedText = AttributedStringBuilder()
-            .typography(descriptionStyle.typography)
-            .textStyle(textStyle: .headline)
-            .textColor(descriptionStyle.color)
-            .alignment(.center)
-            .string(item.message)
+        descriptionTextView.attributedText = AttributedStringBuilder()
+            .with { builder in
+                builder.typography = descriptionStyle.typography
+                builder.textStyle = .body
+                builder.color = descriptionStyle.color
+                builder.lineBreakMode = .byWordWrapping
+                builder.alignment = isMessageCompact ? .center : .natural
+                builder.text = .markdown(item.message)
+            }
             .build()
         if let image = item.image {
             decorationImageView.image = image
@@ -57,7 +66,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         }
         containerView.setCustomSpacing(
             item.isCaptured ? Constants.descriptionBottomSpacing : Constants.descriptionBottomSmallSpacing,
-            after: descriptionLabel
+            after: descriptionTextView
         )
     }
 
@@ -70,12 +79,14 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         static let descriptionBottomSpacing: CGFloat = 46
         static let descriptionBottomSmallSpacing: CGFloat = 24
         static let topContentInset: CGFloat = 68
+        static let compactTopContentInset: CGFloat = 24
+        static let maximumCompactMessageLength = 150
     }
 
     // MARK: - Private Properties
 
     private lazy var containerView: UIStackView = {
-        let view = UIStackView(arrangedSubviews: [iconImageView, descriptionLabel, decorationImageView])
+        let view = UIStackView(arrangedSubviews: [iconImageView, descriptionTextView, decorationImageView])
         view.translatesAutoresizingMaskIntoConstraints = false
         view.spacing = Constants.verticalSpacing
         view.axis = .vertical
@@ -89,14 +100,19 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         return imageView
     }()
 
-    private lazy var descriptionLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 0
-        label.setContentHuggingPriority(.required, for: .vertical)
-        label.setContentCompressionResistancePriority(.required, for: .vertical)
-        label.adjustsFontForContentSizeCategory = false
-        return label
+    private lazy var descriptionTextView: UITextView = {
+        let textView = UITextView()
+        textView.backgroundColor = .clear
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.textContainerInset = .zero
+        textView.textContainer.lineFragmentPadding = 0
+        textView.setContentHuggingPriority(.required, for: .vertical)
+        textView.setContentCompressionResistancePriority(.required, for: .vertical)
+        textView.adjustsFontForContentSizeCategory = false
+        textView.isScrollEnabled = false
+        textView.isEditable = false
+        textView.isSelectable = true
+        return textView
     }()
 
     private lazy var decorationImageView: UIImageView = {
@@ -108,21 +124,25 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
     private lazy var iconImageViewWidthConstraint
         = iconImageView.widthAnchor.constraint(equalToConstant: 0).with(priority: .defaultHigh)
 
-    private lazy var decorationImageViewWidthConstraint: NSLayoutConstraint
+    private lazy var decorationImageViewWidthConstraint
         = decorationImageView.widthAnchor.constraint(equalToConstant: 0).with(priority: .defaultHigh)
+
+    private lazy var containerViewTopConstraint
+        = containerView.topAnchor.constraint(equalTo: contentView.topAnchor)
 
     // MARK: - Private Methods
 
     private func commonInit() {
         contentView.addSubview(containerView)
         let constraints = [
-            containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.topContentInset),
+            containerViewTopConstraint,
             containerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).with(priority: .defaultHigh),
             iconImageView.heightAnchor.constraint(lessThanOrEqualToConstant: Constants.maximumLogoImageHeight),
             iconImageView.widthAnchor.constraint(lessThanOrEqualTo: containerView.widthAnchor),
             iconImageViewWidthConstraint,
+            descriptionTextView.widthAnchor.constraint(equalTo: containerView.widthAnchor),
             decorationImageView.heightAnchor.constraint(
                 lessThanOrEqualToConstant: Constants.maximumDecorationImageHeight
             ),

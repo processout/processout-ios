@@ -36,6 +36,9 @@ public struct PONativeAlternativePaymentMethodStyle {
     public let activityIndicator: POActivityIndicatorStyle
 
     /// Message style.
+    ///
+    /// - NOTE: This style may be used to render rich attributed text so please make sure that your font's
+    /// typeface supports different variations. Currently framework may use bold, italic and mono space traits.
     public let message: POTextStyle
 
     /// Success message style.
@@ -88,8 +91,8 @@ public struct PONativeAlternativePaymentMethodStyle {
         static let activityIndicator = POActivityIndicatorStyle.system(
             .whiteLarge, color: Asset.Colors.Text.secondary.color
         )
-        static let message = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .Medium.subtitle)
-        static let successMessage = POTextStyle(color: Asset.Colors.Text.success.color, typography: .Medium.subtitle)
+        static let message = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .Fixed.body)
+        static let successMessage = POTextStyle(color: Asset.Colors.Text.success.color, typography: .Fixed.body)
         static let background = PONativeAlternativePaymentMethodBackgroundStyle()
         static let separatorColor = Asset.Colors.Border.subtle.color
     }

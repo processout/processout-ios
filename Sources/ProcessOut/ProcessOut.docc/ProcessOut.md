@@ -64,6 +64,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``POContact``
 - ``POCard``
 - ``POCardUpdateRequest``
+- ``POCardIssuerInformation``
 
 ### Customer Tokens
 
@@ -89,6 +90,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``PONativeAlternativePaymentMethodResponse``
 - ``PONativeAlternativePaymentMethodTransactionDetails``
 - ``PONativeAlternativePaymentMethodTransactionDetailsRequest``
+- ``PONativeAlternativePaymentMethodParameterValues``
 - ``PONativeAlternativePaymentMethodState``
 
 ### Appearance

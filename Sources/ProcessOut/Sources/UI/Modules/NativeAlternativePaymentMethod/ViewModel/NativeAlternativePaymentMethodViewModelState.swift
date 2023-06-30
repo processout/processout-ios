@@ -154,6 +154,9 @@ enum NativeAlternativePaymentMethodViewModelState {
 
         /// Section header if any.
         let header: SectionHeader?
+
+        /// Boolean value indicating whether section items should be laid out tightly.
+        let isTight: Bool
     }
 
     struct Section {

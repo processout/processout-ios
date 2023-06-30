@@ -7,14 +7,24 @@
 
 import Foundation
 
-final class HttpCardsRepository: POCardsRepository {
+final class HttpCardsRepository: CardsRepository {
 
     init(connector: HttpConnector, failureMapper: HttpConnectorFailureMapper) {
         self.connector = connector
         self.failureMapper = failureMapper
     }
 
-    // MARK: - POCardsRepository
+    // MARK: - CardsRepository
+
+    func issuerInformation(iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void) {
+        struct Response: Decodable {
+            let cardInformation: POCardIssuerInformation
+        }
+        let httpRequest = HttpConnectorRequest<Response>.get(path: "/iins/" + iin)
+        connector.execute(request: httpRequest) { [failureMapper] result in
+            completion(result.map(\.cardInformation).mapError(failureMapper.failure))
+        }
+    }
 
     func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(

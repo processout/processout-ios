@@ -19,9 +19,10 @@ We welcome contributions of any kind including new features, bug fixes, and gene
 
 ### Development requirements
 
-- A recent version of macOS (tested with 12.6)
-- A recent version of Xcode (tested with 14.0)
+- A recent version of macOS (tested with 13.3.1)
+- A recent version of Xcode (tested with 14.3.1)
 - [Mint](https://github.com/yonaskolb/Mint) package manager
+- [Ruby](https://www.ruby-lang.org) (tested with 3.1.2) with [bundler](https://bundler.io) installed
 
 ### Installation
 

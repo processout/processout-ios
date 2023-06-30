@@ -38,16 +38,10 @@ enum NativeAlternativePaymentMethodInteractorState {
     struct Started {
 
         /// Name of the payment gateway that can be displayed.
-        let gatewayDisplayName: String
+        let gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
 
         /// Gateway's logo URL.
         let gatewayLogo: UIImage?
-
-        /// Customer action image URL if any.
-        let customerActionImageUrl: URL?
-
-        /// Customer action message if any.
-        let customerActionMessage: String?
 
         /// Invoice amount.
         let amount: Decimal

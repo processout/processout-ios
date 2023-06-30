@@ -58,12 +58,14 @@ final class CodeTextFieldComponentView: UIView {
             }
             let previousAttributedText = valueLabel.attributedText
             valueLabel.attributedText = AttributedStringBuilder()
-                .typography(viewModel.style.text.typography)
-                .textStyle(textStyle: .largeTitle)
-                .maximumFontSize(Constants.maximumFontSize)
-                .alignment(.center)
-                .textColor(viewModel.style.text.color)
-                .string(viewModel.value.map(String.init) ?? "")
+                .with { builder in
+                    builder.typography = viewModel.style.text.typography
+                    builder.textStyle = .largeTitle
+                    builder.maximumFontSize = Constants.maximumFontSize
+                    builder.alignment = .center
+                    builder.color = viewModel.style.text.color
+                    builder.text = .plain(viewModel.value.map(String.init) ?? "")
+                }
                 .build()
             if animated, valueLabel.attributedText != previousAttributedText {
                 valueLabel.addTransitionAnimation()

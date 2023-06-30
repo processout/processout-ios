@@ -21,12 +21,14 @@ final class NativeAlternativePaymentMethodTitleCell: UICollectionViewCell {
 
     func configure(item: NativeAlternativePaymentMethodViewModelState.TitleItem, style: POTextStyle) {
         titleLabel.attributedText = AttributedStringBuilder()
-            .typography(style.typography)
-            .textStyle(textStyle: .largeTitle)
-            .alignment(.natural)
-            .lineBreakMode(.byWordWrapping)
-            .textColor(style.color)
-            .string(item.text)
+            .with { builder in
+                builder.typography = style.typography
+                builder.textStyle = .largeTitle
+                builder.alignment = .natural
+                builder.lineBreakMode = .byWordWrapping
+                builder.color = style.color
+                builder.text = .plain(item.text)
+            }
             .build()
     }
 

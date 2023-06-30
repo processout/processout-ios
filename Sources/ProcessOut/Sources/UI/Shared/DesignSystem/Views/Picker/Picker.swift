@@ -58,7 +58,7 @@ final class Picker: UIControl {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let height: CGFloat = 40
+        static let height: CGFloat = 44
         static let horizontalInset: CGFloat = 12
         static let maximumFontSize: CGFloat = 22
         static let animationDuration: TimeInterval = 0.25
@@ -120,12 +120,14 @@ final class Picker: UIControl {
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             let currentAttributedText = titleLabel.attributedText
             titleLabel.attributedText = AttributedStringBuilder()
-                .typography(currentStyle.text.typography)
-                .textStyle(textStyle: .body)
-                .maximumFontSize(Constants.maximumFontSize)
-                .textColor(currentStyle.text.color)
-                .alignment(.natural)
-                .string(currentViewModel.title)
+                .with { builder in
+                    builder.typography = currentStyle.text.typography
+                    builder.textStyle = .body
+                    builder.maximumFontSize = Constants.maximumFontSize
+                    builder.color = currentStyle.text.color
+                    builder.alignment = .natural
+                    builder.text = .plain(currentViewModel.title)
+                }
                 .build()
             if animated, currentAttributedText != titleLabel.attributedText {
                 titleLabel.addTransitionAnimation()

@@ -29,6 +29,7 @@ final class AlternativePaymentMethodsRouter: RouterType {
                 }
                 .with(configuration: configuration)
                 .build()
+            viewController.isModalInPresentation = true
             self.viewController?.present(viewController, animated: true)
         case let .alternativePayment(request):
             let viewController = POAlternativePaymentMethodViewControllerBuilder()

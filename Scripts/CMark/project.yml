@@ -1,0 +1,31 @@
+name: cmark
+settings:
+  GENERATE_INFOPLIST_FILE: NO
+  CODE_SIGNING_ALLOWED: NO
+targets:
+  cmark:
+    type: framework
+    platform: iOS
+    deploymentTarget: "12.0"
+    settings:
+      SKIP_INSTALL: NO
+      BUILD_LIBRARY_FOR_DISTRIBUTION: YES
+      MACH_O_TYPE: staticlib
+      OTHER_CFLAGS:
+        - -DCMARK_STATIC_DEFINE
+        - $(inherited)
+      MODULEMAP_FILE: src/module.modulemap
+    sources:
+      - path: src
+        excludes:
+          - "main.c"
+          - "man.c"
+          - "*.inc"
+          - "*.re"
+          - "*.in"
+          - "*.txt"
+schemes:
+  cmark:
+    build:
+      targets:
+        cmark: all

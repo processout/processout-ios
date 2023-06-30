@@ -199,6 +199,15 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         return sectionInset
     }
 
+    func collectionView(
+        _ collectionView: UICollectionView, layout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int
+    ) -> CGFloat {
+        if let identifier = collectionViewDataSource.sectionIdentifier(for: section), identifier.isTight {
+            return Constants.tightLineSpacing
+        }
+        return Constants.lineSpacing
+    }
+
     // MARK: - Scroll View Delegate
 
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
@@ -259,12 +268,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         return collectionView
     }()
 
-    private lazy var collectionViewLayout: UICollectionViewLayout = {
-        let layout = NativeAlternativePaymentMethodCollectionLayout()
-        layout.minimumLineSpacing = Constants.lineSpacing
-        return layout
-    }()
-
+    private lazy var collectionViewLayout = NativeAlternativePaymentMethodCollectionLayout()
     private lazy var collectionReusableViewSizeProvider = CollectionReusableViewSizeProvider()
 
     private lazy var collectionViewDataSource: CollectionViewDiffableDataSource<SectionIdentifier, ItemIdentifier> = {
@@ -513,9 +517,10 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
 private enum Constants {
     static let animationDuration: TimeInterval = 0.25
     static let lineSpacing: CGFloat = 8
+    static let tightLineSpacing: CGFloat = 4
     static let sectionInset = UIEdgeInsets(top: 8, left: 0, bottom: 32, right: 0)
     static let contentInset = UIEdgeInsets(top: 24, left: 24, bottom: 24, right: 24)
-    static let inputHeight: CGFloat = 40
+    static let inputHeight: CGFloat = 44
     static let loaderHeight: CGFloat = 256
 }
 

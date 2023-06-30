@@ -4,6 +4,53 @@
 // swiftlint:disable all
 
 @available(iOS 13.0, *)
+extension CardsRepository {
+
+    /// Allows to retrieve card issuer information based on iin.
+    /// 
+    /// - Parameters:
+    ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
+    @MainActor
+    public func issuerInformation(
+        iin: String
+    ) async throws -> POCardIssuerInformation {
+        return try await withUnsafeThrowingContinuation { continuation in
+            issuerInformation(iin: iin, completion: continuation.resume)
+        }
+    }
+
+    /// Tokenize a card.
+    @MainActor
+    public func tokenize(
+        request: POCardTokenizationRequest
+    ) async throws -> POCard {
+        return try await withUnsafeThrowingContinuation { continuation in
+            tokenize(request: request, completion: continuation.resume)
+        }
+    }
+
+    /// Updates card information.
+    @MainActor
+    public func updateCard(
+        request: POCardUpdateRequest
+    ) async throws -> POCard {
+        return try await withUnsafeThrowingContinuation { continuation in
+            updateCard(request: request, completion: continuation.resume)
+        }
+    }
+
+    /// Tokenize a card via ApplePay.
+    @MainActor
+    public func tokenize(
+        request: ApplePayCardTokenizationRequest
+    ) async throws -> POCard {
+        return try await withUnsafeThrowingContinuation { continuation in
+            tokenize(request: request, completion: continuation.resume)
+        }
+    }
+}
+
+@available(iOS 13.0, *)
 extension CustomerTokensRepository {
 
     /// Assigns a token to a customer.
@@ -75,41 +122,20 @@ extension InvoicesRepository {
 }
 
 @available(iOS 13.0, *)
-extension POCardsRepository {
-
-    /// Tokenize a card.
-    @MainActor
-    public func tokenize(
-        request: POCardTokenizationRequest
-    ) async throws -> POCard {
-        return try await withUnsafeThrowingContinuation { continuation in
-            tokenize(request: request, completion: continuation.resume)
-        }
-    }
-
-    /// Updates card information.
-    @MainActor
-    public func updateCard(
-        request: POCardUpdateRequest
-    ) async throws -> POCard {
-        return try await withUnsafeThrowingContinuation { continuation in
-            updateCard(request: request, completion: continuation.resume)
-        }
-    }
-
-    /// Tokenize a card via ApplePay.
-    @MainActor
-    public func tokenize(
-        request: ApplePayCardTokenizationRequest
-    ) async throws -> POCard {
-        return try await withUnsafeThrowingContinuation { continuation in
-            tokenize(request: request, completion: continuation.resume)
-        }
-    }
-}
-
-@available(iOS 13.0, *)
 extension POCardsService {
+
+    /// Allows to retrieve card issuer information based on iin.
+    /// 
+    /// - Parameters:
+    ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
+    @MainActor
+    public func issuerInformation(
+        iin: String
+    ) async throws -> POCardIssuerInformation {
+        return try await withUnsafeThrowingContinuation { continuation in
+            issuerInformation(iin: iin, completion: continuation.resume)
+        }
+    }
 
     /// Tokenizes a card. You can use the card for a single payment by creating a card token with it. If you want
     /// to use the card for multiple payments then you can use the card token to create a reusable customer token.

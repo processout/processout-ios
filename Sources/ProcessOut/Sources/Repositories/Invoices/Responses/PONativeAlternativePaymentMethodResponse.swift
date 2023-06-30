@@ -9,11 +9,8 @@ import Foundation
 
 public struct PONativeAlternativePaymentMethodResponse: Decodable {
 
-    public struct NativeAlternativePaymentMethodParameterValues: Decodable {
-
-        /// Message.
-        public let message: String?
-    }
+    @available(*, deprecated, message: "Use PONativeAlternativePaymentMethodParameterValues directly.")
+    public typealias NativeAlternativePaymentMethodParameterValues = PONativeAlternativePaymentMethodParameterValues
 
     public struct NativeApm: Decodable {
 
@@ -25,7 +22,7 @@ public struct PONativeAlternativePaymentMethodResponse: Decodable {
         public let parameterDefinitions: [PONativeAlternativePaymentMethodParameter]?
 
         /// Additional information about payment step.
-        public let parameterValues: NativeAlternativePaymentMethodParameterValues?
+        public let parameterValues: PONativeAlternativePaymentMethodParameterValues?
     }
 
     /// Details for alternative payment method.
