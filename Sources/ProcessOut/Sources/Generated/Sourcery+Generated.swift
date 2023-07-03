@@ -122,6 +122,10 @@ extension InvoicesRepository {
 }
 
 @available(iOS 13.0, *)
+extension LogsRepository {
+}
+
+@available(iOS 13.0, *)
 extension POCardsService {
 
     /// Allows to retrieve card issuer information based on iin.

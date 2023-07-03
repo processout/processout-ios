@@ -19,9 +19,7 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
 
     func alternativePaymentMethodUrl(request: POAlternativePaymentMethodRequest) -> URL {
         guard var components = URLComponents(url: baseUrl, resolvingAgainstBaseURL: true) else {
-            let message = "Can't create components from base url."
-            logger.error("\(message)")
-            fatalError(message)
+            preconditionFailure("Failed to create components from base url.")
         }
         let pathComponents: [String]
         if let tokenId = request.tokenId, let customerId = request.customerId {
@@ -34,9 +32,7 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
             URLQueryItem(name: "additional_data[" + data.key + "]", value: data.value)
         }
         guard let url = components.url else {
-            let message = "Failed to create APM redirection URL."
-            logger.error("\(message)")
-            fatalError(message)
+            preconditionFailure("Failed to create APM redirection URL.")
         }
         return url
     }
@@ -45,13 +41,13 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
               let queryItems = components.queryItems else {
             let message = "Invalid or malformed Alternative Payment Mehod URL response provided."
-            throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
+            throw POFailure(message: message, code: .generic(.mobile), underlyingError: nil)
         }
         if let errorCode = queryItems.queryItemValue(name: "error_code") {
             throw POFailure(code: createFailureCode(rawValue: errorCode))
         }
         guard let gatewayToken = queryItems.queryItemValue(name: "token") else {
-            let message = "Invalid or malformed Alternative Payment Mehod URL response provided."
+            let message = "Mandatory gateway 'token' query item is not set in URL."
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
         guard let customerId = queryItems.queryItemValue(name: "customer_id"),

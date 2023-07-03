@@ -20,7 +20,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
             sessionConfiguration: sessionConfiguration,
             requestMapper: requestMapper,
             decoder: JSONDecoder(),
-            logger: POLogger()
+            logger: .stub
         )
     }
 

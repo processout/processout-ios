@@ -20,4 +20,7 @@ struct HttpConnectorRequestMapperConfiguration {
 
     /// SDK version.
     let version: String
+
+    /// Host application version.
+    let appVersion: String?
 }
