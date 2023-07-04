@@ -18,7 +18,10 @@ final class CardPaymentBuilder {
             router: router,
             invoicesService: ProcessOut.shared.invoices,
             cardsService: ProcessOut.shared.cards,
-            threeDSService: POCheckout3DSServiceBuilder().with(delegate: checkoutDelegate).build()
+            threeDSService: POCheckout3DSServiceBuilder()
+                .with(environment: .sandbox)
+                .with(delegate: checkoutDelegate)
+                .build()
         )
         let viewController = CardPaymentViewController(viewModel: viewModel)
         checkoutDelegate.viewController = viewController
