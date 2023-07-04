@@ -481,7 +481,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         if parameterValues?.providerName != nil {
             return parameterValues?.providerLogoUrl
         }
-        return gateway.customerActionImageUrl
+        return gateway.logoUrl
     }
 }
 
