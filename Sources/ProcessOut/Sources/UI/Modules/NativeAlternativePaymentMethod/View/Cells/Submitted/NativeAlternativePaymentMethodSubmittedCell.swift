@@ -30,21 +30,6 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         } else {
             containerViewTopConstraint.constant = Constants.compactTopContentInset
         }
-        if let title = item.title {
-            titleLabel.attributedText = AttributedStringBuilder()
-                .with { builder in
-                    builder.typography = style.title.typography
-                    builder.textStyle = .largeTitle
-                    builder.alignment = .center
-                    builder.lineBreakMode = .byWordWrapping
-                    builder.color = style.title.color
-                    builder.text = .plain(title)
-                }
-                .build()
-            titleLabel.setHidden(false)
-        } else {
-            titleLabel.setHidden(true)
-        }
         if let image = item.logoImage {
             iconImageView.image = image
             iconImageView.setAspectRatio(image.size.width / image.size.height)
@@ -71,6 +56,21 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
                 builder.text = .markdown(item.message)
             }
             .build()
+        if let title = item.title {
+            titleLabel.attributedText = AttributedStringBuilder()
+                .with { builder in
+                    builder.typography = style.title.typography
+                    builder.textStyle = .largeTitle
+                    builder.alignment = .center
+                    builder.lineBreakMode = .byWordWrapping
+                    builder.color = descriptionStyle.color
+                    builder.text = .plain(title)
+                }
+                .build()
+            titleLabel.setHidden(false)
+        } else {
+            titleLabel.setHidden(true)
+        }
         if let image = item.image {
             decorationImageView.image = image
             decorationImageView.tintColor = descriptionStyle.color
