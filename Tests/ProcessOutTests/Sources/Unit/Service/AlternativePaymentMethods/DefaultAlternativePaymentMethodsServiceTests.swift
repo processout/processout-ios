@@ -14,8 +14,7 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
     override func setUp() {
         super.setUp()
         let baseUrl = URL(string: "https://example.com")!
-        let logger = POLogger(destinations: [])
-        sut = DefaultAlternativePaymentMethodsService(projectId: "proj_test", baseUrl: baseUrl, logger: logger)
+        sut = DefaultAlternativePaymentMethodsService(projectId: "proj_test", baseUrl: baseUrl, logger: .stub)
     }
 
     func test_alternativePaymentMethodUrl_withAdditionalData_succeeds() throws {

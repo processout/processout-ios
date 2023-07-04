@@ -35,9 +35,6 @@ struct AttributedStringBuilder {
     /// Allows to alter font with the specified symbolic traits.
     var fontSymbolicTraits: UIFontDescriptor.SymbolicTraits = []
 
-    /// The text lists that contain text.
-    var textLists: [NSTextList] = []
-
     /// The text tab objects that represent the paragraph’s tab stops.
     var tabStops: [NSTextTab] = []
 
@@ -83,7 +80,6 @@ struct AttributedStringBuilder {
         paragraphStyle.paragraphSpacing = typography.paragraphSpacing
         paragraphStyle.alignment = alignment
         paragraphStyle.lineBreakMode = lineBreakMode
-        paragraphStyle.textLists = textLists
         paragraphStyle.tabStops = tabStops
         paragraphStyle.headIndent = headIndent
         attributes[.paragraphStyle] = paragraphStyle

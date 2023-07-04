@@ -11,12 +11,16 @@ import Foundation
 public typealias ProcessOutApiConfiguration = ProcessOutConfiguration
 
 /// Defines configuration parameters that are used to create API singleton. In order to create instance
-/// of this structure one should use ``ProcessOutConfiguration/production(projectId:isDebug:)``
+/// of this structure one should use ``ProcessOutConfiguration/production(projectId:appVersion:isDebug:)``
 /// method.
 public struct ProcessOutConfiguration {
 
     /// Project id.
     public let projectId: String
+
+    /// Host application version. Providing this value helps ProcessOut to troubleshoot potential
+    /// issues.
+    public let appVersion: String?
 
     /// Boolean value that indicates whether SDK should operate in debug mode. At this moment it
     /// only affects logging level.
@@ -39,13 +43,14 @@ public struct ProcessOutConfiguration {
 extension ProcessOutConfiguration {
 
     /// Creates production configuration.
-    public static func production(projectId: String, isDebug: Bool = false) -> Self {
+    public static func production(projectId: String, appVersion: String? = nil, isDebug: Bool = false) -> Self {
         // swiftlint:disable force_unwrapping
         let apiBaseUrl = URL(string: "https://api.processout.com")!
         let checkoutBaseUrl = URL(string: "https://checkout.processout.com")!
         // swiftlint:enable force_unwrapping
         return ProcessOutConfiguration(
             projectId: projectId,
+            appVersion: appVersion,
             isDebug: isDebug,
             privateKey: nil,
             apiBaseUrl: apiBaseUrl,
@@ -58,6 +63,7 @@ extension ProcessOutConfiguration {
     public static func test(projectId: String, privateKey: String?, apiBaseUrl: URL, checkoutBaseUrl: URL) -> Self {
         ProcessOutConfiguration(
             projectId: projectId,
+            appVersion: nil,
             isDebug: true,
             privateKey: privateKey,
             apiBaseUrl: apiBaseUrl,

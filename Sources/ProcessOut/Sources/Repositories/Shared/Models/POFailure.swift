@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 12.10.2022.
 //
 
+// swiftlint:disable file_length
+
 import Foundation
 
 /// Information about an error that occurred.
@@ -179,6 +181,162 @@ public struct POFailure: Error {
         /// The user has sent too many requests in a given amount of time.
         case requestTooMuch = "request.too-much"
 
+        /// The payment was declined, but no further information was returned.
+        case paymentDeclined = "payment.declined"
+
+        /// The card requires a 3DS authentication to be performed, for example in the scope of 3DS2/SCA.
+        case cardNeedsAuthentication = "card.needs-authentication"
+
+        /// Similarly to payment.declined, the card payment was declined with no further information.
+        case cardDeclined = "card.declined"
+
+        /// Do Not Honor is the default error code sent by bank, without any additional information.
+        case cardDoNotHonor = "card.do-not-honor"
+
+        /// No action was done by the payment provider, and should be retried.
+        case cardNoActionTaken = "card.no-action-taken"
+
+        /// The payment should be retried.
+        case cardPleaseRetry = "card.please-retry"
+
+        /// The transaction represented a security threat during its processing and was declined.
+        case cardSecurityViolation = "card.security-violation"
+
+        /// The acquirer used by the payment processor failed to process the transaction.
+        case cardAcquirerFailed = "card.acquirer-failed"
+
+        /// The processing failed at the acquirer or card holder bank level.
+        case cardProcessingError = "card.processing-error"
+
+        /// The card maximum payment attempts were reached, the customer should contact its bank.
+        case cardMaximumAttempts = "card.maximum-attempts"
+
+        /// The card holder bank declined the payment, and should be contacted by your customer.
+        case cardContactBank = "card.contact-bank"
+
+        /// The card withdrawal limit was reached, the customer should contact its bank.
+        case cardExceededWithdrawalLimit = "card.exceeded-withdrawal-limit"
+
+        /// The card activity limit was reached, the customer should contact its bank.
+        case cardExceededActivityLimits = "card.exceeded-activity-limits"
+
+        /// The transaction had high chances of being a duplicate, and was declined.
+        case cardDuplicate = "card.duplicate"
+
+        /// The payment provider could not find the card issuer bank.
+        case cardIssuerNotFound = "card.issuer-not-found"
+
+        /// The payment provider failed to contact the card network to process the transaction.
+        case cardNetworkFailed = "card.network-failed"
+
+        /// The card is not supported by the payment provider.
+        case cardNotSupported = "card.not-supported"
+
+        /// The currency is not supported by this card.
+        case cardCurrencyUnsupported = "card.currency-unsupported"
+
+        /// The card type was not supported by the payment provider.
+        case cardTypeNotSupported = "card.type-not-supported"
+
+        /// The card was not activated yet by the card holder or its bank.
+        case cardNotActivated = "card.not-activated"
+
+        /// The card was expired.
+        case cardExpired = "card.expired"
+
+        /// The card was invalid (invalid number/expiration date/CVC).
+        case cardInvalid = "card.invalid"
+
+        /// The card has an invalid number.
+        case cardInvalidNumber = "card.invalid-number"
+
+        /// The card PIN was invalid. This error code does not apply for online payments.
+        case cardInvalidPin = "card.invalid-pin"
+
+        /// The name on the card was invalid (potential AVS failure).
+        case cardInvalidName = "card.invalid-name"
+
+        /// The card expiration date was invalid.
+        case cardInvalidExpiryDate = "card.invalid-expiry-date"
+
+        /// The card expiration month was invalid.
+        case cardInvalidExpiryMonth = "card.invalid-expiry-month"
+
+        /// The card expiration year was invalid.
+        case cardInvalidExpiryYear = "card.invalid-expiry-year"
+
+        /// The card holder ZIP code was invalid (potential AVS failure).
+        case cardInvalidZip = "card.invalid-zip"
+
+        /// The card holder address was invalid (potential AVS failure).
+        case cardInvalidAddress = "card.invalid-address"
+
+        /// The card CVC was missing, but needed to process the payment.
+        case cardMissingCvc = "card.missing-cvc"
+
+        /// The card expiry date was missing, but needed to process the payment.
+        case cardMissingExpiry = "card.missing-expiry"
+
+        /// The card number was missing.
+        case cardMissingNumber = "card.missing-number"
+
+        /// The card 3DS verification process was missing but needed to process the payment.
+        case cardMissing3DS = "card.missing-3ds"
+
+        /// The card AVS check failed.
+        case cardFailedAvs = "card.failed-avs"
+
+        /// The card AVS check failed on the postal code.
+        case cardFailedAvsPostal = "card.failed-avs-postal"
+
+        /// The card does not support 3DS authentication (but a 3DS authentication was requested).
+        case cardUnsupported3DS = "card.unsupported-3ds"
+
+        /// The card 3DS check failed.
+        case cardFailed3DS = "card.failed-3ds"
+
+        /// The card 3DS check expired and needs to be retried.
+        case cardExpired3DS = "card.expired-3ds"
+
+        /// The card AVS check failed on the address.
+        case cardFailedAvsAddress = "card.failed-avs-address"
+
+        /// Both the card CVC and AVS checks failed.
+        case cardFailedCvcAndAvs = "card.failed-cvc-and-avs"
+
+        /// The track data of the card was invalid (expiration date or CVC).
+        case cardBadTrackData = "card.bad-track-data"
+
+        /// The card was not yet registered and can therefore not process payments.
+        case cardNotRegistered = "card.not-registered"
+
+        /// The card was stolen.
+        case cardStolen = "card.stolen"
+
+        /// The card was lost by its card holder.
+        case cardLost = "card.lost"
+
+        /// The payment should not be retried.
+        case cardDontRetry = "card.dont-retry"
+
+        /// The card bank account was invalid, the customer should contact its bank.
+        case cardInvalidAccount = "card.invalid-account"
+
+        /// The card was revoked.
+        case cardRevoked = "card.revoked"
+
+        /// All the card holder cards were revoked.
+        case cardRevokedAll = "card.revoked-all"
+
+        /// The card was a test card and can't be used to process live transactions.
+        case cardTest = "card.test"
+
+        /// The card was blacklisted from the payment provider
+        case cardBlacklisted = "card.blacklisted" // swiftlint:disable:this inclusive_language
+
+        /// The transaction has been blocked by ProcessOut for compliance reasons
+        case requestTransactionBlocked = "request.transaction-blocked"
+
         case requestGatewayNotAvailable          = "request.gateway.not-available"
         case requestGatewayOperationNotSupported = "request.gateway.operation-not-supported"
         case requestInvalidIdempotency           = "request.idempotency-key.invalid"
@@ -292,3 +450,5 @@ extension POFailure: CustomDebugStringConvertible {
         return "POFailure(\(parametersDescription))"
     }
 }
+
+// swiftlint:enable file_length

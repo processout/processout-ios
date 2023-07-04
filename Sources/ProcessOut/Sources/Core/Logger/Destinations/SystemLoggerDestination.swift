@@ -10,21 +10,29 @@ import os
 
 final class SystemLoggerDestination: LoggerDestination {
 
-    func log(entry: LogEntry) {
-        let logType = convertToLogType(entry.level)
-        let message = entry.message.interpolation.value
-        os_log("[%{public}@:%{public}ld] %{public}@", log: logger, type: logType, entry.file, entry.line, message)
+    init(subsystem: String) {
+        self.subsystem = subsystem
+        lock = NSLock()
+        logs = [:]
     }
 
-    // MARK: -
-
-    private let logger: OSLog
-
-    init(subsystem: String, category: String) {
-        logger = OSLog(subsystem: subsystem, category: category)
+    func log(event: LogEvent) {
+        os_log(
+            "%{public}@ %{public}@",
+            log: osLog(category: event.category),
+            type: convertToLogType(event.level),
+            attributesDescription(event: event),
+            event.message
+        )
     }
 
-    // MARK: -
+    // MARK: - Private Properties
+
+    private let subsystem: String
+    private let lock: NSLock
+    private var logs: [String: OSLog]
+
+    // MARK: - Private Methods
 
     private func convertToLogType(_ level: LogLevel) -> OSLogType {
         switch level {
@@ -37,5 +45,30 @@ final class SystemLoggerDestination: LoggerDestination {
         case .fault:
             return .fault
         }
+    }
+
+    private func osLog(category: String) -> OSLog {
+        let log = lock.withLock {
+            if let log = logs[category] {
+                return log
+            }
+            let log = OSLog(subsystem: subsystem, category: category)
+            logs[category] = log
+            return log
+        }
+        return log
+    }
+
+    private func attributesDescription(event: LogEvent) -> String {
+        struct Attribute {
+            let key, value: String
+        }
+        var attributes: [Attribute] = [
+            Attribute(key: event.file, value: event.line.description)
+        ]
+        event.additionalAttributes.forEach { key, value in
+            attributes.append(Attribute(key: key, value: value))
+        }
+        return attributes.map { "[" + $0.key + ":" + $0.value + "]" } .joined()
     }
 }

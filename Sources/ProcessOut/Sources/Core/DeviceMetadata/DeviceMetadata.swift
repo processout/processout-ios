@@ -9,6 +9,18 @@ import Foundation
 
 struct DeviceMetadata: Encodable {
 
+    /// Current device identifier.
+    @POImmutableExcludedCodable
+    var id: String?
+
+    /// Installation identifier. Value changes if host application is reinstalled.
+    @POImmutableExcludedCodable
+    var installationId: String?
+
+    /// Device system version.
+    @POImmutableExcludedCodable
+    var systemVersion: String
+
     /// Default app language.
     let appLanguage: String
 
@@ -21,6 +33,6 @@ struct DeviceMetadata: Encodable {
     /// Time zone offset in minutes.
     let appTimeZoneOffset: Int
 
-    /// Device channel.
+    /// Device channel. Holds device system name.
     let channel: String
 }
