@@ -16,7 +16,11 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
     func test_urlRequest_whenBaseUrlIsMalformed_fails() throws {
         // Given
         let configuration = HttpConnectorRequestMapperConfiguration(
-            baseUrl: URL(string: "http://example.com:-80")!, projectId: "", privateKey: nil, version: ""
+            baseUrl: URL(string: "http://example.com:-80")!,
+            projectId: "",
+            privateKey: nil,
+            version: "",
+            appVersion: nil
         )
         let sut = createMapper(configuration: configuration)
         let request = HttpConnectorRequest<VoidCodable>.get(path: "")
@@ -139,7 +143,7 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
 
         // Then
         let userAgent = urlRequest.value(forHTTPHeaderField: "user-agent")
-        let userAgentRegex = /^iOS\/Version\/.*\/ProcessOut iOS-Bindings\/1\.2\.3$/
+        let userAgentRegex = /^test\/Version\/.*\/ProcessOut iOS-Bindings\/1\.2\.3$/
         XCTAssertNotNil(userAgent?.firstMatch(of: userAgentRegex))
     }
 
@@ -167,18 +171,6 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         // Then
         let authorization = urlRequest.value(forHTTPHeaderField: "Authorization")
         XCTAssertEqual(authorization, "Basic PElEPjo8S0VZPg==")
-    }
-
-    func test_urlRequest_whenPrivateKeyIsRequiredButNotSet_fails() throws {
-        // Given
-        let configuration = HttpConnectorRequestMapperConfiguration(
-            baseUrl: Constants.baseUrl, projectId: "", privateKey: nil, version: ""
-        )
-        let sut = createMapper(configuration: configuration)
-        let request = HttpConnectorRequest<VoidCodable>.get(path: "", requiresPrivateKey: true)
-
-        // Then
-        XCTAssertThrowsError(try sut.urlRequest(from: request))
     }
 
     func test_urlRequest_addsDefaultHeaders() throws {
@@ -251,12 +243,12 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
             configuration: configuration,
             encoder: encoder,
             deviceMetadataProvider: StubDeviceMetadataProvider(),
-            logger: POLogger()
+            logger: .stub
         )
         return mapper
     }
 
     private var defaultConfiguration: HttpConnectorRequestMapperConfiguration {
-        .init(baseUrl: Constants.baseUrl, projectId: "<ID>", privateKey: "<KEY>", version: "1.2.3")
+        .init(baseUrl: Constants.baseUrl, projectId: "<ID>", privateKey: "<KEY>", version: "1.2.3", appVersion: "4.5.6")
     }
 }

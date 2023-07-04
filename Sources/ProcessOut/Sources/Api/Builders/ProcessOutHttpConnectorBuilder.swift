@@ -10,33 +10,30 @@ import Foundation
 /// Builds http connector suitable for communications with ProcessOut API.
 final class ProcessOutHttpConnectorBuilder {
 
-    func with(configuration: HttpConnectorRequestMapperConfiguration) -> Self {
-        self.configuration = configuration
-        return self
-    }
+    /// Connector configuration.
+    var configuration: HttpConnectorRequestMapperConfiguration?
 
-    func with(sessionConfiguration: URLSessionConfiguration) -> Self {
-        self.sessionConfiguration = sessionConfiguration
-        return self
-    }
+    /// Retry strategy to use for failing requests.
+    var retryStrategy: RetryStrategy? = .exponential(maximumRetries: 3, interval: 0.1, rate: 3)
 
-    func with(retryStrategy: RetryStrategy?) -> Self {
-        self.retryStrategy = retryStrategy
-        return self
-    }
+    /// Logger.
+    var logger: POLogger?
 
-    func with(deviceMetadataProvider: DeviceMetadataProvider) -> Self {
-        self.deviceMetadataProvider = deviceMetadataProvider
-        return self
-    }
+    /// Device metadata provider.
+    var deviceMetadataProvider: DeviceMetadataProvider?
 
-    func with(logger: POLogger) -> Self {
-        self.logger = logger
-        return self
-    }
+    /// Session configuration.
+    lazy var sessionConfiguration: URLSessionConfiguration = {
+        let configuration = URLSessionConfiguration.default
+        configuration.urlCache = nil
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.waitsForConnectivity = true
+        configuration.timeoutIntervalForRequest = Constants.requestTimeout
+        return configuration
+    }()
 
     func build() -> HttpConnector {
-        guard let configuration, let logger else {
+        guard let configuration, let logger, let deviceMetadataProvider else {
             fatalError("Unable to create connector without required parameters set.")
         }
         let requestMapper = DefaultHttpConnectorRequestMapper(
@@ -66,30 +63,6 @@ final class ProcessOutHttpConnectorBuilder {
 
     // MARK: - Private Properties
 
-    /// Connector configuration.
-    private var configuration: HttpConnectorRequestMapperConfiguration?
-
-    /// Retry strategy to use for failing requests.
-    private var retryStrategy: RetryStrategy? = .exponential(maximumRetries: 3, interval: 0.1, rate: 3)
-
-    /// Logger.
-    private var logger: POLogger?
-
-    /// Session configuration.
-    private lazy var sessionConfiguration: URLSessionConfiguration = {
-        let configuration = URLSessionConfiguration.default
-        configuration.urlCache = nil
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        configuration.waitsForConnectivity = true
-        configuration.timeoutIntervalForRequest = Constants.requestTimeout
-        return configuration
-    }()
-
-    /// Device metadata provider.
-    private lazy var deviceMetadataProvider: DeviceMetadataProvider = {
-        DefaultDeviceMetadataProvider(screen: .main, bundle: .main)
-    }()
-
     private lazy var dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = Constants.dateFormat
@@ -110,4 +83,32 @@ final class ProcessOutHttpConnectorBuilder {
         encoder.dateEncodingStrategy = .formatted(dateFormatter)
         return encoder
     }()
+}
+
+extension ProcessOutHttpConnectorBuilder {
+
+    func with(configuration: HttpConnectorRequestMapperConfiguration) -> Self {
+        self.configuration = configuration
+        return self
+    }
+
+    func with(sessionConfiguration: URLSessionConfiguration) -> Self {
+        self.sessionConfiguration = sessionConfiguration
+        return self
+    }
+
+    func with(retryStrategy: RetryStrategy?) -> Self {
+        self.retryStrategy = retryStrategy
+        return self
+    }
+
+    func with(deviceMetadataProvider: DeviceMetadataProvider) -> Self {
+        self.deviceMetadataProvider = deviceMetadataProvider
+        return self
+    }
+
+    func with(logger: POLogger) -> Self {
+        self.logger = logger
+        return self
+    }
 }

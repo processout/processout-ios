@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import UIKit.UIDevice
 
 final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
@@ -38,14 +37,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         if let encodedBody = try encodedRequestBody(request) {
             sessionRequest.httpBody = encodedBody
         }
-        let defaultHeaders = [
-            "Idempotency-Key": request.id,
-            "User-Agent": userAgent,
-            "Accept-Language": Strings.preferredLocalization,
-            "Content-Type": "application/json",
-            "Authorization": try authorization(request: request)
-        ]
-        defaultHeaders.forEach { field, value in
+        defaultHeaders(for: request).forEach { field, value in
             sessionRequest.setValue(value, forHTTPHeaderField: field)
         }
         request.headers.forEach { field, value in
@@ -61,18 +53,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
     private let deviceMetadataProvider: DeviceMetadataProvider
     private let logger: POLogger
 
-    private var userAgent: String {
-        let components = [
-            UIDevice.current.systemName,
-            "Version",
-            UIDevice.current.systemVersion,
-            "ProcessOut iOS-Bindings",
-            configuration.version
-        ]
-        return components.joined(separator: "/")
-    }
-
-    // MARK: - Private Methods
+    // MARK: - Request Body Encoding
 
     private func encodedRequestBody(_ request: HttpConnectorRequest<some Decodable>) throws -> Data? {
         let decoratedBody: Encodable?
@@ -92,17 +73,47 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         }
     }
 
-    private func authorization(request: HttpConnectorRequest<some Decodable>) throws -> String {
+    // MARK: - Request Headers
+
+    private func authorization(request: HttpConnectorRequest<some Decodable>) -> String {
         var value = configuration.projectId + ":"
         if request.requiresPrivateKey {
             if let privateKey = configuration.privateKey {
                 value += privateKey
             } else {
-                logger.info("Private key is required by '\(request.id)' request but not set")
-                throw HttpConnectorFailure.internal
+                preconditionFailure("Private key is required by '\(request.id)' request but not set")
             }
         }
         return "Basic " + Data(value.utf8).base64EncodedString()
+    }
+
+    private func defaultHeaders(for request: HttpConnectorRequest<some Decodable>) -> [String: String] {
+        let deviceMetadata = deviceMetadataProvider.deviceMetadata
+        let headers = [
+            "Idempotency-Key": request.id,
+            "User-Agent": userAgent(deviceMetadata: deviceMetadata),
+            "Accept-Language": Strings.preferredLocalization,
+            "Content-Type": "application/json",
+            "Authorization": authorization(request: request),
+            "Installation-Id": deviceMetadata.installationId,
+            "Device-Id": deviceMetadata.id,
+            "Device-System-Name": deviceMetadata.channel,
+            "Device-System-Version": deviceMetadata.systemVersion,
+            "Product-Version": configuration.version,
+            "Host-Application-Version": configuration.appVersion
+        ]
+        return headers.compactMapValues { $0 }
+    }
+
+    private func userAgent(deviceMetadata: DeviceMetadata) -> String {
+        let components = [
+            deviceMetadata.channel,
+            "Version",
+            deviceMetadata.systemVersion,
+            "ProcessOut iOS-Bindings",
+            configuration.version
+        ]
+        return components.joined(separator: "/")
     }
 }
 

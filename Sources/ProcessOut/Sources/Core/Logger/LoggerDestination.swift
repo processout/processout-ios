@@ -7,6 +7,6 @@
 
 protocol LoggerDestination {
 
-    /// Logs given message.
-    func log(entry: LogEntry)
+    /// Logs given event.
+    func log(event: LogEvent)
 }

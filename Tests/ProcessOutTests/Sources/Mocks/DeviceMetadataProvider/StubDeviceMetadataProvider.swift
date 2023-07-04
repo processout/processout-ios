@@ -10,6 +10,15 @@
 struct StubDeviceMetadataProvider: DeviceMetadataProvider {
 
     var deviceMetadata: DeviceMetadata {
-        DeviceMetadata(appLanguage: "en", appScreenWidth: 1, appScreenHeight: 2, appTimeZoneOffset: 3, channel: "test")
+        DeviceMetadata(
+            id: .init(value: ""),
+            installationId: .init(value: nil),
+            systemVersion: .init(value: ""),
+            appLanguage: "en",
+            appScreenWidth: 1,
+            appScreenHeight: 2,
+            appTimeZoneOffset: 3,
+            channel: "test"
+        )
     }
 }

@@ -73,6 +73,8 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
             preconditionFailure("Gateway configuration id and invoice id must be set.")
         }
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
+        var logger = api.logger
+        logger[attributeKey: "InvoiceId"] = invoiceId
         let interactor = DefaultNativeAlternativePaymentMethodInteractor(
             invoicesService: api.invoices,
             imagesRepository: api.images,
@@ -82,13 +84,13 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
                 waitsPaymentConfirmation: configuration.waitsPaymentConfirmation,
                 paymentConfirmationTimeout: configuration.paymentConfirmationTimeout
             ),
-            logger: api.logger,
+            logger: logger,
             delegate: delegate
         )
         let viewModel = DefaultNativeAlternativePaymentMethodViewModel(
             interactor: interactor, configuration: configuration, completion: completion
         )
-        return NativeAlternativePaymentMethodViewController(viewModel: viewModel, style: style, logger: api.logger)
+        return NativeAlternativePaymentMethodViewController(viewModel: viewModel, style: style, logger: logger)
     }
 
     // MARK: - Private Properties
