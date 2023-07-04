@@ -114,11 +114,14 @@ enum NativeAlternativePaymentMethodViewModelState {
 
     struct SubmittedItem: Hashable {
 
+        /// Title text.
+        let title: String?
+
+        /// Payment provider logo.
+        let logoImage: UIImage?
+
         /// Message.
         let message: String
-
-        /// Gateway's logo image.
-        let logoImage: UIImage?
 
         /// Image illustrating action.
         let image: UIImage?

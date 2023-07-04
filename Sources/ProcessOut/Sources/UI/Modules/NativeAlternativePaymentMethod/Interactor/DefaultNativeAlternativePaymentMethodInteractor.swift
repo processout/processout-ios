@@ -108,15 +108,13 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 switch result {
                 case let .success(response) where response.nativeApm.state == .pendingCapture:
                     self?.send(event: .didSubmitParameters(additionalParametersExpected: false))
-                    // todo(andrii-vysotskyi): use dynamic logo instead
                     self?.setAwaitingCaptureStateUnchecked(
-                        logoUrl: startedState.gateway.logoUrl,
-                        // swiftlint:disable:next line_length
-                        expectedActionMessage: response.nativeApm.parameterValues?.customerActionMessage ?? startedState.gateway.customerActionMessage,
-                        actionImageUrl: startedState.gateway.customerActionImageUrl
+                        gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
                     )
                 case let .success(response) where response.nativeApm.state == .captured:
-                    self?.setCapturedState()
+                    self?.setCapturedStateUnchecked(
+                        gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
+                    )
                 case let .success(response):
                     self?.defaultValues(for: response.nativeApm.parameterDefinitions) { values in
                         self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm, defaultValues: values)
@@ -176,17 +174,10 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             break
         case .pendingCapture:
             logger.debug("No more parameters to submit, waiting for capture")
-            let actionMessage = details.parameterValues?.customerActionMessage ?? details.gateway.customerActionMessage
-            // todo(andrii-vysotskyi): use dynamic logo instead
-            setAwaitingCaptureStateUnchecked(
-                logoUrl: details.gateway.logoUrl,
-                expectedActionMessage: actionMessage,
-                actionImageUrl: details.gateway.customerActionImageUrl
-            )
+            setAwaitingCaptureStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
             return
         case .captured:
-            // todo(andrii-vysotskyi): use dynamic logo instead
-            setCapturedStateUnchecked(logoUrl: details.gateway.logoUrl)
+            setCapturedStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
             return
         }
         if details.parameters.isEmpty {
@@ -208,15 +199,18 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     // MARK: - Awaiting Capture State
 
     private func setAwaitingCaptureStateUnchecked(
-        logoUrl: URL?, expectedActionMessage: String?, actionImageUrl: URL?
+        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway,
+        parameterValues: PONativeAlternativePaymentMethodParameterValues?
     ) {
         guard configuration.waitsPaymentConfirmation else {
             logger.info("Won't await payment capture because waitsPaymentConfirmation is set to false")
             state = .submitted
             return
         }
-        send(event: .willWaitForCaptureConfirmation(additionalActionExpected: expectedActionMessage != nil))
-        imagesRepository.images(at: logoUrl, actionImageUrl) { [weak self] logo, actionImage in
+        let actionMessage = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
+        let logoUrl = logoUrl(gateway: gateway, parameterValues: parameterValues)
+        send(event: .willWaitForCaptureConfirmation(additionalActionExpected: actionMessage != nil))
+        imagesRepository.images(at: logoUrl, gateway.customerActionImageUrl) { [weak self] logo, actionImage in
             guard let self else {
                 return
             }
@@ -230,7 +224,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 completion: { [weak self] result in
                     switch result {
                     case .success:
-                        self?.setCapturedState()
+                        self?.setCapturedStateUnchecked(gateway: gateway, parameterValues: parameterValues)
                     case .failure(let failure):
                         self?.logger.error("Did fail to capture invoice: \(failure)")
                         self?.setFailureStateUnchecked(failure: failure)
@@ -238,8 +232,9 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 }
             )
             let awaitingCaptureState = State.AwaitingCapture(
+                paymentProviderName: parameterValues?.providerName,
                 logoImage: logo,
-                actionMessage: expectedActionMessage,
+                actionMessage: actionMessage,
                 actionImage: actionImage
             )
             state = .awaitingCapture(awaitingCaptureState)
@@ -249,32 +244,31 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
 
     // MARK: - Captured State
 
-    private func setCapturedState() {
-        switch state {
-        case let .awaitingCapture(awaitingCaptureState):
-            setCapturedStateUnchecked(logoImage: awaitingCaptureState.logoImage)
-        case let .submitting(startedStateSnapshot):
-            setCapturedStateUnchecked(logoUrl: startedStateSnapshot.gateway.logoUrl)
-        default:
-            return
-        }
-    }
-
-    private func setCapturedStateUnchecked(logoUrl: URL?) {
-        imagesRepository.image(at: logoUrl) { [weak self] logoImage in
-            self?.setCapturedStateUnchecked(logoImage: logoImage)
-        }
-    }
-
-    private func setCapturedStateUnchecked(logoImage: UIImage?) {
+    private func setCapturedStateUnchecked(
+        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway,
+        parameterValues: PONativeAlternativePaymentMethodParameterValues?
+    ) {
         logger.info("Did receive invoice capture confirmation")
-        if configuration.waitsPaymentConfirmation {
-            state = .captured(.init(logoImage: logoImage))
-            send(event: .didCompletePayment)
-        } else {
+        guard configuration.waitsPaymentConfirmation else {
             logger.info("Should't wait for confirmation, so setting submitted state instead of captured.")
             state = .submitted
+            return
         }
+        if case let .awaitingCapture(awaitingCaptureState) = state {
+            let capturedState = State.Captured(
+                paymentProviderName: awaitingCaptureState.paymentProviderName, logoImage: awaitingCaptureState.logoImage
+            )
+            state = .captured(capturedState)
+        } else {
+            let logoUrl = logoUrl(gateway: gateway, parameterValues: parameterValues)
+            imagesRepository.image(at: logoUrl) { [weak self] logoImage in
+                let capturedState = State.Captured(
+                    paymentProviderName: parameterValues?.providerName, logoImage: logoImage
+                )
+                self?.state = .captured(capturedState)
+            }
+        }
+        send(event: .didCompletePayment)
     }
 
     // MARK: - Started State Restoration
@@ -478,6 +472,16 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         default:
             return value
         }
+    }
+
+    private func logoUrl(
+        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway,
+        parameterValues: PONativeAlternativePaymentMethodParameterValues?
+    ) -> URL? {
+        if parameterValues?.providerName != nil {
+            return parameterValues?.providerLogoUrl
+        }
+        return gateway.customerActionImageUrl
     }
 }
 

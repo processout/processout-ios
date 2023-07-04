@@ -174,8 +174,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         let item: State.Item
         if let expectedActionMessage = awaitingCaptureState.actionMessage {
             let submittedItem = State.SubmittedItem(
-                message: expectedActionMessage,
+                title: awaitingCaptureState.paymentProviderName,
                 logoImage: awaitingCaptureState.logoImage,
+                message: expectedActionMessage,
                 image: awaitingCaptureState.actionImage,
                 isCaptured: false
             )
@@ -210,8 +211,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 }
             )
             let submittedItem = State.SubmittedItem(
-                message: Text.Success.message,
+                title: capturedState.paymentProviderName,
                 logoImage: capturedState.logoImage,
+                message: Text.Success.message,
                 image: Asset.Images.success.image,
                 isCaptured: true
             )

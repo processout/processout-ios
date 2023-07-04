@@ -58,7 +58,10 @@ enum NativeAlternativePaymentMethodInteractorState {
 
     struct AwaitingCapture {
 
-        /// Gateway logo.
+        /// Payment provider name.
+        let paymentProviderName: String?
+
+        /// Payment provider or gateway logo image.
         let logoImage: UIImage?
 
         /// Messaged describing additional actions that are needed from user in order to capture payment.
@@ -70,7 +73,10 @@ enum NativeAlternativePaymentMethodInteractorState {
 
     struct Captured {
 
-        /// Gateway logo.
+        /// Payment provider name.
+        let paymentProviderName: String?
+
+        /// Payment provider or gateway logo image.
         let logoImage: UIImage?
     }
 
