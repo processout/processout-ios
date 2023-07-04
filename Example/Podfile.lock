@@ -4,10 +4,10 @@ PODS:
     - JOSESwift (= 2.2.1)
   - CheckoutEventLoggerKit (1.2.3)
   - JOSESwift (2.2.1)
-  - ProcessOut (4.0.0)
-  - ProcessOutCheckout3DS (4.0.0):
+  - ProcessOut (4.2.1)
+  - ProcessOutCheckout3DS (4.2.1):
     - Checkout3DS (~> 3.0)
-    - ProcessOut (= 4.0.0)
+    - ProcessOut (= 4.2.1)
 
 DEPENDENCIES:
   - ProcessOut (from `../`)
@@ -29,8 +29,8 @@ SPEC CHECKSUMS:
   Checkout3DS: c137a793916273b868d4434e98340af18fc397d2
   CheckoutEventLoggerKit: ee1f9732728fceb25960bb2f6d424f9e99bac7eb
   JOSESwift: d65ba32c7bceae9982e85e62d35de1f8d135cc89
-  ProcessOut: 787f2b01192711847b3ae7dd8b577a9354325013
-  ProcessOutCheckout3DS: 2e1918e280a186ff614d4e965cb241362a96259d
+  ProcessOut: c388d8464a419fb1dcba788968b8ef666f65cfe2
+  ProcessOutCheckout3DS: a7e48abf806ea3b73c8c893bd0572210bdcca269
 
 PODFILE CHECKSUM: 1ccf21fa034348c760ea0c69df10986caf21a312
 
