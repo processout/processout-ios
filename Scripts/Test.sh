@@ -1,9 +1,9 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
 SDK='iphonesimulator'
-DESTINATION='platform=iOS Simulator,name=iPhone 14 Pro,OS=16.2'
+DESTINATION='platform=iOS Simulator,name=iPhone 14 Pro,OS=latest'
 
 xcodebuild clean test \
     -project ProcessOut.xcodeproj \

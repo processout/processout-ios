@@ -1,6 +1,5 @@
-##   Every input/output paths in the rest of the config will then be expressed relative to these.
-input_dir: ${PROJECT_DIR}/Sources/${TARGET_NAME}/Resources/
-output_dir: ${PROJECT_DIR}/Sources/${TARGET_NAME}/Sources/Generated/
+input_dir: ${TARGET_ROOT}/Resources/
+output_dir: ${TARGET_ROOT}/Sources/Generated/
 
 ## Constants for Assets Catalogs.
 xcassets:
@@ -14,7 +13,7 @@ xcassets:
         forceProvidesNamespaces: true
         bundle: BundleLocator.bundle
       output: Assets+Generated.swift
-      
+
 ## Constants for Localized Strings.
 strings:
   inputs:
