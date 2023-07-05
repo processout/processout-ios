@@ -1,11 +1,4 @@
-### fastlane ###
-fastlane/report.xml
-fastlane/Preview.html
-fastlane/screenshots/**/*.png
-fastlane/screenshots/screenshots.html
-fastlane/test_output
-
-### macOS ###
+## macOS
 .DS_Store
 .AppleDouble
 .LSOverride
@@ -18,3 +11,6 @@ Packages
 xcuserdata/
 Tests/ProcessOutTests/Sources/Generated/*.swift
 Tests/ProcessOutTests/Resources/Constants.yml
+
+## Brew
+Brewfile.lock.json
