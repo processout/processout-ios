@@ -1,8 +1,8 @@
 name: Bootstrap Project
 description: Pulls needed dependencies and bootstraps project
 inputs:
-  example-constants:
-    description: 'Content of example project constants file'
+  test-project-constants:
+    description: 'Content of test project constants file'
     type: string
     required: false
 runs:
@@ -22,13 +22,16 @@ runs:
         key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
         restore-keys: |
           ${{ runner.os }}-mint-
+    - name: Write Constants
+      run: |
+        CONSTANTS="${{ inputs.test-project-constants }}"
+        echo $CONSTANTS > Tests/ProcessOutTests/Resources/Constants.yml
+        echo $CONSTANTS > Example/Example/Resources/Constants.yml
+      shell: bash
     - name: Bootstrap Project
       run: ./Scripts/BootstrapProject.sh --skip-bundle-instal
       shell: bash
-    - name: Bootstrap Example Project
-      if: ${{ inputs.example-constants != '' }}
-      run: |
-        cd Example
-        echo "${{ inputs.example-constants }}" > Example/Resources/Constants.yml
-        source Scripts/BootstrapProject.sh --skip-mint-bootstrap
-      shell: bash
+    # - name: Bootstrap Example Project
+    #   if: ${{ inputs.test-project-constants != '' }}
+    #   run: cd Example && ./Scripts/BootstrapProject.sh --skip-mint-bootstrap
+    #   shell: bash

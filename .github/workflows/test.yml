@@ -14,6 +14,6 @@ jobs:
       - name: Bootstrap Project
         uses: ./.github/actions/bootstrap-project
         with:
-          example-constants: ${{ secrets.EXAMPLE_PROJECT_CONSTANTS }}
+          test-project-constants: ${{ secrets.TEST_PROJECT_CONSTANTS }}
       - name: Run Unit Tests
         run: source Scripts/Test.sh
