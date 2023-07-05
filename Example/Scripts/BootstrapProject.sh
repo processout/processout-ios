@@ -2,6 +2,9 @@
 
 set -e
 
+# Installs brew dependencies
+brew bundle
+
 # Installs mint dependencies if needed
 if ! [[ "$@" =~ '--skip-mint-bootstrap' ]]; then
     mint bootstrap

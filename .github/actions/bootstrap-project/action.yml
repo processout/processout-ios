@@ -12,9 +12,6 @@ runs:
       with:
         ruby-version: '3.1.2'
         bundler-cache: true
-    - name: Install Mint
-      run: brew install mint
-      shell: bash
     - name: Cache Mint Packages
       uses: actions/cache@v3
       with:
