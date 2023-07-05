@@ -33,7 +33,10 @@ targets:
       - path: Scripts/Sourcery.sh
         name: Sourcery
         basedOnDependencyAnalysis: false
-    sources: Sources/ProcessOut
+    sources:
+      - path: Sources/ProcessOut
+        excludes:
+          - swiftgen.yml
     dependencies:
       - framework: Vendor/cmark.xcframework
   ProcessOutTests:
@@ -50,6 +53,8 @@ targets:
       - target: ProcessOut
     sources:
       - path: Tests/ProcessOutTests
+        excludes:
+          - swiftgen.yml
       - path: Tests/ProcessOutTests/Sources/Generated/Constants+Generated.swift
         optional: true
   ProcessOutCheckout3DS:
