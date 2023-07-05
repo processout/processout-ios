@@ -48,6 +48,8 @@ targets:
     preBuildScripts:
       - path: Scripts/SwiftGen.sh
         name: SwiftGen
+        outputFiles:
+          - $(TARGET_ROOT)/Sources/Generated/Constants+Generated.swift
         basedOnDependencyAnalysis: false
     dependencies:
       - target: ProcessOut
