@@ -1,4 +1,3 @@
-##   Every input/output paths in the rest of the config will then be expressed relative to these.
 input_dir: ${TARGET_ROOT}/Resources/
 output_dir: ${TARGET_ROOT}/Sources/Generated/
 

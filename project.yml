@@ -53,8 +53,6 @@ targets:
       - target: ProcessOut
     sources:
       - path: Tests/ProcessOutTests
-        excludes:
-          - swiftgen.yml
       - path: Tests/ProcessOutTests/Sources/Generated/Constants+Generated.swift
         optional: true
   ProcessOutCheckout3DS:
