@@ -22,29 +22,41 @@ targets:
       SKIP_INSTALL: NO
       BUILD_LIBRARY_FOR_DISTRIBUTION: YES
       OTHER_SWIFT_FLAGS: "-Xfrontend -module-interface-preserve-types-as-written"
+      TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOut
     preBuildScripts:
       - path: Scripts/Lint.sh
         name: Swiftlint
         basedOnDependencyAnalysis: false
-      - path: Scripts/SwiftGen/SwiftGen.sh
+      - path: Scripts/SwiftGen.sh
         name: SwiftGen
-        inputFileLists:
-          - $(PROJECT_DIR)/Scripts/SwiftGen/Input.xcfilelist
-        outputFileLists:
-          - $(PROJECT_DIR)/Scripts/SwiftGen/Output.xcfilelist
+        basedOnDependencyAnalysis: false
       - path: Scripts/Sourcery.sh
         name: Sourcery
         basedOnDependencyAnalysis: false
-    sources: Sources/ProcessOut
+    sources:
+      - path: Sources/ProcessOut
+        excludes:
+          - swiftgen.yml
     dependencies:
       - framework: Vendor/cmark.xcframework
   ProcessOutTests:
     type: bundle.unit-test
     platform: iOS
     deploymentTarget: "16.0"
+    settings:
+      TARGET_ROOT: $(PROJECT_DIR)/Tests/ProcessOutTests
+    preBuildScripts:
+      - path: Scripts/SwiftGen.sh
+        name: SwiftGen
+        outputFiles:
+          - $(TARGET_ROOT)/Sources/Generated/Constants+Generated.swift
+        basedOnDependencyAnalysis: false
     dependencies:
       - target: ProcessOut
-    sources: Tests/ProcessOutTests
+    sources:
+      - path: Tests/ProcessOutTests
+      - path: Tests/ProcessOutTests/Sources/Generated/Constants+Generated.swift
+        optional: true
   ProcessOutCheckout3DS:
     type: framework
     platform: iOS
@@ -53,6 +65,7 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.checkout-3ds-ios
       SKIP_INSTALL: NO
       BUILD_LIBRARY_FOR_DISTRIBUTION: YES
+      TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutCheckout3DS
     preBuildScripts:
       - path: Scripts/Lint.sh
         name: Swiftlint
