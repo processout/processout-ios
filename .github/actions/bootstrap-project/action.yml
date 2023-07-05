@@ -21,9 +21,9 @@ runs:
           ${{ runner.os }}-mint-
     - name: Write Constants
       run: |
-        CONSTANTS="${{ inputs.test-project-constants }}"
-        echo $CONSTANTS > Tests/ProcessOutTests/Resources/Constants.yml
-        echo $CONSTANTS > Example/Example/Resources/Constants.yml
+        CONSTANTS=$'${{ inputs.test-project-constants }}'
+        echo "$CONSTANTS" > Tests/ProcessOutTests/Resources/Constants.yml
+        echo "$CONSTANTS" > Example/Example/Resources/Constants.yml
       shell: bash
     - name: Bootstrap Project
       run: ./Scripts/BootstrapProject.sh --skip-bundle-instal
