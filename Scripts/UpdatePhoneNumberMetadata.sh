@@ -4,12 +4,13 @@ set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 OUTPUT_DIR="$SCRIPT_DIR/../Sources/ProcessOut/Resources/PhoneNumberMetadata"
+WORK_DIR=$(mktemp -d)
 
 # Validates arguments acount
 test $# -eq 1
 
 # Go to temporary directory
-cd $(mktemp -d)
+cd $WORK_DIR
 
 # Clone Google's libphonenumber
 git clone --depth 1 --branch $1 https://github.com/google/libphonenumber libphonenumber
