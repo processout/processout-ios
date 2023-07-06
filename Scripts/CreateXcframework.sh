@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 OUTPUT_DIR=".build/framework"
 
 function build_framework {(

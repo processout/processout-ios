@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
 # Exports version as environment variable
 export CURRENT_VERSION="$(cat Version.resolved)"
