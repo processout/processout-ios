@@ -1,9 +1,9 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
 # Installs brew dependencies
-brew bundle
+brew bundle -q
 
 # Installs mint dependencies if needed
 if ! [[ "$@" =~ '--skip-mint-bootstrap' ]]; then

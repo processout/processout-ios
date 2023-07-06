@@ -1,15 +1,16 @@
 #!/bin/sh
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 OUTPUT_DIR="$SCRIPT_DIR/../../Vendor"
+WORK_DIR=$(mktemp -d)
 
 # Script expects revision as a first and only argument
 test $# -eq 1
 
 # Go to temporary directory
-cd $(mktemp -d)
+cd $WORK_DIR
 
 # Clone library
 git clone --depth 1 --branch $1 https://github.com/commonmark/cmark .
@@ -46,3 +47,9 @@ xcodebuild -create-xcframework \
 
 # Write metadata
 echo $1 > "$OUTPUT_DIR/cmark.xcframework.version"
+
+function cleanup {
+  rm -rf $WORK_DIR
+}
+
+trap cleanup EXIT

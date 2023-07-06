@@ -22,7 +22,6 @@ type_name:
 
 opt_in_rules:
   - anonymous_argument_in_multiline_closure
-  - anyobject_protocol
   - closure_end_indentation
   - closure_spacing
   - collection_alignment
