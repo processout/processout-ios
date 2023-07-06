@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
 # Creates XCFramework
 source Scripts/CreateXcframework.sh

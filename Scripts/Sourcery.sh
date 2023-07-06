@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 mint run sourcery \
   --sources $PROJECT_DIR/Sources/$TARGET_NAME/Sources \
   --templates $PROJECT_DIR/Templates \
