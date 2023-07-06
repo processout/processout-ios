@@ -120,7 +120,7 @@ enum NativeAlternativePaymentMethodViewModelState {
         /// Payment provider logo.
         let logoImage: UIImage?
 
-        /// Message.
+        /// Message markdown.
         let message: String
 
         /// Image illustrating action.

@@ -215,11 +215,11 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 return
             }
             let request = PONativeAlternativePaymentCaptureRequest(
-                invoiceId: configuration.invoiceId,
-                gatewayConfigurationId: configuration.gatewayConfigurationId,
-                timeout: configuration.paymentConfirmationTimeout
+                invoiceId: self.configuration.invoiceId,
+                gatewayConfigurationId: self.configuration.gatewayConfigurationId,
+                timeout: self.configuration.paymentConfirmationTimeout
             )
-            captureCancellable = invoicesService.captureNativeAlternativePayment(
+            self.captureCancellable = self.invoicesService.captureNativeAlternativePayment(
                 request: request,
                 completion: { [weak self] result in
                     switch result {
@@ -237,8 +237,8 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
                 actionMessage: actionMessage,
                 actionImage: actionImage
             )
-            state = .awaitingCapture(awaitingCaptureState)
-            logger.info("Waiting for invoice capture confirmation")
+            self.state = .awaitingCapture(awaitingCaptureState)
+            self.logger.info("Waiting for invoice capture confirmation")
         }
     }
 
@@ -254,21 +254,23 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
             state = .submitted
             return
         }
-        if case let .awaitingCapture(awaitingCaptureState) = state {
+        switch state {
+        case .awaitingCapture(let awaitingCaptureState):
             let capturedState = State.Captured(
                 paymentProviderName: awaitingCaptureState.paymentProviderName, logoImage: awaitingCaptureState.logoImage
             )
             state = .captured(capturedState)
-        } else {
+            send(event: .didCompletePayment)
+        default:
             let logoUrl = logoUrl(gateway: gateway, parameterValues: parameterValues)
             imagesRepository.image(at: logoUrl) { [weak self] logoImage in
                 let capturedState = State.Captured(
                     paymentProviderName: parameterValues?.providerName, logoImage: logoImage
                 )
                 self?.state = .captured(capturedState)
+                self?.send(event: .didCompletePayment)
             }
         }
-        send(event: .didCompletePayment)
     }
 
     // MARK: - Started State Restoration
