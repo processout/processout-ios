@@ -1,11 +1,9 @@
 #!/bin/bash
 
-set -euo pipefail
-
 OUTPUT_DIR=".build/framework"
 
 function build_framework {(
-    set -e
+    set -euo pipefail
 
     xcodebuild archive \
         -scheme $1 \
@@ -29,7 +27,7 @@ function build_framework {(
     zip $1.xcframework.zip -r $1.xcframework -x '.*' -x '__MACOSX'
 )}
 
-set -e
+set -euo pipefail
 
 rm -rf $OUTPUT_DIR
 mkdir -p $OUTPUT_DIR
