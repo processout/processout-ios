@@ -6,7 +6,7 @@ set -euo pipefail
 export CURRENT_VERSION="$(cat Version.resolved)"
 
 # Installs brew dependencies
-brew bundle
+brew bundle -q
 
 # Installs mint dependencies
 mint bootstrap
