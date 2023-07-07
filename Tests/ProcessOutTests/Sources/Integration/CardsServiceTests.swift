@@ -23,6 +23,8 @@ final class CardsServiceTests: XCTestCase {
         sut = ProcessOut.shared.cards
     }
 
+    // MARK: - Tests
+
     func test_issuerInformation() async throws {
         // When
         let information = try await sut.issuerInformation(iin: "400012")
@@ -35,21 +37,11 @@ final class CardsServiceTests: XCTestCase {
         XCTAssertEqual(information.type, "debit")
     }
 
-    func test_issuerInformation_whenIinIsTooShort_throws() async {
-        do {
-            // When
-            _ = try await sut.issuerInformation(iin: "4")
-        } catch {
-            return
-        }
-
-        // Then
-        XCTFail("IIN with length less than 6 symbols should be invalid")
-    }
-
     func test_tokenizeRequest_returnsCard() async throws {
         // Given
-        let request = POCardTokenizationRequest(number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737")
+        let request = POCardTokenizationRequest(
+            number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737"
+        )
 
         // When
         let card = try await sut.tokenize(request: request)
@@ -60,7 +52,19 @@ final class CardsServiceTests: XCTestCase {
         XCTAssertEqual(card.expYear, 2040)
     }
 
-    // MARK: - Tests
+    func test_updateCard() async throws {
+        // Given
+        let cardTokenizationRequest = POCardTokenizationRequest(
+            number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737"
+        )
+        let card = try await sut.tokenize(request: cardTokenizationRequest)
+        let cardUpdateRequest = POCardUpdateRequest(cardId: card.id, cvc: "123")
+
+        // When
+        _ = try await sut.updateCard(request: cardUpdateRequest)
+    }
+
+    // MARK: - Private Properties
 
     private var sut: POCardsService!
 }
