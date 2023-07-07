@@ -138,10 +138,10 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
                 viewType: NativeAlternativePaymentMethodSubmittedCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(
-                        item: item,
-                        style: .init(message: self.style.message, successMessage: self.style.successMessage)
+                    let style = NativeAlternativePaymentMethodSubmittedCellStyle(
+                        title: self.style.title, message: self.style.message, successMessage: self.style.successMessage
                     )
+                    cell.configure(item: item, style: style)
                 }
             ).height
         case .input, .codeInput, .picker:
@@ -416,7 +416,10 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             let cell = collectionView.dequeueReusableCell(
                 NativeAlternativePaymentMethodSubmittedCell.self, for: indexPath
             )
-            cell.configure(item: item, style: .init(message: style.message, successMessage: style.successMessage))
+            let style = NativeAlternativePaymentMethodSubmittedCellStyle(
+                title: style.title, message: style.message, successMessage: style.successMessage
+            )
+            cell.configure(item: item, style: style)
             return cell
         case .picker(let item):
             let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodPickerCell.self, for: indexPath)

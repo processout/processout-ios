@@ -40,9 +40,6 @@ enum NativeAlternativePaymentMethodInteractorState {
         /// Name of the payment gateway that can be displayed.
         let gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
 
-        /// Gateway's logo URL.
-        let gatewayLogo: UIImage?
-
         /// Invoice amount.
         let amount: Decimal
 
@@ -61,11 +58,14 @@ enum NativeAlternativePaymentMethodInteractorState {
 
     struct AwaitingCapture {
 
-        /// Gateway logo.
-        let gatewayLogoImage: UIImage?
+        /// Payment provider name.
+        let paymentProviderName: String?
+
+        /// Payment provider or gateway logo image.
+        let logoImage: UIImage?
 
         /// Messaged describing additional actions that are needed from user in order to capture payment.
-        let expectedActionMessage: String?
+        let actionMessage: String?
 
         /// Action image.
         let actionImage: UIImage?
@@ -73,8 +73,11 @@ enum NativeAlternativePaymentMethodInteractorState {
 
     struct Captured {
 
-        /// Gateway logo.
-        let gatewayLogo: UIImage?
+        /// Payment provider name.
+        let paymentProviderName: String?
+
+        /// Payment provider or gateway logo image.
+        let logoImage: UIImage?
     }
 
     /// Initial interactor state.

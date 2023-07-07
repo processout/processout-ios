@@ -19,6 +19,7 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // swiftlint:disable:next function_body_length
     func configure(
         item: NativeAlternativePaymentMethodViewModelState.SubmittedItem,
         style: NativeAlternativePaymentMethodSubmittedCellStyle
@@ -55,6 +56,21 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
                 builder.text = .markdown(item.message)
             }
             .build()
+        if let title = item.title {
+            titleLabel.attributedText = AttributedStringBuilder()
+                .with { builder in
+                    builder.typography = style.title.typography
+                    builder.textStyle = .largeTitle
+                    builder.alignment = .center
+                    builder.lineBreakMode = .byWordWrapping
+                    builder.color = descriptionStyle.color
+                    builder.text = .plain(title)
+                }
+                .build()
+            titleLabel.setHidden(false)
+        } else {
+            titleLabel.setHidden(true)
+        }
         if let image = item.image {
             decorationImageView.image = image
             decorationImageView.tintColor = descriptionStyle.color
@@ -86,12 +102,22 @@ final class NativeAlternativePaymentMethodSubmittedCell: UICollectionViewCell {
     // MARK: - Private Properties
 
     private lazy var containerView: UIStackView = {
-        let view = UIStackView(arrangedSubviews: [iconImageView, descriptionTextView, decorationImageView])
+        let view = UIStackView(arrangedSubviews: [titleLabel, iconImageView, descriptionTextView, decorationImageView])
         view.translatesAutoresizingMaskIntoConstraints = false
         view.spacing = Constants.verticalSpacing
         view.axis = .vertical
         view.alignment = .center
         return view
+    }()
+
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.adjustsFontForContentSizeCategory = false
+        label.numberOfLines = 0
+        label.setContentCompressionResistancePriority(.required, for: .vertical)
+        label.setContentHuggingPriority(.required, for: .vertical)
+        return label
     }()
 
     private lazy var iconImageView: UIImageView = {

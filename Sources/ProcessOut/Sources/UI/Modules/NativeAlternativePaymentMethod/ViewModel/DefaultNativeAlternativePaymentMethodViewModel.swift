@@ -172,10 +172,11 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     private func convertToState(awaitingCaptureState: InteractorState.AwaitingCapture) -> State {
         let item: State.Item
-        if let expectedActionMessage = awaitingCaptureState.expectedActionMessage {
+        if let expectedActionMessage = awaitingCaptureState.actionMessage {
             let submittedItem = State.SubmittedItem(
+                title: awaitingCaptureState.logoImage == nil ? awaitingCaptureState.paymentProviderName : nil,
+                logoImage: awaitingCaptureState.logoImage,
                 message: expectedActionMessage,
-                logoImage: awaitingCaptureState.gatewayLogoImage,
                 image: awaitingCaptureState.actionImage,
                 isCaptured: false
             )
@@ -210,8 +211,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 }
             )
             let submittedItem = State.SubmittedItem(
+                title: capturedState.logoImage == nil ? capturedState.paymentProviderName : nil,
+                logoImage: capturedState.logoImage,
                 message: Text.Success.message,
-                logoImage: capturedState.gatewayLogo,
                 image: Asset.Images.success.image,
                 isCaptured: true
             )
