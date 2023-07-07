@@ -9,7 +9,7 @@ import Foundation
 import XCTest
 @_spi(PO) import ProcessOut
 
-final class CardsServiceTests: XCTestCase {
+@MainActor final class CardsServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
@@ -50,6 +50,32 @@ final class CardsServiceTests: XCTestCase {
         XCTAssertEqual(card.last4Digits, "4242")
         XCTAssertEqual(card.expMonth, 12)
         XCTAssertEqual(card.expYear, 2040)
+    }
+
+    func test_issuerInformation_whenIinIsTooShort_throws() async {
+        // Given
+        let iin = "4"
+
+        // When
+        let issuerInformation = {
+            try await self.sut.issuerInformation(iin: iin)
+        }
+
+        // Then
+        await assertThrowsError(try await issuerInformation(), "IIN with length less than 6 symbols should be invalid")
+    }
+
+    func test_tokenizeRequest_whenNumberIsInvalid_throwsError() async {
+        // Given
+        let request = POCardTokenizationRequest(number: "", expMonth: 12, expYear: 40, cvc: "737")
+
+        // When
+        let card = {
+            try await self.sut.tokenize(request: request)
+        }
+
+        // Then
+        await assertThrowsError(try await card(), "Unexpected success, card number is invalid")
     }
 
     func test_updateCard() async throws {
