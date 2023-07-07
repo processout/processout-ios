@@ -80,10 +80,9 @@ import XCTest
 
     func test_updateCard() async throws {
         // Given
-        let cardTokenizationRequest = POCardTokenizationRequest(
-            number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737"
+        let card = try await sut.tokenize(
+            request: .init(number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737")
         )
-        let card = try await sut.tokenize(request: cardTokenizationRequest)
         let cardUpdateRequest = POCardUpdateRequest(cardId: card.id, cvc: "123")
 
         // When
