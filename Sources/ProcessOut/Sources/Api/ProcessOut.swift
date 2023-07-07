@@ -17,6 +17,11 @@ public final class ProcessOut {
     /// Shared instance.
     public private(set) static var shared: ProcessOut! // swiftlint:disable:this implicitly_unwrapped_optional
 
+    /// Returns boolean value indicating whether SDK is configured and operational.
+    public static var isConfigured: Bool {
+        shared != nil
+    }
+
     /// Configures ``ProcessOut/shared`` instance.
     /// - NOTE: Method must be called from main thread. Only the first invocation takes effect, all
     /// subsequent calls to this method are ignored.
