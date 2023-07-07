@@ -87,11 +87,14 @@ final class Checkout3DSService: PO3DSService {
             completion(.failure(failure))
             return
         }
+        delegate.willHandle(challenge: challenge)
         state = .challenging(context)
         let parameters = convertToChallengeParameters(data: challenge)
         context.transaction.doChallenge(challengeParameters: parameters) { [unowned self, errorMapper] result in
             self.setIdleStateUnchecked()
-            completion(result.map(extractStatus(challengeResult:)).mapError(errorMapper.convert))
+            let challengeResult = result.map(extractStatus(challengeResult:)).mapError(errorMapper.convert)
+            completion(challengeResult)
+            delegate.didHandle3DS2Challenge(result: challengeResult)
         }
     }
 
