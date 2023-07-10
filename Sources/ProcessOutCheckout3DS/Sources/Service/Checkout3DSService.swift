@@ -30,6 +30,7 @@ final class Checkout3DSService: PO3DSService {
 
     // MARK: - PO3DSService
 
+    // swiftlint:disable:next function_body_length
     func authenticationRequest(
         configuration: PO3DS2Configuration,
         completion: @escaping (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
@@ -54,7 +55,7 @@ final class Checkout3DSService: PO3DSService {
                     self.delegate.shouldContinue(with: warnings) { shouldContinue in
                         assert(Thread.isMainThread, "Completion must be called on main thread.")
                         if shouldContinue {
-                            context.transaction.getAuthenticationRequestParameters { result in
+                            context.transaction.getAuthenticationRequestParameters { [unowned self] result in
                                 let mappedResult = result
                                     .mapError(errorMapper.convert)
                                     .map(self.convertToAuthenticationRequest)
@@ -65,19 +66,25 @@ final class Checkout3DSService: PO3DSService {
                                     self.setIdleStateUnchecked()
                                 }
                                 completion(mappedResult)
+                                self.delegate.didCreateAuthenticationRequest(result: mappedResult)
                             }
                         } else {
                             self.setIdleStateUnchecked()
-                            completion(.failure(POFailure(code: .cancelled)))
+                            let failure = POFailure(code: .cancelled)
+                            completion(.failure(failure))
+                            self.delegate.didCreateAuthenticationRequest(result: .failure(failure))
                         }
                     }
                 }
             }
         } catch let error as AuthenticationError {
-            completion(.failure(errorMapper.convert(error: error)))
+            let failure = errorMapper.convert(error: error)
+            completion(.failure(failure))
+            delegate.didCreateAuthenticationRequest(result: .failure(failure))
         } catch {
             let failure = POFailure(code: .generic(.mobile), underlyingError: error)
             completion(.failure(failure))
+            delegate.didCreateAuthenticationRequest(result: .failure(failure))
         }
     }
 
@@ -87,11 +94,14 @@ final class Checkout3DSService: PO3DSService {
             completion(.failure(failure))
             return
         }
+        delegate.willHandle(challenge: challenge)
         state = .challenging(context)
         let parameters = convertToChallengeParameters(data: challenge)
         context.transaction.doChallenge(challengeParameters: parameters) { [unowned self, errorMapper] result in
             self.setIdleStateUnchecked()
-            completion(result.map(extractStatus(challengeResult:)).mapError(errorMapper.convert))
+            let mappedResult = result.map(extractStatus(challengeResult:)).mapError(errorMapper.convert)
+            completion(mappedResult)
+            delegate.didHandle3DS2Challenge(result: mappedResult)
         }
     }
 

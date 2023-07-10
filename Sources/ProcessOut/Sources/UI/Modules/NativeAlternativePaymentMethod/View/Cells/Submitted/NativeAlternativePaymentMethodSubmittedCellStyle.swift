@@ -7,6 +7,9 @@
 
 struct NativeAlternativePaymentMethodSubmittedCellStyle {
 
+    /// Title style.
+    let title: POTextStyle
+
     /// Message style.
     let message: POTextStyle
 
