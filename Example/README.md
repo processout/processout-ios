@@ -16,8 +16,6 @@ Project demonstrates multiple flows that ProcessOut framework is capable of.
 projectId: test-proj_K3Ur9LQzcKtm4zttWJ7oAKHgqdiwboAw
 projectPrivateKey: key_test_RE14RLcNikkP5ZXMn84BFYApwotD05Kc
 customerId: cust_dCFEWBwqWrBFYAtkRIpILCynNqfhLQWX
-apiBaseUrl: https://api.processout.com
-checkoutBaseUrl: https://checkout.processout.com
 ```
 
 2. Run `./Scripts/BootstrapProject.sh` script.
