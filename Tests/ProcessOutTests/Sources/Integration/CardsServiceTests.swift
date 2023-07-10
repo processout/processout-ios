@@ -7,20 +7,14 @@
 
 import Foundation
 import XCTest
-@_spi(PO) import ProcessOut
+@testable import ProcessOut
 
 @MainActor final class CardsServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        let configuration = ProcessOutConfiguration.test(
-            projectId: Constants.projectId,
-            privateKey: Constants.projectPrivateKey,
-            apiBaseUrl: URL(string: Constants.apiBaseUrl)!,
-            checkoutBaseUrl: URL(string: Constants.checkoutBaseUrl)!
-        )
-        ProcessOut.configure(configuration: configuration)
-        sut = ProcessOut.shared.cards
+        let configuration = ProcessOutConfiguration.production(projectId: Constants.projectId)
+        sut = ProcessOut(configuration: configuration).cards
     }
 
     // MARK: - Tests

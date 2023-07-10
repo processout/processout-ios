@@ -6,20 +6,18 @@
 //
 
 import XCTest
-@_spi(PO) import ProcessOut
+@_spi(PO) @testable import ProcessOut
 
 @MainActor final class CustomerTokensServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        let configuration = ProcessOutConfiguration.test(
-            projectId: Constants.projectId,
-            privateKey: Constants.projectPrivateKey,
-            apiBaseUrl: URL(string: Constants.apiBaseUrl)!,
-            checkoutBaseUrl: URL(string: Constants.checkoutBaseUrl)!
+        let configuration = ProcessOutConfiguration.production(
+            projectId: Constants.projectId, privateKey: Constants.projectPrivateKey
         )
-        ProcessOut.configure(configuration: configuration)
-        sut = ProcessOut.shared.customerTokens
+        let processOut = ProcessOut(configuration: configuration)
+        sut = processOut.customerTokens
+        cardsService = processOut.cards
     }
 
     // MARK: - Tests
@@ -37,7 +35,7 @@ import XCTest
 
     func test_assignCustomerToken_whenVerifyIsSetToFalse_assignsNewSource() async throws {
         // Given
-        let card = try await ProcessOut.shared.cards.tokenize(
+        let card = try await cardsService.tokenize(
             request: .init(number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737")
         )
         let token = try await sut.createCustomerToken(
@@ -57,4 +55,5 @@ import XCTest
     // MARK: - Private Properties
 
     private var sut: POCustomerTokensService!
+    private var cardsService: POCardsService!
 }

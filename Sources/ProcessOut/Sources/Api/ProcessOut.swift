@@ -103,6 +103,10 @@ public final class ProcessOut {
     /// Event emitter to use for events exchange.
     private(set) lazy var eventEmitter: EventEmitter = LocalEventEmitter()
 
+    init(configuration: ProcessOutConfiguration) {
+        self.configuration = configuration
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {
@@ -154,10 +158,6 @@ public final class ProcessOut {
     }()
 
     // MARK: - Private Methods
-
-    private init(configuration: ProcessOutConfiguration) {
-        self.configuration = configuration
-    }
 
     private func createLogger(for category: String, includeRemoteDestination: Bool = true) -> POLogger {
         let destinations: [LoggerDestination] = [
