@@ -38,11 +38,10 @@ import XCTest
         let card = try await cardsService.tokenize(
             request: .init(number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737")
         )
-        let token = try await sut.createCustomerToken(
-            request: POCreateCustomerTokenRequest(customerId: Constants.customerId)
-        )
         let request = POAssignCustomerTokenRequest(
-            customerId: Constants.customerId, tokenId: token.id, source: card.id, verify: false
+            customerId: Constants.customerId,
+            tokenId: try await createToken(verify: false).id,
+            source: card.id
         )
 
         // When
@@ -52,8 +51,39 @@ import XCTest
         XCTAssertEqual(updatedToken.cardId, card.id)
     }
 
+    func test_assignCustomerToken_whenVerifyIsSetToTrue_triggers3DS() async throws {
+        // Given
+        let card = try await cardsService.tokenize(
+            request: .init(number: "4000000000000101", expMonth: 12, expYear: 40, cvc: "737")
+        )
+        let request = POAssignCustomerTokenRequest(
+            customerId: Constants.customerId,
+            tokenId: try await createToken(verify: true).id,
+            source: card.id,
+            verify: true,
+            enableThreeDS2: true
+        )
+        let threeDSService = Mock3DSService()
+        threeDSService.authenticationRequestFromClosure = { _, completion in
+            completion(.failure(.init(code: .cancelled)))
+        }
+
+        // When
+        _ = try? await sut.assignCustomerToken(request: request, threeDSService: threeDSService)
+
+        // Then
+        XCTAssertEqual(threeDSService.authenticationRequestCallsCount, 1)
+    }
+
     // MARK: - Private Properties
 
     private var sut: POCustomerTokensService!
     private var cardsService: POCardsService!
+
+    // MARK: - Private Methods
+
+    private func createToken(verify: Bool) async throws -> POCustomerToken {
+        let request = POCreateCustomerTokenRequest(customerId: Constants.customerId, verify: verify)
+        return try await sut.createCustomerToken(request: request)
+    }
 }
