@@ -7,21 +7,17 @@
 
 import Foundation
 import XCTest
-@_spi(PO) import ProcessOut
+@testable import ProcessOut
 
-final class CardsServiceTests: XCTestCase {
+@MainActor final class CardsServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        let configuration = ProcessOutConfiguration.test(
-            projectId: Constants.projectId,
-            privateKey: Constants.projectPrivateKey,
-            apiBaseUrl: URL(string: Constants.apiBaseUrl)!,
-            checkoutBaseUrl: URL(string: Constants.checkoutBaseUrl)!
-        )
-        ProcessOut.configure(configuration: configuration)
-        sut = ProcessOut.shared.cards
+        let configuration = ProcessOutConfiguration.production(projectId: Constants.projectId)
+        sut = ProcessOut(configuration: configuration).cards
     }
+
+    // MARK: - Tests
 
     func test_issuerInformation() async throws {
         // When
@@ -35,21 +31,11 @@ final class CardsServiceTests: XCTestCase {
         XCTAssertEqual(information.type, "debit")
     }
 
-    func test_issuerInformation_whenIinIsTooShort_throws() async {
-        do {
-            // When
-            _ = try await sut.issuerInformation(iin: "4")
-        } catch {
-            return
-        }
-
-        // Then
-        XCTFail("IIN with length less than 6 symbols should be invalid")
-    }
-
     func test_tokenizeRequest_returnsCard() async throws {
         // Given
-        let request = POCardTokenizationRequest(number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737")
+        let request = POCardTokenizationRequest(
+            number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737"
+        )
 
         // When
         let card = try await sut.tokenize(request: request)
@@ -60,7 +46,44 @@ final class CardsServiceTests: XCTestCase {
         XCTAssertEqual(card.expYear, 2040)
     }
 
-    // MARK: - Tests
+    func test_issuerInformation_whenIinIsTooShort_throws() async {
+        // Given
+        let iin = "4"
+
+        // When
+        let issuerInformation = {
+            try await self.sut.issuerInformation(iin: iin)
+        }
+
+        // Then
+        await assertThrowsError(try await issuerInformation(), "IIN with length less than 6 symbols should be invalid")
+    }
+
+    func test_tokenizeRequest_whenNumberIsInvalid_throwsError() async {
+        // Given
+        let request = POCardTokenizationRequest(number: "", expMonth: 12, expYear: 40, cvc: "737")
+
+        // When
+        let card = {
+            try await self.sut.tokenize(request: request)
+        }
+
+        // Then
+        await assertThrowsError(try await card(), "Unexpected success, card number is invalid")
+    }
+
+    func test_updateCard() async throws {
+        // Given
+        let card = try await sut.tokenize(
+            request: .init(number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737")
+        )
+        let cardUpdateRequest = POCardUpdateRequest(cardId: card.id, cvc: "123")
+
+        // When
+        _ = try await sut.updateCard(request: cardUpdateRequest)
+    }
+
+    // MARK: - Private Properties
 
     private var sut: POCardsService!
 }

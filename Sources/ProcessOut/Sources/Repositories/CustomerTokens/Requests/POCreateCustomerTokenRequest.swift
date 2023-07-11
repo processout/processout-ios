@@ -8,12 +8,17 @@
 import Foundation
 
 @_spi(PO)
-public struct POCreateCustomerTokenRequest {
+public struct POCreateCustomerTokenRequest: Encodable {
 
     /// Customer id to associate created token with.
-    public let customerId: String
+    @POImmutableExcludedCodable
+    public var customerId: String
 
-    public init(customerId: String) {
-        self.customerId = customerId
+    /// Flag if you wish to verify the customer token by making zero value transaction. Applicable for cards only.
+    public let verify: Bool
+
+    public init(customerId: String, verify: Bool = false) {
+        self._customerId = .init(value: customerId)
+        self.verify = verify
     }
 }

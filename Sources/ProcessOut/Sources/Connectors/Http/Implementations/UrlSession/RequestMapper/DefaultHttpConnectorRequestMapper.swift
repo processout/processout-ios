@@ -81,7 +81,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
             if let privateKey = configuration.privateKey {
                 value += privateKey
             } else {
-                preconditionFailure("Private key is required by '\(request.id)' request but not set")
+                preconditionFailure("Private key is required by '\(request)' request but not set")
             }
         }
         return "Basic " + Data(value.utf8).base64EncodedString()

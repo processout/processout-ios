@@ -1,5 +1,0 @@
-{
-    "success": false,
-    "error_type": "card.invalid-number",
-    "message": "Your card’s number is too short."
-}

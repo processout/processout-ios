@@ -32,13 +32,11 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Private Methods
 
     private func configureProcessOut() {
-        let configuration = ProcessOutConfiguration.test(
-            projectId: Constants.projectId,
-            privateKey: Constants.projectPrivateKey,
-            // swiftlint:disable force_unwrapping
-            apiBaseUrl: URL(string: Constants.apiBaseUrl)!,
-            checkoutBaseUrl: URL(string: Constants.checkoutBaseUrl)!
-            // swiftlint:enable force_unwrapping
+        // Please note that implementation is using factory method (part of private interface) that creates
+        // configuration with private key. It is only done for demonstration/testing purposes to avoid setting
+        // up test server and shouldn't be shipped with production code.
+        let configuration = ProcessOutConfiguration.production(
+            projectId: Constants.projectId, privateKey: Constants.projectPrivateKey
         )
         ProcessOut.configure(configuration: configuration)
     }

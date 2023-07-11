@@ -34,40 +34,22 @@ public struct ProcessOutConfiguration {
     public let privateKey: String?
 
     /// Api base URL.
-    let apiBaseUrl: URL
+    let apiBaseUrl = URL(string: "https://api.processout.com")! // swiftlint:disable:this force_unwrapping
 
     /// Checkout base URL.
-    let checkoutBaseUrl: URL
+    let checkoutBaseUrl = URL(string: "https://checkout.processout.com")! // swiftlint:disable:this force_unwrapping
 }
 
 extension ProcessOutConfiguration {
 
     /// Creates production configuration.
     public static func production(projectId: String, appVersion: String? = nil, isDebug: Bool = false) -> Self {
-        // swiftlint:disable force_unwrapping
-        let apiBaseUrl = URL(string: "https://api.processout.com")!
-        let checkoutBaseUrl = URL(string: "https://checkout.processout.com")!
-        // swiftlint:enable force_unwrapping
-        return ProcessOutConfiguration(
-            projectId: projectId,
-            appVersion: appVersion,
-            isDebug: isDebug,
-            privateKey: nil,
-            apiBaseUrl: apiBaseUrl,
-            checkoutBaseUrl: checkoutBaseUrl
-        )
+        ProcessOutConfiguration(projectId: projectId, appVersion: appVersion, isDebug: isDebug, privateKey: nil)
     }
 
-    /// Creates test configuration.
+    /// Creates debug production configuration with optional private key.
     @_spi(PO)
-    public static func test(projectId: String, privateKey: String?, apiBaseUrl: URL, checkoutBaseUrl: URL) -> Self {
-        ProcessOutConfiguration(
-            projectId: projectId,
-            appVersion: nil,
-            isDebug: true,
-            privateKey: privateKey,
-            apiBaseUrl: apiBaseUrl,
-            checkoutBaseUrl: checkoutBaseUrl
-        )
+    public static func production(projectId: String, privateKey: String? = nil) -> Self {
+        ProcessOutConfiguration(projectId: projectId, appVersion: nil, isDebug: true, privateKey: privateKey)
     }
 }
