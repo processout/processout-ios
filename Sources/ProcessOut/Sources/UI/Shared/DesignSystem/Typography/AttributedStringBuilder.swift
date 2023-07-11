@@ -48,7 +48,7 @@ struct AttributedStringBuilder {
         switch text {
         case .markdown(let markdown):
             let visitor = AttributedStringMarkdownVisitor(builder: self)
-            let document = MarkdownParser().parse(string: markdown)
+            let document = MarkdownParser.parse(string: markdown)
             return document.accept(visitor: visitor)
         case .plain(let string):
             return NSAttributedString(string: string, attributes: buildAttributes())
