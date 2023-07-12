@@ -6,7 +6,7 @@ Project demonstrates multiple flows that ProcessOut framework is capable of.
 
 - A recent version of macOS (tested with 13.3.1)
 - A recent version of Xcode (tested with 14.3.1)
-- [Homebrew](https://https://brew.sh/) package manager
+- [Homebrew](https://brew.sh) package manager
 
 ### Installation
 
