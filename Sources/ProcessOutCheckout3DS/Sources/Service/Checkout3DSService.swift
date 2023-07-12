@@ -35,11 +35,13 @@ final class Checkout3DSService: PO3DSService {
         configuration: PO3DS2Configuration,
         completion: @escaping (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
     ) {
+        delegate.willCreateAuthenticationRequest(configuration: configuration)
         switch state {
         case .idle, .fingerprinted:
             clean()
         default:
             let failure = POFailure(code: .generic(.mobile))
+            delegate.didCreateAuthenticationRequest(result: .failure(failure))
             completion(.failure(failure))
             return
         }
@@ -65,43 +67,44 @@ final class Checkout3DSService: PO3DSService {
                                 case .failure:
                                     self.setIdleStateUnchecked()
                                 }
-                                completion(mappedResult)
                                 self.delegate.didCreateAuthenticationRequest(result: mappedResult)
+                                completion(mappedResult)
                             }
                         } else {
                             self.setIdleStateUnchecked()
                             let failure = POFailure(code: .cancelled)
-                            completion(.failure(failure))
                             self.delegate.didCreateAuthenticationRequest(result: .failure(failure))
+                            completion(.failure(failure))
                         }
                     }
                 }
             }
         } catch let error as AuthenticationError {
             let failure = errorMapper.convert(error: error)
-            completion(.failure(failure))
             delegate.didCreateAuthenticationRequest(result: .failure(failure))
+            completion(.failure(failure))
         } catch {
             let failure = POFailure(code: .generic(.mobile), underlyingError: error)
-            completion(.failure(failure))
             delegate.didCreateAuthenticationRequest(result: .failure(failure))
+            completion(.failure(failure))
         }
     }
 
     func handle(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
+        delegate.willHandle(challenge: challenge)
         guard case let .fingerprinted(context) = state else {
             let failure = POFailure(code: .generic(.mobile))
+            delegate.didHandle3DS2Challenge(result: .failure(failure))
             completion(.failure(failure))
             return
         }
-        delegate.willHandle(challenge: challenge)
         state = .challenging(context)
         let parameters = convertToChallengeParameters(data: challenge)
         context.transaction.doChallenge(challengeParameters: parameters) { [unowned self, errorMapper] result in
             self.setIdleStateUnchecked()
             let mappedResult = result.map(extractStatus(challengeResult:)).mapError(errorMapper.convert)
-            completion(mappedResult)
             delegate.didHandle3DS2Challenge(result: mappedResult)
+            completion(mappedResult)
         }
     }
 
