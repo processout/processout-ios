@@ -16,10 +16,13 @@ final class GroupCancellable: POCancellable {
     }
 
     func add(_ cancellable: POCancellable) {
+        lock.lock()
         if isCancelled {
+            lock.unlock()
             cancellable.cancel()
         } else {
-            lock.withLock { cancellables.append(cancellable) }
+            cancellables.append(cancellable)
+            lock.unlock()
         }
     }
 

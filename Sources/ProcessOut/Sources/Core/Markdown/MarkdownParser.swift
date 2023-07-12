@@ -8,9 +8,9 @@
 import Foundation
 @_implementationOnly import cmark
 
-final class MarkdownParser {
+enum MarkdownParser {
 
-    func parse(string: String) -> MarkdownDocument {
+    static func parse(string: String) -> MarkdownDocument {
         let document = string.withCString { pointer in
             cmark_parse_document(pointer, strlen(pointer), CMARK_OPT_SMART)
         }
