@@ -13,7 +13,7 @@ final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
 
     /// - NOTE: Method is asynchronous.
     func prewarm() {
-        prewarm(sync: false)
+        loadMetadata(sync: false)
     }
 
     // MARK: - PhoneNumberMetadataProvider
@@ -23,7 +23,7 @@ final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
         if let metadata = metadata {
             return metadata[transformedCountryCode]
         }
-        prewarm(sync: true)
+        loadMetadata(sync: true)
         return metadata?[transformedCountryCode]
     }
 
@@ -40,7 +40,7 @@ final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
         dispatchQueue = DispatchQueue(label: "process-out.phone-number-metadata-provider", qos: .userInitiated)
     }
 
-    private func prewarm(sync: Bool) {
+    private func loadMetadata(sync: Bool) {
         let dispatchWorkItem = DispatchWorkItem { [weak self] in
             guard let self, self.metadata == nil else {
                 return
