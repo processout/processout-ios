@@ -9,6 +9,12 @@ import UIKit
 
 protocol NativeAlternativePaymentMethodCell: UICollectionViewCell {
 
+    /// Tells the cell that it is about to be displayed.
+    func willDisplay()
+
+    /// Tells the cell that it was removed from the collection view.
+    func didEndDisplaying()
+
     /// Should return input responder if any.
     var inputResponder: UIResponder? { get }
 

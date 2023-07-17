@@ -104,6 +104,18 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         }
     }
 
+    func collectionView(_: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        let cell = cell as? NativeAlternativePaymentMethodCell
+        cell?.willDisplay()
+    }
+
+    func collectionView(
+        _: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath
+    ) {
+        let cell = cell as? NativeAlternativePaymentMethodCell
+        cell?.didEndDisplaying()
+    }
+
     // MARK: - UICollectionViewDelegateFlowLayout
 
     func collectionView(
