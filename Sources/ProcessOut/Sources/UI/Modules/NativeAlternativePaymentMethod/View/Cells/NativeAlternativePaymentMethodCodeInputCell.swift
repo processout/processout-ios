@@ -24,11 +24,30 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
         codeTextField.keyboardType = .numberPad
         codeTextField.textContentType = .oneTimeCode
         codeTextFieldCenterXConstraint.isActive = item.isCentered
-        observeChanges(item: item, style: style)
         self.item = item
+        self.style = style
     }
 
     // MARK: - NativeAlternativePaymentMethodCell
+
+    func willDisplay() {
+        guard let item, let style else {
+            return
+        }
+        let isInvalidObserver = item.value.$isInvalid.addObserver { [weak self] isInvalid in
+            self?.codeTextField.configure(isInvalid: isInvalid, style: style, animated: true)
+        }
+        let valueObserver = item.value.$text.addObserver { [weak self] updatedValue in
+            if self?.codeTextField.text != updatedValue {
+                self?.codeTextField.text = item.value.text
+            }
+        }
+        self.observations = [isInvalidObserver, valueObserver]
+    }
+
+    func didEndDisplaying() {
+        observations = []
+    }
 
     var inputResponder: UIResponder? {
         codeTextField
@@ -50,6 +69,7 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
     // swiftlint:enable implicitly_unwrapped_optional
 
     private var item: NativeAlternativePaymentMethodViewModelState.CodeInputItem?
+    private var style: POInputStyle?
     private var observations: [AnyObject] = []
 
     // MARK: - Private Methods
@@ -78,18 +98,6 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
     @objc
     private func textFieldEditingChanged() {
         item?.value.text = codeTextField.text ?? ""
-    }
-
-    private func observeChanges(item: NativeAlternativePaymentMethodViewModelState.CodeInputItem, style: POInputStyle) {
-        let isInvalidObserver = item.value.$isInvalid.addObserver { [weak self] isInvalid in
-            self?.codeTextField.configure(isInvalid: isInvalid, style: style, animated: true)
-        }
-        let valueObserver = item.value.$text.addObserver { [weak self] updatedValue in
-            if self?.codeTextField.text != updatedValue {
-                self?.codeTextField.text = item.value.text
-            }
-        }
-        self.observations = [isInvalidObserver, valueObserver]
     }
 }
 

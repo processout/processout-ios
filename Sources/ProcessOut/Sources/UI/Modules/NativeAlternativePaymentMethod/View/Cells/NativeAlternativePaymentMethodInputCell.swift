@@ -36,11 +36,30 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
         textField.returnKeyType = item.isLast ? .done : .next
         textField.keyboardType = keyboardType(parameterType: item.type)
         textField.textContentType = textContentType(parameterType: item.type)
-        observeChanges(item: item, style: style)
         self.item = item
+        self.style = style
     }
 
     // MARK: - NativeAlternativePaymentMethodCell
+
+    func willDisplay() {
+        guard let item, let style else {
+            return
+        }
+        let isInvalidObserver = item.value.$isInvalid.addObserver { [weak self] isInvalid in
+            self?.textFieldContainer.configure(isInvalid: isInvalid, style: style, animated: true)
+        }
+        let valueObserver = item.value.$text.addObserver { [weak self] updatedValue in
+            if self?.textFieldContainer.textField.text != updatedValue {
+                self?.textFieldContainer.textField.text = updatedValue
+            }
+        }
+        self.observations = [isInvalidObserver, valueObserver]
+    }
+
+    func didEndDisplaying() {
+        observations = []
+    }
 
     var inputResponder: UIResponder? {
         textFieldContainer.textField
@@ -65,6 +84,7 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
     }()
 
     private var item: NativeAlternativePaymentMethodViewModelState.InputItem?
+    private var style: POInputStyle?
     private var observations: [AnyObject]
 
     // MARK: - Private Methods
@@ -100,18 +120,6 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
     @objc
     private func textFieldEditingChanged() {
         item?.value.text = textFieldContainer.textField.text ?? ""
-    }
-
-    private func observeChanges(item: NativeAlternativePaymentMethodViewModelState.InputItem, style: POInputStyle) {
-        let isInvalidObserver = item.value.$isInvalid.addObserver { [weak self] isInvalid in
-            self?.textFieldContainer.configure(isInvalid: isInvalid, style: style, animated: true)
-        }
-        let valueObserver = item.value.$text.addObserver { [weak self] updatedValue in
-            if self?.textFieldContainer.textField.text != updatedValue {
-                self?.textFieldContainer.textField.text = updatedValue
-            }
-        }
-        self.observations = [isInvalidObserver, valueObserver]
     }
 }
 
