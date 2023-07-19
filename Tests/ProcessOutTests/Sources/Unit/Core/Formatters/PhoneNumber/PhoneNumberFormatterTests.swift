@@ -17,7 +17,7 @@ final class PhoneNumberFormatterTests: XCTestCase {
         sut = PhoneNumberFormatter(metadataProvider: metadataProvider)
     }
 
-    func test_normalized_ratainsDigitsAndPlus() {
+    func test_normalized_retainsDigitsAndPlus() {
         // When
         let normalizedNumber = sut.normalized(number: "+1#")
 
