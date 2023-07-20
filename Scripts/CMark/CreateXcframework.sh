@@ -9,11 +9,14 @@ WORK_DIR=$(mktemp -d)
 # Script expects revision as a first and only argument
 test $# -eq 1
 
+# Exports version as environment variable
+export CURRENT_VERSION=$1
+
 # Go to temporary directory
 cd $WORK_DIR
 
 # Clone library
-git clone --depth 1 --branch $1 https://github.com/commonmark/cmark .
+git clone --depth 1 --branch $CURRENT_VERSION https://github.com/commonmark/cmark .
 
 # Create temporary Xcode project
 mkdir build && cd build && cmake -G Xcode .. && cd ../
@@ -46,7 +49,7 @@ xcodebuild -create-xcframework \
     -output "$OUTPUT_DIR/cmark.xcframework"
 
 # Write metadata
-echo $1 > "$OUTPUT_DIR/cmark.xcframework.version"
+echo $CURRENT_VERSION > "$OUTPUT_DIR/cmark.xcframework.version"
 
 function cleanup {
   rm -rf $WORK_DIR
