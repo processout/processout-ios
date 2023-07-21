@@ -22,3 +22,9 @@
 "test-3-d-s.challenge.title" = "Do you want to accept the 3DS2 challenge?";
 "test-3-d-s.challenge.accept" = "Accept";
 "test-3-d-s.challenge.reject" = "Reject";
+
+"card-tokenization.title" = "Add New Card";
+"card-tokenization.card-details.title" = "Card Information";
+"card-tokenization.card-details.number.placeholder" = "4242 4242 4242 4242";
+"card-tokenization.card-details.expiration.placeholder" = "MM / YY";
+"card-tokenization.card-details.cvc.placeholder" = "CVC";
