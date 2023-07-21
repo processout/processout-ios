@@ -9,7 +9,7 @@ import Foundation
 
 final class CardExpirationFormatter: Formatter {
 
-    init(metadataProvider: PhoneNumberMetadataProvider = DefaultPhoneNumberMetadataProvider.shared) {
+    override init() {
         regexProvider = RegexProvider.shared
         super.init()
     }
