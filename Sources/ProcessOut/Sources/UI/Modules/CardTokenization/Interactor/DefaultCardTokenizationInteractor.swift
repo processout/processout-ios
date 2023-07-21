@@ -30,7 +30,7 @@ final class DefaultCardTokenizationInteractor:
             return
         }
         let startedState = State.Started(
-            number: nil, expMonth: nil, expYear: nil, cvc: nil, cardholderName: nil, recentErrorMessage: nil
+            number: nil, expiration: nil, cvc: nil, cardholderName: nil, recentErrorMessage: nil
         )
         state = .started(startedState)
     }
@@ -47,20 +47,18 @@ final class DefaultCardTokenizationInteractor:
         guard case .started(let startedState) = state else {
             return
         }
-        let parameters = [
-            // swiftlint:disable:next line_length
-            startedState.number, startedState.expMonth, startedState.expYear, startedState.cvc, startedState.cardholderName
-        ]
+        let parameters = [startedState.number, startedState.expiration, startedState.cvc, startedState.cardholderName]
         guard parameters.allSatisfy({ $0?.isValid != false }) else {
             logger.debug("Ignoring attempt to tokenize invalid parameters.")
             return
         }
         state = .tokenizing(snapshot: startedState)
         // todo(andrii-vysotskyi): pass contact and metadata information
+        // todo(andrii-vysotskyi): properly parse expiration
         let request = POCardTokenizationRequest(
             number: startedState.number?.value ?? "",
-            expMonth: startedState.expMonth.flatMap { Int($0.value) } ?? 0,
-            expYear: startedState.expYear.flatMap { Int($0.value) } ?? 0,
+            expMonth: 0,
+            expYear: 0,
             cvc: startedState.cvc?.value,
             name: startedState.cardholderName?.value,
             contact: nil,
@@ -90,7 +88,6 @@ final class DefaultCardTokenizationInteractor:
 
     // MARK: - State Management
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func restoreStartedStateAfterTokenizationFailure(_ failure: POFailure) {
         guard case .tokenizing(var startedState) = state, case .generic(let genericFailureCode) = failure.code else {
             setFailureStateUnchecked(failure: failure)
@@ -99,17 +96,13 @@ final class DefaultCardTokenizationInteractor:
         var invalidParameters: [WritableKeyPath<State.Started, State.Parameter?>] = []
         switch genericFailureCode {
         case .requestInvalidCard, .cardInvalid:
-            invalidParameters.append(contentsOf: [\.number, \.expMonth, \.expYear, \.cvc, \.cardholderName])
+            invalidParameters.append(contentsOf: [\.number, \.expiration, \.cvc, \.cardholderName])
         case .cardInvalidNumber, .cardMissingNumber:
             invalidParameters.append(\.number)
-        case .cardInvalidExpiryDate, .cardMissingExpiry:
-            invalidParameters.append(contentsOf: [\.expMonth, \.expYear])
-        case .cardInvalidExpiryMonth:
-            invalidParameters.append(\.expMonth)
-        case .cardInvalidExpiryYear:
-            invalidParameters.append(\.expYear)
+        case .cardInvalidExpiryDate, .cardMissingExpiry, .cardInvalidExpiryMonth, .cardInvalidExpiryYear:
+            invalidParameters.append(\.expiration)
         case .cardBadTrackData:
-            invalidParameters.append(contentsOf: [\.expMonth, \.expYear, \.cvc])
+            invalidParameters.append(contentsOf: [\.expiration, \.cvc])
         case .cardMissingCvc, .cardFailedCvc, .cardFailedCvcAndAvs:
             invalidParameters.append(\.cvc)
         case .cardInvalidName:

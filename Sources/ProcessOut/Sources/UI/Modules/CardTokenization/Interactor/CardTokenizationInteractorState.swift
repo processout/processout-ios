@@ -21,11 +21,8 @@ enum CardTokenizationInteractorState {
         /// Number of the card.
         var number: Parameter?
 
-        /// Expiry month of the card.
-        var expMonth: Parameter?
-
-        /// Expiry year of the card.
-        var expYear: Parameter?
+        /// Expiry date of the card.
+        var expiration: Parameter?
 
         /// Card Verification Code of the card.
         var cvc: Parameter?
