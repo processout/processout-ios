@@ -26,7 +26,6 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
     override func viewDidLoad() {
         configureCollectionView()
         super.viewDidLoad()
-        observeKeyboardChanges()
     }
 
     override func loadView() {
@@ -76,6 +75,16 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         case .started(let startedState):
             configure(with: startedState)
         }
+    }
+
+    override func keyboardWillChange(newHeight: CGFloat) {
+        super.keyboardWillChange(newHeight: newHeight)
+        collectionView.performBatchUpdates {
+            self.keyboardHeight = newHeight
+            self.configureCollectionViewBottomInset(state: self.viewModel.state)
+        }
+        buttonsContainerView.additionalBottomSafeAreaInset = newHeight
+        collectionOverlayView.layoutIfNeeded()
     }
 
     // MARK: - NativeAlternativePaymentMethodCollectionLayoutDelegate
@@ -296,7 +305,6 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         return dataSource
     }()
 
-    private var keyboardChangesObserver: NSObjectProtocol?
     private var keyboardHeight: CGFloat
 
     // MARK: - State Management
@@ -467,53 +475,6 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         default:
             return nil
         }
-    }
-
-    // MARK: - Keyboard Handling
-
-    private func observeKeyboardChanges() {
-        keyboardChangesObserver = NotificationCenter.default.addObserver(
-            forName: UIResponder.keyboardWillChangeFrameNotification,
-            object: nil,
-            queue: nil,
-            using: { [weak self] notification in
-                self?.keyboardWillChangeFrame(notification: notification)
-            }
-        )
-    }
-
-    private func keyboardWillChangeFrame(notification: Notification) {
-        guard let notification = KeyboardNotification(notification: notification) else {
-            return
-        }
-        // Keyboard updates are not always animated so defaults are provided for smoother UI.
-        let animator = UIViewPropertyAnimator(
-            duration: notification.animationDuration ?? Constants.animationDuration,
-            curve: notification.animationCurve ?? .easeInOut,
-            animations: { [self] in
-                let coveredSafeAreaHeight = view.bounds.height
-                    - view.convert(notification.frameEnd, from: nil).minY
-                    - view.safeAreaInsets.bottom
-                let keyboardHeight = max(coveredSafeAreaHeight, 0)
-                guard self.keyboardHeight != keyboardHeight else {
-                    return
-                }
-                collectionView.performBatchUpdates {
-                    self.keyboardHeight = keyboardHeight
-                    self.configureCollectionViewBottomInset(state: self.viewModel.state)
-                }
-                buttonsContainerView.additionalBottomSafeAreaInset = keyboardHeight
-                collectionOverlayView.layoutIfNeeded()
-            }
-        )
-        // An implementation of `UICollectionView.performBatchUpdates` resigns first responder if item associated
-        // with a cell containing it is invalidated, for example moved, deleted or reloaded. And since keyboard
-        // notification is sent as part of resign operation, we shouldn't call `performBatchUpdates` directly here
-        // to avoid recursion which causes weird artifacts and inconsistency. To break it, keyboard animation info
-        // is extracted from notification and update is scheduled for next run loop iteration. Collection layout
-        // update is needed here in a first place because layout depends on inset, which transitively depends on
-        // keyboard visibility.
-        RunLoop.current.perform(animator.startAnimation)
     }
 
     /// Adjusts bottom inset based on current state actions and keyboard height.
