@@ -18,11 +18,13 @@ internal enum Strings {
       /// Card Information
       internal static var title: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.title") }
       internal enum Cvc {
+        /// Cardholder Name
+        internal static var cardholder: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.cvc.cardholder") }
         /// CVC
         internal static var placeholder: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.cvc.placeholder") }
       }
       internal enum Expiration {
-        /// MM / YY
+        /// MM / YY
         internal static var placeholder: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.expiration.placeholder") }
       }
       internal enum Number {

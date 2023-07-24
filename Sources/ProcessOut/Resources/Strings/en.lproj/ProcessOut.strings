@@ -26,5 +26,6 @@
 "card-tokenization.title" = "Add New Card";
 "card-tokenization.card-details.title" = "Card Information";
 "card-tokenization.card-details.number.placeholder" = "4242 4242 4242 4242";
-"card-tokenization.card-details.expiration.placeholder" = "MM / YY";
+"card-tokenization.card-details.expiration.placeholder" = "MM / YY";
 "card-tokenization.card-details.cvc.placeholder" = "CVC";
+"card-tokenization.card-details.cvc.cardholder" = "Cardholder Name";
