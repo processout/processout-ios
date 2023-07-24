@@ -10,7 +10,7 @@ import Foundation
 final class PaymentCardNumberFormatter: Formatter {
 
     func string(from partialNumber: String) -> String {
-        let normalizedNumber = normalized(number: partialNumber)
+        let normalizedNumber = normalized(number: partialNumber).prefix(Constants.maxLength)
         for format in formats {
             if let formattedNumber = attemptToFormat(cardNumber: normalizedNumber, format: format) {
                 return formattedNumber
@@ -82,7 +82,7 @@ final class PaymentCardNumberFormatter: Formatter {
 
     // MARK: - Private Methods
 
-    private func attemptToFormat(cardNumber: String, format: PaymentCardNumberFormat) -> String? {
+    private func attemptToFormat(cardNumber: any StringProtocol, format: PaymentCardNumberFormat) -> String? {
         for acceptableLeading in format.leading {
             // Range's upper and lower bounds are expected to be of the same length.
             let leadingDescription = cardNumber.prefix(acceptableLeading.upperBound.description.count)
@@ -98,7 +98,7 @@ final class PaymentCardNumberFormatter: Formatter {
         return nil
     }
 
-    private func attemptToFormat(cardNumber: String, pattern: String) -> String? {
+    private func attemptToFormat(cardNumber: any StringProtocol, pattern: String) -> String? {
         var formattedNumber = ""
         var cardNumberIndex = cardNumber.startIndex
         for character in pattern where cardNumberIndex < cardNumber.endIndex {
