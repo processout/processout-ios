@@ -20,7 +20,15 @@ final class CardExpirationFormatterTests: XCTestCase {
         let formattedNumber = sut.string(from: "1230")
 
         // Then
-        XCTAssertEqual(formattedNumber, "12 / 30")
+        XCTAssertEqual(formattedNumber, "12 / 30")
+    }
+
+    func test_string_whenValidMonthIsPrefixedWithZeros_keepsZingleZero() {
+        // When
+        let formattedNumber = sut.string(from: "001")
+
+        // Then
+        XCTAssertEqual(formattedNumber, "01 / ")
     }
 
     // MARK: - Private Properties

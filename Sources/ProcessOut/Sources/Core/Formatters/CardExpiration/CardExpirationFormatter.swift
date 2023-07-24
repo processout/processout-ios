@@ -47,12 +47,34 @@ final class CardExpirationFormatter: Formatter {
         return string(from: phoneNumber)
     }
 
+    override func isPartialStringValid(
+        _ partialStringPtr: AutoreleasingUnsafeMutablePointer<NSString>, // swiftlint:disable:this legacy_objc_type
+        proposedSelectedRange proposedSelRangePtr: NSRangePointer?,
+        originalString origString: String,
+        originalSelectedRange origSelRange: NSRange,
+        errorDescription error: AutoreleasingUnsafeMutablePointer<NSString?>? // swiftlint:disable:this legacy_objc_type
+    ) -> Bool {
+        let partialString = partialStringPtr.pointee as String
+        let formatted = string(from: partialString)
+        let adjustedOffset = FormattingUtils.adjustedCursorOffset(
+            in: formatted,
+            source: partialString,
+            // swiftlint:disable:next line_length
+            sourceCursorOffset: origSelRange.lowerBound + origSelRange.length + (partialString.count - origString.count),
+            significantCharacters: Constants.significantCharacters,
+            greedy: partialString.count >= origString.count
+        )
+        partialStringPtr.pointee = formatted as NSString // swiftlint:disable:this legacy_objc_type
+        proposedSelRangePtr?.pointee = NSRange(location: adjustedOffset, length: 0)
+        return true
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {
         static let significantCharacters = CharacterSet.decimalDigits
-        static let pattern = "^(0+[1-9]|1[0-2]{0,1}|[2-9])([0-9]{0,2})"
-        static let separator = " / "
+        static let pattern = "^(0+$|0+[1-9]|1[0-2]{0,1}|[2-9])([0-9]{0,2})"
+        static let separator = " / "
         static let monthLength = 2
     }
 
@@ -68,22 +90,31 @@ final class CardExpirationFormatter: Formatter {
 
     private func formatted(month: String, year: String) -> String {
         var expiration = ""
-        let paddedMonth = padded(month: month, force: !year.isEmpty)
-        expiration += paddedMonth
-        if paddedMonth.count == Constants.monthLength {
+        let formattedMonth = formatted(month: month, forcePadding: !year.isEmpty)
+        expiration += formattedMonth
+        if formattedMonth.count == Constants.monthLength {
             expiration.append(Constants.separator)
         }
         expiration += year
         return expiration.applyingTransform(.toLatin, reverse: false) ?? expiration
     }
 
-    private func padded(month: String, force: Bool) -> String {
-        guard month.count == 1, let monthValue = Int(month) else {
+    private func formatted(month: String, forcePadding: Bool) -> String {
+        if month.isEmpty {
+            return ""
+        }
+        guard let monthValue = Int(month) else {
+            assertionFailure("Month should be valid integer or empty.")
             return month
         }
-        guard force || (monthValue > 1 && monthValue < 10) else {
-            return month
+        guard monthValue != 0 else {
+            return "0"
         }
-        return String(repeating: "0", count: Constants.monthLength - month.count) + month
+        let isPadded = month.first == "0"
+        guard forcePadding || (monthValue > 1 && monthValue < 10) || isPadded else {
+            return monthValue.description
+        }
+        let paddingLength = max(Constants.monthLength - month.count, 0)
+        return String(repeating: "0", count: paddingLength) + month
     }
 }
