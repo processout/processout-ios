@@ -19,23 +19,23 @@ final class CardExpirationFormatter: Formatter {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func string(from expiration: String) -> String {
-        let normalizedExpiration = normalized(expiration: expiration)
-        guard !normalizedExpiration.isEmpty else {
+    /// Returns formatted version of given expiration string.
+    func string(from string: String) -> String {
+        let expiration = self.expiration(from: string)
+        guard !expiration.month.isEmpty || !expiration.year.isEmpty else {
             return ""
         }
-        guard let regex = regexProvider.regex(with: Constants.pattern) else {
-            assertionFailure("Unable to create regex to parse expiration date components.")
-            return expiration
-        }
-        let range = NSRange(normalizedExpiration.startIndex ..< normalizedExpiration.endIndex, in: normalizedExpiration)
-        guard let match = regex.firstMatch(in: normalizedExpiration, options: .anchored, range: range) else {
-            assertionFailure("Unexpected matching failure.")
-            return ""
-        }
-        let month = normalizedExpiration.substring(with: match.range(at: 1))
-        let year = normalizedExpiration.substring(with: match.range(at: 2))
-        return formatted(month: month, year: year)
+        return formatted(month: expiration.month, year: expiration.year)
+    }
+
+    func expirationMonth(from string: String) -> Int? {
+        let monthDescription = expiration(from: string).month
+        return Int(monthDescription)
+    }
+
+    func expirationYear(from string: String) -> Int? {
+        let yearDescription = expiration(from: string).year
+        return Int(yearDescription)
     }
 
     // MARK: - Formatter
@@ -70,6 +70,10 @@ final class CardExpirationFormatter: Formatter {
     }
 
     // MARK: - Private Nested Types
+
+    private struct Expiration {
+        let month, year: String
+    }
 
     private enum Constants {
         static let significantCharacters = CharacterSet.decimalDigits
@@ -116,5 +120,23 @@ final class CardExpirationFormatter: Formatter {
         }
         let paddingLength = max(Constants.monthLength - month.count, 0)
         return String(repeating: "0", count: paddingLength) + month
+    }
+
+    // MARK: -
+
+    private func expiration(from string: String) -> Expiration {
+        let normalizedString = normalized(expiration: string)
+        guard !normalizedString.isEmpty else {
+            return Expiration(month: "", year: "")
+        }
+        let range = NSRange(normalizedString.startIndex ..< normalizedString.endIndex, in: normalizedString)
+        guard let regex = regexProvider.regex(with: Constants.pattern),
+              let match = regex.firstMatch(in: normalizedString, options: .anchored, range: range) else {
+            assertionFailure("Unexpected matching failure.")
+            return Expiration(month: "", year: "")
+        }
+        let month = normalizedString.substring(with: match.range(at: 1))
+        let year = normalizedString.substring(with: match.range(at: 2))
+        return Expiration(month: month, year: year)
     }
 }
