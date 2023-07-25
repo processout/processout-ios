@@ -10,8 +10,6 @@ import UIKit
 
 struct CardTokenizationViewModelState {
 
-    // MARK: - Items
-
     struct InputValue: Hashable {
 
         /// Current parameter's value text.
@@ -41,17 +39,20 @@ struct CardTokenizationViewModelState {
         /// Value details.
         let value: InputValue
 
-        /// Boolean value indicating whether parameter is last in a chain.
-        let isLast: Bool
-
         /// Formatter to use to format value if any.
         let formatter: Formatter?
 
         /// Boolean value indicates whether input should be compact in UI.
         let isCompact: Bool
 
+        /// A boolean value that indicates whether content should be secured eg from copying.
+        let isSecure: Bool
+
         /// Keyboard type.
         let keyboard: UIKeyboardType
+
+        /// Text content type.
+        let contentType: UITextContentType?
     }
 
     struct ErrorItem: Hashable {
@@ -63,8 +64,6 @@ struct CardTokenizationViewModelState {
     enum Item: Hashable {
         case title(TitleItem), input(InputItem), error(ErrorItem)
     }
-
-    // MARK: - Sections
 
     struct SectionIdentifier: Hashable {
 
@@ -84,40 +83,16 @@ struct CardTokenizationViewModelState {
         let items: [Item]
     }
 
-    // MARK: - Actions
-
-    struct Action {
-
-        /// Action title.
-        let title: String
-
-        /// Boolean value indicating whether action is enabled.
-        let isEnabled: Bool
-
-        /// Boolean value indicating whether action associated with button is currently running.
-        let isExecuting: Bool
-
-        /// Action handler.
-        let handler: () -> Void
-    }
-
-    struct Actions {
-
-        /// Primary action.
-        let primary: Action?
-
-        /// Secondary action.
-        let secondary: Action?
-    }
-
-    // MARK: -
-
     /// Available items.
     let sections: [Section]
 
-    /// Available actions.
-    let actions: Actions
-
     /// Boolean value indicating whether editing is allowed.
     let isEditingAllowed: Bool
+}
+
+extension CardTokenizationViewModelState {
+
+    static var idle: Self {
+        Self(sections: [], isEditingAllowed: false)
+    }
 }

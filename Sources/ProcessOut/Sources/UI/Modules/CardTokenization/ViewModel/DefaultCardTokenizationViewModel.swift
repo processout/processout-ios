@@ -11,10 +11,10 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
 
     init(interactor: any CardTokenizationInteractor) {
         self.interactor = interactor
+        inputValuesCache = [:]
         inputValuesObservations = []
         super.init(state: .idle)
         observeInteractorStateChanges()
-        observeInputChanges()
     }
 
     override func start() {
@@ -30,6 +30,11 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     private typealias InteractorState = CardTokenizationInteractorState
     private typealias Text = Strings.CardTokenization
 
+    private enum SectionId {
+        static let title = "title"
+        static let cardInformation = "card-info"
+    }
+
     // MARK: - Private Properties
 
     private let interactor: any CardTokenizationInteractor
@@ -37,26 +42,10 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     private lazy var cardNumberFormatter = PaymentCardNumberFormatter()
     private lazy var cardExpirationFormatter = CardExpirationFormatter()
 
-    private lazy var cardNumber: State.InputValue = .empty
-    private lazy var cardExpiration: State.InputValue = .empty
-    private lazy var cardCvc: State.InputValue = .empty
-
+    private var inputValuesCache: [InteractorState.ParameterId: State.InputValue]
     private var inputValuesObservations: [AnyObject]
 
     // MARK: - Private Methods
-
-    private func observeInputChanges() {
-        let numberObserver = cardNumber.$text.addObserver { [weak self] value in
-            self?.interactor.update(parameterAt: \.number, value: value)
-        }
-        let expirationObserver = cardNumber.$text.addObserver { [weak self] value in
-            self?.interactor.update(parameterAt: \.expiration, value: value)
-        }
-        let cvcObserver = cardNumber.$text.addObserver { [weak self] value in
-            self?.interactor.update(parameterAt: \.cvc, value: value)
-        }
-        inputValuesObservations = [numberObserver, expirationObserver, cvcObserver]
-    }
 
     private func observeInteractorStateChanges() {
         interactor.didChange = { [weak self] in self?.configureWithInteractorState() }
@@ -67,96 +56,102 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         case .idle:
             state = .idle
         case .started(let startedState):
-            state = convertToState(startedState: startedState, isSubmitting: false)
+            state = convertToState(startedState: startedState, isEditingAllowed: true)
         case .failure:
-            break // Temporarly ignored
+            break
         case .tokenizing(let startedState):
-            state = convertToState(startedState: startedState, isSubmitting: true)
+            state = convertToState(startedState: startedState, isEditingAllowed: false)
         case .tokenized:
-            break // Temporarly ignored
+            break // todo(andrii-vysotskyi): support tokenized state
         }
     }
 
     // MARK: - Started State
 
-    private func convertToState(startedState: InteractorState.Started, isSubmitting: Bool) -> State {
-        updateInputValues(startedState: startedState, isSubmitting: isSubmitting)
+    private func convertToState(startedState: InteractorState.Started, isEditingAllowed: Bool) -> State {
         let titleItem = State.TitleItem(text: Text.title)
         var sections = [
-            State.Section(id: .init(id: "title", title: nil), items: [.title(titleItem)])
+            State.Section(id: .init(id: SectionId.title, title: nil), items: [.title(titleItem)])
         ]
-        var cardInformationItems = cardInformationInputItems(startedState: startedState)
+        var cardInformationItems = cardInformationInputItems(
+            startedState: startedState, isEditingAllowed: isEditingAllowed
+        )
         if let error = startedState.recentErrorMessage {
             let errorItem = State.ErrorItem(description: error)
             cardInformationItems.append(.error(errorItem))
         }
         let cardInformationSection = State.Section(
-            id: .init(id: "card-info", title: Text.CardDetails.title), items: cardInformationItems
+            id: .init(id: SectionId.cardInformation, title: Text.CardDetails.title), items: cardInformationItems
         )
         sections.append(cardInformationSection)
         // todo(andrii-vysotskyi): add proper actions
         let startedState = State(
-            sections: sections,
-            actions: .init(primary: nil, secondary: nil),
-            isEditingAllowed: !isSubmitting
+            sections: sections, isEditingAllowed: isEditingAllowed
         )
         return startedState
     }
 
-    private func cardInformationInputItems(startedState: InteractorState.Started) -> [State.Item] {
+    private func cardInformationInputItems(
+        startedState: InteractorState.Started, isEditingAllowed: Bool
+    ) -> [State.Item] {
         let number = State.InputItem(
             placeholder: Text.CardDetails.Number.placeholder,
-            value: cardNumber,
-            isLast: false,
+            value: inputValue(for: startedState.number, isEditingAllowed: isEditingAllowed),
             formatter: cardNumberFormatter,
             isCompact: false,
-            keyboard: .numberPad
+            isSecure: false,
+            keyboard: .asciiCapableNumberPad,
+            contentType: .creditCardNumber
         )
         let expiration = State.InputItem(
             placeholder: Text.CardDetails.Expiration.placeholder,
-            value: cardExpiration,
-            isLast: false,
+            value: inputValue(for: startedState.expiration, isEditingAllowed: isEditingAllowed),
             formatter: cardExpirationFormatter,
             isCompact: true,
-            keyboard: .numberPad
+            isSecure: false,
+            keyboard: .asciiCapableNumberPad,
+            contentType: nil
         )
         let cvc = State.InputItem(
             placeholder: Text.CardDetails.Cvc.placeholder,
-            value: cardCvc,
-            isLast: true,
+            value: inputValue(for: startedState.cvc, isEditingAllowed: isEditingAllowed),
             formatter: nil,
             isCompact: true,
-            keyboard: .numberPad
+            isSecure: true,
+            keyboard: .asciiCapableNumberPad,
+            contentType: nil
         )
-        return [.input(number), .input(expiration), .input(cvc)]
+        let cardholder = State.InputItem(
+            placeholder: Text.CardDetails.Cvc.cardholder,
+            value: inputValue(for: startedState.cardholderName, isEditingAllowed: isEditingAllowed),
+            formatter: nil,
+            isCompact: false,
+            isSecure: false,
+            keyboard: .asciiCapable,
+            contentType: .name
+        )
+        return [.input(number), .input(expiration), .input(cvc), .input(cardholder)]
     }
 
-    private func updateInputValues(startedState: InteractorState.Started, isSubmitting: Bool) {
-        // swiftlint:disable:next line_length
-        let update = { (value: inout State.InputValue, path: KeyPath<InteractorState.Started, InteractorState.Parameter?>) in
-            let parameter = startedState[keyPath: path]
-            value.text = parameter?.value ?? ""
-            value.isInvalid = !(parameter?.isValid ?? true)
-            value.isEditingAllowed = !isSubmitting
+    private func inputValue(for parameter: InteractorState.Parameter, isEditingAllowed: Bool) -> State.InputValue {
+        if let value = inputValuesCache[parameter.id] {
+            value.text = parameter.value
+            value.isInvalid = !parameter.isValid
+            value.isEditingAllowed = isEditingAllowed
+            return value
         }
-        update(&cardNumber, \.number)
-        update(&cardExpiration, \.expiration)
-        update(&cardCvc, \.cvc)
+        let value = State.InputValue(
+            text: .init(value: parameter.value),
+            isInvalid: .init(value: !parameter.isValid),
+            isEditingAllowed: .init(value: isEditingAllowed)
+        )
+        let observer = value.$text.addObserver { [weak self] value in
+            self?.interactor.update(parameterId: parameter.id, value: value)
+        }
+        inputValuesCache[parameter.id] = value
+        inputValuesObservations.append(observer)
+        return value
     }
 
-    // MARK: -
-}
-
-extension CardTokenizationViewModelState.InputValue {
-
-    static var empty: Self {
-        Self(text: .init(value: ""), isInvalid: .init(value: false), isEditingAllowed: .init(value: true))
-    }
-}
-
-extension CardTokenizationViewModelState {
-
-    static var idle: Self {
-        Self(sections: [], actions: .init(primary: nil, secondary: nil), isEditingAllowed: false)
-    }
+    // MARK: - Tokenized State
 }

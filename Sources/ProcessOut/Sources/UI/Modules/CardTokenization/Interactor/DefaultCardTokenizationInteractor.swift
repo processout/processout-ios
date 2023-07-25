@@ -65,6 +65,7 @@ final class DefaultCardTokenizationInteractor:
             case .failure(let failure):
                 self?.restoreStartedStateAfterTokenizationFailure(failure)
             }
+            // todo(andrii-vysotskyi): call completion
         }
     }
 
