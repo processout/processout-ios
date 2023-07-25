@@ -34,7 +34,7 @@ final class TextFieldContainerView: UIView {
     private(set) var isInvalid: Bool
 
     private(set) lazy var textField: UITextField = {
-        let textField = UITextField()
+        let textField = TextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.borderStyle = .none
         textField.adjustsFontForContentSizeCategory = false
@@ -113,5 +113,14 @@ final class TextFieldContainerView: UIView {
             backgroundColor = stateStyle.backgroundColor
             UIView.performWithoutAnimation(layoutIfNeeded)
         }
+    }
+}
+
+private final class TextField: UITextField {
+
+    override func clearButtonRect(forBounds bounds: CGRect) -> CGRect {
+        var rect = super.clearButtonRect(forBounds: bounds)
+        rect.origin.x = bounds.width - rect.width
+        return rect
     }
 }
