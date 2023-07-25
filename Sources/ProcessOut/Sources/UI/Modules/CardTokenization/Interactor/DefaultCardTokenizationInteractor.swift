@@ -8,9 +8,14 @@
 final class DefaultCardTokenizationInteractor:
     BaseInteractor<CardTokenizationInteractorState>, CardTokenizationInteractor {
 
-    init(cardsService: POCardsService, logger: POLogger) {
+    typealias Completion = (Result<POCard, POFailure>) -> Void
+
+    // MARK: -
+
+    init(cardsService: POCardsService, logger: POLogger, completion: @escaping Completion) {
         self.cardsService = cardsService
         self.logger = logger
+        self.completion = completion
         super.init(state: .idle)
     }
 
@@ -65,7 +70,6 @@ final class DefaultCardTokenizationInteractor:
             case .failure(let failure):
                 self?.restoreStartedStateAfterTokenizationFailure(failure)
             }
-            // todo(andrii-vysotskyi): call completion
         }
     }
 
@@ -81,6 +85,7 @@ final class DefaultCardTokenizationInteractor:
 
     private let cardsService: POCardsService
     private let logger: POLogger
+    private let completion: Completion
 
     private lazy var cardNumberFormatter = PaymentCardNumberFormatter()
     private lazy var cardExpirationFormatter = CardExpirationFormatter()
@@ -120,10 +125,12 @@ final class DefaultCardTokenizationInteractor:
     private func setTokenizedStateUnchecked(card: POCard, cardNumber: String) {
         let tokenizedState = State.Tokenized(card: card, cardNumber: cardNumber)
         state = .tokenized(tokenizedState)
+        completion(.success(card))
     }
 
     private func setFailureStateUnchecked(failure: POFailure) {
         state = .failure(failure)
+        completion(.failure(failure))
     }
 
     // MARK: - Utils
