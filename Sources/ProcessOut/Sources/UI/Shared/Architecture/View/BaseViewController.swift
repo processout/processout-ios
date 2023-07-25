@@ -23,9 +23,13 @@ class BaseViewController<Model>: UIViewController where Model: ViewModel {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        viewModel.didChange = { [weak self] in self?.viewModelDidChange() }
         viewModel.start()
         observeKeyboardChanges()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.didChange = { [weak self] in self?.viewModelDidChange() }
     }
 
     // MARK: -
