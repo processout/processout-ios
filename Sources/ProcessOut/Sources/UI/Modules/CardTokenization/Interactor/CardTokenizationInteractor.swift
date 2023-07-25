@@ -7,8 +7,8 @@
 
 protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState> {
 
-    /// Updates card information at given key path.
-    func update(parameterAt path: WritableKeyPath<State.Started, State.Parameter?>, value: String)
+    /// Updates card information parameter with given id.
+    func update(parameterId: State.ParameterId, value: String)
 
     /// Starts card tokenization.
     func tokenize()

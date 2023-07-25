@@ -8,17 +8,8 @@
 final class DefaultCardTokenizationInteractor:
     BaseInteractor<CardTokenizationInteractorState>, CardTokenizationInteractor {
 
-    init(
-        cardsService: POCardsService,
-        customerTokensService: POCustomerTokensService,
-        invoicesService: POInvoicesService,
-        threeDSService: PO3DSService,
-        logger: POLogger
-    ) {
+    init(cardsService: POCardsService, logger: POLogger) {
         self.cardsService = cardsService
-        self.customerTokensService = customerTokensService
-        self.invoicesService = invoicesService
-        self.threeDSService = threeDSService
         self.logger = logger
         super.init(state: .idle)
     }
@@ -30,16 +21,22 @@ final class DefaultCardTokenizationInteractor:
             return
         }
         let startedState = State.Started(
-            number: nil, expiration: nil, cvc: nil, cardholderName: nil, recentErrorMessage: nil
+            number: .init(id: \.number),
+            expiration: .init(id: \.expiration),
+            cvc: .init(id: \.cvc),
+            cardholderName: .init(id: \.cardholderName)
         )
         state = .started(startedState)
     }
 
-    func update(parameterAt path: WritableKeyPath<State.Started, State.Parameter?>, value: String) {
-        guard case .started(var startedState) = state else {
+    func update(parameterId: State.ParameterId, value: String) {
+        guard case .started(var startedState) = state, startedState[keyPath: parameterId].value != value else {
             return
         }
-        startedState[keyPath: path] = .init(value: value, isValid: nil)
+        startedState[keyPath: parameterId] = .init(id: parameterId, value: value, isValid: true)
+        if areParametersValid(startedState: startedState) {
+            startedState.recentErrorMessage = nil
+        }
         self.state = .started(startedState)
     }
 
@@ -47,27 +44,24 @@ final class DefaultCardTokenizationInteractor:
         guard case .started(let startedState) = state else {
             return
         }
-        let parameters = [startedState.number, startedState.expiration, startedState.cvc, startedState.cardholderName]
-        guard parameters.allSatisfy({ $0?.isValid != false }) else {
+        guard areParametersValid(startedState: startedState) else {
             logger.debug("Ignoring attempt to tokenize invalid parameters.")
             return
         }
         state = .tokenizing(snapshot: startedState)
-        // todo(andrii-vysotskyi): pass contact and metadata information
-        // todo(andrii-vysotskyi): properly parse expiration
         let request = POCardTokenizationRequest(
-            number: startedState.number?.value ?? "",
-            expMonth: 0,
-            expYear: 0,
-            cvc: startedState.cvc?.value,
-            name: startedState.cardholderName?.value,
-            contact: nil,
+            number: cardNumberFormatter.normalized(number: startedState.number.value),
+            expMonth: cardExpirationFormatter.expirationMonth(from: startedState.expiration.value) ?? 0,
+            expYear: cardExpirationFormatter.expirationYear(from: startedState.expiration.value) ?? 0,
+            cvc: startedState.cvc.value,
+            name: startedState.cardholderName.value,
+            contact: nil, // todo(andrii-vysotskyi): pass contact and metadata
             metadata: nil
         )
         cardsService.tokenize(request: request) { [weak self] result in
             switch result {
             case .success(let card):
-                self?.setTokenizedStateUnchecked(card: card, cardNumber: request.number)
+                self?.setTokenizedStateUnchecked(card: card, cardNumber: startedState.number.value)
             case .failure(let failure):
                 self?.restoreStartedStateAfterTokenizationFailure(failure)
             }
@@ -75,16 +69,20 @@ final class DefaultCardTokenizationInteractor:
     }
 
     func cancel() {
-        // ignored
+        guard case .started = state else {
+            return
+        }
+        let failure = POFailure(code: .cancelled)
+        setFailureStateUnchecked(failure: failure)
     }
 
     // MARK: - Private Properties
 
     private let cardsService: POCardsService
-    private let customerTokensService: POCustomerTokensService
-    private let invoicesService: POInvoicesService
-    private let threeDSService: PO3DSService
     private let logger: POLogger
+
+    private lazy var cardNumberFormatter = PaymentCardNumberFormatter()
+    private lazy var cardExpirationFormatter = CardExpirationFormatter()
 
     // MARK: - State Management
 
@@ -93,26 +91,26 @@ final class DefaultCardTokenizationInteractor:
             setFailureStateUnchecked(failure: failure)
             return
         }
-        var invalidParameters: [WritableKeyPath<State.Started, State.Parameter?>] = []
+        var invalidParameterIds: [State.ParameterId] = []
         switch genericFailureCode {
         case .requestInvalidCard, .cardInvalid:
-            invalidParameters.append(contentsOf: [\.number, \.expiration, \.cvc, \.cardholderName])
+            invalidParameterIds.append(contentsOf: [\.number, \.expiration, \.cvc, \.cardholderName])
         case .cardInvalidNumber, .cardMissingNumber:
-            invalidParameters.append(\.number)
+            invalidParameterIds.append(\.number)
         case .cardInvalidExpiryDate, .cardMissingExpiry, .cardInvalidExpiryMonth, .cardInvalidExpiryYear:
-            invalidParameters.append(\.expiration)
+            invalidParameterIds.append(\.expiration)
         case .cardBadTrackData:
-            invalidParameters.append(contentsOf: [\.expiration, \.cvc])
+            invalidParameterIds.append(contentsOf: [\.expiration, \.cvc])
         case .cardMissingCvc, .cardFailedCvc, .cardFailedCvcAndAvs:
-            invalidParameters.append(\.cvc)
+            invalidParameterIds.append(\.cvc)
         case .cardInvalidName:
-            invalidParameters.append(\.cardholderName)
+            invalidParameterIds.append(\.cardholderName)
         default:
             setFailureStateUnchecked(failure: failure)
             return
         }
-        for keyPath in invalidParameters {
-            startedState[keyPath: keyPath]?.isValid = false
+        for keyPath in invalidParameterIds {
+            startedState[keyPath: keyPath].isValid = false
         }
         startedState.recentErrorMessage = failure.message
         state = .started(startedState)
@@ -125,5 +123,12 @@ final class DefaultCardTokenizationInteractor:
 
     private func setFailureStateUnchecked(failure: POFailure) {
         state = .failure(failure)
+    }
+
+    // MARK: - Utils
+
+    private func areParametersValid(startedState: State.Started) -> Bool {
+        let parameters = [startedState.number, startedState.expiration, startedState.cvc, startedState.cardholderName]
+        return parameters.allSatisfy(\.isValid)
     }
 }
