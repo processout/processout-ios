@@ -68,8 +68,7 @@ final class TextFieldContainerView: UIView {
         addSubview(textField)
         let constraints = [
             heightAnchor.constraint(equalToConstant: Constants.height),
-            textField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.horizontalInset)
-                .with(priority: .defaultHigh),
+            textField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.horizontalInset),
             textField.centerXAnchor.constraint(equalTo: centerXAnchor),
             textField.centerYAnchor.constraint(equalTo: centerYAnchor)
         ]
