@@ -44,7 +44,8 @@ final class CollectionViewDiffableDataSource<SectionIdentifier: Hashable, ItemId
                 completion?()
             }
         }
-        if animatingDifferences {
+        // Animation flag is ignored if collection is not yet added to window.
+        if animatingDifferences, collectionView.window != nil {
             performUpdates()
         } else {
             UIView.performWithoutAnimation(performUpdates)
