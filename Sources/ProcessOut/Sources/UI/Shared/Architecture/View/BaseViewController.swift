@@ -16,6 +16,10 @@ class BaseViewController<Model>: UIViewController where Model: ViewModel {
         super.init(nibName: nil, bundle: nil)
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -24,12 +28,18 @@ class BaseViewController<Model>: UIViewController where Model: ViewModel {
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.start()
-        observeKeyboardChanges()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        observeKeyboardChanges()
         viewModel.didChange = { [weak self] in self?.viewModelDidChange() }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewModel.didChange = nil
+        removeKeyboardChangesObserver()
     }
 
     // MARK: -
@@ -47,9 +57,7 @@ class BaseViewController<Model>: UIViewController where Model: ViewModel {
     // MARK: - Private Properties
 
     private let logger: POLogger
-
     private var keyboardHeight: CGFloat
-    private var keyboardChangesObserver: NSObjectProtocol?
 
     // MARK: - Private Methods
 
@@ -68,17 +76,17 @@ class BaseViewController<Model>: UIViewController where Model: ViewModel {
     // MARK: - Keyboard Handling
 
     private func observeKeyboardChanges() {
-        keyboardChangesObserver = NotificationCenter.default.addObserver(
-            forName: UIResponder.keyboardWillChangeFrameNotification,
-            object: nil,
-            queue: nil,
-            using: { [weak self] notification in
-                self?.keyboardWillChangeFrame(notification: notification)
-            }
-        )
+        let notificationName = UIResponder.keyboardWillChangeFrameNotification
+        let selector = #selector(keyboardWillChangeFrame(notification:))
+        NotificationCenter.default.addObserver(self, selector: selector, name: notificationName, object: nil)
     }
 
-    private func keyboardWillChangeFrame(notification: Notification) {
+    private func removeKeyboardChangesObserver() {
+        let notificationName = UIResponder.keyboardWillChangeFrameNotification
+        NotificationCenter.default.removeObserver(self, name: notificationName, object: nil)
+    }
+
+    @objc private func keyboardWillChangeFrame(notification: Notification) {
         guard let notification = KeyboardNotification(notification: notification) else {
             return
         }
