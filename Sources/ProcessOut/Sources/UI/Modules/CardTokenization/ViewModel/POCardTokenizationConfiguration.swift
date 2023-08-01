@@ -9,6 +9,7 @@ import Foundation
 
 /// A configuration object that defines a card tokenization module behaves.
 /// Use `nil` as a value for a nullable property to indicate that default value should be used.
+@_spi(PO)
 public struct POCardTokenizationConfiguration {
 
     /// Custom title. Use empty string to hide title.
