@@ -23,6 +23,9 @@ public struct POCardTokenizationStyle {
     /// Error description text style.
     public let errorDescription: POTextStyle
 
+    /// Actions style.
+    public let actions: PONativeAlternativePaymentMethodActionsStyle
+
     /// Background color.
     public let backgroundColor: UIColor
 
@@ -34,6 +37,7 @@ public struct POCardTokenizationStyle {
         sectionTitle: POTextStyle? = nil,
         input: POInputStyle? = nil,
         errorDescription: POTextStyle? = nil,
+        actions: PONativeAlternativePaymentMethodActionsStyle? = nil,
         backgroundColor: UIColor? = nil,
         separatorColor: UIColor? = nil
     ) {
@@ -41,6 +45,7 @@ public struct POCardTokenizationStyle {
         self.sectionTitle = sectionTitle ?? Constants.sectionTitle
         self.input = input ?? Constants.input
         self.errorDescription = errorDescription ?? Constants.errorDescription
+        self.actions = actions ?? Constants.actions
         self.backgroundColor = backgroundColor ?? Constants.backgroundColor
         self.separatorColor = separatorColor ?? Constants.separatorColor
     }
@@ -52,6 +57,7 @@ public struct POCardTokenizationStyle {
         static let sectionTitle = POTextStyle(color: Asset.Colors.Text.secondary.color, typography: .Fixed.labelHeading)
         static let input = POInputStyle.default()
         static let errorDescription = POTextStyle(color: Asset.Colors.Text.error.color, typography: .Fixed.label)
+        static let actions = PONativeAlternativePaymentMethodActionsStyle()
         static let backgroundColor = Asset.Colors.Surface.level1.color
         static let separatorColor = Asset.Colors.Border.subtle.color
     }

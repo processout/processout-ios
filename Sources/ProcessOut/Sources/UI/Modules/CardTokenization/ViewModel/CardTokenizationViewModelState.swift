@@ -83,8 +83,14 @@ struct CardTokenizationViewModelState {
         let items: [Item]
     }
 
+    typealias Action = NativeAlternativePaymentMethodViewModelState.Action
+    typealias Actions = NativeAlternativePaymentMethodViewModelState.Actions
+
     /// Available items.
     let sections: [Section]
+
+    /// Available actions.
+    let actions: Actions
 
     /// Boolean value indicating whether editing is allowed.
     let isEditingAllowed: Bool
@@ -93,6 +99,6 @@ struct CardTokenizationViewModelState {
 extension CardTokenizationViewModelState {
 
     static var idle: Self {
-        Self(sections: [], isEditingAllowed: false)
+        Self(sections: [], actions: .init(primary: nil, secondary: nil), isEditingAllowed: false)
     }
 }

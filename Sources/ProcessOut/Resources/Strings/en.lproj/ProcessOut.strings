@@ -29,3 +29,5 @@
 "card-tokenization.card-details.expiration.placeholder" = "MM / YY";
 "card-tokenization.card-details.cvc.placeholder" = "CVC";
 "card-tokenization.card-details.cvc.cardholder" = "Cardholder Name";
+"card-tokenization.submit-button.title" = "Submit";
+"card-tokenization.cancel-button.title" = "Cancel";

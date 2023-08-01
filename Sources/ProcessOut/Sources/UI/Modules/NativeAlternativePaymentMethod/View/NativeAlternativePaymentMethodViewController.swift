@@ -66,14 +66,14 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
 
     // MARK: - BaseViewController
 
-    override func configure(with state: ViewModel.State) {
-        super.configure(with: state)
+    override func configure(with state: ViewModel.State, animated: Bool) {
+        super.configure(with: state, animated: animated)
         configureCollectionViewBottomInset(state: state)
         switch state {
         case .idle:
             configureWithIdleState()
         case .started(let startedState):
-            configure(with: startedState)
+            configure(with: startedState, animated: animated)
         }
     }
 
@@ -320,7 +320,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
     ///   - reload: Allows to force reload even if new data source is not different from current. This is useful if data
     ///    didn't change but its known that content should change due to external conditions e.g. updated
     ///    traitCollection.
-    private func configure(with state: ViewModel.State.Started, reload: Bool = false, animated: Bool = true) {
+    private func configure(with state: ViewModel.State.Started, reload: Bool = false, animated: Bool) {
         var snapshot = DiffableDataSourceSnapshot<SectionIdentifier, ItemIdentifier>()
         snapshot.appendSections(state.sections.map(\.id))
         for section in state.sections {

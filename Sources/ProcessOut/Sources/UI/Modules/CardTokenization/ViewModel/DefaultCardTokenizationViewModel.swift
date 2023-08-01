@@ -84,9 +84,12 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             id: .init(id: SectionId.cardInformation, title: Text.CardDetails.title), items: cardInformationItems
         )
         sections.append(cardInformationSection)
-        // todo(andrii-vysotskyi): add proper actions
         let startedState = State(
-            sections: sections, isEditingAllowed: isEditingAllowed
+            sections: sections,
+            actions: .init(
+                primary: submitAction(startedState: startedState, isSubmitting: !isEditingAllowed), secondary: nil
+            ),
+            isEditingAllowed: isEditingAllowed
         )
         return startedState
     }
@@ -153,5 +156,17 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         return value
     }
 
-    // MARK: - Tokenized State
+    // MARK: - Actions
+
+    private func submitAction(startedState: InteractorState.Started, isSubmitting: Bool) -> State.Action {
+        let action = State.Action(
+            title: Strings.CardTokenization.SubmitButton.title,
+            isEnabled: startedState.recentErrorMessage == nil,
+            isExecuting: isSubmitting,
+            handler: { [weak self] in
+                self?.interactor.tokenize()
+            }
+        )
+        return action
+    }
 }

@@ -14,6 +14,10 @@ internal enum Strings {
   internal enum CardTokenization {
     /// Add New Card
     internal static var title: String { return Strings.tr("ProcessOut", "card-tokenization.title") }
+    internal enum CancelButton {
+      /// Cancel
+      internal static var title: String { return Strings.tr("ProcessOut", "card-tokenization.cancel-button.title") }
+    }
     internal enum CardDetails {
       /// Card Information
       internal static var title: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.title") }
@@ -31,6 +35,10 @@ internal enum Strings {
         /// 4242 4242 4242 4242
         internal static var placeholder: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.number.placeholder") }
       }
+    }
+    internal enum SubmitButton {
+      /// Submit
+      internal static var title: String { return Strings.tr("ProcessOut", "card-tokenization.submit-button.title") }
     }
   }
 

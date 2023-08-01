@@ -44,7 +44,7 @@ class BaseViewController<Model>: UIViewController where Model: ViewModel {
 
     // MARK: -
 
-    func configure(with state: Model.State) {
+    func configure(with state: Model.State, animated: Bool) {
         logger.debug("Will update view with new state: \(String(describing: state))")
     }
 
@@ -64,13 +64,12 @@ class BaseViewController<Model>: UIViewController where Model: ViewModel {
     private func viewModelDidChange() {
         // There may be UI glitches if view is updated when being tracked by user. So
         // as a workaround, configuration is postponed to a point when tracking ends.
-        if RunLoop.current.currentMode == .tracking {
-            RunLoop.current.perform {
-                self.configure(with: self.viewModel.state)
-            }
-        } else {
-            configure(with: viewModel.state)
+        guard RunLoop.current.currentMode != .tracking else {
+            RunLoop.current.perform(viewModelDidChange)
+            return
         }
+        // View is configured without animation if it is not yet part of the hierarchy to avoid visual issues.
+        configure(with: viewModel.state, animated: viewIfLoaded?.window != nil)
     }
 
     // MARK: - Keyboard Handling

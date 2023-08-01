@@ -18,6 +18,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         self.style = style
         self.logger = logger
         keyboardHeight = 0
+        didAppear = false
         super.init(viewModel: viewModel, logger: logger)
     }
 
@@ -28,11 +29,18 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         super.viewDidLoad()
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        didAppear = true
+        updateFirstResponder()
+    }
+
     override func loadView() {
         view = UIView()
         view.backgroundColor = style.backgroundColor
         view.addSubview(collectionView)
         view.addSubview(collectionOverlayView)
+        collectionOverlayView.addSubview(buttonsContainerView)
         let constraints = [
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -41,15 +49,17 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             collectionOverlayView.topAnchor.constraint(equalTo: view.topAnchor),
             collectionOverlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionOverlayView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            collectionOverlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            collectionOverlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            buttonsContainerView.leadingAnchor.constraint(equalTo: collectionOverlayView.leadingAnchor),
+            buttonsContainerView.centerXAnchor.constraint(equalTo: collectionOverlayView.centerXAnchor),
+            buttonsContainerView.bottomAnchor.constraint(equalTo: collectionOverlayView.bottomAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        // swiftlint:disable:next line_length
-        guard traitCollection.preferredContentSizeCategory != previousTraitCollection?.preferredContentSizeCategory else {
+    override func traitCollectionDidChange(_ previousTrait: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTrait)
+        guard traitCollection.preferredContentSizeCategory != previousTrait?.preferredContentSizeCategory else {
             return
         }
         configure(with: viewModel.state, reload: true, animated: false)
@@ -63,10 +73,10 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
 
     // MARK: - BaseViewController
 
-    override func configure(with state: ViewModel.State) {
-        super.configure(with: state)
+    override func configure(with state: ViewModel.State, animated: Bool) {
+        super.configure(with: state, animated: animated)
         configureCollectionViewBottomInset(state: state)
-        configure(with: state, animated: true)
+        configure(with: state, reload: false, animated: animated)
     }
 
     override func keyboardWillChange(newHeight: CGFloat) {
@@ -75,6 +85,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             self.keyboardHeight = newHeight
             self.configureCollectionViewBottomInset(state: self.viewModel.state)
         }
+        buttonsContainerView.additionalBottomSafeAreaInset = newHeight
         collectionOverlayView.layoutIfNeeded()
     }
 
@@ -227,6 +238,10 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         return view
     }()
 
+    private lazy var buttonsContainerView = NativeAlternativePaymentMethodButtonsView(
+        style: style.actions, horizontalInset: Constants.contentInset.left
+    )
+
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
         collectionView.delegate = self
@@ -260,6 +275,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
     }()
 
     private var keyboardHeight: CGFloat
+    private var didAppear: Bool
 
     // MARK: - State Management
 
@@ -267,7 +283,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
     ///   - reload: Allows to force reload even if new data source is not different from current. This is useful if data
     ///    didn't change but its known that content should change due to external conditions e.g. updated
     ///    traitCollection.
-    private func configure(with state: ViewModel.State, reload: Bool = false, animated: Bool) {
+    private func configure(with state: ViewModel.State, reload: Bool, animated: Bool) {
         var snapshot = DiffableDataSourceSnapshot<SectionIdentifier, ItemIdentifier>()
         snapshot.appendSections(state.sections.map(\.id))
         for section in state.sections {
@@ -280,6 +296,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             self?.updateFirstResponder()
         }
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
+            buttonsContainerView.configure(actions: state.actions, animated: animated)
             collectionOverlayView.layoutIfNeeded()
         }
     }
@@ -287,6 +304,12 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
     // MARK: - Current Responder Handling
 
     private func updateFirstResponder() {
+        // Becoming first responder may cause UI issues related to keyboard presentation if attempted
+        // before view appears on screen. For example, during a push to UINavigationController. So
+        // the operation is delayed until then.
+        guard didAppear else {
+            return
+        }
         if !viewModel.state.isEditingAllowed {
             logger.debug("Editing is not allowed in current state, will resign first responder")
             view.endEditing(true)
@@ -311,8 +334,11 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         var inputsIndexPaths: [IndexPath] = []
         for (section, sectionId) in snapshot.sectionIdentifiers.enumerated() {
             for (row, item) in snapshot.itemIdentifiers(inSection: sectionId).enumerated() {
+                guard case .input(let inputItem) = item else {
+                    continue
+                }
                 let indexPath = IndexPath(row: row, section: section)
-                if case .input(let inputItem) = item, inputItem.value.isInvalid {
+                if inputItem.value.isInvalid {
                     return indexPath
                 }
                 inputsIndexPaths.append(indexPath)
@@ -383,7 +409,9 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
     /// Adjusts bottom inset based on current state actions and keyboard height.
     private func configureCollectionViewBottomInset(state: ViewModel.State) {
         // todo(andrii-vysotskyi): consider observing overlay content height instead for better flexibility in future
-        let bottomInset = Constants.contentInset.bottom + keyboardHeight
+        let bottomInset = Constants.contentInset.bottom
+            + keyboardHeight
+            + buttonsContainerView.contentHeight(actions: state.actions)
         if bottomInset != collectionView.contentInset.bottom {
             collectionView.contentInset.bottom = bottomInset
         }
