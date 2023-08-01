@@ -35,7 +35,6 @@ final class CardTokenizationInputCell: UICollectionViewCell, CardTokenizationCel
         textField.placeholder = item.placeholder
         textField.keyboardType = item.keyboard
         textField.textContentType = item.contentType
-        textField.isSecureTextEntry = item.isSecure
         self.item = item
         self.style = style
     }

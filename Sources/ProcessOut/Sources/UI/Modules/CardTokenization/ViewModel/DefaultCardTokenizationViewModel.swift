@@ -102,7 +102,6 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             value: inputValue(for: startedState.number, isEditingAllowed: isEditingAllowed),
             formatter: cardNumberFormatter,
             isCompact: false,
-            isSecure: false,
             keyboard: .asciiCapableNumberPad,
             contentType: .creditCardNumber
         )
@@ -111,7 +110,6 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             value: inputValue(for: startedState.expiration, isEditingAllowed: isEditingAllowed),
             formatter: cardExpirationFormatter,
             isCompact: true,
-            isSecure: false,
             keyboard: .asciiCapableNumberPad,
             contentType: nil
         )
@@ -120,7 +118,6 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             value: inputValue(for: startedState.cvc, isEditingAllowed: isEditingAllowed),
             formatter: nil,
             isCompact: true,
-            isSecure: true,
             keyboard: .asciiCapableNumberPad,
             contentType: nil
         )
@@ -129,7 +126,6 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             value: inputValue(for: startedState.cardholderName, isEditingAllowed: isEditingAllowed),
             formatter: nil,
             isCompact: false,
-            isSecure: false,
             keyboard: .asciiCapable,
             contentType: .name
         )

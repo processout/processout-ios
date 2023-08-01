@@ -45,9 +45,6 @@ struct CardTokenizationViewModelState {
         /// Boolean value indicates whether input should be compact in UI.
         let isCompact: Bool
 
-        /// A boolean value that indicates whether content should be secured eg from copying.
-        let isSecure: Bool
-
         /// Keyboard type.
         let keyboard: UIKeyboardType
 
