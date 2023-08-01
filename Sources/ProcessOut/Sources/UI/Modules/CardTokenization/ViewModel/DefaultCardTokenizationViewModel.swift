@@ -87,7 +87,8 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         let startedState = State(
             sections: sections,
             actions: .init(
-                primary: submitAction(startedState: startedState, isSubmitting: !isEditingAllowed), secondary: nil
+                primary: submitAction(startedState: startedState, isSubmitting: !isEditingAllowed),
+                secondary: cancelAction(isEnabled: isEditingAllowed)
             ),
             isEditingAllowed: isEditingAllowed
         )
@@ -156,11 +157,23 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
 
     private func submitAction(startedState: InteractorState.Started, isSubmitting: Bool) -> State.Action {
         let action = State.Action(
-            title: Strings.CardTokenization.SubmitButton.title,
+            title: Text.SubmitButton.title,
             isEnabled: startedState.recentErrorMessage == nil,
             isExecuting: isSubmitting,
             handler: { [weak self] in
                 self?.interactor.tokenize()
+            }
+        )
+        return action
+    }
+
+    private func cancelAction(isEnabled: Bool) -> State.Action {
+        let action = State.Action(
+            title: Text.CancelButton.title,
+            isEnabled: isEnabled,
+            isExecuting: false,
+            handler: { [weak self] in
+                self?.interactor.cancel()
             }
         )
         return action
