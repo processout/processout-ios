@@ -9,8 +9,9 @@ import Foundation
 
 final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationViewModelState>, CardTokenizationViewModel {
 
-    init(interactor: any CardTokenizationInteractor) {
+    init(interactor: any CardTokenizationInteractor, configuration: POCardTokenizationConfiguration) {
         self.interactor = interactor
+        self.configuration = configuration
         inputValuesCache = [:]
         inputValuesObservations = []
         super.init(state: .idle)
@@ -38,6 +39,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     // MARK: - Private Properties
 
     private let interactor: any CardTokenizationInteractor
+    private let configuration: POCardTokenizationConfiguration
 
     private lazy var cardNumberFormatter = PaymentCardNumberFormatter()
     private lazy var cardExpirationFormatter = CardExpirationFormatter()
@@ -69,10 +71,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     // MARK: - Started State
 
     private func convertToState(startedState: InteractorState.Started, isEditingAllowed: Bool) -> State {
-        let titleItem = State.TitleItem(text: Text.title)
-        var sections = [
-            State.Section(id: .init(id: SectionId.title, title: nil), items: [.title(titleItem)])
-        ]
+        var sections = [createTitleSection()]
         var cardInformationItems = cardInformationInputItems(
             startedState: startedState, isEditingAllowed: isEditingAllowed
         )
@@ -85,7 +84,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         )
         sections.append(cardInformationSection)
         let startedState = State(
-            sections: sections,
+            sections: sections.compactMap { $0 },
             actions: .init(
                 primary: submitAction(startedState: startedState, isSubmitting: !isEditingAllowed),
                 secondary: cancelAction(isEnabled: isEditingAllowed)
@@ -93,6 +92,15 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             isEditingAllowed: isEditingAllowed
         )
         return startedState
+    }
+
+    private func createTitleSection() -> State.Section? {
+        let title = configuration.title ?? Text.title
+        guard !title.isEmpty else {
+            return nil
+        }
+        let item = State.TitleItem(text: Text.title)
+        return State.Section(id: .init(id: SectionId.title, title: nil), items: [.title(item)])
     }
 
     private func cardInformationInputItems(
@@ -157,7 +165,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
 
     private func submitAction(startedState: InteractorState.Started, isSubmitting: Bool) -> State.Action {
         let action = State.Action(
-            title: Text.SubmitButton.title,
+            title: configuration.primaryActionTitle ?? Text.SubmitButton.title,
             isEnabled: startedState.recentErrorMessage == nil,
             isExecuting: isSubmitting,
             handler: { [weak self] in
@@ -167,9 +175,13 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         return action
     }
 
-    private func cancelAction(isEnabled: Bool) -> State.Action {
+    private func cancelAction(isEnabled: Bool) -> State.Action? {
+        let title = configuration.cancelActionTitle ?? Text.CancelButton.title
+        guard !title.isEmpty else {
+            return nil
+        }
         let action = State.Action(
-            title: Text.CancelButton.title,
+            title: title,
             isEnabled: isEnabled,
             isExecuting: false,
             handler: { [weak self] in

@@ -16,11 +16,18 @@ public final class POCardTokenizationViewControllerBuilder {
     /// Creates builder instance.
     public init() {
         style = POCardTokenizationStyle()
+        configuration = POCardTokenizationConfiguration()
     }
 
     /// Sets UI style.
     public func with(style: POCardTokenizationStyle) -> Self {
         self.style = style
+        return self
+    }
+
+    /// Sets UI configuration.
+    public func with(configuration: POCardTokenizationConfiguration) -> Self {
+        self.configuration = configuration
         return self
     }
 
@@ -44,12 +51,13 @@ public final class POCardTokenizationViewControllerBuilder {
             logger: api.logger,
             completion: completion
         )
-        let viewModel = DefaultCardTokenizationViewModel(interactor: interactor)
+        let viewModel = DefaultCardTokenizationViewModel(interactor: interactor, configuration: configuration)
         return CardTokenizationViewController(viewModel: viewModel, style: style, logger: api.logger)
     }
 
     // MARK: - Private Properties
 
     private var style: POCardTokenizationStyle
+    private var configuration: POCardTokenizationConfiguration
     private var completion: ((Result<POCard, POFailure>) -> Void)?
 }
