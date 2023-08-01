@@ -121,7 +121,6 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
-        // todo(andrii-vysotskyo): consider migrating to self-sizing to evict boilerplate sizing code
         let adjustedBounds = collectionView.bounds.inset(by: collectionView.adjustedContentInset)
         let height: CGFloat
         var width = adjustedBounds.width
@@ -144,7 +143,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             ).height
         case .input(let item):
             if item.isCompact {
-                width = (width - Constants.lineSpacing) / 2
+                width = (width - Constants.itemsSpacing) / 2
             }
             height = Constants.inputHeight
         case nil:
@@ -254,8 +253,8 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
 
     private lazy var collectionViewLayout: NativeAlternativePaymentMethodCollectionLayout = {
         let layout = NativeAlternativePaymentMethodCollectionLayout()
-        layout.minimumLineSpacing = Constants.lineSpacing
-        layout.minimumInteritemSpacing = Constants.lineSpacing
+        layout.minimumLineSpacing = Constants.itemsSpacing
+        layout.minimumInteritemSpacing = Constants.itemsSpacing
         return layout
     }()
 
@@ -406,9 +405,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         }
     }
 
-    /// Adjusts bottom inset based on current state actions and keyboard height.
     private func configureCollectionViewBottomInset(state: ViewModel.State) {
-        // todo(andrii-vysotskyi): consider observing overlay content height instead for better flexibility in future
         let bottomInset = Constants.contentInset.bottom
             + keyboardHeight
             + buttonsContainerView.contentHeight(actions: state.actions)
@@ -420,7 +417,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
 
 private enum Constants {
     static let animationDuration: TimeInterval = 0.25
-    static let lineSpacing: CGFloat = 8
+    static let itemsSpacing: CGFloat = 8
     static let sectionInset = UIEdgeInsets(top: 8, left: 0, bottom: 32, right: 0)
     static let contentInset = UIEdgeInsets(top: 24, left: 24, bottom: 24, right: 24)
     static let inputHeight: CGFloat = 44

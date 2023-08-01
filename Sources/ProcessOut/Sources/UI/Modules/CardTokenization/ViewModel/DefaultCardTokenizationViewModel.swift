@@ -64,7 +64,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         case .tokenizing(let startedState):
             state = convertToState(startedState: startedState, isEditingAllowed: false)
         case .tokenized:
-            break // todo(andrii-vysotskyi): support tokenized state
+            break // Currently tokenized is a sink state so simply ignored
         }
     }
 
