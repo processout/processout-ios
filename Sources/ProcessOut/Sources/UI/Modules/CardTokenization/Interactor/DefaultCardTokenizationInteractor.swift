@@ -87,7 +87,7 @@ final class DefaultCardTokenizationInteractor:
     private let logger: POLogger
     private let completion: Completion
 
-    private lazy var cardNumberFormatter = PaymentCardNumberFormatter()
+    private lazy var cardNumberFormatter = CardNumberFormatter()
     private lazy var cardExpirationFormatter = CardExpirationFormatter()
 
     // MARK: - State Management

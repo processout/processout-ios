@@ -1,5 +1,5 @@
 //
-//  PaymentCardNumberFormatter.swift
+//  CardNumberFormatter.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 18.07.2023.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class PaymentCardNumberFormatter: Formatter {
+final class CardNumberFormatter: Formatter {
 
     func string(from partialNumber: String) -> String {
         let normalizedNumber = normalized(number: partialNumber).prefix(Constants.maxLength)
@@ -59,6 +59,11 @@ final class PaymentCardNumberFormatter: Formatter {
 
     // MARK: - Private Nested Types
 
+    private struct PaymentCardNumberFormat {
+        let leading: [ClosedRange<Int>]
+        let patterns: [String]
+    }
+
     private enum Constants {
         static let significantCharacters = CharacterSet.decimalDigits
         static let maxLength = 19 // Maximum PAN length based on ISO/IEC 7812
@@ -70,14 +75,14 @@ final class PaymentCardNumberFormatter: Formatter {
 
     // Reference: https://baymard.com/blog/credit-card-field-auto-format-spaces
     private let formats: [PaymentCardNumberFormat] = [
-        .init(leading: [34...34, 37...37], patterns: ["#### ###### #####"]), // American Express
-        .init(leading: [62...62], patterns: ["#### #### #### ####", "###### #############"]), // China UnionPay
+        .init(leading: [34...34, 37...37], patterns: ["#### ###### #####"]),
+        .init(leading: [62...62], patterns: ["#### #### #### ####", "###### #############"]),
         .init(
             leading: [500000...509999, 560000...589999, 600000...699999],
             patterns: ["#### #### #####", "#### ###### #####", "#### #### #### ####", "#### #### #### #### ###"]
-        ), // Maestro
-        .init(leading: [300...305, 309...309, 36...36, 38...39], patterns: ["#### ###### ####"]), // Diners Club
-        .init(leading: [1...1], patterns: ["#### ##### ######"]) // UATP
+        ),
+        .init(leading: [300...305, 309...309, 36...36, 38...39], patterns: ["#### ###### ####"]),
+        .init(leading: [1...1], patterns: ["#### ##### ######"])
     ]
 
     // MARK: - Private Methods

@@ -41,7 +41,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     private let interactor: any CardTokenizationInteractor
     private let configuration: POCardTokenizationConfiguration
 
-    private lazy var cardNumberFormatter = PaymentCardNumberFormatter()
+    private lazy var cardNumberFormatter = CardNumberFormatter()
     private lazy var cardExpirationFormatter = CardExpirationFormatter()
 
     private var inputValuesCache: [InteractorState.ParameterId: State.InputValue]

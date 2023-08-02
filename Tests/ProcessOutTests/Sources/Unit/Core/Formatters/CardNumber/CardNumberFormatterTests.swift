@@ -1,5 +1,5 @@
 //
-//  PaymentCardNumberFormatterTests.swift
+//  CardNumberFormatterTests.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 19.07.2023.
@@ -8,11 +8,11 @@
 import XCTest
 @testable import ProcessOut
 
-final class PaymentCardNumberFormatterTests: XCTestCase {
+final class CardNumberFormatterTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        sut = PaymentCardNumberFormatter()
+        sut = CardNumberFormatter()
     }
 
     func test_normalized_retainsDigits() {
@@ -33,5 +33,5 @@ final class PaymentCardNumberFormatterTests: XCTestCase {
 
     // MARK: - Private Properties
 
-    private var sut: PaymentCardNumberFormatter!
+    private var sut: CardNumberFormatter!
 }
