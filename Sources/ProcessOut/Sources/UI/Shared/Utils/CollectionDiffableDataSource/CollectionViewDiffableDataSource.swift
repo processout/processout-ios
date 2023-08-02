@@ -44,7 +44,6 @@ final class CollectionViewDiffableDataSource<SectionIdentifier: Hashable, ItemId
                 completion?()
             }
         }
-        // Animation flag is ignored if collection is not yet added to window.
         if animatingDifferences {
             performUpdates()
         } else {
