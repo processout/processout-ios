@@ -118,8 +118,9 @@ final class CardExpirationFormatter: Formatter {
         guard forcePadding || (monthValue > 1 && monthValue < 10) || isPadded else {
             return monthValue.description
         }
-        let paddingLength = max(Constants.monthLength - month.count, 0)
-        return String(repeating: "0", count: paddingLength) + month
+        let monthValueDescription = String(monthValue)
+        let paddingLength = max(Constants.monthLength - monthValueDescription.count, 0)
+        return String(repeating: "0", count: paddingLength) + monthValueDescription
     }
 
     // MARK: -
