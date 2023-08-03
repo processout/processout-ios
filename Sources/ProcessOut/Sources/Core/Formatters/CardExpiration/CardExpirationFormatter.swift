@@ -22,7 +22,7 @@ final class CardExpirationFormatter: Formatter {
     /// Returns formatted version of given expiration string.
     func string(from string: String) -> String {
         let expiration = self.expiration(from: string)
-        guard !expiration.month.isEmpty || !expiration.year.isEmpty else {
+        guard !expiration.month.isEmpty else {
             return ""
         }
         return formatted(month: expiration.month, year: expiration.year)
@@ -30,7 +30,10 @@ final class CardExpirationFormatter: Formatter {
 
     func expirationMonth(from string: String) -> Int? {
         let monthDescription = expiration(from: string).month
-        return Int(monthDescription)
+        guard let month = Int(monthDescription), month > 0, month <= 12 else {
+            return nil
+        }
+        return month
     }
 
     func expirationYear(from string: String) -> Int? {
@@ -104,11 +107,8 @@ final class CardExpirationFormatter: Formatter {
     }
 
     private func formatted(month: String, forcePadding: Bool) -> String {
-        if month.isEmpty {
-            return ""
-        }
         guard let monthValue = Int(month) else {
-            assertionFailure("Month should be valid integer or empty.")
+            assertionFailure("Month should be valid integer.")
             return month
         }
         guard monthValue != 0 else {
