@@ -22,7 +22,7 @@ extension Strings {
     ///
     /// The implementation falls back to the framework's bundle in case the main application doesn't
     /// provide translations for missing languages to ensure that we don't display untranslated strings.
-    static func localized(_ key: String, _ table: String) -> String {
+    static func localized(_ key: String, _ table: String, _: String) -> String {
         if Bundle.main.preferredLocalizations.first == BundleLocator.bundle.preferredLocalizations.first {
             return BundleLocator.bundle.localizedString(forKey: key, value: nil, table: table)
         }

@@ -9,12 +9,6 @@
   import UIKit
 #endif
 
-// Deprecated typealiases
-@available(*, deprecated, renamed: "ColorAsset.Color", message: "This typealias will be removed in SwiftGen 7.0")
-internal typealias AssetColorTypeAlias = ColorAsset.Color
-@available(*, deprecated, renamed: "ImageAsset.Image", message: "This typealias will be removed in SwiftGen 7.0")
-internal typealias AssetImageTypeAlias = ImageAsset.Image
-
 // swiftlint:disable superfluous_disable_command file_length implicit_return
 
 // MARK: - Asset Catalogs
@@ -154,20 +148,4 @@ internal struct ImageAsset {
     return result
   }
   #endif
-}
-
-internal extension ImageAsset.Image {
-  @available(iOS 8.0, tvOS 9.0, watchOS 2.0, *)
-  @available(macOS, deprecated,
-    message: "This initializer is unsafe on macOS, please use the ImageAsset.image property")
-  convenience init?(asset: ImageAsset) {
-    #if os(iOS) || os(tvOS)
-    let bundle = BundleLocator.bundle
-    self.init(named: asset.name, in: bundle, compatibleWith: nil)
-    #elseif os(macOS)
-    self.init(named: NSImage.Name(asset.name))
-    #elseif os(watchOS)
-    self.init(named: asset.name)
-    #endif
-  }
 }
