@@ -11,6 +11,37 @@ import Foundation
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 internal enum Strings {
 
+  internal enum CardTokenization {
+    /// Add New Card
+    internal static var title: String { return Strings.tr("ProcessOut", "card-tokenization.title") }
+    internal enum CancelButton {
+      /// Cancel
+      internal static var title: String { return Strings.tr("ProcessOut", "card-tokenization.cancel-button.title") }
+    }
+    internal enum CardDetails {
+      /// Card Information
+      internal static var title: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.title") }
+      internal enum Cvc {
+        /// Cardholder Name
+        internal static var cardholder: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.cvc.cardholder") }
+        /// CVC
+        internal static var placeholder: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.cvc.placeholder") }
+      }
+      internal enum Expiration {
+        /// MM / YY
+        internal static var placeholder: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.expiration.placeholder") }
+      }
+      internal enum Number {
+        /// 4242 4242 4242 4242
+        internal static var placeholder: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.number.placeholder") }
+      }
+    }
+    internal enum SubmitButton {
+      /// Submit
+      internal static var title: String { return Strings.tr("ProcessOut", "card-tokenization.submit-button.title") }
+    }
+  }
+
   internal enum NativeAlternativePayment {
     /// Pay with %@
     internal static func title(_ p1: Any) -> String {
