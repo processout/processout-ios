@@ -2,4 +2,8 @@
 
 set -euo pipefail
 
-mint run swiftlint lint --strict
+# Add brew binaries to PATH
+export PATH="/opt/homebrew/bin:$PATH"
+
+# Lint
+swiftlint lint --strict

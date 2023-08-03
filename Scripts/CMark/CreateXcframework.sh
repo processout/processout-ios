@@ -36,7 +36,7 @@ cp "$SCRIPT_DIR/module.modulemap" src/
 cp "$SCRIPT_DIR/project.yml" .
 
 # Generate project
-mint run xcodegen generate
+xcodegen generate
 
 # Create frameworks for needed platforms
 xcodebuild archive -scheme cmark -destination "generic/platform=iOS" -archivePath ./cmark-iOS
