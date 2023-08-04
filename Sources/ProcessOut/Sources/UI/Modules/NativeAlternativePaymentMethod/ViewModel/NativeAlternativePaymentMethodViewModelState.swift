@@ -171,29 +171,8 @@ enum NativeAlternativePaymentMethodViewModelState {
         let items: [Item]
     }
 
-    struct Action {
-
-        /// Action title.
-        let title: String
-
-        /// Boolean value indicating whether action is enabled.
-        let isEnabled: Bool
-
-        /// Boolean value indicating whether action associated with button is currently running.
-        let isExecuting: Bool
-
-        /// Action handler.
-        let handler: () -> Void
-    }
-
-    struct Actions {
-
-        /// Primary action.
-        let primary: Action?
-
-        /// Secondary action.
-        let secondary: Action?
-    }
+    typealias Action = ActionsContainerActionViewModel
+    typealias Actions = ActionsContainerViewModel
 
     struct Started {
 

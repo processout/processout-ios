@@ -275,7 +275,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         return view
     }()
 
-    private lazy var buttonsContainerView = NativeAlternativePaymentMethodButtonsView(
+    private lazy var buttonsContainerView = ActionsContainerView(
         style: style.actions, horizontalInset: Constants.contentInset.left
     )
 
@@ -310,7 +310,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
     // MARK: - State Management
 
     private func configureWithIdleState() {
-        buttonsContainerView.configure(actions: .init(primary: nil, secondary: nil), animated: false)
+        buttonsContainerView.configure(viewModel: .init(primary: nil, secondary: nil), animated: false)
         let snapshot = DiffableDataSourceSnapshot<SectionIdentifier, ItemIdentifier>()
         collectionViewDataSource.applySnapshotUsingReloadData(snapshot)
         view.backgroundColor = style.background.regular
@@ -334,7 +334,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         }
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             view.backgroundColor = state.isCaptured ? style.background.success : style.background.regular
-            buttonsContainerView.configure(actions: state.actions, animated: animated)
+            buttonsContainerView.configure(viewModel: state.actions, animated: animated)
             collectionOverlayView.layoutIfNeeded()
         }
     }
@@ -482,7 +482,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         // todo(andrii-vysotskyi): consider observing overlay content height instead for better flexibility in future
         var bottomInset = Constants.contentInset.bottom + keyboardHeight
         if case .started(let startedState) = state {
-            bottomInset += buttonsContainerView.contentHeight(actions: startedState.actions)
+            bottomInset += buttonsContainerView.contentHeight(viewModel: startedState.actions)
         }
         if bottomInset != collectionView.contentInset.bottom {
             collectionView.contentInset.bottom = bottomInset

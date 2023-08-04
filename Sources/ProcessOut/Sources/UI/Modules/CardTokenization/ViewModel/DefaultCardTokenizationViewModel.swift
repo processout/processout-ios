@@ -168,6 +168,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             title: configuration.primaryActionTitle ?? Text.SubmitButton.title,
             isEnabled: startedState.recentErrorMessage == nil,
             isExecuting: isSubmitting,
+            accessibilityIdentifier: "card-tokenization.primary-button",
             handler: { [weak self] in
                 self?.interactor.tokenize()
             }
@@ -184,6 +185,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             title: title,
             isEnabled: isEnabled,
             isExecuting: false,
+            accessibilityIdentifier: "card-tokenization.secondary-button",
             handler: { [weak self] in
                 self?.interactor.cancel()
             }

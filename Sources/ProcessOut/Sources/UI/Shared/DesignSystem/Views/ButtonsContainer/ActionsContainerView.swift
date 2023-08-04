@@ -7,9 +7,9 @@
 
 import UIKit
 
-final class NativeAlternativePaymentMethodButtonsView: UIView {
+final class ActionsContainerView: UIView {
 
-    init(style: PONativeAlternativePaymentMethodActionsStyle, horizontalInset: CGFloat) {
+    init(style: POActionsContainerStyle, horizontalInset: CGFloat) {
         self.style = style
         self.horizontalInset = horizontalInset
         super.init(frame: .zero)
@@ -21,19 +21,19 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(actions: NativeAlternativePaymentMethodViewModelState.Actions, animated: Bool) {
-        if actions.primary != nil || actions.secondary != nil {
+    func configure(viewModel: ActionsContainerViewModel, animated: Bool) {
+        if viewModel.primary != nil || viewModel.secondary != nil {
             let animated = animated && alpha > 0
-            configure(button: primaryButton, withAction: actions.primary, animated: animated)
-            configure(button: secondaryButton, withAction: actions.secondary, animated: animated)
+            configure(button: primaryButton, viewModel: viewModel.primary, animated: animated)
+            configure(button: secondaryButton, viewModel: viewModel.secondary, animated: animated)
             alpha = 1
         } else {
             alpha = 0
         }
     }
 
-    func contentHeight(actions: NativeAlternativePaymentMethodViewModelState.Actions) -> CGFloat {
-        guard actions.primary != nil || actions.secondary != nil else {
+    func contentHeight(viewModel: ActionsContainerViewModel) -> CGFloat {
+        guard viewModel.primary != nil || viewModel.secondary != nil else {
             return 0
         }
         let numberOfActions: Int
@@ -41,7 +41,7 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         case .horizontal:
             numberOfActions = 1
         case .vertical:
-            numberOfActions = [actions.primary, actions.secondary].compactMap { $0 }.count
+            numberOfActions = [viewModel.primary, viewModel.secondary].compactMap { $0 }.count
         @unknown default:
             assertionFailure("Unexpected axis.")
             numberOfActions = 1
@@ -67,7 +67,7 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
 
     // MARK: - Private Properties
 
-    private let style: PONativeAlternativePaymentMethodActionsStyle
+    private let style: POActionsContainerStyle
     private let horizontalInset: CGFloat
 
     private lazy var contentView: UIStackView = {
@@ -90,17 +90,8 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         return view
     }()
 
-    private lazy var primaryButton: Button = {
-        let button = Button(style: style.primary)
-        button.accessibilityIdentifier = "native-alternative-payment.primary-button"
-        return button
-    }()
-
-    private lazy var secondaryButton: Button = {
-        let button = Button(style: style.secondary)
-        button.accessibilityIdentifier = "native-alternative-payment.secondary-button"
-        return button
-    }()
+    private lazy var primaryButton = Button(style: style.primary)
+    private lazy var secondaryButton = Button(style: style.secondary)
 
     private lazy var bottomConstraint = contentView.bottomAnchor.constraint(
         equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.verticalInset
@@ -129,19 +120,18 @@ final class NativeAlternativePaymentMethodButtonsView: UIView {
         backgroundColor = style.backgroundColor
     }
 
-    private func configure(
-        button: Button, withAction action: NativeAlternativePaymentMethodViewModelState.Action?, animated: Bool
-    ) {
-        guard let action else {
+    private func configure(button: Button, viewModel: ActionsContainerActionViewModel?, animated: Bool) {
+        if let viewModel {
+            let buttonViewModel = Button.ViewModel(
+                title: viewModel.title, isLoading: viewModel.isExecuting, handler: viewModel.handler
+            )
+            button.configure(viewModel: buttonViewModel, isEnabled: viewModel.isEnabled, animated: animated)
+            button.setHidden(false)
+            button.alpha = 1
+            button.accessibilityIdentifier = viewModel.accessibilityIdentifier
+        } else {
             button.setHidden(true)
             button.alpha = 0
-            return
         }
-        let viewModel = Button.ViewModel(
-            title: action.title, isLoading: action.isExecuting, handler: action.handler
-        )
-        button.configure(viewModel: viewModel, isEnabled: action.isEnabled, animated: animated)
-        button.setHidden(false)
-        button.alpha = 1
     }
 }

@@ -237,7 +237,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         return view
     }()
 
-    private lazy var buttonsContainerView = NativeAlternativePaymentMethodButtonsView(
+    private lazy var buttonsContainerView = ActionsContainerView(
         style: style.actions, horizontalInset: Constants.contentInset.left
     )
 
@@ -295,7 +295,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             self?.updateFirstResponder()
         }
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
-            buttonsContainerView.configure(actions: state.actions, animated: animated)
+            buttonsContainerView.configure(viewModel: state.actions, animated: animated)
             collectionOverlayView.layoutIfNeeded()
         }
     }
@@ -408,7 +408,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
     private func configureCollectionViewBottomInset(state: ViewModel.State) {
         let bottomInset = Constants.contentInset.bottom
             + keyboardHeight
-            + buttonsContainerView.contentHeight(actions: state.actions)
+            + buttonsContainerView.contentHeight(viewModel: state.actions)
         if bottomInset != collectionView.contentInset.bottom {
             collectionView.contentInset.bottom = bottomInset
         }

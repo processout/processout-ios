@@ -80,8 +80,8 @@ struct CardTokenizationViewModelState {
         let items: [Item]
     }
 
-    typealias Action = NativeAlternativePaymentMethodViewModelState.Action
-    typealias Actions = NativeAlternativePaymentMethodViewModelState.Actions
+    typealias Action = ActionsContainerActionViewModel
+    typealias Actions = ActionsContainerViewModel
 
     /// Available items.
     let sections: [Section]
