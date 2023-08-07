@@ -11,7 +11,7 @@ import UIKit
 
 final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAlternativePaymentMethodViewModel>:
     BaseViewController<ViewModel>,
-    NativeAlternativePaymentMethodCollectionLayoutDelegate,
+    CollectionViewDelegateCenterLayout,
     NativeAlternativePaymentMethodCellDelegate {
 
     init(viewModel: ViewModel, style: PONativeAlternativePaymentMethodStyle, logger: POLogger) {
@@ -87,7 +87,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         collectionOverlayView.layoutIfNeeded()
     }
 
-    // MARK: - NativeAlternativePaymentMethodCollectionLayoutDelegate
+    // MARK: - CollectionViewDelegateCenterLayout
 
     func centeredSection(layout: UICollectionViewLayout) -> Int? {
         let snapshot = collectionViewDataSource.snapshot()
@@ -289,7 +289,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         return collectionView
     }()
 
-    private lazy var collectionViewLayout = NativeAlternativePaymentMethodCollectionLayout()
+    private lazy var collectionViewLayout = CollectionViewCenterLayout()
     private lazy var collectionReusableViewSizeProvider = CollectionReusableViewSizeProvider()
 
     private lazy var collectionViewDataSource: CollectionViewDiffableDataSource<SectionIdentifier, ItemIdentifier> = {
@@ -394,7 +394,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         )
         collectionView.registerSupplementaryView(
             NativeAlternativePaymentMethodSeparatorView.self,
-            kind: NativeAlternativePaymentMethodCollectionLayout.elementKindSeparator
+            kind: CollectionViewCenterLayout.elementKindSeparator
         )
         collectionView.registerCell(NativeAlternativePaymentMethodTitleCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodLoaderCell.self)
@@ -457,7 +457,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             return nil
         }
         switch kind {
-        case NativeAlternativePaymentMethodCollectionLayout.elementKindSeparator:
+        case CollectionViewCenterLayout.elementKindSeparator:
             let view = collectionView.dequeueReusableSupplementaryView(
                 NativeAlternativePaymentMethodSeparatorView.self, kind: kind, indexPath: indexPath
             )

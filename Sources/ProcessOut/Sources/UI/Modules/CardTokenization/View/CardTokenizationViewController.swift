@@ -11,7 +11,7 @@ import UIKit
 
 final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>:
     BaseViewController<ViewModel>,
-    NativeAlternativePaymentMethodCollectionLayoutDelegate,
+    CollectionViewDelegateCenterLayout,
     CardTokenizationCellDelegate {
 
     init(viewModel: ViewModel, style: POCardTokenizationStyle, logger: POLogger) {
@@ -89,7 +89,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         collectionOverlayView.layoutIfNeeded()
     }
 
-    // MARK: - NativeAlternativePaymentMethodCollectionLayoutDelegate
+    // MARK: - CollectionViewDelegateCenterLayout
 
     func centeredSection(layout: UICollectionViewLayout) -> Int? {
         nil
@@ -251,8 +251,8 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         return collectionView
     }()
 
-    private lazy var collectionViewLayout: NativeAlternativePaymentMethodCollectionLayout = {
-        let layout = NativeAlternativePaymentMethodCollectionLayout()
+    private lazy var collectionViewLayout: CollectionViewCenterLayout = {
+        let layout = CollectionViewCenterLayout()
         layout.minimumLineSpacing = Constants.itemsSpacing
         layout.minimumInteritemSpacing = Constants.itemsSpacing
         return layout
@@ -355,7 +355,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         )
         collectionView.registerSupplementaryView(
             CardTokenizationSeparatorView.self,
-            kind: NativeAlternativePaymentMethodCollectionLayout.elementKindSeparator
+            kind: CollectionViewCenterLayout.elementKindSeparator
         )
         collectionView.registerCell(CardTokenizationTitleCell.self)
         collectionView.registerCell(CardTokenizationInputCell.self)
@@ -385,7 +385,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             return nil
         }
         switch kind {
-        case NativeAlternativePaymentMethodCollectionLayout.elementKindSeparator:
+        case CollectionViewCenterLayout.elementKindSeparator:
             let view = collectionView.dequeueReusableSupplementaryView(
                 CardTokenizationSeparatorView.self, kind: kind, indexPath: indexPath
             )
