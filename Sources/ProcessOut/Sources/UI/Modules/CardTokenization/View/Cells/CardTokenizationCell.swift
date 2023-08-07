@@ -26,4 +26,7 @@ protocol CardTokenizationCellDelegate: AnyObject {
 
     /// Should return boolean value indicating whether cells input should return ie resign first responder.
     func cardTokenizationCellShouldReturn(_ cell: CardTokenizationCell) -> Bool
+
+    /// Should return boolean value indicating whether editing is currently allowed.
+    func cardTokenizationCellShouldBeginEditing(_ cell: CardTokenizationCell) -> Bool
 }

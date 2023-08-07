@@ -108,7 +108,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     ) -> [State.Item] {
         let number = State.InputItem(
             placeholder: Text.CardDetails.Number.placeholder,
-            value: inputValue(for: startedState.number, isEditingAllowed: isEditingAllowed),
+            value: inputValue(for: startedState.number),
             formatter: cardNumberFormatter,
             isCompact: false,
             keyboard: .asciiCapableNumberPad,
@@ -116,7 +116,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         )
         let expiration = State.InputItem(
             placeholder: Text.CardDetails.Expiration.placeholder,
-            value: inputValue(for: startedState.expiration, isEditingAllowed: isEditingAllowed),
+            value: inputValue(for: startedState.expiration),
             formatter: cardExpirationFormatter,
             isCompact: true,
             keyboard: .asciiCapableNumberPad,
@@ -124,7 +124,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         )
         let cvc = State.InputItem(
             placeholder: Text.CardDetails.Cvc.placeholder,
-            value: inputValue(for: startedState.cvc, isEditingAllowed: isEditingAllowed),
+            value: inputValue(for: startedState.cvc),
             formatter: nil,
             isCompact: true,
             keyboard: .asciiCapableNumberPad,
@@ -132,7 +132,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         )
         let cardholder = State.InputItem(
             placeholder: Text.CardDetails.Cvc.cardholder,
-            value: inputValue(for: startedState.cardholderName, isEditingAllowed: isEditingAllowed),
+            value: inputValue(for: startedState.cardholderName),
             formatter: nil,
             isCompact: false,
             keyboard: .asciiCapable,
@@ -141,17 +141,15 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         return [.input(number), .input(expiration), .input(cvc), .input(cardholder)]
     }
 
-    private func inputValue(for parameter: InteractorState.Parameter, isEditingAllowed: Bool) -> State.InputValue {
+    private func inputValue(for parameter: InteractorState.Parameter) -> State.InputValue {
         if let value = inputValuesCache[parameter.id] {
             value.text = parameter.value
             value.isInvalid = !parameter.isValid
-            value.isEditingAllowed = isEditingAllowed
             return value
         }
         let value = State.InputValue(
             text: .init(value: parameter.value),
-            isInvalid: .init(value: !parameter.isValid),
-            isEditingAllowed: .init(value: isEditingAllowed)
+            isInvalid: .init(value: !parameter.isValid)
         )
         let observer = value.$text.addObserver { [weak self] value in
             self?.interactor.update(parameterId: parameter.id, value: value)

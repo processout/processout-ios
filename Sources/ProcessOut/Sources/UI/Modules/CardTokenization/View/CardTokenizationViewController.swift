@@ -221,6 +221,10 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         return true
     }
 
+    func cardTokenizationCellShouldBeginEditing(_ cell: CardTokenizationCell) -> Bool {
+        viewModel.state.isEditingAllowed
+    }
+
     // MARK: - Private Nested Types
 
     private typealias SectionIdentifier = ViewModel.State.SectionIdentifier

@@ -19,10 +19,6 @@ struct CardTokenizationViewModelState {
         /// Boolean value indicating whether value is valid.
         @ReferenceWrapper
         var isInvalid: Bool
-
-        /// Boolean value indicating whether editing is allowed.
-        @ReferenceWrapper
-        var isEditingAllowed: Bool
     }
 
     struct TitleItem: Hashable {

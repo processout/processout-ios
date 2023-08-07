@@ -108,7 +108,7 @@ final class CardTokenizationInputCell: UICollectionViewCell, CardTokenizationCel
 extension CardTokenizationInputCell: UITextFieldDelegate {
 
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        item?.value.isEditingAllowed ?? false
+        delegate?.cardTokenizationCellShouldBeginEditing(self) ?? false
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
