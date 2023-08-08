@@ -25,6 +25,7 @@ final class CollectionViewErrorCell: UICollectionViewCell {
                 builder.typography = style.typography
                 builder.textStyle = .body
                 builder.color = style.color
+                builder.alignment = item.isCentered ? .center : .natural
                 builder.text = .plain(item.description)
             }
             .build()

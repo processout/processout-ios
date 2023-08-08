@@ -9,4 +9,7 @@ struct CollectionViewErrorViewModel: Hashable {
 
     /// Error description.
     let description: String
+
+    /// Indicates whether error should be centered.
+    let isCentered: Bool
 }

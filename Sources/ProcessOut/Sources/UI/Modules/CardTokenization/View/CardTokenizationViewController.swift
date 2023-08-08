@@ -155,7 +155,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         referenceSizeForHeaderInSection section: Int
     ) -> CGSize {
         let sectionIdentifier = collectionViewDataSource.snapshot().sectionIdentifiers[section]
-        guard let sectionTitle = sectionIdentifier.title else {
+        guard let sectionHeader = sectionIdentifier.header else {
             return .zero
         }
         let width = collectionView.bounds.inset(by: collectionView.adjustedContentInset).width
@@ -163,7 +163,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             viewType: CollectionViewSectionHeaderView.self,
             preferredWidth: width,
             configure: { [self] view in
-                view.configure(item: sectionTitle, style: style.sectionTitle)
+                view.configure(item: sectionHeader, style: style.sectionTitle)
             }
         )
     }
@@ -175,7 +175,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
     ) -> UIEdgeInsets {
         let snapshot = collectionViewDataSource.snapshot()
         var sectionInset = Constants.sectionInset
-        if snapshot.sectionIdentifiers[section].title == nil {
+        if snapshot.sectionIdentifiers[section].header == nil {
             // Top inset purpose is to add spacing between header and items,
             // for sections without header instead is 0
             sectionInset.top = 0
@@ -312,13 +312,13 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             view.configure(color: style.separatorColor)
             return view
         case UICollectionView.elementKindSectionHeader:
-            guard let sectionTitle = sectionIdentifier.title else {
+            guard let sectionHeader = sectionIdentifier.header else {
                 return nil
             }
             let view = collectionView.dequeueReusableSupplementaryView(
                 CollectionViewSectionHeaderView.self, kind: kind, indexPath: indexPath
             )
-            view.configure(item: sectionTitle, style: style.sectionTitle)
+            view.configure(item: sectionHeader, style: style.sectionTitle)
             return view
         default:
             return nil

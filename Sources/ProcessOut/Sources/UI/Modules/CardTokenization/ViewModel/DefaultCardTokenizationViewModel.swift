@@ -80,11 +80,12 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             startedState: startedState, isEditingAllowed: isEditingAllowed
         )
         if let error = startedState.recentErrorMessage {
-            let errorItem = State.ErrorItem(description: error)
+            let errorItem = State.ErrorItem(description: error, isCentered: false)
             cardInformationItems.append(.error(errorItem))
         }
         let cardInformationSection = State.Section(
-            id: .init(id: SectionId.cardInformation, title: Text.CardDetails.title), items: cardInformationItems
+            id: .init(id: SectionId.cardInformation, header: .init(title: Text.CardDetails.title, isCentered: false)),
+            items: cardInformationItems
         )
         sections.append(cardInformationSection)
         let startedState = State(
@@ -104,7 +105,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             return nil
         }
         let item = State.TitleItem(text: Text.title)
-        return State.Section(id: .init(id: SectionId.title, title: nil), items: [.title(item)])
+        return State.Section(id: .init(id: SectionId.title, header: nil), items: [.title(item)])
     }
 
     private func cardInformationInputItems(

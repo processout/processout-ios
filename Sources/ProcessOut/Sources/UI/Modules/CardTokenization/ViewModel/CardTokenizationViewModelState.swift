@@ -58,13 +58,15 @@ struct CardTokenizationViewModelState {
         case title(TitleItem), input(InputItem), error(ErrorItem)
     }
 
+    typealias SectionHeader = CollectionViewSectionHeaderViewModel
+
     struct SectionIdentifier: Hashable {
 
         /// Section id.
         let id: String
 
-        /// Section title if any.
-        let title: String?
+        /// Section header if any.
+        let header: SectionHeader?
     }
 
     struct Section {
