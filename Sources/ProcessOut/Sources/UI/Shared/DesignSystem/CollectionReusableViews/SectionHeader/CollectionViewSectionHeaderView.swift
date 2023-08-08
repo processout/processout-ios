@@ -1,5 +1,5 @@
 //
-//  CardTokenizationSectionHeaderView.swift
+//  CollectionViewSectionHeaderView.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 24.07.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class CardTokenizationSectionHeaderView: UICollectionReusableView {
+final class CollectionViewSectionHeaderView: UICollectionReusableView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)

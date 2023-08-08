@@ -1,5 +1,5 @@
 //
-//  CardTokenizationErrorCell.swift
+//  CollectionViewErrorCell.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 24.07.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class CardTokenizationErrorCell: UICollectionViewCell {
+final class CollectionViewErrorCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -19,7 +19,7 @@ final class CardTokenizationErrorCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: CardTokenizationViewModelState.ErrorItem, style: POTextStyle) {
+    func configure(item: CollectionViewErrorViewModel, style: POTextStyle) {
         descriptionLabel.attributedText = AttributedStringBuilder()
             .with { builder in
                 builder.typography = style.typography

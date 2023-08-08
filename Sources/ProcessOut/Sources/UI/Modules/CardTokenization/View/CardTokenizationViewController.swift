@@ -124,7 +124,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         switch collectionViewDataSource.itemIdentifier(for: indexPath) {
         case .title(let item):
             height = collectionReusableViewSizeProvider.systemLayoutSize(
-                viewType: CardTokenizationTitleCell.self,
+                viewType: CollectionViewTitleCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
                     cell.configure(item: item, style: self.style.title)
@@ -132,7 +132,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             ).height
         case .error(let item):
             height = collectionReusableViewSizeProvider.systemLayoutSize(
-                viewType: CardTokenizationErrorCell.self,
+                viewType: CollectionViewErrorCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
                     cell.configure(item: item, style: self.style.errorDescription)
@@ -160,7 +160,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         }
         let width = collectionView.bounds.inset(by: collectionView.adjustedContentInset).width
         return collectionReusableViewSizeProvider.systemLayoutSize(
-            viewType: CardTokenizationSectionHeaderView.self,
+            viewType: CollectionViewSectionHeaderView.self,
             preferredWidth: width,
             configure: { [self] view in
                 view.configure(item: sectionTitle, style: style.sectionTitle)
@@ -272,21 +272,21 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
     private func configureCollectionView() {
         _ = collectionViewDataSource
         collectionView.registerSupplementaryView(
-            CardTokenizationSectionHeaderView.self, kind: UICollectionView.elementKindSectionHeader
+            CollectionViewSectionHeaderView.self, kind: UICollectionView.elementKindSectionHeader
         )
         collectionView.registerSupplementaryView(
-            CardTokenizationSeparatorView.self,
+            CollectionViewSeparatorView.self,
             kind: CollectionViewCenterLayout.elementKindSeparator
         )
-        collectionView.registerCell(CardTokenizationTitleCell.self)
+        collectionView.registerCell(CollectionViewTitleCell.self)
+        collectionView.registerCell(CollectionViewErrorCell.self)
         collectionView.registerCell(CardTokenizationInputCell.self)
-        collectionView.registerCell(CardTokenizationErrorCell.self)
     }
 
     private func cell(for item: ItemIdentifier, at indexPath: IndexPath) -> UICollectionViewCell? {
         switch item {
         case .title(let item):
-            let cell = collectionView.dequeueReusableCell(CardTokenizationTitleCell.self, for: indexPath)
+            let cell = collectionView.dequeueReusableCell(CollectionViewTitleCell.self, for: indexPath)
             cell.configure(item: item, style: style.title)
             return cell
         case .input(let item):
@@ -294,7 +294,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             cell.configure(item: item, style: style.input)
             return cell
         case .error(let item):
-            let cell = collectionView.dequeueReusableCell(CardTokenizationErrorCell.self, for: indexPath)
+            let cell = collectionView.dequeueReusableCell(CollectionViewErrorCell.self, for: indexPath)
             cell.configure(item: item, style: style.errorDescription)
             return cell
         }
@@ -307,7 +307,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         switch kind {
         case CollectionViewCenterLayout.elementKindSeparator:
             let view = collectionView.dequeueReusableSupplementaryView(
-                CardTokenizationSeparatorView.self, kind: kind, indexPath: indexPath
+                CollectionViewSeparatorView.self, kind: kind, indexPath: indexPath
             )
             view.configure(color: style.separatorColor)
             return view
@@ -316,7 +316,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
                 return nil
             }
             let view = collectionView.dequeueReusableSupplementaryView(
-                CardTokenizationSectionHeaderView.self, kind: kind, indexPath: indexPath
+                CollectionViewSectionHeaderView.self, kind: kind, indexPath: indexPath
             )
             view.configure(item: sectionTitle, style: style.sectionTitle)
             return view

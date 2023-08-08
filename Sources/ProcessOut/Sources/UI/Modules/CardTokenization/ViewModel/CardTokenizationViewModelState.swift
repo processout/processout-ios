@@ -10,6 +10,8 @@ import UIKit
 
 struct CardTokenizationViewModelState {
 
+    typealias TitleItem = CollectionViewTitleViewModel
+
     struct InputValue: Hashable {
 
         /// Current parameter's value text.
@@ -23,12 +25,6 @@ struct CardTokenizationViewModelState {
         /// Boolean value indicating whether input is currently focused.
         @ReferenceWrapper
         var isFocused: Bool
-    }
-
-    struct TitleItem: Hashable {
-
-        /// Title text.
-        let text: String
     }
 
     struct InputItem: Hashable {
@@ -56,11 +52,7 @@ struct CardTokenizationViewModelState {
         var submit: () -> Void
     }
 
-    struct ErrorItem: Hashable {
-
-        /// Error description.
-        let description: String
-    }
+    typealias ErrorItem = CollectionViewErrorViewModel
 
     enum Item: Hashable {
         case title(TitleItem), input(InputItem), error(ErrorItem)
