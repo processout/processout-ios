@@ -19,6 +19,10 @@ struct CardTokenizationViewModelState {
         /// Boolean value indicating whether value is valid.
         @ReferenceWrapper
         var isInvalid: Bool
+
+        /// Boolean value indicating whether input is currently focused.
+        @ReferenceWrapper
+        var isFocused: Bool
     }
 
     struct TitleItem: Hashable {
@@ -46,6 +50,10 @@ struct CardTokenizationViewModelState {
 
         /// Text content type.
         let contentType: UITextContentType?
+
+        /// Submit items value.
+        @ImmutableNullHashable
+        var submit: () -> Void
     }
 
     struct ErrorItem: Hashable {

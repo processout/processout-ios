@@ -22,8 +22,9 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         interactor.start()
     }
 
-    func submit() {
-        interactor.tokenize()
+    func didAppear() {
+        focusedParameterId = \.number
+        configureWithInteractorState()
     }
 
     // MARK: - Private Nested Types
@@ -41,11 +42,12 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     private let interactor: any CardTokenizationInteractor
     private let configuration: POCardTokenizationConfiguration
 
-    private lazy var cardNumberFormatter = CardNumberFormatter()
-    private lazy var cardExpirationFormatter = CardExpirationFormatter()
-
     private var inputValuesCache: [InteractorState.ParameterId: State.InputValue]
     private var inputValuesObservations: [AnyObject]
+
+    /// Changes to this property are not automatically propagated to view. Instead
+    /// `configureWithInteractorState` method should be called directly.
+    private var focusedParameterId: InteractorState.ParameterId?
 
     // MARK: - Private Methods
 
@@ -58,10 +60,12 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         case .idle:
             state = .idle
         case .started(let startedState):
+            configureFocusedParameter(startedState: startedState)
             state = convertToState(startedState: startedState, isEditingAllowed: true)
         case .failure:
             break
         case .tokenizing(let startedState):
+            focusedParameterId = nil
             state = convertToState(startedState: startedState, isEditingAllowed: false)
         case .tokenized:
             break // Currently tokenized is a sink state so simply ignored
@@ -106,37 +110,44 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     private func cardInformationInputItems(
         startedState: InteractorState.Started, isEditingAllowed: Bool
     ) -> [State.Item] {
+        let submit: () -> Void = { [weak self] in
+            self?.onParameterSubmit()
+        }
         let number = State.InputItem(
             placeholder: Text.CardDetails.Number.placeholder,
             value: inputValue(for: startedState.number),
-            formatter: cardNumberFormatter,
+            formatter: startedState.number.formatter,
             isCompact: false,
             keyboard: .asciiCapableNumberPad,
-            contentType: .creditCardNumber
+            contentType: .creditCardNumber,
+            submit: submit
         )
         let expiration = State.InputItem(
             placeholder: Text.CardDetails.Expiration.placeholder,
             value: inputValue(for: startedState.expiration),
-            formatter: cardExpirationFormatter,
+            formatter: startedState.expiration.formatter,
             isCompact: true,
             keyboard: .asciiCapableNumberPad,
-            contentType: nil
+            contentType: nil,
+            submit: submit
         )
         let cvc = State.InputItem(
             placeholder: Text.CardDetails.Cvc.placeholder,
             value: inputValue(for: startedState.cvc),
-            formatter: nil,
+            formatter: startedState.cvc.formatter,
             isCompact: true,
             keyboard: .asciiCapableNumberPad,
-            contentType: nil
+            contentType: nil,
+            submit: submit
         )
         let cardholder = State.InputItem(
             placeholder: Text.CardDetails.Cvc.cardholder,
             value: inputValue(for: startedState.cardholderName),
-            formatter: nil,
+            formatter: startedState.cardholderName.formatter,
             isCompact: false,
             keyboard: .asciiCapable,
-            contentType: .name
+            contentType: .name,
+            submit: submit
         )
         return [.input(number), .input(expiration), .input(cvc), .input(cardholder)]
     }
@@ -145,18 +156,46 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         if let value = inputValuesCache[parameter.id] {
             value.text = parameter.value
             value.isInvalid = !parameter.isValid
+            value.isFocused = focusedParameterId == parameter.id
             return value
         }
         let value = State.InputValue(
             text: .init(value: parameter.value),
-            isInvalid: .init(value: !parameter.isValid)
+            isInvalid: .init(value: !parameter.isValid),
+            isFocused: .init(value: focusedParameterId == parameter.id)
         )
-        let observer = value.$text.addObserver { [weak self] value in
+        let textObserver = value.$text.addObserver { [weak self] value in
             self?.interactor.update(parameterId: parameter.id, value: value)
         }
+        inputValuesObservations.append(textObserver)
+        let activityObserver = value.$isFocused.addObserver { [weak self] isActive in
+            if isActive {
+                self?.focusedParameterId = parameter.id
+            } else if self?.focusedParameterId == parameter.id {
+                self?.focusedParameterId = nil
+            }
+        }
+        inputValuesObservations.append(activityObserver)
         inputValuesCache[parameter.id] = value
-        inputValuesObservations.append(observer)
         return value
+    }
+
+    private func onParameterSubmit() {
+        guard let focusedParameterId, case .started(let startedState) = interactor.state else {
+            return
+        }
+        let parameters = [
+            startedState.number, startedState.expiration, startedState.cvc, startedState.cardholderName
+        ]
+        guard let focusedParameterIndex = parameters.map(\.id).firstIndex(of: focusedParameterId) else {
+            return
+        }
+        if parameters.indices.contains(focusedParameterIndex + 1) {
+            self.focusedParameterId = parameters[focusedParameterIndex + 1].id
+            configureWithInteractorState()
+        } else {
+            interactor.tokenize()
+        }
     }
 
     // MARK: - Actions
@@ -189,5 +228,18 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             }
         )
         return action
+    }
+
+    // MARK: - Utils
+
+    private func configureFocusedParameter(startedState: InteractorState.Started) {
+        guard focusedParameterId == nil else {
+            return
+        }
+        let paramters = [startedState.number, startedState.expiration, startedState.cvc, startedState.cardholderName]
+        guard let invalidParameterIndex = paramters.firstIndex(where: { !$0.isValid }) else {
+            return
+        }
+        focusedParameterId = paramters[invalidParameterIndex].id
     }
 }

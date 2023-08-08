@@ -5,20 +5,18 @@
 //  Created by Andrii Vysotskyi on 24.07.2023.
 //
 
-// swiftlint:disable type_body_length file_length
+// swiftlint:disable type_body_length
 
 import UIKit
 
 final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>:
     BaseViewController<ViewModel>,
-    CollectionViewDelegateCenterLayout,
-    CardTokenizationCellDelegate {
+    CollectionViewDelegateCenterLayout {
 
     init(viewModel: ViewModel, style: POCardTokenizationStyle, logger: POLogger) {
         self.style = style
         self.logger = logger
         keyboardHeight = 0
-        didAppear = false
         super.init(viewModel: viewModel, logger: logger)
     }
 
@@ -31,8 +29,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        didAppear = true
-        updateFirstResponder()
+        viewModel.didAppear()
     }
 
     override func loadView() {
@@ -191,40 +188,6 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         return sectionInset
     }
 
-    // MARK: - Scroll View Delegate
-
-    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        updateFirstResponder()
-    }
-
-    // MARK: - CardTokenizationCellDelegate
-
-    func cardTokenizationCellShouldReturn(_ cell: CardTokenizationCell) -> Bool {
-        let visibleIndexPaths = collectionView.indexPathsForVisibleItems.sorted()
-        guard let indexPath = collectionView.indexPath(for: cell),
-              let nextIndex = visibleIndexPaths.firstIndex(of: indexPath)?.advanced(by: 1),
-              visibleIndexPaths.indices.contains(nextIndex) else {
-            viewModel.submit()
-            return true
-        }
-        for indexPath in visibleIndexPaths.suffix(from: nextIndex) {
-            guard let cell = collectionView.cellForItem(at: indexPath) as? CardTokenizationCell,
-                  let responder = cell.inputResponder else {
-                continue
-            }
-            if responder.becomeFirstResponder() {
-                collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
-            }
-            return true
-        }
-        viewModel.submit()
-        return true
-    }
-
-    func cardTokenizationCellShouldBeginEditing(_ cell: CardTokenizationCell) -> Bool {
-        viewModel.state.isEditingAllowed
-    }
-
     // MARK: - Private Nested Types
 
     private typealias SectionIdentifier = ViewModel.State.SectionIdentifier
@@ -278,7 +241,6 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
     }()
 
     private var keyboardHeight: CGFloat
-    private var didAppear: Bool
 
     // MARK: - State Management
 
@@ -295,59 +257,14 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         if reload {
             snapshot.reloadSections(collectionViewDataSource.snapshot().sectionIdentifiers)
         }
-        collectionViewDataSource.apply(snapshot, animatingDifferences: animated) { [weak self] in
-            self?.updateFirstResponder()
-        }
+        collectionViewDataSource.apply(snapshot, animatingDifferences: animated)
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             buttonsContainerView.configure(viewModel: state.actions, animated: animated)
             collectionOverlayView.layoutIfNeeded()
         }
-    }
-
-    // MARK: - Current Responder Handling
-
-    private func updateFirstResponder() {
-        // Becoming first responder may cause UI issues related to keyboard presentation if attempted
-        // before view appears on screen. For example, during a push to UINavigationController. So
-        // the operation is delayed until then.
-        guard didAppear else {
-            return
-        }
-        if !viewModel.state.isEditingAllowed {
-            logger.debug("Editing is not allowed in current state, will resign first responder")
+        if !state.isEditingAllowed {
             view.endEditing(true)
-            return
         }
-        let isEditing = collectionView.indexPathsForVisibleItems.contains { indexPath in
-            let cell = collectionView.cellForItem(at: indexPath) as? CardTokenizationCell
-            return cell?.inputResponder?.isFirstResponder == true
-        }
-        guard !isEditing, let indexPath = indexPathForFutureFirstResponderCell() else {
-            return
-        }
-        if collectionView.indexPathsForVisibleItems.contains(indexPath) {
-            let cell = collectionView.cellForItem(at: indexPath) as? CardTokenizationCell
-            cell?.inputResponder?.becomeFirstResponder()
-        }
-        collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
-    }
-
-    private func indexPathForFutureFirstResponderCell() -> IndexPath? {
-        let snapshot = collectionViewDataSource.snapshot()
-        var inputsIndexPaths: [IndexPath] = []
-        for (section, sectionId) in snapshot.sectionIdentifiers.enumerated() {
-            for (row, item) in snapshot.itemIdentifiers(inSection: sectionId).enumerated() {
-                guard case .input(let inputItem) = item else {
-                    continue
-                }
-                let indexPath = IndexPath(row: row, section: section)
-                if inputItem.value.isInvalid {
-                    return indexPath
-                }
-                inputsIndexPaths.append(indexPath)
-            }
-        }
-        return inputsIndexPaths.first
     }
 
     // MARK: -
@@ -375,7 +292,6 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         case .input(let item):
             let cell = collectionView.dequeueReusableCell(CardTokenizationInputCell.self, for: indexPath)
             cell.configure(item: item, style: style.input)
-            cell.delegate = self
             return cell
         case .error(let item):
             let cell = collectionView.dequeueReusableCell(CardTokenizationErrorCell.self, for: indexPath)
@@ -427,4 +343,4 @@ private enum Constants {
     static let inputHeight: CGFloat = 44
 }
 
-// swiftlint:enable type_body_length file_length
+// swiftlint:enable type_body_length
