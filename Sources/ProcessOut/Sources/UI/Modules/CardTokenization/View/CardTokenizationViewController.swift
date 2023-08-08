@@ -127,7 +127,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
                 viewType: CollectionViewTitleCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(item: item, style: self.style.title)
+                    cell.configure(viewModel: item, style: self.style.title)
                 }
             ).height
         case .error(let item):
@@ -135,7 +135,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
                 viewType: CollectionViewErrorCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(item: item, style: self.style.errorDescription)
+                    cell.configure(viewModel: item, style: self.style.errorDescription)
                 }
             ).height
         case .input(let item):
@@ -163,7 +163,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             viewType: CollectionViewSectionHeaderView.self,
             preferredWidth: width,
             configure: { [self] view in
-                view.configure(item: sectionHeader, style: style.sectionTitle)
+                view.configure(viewModel: sectionHeader, style: style.sectionTitle)
             }
         )
     }
@@ -287,7 +287,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         switch item {
         case .title(let item):
             let cell = collectionView.dequeueReusableCell(CollectionViewTitleCell.self, for: indexPath)
-            cell.configure(item: item, style: style.title)
+            cell.configure(viewModel: item, style: style.title)
             return cell
         case .input(let item):
             let cell = collectionView.dequeueReusableCell(CardTokenizationInputCell.self, for: indexPath)
@@ -295,7 +295,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             return cell
         case .error(let item):
             let cell = collectionView.dequeueReusableCell(CollectionViewErrorCell.self, for: indexPath)
-            cell.configure(item: item, style: style.errorDescription)
+            cell.configure(viewModel: item, style: style.errorDescription)
             return cell
         }
     }
@@ -318,7 +318,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             let view = collectionView.dequeueReusableSupplementaryView(
                 CollectionViewSectionHeaderView.self, kind: kind, indexPath: indexPath
             )
-            view.configure(item: sectionHeader, style: style.sectionTitle)
+            view.configure(viewModel: sectionHeader, style: style.sectionTitle)
             return view
         default:
             return nil

@@ -143,7 +143,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
                 viewType: CollectionViewTitleCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(item: item, style: self.style.title)
+                    cell.configure(viewModel: item, style: self.style.title)
                 }
             ).height
         case .error(let item):
@@ -151,7 +151,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
                 viewType: CollectionViewErrorCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(item: item, style: self.style.errorDescription)
+                    cell.configure(viewModel: item, style: self.style.errorDescription)
                 }
             ).height
         case .submitted(let item):
@@ -195,7 +195,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             viewType: CollectionViewSectionHeaderView.self,
             preferredWidth: width,
             configure: { [self] view in
-                view.configure(item: sectionHeader, style: style.sectionTitle)
+                view.configure(viewModel: sectionHeader, style: style.sectionTitle)
             }
         )
     }
@@ -413,7 +413,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             return cell
         case .title(let item):
             let cell = collectionView.dequeueReusableCell(CollectionViewTitleCell.self, for: indexPath)
-            cell.configure(item: item, style: style.title)
+            cell.configure(viewModel: item, style: style.title)
             return cell
         case .input(let item):
             let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodInputCell.self, for: indexPath)
@@ -429,7 +429,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             return cell
         case .error(let item):
             let cell = collectionView.dequeueReusableCell(CollectionViewErrorCell.self, for: indexPath)
-            cell.configure(item: item, style: style.errorDescription)
+            cell.configure(viewModel: item, style: style.errorDescription)
             return cell
         case .submitted(let item):
             let cell = collectionView.dequeueReusableCell(
@@ -469,7 +469,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             let view = collectionView.dequeueReusableSupplementaryView(
                 CollectionViewSectionHeaderView.self, kind: kind, indexPath: indexPath
             )
-            view.configure(item: sectionHeader, style: style.sectionTitle)
+            view.configure(viewModel: sectionHeader, style: style.sectionTitle)
             return view
         default:
             return nil

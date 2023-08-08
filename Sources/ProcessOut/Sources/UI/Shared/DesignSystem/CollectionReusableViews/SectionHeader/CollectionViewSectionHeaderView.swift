@@ -19,14 +19,14 @@ final class CollectionViewSectionHeaderView: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: CollectionViewSectionHeaderViewModel, style: POTextStyle) {
+    func configure(viewModel: CollectionViewSectionHeaderViewModel, style: POTextStyle) {
         titleLabel.attributedText = AttributedStringBuilder()
             .with { builder in
                 builder.typography = style.typography
                 builder.textStyle = .title3
                 builder.color = style.color
-                builder.alignment = item.isCentered ? .center : .natural
-                builder.text = .plain(item.title)
+                builder.alignment = viewModel.isCentered ? .center : .natural
+                builder.text = .plain(viewModel.title)
             }
             .build()
     }

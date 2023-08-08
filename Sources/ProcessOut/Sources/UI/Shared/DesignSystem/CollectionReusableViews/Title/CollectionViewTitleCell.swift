@@ -19,14 +19,14 @@ final class CollectionViewTitleCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: CollectionViewTitleViewModel, style: POTextStyle) {
+    func configure(viewModel: CollectionViewTitleViewModel, style: POTextStyle) {
         titleLabel.attributedText = AttributedStringBuilder()
             .with { builder in
                 builder.typography = style.typography
                 builder.textStyle = .largeTitle
                 builder.lineBreakMode = .byWordWrapping
                 builder.color = style.color
-                builder.text = .plain(item.text)
+                builder.text = .plain(viewModel.text)
             }
             .build()
     }

@@ -19,14 +19,14 @@ final class CollectionViewErrorCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: CollectionViewErrorViewModel, style: POTextStyle) {
+    func configure(viewModel: CollectionViewErrorViewModel, style: POTextStyle) {
         descriptionLabel.attributedText = AttributedStringBuilder()
             .with { builder in
                 builder.typography = style.typography
                 builder.textStyle = .body
                 builder.color = style.color
-                builder.alignment = item.isCentered ? .center : .natural
-                builder.text = .plain(item.description)
+                builder.alignment = viewModel.isCentered ? .center : .natural
+                builder.text = .plain(viewModel.description)
             }
             .build()
     }
