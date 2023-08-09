@@ -31,6 +31,18 @@ public final class POCardTokenizationViewControllerBuilder {
         return self
     }
 
+    /// Sets delegate.
+    public func with(delegate: POCardTokenizationDelegate) -> Self {
+        self.delegate = delegate
+        return self
+    }
+
+    /// Sets 3DS service.
+    public func with(threeDSService: PO3DSService) -> Self {
+        self.threeDSService = threeDSService
+        return self
+    }
+
     /// Completion to invoke when flow is completed.
     public func with(completion: @escaping (Result<POCard, POFailure>) -> Void) -> Self {
         self.completion = completion
@@ -48,7 +60,10 @@ public final class POCardTokenizationViewControllerBuilder {
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         let interactor = DefaultCardTokenizationInteractor(
             cardsService: api.cards,
+            invoicesService: api.invoices,
+            threeDSService: threeDSService,
             logger: api.logger,
+            delegate: delegate,
             completion: completion
         )
         let viewModel = DefaultCardTokenizationViewModel(interactor: interactor, configuration: configuration)
@@ -59,5 +74,7 @@ public final class POCardTokenizationViewControllerBuilder {
 
     private var style: POCardTokenizationStyle
     private var configuration: POCardTokenizationConfiguration
+    private var threeDSService: PO3DSService?
+    private weak var delegate: POCardTokenizationDelegate?
     private var completion: ((Result<POCard, POFailure>) -> Void)?
 }

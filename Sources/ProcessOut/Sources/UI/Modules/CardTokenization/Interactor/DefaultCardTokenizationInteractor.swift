@@ -12,9 +12,19 @@ final class DefaultCardTokenizationInteractor:
 
     // MARK: -
 
-    init(cardsService: POCardsService, logger: POLogger, completion: @escaping Completion) {
+    init(
+        cardsService: POCardsService,
+        invoicesService: POInvoicesService,
+        threeDSService: PO3DSService?,
+        logger: POLogger,
+        delegate: POCardTokenizationDelegate?,
+        completion: @escaping Completion
+    ) {
         self.cardsService = cardsService
+        self.invoicesService = invoicesService
+        self.threeDSService = threeDSService
         self.logger = logger
+        self.delegate = delegate
         self.completion = completion
         super.init(state: .idle)
     }
@@ -85,11 +95,15 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - Private Properties
 
     private let cardsService: POCardsService
+    private let invoicesService: POInvoicesService
+    private let threeDSService: PO3DSService?
     private let logger: POLogger
     private let completion: Completion
 
     private lazy var cardNumberFormatter = CardNumberFormatter()
     private lazy var cardExpirationFormatter = CardExpirationFormatter()
+
+    private weak var delegate: POCardTokenizationDelegate?
 
     // MARK: - State Management
 
@@ -126,7 +140,34 @@ final class DefaultCardTokenizationInteractor:
     private func setTokenizedStateUnchecked(card: POCard, cardNumber: String) {
         let tokenizedState = State.Tokenized(card: card, cardNumber: cardNumber)
         state = .tokenized(tokenizedState)
+        trySetAuthorizingState()
+        guard case .tokenized = state else {
+            return
+        }
         completion(.success(card))
+    }
+
+    private func trySetAuthorizingState() {
+        guard case .tokenized(let tokenizedState) = state,
+              let request = delegate?.invoiceAuthorizationRequest(card: tokenizedState.card) else {
+            return
+        }
+        guard let threeDSService else {
+            preconditionFailure("3DS service must be set to authorize invoice.")
+        }
+        invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService) { [weak self] result in
+            switch result {
+            case .success:
+                // todo(andrii-vysotskyi): decide if returning to tokenized state is ok
+                self?.state = .tokenized(tokenizedState)
+                self?.completion(.success(tokenizedState.card))
+            case .failure(let failure):
+                // todo(andrii-vysotskyi): decide if implementation should recover in case error is card related
+                self?.setFailureStateUnchecked(failure: failure)
+            }
+        }
+        let authorizingState = State.Authorizing(snapshot: tokenizedState, request: request)
+        state = .authorizing(authorizingState)
     }
 
     private func setFailureStateUnchecked(failure: POFailure) {

@@ -53,5 +53,15 @@ enum CardTokenizationInteractorState {
         let cardNumber: String
     }
 
-    case idle, started(Started), tokenizing(snapshot: Started), tokenized(Tokenized), failure(POFailure)
+    struct Authorizing {
+
+        /// Tokenized state state snapshot.
+        let snapshot: Tokenized
+
+        /// Merchant supplied invoice authorization request.
+        let request: POInvoiceAuthorizationRequest
+    }
+
+    // swiftlint:disable:next line_length
+    case idle, started(Started), tokenizing(snapshot: Started), tokenized(Tokenized), failure(POFailure), authorizing(Authorizing)
 }
