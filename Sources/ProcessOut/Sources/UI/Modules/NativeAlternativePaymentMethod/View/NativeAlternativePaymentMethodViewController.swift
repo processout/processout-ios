@@ -11,7 +11,7 @@ import UIKit
 
 final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAlternativePaymentMethodViewModel>:
     BaseViewController<ViewModel>,
-    NativeAlternativePaymentMethodCollectionLayoutDelegate,
+    CollectionViewDelegateCenterLayout,
     NativeAlternativePaymentMethodCellDelegate {
 
     init(viewModel: ViewModel, style: PONativeAlternativePaymentMethodStyle, logger: POLogger) {
@@ -87,7 +87,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         collectionOverlayView.layoutIfNeeded()
     }
 
-    // MARK: - NativeAlternativePaymentMethodCollectionLayoutDelegate
+    // MARK: - CollectionViewDelegateCenterLayout
 
     func centeredSection(layout: UICollectionViewLayout) -> Int? {
         let snapshot = collectionViewDataSource.snapshot()
@@ -140,18 +140,18 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             height = Constants.loaderHeight
         case .title(let item):
             height = collectionReusableViewSizeProvider.systemLayoutSize(
-                viewType: NativeAlternativePaymentMethodTitleCell.self,
+                viewType: CollectionViewTitleCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(item: item, style: self.style.title)
+                    cell.configure(viewModel: item, style: self.style.title)
                 }
             ).height
         case .error(let item):
             height = collectionReusableViewSizeProvider.systemLayoutSize(
-                viewType: NativeAlternativePaymentMethodErrorCell.self,
+                viewType: CollectionViewErrorCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(item: item, style: self.style.errorDescription)
+                    cell.configure(viewModel: item, style: self.style.errorDescription)
                 }
             ).height
         case .submitted(let item):
@@ -192,10 +192,10 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         }
         let width = collectionView.bounds.inset(by: collectionView.adjustedContentInset).width
         return collectionReusableViewSizeProvider.systemLayoutSize(
-            viewType: NativeAlternativePaymentMethodSectionHeaderView.self,
+            viewType: CollectionViewSectionHeaderView.self,
             preferredWidth: width,
             configure: { [self] view in
-                view.configure(item: sectionHeader, style: style.sectionTitle)
+                view.configure(viewModel: sectionHeader, style: style.sectionTitle)
             }
         )
     }
@@ -275,7 +275,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         return view
     }()
 
-    private lazy var buttonsContainerView = NativeAlternativePaymentMethodButtonsView(
+    private lazy var buttonsContainerView = ActionsContainerView(
         style: style.actions, horizontalInset: Constants.contentInset.left
     )
 
@@ -289,7 +289,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         return collectionView
     }()
 
-    private lazy var collectionViewLayout = NativeAlternativePaymentMethodCollectionLayout()
+    private lazy var collectionViewLayout = CollectionViewCenterLayout()
     private lazy var collectionReusableViewSizeProvider = CollectionReusableViewSizeProvider()
 
     private lazy var collectionViewDataSource: CollectionViewDiffableDataSource<SectionIdentifier, ItemIdentifier> = {
@@ -310,7 +310,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
     // MARK: - State Management
 
     private func configureWithIdleState() {
-        buttonsContainerView.configure(actions: .init(primary: nil, secondary: nil), animated: false)
+        buttonsContainerView.configure(viewModel: .init(primary: nil, secondary: nil), animated: false)
         let snapshot = DiffableDataSourceSnapshot<SectionIdentifier, ItemIdentifier>()
         collectionViewDataSource.applySnapshotUsingReloadData(snapshot)
         view.backgroundColor = style.background.regular
@@ -334,7 +334,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         }
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             view.backgroundColor = state.isCaptured ? style.background.success : style.background.regular
-            buttonsContainerView.configure(actions: state.actions, animated: animated)
+            buttonsContainerView.configure(viewModel: state.actions, animated: animated)
             collectionOverlayView.layoutIfNeeded()
         }
     }
@@ -390,17 +390,16 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
     private func configureCollectionView() {
         _ = collectionViewDataSource
         collectionView.registerSupplementaryView(
-            NativeAlternativePaymentMethodSectionHeaderView.self, kind: UICollectionView.elementKindSectionHeader
+            CollectionViewSectionHeaderView.self, kind: UICollectionView.elementKindSectionHeader
         )
         collectionView.registerSupplementaryView(
-            NativeAlternativePaymentMethodSeparatorView.self,
-            kind: NativeAlternativePaymentMethodCollectionLayout.elementKindSeparator
+            CollectionViewSeparatorView.self, kind: CollectionViewCenterLayout.elementKindSeparator
         )
-        collectionView.registerCell(NativeAlternativePaymentMethodTitleCell.self)
+        collectionView.registerCell(CollectionViewTitleCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodLoaderCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodInputCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodCodeInputCell.self)
-        collectionView.registerCell(NativeAlternativePaymentMethodErrorCell.self)
+        collectionView.registerCell(CollectionViewErrorCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodSubmittedCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodPickerCell.self)
         collectionView.registerCell(NativeAlternativePaymentMethodRadioCell.self)
@@ -413,8 +412,8 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             cell.initialize(style: style.activityIndicator)
             return cell
         case .title(let item):
-            let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodTitleCell.self, for: indexPath)
-            cell.configure(item: item, style: style.title)
+            let cell = collectionView.dequeueReusableCell(CollectionViewTitleCell.self, for: indexPath)
+            cell.configure(viewModel: item, style: style.title)
             return cell
         case .input(let item):
             let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodInputCell.self, for: indexPath)
@@ -429,8 +428,8 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             cell.delegate = self
             return cell
         case .error(let item):
-            let cell = collectionView.dequeueReusableCell(NativeAlternativePaymentMethodErrorCell.self, for: indexPath)
-            cell.configure(item: item, style: style.errorDescription)
+            let cell = collectionView.dequeueReusableCell(CollectionViewErrorCell.self, for: indexPath)
+            cell.configure(viewModel: item, style: style.errorDescription)
             return cell
         case .submitted(let item):
             let cell = collectionView.dequeueReusableCell(
@@ -457,9 +456,9 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
             return nil
         }
         switch kind {
-        case NativeAlternativePaymentMethodCollectionLayout.elementKindSeparator:
+        case CollectionViewCenterLayout.elementKindSeparator:
             let view = collectionView.dequeueReusableSupplementaryView(
-                NativeAlternativePaymentMethodSeparatorView.self, kind: kind, indexPath: indexPath
+                CollectionViewSeparatorView.self, kind: kind, indexPath: indexPath
             )
             view.configure(color: style.separatorColor)
             return view
@@ -468,9 +467,9 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
                 return nil
             }
             let view = collectionView.dequeueReusableSupplementaryView(
-                NativeAlternativePaymentMethodSectionHeaderView.self, kind: kind, indexPath: indexPath
+                CollectionViewSectionHeaderView.self, kind: kind, indexPath: indexPath
             )
-            view.configure(item: sectionHeader, style: style.sectionTitle)
+            view.configure(viewModel: sectionHeader, style: style.sectionTitle)
             return view
         default:
             return nil
@@ -482,7 +481,7 @@ final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAltern
         // todo(andrii-vysotskyi): consider observing overlay content height instead for better flexibility in future
         var bottomInset = Constants.contentInset.bottom + keyboardHeight
         if case .started(let startedState) = state {
-            bottomInset += buttonsContainerView.contentHeight(actions: startedState.actions)
+            bottomInset += buttonsContainerView.contentHeight(viewModel: startedState.actions)
         }
         if bottomInset != collectionView.contentInset.bottom {
             collectionView.contentInset.bottom = bottomInset

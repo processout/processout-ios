@@ -29,7 +29,7 @@ public struct PONativeAlternativePaymentMethodStyle {
     public let errorDescription: POTextStyle
 
     /// Actions style.
-    public let actions: PONativeAlternativePaymentMethodActionsStyle
+    public let actions: POActionsContainerStyle
 
     /// Activity indicator style. Please note that maximum height of activity indicator
     /// is limited to 256.
@@ -57,7 +57,7 @@ public struct PONativeAlternativePaymentMethodStyle {
         codeInput: POInputStyle? = nil,
         radioButton: PORadioButtonStyle? = nil,
         errorDescription: POTextStyle? = nil,
-        actions: PONativeAlternativePaymentMethodActionsStyle? = nil,
+        actions: POActionsContainerStyle? = nil,
         activityIndicator: POActivityIndicatorStyle? = nil,
         message: POTextStyle? = nil,
         successMessage: POTextStyle? = nil,
@@ -87,7 +87,7 @@ public struct PONativeAlternativePaymentMethodStyle {
         static let codeInput = POInputStyle.default(typography: .Medium.title)
         static let radioButton = PORadioButtonStyle.default
         static let errorDescription = POTextStyle(color: Asset.Colors.Text.error.color, typography: .Fixed.label)
-        static let actions = PONativeAlternativePaymentMethodActionsStyle()
+        static let actions = POActionsContainerStyle()
         static let activityIndicator = POActivityIndicatorStyle.system(
             .whiteLarge, color: Asset.Colors.Text.secondary.color
         )

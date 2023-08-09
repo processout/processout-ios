@@ -7,8 +7,8 @@
 
 protocol CardTokenizationViewModel: ViewModel<CardTokenizationViewModelState> {
 
-    /// Submits tokenization request.
-    func submit()
+    /// Invoked when view appears on screen.
+    func didAppear()
 }
 
 // TODOs:

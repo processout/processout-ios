@@ -42,29 +42,13 @@ final class CardTokenizationInputCell: UICollectionViewCell, CardTokenizationCel
     // MARK: - CardTokenizationCell
 
     func willDisplay() {
-        guard let item, let style else {
-            return
-        }
-        let isInvalidObserver = item.value.$isInvalid.addObserver { [weak self] isInvalid in
-            self?.textFieldContainer.configure(isInvalid: isInvalid, style: style, animated: true)
-        }
-        let valueObserver = item.value.$text.addObserver { [weak self] updatedValue in
-            if self?.textFieldContainer.textField.text != updatedValue {
-                self?.textFieldContainer.textField.text = updatedValue
-            }
-        }
-        self.observations = [isInvalidObserver, valueObserver]
+        observeItemChanges()
+        updateFirstResponder()
     }
 
     func didEndDisplaying() {
         observations = []
     }
-
-    var inputResponder: UIResponder? {
-        textFieldContainer.textField
-    }
-
-    weak var delegate: CardTokenizationCellDelegate?
 
     // MARK: - Private Nested Types
 
@@ -77,6 +61,7 @@ final class CardTokenizationInputCell: UICollectionViewCell, CardTokenizationCel
     private lazy var textFieldContainer: TextFieldContainerView = {
         let view = TextFieldContainerView()
         view.textField.clearButtonMode = .whileEditing
+        // todo(andrii-vysotskyi): make accessibility identifier dynamic
         view.textField.accessibilityIdentifier = Constants.accessibilityIdentifier
         view.textField.delegate = self
         view.textField.addTarget(self, action: #selector(textFieldEditingChanged), for: .editingChanged)
@@ -103,16 +88,49 @@ final class CardTokenizationInputCell: UICollectionViewCell, CardTokenizationCel
     private func textFieldEditingChanged() {
         item?.value.text = textFieldContainer.textField.text ?? ""
     }
+
+    private func observeItemChanges() {
+        guard let item, let style else {
+            return
+        }
+        let isInvalidObserver = item.value.$isInvalid.addObserver { [weak self] isInvalid in
+            self?.textFieldContainer.configure(isInvalid: isInvalid, style: style, animated: true)
+        }
+        let valueObserver = item.value.$text.addObserver { [weak self] updatedValue in
+            if self?.textFieldContainer.textField.text != updatedValue {
+                self?.textFieldContainer.textField.text = updatedValue
+            }
+        }
+        let activityObserver = item.value.$isFocused.addObserver { [weak self] _ in
+            self?.updateFirstResponder()
+        }
+        self.observations = [isInvalidObserver, valueObserver, activityObserver]
+    }
+
+    private func updateFirstResponder() {
+        // Explicitly resigning responder and activating another causes the keyboard to jump. So implementation is
+        // ignoring it. It is a responsibility of owning controller/collection to end editing when appropriate.
+        let textField = textFieldContainer.textField
+        guard let item, item.value.isFocused, !textField.isFirstResponder, window != nil else {
+            return
+        }
+        textField.becomeFirstResponder()
+    }
 }
 
 extension CardTokenizationInputCell: UITextFieldDelegate {
 
-    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        item?.value.isEditingAllowed ?? false
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        item?.value.isFocused = true
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        item?.value.isFocused = false
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        delegate?.cardTokenizationCellShouldReturn(self) ?? true
+        item?.submit()
+        return true
     }
 
     func textField(
@@ -121,30 +139,6 @@ extension CardTokenizationInputCell: UITextFieldDelegate {
         guard let formatter = item?.formatter else {
             return true
         }
-        // swiftlint:disable legacy_objc_type
-        let originalString = (textField.text ?? "") as NSString
-        var updatedString = originalString.replacingCharacters(in: range, with: string) as NSString
-        // swiftlint:enable legacy_objc_type
-        var proposedSelectedRange = NSRange(location: updatedString.length, length: 0)
-        let isReplacementValid = formatter.isPartialStringValid(
-            &updatedString,
-            proposedSelectedRange: &proposedSelectedRange,
-            originalString: originalString as String,
-            originalSelectedRange: range,
-            errorDescription: nil
-        )
-        guard isReplacementValid else {
-            return false
-        }
-        textField.text = updatedString as String
-        // swiftlint:disable:next line_length
-        if let position = textField.position(from: textField.beginningOfDocument, offset: proposedSelectedRange.lowerBound) {
-            // fixme(andrii-vysotskyi): when called as a result of paste system changes our selection to wrong value
-            // based on length of `replacementString` after call textField(:shouldChangeCharactersIn:replacementString:)
-            // returns, even if this method returns false.
-            textField.selectedTextRange = textField.textRange(from: position, to: position)
-        }
-        textField.sendActions(for: .editingChanged)
-        return false
+        return TextFieldUtils.changeText(in: range, replacement: string, textField: textField, formatter: formatter)
     }
 }

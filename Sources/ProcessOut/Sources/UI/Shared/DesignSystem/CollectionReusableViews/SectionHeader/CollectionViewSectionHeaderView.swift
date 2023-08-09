@@ -1,17 +1,17 @@
 //
-//  NativeAlternativePaymentMethodTitleCell.swift
+//  CollectionViewSectionHeaderView.swift
 //  ProcessOut
 //
-//  Created by Andrii Vysotskyi on 20.04.2023.
+//  Created by Andrii Vysotskyi on 24.07.2023.
 //
 
 import UIKit
 
-final class NativeAlternativePaymentMethodTitleCell: UICollectionViewCell {
+final class CollectionViewSectionHeaderView: UICollectionReusableView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        commonInit()
+        self.commonInit()
     }
 
     @available(*, unavailable)
@@ -19,15 +19,14 @@ final class NativeAlternativePaymentMethodTitleCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.TitleItem, style: POTextStyle) {
+    func configure(viewModel: CollectionViewSectionHeaderViewModel, style: POTextStyle) {
         titleLabel.attributedText = AttributedStringBuilder()
             .with { builder in
                 builder.typography = style.typography
-                builder.textStyle = .largeTitle
-                builder.alignment = .natural
-                builder.lineBreakMode = .byWordWrapping
+                builder.textStyle = .title3
                 builder.color = style.color
-                builder.text = .plain(item.text)
+                builder.alignment = viewModel.isCentered ? .center : .natural
+                builder.text = .plain(viewModel.title)
             }
             .build()
     }
@@ -39,20 +38,20 @@ final class NativeAlternativePaymentMethodTitleCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = false
         label.numberOfLines = 0
-        label.setContentCompressionResistancePriority(.required, for: .vertical)
         label.setContentHuggingPriority(.required, for: .vertical)
+        label.setContentCompressionResistancePriority(.required, for: .vertical)
         return label
     }()
 
     // MARK: - Private Methods
 
     private func commonInit() {
-        contentView.addSubview(titleLabel)
+        addSubview(titleLabel)
         let constraints = [
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).with(priority: .defaultHigh),
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor)
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
+            titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            titleLabel.topAnchor.constraint(equalTo: topAnchor),
+            titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor).with(priority: .defaultHigh)
         ]
         NSLayoutConstraint.activate(constraints)
     }

@@ -1,13 +1,13 @@
 //
-//  NativeAlternativePaymentMethodErrorCell.swift
+//  CollectionViewErrorCell.swift
 //  ProcessOut
 //
-//  Created by Andrii Vysotskyi on 26.04.2023.
+//  Created by Andrii Vysotskyi on 24.07.2023.
 //
 
 import UIKit
 
-final class NativeAlternativePaymentMethodErrorCell: UICollectionViewCell {
+final class CollectionViewErrorCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -19,14 +19,14 @@ final class NativeAlternativePaymentMethodErrorCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: NativeAlternativePaymentMethodViewModelState.ErrorItem, style: POTextStyle) {
+    func configure(viewModel: CollectionViewErrorViewModel, style: POTextStyle) {
         descriptionLabel.attributedText = AttributedStringBuilder()
             .with { builder in
                 builder.typography = style.typography
                 builder.textStyle = .body
                 builder.color = style.color
-                builder.alignment = item.isCentered ? .center : .natural
-                builder.text = .plain(item.description)
+                builder.alignment = viewModel.isCentered ? .center : .natural
+                builder.text = .plain(viewModel.description)
             }
             .build()
     }

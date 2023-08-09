@@ -26,8 +26,8 @@ final class DefaultCardTokenizationInteractor:
             return
         }
         let startedState = State.Started(
-            number: .init(id: \.number),
-            expiration: .init(id: \.expiration),
+            number: .init(id: \.number, formatter: cardNumberFormatter),
+            expiration: .init(id: \.expiration, formatter: cardExpirationFormatter),
             cvc: .init(id: \.cvc),
             cardholderName: .init(id: \.cardholderName)
         )
@@ -38,7 +38,8 @@ final class DefaultCardTokenizationInteractor:
         guard case .started(var startedState) = state, startedState[keyPath: parameterId].value != value else {
             return
         }
-        startedState[keyPath: parameterId] = .init(id: parameterId, value: value, isValid: true)
+        startedState[keyPath: parameterId].value = value
+        startedState[keyPath: parameterId].isValid = true
         if areParametersValid(startedState: startedState) {
             startedState.recentErrorMessage = nil
         }

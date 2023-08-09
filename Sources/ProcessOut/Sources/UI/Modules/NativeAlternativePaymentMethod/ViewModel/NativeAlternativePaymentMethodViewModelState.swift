@@ -9,13 +9,7 @@ import UIKit
 
 enum NativeAlternativePaymentMethodViewModelState {
 
-    typealias ParameterType = PONativeAlternativePaymentMethodParameter.ParameterType
-
-    struct TitleItem: Hashable {
-
-        /// Title text.
-        let text: String
-    }
+    typealias TitleItem = CollectionViewTitleViewModel
 
     struct RadioButtonItem: Hashable {
 
@@ -85,6 +79,8 @@ enum NativeAlternativePaymentMethodViewModelState {
         let isCentered: Bool
     }
 
+    typealias ParameterType = PONativeAlternativePaymentMethodParameter.ParameterType
+
     struct InputItem: Hashable {
 
         /// Parameter type.
@@ -103,14 +99,7 @@ enum NativeAlternativePaymentMethodViewModelState {
         let formatter: Formatter?
     }
 
-    struct ErrorItem: Hashable {
-
-        /// Error description.
-        let description: String
-
-        /// Indicates whether error should be centered.
-        let isCentered: Bool
-    }
+    typealias ErrorItem = CollectionViewErrorViewModel
 
     struct SubmittedItem: Hashable {
 
@@ -141,14 +130,7 @@ enum NativeAlternativePaymentMethodViewModelState {
         case submitted(SubmittedItem)
     }
 
-    struct SectionHeader: Hashable {
-
-        /// Section title if any.
-        let title: String
-
-        /// Indicates whether section header should be centered.
-        let isCentered: Bool
-    }
+    typealias SectionHeader = CollectionViewSectionHeaderViewModel
 
     struct SectionIdentifier: Hashable {
 
@@ -171,29 +153,8 @@ enum NativeAlternativePaymentMethodViewModelState {
         let items: [Item]
     }
 
-    struct Action {
-
-        /// Action title.
-        let title: String
-
-        /// Boolean value indicating whether action is enabled.
-        let isEnabled: Bool
-
-        /// Boolean value indicating whether action associated with button is currently running.
-        let isExecuting: Bool
-
-        /// Action handler.
-        let handler: () -> Void
-    }
-
-    struct Actions {
-
-        /// Primary action.
-        let primary: Action?
-
-        /// Secondary action.
-        let secondary: Action?
-    }
+    typealias Action = ActionsContainerActionViewModel
+    typealias Actions = ActionsContainerViewModel
 
     struct Started {
 

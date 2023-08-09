@@ -248,6 +248,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             title: title,
             isEnabled: startedState.isSubmitAllowed,
             isExecuting: isSubmitting,
+            accessibilityIdentifier: "native-alternative-payment.primary-button",
             handler: { [weak self] in
                 self?.interactor.submit()
             }
@@ -265,6 +266,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             title: title ?? Text.CancelButton.title,
             isEnabled: isEnabled,
             isExecuting: false,
+            accessibilityIdentifier: "native-alternative-payment.secondary-button",
             handler: { [weak self] in
                 self?.interactor.cancel()
             }

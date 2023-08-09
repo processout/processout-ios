@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 18.07.2023.
 //
 
+import Foundation
+
 enum CardTokenizationInteractorState {
 
     typealias ParameterId = WritableKeyPath<Started, Parameter>
@@ -19,6 +21,9 @@ enum CardTokenizationInteractorState {
 
         /// Indicates whether parameter is valid.
         var isValid = true
+
+        /// Formatter that can be used to format this parameter.
+        var formatter: Formatter?
     }
 
     struct Started {

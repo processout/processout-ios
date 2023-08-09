@@ -1,5 +1,5 @@
 //
-//  NativeAlternativePaymentMethodCollectionLayout.swift
+//  CollectionViewCenterLayout.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 26.04.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlowLayout {
+final class CollectionViewCenterLayout: UICollectionViewFlowLayout {
 
     override init() {
         centeringOffset = 0
@@ -115,9 +115,9 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
 
     // MARK: -
 
-    private func delegate() -> NativeAlternativePaymentMethodCollectionLayoutDelegate {
+    private func delegate() -> CollectionViewDelegateCenterLayout {
         // swiftlint:disable:next force_cast force_unwrapping
-        return collectionView!.delegate as! NativeAlternativePaymentMethodCollectionLayoutDelegate
+        return collectionView!.delegate as! CollectionViewDelegateCenterLayout
     }
 
     private func collectionView() -> UICollectionView {
@@ -205,7 +205,7 @@ final class NativeAlternativePaymentMethodCollectionLayout: UICollectionViewFlow
     }
 }
 
-extension NativeAlternativePaymentMethodCollectionLayout {
+extension CollectionViewCenterLayout {
 
     /// Section background element kind.
     static let elementKindSeparator = "ElementKindSeparator"

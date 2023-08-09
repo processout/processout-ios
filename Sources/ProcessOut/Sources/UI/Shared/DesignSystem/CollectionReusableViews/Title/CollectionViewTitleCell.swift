@@ -1,5 +1,5 @@
 //
-//  CardTokenizationTitleCell.swift
+//  CollectionViewTitleCell.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 24.07.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class CardTokenizationTitleCell: UICollectionViewCell {
+final class CollectionViewTitleCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -19,14 +19,14 @@ final class CardTokenizationTitleCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(item: CardTokenizationViewModelState.TitleItem, style: POTextStyle) {
+    func configure(viewModel: CollectionViewTitleViewModel, style: POTextStyle) {
         titleLabel.attributedText = AttributedStringBuilder()
             .with { builder in
                 builder.typography = style.typography
                 builder.textStyle = .largeTitle
                 builder.lineBreakMode = .byWordWrapping
                 builder.color = style.color
-                builder.text = .plain(item.text)
+                builder.text = .plain(viewModel.text)
             }
             .build()
     }

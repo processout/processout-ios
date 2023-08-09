@@ -5,20 +5,18 @@
 //  Created by Andrii Vysotskyi on 24.07.2023.
 //
 
-// swiftlint:disable type_body_length file_length
+// swiftlint:disable type_body_length
 
 import UIKit
 
 final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>:
     BaseViewController<ViewModel>,
-    NativeAlternativePaymentMethodCollectionLayoutDelegate,
-    CardTokenizationCellDelegate {
+    CollectionViewDelegateCenterLayout {
 
     init(viewModel: ViewModel, style: POCardTokenizationStyle, logger: POLogger) {
         self.style = style
         self.logger = logger
         keyboardHeight = 0
-        didAppear = false
         super.init(viewModel: viewModel, logger: logger)
     }
 
@@ -31,8 +29,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        didAppear = true
-        updateFirstResponder()
+        viewModel.didAppear()
     }
 
     override func loadView() {
@@ -89,7 +86,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         collectionOverlayView.layoutIfNeeded()
     }
 
-    // MARK: - NativeAlternativePaymentMethodCollectionLayoutDelegate
+    // MARK: - CollectionViewDelegateCenterLayout
 
     func centeredSection(layout: UICollectionViewLayout) -> Int? {
         nil
@@ -127,18 +124,18 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         switch collectionViewDataSource.itemIdentifier(for: indexPath) {
         case .title(let item):
             height = collectionReusableViewSizeProvider.systemLayoutSize(
-                viewType: CardTokenizationTitleCell.self,
+                viewType: CollectionViewTitleCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(item: item, style: self.style.title)
+                    cell.configure(viewModel: item, style: self.style.title)
                 }
             ).height
         case .error(let item):
             height = collectionReusableViewSizeProvider.systemLayoutSize(
-                viewType: CardTokenizationErrorCell.self,
+                viewType: CollectionViewErrorCell.self,
                 preferredWidth: adjustedBounds.width,
                 configure: { cell in
-                    cell.configure(item: item, style: self.style.errorDescription)
+                    cell.configure(viewModel: item, style: self.style.errorDescription)
                 }
             ).height
         case .input(let item):
@@ -158,15 +155,15 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         referenceSizeForHeaderInSection section: Int
     ) -> CGSize {
         let sectionIdentifier = collectionViewDataSource.snapshot().sectionIdentifiers[section]
-        guard let sectionTitle = sectionIdentifier.title else {
+        guard let sectionHeader = sectionIdentifier.header else {
             return .zero
         }
         let width = collectionView.bounds.inset(by: collectionView.adjustedContentInset).width
         return collectionReusableViewSizeProvider.systemLayoutSize(
-            viewType: CardTokenizationSectionHeaderView.self,
+            viewType: CollectionViewSectionHeaderView.self,
             preferredWidth: width,
             configure: { [self] view in
-                view.configure(item: sectionTitle, style: style.sectionTitle)
+                view.configure(viewModel: sectionHeader, style: style.sectionTitle)
             }
         )
     }
@@ -178,7 +175,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
     ) -> UIEdgeInsets {
         let snapshot = collectionViewDataSource.snapshot()
         var sectionInset = Constants.sectionInset
-        if snapshot.sectionIdentifiers[section].title == nil {
+        if snapshot.sectionIdentifiers[section].header == nil {
             // Top inset purpose is to add spacing between header and items,
             // for sections without header instead is 0
             sectionInset.top = 0
@@ -189,36 +186,6 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             sectionInset.bottom = 0
         }
         return sectionInset
-    }
-
-    // MARK: - Scroll View Delegate
-
-    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        updateFirstResponder()
-    }
-
-    // MARK: - CardTokenizationCellDelegate
-
-    func cardTokenizationCellShouldReturn(_ cell: CardTokenizationCell) -> Bool {
-        let visibleIndexPaths = collectionView.indexPathsForVisibleItems.sorted()
-        guard let indexPath = collectionView.indexPath(for: cell),
-              let nextIndex = visibleIndexPaths.firstIndex(of: indexPath)?.advanced(by: 1),
-              visibleIndexPaths.indices.contains(nextIndex) else {
-            viewModel.submit()
-            return true
-        }
-        for indexPath in visibleIndexPaths.suffix(from: nextIndex) {
-            guard let cell = collectionView.cellForItem(at: indexPath) as? CardTokenizationCell,
-                  let responder = cell.inputResponder else {
-                continue
-            }
-            if responder.becomeFirstResponder() {
-                collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
-            }
-            return true
-        }
-        viewModel.submit()
-        return true
     }
 
     // MARK: - Private Nested Types
@@ -237,7 +204,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         return view
     }()
 
-    private lazy var buttonsContainerView = NativeAlternativePaymentMethodButtonsView(
+    private lazy var buttonsContainerView = ActionsContainerView(
         style: style.actions, horizontalInset: Constants.contentInset.left
     )
 
@@ -251,8 +218,8 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         return collectionView
     }()
 
-    private lazy var collectionViewLayout: NativeAlternativePaymentMethodCollectionLayout = {
-        let layout = NativeAlternativePaymentMethodCollectionLayout()
+    private lazy var collectionViewLayout: CollectionViewCenterLayout = {
+        let layout = CollectionViewCenterLayout()
         layout.minimumLineSpacing = Constants.itemsSpacing
         layout.minimumInteritemSpacing = Constants.itemsSpacing
         return layout
@@ -274,7 +241,6 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
     }()
 
     private var keyboardHeight: CGFloat
-    private var didAppear: Bool
 
     // MARK: - State Management
 
@@ -291,59 +257,14 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         if reload {
             snapshot.reloadSections(collectionViewDataSource.snapshot().sectionIdentifiers)
         }
-        collectionViewDataSource.apply(snapshot, animatingDifferences: animated) { [weak self] in
-            self?.updateFirstResponder()
-        }
+        collectionViewDataSource.apply(snapshot, animatingDifferences: animated)
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
-            buttonsContainerView.configure(actions: state.actions, animated: animated)
+            buttonsContainerView.configure(viewModel: state.actions, animated: animated)
             collectionOverlayView.layoutIfNeeded()
         }
-    }
-
-    // MARK: - Current Responder Handling
-
-    private func updateFirstResponder() {
-        // Becoming first responder may cause UI issues related to keyboard presentation if attempted
-        // before view appears on screen. For example, during a push to UINavigationController. So
-        // the operation is delayed until then.
-        guard didAppear else {
-            return
-        }
-        if !viewModel.state.isEditingAllowed {
-            logger.debug("Editing is not allowed in current state, will resign first responder")
+        if !state.isEditingAllowed {
             view.endEditing(true)
-            return
         }
-        let isEditing = collectionView.indexPathsForVisibleItems.contains { indexPath in
-            let cell = collectionView.cellForItem(at: indexPath) as? CardTokenizationCell
-            return cell?.inputResponder?.isFirstResponder == true
-        }
-        guard !isEditing, let indexPath = indexPathForFutureFirstResponderCell() else {
-            return
-        }
-        if collectionView.indexPathsForVisibleItems.contains(indexPath) {
-            let cell = collectionView.cellForItem(at: indexPath) as? CardTokenizationCell
-            cell?.inputResponder?.becomeFirstResponder()
-        }
-        collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
-    }
-
-    private func indexPathForFutureFirstResponderCell() -> IndexPath? {
-        let snapshot = collectionViewDataSource.snapshot()
-        var inputsIndexPaths: [IndexPath] = []
-        for (section, sectionId) in snapshot.sectionIdentifiers.enumerated() {
-            for (row, item) in snapshot.itemIdentifiers(inSection: sectionId).enumerated() {
-                guard case .input(let inputItem) = item else {
-                    continue
-                }
-                let indexPath = IndexPath(row: row, section: section)
-                if inputItem.value.isInvalid {
-                    return indexPath
-                }
-                inputsIndexPaths.append(indexPath)
-            }
-        }
-        return inputsIndexPaths.first
     }
 
     // MARK: -
@@ -351,31 +272,30 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
     private func configureCollectionView() {
         _ = collectionViewDataSource
         collectionView.registerSupplementaryView(
-            CardTokenizationSectionHeaderView.self, kind: UICollectionView.elementKindSectionHeader
+            CollectionViewSectionHeaderView.self, kind: UICollectionView.elementKindSectionHeader
         )
         collectionView.registerSupplementaryView(
-            CardTokenizationSeparatorView.self,
-            kind: NativeAlternativePaymentMethodCollectionLayout.elementKindSeparator
+            CollectionViewSeparatorView.self,
+            kind: CollectionViewCenterLayout.elementKindSeparator
         )
-        collectionView.registerCell(CardTokenizationTitleCell.self)
+        collectionView.registerCell(CollectionViewTitleCell.self)
+        collectionView.registerCell(CollectionViewErrorCell.self)
         collectionView.registerCell(CardTokenizationInputCell.self)
-        collectionView.registerCell(CardTokenizationErrorCell.self)
     }
 
     private func cell(for item: ItemIdentifier, at indexPath: IndexPath) -> UICollectionViewCell? {
         switch item {
         case .title(let item):
-            let cell = collectionView.dequeueReusableCell(CardTokenizationTitleCell.self, for: indexPath)
-            cell.configure(item: item, style: style.title)
+            let cell = collectionView.dequeueReusableCell(CollectionViewTitleCell.self, for: indexPath)
+            cell.configure(viewModel: item, style: style.title)
             return cell
         case .input(let item):
             let cell = collectionView.dequeueReusableCell(CardTokenizationInputCell.self, for: indexPath)
             cell.configure(item: item, style: style.input)
-            cell.delegate = self
             return cell
         case .error(let item):
-            let cell = collectionView.dequeueReusableCell(CardTokenizationErrorCell.self, for: indexPath)
-            cell.configure(item: item, style: style.errorDescription)
+            let cell = collectionView.dequeueReusableCell(CollectionViewErrorCell.self, for: indexPath)
+            cell.configure(viewModel: item, style: style.errorDescription)
             return cell
         }
     }
@@ -385,20 +305,20 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
             return nil
         }
         switch kind {
-        case NativeAlternativePaymentMethodCollectionLayout.elementKindSeparator:
+        case CollectionViewCenterLayout.elementKindSeparator:
             let view = collectionView.dequeueReusableSupplementaryView(
-                CardTokenizationSeparatorView.self, kind: kind, indexPath: indexPath
+                CollectionViewSeparatorView.self, kind: kind, indexPath: indexPath
             )
             view.configure(color: style.separatorColor)
             return view
         case UICollectionView.elementKindSectionHeader:
-            guard let sectionTitle = sectionIdentifier.title else {
+            guard let sectionHeader = sectionIdentifier.header else {
                 return nil
             }
             let view = collectionView.dequeueReusableSupplementaryView(
-                CardTokenizationSectionHeaderView.self, kind: kind, indexPath: indexPath
+                CollectionViewSectionHeaderView.self, kind: kind, indexPath: indexPath
             )
-            view.configure(item: sectionTitle, style: style.sectionTitle)
+            view.configure(viewModel: sectionHeader, style: style.sectionTitle)
             return view
         default:
             return nil
@@ -408,7 +328,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
     private func configureCollectionViewBottomInset(state: ViewModel.State) {
         let bottomInset = Constants.contentInset.bottom
             + keyboardHeight
-            + buttonsContainerView.contentHeight(actions: state.actions)
+            + buttonsContainerView.contentHeight(viewModel: state.actions)
         if bottomInset != collectionView.contentInset.bottom {
             collectionView.contentInset.bottom = bottomInset
         }
@@ -423,4 +343,4 @@ private enum Constants {
     static let inputHeight: CGFloat = 44
 }
 
-// swiftlint:enable type_body_length file_length
+// swiftlint:enable type_body_length

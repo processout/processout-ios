@@ -10,6 +10,8 @@ import UIKit
 
 struct CardTokenizationViewModelState {
 
+    typealias TitleItem = CollectionViewTitleViewModel
+
     struct InputValue: Hashable {
 
         /// Current parameter's value text.
@@ -20,15 +22,9 @@ struct CardTokenizationViewModelState {
         @ReferenceWrapper
         var isInvalid: Bool
 
-        /// Boolean value indicating whether editing is allowed.
+        /// Boolean value indicating whether input is currently focused.
         @ReferenceWrapper
-        var isEditingAllowed: Bool
-    }
-
-    struct TitleItem: Hashable {
-
-        /// Title text.
-        let text: String
+        var isFocused: Bool
     }
 
     struct InputItem: Hashable {
@@ -50,25 +46,27 @@ struct CardTokenizationViewModelState {
 
         /// Text content type.
         let contentType: UITextContentType?
+
+        /// Submit items value.
+        @ImmutableNullHashable
+        var submit: () -> Void
     }
 
-    struct ErrorItem: Hashable {
-
-        /// Error description.
-        let description: String
-    }
+    typealias ErrorItem = CollectionViewErrorViewModel
 
     enum Item: Hashable {
         case title(TitleItem), input(InputItem), error(ErrorItem)
     }
+
+    typealias SectionHeader = CollectionViewSectionHeaderViewModel
 
     struct SectionIdentifier: Hashable {
 
         /// Section id.
         let id: String
 
-        /// Section title if any.
-        let title: String?
+        /// Section header if any.
+        let header: SectionHeader?
     }
 
     struct Section {
@@ -80,8 +78,8 @@ struct CardTokenizationViewModelState {
         let items: [Item]
     }
 
-    typealias Action = NativeAlternativePaymentMethodViewModelState.Action
-    typealias Actions = NativeAlternativePaymentMethodViewModelState.Actions
+    typealias Action = ActionsContainerActionViewModel
+    typealias Actions = ActionsContainerViewModel
 
     /// Available items.
     let sections: [Section]
