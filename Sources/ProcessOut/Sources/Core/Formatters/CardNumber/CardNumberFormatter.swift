@@ -16,10 +16,7 @@ final class CardNumberFormatter: Formatter {
                 return formattedNumber
             }
         }
-        if let formattedNumber = attemptToFormat(cardNumber: normalizedNumber, pattern: Constants.defaultPattern) {
-            return formattedNumber
-        }
-        return partialNumber
+        return attemptToFormat(cardNumber: normalizedNumber, pattern: Constants.defaultPattern) ?? partialNumber
     }
 
     func normalized(number: String) -> String {
