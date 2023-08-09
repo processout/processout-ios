@@ -77,7 +77,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     private func convertToState(startedState: InteractorState.Started, isEditingAllowed: Bool) -> State {
         var sections = [createTitleSection()]
         var cardInformationItems = cardInformationInputItems(
-            startedState: startedState, isEditingAllowed: isEditingAllowed
+            startedState: startedState
         )
         if let error = startedState.recentErrorMessage {
             let errorItem = State.ErrorItem(description: error, isCentered: false)
@@ -108,9 +108,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         return State.Section(id: .init(id: SectionId.title, header: nil), items: [.title(item)])
     }
 
-    private func cardInformationInputItems(
-        startedState: InteractorState.Started, isEditingAllowed: Bool
-    ) -> [State.Item] {
+    private func cardInformationInputItems(startedState: InteractorState.Started) -> [State.Item] {
         let submit: () -> Void = { [weak self] in
             self?.onParameterSubmit()
         }
@@ -141,16 +139,26 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             contentType: nil,
             submit: submit
         )
-        let cardholder = State.InputItem(
+        let items = [.input(number), .input(expiration), .input(cvc), cardholderInputItem(startedState: startedState)]
+        return items.compactMap { $0 }
+    }
+
+    private func cardholderInputItem(startedState: InteractorState.Started) -> State.Item? {
+        guard configuration.isCardholderNameInputVisible else {
+            return nil
+        }
+        let inputItem = State.InputItem(
             placeholder: Text.CardDetails.Cvc.cardholder,
             value: inputValue(for: startedState.cardholderName),
             formatter: startedState.cardholderName.formatter,
             isCompact: false,
             keyboard: .asciiCapable,
             contentType: .name,
-            submit: submit
+            submit: { [weak self] in
+                self?.onParameterSubmit()
+            }
         )
-        return [.input(number), .input(expiration), .input(cvc), .input(cardholder)]
+        return .input(inputItem)
     }
 
     private func inputValue(for parameter: InteractorState.Parameter) -> State.InputValue {
