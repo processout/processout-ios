@@ -102,7 +102,7 @@ final class Checkout3DSService: PO3DSService {
         let parameters = convertToChallengeParameters(data: challenge)
         context.transaction.doChallenge(challengeParameters: parameters) { [unowned self, errorMapper] result in
             self.setIdleStateUnchecked()
-            let mappedResult = result.map(extractStatus(challengeResult:)).mapError(errorMapper.convert)
+            let mappedResult = result.map(extractStatus(authenticationResult:)).mapError(errorMapper.convert)
             delegate.didHandle3DS2Challenge(result: mappedResult)
             completion(mappedResult)
         }
@@ -171,7 +171,7 @@ final class Checkout3DSService: PO3DSService {
         return challengeParameters
     }
 
-    private func extractStatus(challengeResult: ChallengeResult) -> Bool {
-        challengeResult.transactionStatus.uppercased() == "Y"
+    private func extractStatus(authenticationResult: AuthenticationResult) -> Bool {
+        authenticationResult.transactionStatus?.uppercased() == "Y"
     }
 }
