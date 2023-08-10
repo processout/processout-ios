@@ -188,16 +188,19 @@ final class DefaultCardTokenizationInteractor:
         guard let threeDSService else {
             preconditionFailure("3DS service must be set to authorize invoice.")
         }
-        // swiftlint:disable:next line_length
-        customerTokensService.assignCustomerToken(request: request, threeDSService: threeDSService) { [weak self] result in
-            switch result {
-            case .success:
-                self?.setTokenizedState(card: card)
-            case .failure(let failure):
-                // todo(andrii-vysotskyi): decide if implementation should attempt to recover
-                self?.setFailureStateUnchecked(failure: failure)
+        customerTokensService.assignCustomerToken(
+            request: request,
+            threeDSService: threeDSService,
+            completion: { [weak self] result in
+                switch result {
+                case .success:
+                    self?.setTokenizedState(card: card)
+                case .failure(let failure):
+                    // todo(andrii-vysotskyi): decide if implementation should attempt to recover
+                    self?.setFailureStateUnchecked(failure: failure)
+                }
             }
-        }
+        )
     }
 
     private func setTokenizedState(card: POCard) {

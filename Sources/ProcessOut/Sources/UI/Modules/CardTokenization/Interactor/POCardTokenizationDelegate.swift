@@ -16,8 +16,9 @@ public protocol POCardTokenizationDelegate: AnyObject {
 
 extension POCardTokenizationDelegate {
 
-    // swiftlint:disable:next line_length
-    public func processTokenizedCard(card: POCard, completion: (Result<POCardTokenizationProcessAction?, Error>) -> Void) {
+    public func processTokenizedCard(
+        card: POCard, completion: (Result<POCardTokenizationProcessAction?, Error>) -> Void
+    ) {
         completion(.success(nil))
     }
 }

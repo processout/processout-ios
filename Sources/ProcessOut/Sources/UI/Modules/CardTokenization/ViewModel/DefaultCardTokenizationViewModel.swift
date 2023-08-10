@@ -65,7 +65,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         case .tokenizing(let startedState):
             focusedParameterId = nil
             state = convertToState(startedState: startedState, isEditingAllowed: false)
-        case .tokenized, .processingCard, .failure:
+        case .tokenized, .failure:
             break
         }
     }

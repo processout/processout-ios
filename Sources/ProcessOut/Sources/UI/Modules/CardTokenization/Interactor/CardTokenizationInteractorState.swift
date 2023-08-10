@@ -53,15 +53,17 @@ enum CardTokenizationInteractorState {
         let cardNumber: String
     }
 
-    struct ProcessingCard {
+    case idle
 
-        /// Tokenized state state snapshot.
-        let snapshot: Tokenized
+    /// Interactor has started and is ready.
+    case started(Started)
 
-        /// Merchant supplied invoice authorization request.
-        let request: POInvoiceAuthorizationRequest
-    }
+    /// Card information is currently being tokenized.
+    case tokenizing(snapshot: Started)
 
-    // swiftlint:disable:next line_length
-    case idle, started(Started), tokenizing(snapshot: Started), tokenized(Tokenized), failure(POFailure), processingCard(ProcessingCard)
+    /// Card was successfully tokenized. This is a sink state.
+    case tokenized(Tokenized)
+
+    /// Card tokenization did end with unrecoverable failure. This is a sink state.
+    case failure(POFailure)
 }
