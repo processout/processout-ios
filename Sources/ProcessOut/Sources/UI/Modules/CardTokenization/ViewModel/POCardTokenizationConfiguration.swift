@@ -15,7 +15,7 @@ public struct POCardTokenizationConfiguration {
     /// Custom title. Use empty string to hide title.
     public let title: String?
 
-    /// Indicates if the input for entering the cardholder name should be displayed. Defaults to false.
+    /// Indicates if the input for entering the cardholder name should be displayed. Defaults to `true`.
     public let isCardholderNameInputVisible: Bool
 
     /// Primary action text, such as "Submit".
@@ -26,7 +26,7 @@ public struct POCardTokenizationConfiguration {
 
     public init(
         title: String? = nil,
-        isCardholderNameInputVisible: Bool = false,
+        isCardholderNameInputVisible: Bool = true,
         primaryActionTitle: String? = nil,
         cancelActionTitle: String? = nil
     ) {
