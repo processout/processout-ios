@@ -77,7 +77,7 @@ final class DefaultCardTokenizationInteractor:
         cardsService.tokenize(request: request) { [weak self] result in
             switch result {
             case .success(let card):
-                self?.setTokenizedStateUnchecked(card: card, cardNumber: startedState.number.value)
+                self?.processTokenizedCard(card: card)
             case .failure(let failure):
                 self?.restoreStartedStateAfterTokenizationFailure(failure)
             }
@@ -137,19 +137,29 @@ final class DefaultCardTokenizationInteractor:
         state = .started(startedState)
     }
 
-    private func setTokenizedStateUnchecked(card: POCard, cardNumber: String) {
-        let tokenizedState = State.Tokenized(card: card, cardNumber: cardNumber)
-        state = .tokenized(tokenizedState)
-        trySetAuthorizingState()
-        guard case .tokenized = state else {
+    private func processTokenizedCard(card: POCard) {
+        guard case .tokenizing = state else {
             return
         }
-        completion(.success(card))
+        if let delegate {
+            delegate.processTokenizedCard(card: card) { [weak self] result in
+                switch result {
+                case .success(let .authorizeInvoice(request)):
+                    self?.authorizeInvoice(card: card, request: request)
+                case .success(nil):
+                    self?.setTokenizedState(card: card)
+                case .failure(let error):
+                    let failure = POFailure(code: .generic(.mobile), underlyingError: error)
+                    self?.setFailureStateUnchecked(failure: failure)
+                }
+            }
+        } else {
+            setTokenizedState(card: card)
+        }
     }
 
-    private func trySetAuthorizingState() {
-        guard case .tokenized(let tokenizedState) = state,
-              let request = delegate?.invoiceAuthorizationRequest(card: tokenizedState.card) else {
+    private func authorizeInvoice(card: POCard, request: POInvoiceAuthorizationRequest) {
+        guard case .tokenizing = state else {
             return
         }
         guard let threeDSService else {
@@ -158,16 +168,21 @@ final class DefaultCardTokenizationInteractor:
         invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService) { [weak self] result in
             switch result {
             case .success:
-                // todo(andrii-vysotskyi): decide if returning to tokenized state is ok
-                self?.state = .tokenized(tokenizedState)
-                self?.completion(.success(tokenizedState.card))
+                self?.setTokenizedState(card: card)
             case .failure(let failure):
-                // todo(andrii-vysotskyi): decide if implementation should recover in case error is card related
+                // todo(andrii-vysotskyi): decide if implementation should attempt to recover
                 self?.setFailureStateUnchecked(failure: failure)
             }
         }
-        let authorizingState = State.Authorizing(snapshot: tokenizedState, request: request)
-        state = .authorizing(authorizingState)
+    }
+
+    private func setTokenizedState(card: POCard) {
+        guard case .tokenizing(let snapshot) = state else {
+            return
+        }
+        let tokenizedState = State.Tokenized(card: card, cardNumber: snapshot.number.value)
+        state = .tokenized(tokenizedState)
+        completion(.success(card))
     }
 
     private func setFailureStateUnchecked(failure: POFailure) {

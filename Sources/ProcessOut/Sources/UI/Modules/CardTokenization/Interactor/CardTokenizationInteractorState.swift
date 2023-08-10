@@ -53,7 +53,7 @@ enum CardTokenizationInteractorState {
         let cardNumber: String
     }
 
-    struct Authorizing {
+    struct ProcessingCard {
 
         /// Tokenized state state snapshot.
         let snapshot: Tokenized
@@ -63,5 +63,5 @@ enum CardTokenizationInteractorState {
     }
 
     // swiftlint:disable:next line_length
-    case idle, started(Started), tokenizing(snapshot: Started), tokenized(Tokenized), failure(POFailure), authorizing(Authorizing)
+    case idle, started(Started), tokenizing(snapshot: Started), tokenized(Tokenized), failure(POFailure), processingCard(ProcessingCard)
 }
