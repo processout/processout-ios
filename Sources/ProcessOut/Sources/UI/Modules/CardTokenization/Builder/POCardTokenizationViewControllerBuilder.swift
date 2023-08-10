@@ -61,6 +61,7 @@ public final class POCardTokenizationViewControllerBuilder {
         let interactor = DefaultCardTokenizationInteractor(
             cardsService: api.cards,
             invoicesService: api.invoices,
+            customerTokensService: api.customerTokens,
             threeDSService: threeDSService,
             logger: api.logger,
             delegate: delegate,
