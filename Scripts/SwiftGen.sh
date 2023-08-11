@@ -2,4 +2,8 @@
 
 set -euo pipefail
 
-mint run swiftgen config run --config "${TARGET_ROOT}/swiftgen.yml"
+# Add brew binaries to PATH
+export PATH="/opt/homebrew/bin:$PATH"
+
+# Run SwiftGen
+swiftgen config run --config "${TARGET_ROOT}/swiftgen.yml"

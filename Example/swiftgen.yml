@@ -8,7 +8,7 @@ xcassets:
     - Images.xcassets
     - Colors.xcassets
   outputs:
-    - templateName: swift5
+    - templatePath: ${SRCROOT}/../Templates/xcassets.stencil
       params:
         forceFileNameEnum: true
         forceProvidesNamespaces: true

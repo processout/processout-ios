@@ -2,8 +2,12 @@
 
 set -euo pipefail
 
-mint run sourcery \
+# Add brew binaries to PATH
+export PATH="/opt/homebrew/bin:$PATH"
+
+# Run sourcery
+sourcery \
   --sources $PROJECT_DIR/Sources/$TARGET_NAME/Sources \
-  --templates $PROJECT_DIR/Templates \
+  --templates $PROJECT_DIR/Templates/AutoAsync.stencil \
   --parseDocumentation \
   --output $PROJECT_DIR/Sources/$TARGET_NAME/Sources/Generated/Sourcery+Generated.swift
