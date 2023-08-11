@@ -53,5 +53,17 @@ enum CardTokenizationInteractorState {
         let cardNumber: String
     }
 
-    case idle, started(Started), tokenizing(snapshot: Started), tokenized(Tokenized), failure(POFailure)
+    case idle
+
+    /// Interactor has started and is ready.
+    case started(Started)
+
+    /// Card information is currently being tokenized.
+    case tokenizing(snapshot: Started)
+
+    /// Card was successfully tokenized. This is a sink state.
+    case tokenized(Tokenized)
+
+    /// Card tokenization did end with unrecoverable failure. This is a sink state.
+    case failure(POFailure)
 }
