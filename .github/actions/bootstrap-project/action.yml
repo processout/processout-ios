@@ -18,6 +18,8 @@ runs:
         echo "$CONSTANTS" > Tests/ProcessOutTests/Resources/Constants.yml
         echo "$CONSTANTS" > Example/Example/Resources/Constants.yml
       shell: bash
+    - name: Select Xcode Version
+      run: sudo xcode-select -s '/Applications/Xcode_14.3.1.app/Contents/Developer'
     - name: Bootstrap Project
       run: ./Scripts/BootstrapProject.sh --skip-bundle-instal
       shell: bash
