@@ -16,12 +16,14 @@ final class HttpCardsRepository: CardsRepository {
 
     // MARK: - CardsRepository
 
-    func issuerInformation(iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void) {
+    func issuerInformation(
+        iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void
+    ) -> POCancellable {
         struct Response: Decodable {
             let cardInformation: POCardIssuerInformation
         }
         let httpRequest = HttpConnectorRequest<Response>.get(path: "/iins/" + iin)
-        connector.execute(request: httpRequest) { [failureMapper] result in
+        return connector.execute(request: httpRequest) { [failureMapper] result in
             completion(result.map(\.cardInformation).mapError(failureMapper.failure))
         }
     }

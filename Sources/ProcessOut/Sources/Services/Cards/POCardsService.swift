@@ -15,7 +15,10 @@ public protocol POCardsService: POService {
     ///
     /// - Parameters:
     ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
-    func issuerInformation(iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void)
+    @discardableResult
+    func issuerInformation(
+        iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void
+    ) -> POCancellable
 
     /// Tokenizes a card. You can use the card for a single payment by creating a card token with it. If you want
     /// to use the card for multiple payments then you can use the card token to create a reusable customer token.
