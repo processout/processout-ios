@@ -15,16 +15,19 @@ struct CardTokenizationViewModelState {
     struct InputValue: Hashable {
 
         /// Current parameter's value text.
-        @ReferenceWrapper
+        @ReferenceWrapper(value: "")
         var text: String
 
         /// Boolean value indicating whether value is valid.
-        @ReferenceWrapper
+        @ReferenceWrapper(value: false)
         var isInvalid: Bool
 
         /// Boolean value indicating whether input is currently focused.
-        @ReferenceWrapper
+        @ReferenceWrapper(value: false)
         var isFocused: Bool
+
+        @ReferenceWrapper(value: nil)
+        var icon: UIImage?
     }
 
     struct InputItem: Hashable {
