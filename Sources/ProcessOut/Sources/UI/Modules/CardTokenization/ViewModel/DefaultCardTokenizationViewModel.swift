@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationViewModelState>, CardTokenizationViewModel {
 
@@ -112,7 +113,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         }
         let number = State.InputItem(
             placeholder: Text.CardDetails.Number.placeholder,
-            value: inputValue(for: startedState.number),
+            value: inputValue(for: startedState.number, icon: cardNumberIcon(startedState: startedState)),
             formatter: startedState.number.formatter,
             isCompact: false,
             keyboard: .asciiCapableNumberPad,
@@ -130,7 +131,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         )
         let cvc = State.InputItem(
             placeholder: Text.CardDetails.Cvc.placeholder,
-            value: inputValue(for: startedState.cvc),
+            value: inputValue(for: startedState.cvc, icon: Asset.Images.cardBack.image),
             formatter: startedState.cvc.formatter,
             isCompact: true,
             keyboard: .asciiCapableNumberPad,
@@ -159,22 +160,26 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         return .input(inputItem)
     }
 
-    private func inputValue(for parameter: InteractorState.Parameter) -> State.InputValue {
-        if let value = inputValuesCache[parameter.id] {
-            value.text = parameter.value
-            value.isInvalid = !parameter.isValid
-            value.isFocused = focusedParameterId == parameter.id
-            return value
+    private func inputValue(for parameter: InteractorState.Parameter, icon: UIImage? = nil) -> State.InputValue {
+        let value: State.InputValue
+        if let cachedValue = inputValuesCache[parameter.id] {
+            value = cachedValue
+        } else {
+            value = State.InputValue()
+            inputValuesCache[parameter.id] = value
+            observeChanges(value: value, parameter: parameter)
         }
-        let value = State.InputValue(
-            text: .init(value: parameter.value),
-            isInvalid: .init(value: !parameter.isValid),
-            isFocused: .init(value: focusedParameterId == parameter.id)
-        )
+        value.text = parameter.value
+        value.isInvalid = !parameter.isValid
+        value.isFocused = focusedParameterId == parameter.id
+        value.icon = icon
+        return value
+    }
+
+    private func observeChanges(value: State.InputValue, parameter: InteractorState.Parameter) {
         let textObserver = value.$text.addObserver { [weak self] value in
             self?.interactor.update(parameterId: parameter.id, value: value)
         }
-        inputValuesObservations.append(textObserver)
         let activityObserver = value.$isFocused.addObserver { [weak self] isActive in
             if isActive {
                 self?.focusedParameterId = parameter.id
@@ -182,9 +187,8 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
                 self?.focusedParameterId = nil
             }
         }
+        inputValuesObservations.append(textObserver)
         inputValuesObservations.append(activityObserver)
-        inputValuesCache[parameter.id] = value
-        return value
     }
 
     private func onParameterSubmit() {
@@ -201,6 +205,23 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         } else {
             interactor.tokenize()
         }
+    }
+
+    private func cardNumberIcon(startedState: InteractorState.Started) -> UIImage? {
+        let defaultIcon = Asset.Images.cardFront.image
+        guard let information = startedState.issuerInformation,
+              let scheme = startedState.prefersCoScheme ? information.coScheme : information.scheme else {
+            return defaultIcon
+        }
+        // todo(andrii-vysotskyi): support more schemes
+        let assets = [
+            "visa": Asset.Images.visa,
+            "mastercard": Asset.Images.mastercard,
+            "american express": Asset.Images.amex,
+            "china union pay": Asset.Images.unionPay
+        ]
+        let normalizedScheme = scheme.lowercased()
+        return assets[normalizedScheme]?.image ?? defaultIcon
     }
 
     // MARK: - Actions
