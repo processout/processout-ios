@@ -208,10 +208,9 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     }
 
     private func cardNumberIcon(startedState: InteractorState.Started) -> UIImage? {
-        let defaultIcon = Asset.Images.cardFront.image
         guard let information = startedState.issuerInformation,
               let scheme = startedState.prefersCoScheme ? information.coScheme : information.scheme else {
-            return defaultIcon
+            return nil
         }
         // todo(andrii-vysotskyi): support more schemes
         let assets = [
@@ -221,7 +220,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             "china union pay": Asset.Images.unionPay
         ]
         let normalizedScheme = scheme.lowercased()
-        return assets[normalizedScheme]?.image ?? defaultIcon
+        return assets[normalizedScheme]?.image
     }
 
     // MARK: - Actions
