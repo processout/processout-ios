@@ -294,7 +294,11 @@ final class DefaultCardTokenizationInteractor:
             .init(scheme: "mastercard", leading: 51...55, length: 2),
             .init(scheme: "china union pay", leading: 62...62, length: 2),
             .init(scheme: "american express", leading: 34...34, length: 2),
-            .init(scheme: "american express", leading: 37...37, length: 2)
+            .init(scheme: "american express", leading: 37...37, length: 2),
+            .init(scheme: "discover", leading: 6011...6011, length: 4),
+            .init(scheme: "discover", leading: 622126...622925, length: 6),
+            .init(scheme: "discover", leading: 644...649, length: 3),
+            .init(scheme: "discover", leading: 65...65, length: 2)
         ]
         let normalizedNumber = cardNumberFormatter.normalized(number: number)
         let issuer = issuers.first { issuer in

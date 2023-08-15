@@ -217,7 +217,8 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             "visa": Asset.Images.visa,
             "mastercard": Asset.Images.mastercard,
             "american express": Asset.Images.amex,
-            "china union pay": Asset.Images.unionPay
+            "china union pay": Asset.Images.unionPay,
+            "discover": Asset.Images.discover
         ]
         let normalizedScheme = scheme.lowercased()
         return assets[normalizedScheme]?.image

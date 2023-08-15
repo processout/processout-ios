@@ -61,6 +61,7 @@ internal enum Asset {
     internal static let cardBack = ImageAsset(name: "CardBack")
     internal static let cardFront = ImageAsset(name: "CardFront")
     internal static let chevronDown = ImageAsset(name: "ChevronDown")
+    internal static let discover = ImageAsset(name: "Discover")
     internal static let mastercard = ImageAsset(name: "Mastercard")
     internal static let success = ImageAsset(name: "Success")
     internal static let unionPay = ImageAsset(name: "UnionPay")
