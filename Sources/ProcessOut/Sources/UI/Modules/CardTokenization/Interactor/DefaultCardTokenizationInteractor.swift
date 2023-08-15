@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 18.07.2023.
 //
 
+// swiftlint:disable:next type_body_length
 final class DefaultCardTokenizationInteractor:
     BaseInteractor<CardTokenizationInteractorState>, CardTokenizationInteractor {
 
@@ -41,7 +42,8 @@ final class DefaultCardTokenizationInteractor:
             number: .init(id: \.number, formatter: cardNumberFormatter),
             expiration: .init(id: \.expiration, formatter: cardExpirationFormatter),
             cvc: .init(id: \.cvc),
-            cardholderName: .init(id: \.cardholderName)
+            cardholderName: .init(id: \.cardholderName),
+            prefersCoScheme: false
         )
         state = .started(startedState)
     }
@@ -50,12 +52,24 @@ final class DefaultCardTokenizationInteractor:
         guard case .started(var startedState) = state, startedState[keyPath: parameterId].value != value else {
             return
         }
+        let oldParameterValue = startedState[keyPath: parameterId].value
         startedState[keyPath: parameterId].value = value
         startedState[keyPath: parameterId].isValid = true
         if areParametersValid(startedState: startedState) {
             startedState.recentErrorMessage = nil
         }
         self.state = .started(startedState)
+        if parameterId == startedState.number.id {
+            updateCardIssuerInformation(oldNumber: oldParameterValue)
+        }
+    }
+
+    func setPrefersCoScheme(_ prefersCoScheme: Bool) {
+        guard case .started(var startedState) = state else {
+            return
+        }
+        startedState.prefersCoScheme = prefersCoScheme
+        state = .started(startedState)
     }
 
     func tokenize() {
@@ -73,8 +87,8 @@ final class DefaultCardTokenizationInteractor:
             expYear: cardExpirationFormatter.expirationYear(from: startedState.expiration.value) ?? 0,
             cvc: startedState.cvc.value,
             name: startedState.cardholderName.value,
-            contact: nil, // todo(andrii-vysotskyi): pass contact and metadata
-            metadata: nil
+            contact: nil, // todo(andrii-vysotskyi): collect contact information
+            metadata: nil // todo(andrii-vysotskyi): allow merchant to inject tokenization metadata
         )
         cardsService.tokenize(request: request) { [weak self] result in
             switch result {
@@ -94,6 +108,12 @@ final class DefaultCardTokenizationInteractor:
         setFailureStateUnchecked(failure: failure)
     }
 
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let iinLength = 6
+    }
+
     // MARK: - Private Properties
 
     private let cardsService: POCardsService
@@ -107,6 +127,7 @@ final class DefaultCardTokenizationInteractor:
     private lazy var cardExpirationFormatter = CardExpirationFormatter()
 
     private weak var delegate: POCardTokenizationDelegate?
+    private var issuerInformationCancellable: POCancellable?
 
     // MARK: - State Management
 
@@ -215,6 +236,77 @@ final class DefaultCardTokenizationInteractor:
     private func setFailureStateUnchecked(failure: POFailure) {
         state = .failure(failure)
         completion(.failure(failure))
+    }
+
+    // MARK: - Card Issuer Information
+
+    private func updateCardIssuerInformation(oldNumber: String) {
+        guard case .started(var startedState) = state else {
+            return
+        }
+        startedState.issuerInformation = issuerInformation(number: startedState.number.value)
+        startedState.prefersCoScheme = false
+        if let iin = issuerIdentificationNumber(number: startedState.number.value) {
+            guard iin != issuerIdentificationNumber(number: oldNumber) else {
+                return // IIN didn't change so abort.
+            }
+            state = .started(startedState)
+            issuerInformationCancellable?.cancel()
+            issuerInformationCancellable = cardsService.issuerInformation(iin: iin) { [weak self] result in
+                guard case .started(var startedState) = self?.state else {
+                    return
+                }
+                switch result {
+                case .success(let issuerInformation):
+                    startedState.issuerInformation = issuerInformation
+                case .failure(let failure) where failure.code == .cancelled:
+                    break
+                case .failure:
+                    break // todo(andrii-vysotskyi): ask merchant whether this error should fail whole flow
+                }
+                self?.state = .started(startedState)
+            }
+        } else {
+            state = .started(startedState)
+        }
+    }
+
+    private func issuerIdentificationNumber(number: String) -> String? {
+        let normalizedNumber = cardNumberFormatter.normalized(number: number)
+        guard normalizedNumber.count >= Constants.iinLength else {
+            return nil
+        }
+        return String(normalizedNumber.prefix(Constants.iinLength))
+    }
+
+    /// Returns locally generated issuer information where only `scheme` property is set.
+    private func issuerInformation(number: String) -> POCardIssuerInformation? {
+        struct Issuer {
+            let scheme: String
+            let leading: ClosedRange<Int>
+            let length: Int
+        }
+        // Based on https://www.bincodes.com/bin-list
+        // todo(andrii-vysotskyi): support more schemes
+        let issuers: [Issuer] = [
+            .init(scheme: "visa", leading: 4...4, length: 1),
+            .init(scheme: "mastercard", leading: 2221...2720, length: 4),
+            .init(scheme: "mastercard", leading: 51...55, length: 2),
+            .init(scheme: "china union pay", leading: 62...62, length: 2),
+            .init(scheme: "american express", leading: 34...34, length: 2),
+            .init(scheme: "american express", leading: 37...37, length: 2)
+        ]
+        let normalizedNumber = cardNumberFormatter.normalized(number: number)
+        let issuer = issuers.first { issuer in
+            guard let leading = Int(normalizedNumber.prefix(issuer.length)) else {
+                return false
+            }
+            return issuer.leading.contains(leading)
+        }
+        guard let issuer else {
+            return nil
+        }
+        return .init(scheme: issuer.scheme, coScheme: nil, type: nil, bankName: nil, brand: nil, category: nil)
     }
 
     // MARK: - Utils
