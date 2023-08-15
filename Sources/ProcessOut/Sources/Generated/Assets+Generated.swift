@@ -57,8 +57,14 @@ internal enum Asset {
     }
   }
   internal enum Images {
+    internal static let amex = ImageAsset(name: "Amex")
+    internal static let cardBack = ImageAsset(name: "CardBack")
+    internal static let cardFront = ImageAsset(name: "CardFront")
     internal static let chevronDown = ImageAsset(name: "ChevronDown")
+    internal static let mastercard = ImageAsset(name: "Mastercard")
     internal static let success = ImageAsset(name: "Success")
+    internal static let unionPay = ImageAsset(name: "UnionPay")
+    internal static let visa = ImageAsset(name: "Visa")
   }
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
