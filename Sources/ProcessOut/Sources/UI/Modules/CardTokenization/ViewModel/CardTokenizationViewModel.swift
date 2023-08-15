@@ -15,5 +15,4 @@ protocol CardTokenizationViewModel: ViewModel<CardTokenizationViewModelState> {
 // - Decide whether module should allow to collect custom parameters specified by merchant
 // - Support scanning card details with camera
 // - Allow selecting card co-scheme when authorizing invoice or assigning token
-// - Add icons to card input and cvc fields
 // - Decide whether we need to collect additional information except card details
