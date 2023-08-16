@@ -81,6 +81,9 @@ final class DefaultCardTokenizationInteractor:
             return
         }
         state = .tokenizing(snapshot: startedState)
+        let preferredScheme = startedState.prefersCoScheme
+            ? startedState.issuerInformation?.coScheme
+            : startedState.issuerInformation?.scheme
         let request = POCardTokenizationRequest(
             number: cardNumberFormatter.normalized(number: startedState.number.value),
             expMonth: cardExpirationFormatter.expirationMonth(from: startedState.expiration.value) ?? 0,
@@ -88,6 +91,7 @@ final class DefaultCardTokenizationInteractor:
             cvc: startedState.cvc.value,
             name: startedState.cardholderName.value,
             contact: nil, // todo(andrii-vysotskyi): collect contact information
+            preferredScheme: preferredScheme,
             metadata: nil // todo(andrii-vysotskyi): allow merchant to inject tokenization metadata
         )
         cardsService.tokenize(request: request) { [weak self] result in
