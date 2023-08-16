@@ -196,6 +196,15 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         return sectionInset
     }
 
+    func collectionView(
+        _ collectionView: UICollectionView, layout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int
+    ) -> CGFloat {
+        if let identifier = collectionViewDataSource.sectionIdentifier(for: section), identifier.isTight {
+            return Constants.itemsTightSpacing
+        }
+        return Constants.itemsSpacing
+    }
+
     // MARK: - Private Nested Types
 
     private typealias SectionIdentifier = ViewModel.State.SectionIdentifier
@@ -228,7 +237,6 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
 
     private lazy var collectionViewLayout: CollectionViewCenterLayout = {
         let layout = CollectionViewCenterLayout()
-        layout.minimumLineSpacing = Constants.itemsSpacing
         layout.minimumInteritemSpacing = Constants.itemsSpacing
         return layout
     }()
@@ -350,6 +358,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
 
 private enum Constants {
     static let animationDuration: TimeInterval = 0.25
+    static let itemsTightSpacing: CGFloat = 0
     static let itemsSpacing: CGFloat = 8
     static let sectionInset = UIEdgeInsets(top: 8, left: 0, bottom: 32, right: 0)
     static let contentInset = UIEdgeInsets(top: 24, left: 24, bottom: 24, right: 24)
