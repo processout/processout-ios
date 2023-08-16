@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class GroupCancellable: POCancellable {
+final class GroupCancellable: POCancellable, @unchecked Sendable {
 
     init() {
         isCancelled = false

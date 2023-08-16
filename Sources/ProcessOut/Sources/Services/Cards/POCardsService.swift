@@ -32,3 +32,23 @@ public protocol POCardsService: POService {
     /// Tokenize a card via ApplePay. You can use the card for a single payment by creating a card token with it.
     func tokenize(request: POApplePayCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void)
 }
+
+extension POCardsService {
+
+    /// Allows to retrieve card issuer information based on iin.
+    ///
+    /// - Parameters:
+    ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
+    @available(iOS 13.0, *)
+    public func issuerInformation(iin: String) async throws -> POCardIssuerInformation {
+        let cancellable = GroupCancellable()
+        let information: POCardIssuerInformation = try await withTaskCancellationHandler {
+            try await withUnsafeThrowingContinuation { continuation in
+                cancellable.add(issuerInformation(iin: iin, completion: continuation.resume))
+            }
+        } onCancel: {
+            cancellable.cancel()
+        }
+        return information
+    }
+}
