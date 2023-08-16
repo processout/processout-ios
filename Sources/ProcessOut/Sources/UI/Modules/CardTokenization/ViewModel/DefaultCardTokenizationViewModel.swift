@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+// swiftlint:disable:next type_body_length
 final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationViewModelState>, CardTokenizationViewModel {
 
     init(interactor: any CardTokenizationInteractor, configuration: POCardTokenizationConfiguration) {
@@ -36,6 +37,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     private enum SectionId {
         static let title = "title"
         static let cardInformation = "card-info"
+        static let preferredScheme = "preferred-scheme"
     }
 
     // MARK: - Private Properties
@@ -74,7 +76,6 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     // MARK: - Started State
 
     private func convertToState(startedState: InteractorState.Started, isEditingAllowed: Bool) -> State {
-        var sections = [createTitleSection()]
         var cardInformationItems = cardInformationInputItems(
             startedState: startedState
         )
@@ -83,10 +84,18 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             cardInformationItems.append(.error(errorItem))
         }
         let cardInformationSection = State.Section(
-            id: .init(id: SectionId.cardInformation, header: .init(title: Text.CardDetails.title, isCentered: false)),
+            id: .init(
+                id: SectionId.cardInformation,
+                header: .init(title: Text.CardDetails.title, isCentered: false),
+                isTight: false
+            ),
             items: cardInformationItems
         )
-        sections.append(cardInformationSection)
+        let sections = [
+            createTitleSection(),
+            cardInformationSection,
+            preferredSchemeSection(startedState: startedState)
+        ]
         let startedState = State(
             sections: sections.compactMap { $0 },
             actions: .init(
@@ -104,7 +113,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             return nil
         }
         let item = State.TitleItem(text: Text.title)
-        return State.Section(id: .init(id: SectionId.title, header: nil), items: [.title(item)])
+        return State.Section(id: .init(id: SectionId.title, header: nil, isTight: false), items: [.title(item)])
     }
 
     private func cardInformationInputItems(startedState: InteractorState.Started) -> [State.Item] {
@@ -208,8 +217,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     }
 
     private func cardNumberIcon(startedState: InteractorState.Started) -> UIImage? {
-        guard let information = startedState.issuerInformation,
-              let scheme = startedState.prefersCoScheme ? information.coScheme : information.scheme else {
+        guard let scheme = startedState.preferredScheme ?? startedState.issuerInformation?.scheme else {
             return nil
         }
         // todo(andrii-vysotskyi): support more schemes
@@ -222,6 +230,38 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         ]
         let normalizedScheme = scheme.lowercased()
         return assets[normalizedScheme]?.image
+    }
+
+    private func preferredSchemeSection(startedState: InteractorState.Started) -> State.Section? {
+        guard let issuerInformation = startedState.issuerInformation,
+              let coScheme = issuerInformation.coScheme else {
+            return nil
+        }
+        let sectionId = State.SectionIdentifier(
+            id: SectionId.preferredScheme,
+            header: .init(title: Text.PreferredScheme.title, isCentered: false),
+            isTight: true
+        )
+        let schemeItem = State.RadioButtonItem(
+            value: Text.PreferredScheme.description(issuerInformation.scheme.capitalized),
+            isSelected: startedState.preferredScheme == issuerInformation.scheme,
+            isInvalid: false,
+            accessibilityIdentifier: "card-tokenization.scheme-button",
+            select: { [weak self] in
+                self?.interactor.setPreferredScheme(issuerInformation.scheme)
+            }
+        )
+        let coSchemeItem = State.RadioButtonItem(
+            value: Text.PreferredScheme.description(coScheme.capitalized),
+            isSelected: startedState.preferredScheme == coScheme,
+            isInvalid: false,
+            accessibilityIdentifier: "card-tokenization.co-scheme-button",
+            select: { [weak self] in
+                self?.interactor.setPreferredScheme(coScheme)
+            }
+        )
+        let items = [schemeItem, coSchemeItem].map(State.Item.radio)
+        return State.Section(id: sectionId, items: items)
     }
 
     // MARK: - Actions

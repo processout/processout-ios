@@ -35,6 +35,14 @@ internal enum Strings {
         internal static var placeholder: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.number.placeholder", fallback: "4242 4242 4242 4242") }
       }
     }
+    internal enum PreferredScheme {
+      /// %@
+      internal static func description(_ p1: Any) -> String {
+        return Strings.tr("ProcessOut", "card-tokenization.preferred-scheme.description", String(describing: p1), fallback: "%@")
+      }
+      /// Preferred Scheme
+      internal static var title: String { return Strings.tr("ProcessOut", "card-tokenization.preferred-scheme.title", fallback: "Preferred Scheme") }
+    }
     internal enum SubmitButton {
       /// Submit
       internal static var title: String { return Strings.tr("ProcessOut", "card-tokenization.submit-button.title", fallback: "Submit") }
