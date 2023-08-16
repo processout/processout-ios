@@ -119,7 +119,7 @@ final class AlternativePaymentMethodsViewModel:
                 .contains(gatewayConfiguration.gatewayName ?? "") ?? false
             if !isSubaccount {
                 return
-            } else if prefersNative, gatewayConfiguration.gateway?.nativeApmConfig != nil {
+            } else if prefersNative {
                 let paymentRoute = AlternativePaymentMethodsRoute.NativeAlternativePayment(
                     gatewayConfigurationId: gatewayConfiguration.id,
                     invoiceId: invoice.id,

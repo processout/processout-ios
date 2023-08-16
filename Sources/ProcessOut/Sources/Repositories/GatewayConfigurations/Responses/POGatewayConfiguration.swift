@@ -39,6 +39,7 @@ public struct POGatewayConfiguration: Decodable {
         public let canRefund: Bool
 
         /// Native alternative payment method configuration.
+        @available(*, deprecated, message: "Use POInvoicesService/nativeAlternativePaymentMethodTransactionDetails(request:) instead.") // swiftlint:disable:this line_length
         public let nativeApmConfig: NativeAlternativePaymentMethodConfig?
     }
 
