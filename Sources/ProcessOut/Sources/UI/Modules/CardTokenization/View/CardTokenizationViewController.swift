@@ -143,6 +143,14 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
                 width = (width - Constants.itemsSpacing) / 2
             }
             height = Constants.inputHeight
+        case .radio(let item):
+            height = collectionReusableViewSizeProvider.systemLayoutSize(
+                viewType: CollectionViewRadioCell.self,
+                preferredWidth: adjustedBounds.width,
+                configure: { cell in
+                    cell.configure(viewModel: item, style: self.style.radioButton)
+                }
+            ).height
         case nil:
             height = .zero
         }
@@ -281,6 +289,7 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         collectionView.registerCell(CollectionViewTitleCell.self)
         collectionView.registerCell(CollectionViewErrorCell.self)
         collectionView.registerCell(CardTokenizationInputCell.self)
+        collectionView.registerCell(CollectionViewRadioCell.self)
     }
 
     private func cell(for item: ItemIdentifier, at indexPath: IndexPath) -> UICollectionViewCell? {
@@ -296,6 +305,10 @@ final class CardTokenizationViewController<ViewModel: CardTokenizationViewModel>
         case .error(let item):
             let cell = collectionView.dequeueReusableCell(CollectionViewErrorCell.self, for: indexPath)
             cell.configure(viewModel: item, style: style.errorDescription)
+            return cell
+        case .radio(let item):
+            let cell = collectionView.dequeueReusableCell(CollectionViewRadioCell.self, for: indexPath)
+            cell.configure(viewModel: item, style: style.radioButton)
             return cell
         }
     }

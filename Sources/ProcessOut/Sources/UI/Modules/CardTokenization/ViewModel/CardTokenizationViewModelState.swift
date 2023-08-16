@@ -56,9 +56,10 @@ struct CardTokenizationViewModelState {
     }
 
     typealias ErrorItem = CollectionViewErrorViewModel
+    typealias RadioButtonItem = CollectionViewRadioViewModel
 
     enum Item: Hashable {
-        case title(TitleItem), input(InputItem), error(ErrorItem)
+        case title(TitleItem), input(InputItem), error(ErrorItem), radio(RadioButtonItem)
     }
 
     typealias SectionHeader = CollectionViewSectionHeaderViewModel
