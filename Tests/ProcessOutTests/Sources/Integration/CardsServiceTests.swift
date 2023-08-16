@@ -83,6 +83,19 @@ import XCTest
         _ = try await sut.updateCard(request: cardUpdateRequest)
     }
 
+    func test_tokenize_whenPreferredSchemeIsSet() async throws {
+        // Given
+        let request = POCardTokenizationRequest(
+            number: "5341026607460971", expMonth: 12, expYear: 40, preferredScheme: "carte bancaire"
+        )
+
+        // When
+        let card = try await sut.tokenize(request: request)
+
+        // Then
+        XCTAssertEqual(card.preferredScheme, request.preferredScheme)
+    }
+
     // MARK: - Private Properties
 
     private var sut: POCardsService!
