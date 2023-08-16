@@ -43,8 +43,8 @@ enum CardTokenizationInteractorState {
         /// Card issuer information based on number.
         var issuerInformation: POCardIssuerInformation?
 
-        /// Boolean value identifying whether co-scheme is preferred over scheme.
-        var prefersCoScheme: Bool
+        /// Preferred scheme.
+        var preferredScheme: String?
 
         /// The most recent error message.
         var recentErrorMessage: String?

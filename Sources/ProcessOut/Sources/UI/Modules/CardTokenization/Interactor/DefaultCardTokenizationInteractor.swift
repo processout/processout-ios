@@ -42,8 +42,7 @@ final class DefaultCardTokenizationInteractor:
             number: .init(id: \.number, formatter: cardNumberFormatter),
             expiration: .init(id: \.expiration, formatter: cardExpirationFormatter),
             cvc: .init(id: \.cvc),
-            cardholderName: .init(id: \.cardholderName),
-            prefersCoScheme: false
+            cardholderName: .init(id: \.cardholderName)
         )
         state = .started(startedState)
     }
@@ -64,11 +63,16 @@ final class DefaultCardTokenizationInteractor:
         }
     }
 
-    func setPrefersCoScheme(_ prefersCoScheme: Bool) {
+    func setPreferredScheme(_ scheme: String) {
         guard case .started(var startedState) = state else {
             return
         }
-        startedState.prefersCoScheme = prefersCoScheme
+        let supportedSchemes = [startedState.issuerInformation?.scheme, startedState.issuerInformation?.coScheme]
+        guard supportedSchemes.contains(scheme) else {
+            logger.info("Attempted to select unknown '\(scheme)' scheme.")
+            return
+        }
+        startedState.preferredScheme = scheme
         state = .started(startedState)
     }
 
@@ -81,9 +85,6 @@ final class DefaultCardTokenizationInteractor:
             return
         }
         state = .tokenizing(snapshot: startedState)
-        let preferredScheme = startedState.prefersCoScheme
-            ? startedState.issuerInformation?.coScheme
-            : startedState.issuerInformation?.scheme
         let request = POCardTokenizationRequest(
             number: cardNumberFormatter.normalized(number: startedState.number.value),
             expMonth: cardExpirationFormatter.expirationMonth(from: startedState.expiration.value) ?? 0,
@@ -91,7 +92,7 @@ final class DefaultCardTokenizationInteractor:
             cvc: startedState.cvc.value,
             name: startedState.cardholderName.value,
             contact: nil, // todo(andrii-vysotskyi): collect contact information
-            preferredScheme: preferredScheme,
+            preferredScheme: startedState.preferredScheme,
             metadata: nil // todo(andrii-vysotskyi): allow merchant to inject tokenization metadata
         )
         cardsService.tokenize(request: request) { [weak self] result in
@@ -249,7 +250,7 @@ final class DefaultCardTokenizationInteractor:
             return
         }
         startedState.issuerInformation = issuerInformation(number: startedState.number.value)
-        startedState.prefersCoScheme = false
+        startedState.preferredScheme = nil
         if let iin = issuerIdentificationNumber(number: startedState.number.value) {
             guard iin != issuerIdentificationNumber(number: oldNumber) else {
                 return // IIN didn't change so abort.
@@ -287,29 +288,30 @@ final class DefaultCardTokenizationInteractor:
     private func issuerInformation(number: String) -> POCardIssuerInformation? {
         struct Issuer {
             let scheme: String
-            let leading: ClosedRange<Int>
+            let ranges: [ClosedRange<Int>]
             let length: Int
         }
         // Based on https://www.bincodes.com/bin-list
         // todo(andrii-vysotskyi): support more schemes
         let issuers: [Issuer] = [
-            .init(scheme: "visa", leading: 4...4, length: 1),
-            .init(scheme: "mastercard", leading: 2221...2720, length: 4),
-            .init(scheme: "mastercard", leading: 51...55, length: 2),
-            .init(scheme: "china union pay", leading: 62...62, length: 2),
-            .init(scheme: "american express", leading: 34...34, length: 2),
-            .init(scheme: "american express", leading: 37...37, length: 2),
-            .init(scheme: "discover", leading: 6011...6011, length: 4),
-            .init(scheme: "discover", leading: 622126...622925, length: 6),
-            .init(scheme: "discover", leading: 644...649, length: 3),
-            .init(scheme: "discover", leading: 65...65, length: 2)
+            .init(scheme: "uatp", ranges: [1...1], length: 1),
+            .init(scheme: "visa", ranges: [4...4], length: 1),
+            .init(scheme: "mastercard", ranges: [2221...2720], length: 4),
+            .init(scheme: "mastercard", ranges: [51...55], length: 2),
+            .init(scheme: "china union pay", ranges: [62...62], length: 2),
+            .init(scheme: "american express", ranges: [34...34, 37...37], length: 2),
+            .init(scheme: "discover", ranges: [6011...6011], length: 4),
+            .init(scheme: "discover", ranges: [644...649], length: 3),
+            .init(scheme: "discover", ranges: [65...65], length: 2),
+            .init(scheme: "jcb", ranges: [3528...3589], length: 4),
+            .init(scheme: "argencard", ranges: [501105...501105], length: 6)
         ]
         let normalizedNumber = cardNumberFormatter.normalized(number: number)
         let issuer = issuers.first { issuer in
             guard let leading = Int(normalizedNumber.prefix(issuer.length)) else {
                 return false
             }
-            return issuer.leading.contains(leading)
+            return issuer.ranges.contains { $0.contains(leading) }
         }
         guard let issuer else {
             return nil
