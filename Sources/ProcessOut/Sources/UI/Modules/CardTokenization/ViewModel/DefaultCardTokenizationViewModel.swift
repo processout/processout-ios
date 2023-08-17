@@ -217,7 +217,10 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     }
 
     private func cardNumberIcon(startedState: InteractorState.Started) -> UIImage? {
-        guard let scheme = startedState.preferredScheme ?? startedState.issuerInformation?.scheme else {
+        let scheme = startedState.issuerInformation?.coScheme != nil
+            ? startedState.preferredScheme
+            : startedState.issuerInformation?.scheme
+        guard let scheme else {
             return nil
         }
         // todo(andrii-vysotskyi): support more schemes
