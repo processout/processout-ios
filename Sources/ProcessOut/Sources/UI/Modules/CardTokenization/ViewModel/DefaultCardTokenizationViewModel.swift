@@ -236,7 +236,8 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     }
 
     private func preferredSchemeSection(startedState: InteractorState.Started) -> State.Section? {
-        guard let issuerInformation = startedState.issuerInformation,
+        guard configuration.isSchemeSelectionAllowed,
+              let issuerInformation = startedState.issuerInformation,
               let coScheme = issuerInformation.coScheme else {
             return nil
         }
