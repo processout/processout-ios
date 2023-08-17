@@ -292,7 +292,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             title: title,
             isEnabled: isEnabled,
             isExecuting: false,
-            accessibilityIdentifier: "card-tokenization.secondary-button",
+            accessibilityIdentifier: "card-tokenization.cancel-button",
             handler: { [weak self] in
                 self?.interactor.cancel()
             }
