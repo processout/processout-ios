@@ -28,12 +28,6 @@ final class CollectionViewRadioCell: UICollectionViewCell {
         self.viewModel = viewModel
     }
 
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let accessibilityIdentifier = "native-alternative-payment.radio-button"
-    }
-
     // MARK: - Private Properties
 
     private lazy var radioButton: RadioButton = {
