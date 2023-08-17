@@ -57,10 +57,10 @@ final class DefaultCardTokenizationInteractor:
         if areParametersValid(startedState: startedState) {
             startedState.recentErrorMessage = nil
         }
-        self.state = .started(startedState)
         if parameterId == startedState.number.id {
-            updateCardIssuerInformation(oldNumber: oldParameterValue)
+            updateIssuerInformation(startedState: &startedState, oldNumber: oldParameterValue)
         }
+        self.state = .started(startedState)
     }
 
     func setPreferredScheme(_ scheme: String) {
@@ -100,7 +100,7 @@ final class DefaultCardTokenizationInteractor:
             case .success(let card):
                 self?.processTokenizedCard(card: card)
             case .failure(let failure):
-                self?.restoreStartedStateAfterTokenizationFailure(failure)
+                self?.restoreStartedState(tokenizationFailure: failure)
             }
         }
     }
@@ -136,32 +136,36 @@ final class DefaultCardTokenizationInteractor:
 
     // MARK: - State Management
 
-    private func restoreStartedStateAfterTokenizationFailure(_ failure: POFailure) {
-        guard case .tokenizing(var startedState) = state, case .generic(let genericFailureCode) = failure.code else {
+    private func restoreStartedState(tokenizationFailure failure: POFailure) {
+        let shouldContinue = delegate?.shouldContinueTokenization(after: failure) ?? true
+        guard shouldContinue, case .tokenizing(var startedState) = state else {
             setFailureStateUnchecked(failure: failure)
             return
         }
         var invalidParameterIds: [State.ParameterId] = []
-        switch genericFailureCode {
-        case .requestInvalidCard, .cardInvalid:
+        switch failure.code {
+        case .generic(.requestInvalidCard), .generic(.cardInvalid):
             invalidParameterIds.append(contentsOf: [\.number, \.expiration, \.cvc, \.cardholderName])
-        case .cardInvalidNumber, .cardMissingNumber:
+        case .generic(.cardInvalidNumber), .generic(.cardMissingNumber):
             invalidParameterIds.append(\.number)
-        case .cardInvalidExpiryDate, .cardMissingExpiry, .cardInvalidExpiryMonth, .cardInvalidExpiryYear:
+        case .generic(.cardInvalidExpiryDate),
+             .generic(.cardMissingExpiry),
+             .generic(.cardInvalidExpiryMonth),
+             .generic(.cardInvalidExpiryYear):
             invalidParameterIds.append(\.expiration)
-        case .cardBadTrackData:
+        case .generic(.cardBadTrackData):
             invalidParameterIds.append(contentsOf: [\.expiration, \.cvc])
-        case .cardMissingCvc, .cardFailedCvc, .cardFailedCvcAndAvs:
+        case .generic(.cardMissingCvc), .generic(.cardFailedCvc), .generic(.cardFailedCvcAndAvs):
             invalidParameterIds.append(\.cvc)
-        case .cardInvalidName:
+        case .generic(.cardInvalidName):
             invalidParameterIds.append(\.cardholderName)
         default:
-            setFailureStateUnchecked(failure: failure)
-            return
+            break
         }
         for keyPath in invalidParameterIds {
             startedState[keyPath: keyPath].isValid = false
         }
+        // todo(andrii-vysotskyi): replace message with localized local copy.
         startedState.recentErrorMessage = failure.message
         state = .started(startedState)
     }
@@ -181,7 +185,7 @@ final class DefaultCardTokenizationInteractor:
                     self?.setTokenizedState(card: card)
                 case .failure(let error):
                     let failure = POFailure(code: .generic(.mobile), underlyingError: error)
-                    self?.setFailureStateUnchecked(failure: failure)
+                    self?.restoreStartedState(tokenizationFailure: failure)
                 }
             }
         } else {
@@ -201,8 +205,7 @@ final class DefaultCardTokenizationInteractor:
             case .success:
                 self?.setTokenizedState(card: card)
             case .failure(let failure):
-                // todo(andrii-vysotskyi): decide if implementation should attempt to recover
-                self?.setFailureStateUnchecked(failure: failure)
+                self?.restoreStartedState(tokenizationFailure: failure)
             }
         }
     }
@@ -222,8 +225,7 @@ final class DefaultCardTokenizationInteractor:
                 case .success:
                     self?.setTokenizedState(card: card)
                 case .failure(let failure):
-                    // todo(andrii-vysotskyi): decide if implementation should attempt to recover
-                    self?.setFailureStateUnchecked(failure: failure)
+                    self?.restoreStartedState(tokenizationFailure: failure)
                 }
             }
         )
@@ -245,34 +247,28 @@ final class DefaultCardTokenizationInteractor:
 
     // MARK: - Card Issuer Information
 
-    private func updateCardIssuerInformation(oldNumber: String) {
-        guard case .started(var startedState) = state else {
-            return
-        }
-        startedState.issuerInformation = issuerInformation(number: startedState.number.value)
-        startedState.preferredScheme = nil
+    private func updateIssuerInformation(startedState: inout State.Started, oldNumber: String) {
         if let iin = issuerIdentificationNumber(number: startedState.number.value) {
             guard iin != issuerIdentificationNumber(number: oldNumber) else {
                 return // IIN didn't change so abort.
             }
-            state = .started(startedState)
+            startedState.issuerInformation = issuerInformation(number: startedState.number.value)
+            startedState.preferredScheme = nil
             issuerInformationCancellable?.cancel()
             issuerInformationCancellable = cardsService.issuerInformation(iin: iin) { [weak self] result in
-                guard case .started(var startedState) = self?.state else {
+                guard case .started(var startedState) = self?.state,
+                      case .success(let issuerInformation) = result else {
                     return
                 }
-                switch result {
-                case .success(let issuerInformation):
-                    startedState.issuerInformation = issuerInformation
-                case .failure(let failure) where failure.code == .cancelled:
-                    break
-                case .failure:
-                    break // todo(andrii-vysotskyi): ask merchant whether this error should fail whole flow
-                }
+                // Inability to select co-scheme is considered minor issue and we still want
+                // users to be able to continue tokenization. So errors are silently ignored.
+                startedState.issuerInformation = issuerInformation
+                startedState.preferredScheme = self?.delegate?.preferredScheme(issuerInformation: issuerInformation)
                 self?.state = .started(startedState)
             }
         } else {
-            state = .started(startedState)
+            startedState.issuerInformation = issuerInformation(number: startedState.number.value)
+            startedState.preferredScheme = nil
         }
     }
 
