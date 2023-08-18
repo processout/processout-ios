@@ -142,31 +142,37 @@ final class DefaultCardTokenizationInteractor:
             setFailureStateUnchecked(failure: failure)
             return
         }
+        var errorMessage: String?
         var invalidParameterIds: [State.ParameterId] = []
         switch failure.code {
         case .generic(.requestInvalidCard), .generic(.cardInvalid):
             invalidParameterIds.append(contentsOf: [\.number, \.expiration, \.cvc, \.cardholderName])
+            errorMessage = Strings.CardTokenization.Error.card
         case .generic(.cardInvalidNumber), .generic(.cardMissingNumber):
             invalidParameterIds.append(\.number)
+            errorMessage = Strings.CardTokenization.Error.cardNumber
         case .generic(.cardInvalidExpiryDate),
              .generic(.cardMissingExpiry),
              .generic(.cardInvalidExpiryMonth),
              .generic(.cardInvalidExpiryYear):
             invalidParameterIds.append(\.expiration)
+            errorMessage = Strings.CardTokenization.Error.cardExpiration
         case .generic(.cardBadTrackData):
             invalidParameterIds.append(contentsOf: [\.expiration, \.cvc])
+            errorMessage = Strings.CardTokenization.Error.trackData
         case .generic(.cardMissingCvc), .generic(.cardFailedCvc), .generic(.cardFailedCvcAndAvs):
             invalidParameterIds.append(\.cvc)
+            errorMessage = Strings.CardTokenization.Error.cvc
         case .generic(.cardInvalidName):
             invalidParameterIds.append(\.cardholderName)
+            errorMessage = Strings.CardTokenization.Error.cardholderName
         default:
-            break
+            errorMessage = Strings.CardTokenization.Error.generic
         }
         for keyPath in invalidParameterIds {
             startedState[keyPath: keyPath].isValid = false
         }
-        // todo(andrii-vysotskyi): replace message with localized local copy.
-        startedState.recentErrorMessage = failure.message
+        startedState.recentErrorMessage = errorMessage
         state = .started(startedState)
     }
 
