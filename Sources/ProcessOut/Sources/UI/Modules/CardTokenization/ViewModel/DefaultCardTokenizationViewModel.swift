@@ -140,7 +140,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         )
         let cvc = State.InputItem(
             placeholder: Text.CardDetails.Cvc.placeholder,
-            value: inputValue(for: startedState.cvc, icon: Asset.Images.cardBack.image),
+            value: inputValue(for: startedState.cvc, icon: Asset.Images.Card.back.image),
             formatter: startedState.cvc.formatter,
             isCompact: true,
             keyboard: .asciiCapableNumberPad,
@@ -225,11 +225,25 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         }
         // todo(andrii-vysotskyi): support more schemes
         let assets = [
-            "visa": Asset.Images.visa,
-            "mastercard": Asset.Images.mastercard,
-            "american express": Asset.Images.amex,
-            "china union pay": Asset.Images.unionPay,
-            "discover": Asset.Images.discover
+            "american express": Asset.Images.Schemes.amex,
+            "carte bancaire": Asset.Images.Schemes.carteBancaire,
+            "dinacard": Asset.Images.Schemes.dinacard,
+            "diners club": Asset.Images.Schemes.diners,
+            "diners club carte blanche": Asset.Images.Schemes.diners,
+            "diners club international": Asset.Images.Schemes.diners,
+            "diners club united states & canada": Asset.Images.Schemes.diners,
+            "discover": Asset.Images.Schemes.discover,
+            "elo": Asset.Images.Schemes.elo,
+            "jcb": Asset.Images.Schemes.jcb,
+            "mada": Asset.Images.Schemes.mada,
+            "maestro": Asset.Images.Schemes.maestro,
+            "mastercard": Asset.Images.Schemes.mastercard,
+            "rupay": Asset.Images.Schemes.rupay,
+            "sodexo": Asset.Images.Schemes.sodexo,
+            "china union pay": Asset.Images.Schemes.unionPay,
+            "verve": Asset.Images.Schemes.verve,
+            "visa": Asset.Images.Schemes.visa,
+            "vpay": Asset.Images.Schemes.vpay
         ]
         let normalizedScheme = scheme.lowercased()
         return assets[normalizedScheme]?.image
