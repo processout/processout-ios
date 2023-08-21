@@ -38,20 +38,20 @@ internal enum Strings {
       }
     }
     internal enum Error {
-      /// Your card’s information is invalid.
-      internal static var card: String { return Strings.tr("ProcessOut", "card-tokenization.error.card", fallback: "Your card’s information is invalid.") }
-      /// Your card’s expiration date is invalid.
-      internal static var cardExpiration: String { return Strings.tr("ProcessOut", "card-tokenization.error.card-expiration", fallback: "Your card’s expiration date is invalid.") }
-      /// Your card’s number is invalid.
-      internal static var cardNumber: String { return Strings.tr("ProcessOut", "card-tokenization.error.card-number", fallback: "Your card’s number is invalid.") }
-      /// Cardholder name is invalid.
-      internal static var cardholderName: String { return Strings.tr("ProcessOut", "card-tokenization.error.cardholder-name", fallback: "Cardholder name is invalid.") }
-      /// Your card’s CVC is invalid.
-      internal static var cvc: String { return Strings.tr("ProcessOut", "card-tokenization.error.cvc", fallback: "Your card’s CVC is invalid.") }
+      /// Your card information is invalid.
+      internal static var card: String { return Strings.tr("ProcessOut", "card-tokenization.error.card", fallback: "Your card information is invalid.") }
+      /// Your card expiration date is invalid.
+      internal static var cardExpiration: String { return Strings.tr("ProcessOut", "card-tokenization.error.card-expiration", fallback: "Your card expiration date is invalid.") }
+      /// Your card number is invalid.
+      internal static var cardNumber: String { return Strings.tr("ProcessOut", "card-tokenization.error.card-number", fallback: "Your card number is invalid.") }
+      /// The cardholder name is invalid.
+      internal static var cardholderName: String { return Strings.tr("ProcessOut", "card-tokenization.error.cardholder-name", fallback: "The cardholder name is invalid.") }
+      /// Your card CVC is invalid.
+      internal static var cvc: String { return Strings.tr("ProcessOut", "card-tokenization.error.cvc", fallback: "Your card CVC is invalid.") }
       /// Something went wrong, please try again.
       internal static var generic: String { return Strings.tr("ProcessOut", "card-tokenization.error.generic", fallback: "Something went wrong, please try again.") }
-      /// Your card's expiration date and/or CVC is invalid.
-      internal static var trackData: String { return Strings.tr("ProcessOut", "card-tokenization.error.track-data", fallback: "Your card's expiration date and/or CVC is invalid.") }
+      /// Your card expiration date and/or CVC is invalid.
+      internal static var trackData: String { return Strings.tr("ProcessOut", "card-tokenization.error.track-data", fallback: "Your card expiration date and/or CVC is invalid.") }
     }
     internal enum PreferredScheme {
       /// %@
