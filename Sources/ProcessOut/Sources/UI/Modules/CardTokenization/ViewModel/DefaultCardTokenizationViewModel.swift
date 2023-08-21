@@ -156,7 +156,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             return nil
         }
         let inputItem = State.InputItem(
-            placeholder: Text.CardDetails.Cvc.cardholder,
+            placeholder: Text.CardDetails.Cardholder.placeholder,
             value: inputValue(for: startedState.cardholderName),
             formatter: startedState.cardholderName.formatter,
             isCompact: false,

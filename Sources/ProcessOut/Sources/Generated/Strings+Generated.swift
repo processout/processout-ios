@@ -20,9 +20,11 @@ internal enum Strings {
     internal enum CardDetails {
       /// Card Information
       internal static var title: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.title", fallback: "Card Information") }
-      internal enum Cvc {
+      internal enum Cardholder {
         /// Cardholder Name
-        internal static var cardholder: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.cvc.cardholder", fallback: "Cardholder Name") }
+        internal static var placeholder: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.cardholder.placeholder", fallback: "Cardholder Name") }
+      }
+      internal enum Cvc {
         /// CVC
         internal static var placeholder: String { return Strings.tr("ProcessOut", "card-tokenization.card-details.cvc.placeholder", fallback: "CVC") }
       }
