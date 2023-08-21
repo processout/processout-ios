@@ -172,6 +172,7 @@ final class DefaultCardTokenizationInteractor:
         for keyPath in invalidParameterIds {
             startedState[keyPath: keyPath].isValid = false
         }
+        // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
         startedState.recentErrorMessage = errorMessage
         state = .started(startedState)
     }
