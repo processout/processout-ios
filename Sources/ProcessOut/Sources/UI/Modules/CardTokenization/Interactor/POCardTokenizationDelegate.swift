@@ -10,12 +10,15 @@ public protocol POCardTokenizationDelegate: AnyObject {
 
     /// Allows delegate to additionally process tokenized card before ending module's lifecycle. For example
     /// it is possible to authorize an invoice or assign customer token.
-    /// Default implementation does nothing.
+    /// Default implementation immediately calls completion.
     func processTokenizedCard(card: POCard, completion: (Result<POCardTokenizationProcessAction?, Error>) -> Void)
 
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
     func preferredScheme(issuerInformation: POCardIssuerInformation) -> String?
+
+    /// Implementation should return default card's billing address if any.
+    var cardBillingAddress: POContact? { get }
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
@@ -31,6 +34,10 @@ extension POCardTokenizationDelegate {
 
     public func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
         issuerInformation.scheme
+    }
+
+    public var cardBillingAddress: POContact? {
+        nil
     }
 
     public func shouldContinueTokenization(after failure: POFailure) -> Bool {

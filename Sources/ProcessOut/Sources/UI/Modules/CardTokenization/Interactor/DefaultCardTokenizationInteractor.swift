@@ -91,7 +91,7 @@ final class DefaultCardTokenizationInteractor:
             expYear: cardExpirationFormatter.expirationYear(from: startedState.expiration.value) ?? 0,
             cvc: startedState.cvc.value,
             name: startedState.cardholderName.value,
-            contact: nil, // todo(andrii-vysotskyi): collect contact information
+            contact: delegate?.cardBillingAddress,
             preferredScheme: startedState.preferredScheme,
             metadata: nil // todo(andrii-vysotskyi): allow merchant to inject tokenization metadata
         )
