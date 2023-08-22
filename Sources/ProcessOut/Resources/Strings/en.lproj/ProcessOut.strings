@@ -7,7 +7,7 @@
 */
 
 "native-alternative-payment.title" = "Pay with %@";
-"native-alternative-payment.success.message" = "Success!\nPayment approved";
+"native-alternative-payment.success.message" = "Success!\nPayment approved.";
 "native-alternative-payment.email.placeholder" = "name@example.com";
 "native-alternative-payment.phone.placeholder" = "Enter phone number";
 "native-alternative-payment.submit-button.title" = "Pay %@";
