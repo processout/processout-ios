@@ -19,6 +19,7 @@ final class DefaultCardTokenizationInteractor:
         customerTokensService: POCustomerTokensService,
         threeDSService: PO3DSService?,
         logger: POLogger,
+        billingAddress: POContact?,
         delegate: POCardTokenizationDelegate?,
         completion: @escaping Completion
     ) {
@@ -27,6 +28,7 @@ final class DefaultCardTokenizationInteractor:
         self.customerTokensService = customerTokensService
         self.threeDSService = threeDSService
         self.logger = logger
+        self.billingAddress = billingAddress
         self.delegate = delegate
         self.completion = completion
         super.init(state: .idle)
@@ -91,7 +93,7 @@ final class DefaultCardTokenizationInteractor:
             expYear: cardExpirationFormatter.expirationYear(from: startedState.expiration.value) ?? 0,
             cvc: startedState.cvc.value,
             name: startedState.cardholderName.value,
-            contact: delegate?.cardBillingAddress,
+            contact: billingAddress,
             preferredScheme: startedState.preferredScheme,
             metadata: nil // todo(andrii-vysotskyi): allow merchant to inject tokenization metadata
         )
@@ -125,6 +127,7 @@ final class DefaultCardTokenizationInteractor:
     private let invoicesService: POInvoicesService
     private let customerTokensService: POCustomerTokensService
     private let threeDSService: PO3DSService?
+    private let billingAddress: POContact?
     private let logger: POLogger
     private let completion: Completion
 

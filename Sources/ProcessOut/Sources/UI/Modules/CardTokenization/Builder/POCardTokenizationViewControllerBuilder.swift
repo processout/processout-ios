@@ -64,6 +64,7 @@ public final class POCardTokenizationViewControllerBuilder {
             customerTokensService: api.customerTokens,
             threeDSService: threeDSService,
             logger: api.logger,
+            billingAddress: configuration.billingAddress,
             delegate: delegate,
             completion: completion
         )

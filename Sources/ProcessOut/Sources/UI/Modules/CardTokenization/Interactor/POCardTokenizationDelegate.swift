@@ -17,9 +17,6 @@ public protocol POCardTokenizationDelegate: AnyObject {
     /// implementation returns primary scheme.
     func preferredScheme(issuerInformation: POCardIssuerInformation) -> String?
 
-    /// Implementation should return default card's billing address if any.
-    var cardBillingAddress: POContact? { get }
-
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
     func shouldContinueTokenization(after failure: POFailure) -> Bool
@@ -34,10 +31,6 @@ extension POCardTokenizationDelegate {
 
     public func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
         issuerInformation.scheme
-    }
-
-    public var cardBillingAddress: POContact? {
-        nil
     }
 
     public func shouldContinueTokenization(after failure: POFailure) -> Bool {
