@@ -83,20 +83,20 @@ internal enum Strings {
       internal static var placeholder: String { return Strings.tr("ProcessOut", "native-alternative-payment.email.placeholder", fallback: "name@example.com") }
     }
     internal enum Error {
-      /// Email is not valid
-      internal static var invalidEmail: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-email", fallback: "Email is not valid") }
+      /// Email is not valid.
+      internal static var invalidEmail: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-email", fallback: "Email is not valid.") }
       /// Plural format key: "%#@length@"
       internal static func invalidLength(_ p1: Int) -> String {
         return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-length", p1, fallback: "Plural format key: \"%#@length@\"")
       }
-      /// Number is not valid
-      internal static var invalidNumber: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-number", fallback: "Number is not valid") }
-      /// Phone number is not valid
-      internal static var invalidPhone: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-phone", fallback: "Phone number is not valid") }
-      /// Value is not valid
-      internal static var invalidValue: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-value", fallback: "Value is not valid") }
-      /// Parameter is required
-      internal static var requiredParameter: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.required-parameter", fallback: "Parameter is required") }
+      /// Number is not valid.
+      internal static var invalidNumber: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-number", fallback: "Number is not valid.") }
+      /// Phone number is not valid.
+      internal static var invalidPhone: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-phone", fallback: "Phone number is not valid.") }
+      /// Value is not valid.
+      internal static var invalidValue: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.invalid-value", fallback: "Value is not valid.") }
+      /// Parameter is required.
+      internal static var requiredParameter: String { return Strings.tr("ProcessOut", "native-alternative-payment.error.required-parameter", fallback: "Parameter is required.") }
     }
     internal enum Phone {
       /// Enter phone number
@@ -112,8 +112,8 @@ internal enum Strings {
     }
     internal enum Success {
       /// Success!
-      /// Payment approved
-      internal static var message: String { return Strings.tr("ProcessOut", "native-alternative-payment.success.message", fallback: "Success!\nPayment approved") }
+      /// Payment approved.
+      internal static var message: String { return Strings.tr("ProcessOut", "native-alternative-payment.success.message", fallback: "Success!\nPayment approved.") }
     }
   }
   internal enum Test3DS {
