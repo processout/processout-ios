@@ -13,9 +13,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Quantidade de caracteres incorreta, espera-se %d caractere</string>
+			<string>Quantidade de caracteres incorreta, espera-se %d caractere.</string>
 			<key>other</key>
-			<string>Quantidade de caracteres incorreta, espera-se %d caracteres</string>
+			<string>Quantidade de caracteres incorreta, espera-se %d caracteres.</string>
 		</dict>
 	</dict>
 </dict>

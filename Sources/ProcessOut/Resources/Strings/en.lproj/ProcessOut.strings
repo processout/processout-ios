@@ -7,17 +7,17 @@
 */
 
 "native-alternative-payment.title" = "Pay with %@";
-"native-alternative-payment.success.message" = "Success!\nPayment approved";
+"native-alternative-payment.success.message" = "Success!\nPayment approved.";
 "native-alternative-payment.email.placeholder" = "name@example.com";
 "native-alternative-payment.phone.placeholder" = "Enter phone number";
 "native-alternative-payment.submit-button.title" = "Pay %@";
 "native-alternative-payment.submit-button.default-title" = "Pay";
 "native-alternative-payment.cancel-button.title" = "Cancel";
-"native-alternative-payment.error.required-parameter" = "Parameter is required";
-"native-alternative-payment.error.invalid-number" = "Number is not valid";
-"native-alternative-payment.error.invalid-value" = "Value is not valid";
-"native-alternative-payment.error.invalid-email" = "Email is not valid";
-"native-alternative-payment.error.invalid-phone" = "Phone number is not valid";
+"native-alternative-payment.error.required-parameter" = "Parameter is required.";
+"native-alternative-payment.error.invalid-number" = "Number is not valid.";
+"native-alternative-payment.error.invalid-value" = "Value is not valid.";
+"native-alternative-payment.error.invalid-email" = "Email is not valid.";
+"native-alternative-payment.error.invalid-phone" = "Phone number is not valid.";
 
 "test-3-d-s.challenge.title" = "Do you want to accept the 3DS2 challenge?";
 "test-3-d-s.challenge.accept" = "Accept";
