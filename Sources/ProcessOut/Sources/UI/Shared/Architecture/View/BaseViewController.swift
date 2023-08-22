@@ -45,7 +45,7 @@ class BaseViewController<Model>: UIViewController where Model: ViewModel {
     // MARK: -
 
     func configure(with state: Model.State, animated: Bool) {
-        logger.debug("Will update view with new state: \(String(describing: state))")
+        // Ignored
     }
 
     func keyboardWillChange(newHeight: CGFloat) {

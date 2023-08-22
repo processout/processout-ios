@@ -28,6 +28,15 @@
 "card-tokenization.card-details.number.placeholder" = "4242 4242 4242 4242";
 "card-tokenization.card-details.expiration.placeholder" = "MM / YY";
 "card-tokenization.card-details.cvc.placeholder" = "CVC";
-"card-tokenization.card-details.cvc.cardholder" = "Cardholder Name";
+"card-tokenization.card-details.cardholder.placeholder" = "Cardholder Name";
+"card-tokenization.preferred-scheme.title" = "Preferred Scheme";
+"card-tokenization.preferred-scheme.description" = "%@";
+"card-tokenization.error.card" = "Your card information is invalid.";
+"card-tokenization.error.card-number" = "Your card number is invalid.";
+"card-tokenization.error.card-expiration" = "Your card expiration date is invalid.";
+"card-tokenization.error.track-data" = "Your card expiration date and/or CVC is invalid.";
+"card-tokenization.error.cvc" = "Your card CVC is invalid.";
+"card-tokenization.error.cardholder-name" = "The cardholder name is invalid.";
+"card-tokenization.error.generic" = "Something went wrong, please try again.";
 "card-tokenization.submit-button.title" = "Submit";
 "card-tokenization.cancel-button.title" = "Cancel";

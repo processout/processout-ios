@@ -20,6 +20,9 @@ public struct POCardTokenizationStyle {
     /// Input style.
     public let input: POInputStyle
 
+    /// Radio button style.
+    public let radioButton: PORadioButtonStyle
+
     /// Error description text style.
     public let errorDescription: POTextStyle
 
@@ -36,6 +39,7 @@ public struct POCardTokenizationStyle {
         title: POTextStyle? = nil,
         sectionTitle: POTextStyle? = nil,
         input: POInputStyle? = nil,
+        radioButton: PORadioButtonStyle? = nil,
         errorDescription: POTextStyle? = nil,
         actions: POActionsContainerStyle? = nil,
         backgroundColor: UIColor? = nil,
@@ -44,6 +48,7 @@ public struct POCardTokenizationStyle {
         self.title = title ?? Constants.title
         self.sectionTitle = sectionTitle ?? Constants.sectionTitle
         self.input = input ?? Constants.input
+        self.radioButton = radioButton ?? Constants.radioButton
         self.errorDescription = errorDescription ?? Constants.errorDescription
         self.actions = actions ?? Constants.actions
         self.backgroundColor = backgroundColor ?? Constants.backgroundColor
@@ -56,6 +61,7 @@ public struct POCardTokenizationStyle {
         static let title = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .Medium.title)
         static let sectionTitle = POTextStyle(color: Asset.Colors.Text.secondary.color, typography: .Fixed.labelHeading)
         static let input = POInputStyle.default()
+        static let radioButton = PORadioButtonStyle.default
         static let errorDescription = POTextStyle(color: Asset.Colors.Text.error.color, typography: .Fixed.label)
         static let actions = POActionsContainerStyle()
         static let backgroundColor = Asset.Colors.Surface.level1.color

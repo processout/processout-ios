@@ -10,6 +10,9 @@ protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState>
     /// Updates card information parameter with given id.
     func update(parameterId: State.ParameterId, value: String)
 
+    /// Changes preferred scheme to use when tokenizing card.
+    func setPreferredScheme(_ scheme: String)
+
     /// Starts card tokenization.
     func tokenize()
 

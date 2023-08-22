@@ -13,7 +13,9 @@ protocol CardsRepository: PORepository {
     /// 
     /// - Parameters:
     ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
-    func issuerInformation(iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void)
+    func issuerInformation(
+        iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void
+    ) -> POCancellable
 
     /// Tokenize a card.
     func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void)

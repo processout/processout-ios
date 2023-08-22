@@ -40,6 +40,12 @@ enum CardTokenizationInteractorState {
         /// Name of cardholder.
         var cardholderName: Parameter
 
+        /// Card issuer information based on number.
+        var issuerInformation: POCardIssuerInformation?
+
+        /// Preferred scheme.
+        var preferredScheme: String?
+
         /// The most recent error message.
         var recentErrorMessage: String?
     }

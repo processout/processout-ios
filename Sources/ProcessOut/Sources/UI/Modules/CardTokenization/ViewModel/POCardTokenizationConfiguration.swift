@@ -24,15 +24,25 @@ public struct POCardTokenizationConfiguration {
     /// Primary action text, such as "Cancel". Use empty string to hide button.
     public let cancelActionTitle: String?
 
+    /// Card billing address.
+    public let billingAddress: POContact?
+
+    /// Boolean flag determines whether user will be aksed to select scheme if co-scheme is available.
+    /// Until feature is fully ready this is hardcoded to `false`.
+    let isSchemeSelectionAllowed: Bool
+
     public init(
         title: String? = nil,
         isCardholderNameInputVisible: Bool = true,
         primaryActionTitle: String? = nil,
-        cancelActionTitle: String? = nil
+        cancelActionTitle: String? = nil,
+        billingAddress: POContact? = nil
     ) {
         self.title = title
         self.isCardholderNameInputVisible = isCardholderNameInputVisible
         self.primaryActionTitle = primaryActionTitle
         self.cancelActionTitle = cancelActionTitle
+        self.billingAddress = billingAddress
+        isSchemeSelectionAllowed = false
     }
 }

@@ -15,16 +15,19 @@ struct CardTokenizationViewModelState {
     struct InputValue: Hashable {
 
         /// Current parameter's value text.
-        @ReferenceWrapper
+        @ReferenceWrapper(value: "")
         var text: String
 
         /// Boolean value indicating whether value is valid.
-        @ReferenceWrapper
+        @ReferenceWrapper(value: false)
         var isInvalid: Bool
 
         /// Boolean value indicating whether input is currently focused.
-        @ReferenceWrapper
+        @ReferenceWrapper(value: false)
         var isFocused: Bool
+
+        @ReferenceWrapper(value: nil)
+        var icon: UIImage?
     }
 
     struct InputItem: Hashable {
@@ -53,9 +56,10 @@ struct CardTokenizationViewModelState {
     }
 
     typealias ErrorItem = CollectionViewErrorViewModel
+    typealias RadioButtonItem = CollectionViewRadioViewModel
 
     enum Item: Hashable {
-        case title(TitleItem), input(InputItem), error(ErrorItem)
+        case title(TitleItem), input(InputItem), error(ErrorItem), radio(RadioButtonItem)
     }
 
     typealias SectionHeader = CollectionViewSectionHeaderViewModel
@@ -67,6 +71,9 @@ struct CardTokenizationViewModelState {
 
         /// Section header if any.
         let header: SectionHeader?
+
+        /// Boolean value indicating whether section items should be laid out tightly.
+        let isTight: Bool
     }
 
     struct Section {

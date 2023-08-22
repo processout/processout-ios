@@ -22,3 +22,19 @@
 "test-3-d-s.challenge.title" = "Você quer aceitar o desafio 3DS2?";
 "test-3-d-s.challenge.accept" = "Aceitar";
 "test-3-d-s.challenge.reject" = "Rejeitar";
+
+"card-tokenization.title" = "Adicionar novo cartão";
+"card-tokenization.card-details.title" = "Dados do cartão";
+"card-tokenization.card-details.number.placeholder" = "4242 4242 4242 4242";
+"card-tokenization.card-details.expiration.placeholder" = "MM / AA";
+"card-tokenization.card-details.cvc.placeholder" = "CVC";
+"card-tokenization.card-details.cardholder.placeholder" = "Nome no cartão";
+"card-tokenization.error.card" = "Os dados do seu cartão são inválidos.";
+"card-tokenization.error.card-number" = "O número do seu cartão é inválido.";
+"card-tokenization.error.card-expiration" = "A data de validade do seu cartão é inválida.";
+"card-tokenization.error.track-data" = "A data de validade e/ou o código de segurança do seu cartão são inválidos.";
+"card-tokenization.error.cvc" = "O código de segurança do seu cartão é inválido.";
+"card-tokenization.error.cardholder-name" = "O nome no cartão é inválido.";
+"card-tokenization.error.generic" = "Ocorreu um erro ao processar o seu cartão, por favor tente novamente.";
+"card-tokenization.submit-button.title" = "Enviar";
+"card-tokenization.cancel-button.title" = "Cancelar";

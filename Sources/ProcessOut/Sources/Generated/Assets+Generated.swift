@@ -57,7 +57,29 @@ internal enum Asset {
     }
   }
   internal enum Images {
+    internal enum Card {
+      internal static let back = ImageAsset(name: "Card/Back")
+      internal static let front = ImageAsset(name: "Card/Front")
+    }
     internal static let chevronDown = ImageAsset(name: "ChevronDown")
+    internal enum Schemes {
+      internal static let amex = ImageAsset(name: "Schemes/Amex")
+      internal static let carteBancaire = ImageAsset(name: "Schemes/CarteBancaire")
+      internal static let dinacard = ImageAsset(name: "Schemes/Dinacard")
+      internal static let diners = ImageAsset(name: "Schemes/Diners")
+      internal static let discover = ImageAsset(name: "Schemes/Discover")
+      internal static let elo = ImageAsset(name: "Schemes/Elo")
+      internal static let jcb = ImageAsset(name: "Schemes/JCB")
+      internal static let mada = ImageAsset(name: "Schemes/Mada")
+      internal static let maestro = ImageAsset(name: "Schemes/Maestro")
+      internal static let mastercard = ImageAsset(name: "Schemes/Mastercard")
+      internal static let rupay = ImageAsset(name: "Schemes/Rupay")
+      internal static let sodexo = ImageAsset(name: "Schemes/Sodexo")
+      internal static let unionPay = ImageAsset(name: "Schemes/UnionPay")
+      internal static let verve = ImageAsset(name: "Schemes/Verve")
+      internal static let visa = ImageAsset(name: "Schemes/Visa")
+      internal static let vpay = ImageAsset(name: "Schemes/Vpay")
+    }
     internal static let success = ImageAsset(name: "Success")
   }
 }

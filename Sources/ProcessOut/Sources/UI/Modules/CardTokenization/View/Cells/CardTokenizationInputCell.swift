@@ -35,6 +35,7 @@ final class CardTokenizationInputCell: UICollectionViewCell, CardTokenizationCel
         textField.placeholder = item.placeholder
         textField.keyboardType = item.keyboard
         textField.textContentType = item.contentType
+        setTextFieldIcon(item.value.icon)
         self.item = item
         self.style = style
     }
@@ -60,7 +61,6 @@ final class CardTokenizationInputCell: UICollectionViewCell, CardTokenizationCel
 
     private lazy var textFieldContainer: TextFieldContainerView = {
         let view = TextFieldContainerView()
-        view.textField.clearButtonMode = .whileEditing
         // todo(andrii-vysotskyi): make accessibility identifier dynamic
         view.textField.accessibilityIdentifier = Constants.accessibilityIdentifier
         view.textField.delegate = self
@@ -104,7 +104,10 @@ final class CardTokenizationInputCell: UICollectionViewCell, CardTokenizationCel
         let activityObserver = item.value.$isFocused.addObserver { [weak self] _ in
             self?.updateFirstResponder()
         }
-        self.observations = [isInvalidObserver, valueObserver, activityObserver]
+        let iconObserver = item.value.$icon.addObserver { [weak self] updatedIcon in
+            self?.setTextFieldIcon(updatedIcon)
+        }
+        self.observations = [isInvalidObserver, valueObserver, activityObserver, iconObserver]
     }
 
     private func updateFirstResponder() {
@@ -115,6 +118,15 @@ final class CardTokenizationInputCell: UICollectionViewCell, CardTokenizationCel
             return
         }
         textField.becomeFirstResponder()
+    }
+
+    private func setTextFieldIcon(_ image: UIImage?) {
+        if let image {
+            textFieldContainer.textField.rightView = UIImageView(image: image)
+            textFieldContainer.textField.rightViewMode = .always
+        } else {
+            textFieldContainer.textField.rightViewMode = .never
+        }
     }
 }
 

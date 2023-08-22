@@ -19,7 +19,9 @@ final class DefaultCardsService: POCardsService {
 
     // MARK: - POCardsService
 
-    func issuerInformation(iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void) {
+    func issuerInformation(
+        iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void
+    ) -> POCancellable {
         repository.issuerInformation(iin: iin, completion: completion)
     }
 

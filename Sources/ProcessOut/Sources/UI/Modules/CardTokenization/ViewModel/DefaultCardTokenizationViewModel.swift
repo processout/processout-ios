@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import UIKit
 
+// swiftlint:disable:next type_body_length
 final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationViewModelState>, CardTokenizationViewModel {
 
     init(interactor: any CardTokenizationInteractor, configuration: POCardTokenizationConfiguration) {
@@ -35,6 +37,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     private enum SectionId {
         static let title = "title"
         static let cardInformation = "card-info"
+        static let preferredScheme = "preferred-scheme"
     }
 
     // MARK: - Private Properties
@@ -73,7 +76,6 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
     // MARK: - Started State
 
     private func convertToState(startedState: InteractorState.Started, isEditingAllowed: Bool) -> State {
-        var sections = [createTitleSection()]
         var cardInformationItems = cardInformationInputItems(
             startedState: startedState
         )
@@ -82,10 +84,18 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             cardInformationItems.append(.error(errorItem))
         }
         let cardInformationSection = State.Section(
-            id: .init(id: SectionId.cardInformation, header: .init(title: Text.CardDetails.title, isCentered: false)),
+            id: .init(
+                id: SectionId.cardInformation,
+                header: .init(title: Text.CardDetails.title, isCentered: false),
+                isTight: false
+            ),
             items: cardInformationItems
         )
-        sections.append(cardInformationSection)
+        let sections = [
+            createTitleSection(),
+            cardInformationSection,
+            preferredSchemeSection(startedState: startedState)
+        ]
         let startedState = State(
             sections: sections.compactMap { $0 },
             actions: .init(
@@ -103,7 +113,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             return nil
         }
         let item = State.TitleItem(text: Text.title)
-        return State.Section(id: .init(id: SectionId.title, header: nil), items: [.title(item)])
+        return State.Section(id: .init(id: SectionId.title, header: nil, isTight: false), items: [.title(item)])
     }
 
     private func cardInformationInputItems(startedState: InteractorState.Started) -> [State.Item] {
@@ -112,7 +122,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         }
         let number = State.InputItem(
             placeholder: Text.CardDetails.Number.placeholder,
-            value: inputValue(for: startedState.number),
+            value: inputValue(for: startedState.number, icon: cardNumberIcon(startedState: startedState)),
             formatter: startedState.number.formatter,
             isCompact: false,
             keyboard: .asciiCapableNumberPad,
@@ -130,7 +140,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         )
         let cvc = State.InputItem(
             placeholder: Text.CardDetails.Cvc.placeholder,
-            value: inputValue(for: startedState.cvc),
+            value: inputValue(for: startedState.cvc, icon: Asset.Images.Card.back.image),
             formatter: startedState.cvc.formatter,
             isCompact: true,
             keyboard: .asciiCapableNumberPad,
@@ -146,7 +156,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             return nil
         }
         let inputItem = State.InputItem(
-            placeholder: Text.CardDetails.Cvc.cardholder,
+            placeholder: Text.CardDetails.Cardholder.placeholder,
             value: inputValue(for: startedState.cardholderName),
             formatter: startedState.cardholderName.formatter,
             isCompact: false,
@@ -159,22 +169,26 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         return .input(inputItem)
     }
 
-    private func inputValue(for parameter: InteractorState.Parameter) -> State.InputValue {
-        if let value = inputValuesCache[parameter.id] {
-            value.text = parameter.value
-            value.isInvalid = !parameter.isValid
-            value.isFocused = focusedParameterId == parameter.id
-            return value
+    private func inputValue(for parameter: InteractorState.Parameter, icon: UIImage? = nil) -> State.InputValue {
+        let value: State.InputValue
+        if let cachedValue = inputValuesCache[parameter.id] {
+            value = cachedValue
+        } else {
+            value = State.InputValue()
+            inputValuesCache[parameter.id] = value
+            observeChanges(value: value, parameter: parameter)
         }
-        let value = State.InputValue(
-            text: .init(value: parameter.value),
-            isInvalid: .init(value: !parameter.isValid),
-            isFocused: .init(value: focusedParameterId == parameter.id)
-        )
+        value.text = parameter.value
+        value.isInvalid = !parameter.isValid
+        value.isFocused = focusedParameterId == parameter.id
+        value.icon = icon
+        return value
+    }
+
+    private func observeChanges(value: State.InputValue, parameter: InteractorState.Parameter) {
         let textObserver = value.$text.addObserver { [weak self] value in
             self?.interactor.update(parameterId: parameter.id, value: value)
         }
-        inputValuesObservations.append(textObserver)
         let activityObserver = value.$isFocused.addObserver { [weak self] isActive in
             if isActive {
                 self?.focusedParameterId = parameter.id
@@ -182,9 +196,8 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
                 self?.focusedParameterId = nil
             }
         }
+        inputValuesObservations.append(textObserver)
         inputValuesObservations.append(activityObserver)
-        inputValuesCache[parameter.id] = value
-        return value
     }
 
     private func onParameterSubmit() {
@@ -201,6 +214,72 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         } else {
             interactor.tokenize()
         }
+    }
+
+    private func cardNumberIcon(startedState: InteractorState.Started) -> UIImage? {
+        let scheme = startedState.issuerInformation?.coScheme != nil
+            ? startedState.preferredScheme
+            : startedState.issuerInformation?.scheme
+        guard let scheme else {
+            return nil
+        }
+        // todo(andrii-vysotskyi): support more schemes
+        let assets = [
+            "american express": Asset.Images.Schemes.amex,
+            "carte bancaire": Asset.Images.Schemes.carteBancaire,
+            "dinacard": Asset.Images.Schemes.dinacard,
+            "diners club": Asset.Images.Schemes.diners,
+            "diners club carte blanche": Asset.Images.Schemes.diners,
+            "diners club international": Asset.Images.Schemes.diners,
+            "diners club united states & canada": Asset.Images.Schemes.diners,
+            "discover": Asset.Images.Schemes.discover,
+            "elo": Asset.Images.Schemes.elo,
+            "jcb": Asset.Images.Schemes.jcb,
+            "mada": Asset.Images.Schemes.mada,
+            "maestro": Asset.Images.Schemes.maestro,
+            "mastercard": Asset.Images.Schemes.mastercard,
+            "rupay": Asset.Images.Schemes.rupay,
+            "sodexo": Asset.Images.Schemes.sodexo,
+            "china union pay": Asset.Images.Schemes.unionPay,
+            "verve": Asset.Images.Schemes.verve,
+            "visa": Asset.Images.Schemes.visa,
+            "vpay": Asset.Images.Schemes.vpay
+        ]
+        let normalizedScheme = scheme.lowercased()
+        return assets[normalizedScheme]?.image
+    }
+
+    private func preferredSchemeSection(startedState: InteractorState.Started) -> State.Section? {
+        guard configuration.isSchemeSelectionAllowed,
+              let issuerInformation = startedState.issuerInformation,
+              let coScheme = issuerInformation.coScheme else {
+            return nil
+        }
+        let sectionId = State.SectionIdentifier(
+            id: SectionId.preferredScheme,
+            header: .init(title: Text.PreferredScheme.title, isCentered: false),
+            isTight: true
+        )
+        let schemeItem = State.RadioButtonItem(
+            value: Text.PreferredScheme.description(issuerInformation.scheme.capitalized),
+            isSelected: startedState.preferredScheme == issuerInformation.scheme,
+            isInvalid: false,
+            accessibilityIdentifier: "card-tokenization.scheme-button",
+            select: { [weak self] in
+                self?.interactor.setPreferredScheme(issuerInformation.scheme)
+            }
+        )
+        let coSchemeItem = State.RadioButtonItem(
+            value: Text.PreferredScheme.description(coScheme.capitalized),
+            isSelected: startedState.preferredScheme == coScheme,
+            isInvalid: false,
+            accessibilityIdentifier: "card-tokenization.co-scheme-button",
+            select: { [weak self] in
+                self?.interactor.setPreferredScheme(coScheme)
+            }
+        )
+        let items = [schemeItem, coSchemeItem].map(State.Item.radio)
+        return State.Section(id: sectionId, items: items)
     }
 
     // MARK: - Actions
@@ -227,7 +306,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             title: title,
             isEnabled: isEnabled,
             isExecuting: false,
-            accessibilityIdentifier: "card-tokenization.secondary-button",
+            accessibilityIdentifier: "card-tokenization.cancel-button",
             handler: { [weak self] in
                 self?.interactor.cancel()
             }
