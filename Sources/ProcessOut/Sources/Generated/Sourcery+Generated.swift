@@ -1,4 +1,4 @@
-// Generated using Sourcery 2.0.2 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 2.0.3 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 // swiftlint:disable all
@@ -162,6 +162,7 @@ extension POCustomerTokensService {
         }
     }
 
+    /// Creates customer token using given request.
     @MainActor
     @_spi(PO)
     public func createCustomerToken(
@@ -241,6 +242,7 @@ extension POInvoicesService {
         }
     }
 
+    /// Creates invoice with given parameters.
     @MainActor
     @_spi(PO)
     public func createInvoice(

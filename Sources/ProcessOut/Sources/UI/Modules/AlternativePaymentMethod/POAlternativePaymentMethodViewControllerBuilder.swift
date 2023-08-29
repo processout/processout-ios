@@ -29,7 +29,15 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
 
     /// Changes request.
     public func with(request: POAlternativePaymentMethodRequest) -> Self {
-        self.request = request
+        self.url = ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodUrl(request: request)
+        return self
+    }
+
+    /// Allows to inject initial URL instead of **request**. While doing so please note that
+    /// implementation does not validate whether given value is valid to actually start APM
+    /// flow.
+    public func with(url: URL) -> Self {
+        self.url = url
         return self
     }
 
@@ -59,12 +67,12 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
     /// - Warning: Make sure that `completion`, `request` and `returnUrl` are set
     /// before calling this method. Otherwise precondition failure is raised.
     public func build() -> SFSafariViewController {
-        guard let completion, let returnUrl, let request else {
+        guard let completion, let returnUrl, let url else {
             preconditionFailure("Completion, return url and request must be set.")
         }
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         let viewController = SFSafariViewController(
-            url: api.alternativePaymentMethods.alternativePaymentMethodUrl(request: request),
+            url: url,
             configuration: safariConfiguration
         )
         let delegate = AlternativePaymentMethodSafariViewModelDelegate(
@@ -83,7 +91,7 @@ public final class POAlternativePaymentMethodViewControllerBuilder {
 
     // MARK: - Private Properties
 
-    private var request: POAlternativePaymentMethodRequest?
+    private var url: URL?
     private var completion: Completion?
     private var returnUrl: URL?
     private var safariConfiguration: SFSafariViewController.Configuration
