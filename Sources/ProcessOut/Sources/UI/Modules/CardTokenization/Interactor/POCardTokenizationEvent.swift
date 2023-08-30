@@ -18,11 +18,11 @@ public enum POCardTokenizationEvent {
     /// Event is sent when the user changes any editable value.
     case parametersChanged
 
-    /// Event is sent just before sending user input, this is usually a result of a user action, e.g. button press.
-    case willSubmitParameters
+    /// Event is sent just before tokenizing card, this is usually a result of a user action, e.g. button press.
+    case willTokenizeCard
 
-    /// Sent in case parameters were submitted successfully.
-    case didSubmitParameters
+    /// Sent in case parameters were submitted successfully meaning card was tokenized.
+    case didTokenize(card: POCard)
 
     /// Event is sent after payment was confirmed to be captured. This is a final event.
     case didComplete

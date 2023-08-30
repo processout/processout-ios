@@ -79,6 +79,7 @@ final class DefaultCardTokenizationInteractor:
         }
         startedState.preferredScheme = scheme
         state = .started(startedState)
+        delegate?.cardTokenizationDidEmitEvent(.parametersChanged)
     }
 
     func tokenize() {
@@ -89,7 +90,7 @@ final class DefaultCardTokenizationInteractor:
             logger.debug("Ignoring attempt to tokenize invalid parameters.")
             return
         }
-        delegate?.cardTokenizationDidEmitEvent(.willSubmitParameters)
+        delegate?.cardTokenizationDidEmitEvent(.willTokenizeCard)
         state = .tokenizing(snapshot: startedState)
         let request = POCardTokenizationRequest(
             number: cardNumberFormatter.normalized(number: startedState.number.value),
@@ -188,7 +189,7 @@ final class DefaultCardTokenizationInteractor:
         guard case .tokenizing = state else {
             return
         }
-        delegate?.cardTokenizationDidEmitEvent(.didSubmitParameters)
+        delegate?.cardTokenizationDidEmitEvent(.didTokenize(card: card))
         if let delegate {
             delegate.processTokenizedCard(card: card) { [weak self] result in
                 switch result {
