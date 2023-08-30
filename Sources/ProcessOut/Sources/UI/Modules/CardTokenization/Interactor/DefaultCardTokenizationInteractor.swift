@@ -40,6 +40,7 @@ final class DefaultCardTokenizationInteractor:
         guard case .idle = state else {
             return
         }
+        delegate?.cardTokenizationDidEmitEvent(.willStart)
         let startedState = State.Started(
             number: .init(id: \.number, formatter: cardNumberFormatter),
             expiration: .init(id: \.expiration, formatter: cardExpirationFormatter),
@@ -47,6 +48,7 @@ final class DefaultCardTokenizationInteractor:
             cardholderName: .init(id: \.cardholderName)
         )
         state = .started(startedState)
+        delegate?.cardTokenizationDidEmitEvent(.didStart)
     }
 
     func update(parameterId: State.ParameterId, value: String) {
@@ -63,6 +65,7 @@ final class DefaultCardTokenizationInteractor:
             updateIssuerInformation(startedState: &startedState, oldNumber: oldParameterValue)
         }
         self.state = .started(startedState)
+        delegate?.cardTokenizationDidEmitEvent(.parametersChanged)
     }
 
     func setPreferredScheme(_ scheme: String) {
@@ -86,6 +89,7 @@ final class DefaultCardTokenizationInteractor:
             logger.debug("Ignoring attempt to tokenize invalid parameters.")
             return
         }
+        delegate?.cardTokenizationDidEmitEvent(.willSubmitParameters)
         state = .tokenizing(snapshot: startedState)
         let request = POCardTokenizationRequest(
             number: cardNumberFormatter.normalized(number: startedState.number.value),
@@ -184,6 +188,7 @@ final class DefaultCardTokenizationInteractor:
         guard case .tokenizing = state else {
             return
         }
+        delegate?.cardTokenizationDidEmitEvent(.didSubmitParameters)
         if let delegate {
             delegate.processTokenizedCard(card: card) { [weak self] result in
                 switch result {
@@ -246,6 +251,7 @@ final class DefaultCardTokenizationInteractor:
         }
         let tokenizedState = State.Tokenized(card: card, cardNumber: snapshot.number.value)
         state = .tokenized(tokenizedState)
+        delegate?.cardTokenizationDidEmitEvent(.didCompleteTokenization)
         completion(.success(card))
     }
 
