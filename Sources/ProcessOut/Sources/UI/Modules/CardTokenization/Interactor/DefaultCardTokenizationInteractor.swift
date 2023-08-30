@@ -49,16 +49,19 @@ final class DefaultCardTokenizationInteractor:
         )
         state = .started(startedState)
         delegate?.cardTokenizationDidEmitEvent(.didStart)
+        logger.debug("Did start card tokenization flow")
     }
 
     func update(parameterId: State.ParameterId, value: String) {
         guard case .started(var startedState) = state, startedState[keyPath: parameterId].value != value else {
             return
         }
+        logger.debug("Will change parameter \(String(describing: parameterId)) value to '\(value)'")
         let oldParameterValue = startedState[keyPath: parameterId].value
         startedState[keyPath: parameterId].value = value
         startedState[keyPath: parameterId].isValid = true
         if areParametersValid(startedState: startedState) {
+            logger.debug("Card information is no longer invalid, will reset error message")
             startedState.recentErrorMessage = nil
         }
         if parameterId == startedState.number.id {
@@ -73,8 +76,11 @@ final class DefaultCardTokenizationInteractor:
             return
         }
         let supportedSchemes = [startedState.issuerInformation?.scheme, startedState.issuerInformation?.coScheme]
+        logger.debug("Will change card scheme to \(scheme)")
         guard supportedSchemes.contains(scheme) else {
-            logger.info("Attempted to select unknown '\(scheme)' scheme.")
+            logger.info(
+                "Aborting attempt to select unknown '\(scheme)' scheme, supported schemes are: \(supportedSchemes)"
+            )
             return
         }
         startedState.preferredScheme = scheme
@@ -90,6 +96,7 @@ final class DefaultCardTokenizationInteractor:
             logger.debug("Ignoring attempt to tokenize invalid parameters.")
             return
         }
+        logger.debug("Will tokenize card")
         delegate?.cardTokenizationDidEmitEvent(.willTokenizeCard)
         state = .tokenizing(snapshot: startedState)
         let request = POCardTokenizationRequest(
@@ -183,12 +190,14 @@ final class DefaultCardTokenizationInteractor:
         // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
         startedState.recentErrorMessage = errorMessage
         state = .started(startedState)
+        logger.debug("Did recover started state after failure: \(failure)")
     }
 
     private func processTokenizedCard(card: POCard) {
         guard case .tokenizing = state else {
             return
         }
+        logger.debug("Did tokenize card: \(String(describing: card))")
         delegate?.cardTokenizationDidEmitEvent(.didTokenize(card: card))
         if let delegate {
             delegate.processTokenizedCard(card: card) { [weak self] result in
@@ -213,6 +222,7 @@ final class DefaultCardTokenizationInteractor:
         guard case .tokenizing = state else {
             return
         }
+        logger.debug("Will authorize invoice", attributes: ["InvoiceId": request.invoiceId, "CardId": card.id])
         guard let threeDSService else {
             preconditionFailure("3DS service must be set to authorize invoice.")
         }
@@ -225,6 +235,7 @@ final class DefaultCardTokenizationInteractor:
         guard case .tokenizing = state else {
             return
         }
+        logger.debug("Will assign customer token", attributes: ["TokenId": request.tokenId, "CardId": card.id])
         guard let threeDSService else {
             preconditionFailure("3DS service must be set to authorize invoice.")
         }
@@ -252,12 +263,14 @@ final class DefaultCardTokenizationInteractor:
         }
         let tokenizedState = State.Tokenized(card: card, cardNumber: snapshot.number.value)
         state = .tokenized(tokenizedState)
+        logger.info("Did tokenize/process card", attributes: ["CardId": card.id])
         delegate?.cardTokenizationDidEmitEvent(.didComplete)
         completion(.success(card))
     }
 
     private func setFailureStateUnchecked(failure: POFailure) {
         state = .failure(failure)
+        logger.info("Did fail to tokenize/process card \(failure)")
         completion(.failure(failure))
     }
 
@@ -266,21 +279,28 @@ final class DefaultCardTokenizationInteractor:
     private func updateIssuerInformation(startedState: inout State.Started, oldNumber: String) {
         if let iin = issuerIdentificationNumber(number: startedState.number.value) {
             guard iin != issuerIdentificationNumber(number: oldNumber) else {
-                return // IIN didn't change so abort.
+                return
             }
             startedState.issuerInformation = issuerInformation(number: startedState.number.value)
             startedState.preferredScheme = nil
             issuerInformationCancellable?.cancel()
-            issuerInformationCancellable = cardsService.issuerInformation(iin: iin) { [weak self] result in
-                guard case .started(var startedState) = self?.state,
-                      case .success(let issuerInformation) = result else {
+            logger.debug("Will fetch issuer information", attributes: ["IIN": iin])
+            issuerInformationCancellable = cardsService.issuerInformation(iin: iin) { [logger, weak self] result in
+                guard case .started(var startedState) = self?.state else {
                     return
                 }
-                // Inability to select co-scheme is considered minor issue and we still want
-                // users to be able to continue tokenization. So errors are silently ignored.
-                startedState.issuerInformation = issuerInformation
-                startedState.preferredScheme = self?.delegate?.preferredScheme(issuerInformation: issuerInformation)
-                self?.state = .started(startedState)
+                switch result {
+                case .failure(let failure) where failure.code == .cancelled:
+                    break
+                case .failure(let failure):
+                    // Inability to select co-scheme is considered minor issue and we still want
+                    // users to be able to continue tokenization. So errors are silently ignored.
+                    logger.info("Did fail to fetch issuer information: \(failure)", attributes: ["IIN": iin])
+                case .success(let issuerInformation):
+                    startedState.issuerInformation = issuerInformation
+                    startedState.preferredScheme = self?.delegate?.preferredScheme(issuerInformation: issuerInformation)
+                    self?.state = .started(startedState)
+                }
             }
         } else {
             startedState.issuerInformation = issuerInformation(number: startedState.number.value)
