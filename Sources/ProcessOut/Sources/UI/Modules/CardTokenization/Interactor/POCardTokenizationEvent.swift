@@ -21,10 +21,9 @@ public enum POCardTokenizationEvent {
     /// Event is sent just before sending user input, this is usually a result of a user action, e.g. button press.
     case willSubmitParameters
 
-    /// Sent in case parameters were submitted successfully. You could inspect the associated value to understand
-    /// whether card will be additionally processed.
+    /// Sent in case parameters were submitted successfully.
     case didSubmitParameters
 
     /// Event is sent after payment was confirmed to be captured. This is a final event.
-    case didCompleteTokenization
+    case didComplete
 }
