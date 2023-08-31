@@ -5,8 +5,12 @@
 //  Created by Andrii Vysotskyi on 09.08.2023.
 //
 
+/// Card tokenization module delegate definition.
 @_spi(PO)
 public protocol POCardTokenizationDelegate: AnyObject {
+
+    /// Invoked when module emits event.
+    func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent)
 
     /// Allows delegate to additionally process tokenized card before ending module's lifecycle. For example
     /// it is possible to authorize an invoice or assign customer token.
@@ -23,6 +27,10 @@ public protocol POCardTokenizationDelegate: AnyObject {
 }
 
 extension POCardTokenizationDelegate {
+
+    public func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent) {
+        // Ignroed
+    }
 
     // swiftlint:disable:next line_length
     public func processTokenizedCard(card: POCard, completion: (Result<POCardTokenizationProcessAction?, Error>) -> Void) {
