@@ -1,0 +1,24 @@
+input_dir: ${TARGET_ROOT}/Resources/
+output_dir: ${TARGET_ROOT}/Sources/Generated/
+
+xcassets:
+  inputs:
+    - Colors.xcassets
+  outputs:
+    - templateName: swift5
+      params:
+        publicAccess: true
+        forceFileNameEnum: true
+        forceProvidesNamespaces: true
+        bundle: BundleLocator.bundle
+      output: Assets+Generated.swift
+fonts:
+  inputs:
+    - Fonts
+  outputs:
+    - templateName: swift5
+      params:
+        publicAccess: true
+        fontAliasName: _Font
+        bundle: BundleLocator.bundle
+      output: Fonts+Generated.swift
