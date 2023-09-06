@@ -14,7 +14,7 @@ extension View {
     ///   - maximumFontSize: The maximum point size allowed for the font. Use this value to constrain the font to
     ///   the specified size when your interface cannot accommodate text that is any larger.
     ///   - textStyle: Constants that describe the preferred styles for fonts.
-    func typography(
+    public func typography(
         _ typography: POTypography,
         maximumFontSize: CGFloat = .greatestFiniteMagnitude,
         relativeTo textStyle: UIFont.TextStyle = .body

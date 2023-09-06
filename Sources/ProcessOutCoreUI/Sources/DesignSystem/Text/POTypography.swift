@@ -50,29 +50,29 @@ public struct POTypography {
 
 extension POTypography {
 
-    enum Fixed {
+    public enum Fixed {
 
         /// Use for captions, status labels and tags.
-        static let caption = POTypography(font: FontFamily.WorkSans.regular.font(size: 12), lineHeight: 16)
+        public static let caption = POTypography(font: FontFamily.WorkSans.regular.font(size: 12), lineHeight: 16)
 
         /// Use for buttons.
-        static let button = POTypography(font: FontFamily.WorkSans.medium.font(size: 14), lineHeight: 18)
+        public static let button = POTypography(font: FontFamily.WorkSans.medium.font(size: 14), lineHeight: 18)
 
         /// Use for body copy on larger screens, or smaller blocks of text.
-        static let body = POTypography(
+        public static let body = POTypography(
             font: FontFamily.WorkSans.regular.font(size: 16), lineHeight: 24, paragraphSpacing: 8
         )
 
         /// Use for form components, error text and key value data.
-        static let label = POTypography(font: FontFamily.WorkSans.regular.font(size: 14), lineHeight: 18)
+        public static let label = POTypography(font: FontFamily.WorkSans.regular.font(size: 14), lineHeight: 18)
 
         /// Use for form components, error text and key value data.
-        static let labelHeading = POTypography(font: FontFamily.WorkSans.medium.font(size: 14), lineHeight: 18)
+        public static let labelHeading = POTypography(font: FontFamily.WorkSans.medium.font(size: 14), lineHeight: 18)
     }
 
-    enum Medium {
+    public enum Medium {
 
         /// Use for page titles.
-        static let title = POTypography(font: FontFamily.WorkSans.medium.font(size: 20), lineHeight: 28)
+        public static let title = POTypography(font: FontFamily.WorkSans.medium.font(size: 20), lineHeight: 28)
     }
 }

@@ -14,12 +14,12 @@ extension View {
     ///   - maximumFontSize: The maximum point size allowed for the font. Use this value to constrain the font to
     ///   the specified size when your interface cannot accommodate text that is any larger.
     ///   - textStyle: Constants that describe the preferred styles for fonts.
-    func textStyle(
+    public func textStyle(
         _ style: POTextStyle,
-        maximumFontSize: CGFloat = .greatestFiniteMagnitude,
+        maximumFontSize maxSize: CGFloat = .greatestFiniteMagnitude,
         relativeTo textStyle: UIFont.TextStyle = .body
     ) -> some View {
-        self.typography(style.typography, maximumFontSize: maximumFontSize, relativeTo: textStyle)
-            .foregroundColor(Color(style.color))
+        let color = Color(style.color)
+        return self.typography(style.typography, maximumFontSize: maxSize, relativeTo: textStyle).foregroundColor(color)
     }
 }
