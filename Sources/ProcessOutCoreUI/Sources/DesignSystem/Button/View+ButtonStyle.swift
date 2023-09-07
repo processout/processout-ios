@@ -46,7 +46,6 @@ private struct ProcessOutButtonStyle: ButtonStyle {
     // MARK: - ButtonStyle
 
     func makeBody(configuration: Configuration) -> some View {
-        // todo(andrii-vysotskyi): support activity indicator
         let currentStyle = stateStyle(isPressed: configuration.isPressed)
         ZStack {
             ActivityIndicatorView()
