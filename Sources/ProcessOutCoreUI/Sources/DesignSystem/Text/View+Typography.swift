@@ -31,16 +31,17 @@ private struct TypographyModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         let font = createFont()
+        let lineSpacing = (typography.lineHeight / typography.font.lineHeight - 1) * font.lineHeight
         return content
-            .font(SwiftUI.Font(font))
+            .font(Font(font))
             .modify { content in
                 if let tracking = typography.tracking, #available(iOS 16.0, *) {
                     content.tracking(tracking)
                 }
                 content
             }
-            .lineSpacing(font.lineHeight - font.lineHeight)
-            .padding(.vertical, (font.lineHeight - font.lineHeight) / 2)
+            .lineSpacing(lineSpacing)
+            .padding(.vertical, lineSpacing / 2)
     }
 
     // MARK: - Private Properties
@@ -56,7 +57,8 @@ private struct TypographyModifier: ViewModifier {
             let traits = UITraitCollection(
                 traitsFrom: [.current, .init(preferredContentSizeCategory: uiSizeCategory)]
             )
-            font = UIFontMetrics(forTextStyle: textStyle).scaledFont(for: typography.font, compatibleWith: traits)
+            let multipler = UIFontMetrics(forTextStyle: textStyle).scaledValue(for: 1, compatibleWith: traits)
+            font = font.withSize(typography.font.pointSize * multipler)
         }
         if font.pointSize > maximumFontSize {
             font = font.withSize(maximumFontSize)
