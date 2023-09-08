@@ -52,12 +52,12 @@ private struct ProcessOutButtonStyle: ButtonStyle {
                 .activityIndicatorStyle(style.activityIndicator)
                 .opacity(isLoading ? 1 : 0)
             configuration.label
-                .textStyle(currentStyle.title, maximumFontSize: Constants.maximumFontSize, relativeTo: .body)
+                .textStyle(currentStyle.title, relativeTo: .body)
                 .opacity(isLoading ? 0 : 1)
         }
+        .padding(.all, Constants.padding)
         .frame(maxWidth: .infinity, minHeight: Constants.height)
         .background(Color(currentStyle.backgroundColor))
-        .environment(\.isEnabled, true)
         .border(style: currentStyle.border)
         .shadow(style: currentStyle.shadow)
         .allowsHitTesting(isEnabled && !isLoading)
@@ -67,7 +67,7 @@ private struct ProcessOutButtonStyle: ButtonStyle {
 
     private enum Constants {
         static let height: CGFloat = 44
-        static let maximumFontSize: CGFloat = 28
+        static let padding: CGFloat = 8
     }
 
     // MARK: - Private Properties
