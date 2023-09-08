@@ -25,9 +25,11 @@ extension View {
 
 private struct TypographyModifier: ViewModifier {
 
-    let typography: POTypography
-    let maximumFontSize: CGFloat
-    let textStyle: UIFont.TextStyle
+    init(typography: POTypography, maximumFontSize: CGFloat, textStyle: UIFont.TextStyle) {
+        self.typography = typography
+        self.maximumFontSize = maximumFontSize
+        _multipler = .init(wrappedValue: 1, relativeTo: textStyle)
+    }
 
     func body(content: Content) -> some View {
         let font = createFont()
@@ -46,18 +48,17 @@ private struct TypographyModifier: ViewModifier {
 
     // MARK: - Private Properties
 
-    @Environment(\.sizeCategory) private var sizeCategory
+    private let typography: POTypography
+    private let maximumFontSize: CGFloat
+
+    @ScaledMetricBackport
+    private var multipler: CGFloat
 
     // MARK: - Private Methods
 
     private func createFont() -> UIFont {
         var font = typography.font
         if typography.adjustsFontForContentSizeCategory {
-            let uiSizeCategory = UIContentSizeCategory(sizeCategory)
-            let traits = UITraitCollection(
-                traitsFrom: [.current, .init(preferredContentSizeCategory: uiSizeCategory)]
-            )
-            let multipler = UIFontMetrics(forTextStyle: textStyle).scaledValue(for: 1, compatibleWith: traits)
             font = font.withSize(typography.font.pointSize * multipler)
         }
         if font.pointSize > maximumFontSize {
