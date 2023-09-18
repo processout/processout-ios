@@ -18,33 +18,16 @@ public struct PickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
     }
 
     public var body: some View {
-        let currentStyle = stateStyle()
-        if #available(iOS 14, *) {
-            Menu {
-                ForEach(data, id: elementId) { element in
-                    Button { selection = element } label: { content(element) }
-                }
-            } label: {
-                label(element: selection, style: currentStyle)
+        Group {
+            let currentStyle = inError ? style.error : style.normal
+            if #available(iOS 14, *) {
+                menu(style: currentStyle)
+            } else {
+                actionSheetMenu(style: currentStyle)
             }
-            .menuStyle(.borderlessButton)
-            .animation(.default, value: inError)
-        } else {
-            label(element: selection, style: currentStyle)
-                .actionSheet(isPresented: $isActionSheetPresented) {
-                    let buttons: [ActionSheet.Button] = data.map { element in
-                        .default(content(element), action: { selection = element })
-                    }
-                    // todo(andrii-vysotskyi): replace with proper text when available
-                    return ActionSheet(title: Text(""), message: nil, buttons: buttons)
-                }
-                .onTapGesture {
-                    isActionSheetPresented = true
-                }
         }
+        .animation(.default, value: inError)
     }
-
-    // MARK: - Nested Types
 
     // MARK: - Private Properties
 
@@ -63,10 +46,6 @@ public struct PickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
 
     // MARK: - Private Methods
 
-    private func stateStyle() -> POInputStateStyle {
-        inError ? style.error : style.normal
-    }
-
     private func label(element: Data.Element, style: POInputStateStyle) -> some View {
         content(element)
             .textStyle(style.text)
@@ -77,6 +56,32 @@ public struct PickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
             .background(Color(style.backgroundColor))
             .border(style: style.border)
             .shadow(style: style.shadow)
+    }
+
+    @available(iOS 14, *)
+    private func menu(style: POInputStateStyle) -> some View {
+        Menu {
+            ForEach(data, id: elementId) { element in
+                Button { selection = element } label: { content(element) }
+            }
+        } label: {
+            label(element: selection, style: style)
+        }
+        .menuStyle(.borderlessButton)
+    }
+
+    private func actionSheetMenu(style: POInputStateStyle) -> some View {
+        label(element: selection, style: style)
+            .actionSheet(isPresented: $isActionSheetPresented) {
+                let buttons: [ActionSheet.Button] = data.map { element in
+                    .default(content(element), action: { selection = element })
+                }
+                // todo(andrii-vysotskyi): replace with proper text when available
+                return ActionSheet(title: Text(""), message: nil, buttons: buttons)
+            }
+            .onTapGesture {
+                isActionSheetPresented = true
+            }
     }
 }
 
