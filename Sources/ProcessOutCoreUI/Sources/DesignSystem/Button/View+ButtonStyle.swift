@@ -23,11 +23,7 @@ extension View {
 
 extension EnvironmentValues {
 
-    /// A Boolean value that indicates whether the button associated with this
-    /// environment shows loading indicator. Only applicable with `POButtonStyle`.
-    ///
-    /// The default value is `false`.
-    public var isButtonLoading: Bool {
+    var isButtonLoading: Bool {
         get { self[Key.self] }
         set { self[Key.self] = newValue }
     }

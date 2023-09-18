@@ -24,12 +24,12 @@ extension View {
 
 extension EnvironmentValues {
 
-    public var isRadioButtonSelected: Bool {
+    var isRadioButtonSelected: Bool {
         get { self[SelectionKey.self] }
         set { self[SelectionKey.self] = newValue }
     }
 
-    public var isRadioButtonInError: Bool {
+    var isRadioButtonInError: Bool {
         get { self[ErrorKey.self] }
         set { self[ErrorKey.self] = newValue }
     }
