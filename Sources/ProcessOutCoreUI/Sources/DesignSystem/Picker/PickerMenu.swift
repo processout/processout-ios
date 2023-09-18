@@ -35,7 +35,8 @@ public struct PickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
                     let buttons: [ActionSheet.Button] = data.map { element in
                         .default(content(element), action: { selection = element })
                     }
-                    return ActionSheet(title: Text("Please select option"), message: nil, buttons: buttons)
+                    // todo(andrii-vysotskyi): replace with proper text when available
+                    return ActionSheet(title: Text(""), message: nil, buttons: buttons)
                 }
                 .onTapGesture {
                     isActionSheetPresented = true
