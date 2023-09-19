@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 // swiftlint:disable type_body_length file_length
 
@@ -214,7 +215,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 title: capturedState.logoImage == nil ? capturedState.paymentProviderName : nil,
                 logoImage: capturedState.logoImage,
                 message: Text.Success.message,
-                image: Asset.Images.success.image,
+                image: UIImage(resource: .success),
                 isCaptured: true
             )
             let startedState = State.Started(

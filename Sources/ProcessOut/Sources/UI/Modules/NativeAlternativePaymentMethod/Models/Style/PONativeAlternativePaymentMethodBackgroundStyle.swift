@@ -18,7 +18,7 @@ public struct PONativeAlternativePaymentMethodBackgroundStyle {
 
     /// Creates background style instance.
     public init(regular: UIColor? = nil, success: UIColor? = nil) {
-        self.regular = regular ?? Asset.Colors.Surface.level1.color
-        self.success = success ?? Asset.Colors.Surface.success.color
+        self.regular = regular ?? UIColor(resource: .Surface.level1)
+        self.success = success ?? UIColor(resource: .Surface.success)
     }
 }
