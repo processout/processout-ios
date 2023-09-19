@@ -314,7 +314,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         expectation.expectedFulfillmentCount = actionTypes.count
 
         for actionType in actionTypes {
-            let action = ThreeDSCustomerAction(type: actionType, value: " ")
+            let action = ThreeDSCustomerAction(type: actionType, value: "http://:-1")
 
             // When
             sut.handle(action: action, delegate: delegate) { result in
