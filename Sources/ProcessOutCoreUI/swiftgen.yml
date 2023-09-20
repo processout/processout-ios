@@ -18,7 +18,6 @@ fonts:
   outputs:
     - templateName: swift5
       params:
-        publicAccess: true
         fontAliasName: _Font
         bundle: BundleLocator.bundle
       output: Fonts+Generated.swift
