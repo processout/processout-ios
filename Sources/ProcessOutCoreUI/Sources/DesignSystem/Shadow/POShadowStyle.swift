@@ -1,6 +1,6 @@
 //
 //  POShadowStyle.swift
-//  ProcessOut
+//  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 28.11.2022.
 //

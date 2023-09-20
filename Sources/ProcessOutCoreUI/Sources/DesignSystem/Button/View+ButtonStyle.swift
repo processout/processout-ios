@@ -1,5 +1,5 @@
 //
-//  CustomButtonStyle.swift
+//  View+ButtonStyle.swift
 //  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 04.09.2023.

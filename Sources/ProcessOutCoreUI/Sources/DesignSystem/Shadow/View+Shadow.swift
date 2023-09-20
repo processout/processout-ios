@@ -1,6 +1,6 @@
 //
 //  View+Shadow.swift
-//  ProcessOut
+//  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 31.08.2023.
 //

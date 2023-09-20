@@ -23,7 +23,8 @@ public struct ActivityIndicatorView: UIViewRepresentable {
     }
 
     public func updateUIView(_ uiView: UIView, context: Context) {
-        // Ignored
+        // todo(andrii-vysotskyi): when style changes view won't be recreated so implementation should be able
+        // to update previously created one.
     }
 
     // MARK: - Private Properties

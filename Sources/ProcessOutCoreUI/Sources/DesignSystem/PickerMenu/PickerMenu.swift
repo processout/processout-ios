@@ -1,6 +1,6 @@
 //
 //  PickerMenu.swift
-//  ProcessOut
+//  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 18.09.2023.
 //

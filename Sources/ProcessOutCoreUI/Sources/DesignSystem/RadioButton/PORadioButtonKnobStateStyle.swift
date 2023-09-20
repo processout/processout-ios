@@ -1,6 +1,6 @@
 //
 //  PORadioButtonKnobStateStyle.swift
-//  ProcessOut
+//  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 08.06.2023.
 //
