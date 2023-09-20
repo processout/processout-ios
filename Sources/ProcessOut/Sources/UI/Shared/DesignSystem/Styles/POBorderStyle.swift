@@ -34,7 +34,7 @@ extension POBorderStyle {
     }
 
     /// Regular width border.
-    static func regular(radius: CGFloat, color: UIColor) -> POBorderStyle {
+    public static func regular(radius: CGFloat, color: UIColor) -> POBorderStyle {
         .init(radius: radius, width: 1, color: color)
     }
 }

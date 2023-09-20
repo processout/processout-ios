@@ -8,7 +8,7 @@
 import SwiftUI
 import UIKit
 
-public struct ActivityIndicatorView: UIViewRepresentable {
+public struct POActivityIndicatorView: UIViewRepresentable {
 
     public func makeUIView(context: Context) -> UIView {
         switch style {
@@ -34,8 +34,7 @@ public struct ActivityIndicatorView: UIViewRepresentable {
 
 extension View {
 
-    /// Sets the style for buttons within this view to a button style with a
-    /// custom appearance and standard interaction behavior.
+    /// Sets the style for activity indicators within this view.
     public func activityIndicatorStyle(_ style: POActivityIndicatorStyle) -> some View {
         environment(\.activityIndicatorStyle, style)
     }

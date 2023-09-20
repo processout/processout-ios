@@ -12,7 +12,7 @@ extension View {
     /// Sets the style for buttons within this view to a button style with a
     /// custom appearance and standard interaction behavior.
     public func buttonStyle(_ style: POButtonStyle) -> some View {
-        buttonStyle(ProcessOutButtonStyle(style: style))
+        buttonStyle(Style(style: style))
     }
 
     /// Adds a condition that controls whether button with a `POButtonStyle` should show loading indicator.
@@ -35,7 +35,7 @@ extension EnvironmentValues {
     }
 }
 
-private struct ProcessOutButtonStyle: ButtonStyle {
+private struct Style: ButtonStyle {
 
     let style: POButtonStyle
 
@@ -44,7 +44,7 @@ private struct ProcessOutButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         let currentStyle = stateStyle(isPressed: configuration.isPressed)
         ZStack {
-            ActivityIndicatorView()
+            POActivityIndicatorView()
                 .activityIndicatorStyle(style.activityIndicator)
                 .opacity(isLoading ? 1 : 0)
             configuration.label

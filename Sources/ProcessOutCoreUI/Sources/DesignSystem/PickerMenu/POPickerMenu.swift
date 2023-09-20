@@ -1,5 +1,5 @@
 //
-//  PickerMenu.swift
+//  POPickerMenu.swift
 //  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 18.09.2023.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct PickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
+public struct POPickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
 
     // swiftlint:disable:next line_length
     init(_ data: Data, selection: Binding<Data.Element>, content: @escaping (Data.Element) -> Text) where Data.Element == Id {
@@ -50,8 +50,8 @@ public struct PickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
         content(element)
             .textStyle(style.text)
             .lineLimit(1)
-            .padding(.horizontal, 12)
-            .frame(maxWidth: .infinity, idealHeight: 44, alignment: .leading)
+            .padding(Constants.padding)
+            .frame(maxWidth: .infinity, minHeight: Constants.minHeight, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
             .background(Color(style.backgroundColor))
             .border(style: style.border)
@@ -117,4 +117,9 @@ extension EnvironmentValues {
     private struct ErrorKey: EnvironmentKey {
         static let defaultValue = false
     }
+}
+
+private enum Constants {
+    static let minHeight: CGFloat = 44
+    static let padding = EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
 }
