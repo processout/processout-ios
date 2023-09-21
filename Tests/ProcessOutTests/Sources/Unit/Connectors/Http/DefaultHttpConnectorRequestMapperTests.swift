@@ -11,6 +11,24 @@ import XCTest
 
 final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
 
+    // MARK: - URL
+
+    func test_urlRequest_whenBaseUrlIsMalformed_fails() throws {
+        // Given
+        let configuration = HttpConnectorRequestMapperConfiguration(
+            baseUrl: URL(string: "http://example.com:-80")!,
+            projectId: "",
+            privateKey: nil,
+            version: "",
+            appVersion: nil
+        )
+        let sut = createMapper(configuration: configuration)
+        let request = HttpConnectorRequest<VoidCodable>.get(path: "")
+
+        // Then
+        XCTAssertThrowsError(try sut.urlRequest(from: request))
+    }
+
     // MARK: - Request Path
 
     func test_urlRequest_whenPathIsInvalid_fails() throws {
