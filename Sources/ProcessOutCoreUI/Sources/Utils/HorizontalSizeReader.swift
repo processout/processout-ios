@@ -10,7 +10,7 @@ import SwiftUI
 struct HorizontalSizeReader<Content: View>: View {
 
     @ViewBuilder
-    var content: (CGFloat) -> Content
+    let content: (CGFloat) -> Content
 
     var body: some View {
         content(width)
