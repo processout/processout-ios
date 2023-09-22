@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 08.09.2023.
 //
 
+#if DEBUG
+
 import SwiftUI
 
 extension View {
@@ -39,3 +41,5 @@ private struct SizePreferenceKey: PreferenceKey {
         value = nextValue()
     }
 }
+
+#endif
