@@ -1,6 +1,6 @@
 //
 //  POInputStateStyle.swift
-//  ProcessOut
+//  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 24.11.2022.
 //
