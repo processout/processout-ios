@@ -49,6 +49,7 @@ private struct Style: ButtonStyle {
                 .opacity(isLoading ? 1 : 0)
             configuration.label
                 .textStyle(currentStyle.title, relativeTo: .body)
+                .multilineTextAlignment(.center)
                 .opacity(isLoading ? 0 : 1)
         }
         .padding(.all, Constants.padding)
