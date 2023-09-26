@@ -76,7 +76,7 @@ final class Picker: UIControl {
     }()
 
     private lazy var iconImageView: UIImageView = {
-        let imageView = UIImageView(image: Asset.Images.chevronDown.image.withRenderingMode(.alwaysTemplate))
+        let imageView = UIImageView(image: UIImage(resource: .chevronDown).withRenderingMode(.alwaysTemplate))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.setContentHuggingPriority(.required, for: .horizontal)
         imageView.setContentCompressionResistancePriority(.required, for: .horizontal)

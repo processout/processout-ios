@@ -26,17 +26,17 @@ final class Mock3DSService: PO3DSService {
         completion: @escaping (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
     ) {
         authenticationRequestCallsCount += 1
-        authenticationRequestFromClosure?(configuration, completion)
+        authenticationRequestFromClosure!(configuration, completion)
     }
 
     func handle(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
         handleChallengeCallsCount += 1
-        handleChallengeFromClosure?(challenge, completion)
+        handleChallengeFromClosure!(challenge, completion)
     }
 
     func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
         handleRedirectCallsCount += 1
-        handleRedirectFromClosure?(redirect, completion)
+        handleRedirectFromClosure!(redirect, completion)
     }
 }
 

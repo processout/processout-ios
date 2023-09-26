@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 06.06.2023.
 //
 
-import Foundation
+import UIKit
 
 /// Describes radio button style in different states.
 public struct PORadioButtonStyle {
@@ -43,7 +43,7 @@ extension PORadioButtonStyle {
         normal: .init(
             knob: .init(
                 backgroundColor: .clear,
-                border: .regular(radius: 0, color: Asset.Colors.Border.default.color),
+                border: .regular(radius: 0, color: UIColor(resource: .Border.default)),
                 innerCircleColor: .clear,
                 innerCircleRadius: 0
             ),
@@ -52,8 +52,8 @@ extension PORadioButtonStyle {
         selected: .init(
             knob: .init(
                 backgroundColor: .clear,
-                border: .regular(radius: 0, color: Asset.Colors.Action.Primary.default.color),
-                innerCircleColor: Asset.Colors.Action.Primary.default.color,
+                border: .regular(radius: 0, color: UIColor(resource: .Action.Primary.default)),
+                innerCircleColor: UIColor(resource: .Action.Primary.default),
                 innerCircleRadius: 4
             ),
             value: valueStyle
@@ -61,7 +61,7 @@ extension PORadioButtonStyle {
         highlighted: .init(
             knob: .init(
                 backgroundColor: .clear,
-                border: .regular(radius: 0, color: Asset.Colors.Text.muted.color),
+                border: .regular(radius: 0, color: UIColor(resource: .Text.muted)),
                 innerCircleColor: .clear,
                 innerCircleRadius: 0
             ),
@@ -70,7 +70,7 @@ extension PORadioButtonStyle {
         error: .init(
             knob: .init(
                 backgroundColor: .clear,
-                border: .regular(radius: 0, color: Asset.Colors.Text.error.color),
+                border: .regular(radius: 0, color: UIColor(resource: .Text.error)),
                 innerCircleColor: .clear,
                 innerCircleRadius: 0
             ),
@@ -80,5 +80,5 @@ extension PORadioButtonStyle {
 
     // MARK: - Private Properties
 
-    private static let valueStyle = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .Fixed.label)
+    private static let valueStyle = POTextStyle(color: UIColor(resource: .Text.primary), typography: .Fixed.label)
 }

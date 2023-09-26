@@ -58,13 +58,15 @@ public struct POCardTokenizationStyle {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let title = POTextStyle(color: Asset.Colors.Text.primary.color, typography: .Medium.title)
-        static let sectionTitle = POTextStyle(color: Asset.Colors.Text.secondary.color, typography: .Fixed.labelHeading)
+        static let title = POTextStyle(color: UIColor(resource: .Text.primary), typography: .Medium.title)
+        static let sectionTitle = POTextStyle(
+            color: UIColor(resource: .Text.secondary), typography: .Fixed.labelHeading
+        )
         static let input = POInputStyle.default()
         static let radioButton = PORadioButtonStyle.default
-        static let errorDescription = POTextStyle(color: Asset.Colors.Text.error.color, typography: .Fixed.label)
+        static let errorDescription = POTextStyle(color: UIColor(resource: .Text.error), typography: .Fixed.label)
         static let actions = POActionsContainerStyle()
-        static let backgroundColor = Asset.Colors.Surface.level1.color
-        static let separatorColor = Asset.Colors.Border.subtle.color
+        static let backgroundColor = UIColor(resource: .Surface.level1)
+        static let separatorColor = UIColor(resource: .Border.subtle)
     }
 }

@@ -140,7 +140,7 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
         )
         let cvc = State.InputItem(
             placeholder: Text.CardDetails.Cvc.placeholder,
-            value: inputValue(for: startedState.cvc, icon: Asset.Images.Card.back.image),
+            value: inputValue(for: startedState.cvc, icon: UIImage(resource: .Card.back)),
             formatter: startedState.cvc.formatter,
             isCompact: true,
             keyboard: .asciiCapableNumberPad,
@@ -224,29 +224,32 @@ final class DefaultCardTokenizationViewModel: BaseViewModel<CardTokenizationView
             return nil
         }
         // todo(andrii-vysotskyi): support more schemes
-        let assets = [
-            "american express": Asset.Images.Schemes.amex,
-            "carte bancaire": Asset.Images.Schemes.carteBancaire,
-            "dinacard": Asset.Images.Schemes.dinacard,
-            "diners club": Asset.Images.Schemes.diners,
-            "diners club carte blanche": Asset.Images.Schemes.diners,
-            "diners club international": Asset.Images.Schemes.diners,
-            "diners club united states & canada": Asset.Images.Schemes.diners,
-            "discover": Asset.Images.Schemes.discover,
-            "elo": Asset.Images.Schemes.elo,
-            "jcb": Asset.Images.Schemes.jcb,
-            "mada": Asset.Images.Schemes.mada,
-            "maestro": Asset.Images.Schemes.maestro,
-            "mastercard": Asset.Images.Schemes.mastercard,
-            "rupay": Asset.Images.Schemes.rupay,
-            "sodexo": Asset.Images.Schemes.sodexo,
-            "china union pay": Asset.Images.Schemes.unionPay,
-            "verve": Asset.Images.Schemes.verve,
-            "visa": Asset.Images.Schemes.visa,
-            "vpay": Asset.Images.Schemes.vpay
+        let resources = [
+            "american express": ImageResource.Schemes.amex,
+            "carte bancaire": ImageResource.Schemes.carteBancaire,
+            "dinacard": ImageResource.Schemes.dinacard,
+            "diners club": ImageResource.Schemes.diners,
+            "diners club carte blanche": ImageResource.Schemes.diners,
+            "diners club international": ImageResource.Schemes.diners,
+            "diners club united states & canada": ImageResource.Schemes.diners,
+            "discover": ImageResource.Schemes.discover,
+            "elo": ImageResource.Schemes.elo,
+            "jcb": ImageResource.Schemes.JCB,
+            "mada": ImageResource.Schemes.mada,
+            "maestro": ImageResource.Schemes.maestro,
+            "mastercard": ImageResource.Schemes.mastercard,
+            "rupay": ImageResource.Schemes.rupay,
+            "sodexo": ImageResource.Schemes.sodexo,
+            "china union pay": ImageResource.Schemes.unionPay,
+            "verve": ImageResource.Schemes.verve,
+            "visa": ImageResource.Schemes.visa,
+            "vpay": ImageResource.Schemes.vpay
         ]
         let normalizedScheme = scheme.lowercased()
-        return assets[normalizedScheme]?.image
+        guard let resource = resources[normalizedScheme] else {
+            return nil
+        }
+        return UIImage(resource: resource)
     }
 
     private func preferredSchemeSection(startedState: InteractorState.Started) -> State.Section? {
