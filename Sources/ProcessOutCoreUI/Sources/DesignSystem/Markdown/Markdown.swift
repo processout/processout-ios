@@ -10,7 +10,7 @@ import SwiftUI
 
 public struct POMarkdown: View {
 
-    init(_ string: String, style: POTextStyle) {
+    public init(_ string: String, style: POTextStyle) {
         self.string = string
         self.style = style
     }

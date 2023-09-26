@@ -10,7 +10,7 @@ import SwiftUI
 public struct POPickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
 
     // swiftlint:disable:next line_length
-    init(_ data: Data, selection: Binding<Data.Element>, content: @escaping (Data.Element) -> Text) where Data.Element == Id {
+    public init(_ data: Data, selection: Binding<Data.Element>, content: @escaping (Data.Element) -> Text) where Data.Element == Id {
         self.data = data
         elementId = \.self
         self._selection = selection
@@ -41,8 +41,8 @@ public struct POPickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
     @State
     private var isActionSheetPresented = false
 
-    @Environment(\.pickerMenuStyle) private var style
-    @Environment(\.pickerMenuError) private var inError
+    @Environment(\.inputStyle) private var style
+    @Environment(\.inputError) private var inError
 
     // MARK: - Private Methods
 
@@ -82,40 +82,6 @@ public struct POPickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
             .onTapGesture {
                 isActionSheetPresented = true
             }
-    }
-}
-
-extension View {
-
-    public func pickerMenuStyle(_ style: POInputStyle) -> some View {
-        environment(\.pickerMenuStyle, style)
-    }
-
-    public func pickerMenuError(_ inError: Bool) -> some View {
-        environment(\.pickerMenuError, inError)
-    }
-}
-
-extension EnvironmentValues {
-
-    var pickerMenuStyle: POInputStyle {
-        get { self[StyleKey.self] }
-        set { self[StyleKey.self] = newValue }
-    }
-
-    var pickerMenuError: Bool {
-        get { self[ErrorKey.self] }
-        set { self[ErrorKey.self] = newValue }
-    }
-
-    // MARK: - Private Nested Types
-
-    private struct StyleKey: EnvironmentKey {
-        static let defaultValue = POInputStyle.default()
-    }
-
-    private struct ErrorKey: EnvironmentKey {
-        static let defaultValue = false
     }
 }
 
