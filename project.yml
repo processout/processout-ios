@@ -4,6 +4,7 @@ settings:
   CODE_SIGN_IDENTITY: ""
   GCC_TREAT_WARNINGS_AS_ERRORS: true
   SWIFT_TREAT_WARNINGS_AS_ERRORS: true
+  CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: true
 packages:
   CheckoutEventLoggerKit:
     url: https://github.com/checkout/checkout-event-logger-ios-framework
@@ -53,7 +54,6 @@ targets:
       - path: Scripts/SwiftGen.sh
         name: SwiftGen
         outputFiles:
-          - $(TARGET_ROOT)/Sources/Generated/Assets+Generated.swift
           - $(TARGET_ROOT)/Sources/Generated/Files+Generated.swift
           - $(TARGET_ROOT)/Sources/Generated/Strings+Generated.swift
         basedOnDependencyAnalysis: false

@@ -1,19 +1,6 @@
 input_dir: ${TARGET_ROOT}/Resources/
 output_dir: ${TARGET_ROOT}/Sources/Generated/
 
-## Constants for Assets Catalogs.
-xcassets:
-  inputs:
-    - Images.xcassets
-    - Colors.xcassets
-  outputs:
-    - templatePath: ${SRCROOT}/Templates/xcassets.stencil
-      params:
-        forceFileNameEnum: true
-        forceProvidesNamespaces: true
-        bundle: BundleLocator.bundle
-      output: Assets+Generated.swift
-
 ## Constants for Localized Strings.
 strings:
   inputs:
