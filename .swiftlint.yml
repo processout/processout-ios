@@ -4,7 +4,7 @@ included:
 
 excluded:
   - Sources/ProcessOut/Sources/Legacy
-  - Sources/ProcessOut/Sources/Generated
+  - Sources/*/Sources/Generated
   - Tests/ProcessOutTests/Sources/Generated
 
 function_parameter_count:
