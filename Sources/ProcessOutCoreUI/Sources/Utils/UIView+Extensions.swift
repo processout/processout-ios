@@ -18,4 +18,47 @@ extension UIView {
             UIView.performWithoutAnimation(actions)
         }
     }
+
+    /// Setting the value of this property to true hides the receiver and setting it to false shows
+    /// the receiver. The default value is false.
+    ///
+    /// - Warning: UIKit has a known bug when changing `isHidden` on a subview of
+    /// UIStackView does not always work. It seems to be caused by fact that `isHidden`
+    /// is cumulative in `UIStackView`, so we have to ensure to not set it the same value
+    /// twice http://www.openradar.me/25087688
+    func setHidden(_ isHidden: Bool) {
+        if isHidden != self.isHidden {
+            self.isHidden = isHidden
+        }
+    }
+
+    /// Adds transition animation to receiver's layer. Method must be called inside animation block
+    /// to make sure that timing properties are properly set.
+    func addTransitionAnimation(type: CATransitionType = .fade, subtype: CATransitionSubtype? = nil) {
+        let transition = CATransition()
+        transition.type = type
+        transition.subtype = subtype
+        if let animation = layer.action(forKey: "backgroundColor") as? CAAnimation {
+            transition.duration = animation.duration
+            transition.timingFunction = animation.timingFunction
+        } else {
+            return
+        }
+        layer.add(transition, forKey: "transition")
+    }
+
+    /// Applies given border style to view's layer.
+    func apply(style: POBorderStyle) {
+        layer.cornerRadius = style.radius
+        layer.borderWidth = style.width
+        layer.borderColor = style.color.cgColor
+    }
+
+    /// Applies given shadow style to view's layer.
+    func apply(style: POShadowStyle, shadowOpacity: CGFloat = 1) {
+        layer.shadowColor = style.color.cgColor
+        layer.shadowOpacity = Float(shadowOpacity)
+        layer.shadowOffset = style.offset
+        layer.shadowRadius = style.radius
+    }
 }
