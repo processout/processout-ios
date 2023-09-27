@@ -378,13 +378,13 @@ final class CodeField: UIControl, UITextInput {
         ]
         NSLayoutConstraint.activate(constraints)
         stride(from: 0, to: length, by: 1)
-            .map(createCodeTextFieldComponentView)
+            .map(createCodeFieldComponentView)
             .forEach(contentView.addArrangedSubview)
         addContextMenuGesture()
         isAccessibilityElement = true
     }
 
-    private func createCodeTextFieldComponentView(index: Int) -> CodeFieldComponentView {
+    private func createCodeFieldComponentView(index: Int) -> CodeFieldComponentView {
         let size = CGSize(width: Constants.height, height: Constants.height)
         let view = CodeFieldComponentView(size: size) { [weak self] position in
             self?.setCarretPosition(position: position, index: index)
