@@ -134,30 +134,3 @@ private final class CodeFieldCoordinator: NSObject {
         view.isFocused = false
     }
 }
-
-struct ContentView: View {
-
-    @State var length = 3
-    @State var text = ""
-
-    var body: some View {
-        VStack(alignment: .center) {
-            Spacer()
-            POCodeField(length: length, text: $text)
-                .inputStyle(.default(typography: .Medium.title))
-            Button("saca") {
-                length += 1
-            }
-        }
-        .padding()
-    }
-}
-
-struct Foobar_Previews: PreviewProvider {
-
-    static var previews: some View {
-        ContentView()
-    }
-}
-
-// this should support focus state as well ???
