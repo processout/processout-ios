@@ -1,6 +1,6 @@
 //
 //  NSLayoutConstraint+Extensions.swift
-//  ProcessOut
+//  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 05.12.2022.
 //
