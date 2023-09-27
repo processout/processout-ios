@@ -10,10 +10,6 @@ import XCTest
 
 final class ImmutableExcludedCodableTests: XCTestCase {
 
-    override func setUp() {
-        super.setUp()
-    }
-
     func test_excludedCodable_whenWrappedInContainer_isNotEncoded() throws {
         // Given
         let encoder = JSONEncoder()
