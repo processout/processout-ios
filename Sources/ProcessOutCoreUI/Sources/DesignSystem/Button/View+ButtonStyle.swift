@@ -52,7 +52,7 @@ private struct Style: ButtonStyle {
                 .multilineTextAlignment(.center)
                 .opacity(isLoading ? 0 : 1)
         }
-        .padding(.all, Constants.padding)
+        .padding(Constants.padding)
         .frame(maxWidth: .infinity, minHeight: Constants.height)
         .background(Color(currentStyle.backgroundColor))
         .border(style: currentStyle.border)
@@ -64,7 +64,7 @@ private struct Style: ButtonStyle {
 
     private enum Constants {
         static let height: CGFloat = 44
-        static let padding: CGFloat = 8
+        static let padding = EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8)
     }
 
     // MARK: - Private Properties
