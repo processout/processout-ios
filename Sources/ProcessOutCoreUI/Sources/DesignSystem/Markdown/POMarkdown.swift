@@ -1,39 +1,33 @@
 //
-//  Markdown.swift
+//  POMarkdown.swift
 //  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 21.09.2023.
 //
 
-import UIKit
 import SwiftUI
 
 public struct POMarkdown: View {
 
-    public init(_ string: String, style: POTextStyle) {
+    public init(_ string: String) {
         self.string = string
-        self.style = style
     }
 
     public var body: some View {
         HorizontalSizeReader { width in
-            TextViewRepresentable(string: string, style: style, preferredWidth: width)
+            TextViewRepresentable(string: string, preferredWidth: width)
         }
     }
 
     // MARK: - Private Properties
 
     private let string: String
-    private let style: POTextStyle
 }
 
 private struct TextViewRepresentable: UIViewRepresentable {
 
     /// The text that the view displays.
     let string: String
-
-    /// Base text style.
-    let style: POTextStyle
 
     /// The preferred maximum width, in points.
     let preferredWidth: CGFloat
@@ -61,7 +55,6 @@ private struct TextViewRepresentable: UIViewRepresentable {
         textView.attributedText = AttributedStringBuilder()
             .with { builder in
                 builder.typography = style.typography
-                builder.textStyle = .body
                 builder.sizeCategory = UIContentSizeCategory(sizeCategory)
                 builder.color = style.color
                 builder.lineBreakMode = .byWordWrapping
@@ -85,6 +78,9 @@ private struct TextViewRepresentable: UIViewRepresentable {
 
     @Environment(\.multilineTextAlignment)
     private var multilineTextAlignment
+
+    @Environment(\.textStyle)
+    private var style: POTextStyle
 
     // MARK: - Private Methods
 
