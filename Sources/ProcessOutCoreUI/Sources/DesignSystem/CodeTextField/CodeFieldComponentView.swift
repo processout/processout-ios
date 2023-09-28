@@ -64,7 +64,6 @@ final class CodeFieldComponentView: UIView {
             valueLabel.attributedText = AttributedStringBuilder()
                 .with { builder in
                     builder.typography = viewModel.style.text.typography
-                    builder.textStyle = .largeTitle
                     builder.maximumFontSize = Constants.maximumFontSize
                     builder.alignment = .center
                     builder.color = viewModel.style.text.color

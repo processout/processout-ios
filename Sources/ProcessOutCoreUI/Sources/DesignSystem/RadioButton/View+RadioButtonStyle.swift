@@ -69,7 +69,7 @@ private struct RadioButtonStyle: ButtonStyle {
             )
             configuration
                 .label
-                .textStyle(style.value, relativeTo: .body)
+                .textStyle(style.value)
                 .frame(minHeight: Constants.knobSize)
         }
         .padding(.vertical, Constants.minimumPadding)
@@ -113,7 +113,7 @@ private struct RadioButtonStyle: ButtonStyle {
     }
 
     private func knobVerticalOffset(typography: POTypography) -> CGFloat {
-        if typography.adjustsFontForContentSizeCategory {
+        if typography.textStyle != nil {
             return typography.lineHeight * contentSizeMultipler
         }
         return typography.lineHeight

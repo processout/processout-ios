@@ -160,7 +160,6 @@ private struct TextFieldRepresentable: UIViewRepresentable {
         let textAttributes = AttributedStringBuilder()
             .with { builder in
                 builder.typography = style.text.typography
-                builder.textStyle = .body
                 builder.sizeCategory = .init(sizeCategory)
                 builder.color = style.text.color
             }
@@ -173,7 +172,6 @@ private struct TextFieldRepresentable: UIViewRepresentable {
         let updatedPlaceholder = AttributedStringBuilder()
             .with { builder in
                 builder.typography = style.placeholder.typography
-                builder.textStyle = .body
                 builder.sizeCategory = .init(sizeCategory)
                 builder.color = style.placeholder.color
                 builder.text = .plain(prompt)

@@ -48,7 +48,7 @@ private struct Style: ButtonStyle {
                 .activityIndicatorStyle(style.activityIndicator)
                 .opacity(isLoading ? 1 : 0)
             configuration.label
-                .textStyle(currentStyle.title, relativeTo: .body)
+                .textStyle(currentStyle.title)
                 .multilineTextAlignment(.center)
                 .opacity(isLoading ? 0 : 1)
         }
