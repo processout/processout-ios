@@ -13,6 +13,6 @@ extension View {
     public func border(style: POBorderStyle) -> some View {
         let borderRectangle = RoundedRectangle(cornerRadius: style.radius)
             .stroke(Color(style.color), lineWidth: style.width)
-        return self.overlay(borderRectangle).cornerRadius(style.radius)
+        return self.overlay(borderRectangle).clipShape(RoundedRectangle(cornerRadius: style.radius))
     }
 }
