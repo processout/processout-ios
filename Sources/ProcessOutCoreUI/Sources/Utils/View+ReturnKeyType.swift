@@ -1,6 +1,6 @@
 //
 //  View+ReturnKeyType.swift
-//  ProcessOut
+//  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 25.09.2023.
 //

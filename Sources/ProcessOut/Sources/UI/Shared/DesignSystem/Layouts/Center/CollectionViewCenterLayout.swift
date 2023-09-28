@@ -117,7 +117,7 @@ final class CollectionViewCenterLayout: UICollectionViewFlowLayout {
 
     private func delegate() -> CollectionViewDelegateCenterLayout {
         // swiftlint:disable:next force_cast force_unwrapping
-        return collectionView!.delegate as! CollectionViewDelegateCenterLayout
+        collectionView!.delegate as! CollectionViewDelegateCenterLayout
     }
 
     private func collectionView() -> UICollectionView {
