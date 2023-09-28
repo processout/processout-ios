@@ -53,26 +53,31 @@ extension POTypography {
     public enum Fixed {
 
         /// Use for captions, status labels and tags.
-        public static let caption = POTypography(font: FontFamily.WorkSans.regular.font(size: 12), lineHeight: 16)
+        public static let caption = POTypography(font: UIFont(.WorkSans.regular, size: 12), lineHeight: 16)
 
         /// Use for buttons.
-        public static let button = POTypography(font: FontFamily.WorkSans.medium.font(size: 14), lineHeight: 18)
+        public static let button = POTypography(font: UIFont(.WorkSans.medium, size: 14), lineHeight: 18)
 
         /// Use for body copy on larger screens, or smaller blocks of text.
         public static let body = POTypography(
-            font: FontFamily.WorkSans.regular.font(size: 16), lineHeight: 24, paragraphSpacing: 8
+            font: UIFont(.WorkSans.regular, size: 16), lineHeight: 24, paragraphSpacing: 8
         )
 
         /// Use for form components, error text and key value data.
-        public static let label = POTypography(font: FontFamily.WorkSans.regular.font(size: 14), lineHeight: 18)
+        public static let label = POTypography(font: UIFont(.WorkSans.regular, size: 14), lineHeight: 18)
 
         /// Use for form components, error text and key value data.
-        public static let labelHeading = POTypography(font: FontFamily.WorkSans.medium.font(size: 14), lineHeight: 18)
+        public static let labelHeading = POTypography(font: UIFont(.WorkSans.medium, size: 14), lineHeight: 18)
     }
 
     public enum Medium {
 
         /// Use for page titles.
-        public static let title = POTypography(font: FontFamily.WorkSans.medium.font(size: 20), lineHeight: 28)
+        public static let title = POTypography(font: UIFont(.WorkSans.medium, size: 20), lineHeight: 28)
+    }
+
+    /// Registers all custom fonts.
+    @_spi(PO) public static func register() {
+        FontResource.register()
     }
 }
