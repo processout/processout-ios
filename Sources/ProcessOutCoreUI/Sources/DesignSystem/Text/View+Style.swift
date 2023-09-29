@@ -10,14 +10,10 @@ import SwiftUI
 extension View {
 
     /// Applies given `style` to text.
-    /// - NOTE: Implementation also adds necessary padding to match requested line height.
-    public func textStyle(_ style: POTextStyle) -> some View where Self == Text {
-        modifier(ContentModifier(style: style, addPadding: true))
-    }
-
-    /// Applies given `style` to text.
-    public func textStyle(_ style: POTextStyle) -> some View {
-        modifier(ContentModifier(style: style, addPadding: false))
+    ///
+    /// - NOTE: When `addPadding` is set to true this method has a cumulative effect.
+    public func textStyle(_ style: POTextStyle, addPadding: Bool = true) -> some View {
+        modifier(ContentModifier(style: style, addPadding: addPadding))
     }
 }
 
