@@ -15,6 +15,7 @@ public struct POPickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
         elementId = \.self
         self._selection = selection
         self.content = content
+        _isActionSheetPresented = State(initialValue: false)
     }
 
     public var body: some View {
@@ -35,11 +36,8 @@ public struct POPickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
     private let elementId: KeyPath<Data.Element, Id>
     private let content: (Data.Element) -> Text
 
-    @Binding
-    private var selection: Data.Element
-
-    @State
-    private var isActionSheetPresented = false
+    @Binding private var selection: Data.Element
+    @State private var isActionSheetPresented: Bool
 
     @Environment(\.inputStyle) private var style
     @Environment(\.isControlInvalid) private var isInvalid
