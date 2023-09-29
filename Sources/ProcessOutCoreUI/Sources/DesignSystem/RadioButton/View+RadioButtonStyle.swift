@@ -16,31 +16,18 @@ extension View {
     public func radioButtonSelected(_ isSelected: Bool) -> some View {
         environment(\.isRadioButtonSelected, isSelected)
     }
-
-    public func radioButtonInError(_ inError: Bool) -> some View {
-        environment(\.isRadioButtonInError, inError)
-    }
 }
 
 extension EnvironmentValues {
 
     var isRadioButtonSelected: Bool {
-        get { self[SelectionKey.self] }
-        set { self[SelectionKey.self] = newValue }
-    }
-
-    var isRadioButtonInError: Bool {
-        get { self[ErrorKey.self] }
-        set { self[ErrorKey.self] = newValue }
+        get { self[Key.self] }
+        set { self[Key.self] = newValue }
     }
 
     // MARK: - Private Nested Types
 
-    private struct SelectionKey: EnvironmentKey {
-        static let defaultValue = false
-    }
-
-    private struct ErrorKey: EnvironmentKey {
+    private struct Key: EnvironmentKey {
         static let defaultValue = false
     }
 }
@@ -88,11 +75,8 @@ private struct RadioButtonStyle: ButtonStyle {
 
     // MARK: - Private Properties
 
-    @Environment(\.isRadioButtonSelected)
-    private var isSelected
-
-    @Environment(\.isRadioButtonInError)
-    private var isInError
+    @Environment(\.isRadioButtonSelected) private var isSelected
+    @Environment(\.isControlInvalid) private var isInvalid
 
     @ScaledMetricBackport(relativeTo: .body)
     private var contentSizeMultipler: CGFloat = 1
@@ -106,7 +90,7 @@ private struct RadioButtonStyle: ButtonStyle {
         if isPressed {
             return style.highlighted
         }
-        if isInError {
+        if isInvalid {
             return style.error
         }
         return style.normal

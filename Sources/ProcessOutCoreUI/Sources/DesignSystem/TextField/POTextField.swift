@@ -53,7 +53,7 @@ public struct POTextField: View {
     }
 
     public var body: some View {
-        let style = inError ? style.error : style.normal
+        let style = isInvalid ? style.error : style.normal
         TextFieldRepresentable(
             text: text,
             isFocused: isFocused ?? $_isFocused,
@@ -68,7 +68,7 @@ public struct POTextField: View {
         .border(style: style.border)
         .shadow(style: style.shadow)
         .accentColor(Color(style.tintColor))
-        .animation(.default, value: inError)
+        .animation(.default, value: isInvalid)
     }
 
     // MARK: - Nested Types
@@ -91,7 +91,7 @@ public struct POTextField: View {
     @State private var _isFocused = false
 
     @Environment(\.inputStyle) private var style
-    @Environment(\.inputError) private var inError
+    @Environment(\.isControlInvalid) private var isInvalid
 }
 
 // todo(andrii-vysotskyi): support textContentType

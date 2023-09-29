@@ -73,14 +73,9 @@ private struct TextViewRepresentable: UIViewRepresentable {
 
     // MARK: - Private Properties
 
-    @Environment(\.sizeCategory)
-    private var sizeCategory
-
-    @Environment(\.multilineTextAlignment)
-    private var multilineTextAlignment
-
-    @Environment(\.textStyle)
-    private var style: POTextStyle
+    @Environment(\.sizeCategory) private var sizeCategory
+    @Environment(\.multilineTextAlignment) private var multilineTextAlignment
+    @Environment(\.textStyle) private var style: POTextStyle
 
     // MARK: - Private Methods
 

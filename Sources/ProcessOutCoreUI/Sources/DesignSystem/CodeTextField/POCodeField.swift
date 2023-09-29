@@ -68,7 +68,7 @@ private struct CodeFieldRepresentable: UIViewRepresentable {
     func updateUIView(_ textField: CodeField, context: Context) {
         let animated = context.transaction.animation != nil
         textField.configure(
-            isInvalid: inError, style: style, animated: animated
+            isInvalid: isInvalid, style: style, animated: animated
         )
         if textField.text != text {
             textField.text = text
@@ -83,7 +83,7 @@ private struct CodeFieldRepresentable: UIViewRepresentable {
     // MARK: - Private Properties
 
     @Environment(\.inputStyle) private var style
-    @Environment(\.inputError) private var inError
+    @Environment(\.isControlInvalid) private var isInvalid
 
     // MARK: - Private Methods
 

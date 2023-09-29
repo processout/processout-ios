@@ -19,14 +19,14 @@ public struct POPickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
 
     public var body: some View {
         Group {
-            let currentStyle = inError ? style.error : style.normal
+            let currentStyle = isInvalid ? style.error : style.normal
             if #available(iOS 14, *) {
                 menu(style: currentStyle)
             } else {
                 actionSheetMenu(style: currentStyle)
             }
         }
-        .animation(.default, value: inError)
+        .animation(.default, value: isInvalid)
     }
 
     // MARK: - Private Properties
@@ -42,7 +42,7 @@ public struct POPickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
     private var isActionSheetPresented = false
 
     @Environment(\.inputStyle) private var style
-    @Environment(\.inputError) private var inError
+    @Environment(\.isControlInvalid) private var isInvalid
 
     // MARK: - Private Methods
 
