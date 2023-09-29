@@ -44,8 +44,8 @@ private struct Style: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         let currentStyle = stateStyle(isPressed: configuration.isPressed)
         ZStack {
-            POActivityIndicatorView()
-                .activityIndicatorStyle(style.activityIndicator)
+            POProgressView()
+                .progressViewStyle(style.progressView)
                 .opacity(isLoading ? 1 : 0)
             configuration.label
                 .textStyle(currentStyle.title)
