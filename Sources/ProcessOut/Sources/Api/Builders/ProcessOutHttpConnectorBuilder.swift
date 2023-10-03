@@ -57,7 +57,6 @@ final class ProcessOutHttpConnectorBuilder {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         static let requestTimeout: TimeInterval = 30
     }
 
@@ -65,7 +64,8 @@ final class ProcessOutHttpConnectorBuilder {
 
     private lazy var dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = Constants.dateFormat
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         return dateFormatter
     }()
