@@ -5,6 +5,8 @@ settings:
   GCC_TREAT_WARNINGS_AS_ERRORS: true
   SWIFT_TREAT_WARNINGS_AS_ERRORS: true
   CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: true
+options:
+  transitivelyLinkDependencies: true
 packages:
   Checkout3DSPackages:
     url: https://github.com/checkout/checkout-3ds-sdk-ios
