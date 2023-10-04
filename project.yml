@@ -6,12 +6,9 @@ settings:
   SWIFT_TREAT_WARNINGS_AS_ERRORS: true
   CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: true
 packages:
-  CheckoutEventLoggerKit:
-    url: https://github.com/checkout/checkout-event-logger-ios-framework
-    from: 1.2.1
-  JOSESwift:
-    url: https://github.com/airsidemobile/JOSESwift
-    from: 2.2.1
+  Checkout3DSPackages:
+    url: https://github.com/checkout/checkout-3ds-sdk-ios
+    branch: feature/PIMOB-2035_support_spm
 targets:
   ProcessOutCoreUI:
     type: framework
@@ -98,8 +95,7 @@ targets:
         name: Swiftlint
         basedOnDependencyAnalysis: false
     dependencies:
-      - package: CheckoutEventLoggerKit
-      - package: JOSESwift
+      - package: Checkout3DSPackages
       - target: ProcessOut
     sources: Sources/ProcessOutCheckout3DS
 schemes:
