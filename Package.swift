@@ -10,11 +10,11 @@ let package = Package(
     ],
     products: [
         .library(name: "ProcessOut", targets: ["ProcessOut"]),
-        .library(name: "ProcessOutCheckout3DS", targets: ["ProcessOutCheckout3DS"])
+        .library(name: "ProcessOutCheckout3DS", type: .dynamic, targets: ["ProcessOutCheckout3DS"])
     ],
     dependencies: [
         // todo(andrii-vysotskyi): replace branch with version where feature is released.
-        .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios.git", branch: "feature/PIMOB-2035_support_spm")
+        .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", branch: "feature/PIMOB-2035_support_spm")
     ],
     targets: [
         .target(
