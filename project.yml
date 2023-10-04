@@ -98,6 +98,16 @@ targets:
       - package: Checkout3DSPackages
       - target: ProcessOut
     sources: Sources/ProcessOutCheckout3DS
+  ProcessOutCheckout3DSTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "16.0"
+    settings:
+      TARGET_ROOT: $(PROJECT_DIR)/Tests/ProcessOutCheckout3DSTests
+    dependencies:
+      - target: ProcessOutCheckout3DS
+    sources:
+      - path: Tests/ProcessOutCheckout3DSTests
 schemes:
   ProcessOut:
     build:
@@ -111,6 +121,9 @@ schemes:
     build:
       targets:
         ProcessOutCheckout3DS: all
+    test:
+      gatherCoverageData: true
+      targets: [ProcessOutCheckout3DSTests]
   ProcessOutCoreUI:
     build:
       targets:
