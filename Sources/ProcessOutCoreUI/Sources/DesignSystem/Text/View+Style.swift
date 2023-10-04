@@ -55,6 +55,6 @@ private struct ContentModifier: ViewModifier {
     private let style: POTextStyle
     private let addPadding: Bool
 
-    @ScaledMetricBackport
+    @POBackport.ScaledMetric
     private var multipler: CGFloat
 }

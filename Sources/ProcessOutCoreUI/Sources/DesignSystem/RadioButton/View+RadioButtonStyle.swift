@@ -78,7 +78,7 @@ private struct RadioButtonStyle: ButtonStyle {
     @Environment(\.isRadioButtonSelected) private var isSelected
     @Environment(\.isControlInvalid) private var isInvalid
 
-    @ScaledMetricBackport(relativeTo: .body)
+    @POBackport.ScaledMetric(relativeTo: .body)
     private var contentSizeMultipler: CGFloat = 1
 
     // MARK: - Private Methods
