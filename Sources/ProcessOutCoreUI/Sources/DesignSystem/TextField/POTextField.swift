@@ -22,14 +22,13 @@ public struct POTextField: View {
         text: Binding<String>,
         formatter: Formatter? = nil,
         prompt: String = "",
-        isFocused: Binding<Bool>,
-        onCommit: @escaping () -> Void = { }
+        isFocused: Binding<Bool>
     ) {
         self.text = text
         self.formatter = formatter
         self.prompt = prompt
         self.isFocused = isFocused
-        self.onCommit = onCommit
+        inputIdentifier = UUID().uuidString
     }
 
     /// - Parameters:
@@ -42,14 +41,13 @@ public struct POTextField: View {
     public init(
         text: Binding<String>,
         formatter: Formatter? = nil,
-        prompt: String = "",
-        onCommit: @escaping () -> Void = { }
+        prompt: String = ""
     ) {
         self.text = text
         self.formatter = formatter
         self.prompt = prompt
         self.isFocused = nil
-        self.onCommit = onCommit
+        inputIdentifier = UUID().uuidString
     }
 
     public var body: some View {
@@ -60,8 +58,9 @@ public struct POTextField: View {
             formatter: formatter,
             prompt: prompt,
             style: style,
-            onCommit: onCommit
+            id: inputIdentifier
         )
+        .inputIdentifier(inputIdentifier)
         .padding(Constants.padding)
         .frame(maxWidth: .infinity, minHeight: Constants.height)
         .background(Color(style.backgroundColor))
@@ -84,11 +83,11 @@ public struct POTextField: View {
     private let formatter: Formatter?
     private let prompt: String
     private let isFocused: Binding<Bool>?
-    private let onCommit: () -> Void
 
     /// Fallback property to pass down to underlying representable when `isFocused` binding is
     /// not supplied to `init`.
     @State private var _isFocused = false
+    @State private var inputIdentifier: String
 
     @Environment(\.inputStyle) private var style
     @Environment(\.isControlInvalid) private var isInvalid
@@ -103,7 +102,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
     let formatter: Formatter?
     let prompt: String
     let style: POInputStateStyle
-    let onCommit: () -> Void
+    let id: String
 
     // MARK: - UIViewRepresentable
 
@@ -118,7 +117,6 @@ private struct TextFieldRepresentable: UIViewRepresentable {
         textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         textField.adjustsFontForContentSizeCategory = false
         context.coordinator.configure(textField: textField)
-        updateUIView(textField, context: context)
         return textField
     }
 
@@ -130,7 +128,8 @@ private struct TextFieldRepresentable: UIViewRepresentable {
             UIView.performWithoutAnimation(textField.layoutIfNeeded)
         }
         updateFirstResponderStatus(textField)
-        textField.returnKeyType = returnKeyType
+        textField.returnKeyType = submitLabel.returnKeyType
+        textField.inputIdentifier = id
     }
 
     func makeCoordinator() -> Coordinator {
@@ -147,7 +146,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
     // MARK: - Private Properties
 
     @Environment(\.sizeCategory) private var sizeCategory
-    @Environment(\.returnKeyType) private var returnKeyType
+    @Environment(\.backportSubmitLabel) private var submitLabel
 
     // MARK: - Private Methods
 
@@ -208,7 +207,6 @@ private final class TextFieldCoordinator: NSObject, UITextFieldDelegate {
     func configure(textField: UITextField) {
         textField.delegate = self
         textField.addTarget(self, action: #selector(editingChanged(textField:)), for: .editingChanged)
-        textField.addTarget(self, action: #selector(editingDidEndOnExit), for: .editingDidEndOnExit)
     }
 
     // MARK: - UITextFieldDelegate
@@ -264,9 +262,5 @@ private final class TextFieldCoordinator: NSObject, UITextFieldDelegate {
 
     @objc private func editingChanged(textField: UITextField) {
         view.text = textField.text ?? ""
-    }
-
-    @objc private func editingDidEndOnExit() {
-        view.onCommit()
     }
 }
