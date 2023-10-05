@@ -18,35 +18,66 @@ extension POBackport where Wrapped: View {
 
 private struct SubmitModifier: ViewModifier {
 
-    let action: () -> Void
+    init(action: @escaping () -> Void) {
+        _coordinator = .init(wrappedValue: .init(onSubmit: action))
+    }
 
     func body(content: Content) -> some View {
         content
-            .onReceive(Constants.didEndEditingPublisher) { output in
-                guard let reasonRawValue = output.userInfo?[UITextField.didEndEditingReasonUserInfoKey] as? Int,
-                      let control = output.object as? UIView else {
-                    return
-                }
-                let reason = UITextField.DidEndEditingReason(rawValue: reasonRawValue)
-                if reason == .committed, focusableIdentifier == control.inputIdentifier {
-                    action()
+            .onReceive(Constants.didBeginEditingPublisher) { output in
+                if let textField = output.object as? UITextField, textField.inputIdentifier == inputIdentifier {
+                    coordinator.configure(textField: textField)
                 }
             }
+            .onDisappear {
+                coordinator.clean()
+            }
             .onPreferenceChange(InputIdentifierPreferenceKey.self) { id in
-                focusableIdentifier = id
+                inputIdentifier = id
             }
     }
 
     // MARK: -
 
     private enum Constants {
-        static let didEndEditingPublisher = NotificationCenter.default.publisher(
-            for: UITextField.textDidEndEditingNotification
+        static let didBeginEditingPublisher = NotificationCenter.default.publisher(
+            for: UITextField.textDidBeginEditingNotification
         )
     }
 
     // MARK: - Private Properties
 
+    @POBackport.StateObject
+    private var coordinator: Coordinator
+
     @State
-    private var focusableIdentifier: String?
+    private var inputIdentifier: String?
+}
+
+private final class Coordinator: ObservableObject {
+
+    init(onSubmit: @escaping () -> Void) {
+        self.onSubmit = onSubmit
+    }
+
+    func configure(textField: UITextField) {
+        clean()
+        textField.addTarget(self, action: #selector(editingDidEndOnExit), for: .editingDidEndOnExit)
+        self.textField = textField
+    }
+
+    func clean() {
+        textField?.removeTarget(self, action: nil, for: .allEvents)
+    }
+
+    // MARK: - Private Properties
+
+    private let onSubmit: () -> Void
+    private weak var textField: UITextField?
+
+    // MARK: - Private Methods
+
+    @objc private func editingDidEndOnExit() {
+        onSubmit()
+    }
 }
