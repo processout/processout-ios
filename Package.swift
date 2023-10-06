@@ -10,7 +10,7 @@ let package = Package(
     ],
     products: [
         .library(name: "ProcessOut", targets: ["ProcessOut"]),
-        .library(name: "ProcessOutCheckout3DS", type: .dynamic, targets: ["ProcessOutCheckout3DS"])
+        .library(name: "ProcessOutCheckout3DS", targets: ["ProcessOutCheckout3DS"])
     ],
     dependencies: [
         // todo(andrii-vysotskyi): stop vendoring CKO 3DS SDK and dependencies when SPM support is ready.
