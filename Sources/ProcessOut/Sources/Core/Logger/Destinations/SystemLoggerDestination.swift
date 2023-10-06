@@ -19,6 +19,7 @@ final class SystemLoggerDestination: LoggerDestination {
     func log(event: LogEvent) {
         os_log(
             "%{public}@ %{public}@",
+            dso: event.dso,
             log: osLog(category: event.category),
             type: convertToLogType(event.level),
             attributesDescription(event: event),

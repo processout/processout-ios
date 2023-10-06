@@ -21,6 +21,9 @@ struct LogEvent {
     /// Date associated with message.
     let timestamp: Date
 
+    /// DSO handle.
+    let dso: UnsafeRawPointer?
+
     /// File name.
     let file: String
 
