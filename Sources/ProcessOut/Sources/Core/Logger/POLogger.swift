@@ -32,23 +32,47 @@ public struct POLogger {
     let category: String
 
     /// Logs a message at the `debug` level.
-    func debug(_ message: LogMessage, attributes: [String: String] = [:], file: String = #file, line: Int = #line) {
-        log(level: .debug, message, attributes: attributes, file: file, line: line)
+    func debug(
+        _ message: LogMessage,
+        attributes: [String: String] = [:],
+        dso: UnsafeRawPointer? = #dsohandle,
+        file: String = #file,
+        line: Int = #line
+    ) {
+        log(level: .debug, message, attributes: attributes, dso: dso, file: file, line: line)
     }
 
     /// Logs a message at the `info` level.
-    func info(_ message: LogMessage, attributes: [String: String] = [:], file: String = #file, line: Int = #line) {
-        log(level: .info, message, attributes: attributes, file: file, line: line)
+    func info(
+        _ message: LogMessage,
+        attributes: [String: String] = [:],
+        dso: UnsafeRawPointer? = #dsohandle,
+        file: String = #file,
+        line: Int = #line
+    ) {
+        log(level: .info, message, attributes: attributes, dso: dso, file: file, line: line)
     }
 
     /// Logs a message at the `error` level.
-    func error(_ message: LogMessage, attributes: [String: String] = [:], file: String = #file, line: Int = #line) {
-        log(level: .error, message, attributes: attributes, file: file, line: line)
+    func error(
+        _ message: LogMessage,
+        attributes: [String: String] = [:],
+        dso: UnsafeRawPointer? = #dsohandle,
+        file: String = #file,
+        line: Int = #line
+    ) {
+        log(level: .error, message, attributes: attributes, dso: dso, file: file, line: line)
     }
 
     /// Logs a message at the `fault` level.
-    func fault(_ message: LogMessage, attributes: [String: String] = [:], file: String = #file, line: Int = #line) {
-        log(level: .fault, message, attributes: attributes, file: file, line: line)
+    func fault(
+        _ message: LogMessage,
+        attributes: [String: String] = [:],
+        dso: UnsafeRawPointer? = #dsohandle,
+        file: String = #file,
+        line: Int = #line
+    ) {
+        log(level: .fault, message, attributes: attributes, dso: dso, file: file, line: line)
     }
 
     // MARK: - Private Properties
@@ -72,8 +96,9 @@ public struct POLogger {
         level: LogLevel,
         _ message: LogMessage,
         attributes additionalAttributes: [String: String] = [:],
-        file: String = #file,
-        line: Int = #line
+        dso: UnsafeRawPointer?,
+        file: String,
+        line: Int
     ) {
         guard level >= minimumLevel else {
             return
@@ -87,6 +112,7 @@ public struct POLogger {
             message: message.interpolation.value,
             category: category,
             timestamp: Date(),
+            dso: dso,
             // swiftlint:disable:next legacy_objc_type
             file: NSString(string: NSString(string: file).deletingPathExtension).lastPathComponent,
             line: line,
