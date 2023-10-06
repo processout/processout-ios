@@ -14,7 +14,7 @@ let package = Package(
     ],
     dependencies: [
         // todo(andrii-vysotskyi): stop vendoring CKO 3DS SDK and dependencies when SPM support is ready.
-        .package(url: "https://github.com/checkout/checkout-event-logger-ios-framework", from: "1.2.4"),
+        .package(url: "https://github.com/checkout/checkout-event-logger-ios-framework", exact: "1.2.4"),
     ],
     targets: [
         .target(
