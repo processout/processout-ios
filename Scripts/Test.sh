@@ -5,16 +5,14 @@ set -euo pipefail
 SDK='iphonesimulator'
 DESTINATION='platform=iOS Simulator,name=iPhone 14 Pro,OS=latest'
 
-xcodebuild clean test \
-    -project ProcessOut.xcodeproj \
-    -scheme ProcessOut \
-    -sdk "$SDK" \
-    -destination "$DESTINATION" |
-    bundle exec xcpretty
-
-# Checkout3DS dependency is only available via cocoapods now, so target is tested
-# using `pod lib lint`.
-bundle exec pod repo update
-bundle exec pod lib lint ProcessOutCheckout3DS.podspec --allow-warnings
+# Run Tests
+for PRODUCT in "ProcessOut" "ProcessOutCheckout3DS" ; do
+    xcodebuild clean test \
+        -project ProcessOut.xcodeproj \
+        -scheme "$PRODUCT" \
+        -sdk "$SDK" \
+        -destination "$DESTINATION" |
+        bundle exec xcpretty
+done
 
 # todo(andrii-vysotskyi): run example target tests when POM-144 is resolved

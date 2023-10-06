@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "checkout-event-logger-ios-framework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/checkout/checkout-event-logger-ios-framework.git",
+      "state" : {
+        "revision" : "a914d754b4ffb1843730e8e1f8e7e60c4bf81cf9",
+        "version" : "1.2.4"
+      }
+    }
+  ],
+  "version" : 2
+}

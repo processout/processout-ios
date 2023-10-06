@@ -10,6 +10,11 @@ let package = Package(
     ],
     products: [
         .library(name: "ProcessOut", targets: ["ProcessOut"]),
+        .library(name: "ProcessOutCheckout3DS", targets: ["ProcessOutCheckout3DS"])
+    ],
+    dependencies: [
+        // todo(andrii-vysotskyi): stop vendoring CKO 3DS SDK and dependencies when SPM support is ready.
+        .package(url: "https://github.com/checkout/checkout-event-logger-ios-framework", exact: "1.2.4"),
     ],
     targets: [
         .target(
@@ -21,6 +26,24 @@ let package = Package(
             resources: [
                 .process("Resources")
             ]
+        ),
+        .target(
+            name: "ProcessOutCheckout3DS",
+            dependencies: [
+                .target(name: "ProcessOut"),
+                .product(
+                    name: "CheckoutEventLoggerKit", package: "checkout-event-logger-ios-framework"
+                ),
+                .target(name: "JOSESwift"),
+                .target(name: "Checkout3DS")
+            ],
+            exclude: ["ProcessOutCheckout3DS.docc"]
+        ),
+        .binaryTarget(
+            name: "Checkout3DS", path: "Vendor/Checkout3DS.xcframework"
+        ),
+        .binaryTarget(
+            name: "JOSESwift", path: "Vendor/JOSESwift.xcframework"
         ),
         .binaryTarget(name: "cmark", path: "Vendor/cmark.xcframework")
     ]

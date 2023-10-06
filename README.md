@@ -13,6 +13,12 @@ Get started with our [ProcessOut documentation](https://docs.processout.com/) or
 | ProcessOut            | Allows to interact with ProcessOut API and provides a UI to handle payments. |
 | ProcessOutCheckout3DS | Integration with Checkout.com 3D Secure (3DS) mobile SDK.                    |
 
+> **Warning**
+>
+> SPM support for `ProcessOutCheckout3DS` is **experimental**. Module depends on [Checkout3DS SDK](https://github.com/checkout/checkout-3ds-sdk-ios)
+> that is not compatible with SPM. As a workaround, we vendor `Checkout3DS` (v3.1.1) and its dependency
+> [JOSESwift](https://github.com/airsidemobile/JOSESwift) (v2.4.0).
+
 ## Contributing
 
 We welcome contributions of any kind including new features, bug fixes, and general improvements.
