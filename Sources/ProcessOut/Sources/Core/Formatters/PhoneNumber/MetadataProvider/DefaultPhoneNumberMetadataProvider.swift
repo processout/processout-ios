@@ -54,7 +54,7 @@ final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
                     return PhoneNumberMetadata(countryCode: countryCode, formats: values.flatMap(\.formats))
                 }
             } catch {
-                assertionFailure("Failed to load metadata: \(error.localizedDescription)")
+                assertionFailure("Failed to load metadata: \(error)")
                 groupedMetadata = [:]
             }
             self.$metadata.withLock { $0 = groupedMetadata }

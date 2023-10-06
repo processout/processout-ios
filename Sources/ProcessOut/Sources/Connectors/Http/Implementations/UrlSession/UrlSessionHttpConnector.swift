@@ -48,7 +48,7 @@ final class UrlSessionHttpConnector: HttpConnector {
                 dataTask.resume()
                 cancellable.add(dataTask)
             } catch {
-                logger.error("Did fail to create a request: '\(error.localizedDescription)'")
+                logger.error("Did fail to create a request: '\(error)'")
                 complete(completion: completion, result: .failure(error))
             }
         }
@@ -71,7 +71,7 @@ final class UrlSessionHttpConnector: HttpConnector {
         _ valueType: Value.Type, from data: Data?, response: URLResponse?, error: Error?, requestId: String
     ) throws -> Value {
         if let error {
-            logger.info("Request \(requestId) did fail with error: '\(error.localizedDescription)'.")
+            logger.info("Request \(requestId) did fail with error: '\(error)'.")
             throw convertToFailure(urlError: error)
         }
         guard let data, let response = response as? HTTPURLResponse else {
@@ -89,7 +89,7 @@ final class UrlSessionHttpConnector: HttpConnector {
             )
             throw failure
         } catch let error as DecodingError {
-            logger.error("Did fail to decode response for \(requestId): '\(error.localizedDescription)'.")
+            logger.error("Did fail to decode response for \(requestId): '\(error)'.")
             throw Failure.coding(error)
         }
     }
