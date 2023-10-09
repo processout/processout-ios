@@ -14,39 +14,10 @@ public struct POTextField: View {
     ///   - formatter: A formatter to use when converting between the string the user edits and the underlying value.
     ///   If `formatter` can't perform the conversion, the text field doesn't modify `binding.value`.
     ///   - prompt: A `String` which provides users with guidance on what to enter into the text field.
-    ///   - isFocused: You can use this property to observe the focus state of a single view, or programmatically
-    ///   set and remove focus from the view.
-    ///   - onCommit: An action to perform when the user performs an action (for example, when the user
-    ///   presses the return key) while the text field has focus.
-    public init(
-        text: Binding<String>,
-        formatter: Formatter? = nil,
-        prompt: String = "",
-        isFocused: Binding<Bool>
-    ) {
+    public init(text: Binding<String>, formatter: Formatter? = nil, prompt: String = "") {
         self.text = text
         self.formatter = formatter
         self.prompt = prompt
-        self.isFocused = isFocused
-        inputIdentifier = UUID().uuidString
-    }
-
-    /// - Parameters:
-    ///   - text: The underlying text to edit.
-    ///   - formatter: A formatter to use when converting between the string the user edits and the underlying value.
-    ///   If `formatter` can't perform the conversion, the text field doesn't modify `binding.value`.
-    ///   - prompt: A `String` which provides users with guidance on what to enter into the text field.
-    ///   - onCommit: An action to perform when the user performs an action (for example, when the user
-    ///   presses the return key) while the text field has focus.
-    public init(
-        text: Binding<String>,
-        formatter: Formatter? = nil,
-        prompt: String = ""
-    ) {
-        self.text = text
-        self.formatter = formatter
-        self.prompt = prompt
-        self.isFocused = nil
         inputIdentifier = UUID().uuidString
     }
 
@@ -54,7 +25,6 @@ public struct POTextField: View {
         let style = isInvalid ? style.error : style.normal
         TextFieldRepresentable(
             text: text,
-            isFocused: isFocused ?? $_isFocused,
             formatter: formatter,
             prompt: prompt,
             style: style,
@@ -82,22 +52,17 @@ public struct POTextField: View {
     private let text: Binding<String>
     private let formatter: Formatter?
     private let prompt: String
-    private let isFocused: Binding<Bool>?
-
-    /// Fallback property to pass down to underlying representable when `isFocused` binding is
-    /// not supplied to `init`.
-    @State private var _isFocused = false
-    @State private var inputIdentifier: String
 
     @Environment(\.inputStyle) private var style
     @Environment(\.isControlInvalid) private var isInvalid
+
+    @State private var inputIdentifier: String
 }
 
 // todo(andrii-vysotskyi): support textContentType
 private struct TextFieldRepresentable: UIViewRepresentable {
 
     @Binding var text: String
-    @Binding var isFocused: Bool
 
     let formatter: Formatter?
     let prompt: String
@@ -127,13 +92,18 @@ private struct TextFieldRepresentable: UIViewRepresentable {
             updatePlaceholder(textField)
             UIView.performWithoutAnimation(textField.layoutIfNeeded)
         }
-        updateFirstResponderStatus(textField)
         textField.returnKeyType = submitLabel.returnKeyType
         textField.inputIdentifier = id
     }
 
     func makeCoordinator() -> Coordinator {
         Coordinator(view: self)
+    }
+
+    // MARK: -
+
+    func willReturn() {
+        submitAction?()
     }
 
     // MARK: - Private Nested Types
@@ -147,6 +117,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
 
     @Environment(\.sizeCategory) private var sizeCategory
     @Environment(\.backportSubmitLabel) private var submitLabel
+    @Environment(\.backportSubmitAction) private var submitAction
 
     // MARK: - Private Methods
 
@@ -180,22 +151,6 @@ private struct TextFieldRepresentable: UIViewRepresentable {
             textField.attributedPlaceholder = updatedPlaceholder
         }
     }
-
-    private func updateFirstResponderStatus(_ textField: UITextField) {
-        // todo(andrii-vysotskyi): reference implementations are wrapping this
-        // into dispatch async, inspect why it may be needed.
-        guard textField.window != nil else {
-            return
-        }
-        if isFocused {
-            guard !textField.isFirstResponder else {
-                return
-            }
-            textField.becomeFirstResponder()
-        } else if textField.isFirstResponder {
-            textField.resignFirstResponder()
-        }
-    }
 }
 
 private final class TextFieldCoordinator: NSObject, UITextFieldDelegate {
@@ -211,12 +166,9 @@ private final class TextFieldCoordinator: NSObject, UITextFieldDelegate {
 
     // MARK: - UITextFieldDelegate
 
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        view.isFocused = true
-    }
-
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        view.isFocused = false
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        view.willReturn()
+        return true
     }
 
     func textField(
