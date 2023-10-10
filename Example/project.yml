@@ -34,8 +34,6 @@ targets:
           - $(PROJECT_DIR)/Scripts/SwiftGen/Output.xcfilelist
     sources:
       - path: Example
-      - path: Example/Sources/Generated/Assets+Generated.swift
-        optional: true
       - path: Example/Sources/Generated/Constants+Generated.swift
         optional: true
       - path: Example/Sources/Generated/Strings+Generated.swift

@@ -437,7 +437,7 @@ extension POFailure: CustomDebugStringConvertible {
         let parameters = [
             ("code", code.rawValue),
             ("message", message),
-            ("underlyingError", underlyingError?.localizedDescription)
+            ("underlyingError", underlyingError.map(String.init(describing:)))
         ]
         let parametersDescription = parameters
             .compactMap { name, value -> String? in

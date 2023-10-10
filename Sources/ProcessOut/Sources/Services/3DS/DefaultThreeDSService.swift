@@ -89,7 +89,7 @@ final class DefaultThreeDSService: ThreeDSService {
             logger.error("Did fail to decode configuration: '\(error.message ?? "")'.")
             completion(.failure(error))
         } catch {
-            logger.error("Did fail to decode configuration: '\(error.localizedDescription)'.")
+            logger.error("Did fail to decode configuration: '\(error)'.")
             completion(.failure(.init(code: .internal(.mobile), underlyingError: error)))
         }
     }
@@ -113,7 +113,7 @@ final class DefaultThreeDSService: ThreeDSService {
             logger.error("Did fail to decode challenge: '\(error.message ?? "")'.")
             completion(.failure(error))
         } catch {
-            logger.error("Did fail to decode challenge: '\(error.localizedDescription)'.")
+            logger.error("Did fail to decode challenge: '\(error)'.")
             completion(.failure(.init(code: .internal(.mobile), underlyingError: error)))
         }
     }
@@ -192,7 +192,7 @@ final class DefaultThreeDSService: ThreeDSService {
             let token = try Constants.tokenPrefix + encoder.encode(fingerprintResponse).base64EncodedString()
             result = .success(token)
         } catch {
-            logger.error("Did fail to encode fingerprint: '\(error.localizedDescription)'.")
+            logger.error("Did fail to encode fingerprint: '\(error)'.")
             let failure = POFailure(message: nil, code: .internal(.mobile), underlyingError: error)
             result = .failure(failure)
         }
