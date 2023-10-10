@@ -1,5 +1,5 @@
 //
-//  POFocusState.swift
+//  FocusState.swift
 //  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 03.10.2023.
