@@ -18,19 +18,13 @@ public struct POTextField: View {
         self.text = text
         self.formatter = formatter
         self.prompt = prompt
-        inputIdentifier = UUID().uuidString
     }
 
     public var body: some View {
         let style = isInvalid ? style.error : style.normal
         TextFieldRepresentable(
-            text: text,
-            formatter: formatter,
-            prompt: prompt,
-            style: style,
-            id: inputIdentifier
+            text: text, formatter: formatter, prompt: prompt, style: style
         )
-        .inputIdentifier(inputIdentifier)
         .padding(Constants.padding)
         .frame(maxWidth: .infinity, minHeight: Constants.height)
         .background(Color(style.backgroundColor))
@@ -55,8 +49,6 @@ public struct POTextField: View {
 
     @Environment(\.inputStyle) private var style
     @Environment(\.isControlInvalid) private var isInvalid
-
-    @State private var inputIdentifier: String
 }
 
 // todo(andrii-vysotskyi): support textContentType
@@ -67,7 +59,6 @@ private struct TextFieldRepresentable: UIViewRepresentable {
     let formatter: Formatter?
     let prompt: String
     let style: POInputStateStyle
-    let id: String
 
     // MARK: - UIViewRepresentable
 
@@ -82,6 +73,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
         textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         textField.adjustsFontForContentSizeCategory = false
         context.coordinator.configure(textField: textField)
+        focusCoordinator?.track(control: textField)
         return textField
     }
 
@@ -93,7 +85,6 @@ private struct TextFieldRepresentable: UIViewRepresentable {
             UIView.performWithoutAnimation(textField.layoutIfNeeded)
         }
         textField.returnKeyType = submitLabel.returnKeyType
-        textField.inputIdentifier = id
     }
 
     func makeCoordinator() -> Coordinator {
@@ -118,6 +109,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
     @Environment(\.sizeCategory) private var sizeCategory
     @Environment(\.backportSubmitLabel) private var submitLabel
     @Environment(\.backportSubmitAction) private var submitAction
+    @Environment(\.focusCoordinator) private var focusCoordinator
 
     // MARK: - Private Methods
 
