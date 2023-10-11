@@ -42,7 +42,8 @@ for PRODUCT in "ProcessOutCheckout3DS" "ProcessOutCoreUI"; do
     build_doc "$PRODUCT" "$DOCC_TARGET_OUTPUT_DIR/$PRODUCT"
 
     # Merge into the primary ProcessOut docs
-    cp -R "$DOCC_TARGET_OUTPUT_DIR/$PRODUCT"/* "$DOCC_OUTPUT_DIR"
+    cp -R "$DOCC_TARGET_OUTPUT_DIR/$PRODUCT/documentation"/* "$DOCC_OUTPUT_DIR/documentation/"
+    cp -R "$DOCC_TARGET_OUTPUT_DIR/$PRODUCT/data/documentation"/* "$DOCC_OUTPUT_DIR/data/documentation/"
 done
 
 # Delete non-mergable metadata.json
