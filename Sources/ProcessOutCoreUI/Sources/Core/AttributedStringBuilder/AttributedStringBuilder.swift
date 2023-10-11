@@ -25,9 +25,6 @@ struct AttributedStringBuilder {
     /// The typography of the text.
     var typography: POTypography?
 
-    /// Constants that describe the preferred styles for fonts.
-    var textStyle: UIFont.TextStyle?
-
     /// Allows to override current trait collection's size category with custom value.
     var sizeCategory: UIContentSizeCategory?
 
@@ -62,20 +59,12 @@ struct AttributedStringBuilder {
         guard let typography else {
             preconditionFailure("Typography must be set.")
         }
-        let font = font(
-            typography: typography,
-            symbolicTraits: fontSymbolicTraits,
-            textStyle: textStyle,
-            maximumFontSize: maximumFontSize
-        )
+        let font = font(typography: typography, symbolicTraits: fontSymbolicTraits, maximumFontSize: maximumFontSize)
         var attributes: [NSAttributedString.Key: Any] = [:]
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
         attributes[.font] = font
         attributes[.baselineOffset] = baselineOffset(font: font, lineHeightMultiple: lineHeightMultiple)
         attributes[.foregroundColor] = color
-        if #available(iOS 14.0, *) {
-            attributes[.tracking] = typography.tracking
-        }
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.maximumLineHeight = font.lineHeight * lineHeightMultiple
         paragraphStyle.minimumLineHeight = font.lineHeight * lineHeightMultiple
@@ -102,13 +91,10 @@ struct AttributedStringBuilder {
     }
 
     private func font(
-        typography: POTypography,
-        symbolicTraits: UIFontDescriptor.SymbolicTraits,
-        textStyle: UIFont.TextStyle?,
-        maximumFontSize: CGFloat?
+        typography: POTypography, symbolicTraits: UIFontDescriptor.SymbolicTraits, maximumFontSize: CGFloat?
     ) -> UIFont {
         var font = typography.font
-        if let textStyle, typography.adjustsFontForContentSizeCategory {
+        if let textStyle = typography.textStyle {
             let uiSizeCategory = sizeCategory ?? UITraitCollection.current.preferredContentSizeCategory
             let traits = UITraitCollection(
                 traitsFrom: [.current, .init(preferredContentSizeCategory: uiSizeCategory)]

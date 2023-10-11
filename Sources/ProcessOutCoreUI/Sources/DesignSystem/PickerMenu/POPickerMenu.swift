@@ -15,18 +15,19 @@ public struct POPickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
         elementId = \.self
         self._selection = selection
         self.content = content
+        _isActionSheetPresented = State(initialValue: false)
     }
 
     public var body: some View {
         Group {
-            let currentStyle = inError ? style.error : style.normal
+            let currentStyle = isInvalid ? style.error : style.normal
             if #available(iOS 14, *) {
                 menu(style: currentStyle)
             } else {
                 actionSheetMenu(style: currentStyle)
             }
         }
-        .animation(.default, value: inError)
+        .animation(.default, value: isInvalid)
     }
 
     // MARK: - Private Properties
@@ -35,14 +36,11 @@ public struct POPickerMenu<Data: RandomAccessCollection, Id: Hashable>: View {
     private let elementId: KeyPath<Data.Element, Id>
     private let content: (Data.Element) -> Text
 
-    @Binding
-    private var selection: Data.Element
-
-    @State
-    private var isActionSheetPresented = false
+    @Binding private var selection: Data.Element
+    @State private var isActionSheetPresented: Bool
 
     @Environment(\.inputStyle) private var style
-    @Environment(\.inputError) private var inError
+    @Environment(\.isControlInvalid) private var isInvalid
 
     // MARK: - Private Methods
 

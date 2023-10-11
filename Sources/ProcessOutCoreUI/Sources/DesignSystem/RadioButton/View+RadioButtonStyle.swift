@@ -16,31 +16,18 @@ extension View {
     public func radioButtonSelected(_ isSelected: Bool) -> some View {
         environment(\.isRadioButtonSelected, isSelected)
     }
-
-    public func radioButtonInError(_ inError: Bool) -> some View {
-        environment(\.isRadioButtonInError, inError)
-    }
 }
 
 extension EnvironmentValues {
 
     var isRadioButtonSelected: Bool {
-        get { self[SelectionKey.self] }
-        set { self[SelectionKey.self] = newValue }
-    }
-
-    var isRadioButtonInError: Bool {
-        get { self[ErrorKey.self] }
-        set { self[ErrorKey.self] = newValue }
+        get { self[Key.self] }
+        set { self[Key.self] = newValue }
     }
 
     // MARK: - Private Nested Types
 
-    private struct SelectionKey: EnvironmentKey {
-        static let defaultValue = false
-    }
-
-    private struct ErrorKey: EnvironmentKey {
+    private struct Key: EnvironmentKey {
         static let defaultValue = false
     }
 }
@@ -69,7 +56,7 @@ private struct RadioButtonStyle: ButtonStyle {
             )
             configuration
                 .label
-                .textStyle(style.value, relativeTo: .body)
+                .textStyle(style.value)
                 .frame(minHeight: Constants.knobSize)
         }
         .padding(.vertical, Constants.minimumPadding)
@@ -88,13 +75,10 @@ private struct RadioButtonStyle: ButtonStyle {
 
     // MARK: - Private Properties
 
-    @Environment(\.isRadioButtonSelected)
-    private var isSelected
+    @Environment(\.isRadioButtonSelected) private var isSelected
+    @Environment(\.isControlInvalid) private var isInvalid
 
-    @Environment(\.isRadioButtonInError)
-    private var isInError
-
-    @ScaledMetricBackport(relativeTo: .body)
+    @POBackport.ScaledMetric(relativeTo: .body)
     private var contentSizeMultipler: CGFloat = 1
 
     // MARK: - Private Methods
@@ -106,14 +90,14 @@ private struct RadioButtonStyle: ButtonStyle {
         if isPressed {
             return style.highlighted
         }
-        if isInError {
+        if isInvalid {
             return style.error
         }
         return style.normal
     }
 
     private func knobVerticalOffset(typography: POTypography) -> CGFloat {
-        if typography.adjustsFontForContentSizeCategory {
+        if typography.textStyle != nil {
             return typography.lineHeight * contentSizeMultipler
         }
         return typography.lineHeight

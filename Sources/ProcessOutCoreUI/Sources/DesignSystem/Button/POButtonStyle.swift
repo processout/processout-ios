@@ -19,19 +19,19 @@ public struct POButtonStyle {
     /// Style for disabled state.
     public let disabled: POButtonStateStyle
 
-    /// Activity indicator style. Only used with normal state.
-    public let activityIndicator: POActivityIndicatorStyle
+    /// Progress view style. Only used with normal state.
+    public let progressView: POProgressViewStyle
 
     public init(
         normal: POButtonStateStyle,
         highlighted: POButtonStateStyle,
         disabled: POButtonStateStyle,
-        activityIndicator: POActivityIndicatorStyle
+        progressView: POProgressViewStyle
     ) {
         self.normal = normal
         self.highlighted = highlighted
         self.disabled = disabled
-        self.activityIndicator = activityIndicator
+        self.progressView = progressView
     }
 }
 
@@ -57,7 +57,7 @@ extension POButtonStyle {
             shadow: .clear,
             backgroundColor: Asset.Colors.Action.Primary.disabled.color
         ),
-        activityIndicator: .system(.medium, color: Asset.Colors.Text.onColor.color)
+        progressView: .system(.medium, color: Asset.Colors.Text.onColor.color)
     )
 
     /// Default style for secondary button.
@@ -80,6 +80,6 @@ extension POButtonStyle {
             shadow: .clear,
             backgroundColor: .clear
         ),
-        activityIndicator: .system(.medium, color: Asset.Colors.Text.secondary.color)
+        progressView: .system(.medium, color: Asset.Colors.Text.secondary.color)
     )
 }
