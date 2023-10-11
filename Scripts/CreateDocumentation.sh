@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-OUTPUT_DIR="Docs"
+DOCC_TARGET_OUTPUT_DIR="./.build/artifacts/docc-static"
+DOCC_OUTPUT_DIR="Docs"
 
 function build_doc {(
     set -e
@@ -21,14 +22,29 @@ function build_doc {(
     # Transforms archive into static website
     $(xcrun --find docc) process-archive \
         transform-for-static-hosting $ARCHIVE_PATH \
-        --output-path "$OUTPUT_DIR" \
+        --output-path $2 \
         --hosting-base-path "processout-ios"
 )}
 
-rm -rf $OUTPUT_DIR
-mkdir -p $OUTPUT_DIR
+mkdir -p $DOCC_TARGET_OUTPUT_DIR
+mkdir -p $DOCC_OUTPUT_DIR
 
-# TODO(andrii-vysotskyi): Add "ProcessOutCheckout3DS" when Checkout3DS is available via SPM
-for PRODUCT in "ProcessOut" ; do
-    build_doc $PRODUCT
+# Remove @_exported imports to avoid exposing unwanted symbols
+find . -type f -path './Sources/*' -name '*.swift' | xargs sed -Ei "" 's/@_exported import/import/g'
+
+# Generate documentation for the primary 'ProcessOut' target
+build_doc "ProcessOut" "$DOCC_OUTPUT_DIR"
+
+# Generate documentation for secondary targets
+for PRODUCT in "ProcessOutCheckout3DS" "ProcessOutCoreUI"; do
+
+    # Generate documentation
+    build_doc "$PRODUCT" "$DOCC_TARGET_OUTPUT_DIR/$PRODUCT"
+
+    # Merge into the primary ProcessOut docs
+    cp -R "$DOCC_TARGET_OUTPUT_DIR/$PRODUCT/documentation"/* "$DOCC_OUTPUT_DIR/documentation/"
+    cp -R "$DOCC_TARGET_OUTPUT_DIR/$PRODUCT/data/documentation"/* "$DOCC_OUTPUT_DIR/data/documentation/"
 done
+
+# Delete non-mergable metadata.json
+rm -f "$DOCC_OUTPUT_DIR/metadata.json"
