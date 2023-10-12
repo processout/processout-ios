@@ -46,19 +46,4 @@ extension UIView {
         }
         layer.add(transition, forKey: "transition")
     }
-
-    /// Applies given border style to view's layer.
-    func apply(style: POBorderStyle) {
-        layer.cornerRadius = style.radius
-        layer.borderWidth = style.width
-        layer.borderColor = style.color.cgColor
-    }
-
-    /// Applies given shadow style to view's layer.
-    func apply(style: POShadowStyle, shadowOpacity: CGFloat = 1) {
-        layer.shadowColor = style.color.cgColor
-        layer.shadowOpacity = Float(shadowOpacity)
-        layer.shadowOffset = style.offset
-        layer.shadowRadius = style.radius
-    }
 }

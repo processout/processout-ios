@@ -43,7 +43,7 @@ extension PORadioButtonStyle {
         normal: .init(
             knob: .init(
                 backgroundColor: .clear,
-                border: .regular(radius: 0, color: UIColor(resource: .Border.default)),
+                border: .regular(color: UIColor(resource: .Border.default)),
                 innerCircleColor: .clear,
                 innerCircleRadius: 0
             ),
@@ -52,7 +52,7 @@ extension PORadioButtonStyle {
         selected: .init(
             knob: .init(
                 backgroundColor: .clear,
-                border: .regular(radius: 0, color: UIColor(resource: .Action.Primary.default)),
+                border: .regular(color: UIColor(resource: .Action.Primary.default)),
                 innerCircleColor: UIColor(resource: .Action.Primary.default),
                 innerCircleRadius: 4
             ),
@@ -61,7 +61,7 @@ extension PORadioButtonStyle {
         highlighted: .init(
             knob: .init(
                 backgroundColor: .clear,
-                border: .regular(radius: 0, color: UIColor(resource: .Text.muted)),
+                border: .regular(color: UIColor(resource: .Text.muted)),
                 innerCircleColor: .clear,
                 innerCircleRadius: 0
             ),
@@ -70,7 +70,7 @@ extension PORadioButtonStyle {
         error: .init(
             knob: .init(
                 backgroundColor: .clear,
-                border: .regular(radius: 0, color: UIColor(resource: .Text.error)),
+                border: .regular(color: UIColor(resource: .Text.error)),
                 innerCircleColor: .clear,
                 innerCircleRadius: 0
             ),

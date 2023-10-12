@@ -41,19 +41,19 @@ extension POButtonStyle {
     public static let primary = POButtonStyle(
         normal: .init(
             title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
-            border: .clear(radius: 8),
+            border: .clear,
             shadow: .clear,
             backgroundColor: UIColor(resource: .Action.Primary.default)
         ),
         highlighted: .init(
             title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
-            border: .clear(radius: 8),
+            border: .clear,
             shadow: .clear,
             backgroundColor: UIColor(resource: .Action.Primary.pressed)
         ),
         disabled: .init(
             title: .init(color: UIColor(resource: .Text.disabled), typography: .Fixed.button),
-            border: .clear(radius: 8),
+            border: .clear,
             shadow: .clear,
             backgroundColor: UIColor(resource: .Action.Primary.disabled)
         ),
@@ -64,19 +64,19 @@ extension POButtonStyle {
     public static let secondary = POButtonStyle(
         normal: .init(
             title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
-            border: .regular(radius: 8, color: UIColor(resource: .Border.default)),
+            border: .regular(color: UIColor(resource: .Border.default)),
             shadow: .clear,
             backgroundColor: UIColor(resource: .Action.Secondary.default)
         ),
         highlighted: .init(
             title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
-            border: .regular(radius: 8, color: UIColor(resource: .Border.default)),
+            border: .regular(color: UIColor(resource: .Border.default)),
             shadow: .clear,
             backgroundColor: UIColor(resource: .Action.Secondary.pressed)
         ),
         disabled: .init(
             title: .init(color: UIColor(resource: .Text.disabled), typography: .Fixed.button),
-            border: .regular(radius: 8, color: UIColor(resource: .Action.Border.disabled)),
+            border: .regular(color: UIColor(resource: .Action.Border.disabled)),
             shadow: .clear,
             backgroundColor: .clear
         ),

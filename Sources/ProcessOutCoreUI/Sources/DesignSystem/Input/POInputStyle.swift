@@ -32,7 +32,7 @@ extension POInputStyle {
                 text: .init(color: UIColor(resource: .Text.primary), typography: typography ?? .Fixed.label),
                 placeholder: .init(color: UIColor(resource: .Text.muted), typography: typography ?? .Fixed.label),
                 backgroundColor: UIColor(resource: .Surface.background),
-                border: .regular(radius: 8, color: UIColor(resource: .Border.default)),
+                border: .regular(color: UIColor(resource: .Border.default)),
                 shadow: .clear,
                 tintColor: UIColor(resource: .Text.primary)
             ),
@@ -40,7 +40,7 @@ extension POInputStyle {
                 text: .init(color: UIColor(resource: .Text.primary), typography: typography ?? .Fixed.label),
                 placeholder: .init(color: UIColor(resource: .Text.muted), typography: typography ?? .Fixed.label),
                 backgroundColor: UIColor(resource: .Surface.background),
-                border: .regular(radius: 8, color: UIColor(resource: .Text.error)),
+                border: .regular(color: UIColor(resource: .Text.error)),
                 shadow: .clear,
                 tintColor: UIColor(resource: .Text.error)
             )

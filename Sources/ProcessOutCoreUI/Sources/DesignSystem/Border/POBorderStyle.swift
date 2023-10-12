@@ -28,13 +28,18 @@ public struct POBorderStyle {
 
 extension POBorderStyle {
 
-    /// Clear border of specified radius.
-    public static func clear(radius: CGFloat) -> POBorderStyle {
-        .init(radius: radius, width: 0, color: .clear)
-    }
+    /// Clear border.
+    public static let clear = POBorderStyle(radius: Constants.radius, width: 0, color: .clear)
 
     /// Regular width border.
-    static func regular(radius: CGFloat, color: UIColor) -> POBorderStyle {
-        .init(radius: radius, width: 1, color: color)
+    static func regular(color: UIColor) -> POBorderStyle {
+        .init(radius: Constants.radius, width: Constants.width, color: color)
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let width: CGFloat = 1
+        static let radius: CGFloat = 8
     }
 }

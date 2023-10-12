@@ -29,5 +29,5 @@ public struct POShadowStyle {
 extension POShadowStyle {
 
     /// Value represents no shadow.
-    static let clear = Self(color: .clear, offset: .zero, radius: 0)
+    public static let clear = Self(color: .clear, offset: .zero, radius: 0)
 }
