@@ -6,10 +6,9 @@
 //
 
 import SwiftUI
-import ObjectiveC
 
 /// Provides a convenient method for backporting API.
-public struct POBackport<Wrapped> {
+@_spi(PO) public struct POBackport<Wrapped> {
 
     /// The underlying content this backport represents.
     public let wrapped: Wrapped
@@ -24,7 +23,7 @@ public struct POBackport<Wrapped> {
 extension View {
 
     /// Wraps a SwiftUI `View` that can be extended to provide backport functionality.
-    public var backport: POBackport<Self> {
+    @_spi(PO) public var backport: POBackport<Self> {
         .init(self)
     }
 }
