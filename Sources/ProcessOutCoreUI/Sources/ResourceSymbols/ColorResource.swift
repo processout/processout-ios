@@ -10,8 +10,8 @@ import UIKit
 // swiftlint:disable strict_fileprivate identifier_name
 
 /// A color resource.
-/// - NOTE: This type wraps natively generated `ColorResource` to make them publicly accessible.
-public struct POColorResource {
+/// - NOTE: This type wraps natively generated `ColorResource` to make resources publicly accessible.
+@_spi(PO) public struct POColorResource {
 
     fileprivate init(_ colorResource: ColorResource) {
         self.colorResource = colorResource
@@ -79,7 +79,7 @@ extension POColorResource {
 extension UIKit.UIColor {
 
     /// Initialize a `UIColor` with a color resource.
-    public convenience init(poResource: POColorResource) {
+    @_spi(PO) public convenience init(poResource: POColorResource) {
         self.init(resource: poResource.colorResource)
     }
 }
