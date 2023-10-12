@@ -77,8 +77,9 @@ public struct PORadioButtonStyle: ButtonStyle {
 
     @Environment(\.isRadioButtonSelected) private var isSelected
     @Environment(\.isControlInvalid) private var isInvalid
+    @Environment(\.sizeCategory) private var sizeCategory
 
-    @POBackport.ScaledMetric(relativeTo: .body) // todo(andrii-vysotskyi): style is not always body
+    @POBackport.ScaledMetric
     private var contentSizeMultipler: CGFloat = 1
 
     // MARK: - Private Methods
@@ -98,7 +99,7 @@ public struct PORadioButtonStyle: ButtonStyle {
 
     private func knobVerticalOffset(typography: POTypography) -> CGFloat {
         if typography.textStyle != nil {
-            return typography.lineHeight * contentSizeMultipler
+            return typography.lineHeight * _contentSizeMultipler.value(relativeTo: typography.textStyle)
         }
         return typography.lineHeight
     }
@@ -106,7 +107,7 @@ public struct PORadioButtonStyle: ButtonStyle {
 
 extension PORadioButtonStyle {
 
-    static let `default` = PORadioButtonStyle(
+    @_spi(PO) public static let `default` = PORadioButtonStyle(
         normal: .init(
             knob: .init(
                 backgroundColor: .clear,

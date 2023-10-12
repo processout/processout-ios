@@ -1,5 +1,5 @@
 //
-//  ScaledMetricBackport.swift
+//  ScaledMetric.swift
 //  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 08.09.2023.
@@ -13,32 +13,38 @@ extension POBackport where Wrapped == Any {
     @propertyWrapper
     struct ScaledMetric<Value: BinaryFloatingPoint>: DynamicProperty {
 
-        /// The value scaled based on the current environment.
-        var wrappedValue: Value {
-            let uiSizeCategory = UIContentSizeCategory(sizeCategory)
-            let traits = UITraitCollection(preferredContentSizeCategory: uiSizeCategory)
-            let scaledValue = metrics?.scaledValue(for: CGFloat(baseValue), compatibleWith: traits)
-            return scaledValue.map(Value.init) ?? baseValue
-        }
-
         /// Creates the scaled metric with an unscaled value and a text style to
         /// scale relative to.
         init(wrappedValue: Value, relativeTo textStyle: UIFont.TextStyle?) {
             baseValue = wrappedValue
-            metrics = textStyle.map(UIFontMetrics.init)
+            self.textStyle = textStyle
         }
 
         /// Creates the scaled metric with an unscaled value using the default
         /// scaling.
         init(wrappedValue: Value) {
             baseValue = wrappedValue
-            metrics = UIFontMetrics(forTextStyle: .body)
+            textStyle = .body
+        }
+
+        /// The value scaled based on the current environment.
+        var wrappedValue: Value {
+            value(relativeTo: textStyle)
+        }
+
+        /// Returns value scaled based on the current environment to scale relative to.
+        func value(relativeTo textStyle: UIFont.TextStyle?) -> Value {
+            let metrics = textStyle.map(UIFontMetrics.init)
+            let uiSizeCategory = UIContentSizeCategory(sizeCategory)
+            let traits = UITraitCollection(preferredContentSizeCategory: uiSizeCategory)
+            let scaledValue = metrics?.scaledValue(for: CGFloat(baseValue), compatibleWith: traits)
+            return scaledValue.map(Value.init) ?? baseValue
         }
 
         // MARK: - Private Properties
 
         private let baseValue: Value
-        private let metrics: UIFontMetrics?
+        private let textStyle: UIFont.TextStyle?
 
         @Environment(\.sizeCategory) private var sizeCategory
     }
