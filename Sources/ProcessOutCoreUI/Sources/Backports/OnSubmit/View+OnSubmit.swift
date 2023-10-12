@@ -35,6 +35,6 @@ extension EnvironmentValues {
     // MARK: - Private Properties
 
     private struct Key: EnvironmentKey {
-        static let defaultValue: (() -> Void)?
+        static let defaultValue: (() -> Void)? = nil
     }
 }
