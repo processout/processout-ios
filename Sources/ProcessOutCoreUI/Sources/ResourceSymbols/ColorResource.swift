@@ -79,8 +79,8 @@ extension POColorResource {
 extension UIKit.UIColor {
 
     /// Initialize a `UIColor` with a color resource.
-    public convenience init(resource: POColorResource) {
-        self.init(resource: resource.colorResource)
+    public convenience init(poResource: POColorResource) {
+        self.init(resource: poResource.colorResource)
     }
 }
 

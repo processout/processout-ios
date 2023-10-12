@@ -23,13 +23,6 @@ targets:
       - path: Scripts/Lint.sh
         name: Swiftlint
         basedOnDependencyAnalysis: false
-      - path: Scripts/SwiftGen.sh
-        name: SwiftGen
-        outputFiles:
-          - $(TARGET_ROOT)/Sources/Generated/Assets+Generated.swift
-          - $(TARGET_ROOT)/Sources/Generated/Files+Generated.swift
-          - $(TARGET_ROOT)/Sources/Generated/Strings+Generated.swift
-        basedOnDependencyAnalysis: false
     sources:
       - path: Sources/ProcessOutCoreUI
     dependencies:
