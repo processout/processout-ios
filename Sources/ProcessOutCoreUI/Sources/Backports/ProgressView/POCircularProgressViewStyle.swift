@@ -10,7 +10,7 @@ import SwiftUI
 @available(iOS, deprecated: 14)
 public struct POCircularProgressViewStyle: POProgressViewStyle {
 
-    public init(style: UIActivityIndicatorView.Style = .medium, tint: UIColor? = nil) {
+    public init(style: UIActivityIndicatorView.Style, tint: UIColor?) {
         self.style = style
         self.tint = tint
     }
@@ -23,6 +23,15 @@ public struct POCircularProgressViewStyle: POProgressViewStyle {
 
     private let style: UIActivityIndicatorView.Style
     private let tint: UIColor?
+}
+
+extension POProgressViewStyle where Self == POCircularProgressViewStyle {
+
+    public static func circular(
+        style: UIActivityIndicatorView.Style = .medium, tint: UIColor? = nil
+    ) -> POCircularProgressViewStyle {
+        POCircularProgressViewStyle(style: style, tint: tint)
+    }
 }
 
 private struct ActivityIndicatorViewRepresentable: UIViewRepresentable {

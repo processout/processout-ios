@@ -98,7 +98,7 @@ extension ButtonStyle where Self == POButtonStyle<POCircularProgressViewStyle> {
                 shadow: .clear,
                 backgroundColor: UIColor(resource: .Action.Primary.disabled)
             ),
-            progressView: POCircularProgressViewStyle(tint: UIColor(resource: .Text.on))
+            progressView: .circular(tint: UIColor(resource: .Text.on))
         )
     }
 
@@ -123,7 +123,7 @@ extension ButtonStyle where Self == POButtonStyle<POCircularProgressViewStyle> {
                 shadow: .clear,
                 backgroundColor: .clear
             ),
-            progressView: POCircularProgressViewStyle(tint: UIColor(resource: .Text.secondary))
+            progressView: .circular(tint: UIColor(resource: .Text.secondary))
         )
     }
 }

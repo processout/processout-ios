@@ -48,6 +48,6 @@ extension EnvironmentValues {
     // MARK: - Private Properties
 
     private struct Key: EnvironmentKey {
-        static var defaultValue = POBackport<Any>.AnyProgressViewStyle(POCircularProgressViewStyle())
+        static var defaultValue = POBackport<Any>.AnyProgressViewStyle(.circular())
     }
 }
