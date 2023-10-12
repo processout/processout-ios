@@ -10,7 +10,7 @@ import UIKit
 /// Defines button's styling information in a specific state.
 public struct POButtonStateStyle {
 
-    /// Text typography.
+    /// Title typography.
     public let title: POTextStyle
 
     /// Border style.
