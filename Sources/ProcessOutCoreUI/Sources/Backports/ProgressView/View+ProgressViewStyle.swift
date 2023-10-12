@@ -11,7 +11,7 @@ import SwiftUI
 extension POBackport where Wrapped: View {
 
     /// Sets the style for progress views within this view.
-    @_spi(PO) public func progressViewStyle<Style: POProgressViewStyle>(_ style: Style) -> some View {
+    public func progressViewStyle<Style: POProgressViewStyle>(_ style: Style) -> some View {
         wrapped.environment(\.backportProgressViewStyle, .init(style))
     }
 }

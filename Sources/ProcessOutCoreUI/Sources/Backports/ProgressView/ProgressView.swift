@@ -10,7 +10,7 @@ import SwiftUI
 @available(iOS, deprecated: 14)
 extension POBackport where Wrapped == Any {
 
-    @_spi(PO) public struct ProgressView: View {
+    public struct ProgressView: View {
 
         public var body: some View {
             style.makeBody()
