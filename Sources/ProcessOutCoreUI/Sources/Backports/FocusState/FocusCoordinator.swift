@@ -62,6 +62,6 @@ extension EnvironmentValues {
     // MARK: - Private Properties
 
     private struct Key: EnvironmentKey {
-        static var defaultValue: FocusCoordinator?
+        static let defaultValue: FocusCoordinator?
     }
 }

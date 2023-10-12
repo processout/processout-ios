@@ -71,6 +71,6 @@ extension EnvironmentValues {
     // MARK: - Private Properties
 
     private struct LabelKey: EnvironmentKey {
-        static var defaultValue = POBackport.SubmitLabel.done
+        static let defaultValue = POBackport.SubmitLabel.done
     }
 }

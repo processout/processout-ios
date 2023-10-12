@@ -9,7 +9,7 @@ import SwiftUI
 
 extension View {
 
-    public func inputStyle(_ style: POInputStyle) -> some View {
+    @_spi(PO) public func inputStyle(_ style: POInputStyle) -> some View {
         environment(\.inputStyle, style)
     }
 }
