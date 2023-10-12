@@ -75,51 +75,55 @@ private enum Constants {
     static let padding = EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8)
 }
 
-extension POButtonStyle where ProgressViewStyle == POCircularProgressViewStyle {
+extension ButtonStyle where Self == POButtonStyle<POCircularProgressViewStyle> {
 
     /// Default style for primary button.
-    @_spi(PO) public static let primary = POButtonStyle(
-        normal: .init(
-            title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
-            border: .clear,
-            shadow: .clear,
-            backgroundColor: UIColor(resource: .Action.Primary.default)
-        ),
-        highlighted: .init(
-            title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
-            border: .clear,
-            shadow: .clear,
-            backgroundColor: UIColor(resource: .Action.Primary.pressed)
-        ),
-        disabled: .init(
-            title: .init(color: UIColor(resource: .Text.disabled), typography: .Fixed.button),
-            border: .clear,
-            shadow: .clear,
-            backgroundColor: UIColor(resource: .Action.Primary.disabled)
-        ),
-        progressView: POCircularProgressViewStyle(tint: UIColor(resource: .Text.on))
-    )
+    @_spi(PO) public static var primary: POButtonStyle<POCircularProgressViewStyle> {
+        POButtonStyle(
+            normal: .init(
+                title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
+                border: .clear,
+                shadow: .clear,
+                backgroundColor: UIColor(resource: .Action.Primary.default)
+            ),
+            highlighted: .init(
+                title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
+                border: .clear,
+                shadow: .clear,
+                backgroundColor: UIColor(resource: .Action.Primary.pressed)
+            ),
+            disabled: .init(
+                title: .init(color: UIColor(resource: .Text.disabled), typography: .Fixed.button),
+                border: .clear,
+                shadow: .clear,
+                backgroundColor: UIColor(resource: .Action.Primary.disabled)
+            ),
+            progressView: POCircularProgressViewStyle(tint: UIColor(resource: .Text.on))
+        )
+    }
 
     /// Default style for secondary button.
-    @_spi(PO) public static var secondary = POButtonStyle(
-        normal: .init(
-            title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
-            border: .regular(color: UIColor(resource: .Border.default)),
-            shadow: .clear,
-            backgroundColor: UIColor(resource: .Action.Secondary.default)
-        ),
-        highlighted: .init(
-            title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
-            border: .regular(color: UIColor(resource: .Border.default)),
-            shadow: .clear,
-            backgroundColor: UIColor(resource: .Action.Secondary.pressed)
-        ),
-        disabled: .init(
-            title: .init(color: UIColor(resource: .Text.disabled), typography: .Fixed.button),
-            border: .regular(color: UIColor(resource: .Action.Border.disabled)),
-            shadow: .clear,
-            backgroundColor: .clear
-        ),
-        progressView: POCircularProgressViewStyle(tint: UIColor(resource: .Text.secondary))
-    )
+    @_spi(PO) public static var secondary: POButtonStyle<POCircularProgressViewStyle> {
+        POButtonStyle(
+            normal: .init(
+                title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
+                border: .regular(color: UIColor(resource: .Border.default)),
+                shadow: .clear,
+                backgroundColor: UIColor(resource: .Action.Secondary.default)
+            ),
+            highlighted: .init(
+                title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
+                border: .regular(color: UIColor(resource: .Border.default)),
+                shadow: .clear,
+                backgroundColor: UIColor(resource: .Action.Secondary.pressed)
+            ),
+            disabled: .init(
+                title: .init(color: UIColor(resource: .Text.disabled), typography: .Fixed.button),
+                border: .regular(color: UIColor(resource: .Action.Border.disabled)),
+                shadow: .clear,
+                backgroundColor: .clear
+            ),
+            progressView: POCircularProgressViewStyle(tint: UIColor(resource: .Text.secondary))
+        )
+    }
 }
