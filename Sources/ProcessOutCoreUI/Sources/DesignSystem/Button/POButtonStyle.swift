@@ -52,6 +52,7 @@ public struct POButtonStyle<ProgressViewStyle: POProgressViewStyle>: ButtonStyle
         .background(Color(currentStyle.backgroundColor))
         .border(style: currentStyle.border)
         .shadow(style: currentStyle.shadow)
+        .contentShape(.rect)
         .allowsHitTesting(isEnabled && !isLoading)
     }
 

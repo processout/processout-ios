@@ -60,7 +60,8 @@ public struct PORadioButtonStyle: ButtonStyle {
                 .frame(minHeight: Constants.knobSize)
         }
         .padding(.vertical, Constants.minVerticalPadding)
-        .frame(minHeight: Constants.minHeight)
+        .frame(maxWidth: .infinity, minHeight: Constants.minHeight, alignment: .leading)
+        .contentShape(.rect)
         .allowsHitTesting(!isSelected)
     }
 
@@ -105,48 +106,52 @@ public struct PORadioButtonStyle: ButtonStyle {
     }
 }
 
-extension PORadioButtonStyle {
+extension ButtonStyle where Self == PORadioButtonStyle {
 
-    @_spi(PO) public static let `default` = PORadioButtonStyle(
-        normal: .init(
-            knob: .init(
-                backgroundColor: .clear,
-                border: .regular(color: UIColor(resource: .Border.default)),
-                innerCircleColor: .clear,
-                innerCircleRadius: 0
+    public static var radio: PORadioButtonStyle {
+        PORadioButtonStyle(
+            normal: .init(
+                knob: .init(
+                    backgroundColor: .clear,
+                    border: .regular(color: UIColor(resource: .Border.default)),
+                    innerCircleColor: .clear,
+                    innerCircleRadius: 0
+                ),
+                value: valueStyle
             ),
-            value: valueStyle
-        ),
-        selected: .init(
-            knob: .init(
-                backgroundColor: .clear,
-                border: .regular(color: UIColor(resource: .Action.Primary.default)),
-                innerCircleColor: UIColor(resource: .Action.Primary.default),
-                innerCircleRadius: 4
+            selected: .init(
+                knob: .init(
+                    backgroundColor: .clear,
+                    border: .regular(color: UIColor(resource: .Action.Primary.default)),
+                    innerCircleColor: UIColor(resource: .Action.Primary.default),
+                    innerCircleRadius: 4
+                ),
+                value: valueStyle
             ),
-            value: valueStyle
-        ),
-        highlighted: .init(
-            knob: .init(
-                backgroundColor: .clear,
-                border: .regular(color: UIColor(resource: .Text.muted)),
-                innerCircleColor: .clear,
-                innerCircleRadius: 0
+            highlighted: .init(
+                knob: .init(
+                    backgroundColor: .clear,
+                    border: .regular(color: UIColor(resource: .Text.muted)),
+                    innerCircleColor: .clear,
+                    innerCircleRadius: 0
+                ),
+                value: valueStyle
             ),
-            value: valueStyle
-        ),
-        error: .init(
-            knob: .init(
-                backgroundColor: .clear,
-                border: .regular(color: UIColor(resource: .Text.error)),
-                innerCircleColor: .clear,
-                innerCircleRadius: 0
-            ),
-            value: valueStyle
+            error: .init(
+                knob: .init(
+                    backgroundColor: .clear,
+                    border: .regular(color: UIColor(resource: .Text.error)),
+                    innerCircleColor: .clear,
+                    innerCircleRadius: 0
+                ),
+                value: valueStyle
+            )
         )
-    )
+    }
 
     // MARK: - Private Properties
 
-    private static let valueStyle = POTextStyle(color: UIColor(resource: .Text.primary), typography: .Fixed.label)
+    private static var valueStyle: POTextStyle {
+        POTextStyle(color: UIColor(resource: .Text.primary), typography: .Fixed.label)
+    }
 }
