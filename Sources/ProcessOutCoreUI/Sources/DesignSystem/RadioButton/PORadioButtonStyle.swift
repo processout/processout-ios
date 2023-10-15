@@ -61,6 +61,7 @@ public struct PORadioButtonStyle: ButtonStyle {
         }
         .padding(.vertical, Constants.minVerticalPadding)
         .frame(maxWidth: .infinity, minHeight: Constants.minHeight, alignment: .leading)
+        .animation(.default, value: isSelected)
         .contentShape(.rect)
         .allowsHitTesting(!isSelected)
     }
