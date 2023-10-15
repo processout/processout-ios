@@ -18,3 +18,21 @@ public protocol POProgressViewStyle {
     /// Creates a view representing the body of a progress view.
     @ViewBuilder func makeBody() -> Self.Body
 }
+
+@available(iOS, deprecated: 14)
+struct AnyProgressViewStyle: POProgressViewStyle {
+
+    init<Style: POProgressViewStyle>(erasing style: Style) {
+        _makeBody = {
+            AnyView(style.makeBody())
+        }
+    }
+
+    func makeBody() -> some View {
+        _makeBody()
+    }
+
+    // MARK: - Private Properties
+
+    private let _makeBody: () -> AnyView
+}

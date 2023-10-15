@@ -12,35 +12,14 @@ extension POBackport where Wrapped: View {
 
     /// Sets the style for progress views within this view.
     public func progressViewStyle<Style: POProgressViewStyle>(_ style: Style) -> some View {
-        wrapped.environment(\.backportProgressViewStyle, .init(style))
-    }
-}
-
-@available(iOS, deprecated: 14)
-extension POBackport where Wrapped == Any {
-
-    struct AnyProgressViewStyle: POProgressViewStyle {
-
-        init<Style: POProgressViewStyle>(_ style: Style) {
-            _makeBody = {
-                AnyView(style.makeBody())
-            }
-        }
-
-        func makeBody() -> some View {
-            _makeBody()
-        }
-
-        // MARK: - Private Properties
-
-        private let _makeBody: () -> AnyView
+        wrapped.environment(\.backportProgressViewStyle, AnyProgressViewStyle(erasing: style))
     }
 }
 
 @available(iOS, deprecated: 14)
 extension EnvironmentValues {
 
-    var backportProgressViewStyle: POBackport<Any>.AnyProgressViewStyle {
+    var backportProgressViewStyle: AnyProgressViewStyle {
         get { self[Key.self] }
         set { self[Key.self] = newValue }
     }
@@ -48,6 +27,6 @@ extension EnvironmentValues {
     // MARK: - Private Properties
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = POBackport<Any>.AnyProgressViewStyle(.circular())
+        static let defaultValue = AnyProgressViewStyle(erasing: .circular())
     }
 }
