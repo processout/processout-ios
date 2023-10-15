@@ -109,7 +109,7 @@ public struct PORadioButtonStyle: ButtonStyle {
 
 extension ButtonStyle where Self == PORadioButtonStyle {
 
-    public static var radio: PORadioButtonStyle {
+    @_spi(PO) public static var radio: PORadioButtonStyle {
         PORadioButtonStyle(
             normal: .init(
                 knob: .init(

@@ -9,7 +9,7 @@ import SwiftUI
 
 /// A type that specifies the appearance and interaction of all pickers
 /// within a view hierarchy.
-public protocol POPickerStyle {
+@_spi(PO) public protocol POPickerStyle {
 
     /// A view representing the appearance and interaction of a `POPicker`.
     associatedtype Body: View
@@ -20,7 +20,7 @@ public protocol POPickerStyle {
     @ViewBuilder func makeBody(configuration: POPickerStyleConfiguration) -> Self.Body
 }
 
-public struct POPickerStyleConfiguration {
+@_spi(PO) public struct POPickerStyleConfiguration {
 
     /// Picker elements.
     public let elements: [POPickerStyleConfigurationElement]
@@ -29,7 +29,7 @@ public struct POPickerStyleConfiguration {
     public let isInvalid: Bool
 }
 
-public struct POPickerStyleConfigurationElement: Identifiable {
+@_spi(PO) public struct POPickerStyleConfigurationElement: Identifiable {
 
     /// The stable identity of the element.
     public let id: AnyHashable

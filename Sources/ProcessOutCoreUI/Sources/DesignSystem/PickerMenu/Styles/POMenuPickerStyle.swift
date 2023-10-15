@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct POMenuPickerStyle: POPickerStyle {
+@_spi(PO) public struct POMenuPickerStyle: POPickerStyle {
 
     public init(inputStyle: POInputStyle? = nil) { // todo(andrii-vysotskyi): add proper default value
         self.inputStyle = inputStyle ?? .medium
@@ -87,7 +87,7 @@ public struct POMenuPickerStyle: POPickerStyle {
     }
 }
 
-extension POPickerStyle where Self == POMenuPickerStyle {
+@_spi(PO) extension POPickerStyle where Self == POMenuPickerStyle {
 
     /// A picker style that presents the options as a menu when the user
     /// presses a button, or as a submenu when nested within a larger menu.

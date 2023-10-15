@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct POPicker<Data: RandomAccessCollection, Id: Hashable>: View {
+@_spi(PO) public struct POPicker<Data: RandomAccessCollection, Id: Hashable>: View {
 
     // swiftlint:disable:next line_length
     public init(_ data: Data, selection: Binding<Data.Element?>, content: @escaping (Data.Element) -> Text) where Data.Element == Id {

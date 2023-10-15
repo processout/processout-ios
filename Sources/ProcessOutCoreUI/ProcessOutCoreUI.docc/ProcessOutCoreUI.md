@@ -34,7 +34,3 @@
 
 - ``POProgressViewStyle``
 - ``POCircularProgressViewStyle``
-
-### Picker Menu
-
-- ``POPickerMenu``
