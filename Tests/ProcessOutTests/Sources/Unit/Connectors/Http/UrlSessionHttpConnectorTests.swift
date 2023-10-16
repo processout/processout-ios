@@ -295,10 +295,10 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
             }
             expectation.fulfill()
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.async {
             cancellable.cancel()
         }
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 3)
     }
 
     // MARK: - Private Nested Types
