@@ -6,8 +6,8 @@
 //
 
 import Foundation
-@_exported import ProcessOut
-@_exported import Checkout3DS
+import ProcessOut
+import Checkout3DS
 
 /// Builder to configure and create service capable of handling 3DS challenges using Checkout3DS SDK.
 public final class POCheckout3DSServiceBuilder {
