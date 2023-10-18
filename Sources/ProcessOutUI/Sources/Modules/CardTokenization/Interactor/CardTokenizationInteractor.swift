@@ -5,7 +5,17 @@
 //  Created by Andrii Vysotskyi on 18.07.2023.
 //
 
-protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState> {
+import Foundation
+
+protocol CardTokenizationInteractor: ObservableObject {
+
+    typealias State = CardTokenizationInteractorState
+
+    /// Current state.
+    var state: State { get }
+
+    /// Starts interactor.
+    func start()
 
     /// Updates card information parameter with given id.
     func update(parameterId: State.ParameterId, value: String)

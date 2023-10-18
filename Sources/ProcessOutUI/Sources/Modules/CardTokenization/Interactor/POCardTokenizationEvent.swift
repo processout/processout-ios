@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 30.08.2023.
 //
 
+import ProcessOut
+
 /// Describes events that could happen during card tokenization lifecycle.
 public enum POCardTokenizationEvent {
 

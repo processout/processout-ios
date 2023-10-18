@@ -5,8 +5,9 @@
 //  Created by Andrii Vysotskyi on 09.08.2023.
 //
 
+import ProcessOut
+
 /// Card tokenization module delegate definition.
-@_spi(PO)
 public protocol POCardTokenizationDelegate: AnyObject {
 
     /// Invoked when module emits event.
@@ -15,7 +16,7 @@ public protocol POCardTokenizationDelegate: AnyObject {
     /// Allows delegate to additionally process tokenized card before ending module's lifecycle. For example
     /// it is possible to authorize an invoice or assign customer token.
     /// Default implementation immediately calls completion.
-    func processTokenizedCard(card: POCard, completion: (Result<POCardTokenizationProcessAction?, Error>) -> Void)
+    func processTokenizedCard(card: POCard) async throws -> POCardTokenizationProcessAction?
 
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
@@ -32,9 +33,8 @@ extension POCardTokenizationDelegate {
         // Ignroed
     }
 
-    // swiftlint:disable:next line_length
-    public func processTokenizedCard(card: POCard, completion: (Result<POCardTokenizationProcessAction?, Error>) -> Void) {
-        completion(.success(nil))
+    public func processTokenizedCard(card: POCard) async throws -> POCardTokenizationProcessAction? {
+        nil
     }
 
     public func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {

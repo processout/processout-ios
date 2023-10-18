@@ -5,9 +5,11 @@
 //  Created by Andrii Vysotskyi on 18.07.2023.
 //
 
+import Foundation
+@_spi(PO) import ProcessOut
+
 // swiftlint:disable:next type_body_length
-final class DefaultCardTokenizationInteractor:
-    BaseInteractor<CardTokenizationInteractorState>, CardTokenizationInteractor {
+final class DefaultCardTokenizationInteractor: CardTokenizationInteractor {
 
     typealias Completion = (Result<POCard, POFailure>) -> Void
 
@@ -31,12 +33,15 @@ final class DefaultCardTokenizationInteractor:
         self.billingAddress = billingAddress
         self.delegate = delegate
         self.completion = completion
-        super.init(state: .idle)
+        state = .idle
     }
 
     // MARK: - CardTokenizationInteractor
 
-    override func start() {
+    @Published
+    private(set) var state: State
+
+    func start() {
         guard case .idle = state else {
             return
         }
@@ -143,8 +148,8 @@ final class DefaultCardTokenizationInteractor:
     private let logger: POLogger
     private let completion: Completion
 
-    private lazy var cardNumberFormatter = CardNumberFormatter()
-    private lazy var cardExpirationFormatter = CardExpirationFormatter()
+    private lazy var cardNumberFormatter = POCardNumberFormatter()
+    private lazy var cardExpirationFormatter = POCardExpirationFormatter()
 
     private weak var delegate: POCardTokenizationDelegate?
     private var issuerInformationCancellable: POCancellable?
@@ -157,38 +162,38 @@ final class DefaultCardTokenizationInteractor:
             setFailureStateUnchecked(failure: failure)
             return
         }
-        var errorMessage: String?
+        var errorMessage: StringResource
         var invalidParameterIds: [State.ParameterId] = []
         switch failure.code {
         case .generic(.requestInvalidCard), .generic(.cardInvalid):
             invalidParameterIds.append(contentsOf: [\.number, \.expiration, \.cvc, \.cardholderName])
-            errorMessage = Strings.CardTokenization.Error.card
+            errorMessage = .CardTokenization.Error.card
         case .generic(.cardInvalidNumber), .generic(.cardMissingNumber):
             invalidParameterIds.append(\.number)
-            errorMessage = Strings.CardTokenization.Error.cardNumber
+            errorMessage = .CardTokenization.Error.cardNumber
         case .generic(.cardInvalidExpiryDate),
-             .generic(.cardMissingExpiry),
-             .generic(.cardInvalidExpiryMonth),
-             .generic(.cardInvalidExpiryYear):
+                .generic(.cardMissingExpiry),
+                .generic(.cardInvalidExpiryMonth),
+                .generic(.cardInvalidExpiryYear):
             invalidParameterIds.append(\.expiration)
-            errorMessage = Strings.CardTokenization.Error.cardExpiration
+            errorMessage = .CardTokenization.Error.cardExpiration
         case .generic(.cardBadTrackData):
             invalidParameterIds.append(contentsOf: [\.expiration, \.cvc])
-            errorMessage = Strings.CardTokenization.Error.trackData
+            errorMessage = .CardTokenization.Error.trackData
         case .generic(.cardMissingCvc), .generic(.cardFailedCvc), .generic(.cardFailedCvcAndAvs):
             invalidParameterIds.append(\.cvc)
-            errorMessage = Strings.CardTokenization.Error.cvc
+            errorMessage = .CardTokenization.Error.cvc
         case .generic(.cardInvalidName):
             invalidParameterIds.append(\.cardholderName)
-            errorMessage = Strings.CardTokenization.Error.cardholderName
+            errorMessage = .CardTokenization.Error.cardholderName
         default:
-            errorMessage = Strings.CardTokenization.Error.generic
+            errorMessage = .CardTokenization.Error.generic
         }
         for keyPath in invalidParameterIds {
             startedState[keyPath: keyPath].isValid = false
         }
         // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
-        startedState.recentErrorMessage = errorMessage
+        startedState.recentErrorMessage = String(resource: errorMessage)
         state = .started(startedState)
         logger.debug("Did recover started state after failure: \(failure)")
     }
@@ -200,17 +205,19 @@ final class DefaultCardTokenizationInteractor:
         logger.debug("Did tokenize card: \(String(describing: card))")
         delegate?.cardTokenizationDidEmitEvent(.didTokenize(card: card))
         if let delegate {
-            delegate.processTokenizedCard(card: card) { [weak self] result in
-                switch result {
-                case .success(let .authorizeInvoice(request)):
-                    self?.authorizeInvoice(card: card, request: request)
-                case .success(let .assignToken(request)):
-                    self?.assignCustomerToken(card: card, request: request)
-                case .success(nil):
-                    self?.setTokenizedState(card: card)
-                case .failure(let error):
+            Task {
+                do {
+                    switch try await delegate.processTokenizedCard(card: card) {
+                    case let .authorizeInvoice(request):
+                        authorizeInvoice(card: card, request: request)
+                    case let .assignToken(request):
+                        assignCustomerToken(card: card, request: request)
+                    case nil:
+                        setTokenizedState(card: card)
+                    }
+                } catch {
                     let failure = POFailure(code: .generic(.mobile), underlyingError: error)
-                    self?.restoreStartedState(tokenizationFailure: failure)
+                    restoreStartedState(tokenizationFailure: failure)
                 }
             }
         } else {
@@ -298,7 +305,9 @@ final class DefaultCardTokenizationInteractor:
                     logger.info("Did fail to fetch issuer information: \(failure)", attributes: ["IIN": iin])
                 case .success(let issuerInformation):
                     startedState.issuerInformation = issuerInformation
-                    startedState.preferredScheme = self?.delegate?.preferredScheme(issuerInformation: issuerInformation)
+                    startedState.preferredScheme = self?.delegate?.preferredScheme(
+                        issuerInformation: issuerInformation
+                    )
                     self?.state = .started(startedState)
                 }
             }
@@ -321,7 +330,7 @@ final class DefaultCardTokenizationInteractor:
         guard let scheme = CardTokenizationSchemeProvider().scheme(cardNumber: number) else {
             return nil
         }
-        return .init(scheme: scheme, coScheme: nil, type: nil, bankName: nil, brand: nil, category: nil)
+        return .init(scheme: scheme)
     }
 
     // MARK: - Utils

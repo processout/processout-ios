@@ -5,6 +5,9 @@
 //  Created by Andrii Vysotskyi on 18.08.2023.
 //
 
+import Foundation
+@_spi(PO) import ProcessOut
+
 // todo(andrii-vysotskyi): support more schemes
 struct CardTokenizationSchemeProvider {
 
@@ -147,5 +150,5 @@ struct CardTokenizationSchemeProvider {
         .init(scheme: "uatp", numbers: .exact(1), length: 1)
     ]
 
-    private let cardNumberFormatter = CardNumberFormatter()
+    private let cardNumberFormatter = POCardNumberFormatter()
 }

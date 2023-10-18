@@ -5,8 +5,9 @@
 //  Created by Andrii Vysotskyi on 10.08.2023.
 //
 
+import ProcessOut
+
 /// Defines possible actions to perform with tokenized card.
-@_spi(PO)
 public enum POCardTokenizationProcessAction {
 
     /// Use this action to authorize an invoice.
