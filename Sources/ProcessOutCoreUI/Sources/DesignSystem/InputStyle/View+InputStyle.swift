@@ -9,7 +9,7 @@ import SwiftUI
 
 extension View {
 
-    public func inputStyle(_ style: POInputStyle) -> some View {
+    @_spi(PO) public func inputStyle(_ style: POInputStyle) -> some View {
         environment(\.inputStyle, style)
     }
 }
@@ -17,13 +17,13 @@ extension View {
 extension EnvironmentValues {
 
     var inputStyle: POInputStyle {
-        get { self[StyleKey.self] }
-        set { self[StyleKey.self] = newValue }
+        get { self[Key.self] }
+        set { self[Key.self] = newValue }
     }
 
     // MARK: - Private Nested Types
 
-    private struct StyleKey: EnvironmentKey {
-        static let defaultValue = POInputStyle.default()
+    private struct Key: EnvironmentKey {
+        static let defaultValue: POInputStyle = .medium
     }
 }

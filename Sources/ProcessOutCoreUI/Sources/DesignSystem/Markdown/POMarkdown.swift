@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct POMarkdown: View {
+@_spi(PO) public struct POMarkdown: View {
 
     public init(_ string: String) {
         self.string = string

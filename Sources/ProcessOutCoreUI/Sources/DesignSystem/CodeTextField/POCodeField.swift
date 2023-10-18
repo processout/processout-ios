@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct POCodeField: View {
+@_spi(PO) public struct POCodeField: View {
 
     /// - Parameters:
     ///   - length: code text field length.

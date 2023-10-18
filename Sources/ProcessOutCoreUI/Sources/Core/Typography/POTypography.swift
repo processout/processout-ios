@@ -42,15 +42,13 @@ public struct POTypography {
 
 extension POTypography {
 
-    public enum Fixed {
-
-        /// Use for captions, status labels and tags.
-        public static let caption = POTypography(
-            font: UIFont(.WorkSans.regular, size: 12), textStyle: .caption1, lineHeight: 16
-        )
+    @_spi(PO) public enum Fixed {
 
         /// Use for buttons.
-        public static let button = POTypography(font: UIFont(.WorkSans.medium, size: 14), lineHeight: 18)
+        static let button = POTypography(font: UIFont(.WorkSans.medium, size: 14), lineHeight: 18)
+
+        /// Use for form components, error text and key value data.
+        static let label = POTypography(font: UIFont(.WorkSans.regular, size: 14), lineHeight: 18)
 
         /// Use for body copy on larger screens, or smaller blocks of text.
         public static let body = POTypography(
@@ -58,15 +56,12 @@ extension POTypography {
         )
 
         /// Use for form components, error text and key value data.
-        public static let label = POTypography(font: UIFont(.WorkSans.regular, size: 14), lineHeight: 18)
-
-        /// Use for form components, error text and key value data.
         public static let labelHeading = POTypography(
             font: UIFont(.WorkSans.medium, size: 14), textStyle: .subheadline, lineHeight: 18
         )
     }
 
-    public enum Medium {
+    @_spi(PO) public enum Medium {
 
         /// Use for page titles.
         public static let title = POTypography(
@@ -75,7 +70,7 @@ extension POTypography {
     }
 
     /// Registers all custom fonts.
-    public static func registerFonts() {
+    @_spi(PO) public static func registerFonts() {
         FontResource.register()
     }
 }

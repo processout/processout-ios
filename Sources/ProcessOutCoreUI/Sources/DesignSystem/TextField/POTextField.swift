@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct POTextField: View {
+@_spi(PO) public struct POTextField: View {
 
     /// - Parameters:
     ///   - text: The underlying text to edit.
@@ -26,7 +26,7 @@ public struct POTextField: View {
             text: text, formatter: formatter, prompt: prompt, style: style
         )
         .padding(Constants.padding)
-        .frame(maxWidth: .infinity, minHeight: Constants.height)
+        .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
         .background(Color(style.backgroundColor))
         .border(style: style.border)
         .shadow(style: style.shadow)
@@ -37,8 +37,8 @@ public struct POTextField: View {
     // MARK: - Nested Types
 
     private enum Constants {
-        static let height: CGFloat = 44
-        static let padding = EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
+        static let minHeight: CGFloat = 44
+        static let padding = EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)
     }
 
     // MARK: - Private Properties

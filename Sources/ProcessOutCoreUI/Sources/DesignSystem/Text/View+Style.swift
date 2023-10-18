@@ -12,7 +12,7 @@ extension View {
     /// Applies given `style` to text.
     ///
     /// - NOTE: When `addPadding` is set to true this method has a cumulative effect.
-    public func textStyle(_ style: POTextStyle, addPadding: Bool = true) -> some View {
+    @_spi(PO) public func textStyle(_ style: POTextStyle, addPadding: Bool = true) -> some View {
         modifier(ContentModifier(style: style, addPadding: addPadding))
     }
 }

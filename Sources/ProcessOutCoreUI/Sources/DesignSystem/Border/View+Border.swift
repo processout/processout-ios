@@ -10,7 +10,7 @@ import SwiftUI
 extension View {
 
     /// Applies border of a given style to view.
-    public func border(style: POBorderStyle) -> some View {
+    func border(style: POBorderStyle) -> some View {
         let borderRectangle = RoundedRectangle(cornerRadius: style.radius)
             .stroke(Color(style.color), lineWidth: style.width)
         return self.overlay(borderRectangle).clipShape(RoundedRectangle(cornerRadius: style.radius))
