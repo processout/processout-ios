@@ -34,6 +34,8 @@ targets:
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.ui
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutUI
+      LOCALIZED_STRING_MACRO_NAMES: "$(inherited) StringResource"
+      LOCALIZATION_PREFERS_STRING_CATALOGS: true
     preBuildScripts:
       - path: Scripts/Lint.sh
         name: Swiftlint
