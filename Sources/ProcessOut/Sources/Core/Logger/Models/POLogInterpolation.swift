@@ -1,15 +1,15 @@
 //
-//  LogInterpolation.swift
+//  POLogInterpolation.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 25.10.2022.
 //
 
-struct LogInterpolation: StringInterpolationProtocol {
+@_spi(PO) public struct POLogInterpolation: StringInterpolationProtocol {
 
     /// Privacy options for specifying privacy level of the interpolated expressions
     /// in the string interpolations passed to the log APIs.
-    enum Privacy {
+    public enum Privacy {
 
         /// Sets the privacy level of an interpolated value to public.
         ///
@@ -27,11 +27,11 @@ struct LogInterpolation: StringInterpolationProtocol {
     /// Interpolation's content.
     private(set) var value: String
 
-    mutating func appendLiteral(_ literal: String) {
+    public mutating func appendLiteral(_ literal: String) {
         value.append(literal)
     }
 
-    mutating func appendInterpolation(_ value: String, privacy: Privacy = .public) {
+    public mutating func appendInterpolation(_ value: String, privacy: Privacy = .public) {
         switch privacy {
         case .public:
             self.value.append(value)
@@ -40,15 +40,17 @@ struct LogInterpolation: StringInterpolationProtocol {
         }
     }
 
-    mutating func appendInterpolation<Value: CustomStringConvertible>(_ value: Value, privacy: Privacy = .public) {
+    public mutating func appendInterpolation<Value: CustomStringConvertible>(
+        _ value: Value, privacy: Privacy = .public
+    ) {
         appendInterpolation(value.description, privacy: privacy)
     }
 
-    mutating func appendInterpolation(_ error: Error, privacy: Privacy = .public) {
+    public mutating func appendInterpolation(_ error: Error, privacy: Privacy = .public) {
         appendInterpolation(String(describing: error), privacy: privacy)
     }
 
-    init(literalCapacity: Int, interpolationCount: Int) {
+    public init(literalCapacity: Int, interpolationCount: Int) {
         value = String()
         value.reserveCapacity(literalCapacity)
     }
