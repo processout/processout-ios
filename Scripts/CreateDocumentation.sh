@@ -29,9 +29,6 @@ function build_doc {(
 mkdir -p $DOCC_TARGET_OUTPUT_DIR
 mkdir -p $DOCC_OUTPUT_DIR
 
-# Remove @_exported imports to avoid exposing unwanted symbols
-find . -type f -path './Sources/*' -name '*.swift' | xargs sed -Ei "" 's/@_exported import/import/g'
-
 # Generate documentation for the primary 'ProcessOut' target
 build_doc "ProcessOut" "$DOCC_OUTPUT_DIR"
 
