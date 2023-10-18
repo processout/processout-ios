@@ -1,5 +1,5 @@
 //
-//  CardExpirationFormatter.swift
+//  POCardExpirationFormatter.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 21.07.2023.
@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class CardExpirationFormatter: Formatter {
+@_spi(PO) public final class POCardExpirationFormatter: Formatter {
 
-    override init() {
+    override public init() {
         regexProvider = RegexProvider.shared
         super.init()
     }
@@ -20,7 +20,7 @@ final class CardExpirationFormatter: Formatter {
     }
 
     /// Returns formatted version of given expiration string.
-    func string(from string: String) -> String {
+    public func string(from string: String) -> String {
         let expiration = self.expiration(from: string)
         guard !expiration.month.isEmpty else {
             return ""
@@ -28,7 +28,7 @@ final class CardExpirationFormatter: Formatter {
         return formatted(month: expiration.month, year: expiration.year)
     }
 
-    func expirationMonth(from string: String) -> Int? {
+    public func expirationMonth(from string: String) -> Int? {
         let monthDescription = expiration(from: string).month
         guard let month = Int(monthDescription), month > 0, month <= 12 else {
             return nil
@@ -36,21 +36,21 @@ final class CardExpirationFormatter: Formatter {
         return month
     }
 
-    func expirationYear(from string: String) -> Int? {
+    public func expirationYear(from string: String) -> Int? {
         let yearDescription = expiration(from: string).year
         return Int(yearDescription)
     }
 
     // MARK: - Formatter
 
-    override func string(for obj: Any?) -> String? {
+    override public func string(for obj: Any?) -> String? {
         guard let phoneNumber = obj as? String else {
             return nil
         }
         return string(from: phoneNumber)
     }
 
-    override func isPartialStringValid(
+    override public func isPartialStringValid(
         _ partialStringPtr: AutoreleasingUnsafeMutablePointer<NSString>, // swiftlint:disable:this legacy_objc_type
         proposedSelectedRange proposedSelRangePtr: NSRangePointer?,
         originalString origString: String,

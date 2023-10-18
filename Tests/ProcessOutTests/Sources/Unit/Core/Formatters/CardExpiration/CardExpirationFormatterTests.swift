@@ -12,7 +12,7 @@ final class CardExpirationFormatterTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        sut = CardExpirationFormatter()
+        sut = POCardExpirationFormatter()
     }
 
     func test_string() {
@@ -105,5 +105,5 @@ final class CardExpirationFormatterTests: XCTestCase {
 
     // MARK: - Private Properties
 
-    private var sut: CardExpirationFormatter!
+    private var sut: POCardExpirationFormatter!
 }

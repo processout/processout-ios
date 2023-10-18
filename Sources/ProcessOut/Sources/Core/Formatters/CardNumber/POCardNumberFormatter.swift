@@ -1,5 +1,5 @@
 //
-//  CardNumberFormatter.swift
+//  POCardNumberFormatter.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 18.07.2023.
@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class CardNumberFormatter: Formatter {
+@_spi(PO) public final class POCardNumberFormatter: Formatter {
 
-    func string(from partialNumber: String) -> String {
+    public func string(from partialNumber: String) -> String {
         let normalizedNumber = normalized(number: partialNumber).prefix(Constants.maxLength)
         for format in formats {
             if let formattedNumber = attemptToFormat(cardNumber: normalizedNumber, format: format) {
@@ -19,20 +19,20 @@ final class CardNumberFormatter: Formatter {
         return attemptToFormat(cardNumber: normalizedNumber, pattern: Constants.defaultPattern) ?? partialNumber
     }
 
-    func normalized(number: String) -> String {
+    public func normalized(number: String) -> String {
         number.removingCharacters(in: Constants.significantCharacters.inverted)
     }
 
     // MARK: - Formatter
 
-    override func string(for obj: Any?) -> String? {
+    override public func string(for obj: Any?) -> String? {
         guard let cardNumber = obj as? String else {
             return nil
         }
         return string(from: cardNumber)
     }
 
-    override func isPartialStringValid(
+    override public func isPartialStringValid(
         _ partialStringPtr: AutoreleasingUnsafeMutablePointer<NSString>, // swiftlint:disable:this legacy_objc_type
         proposedSelectedRange proposedSelRangePtr: NSRangePointer?,
         originalString origString: String,
