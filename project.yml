@@ -8,9 +8,9 @@ settings:
 options:
   transitivelyLinkDependencies: true
 packages:
-  CheckoutEventLoggerKit:
-    url: https://github.com/checkout/checkout-event-logger-ios-framework
-    from: 1.2.4
+  Checkout3DSPackages:
+    url: https://github.com/checkout/checkout-3ds-sdk-ios
+    version: 3.2.1
 targets:
   ProcessOutCoreUI:
     type: framework
@@ -90,10 +90,8 @@ targets:
         name: Swiftlint
         basedOnDependencyAnalysis: false
     dependencies:
-      - package: CheckoutEventLoggerKit
+      - package: Checkout3DSPackages
       - target: ProcessOut
-      - framework: Vendor/Checkout3DS.xcframework
-      - framework: Vendor/JOSESwift.xcframework
     sources: Sources/ProcessOutCheckout3DS
   ProcessOutCheckout3DSTests:
     type: bundle.unit-test
