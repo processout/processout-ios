@@ -48,7 +48,7 @@ extension POTypography {
         static let button = POTypography(font: UIFont(.WorkSans.medium, size: 14), lineHeight: 18)
 
         /// Use for form components, error text and key value data.
-        static let label = POTypography(font: UIFont(.WorkSans.regular, size: 14), lineHeight: 18)
+        public static let label = POTypography(font: UIFont(.WorkSans.regular, size: 14), lineHeight: 18)
 
         /// Use for body copy on larger screens, or smaller blocks of text.
         public static let body = POTypography(
