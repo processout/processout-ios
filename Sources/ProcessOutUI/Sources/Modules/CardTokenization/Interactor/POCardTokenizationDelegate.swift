@@ -15,8 +15,10 @@ public protocol POCardTokenizationDelegate: AnyObject {
 
     /// Allows delegate to additionally process tokenized card before ending module's lifecycle. For example
     /// it is possible to authorize an invoice or assign customer token.
-    /// Default implementation immediately calls completion.
-    func processTokenizedCard(card: POCard) async throws -> POCardTokenizationProcessAction?
+    /// Default implementation does nothing.
+    ///
+    /// - NOTE: When possible please prefer throwing `POFailure` instead of other error types.
+    func processTokenizedCard(card: POCard) async throws
 
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
@@ -33,8 +35,8 @@ extension POCardTokenizationDelegate {
         // Ignroed
     }
 
-    public func processTokenizedCard(card: POCard) async throws -> POCardTokenizationProcessAction? {
-        nil
+    public func processTokenizedCard(card: POCard) async throws {
+        // Ignored
     }
 
     public func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {

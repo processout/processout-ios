@@ -8,8 +8,8 @@
 import Foundation
 @_spi(PO) import ProcessOut
 
-// swiftlint:disable:next type_body_length
-final class DefaultCardTokenizationInteractor: CardTokenizationInteractor {
+final class DefaultCardTokenizationInteractor:
+    BaseInteractor<CardTokenizationInteractorState>, CardTokenizationInteractor {
 
     typealias Completion = (Result<POCard, POFailure>) -> Void
 
@@ -17,31 +17,22 @@ final class DefaultCardTokenizationInteractor: CardTokenizationInteractor {
 
     init(
         cardsService: POCardsService,
-        invoicesService: POInvoicesService,
-        customerTokensService: POCustomerTokensService,
-        threeDSService: PO3DSService?,
         logger: POLogger,
         billingAddress: POContact?,
         delegate: POCardTokenizationDelegate?,
         completion: @escaping Completion
     ) {
         self.cardsService = cardsService
-        self.invoicesService = invoicesService
-        self.customerTokensService = customerTokensService
-        self.threeDSService = threeDSService
         self.logger = logger
         self.billingAddress = billingAddress
         self.delegate = delegate
         self.completion = completion
-        state = .idle
+        super.init(state: .idle)
     }
 
     // MARK: - CardTokenizationInteractor
 
-    @Published
-    private(set) var state: State
-
-    func start() {
+    override func start() {
         guard case .idle = state else {
             return
         }
@@ -93,7 +84,7 @@ final class DefaultCardTokenizationInteractor: CardTokenizationInteractor {
         delegate?.cardTokenizationDidEmitEvent(.parametersChanged)
     }
 
-    func tokenize() {
+    @MainActor func tokenize() {
         guard case .started(let startedState) = state else {
             return
         }
@@ -114,12 +105,18 @@ final class DefaultCardTokenizationInteractor: CardTokenizationInteractor {
             preferredScheme: startedState.preferredScheme,
             metadata: nil // todo(andrii-vysotskyi): allow merchant to inject tokenization metadata
         )
-        cardsService.tokenize(request: request) { [weak self] result in
-            switch result {
-            case .success(let card):
-                self?.processTokenizedCard(card: card)
-            case .failure(let failure):
-                self?.restoreStartedState(tokenizationFailure: failure)
+        Task {
+            do {
+                let card = try await cardsService.tokenize(request: request)
+                logger.debug("Did tokenize card: \(String(describing: card))")
+                delegate?.cardTokenizationDidEmitEvent(.didTokenize(card: card))
+                try await delegate?.processTokenizedCard(card: card)
+                setTokenizedState(card: card)
+            } catch let error as POFailure {
+                restoreStartedState(tokenizationFailure: error)
+            } catch {
+                let failure = POFailure(code: .generic(.mobile), underlyingError: error)
+                restoreStartedState(tokenizationFailure: failure)
             }
         }
     }
@@ -141,9 +138,6 @@ final class DefaultCardTokenizationInteractor: CardTokenizationInteractor {
     // MARK: - Private Properties
 
     private let cardsService: POCardsService
-    private let invoicesService: POInvoicesService
-    private let customerTokensService: POCustomerTokensService
-    private let threeDSService: PO3DSService?
     private let billingAddress: POContact?
     private let logger: POLogger
     private let completion: Completion
@@ -196,63 +190,6 @@ final class DefaultCardTokenizationInteractor: CardTokenizationInteractor {
         startedState.recentErrorMessage = String(resource: errorMessage)
         state = .started(startedState)
         logger.debug("Did recover started state after failure: \(failure)")
-    }
-
-    private func processTokenizedCard(card: POCard) {
-        guard case .tokenizing = state else {
-            return
-        }
-        logger.debug("Did tokenize card: \(String(describing: card))")
-        delegate?.cardTokenizationDidEmitEvent(.didTokenize(card: card))
-        if let delegate {
-            Task {
-                do {
-                    switch try await delegate.processTokenizedCard(card: card) {
-                    case let .authorizeInvoice(request):
-                        authorizeInvoice(card: card, request: request)
-                    case let .assignToken(request):
-                        assignCustomerToken(card: card, request: request)
-                    case nil:
-                        setTokenizedState(card: card)
-                    }
-                } catch {
-                    let failure = POFailure(code: .generic(.mobile), underlyingError: error)
-                    restoreStartedState(tokenizationFailure: failure)
-                }
-            }
-        } else {
-            setTokenizedState(card: card)
-        }
-    }
-
-    private func authorizeInvoice(card: POCard, request: POInvoiceAuthorizationRequest) {
-        guard case .tokenizing = state else {
-            return
-        }
-        logger.debug("Will authorize invoice", attributes: ["InvoiceId": request.invoiceId, "CardId": card.id])
-        guard let threeDSService else {
-            preconditionFailure("3DS service must be set to authorize invoice.")
-        }
-        invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService) { [weak self] result in
-            self?.setTokenizedState(result: result, card: card)
-        }
-    }
-
-    private func assignCustomerToken(card: POCard, request: POAssignCustomerTokenRequest) {
-        guard case .tokenizing = state else {
-            return
-        }
-        logger.debug("Will assign customer token", attributes: ["TokenId": request.tokenId, "CardId": card.id])
-        guard let threeDSService else {
-            preconditionFailure("3DS service must be set to authorize invoice.")
-        }
-        customerTokensService.assignCustomerToken(
-            request: request,
-            threeDSService: threeDSService,
-            completion: { [weak self] result in
-                self?.setTokenizedState(result: result, card: card)
-            }
-        )
     }
 
     private func setTokenizedState<T>(result: Result<T, POFailure>, card: POCard) {
