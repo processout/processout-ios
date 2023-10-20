@@ -37,33 +37,35 @@ public struct POButtonStyle<ProgressViewStyle: POProgressViewStyle>: ButtonStyle
     // MARK: - ButtonStyle
 
     public func makeBody(configuration: Configuration) -> some View {
-        let currentStyle = stateStyle(isPressed: configuration.isPressed)
-        ZStack {
-            POBackport<Any>.ProgressView()
-                .backport.progressViewStyle(progressView)
-                .opacity(isLoading ? 1 : 0)
-            configuration.label
-                .textStyle(currentStyle.title)
-                .multilineTextAlignment(.center)
-                .opacity(isLoading ? 0 : 1)
+        ContentView { isEnabled, isLoading in
+            let currentStyle = stateStyle(
+                isEnabled: isEnabled, isLoading: isLoading, isPressed: configuration.isPressed
+            )
+            ZStack {
+                POBackport<Any>.ProgressView()
+                    .backport.progressViewStyle(progressView)
+                    .opacity(isLoading ? 1 : 0)
+                configuration.label
+                    .textStyle(currentStyle.title)
+                    .multilineTextAlignment(.center)
+                    .opacity(isLoading ? 0 : 1)
+            }
+            .padding(Constants.padding)
+            .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
+            .background(Color(currentStyle.backgroundColor))
+            .border(style: currentStyle.border)
+            .shadow(style: currentStyle.shadow)
+            .contentShape(.rect)
+            .allowsHitTesting(isEnabled && !isLoading)
         }
-        .padding(Constants.padding)
-        .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
-        .background(Color(currentStyle.backgroundColor))
-        .border(style: currentStyle.border)
-        .shadow(style: currentStyle.shadow)
-        .contentShape(.rect)
-        .allowsHitTesting(isEnabled && !isLoading)
     }
-
-    // MARK: - Private Properties
-
-    @Environment(\.isEnabled) private var isEnabled
-    @Environment(\.isButtonLoading) private var isLoading
 
     // MARK: - Private Methods
 
-    private func stateStyle(isPressed: Bool) -> POButtonStateStyle {
+    private func stateStyle(isEnabled: Bool, isLoading: Bool, isPressed: Bool) -> POButtonStateStyle {
+        if isLoading {
+            return normal
+        }
         if !isEnabled {
             return disabled
         }
@@ -71,60 +73,24 @@ public struct POButtonStyle<ProgressViewStyle: POProgressViewStyle>: ButtonStyle
     }
 }
 
+// Environments are not propagated directly to ButtonStyle in any iOS before 14.5 workaround is
+// to wrap content into additional view and extract them.
+private struct ContentView<Content: View>: View {
+
+    @ViewBuilder
+    let content: (_ isEnabled: Bool, _ isLoading: Bool) -> Content
+
+    var body: some View {
+        content(isEnabled, isLoading)
+    }
+
+    // MARK: - Private Properties
+
+    @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.isButtonLoading) private var isLoading
+}
+
 private enum Constants {
     static let minHeight: CGFloat = 44
     static let padding = EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8)
-}
-
-extension ButtonStyle where Self == POButtonStyle<POCircularProgressViewStyle> {
-
-    /// Default style for primary button.
-    @_spi(PO) public static var primary: POButtonStyle<POCircularProgressViewStyle> {
-        POButtonStyle(
-            normal: .init(
-                title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
-                border: .clear,
-                shadow: .clear,
-                backgroundColor: UIColor(resource: .Action.Primary.default)
-            ),
-            highlighted: .init(
-                title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
-                border: .clear,
-                shadow: .clear,
-                backgroundColor: UIColor(resource: .Action.Primary.pressed)
-            ),
-            disabled: .init(
-                title: .init(color: UIColor(resource: .Text.disabled), typography: .Fixed.button),
-                border: .clear,
-                shadow: .clear,
-                backgroundColor: UIColor(resource: .Action.Primary.disabled)
-            ),
-            progressView: .circular(tint: UIColor(resource: .Text.on))
-        )
-    }
-
-    /// Default style for secondary button.
-    @_spi(PO) public static var secondary: POButtonStyle<POCircularProgressViewStyle> {
-        POButtonStyle(
-            normal: .init(
-                title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
-                border: .regular(color: UIColor(resource: .Border.default)),
-                shadow: .clear,
-                backgroundColor: UIColor(resource: .Action.Secondary.default)
-            ),
-            highlighted: .init(
-                title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
-                border: .regular(color: UIColor(resource: .Border.default)),
-                shadow: .clear,
-                backgroundColor: UIColor(resource: .Action.Secondary.pressed)
-            ),
-            disabled: .init(
-                title: .init(color: UIColor(resource: .Text.disabled), typography: .Fixed.button),
-                border: .regular(color: UIColor(resource: .Action.Border.disabled)),
-                shadow: .clear,
-                backgroundColor: .clear
-            ),
-            progressView: .circular(tint: UIColor(resource: .Text.secondary))
-        )
-    }
 }
