@@ -9,9 +9,9 @@ import SwiftUI
 
 /// The `AnyHashable` type forwards body creation to an underlying style value,
 /// hiding the type of the wrapped value.
-public struct POAnyButtonStyle: ButtonStyle {
+@_spi(PO) public struct POAnyButtonStyle: ButtonStyle {
 
-    public init<Style: ButtonStyle>(erasing style: Style) {
+    public init(erasing style: any ButtonStyle) {
         self.style = style
     }
 

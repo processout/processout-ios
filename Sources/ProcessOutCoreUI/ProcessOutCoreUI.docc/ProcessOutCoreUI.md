@@ -14,7 +14,6 @@
 
 ### Button
 
-- ``POAnyButtonStyle``
 - ``POButtonStyle``
 - ``POButtonStateStyle``
 - ``SwiftUI/EnvironmentValues/isButtonLoading``
