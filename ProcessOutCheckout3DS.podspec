@@ -12,5 +12,5 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '12.0'
   s.source_files          = 'Sources/ProcessOutCheckout3DS/**/*.swift'
   s.dependency            'ProcessOut', s.version.to_s
-  s.dependency            'Checkout3DS', '3.1.1'
+  s.dependency            'Checkout3DS', '3.2.1'
 end
