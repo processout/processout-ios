@@ -6,13 +6,13 @@
 //
 
 import XCTest
-@testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 
 final class CardNumberFormatterTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        sut = CardNumberFormatter()
+        sut = POCardNumberFormatter()
     }
 
     func test_normalized_retainsDigits() {
@@ -57,5 +57,5 @@ final class CardNumberFormatterTests: XCTestCase {
 
     // MARK: - Private Properties
 
-    private var sut: CardNumberFormatter!
+    private var sut: POCardNumberFormatter!
 }
