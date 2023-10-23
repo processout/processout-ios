@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-SDK='iphonesimulator'
-DESTINATION='platform=iOS Simulator,name=iPhone 14 Pro,OS=latest'
+SDK='iphonesimulator17.0'
+DESTINATION='platform=iOS Simulator,name=iPhone 15'
 
 # Run Tests
 for PRODUCT in "ProcessOut" "ProcessOutCheckout3DS" ; do
