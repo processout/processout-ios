@@ -8,10 +8,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.1.2'
-        bundler-cache: true
     - name: Write Constants
       run: |
         CONSTANTS=$'${{ inputs.test-project-constants }}'
@@ -22,7 +18,7 @@ runs:
       run: sudo xcode-select -s '/Applications/Xcode_15.0.app/Contents/Developer'
       shell: bash
     - name: Bootstrap Project
-      run: ./Scripts/BootstrapProject.sh --skip-bundle-instal
+      run: ./Scripts/BootstrapProject.sh
       shell: bash
     # - name: Bootstrap Example Project
     #   if: ${{ inputs.test-project-constants != '' }}

@@ -25,7 +25,6 @@ We welcome contributions of any kind including new features, bug fixes, and gene
 - A recent version of macOS (tested with 13.3.1)
 - A recent version of Xcode (tested with 14.3.1)
 - [Homebrew](https://brew.sh/) package manager
-- [Ruby](https://www.ruby-lang.org) (tested with 3.1.2) with [bundler](https://bundler.io) installed
 
 ### Installation
 
