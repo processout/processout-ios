@@ -22,7 +22,7 @@ let package = Package(
             dependencies: [
                 .target(name: "cmark")
             ],
-            exclude: ["ProcessOut.docc", "swiftgen.yml"],
+            exclude: ["swiftgen.yml"],
             resources: [
                 .process("Resources")
             ]
@@ -36,8 +36,7 @@ let package = Package(
                 ),
                 .target(name: "JOSESwift"),
                 .target(name: "Checkout3DS")
-            ],
-            exclude: ["ProcessOutCheckout3DS.docc"]
+            ]
         ),
         .binaryTarget(
             name: "Checkout3DS", path: "Vendor/Checkout3DS.xcframework"

@@ -5,6 +5,7 @@ settings:
   GCC_TREAT_WARNINGS_AS_ERRORS: true
   SWIFT_TREAT_WARNINGS_AS_ERRORS: true
   CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: true
+  SUPPORTS_MACCATALYST: false
 options:
   transitivelyLinkDependencies: true
 packages:
