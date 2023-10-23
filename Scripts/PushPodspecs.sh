@@ -6,5 +6,5 @@ set +e
 
 # Push Podspecs
 for PRODUCT in "ProcessOut" "ProcessOutCheckout3DS"; do
-  bundle exec pod trunk push $PRODUCT.podspec --allow-warnings --synchronous
+  pod trunk push $PRODUCT.podspec --allow-warnings --synchronous
 done
