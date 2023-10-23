@@ -21,7 +21,7 @@ let package = Package(
             dependencies: [
                 .target(name: "cmark")
             ],
-            exclude: ["ProcessOut.docc", "swiftgen.yml"],
+            exclude: ["swiftgen.yml"],
             resources: [
                 .process("Resources")
             ]
@@ -31,8 +31,7 @@ let package = Package(
             dependencies: [
                 .target(name: "ProcessOut"),
                 .product(name: "Checkout3DSPackages", package: "checkout-3ds-sdk-ios")
-            ],
-            exclude: ["ProcessOutCheckout3DS.docc"]
+            ]
         ),
         .binaryTarget(name: "cmark", path: "Vendor/cmark.xcframework")
     ]
