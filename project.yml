@@ -9,9 +9,9 @@ settings:
 options:
   transitivelyLinkDependencies: true
 packages:
-  CheckoutEventLoggerKit:
-    url: https://github.com/checkout/checkout-event-logger-ios-framework
-    from: 1.2.4
+  Checkout3DSPackages:
+    url: https://github.com/checkout/checkout-3ds-sdk-ios
+    version: 3.2.1
 targets:
   ProcessOutCoreUI:
     type: framework
@@ -103,16 +103,15 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.checkout-3ds-ios
       SKIP_INSTALL: NO
       BUILD_LIBRARY_FOR_DISTRIBUTION: YES
+      EXCLUDED_ARCHS: x86_64 # Checkout3DS doesn't support x86_64 so are we
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutCheckout3DS
     preBuildScripts:
       - path: Scripts/Lint.sh
         name: Swiftlint
         basedOnDependencyAnalysis: false
     dependencies:
-      - package: CheckoutEventLoggerKit
+      - package: Checkout3DSPackages
       - target: ProcessOut
-      - framework: Vendor/Checkout3DS.xcframework
-      - framework: Vendor/JOSESwift.xcframework
     sources: Sources/ProcessOutCheckout3DS
   ProcessOutCheckout3DSTests:
     type: bundle.unit-test
