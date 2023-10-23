@@ -25,4 +25,20 @@ public struct POCardIssuerInformation: Decodable {
 
     /// Card category.
     public let category: String?
+
+    @_spi(PO) public init(
+        scheme: String,
+        coScheme: String? = nil,
+        type: String? = nil,
+        bankName: String? = nil,
+        brand: String? = nil,
+        category: String? = nil
+    ) {
+        self.scheme = scheme
+        self.coScheme = coScheme
+        self.type = type
+        self.bankName = bankName
+        self.brand = brand
+        self.category = category
+    }
 }

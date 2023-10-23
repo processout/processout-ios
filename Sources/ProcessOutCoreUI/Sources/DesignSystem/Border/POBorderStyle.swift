@@ -28,7 +28,7 @@ public struct POBorderStyle {
 
 extension POBorderStyle {
 
-    /// Clear border.
+    /// Clear border with default corner radius.
     public static let clear = POBorderStyle(radius: Constants.radius, width: 0, color: .clear)
 
     /// Regular width border.

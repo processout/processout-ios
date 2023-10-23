@@ -22,6 +22,13 @@ import UIKit
 
 extension POColorResource {
 
+    /// The "Border" asset catalog resource namespace.
+    public enum Border {
+
+        /// The "Border/Subtle" asset catalog color resource.
+        public static let subtle = POColorResource(.Border.subtle)
+    }
+
     /// The "Surface" asset catalog resource namespace.
     public enum Surface {
 

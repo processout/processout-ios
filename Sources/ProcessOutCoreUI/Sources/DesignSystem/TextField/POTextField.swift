@@ -7,24 +7,30 @@
 
 import SwiftUI
 
-@_spi(PO) public struct POTextField: View {
+@_spi(PO) public struct POTextField<Trailing: View>: View {
 
     /// - Parameters:
     ///   - text: The underlying text to edit.
     ///   - formatter: A formatter to use when converting between the string the user edits and the underlying value.
     ///   If `formatter` can't perform the conversion, the text field doesn't modify `binding.value`.
     ///   - prompt: A `String` which provides users with guidance on what to enter into the text field.
-    public init(text: Binding<String>, formatter: Formatter? = nil, prompt: String = "") {
+    public init(
+        text: Binding<String>, formatter: Formatter? = nil, prompt: String = "", trailingView: Trailing = EmptyView()
+    ) {
         self.text = text
         self.formatter = formatter
         self.prompt = prompt
+        self.trailingView = trailingView
     }
 
     public var body: some View {
         let style = isInvalid ? style.error : style.normal
-        TextFieldRepresentable(
-            text: text, formatter: formatter, prompt: prompt, style: style
-        )
+        HStack {
+            TextFieldRepresentable(
+                text: text, formatter: formatter, prompt: prompt, style: style
+            )
+            trailingView
+        }
         .padding(Constants.padding)
         .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
         .background(Color(style.backgroundColor))
@@ -34,21 +40,20 @@ import SwiftUI
         .animation(.default, value: isInvalid)
     }
 
-    // MARK: - Nested Types
-
-    private enum Constants {
-        static let minHeight: CGFloat = 44
-        static let padding = EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)
-    }
-
     // MARK: - Private Properties
 
     private let text: Binding<String>
     private let formatter: Formatter?
     private let prompt: String
+    private let trailingView: Trailing
 
     @Environment(\.inputStyle) private var style
     @Environment(\.isControlInvalid) private var isInvalid
+}
+
+private enum Constants {
+    static let minHeight: CGFloat = 44
+    static let padding = EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)
 }
 
 // todo(andrii-vysotskyi): support textContentType

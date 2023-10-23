@@ -9,16 +9,15 @@ import SwiftUI
 
 @_spi(PO) public struct POMenuPickerStyle: POPickerStyle {
 
-    public init(inputStyle: POInputStyle? = nil) { // todo(andrii-vysotskyi): add proper default value
-        self.inputStyle = inputStyle ?? .medium
-        _isSheetPresented = .init(initialValue: false)
+    public init(inputStyle: POInputStyle = .medium) {
+        self.inputStyle = inputStyle
     }
 
     public func makeBody(configuration: POPickerStyleConfiguration) -> some View {
         if #available(iOS 14.0, *) {
             makeMenu(configuration: configuration)
         } else {
-            makeSheetMenu(configuration: configuration)
+            SheetMenu(label: label(configuration: configuration), configuration: configuration)
         }
     }
 
@@ -33,9 +32,6 @@ import SwiftUI
 
     private let inputStyle: POInputStyle
 
-    @State
-    private var isSheetPresented: Bool
-
     // MARK: - Private Methods
 
     @available(iOS 14.0, *)
@@ -48,21 +44,6 @@ import SwiftUI
             label(configuration: configuration)
         }
         .menuStyle(.borderlessButton)
-    }
-
-    @ViewBuilder
-    private func makeSheetMenu(configuration: POPickerStyleConfiguration) -> some View {
-        label(configuration: configuration)
-            .actionSheet(isPresented: $isSheetPresented) {
-                let buttons: [ActionSheet.Button] = configuration.elements.map { element in
-                    .default(element.makeBody(), action: element.select)
-                }
-                // todo(andrii-vysotskyi): replace with proper text when available
-                return ActionSheet(title: Text(""), message: nil, buttons: buttons)
-            }
-            .onTapGesture {
-                isSheetPresented = true
-            }
     }
 
     @ViewBuilder
@@ -85,6 +66,31 @@ import SwiftUI
         .border(style: style.border)
         .shadow(style: style.shadow)
     }
+}
+
+private struct SheetMenu<Label: View>: View {
+
+    let label: Label
+    let configuration: POPickerStyleConfiguration
+
+    var body: some View {
+        label
+            .actionSheet(isPresented: $isSheetPresented) {
+                let buttons: [ActionSheet.Button] = configuration.elements.map { element in
+                    .default(element.makeBody(), action: element.select)
+                }
+                // todo(andrii-vysotskyi): replace with proper text when available
+                return ActionSheet(title: Text(""), message: nil, buttons: buttons)
+            }
+            .onTapGesture {
+                isSheetPresented = true
+            }
+    }
+
+    // MARK: - Private Properties
+
+    @State
+    private var isSheetPresented = false
 }
 
 @_spi(PO) extension POPickerStyle where Self == POMenuPickerStyle {

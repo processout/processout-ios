@@ -28,6 +28,24 @@ targets:
       - path: Sources/ProcessOutCoreUI
     dependencies:
       - framework: Vendor/cmark.xcframework
+  ProcessOutUI:
+    type: framework
+    platform: iOS
+    deploymentTarget: "13.0"
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.processout.ui
+      TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutUI
+      LOCALIZED_STRING_MACRO_NAMES: "$(inherited) StringResource"
+      LOCALIZATION_PREFERS_STRING_CATALOGS: true
+    preBuildScripts:
+      - path: Scripts/Lint.sh
+        name: Swiftlint
+        basedOnDependencyAnalysis: false
+    sources:
+      - path: Sources/ProcessOutUI
+    dependencies:
+      - target: ProcessOut
+      - target: ProcessOutCoreUI
   ProcessOut:
     type: framework
     platform: iOS
@@ -126,3 +144,7 @@ schemes:
     build:
       targets:
         ProcessOutCoreUI: all
+  ProcessOutUI:
+    build:
+      targets:
+        ProcessOutUI: all

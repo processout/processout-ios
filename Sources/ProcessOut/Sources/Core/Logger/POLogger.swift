@@ -32,8 +32,8 @@ public struct POLogger {
     let category: String
 
     /// Logs a message at the `debug` level.
-    func debug(
-        _ message: LogMessage,
+    @_spi(PO) public func debug(
+        _ message: POLogMessage,
         attributes: [String: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
         file: String = #file,
@@ -43,8 +43,8 @@ public struct POLogger {
     }
 
     /// Logs a message at the `info` level.
-    func info(
-        _ message: LogMessage,
+    @_spi(PO) public func info(
+        _ message: POLogMessage,
         attributes: [String: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
         file: String = #file,
@@ -54,8 +54,8 @@ public struct POLogger {
     }
 
     /// Logs a message at the `error` level.
-    func error(
-        _ message: LogMessage,
+    @_spi(PO) public func error(
+        _ message: POLogMessage,
         attributes: [String: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
         file: String = #file,
@@ -65,8 +65,8 @@ public struct POLogger {
     }
 
     /// Logs a message at the `fault` level.
-    func fault(
-        _ message: LogMessage,
+    @_spi(PO) public func fault(
+        _ message: POLogMessage,
         attributes: [String: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
         file: String = #file,
@@ -94,7 +94,7 @@ public struct POLogger {
     ///   - attributes: additional attributes to log alongside primary logger attributes.
     private func log(
         level: LogLevel,
-        _ message: LogMessage,
+        _ message: POLogMessage,
         attributes additionalAttributes: [String: String] = [:],
         dso: UnsafeRawPointer?,
         file: String,
