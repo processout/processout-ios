@@ -107,7 +107,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
 
     private enum Constants {
         static let animationDuration: TimeInterval = 0.25
-        static let excludedTextAttributes: Set<NSAttributedString.Key> = [.paragraphStyle, .baselineOffset]
+        static let includedTextAttributes: Set<NSAttributedString.Key> = [.foregroundColor, .font]
     }
 
     // MARK: - Private Properties
@@ -134,19 +134,20 @@ private struct TextFieldRepresentable: UIViewRepresentable {
                 builder.color = style.text.color
             }
             .buildAttributes()
-            .filter { !Constants.excludedTextAttributes.contains($0.key) }
+            .filter { Constants.includedTextAttributes.contains($0.key) }
         textField.defaultTextAttributes = textAttributes
     }
 
     private func updatePlaceholder(_ textField: UITextField) {
-        let updatedPlaceholder = AttributedStringBuilder()
+        let placeholderAttributes = AttributedStringBuilder()
             .with { builder in
                 builder.typography = style.placeholder.typography
                 builder.sizeCategory = .init(sizeCategory)
                 builder.color = style.placeholder.color
-                builder.text = .plain(prompt)
             }
-            .build()
+            .buildAttributes()
+            .filter { Constants.includedTextAttributes.contains($0.key) }
+        let updatedPlaceholder = NSAttributedString(string: prompt, attributes: placeholderAttributes)
         if textField.attributedPlaceholder != updatedPlaceholder {
             textField.attributedPlaceholder = updatedPlaceholder
         }
