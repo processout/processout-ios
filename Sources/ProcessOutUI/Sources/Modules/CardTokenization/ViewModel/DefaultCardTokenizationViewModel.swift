@@ -5,11 +5,10 @@
 //  Created by Andrii Vysotskyi on 20.07.2023.
 //
 
-import Foundation
-import Combine
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
+// swiftlint:disable:next type_body_length
 final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     init(interactor: some CardTokenizationInteractor, configuration: POCardTokenizationConfiguration) {
@@ -47,8 +46,6 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     private let interactor: any CardTokenizationInteractor
     private let configuration: POCardTokenizationConfiguration
-
-    private var interactorChangesCancellable: AnyCancellable?
 
     // MARK: - Private Methods
 
@@ -116,18 +113,21 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.number),
             icon: cardNumberIcon(startedState: startedState),
             keyboard: .asciiCapableNumberPad,
-            contentType: .creditCardNumber
+            contentType: .creditCardNumber,
+            accessibilityId: "card-number"
         )
         let expirationItem = createItem(
             parameter: startedState.expiration,
             placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.expiration),
-            keyboard: .asciiCapableNumberPad
+            keyboard: .asciiCapableNumberPad,
+            accessibilityId: "expiration"
         )
         let cvcItem = createItem(
             parameter: startedState.cvc,
             placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.cvc),
             icon: Image(.Card.back),
-            keyboard: .asciiCapableNumberPad
+            keyboard: .asciiCapableNumberPad,
+            accessibilityId: "cvc"
         )
         var items = [
             numberItem,
@@ -140,7 +140,8 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
                 parameter: startedState.cardholderName,
                 placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.cardholder),
                 keyboard: .asciiCapable,
-                contentType: .name
+                contentType: .name,
+                accessibilityId: "cardholder"
             )
             items.append(cardholderItem)
         }
@@ -152,7 +153,8 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         placeholder: String,
         icon: Image? = nil,
         keyboard: UIKeyboardType,
-        contentType: UITextContentType? = nil
+        contentType: UITextContentType? = nil,
+        accessibilityId: String
     ) -> CardTokenizationViewModelState.Item {
         let value = Binding<String>(
             get: { parameter.value },
@@ -167,6 +169,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             formatter: parameter.formatter,
             keyboard: keyboard,
             contentType: contentType,
+            accessibilityId: accessibilityId,
             onSubmit: { [weak self] in
                 self?.submitFocusedInput()
             }
@@ -260,7 +263,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         startedState: InteractorState.Started, isSubmitting: Bool
     ) -> POActionsContainerActionViewModel {
         let action = POActionsContainerActionViewModel(
-            id: "card-tokenization.primary-button",
+            id: "primary-button",
             title: configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit),
             isEnabled: startedState.recentErrorMessage == nil,
             isLoading: isSubmitting,
@@ -278,7 +281,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             return nil
         }
         let action = POActionsContainerActionViewModel(
-            id: "card-tokenization.cancel-button",
+            id: "cancel-button",
             title: title,
             isEnabled: isEnabled,
             isLoading: false,

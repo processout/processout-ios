@@ -63,6 +63,9 @@ struct CardTokenizationViewModelState {
         /// Text content type.
         let contentType: UITextContentType?
 
+        /// Accessibility identifier useful for testing.
+        let accessibilityId: String
+
         /// Action to perform when the user submits a value to this input.
         let onSubmit: () -> Void
     }

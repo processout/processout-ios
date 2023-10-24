@@ -21,19 +21,18 @@ struct CardTokenizationItemView: View {
     var body: some View {
         switch item {
         case .input(let inputItem):
-            // todo(andrii-vysotskyi):
-            //  - change accesility identifier
             POTextField(
                 text: inputItem.$value,
                 formatter: inputItem.formatter,
                 prompt: inputItem.placeholder,
-                trailingView: inputItem.icon
+                trailingView: inputItem.icon?.accessibility(hidden: true)
             )
             .backport.focused($focusedInputId, equals: inputItem.id)
             .backport.onSubmit(inputItem.onSubmit)
             .inputStyle(style.input)
             .poTextContentType(inputItem.contentType)
             .poKeyboardType(inputItem.keyboard)
+            .accessibility(identifier: inputItem.accessibilityId)
         case .error(let errorItem):
             Text(errorItem.description)
                 .textStyle(style.errorDescription)
