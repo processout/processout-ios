@@ -16,7 +16,7 @@ import SwiftUI
     }
 
     public var body: some View {
-        container {
+        VStack(spacing: spacing) {
             Divider()
                 .frame(height: 1)
                 .overlay(Color(style.separatorColor))
@@ -26,6 +26,9 @@ import SwiftUI
                     .disabled(!element.isEnabled)
                     .buttonLoading(element.isLoading)
                     .accessibility(identifier: element.id)
+            }
+            .modify(when: style.axis == .horizontal) { content in
+                HStack(spacing: spacing) { content }
             }
             .padding(.horizontal, horizontalPadding)
         }
@@ -40,17 +43,4 @@ import SwiftUI
     private let horizontalPadding: CGFloat
 
     @Environment(\.actionsContainerStyle) private var style
-
-    // MARK: - Private Methods
-
-    /// Wraps given in a container that lays out items based on axis defined in style.
-    @ViewBuilder
-    private func container<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        switch style.axis {
-        case .horizontal:
-            HStack(spacing: spacing, content: content)
-        case .vertical:
-            VStack(spacing: spacing, content: content)
-        }
-    }
 }

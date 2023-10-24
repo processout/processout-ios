@@ -7,9 +7,19 @@
 
 import SwiftUI
 
-extension View {
+@_spi(PO) extension View {
 
-    func modify<Content: View>(@ViewBuilder _ transform: (Self) -> Content) -> Content {
+    @ViewBuilder
+    public func modify(when condition: Bool, @ViewBuilder _ transform: (Self) -> some View) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder
+    public func modify(@ViewBuilder _ transform: (Self) -> some View) -> some View {
         transform(self)
     }
 }
