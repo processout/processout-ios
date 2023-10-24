@@ -8,14 +8,12 @@ function build_framework {(
     xcodebuild archive \
         -scheme $1 \
         -destination "generic/platform=iOS" \
-        -archivePath .build/framework/$1-iOS |
-        bundle exec xcpretty
+        -archivePath .build/framework/$1-iOS
 
     xcodebuild archive \
         -scheme $1 \
         -destination "generic/platform=iOS Simulator" \
-        -archivePath .build/framework/$1-Sim |
-        bundle exec xcpretty
+        -archivePath .build/framework/$1-Sim
 
     cd .build/framework
 

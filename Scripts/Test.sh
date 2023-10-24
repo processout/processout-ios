@@ -18,7 +18,6 @@ done
 xcodebuild clean build \
     -project $PROJECT \
     -scheme ProcessOutCheckout3DS \
-    -destination "generic/platform=iOS" |
-    bundle exec xcpretty
+    -destination "generic/platform=iOS"
 
 # todo(andrii-vysotskyi): run example target tests when POM-144 is resolved
