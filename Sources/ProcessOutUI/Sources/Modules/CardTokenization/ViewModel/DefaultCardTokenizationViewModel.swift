@@ -89,7 +89,6 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         let startedState = State(
             title: title(),
             sections: sections.compactMap { $0 },
-            isEditingAllowed: !isSubmitting,
             actions: createActions(startedState: startedState, isSubmitting: isSubmitting),
             focusedInputId: focusedInputId(startedState: startedState, isSubmitting: isSubmitting)
         )

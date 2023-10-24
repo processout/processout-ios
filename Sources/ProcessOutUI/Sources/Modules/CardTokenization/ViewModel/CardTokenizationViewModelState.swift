@@ -85,9 +85,6 @@ struct CardTokenizationViewModelState {
     /// Available items.
     let sections: [Section]
 
-    /// Boolean value indicating whether editing is allowed.
-    let isEditingAllowed: Bool
-
     /// Available actions.
     let actions: [POActionsContainerActionViewModel]
 
@@ -98,7 +95,7 @@ struct CardTokenizationViewModelState {
 extension CardTokenizationViewModelState {
 
     static var idle: Self {
-        Self(title: nil, sections: [], isEditingAllowed: false, actions: [], focusedInputId: nil)
+        Self(title: nil, sections: [], actions: [], focusedInputId: nil)
     }
 }
 
