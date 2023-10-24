@@ -37,6 +37,7 @@ import SwiftUI
         .border(style: style.border)
         .shadow(style: style.shadow)
         .accentColor(Color(style.tintColor))
+        .transformEffect(.identity)
         .animation(.default, value: isInvalid)
     }
 
