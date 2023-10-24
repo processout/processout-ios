@@ -2,8 +2,8 @@
 
 Get started with our ProcessOut [documentation](https://docs.processout.com/) or browse the SDK reference:
 
-- [ProcessOut](https://processout.github.io/processout-ios/documentation/processout)
-- [ProcessOutCheckout3DS](https://processout.github.io/processout-ios/documentation/processoutcheckout3ds)
+- [ProcessOut](https://swiftpackageindex.com/processout/processout-ios/documentation/processout)
+- [ProcessOutCheckout3DS](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutcheckout3ds)
 
 ## Requirements
 
