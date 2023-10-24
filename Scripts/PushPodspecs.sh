@@ -6,5 +6,7 @@ set +e
 
 # Push Podspecs
 for PRODUCT in "ProcessOut" "ProcessOutCheckout3DS"; do
+
+  # This script is intended to be run on CI where cocoapods is already installed.
   pod trunk push $PRODUCT.podspec --allow-warnings --synchronous
 done
