@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 20.10.2023.
 //
 
+@_spi(PO) import ProcessOut
+
 extension POCardTokenizationView {
 
     /// Creates card tokenization view.
