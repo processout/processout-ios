@@ -43,6 +43,7 @@ struct CardTokenizationItemView: View {
                     CardTokenizationItemView(item: item, spacing: spacing, focusedInputId: $focusedInputId)
                 }
             }
+            .animation(.default, value: groupItem.items.map(\.id))
         }
     }
 
