@@ -56,7 +56,6 @@ private enum Constants {
     static let padding = EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)
 }
 
-// todo(andrii-vysotskyi): support textContentType
 private struct TextFieldRepresentable: UIViewRepresentable {
 
     @Binding var text: String
