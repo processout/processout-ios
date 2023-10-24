@@ -89,6 +89,8 @@ private struct TextFieldRepresentable: UIViewRepresentable {
             updatePlaceholder(textField)
             UIView.performWithoutAnimation(textField.layoutIfNeeded)
         }
+        textField.keyboardType = keyboardType
+        textField.textContentType = textContentType
         textField.returnKeyType = submitLabel.returnKeyType
     }
 
@@ -112,6 +114,8 @@ private struct TextFieldRepresentable: UIViewRepresentable {
     // MARK: - Private Properties
 
     @Environment(\.sizeCategory) private var sizeCategory
+    @Environment(\.poKeyboardType) private var keyboardType
+    @Environment(\.poTextContentType) private var textContentType
     @Environment(\.backportSubmitLabel) private var submitLabel
     @Environment(\.backportSubmitAction) private var submitAction
     @Environment(\.focusCoordinator) private var focusCoordinator

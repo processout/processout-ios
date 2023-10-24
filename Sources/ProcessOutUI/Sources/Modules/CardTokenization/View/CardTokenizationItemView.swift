@@ -22,8 +22,6 @@ struct CardTokenizationItemView: View {
         switch item {
         case .input(let inputItem):
             // todo(andrii-vysotskyi):
-            //  - check if keyboard type actually works
-            //  - support content type
             //  - change accesility identifier
             POTextField(
                 text: inputItem.$value,
@@ -34,7 +32,8 @@ struct CardTokenizationItemView: View {
             .backport.focused($focusedInputId, equals: inputItem.id)
             .backport.onSubmit(inputItem.onSubmit)
             .inputStyle(style.input)
-            .keyboardType(inputItem.keyboard)
+            .poTextContentType(inputItem.contentType)
+            .poKeyboardType(inputItem.keyboard)
         case .error(let errorItem):
             Text(errorItem.description)
                 .textStyle(style.errorDescription)
