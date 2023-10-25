@@ -9,7 +9,7 @@ import SwiftUI
 
 @_spi(PO) public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerStyle {
 
-    init(radioButtonStyle: RadioButtonStyle = PORadioButtonStyle.radio) {
+    public init(radioButtonStyle: RadioButtonStyle = PORadioButtonStyle.radio) {
         self.radioButtonStyle = radioButtonStyle
     }
 

@@ -10,17 +10,9 @@ import SwiftUI
 @_spi(PO) public struct POPicker<Data: RandomAccessCollection, Id: Hashable>: View {
 
     // swiftlint:disable:next line_length
-    public init(_ data: Data, selection: Binding<Data.Element?>, content: @escaping (Data.Element) -> Text) where Data.Element == Id {
+    public init(_ data: Data, selection: Binding<Id?>, content: @escaping (Data.Element) -> Text) where Data.Element: Identifiable, Data.Element.ID == Id {
         self.data = data
-        self.id = \.self
-        self._selection = selection
-        self.content = content
-    }
-
-    // swiftlint:disable:next line_length
-    public init(_ data: Data, id: KeyPath<Data.Element, Id>, selection: Binding<Data.Element?>, content: @escaping (Data.Element) -> Text) {
-        self.data = data
-        self.id = id
+        self.id = \.id
         self._selection = selection
         self.content = content
     }
@@ -38,7 +30,7 @@ import SwiftUI
     private let id: KeyPath<Data.Element, Id>
     private let content: (Data.Element) -> Text
 
-    @Binding private var selection: Data.Element?
+    @Binding private var selection: Id?
 
     @Environment(\.pickerStyle) private var style
     @Environment(\.isControlInvalid) private var isInvalid
@@ -51,10 +43,10 @@ import SwiftUI
             makeBody: {
                 content(element)
             },
-            isSelected: selection?[keyPath: id] == element[keyPath: id],
+            isSelected: selection == element[keyPath: id],
             select: {
                 withAnimation {
-                    selection = element
+                    selection = element[keyPath: id]
                 }
             }
         )
