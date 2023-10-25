@@ -88,7 +88,7 @@ final class DefaultCardTokenizationInteractor:
         guard case .started(let startedState) = state else {
             return
         }
-        guard areParametersValid(startedState: startedState) else {
+        guard areParametersValid(startedState: startedState), startedState.recentErrorMessage == nil else {
             logger.debug("Ignoring attempt to tokenize invalid parameters.")
             return
         }
