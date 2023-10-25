@@ -15,7 +15,7 @@ extension ButtonStyle where Self == PORadioButtonStyle {
                 knob: .init(
                     backgroundColor: .clear,
                     border: .regular(color: UIColor(resource: .Border.default)),
-                    innerCircleColor: .clear,
+                    innerCircleColor: UIColor(resource: .Action.Primary.default).withAlphaComponent(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
@@ -33,7 +33,7 @@ extension ButtonStyle where Self == PORadioButtonStyle {
                 knob: .init(
                     backgroundColor: .clear,
                     border: .regular(color: UIColor(resource: .Text.muted)),
-                    innerCircleColor: .clear,
+                    innerCircleColor: UIColor(resource: .Action.Primary.default).withAlphaComponent(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
@@ -42,7 +42,7 @@ extension ButtonStyle where Self == PORadioButtonStyle {
                 knob: .init(
                     backgroundColor: .clear,
                     border: .regular(color: UIColor(resource: .Text.error)),
-                    innerCircleColor: .clear,
+                    innerCircleColor: UIColor(resource: .Action.Primary.default).withAlphaComponent(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
