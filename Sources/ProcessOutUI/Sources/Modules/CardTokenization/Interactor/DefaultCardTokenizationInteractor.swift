@@ -18,13 +18,13 @@ final class DefaultCardTokenizationInteractor:
     init(
         cardsService: POCardsService,
         logger: POLogger,
-        billingAddress: POContact?,
+        configuration: POCardTokenizationConfiguration,
         delegate: POCardTokenizationDelegate?,
         completion: @escaping Completion
     ) {
         self.cardsService = cardsService
         self.logger = logger
-        self.billingAddress = billingAddress
+        self.configuration = configuration
         self.delegate = delegate
         self.completion = completion
         super.init(state: .idle)
@@ -101,9 +101,9 @@ final class DefaultCardTokenizationInteractor:
             expYear: cardExpirationFormatter.expirationYear(from: startedState.expiration.value) ?? 0,
             cvc: startedState.cvc.value,
             name: startedState.cardholderName.value,
-            contact: billingAddress,
+            contact: configuration.billingAddress,
             preferredScheme: startedState.preferredScheme,
-            metadata: nil // todo(andrii-vysotskyi): allow merchant to inject tokenization metadata
+            metadata: configuration.metadata
         )
         Task {
             do {
@@ -138,7 +138,7 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - Private Properties
 
     private let cardsService: POCardsService
-    private let billingAddress: POContact?
+    private let configuration: POCardTokenizationConfiguration
     private let logger: POLogger
     private let completion: Completion
 
@@ -166,9 +166,9 @@ final class DefaultCardTokenizationInteractor:
             invalidParameterIds.append(\.number)
             errorMessage = .CardTokenization.Error.cardNumber
         case .generic(.cardInvalidExpiryDate),
-                .generic(.cardMissingExpiry),
-                .generic(.cardInvalidExpiryMonth),
-                .generic(.cardInvalidExpiryYear):
+             .generic(.cardMissingExpiry),
+             .generic(.cardInvalidExpiryMonth),
+             .generic(.cardInvalidExpiryYear):
             invalidParameterIds.append(\.expiration)
             errorMessage = .CardTokenization.Error.cardExpiration
         case .generic(.cardBadTrackData):

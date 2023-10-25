@@ -21,7 +21,7 @@ extension POCardTokenizationView {
             interactor: DefaultCardTokenizationInteractor(
                 cardsService: ProcessOut.shared.cards,
                 logger: ProcessOut.shared.logger,
-                billingAddress: configuration.billingAddress,
+                configuration: configuration,
                 delegate: delegate,
                 completion: completion
             ),
