@@ -8,7 +8,6 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-// swiftlint:disable:next type_body_length
 final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     init(interactor: some CardTokenizationInteractor, configuration: POCardTokenizationConfiguration) {
@@ -22,10 +21,6 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     @Published
     var state: CardTokenizationViewModelState
-
-    func didAppear() {
-        interactor.start()
-    }
 
     // MARK: - Private Nested Types
 
@@ -53,6 +48,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         interactor.didChange = { [weak self] in
             self?.configureWithInteractorState()
         }
+        interactor.start()
     }
 
     private func configureWithInteractorState() {

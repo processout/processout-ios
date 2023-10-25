@@ -25,10 +25,6 @@ final class AnyCardTokenizationViewModel: CardTokenizationViewModel {
         set { base.state = newValue }
     }
 
-    func didAppear() {
-        base.didAppear()
-    }
-
     // MARK: - Private Properties
 
     private var cancellable: AnyCancellable?

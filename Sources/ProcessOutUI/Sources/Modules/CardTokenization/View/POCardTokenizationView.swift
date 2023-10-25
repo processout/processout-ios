@@ -56,7 +56,6 @@ public struct POCardTokenizationView: View {
         .background(
             Color(style.backgroundColor).edgesIgnoringSafeArea(.all)
         )
-        .onAppear(perform: viewModel.didAppear)
     }
 
     // MARK: - Private Nested Types

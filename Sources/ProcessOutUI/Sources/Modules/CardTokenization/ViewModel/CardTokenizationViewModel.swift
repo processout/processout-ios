@@ -14,9 +14,6 @@ protocol CardTokenizationViewModel: ObservableObject {
 
     /// Current state.
     var state: State { get set }
-
-    /// Invoked when view appears on screen.
-    func didAppear()
 }
 
 // TODOs:
