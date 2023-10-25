@@ -33,7 +33,11 @@ import SwiftUI
             .padding(.horizontal, horizontalPadding)
         }
         .padding(.bottom, spacing)
-        .background(Color(style.backgroundColor).edgesIgnoringSafeArea(.all))
+        .background(
+            Color(style.backgroundColor).edgesIgnoringSafeArea(.all)
+        )
+        .backport.geometryGroup()
+        .animation(.default, value: actions.map(\.id))
     }
 
     // MARK: - Private Properties

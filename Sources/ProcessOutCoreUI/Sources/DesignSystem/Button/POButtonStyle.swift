@@ -55,7 +55,10 @@ public struct POButtonStyle<ProgressViewStyle: POProgressViewStyle>: ButtonStyle
             .background(Color(currentStyle.backgroundColor))
             .border(style: currentStyle.border)
             .shadow(style: currentStyle.shadow)
+            .backport.geometryGroup()
             .contentShape(.rect)
+            .animation(.default, value: isLoading)
+            .animation(.default, value: isEnabled)
             .allowsHitTesting(isEnabled && !isLoading)
         }
     }
