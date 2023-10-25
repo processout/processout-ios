@@ -30,19 +30,21 @@ public struct POCardTokenizationView: View {
                                 .frame(height: 1)
                                 .overlay(Color(style.separatorColor))
                         }
-                        ForEach(viewModel.state.sections) { section in
-                            CardTokenizationSectionView(
-                                section: section,
-                                spacing: Constants.sectionSpacing,
-                                focusedInputId: $viewModel.state.focusedInputId
-                            )
+                        VStack(alignment: .leading, spacing: Constants.spacing) {
+                            ForEach(viewModel.state.sections) { section in
+                                CardTokenizationSectionView(
+                                    section: section,
+                                    spacing: Constants.sectionSpacing,
+                                    focusedInputId: $viewModel.state.focusedInputId
+                                )
+                            }
                         }
                         .padding(.horizontal, Constants.horizontalPadding)
                         .frame(maxHeight: .infinity)
-                        .animation(.default, value: viewModel.state.sections.map(\.id))
                     }
                     .padding(.vertical, Constants.spacing)
                     .frame(minHeight: geometry.size.height)
+                    .animation(.default, value: viewModel.state.sections.map(\.id))
                 }
                 .clipped()
             }
