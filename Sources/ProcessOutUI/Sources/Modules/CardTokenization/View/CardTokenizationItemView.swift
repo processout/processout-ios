@@ -32,6 +32,7 @@ struct CardTokenizationItemView: View {
             .poTextContentType(inputItem.contentType)
             .poKeyboardType(inputItem.keyboard)
             .inputStyle(style.input)
+            .controlInvalid(inputItem.isInvalid)
             .animation(.default, value: inputItem.icon == nil)
             .accessibility(identifier: inputItem.accessibilityId)
         case .picker(let pickerItem):
