@@ -34,6 +34,11 @@ struct CardTokenizationItemView: View {
             .inputStyle(style.input)
             .animation(.default, value: inputItem.icon == nil)
             .accessibility(identifier: inputItem.accessibilityId)
+        case .picker(let pickerItem):
+            POPicker(pickerItem.options, selection: pickerItem.$selectedOptionId) { option in
+                Text(option.title)
+            }
+            .pickerStyle(PORadioGroupPickerStyle(radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton)))
         case .error(let errorItem):
             Text(errorItem.description)
                 .textStyle(style.errorDescription)

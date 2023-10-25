@@ -8,6 +8,7 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
+// swiftlint:disable:next type_body_length
 final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     init(interactor: some CardTokenizationInteractor, configuration: POCardTokenizationConfiguration) {
@@ -35,6 +36,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     private enum ItemId {
         static let error = "error"
         static let trackData = "track-data"
+        static let scheme = "card-scheme"
     }
 
     // MARK: - Private Properties
@@ -74,13 +76,13 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             let errorItem = State.ErrorItem(id: ItemId.error, description: error)
             cardInformationItems.append(.error(errorItem))
         }
-        let cardInformationSection = State.Section(
-            id: SectionId.cardInformation,
-            title: String(resource: .CardTokenization.CardDetails.title),
-            items: cardInformationItems
-        )
         let sections = [
-            cardInformationSection
+            State.Section(
+                id: SectionId.cardInformation,
+                title: String(resource: .CardTokenization.CardDetails.title),
+                items: cardInformationItems
+            ),
+            preferredSchemeSection(startedState: startedState)
         ]
         let startedState = State(
             title: title(),
@@ -209,38 +211,34 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     // MARK: - Preferred Scheme
 
-//    private func preferredSchemeSection(startedState: InteractorState.Started) -> State.Section? {
-//        guard configuration.isSchemeSelectionAllowed,
-//              let issuerInformation = startedState.issuerInformation,
-//              let coScheme = issuerInformation.coScheme else {
-//            return nil
-//        }
-//        let sectionId = State.SectionIdentifier(
-//            id: SectionId.preferredScheme,
-//            header: .init(title: Text.PreferredScheme.title, isCentered: false),
-//            isTight: true
-//        )
-//        let schemeItem = State.RadioButtonItem(
-//            value: Text.PreferredScheme.description(issuerInformation.scheme.capitalized),
-//            isSelected: startedState.preferredScheme == issuerInformation.scheme,
-//            isInvalid: false,
-//            accessibilityIdentifier: "card-tokenization.scheme-button",
-//            select: { [weak self] in
-//                self?.interactor.setPreferredScheme(issuerInformation.scheme)
-//            }
-//        )
-//        let coSchemeItem = State.RadioButtonItem(
-//            value: Text.PreferredScheme.description(coScheme.capitalized),
-//            isSelected: startedState.preferredScheme == coScheme,
-//            isInvalid: false,
-//            accessibilityIdentifier: "card-tokenization.co-scheme-button",
-//            select: { [weak self] in
-//                self?.interactor.setPreferredScheme(coScheme)
-//            }
-//        )
-//        let items = [schemeItem, coSchemeItem].map(State.Item.radio)
-//        return State.Section(id: sectionId, items: items)
-//    }
+    private func preferredSchemeSection(
+        startedState: InteractorState.Started
+    ) -> CardTokenizationViewModelState.Section? {
+        guard configuration.isSchemeSelectionAllowed,
+              let issuerInformation = startedState.issuerInformation,
+              let coScheme = issuerInformation.coScheme else {
+            return nil
+        }
+        let pickerItem = State.PickerItem(
+            id: ItemId.scheme,
+            options: [
+                .init(id: issuerInformation.scheme, title: issuerInformation.scheme.capitalized),
+                .init(id: coScheme, title: coScheme.capitalized)
+            ],
+            selectedOptionId: .init(
+                get: { startedState.preferredScheme },
+                set: { [weak self] newValue in
+                    self?.interactor.setPreferredScheme(newValue ?? issuerInformation.scheme)
+                }
+            )
+        )
+        let section = State.Section(
+            id: SectionId.preferredScheme,
+            title: String(resource: .CardTokenization.PreferredScheme.title),
+            items: [.picker(pickerItem)]
+        )
+        return section
+    }
 
     // MARK: - Actions
 

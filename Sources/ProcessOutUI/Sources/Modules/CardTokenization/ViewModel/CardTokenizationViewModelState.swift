@@ -24,7 +24,7 @@ struct CardTokenizationViewModelState {
     }
 
     enum Item {
-        case group(GroupItem), input(InputItem), error(ErrorItem)
+        case group(GroupItem), input(InputItem), picker(PickerItem), error(ErrorItem)
     }
 
     struct GroupItem: Identifiable {
@@ -70,6 +70,27 @@ struct CardTokenizationViewModelState {
         let onSubmit: () -> Void
     }
 
+    struct PickerItem: Identifiable {
+
+        /// Item identifier.
+        let id: AnyHashable
+
+        /// Availale options.
+        let options: [PickerItemOption]
+
+        /// Currently selected option id.
+        @Binding var selectedOptionId: String?
+    }
+
+    struct PickerItemOption: Identifiable {
+
+        /// Option id.
+        let id: String
+
+        /// Option title.
+        let title: String
+    }
+
     struct ErrorItem: Identifiable {
 
         /// Item identifier.
@@ -105,6 +126,8 @@ extension CardTokenizationViewModelState.Item: Identifiable {
         switch self {
         case .input(let inputItem):
             return inputItem.id
+        case .picker(let pickerItem):
+            return pickerItem.id
         case .group(let groupItem):
             return groupItem.id
         case .error(let errorItem):
