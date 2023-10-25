@@ -242,9 +242,11 @@ final class DefaultCardTokenizationInteractor:
                     logger.info("Did fail to fetch issuer information: \(failure)", attributes: ["IIN": iin])
                 case .success(let issuerInformation):
                     startedState.issuerInformation = issuerInformation
-                    startedState.preferredScheme = self?.delegate?.preferredScheme(
-                        issuerInformation: issuerInformation
-                    )
+                    if let delegate = self?.delegate {
+                        startedState.preferredScheme = delegate.preferredScheme(issuerInformation: issuerInformation)
+                    } else {
+                        startedState.preferredScheme = issuerInformation.scheme
+                    }
                     self?.state = .started(startedState)
                 }
             }
