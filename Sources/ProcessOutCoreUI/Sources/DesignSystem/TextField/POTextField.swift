@@ -37,13 +37,7 @@ import SwiftUI
         .border(style: style.border)
         .shadow(style: style.shadow)
         .accentColor(Color(style.tintColor))
-        .modify { content in
-            if #available(iOS 17, *) {
-                content.geometryGroup()
-            } else {
-                content.transformEffect(.identity)
-            }
-        }
+        .backport.geometryGroup()
         .animation(.default, value: isInvalid)
     }
 
