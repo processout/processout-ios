@@ -29,9 +29,10 @@ struct CardTokenizationItemView: View {
             )
             .backport.focused($focusedInputId, equals: inputItem.id)
             .backport.onSubmit(inputItem.onSubmit)
-            .inputStyle(style.input)
             .poTextContentType(inputItem.contentType)
             .poKeyboardType(inputItem.keyboard)
+            .inputStyle(style.input)
+            .animation(.default, value: inputItem.icon == nil)
             .accessibility(identifier: inputItem.accessibilityId)
         case .error(let errorItem):
             Text(errorItem.description)
