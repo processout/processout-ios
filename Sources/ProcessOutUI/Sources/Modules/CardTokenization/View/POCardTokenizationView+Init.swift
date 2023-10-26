@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 20.10.2023.
 //
 
+@_spi(PO) import ProcessOut
+
 extension POCardTokenizationView {
 
     /// Creates card tokenization view.
@@ -19,7 +21,7 @@ extension POCardTokenizationView {
             interactor: DefaultCardTokenizationInteractor(
                 cardsService: ProcessOut.shared.cards,
                 logger: ProcessOut.shared.logger,
-                billingAddress: configuration.billingAddress,
+                configuration: configuration,
                 delegate: delegate,
                 completion: completion
             ),

@@ -45,6 +45,14 @@ extension StringResource {
             }
         }
 
+        enum PreferredScheme {
+
+            /// Preferred scheme section title.
+            static let title = StringResource(
+                "card-tokenization.preferred-scheme.title", tableName: "ProcessOutUI", comment: ""
+            )
+        }
+
         enum Error {
 
             /// Generic card error.

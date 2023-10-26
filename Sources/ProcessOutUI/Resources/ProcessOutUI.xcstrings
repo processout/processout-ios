@@ -287,6 +287,16 @@
         }
       }
     },
+    "card-tokenization.preferred-scheme.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferred Scheme"
+          }
+        }
+      }
+    },
     "card-tokenization.submit-button.title" : {
       "localizations" : {
         "en" : {

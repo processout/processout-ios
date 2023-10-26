@@ -37,6 +37,7 @@ import SwiftUI
         .border(style: style.border)
         .shadow(style: style.shadow)
         .accentColor(Color(style.tintColor))
+        .backport.geometryGroup()
         .animation(.default, value: isInvalid)
     }
 
@@ -56,7 +57,6 @@ private enum Constants {
     static let padding = EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)
 }
 
-// todo(andrii-vysotskyi): support textContentType
 private struct TextFieldRepresentable: UIViewRepresentable {
 
     @Binding var text: String
@@ -89,6 +89,8 @@ private struct TextFieldRepresentable: UIViewRepresentable {
             updatePlaceholder(textField)
             UIView.performWithoutAnimation(textField.layoutIfNeeded)
         }
+        textField.keyboardType = keyboardType
+        textField.textContentType = textContentType
         textField.returnKeyType = submitLabel.returnKeyType
     }
 
@@ -106,12 +108,14 @@ private struct TextFieldRepresentable: UIViewRepresentable {
 
     private enum Constants {
         static let animationDuration: TimeInterval = 0.25
-        static let excludedTextAttributes: Set<NSAttributedString.Key> = [.paragraphStyle, .baselineOffset]
+        static let includedTextAttributes: Set<NSAttributedString.Key> = [.foregroundColor, .font]
     }
 
     // MARK: - Private Properties
 
     @Environment(\.sizeCategory) private var sizeCategory
+    @Environment(\.poKeyboardType) private var keyboardType
+    @Environment(\.poTextContentType) private var textContentType
     @Environment(\.backportSubmitLabel) private var submitLabel
     @Environment(\.backportSubmitAction) private var submitAction
     @Environment(\.focusCoordinator) private var focusCoordinator
@@ -131,19 +135,20 @@ private struct TextFieldRepresentable: UIViewRepresentable {
                 builder.color = style.text.color
             }
             .buildAttributes()
-            .filter { !Constants.excludedTextAttributes.contains($0.key) }
+            .filter { Constants.includedTextAttributes.contains($0.key) }
         textField.defaultTextAttributes = textAttributes
     }
 
     private func updatePlaceholder(_ textField: UITextField) {
-        let updatedPlaceholder = AttributedStringBuilder()
+        let placeholderAttributes = AttributedStringBuilder()
             .with { builder in
                 builder.typography = style.placeholder.typography
                 builder.sizeCategory = .init(sizeCategory)
                 builder.color = style.placeholder.color
-                builder.text = .plain(prompt)
             }
-            .build()
+            .buildAttributes()
+            .filter { Constants.includedTextAttributes.contains($0.key) }
+        let updatedPlaceholder = NSAttributedString(string: prompt, attributes: placeholderAttributes)
         if textField.attributedPlaceholder != updatedPlaceholder {
             textField.attributedPlaceholder = updatedPlaceholder
         }

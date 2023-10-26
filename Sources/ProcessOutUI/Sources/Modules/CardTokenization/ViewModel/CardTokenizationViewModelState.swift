@@ -24,7 +24,7 @@ struct CardTokenizationViewModelState {
     }
 
     enum Item {
-        case group(GroupItem), input(InputItem), error(ErrorItem)
+        case group(GroupItem), input(InputItem), picker(PickerItem), error(ErrorItem)
     }
 
     struct GroupItem: Identifiable {
@@ -63,8 +63,32 @@ struct CardTokenizationViewModelState {
         /// Text content type.
         let contentType: UITextContentType?
 
+        /// Accessibility identifier useful for testing.
+        let accessibilityId: String
+
         /// Action to perform when the user submits a value to this input.
         let onSubmit: () -> Void
+    }
+
+    struct PickerItem: Identifiable {
+
+        /// Item identifier.
+        let id: AnyHashable
+
+        /// Availale options.
+        let options: [PickerItemOption]
+
+        /// Currently selected option id.
+        @Binding var selectedOptionId: String?
+    }
+
+    struct PickerItemOption: Identifiable {
+
+        /// Option id.
+        let id: String
+
+        /// Option title.
+        let title: String
     }
 
     struct ErrorItem: Identifiable {
@@ -82,9 +106,6 @@ struct CardTokenizationViewModelState {
     /// Available items.
     let sections: [Section]
 
-    /// Boolean value indicating whether editing is allowed.
-    let isEditingAllowed: Bool
-
     /// Available actions.
     let actions: [POActionsContainerActionViewModel]
 
@@ -95,7 +116,7 @@ struct CardTokenizationViewModelState {
 extension CardTokenizationViewModelState {
 
     static var idle: Self {
-        Self(title: nil, sections: [], isEditingAllowed: false, actions: [], focusedInputId: nil)
+        Self(title: nil, sections: [], actions: [], focusedInputId: nil)
     }
 }
 
@@ -105,6 +126,8 @@ extension CardTokenizationViewModelState.Item: Identifiable {
         switch self {
         case .input(let inputItem):
             return inputItem.id
+        case .picker(let pickerItem):
+            return pickerItem.id
         case .group(let groupItem):
             return groupItem.id
         case .error(let errorItem):

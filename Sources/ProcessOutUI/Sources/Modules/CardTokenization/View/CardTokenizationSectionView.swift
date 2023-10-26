@@ -27,6 +27,7 @@ struct CardTokenizationSectionView: View {
                 CardTokenizationItemView(item: element, spacing: spacing, focusedInputId: $focusedInputId)
             }
         }
+        .backport.geometryGroup()
         .animation(.default, value: section.items.map(\.id))
     }
 

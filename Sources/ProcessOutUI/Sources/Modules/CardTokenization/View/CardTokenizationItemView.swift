@@ -21,20 +21,25 @@ struct CardTokenizationItemView: View {
     var body: some View {
         switch item {
         case .input(let inputItem):
-            // todo(andrii-vysotskyi):
-            //  - check if keyboard type actually works
-            //  - support content type
-            //  - change accesility identifier
             POTextField(
                 text: inputItem.$value,
                 formatter: inputItem.formatter,
                 prompt: inputItem.placeholder,
-                trailingView: inputItem.icon
+                trailingView: inputItem.icon?.accessibility(hidden: true)
             )
             .backport.focused($focusedInputId, equals: inputItem.id)
             .backport.onSubmit(inputItem.onSubmit)
+            .poTextContentType(inputItem.contentType)
+            .poKeyboardType(inputItem.keyboard)
             .inputStyle(style.input)
-            .keyboardType(inputItem.keyboard)
+            .controlInvalid(inputItem.isInvalid)
+            .animation(.default, value: inputItem.icon == nil)
+            .accessibility(identifier: inputItem.accessibilityId)
+        case .picker(let pickerItem):
+            POPicker(pickerItem.options, selection: pickerItem.$selectedOptionId) { option in
+                Text(option.title)
+            }
+            .pickerStyle(PORadioGroupPickerStyle(radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton)))
         case .error(let errorItem):
             Text(errorItem.description)
                 .textStyle(style.errorDescription)
@@ -44,6 +49,8 @@ struct CardTokenizationItemView: View {
                     CardTokenizationItemView(item: item, spacing: spacing, focusedInputId: $focusedInputId)
                 }
             }
+            .backport.geometryGroup()
+            .animation(.default, value: groupItem.items.map(\.id))
         }
     }
 

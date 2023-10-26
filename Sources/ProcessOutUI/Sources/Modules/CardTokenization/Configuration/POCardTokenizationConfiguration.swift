@@ -27,6 +27,9 @@ public struct POCardTokenizationConfiguration {
     /// Card billing address.
     public let billingAddress: POContact?
 
+    /// Metada related to the card.
+    public let metadata: [String: String]?
+
     /// Boolean flag determines whether user will be aksed to select scheme if co-scheme is available.
     /// Until feature is fully ready this is hardcoded to `false`.
     let isSchemeSelectionAllowed: Bool
@@ -36,13 +39,15 @@ public struct POCardTokenizationConfiguration {
         isCardholderNameInputVisible: Bool = true,
         primaryActionTitle: String? = nil,
         cancelActionTitle: String? = nil,
-        billingAddress: POContact? = nil
+        billingAddress: POContact? = nil,
+        metadata: [String: String]? = nil
     ) {
         self.title = title
         self.isCardholderNameInputVisible = isCardholderNameInputVisible
         self.primaryActionTitle = primaryActionTitle
         self.cancelActionTitle = cancelActionTitle
         self.billingAddress = billingAddress
+        self.metadata = metadata
         isSchemeSelectionAllowed = false
     }
 }

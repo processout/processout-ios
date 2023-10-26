@@ -5,11 +5,10 @@
 //  Created by Andrii Vysotskyi on 20.07.2023.
 //
 
-import Foundation
-import Combine
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
+// swiftlint:disable:next type_body_length
 final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     init(interactor: some CardTokenizationInteractor, configuration: POCardTokenizationConfiguration) {
@@ -24,10 +23,6 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     @Published
     var state: CardTokenizationViewModelState
 
-    func didAppear() {
-        interactor.start()
-    }
-
     // MARK: - Private Nested Types
 
     private typealias InteractorState = CardTokenizationInteractorState
@@ -41,6 +36,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     private enum ItemId {
         static let error = "error"
         static let trackData = "track-data"
+        static let scheme = "card-scheme"
     }
 
     // MARK: - Private Properties
@@ -48,14 +44,13 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     private let interactor: any CardTokenizationInteractor
     private let configuration: POCardTokenizationConfiguration
 
-    private var interactorChangesCancellable: AnyCancellable?
-
     // MARK: - Private Methods
 
     private func observeChanges(interactor: some CardTokenizationInteractor) {
         interactor.didChange = { [weak self] in
             self?.configureWithInteractorState()
         }
+        interactor.start()
     }
 
     private func configureWithInteractorState() {
@@ -81,18 +76,17 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             let errorItem = State.ErrorItem(id: ItemId.error, description: error)
             cardInformationItems.append(.error(errorItem))
         }
-        let cardInformationSection = State.Section(
-            id: SectionId.cardInformation,
-            title: String(resource: .CardTokenization.CardDetails.title),
-            items: cardInformationItems
-        )
         let sections = [
-            cardInformationSection
+            State.Section(
+                id: SectionId.cardInformation,
+                title: String(resource: .CardTokenization.CardDetails.title),
+                items: cardInformationItems
+            ),
+            preferredSchemeSection(startedState: startedState)
         ]
         let startedState = State(
             title: title(),
             sections: sections.compactMap { $0 },
-            isEditingAllowed: !isSubmitting,
             actions: createActions(startedState: startedState, isSubmitting: isSubmitting),
             focusedInputId: focusedInputId(startedState: startedState, isSubmitting: isSubmitting)
         )
@@ -116,18 +110,21 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.number),
             icon: cardNumberIcon(startedState: startedState),
             keyboard: .asciiCapableNumberPad,
-            contentType: .creditCardNumber
+            contentType: .creditCardNumber,
+            accessibilityId: "card-number"
         )
         let expirationItem = createItem(
             parameter: startedState.expiration,
             placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.expiration),
-            keyboard: .asciiCapableNumberPad
+            keyboard: .asciiCapableNumberPad,
+            accessibilityId: "expiration"
         )
         let cvcItem = createItem(
             parameter: startedState.cvc,
             placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.cvc),
             icon: Image(.Card.back),
-            keyboard: .asciiCapableNumberPad
+            keyboard: .asciiCapableNumberPad,
+            accessibilityId: "cvc"
         )
         var items = [
             numberItem,
@@ -140,7 +137,8 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
                 parameter: startedState.cardholderName,
                 placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.cardholder),
                 keyboard: .asciiCapable,
-                contentType: .name
+                contentType: .name,
+                accessibilityId: "cardholder"
             )
             items.append(cardholderItem)
         }
@@ -152,7 +150,8 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         placeholder: String,
         icon: Image? = nil,
         keyboard: UIKeyboardType,
-        contentType: UITextContentType? = nil
+        contentType: UITextContentType? = nil,
+        accessibilityId: String
     ) -> CardTokenizationViewModelState.Item {
         let value = Binding<String>(
             get: { parameter.value },
@@ -167,6 +166,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             formatter: parameter.formatter,
             keyboard: keyboard,
             contentType: contentType,
+            accessibilityId: accessibilityId,
             onSubmit: { [weak self] in
                 self?.submitFocusedInput()
             }
@@ -211,38 +211,34 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     // MARK: - Preferred Scheme
 
-//    private func preferredSchemeSection(startedState: InteractorState.Started) -> State.Section? {
-//        guard configuration.isSchemeSelectionAllowed,
-//              let issuerInformation = startedState.issuerInformation,
-//              let coScheme = issuerInformation.coScheme else {
-//            return nil
-//        }
-//        let sectionId = State.SectionIdentifier(
-//            id: SectionId.preferredScheme,
-//            header: .init(title: Text.PreferredScheme.title, isCentered: false),
-//            isTight: true
-//        )
-//        let schemeItem = State.RadioButtonItem(
-//            value: Text.PreferredScheme.description(issuerInformation.scheme.capitalized),
-//            isSelected: startedState.preferredScheme == issuerInformation.scheme,
-//            isInvalid: false,
-//            accessibilityIdentifier: "card-tokenization.scheme-button",
-//            select: { [weak self] in
-//                self?.interactor.setPreferredScheme(issuerInformation.scheme)
-//            }
-//        )
-//        let coSchemeItem = State.RadioButtonItem(
-//            value: Text.PreferredScheme.description(coScheme.capitalized),
-//            isSelected: startedState.preferredScheme == coScheme,
-//            isInvalid: false,
-//            accessibilityIdentifier: "card-tokenization.co-scheme-button",
-//            select: { [weak self] in
-//                self?.interactor.setPreferredScheme(coScheme)
-//            }
-//        )
-//        let items = [schemeItem, coSchemeItem].map(State.Item.radio)
-//        return State.Section(id: sectionId, items: items)
-//    }
+    private func preferredSchemeSection(
+        startedState: InteractorState.Started
+    ) -> CardTokenizationViewModelState.Section? {
+        guard configuration.isSchemeSelectionAllowed,
+              let issuerInformation = startedState.issuerInformation,
+              let coScheme = issuerInformation.coScheme else {
+            return nil
+        }
+        let pickerItem = State.PickerItem(
+            id: ItemId.scheme,
+            options: [
+                .init(id: issuerInformation.scheme, title: issuerInformation.scheme.capitalized),
+                .init(id: coScheme, title: coScheme.capitalized)
+            ],
+            selectedOptionId: .init(
+                get: { startedState.preferredScheme },
+                set: { [weak self] newValue in
+                    self?.interactor.setPreferredScheme(newValue ?? issuerInformation.scheme)
+                }
+            )
+        )
+        let section = State.Section(
+            id: SectionId.preferredScheme,
+            title: String(resource: .CardTokenization.PreferredScheme.title),
+            items: [.picker(pickerItem)]
+        )
+        return section
+    }
 
     // MARK: - Actions
 
@@ -260,7 +256,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         startedState: InteractorState.Started, isSubmitting: Bool
     ) -> POActionsContainerActionViewModel {
         let action = POActionsContainerActionViewModel(
-            id: "card-tokenization.primary-button",
+            id: "primary-button",
             title: configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit),
             isEnabled: startedState.recentErrorMessage == nil,
             isLoading: isSubmitting,
@@ -278,7 +274,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             return nil
         }
         let action = POActionsContainerActionViewModel(
-            id: "card-tokenization.cancel-button",
+            id: "cancel-button",
             title: title,
             isEnabled: isEnabled,
             isLoading: false,
