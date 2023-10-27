@@ -1,0 +1,1882 @@
+{
+  "AC": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "AD": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "AE": {
+    "stateUnit": "emirate",
+    "units": [
+      "street",
+      "state"
+    ]
+  },
+  "AF": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "AG": {
+
+  },
+  "AI": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "AL": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "AM": {
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "AO": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "AR": {
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "AT": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "AU": {
+    "cityUnit": "suburb",
+    "stateUnit": "state"
+  },
+  "AW": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "AX": {
+    "units": [
+      "street",
+      "street",
+      "postcode",
+      "city",
+      "street"
+    ]
+  },
+  "AZ": {
+    "units": [
+      "street",
+      "street",
+      "postcode",
+      "postcode",
+      "city"
+    ]
+  },
+  "BA": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "BB": {
+    "stateUnit": "parish"
+  },
+  "BD": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "BE": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "BF": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "BG": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "BH": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "BI": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "BJ": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "BL": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "BM": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "BN": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "BO": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "BQ": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "BR": {
+    "stateUnit": "state"
+  },
+  "BS": {
+    "stateUnit": "island",
+    "units": [
+      "street",
+      "city",
+      "state"
+    ]
+  },
+  "BT": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "BV": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "BW": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "BY": {
+    "units": [
+      "state",
+      "postcode",
+      "city",
+      "street"
+    ]
+  },
+  "BZ": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "CA": {
+    "states": [
+      {
+        "abbreviation": "AB",
+        "name": "Alberta"
+      },
+      {
+        "abbreviation": "BC",
+        "name": "British Columbia"
+      },
+      {
+        "abbreviation": "MB",
+        "name": "Manitoba"
+      },
+      {
+        "abbreviation": "NB",
+        "name": "New Brunswick"
+      },
+      {
+        "abbreviation": "NL",
+        "name": "Newfoundland and Labrador"
+      },
+      {
+        "abbreviation": "NT",
+        "name": "Northwest Territories"
+      },
+      {
+        "abbreviation": "NS",
+        "name": "Nova Scotia"
+      },
+      {
+        "abbreviation": "NU",
+        "name": "Nunavut"
+      },
+      {
+        "abbreviation": "ON",
+        "name": "Ontario"
+      },
+      {
+        "abbreviation": "PE",
+        "name": "Prince Edward Island"
+      },
+      {
+        "abbreviation": "QC",
+        "name": "Quebec"
+      },
+      {
+        "abbreviation": "SK",
+        "name": "Saskatchewan"
+      },
+      {
+        "abbreviation": "YT",
+        "name": "Yukon"
+      }
+    ]
+  },
+  "CD": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "CF": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "CG": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "CH": {
+    "units": [
+      "street",
+      "city",
+      "postcode",
+      "city"
+    ]
+  },
+  "CI": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "CK": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "CL": {
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "CM": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "CN": {
+    "units": [
+      "postcode",
+      "state",
+      "city",
+      "street"
+    ]
+  },
+  "CO": {
+    "stateUnit": "department"
+  },
+  "CR": {
+    "units": [
+      "street",
+      "state",
+      "city",
+      "postcode"
+    ]
+  },
+  "CV": {
+    "stateUnit": "island",
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "CW": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "CY": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "CZ": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "DE": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "DJ": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "DK": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "DM": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "DO": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "DZ": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "EC": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "EE": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "EG": {
+
+  },
+  "EH": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "ER": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "ES": {
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "ET": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "FI": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "FJ": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "FK": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "FO": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "FR": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "GA": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "GB": {
+    "cityUnit": "postTown",
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "GD": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "GE": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "GF": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "GG": {
+
+  },
+  "GH": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "GI": {
+    "units": [
+      "street",
+      "street",
+      "street",
+      "postcode"
+    ]
+  },
+  "GL": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "GM": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "GN": {
+    "units": [
+      "postcode",
+      "street",
+      "city"
+    ]
+  },
+  "GP": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "GQ": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "GR": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "GS": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "GT": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "GU": {
+    "postcodeUnit": "zip",
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "GW": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "GY": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "HK": {
+    "cityUnit": "district",
+    "stateUnit": "area",
+    "units": [
+      "state",
+      "city",
+      "street"
+    ]
+  },
+  "HN": {
+    "stateUnit": "department"
+  },
+  "HR": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "HT": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "HU": {
+    "units": [
+      "city",
+      "street",
+      "postcode"
+    ]
+  },
+  "ID": {
+
+  },
+  "IE": {
+    "postcodeUnit": "eircode",
+    "stateUnit": "county"
+  },
+  "IL": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "IM": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "IN": {
+    "postcodeUnit": "pin",
+    "stateUnit": "state",
+    "units": [
+      "street",
+      "city",
+      "postcode",
+      "state"
+    ]
+  },
+  "IO": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "IQ": {
+
+  },
+  "IS": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "IT": {
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "JE": {
+
+  },
+  "JM": {
+    "stateUnit": "parish",
+    "units": [
+      "street",
+      "city",
+      "state"
+    ]
+  },
+  "JO": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "JP": {
+    "stateUnit": "prefecture",
+    "units": [
+      "postcode",
+      "state",
+      "street"
+    ]
+  },
+  "KE": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "KG": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "KH": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "KI": {
+    "stateUnit": "island",
+    "units": [
+      "street",
+      "state",
+      "city"
+    ]
+  },
+  "KM": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "KN": {
+    "stateUnit": "island",
+    "units": [
+      "street",
+      "city",
+      "state"
+    ]
+  },
+  "KR": {
+    "stateUnit": "doSi",
+    "units": [
+      "state",
+      "city",
+      "street",
+      "postcode"
+    ]
+  },
+  "KW": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "KY": {
+    "stateUnit": "island",
+    "units": [
+      "street",
+      "state",
+      "postcode"
+    ]
+  },
+  "KZ": {
+    "units": [
+      "postcode",
+      "state",
+      "city",
+      "street"
+    ]
+  },
+  "LA": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "LB": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "LC": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "LI": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "LK": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "LR": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "LS": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "LT": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "LU": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "LV": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "LY": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "MA": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "MC": {
+    "units": [
+      "street",
+      "city",
+      "postcode",
+      "city"
+    ]
+  },
+  "MD": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "ME": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "MF": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "MG": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "MK": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "ML": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "MM": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "MN": {
+
+  },
+  "MO": {
+    "units": [
+      "street"
+    ]
+  },
+  "MQ": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "MR": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "MS": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "MT": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "MU": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "MV": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "MW": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "MX": {
+    "stateUnit": "state",
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "MY": {
+    "stateUnit": "state",
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "MZ": {
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "NA": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "NC": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "NE": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "NG": {
+    "stateUnit": "state",
+    "units": [
+      "street",
+      "city",
+      "postcode",
+      "state"
+    ]
+  },
+  "NI": {
+    "stateUnit": "department",
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "NL": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "NO": {
+    "cityUnit": "postTown",
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "NP": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "NR": {
+    "stateUnit": "prefecture",
+    "units": [
+      "street",
+      "state"
+    ]
+  },
+  "NU": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "NZ": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "OM": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "PA": {
+    "units": [
+      "street",
+      "city",
+      "state"
+    ]
+  },
+  "PE": {
+    "cityUnit": "district",
+    "units": [
+      "street",
+      "city",
+      "postcode",
+      "state"
+    ]
+  },
+  "PF": {
+    "stateUnit": "island",
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "PG": {
+    "units": [
+      "street",
+      "city",
+      "postcode",
+      "state"
+    ]
+  },
+  "PH": {
+    "units": [
+      "street",
+      "city",
+      "postcode",
+      "state"
+    ]
+  },
+  "PK": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "PL": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "PM": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "PN": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "PR": {
+    "postcodeUnit": "zip",
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "PS": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "PT": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "PY": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "QA": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "RE": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "RO": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "RS": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "RU": {
+    "stateUnit": "oblast"
+  },
+  "RW": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "SA": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "SB": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "SC": {
+    "stateUnit": "island",
+    "units": [
+      "street",
+      "city",
+      "state"
+    ]
+  },
+  "SE": {
+    "cityUnit": "postTown",
+    "units": [
+      "street",
+      "state",
+      "postcode",
+      "city"
+    ]
+  },
+  "SG": {
+    "units": [
+      "street",
+      "state",
+      "street",
+      "postcode"
+    ]
+  },
+  "SH": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "SI": {
+    "units": [
+      "street",
+      "state",
+      "postcode",
+      "city"
+    ]
+  },
+  "SJ": {
+    "cityUnit": "postTown",
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "SK": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "SL": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "SM": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "SN": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "SO": {
+
+  },
+  "SR": {
+    "units": [
+      "street",
+      "city",
+      "state"
+    ]
+  },
+  "SS": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "ST": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "SV": {
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "SX": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "SZ": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "TA": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "TC": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "TD": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "TF": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "TG": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "TH": {
+
+  },
+  "TJ": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "TK": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "TL": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "TM": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "TN": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "TO": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "TR": {
+    "cityUnit": "district",
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "TT": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "TV": {
+    "stateUnit": "island",
+    "units": [
+      "street",
+      "city",
+      "state"
+    ]
+  },
+  "TW": {
+    "stateUnit": "county",
+    "units": [
+      "postcode",
+      "state",
+      "city",
+      "street"
+    ]
+  },
+  "TZ": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "UA": {
+    "stateUnit": "oblast"
+  },
+  "UG": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "US": {
+    "postcodeUnit": "zip",
+    "stateUnit": "state",
+    "states": [
+      {
+        "abbreviation": "AL",
+        "name": "Alabama"
+      },
+      {
+        "abbreviation": "AK",
+        "name": "Alaska"
+      },
+      {
+        "abbreviation": "AS",
+        "name": "American Samoa"
+      },
+      {
+        "abbreviation": "AZ",
+        "name": "Arizona"
+      },
+      {
+        "abbreviation": "AR",
+        "name": "Arkansas"
+      },
+      {
+        "abbreviation": "AA",
+        "name": "Armed Forces (AA)"
+      },
+      {
+        "abbreviation": "AE",
+        "name": "Armed Forces (AE)"
+      },
+      {
+        "abbreviation": "AP",
+        "name": "Armed Forces (AP)"
+      },
+      {
+        "abbreviation": "CA",
+        "name": "California"
+      },
+      {
+        "abbreviation": "CO",
+        "name": "Colorado"
+      },
+      {
+        "abbreviation": "CT",
+        "name": "Connecticut"
+      },
+      {
+        "abbreviation": "DE",
+        "name": "Delaware"
+      },
+      {
+        "abbreviation": "DC",
+        "name": "District of Columbia"
+      },
+      {
+        "abbreviation": "FL",
+        "name": "Florida"
+      },
+      {
+        "abbreviation": "GA",
+        "name": "Georgia"
+      },
+      {
+        "abbreviation": "GU",
+        "name": "Guam"
+      },
+      {
+        "abbreviation": "HI",
+        "name": "Hawaii"
+      },
+      {
+        "abbreviation": "ID",
+        "name": "Idaho"
+      },
+      {
+        "abbreviation": "IL",
+        "name": "Illinois"
+      },
+      {
+        "abbreviation": "IN",
+        "name": "Indiana"
+      },
+      {
+        "abbreviation": "IA",
+        "name": "Iowa"
+      },
+      {
+        "abbreviation": "KS",
+        "name": "Kansas"
+      },
+      {
+        "abbreviation": "KY",
+        "name": "Kentucky"
+      },
+      {
+        "abbreviation": "LA",
+        "name": "Louisiana"
+      },
+      {
+        "abbreviation": "ME",
+        "name": "Maine"
+      },
+      {
+        "abbreviation": "MH",
+        "name": "Marshall Islands"
+      },
+      {
+        "abbreviation": "MD",
+        "name": "Maryland"
+      },
+      {
+        "abbreviation": "MA",
+        "name": "Massachusetts"
+      },
+      {
+        "abbreviation": "MI",
+        "name": "Michigan"
+      },
+      {
+        "abbreviation": "FM",
+        "name": "Micronesia"
+      },
+      {
+        "abbreviation": "MN",
+        "name": "Minnesota"
+      },
+      {
+        "abbreviation": "MS",
+        "name": "Mississippi"
+      },
+      {
+        "abbreviation": "MO",
+        "name": "Missouri"
+      },
+      {
+        "abbreviation": "MT",
+        "name": "Montana"
+      },
+      {
+        "abbreviation": "NE",
+        "name": "Nebraska"
+      },
+      {
+        "abbreviation": "NV",
+        "name": "Nevada"
+      },
+      {
+        "abbreviation": "NH",
+        "name": "New Hampshire"
+      },
+      {
+        "abbreviation": "NJ",
+        "name": "New Jersey"
+      },
+      {
+        "abbreviation": "NM",
+        "name": "New Mexico"
+      },
+      {
+        "abbreviation": "NY",
+        "name": "New York"
+      },
+      {
+        "abbreviation": "NC",
+        "name": "North Carolina"
+      },
+      {
+        "abbreviation": "ND",
+        "name": "North Dakota"
+      },
+      {
+        "abbreviation": "MP",
+        "name": "Northern Mariana Islands"
+      },
+      {
+        "abbreviation": "OH",
+        "name": "Ohio"
+      },
+      {
+        "abbreviation": "OK",
+        "name": "Oklahoma"
+      },
+      {
+        "abbreviation": "OR",
+        "name": "Oregon"
+      },
+      {
+        "abbreviation": "PW",
+        "name": "Palau"
+      },
+      {
+        "abbreviation": "PA",
+        "name": "Pennsylvania"
+      },
+      {
+        "abbreviation": "PR",
+        "name": "Puerto Rico"
+      },
+      {
+        "abbreviation": "RI",
+        "name": "Rhode Island"
+      },
+      {
+        "abbreviation": "SC",
+        "name": "South Carolina"
+      },
+      {
+        "abbreviation": "SD",
+        "name": "South Dakota"
+      },
+      {
+        "abbreviation": "TN",
+        "name": "Tennessee"
+      },
+      {
+        "abbreviation": "TX",
+        "name": "Texas"
+      },
+      {
+        "abbreviation": "UT",
+        "name": "Utah"
+      },
+      {
+        "abbreviation": "VT",
+        "name": "Vermont"
+      },
+      {
+        "abbreviation": "VI",
+        "name": "Virgin Islands"
+      },
+      {
+        "abbreviation": "VA",
+        "name": "Virginia"
+      },
+      {
+        "abbreviation": "WA",
+        "name": "Washington"
+      },
+      {
+        "abbreviation": "WV",
+        "name": "West Virginia"
+      },
+      {
+        "abbreviation": "WI",
+        "name": "Wisconsin"
+      },
+      {
+        "abbreviation": "WY",
+        "name": "Wyoming"
+      }
+    ]
+  },
+  "UY": {
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "UZ": {
+    "units": [
+      "street",
+      "postcode",
+      "city",
+      "state"
+    ]
+  },
+  "VA": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "VC": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "VE": {
+    "stateUnit": "state",
+    "units": [
+      "street",
+      "city",
+      "postcode",
+      "state"
+    ]
+  },
+  "VG": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "VN": {
+
+  },
+  "VU": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "WF": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "WS": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "XK": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "YE": {
+    "units": [
+      "street",
+      "city"
+    ]
+  },
+  "YT": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "ZA": {
+    "units": [
+      "street",
+      "city",
+      "postcode"
+    ]
+  },
+  "ZM": {
+    "units": [
+      "street",
+      "postcode",
+      "city"
+    ]
+  },
+  "ZW": {
+    "units": [
+      "street",
+      "city"
+    ]
+  }
+}
