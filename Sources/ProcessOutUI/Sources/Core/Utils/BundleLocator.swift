@@ -1,8 +1,8 @@
 //
 //  BundleLocator.swift
-//  ProcessOut
+//  ProcessOutUI
 //
-//  Created by Andrii Vysotskyi on 07.10.2022.
+//  Created by Andrii Vysotskyi on 17.10.2023.
 //
 
 import Foundation

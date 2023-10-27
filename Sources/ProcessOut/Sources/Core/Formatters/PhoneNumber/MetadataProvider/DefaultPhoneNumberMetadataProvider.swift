@@ -31,7 +31,7 @@ final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
 
     private let dispatchQueue: DispatchQueue
 
-    @UnfairlyLocked
+    @POUnfairlyLocked
     private var metadata: [String: PhoneNumberMetadata]?
 
     // MARK: - Private Methods
