@@ -12,6 +12,7 @@ struct StringResource {
     /// The key to use to look up a localized string.
     let key: String
 
+    /// The name of the table containing the key-value pairs.
     let tableName: String?
 
     init(_ key: String, tableName: String? = nil, comment: String) {
@@ -55,7 +56,6 @@ extension String {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let table = "ProcessOutUI"
         static let unknownString = UUID().uuidString
     }
 }
