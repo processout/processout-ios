@@ -1,5 +1,5 @@
 //
-//  UnfairlyLocked.swift
+//  POUnfairlyLocked.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 14.07.2023.
@@ -9,22 +9,22 @@
 
 /// A thread-safe wrapper around a value.
 @propertyWrapper
-final class UnfairlyLocked<Value> {
+@_spi(PO) public final class POUnfairlyLocked<Value> {
 
-    init(wrappedValue: Value) {
+    public init(wrappedValue: Value) {
         value = wrappedValue
     }
 
     /// The contained value. Unsafe for anything more than direct read or write.
-    var wrappedValue: Value {
+    public var wrappedValue: Value {
         lock.withLock { value }
     }
 
-    var projectedValue: UnfairlyLocked<Value> {
+    public var projectedValue: POUnfairlyLocked<Value> {
         self
     }
 
-    func withLock<R>(_ body: (inout Value) -> R) -> R {
+    public func withLock<R>(_ body: (inout Value) -> R) -> R {
         lock.withLock {
             body(&value)
         }
