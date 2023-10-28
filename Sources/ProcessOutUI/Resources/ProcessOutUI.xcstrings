@@ -419,6 +419,16 @@
         }
       }
     },
+    "card-tokenization.billing-address.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Billing Address"
+          }
+        }
+      }
+    },
     "card-tokenization.cancel-button.title" : {
       "localizations" : {
         "en" : {
