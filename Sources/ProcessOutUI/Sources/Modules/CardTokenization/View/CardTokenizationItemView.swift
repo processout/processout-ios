@@ -39,7 +39,16 @@ struct CardTokenizationItemView: View {
             POPicker(pickerItem.options, selection: pickerItem.$selectedOptionId) { option in
                 Text(option.title)
             }
-            .pickerStyle(PORadioGroupPickerStyle(radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton)))
+            .modify { view in
+                if pickerItem.preferrsInline {
+                    view.pickerStyle(
+                        PORadioGroupPickerStyle(radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton))
+                    )
+                } else {
+                    view.pickerStyle(POMenuPickerStyle(inputStyle: style.input))
+                }
+            }
+            .animation(.default, value: pickerItem.preferrsInline)
         case .error(let errorItem):
             Text(errorItem.description)
                 .textStyle(style.errorDescription)
