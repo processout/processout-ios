@@ -8,20 +8,20 @@
 import Foundation
 @_spi(PO) import ProcessOut
 
-struct AddressSpecificationProvider {
+final class AddressSpecificationProvider {
 
     static let shared = AddressSpecificationProvider()
 
     /// Preloads specifications.
     func prewarm() {
-        DispatchQueue.global(qos: .userInitiated).async { loadSpecifications() }
+        DispatchQueue.global(qos: .userInitiated).async { self.loadSpecifications() }
     }
 
     // MARK: - AddressSpecificationProvider
 
     /// Returns supported country codes.
     private(set) lazy var countryCodes: [String] = {
-        Array(loadSpecifications().keys)
+        Array(loadSpecifications().keys).sorted(by: <)
     }()
 
     /// Returns address spec for given country code or default if country is unknown.
