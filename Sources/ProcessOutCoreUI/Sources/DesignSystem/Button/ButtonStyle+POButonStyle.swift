@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-extension ButtonStyle where Self == POButtonStyle<POCircularProgressViewStyle> {
+extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
 
     /// Default style for primary button.
-    @_spi(PO) public static var primary: POButtonStyle<POCircularProgressViewStyle> {
+    @_spi(PO) public static var primary: POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(
                 title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
@@ -30,12 +30,12 @@ extension ButtonStyle where Self == POButtonStyle<POCircularProgressViewStyle> {
                 shadow: .clear,
                 backgroundColor: UIColor(resource: .Action.Primary.disabled)
             ),
-            progressView: .circular(tint: UIColor(resource: .Text.on))
+            progressView: CircularProgressViewStyle(tint: Color(UIColor(resource: .Text.on)))
         )
     }
 
     /// Default style for secondary button.
-    @_spi(PO) public static var secondary: POButtonStyle<POCircularProgressViewStyle> {
+    @_spi(PO) public static var secondary: POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(
                 title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
@@ -55,7 +55,7 @@ extension ButtonStyle where Self == POButtonStyle<POCircularProgressViewStyle> {
                 shadow: .clear,
                 backgroundColor: UIColor(resource: .Action.Secondary.default).withAlphaComponent(0)
             ),
-            progressView: .circular(tint: UIColor(resource: .Text.secondary))
+            progressView: CircularProgressViewStyle(tint: Color(UIColor(resource: .Text.secondary)))
         )
     }
 }
