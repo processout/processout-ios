@@ -81,6 +81,6 @@ private struct FocusModifier<Value: Hashable>: ViewModifier {
     /// Indicates whether
     @State private var isVisible: Bool
 
-    @POBackport.StateObject
+    @StateObject
     private var coordinator: FocusCoordinator
 }
