@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-@_spi(PO) public struct POTextField<Trailing: View>: View {
+@available(iOS 14, *)
+@_spi(PO)
+public struct POTextField<Trailing: View>: View {
 
     /// - Parameters:
     ///   - text: The underlying text to edit.
@@ -57,6 +59,7 @@ private enum Constants {
     static let padding = EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)
 }
 
+@available(iOS 14, *)
 private struct TextFieldRepresentable: UIViewRepresentable {
 
     @Binding var text: String
@@ -155,6 +158,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
     }
 }
 
+@available(iOS 14, *)
 private final class TextFieldCoordinator: NSObject, UITextFieldDelegate {
 
     init(view: TextFieldRepresentable) {

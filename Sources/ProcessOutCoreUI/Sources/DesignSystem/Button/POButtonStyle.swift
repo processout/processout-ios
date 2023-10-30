@@ -8,6 +8,7 @@
 import SwiftUI
 
 /// Defines button style in all possible states.
+@available(iOS 14, *)
 public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
 
     /// Style for normal state.

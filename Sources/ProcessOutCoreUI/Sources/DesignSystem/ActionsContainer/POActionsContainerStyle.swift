@@ -44,6 +44,7 @@ public struct POActionsContainerStyle {
 extension POActionsContainerStyle {
 
     /// Default actions container style.
+    @available(iOS 14, *)
     public static var `default`: POActionsContainerStyle {
         POActionsContainerStyle(
             primary: .primary,

@@ -16,7 +16,7 @@ targets:
   ProcessOutCoreUI:
     type: framework
     platform: iOS
-    deploymentTarget: "14.0"
+    deploymentTarget: "13.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.core-ui
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutCoreUI

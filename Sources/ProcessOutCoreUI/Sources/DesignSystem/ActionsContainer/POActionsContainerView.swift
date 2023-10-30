@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-@_spi(PO) public struct POActionsContainerView: View {
+@available(iOS 14, *)
+@_spi(PO)
+public struct POActionsContainerView: View {
 
     public init(actions: [POActionsContainerActionViewModel], spacing: CGFloat, horizontalPadding: CGFloat) {
         self.actions = actions
