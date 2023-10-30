@@ -85,8 +85,6 @@
   },
   "AX": {
     "units": [
-      "street",
-      "street",
       "postcode",
       "city",
       "street"
@@ -95,8 +93,6 @@
   "AZ": {
     "units": [
       "street",
-      "street",
-      "postcode",
       "postcode",
       "city"
     ]
@@ -311,7 +307,6 @@
   "CH": {
     "units": [
       "street",
-      "city",
       "postcode",
       "city"
     ]
@@ -554,8 +549,6 @@
   },
   "GI": {
     "units": [
-      "street",
-      "street",
       "street",
       "postcode"
     ]
@@ -910,7 +903,6 @@
   "MC": {
     "units": [
       "street",
-      "city",
       "postcode",
       "city"
     ]
@@ -1296,8 +1288,6 @@
   },
   "SG": {
     "units": [
-      "street",
-      "state",
       "street",
       "postcode"
     ]
