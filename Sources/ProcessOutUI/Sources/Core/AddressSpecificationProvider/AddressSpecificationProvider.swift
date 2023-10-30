@@ -21,7 +21,7 @@ final class AddressSpecificationProvider {
 
     /// Returns supported country codes.
     private(set) lazy var countryCodes: [String] = {
-        Array(loadSpecifications().keys).sorted(by: <)
+        Array(loadSpecifications().keys)
     }()
 
     /// Returns address spec for given country code or default if country is unknown.
