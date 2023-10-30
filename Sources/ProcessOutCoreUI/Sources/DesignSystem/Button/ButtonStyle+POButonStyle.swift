@@ -13,24 +13,24 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
     @_spi(PO) public static var primary: POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(
-                title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
+                title: .init(color: Color(.Text.on), typography: .Fixed.button),
                 border: .clear,
                 shadow: .clear,
-                backgroundColor: UIColor(resource: .Action.Primary.default)
+                backgroundColor: Color(.Action.Primary.default)
             ),
             highlighted: .init(
-                title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
+                title: .init(color: Color(.Text.on), typography: .Fixed.button),
                 border: .clear,
                 shadow: .clear,
-                backgroundColor: UIColor(resource: .Action.Primary.pressed)
+                backgroundColor: Color(.Action.Primary.pressed)
             ),
             disabled: .init(
-                title: .init(color: UIColor(resource: .Text.disabled), typography: .Fixed.button),
+                title: .init(color: Color(.Text.disabled), typography: .Fixed.button),
                 border: .clear,
                 shadow: .clear,
-                backgroundColor: UIColor(resource: .Action.Primary.disabled)
+                backgroundColor: Color(.Action.Primary.disabled)
             ),
-            progressView: CircularProgressViewStyle(tint: Color(UIColor(resource: .Text.on)))
+            progressView: CircularProgressViewStyle(tint: Color(.Text.on))
         )
     }
 
@@ -38,24 +38,24 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
     @_spi(PO) public static var secondary: POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(
-                title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
-                border: .regular(color: UIColor(resource: .Border.default)),
+                title: .init(color: Color(.Text.secondary), typography: .Fixed.button),
+                border: .regular(color: Color(.Border.default)),
                 shadow: .clear,
-                backgroundColor: UIColor(resource: .Action.Secondary.default)
+                backgroundColor: Color(.Action.Secondary.default)
             ),
             highlighted: .init(
-                title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
-                border: .regular(color: UIColor(resource: .Border.default)),
+                title: .init(color: Color(.Text.secondary), typography: .Fixed.button),
+                border: .regular(color: Color(.Border.default)),
                 shadow: .clear,
-                backgroundColor: UIColor(resource: .Action.Secondary.pressed)
+                backgroundColor: Color(.Action.Secondary.pressed)
             ),
             disabled: .init(
-                title: .init(color: UIColor(resource: .Text.disabled), typography: .Fixed.button),
-                border: .regular(color: UIColor(resource: .Action.Border.disabled)),
+                title: .init(color: Color(.Text.disabled), typography: .Fixed.button),
+                border: .regular(color: Color(.Action.Border.disabled)),
                 shadow: .clear,
-                backgroundColor: UIColor(resource: .Action.Secondary.default).withAlphaComponent(0)
+                backgroundColor: Color(.Action.Secondary.default).opacity(0)
             ),
-            progressView: CircularProgressViewStyle(tint: Color(UIColor(resource: .Text.secondary)))
+            progressView: CircularProgressViewStyle(tint: Color(.Text.secondary))
         )
     }
 }

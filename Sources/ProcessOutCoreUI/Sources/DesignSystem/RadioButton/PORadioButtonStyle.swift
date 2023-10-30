@@ -44,11 +44,11 @@ public struct PORadioButtonStyle: ButtonStyle {
             HStack(alignment: .top, spacing: Constants.spacing) {
                 ZStack {
                     Circle()
-                        .fill(Color(style.knob.backgroundColor))
+                        .fill(style.knob.backgroundColor)
                     Circle()
-                        .strokeBorder(Color(style.knob.border.color), lineWidth: style.knob.border.width)
+                        .strokeBorder(style.knob.border.color, lineWidth: style.knob.border.width)
                     Circle()
-                        .fill(Color(style.knob.innerCircleColor))
+                        .fill(style.knob.innerCircleColor)
                         .frame(width: style.knob.innerCircleRadius * 2)
                 }
                 .frame(width: Constants.knobSize, height: Constants.knobSize)

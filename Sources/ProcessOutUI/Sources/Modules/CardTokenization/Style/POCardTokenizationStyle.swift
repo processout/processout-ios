@@ -27,13 +27,13 @@ public struct POCardTokenizationStyle {
     public let errorDescription: POTextStyle
 
     /// Background color.
-    public let backgroundColor: UIColor
+    public let backgroundColor: Color
 
     /// Actions container style.
     public let actionsContainer: POActionsContainerStyle
 
     /// Separator color.
-    public let separatorColor: UIColor
+    public let separatorColor: Color
 
     public init(
         title: POTextStyle,
@@ -41,9 +41,9 @@ public struct POCardTokenizationStyle {
         input: POInputStyle,
         radioButton: some ButtonStyle,
         errorDescription: POTextStyle,
-        backgroundColor: UIColor,
+        backgroundColor: Color,
         actionsContainer: POActionsContainerStyle,
-        separatorColor: UIColor
+        separatorColor: Color
     ) {
         self.title = title
         self.sectionTitle = sectionTitle
@@ -67,9 +67,9 @@ extension POCardTokenizationStyle {
             input: .medium,
             radioButton: .radio,
             errorDescription: POTextStyle(color: UIColor(poResource: .Text.error), typography: .Fixed.label),
-            backgroundColor: UIColor(poResource: .Surface.level1),
+            backgroundColor: Color(poResource: .Surface.level1),
             actionsContainer: .default,
-            separatorColor: UIColor(poResource: .Border.subtle)
+            separatorColor: Color(poResource: .Border.subtle)
         )
     }
 }

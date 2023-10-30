@@ -62,7 +62,7 @@ import SwiftUI
         .lineLimit(1)
         .padding(Constants.padding)
         .frame(maxWidth: .infinity, minHeight: Constants.minHeight, alignment: .leading)
-        .background(Color(style.backgroundColor))
+        .background(style.backgroundColor)
         .border(style: style.border)
         .shadow(style: style.shadow)
     }

@@ -52,7 +52,7 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
             }
             .padding(Constants.padding)
             .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
-            .background(Color(currentStyle.backgroundColor))
+            .background(currentStyle.backgroundColor)
             .border(style: currentStyle.border)
             .shadow(style: currentStyle.shadow)
             .backport.geometryGroup()

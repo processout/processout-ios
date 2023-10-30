@@ -19,7 +19,7 @@ import SwiftUI
         VStack(spacing: spacing) {
             Divider()
                 .frame(height: 1)
-                .overlay(Color(style.separatorColor))
+                .overlay(style.separatorColor)
             ForEach(actions) { element in
                 Button(element.title, action: element.action)
                     .buttonStyle(POAnyButtonStyle(erasing: element.isPrimary ? style.primary : style.secondary))
@@ -34,7 +34,7 @@ import SwiftUI
         }
         .padding(.bottom, spacing)
         .background(
-            Color(style.backgroundColor).edgesIgnoringSafeArea(.all)
+            style.backgroundColor.edgesIgnoringSafeArea(.all)
         )
         .backport.geometryGroup()
         .animation(.default, value: actions.map(\.id))

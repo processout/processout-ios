@@ -56,7 +56,7 @@ private struct TextViewRepresentable: UIViewRepresentable {
             .with { builder in
                 builder.typography = style.typography
                 builder.sizeCategory = UIContentSizeCategory(sizeCategory)
-                builder.color = style.color
+                builder.color = UIColor(style.color)
                 builder.lineBreakMode = .byWordWrapping
                 builder.alignment = NSTextAlignment(multilineTextAlignment)
                 builder.text = .markdown(string)

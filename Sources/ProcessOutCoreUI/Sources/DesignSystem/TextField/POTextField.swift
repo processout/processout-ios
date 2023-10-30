@@ -33,10 +33,10 @@ import SwiftUI
         }
         .padding(Constants.padding)
         .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
-        .background(Color(style.backgroundColor))
+        .background(style.backgroundColor)
         .border(style: style.border)
         .shadow(style: style.shadow)
-        .accentColor(Color(style.tintColor))
+        .accentColor(style.tintColor)
         .backport.geometryGroup()
         .animation(.default, value: isInvalid)
     }
@@ -132,7 +132,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
             .with { builder in
                 builder.typography = style.text.typography
                 builder.sizeCategory = .init(sizeCategory)
-                builder.color = style.text.color
+                builder.color = UIColor(style.text.color)
             }
             .buildAttributes()
             .filter { Constants.includedTextAttributes.contains($0.key) }
@@ -144,7 +144,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
             .with { builder in
                 builder.typography = style.placeholder.typography
                 builder.sizeCategory = .init(sizeCategory)
-                builder.color = style.placeholder.color
+                builder.color = UIColor(style.placeholder.color)
             }
             .buildAttributes()
             .filter { Constants.includedTextAttributes.contains($0.key) }

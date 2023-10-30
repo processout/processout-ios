@@ -66,7 +66,7 @@ final class CodeFieldComponentView: UIView {
                     builder.typography = viewModel.style.text.typography
                     builder.maximumFontSize = Constants.maximumFontSize
                     builder.alignment = .center
-                    builder.color = viewModel.style.text.color
+                    builder.color = UIColor(viewModel.style.text.color)
                     builder.text = .plain(viewModel.value.map(String.init) ?? "")
                 }
                 .build()
@@ -75,8 +75,8 @@ final class CodeFieldComponentView: UIView {
             }
             apply(style: viewModel.style.border)
             apply(style: viewModel.style.shadow)
-            backgroundColor = viewModel.style.backgroundColor
-            carretView.backgroundColor = viewModel.style.tintColor
+            backgroundColor = UIColor(viewModel.style.backgroundColor)
+            carretView.backgroundColor = UIColor(viewModel.style.tintColor)
             UIView.performWithoutAnimation(layoutIfNeeded)
         }
         currentViewModel = viewModel
