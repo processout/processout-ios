@@ -9,6 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 /// Defines style for card tokenization module.
+@available(iOS 14, *)
 public struct POCardTokenizationStyle {
 
     /// Title style.
@@ -56,17 +57,18 @@ public struct POCardTokenizationStyle {
     }
 }
 
+@available(iOS 14, *)
 extension POCardTokenizationStyle {
 
     public static var `default`: POCardTokenizationStyle {
         POCardTokenizationStyle(
-            title: POTextStyle(color: UIColor(poResource: .Text.primary), typography: .Medium.title),
+            title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title),
             sectionTitle: POTextStyle(
-                color: UIColor(poResource: .Text.secondary), typography: .Fixed.labelHeading
+                color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading
             ),
             input: .medium,
             radioButton: .radio,
-            errorDescription: POTextStyle(color: UIColor(poResource: .Text.error), typography: .Fixed.label),
+            errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
             backgroundColor: Color(poResource: .Surface.level1),
             actionsContainer: .default,
             separatorColor: Color(poResource: .Border.subtle)
