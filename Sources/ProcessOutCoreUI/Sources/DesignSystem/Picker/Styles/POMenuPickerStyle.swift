@@ -7,18 +7,23 @@
 
 import SwiftUI
 
-@_spi(PO) public struct POMenuPickerStyle: POPickerStyle {
+@available(iOS 14.0, *)
+@_spi(PO)
+public struct POMenuPickerStyle: POPickerStyle {
 
     public init(inputStyle: POInputStyle = .medium) {
         self.inputStyle = inputStyle
     }
 
     public func makeBody(configuration: POPickerStyleConfiguration) -> some View {
-        if #available(iOS 14.0, *) {
-            makeMenu(configuration: configuration)
-        } else {
-            SheetMenu(label: label(configuration: configuration), configuration: configuration)
+        Menu {
+            ForEach(configuration.elements) { element in
+                Button(action: element.select, label: element.makeBody)
+            }
+        } label: {
+            label(configuration: configuration)
         }
+        .menuStyle(.borderlessButton)
     }
 
     // MARK: - Private Nested Types
@@ -33,18 +38,6 @@ import SwiftUI
     private let inputStyle: POInputStyle
 
     // MARK: - Private Methods
-
-    @available(iOS 14.0, *)
-    private func makeMenu(configuration: POPickerStyleConfiguration) -> some View {
-        Menu {
-            ForEach(configuration.elements) { element in
-                Button(action: element.select, label: element.makeBody)
-            }
-        } label: {
-            label(configuration: configuration)
-        }
-        .menuStyle(.borderlessButton)
-    }
 
     @ViewBuilder
     private func label(configuration: POPickerStyleConfiguration) -> some View {
@@ -68,32 +61,9 @@ import SwiftUI
     }
 }
 
-private struct SheetMenu<Label: View>: View {
-
-    let label: Label
-    let configuration: POPickerStyleConfiguration
-
-    var body: some View {
-        label
-            .actionSheet(isPresented: $isSheetPresented) {
-                let buttons: [ActionSheet.Button] = configuration.elements.map { element in
-                    .default(element.makeBody(), action: element.select)
-                }
-                // todo(andrii-vysotskyi): replace with proper text when available
-                return ActionSheet(title: Text(""), message: nil, buttons: buttons)
-            }
-            .onTapGesture {
-                isSheetPresented = true
-            }
-    }
-
-    // MARK: - Private Properties
-
-    @State
-    private var isSheetPresented = false
-}
-
-@_spi(PO) extension POPickerStyle where Self == POMenuPickerStyle {
+@_spi(PO)
+@available(iOS 14.0, *)
+extension POPickerStyle where Self == POMenuPickerStyle {
 
     /// A picker style that presents the options as a menu when the user
     /// presses a button, or as a submenu when nested within a larger menu.
