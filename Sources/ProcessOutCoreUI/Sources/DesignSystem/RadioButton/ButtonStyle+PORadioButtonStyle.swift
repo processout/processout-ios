@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 14, *)
 extension ButtonStyle where Self == PORadioButtonStyle {
 
     @_spi(PO) public static var radio: PORadioButtonStyle {

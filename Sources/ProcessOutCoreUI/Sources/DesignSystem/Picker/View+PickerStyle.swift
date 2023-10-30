@@ -10,11 +10,14 @@ import SwiftUI
 extension View {
 
     /// Sets the style for picker views within this view.
-    @_spi(PO) public func pickerStyle<Style: POPickerStyle>(_ style: Style) -> some View {
+    @_spi(PO)
+    @available(iOS 14, *)
+    public func pickerStyle<Style: POPickerStyle>(_ style: Style) -> some View {
         environment(\.pickerStyle, AnyPickerStyle(erasing: style))
     }
 }
 
+@available(iOS 14, *)
 extension EnvironmentValues {
 
     var pickerStyle: AnyPickerStyle {
