@@ -23,8 +23,47 @@ enum CardTokenizationInteractorState {
         /// Indicates whether parameter is valid.
         var isValid = true
 
+        /// Boolean flag indicating whether parameter should be collected.
+        var shouldCollect = true // todo(andrii-vysotskyi): consider migrating to optional parameters
+
+        /// Available parameter values.
+        var availableValues: [ParameterValue] = []
+
         /// Formatter that can be used to format this parameter.
         var formatter: Formatter?
+    }
+
+    struct ParameterValue: Decodable, Hashable {
+
+        /// Display name of value.
+        let displayName: String
+
+        /// Actual parameter value.
+        let value: String
+    }
+
+    struct AddressParameters {
+
+        /// Billing address country.
+        var country: Parameter
+
+        /// Billing address street line 1.
+        var street1: Parameter
+
+        /// Billing address street line 2.
+        var street2: Parameter
+
+        /// Billing address city.
+        var city: Parameter
+
+        /// Billing address state.
+        var state: Parameter
+
+        /// Billing address postal code.
+        var postalCode: Parameter
+
+        /// Address country specification.
+        var specification: AddressSpecification
     }
 
     struct Started {
@@ -46,6 +85,9 @@ enum CardTokenizationInteractorState {
 
         /// Preferred scheme.
         var preferredScheme: String?
+
+        /// Billing address parameters.
+        var address: AddressParameters
 
         /// The most recent error message.
         var recentErrorMessage: String?

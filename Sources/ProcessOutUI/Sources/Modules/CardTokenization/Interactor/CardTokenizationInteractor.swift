@@ -7,6 +7,9 @@
 
 protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState> {
 
+    /// Tokenization configuration.
+    var configuration: POCardTokenizationConfiguration { get }
+
     /// Updates card information parameter with given id.
     func update(parameterId: State.ParameterId, value: String)
 
