@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 14, *)
 extension ButtonStyle where Self == PORadioButtonStyle {
 
     @_spi(PO) public static var radio: PORadioButtonStyle {
@@ -14,8 +15,8 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             normal: .init(
                 knob: .init(
                     backgroundColor: .clear,
-                    border: .regular(color: UIColor(resource: .Border.default)),
-                    innerCircleColor: UIColor(resource: .Action.Primary.default).withAlphaComponent(0),
+                    border: .regular(color: Color(.Border.default)),
+                    innerCircleColor: Color(.Action.Primary.default).opacity(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
@@ -23,8 +24,8 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             selected: .init(
                 knob: .init(
                     backgroundColor: .clear,
-                    border: .regular(color: UIColor(resource: .Action.Primary.default)),
-                    innerCircleColor: UIColor(resource: .Action.Primary.default),
+                    border: .regular(color: Color(.Action.Primary.default)),
+                    innerCircleColor: Color(.Action.Primary.default),
                     innerCircleRadius: 4
                 ),
                 value: valueStyle
@@ -32,8 +33,8 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             highlighted: .init(
                 knob: .init(
                     backgroundColor: .clear,
-                    border: .regular(color: UIColor(resource: .Text.muted)),
-                    innerCircleColor: UIColor(resource: .Action.Primary.default).withAlphaComponent(0),
+                    border: .regular(color: Color(.Text.muted)),
+                    innerCircleColor: Color(.Action.Primary.default).opacity(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
@@ -41,8 +42,8 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             error: .init(
                 knob: .init(
                     backgroundColor: .clear,
-                    border: .regular(color: UIColor(resource: .Text.error)),
-                    innerCircleColor: UIColor(resource: .Action.Primary.default).withAlphaComponent(0),
+                    border: .regular(color: Color(.Text.error)),
+                    innerCircleColor: Color(.Action.Primary.default).opacity(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
@@ -53,6 +54,6 @@ extension ButtonStyle where Self == PORadioButtonStyle {
     // MARK: - Private Properties
 
     private static var valueStyle: POTextStyle {
-        POTextStyle(color: UIColor(resource: .Text.primary), typography: .Fixed.label)
+        POTextStyle(color: Color(.Text.primary), typography: .Fixed.label)
     }
 }

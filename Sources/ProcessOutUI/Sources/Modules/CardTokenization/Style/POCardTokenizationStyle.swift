@@ -9,6 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 /// Defines style for card tokenization module.
+@available(iOS 14, *)
 public struct POCardTokenizationStyle {
 
     /// Title style.
@@ -27,13 +28,13 @@ public struct POCardTokenizationStyle {
     public let errorDescription: POTextStyle
 
     /// Background color.
-    public let backgroundColor: UIColor
+    public let backgroundColor: Color
 
     /// Actions container style.
     public let actionsContainer: POActionsContainerStyle
 
     /// Separator color.
-    public let separatorColor: UIColor
+    public let separatorColor: Color
 
     public init(
         title: POTextStyle,
@@ -41,9 +42,9 @@ public struct POCardTokenizationStyle {
         input: POInputStyle,
         radioButton: some ButtonStyle,
         errorDescription: POTextStyle,
-        backgroundColor: UIColor,
+        backgroundColor: Color,
         actionsContainer: POActionsContainerStyle,
-        separatorColor: UIColor
+        separatorColor: Color
     ) {
         self.title = title
         self.sectionTitle = sectionTitle
@@ -56,20 +57,21 @@ public struct POCardTokenizationStyle {
     }
 }
 
+@available(iOS 14, *)
 extension POCardTokenizationStyle {
 
     public static var `default`: POCardTokenizationStyle {
         POCardTokenizationStyle(
-            title: POTextStyle(color: UIColor(poResource: .Text.primary), typography: .Medium.title),
+            title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title),
             sectionTitle: POTextStyle(
-                color: UIColor(poResource: .Text.secondary), typography: .Fixed.labelHeading
+                color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading
             ),
             input: .medium,
             radioButton: .radio,
-            errorDescription: POTextStyle(color: UIColor(poResource: .Text.error), typography: .Fixed.label),
-            backgroundColor: UIColor(poResource: .Surface.level1),
+            errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
+            backgroundColor: Color(poResource: .Surface.level1),
             actionsContainer: .default,
-            separatorColor: UIColor(poResource: .Border.subtle)
+            separatorColor: Color(poResource: .Border.subtle)
         )
     }
 }

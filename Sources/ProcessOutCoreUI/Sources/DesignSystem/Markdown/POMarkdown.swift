@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-@_spi(PO) public struct POMarkdown: View {
+@available(iOS 14, *)
+@_spi(PO)
+public struct POMarkdown: View {
 
     public init(_ string: String) {
         self.string = string
@@ -24,6 +26,7 @@ import SwiftUI
     private let string: String
 }
 
+@available(iOS 14, *)
 private struct TextViewRepresentable: UIViewRepresentable {
 
     /// The text that the view displays.
@@ -56,7 +59,7 @@ private struct TextViewRepresentable: UIViewRepresentable {
             .with { builder in
                 builder.typography = style.typography
                 builder.sizeCategory = UIContentSizeCategory(sizeCategory)
-                builder.color = style.color
+                builder.color = UIColor(style.color)
                 builder.lineBreakMode = .byWordWrapping
                 builder.alignment = NSTextAlignment(multilineTextAlignment)
                 builder.text = .markdown(string)

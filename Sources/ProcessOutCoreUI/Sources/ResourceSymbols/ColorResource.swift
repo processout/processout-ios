@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 11.10.2023.
 //
 
-import UIKit
+import SwiftUI
 
 // swiftlint:disable strict_fileprivate identifier_name
 
@@ -83,11 +83,11 @@ extension POColorResource {
     }
 }
 
-extension UIKit.UIColor {
+extension SwiftUI.Color {
 
-    /// Initialize a `UIColor` with a color resource.
-    @_spi(PO) public convenience init(poResource: POColorResource) {
-        self.init(resource: poResource.colorResource)
+    /// Initialize a `Color` with a color resource.
+    @_spi(PO) public init(poResource: POColorResource) {
+        self.init(poResource.colorResource)
     }
 }
 

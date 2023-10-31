@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-@_spi(PO) public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerStyle {
+@available(iOS 14, *)
+@_spi(PO)
+public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerStyle {
 
     public init(radioButtonStyle: RadioButtonStyle = PORadioButtonStyle.radio) {
         self.radioButtonStyle = radioButtonStyle
@@ -28,7 +30,9 @@ import SwiftUI
     private let radioButtonStyle: RadioButtonStyle
 }
 
-@_spi(PO) extension POPickerStyle where Self == PORadioGroupPickerStyle<PORadioButtonStyle> {
+@available(iOS 14, *)
+@_spi(PO)
+extension POPickerStyle where Self == PORadioGroupPickerStyle<PORadioButtonStyle> {
 
     /// A picker style that presents the options as a group of radio buttons.
     public static var radioGroup: PORadioGroupPickerStyle<PORadioButtonStyle> {

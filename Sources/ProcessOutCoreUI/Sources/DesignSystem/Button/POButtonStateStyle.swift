@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 28.11.2022.
 //
 
-import UIKit
+import SwiftUI
 
 /// Defines button's styling information in a specific state.
 public struct POButtonStateStyle {
@@ -20,9 +20,9 @@ public struct POButtonStateStyle {
     public let shadow: POShadowStyle
 
     /// Background color.
-    public let backgroundColor: UIColor
+    public let backgroundColor: Color
 
-    public init(title: POTextStyle, border: POBorderStyle, shadow: POShadowStyle, backgroundColor: UIColor) {
+    public init(title: POTextStyle, border: POBorderStyle, shadow: POShadowStyle, backgroundColor: Color) {
         self.title = title
         self.border = border
         self.shadow = shadow

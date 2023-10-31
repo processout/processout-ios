@@ -8,6 +8,7 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
+@available(iOS 14, *)
 struct CardTokenizationItemView: View {
 
     let item: CardTokenizationViewModelState.Item

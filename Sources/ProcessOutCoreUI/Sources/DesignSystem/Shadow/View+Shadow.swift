@@ -11,6 +11,6 @@ extension View {
 
     /// Applies shadow of a given style to a view.
     func shadow(style: POShadowStyle) -> some View {
-        self.shadow(color: Color(style.color), radius: style.radius, x: style.offset.width, y: style.offset.height)
+        self.shadow(color: style.color, radius: style.radius, x: style.offset.width, y: style.offset.height)
     }
 }

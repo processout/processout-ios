@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 24.05.2023.
 //
 
-import UIKit
+import SwiftUI
 
 /// Defines input control style in both normal and error states.
 public struct POInputStyle {
@@ -36,20 +36,20 @@ extension POInputStyle {
     private static func `default`(typography: POTypography) -> POInputStyle {
         POInputStyle(
             normal: POInputStateStyle(
-                text: .init(color: UIColor(resource: .Text.primary), typography: typography),
-                placeholder: .init(color: UIColor(resource: .Text.muted), typography: typography),
-                backgroundColor: UIColor(resource: .Surface.background),
-                border: .regular(color: UIColor(resource: .Border.default)),
+                text: .init(color: Color(.Text.primary), typography: typography),
+                placeholder: .init(color: Color(.Text.muted), typography: typography),
+                backgroundColor: Color(.Surface.background),
+                border: .regular(color: Color(.Border.default)),
                 shadow: .clear,
-                tintColor: UIColor(resource: .Text.primary)
+                tintColor: Color(.Text.primary)
             ),
             error: POInputStateStyle(
-                text: .init(color: UIColor(resource: .Text.primary), typography: typography),
-                placeholder: .init(color: UIColor(resource: .Text.muted), typography: typography),
-                backgroundColor: UIColor(resource: .Surface.background),
-                border: .regular(color: UIColor(resource: .Text.error)),
+                text: .init(color: Color(.Text.primary), typography: typography),
+                placeholder: .init(color: Color(.Text.muted), typography: typography),
+                backgroundColor: Color(.Surface.background),
+                border: .regular(color: Color(.Text.error)),
                 shadow: .clear,
-                tintColor: UIColor(resource: .Text.error)
+                tintColor: Color(.Text.error)
             )
         )
     }

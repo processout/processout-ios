@@ -20,18 +20,18 @@ public struct POActionsContainerStyle {
     public let axis: Axis
 
     /// Container separator color.
-    public let separatorColor: UIColor
+    public let separatorColor: Color
 
     /// Container background color.
-    public let backgroundColor: UIColor
+    public let backgroundColor: Color
 
     /// Creates style instance.
     public init(
         primary: some ButtonStyle,
         secondary: some ButtonStyle,
         axis: Axis = .vertical,
-        separatorColor: UIColor = .clear,
-        backgroundColor: UIColor = .clear
+        separatorColor: Color = .clear,
+        backgroundColor: Color = .clear
     ) {
         self.primary = primary
         self.secondary = secondary
@@ -44,12 +44,13 @@ public struct POActionsContainerStyle {
 extension POActionsContainerStyle {
 
     /// Default actions container style.
+    @available(iOS 14, *)
     public static var `default`: POActionsContainerStyle {
         POActionsContainerStyle(
             primary: .primary,
             secondary: .secondary,
-            separatorColor: UIColor(poResource: .Border.subtle),
-            backgroundColor: UIColor(poResource: .Surface.level1)
+            separatorColor: Color(.Border.subtle),
+            backgroundColor: Color(.Surface.level1)
         )
     }
 }

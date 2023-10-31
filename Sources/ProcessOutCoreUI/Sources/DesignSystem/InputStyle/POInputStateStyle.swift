@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 24.11.2022.
 //
 
-import UIKit
+import SwiftUI
 
 /// Defines input's styling information in a specific state.
 public struct POInputStateStyle {
@@ -17,7 +17,7 @@ public struct POInputStateStyle {
     public let placeholder: POTextStyle
 
     /// Input's background color.
-    public let backgroundColor: UIColor
+    public let backgroundColor: Color
 
     /// Border style.
     public let border: POBorderStyle
@@ -26,16 +26,16 @@ public struct POInputStateStyle {
     public let shadow: POShadowStyle
 
     /// Tint color that is used by input.
-    public let tintColor: UIColor
+    public let tintColor: Color
 
     /// Creates style instance.
     public init(
         text: POTextStyle,
         placeholder: POTextStyle,
-        backgroundColor: UIColor,
+        backgroundColor: Color,
         border: POBorderStyle,
         shadow: POShadowStyle,
-        tintColor: UIColor
+        tintColor: Color
     ) {
         self.text = text
         self.placeholder = placeholder

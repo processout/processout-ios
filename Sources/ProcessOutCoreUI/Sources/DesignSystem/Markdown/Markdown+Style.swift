@@ -7,10 +7,12 @@
 
 import SwiftUI
 
+@available(iOS 14, *)
 extension POMarkdown {
 
     /// Applies given `style` to text.
-    @_spi(PO) public func textStyle(_ style: POTextStyle) -> some View {
+    @_spi(PO)
+    public func textStyle(_ style: POTextStyle) -> some View {
         textStyle(style, addPadding: false)
     }
 }
