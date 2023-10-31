@@ -344,9 +344,7 @@ final class DefaultCardTokenizationInteractor:
             let shouldCollect = shouldCollect(unit: unit, specification: specification, countryCode: countryCode)
             parameters[keyPath: id].shouldCollect = shouldCollect
         }
-        parameters.state.availableValues = specification.states.map { state in
-            .init(displayName: state.name, value: state.abbreviation)
-        }
+        // todo(andrii-vysotskyi): consider setting available values for state.
         parameters.specification = specification
     }
 
