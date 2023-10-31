@@ -1,6 +1,6 @@
 //
 //  CardTokenizationViewModelState.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 20.07.2023.
 //

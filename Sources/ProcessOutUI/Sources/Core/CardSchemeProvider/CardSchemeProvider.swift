@@ -1,6 +1,6 @@
 //
 //  CardSchemeProvider.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 18.08.2023.
 //

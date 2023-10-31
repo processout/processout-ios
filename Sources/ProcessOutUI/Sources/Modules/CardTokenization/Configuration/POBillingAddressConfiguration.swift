@@ -1,6 +1,6 @@
 //
 //  POBillingAddressConfiguration.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 23.08.2023.
 //
