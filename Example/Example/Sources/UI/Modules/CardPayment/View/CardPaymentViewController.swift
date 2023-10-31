@@ -82,7 +82,7 @@ final class CardPaymentViewController<ViewModel: CardPaymentViewModelType>: View
 
     private func supplementaryView(ofKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView? {
         let sectionIdentifier: SectionIdentifier?
-        if #available(iOS 15.0, *) {
+        if #available(iOS 15, *) {
             sectionIdentifier = collectionViewDataSource.sectionIdentifier(for: indexPath.section)
         } else {
             sectionIdentifier = collectionViewDataSource.snapshot().sectionIdentifiers[indexPath.section]
