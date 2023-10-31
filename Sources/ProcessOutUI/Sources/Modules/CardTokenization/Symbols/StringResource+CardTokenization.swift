@@ -53,6 +53,19 @@ extension StringResource {
             )
         }
 
+        enum BillingAddress {
+
+            /// Billing address section title.
+            static let title = StringResource(
+                "card-tokenization.billing-address.title", tableName: "ProcessOutUI", comment: ""
+            )
+
+            /// Billing address street.
+            static let street = StringResource(
+                "card-tokenization.billing-address.street", tableName: "ProcessOutUI", comment: ""
+            )
+        }
+
         enum Error {
 
             /// Generic card error.

@@ -1,12 +1,14 @@
 //
 //  DefaultCardTokenizationInteractor.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 18.07.2023.
 //
 
 import Foundation
 @_spi(PO) import ProcessOut
+
+// swiftlint:disable type_body_length file_length
 
 final class DefaultCardTokenizationInteractor:
     BaseInteractor<CardTokenizationInteractorState>, CardTokenizationInteractor {
@@ -32,6 +34,8 @@ final class DefaultCardTokenizationInteractor:
 
     // MARK: - CardTokenizationInteractor
 
+    let configuration: POCardTokenizationConfiguration
+
     override func start() {
         guard case .idle = state else {
             return
@@ -41,7 +45,8 @@ final class DefaultCardTokenizationInteractor:
             number: .init(id: \.number, formatter: cardNumberFormatter),
             expiration: .init(id: \.expiration, formatter: cardExpirationFormatter),
             cvc: .init(id: \.cvc),
-            cardholderName: .init(id: \.cardholderName)
+            cardholderName: .init(id: \.cardholderName, shouldCollect: configuration.isCardholderNameInputVisible),
+            address: defaultAddressParameters
         )
         state = .started(startedState)
         delegate?.cardTokenizationDidEmitEvent(.didStart)
@@ -60,8 +65,13 @@ final class DefaultCardTokenizationInteractor:
             logger.debug("Card information is no longer invalid, will reset error message")
             startedState.recentErrorMessage = nil
         }
-        if parameterId == startedState.number.id {
+        switch parameterId {
+        case startedState.number.id:
             updateIssuerInformation(startedState: &startedState, oldNumber: oldParameterValue)
+        case startedState.address.country.id:
+            updateAddressParameters(&startedState.address)
+        default:
+            break
         }
         self.state = .started(startedState)
         delegate?.cardTokenizationDidEmitEvent(.parametersChanged)
@@ -101,7 +111,7 @@ final class DefaultCardTokenizationInteractor:
             expYear: cardExpirationFormatter.expirationYear(from: startedState.expiration.value) ?? 0,
             cvc: startedState.cvc.value,
             name: startedState.cardholderName.value,
-            contact: configuration.billingAddress,
+            contact: convertToContact(addressParameters: startedState.address),
             preferredScheme: startedState.preferredScheme,
             metadata: configuration.metadata
         )
@@ -138,7 +148,6 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - Private Properties
 
     private let cardsService: POCardsService
-    private let configuration: POCardTokenizationConfiguration
     private let logger: POLogger
     private let completion: Completion
 
@@ -266,16 +275,139 @@ final class DefaultCardTokenizationInteractor:
 
     /// Returns locally generated issuer information where only `scheme` property is set.
     private func issuerInformation(number: String) -> POCardIssuerInformation? {
-        guard let scheme = CardTokenizationSchemeProvider().scheme(cardNumber: number) else {
+        guard let scheme = CardSchemeProvider().scheme(cardNumber: number) else {
             return nil
         }
         return .init(scheme: scheme)
     }
 
+    // MARK: - Billing Address
+
+    private var defaultAddressParameters: State.AddressParameters {
+        let address = configuration.billingAddress.defaultAddress
+        var addressParameters = State.AddressParameters(
+            country: countryAddressParameter,
+            street1: .init(id: \.address.street1, value: address?.address1 ?? ""),
+            street2: .init(id: \.address.street2, value: address?.address2 ?? ""),
+            city: .init(id: \.address.city, value: address?.city ?? ""),
+            state: .init(id: \.address.state, value: address?.state ?? ""),
+            postalCode: .init(id: \.address.postalCode, value: address?.zip ?? ""),
+            specification: .default
+        )
+        updateAddressParameters(&addressParameters)
+        return addressParameters
+    }
+
+    private var countryAddressParameter: State.Parameter {
+        var countryCodes = Set(AddressSpecificationProvider.shared.countryCodes)
+        if let supportedCountryCodes = configuration.billingAddress.countryCodes {
+            countryCodes = countryCodes.filter(supportedCountryCodes.contains)
+        }
+        let locale = Locale.current
+        let values = countryCodes
+            .map { code -> State.ParameterValue in
+                let displayName = locale.localizedString(forRegionCode: code)
+                return State.ParameterValue(displayName: displayName ?? "", value: code)
+            }
+            .sorted { $0.displayName < $1.displayName }
+        let configuration = configuration.billingAddress
+        var defaultCountryCode = configuration.defaultAddress?.countryCode
+        if let code = defaultCountryCode, !countryCodes.contains(code) {
+            assertionFailure("Default country code is not valid.")
+            defaultCountryCode = nil
+        }
+        let supportedModes: Set<POBillingAddressConfiguration.CollectionMode> = [.automatic, .full]
+        let parameter = State.Parameter(
+            id: \.address.country,
+            value: defaultCountryCode ?? locale.regionCode ?? "",
+            shouldCollect: supportedModes.contains(configuration.mode),
+            availableValues: values
+        )
+        return parameter
+    }
+
+    /// Updates parameters and specification based on currently selected country.
+    private func updateAddressParameters(_ parameters: inout State.AddressParameters) {
+        let countryCode = parameters.country.value
+        if !parameters.country.availableValues.map(\.value).contains(countryCode) {
+            assertionFailure("Country code \(countryCode) is not supported.")
+        }
+        let parameterss: [WritableKeyPath<State.AddressParameters, State.Parameter>: AddressSpecification.Unit] = [
+            \.street1: .street,
+            \.street2: .street,
+            \.city: .city,
+            \.state: .state,
+            \.postalCode: .postcode
+        ]
+        let specification = AddressSpecificationProvider.shared.specification(for: countryCode)
+        for (id, unit) in parameterss {
+            let shouldCollect = shouldCollect(unit: unit, specification: specification, countryCode: countryCode)
+            parameters[keyPath: id].shouldCollect = shouldCollect
+        }
+        // todo(andrii-vysotskyi): consider setting available values for state.
+        parameters.specification = specification
+    }
+
+    private func shouldCollect(
+        unit: AddressSpecification.Unit, specification: AddressSpecification, countryCode: String
+    ) -> Bool {
+        guard specification.units.contains(unit) else {
+            return false
+        }
+        switch configuration.billingAddress.mode {
+        case .automatic where unit == .postcode:
+            let supportedCountryCodes: Set = ["US", "GB", "CA"]
+            return supportedCountryCodes.contains(countryCode)
+        case .automatic, .never:
+            return false
+        case .full:
+            return true
+        }
+    }
+
+    private func convertToContact(addressParameters parameters: State.AddressParameters) -> POContact? {
+        var defaultAddress: POContact?
+        if configuration.billingAddress.attachDefaultsToPaymentMethod {
+            defaultAddress = configuration.billingAddress.defaultAddress
+        }
+        let contact = POContact(
+            address1: value(parameter: parameters.street1, default: defaultAddress?.address1),
+            address2: value(parameter: parameters.street2, default: defaultAddress?.address2),
+            city: value(parameter: parameters.city, default: defaultAddress?.city),
+            state: value(parameter: parameters.state, default: defaultAddress?.state),
+            zip: value(parameter: parameters.postalCode, default: defaultAddress?.zip),
+            countryCode: value(parameter: parameters.country, default: defaultAddress?.countryCode)
+        )
+        return contact
+    }
+
     // MARK: - Utils
 
     private func areParametersValid(startedState: State.Started) -> Bool {
-        let parameters = [startedState.number, startedState.expiration, startedState.cvc, startedState.cardholderName]
+        let parameters = [
+            startedState.number,
+            startedState.expiration,
+            startedState.cvc,
+            startedState.cardholderName,
+            startedState.address.country,
+            startedState.address.street1,
+            startedState.address.street2,
+            startedState.address.city,
+            startedState.address.state,
+            startedState.address.postalCode
+        ]
         return parameters.allSatisfy(\.isValid)
     }
+
+    private func value(parameter: State.Parameter, default defaultValue: String? = nil) -> String? {
+        guard parameter.shouldCollect else {
+            return nil
+        }
+        if !parameter.value.isEmpty {
+            return parameter.value
+        }
+        return defaultValue
+    }
 }
+
+// swiftlint:enable type_body_length file_length

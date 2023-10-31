@@ -419,6 +419,38 @@
         }
       }
     },
+    "card-tokenization.billing-address.street" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Address line %d"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linia adresu %d"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linha de endereço %d"
+          }
+        }
+      }
+    },
+    "card-tokenization.billing-address.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Billing Address"
+          }
+        }
+      }
+    },
     "card-tokenization.cancel-button.title" : {
       "localizations" : {
         "en" : {

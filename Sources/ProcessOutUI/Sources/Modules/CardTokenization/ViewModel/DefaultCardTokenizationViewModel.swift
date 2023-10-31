@@ -1,6 +1,6 @@
 //
 //  DefaultCardTokenizationViewModel.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 20.07.2023.
 //
@@ -8,12 +8,12 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-// swiftlint:disable:next type_body_length
+// swiftlint:disable type_body_length file_length
+
 final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
-    init(interactor: some CardTokenizationInteractor, configuration: POCardTokenizationConfiguration) {
+    init(interactor: some CardTokenizationInteractor) {
         self.interactor = interactor
-        self.configuration = configuration
         state = .idle
         observeChanges(interactor: interactor)
     }
@@ -31,6 +31,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         static let title = "title"
         static let cardInformation = "card-info"
         static let preferredScheme = "preferred-scheme"
+        static let billingAddress = "billing-address"
     }
 
     private enum ItemId {
@@ -42,7 +43,10 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     // MARK: - Private Properties
 
     private let interactor: any CardTokenizationInteractor
-    private let configuration: POCardTokenizationConfiguration
+
+    private var configuration: POCardTokenizationConfiguration {
+        interactor.configuration
+    }
 
     // MARK: - Private Methods
 
@@ -82,7 +86,8 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
                 title: String(resource: .CardTokenization.CardDetails.title),
                 items: cardInformationItems
             ),
-            preferredSchemeSection(startedState: startedState)
+            preferredSchemeSection(startedState: startedState),
+            billingAddressSection(startedState: startedState)
         ]
         let startedState = State(
             title: title(),
@@ -100,78 +105,41 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         return title.isEmpty ? nil : title
     }
 
-    // MARK: - Input Items
+    // MARK: - Card Defailts
 
     private func cardInformationInputItems(
         startedState: InteractorState.Started
     ) -> [CardTokenizationViewModelState.Item] {
-        let numberItem = createItem(
-            parameter: startedState.number,
-            placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.number),
-            icon: cardNumberIcon(startedState: startedState),
-            keyboard: .asciiCapableNumberPad,
-            contentType: .creditCardNumber,
-            accessibilityId: "card-number"
-        )
         let expirationItem = createItem(
             parameter: startedState.expiration,
             placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.expiration),
-            keyboard: .asciiCapableNumberPad,
-            accessibilityId: "expiration"
+            keyboard: .asciiCapableNumberPad
         )
         let cvcItem = createItem(
             parameter: startedState.cvc,
             placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.cvc),
             icon: Image(.Card.back),
-            keyboard: .asciiCapableNumberPad,
-            accessibilityId: "cvc"
+            keyboard: .asciiCapableNumberPad
         )
-        var items = [
-            numberItem,
+        let items = [
+            createItem(
+                parameter: startedState.number,
+                placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.number),
+                icon: cardNumberIcon(startedState: startedState),
+                keyboard: .asciiCapableNumberPad,
+                contentType: .creditCardNumber
+            ),
             .group(
-                State.GroupItem(id: ItemId.trackData, items: [expirationItem, cvcItem])
-            )
-        ]
-        if configuration.isCardholderNameInputVisible {
-            let cardholderItem = createItem(
+                State.GroupItem(id: ItemId.trackData, items: [expirationItem, cvcItem].compactMap { $0 })
+            ),
+            createItem(
                 parameter: startedState.cardholderName,
                 placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.cardholder),
                 keyboard: .asciiCapable,
-                contentType: .name,
-                accessibilityId: "cardholder"
+                contentType: .name
             )
-            items.append(cardholderItem)
-        }
-        return items
-    }
-
-    private func createItem(
-        parameter: InteractorState.Parameter,
-        placeholder: String,
-        icon: Image? = nil,
-        keyboard: UIKeyboardType,
-        contentType: UITextContentType? = nil,
-        accessibilityId: String
-    ) -> CardTokenizationViewModelState.Item {
-        let value = Binding<String>(
-            get: { parameter.value },
-            set: { [weak self] in self?.interactor.update(parameterId: parameter.id, value: $0) }
-        )
-        let inputItem = State.InputItem(
-            id: parameter.id,
-            value: value,
-            placeholder: placeholder,
-            isInvalid: !parameter.isValid,
-            icon: icon,
-            formatter: parameter.formatter,
-            keyboard: keyboard,
-            contentType: contentType,
-            accessibilityId: accessibilityId,
-            onSubmit: { [weak self] in
-                self?.submitFocusedInput()
-            }
-        )
-        return .input(inputItem)
+        ]
+        return items.compactMap { $0 }
     }
 
     private func cardNumberIcon(startedState: InteractorState.Started) -> Image? {
@@ -230,7 +198,8 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
                 set: { [weak self] newValue in
                     self?.interactor.setPreferredScheme(newValue ?? issuerInformation.scheme)
                 }
-            )
+            ),
+            preferrsInline: true
         )
         let section = State.Section(
             id: SectionId.preferredScheme,
@@ -238,6 +207,122 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             items: [.picker(pickerItem)]
         )
         return section
+    }
+
+    // MARK: - Billing Address
+
+    private func billingAddressSection(
+        startedState: InteractorState.Started
+    ) -> CardTokenizationViewModelState.Section? {
+        var items: [CardTokenizationViewModelState.Item] = []
+        if let item = createItem(parameter: startedState.address.country, placeholder: "") {
+            items.append(item)
+        }
+        items += startedState.address.specification.units.flatMap { unit in
+            createAddressItems(unit: unit, startedState: startedState)
+        }
+        guard !items.isEmpty else {
+            return nil
+        }
+        let section = CardTokenizationViewModelState.Section(
+            id: SectionId.billingAddress,
+            title: String(resource: .CardTokenization.BillingAddress.title),
+            items: items
+        )
+        return section
+    }
+
+    private func createAddressItems(
+        unit: AddressSpecification.Unit, startedState: InteractorState.Started
+    ) -> [CardTokenizationViewModelState.Item] {
+        var items: [CardTokenizationViewModelState.Item?] = []
+        switch unit {
+        case .street:
+            let streetItems = [
+                createItem(
+                    parameter: startedState.address.street1,
+                    placeholder: String(resource: .CardTokenization.BillingAddress.street, replacements: 1)
+                ),
+                createItem(
+                    parameter: startedState.address.street2,
+                    placeholder: String(resource: .CardTokenization.BillingAddress.street, replacements: 2)
+                )
+            ]
+            items.append(contentsOf: streetItems)
+        case .city:
+            let placeholder = String(resource: startedState.address.specification.cityUnit.stringResource)
+            items.append(createItem(parameter: startedState.address.city, placeholder: placeholder))
+        case .state:
+            let placeholder = String(resource: startedState.address.specification.stateUnit.stringResource)
+            items.append(createItem(parameter: startedState.address.state, placeholder: placeholder))
+        case .postcode:
+            let placeholder = String(resource: startedState.address.specification.postcodeUnit.stringResource)
+            items.append(createItem(parameter: startedState.address.postalCode, placeholder: placeholder))
+        }
+        return items.compactMap { $0 }
+    }
+
+    // MARK: - Input & Picker Items
+
+    private func createItem(
+        parameter: InteractorState.Parameter,
+        placeholder: String,
+        icon: Image? = nil,
+        keyboard: UIKeyboardType = .default,
+        contentType: UITextContentType? = nil
+    ) -> CardTokenizationViewModelState.Item? {
+        guard parameter.shouldCollect else {
+            return nil
+        }
+        if parameter.availableValues.isEmpty {
+            return createInputItem(
+                parameter: parameter, placeholder: placeholder, icon: icon, keyboard: keyboard, contentType: contentType
+            )
+        }
+        return createPickerItem(parameter: parameter)
+    }
+
+    private func createInputItem(
+        parameter: InteractorState.Parameter,
+        placeholder: String,
+        icon: Image? = nil,
+        keyboard: UIKeyboardType = .default,
+        contentType: UITextContentType? = nil
+    ) -> CardTokenizationViewModelState.Item {
+        let value = Binding<String>(
+            get: { parameter.value },
+            set: { [weak self] in self?.interactor.update(parameterId: parameter.id, value: $0) }
+        )
+        let inputItem = State.InputItem(
+            id: parameter.id,
+            value: value,
+            placeholder: placeholder,
+            isInvalid: !parameter.isValid,
+            icon: icon,
+            formatter: parameter.formatter,
+            keyboard: keyboard,
+            contentType: contentType,
+            onSubmit: { [weak self] in
+                self?.submitFocusedInput()
+            }
+        )
+        return .input(inputItem)
+    }
+
+    private func createPickerItem(parameter: InteractorState.Parameter) -> CardTokenizationViewModelState.Item {
+        let options = parameter.availableValues.map { value in
+            CardTokenizationViewModelState.PickerItemOption(id: value.value, title: value.displayName)
+        }
+        let selectedOptionId = Binding<String?>(
+            get: { parameter.value },
+            set: { [weak self] newValue in
+                self?.interactor.update(parameterId: parameter.id, value: newValue ?? "")
+            }
+        )
+        let item = CardTokenizationViewModelState.PickerItem(
+            id: parameter.id, options: options, selectedOptionId: selectedOptionId, preferrsInline: false
+        )
+        return .picker(item)
     }
 
     // MARK: - Actions
@@ -328,10 +413,20 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     // MARK: - Utils
 
     private func parameters(startedState: InteractorState.Started) -> [InteractorState.Parameter] {
-        var parameters = [startedState.number, startedState.expiration, startedState.cvc]
-        if configuration.isCardholderNameInputVisible {
-            parameters.append(startedState.cardholderName)
-        }
-        return parameters
+        let parameters = [
+            startedState.number,
+            startedState.expiration,
+            startedState.cvc,
+            startedState.cardholderName,
+            startedState.address.country,
+            startedState.address.street1,
+            startedState.address.street2,
+            startedState.address.city,
+            startedState.address.state,
+            startedState.address.postalCode
+        ]
+        return parameters.filter(\.shouldCollect)
     }
 }
+
+// swiftlint:enable type_body_length file_length

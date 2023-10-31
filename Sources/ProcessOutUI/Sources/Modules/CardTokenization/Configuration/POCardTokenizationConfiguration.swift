@@ -1,6 +1,6 @@
 //
 //  POCardTokenizationConfiguration.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 01.08.2023.
 //
@@ -24,8 +24,8 @@ public struct POCardTokenizationConfiguration {
     /// Primary action text, such as "Cancel". Use empty string to hide button.
     public let cancelActionTitle: String?
 
-    /// Card billing address.
-    public let billingAddress: POContact?
+    /// Card billing address collection configuration.
+    public let billingAddress: POBillingAddressConfiguration
 
     /// Metada related to the card.
     public let metadata: [String: String]?
@@ -39,7 +39,7 @@ public struct POCardTokenizationConfiguration {
         isCardholderNameInputVisible: Bool = true,
         primaryActionTitle: String? = nil,
         cancelActionTitle: String? = nil,
-        billingAddress: POContact? = nil,
+        billingAddress: POBillingAddressConfiguration = .init(),
         metadata: [String: String]? = nil
     ) {
         self.title = title

@@ -8,13 +8,13 @@
 import Foundation
 @_spi(PO) import ProcessOut
 
-struct AddressSpecificationProvider {
+final class AddressSpecificationProvider {
 
     static let shared = AddressSpecificationProvider()
 
     /// Preloads specifications.
     func prewarm() {
-        DispatchQueue.global(qos: .userInitiated).async { loadSpecifications() }
+        DispatchQueue.global(qos: .userInitiated).async { self.loadSpecifications() }
     }
 
     // MARK: - AddressSpecificationProvider

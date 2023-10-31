@@ -1,6 +1,6 @@
 //
 //  POCardTokenizationEvent.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 30.08.2023.
 //

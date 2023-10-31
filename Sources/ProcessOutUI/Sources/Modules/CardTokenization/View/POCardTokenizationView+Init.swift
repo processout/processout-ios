@@ -18,16 +18,14 @@ extension POCardTokenizationView {
         delegate: POCardTokenizationDelegate? = nil,
         completion: @escaping (Result<POCard, POFailure>) -> Void
     ) {
-        let viewModel = DefaultCardTokenizationViewModel(
-            interactor: DefaultCardTokenizationInteractor(
-                cardsService: ProcessOut.shared.cards,
-                logger: ProcessOut.shared.logger,
-                configuration: configuration,
-                delegate: delegate,
-                completion: completion
-            ),
-            configuration: configuration
+        let interactor = DefaultCardTokenizationInteractor(
+            cardsService: ProcessOut.shared.cards,
+            logger: ProcessOut.shared.logger,
+            configuration: configuration,
+            delegate: delegate,
+            completion: completion
         )
+        let viewModel = DefaultCardTokenizationViewModel(interactor: interactor)
         self = .init(viewModel: viewModel)
     }
 }

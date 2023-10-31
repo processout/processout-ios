@@ -1,6 +1,6 @@
 //
-//  CardTokenizationSchemeProvider.swift
-//  ProcessOut
+//  CardSchemeProvider.swift
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 18.08.2023.
 //
@@ -9,7 +9,7 @@ import Foundation
 @_spi(PO) import ProcessOut
 
 // todo(andrii-vysotskyi): support more schemes
-struct CardTokenizationSchemeProvider {
+struct CardSchemeProvider {
 
     /// Returns locally generated scheme.
     func scheme(cardNumber number: String) -> String? {

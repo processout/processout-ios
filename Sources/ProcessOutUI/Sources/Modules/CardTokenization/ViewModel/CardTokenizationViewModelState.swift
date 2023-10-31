@@ -1,6 +1,6 @@
 //
 //  CardTokenizationViewModelState.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 20.07.2023.
 //
@@ -63,9 +63,6 @@ struct CardTokenizationViewModelState {
         /// Text content type.
         let contentType: UITextContentType?
 
-        /// Accessibility identifier useful for testing.
-        let accessibilityId: String
-
         /// Action to perform when the user submits a value to this input.
         let onSubmit: () -> Void
     }
@@ -80,6 +77,9 @@ struct CardTokenizationViewModelState {
 
         /// Currently selected option id.
         @Binding var selectedOptionId: String?
+
+        /// Boolean flag indicating whether inline style is preferred.
+        let preferrsInline: Bool
     }
 
     struct PickerItemOption: Identifiable {
