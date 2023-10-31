@@ -45,6 +45,9 @@ let package = Package(
         ),
         .target(
             name: "ProcessOutCoreUI",
+            dependencies: [
+                .target(name: "cmark")
+            ],
             resources: [
                 .process("Resources")
             ]
