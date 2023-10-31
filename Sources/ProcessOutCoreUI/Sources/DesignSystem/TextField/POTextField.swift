@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-@_spi(PO) public struct POTextField<Trailing: View>: View {
+@available(iOS 14, *)
+@_spi(PO)
+public struct POTextField<Trailing: View>: View {
 
     /// - Parameters:
     ///   - text: The underlying text to edit.
@@ -33,10 +35,10 @@ import SwiftUI
         }
         .padding(Constants.padding)
         .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
-        .background(Color(style.backgroundColor))
+        .background(style.backgroundColor)
         .border(style: style.border)
         .shadow(style: style.shadow)
-        .accentColor(Color(style.tintColor))
+        .accentColor(style.tintColor)
         .backport.geometryGroup()
         .animation(.default, value: isInvalid)
     }
@@ -57,6 +59,7 @@ private enum Constants {
     static let padding = EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)
 }
 
+@available(iOS 14, *)
 private struct TextFieldRepresentable: UIViewRepresentable {
 
     @Binding var text: String
@@ -132,7 +135,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
             .with { builder in
                 builder.typography = style.text.typography
                 builder.sizeCategory = .init(sizeCategory)
-                builder.color = style.text.color
+                builder.color = UIColor(style.text.color)
             }
             .buildAttributes()
             .filter { Constants.includedTextAttributes.contains($0.key) }
@@ -144,7 +147,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
             .with { builder in
                 builder.typography = style.placeholder.typography
                 builder.sizeCategory = .init(sizeCategory)
-                builder.color = style.placeholder.color
+                builder.color = UIColor(style.placeholder.color)
             }
             .buildAttributes()
             .filter { Constants.includedTextAttributes.contains($0.key) }
@@ -155,6 +158,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
     }
 }
 
+@available(iOS 14, *)
 private final class TextFieldCoordinator: NSObject, UITextFieldDelegate {
 
     init(view: TextFieldRepresentable) {

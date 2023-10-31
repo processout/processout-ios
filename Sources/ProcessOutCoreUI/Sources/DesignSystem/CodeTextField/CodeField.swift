@@ -9,6 +9,7 @@ import UIKit
 
 // swiftlint:disable file_length type_body_length unused_setter_value
 
+@available(iOS 14, *)
 final class CodeField: UIControl, UITextInput {
 
     init(length: Int) {

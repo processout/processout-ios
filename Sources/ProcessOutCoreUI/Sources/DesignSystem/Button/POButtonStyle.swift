@@ -8,7 +8,8 @@
 import SwiftUI
 
 /// Defines button style in all possible states.
-public struct POButtonStyle<ProgressViewStyle: POProgressViewStyle>: ButtonStyle {
+@available(iOS 14, *)
+public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
 
     /// Style for normal state.
     public let normal: POButtonStateStyle
@@ -20,13 +21,13 @@ public struct POButtonStyle<ProgressViewStyle: POProgressViewStyle>: ButtonStyle
     public let disabled: POButtonStateStyle
 
     /// Progress view style. Only used with normal state.
-    public let progressView: ProgressViewStyle
+    public let progressView: ProgressStyle
 
     public init(
         normal: POButtonStateStyle,
         highlighted: POButtonStateStyle,
         disabled: POButtonStateStyle,
-        progressView: ProgressViewStyle
+        progressView: ProgressStyle
     ) {
         self.normal = normal
         self.highlighted = highlighted
@@ -42,8 +43,8 @@ public struct POButtonStyle<ProgressViewStyle: POProgressViewStyle>: ButtonStyle
                 isEnabled: isEnabled, isLoading: isLoading, isPressed: configuration.isPressed
             )
             ZStack {
-                POBackport<Any>.ProgressView()
-                    .backport.progressViewStyle(progressView)
+                ProgressView()
+                    .progressViewStyle(progressView)
                     .opacity(isLoading ? 1 : 0)
                 configuration.label
                     .textStyle(currentStyle.title)
@@ -52,7 +53,7 @@ public struct POButtonStyle<ProgressViewStyle: POProgressViewStyle>: ButtonStyle
             }
             .padding(Constants.padding)
             .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
-            .background(Color(currentStyle.backgroundColor))
+            .background(currentStyle.backgroundColor)
             .border(style: currentStyle.border)
             .shadow(style: currentStyle.shadow)
             .backport.geometryGroup()

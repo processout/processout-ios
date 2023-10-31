@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-@_spi(PO) public struct POCodeField: View {
+@available(iOS 14, *)
+@_spi(PO)
+public struct POCodeField: View {
 
     /// - Parameters:
     ///   - length: code text field length.
@@ -29,6 +31,7 @@ import SwiftUI
     private let text: Binding<String>
 }
 
+@available(iOS 14, *)
 private struct CodeFieldRepresentable: UIViewRepresentable {
 
     let length: Int
@@ -66,6 +69,7 @@ private struct CodeFieldRepresentable: UIViewRepresentable {
     @Environment(\.focusCoordinator) private var focusCoordinator
 }
 
+@available(iOS 14, *)
 private final class CodeFieldCoordinator: NSObject {
 
     init(view: CodeFieldRepresentable) {

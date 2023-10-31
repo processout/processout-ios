@@ -8,6 +8,7 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
+@available(iOS 14, *)
 public struct POCardTokenizationView: View {
 
     init(viewModel: some CardTokenizationViewModel) {
@@ -28,7 +29,7 @@ public struct POCardTokenizationView: View {
                                 .padding(.horizontal, Constants.horizontalPadding)
                             Divider()
                                 .frame(height: 1)
-                                .overlay(Color(style.separatorColor))
+                                .overlay(style.separatorColor)
                         }
                         VStack(alignment: .leading, spacing: Constants.spacing) {
                             ForEach(viewModel.state.sections) { section in
@@ -55,9 +56,7 @@ public struct POCardTokenizationView: View {
             )
             .actionsContainerStyle(style.actionsContainer)
         }
-        .background(
-            Color(style.backgroundColor).edgesIgnoringSafeArea(.all)
-        )
+        .background(style.backgroundColor.edgesIgnoringSafeArea(.all))
     }
 
     // MARK: - Private Nested Types
@@ -73,6 +72,6 @@ public struct POCardTokenizationView: View {
     @Environment(\.cardTokenizationStyle)
     private var style
 
-    @POBackport.StateObject
+    @StateObject
     private var viewModel: AnyCardTokenizationViewModel
 }

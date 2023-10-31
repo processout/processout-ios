@@ -7,6 +7,7 @@
 
 @_spi(PO) import ProcessOut
 
+@available(iOS 14, *)
 extension POCardTokenizationView {
 
     /// Creates card tokenization view.

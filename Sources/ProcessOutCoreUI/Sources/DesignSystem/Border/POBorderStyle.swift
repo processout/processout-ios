@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 28.11.2022.
 //
 
-import UIKit
+import SwiftUI
 
 /// Style that defines border appearance. Border is always a solid line.
 public struct POBorderStyle {
@@ -17,9 +17,9 @@ public struct POBorderStyle {
     public let width: CGFloat
 
     /// Border color.
-    public let color: UIColor
+    public let color: Color
 
-    public init(radius: CGFloat, width: CGFloat, color: UIColor) {
+    public init(radius: CGFloat, width: CGFloat, color: Color) {
         self.radius = radius
         self.width = width
         self.color = color
@@ -32,7 +32,7 @@ extension POBorderStyle {
     public static let clear = POBorderStyle(radius: Constants.radius, width: 0, color: .clear)
 
     /// Regular width border.
-    static func regular(color: UIColor) -> POBorderStyle {
+    static func regular(color: Color) -> POBorderStyle {
         .init(radius: Constants.radius, width: Constants.width, color: color)
     }
 

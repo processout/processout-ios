@@ -10,6 +10,7 @@ import UIKit
 extension UIView {
 
     /// Applies given border style to view's layer.
+    @available(iOS 14, *)
     func apply(style: POBorderStyle) {
         layer.cornerRadius = style.radius
         layer.borderWidth = style.width

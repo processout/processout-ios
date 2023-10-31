@@ -27,7 +27,7 @@ extension EnvironmentValues {
     // MARK: - Private Nested Types
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = POTextStyle(color: UIColor(resource: .Text.primary), typography: .Fixed.body)
+        static let defaultValue = POTextStyle(color: Color(.Text.primary), typography: .Fixed.body)
     }
 }
 
@@ -46,7 +46,7 @@ private struct ContentModifier: ViewModifier {
             .font(Font(font))
             .lineSpacing(lineSpacing)
             .padding(.vertical, addPadding ? lineSpacing / 2 : 0)
-            .foregroundColor(Color(style.color))
+            .foregroundColor(style.color)
             .environment(\.textStyle, style)
     }
 

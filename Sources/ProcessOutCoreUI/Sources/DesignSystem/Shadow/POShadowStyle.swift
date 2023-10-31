@@ -5,13 +5,13 @@
 //  Created by Andrii Vysotskyi on 28.11.2022.
 //
 
-import UIKit
+import SwiftUI
 
 /// Style that defines shadow appearance.
 public struct POShadowStyle {
 
     /// The color of the shadow.
-    public let color: UIColor
+    public let color: Color
 
     /// The offset (in points) of the shadow.
     public let offset: CGSize
@@ -19,7 +19,7 @@ public struct POShadowStyle {
     /// The blur radius (in points) used to render the shadow.
     public let radius: CGFloat
 
-    public init(color: UIColor, offset: CGSize, radius: CGFloat) {
+    public init(color: Color, offset: CGSize, radius: CGFloat) {
         self.color = color
         self.offset = offset
         self.radius = radius
