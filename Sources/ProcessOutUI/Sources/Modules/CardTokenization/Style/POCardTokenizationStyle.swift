@@ -8,7 +8,7 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-/// Defines style for card tokenization module.
+/// Defines style for card tokenization view.
 @available(iOS 14, *)
 public struct POCardTokenizationStyle {
 

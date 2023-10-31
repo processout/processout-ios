@@ -32,8 +32,3 @@
 
 - ``POInputStyle``
 - ``POInputStateStyle``
-
-### Progress View
-
-- ``POProgressViewStyle``
-- ``POCircularProgressViewStyle``
