@@ -35,7 +35,6 @@ struct CardTokenizationItemView: View {
             .inputStyle(style.input)
             .controlInvalid(inputItem.isInvalid)
             .animation(.default, value: inputItem.icon == nil)
-            .accessibility(identifier: inputItem.accessibilityId)
         case .picker(let pickerItem):
             POPicker(pickerItem.options, selection: pickerItem.$selectedOptionId) { option in
                 Text(option.title)
