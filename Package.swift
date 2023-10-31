@@ -6,10 +6,11 @@ let package = Package(
     name: "ProcessOut",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v12)
+        .iOS(.v13)
     ],
     products: [
         .library(name: "ProcessOut", targets: ["ProcessOut"]),
+        .library(name: "ProcessOutUI", targets: ["ProcessOutUI"]),
         .library(name: "ProcessOutCheckout3DS", targets: ["ProcessOutCheckout3DS"])
     ],
     dependencies: [
@@ -31,6 +32,21 @@ let package = Package(
             dependencies: [
                 .target(name: "ProcessOut"),
                 .product(name: "Checkout3DSPackages", package: "checkout-3ds-sdk-ios")
+            ]
+        ),
+        .target(
+            name: "ProcessOutUI",
+            dependencies: [
+                .target(name: "ProcessOut"), .target(name: "ProcessOutCoreUI")
+            ],
+            resources: [
+                .process("Resources")
+            ]
+        ),
+        .target(
+            name: "ProcessOutCoreUI",
+            resources: [
+                .process("Resources")
             ]
         ),
         .binaryTarget(name: "cmark", path: "Vendor/cmark.xcframework")
