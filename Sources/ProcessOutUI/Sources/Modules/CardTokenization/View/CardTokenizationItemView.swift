@@ -22,31 +22,15 @@ struct CardTokenizationItemView: View {
     var body: some View {
         switch item {
         case .input(let inputItem):
-            POTextField(
-                text: inputItem.$value,
-                formatter: inputItem.formatter,
-                prompt: inputItem.placeholder,
-                trailingView: inputItem.icon?.accessibility(hidden: true)
-            )
-            .backport.focused($focusedInputId, equals: inputItem.id)
-            .backport.onSubmit(inputItem.onSubmit)
-            .poTextContentType(inputItem.contentType)
-            .poKeyboardType(inputItem.keyboard)
-            .inputStyle(style.input)
-            .controlInvalid(inputItem.isInvalid)
-            .animation(.default, value: inputItem.icon == nil)
+            CardTokenizationInputItemView(item: inputItem, focusedInputId: $focusedInputId)
         case .picker(let pickerItem):
             POPicker(pickerItem.options, selection: pickerItem.$selectedOptionId) { option in
                 Text(option.title)
             }
-            .modify { view in
-                if pickerItem.preferrsInline {
-                    view.pickerStyle(
-                        PORadioGroupPickerStyle(radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton))
-                    )
-                } else {
-                    view.pickerStyle(POMenuPickerStyle(inputStyle: style.input))
-                }
+            .pickerStyle(POMenuPickerStyle(inputStyle: style.input))
+            .modify(when: pickerItem.preferrsInline) { view in
+                let style = PORadioGroupPickerStyle(radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton))
+                view.pickerStyle(style)
             }
             .animation(.default, value: pickerItem.preferrsInline)
         case .error(let errorItem):
