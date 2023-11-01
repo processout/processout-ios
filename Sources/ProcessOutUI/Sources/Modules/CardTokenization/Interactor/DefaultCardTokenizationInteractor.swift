@@ -216,7 +216,7 @@ final class DefaultCardTokenizationInteractor:
         }
         let tokenizedState = State.Tokenized(card: card, cardNumber: snapshot.number.value)
         state = .tokenized(tokenizedState)
-        logger.info("Did tokenize/process card", attributes: ["CardId": card.id])
+        logger.info("Did tokenize and process card", attributes: ["CardId": card.id])
         delegate?.cardTokenizationDidEmitEvent(.didComplete)
         completion(.success(card))
     }
