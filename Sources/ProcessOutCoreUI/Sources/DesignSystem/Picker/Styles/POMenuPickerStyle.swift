@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 @_spi(PO)
 public struct POMenuPickerStyle: POPickerStyle {
 
-    public init(inputStyle: POInputStyle = .medium) {
+    public init(inputStyle: POInputStyle) {
         self.inputStyle = inputStyle
     }
 
@@ -61,13 +61,12 @@ public struct POMenuPickerStyle: POPickerStyle {
     }
 }
 
-@_spi(PO)
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 extension POPickerStyle where Self == POMenuPickerStyle {
 
     /// A picker style that presents the options as a menu when the user
     /// presses a button, or as a submenu when nested within a larger menu.
     public static var menu: POMenuPickerStyle {
-        POMenuPickerStyle()
+        POMenuPickerStyle(inputStyle: .medium)
     }
 }

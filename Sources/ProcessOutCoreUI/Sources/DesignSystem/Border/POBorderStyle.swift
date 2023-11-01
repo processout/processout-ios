@@ -31,8 +31,8 @@ extension POBorderStyle {
     /// Clear border with default corner radius.
     public static let clear = POBorderStyle(radius: Constants.radius, width: 0, color: .clear)
 
-    /// Regular width border.
-    static func regular(color: Color) -> POBorderStyle {
+    /// Border style with default width and corner radius.
+    public static func regular(color: Color) -> POBorderStyle {
         .init(radius: Constants.radius, width: Constants.width, color: color)
     }
 
