@@ -36,7 +36,7 @@ public struct POActionsContainerView: View {
         }
         .padding(.bottom, spacing)
         .background(
-            style.backgroundColor.edgesIgnoringSafeArea(.all)
+            style.backgroundColor.ignoresSafeArea()
         )
         .backport.geometryGroup()
         .animation(.default, value: actions.map(\.id))
