@@ -81,7 +81,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             cardInformationItems.append(.error(errorItem))
         }
         let sections = [
-            State.Section(id: SectionId.cardInformation, title: "", items: cardInformationItems),
+            State.Section(id: SectionId.cardInformation, title: nil, items: cardInformationItems),
             preferredSchemeSection(startedState: startedState),
             billingAddressSection(startedState: startedState)
         ]
@@ -416,7 +416,6 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             startedState.expiration,
             startedState.cvc,
             startedState.cardholderName,
-            startedState.address.country,
             startedState.address.street1,
             startedState.address.street2,
             startedState.address.city,
