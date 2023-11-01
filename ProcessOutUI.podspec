@@ -11,6 +11,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '14.0'
   s.ios.resources         = 'Sources/ProcessOutUI/Resources/**/*'
   s.source_files          = 'Sources/ProcessOutUI/**/*.swift'
+  s.pod_target_xcconfig   = { 'OTHER_SWIFT_FLAGS' => '-Xfrontend -module-interface-preserve-types-as-written' }
   s.dependency            'ProcessOut', s.version.to_s
   s.dependency            'ProcessOutCoreUI', s.version.to_s
 end
