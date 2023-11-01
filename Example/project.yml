@@ -18,6 +18,8 @@ packages:
     from: 5.6.0
   ProcessOut:
     path: ../
+  ProcessOutCheckout3DS:
+    path: ../
 
 targets:
   Example:
@@ -45,6 +47,7 @@ targets:
     dependencies:
       - package: SnapKit
       - package: ProcessOut
+      - package: ProcessOutCheckout3DS
   ExampleUiTests:
     type: bundle.ui-testing
     sources: ExampleUiTests
