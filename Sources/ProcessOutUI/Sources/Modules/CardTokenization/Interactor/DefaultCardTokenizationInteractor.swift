@@ -303,6 +303,7 @@ final class DefaultCardTokenizationInteractor:
         if let supportedCountryCodes = configuration.billingAddress.countryCodes {
             countryCodes = countryCodes.filter(supportedCountryCodes.contains)
         }
+        assert(!countryCodes.isEmpty, "At least one country code should be supported.")
         let locale = Locale.current
         let values = countryCodes
             .map { code -> State.ParameterValue in
@@ -311,15 +312,15 @@ final class DefaultCardTokenizationInteractor:
             }
             .sorted { $0.displayName < $1.displayName }
         let configuration = configuration.billingAddress
-        var defaultCountryCode = configuration.defaultAddress?.countryCode
+        var defaultCountryCode = configuration.defaultAddress?.countryCode ?? locale.regionCode
         if let code = defaultCountryCode, !countryCodes.contains(code) {
-            assertionFailure("Default country code is not valid.")
-            defaultCountryCode = nil
+            logger.info("Default country code \(code) is not supported, ignored")
+            defaultCountryCode = values.first?.value
         }
         let supportedModes: Set<POBillingAddressConfiguration.CollectionMode> = [.automatic, .full]
         let parameter = State.Parameter(
             id: \.address.country,
-            value: defaultCountryCode ?? locale.regionCode ?? "",
+            value: defaultCountryCode ?? "",
             shouldCollect: supportedModes.contains(configuration.mode),
             availableValues: values
         )
@@ -371,14 +372,24 @@ final class DefaultCardTokenizationInteractor:
             defaultAddress = configuration.billingAddress.defaultAddress
         }
         let contact = POContact(
-            address1: value(parameter: parameters.street1, default: defaultAddress?.address1),
-            address2: value(parameter: parameters.street2, default: defaultAddress?.address2),
-            city: value(parameter: parameters.city, default: defaultAddress?.city),
-            state: value(parameter: parameters.state, default: defaultAddress?.state),
-            zip: value(parameter: parameters.postalCode, default: defaultAddress?.zip),
-            countryCode: value(parameter: parameters.country, default: defaultAddress?.countryCode)
+            address1: addressValue(parameter: parameters.street1, default: defaultAddress?.address1),
+            address2: addressValue(parameter: parameters.street2, default: defaultAddress?.address2),
+            city: addressValue(parameter: parameters.city, default: defaultAddress?.city),
+            state: addressValue(parameter: parameters.state, default: defaultAddress?.state),
+            zip: addressValue(parameter: parameters.postalCode, default: defaultAddress?.zip),
+            countryCode: addressValue(parameter: parameters.country, default: defaultAddress?.countryCode)
         )
         return contact
+    }
+
+    private func addressValue(parameter: State.Parameter, default defaultValue: String? = nil) -> String? {
+        guard parameter.shouldCollect || configuration.billingAddress.attachDefaultsToPaymentMethod else {
+            return nil
+        }
+        if !parameter.value.isEmpty {
+            return parameter.value
+        }
+        return defaultValue
     }
 
     // MARK: - Utils
@@ -397,16 +408,6 @@ final class DefaultCardTokenizationInteractor:
             startedState.address.postalCode
         ]
         return parameters.allSatisfy(\.isValid)
-    }
-
-    private func value(parameter: State.Parameter, default defaultValue: String? = nil) -> String? {
-        guard parameter.shouldCollect else {
-            return nil
-        }
-        if !parameter.value.isEmpty {
-            return parameter.value
-        }
-        return defaultValue
     }
 }
 
