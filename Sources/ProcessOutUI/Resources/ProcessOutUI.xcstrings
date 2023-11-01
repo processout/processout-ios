@@ -561,28 +561,6 @@
         }
       }
     },
-    "card-tokenization.card-details.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Card Information"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dane karty"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dados do cartão"
-          }
-        }
-      }
-    },
     "card-tokenization.error.card" : {
       "localizations" : {
         "en" : {

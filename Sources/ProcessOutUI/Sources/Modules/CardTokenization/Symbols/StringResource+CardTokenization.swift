@@ -16,33 +16,25 @@ extension StringResource {
 
         enum CardDetails {
 
-            /// Card details section title.
-            static let title = StringResource(
-                "card-tokenization.card-details.title", tableName: "ProcessOutUI", comment: ""
+            /// Card number placeholder.
+            static let number = StringResource(
+                "card-tokenization.card-details.number.placeholder", tableName: "ProcessOutUI", comment: ""
             )
 
-            enum Placeholder {
+            /// Card expiration placeholder.
+            static let expiration = StringResource(
+                "card-tokenization.card-details.expiration.placeholder", tableName: "ProcessOutUI", comment: ""
+            )
 
-                /// Card number placeholder.
-                static let number = StringResource(
-                    "card-tokenization.card-details.number.placeholder", tableName: "ProcessOutUI", comment: ""
-                )
+            /// Card CVC placeholder.
+            static let cvc = StringResource(
+                "card-tokenization.card-details.cvc.placeholder", tableName: "ProcessOutUI", comment: ""
+            )
 
-                /// Card expiration placeholder.
-                static let expiration = StringResource(
-                    "card-tokenization.card-details.expiration.placeholder", tableName: "ProcessOutUI", comment: ""
-                )
-
-                /// Card CVC placeholder.
-                static let cvc = StringResource(
-                    "card-tokenization.card-details.cvc.placeholder", tableName: "ProcessOutUI", comment: ""
-                )
-
-                /// Cardholder name placeholder.
-                static let cardholder = StringResource(
-                    "card-tokenization.card-details.cardholder.placeholder", tableName: "ProcessOutUI", comment: ""
-                )
-            }
+            /// Cardholder name placeholder.
+            static let cardholder = StringResource(
+                "card-tokenization.card-details.cardholder.placeholder", tableName: "ProcessOutUI", comment: ""
+            )
         }
 
         enum PreferredScheme {
