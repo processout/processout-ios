@@ -29,7 +29,6 @@ struct CardTokenizationSectionView: View {
             }
         }
         .backport.geometryGroup()
-        .animation(.default, value: section.items.map(\.id))
     }
 
     // MARK: - Private Properties

@@ -18,7 +18,6 @@ public struct POCardTokenizationView: View {
     // MARK: - View
 
     public var body: some View {
-        // todo(andrii-vysotskyi): handle keyboard on iOS 13
         VStack(spacing: 0) {
             ScrollViewReader { scrollView in
                 ScrollView(showsIndicators: false) {
@@ -41,10 +40,10 @@ public struct POCardTokenizationView: View {
                             }
                         }
                         .padding(.horizontal, Constants.horizontalPadding)
-                        .frame(maxHeight: .infinity)
                     }
-                    .padding(.vertical, Constants.spacing)
                     .animation(.default, value: viewModel.state.sections.map(\.id))
+                    .animation(.default, value: viewModel.state.sections.flatMap(\.items).map(\.id))
+                    .padding(.vertical, Constants.spacing)
                 }
                 .backport.onChange(of: viewModel.state.focusedInputId) {
                     scrollToFocusedInput(scrollView: scrollView)
@@ -83,6 +82,6 @@ public struct POCardTokenizationView: View {
         guard let id = viewModel.state.focusedInputId else {
             return
         }
-        withAnimation { scrollView.scrollTo(id, anchor: .center) }
+        withAnimation { scrollView.scrollTo(id) }
     }
 }
