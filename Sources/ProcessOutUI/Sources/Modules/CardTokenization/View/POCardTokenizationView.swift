@@ -8,6 +8,7 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
+/// View that allows user to enter card details and tokenize it.
 @available(iOS 14, *)
 public struct POCardTokenizationView: View {
 
