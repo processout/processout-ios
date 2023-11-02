@@ -20,6 +20,9 @@ type_name:
   max_length:
     warning: 50
 
+line_length: 
+  ignores_comments: true
+
 opt_in_rules:
   - anonymous_argument_in_multiline_closure
   - closure_end_indentation
