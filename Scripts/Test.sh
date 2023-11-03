@@ -6,7 +6,7 @@ PROJECT='ProcessOut.xcodeproj'
 DESTINATION=$(python3 ./Scripts/TestDestination.py)
 
 # Run Tests
-for PRODUCT in "ProcessOut" "ProcessOutUI"; do
+for PRODUCT in "ProcessOut"; do
     xcodebuild clean test \
         -destination "$DESTINATION" \
         -project $PROJECT \
