@@ -30,13 +30,19 @@ public struct POActionsContainerView: View {
                     .accessibility(identifier: element.id)
             }
             .modify(when: style.axis == .horizontal) { content in
-                HStack(spacing: spacing) { content }
+                // The implementation considers that benign action that people are likely to
+                // want is first and when the axis is horizontal, we want it to be placed on
+                // the right, so layout direction is hardcoded to RTL.
+                HStack(spacing: spacing) {
+                    content.environment(\.layoutDirection, layoutDirection)
+                }
+                .environment(\.layoutDirection, .rightToLeft)
             }
             .padding(.horizontal, horizontalPadding)
         }
         .padding(.bottom, spacing)
         .background(
-            style.backgroundColor.edgesIgnoringSafeArea(.all)
+            style.backgroundColor.ignoresSafeArea()
         )
         .backport.geometryGroup()
         .animation(.default, value: actions.map(\.id))
@@ -49,4 +55,5 @@ public struct POActionsContainerView: View {
     private let horizontalPadding: CGFloat
 
     @Environment(\.actionsContainerStyle) private var style
+    @Environment(\.layoutDirection) private var layoutDirection
 }

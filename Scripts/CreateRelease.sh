@@ -2,9 +2,6 @@
 
 set -euo pipefail
 
-# Creates XCFramework
-source Scripts/CreateXcframework.sh
-
 # Reads current version into variable
 RELEASE_VERSION=$(cat Version.resolved)
 

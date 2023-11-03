@@ -49,7 +49,7 @@ targets:
   ProcessOut:
     type: framework
     platform: iOS
-    deploymentTarget: "12.0"
+    deploymentTarget: "13.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-ios
       MARKETING_VERSION: ${CURRENT_VERSION}
@@ -98,7 +98,7 @@ targets:
   ProcessOutCheckout3DS:
     type: framework
     platform: iOS
-    deploymentTarget: "12.0"
+    deploymentTarget: "13.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.checkout-3ds-ios
       SKIP_INSTALL: NO

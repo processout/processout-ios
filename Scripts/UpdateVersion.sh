@@ -49,6 +49,6 @@ extension ProcessOut {
 EOF
 
 # Updates version in podspecs
-for PRODUCT in "ProcessOut" "ProcessOutCheckout3DS" ; do
+for PRODUCT in "ProcessOut" "ProcessOutCheckout3DS" "ProcessOutUI" "ProcessOutCoreUI" ; do
     sed -Ei "" "s|(s[.]version *= *)'(.*)'|\1'$VERSION'|" "$PRODUCT.podspec"
 done

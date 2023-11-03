@@ -4,10 +4,11 @@ Get started with our ProcessOut [documentation](https://docs.processout.com/) or
 
 - [ProcessOut](https://swiftpackageindex.com/processout/processout-ios/documentation/processout)
 - [ProcessOutCheckout3DS](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutcheckout3ds)
+- [ProcessOutUI](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutui)
 
 ## Requirements
 
-*iOS 12.0+*
+*iOS 13.0+*
 
 ## Modules
 
@@ -15,6 +16,13 @@ Get started with our ProcessOut [documentation](https://docs.processout.com/) or
 | --------------------- | ---------------------------------------------------------------------------- |
 | ProcessOut            | Allows to interact with ProcessOut API and provides a UI to handle payments. |
 | ProcessOutCheckout3DS | Integration with Checkout.com 3D Secure (3DS) mobile SDK.                    |
+| ProcessOutUI          | ProcessOut prebuilt UI to handle payments.                                   |
+
+> **Note**
+>
+> We are currently in the process of migrating UI from ProcessOut to ProcessOutUI module. The new module
+> is based on SwiftUI, so styling is not compatible with ProcessOut (that is based on UIKit). When
+> feature parity is reached, UI in ProcessOut will be deprecated.
 
 ## Contributing
 
@@ -22,8 +30,7 @@ We welcome contributions of any kind including new features, bug fixes, and gene
 
 ### Development requirements
 
-- A recent version of macOS (tested with 13.3.1)
-- A recent version of Xcode (tested with 14.3.1)
+- A recent version of Xcode (tested with 15.0.1)
 - [Homebrew](https://brew.sh/) package manager
 
 ### Installation

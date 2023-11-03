@@ -47,7 +47,9 @@ private struct FocusModifier<Value: Hashable>: ViewModifier {
             }
             .onDisappear {
                 isVisible = false
-                binding = nil
+                if binding == value {
+                    binding = nil
+                }
             }
             .backport.onChange(of: binding) {
                 updateFirstResponder()
@@ -60,17 +62,6 @@ private struct FocusModifier<Value: Hashable>: ViewModifier {
                 }
             }
             .environment(\.focusCoordinator, coordinator)
-    }
-
-    private func updateFirstResponder() {
-        guard isVisible else {
-            return
-        }
-        if binding == value {
-            coordinator.beginEditing()
-        } else if binding == nil {
-            coordinator.endEditing()
-        }
     }
 
     // MARK: - Private Properties
@@ -86,4 +77,17 @@ private struct FocusModifier<Value: Hashable>: ViewModifier {
 
     @StateObject
     private var coordinator: FocusCoordinator
+
+    // MARK: - Private Methods
+
+    private func updateFirstResponder() {
+        guard isVisible else {
+            return
+        }
+        if binding == value {
+            coordinator.beginEditing()
+        } else if binding == nil {
+            coordinator.endEditing()
+        }
+    }
 }

@@ -8,7 +8,10 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-/// Defines style for card tokenization module.
+/// Defines style for card tokenization view.
+///
+/// For more information about styling specific components, see
+/// [the dedicated documentation.](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutcoreui)
 @available(iOS 14, *)
 public struct POCardTokenizationStyle {
 
@@ -60,6 +63,7 @@ public struct POCardTokenizationStyle {
 @available(iOS 14, *)
 extension POCardTokenizationStyle {
 
+    /// Default card tokenization style.
     public static var `default`: POCardTokenizationStyle {
         POCardTokenizationStyle(
             title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title),

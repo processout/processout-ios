@@ -21,18 +21,18 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
     public let disabled: POButtonStateStyle
 
     /// Progress view style. Only used with normal state.
-    public let progressView: ProgressStyle
+    public let progressStyle: ProgressStyle
 
     public init(
         normal: POButtonStateStyle,
         highlighted: POButtonStateStyle,
         disabled: POButtonStateStyle,
-        progressView: ProgressStyle
+        progressStyle: ProgressStyle
     ) {
         self.normal = normal
         self.highlighted = highlighted
         self.disabled = disabled
-        self.progressView = progressView
+        self.progressStyle = progressStyle
     }
 
     // MARK: - ButtonStyle
@@ -44,7 +44,7 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
             )
             ZStack {
                 ProgressView()
-                    .progressViewStyle(progressView)
+                    .progressViewStyle(progressStyle)
                     .opacity(isLoading ? 1 : 0)
                 configuration.label
                     .textStyle(currentStyle.title)

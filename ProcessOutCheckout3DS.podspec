@@ -8,8 +8,7 @@ Pod::Spec.new do |s|
   s.summary               = 'Integration with Checkout.com 3D Secure (3DS) mobile SDK.'
   s.source                = { :git => 'https://github.com/processout/processout-ios.git', :tag => s.version.to_s }
   s.frameworks            = 'Foundation'
-  s.requires_arc          = true
-  s.ios.deployment_target = '12.0'
+  s.ios.deployment_target = '13.0'
   s.source_files          = 'Sources/ProcessOutCheckout3DS/**/*.swift'
   s.pod_target_xcconfig   = { 'EXCLUDED_ARCHS' => 'x86_64' }
   s.dependency            'ProcessOut', s.version.to_s

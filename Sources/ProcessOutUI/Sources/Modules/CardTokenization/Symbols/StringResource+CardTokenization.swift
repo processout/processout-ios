@@ -12,105 +12,69 @@ extension StringResource {
     enum CardTokenization {
 
         /// Card tokenization title.
-        static let title = StringResource("card-tokenization.title", tableName: "ProcessOutUI", comment: "")
+        static let title = StringResource("card-tokenization.title", comment: "")
 
         enum CardDetails {
 
-            /// Card details section title.
-            static let title = StringResource(
-                "card-tokenization.card-details.title", tableName: "ProcessOutUI", comment: ""
-            )
+            /// Card number placeholder.
+            static let number = StringResource("card-tokenization.card-details.number.placeholder", comment: "")
 
-            enum Placeholder {
+            /// Card expiration placeholder.
+            static let expiration = StringResource("card-tokenization.card-details.expiration.placeholder", comment: "")
 
-                /// Card number placeholder.
-                static let number = StringResource(
-                    "card-tokenization.card-details.number.placeholder", tableName: "ProcessOutUI", comment: ""
-                )
+            /// Card CVC placeholder.
+            static let cvc = StringResource("card-tokenization.card-details.cvc.placeholder", comment: "")
 
-                /// Card expiration placeholder.
-                static let expiration = StringResource(
-                    "card-tokenization.card-details.expiration.placeholder", tableName: "ProcessOutUI", comment: ""
-                )
-
-                /// Card CVC placeholder.
-                static let cvc = StringResource(
-                    "card-tokenization.card-details.cvc.placeholder", tableName: "ProcessOutUI", comment: ""
-                )
-
-                /// Cardholder name placeholder.
-                static let cardholder = StringResource(
-                    "card-tokenization.card-details.cardholder.placeholder", tableName: "ProcessOutUI", comment: ""
-                )
-            }
+            /// Cardholder name placeholder.
+            static let cardholder = StringResource("card-tokenization.card-details.cardholder.placeholder", comment: "")
         }
 
         enum PreferredScheme {
 
             /// Preferred scheme section title.
-            static let title = StringResource(
-                "card-tokenization.preferred-scheme.title", tableName: "ProcessOutUI", comment: ""
-            )
+            static let title = StringResource("card-tokenization.preferred-scheme.title", comment: "")
         }
 
         enum BillingAddress {
 
             /// Billing address section title.
-            static let title = StringResource(
-                "card-tokenization.billing-address.title", tableName: "ProcessOutUI", comment: ""
-            )
+            static let title = StringResource("card-tokenization.billing-address.title", comment: "")
 
             /// Billing address street.
-            static let street = StringResource(
-                "card-tokenization.billing-address.street", tableName: "ProcessOutUI", comment: ""
-            )
+            static let street = StringResource("card-tokenization.billing-address.street", comment: "")
         }
 
         enum Error {
 
             /// Generic card error.
-            static let card = StringResource("card-tokenization.error.card", tableName: "ProcessOutUI", comment: "")
+            static let card = StringResource("card-tokenization.error.card", comment: "")
 
             /// Invalid card number.
-            static let cardNumber = StringResource(
-                "card-tokenization.error.card-number", tableName: "ProcessOutUI", comment: ""
-            )
+            static let cardNumber = StringResource("card-tokenization.error.card-number", comment: "")
 
             /// Invalid card expiration.
-            static let cardExpiration = StringResource(
-                "card-tokenization.error.card-expiration", tableName: "ProcessOutUI", comment: ""
-            )
+            static let cardExpiration = StringResource("card-tokenization.error.card-expiration", comment: "")
 
             /// Invalid card track data.
-            static let trackData = StringResource(
-                "card-tokenization.error.track-data", tableName: "ProcessOutUI", comment: ""
-            )
+            static let trackData = StringResource("card-tokenization.error.track-data", comment: "")
 
             /// Invalid CVC.
-            static let cvc = StringResource("card-tokenization.error.cvc", tableName: "ProcessOutUI", comment: "")
+            static let cvc = StringResource("card-tokenization.error.cvc", comment: "")
 
             /// Invalid cardholder name.
-            static let cardholderName = StringResource(
-                "card-tokenization.error.cardholder-name", tableName: "ProcessOutUI", comment: ""
-            )
+            static let cardholderName = StringResource("card-tokenization.error.cardholder-name", comment: "")
 
             /// Generic error description.
-            static let generic = StringResource(
-                "card-tokenization.error.generic", tableName: "ProcessOutUI", comment: ""
-            )
+            static let generic = StringResource("card-tokenization.error.generic", comment: "")
         }
 
         enum Button {
 
             /// Submit button title.
-            static let submit = StringResource(
-                "card-tokenization.submit-button.title", tableName: "ProcessOutUI", comment: ""
-            )
+            static let submit = StringResource("card-tokenization.submit-button.title", comment: "")
 
             /// Cancel button title.
-            static let cancel = StringResource(
-                "card-tokenization.cancel-button.title", tableName: "ProcessOutUI", comment: ""
-            )
+            static let cancel = StringResource("card-tokenization.cancel-button.title", comment: "")
         }
     }
 }

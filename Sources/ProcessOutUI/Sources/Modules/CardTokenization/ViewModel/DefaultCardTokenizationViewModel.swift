@@ -81,11 +81,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             cardInformationItems.append(.error(errorItem))
         }
         let sections = [
-            State.Section(
-                id: SectionId.cardInformation,
-                title: String(resource: .CardTokenization.CardDetails.title),
-                items: cardInformationItems
-            ),
+            State.Section(id: SectionId.cardInformation, title: nil, items: cardInformationItems),
             preferredSchemeSection(startedState: startedState),
             billingAddressSection(startedState: startedState)
         ]
@@ -110,31 +106,33 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     private func cardInformationInputItems(
         startedState: InteractorState.Started
     ) -> [CardTokenizationViewModelState.Item] {
-        let expirationItem = createItem(
-            parameter: startedState.expiration,
-            placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.expiration),
-            keyboard: .asciiCapableNumberPad
-        )
-        let cvcItem = createItem(
-            parameter: startedState.cvc,
-            placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.cvc),
-            icon: Image(.Card.back),
-            keyboard: .asciiCapableNumberPad
-        )
+        let trackItems = [
+            createItem(
+                parameter: startedState.expiration,
+                placeholder: String(resource: .CardTokenization.CardDetails.expiration),
+                keyboard: .asciiCapableNumberPad
+            ),
+            createItem(
+                parameter: startedState.cvc,
+                placeholder: String(resource: .CardTokenization.CardDetails.cvc),
+                icon: Image(.Card.back),
+                keyboard: .asciiCapableNumberPad
+            )
+        ]
         let items = [
             createItem(
                 parameter: startedState.number,
-                placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.number),
+                placeholder: String(resource: .CardTokenization.CardDetails.number),
                 icon: cardNumberIcon(startedState: startedState),
                 keyboard: .asciiCapableNumberPad,
                 contentType: .creditCardNumber
             ),
             .group(
-                State.GroupItem(id: ItemId.trackData, items: [expirationItem, cvcItem].compactMap { $0 })
+                State.GroupItem(id: ItemId.trackData, items: trackItems.compactMap { $0 })
             ),
             createItem(
                 parameter: startedState.cardholderName,
-                placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.cardholder),
+                placeholder: String(resource: .CardTokenization.CardDetails.cardholder),
                 keyboard: .asciiCapable,
                 contentType: .name
             )
@@ -418,7 +416,6 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             startedState.expiration,
             startedState.cvc,
             startedState.cardholderName,
-            startedState.address.country,
             startedState.address.street1,
             startedState.address.street2,
             startedState.address.city,
