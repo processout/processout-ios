@@ -3,14 +3,14 @@
 set -euo pipefail
 
 PROJECT='ProcessOut.xcodeproj'
+DESTINATION=$(python3 ./Scripts/TestDestination.py)
 
 # Run Tests
-for PRODUCT in "ProcessOut" ; do
+for PRODUCT in "ProcessOut" "ProcessOutUI"; do
     xcodebuild clean test \
+        -destination "$DESTINATION" \
         -project $PROJECT \
-        -scheme $PRODUCT \
-        -sdk 'iphonesimulator17.0' \
-        -destination 'platform=iOS Simulator,name=iPhone 15'
+        -scheme $PRODUCT
 done
 
 # It is a known issue that Checkout3DS v3.2.1 (framework that ProcessOutCheckout3DS
