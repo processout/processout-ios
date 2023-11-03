@@ -2,15 +2,14 @@
 
 import subprocess
 import json
-from pkg_resources import parse_version
 
 # Constants
-min_version = parse_version("17")
+min_major_version = "17"
 
 # Get valid runtime
 def is_valid_runtime(runtime):
-  version = parse_version(runtime["version"])
-  return runtime["platform"] == "iOS" and version >= min_version
+  is_version_valid = runtime["version"].startswith(min_major_version)
+  return runtime["platform"] == "iOS" and is_version_valid == True
 
 runtimes_description = subprocess.check_output("xcrun simctl list runtimes -j", shell=True).decode("utf-8")
 runtimes = json.loads(runtimes_description)["runtimes"]
