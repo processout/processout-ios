@@ -17,8 +17,8 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Área"
+            "state" : "translated",
+            "value" : "Região"
           }
         }
       }
@@ -39,7 +39,7 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Cidade"
           }
         }
@@ -61,8 +61,8 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Concelho"
+            "state" : "translated",
+            "value" : "Distrito"
           }
         }
       }
@@ -83,8 +83,8 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Departamento"
+            "state" : "translated",
+            "value" : "Estado"
           }
         }
       }
@@ -105,7 +105,7 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Distrito"
           }
         }
@@ -127,7 +127,7 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Do Si"
           }
         }
@@ -149,7 +149,7 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Eircode"
           }
         }
@@ -171,7 +171,7 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Emirado"
           }
         }
@@ -193,7 +193,7 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ilha"
           }
         }
@@ -215,8 +215,8 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Oblast"
+            "state" : "translated",
+            "value" : "Região"
           }
         }
       }
@@ -237,8 +237,8 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Paróquia"
+            "state" : "translated",
+            "value" : "Freguesia"
           }
         }
       }
@@ -259,7 +259,7 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "PIN"
           }
         }
@@ -281,8 +281,8 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Localidade ou cidade"
+            "state" : "translated",
+            "value" : "Cidade"
           }
         }
       }
@@ -303,7 +303,7 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Código postal"
           }
         }
@@ -325,8 +325,8 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Câmara municipal"
+            "state" : "translated",
+            "value" : "Distrito"
           }
         }
       }
@@ -347,7 +347,7 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Província"
           }
         }
@@ -369,7 +369,7 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Estado"
           }
         }
@@ -391,8 +391,8 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Subúrbio"
+            "state" : "translated",
+            "value" : "Localidade"
           }
         }
       }
@@ -413,8 +413,8 @@
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "C.P."
+            "state" : "translated",
+            "value" : "Código postal"
           }
         }
       }
@@ -436,7 +436,7 @@
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Linha de endereço %d"
+            "value" : "Endereço %d"
           }
         }
       }
@@ -447,6 +447,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Billing Address"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morada de faturação"
           }
         }
       }
@@ -721,6 +727,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Preferred Scheme"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rede de pagamento preferencial"
           }
         }
       }
