@@ -26,6 +26,6 @@ public enum POCardTokenizationEvent {
     /// Sent in case parameters were submitted successfully meaning card was tokenized.
     case didTokenize(card: POCard)
 
-    /// Event is sent after payment was confirmed to be captured. This is a final event.
+    /// Event is sent after tokenized card was processed. This is a final event.
     case didComplete
 }
