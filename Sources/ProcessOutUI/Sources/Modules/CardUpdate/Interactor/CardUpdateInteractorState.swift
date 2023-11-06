@@ -18,7 +18,7 @@ enum CardUpdateInteractorState {
         var scheme: String?
 
         /// Current CVC value.
-        var cvc: String
+        var cvc: String = ""
 
         /// The most recent error message.
         var recentErrorMessage: String?
@@ -35,9 +35,6 @@ enum CardUpdateInteractorState {
     /// Card information is currently being updated.
     case updating(snapshot: Started)
 
-    /// Card was successfully updated. This is a sink state.
-    case updated
-
-    /// Card update did end with unrecoverable failure. This is a sink state.
-    case failure(POFailure)
+    /// Card update has finished. This is a sink state.
+    case completed(Result<POCard, POFailure>)
 }

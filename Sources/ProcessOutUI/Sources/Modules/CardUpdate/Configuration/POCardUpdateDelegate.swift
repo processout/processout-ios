@@ -10,6 +10,9 @@ import ProcessOut
 /// Card update module delegate definition.
 public protocol POCardUpdateDelegate: AnyObject {
 
+    /// Invoked when module emits event.
+    func cardUpdateDidEmitEvent(_ event: POCardUpdateEvent)
+
     /// Asks delegate to resolve card information based on card id.
     func cardInformation(cardId: String) async -> POCardUpdateInformation?
 
@@ -19,6 +22,10 @@ public protocol POCardUpdateDelegate: AnyObject {
 }
 
 extension POCardUpdateDelegate {
+
+    func cardUpdateDidEmitEvent(_ event: POCardUpdateEvent) {
+        // Ignored
+    }
 
     func cardInformation(cardId: String) async -> POCardUpdateInformation? {
         nil

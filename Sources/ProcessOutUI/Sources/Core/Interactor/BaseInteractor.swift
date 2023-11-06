@@ -21,6 +21,7 @@ class BaseInteractor<State>: Interactor {
         didSet { didChange?() }
     }
 
+    @MainActor
     func start() {
         // Does nothing
     }
