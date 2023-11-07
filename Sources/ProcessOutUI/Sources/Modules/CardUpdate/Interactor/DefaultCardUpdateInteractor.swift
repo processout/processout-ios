@@ -9,11 +9,18 @@
 
 final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorState>, CardUpdateInteractor {
 
-    init(cardId: String, cardsService: POCardsService, logger: POLogger, delegate: POCardUpdateDelegate?) {
-        self.cardId = cardId
+    init(
+        cardsService: POCardsService,
+        logger: POLogger,
+        cardId: String,
+        delegate: POCardUpdateDelegate?,
+        completion: @escaping (Result<POCard, POFailure>) -> Void
+    ) {
         self.cardsService = cardsService
         self.logger = logger
+        self.cardId = cardId
         self.delegate = delegate
+        self.completion = completion
         super.init(state: .idle)
     }
 
@@ -71,9 +78,10 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     // MARK: - Private Properties
 
-    private let cardId: String
     private let cardsService: POCardsService
     private let logger: POLogger
+    private let cardId: String
+    private let completion: (Result<POCard, POFailure>) -> Void
 
     private weak var delegate: POCardUpdateDelegate?
 
@@ -157,8 +165,9 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
     }
 
     private func setFailureStateUnchecked(failure: POFailure) {
-        state = .completed(.failure(failure))
         logger.info("Did fail to update card \(failure)")
+        state = .completed
+        completion(.failure(failure))
     }
 
     // MARK: - Completed State
@@ -167,8 +176,9 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         guard case .updating = state else {
             return
         }
-        state = .completed(.success(card))
         logger.info("Did update card", attributes: ["CardId": card.id])
+        state = .completed
         delegate?.cardUpdateDidEmitEvent(.didComplete)
+        completion(.success(card))
     }
 }

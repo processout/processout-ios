@@ -36,5 +36,5 @@ enum CardUpdateInteractorState {
     case updating(snapshot: Started)
 
     /// Card update has finished. This is a sink state.
-    case completed(Result<POCard, POFailure>)
+    case completed
 }
