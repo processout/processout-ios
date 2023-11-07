@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 06.11.2023.
 //
 
+/// Short card information necessary for CVC update.
 public struct POCardUpdateInformation {
 
     /// Masked card number.
