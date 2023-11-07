@@ -14,13 +14,16 @@ extension StringResource {
         /// Card update title.
         static let title = StringResource("card-update.title", comment: "")
 
+        /// Card CVC placeholder.
+        static let cvc = StringResource("card-update.cvc", comment: "")
+
         enum Button {
 
             /// Submit button title.
-            static let submit = StringResource("card-update.submit-button.title", comment: "")
+            static let submit = StringResource("card-update.submit-button", comment: "")
 
             /// Cancel button title.
-            static let cancel = StringResource("card-update.cancel-button.title", comment: "")
+            static let cancel = StringResource("card-update.cancel-button", comment: "")
         }
 
         enum Error {
