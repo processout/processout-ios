@@ -144,35 +144,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         let scheme = startedState.issuerInformation?.coScheme != nil
             ? startedState.preferredScheme
             : startedState.issuerInformation?.scheme
-        guard let scheme else {
-            return nil
-        }
-        let resources: [String: ImageResource] = [
-            "american express": .Schemes.amex,
-            "carte bancaire": .Schemes.carteBancaire,
-            "dinacard": .Schemes.dinacard,
-            "diners club": .Schemes.diners,
-            "diners club carte blanche": .Schemes.diners,
-            "diners club international": .Schemes.diners,
-            "diners club united states & canada": .Schemes.diners,
-            "discover": .Schemes.discover,
-            "elo": .Schemes.elo,
-            "jcb": .Schemes.JCB,
-            "mada": .Schemes.mada,
-            "maestro": .Schemes.maestro,
-            "mastercard": .Schemes.mastercard,
-            "rupay": .Schemes.rupay,
-            "sodexo": .Schemes.sodexo,
-            "china union pay": .Schemes.unionPay,
-            "verve": .Schemes.verve,
-            "visa": .Schemes.visa,
-            "vpay": .Schemes.vpay
-        ]
-        let normalizedScheme = scheme.lowercased()
-        guard let resource = resources[normalizedScheme] else {
-            return nil
-        }
-        return Image(resource)
+        return scheme.flatMap(CardSchemeImageProvider.shared.image)
     }
 
     // MARK: - Preferred Scheme
