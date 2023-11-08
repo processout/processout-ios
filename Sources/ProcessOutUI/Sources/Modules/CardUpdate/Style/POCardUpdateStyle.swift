@@ -30,6 +30,9 @@ public struct POCardUpdateStyle {
     /// Actions container style.
     public let actionsContainer: POActionsContainerStyle
 
+    /// Progress view style.
+    public let progressView: any ProgressViewStyle
+
     /// Separator color.
     public let separatorColor: Color
 
@@ -39,6 +42,7 @@ public struct POCardUpdateStyle {
         errorDescription: POTextStyle,
         backgroundColor: Color,
         actionsContainer: POActionsContainerStyle,
+        progress: some ProgressViewStyle,
         separatorColor: Color
     ) {
         self.title = title
@@ -46,6 +50,7 @@ public struct POCardUpdateStyle {
         self.errorDescription = errorDescription
         self.backgroundColor = backgroundColor
         self.actionsContainer = actionsContainer
+        self.progressView = progress
         self.separatorColor = separatorColor
     }
 }
@@ -61,6 +66,7 @@ extension POCardUpdateStyle {
             errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
             backgroundColor: Color(poResource: .Surface.level1),
             actionsContainer: .default,
+            progress: .circular,
             separatorColor: Color(poResource: .Border.subtle)
         )
     }
