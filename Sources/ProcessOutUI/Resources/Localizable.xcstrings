@@ -781,7 +781,7 @@
         }
       }
     },
-    "card-update.cancel-button.title" : {
+    "card-update.cancel-button" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -799,6 +799,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancelar"
+          }
+        }
+      }
+    },
+    "card-update.cvc" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CVC"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CVC"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CVC"
           }
         }
       }
@@ -847,7 +869,7 @@
         }
       }
     },
-    "card-update.submit-button.title" : {
+    "card-update.submit-button" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -870,7 +892,14 @@
       }
     },
     "card-update.title" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment Details"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
