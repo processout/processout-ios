@@ -9,7 +9,7 @@ import Foundation
 
 struct ApplePayCardTokenizationRequest: Encodable {
 
-    struct PaymentMethod: Encodable {
+    struct PaymentMethod {
 
         /// Card display name.
         let displayName: String?
@@ -36,13 +36,16 @@ struct ApplePayCardTokenizationRequest: Encodable {
         let version: String
     }
 
-    struct ApplePayToken: Encodable {
+    struct ApplePayToken {
 
         /// Payment data.
         let paymentData: PaymentData
 
         /// Payment method.
         let paymentMethod: PaymentMethod
+
+        /// Transaction identifier.
+        let transactionIdentifier: String
     }
 
     struct ApplePay: Encodable {
@@ -62,4 +65,28 @@ struct ApplePayCardTokenizationRequest: Encodable {
 
     /// Payment information.
     let applepayResponse: ApplePay
+}
+
+extension ApplePayCardTokenizationRequest.PaymentMethod: Encodable {
+
+    func encode(to encoder: Encoder) throws {
+        let content = [
+            "displayName": displayName, "network": network, "type": type
+        ]
+        var container = encoder.singleValueContainer()
+        try container.encode(content)
+    }
+}
+
+extension ApplePayCardTokenizationRequest.ApplePayToken: Encodable {
+
+    func encode(to encoder: Encoder) throws {
+        let content: [String: AnyEncodable] = [
+            "paymentData": .init(paymentData),
+            "paymentMethod": .init(paymentMethod),
+            "transactionIdentifier": .init(transactionIdentifier)
+        ]
+        var container = encoder.singleValueContainer()
+        try container.encode(content)
+    }
 }
