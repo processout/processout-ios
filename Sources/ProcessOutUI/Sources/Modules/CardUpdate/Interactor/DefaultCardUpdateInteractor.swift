@@ -92,7 +92,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         guard let maskedNumber = cardInfo?.maskedNumber, cardInfo?.preferredScheme == nil else {
             return
         }
-        guard let iin = issuerIdentificationNumber(maskedNumber: maskedNumber) else {
+        guard let iin = cardInfo?.iin ?? issuerIdentificationNumber(maskedNumber: maskedNumber) else {
             logger.info("Unable to extract IIN from masked number: \(maskedNumber)")
             return
         }

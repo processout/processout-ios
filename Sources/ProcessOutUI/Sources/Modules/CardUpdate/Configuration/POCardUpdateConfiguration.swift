@@ -9,6 +9,9 @@
 /// Use `nil` as a value for a nullable property to indicate that default value should be used.
 public struct POCardUpdateConfiguration {
 
+    /// Card id that needs to be updated.
+    public let cardId: String
+
     /// Custom title. Use empty string to hide title.
     public let title: String?
 
@@ -19,10 +22,12 @@ public struct POCardUpdateConfiguration {
     public let cancelActionTitle: String?
 
     public init(
+        cardId: String,
         title: String? = nil,
         primaryActionTitle: String? = nil,
         cancelActionTitle: String? = nil
     ) {
+        self.cardId = cardId
         self.title = title
         self.primaryActionTitle = primaryActionTitle
         self.cancelActionTitle = cancelActionTitle
