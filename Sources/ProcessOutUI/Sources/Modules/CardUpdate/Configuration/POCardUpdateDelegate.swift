@@ -23,15 +23,15 @@ public protocol POCardUpdateDelegate: AnyObject {
 
 extension POCardUpdateDelegate {
 
-    func cardUpdateDidEmitEvent(_ event: POCardUpdateEvent) {
+    public func cardUpdateDidEmitEvent(_ event: POCardUpdateEvent) {
         // Ignored
     }
 
-    func cardInformation(cardId: String) async -> POCardUpdateInformation? {
+    public func cardInformation(cardId: String) async -> POCardUpdateInformation? {
         nil
     }
 
-    func shouldContinueUpdate(after failure: POFailure) -> Bool {
+    public func shouldContinueUpdate(after failure: POFailure) -> Bool {
         true
     }
 }
