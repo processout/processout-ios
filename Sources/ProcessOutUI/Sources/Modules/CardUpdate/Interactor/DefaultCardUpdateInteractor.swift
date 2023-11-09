@@ -30,6 +30,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         guard case .idle = state else {
             return
         }
+        logger.debug("Will start card update")
         delegate?.cardUpdateDidEmitEvent(.willStart)
         state = .starting
         Task {
@@ -39,6 +40,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             )
             self.state = .started(startedState)
             delegate?.cardUpdateDidEmitEvent(.didStart)
+            logger.debug("Did start card update")
             await updateSchemeIfNeeded(cardInfo: cardInfo)
         }
     }
@@ -47,6 +49,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         guard case .started(var startedState) = state, startedState.cvc != cvc else {
             return
         }
+        logger.debug("Will change CVC value to '\(cvc)'")
         startedState.recentErrorMessage = nil
         startedState.cvc = cvc
         state = .started(startedState)
@@ -55,9 +58,14 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     @MainActor
     func submit() {
-        guard case .started(let startedState) = state, startedState.recentErrorMessage == nil else {
+        guard case .started(let startedState) = state else {
             return
         }
+        guard startedState.recentErrorMessage == nil  else {
+            logger.debug("Ignoring attempt to submit invalid CVC")
+            return
+        }
+        logger.debug("Will submit card information")
         delegate?.cardUpdateDidEmitEvent(.willUpdateCard)
         state = .updating(snapshot: startedState)
         Task {
@@ -143,8 +151,12 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
     }
 
     private func recoverUpdate(from failure: POFailure) {
+        guard case .updating(var startedState) = state else {
+            assertionFailure("Unsupported state")
+            return
+        }
         let shouldContinue = delegate?.shouldContinueUpdate(after: failure) ?? true
-        guard shouldContinue, case .updating(var startedState) = state else {
+        guard shouldContinue else {
             setFailureStateUnchecked(failure: failure)
             return
         }
@@ -178,7 +190,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         guard case .updating = state else {
             return
         }
-        logger.info("Did update card", attributes: ["CardId": card.id])
+        logger.info("Did update card")
         state = .completed
         delegate?.cardUpdateDidEmitEvent(.didComplete)
         completion(.success(card))
