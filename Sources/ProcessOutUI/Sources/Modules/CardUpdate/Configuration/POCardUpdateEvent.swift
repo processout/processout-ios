@@ -1,14 +1,12 @@
 //
-//  POCardTokenizationEvent.swift
+//  POCardUpdateEvent.swift
 //  ProcessOutUI
 //
-//  Created by Andrii Vysotskyi on 30.08.2023.
+//  Created by Andrii Vysotskyi on 03.11.2023.
 //
 
-import ProcessOut
-
-/// Describes events that could happen during card tokenization lifecycle.
-public enum POCardTokenizationEvent {
+/// Describes events that could happen during card update lifecycle.
+public enum POCardUpdateEvent {
 
     /// Initial event that is sent prior any other event.
     case willStart
@@ -21,11 +19,8 @@ public enum POCardTokenizationEvent {
     case parametersChanged
 
     /// Event is sent just before tokenizing card, this is usually a result of a user action, e.g. button press.
-    case willTokenizeCard
+    case willUpdateCard
 
-    /// Sent in case parameters were submitted successfully meaning card was tokenized.
-    case didTokenize(card: POCard)
-
-    /// Event is sent after tokenized card was processed. This is a final event.
+    /// Event is sent after card is updated. This is a final event.
     case didComplete
 }

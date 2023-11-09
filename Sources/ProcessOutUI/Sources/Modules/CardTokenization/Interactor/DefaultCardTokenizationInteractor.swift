@@ -201,15 +201,6 @@ final class DefaultCardTokenizationInteractor:
         logger.debug("Did recover started state after failure: \(failure)")
     }
 
-    private func setTokenizedState<T>(result: Result<T, POFailure>, card: POCard) {
-        switch result {
-        case .success:
-            setTokenizedState(card: card)
-        case .failure(let failure):
-            restoreStartedState(tokenizationFailure: failure)
-        }
-    }
-
     private func setTokenizedState(card: POCard) {
         guard case .tokenizing(let snapshot) = state else {
             return
