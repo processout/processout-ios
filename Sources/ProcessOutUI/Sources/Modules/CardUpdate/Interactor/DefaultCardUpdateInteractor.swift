@@ -38,6 +38,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
                 cardNumber: cardInfo?.maskedNumber, scheme: cardInfo?.preferredScheme
             )
             self.state = .started(startedState)
+            delegate?.cardUpdateDidEmitEvent(.didStart)
             await updateSchemeIfNeeded(cardInfo: cardInfo)
         }
     }
@@ -57,6 +58,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         guard case .started(let startedState) = state, startedState.recentErrorMessage == nil else {
             return
         }
+        delegate?.cardUpdateDidEmitEvent(.willUpdateCard)
         state = .updating(snapshot: startedState)
         Task {
             do {
