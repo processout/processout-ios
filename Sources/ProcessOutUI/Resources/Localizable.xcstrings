@@ -898,6 +898,12 @@
             "state" : "translated",
             "value" : "Payment Details"
           }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detalhes do pagamento"
+          }
         }
       }
     }
