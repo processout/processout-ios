@@ -8,6 +8,13 @@
 import ProcessOut
 
 enum FeaturesRoute: RouteType {
+
+    /// Available gateway configurations.
     case gatewayConfigurations(filter: POAllGatewayConfigurationsRequest.Filter)
-    case cardDetails
+
+    /// Card tokenization form.
+    case cardTokenization(completion: (Result<POCard, POFailure>) -> Void)
+
+    /// Alerty with given message.
+    case alert(message: String)
 }

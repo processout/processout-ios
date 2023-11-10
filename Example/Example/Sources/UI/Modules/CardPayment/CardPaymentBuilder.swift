@@ -7,21 +7,24 @@
 
 import UIKit
 import ProcessOut
+import ProcessOutUI
 
 final class CardPaymentBuilder {
 
+    init(completion: @escaping (Result<POCard, POFailure>) -> Void) {
+        self.completion = completion
+    }
+
     func build() -> UIViewController {
-        let threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
-        let router = CardPaymentRouter()
-        let viewModel = CardPaymentViewModel(
-            router: router,
-            invoicesService: ProcessOut.shared.invoices,
-            cardsService: ProcessOut.shared.cards,
-            threeDSService: threeDSService
+        // todo(andrii-vysotskyi): authorize tokenized card
+        let configuration = POCardTokenizationConfiguration(isCardholderNameInputVisible: false)
+        let viewController = POCardTokenizationViewController(
+            configuration: configuration, completion: completion
         )
-        let viewController = CardPaymentViewController(viewModel: viewModel)
-        threeDSService.viewController = viewController
-        router.viewController = viewController
         return viewController
     }
+
+    // MARK: - Private Properties
+
+    private let completion: (Result<POCard, POFailure>) -> Void
 }
