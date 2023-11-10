@@ -16,7 +16,7 @@ packages:
   SnapKit:
     url: https://github.com/SnapKit/SnapKit
     from: 5.6.0
-  ProcessOut:
+  ProcessOutUI:
     path: ../
 
 targets:
@@ -44,7 +44,7 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.example
     dependencies:
       - package: SnapKit
-      - package: ProcessOut
+      - package: ProcessOutUI
   ExampleUiTests:
     type: bundle.ui-testing
     sources: ExampleUiTests
