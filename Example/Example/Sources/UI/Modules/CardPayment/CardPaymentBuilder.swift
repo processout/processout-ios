@@ -16,12 +16,23 @@ final class CardPaymentBuilder {
     }
 
     func build() -> UIViewController {
-        // todo(andrii-vysotskyi): authorize tokenized card
+        let threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
+        let delegate = CardPaymentDelegate(
+            invoicesService: ProcessOut.shared.invoices, threeDSService: threeDSService
+        )
         let configuration = POCardTokenizationConfiguration(isCardholderNameInputVisible: false)
         let viewController = POCardTokenizationViewController(
-            configuration: configuration, completion: completion
+            configuration: configuration, delegate: delegate, completion: completion
         )
+        threeDSService.viewController = viewController
+        objc_setAssociatedObject(viewController, &AssociatedObjectKeys.delegate, delegate, .OBJC_ASSOCIATION_RETAIN)
         return viewController
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum AssociatedObjectKeys {
+        static var delegate: UInt8 = 0
     }
 
     // MARK: - Private Properties
