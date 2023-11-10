@@ -21,6 +21,7 @@ struct ApplePayCardTokenizationRequest: Encodable {
         let type: String?
     }
 
+    /// Based on [payment token structure.](https://developer.apple.com/documentation/passkit/apple_pay/payment_token_format_reference#3949537)
     struct PaymentData: Codable {
 
         /// Encrypted payment data.
