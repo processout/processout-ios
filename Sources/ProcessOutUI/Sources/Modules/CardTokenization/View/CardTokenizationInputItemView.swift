@@ -25,6 +25,7 @@ struct CardTokenizationInputItemView: View {
         )
         .backport.focused($focusedInputId, equals: item.id)
         .backport.onSubmit(item.onSubmit)
+        .backport.submitLabel(.next)
         .poTextContentType(item.contentType)
         .poKeyboardType(item.keyboard)
         .inputStyle(style.input)
