@@ -7,6 +7,7 @@
 
 import UIKit
 @_spi(PO) import ProcessOut
+import ProcessOutUI
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -39,5 +40,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             projectId: Constants.projectId, privateKey: Constants.projectPrivateKey
         )
         ProcessOut.configure(configuration: configuration)
+        ProcessOutUI.configure()
     }
 }
