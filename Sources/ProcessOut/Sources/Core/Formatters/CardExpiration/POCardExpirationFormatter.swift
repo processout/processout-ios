@@ -44,10 +44,10 @@ import Foundation
     // MARK: - Formatter
 
     override public func string(for obj: Any?) -> String? {
-        guard let phoneNumber = obj as? String else {
+        guard let expiration = obj as? String else {
             return nil
         }
-        return string(from: phoneNumber)
+        return string(from: expiration)
     }
 
     override public func isPartialStringValid(
@@ -59,7 +59,7 @@ import Foundation
     ) -> Bool {
         let partialString = partialStringPtr.pointee as String
         let formatted = string(from: partialString)
-        let adjustedOffset = FormattingUtils.adjustedCursorOffset(
+        let adjustedOffset = POFormattingUtils.adjustedCursorOffset(
             in: formatted,
             source: partialString,
             // swiftlint:disable:next line_length
