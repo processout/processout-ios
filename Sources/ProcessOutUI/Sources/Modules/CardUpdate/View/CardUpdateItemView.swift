@@ -19,7 +19,7 @@ struct CardUpdateItemView: View {
     var body: some View {
         switch item {
         case .input(let item):
-            InputView(item: item, focusedInputId: $focusedInputId)
+            InputView(viewModel: item, focusedInputId: $focusedInputId)
                 .inputStyle(style.input)
         case .error(let errorItem):
             Text(errorItem.description)

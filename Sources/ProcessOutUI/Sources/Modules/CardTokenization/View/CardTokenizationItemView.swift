@@ -22,7 +22,7 @@ struct CardTokenizationItemView: View {
     var body: some View {
         switch item {
         case .input(let inputItem):
-            InputView(item: inputItem, focusedInputId: $focusedInputId)
+            InputView(viewModel: inputItem, focusedInputId: $focusedInputId)
                 .inputStyle(style.input)
         case .picker(let pickerItem):
             POPicker(pickerItem.options, selection: pickerItem.$selectedOptionId) { option in
