@@ -12,13 +12,13 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
     init(
         cardsService: POCardsService,
         logger: POLogger,
-        cardId: String,
+        configuration: POCardUpdateConfiguration,
         delegate: POCardUpdateDelegate?,
         completion: @escaping (Result<POCard, POFailure>) -> Void
     ) {
         self.cardsService = cardsService
         self.logger = logger
-        self.cardId = cardId
+        self.configuration = configuration
         self.delegate = delegate
         self.completion = completion
         super.init(state: .idle)
@@ -33,18 +33,13 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         logger.debug("Will start card update")
         delegate?.cardUpdateDidEmitEvent(.willStart)
         state = .starting
+        if let cardInfo = configuration.cardInformation {
+            setStartedStateUnchecked(cardInfo: cardInfo)
+            return
+        }
         Task {
-            let cardInfo = await delegate?.cardInformation(cardId: cardId)
-            cardSecurityCodeFormatter.scheme = cardInfo?.preferredScheme
-            let startedState = State.Started(
-                cardNumber: cardInfo?.maskedNumber,
-                scheme: cardInfo?.preferredScheme,
-                formatter: cardSecurityCodeFormatter
-            )
-            self.state = .started(startedState)
-            delegate?.cardUpdateDidEmitEvent(.didStart)
-            logger.debug("Did start card update")
-            await updateSchemeIfNeeded(cardInfo: cardInfo)
+            let cardInfo = await delegate?.cardInformation(cardId: configuration.cardId)
+            setStartedStateUnchecked(cardInfo: cardInfo)
         }
     }
 
@@ -78,7 +73,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         state = .updating(snapshot: startedState)
         Task {
             do {
-                let request = POCardUpdateRequest(cardId: cardId, cvc: startedState.cvc)
+                let request = POCardUpdateRequest(cardId: configuration.cardId, cvc: startedState.cvc)
                 setCompletedState(card: try await cardsService.updateCard(request: request))
             } catch {
                 recoverUpdate(from: error)
@@ -100,10 +95,28 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     private let cardsService: POCardsService
     private let logger: POLogger
-    private let cardId: String
+    private let configuration: POCardUpdateConfiguration
     private let completion: (Result<POCard, POFailure>) -> Void
 
     private lazy var cardSecurityCodeFormatter = CardSecurityCodeFormatter()
+
+    // MARK: - Started State
+
+    @MainActor
+    private func setStartedStateUnchecked(cardInfo: POCardUpdateInformation?) {
+        cardSecurityCodeFormatter.scheme = cardInfo?.preferredScheme
+        let startedState = State.Started(
+            cardNumber: cardInfo?.maskedNumber,
+            scheme: cardInfo?.preferredScheme,
+            formatter: cardSecurityCodeFormatter
+        )
+        self.state = .started(startedState)
+        delegate?.cardUpdateDidEmitEvent(.didStart)
+        logger.debug("Did start card update")
+        Task {
+            await updateSchemeIfNeeded(cardInfo: cardInfo)
+        }
+    }
 
     // MARK: - Scheme Update
 
