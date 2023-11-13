@@ -32,11 +32,11 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         }
         logger.debug("Will start card update")
         delegate?.cardUpdateDidEmitEvent(.willStart)
-        state = .starting
         if let cardInfo = configuration.cardInformation {
             setStartedStateUnchecked(cardInfo: cardInfo)
             return
         }
+        state = .starting
         Task {
             let cardInfo = await delegate?.cardInformation(cardId: configuration.cardId)
             setStartedStateUnchecked(cardInfo: cardInfo)
@@ -137,13 +137,13 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             case .started(var startedState):
                 cardSecurityCodeFormatter.scheme = scheme
                 startedState.scheme = scheme
+                startedState.cvc = cardSecurityCodeFormatter.string(from: startedState.cvc)
                 state = .started(startedState)
-                update(cvc: startedState.cvc)
             case .updating(var startedState):
                 cardSecurityCodeFormatter.scheme = scheme
                 startedState.scheme = scheme
+                startedState.cvc = cardSecurityCodeFormatter.string(from: startedState.cvc)
                 state = .updating(snapshot: startedState)
-                update(cvc: startedState.cvc)
             default:
                 logger.debug("Unsupported state, scheme is ignored.")
             }
