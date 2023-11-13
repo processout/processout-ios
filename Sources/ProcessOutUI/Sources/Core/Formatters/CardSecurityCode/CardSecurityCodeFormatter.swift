@@ -15,8 +15,11 @@ final class CardSecurityCodeFormatter: Formatter {
 
     /// Returns formatted version of given cvc string.
     func string(from string: String) -> String {
-        // When scheme is not available or unknown we assume that CSC could be up to 4 digits.
-        let length = scheme.flatMap { Self.lengths[$0] } ?? 4
+        // When scheme is not available or AMEX, CSC could be up to 4 digits.
+        var length = 4
+        if let scheme, scheme != "american express" {
+            length = 3
+        }
         let formatted = string
             .removingCharacters(in: CharacterSet.decimalDigits.inverted)
             .prefix(length)
@@ -53,25 +56,4 @@ final class CardSecurityCodeFormatter: Formatter {
         proposedSelRangePtr?.pointee = NSRange(location: adjustedOffset, length: 0)
         return true
     }
-
-    // MARK: - Private Properties
-
-    private static let lengths: [String: Int] = [
-        "american express": 4,
-        "visa": 3,
-        "mastercard": 3,
-        "jcb": 3,
-        "discover": 3,
-        "diners club": 3,
-        "diners club carte blanche": 3,
-        "diners club international": 3,
-        "diners club united states & canada": 3,
-        "nspk mir": 3,
-        "china union pay": 3,
-        "elo": 3,
-        "vpay": 3,
-        "mada": 3,
-        "rupay": 3,
-        "switch": 3
-    ]
 }
