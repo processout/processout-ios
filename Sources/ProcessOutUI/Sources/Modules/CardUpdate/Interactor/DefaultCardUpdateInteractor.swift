@@ -64,7 +64,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         guard case .started(let startedState) = state else {
             return
         }
-        guard startedState.recentErrorMessage == nil  else {
+        guard startedState.recentErrorMessage == nil else {
             logger.debug("Ignoring attempt to submit invalid CVC")
             return
         }
@@ -104,10 +104,10 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     @MainActor
     private func setStartedStateUnchecked(cardInfo: POCardUpdateInformation?) {
-        cardSecurityCodeFormatter.scheme = cardInfo?.preferredScheme
+        cardSecurityCodeFormatter.scheme = cardInfo?.scheme
         let startedState = State.Started(
             cardNumber: cardInfo?.maskedNumber,
-            scheme: cardInfo?.preferredScheme,
+            scheme: cardInfo?.preferredScheme ?? cardInfo?.scheme,
             formatter: cardSecurityCodeFormatter
         )
         self.state = .started(startedState)
@@ -122,7 +122,8 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     @MainActor
     private func updateSchemeIfNeeded(cardInfo: POCardUpdateInformation?) async {
-        guard let maskedNumber = cardInfo?.maskedNumber, cardInfo?.preferredScheme == nil else {
+        guard let maskedNumber = cardInfo?.maskedNumber,
+              cardInfo?.scheme == nil && cardInfo?.preferredScheme == nil else {
             return
         }
         guard let iin = cardInfo?.iin ?? issuerIdentificationNumber(maskedNumber: maskedNumber) else {
