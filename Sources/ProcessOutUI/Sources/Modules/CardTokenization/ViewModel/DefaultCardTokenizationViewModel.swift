@@ -268,6 +268,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             value: value,
             placeholder: placeholder,
             isInvalid: !parameter.isValid,
+            isEnabled: true,
             icon: icon,
             formatter: parameter.formatter,
             keyboard: keyboard,
