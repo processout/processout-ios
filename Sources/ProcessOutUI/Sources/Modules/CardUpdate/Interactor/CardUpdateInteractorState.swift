@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 03.11.2023.
 //
 
+import Foundation
 import ProcessOut
 
 enum CardUpdateInteractorState {
@@ -19,6 +20,9 @@ enum CardUpdateInteractorState {
 
         /// Current CVC value.
         var cvc: String = ""
+
+        /// Formatter that should be used to format CVC.
+        var formatter: Formatter?
 
         /// The most recent error message.
         var recentErrorMessage: String?

@@ -35,8 +35,11 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         state = .starting
         Task {
             let cardInfo = await delegate?.cardInformation(cardId: cardId)
+            cardSecurityCodeFormatter.scheme = cardInfo?.preferredScheme
             let startedState = State.Started(
-                cardNumber: cardInfo?.maskedNumber, scheme: cardInfo?.preferredScheme
+                cardNumber: cardInfo?.maskedNumber,
+                scheme: cardInfo?.preferredScheme,
+                formatter: cardSecurityCodeFormatter
             )
             self.state = .started(startedState)
             delegate?.cardUpdateDidEmitEvent(.didStart)
@@ -46,12 +49,17 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
     }
 
     func update(cvc: String) {
-        guard case .started(var startedState) = state, startedState.cvc != cvc else {
+        guard case .started(var startedState) = state else {
             return
         }
-        logger.debug("Will change CVC value to '\(cvc)'")
+        logger.debug("Will change CVC to '\(cvc)'")
+        let formatted = cardSecurityCodeFormatter.string(from: cvc)
+        guard startedState.cvc != formatted else {
+            logger.debug("Ignoring same CVC value \(formatted)")
+            return
+        }
         startedState.recentErrorMessage = nil
-        startedState.cvc = cvc
+        startedState.cvc = formatted
         state = .started(startedState)
         delegate?.cardUpdateDidEmitEvent(.parametersChanged)
     }
@@ -88,12 +96,14 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     // MARK: - Private Properties
 
+    private weak var delegate: POCardUpdateDelegate?
+
     private let cardsService: POCardsService
     private let logger: POLogger
     private let cardId: String
     private let completion: (Result<POCard, POFailure>) -> Void
 
-    private weak var delegate: POCardUpdateDelegate?
+    private lazy var cardSecurityCodeFormatter = CardSecurityCodeFormatter()
 
     // MARK: - Scheme Update
 
@@ -111,11 +121,15 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             logger.info("Did resolve \(scheme) for masked number: \(maskedNumber)")
             switch state {
             case .started(var startedState):
+                cardSecurityCodeFormatter.scheme = scheme
                 startedState.scheme = scheme
                 state = .started(startedState)
+                update(cvc: startedState.cvc)
             case .updating(var startedState):
+                cardSecurityCodeFormatter.scheme = scheme
                 startedState.scheme = scheme
                 state = .updating(snapshot: startedState)
+                update(cvc: startedState.cvc)
             default:
                 logger.debug("Unsupported state, scheme is ignored.")
             }

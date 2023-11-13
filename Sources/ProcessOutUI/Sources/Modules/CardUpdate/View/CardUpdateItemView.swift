@@ -19,16 +19,8 @@ struct CardUpdateItemView: View {
     var body: some View {
         switch item {
         case .input(let item):
-            POTextField(
-                text: item.$value, prompt: item.placeholder, trailingView: item.icon?.accessibility(hidden: true)
-            )
-            .backport.focused($focusedInputId, equals: item.id)
-            .backport.onSubmit(item.onSubmit)
-            .poKeyboardType(.asciiCapableNumberPad)
-            .inputStyle(style.input)
-            .controlInvalid(item.isInvalid)
-            .disabled(!item.isEnabled)
-            .animation(.default, value: item.icon == nil)
+            InputView(item: item, focusedInputId: $focusedInputId)
+                .inputStyle(style.input)
         case .error(let errorItem):
             Text(errorItem.description)
                 .textStyle(style.errorDescription)
