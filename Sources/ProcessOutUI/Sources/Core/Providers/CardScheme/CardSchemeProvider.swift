@@ -9,12 +9,14 @@ import Foundation
 @_spi(PO) import ProcessOut
 
 // todo(andrii-vysotskyi): support more schemes
-struct CardSchemeProvider {
+final class CardSchemeProvider {
+
+    static let shared = CardSchemeProvider()
 
     /// Returns locally generated scheme.
     func scheme(cardNumber number: String) -> String? {
-        let normalizedNumber = cardNumberFormatter
-            .normalized(number: number)
+        let normalizedNumber = number
+            .removingCharacters(in: .decimalDigits.inverted)
             .prefix(Constants.maximumIinLength)
         // It is possible for a card number to start with "0" but it isn't supported by the
         // implementation below because it relies on integer ranges to perform a lookup.
@@ -22,7 +24,7 @@ struct CardSchemeProvider {
               let numberValue = Int(normalizedNumber) else {
             return nil
         }
-        let issuer = Self.issuers.first { issuer in
+        let issuer = issuers.first { issuer in
             let lengthDifference = normalizedNumber.count - issuer.length
             guard lengthDifference >= 0 else {
                 return false
@@ -61,7 +63,7 @@ struct CardSchemeProvider {
 
     // Based on https://www.bincodes.com/bin-list
     // Information is sorted by length to properly handle overlapping numbers (like 622126 and 62).
-    private static let issuers: [Issuer] = [
+    private let issuers: [Issuer] = [
         .init(scheme: "discover", numbers: .range(622126...622925), length: 6),
         .init(
             scheme: "elo",
@@ -138,5 +140,7 @@ struct CardSchemeProvider {
         .init(scheme: "maestro", numbers: .exact(6), length: 1)
     ]
 
-    private let cardNumberFormatter = POCardNumberFormatter()
+    // MARK: - Private Methods
+
+    private init() { }
 }

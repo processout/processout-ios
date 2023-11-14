@@ -289,7 +289,7 @@ final class DefaultCardTokenizationInteractor:
 
     /// Returns locally generated issuer information where only `scheme` property is set.
     private func localIssuerInformation(number: String) -> POCardIssuerInformation? {
-        guard let scheme = CardSchemeProvider().scheme(cardNumber: number) else {
+        guard let scheme = CardSchemeProvider.shared.scheme(cardNumber: number) else {
             return nil
         }
         return .init(scheme: scheme)
