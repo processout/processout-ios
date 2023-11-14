@@ -44,7 +44,9 @@ final class DefaultCardTokenizationInteractor:
         let startedState = State.Started(
             number: .init(id: \.number, formatter: cardNumberFormatter),
             expiration: .init(id: \.expiration, formatter: cardExpirationFormatter),
-            cvc: .init(id: \.cvc),
+            cvc: .init(
+                id: \.cvc, formatter: CardSecurityCodeFormatter()
+            ),
             cardholderName: .init(id: \.cardholderName, shouldCollect: configuration.isCardholderNameInputVisible),
             address: defaultAddressParameters
         )
@@ -54,12 +56,17 @@ final class DefaultCardTokenizationInteractor:
     }
 
     func update(parameterId: State.ParameterId, value: String) {
-        guard case .started(var startedState) = state, startedState[keyPath: parameterId].value != value else {
+        guard case .started(var startedState) = state else {
             return
         }
+        let oldParameter = startedState[keyPath: parameterId]
+        let formattedValue = oldParameter.formatter?.string(for: value) ?? value
         logger.debug("Will change parameter \(String(describing: parameterId)) value to '\(value)'")
-        let oldParameterValue = startedState[keyPath: parameterId].value
-        startedState[keyPath: parameterId].value = value
+        guard formattedValue != oldParameter.value else {
+            logger.debug("Ignoring same value \(formattedValue)")
+            return
+        }
+        startedState[keyPath: parameterId].value = formattedValue
         startedState[keyPath: parameterId].isValid = true
         if areParametersValid(startedState: startedState) {
             logger.debug("Card information is no longer invalid, will reset error message")
@@ -67,7 +74,7 @@ final class DefaultCardTokenizationInteractor:
         }
         switch parameterId {
         case startedState.number.id:
-            updateIssuerInformation(startedState: &startedState, oldNumber: oldParameterValue)
+            updateIssuerInformation(startedState: &startedState, oldNumber: oldParameter.value)
         case startedState.address.country.id:
             updateAddressParameters(&startedState.address)
         default:
@@ -220,40 +227,56 @@ final class DefaultCardTokenizationInteractor:
 
     // MARK: - Card Issuer Information
 
+    /// Method also updates scheme and CVC if needed.
     private func updateIssuerInformation(startedState: inout State.Started, oldNumber: String) {
-        if let iin = issuerIdentificationNumber(number: startedState.number.value) {
-            guard iin != issuerIdentificationNumber(number: oldNumber) else {
+        let iin = issuerIdentificationNumber(number: startedState.number.value)
+        if let iin, iin == issuerIdentificationNumber(number: oldNumber) {
+            return
+        }
+        issuerInformationCancellable?.cancel()
+        update(
+            startedState: &startedState,
+            issuerInformation: localIssuerInformation(number: startedState.number.value),
+            resolvePreferredScheme: false
+        )
+        guard let iin else {
+            return
+        }
+        logger.debug("Will fetch issuer information", attributes: ["IIN": iin])
+        issuerInformationCancellable = cardsService.issuerInformation(iin: iin) { [logger, weak self] result in
+            guard let self, case .started(var startedState) = self.state else {
                 return
             }
-            startedState.issuerInformation = issuerInformation(number: startedState.number.value)
-            startedState.preferredScheme = nil
-            issuerInformationCancellable?.cancel()
-            logger.debug("Will fetch issuer information", attributes: ["IIN": iin])
-            issuerInformationCancellable = cardsService.issuerInformation(iin: iin) { [logger, weak self] result in
-                guard case .started(var startedState) = self?.state else {
-                    return
-                }
-                switch result {
-                case .failure(let failure) where failure.code == .cancelled:
-                    break
-                case .failure(let failure):
-                    // Inability to select co-scheme is considered minor issue and we still want
-                    // users to be able to continue tokenization. So errors are silently ignored.
-                    logger.info("Did fail to fetch issuer information: \(failure)", attributes: ["IIN": iin])
-                case .success(let issuerInformation):
-                    startedState.issuerInformation = issuerInformation
-                    if let delegate = self?.delegate {
-                        startedState.preferredScheme = delegate.preferredScheme(issuerInformation: issuerInformation)
-                    } else {
-                        startedState.preferredScheme = issuerInformation.scheme
-                    }
-                    self?.state = .started(startedState)
-                }
+            switch result {
+            case .failure(let failure) where failure.code == .cancelled:
+                break
+            case .failure(let failure):
+                // Inability to select co-scheme is considered minor issue and we still want
+                // users to be able to continue tokenization. So errors are silently ignored.
+                logger.info("Did fail to fetch issuer information: \(failure)", attributes: ["IIN": iin])
+            case .success(let issuerInformation):
+                update(startedState: &startedState, issuerInformation: issuerInformation, resolvePreferredScheme: true)
+                self.state = .started(startedState)
             }
-        } else {
-            startedState.issuerInformation = issuerInformation(number: startedState.number.value)
-            startedState.preferredScheme = nil
         }
+    }
+
+    /// Updates started state with given issuer information, which includes scheme and possibly CVC.
+    private func update(
+        startedState: inout State.Started, issuerInformation: POCardIssuerInformation?, resolvePreferredScheme: Bool
+    ) {
+        startedState.issuerInformation = issuerInformation
+        if !resolvePreferredScheme {
+            startedState.preferredScheme = nil
+        } else if let issuerInformation, let delegate = delegate {
+            startedState.preferredScheme = delegate.preferredScheme(issuerInformation: issuerInformation)
+        } else {
+            startedState.preferredScheme = issuerInformation?.scheme
+        }
+        let securityCodeFormatter = CardSecurityCodeFormatter()
+        securityCodeFormatter.scheme = issuerInformation?.scheme
+        startedState.cvc.value = securityCodeFormatter.string(from: startedState.cvc.value)
+        startedState.cvc.formatter = securityCodeFormatter
     }
 
     private func issuerIdentificationNumber(number: String) -> String? {
@@ -265,7 +288,7 @@ final class DefaultCardTokenizationInteractor:
     }
 
     /// Returns locally generated issuer information where only `scheme` property is set.
-    private func issuerInformation(number: String) -> POCardIssuerInformation? {
+    private func localIssuerInformation(number: String) -> POCardIssuerInformation? {
         guard let scheme = CardSchemeProvider().scheme(cardNumber: number) else {
             return nil
         }

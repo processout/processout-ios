@@ -36,36 +36,7 @@ struct CardTokenizationViewModelState {
         let items: [Item]
     }
 
-    struct InputItem: Identifiable {
-
-        /// Item identifier.
-        let id: AnyHashable
-
-        /// Current parameter's value text.
-        /// - NOTE: View model doesn't own value of input item so binding is used instead.
-        @Binding var value: String
-
-        /// Parameter's placeholder.
-        let placeholder: String
-
-        /// Boolean value indicating whether value is valid.
-        let isInvalid: Bool
-
-        /// Input icon.
-        let icon: Image?
-
-        /// Formatter to use to format value if any.
-        let formatter: Formatter?
-
-        /// Keyboard type.
-        let keyboard: UIKeyboardType
-
-        /// Text content type.
-        let contentType: UITextContentType?
-
-        /// Action to perform when the user submits a value to this input.
-        let onSubmit: () -> Void
-    }
+    typealias InputItem = InputViewModel
 
     struct PickerItem: Identifiable {
 

@@ -10,29 +10,7 @@ import SwiftUI
 
 enum CardUpdateViewModelItem {
 
-    struct Input: Identifiable {
-
-        /// Item identifier.
-        let id: AnyHashable
-
-        /// Current parameter's value text.
-        @Binding var value: String
-
-        /// Parameter's placeholder.
-        let placeholder: String
-
-        /// Boolean value indicating whether value is valid.
-        let isInvalid: Bool
-
-        /// Boolean value indicating whether input is currently enabled.
-        let isEnabled: Bool
-
-        /// Input icon.
-        let icon: Image?
-
-        /// Action to perform when the user submits a value to this input.
-        let onSubmit: () -> Void
-    }
+    typealias Input = InputViewModel
 
     struct Error: Identifiable {
 

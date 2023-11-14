@@ -13,11 +13,13 @@ struct CardSchemeProvider {
 
     /// Returns locally generated scheme.
     func scheme(cardNumber number: String) -> String? {
-        let normalizedNumber = cardNumberFormatter.normalized(number: number)
+        let normalizedNumber = cardNumberFormatter
+            .normalized(number: number)
+            .prefix(Constants.maximumIinLength)
         // It is possible for a card number to start with "0" but it isn't supported by the
         // implementation below because it relies on integer ranges to perform a lookup.
         guard !normalizedNumber.starts(with: "0"),
-              let numberValue = Int(normalizedNumber.prefix(Constants.maximumIinLength)) else {
+              let numberValue = Int(normalizedNumber) else {
             return nil
         }
         let issuer = Self.issuers.first { issuer in

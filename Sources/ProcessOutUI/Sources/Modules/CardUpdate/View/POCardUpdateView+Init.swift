@@ -21,7 +21,7 @@ extension POCardUpdateView {
         let interactor = DefaultCardUpdateInteractor(
             cardsService: ProcessOut.shared.cards,
             logger: logger,
-            cardId: configuration.cardId,
+            configuration: configuration,
             delegate: delegate,
             completion: completion
         )

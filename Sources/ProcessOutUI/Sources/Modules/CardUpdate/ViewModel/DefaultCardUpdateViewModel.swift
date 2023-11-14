@@ -106,6 +106,9 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
             isInvalid: false,
             isEnabled: false,
             icon: state.scheme.flatMap(CardSchemeImageProvider.shared.image),
+            formatter: nil,
+            keyboard: .asciiCapableNumberPad,
+            contentType: nil,
             onSubmit: { }
         )
         return .input(item)
@@ -124,6 +127,9 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
             isInvalid: state.recentErrorMessage != nil,
             isEnabled: true,
             icon: Image(.Card.back),
+            formatter: state.formatter,
+            keyboard: .asciiCapableNumberPad,
+            contentType: nil,
             onSubmit: { [weak self] in
                 self?.interactor.submit()
             }

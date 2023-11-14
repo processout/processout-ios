@@ -12,6 +12,10 @@ public struct POCardUpdateConfiguration {
     /// Card id that needs to be updated.
     public let cardId: String
 
+    /// Allows to provide card information that will be visible in UI. It is also possible to inject
+    /// it dynamically using ``POCardUpdateDelegate/cardInformation(cardId:)``.
+    public let cardInformation: POCardUpdateInformation?
+
     /// Custom title. Use empty string to hide title.
     public let title: String?
 
@@ -23,11 +27,13 @@ public struct POCardUpdateConfiguration {
 
     public init(
         cardId: String,
+        cardInformation: POCardUpdateInformation? = nil,
         title: String? = nil,
         primaryActionTitle: String? = nil,
         cancelActionTitle: String? = nil
     ) {
         self.cardId = cardId
+        self.cardInformation = cardInformation
         self.title = title
         self.primaryActionTitle = primaryActionTitle
         self.cancelActionTitle = cancelActionTitle

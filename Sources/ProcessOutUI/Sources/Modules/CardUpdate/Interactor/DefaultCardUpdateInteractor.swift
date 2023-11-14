@@ -12,13 +12,13 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
     init(
         cardsService: POCardsService,
         logger: POLogger,
-        cardId: String,
+        configuration: POCardUpdateConfiguration,
         delegate: POCardUpdateDelegate?,
         completion: @escaping (Result<POCard, POFailure>) -> Void
     ) {
         self.cardsService = cardsService
         self.logger = logger
-        self.cardId = cardId
+        self.configuration = configuration
         self.delegate = delegate
         self.completion = completion
         super.init(state: .idle)
@@ -32,26 +32,29 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         }
         logger.debug("Will start card update")
         delegate?.cardUpdateDidEmitEvent(.willStart)
+        if let cardInfo = configuration.cardInformation {
+            setStartedStateUnchecked(cardInfo: cardInfo)
+            return
+        }
         state = .starting
         Task {
-            let cardInfo = await delegate?.cardInformation(cardId: cardId)
-            let startedState = State.Started(
-                cardNumber: cardInfo?.maskedNumber, scheme: cardInfo?.preferredScheme
-            )
-            self.state = .started(startedState)
-            delegate?.cardUpdateDidEmitEvent(.didStart)
-            logger.debug("Did start card update")
-            await updateSchemeIfNeeded(cardInfo: cardInfo)
+            let cardInfo = await delegate?.cardInformation(cardId: configuration.cardId)
+            setStartedStateUnchecked(cardInfo: cardInfo)
         }
     }
 
     func update(cvc: String) {
-        guard case .started(var startedState) = state, startedState.cvc != cvc else {
+        guard case .started(var startedState) = state else {
             return
         }
-        logger.debug("Will change CVC value to '\(cvc)'")
+        logger.debug("Will change CVC to '\(cvc)'")
+        let formatted = cardSecurityCodeFormatter.string(from: cvc)
+        guard startedState.cvc != formatted else {
+            logger.debug("Ignoring same CVC value \(formatted)")
+            return
+        }
         startedState.recentErrorMessage = nil
-        startedState.cvc = cvc
+        startedState.cvc = formatted
         state = .started(startedState)
         delegate?.cardUpdateDidEmitEvent(.parametersChanged)
     }
@@ -61,7 +64,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         guard case .started(let startedState) = state else {
             return
         }
-        guard startedState.recentErrorMessage == nil  else {
+        guard startedState.recentErrorMessage == nil else {
             logger.debug("Ignoring attempt to submit invalid CVC")
             return
         }
@@ -70,7 +73,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         state = .updating(snapshot: startedState)
         Task {
             do {
-                let request = POCardUpdateRequest(cardId: cardId, cvc: startedState.cvc)
+                let request = POCardUpdateRequest(cardId: configuration.cardId, cvc: startedState.cvc)
                 setCompletedState(card: try await cardsService.updateCard(request: request))
             } catch {
                 recoverUpdate(from: error)
@@ -88,18 +91,39 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     // MARK: - Private Properties
 
+    private weak var delegate: POCardUpdateDelegate?
+
     private let cardsService: POCardsService
     private let logger: POLogger
-    private let cardId: String
+    private let configuration: POCardUpdateConfiguration
     private let completion: (Result<POCard, POFailure>) -> Void
 
-    private weak var delegate: POCardUpdateDelegate?
+    private lazy var cardSecurityCodeFormatter = CardSecurityCodeFormatter()
+
+    // MARK: - Started State
+
+    @MainActor
+    private func setStartedStateUnchecked(cardInfo: POCardUpdateInformation?) {
+        cardSecurityCodeFormatter.scheme = cardInfo?.scheme
+        let startedState = State.Started(
+            cardNumber: cardInfo?.maskedNumber,
+            scheme: cardInfo?.preferredScheme ?? cardInfo?.scheme,
+            formatter: cardSecurityCodeFormatter
+        )
+        self.state = .started(startedState)
+        delegate?.cardUpdateDidEmitEvent(.didStart)
+        logger.debug("Did start card update")
+        Task {
+            await updateSchemeIfNeeded(cardInfo: cardInfo)
+        }
+    }
 
     // MARK: - Scheme Update
 
     @MainActor
     private func updateSchemeIfNeeded(cardInfo: POCardUpdateInformation?) async {
-        guard let maskedNumber = cardInfo?.maskedNumber, cardInfo?.preferredScheme == nil else {
+        guard let maskedNumber = cardInfo?.maskedNumber,
+              cardInfo?.scheme == nil && cardInfo?.preferredScheme == nil else {
             return
         }
         guard let iin = cardInfo?.iin ?? issuerIdentificationNumber(maskedNumber: maskedNumber) else {
@@ -111,10 +135,14 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             logger.info("Did resolve \(scheme) for masked number: \(maskedNumber)")
             switch state {
             case .started(var startedState):
+                cardSecurityCodeFormatter.scheme = scheme
                 startedState.scheme = scheme
+                startedState.cvc = cardSecurityCodeFormatter.string(from: startedState.cvc)
                 state = .started(startedState)
             case .updating(var startedState):
+                cardSecurityCodeFormatter.scheme = scheme
                 startedState.scheme = scheme
+                startedState.cvc = cardSecurityCodeFormatter.string(from: startedState.cvc)
                 state = .updating(snapshot: startedState)
             default:
                 logger.debug("Unsupported state, scheme is ignored.")

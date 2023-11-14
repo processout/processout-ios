@@ -1,5 +1,5 @@
 //
-//  FormattingUtils.swift
+//  POFormattingUtils.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 12.05.2023.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum FormattingUtils {
+@_spi(PO) public enum POFormattingUtils {
 
     /// Returns index in formatted string that matches index in `string`.
     ///
@@ -17,7 +17,7 @@ enum FormattingUtils {
     /// Alternative solution would be to compare all substrings starting from end of `target` with suffix
     /// after cursor in `source` and finding substring with least possible difference (using for example Levenshtein
     /// distance). Downside of it would be almost cubic complexity.
-    static func adjustedCursorOffset(
+    public static func adjustedCursorOffset(
         in target: String,
         source: String,
         sourceCursorOffset: Int,
