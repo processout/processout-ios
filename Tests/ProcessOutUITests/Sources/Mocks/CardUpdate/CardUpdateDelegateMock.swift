@@ -10,21 +10,21 @@ import ProcessOut
 
 final class CardUpdateDelegateMock: POCardUpdateDelegate {
 
-    var cardUpdateDidEmitEventFromClosure: ((POCardUpdateEvent) -> Void)!
-    var cardInformationFromClosure: ((String) -> POCardUpdateInformation?)!
-    var shouldContinueUpdateFromClosure: ((POFailure) -> Bool)!
+    var cardUpdateDidEmitEventFromClosure: ((POCardUpdateEvent) -> Void)?
+    var cardInformationFromClosure: ((String) -> POCardUpdateInformation?)?
+    var shouldContinueUpdateFromClosure: ((POFailure) -> Bool)?
 
     // MARK: - PO3DSService
 
     func cardUpdateDidEmitEvent(_ event: POCardUpdateEvent) {
-        cardUpdateDidEmitEventFromClosure(event)
+        cardUpdateDidEmitEventFromClosure?(event)
     }
 
     func cardInformation(cardId: String) async -> POCardUpdateInformation? {
-        cardInformationFromClosure(cardId)
+        cardInformationFromClosure?(cardId)
     }
 
     func shouldContinueUpdate(after failure: POFailure) -> Bool {
-        shouldContinueUpdateFromClosure(failure)
+        shouldContinueUpdateFromClosure?(failure) ?? false
     }
 }

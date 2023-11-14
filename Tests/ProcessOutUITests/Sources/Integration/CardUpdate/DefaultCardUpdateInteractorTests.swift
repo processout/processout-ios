@@ -9,7 +9,6 @@ import XCTest
 @testable import ProcessOut
 @testable import ProcessOutUI
 
-@MainActor
 final class DefaultCardUpdateInteractorTests: XCTestCase {
 
     override func setUp() {
@@ -18,22 +17,49 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
         cardsService = ProcessOut(configuration: configuration).cards
     }
 
-    func test_start_setsStartingState() {
+    // MARK: - Start
+
+    func test_start_whenCardInfoIsNotSet_setsStartingState() {
         // Given
+        let delegate = CardUpdateDelegateMock()
         let configuration = POCardUpdateConfiguration(cardId: "")
+        let sut = createSut(configuration: configuration, delegate: delegate)
+
+        // When
+        sut.start()
+
+        // Then
+        let expectation = XCTestExpectation()
+        delegate.cardInformationFromClosure = { _ in
+            expectation.fulfill()
+            return nil
+        }
+        wait(for: [expectation])
+        XCTAssertEqual(sut.state, .starting)
+    }
+
+    // MARK: - Scheme Resolve
+
+    func test_start_whenCardSchemeIsSetInConfiguration_setsStartedStateWithIt() {
+        // Given
+        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
         let sut = createSut(configuration: configuration)
 
         // When
         sut.start()
 
         // Then
-        XCTAssertEqual(sut.state, .starting)
+        guard case .started(let startedState) = sut.state else {
+            XCTFail("Unexpected state")
+            return
+        }
+        XCTAssertEqual(startedState.scheme, "visa")
     }
 
-    func test_start_whenCardInformationIsAvailableInConfiguration_setsStartedState() {
+    func test_start_whenPreferredCardSchemeIsAvailable_setsStartedStateWithIt() {
         // Given
         let configuration = POCardUpdateConfiguration(
-            cardId: "", cardInformation: .init(scheme: "visa")
+            cardId: "", cardInformation: .init(scheme: "visa", preferredScheme: "carte bancaire")
         )
         let sut = createSut(configuration: configuration)
 
@@ -41,10 +67,139 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
         sut.start()
 
         // Then
-        if case .started = sut.state {
+        guard case .started(let startedState) = sut.state else {
+            XCTFail("Unexpected state")
             return
         }
-        XCTFail("Unexpected state")
+        XCTAssertEqual(startedState.scheme, "carte bancaire")
+    }
+
+    func test_start_whenCardSchemeIsNotSetAndIinIsSet_attemptsToResolve() {
+        // Given
+        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(iin: "424242"))
+        let sut = createSut(configuration: configuration)
+
+        // When
+        sut.start()
+
+        // Then
+        let expectation = XCTestExpectation()
+        sut.didChange = { [weak sut] in
+            if case .started(let startedState) = sut?.state, startedState.scheme == "visa" {
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 5)
+    }
+
+    func test_start_whenCardSchemeIsNotSetAndMaskedNumberIsSet_attemptsToResolve() {
+        // Given
+        let configuration = POCardUpdateConfiguration(
+            cardId: "", cardInformation: .init(maskedNumber: "4242 42** **42")
+        )
+        let sut = createSut(configuration: configuration)
+
+        // When
+        sut.start()
+
+        // Then
+        let expectation = XCTestExpectation()
+        sut.didChange = { [weak sut] in
+            if case .started(let startedState) = sut?.state, startedState.scheme == "visa" {
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 5)
+    }
+
+    // MARK: - Cancel
+
+    func test_cancel_whenStarted() {
+        // Given
+        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
+        let sut = createSut(configuration: configuration)
+        sut.start()
+
+        // When
+        sut.cancel()
+
+        // Then
+        XCTAssertEqual(sut.state, .completed)
+    }
+
+    // MARK: - Update CVC
+
+    func test_updateCvc_whenStarting_isIgnored() {
+        // Given
+        let configuration = POCardUpdateConfiguration(cardId: "")
+        let sut = createSut(configuration: configuration)
+        sut.start()
+        let oldState = sut.state
+
+        // When
+        sut.update(cvc: "123")
+
+        // Then
+        XCTAssertEqual(sut.state, oldState)
+    }
+
+    func test_updateCvc_whenStarted_updatesState() {
+        // Given
+        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
+        let sut = createSut(configuration: configuration)
+        sut.start()
+
+        // When
+        sut.update(cvc: "1 23 45")
+
+        // Then
+        guard case .started(let startedState) = sut.state else {
+            return
+        }
+        XCTAssertEqual(startedState.cvc, "123")
+    }
+
+    // MARK: - Submit
+
+    func test_submit_whenCvcIsNotSet_causesError() {
+        // Given
+        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
+        let sut = createSut(configuration: configuration)
+        sut.start()
+
+        // When
+        sut.submit()
+
+        // Then
+        let expectation = XCTestExpectation()
+        sut.didChange = { [weak sut] in
+            if case .started(let startedState) = sut?.state, startedState.recentErrorMessage != nil {
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 5)
+    }
+
+    func test_submit_whenValidCvcIsSet_completes() {
+        // Given
+        let configuration = POCardUpdateConfiguration(
+            cardId: "card_ZbHkl2Uh3Udafx2cbb2uN4pP2evwHPyf", cardInformation: .init(scheme: "visa")
+        )
+        let sut = createSut(configuration: configuration)
+        sut.start()
+        sut.update(cvc: "123")
+
+        // When
+        sut.submit()
+
+        // Then
+        let expectation = XCTestExpectation()
+        sut.didChange = { [weak sut] in
+            if case .completed = sut?.state {
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 5)
     }
 
     // MARK: - Private Properties
