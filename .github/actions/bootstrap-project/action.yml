@@ -12,6 +12,7 @@ runs:
       run: |
         CONSTANTS=$'${{ inputs.test-project-constants }}'
         echo "$CONSTANTS" > Tests/ProcessOutTests/Resources/Constants.yml
+        echo "$CONSTANTS" > Tests/ProcessOutUITests/Resources/Constants.yml
         echo "$CONSTANTS" > Example/Example/Resources/Constants.yml
       shell: bash
     - name: Select Xcode Version
