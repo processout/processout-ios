@@ -26,7 +26,8 @@ final class DefaultApplePayCardTokenizationRequestMapper: ApplePayCardTokenizati
                 paymentData: try decoder.decode(
                     ApplePayCardTokenizationRequest.PaymentData.self, from: request.payment.token.paymentData
                 ),
-                paymentMethod: paymentMethod(from: request.payment.token.paymentMethod)
+                paymentMethod: paymentMethod(from: request.payment.token.paymentMethod),
+                transactionIdentifier: request.payment.token.transactionIdentifier
             )
             let tokenizationRequest = ApplePayCardTokenizationRequest(
                 tokenType: "applepay",

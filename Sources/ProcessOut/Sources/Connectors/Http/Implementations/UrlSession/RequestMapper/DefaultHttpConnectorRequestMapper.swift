@@ -108,9 +108,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
     private func userAgent(deviceMetadata: DeviceMetadata) -> String {
         let components = [
             deviceMetadata.channel,
-            "Version",
-            deviceMetadata.systemVersion,
-            "ProcessOut iOS-Bindings",
+            deviceMetadata.systemVersion + " ProcessOut iOS-Bindings",
             configuration.version
         ]
         return components.joined(separator: "/")
