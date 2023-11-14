@@ -198,7 +198,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
              .generic(.cardFailedCvcAndAvs):
             errorMessage = .CardUpdate.Error.cvc
         default:
-            errorMessage = .CardTokenization.Error.generic
+            errorMessage = .CardUpdate.Error.generic
         }
         // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
         startedState.recentErrorMessage = String(resource: errorMessage)
