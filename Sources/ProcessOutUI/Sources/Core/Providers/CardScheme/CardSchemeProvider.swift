@@ -11,7 +11,15 @@ import Foundation
 // todo(andrii-vysotskyi): support more schemes
 final class CardSchemeProvider {
 
-    static let shared = CardSchemeProvider()
+    struct Issuer {
+        let scheme: String
+        let numbers: IssuerNumbers
+        let length: Int
+    }
+
+    enum IssuerNumbers {
+        case range(ClosedRange<Int>), exact(Int), set(Set<Int>)
+    }
 
     /// Returns locally generated scheme.
     func scheme(cardNumber number: String) -> String? {
@@ -43,27 +51,30 @@ final class CardSchemeProvider {
         return issuer?.scheme
     }
 
+    init(issuers: [Issuer]) {
+        self.issuers = issuers
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {
         static let maximumIinLength = 6
     }
 
-    private struct Issuer {
-        let scheme: String
-        let numbers: IssuerNumbers
-        let length: Int
-    }
+    // MARK: - Private Properties
 
-    private enum IssuerNumbers {
-        case range(ClosedRange<Int>), exact(Int), set(Set<Int>)
-    }
+    private let issuers: [Issuer]
+}
+
+extension CardSchemeProvider {
+
+    static let shared = CardSchemeProvider(issuers: CardSchemeProvider.defaultIssuers)
 
     // MARK: - Private Properties
 
     // Based on https://www.bincodes.com/bin-list
     // Information is sorted by length to properly handle overlapping numbers (like 622126 and 62).
-    private let issuers: [Issuer] = [
+    private static let defaultIssuers: [Issuer] = [
         .init(scheme: "discover", numbers: .range(622126...622925), length: 6),
         .init(
             scheme: "elo",
@@ -139,8 +150,4 @@ final class CardSchemeProvider {
         .init(scheme: "visa", numbers: .exact(4), length: 1),
         .init(scheme: "maestro", numbers: .exact(6), length: 1)
     ]
-
-    // MARK: - Private Methods
-
-    private init() { }
 }
