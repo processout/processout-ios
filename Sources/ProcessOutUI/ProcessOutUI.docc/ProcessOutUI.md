@@ -19,6 +19,7 @@
 
 ### Card Update
 
+- <doc:CardUpdate>
 - ``POCardUpdateView``
 - ``POCardUpdateViewController``
 - ``POCardUpdateStyle``
