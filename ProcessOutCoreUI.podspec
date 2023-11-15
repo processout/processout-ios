@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.source                = { :git => 'https://github.com/processout/processout-ios.git', :tag => s.version.to_s }
   s.frameworks            = 'Foundation', 'SwiftUI'
   s.ios.deployment_target = '14.0'
-  s.vendored_frameworks   = "Vendor/cmark.xcframework"
   s.ios.resources         = 'Sources/ProcessOutCoreUI/Resources/**/*'
   s.source_files          = 'Sources/ProcessOutCoreUI/**/*.swift'
+  s.dependency            'ProcessOut' # todo(andrii-vysotskyi): vendor cmark.xcframework instead after UI migration is completed
 end
