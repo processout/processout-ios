@@ -10,7 +10,8 @@ for PRODUCT in "ProcessOut" "ProcessOutUI"; do
     xcodebuild clean test \
         -destination "$DESTINATION" \
         -project $PROJECT \
-        -scheme $PRODUCT |
+        -scheme $PRODUCT \
+        -enableCodeCoverage NO |
         xcpretty
 done
 
