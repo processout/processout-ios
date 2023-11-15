@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 
+@available(iOS 14, *)
 extension POBackport where Wrapped: View {
 
     /// Adds a modifier for this view that fires an action when a specific value changes.
@@ -17,33 +18,7 @@ extension POBackport where Wrapped: View {
         if #available(iOS 17, *) {
             wrapped.onChange(of: value, action)
         } else {
-            wrapped.modifier(Modifier(value: value, action: action))
+            wrapped.onChange(of: value) { _ in action() }
         }
     }
-}
-
-private struct Modifier<Value: Equatable>: ViewModifier {
-
-    init(value: Value, action: @escaping () -> Void) {
-        self.value = value
-        self.action = action
-        _oldValue = .init(initialValue: value)
-    }
-
-    func body(content: Content) -> some View {
-        content.onReceive(Just(value)) { newValue in
-            guard newValue != oldValue else {
-                return
-            }
-            oldValue = newValue
-            action()
-        }
-    }
-
-    // MARK: - Private Properties
-
-    private let value: Value
-    private let action: () -> Void
-
-    @State private var oldValue: Value?
 }
