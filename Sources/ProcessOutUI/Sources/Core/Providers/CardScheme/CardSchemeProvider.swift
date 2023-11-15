@@ -9,12 +9,22 @@ import Foundation
 @_spi(PO) import ProcessOut
 
 // todo(andrii-vysotskyi): support more schemes
-struct CardSchemeProvider {
+final class CardSchemeProvider {
+
+    struct Issuer {
+        let scheme: String
+        let numbers: IssuerNumbers
+        let length: Int
+    }
+
+    enum IssuerNumbers {
+        case range(ClosedRange<Int>), exact(Int), set(Set<Int>)
+    }
 
     /// Returns locally generated scheme.
     func scheme(cardNumber number: String) -> String? {
-        let normalizedNumber = cardNumberFormatter
-            .normalized(number: number)
+        let normalizedNumber = number
+            .removingCharacters(in: .decimalDigits.inverted)
             .prefix(Constants.maximumIinLength)
         // It is possible for a card number to start with "0" but it isn't supported by the
         // implementation below because it relies on integer ranges to perform a lookup.
@@ -22,7 +32,7 @@ struct CardSchemeProvider {
               let numberValue = Int(normalizedNumber) else {
             return nil
         }
-        let issuer = Self.issuers.first { issuer in
+        let issuer = issuers.first { issuer in
             let lengthDifference = normalizedNumber.count - issuer.length
             guard lengthDifference >= 0 else {
                 return false
@@ -41,37 +51,31 @@ struct CardSchemeProvider {
         return issuer?.scheme
     }
 
+    init(issuers: [Issuer]) {
+        self.issuers = issuers
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {
         static let maximumIinLength = 6
     }
 
-    private struct Issuer {
-        let scheme: String
-        let numbers: IssuerNumbers
-        let length: Int
-    }
+    // MARK: - Private Properties
 
-    private enum IssuerNumbers {
-        case range(ClosedRange<Int>), exact(Int), set(Set<Int>)
-    }
+    private let issuers: [Issuer]
+}
+
+extension CardSchemeProvider {
+
+    static let shared = CardSchemeProvider(issuers: CardSchemeProvider.defaultIssuers)
 
     // MARK: - Private Properties
 
     // Based on https://www.bincodes.com/bin-list
     // Information is sorted by length to properly handle overlapping numbers (like 622126 and 62).
-    private static let issuers: [Issuer] = [
+    private static let defaultIssuers: [Issuer] = [
         .init(scheme: "discover", numbers: .range(622126...622925), length: 6),
-        .init(scheme: "argencard", numbers: .exact(501105), length: 6),
-        .init(scheme: "naranja", numbers: .set([377798, 377799, 402917, 402918, 527571, 527572, 589562]), length: 6),
-        .init(scheme: "cabal", numbers: .set([589657, 600691, 603522, 636908]), length: 6),
-        .init(scheme: "hipercard", numbers: .exact(606282), length: 6),
-        .init(
-            scheme: "bancontact",
-            numbers: .set([487104, 487109, 670300, 670305, 670310, 670319, 670330, 670342, 670375, 670397]),
-            length: 6
-        ),
         .init(
             scheme: "elo",
             numbers: .set([
@@ -130,12 +134,8 @@ struct CardSchemeProvider {
             ]),
             length: 5
         ),
-        .init(scheme: "cabal", numbers: .set([6042, 6043]), length: 4),
         .init(scheme: "discover", numbers: .exact(6011), length: 4),
         .init(scheme: "jcb", numbers: .range(3528...3589), length: 4),
-        .init(scheme: "dankort", numbers: .set([4175, 4571, 5019]), length: 4),
-        .init(scheme: "cardguard ead bg ils", numbers: .exact(5392), length: 4),
-        .init(scheme: "bancontact", numbers: .exact(6703), length: 4),
         .init(scheme: "elo", numbers: .exact(509), length: 3),
         .init(scheme: "discover", numbers: .range(644...649), length: 3),
         .init(scheme: "diners club carte blanche", numbers: .range(300...305), length: 3),
@@ -148,9 +148,6 @@ struct CardSchemeProvider {
         .init(scheme: "diners club international", numbers: .set([36, 38, 39]), length: 2),
         .init(scheme: "diners club united states & canada", numbers: .range(54...55), length: 2),
         .init(scheme: "visa", numbers: .exact(4), length: 1),
-        .init(scheme: "maestro", numbers: .exact(6), length: 1),
-        .init(scheme: "uatp", numbers: .exact(1), length: 1)
+        .init(scheme: "maestro", numbers: .exact(6), length: 1)
     ]
-
-    private let cardNumberFormatter = POCardNumberFormatter()
 }

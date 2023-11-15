@@ -6,6 +6,7 @@ excluded:
   - Sources/ProcessOut/Sources/Legacy
   - Sources/*/Sources/Generated
   - Tests/ProcessOutTests/Sources/Generated
+  - Tests/ProcessOutUITests/Sources/Generated
 
 function_parameter_count:
   warning: 5

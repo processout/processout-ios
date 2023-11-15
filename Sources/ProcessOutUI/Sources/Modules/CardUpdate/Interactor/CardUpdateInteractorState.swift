@@ -8,9 +8,9 @@
 import Foundation
 import ProcessOut
 
-enum CardUpdateInteractorState {
+enum CardUpdateInteractorState: Equatable {
 
-    struct Started {
+    struct Started: Equatable {
 
         /// Masked card number.
         var cardNumber: String?

@@ -122,33 +122,33 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     @MainActor
     private func updateSchemeIfNeeded(cardInfo: POCardUpdateInformation?) async {
-        guard let maskedNumber = cardInfo?.maskedNumber,
-              cardInfo?.scheme == nil && cardInfo?.preferredScheme == nil else {
+        guard cardInfo?.scheme == nil else {
+            logger.debug("Scheme is already set, ignored")
             return
         }
-        guard let iin = cardInfo?.iin ?? issuerIdentificationNumber(maskedNumber: maskedNumber) else {
-            logger.info("Unable to extract IIN from masked number: \(maskedNumber)")
+        guard let iin = cardInfo?.iin ?? cardInfo?.maskedNumber.flatMap(issuerIdentificationNumber) else {
+            logger.info("Unable to resolve scheme, IIN is not available")
             return
         }
         do {
             let scheme = try await cardsService.issuerInformation(iin: iin).scheme
-            logger.info("Did resolve \(scheme) for masked number: \(maskedNumber)")
+            logger.info("Did resolve card scheme: \(scheme)")
             switch state {
             case .started(var startedState):
                 cardSecurityCodeFormatter.scheme = scheme
-                startedState.scheme = scheme
+                startedState.scheme = cardInfo?.preferredScheme ?? scheme
                 startedState.cvc = cardSecurityCodeFormatter.string(from: startedState.cvc)
                 state = .started(startedState)
             case .updating(var startedState):
                 cardSecurityCodeFormatter.scheme = scheme
-                startedState.scheme = scheme
+                startedState.scheme = cardInfo?.preferredScheme ?? scheme
                 startedState.cvc = cardSecurityCodeFormatter.string(from: startedState.cvc)
                 state = .updating(snapshot: startedState)
             default:
-                logger.debug("Unsupported state, scheme is ignored.")
+                logger.debug("Unsupported state, resolved scheme is ignored.")
             }
         } catch {
-            logger.info("Did fail to retrieve card issuer information: \(error)")
+            logger.info("Did fail to resolve scheme: \(error)")
         }
     }
 
@@ -198,7 +198,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
              .generic(.cardFailedCvcAndAvs):
             errorMessage = .CardUpdate.Error.cvc
         default:
-            errorMessage = .CardTokenization.Error.generic
+            errorMessage = .CardUpdate.Error.generic
         }
         // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
         startedState.recentErrorMessage = String(resource: errorMessage)

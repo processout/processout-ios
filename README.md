@@ -39,7 +39,7 @@ Before going further please make sure that you have installed all dependencies s
 
 > **Note**
 > 
-> If you plan to run tests ensure that `Tests/ProcessOutTests/Resources/Constants.yml` file with test project credentials exists before generating project. E.g.
+> If you plan to run tests ensure that `Tests/ProcessOutTests/Resources/Constants.yml` and `Tests/ProcessOutUITests/Resources/Constants.yml` files with test project credentials exist before generating project. E.g.
 >
 > ```yml
 > projectId: test-proj_K3Ur9LQzcKtm4zttWJ7oAKHgqdiwboAw

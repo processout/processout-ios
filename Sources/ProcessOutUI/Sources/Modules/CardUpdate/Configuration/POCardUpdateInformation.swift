@@ -8,8 +8,8 @@
 /// Short card information necessary for CVC update.
 public struct POCardUpdateInformation {
 
-    /// Masked card number displayed to user as is.
-    public let maskedNumber: String
+    /// Masked card number displayed to user as is if set.
+    public let maskedNumber: String?
 
     /// Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
     ///
@@ -23,7 +23,9 @@ public struct POCardUpdateInformation {
     /// Preferred scheme previously selected by customer if any.
     public let preferredScheme: String?
 
-    public init(maskedNumber: String, iin: String? = nil, scheme: String? = nil, preferredScheme: String? = nil) {
+    public init(
+        maskedNumber: String? = nil, iin: String? = nil, scheme: String? = nil, preferredScheme: String? = nil
+    ) {
         self.maskedNumber = maskedNumber
         self.iin = iin
         self.scheme = scheme
