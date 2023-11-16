@@ -9,12 +9,6 @@
             "value" : "Area"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Obszar"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -29,12 +23,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "City"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Miejscowość"
           }
         },
         "pt-PT" : {
@@ -53,12 +41,6 @@
             "value" : "County"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Hrabstwo"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -73,12 +55,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Department"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Departament"
           }
         },
         "pt-PT" : {
@@ -97,12 +73,6 @@
             "value" : "District"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dystrykt"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -116,12 +86,6 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Do Si"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
             "value" : "Do Si"
           }
         },
@@ -141,12 +105,6 @@
             "value" : "Eircode"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Eircode"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -161,12 +119,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Emirate"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Emiraty"
           }
         },
         "pt-PT" : {
@@ -185,12 +137,6 @@
             "value" : "Island"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wyspa"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -205,12 +151,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oblast"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Obwód"
           }
         },
         "pt-PT" : {
@@ -229,12 +169,6 @@
             "value" : "Parish"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Parafia"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -248,12 +182,6 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PIN"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
             "value" : "PIN"
           }
         },
@@ -273,12 +201,6 @@
             "value" : "Town or city"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Miejscowość"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -293,12 +215,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Postal code"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Kod pocztowy"
           }
         },
         "pt-PT" : {
@@ -317,12 +233,6 @@
             "value" : "Prefecture"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Prefektura"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -337,12 +247,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Province"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Prowincja"
           }
         },
         "pt-PT" : {
@@ -361,12 +265,6 @@
             "value" : "State"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Stan"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -381,12 +279,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Suburb"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Przedmieścia"
           }
         },
         "pt-PT" : {
@@ -405,12 +297,6 @@
             "value" : "ZIP"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Kod p"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -425,12 +311,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Address line %d"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Linia adresu %d"
           }
         },
         "pt-PT" : {
@@ -465,12 +345,6 @@
             "value" : "Cancel"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anuluj"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -487,12 +361,6 @@
             "value" : "Cardholder Name"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imię i nazwisko na karcie"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -504,12 +372,6 @@
     "card-tokenization.card-details.cvc.placeholder" : {
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CVC"
-          }
-        },
-        "pl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "CVC"
@@ -531,12 +393,6 @@
             "value" : "MM / YY"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MM / RR"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -548,12 +404,6 @@
     "card-tokenization.card-details.number.placeholder" : {
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "4242 4242 4242 4242"
-          }
-        },
-        "pl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "4242 4242 4242 4242"
@@ -575,12 +425,6 @@
             "value" : "Your card information is invalid."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Niepoprawne dane karty."
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -595,12 +439,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your card expiration date is invalid."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Data ważności karty jest nieprawidłowa."
           }
         },
         "pt-PT" : {
@@ -619,12 +457,6 @@
             "value" : "Your card number is invalid."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nieprawidłowy numer karty."
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -639,12 +471,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The cardholder name is invalid."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nieprawidłowe imię i nazwisko na karcie."
           }
         },
         "pt-PT" : {
@@ -663,12 +489,6 @@
             "value" : "Your card CVC is invalid."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nieprawidłowy numer CVC."
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -685,12 +505,6 @@
             "value" : "Something went wrong, please try again."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coś poszło nie tak, spróbuj ponownie."
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -705,12 +519,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your card expiration date and/or CVC is invalid."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Data ważności karty oraz/lub kod CVC są nieprawidłowe."
           }
         },
         "pt-PT" : {
@@ -745,12 +553,6 @@
             "value" : "Submit"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zatwierdź"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -765,12 +567,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add New Card"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dodaj nową kartę"
           }
         },
         "pt-PT" : {
@@ -789,12 +585,6 @@
             "value" : "Cancel"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anuluj"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -806,12 +596,6 @@
     "card-update.cvc" : {
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CVC"
-          }
-        },
-        "pl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "CVC"
@@ -833,12 +617,6 @@
             "value" : "Your card CVC is invalid."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nieprawidłowy numer CVC."
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -855,12 +633,6 @@
             "value" : "Something went wrong, please try again."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coś poszło nie tak, spróbuj ponownie."
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -875,12 +647,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Submit"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zatwierdź"
           }
         },
         "pt-PT" : {
