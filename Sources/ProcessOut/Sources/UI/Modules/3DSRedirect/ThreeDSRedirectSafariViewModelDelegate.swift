@@ -7,6 +7,7 @@
 
 import WebKit
 
+@available(*, deprecated)
 final class ThreeDSRedirectSafariViewModelDelegate: DefaultSafariViewModelDelegate {
 
     typealias Completion = (Result<String, POFailure>) -> Void

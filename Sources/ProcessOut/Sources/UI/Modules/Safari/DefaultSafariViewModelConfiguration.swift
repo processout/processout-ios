@@ -7,6 +7,7 @@
 
 import Foundation
 
+@available(*, deprecated)
 struct DefaultSafariViewModelConfiguration {
 
     /// Return url specified when creating invoice.

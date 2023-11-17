@@ -8,6 +8,7 @@
 import Foundation
 import SafariServices
 
+@available(*, deprecated)
 final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     init(
