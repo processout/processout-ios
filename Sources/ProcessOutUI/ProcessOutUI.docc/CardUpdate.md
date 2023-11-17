@@ -1,4 +1,4 @@
-# Getting Started with Native Alternative Payments
+# Getting Started with Card Update
 
 ## Overview
 
