@@ -6,6 +6,11 @@
 
 - ``ProcessOutUI``
 
+### 3DS
+
+- ``PO3DSRedirectController``
+- ``SafariServices/SFSafariViewController/init(redirect:returnUrl:safariConfiguration:completion:)``
+
 ### Card Tokenization
 
 - ``POCardTokenizationView``
@@ -28,3 +33,8 @@
 - ``POCardUpdateDelegate``
 - ``POCardUpdateInformation``
 - ``POCardUpdateEvent``
+
+### Alternative Payment Method
+
+- ``SafariServices/SFSafariViewController/init(request:returnUrl:safariConfiguration:completion:)``
+- ``SafariServices/SFSafariViewController/init(alternativePaymentMethodUrl:returnUrl:safariConfiguration:completion:)``
