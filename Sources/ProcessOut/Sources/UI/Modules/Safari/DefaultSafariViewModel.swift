@@ -12,7 +12,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     init(
         configuration: DefaultSafariViewModelConfiguration,
-        eventEmitter: EventEmitter,
+        eventEmitter: POEventEmitter,
         logger: POLogger,
         delegate: DefaultSafariViewModelDelegate
     ) {
@@ -32,7 +32,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
                 self?.setCompletedState(with: POFailure(code: .timeout(.mobile)))
             }
         }
-        deepLinkObserver = eventEmitter.on(DeepLinkReceivedEvent.self) { [weak self] event in
+        deepLinkObserver = eventEmitter.on(PODeepLinkReceivedEvent.self) { [weak self] event in
             self?.setCompletedState(with: event.url) ?? false
         }
         state = .started
@@ -77,7 +77,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
     // MARK: - Private Properties
 
     private let configuration: DefaultSafariViewModelConfiguration
-    private let eventEmitter: EventEmitter
+    private let eventEmitter: POEventEmitter
     private let logger: POLogger
     private let delegate: DefaultSafariViewModelDelegate
 

@@ -83,7 +83,7 @@ public final class ProcessOut {
     /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
     @discardableResult
     public func processDeepLink(url: URL) -> Bool {
-        let event = DeepLinkReceivedEvent(url: url)
+        let event = PODeepLinkReceivedEvent(url: url)
         return eventEmitter.emit(event: event)
     }
 
@@ -93,15 +93,16 @@ public final class ProcessOut {
     @_spi(PO)
     public private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
 
+    /// Event emitter to use for events exchange.
+    @_spi(PO)
+    public private(set) lazy var eventEmitter: POEventEmitter = LocalEventEmitter()
+
     // MARK: - Internal
 
     /// Images repository.
     private(set) lazy var images: ImagesRepository = UrlSessionImagesRepository(session: .shared)
 
     // MARK: - Internal
-
-    /// Event emitter to use for events exchange.
-    private(set) lazy var eventEmitter: EventEmitter = LocalEventEmitter()
 
     init(configuration: ProcessOutConfiguration) {
         self.configuration = configuration
