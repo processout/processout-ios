@@ -10,6 +10,7 @@ let package = Package(
     ],
     products: [
         .library(name: "ProcessOut", targets: ["ProcessOut"]),
+        .library(name: "ProcessOutCoreUI", targets: ["ProcessOutCoreUI"]),
         .library(name: "ProcessOutUI", targets: ["ProcessOutUI"]),
         .library(name: "ProcessOutCheckout3DS", targets: ["ProcessOutCheckout3DS"])
     ],
