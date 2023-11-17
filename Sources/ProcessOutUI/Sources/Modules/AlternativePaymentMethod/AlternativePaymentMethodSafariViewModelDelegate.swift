@@ -1,6 +1,6 @@
 //
 //  AlternativePaymentMethodSafariViewModelDelegate.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 07.11.2022.
 //
