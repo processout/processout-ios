@@ -8,8 +8,10 @@
 
 ### 3DS
 
-- ``PO3DSRedirectController``
+- <doc:3DS>
 - ``SafariServices/SFSafariViewController/init(redirect:returnUrl:safariConfiguration:completion:)``
+- ``PO3DSRedirectController``
+- ``POTest3DSService``
 
 ### Card Tokenization
 
