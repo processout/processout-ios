@@ -20,71 +20,81 @@ public final class PO3DSRedirectController {
     ///   - redirect: redirect to handle.
     ///   - returnUrl: Return URL specified when creating invoice or customer token.
     ///   - safariConfiguration: The configuration for the new view controller.
-    ///   - completion: Completion to invoke when redirect handling ends.
     public init(
         redirect: PO3DSRedirect,
         returnUrl: URL,
-        safariConfiguration: SFSafariViewController.Configuration = SFSafariViewController.Configuration(),
-        completion: @escaping (Result<String, POFailure>) -> Void
+        safariConfiguration: SFSafariViewController.Configuration = SFSafariViewController.Configuration()
     ) {
-        safariViewController = .init(
-            redirect: redirect, returnUrl: returnUrl, safariConfiguration: safariConfiguration, completion: completion
-        )
+        self.redirect = redirect
+        self.returnUrl = returnUrl
+        self.safariConfiguration = safariConfiguration
     }
 
-    /// Presents the Redirect UI modally over your app. You are responsible for dismissal
+    /// Presents the Redirect UI modally over your app. You are responsible for dismissal.
     ///
     /// - Parameters:
     ///   - completion: A block that is called after the screen is presented.
-    ///   - success: A Boolean value that indicates whether the payment sheet was successfully presented. true
-    /// if the payment sheet was presented successfully; otherwise, false.
-    public func present(completion: @escaping (_ success: Bool) -> Void) {
-        guard safariViewController.presentingViewController == nil else {
-            assertionFailure("Attempted to present already visible controller.")
-            return
+    ///   - success: A Boolean value that indicates whether the screen was successfully presented.
+    ///
+    /// - NOTE: Redirect controller is retained for the duration of presentation.
+    public func present(completion: ((_ success: Bool) -> Void)? = nil) {
+        guard safariViewController == nil else {
+            preconditionFailure("Controller is already presented.")
         }
-        let rootViewController = UIApplication.shared
-            .connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .first { $0.activationState == .foregroundActive }?
-            .windows
-            .first(where: \.isKeyWindow)?
-            .rootViewController
-        var presentingViewController = rootViewController
-        while let presented = presentingViewController?.presentedViewController {
-            presentingViewController = presented
+        if let presentingViewController = PresentingViewControllerProvider.find() {
+            let safariViewController = SFSafariViewController(
+                redirect: redirect,
+                returnUrl: returnUrl,
+                safariConfiguration: safariConfiguration,
+                completion: self.completion ?? { _ in }
+            )
+            safariViewController.preferredBarTintColor = preferredBarTintColor
+            safariViewController.preferredControlTintColor = preferredControlTintColor
+            safariViewController.dismissButtonStyle = .cancel
+            presentingViewController.present(safariViewController, animated: true) {
+                completion?(true)
+            }
+            objc_setAssociatedObject(
+                safariViewController, &AssociatedKeys.redirectController, self, .OBJC_ASSOCIATION_RETAIN
+            )
+            self.safariViewController = safariViewController
+        } else {
+            completion?(false)
+            let failure = POFailure(message: "Unable to present redirect UI.", code: .generic(.mobile))
+            self.completion?(.failure(failure))
         }
-        guard let presentingViewController else {
-            completion(false)
-            return
-        }
-        presentingViewController.present(safariViewController, animated: true) { completion(true) }
     }
 
-    /// Dismisses the Redirect UI. Call this when you receive the completion or otherwise wish a dismissal to occur.
+    /// Dismisses the Redirect UI.
     public func dismiss(completion: (() -> Void)? = nil) {
-        safariViewController.presentingViewController?.dismiss(animated: true, completion: completion)
+        if let presentingViewController = safariViewController?.presentingViewController {
+            safariViewController = nil
+            presentingViewController.dismiss(animated: true, completion: completion)
+        } else {
+            completion?()
+        }
     }
+
+    /// Completion to invoke when redirect handling ends.
+    public var completion: ((Result<String, POFailure>) -> Void)?
 
     /// The preferred color to tint the background of the navigation bar and toolbar.
-    public var preferredBarTintColor: UIColor? {
-        get { safariViewController.preferredBarTintColor }
-        set { safariViewController.preferredBarTintColor = newValue }
-    }
+    public var preferredBarTintColor: UIColor?
 
     /// The preferred color to tint the control buttons on the navigation bar and toolbar.
-    public var preferredControlTintColor: UIColor? {
-        get { safariViewController.preferredControlTintColor }
-        set { safariViewController.preferredControlTintColor = newValue }
-    }
+    public var preferredControlTintColor: UIColor?
 
-    /// The style of dismiss button to use in the navigation bar to close SFSafariViewController.
-    var dismissButtonStyle: SFSafariViewController.DismissButtonStyle {
-        get { safariViewController.dismissButtonStyle }
-        set { safariViewController.dismissButtonStyle = newValue }
+    // MARK: - Private Nested Types
+
+    private enum AssociatedKeys {
+        static var redirectController: UInt8 = 0
     }
 
     // MARK: - Private Properties
 
-    private let safariViewController: SFSafariViewController
+    private let redirect: PO3DSRedirect
+    private let returnUrl: URL
+    private let safariConfiguration: SFSafariViewController.Configuration
+
+    private weak var safariViewController: SFSafariViewController?
 }
