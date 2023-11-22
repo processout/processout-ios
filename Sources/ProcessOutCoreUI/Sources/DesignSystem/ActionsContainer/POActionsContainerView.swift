@@ -29,14 +29,14 @@ public struct POActionsContainerView: View {
                     .buttonLoading(element.isLoading)
                     .accessibility(identifier: element.id)
             }
-            .modify(when: style.axis == .horizontal && layoutDirection == .leftToRight) { content in
+            .modify(when: style.axis == .horizontal) { content in
                 // The implementation considers that benign action that people are likely to
                 // want is first and when the axis is horizontal and layout direction is LTR,
                 // we want it to be placed on the right.
                 HStack(spacing: spacing) {
-                    content.environment(\.layoutDirection, .leftToRight)
+                    content.environment(\.layoutDirection, layoutDirection)
                 }
-                .environment(\.layoutDirection, .rightToLeft)
+                .environment(\.layoutDirection, layoutDirection == .leftToRight ? .rightToLeft : .leftToRight)
             }
             .padding(.horizontal, horizontalPadding)
         }
