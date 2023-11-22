@@ -3,6 +3,12 @@
   "strings" : {
     "address-spec.area" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المنطقة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19,6 +25,12 @@
     },
     "address-spec.city" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المدينة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -35,6 +47,12 @@
     },
     "address-spec.county" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "البلد"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -51,6 +69,12 @@
     },
     "address-spec.department" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المقاطعة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -67,6 +91,12 @@
     },
     "address-spec.district" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المقاطعة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -83,6 +113,12 @@
     },
     "address-spec.do-si" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الولاية"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -99,6 +135,12 @@
     },
     "address-spec.eircode" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الرمز البريدي في أيرلندا"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -115,6 +157,12 @@
     },
     "address-spec.emirate" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الإمارة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -131,6 +179,12 @@
     },
     "address-spec.island" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الجزيرة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -147,6 +201,12 @@
     },
     "address-spec.oblast" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المقاطعة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -163,6 +223,12 @@
     },
     "address-spec.parish" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إيبارشية"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -179,6 +245,12 @@
     },
     "address-spec.pin" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رقم التعريف الشخصي"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -195,6 +267,12 @@
     },
     "address-spec.post-town" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المدينة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -211,6 +289,12 @@
     },
     "address-spec.postcode" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الرمز البريدي"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -227,6 +311,12 @@
     },
     "address-spec.prefecture" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الحي السكني"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -243,6 +333,12 @@
     },
     "address-spec.province" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الولاية"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -259,6 +355,12 @@
     },
     "address-spec.state" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الولاية"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -275,6 +377,12 @@
     },
     "address-spec.suburb" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المنطقة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -291,6 +399,12 @@
     },
     "address-spec.zip" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الرمز البريدي"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -307,6 +421,12 @@
     },
     "card-tokenization.billing-address.street" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سطر العنوان %d"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -323,6 +443,12 @@
     },
     "card-tokenization.billing-address.title" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عنوان إرسال الفواتير"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -339,6 +465,12 @@
     },
     "card-tokenization.cancel-button.title" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -355,6 +487,12 @@
     },
     "card-tokenization.card-details.cardholder.placeholder" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اسم حامل البطاقة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -371,6 +509,12 @@
     },
     "card-tokenization.card-details.cvc.placeholder" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كود التحقق CVV"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -387,6 +531,12 @@
     },
     "card-tokenization.card-details.expiration.placeholder" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "شهر / سنة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -403,6 +553,12 @@
     },
     "card-tokenization.card-details.number.placeholder" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4242 4242 4242 4242"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -419,6 +575,12 @@
     },
     "card-tokenization.error.card" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنَّ معلومات البطاقة غير صالحة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -435,6 +597,12 @@
     },
     "card-tokenization.error.card-expiration" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنّ تاريخ صلاحية البطاقة غير صالح"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -451,6 +619,12 @@
     },
     "card-tokenization.error.card-number" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنّ رقم البطاقة غير صالح"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -467,6 +641,12 @@
     },
     "card-tokenization.error.cardholder-name" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اسم حامل البطاقة غير صالح"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -483,6 +663,12 @@
     },
     "card-tokenization.error.cvc" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رقم كود التحقق CVV غير صالح"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -499,6 +685,12 @@
     },
     "card-tokenization.error.generic" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدث خطأ ما، يرجى المحاولة مرة أخرى"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -515,6 +707,12 @@
     },
     "card-tokenization.error.track-data" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تاريخ انتهاء صلاحية البطاقة و/أو كود التحقق CVV غير صالح"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -531,6 +729,12 @@
     },
     "card-tokenization.preferred-scheme.title" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النظام المفضل للبطاقة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -547,6 +751,12 @@
     },
     "card-tokenization.submit-button.title" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرسال"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -563,6 +773,12 @@
     },
     "card-tokenization.title" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة بطاقة جديدة"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -579,6 +795,12 @@
     },
     "card-update.cancel-button" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -595,6 +817,12 @@
     },
     "card-update.cvc" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كود التحقق CVV"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -611,6 +839,12 @@
     },
     "card-update.error.cvc" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رقم كود التحقق CVV غير صالح"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -627,6 +861,12 @@
     },
     "card-update.error.generic" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدث خطأ ما، يرجى المحاولة مرة أخرى"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -643,6 +883,12 @@
     },
     "card-update.submit-button" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرسال"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -659,6 +905,12 @@
     },
     "card-update.title" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تفاصيل الدفع"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
