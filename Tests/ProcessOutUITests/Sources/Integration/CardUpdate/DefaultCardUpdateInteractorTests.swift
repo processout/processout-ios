@@ -26,16 +26,17 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
         let sut = createSut(configuration: configuration, delegate: delegate)
 
         // When
+        let expectation = XCTestExpectation()
+        delegate.cardInformationFromClosure = { [unowned sut] _ in
+            if sut.state == .starting {
+                expectation.fulfill()
+            }
+            return nil
+        }
         sut.start()
 
         // Then
-        let expectation = XCTestExpectation()
-        delegate.cardInformationFromClosure = { _ in
-            expectation.fulfill()
-            return nil
-        }
         wait(for: [expectation])
-        XCTAssertEqual(sut.state, .starting)
     }
 
     // MARK: - Scheme Resolve
