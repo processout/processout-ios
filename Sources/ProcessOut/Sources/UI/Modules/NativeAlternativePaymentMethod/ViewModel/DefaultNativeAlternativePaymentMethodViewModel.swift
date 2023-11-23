@@ -14,7 +14,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
     BaseViewModel<NativeAlternativePaymentMethodViewModelState>, NativeAlternativePaymentMethodViewModel {
 
     init(
-        interactor: any NativeAlternativePaymentMethodInteractor,
+        interactor: any PONativeAlternativePaymentMethodInteractor,
         configuration: PONativeAlternativePaymentMethodConfiguration,
         completion: ((Result<Void, POFailure>) -> Void)?
     ) {
@@ -40,7 +40,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     // MARK: - Private Nested Types
 
-    private typealias InteractorState = NativeAlternativePaymentMethodInteractorState
+    private typealias InteractorState = PONativeAlternativePaymentMethodInteractorState
     private typealias Text = Strings.NativeAlternativePayment
 
     private enum Constants {
@@ -50,7 +50,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     // MARK: - NativeAlternativePaymentMethodInteractor
 
-    private let interactor: any NativeAlternativePaymentMethodInteractor
+    private let interactor: any PONativeAlternativePaymentMethodInteractor
     private let configuration: PONativeAlternativePaymentMethodConfiguration
     private let completion: ((Result<Void, POFailure>) -> Void)?
 

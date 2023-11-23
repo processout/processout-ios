@@ -93,10 +93,9 @@ public final class ProcessOut {
     @_spi(PO)
     public private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
 
-    // MARK: - Internal
-
     /// Images repository.
-    private(set) lazy var images: ImagesRepository = UrlSessionImagesRepository(session: .shared)
+    @_spi(PO)
+    public private(set) lazy var images: POImagesRepository = UrlSessionImagesRepository(session: .shared)
 
     // MARK: - Internal
 
