@@ -89,7 +89,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
                 expectation.fulfill()
             }
         }
-        wait(for: [expectation], timeout: 5)
+        wait(for: [expectation])
     }
 
     func test_start_whenCardSchemeIsNotSetAndMaskedNumberIsSet_attemptsToResolve() {
@@ -109,7 +109,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
                 expectation.fulfill()
             }
         }
-        wait(for: [expectation], timeout: 5)
+        wait(for: [expectation])
     }
 
     // MARK: - Cancel
@@ -177,7 +177,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
                 expectation.fulfill()
             }
         }
-        wait(for: [expectation], timeout: 5)
+        wait(for: [expectation])
     }
 
     func test_submit_whenValidCvcIsSet_completes() {
@@ -199,7 +199,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
                 expectation.fulfill()
             }
         }
-        wait(for: [expectation], timeout: 5)
+        wait(for: [expectation])
     }
 
     // MARK: - Private Properties
