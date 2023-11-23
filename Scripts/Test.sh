@@ -3,7 +3,7 @@
 set -euo pipefail
 
 PROJECT='ProcessOut.xcodeproj'
-DESTINATION=$(python3 ./Scripts/TestDestination.py)
+DESTINATION=$(./Scripts/TestDestination.swift)
 
 # Run Tests
 for PRODUCT in "ProcessOut" "ProcessOutUI"; do
