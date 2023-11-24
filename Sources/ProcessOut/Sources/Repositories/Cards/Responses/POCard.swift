@@ -45,7 +45,9 @@ public struct POCard: Decodable, Hashable {
     public let last4Digits: String
 
     /// Hash value that remains the same for this card even if it is tokenized several times.
-    public let fingerprint: String
+    /// - NOTE: fingerprint is empty string for Apple and Google Pay cards.
+    @POFallbackDecodable<POEmptyStringProvider>
+    public private(set) var fingerprint: String
 
     /// Month of the expiration date.
     public let expMonth: Int
