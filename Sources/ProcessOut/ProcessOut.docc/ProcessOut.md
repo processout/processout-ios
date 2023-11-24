@@ -119,6 +119,9 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POImmutableExcludedCodable``
 - ``POImmutableStringCodableDecimal``
 - ``POImmutableStringCodableOptionalDecimal``
+- ``POFallbackDecodable``
+- ``POFallbackValueProvider``
+- ``POEmptyStringProvider``
 - ``PORepository``
 - ``POService``
 - ``POAutoAsync``
