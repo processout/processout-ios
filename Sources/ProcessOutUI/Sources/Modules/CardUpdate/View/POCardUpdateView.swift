@@ -40,12 +40,8 @@ public struct POCardUpdateView: View {
                 .animation(.default, value: viewModel.items.map(\.id))
             }
             .clipped()
-            POActionsContainerView(
-                actions: viewModel.actions,
-                spacing: Constants.spacing,
-                horizontalPadding: Constants.horizontalPadding
-            )
-            .actionsContainerStyle(style.actionsContainer)
+            POActionsContainerView(actions: viewModel.actions)
+                .actionsContainerStyle(style.actionsContainer)
         }
         .background(style.backgroundColor.ignoresSafeArea())
     }
