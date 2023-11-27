@@ -10,7 +10,7 @@ struct NativeAlternativePaymentViewModelSection: Identifiable {
     /// Section id.
     let id: AnyHashable
 
-    /// Indicates whether section header should be centered.
+    /// Indicates whether section content should be centered.
     let isCentered: Bool
 
     /// Section title if any.

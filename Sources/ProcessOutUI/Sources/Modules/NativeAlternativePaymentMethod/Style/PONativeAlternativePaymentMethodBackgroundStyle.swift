@@ -26,7 +26,7 @@ public struct PONativeAlternativePaymentMethodBackgroundStyle {
 
 extension PONativeAlternativePaymentMethodBackgroundStyle {
 
-    /// Default card tokenization style.
+    /// Default native APM background style.
     public static let `default` = PONativeAlternativePaymentMethodBackgroundStyle(
         regular: Color(poResource: .Surface.level1), success: Color(poResource: .Surface.success)
     )

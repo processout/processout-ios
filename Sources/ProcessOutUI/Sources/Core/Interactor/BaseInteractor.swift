@@ -1,5 +1,5 @@
 //
-//  POBaseInteractor.swift
+//  BaseInteractor.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 19.10.2023.

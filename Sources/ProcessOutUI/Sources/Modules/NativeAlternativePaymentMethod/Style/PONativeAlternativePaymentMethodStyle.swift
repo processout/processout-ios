@@ -84,12 +84,10 @@ public struct PONativeAlternativePaymentMethodStyle {
 @available(iOS 14, *)
 extension PONativeAlternativePaymentMethodStyle {
 
-    /// Default native alternative payment method style.
+    /// Default native alternative payment style.
     public static let `default` = PONativeAlternativePaymentMethodStyle(
         title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title),
-        sectionTitle: POTextStyle(
-            color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading
-        ),
+        sectionTitle: POTextStyle(color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading),
         input: .medium,
         codeInput: .large,
         radioButton: .radio,
