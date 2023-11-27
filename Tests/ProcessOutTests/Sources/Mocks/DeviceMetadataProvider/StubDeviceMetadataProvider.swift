@@ -13,7 +13,7 @@ struct StubDeviceMetadataProvider: DeviceMetadataProvider {
         DeviceMetadata(
             id: .init(value: ""),
             installationId: .init(value: nil),
-            systemVersion: .init(value: ""),
+            systemVersion: .init(value: "4"),
             appLanguage: "en",
             appScreenWidth: 1,
             appScreenHeight: 2,

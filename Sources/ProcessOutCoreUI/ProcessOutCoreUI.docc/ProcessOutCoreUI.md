@@ -17,6 +17,8 @@
 - ``POButtonStyle``
 - ``POButtonStateStyle``
 - ``SwiftUI/EnvironmentValues/isButtonLoading``
+- ``POButtonStyle/primary``
+- ``POButtonStyle/secondary``
 
 ### Radio Button
 
@@ -24,16 +26,13 @@
 - ``PORadioButtonStateStyle``
 - ``PORadioButtonKnobStateStyle``
 - ``SwiftUI/EnvironmentValues/isRadioButtonSelected``
+- ``PORadioButtonStyle/radio``
 
 ### Actions Container
+
 - ``POActionsContainerStyle``
 
 ### Input
 
 - ``POInputStyle``
 - ``POInputStateStyle``
-
-### Progress View
-
-- ``POProgressViewStyle``
-- ``POCircularProgressViewStyle``

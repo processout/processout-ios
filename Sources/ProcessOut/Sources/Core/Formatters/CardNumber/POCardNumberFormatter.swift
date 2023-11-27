@@ -41,7 +41,7 @@ import Foundation
     ) -> Bool {
         let partialString = partialStringPtr.pointee as String
         let formatted = string(from: partialString)
-        let adjustedOffset = FormattingUtils.adjustedCursorOffset(
+        let adjustedOffset = POFormattingUtils.adjustedCursorOffset(
             in: formatted,
             source: partialString,
             // swiftlint:disable:next line_length

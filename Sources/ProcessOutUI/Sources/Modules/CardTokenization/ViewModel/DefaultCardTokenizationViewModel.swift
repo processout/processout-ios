@@ -81,11 +81,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             cardInformationItems.append(.error(errorItem))
         }
         let sections = [
-            State.Section(
-                id: SectionId.cardInformation,
-                title: String(resource: .CardTokenization.CardDetails.title),
-                items: cardInformationItems
-            ),
+            State.Section(id: SectionId.cardInformation, title: nil, items: cardInformationItems),
             preferredSchemeSection(startedState: startedState),
             billingAddressSection(startedState: startedState)
         ]
@@ -110,31 +106,33 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     private func cardInformationInputItems(
         startedState: InteractorState.Started
     ) -> [CardTokenizationViewModelState.Item] {
-        let expirationItem = createItem(
-            parameter: startedState.expiration,
-            placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.expiration),
-            keyboard: .asciiCapableNumberPad
-        )
-        let cvcItem = createItem(
-            parameter: startedState.cvc,
-            placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.cvc),
-            icon: Image(.Card.back),
-            keyboard: .asciiCapableNumberPad
-        )
+        let trackItems = [
+            createItem(
+                parameter: startedState.expiration,
+                placeholder: String(resource: .CardTokenization.CardDetails.expiration),
+                keyboard: .asciiCapableNumberPad
+            ),
+            createItem(
+                parameter: startedState.cvc,
+                placeholder: String(resource: .CardTokenization.CardDetails.cvc),
+                icon: Image(.Card.back),
+                keyboard: .asciiCapableNumberPad
+            )
+        ]
         let items = [
             createItem(
                 parameter: startedState.number,
-                placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.number),
+                placeholder: String(resource: .CardTokenization.CardDetails.number),
                 icon: cardNumberIcon(startedState: startedState),
                 keyboard: .asciiCapableNumberPad,
                 contentType: .creditCardNumber
             ),
             .group(
-                State.GroupItem(id: ItemId.trackData, items: [expirationItem, cvcItem].compactMap { $0 })
+                State.GroupItem(id: ItemId.trackData, items: trackItems.compactMap { $0 })
             ),
             createItem(
                 parameter: startedState.cardholderName,
-                placeholder: String(resource: .CardTokenization.CardDetails.Placeholder.cardholder),
+                placeholder: String(resource: .CardTokenization.CardDetails.cardholder),
                 keyboard: .asciiCapable,
                 contentType: .name
             )
@@ -146,35 +144,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         let scheme = startedState.issuerInformation?.coScheme != nil
             ? startedState.preferredScheme
             : startedState.issuerInformation?.scheme
-        guard let scheme else {
-            return nil
-        }
-        let resources: [String: ImageResource] = [
-            "american express": .Schemes.amex,
-            "carte bancaire": .Schemes.carteBancaire,
-            "dinacard": .Schemes.dinacard,
-            "diners club": .Schemes.diners,
-            "diners club carte blanche": .Schemes.diners,
-            "diners club international": .Schemes.diners,
-            "diners club united states & canada": .Schemes.diners,
-            "discover": .Schemes.discover,
-            "elo": .Schemes.elo,
-            "jcb": .Schemes.JCB,
-            "mada": .Schemes.mada,
-            "maestro": .Schemes.maestro,
-            "mastercard": .Schemes.mastercard,
-            "rupay": .Schemes.rupay,
-            "sodexo": .Schemes.sodexo,
-            "china union pay": .Schemes.unionPay,
-            "verve": .Schemes.verve,
-            "visa": .Schemes.visa,
-            "vpay": .Schemes.vpay
-        ]
-        let normalizedScheme = scheme.lowercased()
-        guard let resource = resources[normalizedScheme] else {
-            return nil
-        }
-        return Image(resource)
+        return scheme.flatMap(CardSchemeImageProvider.shared.image)
     }
 
     // MARK: - Preferred Scheme
@@ -298,6 +268,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             value: value,
             placeholder: placeholder,
             isInvalid: !parameter.isValid,
+            isEnabled: true,
             icon: icon,
             formatter: parameter.formatter,
             keyboard: keyboard,
@@ -418,7 +389,6 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             startedState.expiration,
             startedState.cvc,
             startedState.cardholderName,
-            startedState.address.country,
             startedState.address.street1,
             startedState.address.street2,
             startedState.address.city,

@@ -31,7 +31,6 @@ public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerSt
 }
 
 @available(iOS 14, *)
-@_spi(PO)
 extension POPickerStyle where Self == PORadioGroupPickerStyle<PORadioButtonStyle> {
 
     /// A picker style that presents the options as a group of radio buttons.

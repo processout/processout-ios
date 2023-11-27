@@ -483,7 +483,7 @@ final class CodeTextField: UIControl, UITextInput {
         if sendActions {
             self.sendActions(for: .editingChanged)
         }
-        UIMenuController.shared.setMenuVisible(false, animated: true)
+        UIMenuController.shared.hideMenu(from: self)
     }
 
     // MARK: - Context Menu
@@ -495,13 +495,7 @@ final class CodeTextField: UIControl, UITextInput {
 
     @objc
     private func showContextMenu() {
-        let controller = UIMenuController.shared
-        if #available(iOS 13.0, *) {
-            controller.showMenu(from: self, rect: contentView.frame)
-        } else {
-            controller.setTargetRect(contentView.frame, in: self)
-            controller.setMenuVisible(true, animated: true)
-        }
+        UIMenuController.shared.showMenu(from: self, rect: contentView.frame)
     }
 }
 

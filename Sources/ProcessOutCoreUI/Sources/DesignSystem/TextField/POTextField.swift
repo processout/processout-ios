@@ -86,6 +86,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ textField: UITextField, context: Context) {
+        context.coordinator.view = self
         let animated = context.transaction.animation != nil
         UIView.perform(withAnimation: animated, duration: 0.25) {
             updateText(textField)
@@ -170,6 +171,8 @@ private final class TextFieldCoordinator: NSObject, UITextFieldDelegate {
         textField.addTarget(self, action: #selector(editingChanged(textField:)), for: .editingChanged)
     }
 
+    var view: TextFieldRepresentable
+
     // MARK: - UITextFieldDelegate
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -211,10 +214,6 @@ private final class TextFieldCoordinator: NSObject, UITextFieldDelegate {
         textField.sendActions(for: .editingChanged)
         return false
     }
-
-    // MARK: - Private Properties
-
-    private let view: TextFieldRepresentable
 
     // MARK: - Private Methods
 

@@ -44,7 +44,9 @@ final class DefaultCardTokenizationInteractor:
         let startedState = State.Started(
             number: .init(id: \.number, formatter: cardNumberFormatter),
             expiration: .init(id: \.expiration, formatter: cardExpirationFormatter),
-            cvc: .init(id: \.cvc),
+            cvc: .init(
+                id: \.cvc, formatter: CardSecurityCodeFormatter()
+            ),
             cardholderName: .init(id: \.cardholderName, shouldCollect: configuration.isCardholderNameInputVisible),
             address: defaultAddressParameters
         )
@@ -54,12 +56,17 @@ final class DefaultCardTokenizationInteractor:
     }
 
     func update(parameterId: State.ParameterId, value: String) {
-        guard case .started(var startedState) = state, startedState[keyPath: parameterId].value != value else {
+        guard case .started(var startedState) = state else {
             return
         }
+        let oldParameter = startedState[keyPath: parameterId]
+        let formattedValue = oldParameter.formatter?.string(for: value) ?? value
         logger.debug("Will change parameter \(String(describing: parameterId)) value to '\(value)'")
-        let oldParameterValue = startedState[keyPath: parameterId].value
-        startedState[keyPath: parameterId].value = value
+        guard formattedValue != oldParameter.value else {
+            logger.debug("Ignoring same value \(formattedValue)")
+            return
+        }
+        startedState[keyPath: parameterId].value = formattedValue
         startedState[keyPath: parameterId].isValid = true
         if areParametersValid(startedState: startedState) {
             logger.debug("Card information is no longer invalid, will reset error message")
@@ -67,7 +74,7 @@ final class DefaultCardTokenizationInteractor:
         }
         switch parameterId {
         case startedState.number.id:
-            updateIssuerInformation(startedState: &startedState, oldNumber: oldParameterValue)
+            updateIssuerInformation(startedState: &startedState, oldNumber: oldParameter.value)
         case startedState.address.country.id:
             updateAddressParameters(&startedState.address)
         default:
@@ -201,22 +208,13 @@ final class DefaultCardTokenizationInteractor:
         logger.debug("Did recover started state after failure: \(failure)")
     }
 
-    private func setTokenizedState<T>(result: Result<T, POFailure>, card: POCard) {
-        switch result {
-        case .success:
-            setTokenizedState(card: card)
-        case .failure(let failure):
-            restoreStartedState(tokenizationFailure: failure)
-        }
-    }
-
     private func setTokenizedState(card: POCard) {
         guard case .tokenizing(let snapshot) = state else {
             return
         }
         let tokenizedState = State.Tokenized(card: card, cardNumber: snapshot.number.value)
         state = .tokenized(tokenizedState)
-        logger.info("Did tokenize/process card", attributes: ["CardId": card.id])
+        logger.info("Did tokenize and process card", attributes: ["CardId": card.id])
         delegate?.cardTokenizationDidEmitEvent(.didComplete)
         completion(.success(card))
     }
@@ -229,40 +227,56 @@ final class DefaultCardTokenizationInteractor:
 
     // MARK: - Card Issuer Information
 
+    /// Method also updates scheme and CVC if needed.
     private func updateIssuerInformation(startedState: inout State.Started, oldNumber: String) {
-        if let iin = issuerIdentificationNumber(number: startedState.number.value) {
-            guard iin != issuerIdentificationNumber(number: oldNumber) else {
+        let iin = issuerIdentificationNumber(number: startedState.number.value)
+        if let iin, iin == issuerIdentificationNumber(number: oldNumber) {
+            return
+        }
+        issuerInformationCancellable?.cancel()
+        update(
+            startedState: &startedState,
+            issuerInformation: localIssuerInformation(number: startedState.number.value),
+            resolvePreferredScheme: false
+        )
+        guard let iin else {
+            return
+        }
+        logger.debug("Will fetch issuer information", attributes: ["IIN": iin])
+        issuerInformationCancellable = cardsService.issuerInformation(iin: iin) { [logger, weak self] result in
+            guard let self, case .started(var startedState) = self.state else {
                 return
             }
-            startedState.issuerInformation = issuerInformation(number: startedState.number.value)
-            startedState.preferredScheme = nil
-            issuerInformationCancellable?.cancel()
-            logger.debug("Will fetch issuer information", attributes: ["IIN": iin])
-            issuerInformationCancellable = cardsService.issuerInformation(iin: iin) { [logger, weak self] result in
-                guard case .started(var startedState) = self?.state else {
-                    return
-                }
-                switch result {
-                case .failure(let failure) where failure.code == .cancelled:
-                    break
-                case .failure(let failure):
-                    // Inability to select co-scheme is considered minor issue and we still want
-                    // users to be able to continue tokenization. So errors are silently ignored.
-                    logger.info("Did fail to fetch issuer information: \(failure)", attributes: ["IIN": iin])
-                case .success(let issuerInformation):
-                    startedState.issuerInformation = issuerInformation
-                    if let delegate = self?.delegate {
-                        startedState.preferredScheme = delegate.preferredScheme(issuerInformation: issuerInformation)
-                    } else {
-                        startedState.preferredScheme = issuerInformation.scheme
-                    }
-                    self?.state = .started(startedState)
-                }
+            switch result {
+            case .failure(let failure) where failure.code == .cancelled:
+                break
+            case .failure(let failure):
+                // Inability to select co-scheme is considered minor issue and we still want
+                // users to be able to continue tokenization. So errors are silently ignored.
+                logger.info("Did fail to fetch issuer information: \(failure)", attributes: ["IIN": iin])
+            case .success(let issuerInformation):
+                update(startedState: &startedState, issuerInformation: issuerInformation, resolvePreferredScheme: true)
+                self.state = .started(startedState)
             }
-        } else {
-            startedState.issuerInformation = issuerInformation(number: startedState.number.value)
-            startedState.preferredScheme = nil
         }
+    }
+
+    /// Updates started state with given issuer information, which includes scheme and possibly CVC.
+    private func update(
+        startedState: inout State.Started, issuerInformation: POCardIssuerInformation?, resolvePreferredScheme: Bool
+    ) {
+        startedState.issuerInformation = issuerInformation
+        if !resolvePreferredScheme {
+            startedState.preferredScheme = nil
+        } else if let issuerInformation, let delegate = delegate {
+            startedState.preferredScheme = delegate.preferredScheme(issuerInformation: issuerInformation)
+        } else {
+            startedState.preferredScheme = issuerInformation?.scheme
+        }
+        let securityCodeFormatter = CardSecurityCodeFormatter()
+        securityCodeFormatter.scheme = issuerInformation?.scheme
+        startedState.cvc.value = securityCodeFormatter.string(from: startedState.cvc.value)
+        startedState.cvc.formatter = securityCodeFormatter
     }
 
     private func issuerIdentificationNumber(number: String) -> String? {
@@ -274,8 +288,8 @@ final class DefaultCardTokenizationInteractor:
     }
 
     /// Returns locally generated issuer information where only `scheme` property is set.
-    private func issuerInformation(number: String) -> POCardIssuerInformation? {
-        guard let scheme = CardSchemeProvider().scheme(cardNumber: number) else {
+    private func localIssuerInformation(number: String) -> POCardIssuerInformation? {
+        guard let scheme = CardSchemeProvider.shared.scheme(cardNumber: number) else {
             return nil
         }
         return .init(scheme: scheme)
@@ -303,6 +317,7 @@ final class DefaultCardTokenizationInteractor:
         if let supportedCountryCodes = configuration.billingAddress.countryCodes {
             countryCodes = countryCodes.filter(supportedCountryCodes.contains)
         }
+        assert(!countryCodes.isEmpty, "At least one country code should be supported.")
         let locale = Locale.current
         let values = countryCodes
             .map { code -> State.ParameterValue in
@@ -311,15 +326,15 @@ final class DefaultCardTokenizationInteractor:
             }
             .sorted { $0.displayName < $1.displayName }
         let configuration = configuration.billingAddress
-        var defaultCountryCode = configuration.defaultAddress?.countryCode
+        var defaultCountryCode = configuration.defaultAddress?.countryCode ?? locale.regionCode
         if let code = defaultCountryCode, !countryCodes.contains(code) {
-            assertionFailure("Default country code is not valid.")
-            defaultCountryCode = nil
+            logger.info("Default country code \(code) is not supported, ignored")
+            defaultCountryCode = values.first?.value
         }
         let supportedModes: Set<POBillingAddressConfiguration.CollectionMode> = [.automatic, .full]
         let parameter = State.Parameter(
             id: \.address.country,
-            value: defaultCountryCode ?? locale.regionCode ?? "",
+            value: defaultCountryCode ?? "",
             shouldCollect: supportedModes.contains(configuration.mode),
             availableValues: values
         )
@@ -371,14 +386,24 @@ final class DefaultCardTokenizationInteractor:
             defaultAddress = configuration.billingAddress.defaultAddress
         }
         let contact = POContact(
-            address1: value(parameter: parameters.street1, default: defaultAddress?.address1),
-            address2: value(parameter: parameters.street2, default: defaultAddress?.address2),
-            city: value(parameter: parameters.city, default: defaultAddress?.city),
-            state: value(parameter: parameters.state, default: defaultAddress?.state),
-            zip: value(parameter: parameters.postalCode, default: defaultAddress?.zip),
-            countryCode: value(parameter: parameters.country, default: defaultAddress?.countryCode)
+            address1: addressValue(parameter: parameters.street1, default: defaultAddress?.address1),
+            address2: addressValue(parameter: parameters.street2, default: defaultAddress?.address2),
+            city: addressValue(parameter: parameters.city, default: defaultAddress?.city),
+            state: addressValue(parameter: parameters.state, default: defaultAddress?.state),
+            zip: addressValue(parameter: parameters.postalCode, default: defaultAddress?.zip),
+            countryCode: addressValue(parameter: parameters.country, default: defaultAddress?.countryCode)
         )
         return contact
+    }
+
+    private func addressValue(parameter: State.Parameter, default defaultValue: String? = nil) -> String? {
+        guard parameter.shouldCollect || configuration.billingAddress.attachDefaultsToPaymentMethod else {
+            return nil
+        }
+        if !parameter.value.isEmpty {
+            return parameter.value
+        }
+        return defaultValue
     }
 
     // MARK: - Utils
@@ -397,16 +422,6 @@ final class DefaultCardTokenizationInteractor:
             startedState.address.postalCode
         ]
         return parameters.allSatisfy(\.isValid)
-    }
-
-    private func value(parameter: State.Parameter, default defaultValue: String? = nil) -> String? {
-        guard parameter.shouldCollect else {
-            return nil
-        }
-        if !parameter.value.isEmpty {
-            return parameter.value
-        }
-        return defaultValue
     }
 }
 

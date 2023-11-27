@@ -26,10 +26,10 @@ public struct POInputStyle {
 extension POInputStyle {
 
     /// Medium size input style.
-    @_spi(PO) public static let medium = `default`(typography: .Fixed.label)
+    public static let medium = `default`(typography: .Fixed.label)
 
     /// Large input style.
-    @_spi(PO) public static let large = `default`(typography: .Medium.title)
+    public static let large = `default`(typography: .Medium.title)
 
     // MARK: - Private Methods
 

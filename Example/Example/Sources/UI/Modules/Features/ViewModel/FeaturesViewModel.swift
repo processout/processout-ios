@@ -37,7 +37,7 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
                 name: Strings.Features.CardPayment.title,
                 accessibilityId: "features.card-payment",
                 select: { [weak self] in
-                    self?.router.trigger(route: .cardDetails)
+                    self?.startCardTokenization()
                 }
             )
         ])
@@ -47,4 +47,24 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
     // MARK: - Private Properties
 
     private let router: any RouterType<FeaturesRoute>
+
+    // MARK: - Private Methods
+
+    private func startCardTokenization() {
+        let route = FeaturesRoute.cardTokenization { [weak self] result in
+            let message: String
+            switch result {
+            case .success(let card):
+                message = Strings.Features.CardPayment.success(card.id)
+            case .failure(let failure):
+                if let errorMessage = failure.message {
+                    message = Strings.Features.CardPayment.error(errorMessage)
+                } else {
+                    message = Strings.Features.CardPayment.errorGeneric
+                }
+            }
+            self?.router.trigger(route: .alert(message: message))
+        }
+        router.trigger(route: route)
+    }
 }

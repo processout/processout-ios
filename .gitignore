@@ -9,8 +9,8 @@
 Packages
 *.xcodeproj
 xcuserdata/
-Tests/ProcessOutTests/Sources/Generated/*.swift
-Tests/ProcessOutTests/Resources/Constants.yml
+Tests/*/Sources/Generated/*.swift
+Tests/*/Resources/Constants.yml
 
 ## Brew
 Brewfile.lock.json

@@ -11,7 +11,8 @@ import SwiftUI
 extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
 
     /// Default style for primary button.
-    @_spi(PO) public static var primary: POButtonStyle<CircularProgressViewStyle> {
+    @_disfavoredOverload
+    public static var primary: POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(
                 title: .init(color: Color(.Text.on), typography: .Fixed.button),
@@ -31,12 +32,13 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                 shadow: .clear,
                 backgroundColor: Color(.Action.Primary.disabled)
             ),
-            progressView: CircularProgressViewStyle(tint: Color(.Text.on))
+            progressStyle: CircularProgressViewStyle(tint: Color(.Text.on))
         )
     }
 
     /// Default style for secondary button.
-    @_spi(PO) public static var secondary: POButtonStyle<CircularProgressViewStyle> {
+    @_disfavoredOverload
+    public static var secondary: POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(
                 title: .init(color: Color(.Text.secondary), typography: .Fixed.button),
@@ -56,7 +58,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                 shadow: .clear,
                 backgroundColor: Color(.Action.Secondary.default).opacity(0)
             ),
-            progressView: CircularProgressViewStyle(tint: Color(.Text.secondary))
+            progressStyle: CircularProgressViewStyle(tint: Color(.Text.secondary))
         )
     }
 }

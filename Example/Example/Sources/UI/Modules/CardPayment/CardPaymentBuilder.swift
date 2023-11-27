@@ -7,45 +7,40 @@
 
 import UIKit
 import ProcessOut
+import ProcessOutUI
 import ProcessOutCheckout3DS
 
 final class CardPaymentBuilder {
 
+    init(completion: @escaping (Result<POCard, POFailure>) -> Void) {
+        self.completion = completion
+    }
+
     func build() -> UIViewController {
-        let threeDSServiceDelegate = Checkout3DSServiceDelegate()
+        let threeDSServiceDelegate = CardPayment3DSServiceDelegate()
         let threeDSService = POCheckout3DSServiceBuilder()
             .with(delegate: threeDSServiceDelegate)
             .with(environment: .sandbox)
             .build()
-        let router = CardPaymentRouter()
-        let viewModel = CardPaymentViewModel(
-            router: router,
-            invoicesService: ProcessOut.shared.invoices,
-            cardsService: ProcessOut.shared.cards,
-            threeDSService: threeDSService
+        let delegate = CardPaymentDelegate(
+            invoicesService: ProcessOut.shared.invoices, threeDSService: threeDSService
         )
-        let viewController = CardPaymentViewController(viewModel: viewModel)
+        let configuration = POCardTokenizationConfiguration(isCardholderNameInputVisible: false)
+        let viewController = POCardTokenizationViewController(
+            configuration: configuration, delegate: delegate, completion: completion
+        )
         threeDSServiceDelegate.viewController = viewController
-        router.viewController = viewController
+        objc_setAssociatedObject(viewController, &AssociatedObjectKeys.delegate, delegate, .OBJC_ASSOCIATION_RETAIN)
         return viewController
     }
-}
 
-private final class Checkout3DSServiceDelegate: POCheckout3DSServiceDelegate {
+    // MARK: - Private Nested Types
 
-    /// View controller to use for presentations.
-    unowned var viewController: UIViewController! // swiftlint:disable:this implicitly_unwrapped_optional
-
-    func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        let viewController = PO3DSRedirectViewControllerBuilder()
-            .with(redirect: redirect)
-            .with(returnUrl: Constants.returnUrl)
-            .with { [weak self] result in
-                self?.viewController.dismiss(animated: true) {
-                    completion(result)
-                }
-            }
-            .build()
-        self.viewController.present(viewController, animated: true)
+    private enum AssociatedObjectKeys {
+        static var delegate: UInt8 = 0
     }
+
+    // MARK: - Private Properties
+
+    private let completion: (Result<POCard, POFailure>) -> Void
 }

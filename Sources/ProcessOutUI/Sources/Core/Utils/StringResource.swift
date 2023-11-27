@@ -12,12 +12,8 @@ struct StringResource {
     /// The key to use to look up a localized string.
     let key: String
 
-    /// The name of the table containing the key-value pairs.
-    let tableName: String?
-
-    init(_ key: String, tableName: String? = nil, comment: String) {
+    init(_ key: String, comment: String) {
         self.key = key
-        self.tableName = tableName
     }
 }
 
@@ -25,7 +21,7 @@ extension String {
 
     /// Creates string with given resource and replacements.
     init(resource: StringResource, replacements: CVarArg...) {
-        let format = Self.localized(resource.key, resource.tableName)
+        let format = Self.localized(resource.key)
         self = String(format: format, locale: .current, arguments: replacements)
     }
 
@@ -42,20 +38,23 @@ extension String {
     ///
     /// The implementation falls back to the framework's bundle in case the main application doesn't
     /// provide translations for missing languages to ensure that we don't display untranslated strings.
-    private static func localized(_ key: String, _ table: String?) -> String {
+    private static func localized(_ key: String) -> String {
         if Bundle.main.preferredLocalizations.first == BundleLocator.bundle.preferredLocalizations.first {
-            return BundleLocator.bundle.localizedString(forKey: key, value: nil, table: table)
+            return BundleLocator.bundle.localizedString(forKey: key, value: nil, table: nil)
         }
-        let string = Bundle.main.localizedString(forKey: key, value: Constants.unknownString, table: table)
+        let string = Bundle.main.localizedString(
+            forKey: key, value: Constants.unknownString, table: Constants.externalTable
+        )
         if string != Constants.unknownString {
             return string
         }
-        return BundleLocator.bundle.localizedString(forKey: key, value: nil, table: table)
+        return BundleLocator.bundle.localizedString(forKey: key, value: nil, table: nil)
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
+        static let externalTable = "ProcessOut"
         static let unknownString = UUID().uuidString
     }
 }

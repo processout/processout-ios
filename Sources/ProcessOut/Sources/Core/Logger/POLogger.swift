@@ -20,7 +20,8 @@ public struct POLogger {
     }
 
     /// Add, change, or remove a logging attribute.
-    subscript(attributeKey attributeKey: String) -> String? {
+    @_spi(PO)
+    public subscript(attributeKey attributeKey: String) -> String? {
         get {
             lock.withLock { attributes[attributeKey] }
         }

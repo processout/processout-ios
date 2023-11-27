@@ -70,7 +70,7 @@ struct AttributedStringBuilder {
         attributes[.font] = font
         attributes[.baselineOffset] = baselineOffset(font: font, lineHeightMultiple: lineHeightMultiple)
         attributes[.foregroundColor] = color
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14, *) {
             attributes[.tracking] = typography.tracking
         }
         let paragraphStyle = NSMutableParagraphStyle()

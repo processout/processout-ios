@@ -3,14 +3,16 @@
 set -euo pipefail
 
 PROJECT='ProcessOut.xcodeproj'
+DESTINATION=$(./Scripts/TestDestination.swift)
 
 # Run Tests
-for PRODUCT in "ProcessOut" ; do
+for PRODUCT in "ProcessOut" "ProcessOutUI"; do
     xcodebuild clean test \
+        -destination "$DESTINATION" \
         -project $PROJECT \
         -scheme $PRODUCT \
-        -sdk 'iphonesimulator17.0' \
-        -destination 'platform=iOS Simulator,name=iPhone 15'
+        -enableCodeCoverage NO |
+        xcpretty
 done
 
 # It is a known issue that Checkout3DS v3.2.1 (framework that ProcessOutCheckout3DS
@@ -18,6 +20,7 @@ done
 xcodebuild clean build \
     -project $PROJECT \
     -scheme ProcessOutCheckout3DS \
-    -destination "generic/platform=iOS"
+    -destination "generic/platform=iOS" |
+    xcpretty
 
 # todo(andrii-vysotskyi): run example target tests when POM-144 is resolved

@@ -6,6 +6,7 @@ excluded:
   - Sources/ProcessOut/Sources/Legacy
   - Sources/*/Sources/Generated
   - Tests/ProcessOutTests/Sources/Generated
+  - Tests/ProcessOutUITests/Sources/Generated
 
 function_parameter_count:
   warning: 5
@@ -19,6 +20,9 @@ enum_case_associated_values_count:
 type_name:
   max_length:
     warning: 50
+
+line_length: 
+  ignores_comments: true
 
 opt_in_rules:
   - anonymous_argument_in_multiline_closure

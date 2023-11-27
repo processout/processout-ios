@@ -1,0 +1,12 @@
+input_dir: ${TARGET_ROOT}/Resources/
+output_dir: ${TARGET_ROOT}/Sources/Generated/
+
+## Application Constants
+yaml:
+  inputs:
+    - Constants.yml
+  outputs:
+    - templateName: inline-swift5
+      params:
+        enumName: Constants
+      output: Constants+Generated.swift

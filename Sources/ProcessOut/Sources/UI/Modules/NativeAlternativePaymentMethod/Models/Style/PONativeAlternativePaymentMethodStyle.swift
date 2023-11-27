@@ -91,7 +91,7 @@ public struct PONativeAlternativePaymentMethodStyle {
         static let errorDescription = POTextStyle(color: UIColor(resource: .Text.error), typography: .Fixed.label)
         static let actions = POActionsContainerStyle()
         static let activityIndicator = POActivityIndicatorStyle.system(
-            .whiteLarge, color: UIColor(resource: .Text.secondary)
+            .large, color: UIColor(resource: .Text.secondary)
         )
         static let message = POTextStyle(color: UIColor(resource: .Text.primary), typography: .Fixed.body)
         static let successMessage = POTextStyle(color: UIColor(resource: .Text.success), typography: .Fixed.body)

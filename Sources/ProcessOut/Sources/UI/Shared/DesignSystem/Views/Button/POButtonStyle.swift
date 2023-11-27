@@ -86,9 +86,6 @@ extension POButtonStyle {
     // MARK: - Private Methods
 
     private static func activityIndicatorStyle(color: UIColor) -> POActivityIndicatorStyle {
-        if #available(iOS 13.0, *) {
-            return .system(.medium, color: color)
-        }
-        return .system(.white, color: color)
+        .system(.medium, color: color)
     }
 }
