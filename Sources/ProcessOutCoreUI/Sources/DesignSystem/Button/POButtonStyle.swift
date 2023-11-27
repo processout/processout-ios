@@ -96,5 +96,7 @@ private struct ContentView<Content: View>: View {
 
 private enum Constants {
     static let minHeight: CGFloat = 44
-    static let padding = EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8)
+    static let padding = EdgeInsets(
+        top: POSpacing.extraSmall, leading: POSpacing.small, bottom: POSpacing.small, trailing: POSpacing.extraSmall
+    )
 }
