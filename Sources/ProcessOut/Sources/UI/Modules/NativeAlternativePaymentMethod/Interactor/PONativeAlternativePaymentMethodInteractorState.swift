@@ -1,83 +1,66 @@
 //
-//  NativeAlternativePaymentMethodInteractor.swift
+//  PONativeAlternativePaymentMethodInteractorState.swift
 //  ProcessOut
 //
-//  Created by Andrii Vysotskyi on 19.10.2022.
+//  Created by Andrii Vysotskyi on 23.11.2023.
 //
 
-import Foundation
 import UIKit
 
-protocol NativeAlternativePaymentMethodInteractor: Interactor
-    where State == NativeAlternativePaymentMethodInteractorState {
+@_spi(PO) public enum PONativeAlternativePaymentMethodInteractorState {
 
-    /// Updates value for given key.
-    func updateValue(_ value: String?, for key: String)
-
-    /// Returns formatter that could be used to format given value type if any.
-    func formatter(type: PONativeAlternativePaymentMethodParameter.ParameterType) -> Formatter?
-
-    /// Submits parameters.
-    func submit()
-
-    /// Cancells payment if possible.
-    func cancel()
-}
-
-enum NativeAlternativePaymentMethodInteractorState {
-
-    struct ParameterValue {
+    public struct ParameterValue {
 
         /// Actual parameter value.
-        let value: String?
+        public let value: String?
 
         /// The most recent error message associated with this parameter value.
-        let recentErrorMessage: String?
+        public let recentErrorMessage: String?
     }
 
-    struct Started {
+    public struct Started {
 
         /// Name of the payment gateway that can be displayed.
-        let gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
+        public let gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
 
         /// Invoice amount.
-        let amount: Decimal
+        public let amount: Decimal
 
         /// Invoice currency code.
-        let currencyCode: String
+        public let currencyCode: String
 
         /// Parameters that are expected from user.
-        let parameters: [PONativeAlternativePaymentMethodParameter]
+        public let parameters: [PONativeAlternativePaymentMethodParameter]
 
         /// Parameter values.
-        let values: [String: ParameterValue]
+        public let values: [String: ParameterValue]
 
         /// Boolean value indicating whether submit it currently allowed.
-        let isSubmitAllowed: Bool
+        public let isSubmitAllowed: Bool
     }
 
-    struct AwaitingCapture {
+    public struct AwaitingCapture {
 
         /// Payment provider name.
-        let paymentProviderName: String?
+        public let paymentProviderName: String?
 
         /// Payment provider or gateway logo image.
-        let logoImage: UIImage?
+        public let logoImage: UIImage?
 
         /// Messaged describing additional actions that are needed from user in order to capture payment.
-        let actionMessage: String?
+        public let actionMessage: String?
 
         /// Action image.
-        let actionImage: UIImage?
+        public let actionImage: UIImage?
     }
 
-    struct Captured {
+    public struct Captured {
 
         /// Payment provider name.
-        let paymentProviderName: String?
+        public let paymentProviderName: String?
 
         /// Payment provider or gateway logo image.
-        let logoImage: UIImage?
+        public let logoImage: UIImage?
     }
 
     /// Initial interactor state.

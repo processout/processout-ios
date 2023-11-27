@@ -1,5 +1,5 @@
 //
-//  DefaultNativeAlternativePaymentMethodInteractor.swift
+//  PODefaultNativeAlternativePaymentMethodInteractor.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 19.10.2022.
@@ -10,13 +10,13 @@
 import Foundation
 import UIKit
 
-final class DefaultNativeAlternativePaymentMethodInteractor:
-    BaseInteractor<NativeAlternativePaymentMethodInteractorState>, NativeAlternativePaymentMethodInteractor {
+@_spi(PO) public final class PODefaultNativeAlternativePaymentMethodInteractor:
+    PONativeAlternativePaymentMethodInteractor {
 
-    init(
+    public init(
         invoicesService: POInvoicesService,
-        imagesRepository: ImagesRepository,
-        configuration: NativeAlternativePaymentMethodInteractorConfiguration,
+        imagesRepository: POImagesRepository,
+        configuration: PONativeAlternativePaymentMethodInteractorConfiguration,
         logger: POLogger,
         delegate: PONativeAlternativePaymentMethodDelegate?
     ) {
@@ -25,7 +25,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         self.configuration = configuration
         self.logger = logger
         self.delegate = delegate
-        super.init(state: .idle)
+        state = .idle
     }
 
     deinit {
@@ -34,7 +34,15 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
 
     // MARK: - NativeAlternativePaymentMethodInteractor
 
-    override func start() {
+    public private(set) var state: State {
+        didSet { didChange?() }
+    }
+
+    public var didChange: (() -> Void)? {
+        didSet { didChange?() }
+    }
+
+    public func start() {
         guard case .idle = state else {
             return
         }
@@ -59,7 +67,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         }
     }
 
-    func formatter(type: PONativeAlternativePaymentMethodParameter.ParameterType) -> Formatter? {
+    public func formatter(type: PONativeAlternativePaymentMethodParameter.ParameterType) -> Formatter? {
         switch type {
         case .phone:
             return phoneNumberFormatter
@@ -68,7 +76,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         }
     }
 
-    func updateValue(_ value: String?, for key: String) {
+    public func updateValue(_ value: String?, for key: String) {
         guard case let .started(startedState) = state,
               let parameter = startedState.parameters.first(where: { $0.key == key }) else {
             return
@@ -90,7 +98,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         logger.debug("Did update parameter value '\(value ?? "nil")' for '\(key)' key")
     }
 
-    func submit() {
+    public func submit() {
         guard case let .started(startedState) = state, startedState.isSubmitAllowed else {
             return
         }
@@ -131,7 +139,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
         }
     }
 
-    func cancel() {
+    public func cancel() {
         logger.debug("Will attempt to cancel payment.")
         switch state {
         case .started:
@@ -153,8 +161,8 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
     // MARK: - Private Properties
 
     private let invoicesService: POInvoicesService
-    private let imagesRepository: ImagesRepository
-    private let configuration: NativeAlternativePaymentMethodInteractorConfiguration
+    private let imagesRepository: POImagesRepository
+    private let configuration: PONativeAlternativePaymentMethodInteractorConfiguration
     private var logger: POLogger
     private weak var delegate: PONativeAlternativePaymentMethodDelegate?
 
@@ -488,11 +496,11 @@ final class DefaultNativeAlternativePaymentMethodInteractor:
 }
 
 // swiftlint:disable:next no_extension_access_modifier
-private extension NativeAlternativePaymentMethodInteractorState.Started {
+private extension PONativeAlternativePaymentMethodInteractorState.Started {
 
     func replacing(
         parameters: [PONativeAlternativePaymentMethodParameter],
-        values: [String: NativeAlternativePaymentMethodInteractorState.ParameterValue],
+        values: [String: PONativeAlternativePaymentMethodInteractorState.ParameterValue],
         isSubmitAllowed: Bool
     ) -> Self {
         let updatedState = Self(
