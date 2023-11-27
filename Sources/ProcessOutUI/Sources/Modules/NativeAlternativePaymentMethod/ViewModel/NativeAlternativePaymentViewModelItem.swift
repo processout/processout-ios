@@ -65,15 +65,6 @@ enum NativeAlternativePaymentViewModelItem {
         let isEnabled: Bool
     }
 
-    struct Error: Identifiable {
-
-        /// Item identifier.
-        let id: AnyHashable
-
-        /// Error description.
-        let description: String
-    }
-
     struct Submitted: Identifiable {
 
         /// Item identifier.
@@ -95,7 +86,7 @@ enum NativeAlternativePaymentViewModelItem {
         let isCaptured: Bool
     }
 
-    case progress, title(Title), input(Input), codeInput(CodeInput), picker(Picker), error(Error), submitted(Submitted)
+    case progress, title(Title), input(Input), codeInput(CodeInput), picker(Picker), submitted(Submitted)
 }
 
 extension NativeAlternativePaymentViewModelItem: Identifiable {
@@ -111,8 +102,6 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
         case .codeInput(let item):
             return item.id
         case .picker(let item):
-            return item.id
-        case .error(let item):
             return item.id
         case .submitted(let item):
             return item.id
