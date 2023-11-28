@@ -38,14 +38,6 @@ final class CodeFieldComponentView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if let currentViewModel, traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-            layer.borderColor = currentViewModel.style.border.color.cgColor
-            layer.shadowColor = currentViewModel.style.shadow.color.cgColor
-        }
-    }
-
     func configure(viewModel: ViewModel, animated: Bool) {
         UIView.perform(withAnimation: animated, duration: Constants.animationDuration) { [self] in
             switch viewModel.carretPosition {
@@ -74,8 +66,6 @@ final class CodeFieldComponentView: UIView {
             if animated, valueLabel.attributedText != previousAttributedText {
                 valueLabel.addTransitionAnimation()
             }
-            apply(style: viewModel.style.border)
-            apply(style: viewModel.style.shadow)
             backgroundColor = UIColor(viewModel.style.backgroundColor)
             carretView.backgroundColor = UIColor(viewModel.style.tintColor)
             UIView.performWithoutAnimation(layoutIfNeeded)
