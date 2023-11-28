@@ -151,9 +151,9 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             let submittedItem = NativeAlternativePaymentViewModelItem.Submitted(
                 id: "awaiting-capture",
                 title: state.logoImage == nil ? state.paymentProviderName : nil,
-                logoImage: state.logoImage.map(Image.init),
+                logoImage: state.logoImage,
                 message: expectedActionMessage,
-                image: state.actionImage.map(Image.init),
+                image: state.actionImage,
                 isCaptured: false
             )
             item = .submitted(submittedItem)
@@ -180,9 +180,9 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             let item = NativeAlternativePaymentViewModelItem.Submitted(
                 id: "captured",
                 title: state.logoImage == nil ? state.paymentProviderName : nil,
-                logoImage: state.logoImage.map(Image.init),
+                logoImage: state.logoImage,
                 message: String(resource: .NativeAlternativePayment.Success.message),
-                image: Image(.success),
+                image: UIImage(resource: .success),
                 isCaptured: true
             )
             let section = NativeAlternativePaymentViewModelSection(

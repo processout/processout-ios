@@ -74,13 +74,13 @@ enum NativeAlternativePaymentViewModelItem {
         let title: String?
 
         /// Payment provider logo.
-        let logoImage: Image?
+        let logoImage: UIImage?
 
         /// Message markdown.
         let message: String
 
         /// Image illustrating action.
-        let image: Image?
+        let image: UIImage?
 
         /// Boolean value that indicates whether payment is already captured.
         let isCaptured: Bool
