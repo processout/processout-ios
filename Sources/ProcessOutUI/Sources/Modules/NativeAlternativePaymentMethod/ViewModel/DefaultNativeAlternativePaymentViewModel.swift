@@ -220,7 +220,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             let pickerItem = NativeAlternativePaymentViewModelItem.Picker(
                 id: parameter.key,
                 options: parameter.availableValues?.map { availableValue in
-                    .init(id: availableValue.value, title: availableValue.displayName)
+                        .init(id: availableValue.value, title: availableValue.displayName)
                 } ?? [],
                 selectedOptionId: .init(
                     get: { parameterValue?.value },
@@ -246,14 +246,32 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
                 isEnabled: isEnabled,
                 icon: nil,
                 formatter: interactor.formatter(type: parameter.type),
-                keyboard: .default,
-                contentType: nil,
+                keyboard: keyboard(parameterType: parameter.type),
+                contentType: contentType(parameterType: parameter.type),
                 onSubmit: { [weak self] in
                     self?.submitFocusedInput()
                 }
             )
             return .input(inputItem)
         }
+    }
+
+    private func contentType(
+        parameterType: PONativeAlternativePaymentMethodParameter.ParameterType
+    ) -> UITextContentType? {
+        let contentTypes: [PONativeAlternativePaymentMethodParameter.ParameterType: UITextContentType] = [
+            .email: .emailAddress, .numeric: .oneTimeCode, .phone: .telephoneNumber
+        ]
+        return contentTypes[parameterType]
+    }
+
+    private func keyboard(
+        parameterType: PONativeAlternativePaymentMethodParameter.ParameterType
+    ) -> UIKeyboardType {
+        let keyboardTypes: [PONativeAlternativePaymentMethodParameter.ParameterType: UIKeyboardType] = [
+            .text: .asciiCapable, .email: .emailAddress, .numeric: .numberPad, .phone: .phonePad
+        ]
+        return keyboardTypes[parameterType] ?? .default
     }
 
     private func placeholder(for parameter: PONativeAlternativePaymentMethodParameter) -> String {
