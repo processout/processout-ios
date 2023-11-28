@@ -19,13 +19,17 @@ struct NativeAlternativePaymentSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: POSpacing.small) {
             if let title = section.title {
-                Text(title).textStyle(style.sectionTitle)
+                Text(title)
+                    .textStyle(style.sectionTitle)
+                    .padding(.horizontal, POSpacing.large)
             }
             ForEach(section.items) { element in
                 NativeAlternativePaymentItemView(item: element, focusedInputId: $focusedInputId)
             }
             if let error = section.error {
-                Text(error).textStyle(style.errorDescription)
+                Text(error)
+                    .textStyle(style.errorDescription)
+                    .padding(.horizontal, POSpacing.large)
             }
         }
         .backport.geometryGroup()
