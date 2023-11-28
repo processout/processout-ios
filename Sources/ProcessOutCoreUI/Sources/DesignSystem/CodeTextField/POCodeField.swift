@@ -22,13 +22,17 @@ public struct POCodeField: View {
     // MARK: - View
 
     public var body: some View {
-        CodeFieldRepresentable(length: length, text: text).id(length)
+        CodeFieldRepresentable(length: length, text: text)
+            .animation(.default, value: isInvalid)
+            .id(length)
     }
 
     // MARK: - Private Properties
 
     private let length: Int
     private let text: Binding<String>
+
+    @Environment(\.isControlInvalid) private var isInvalid
 }
 
 @available(iOS 14, *)
