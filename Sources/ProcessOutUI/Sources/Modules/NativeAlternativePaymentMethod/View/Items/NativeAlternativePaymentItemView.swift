@@ -21,7 +21,8 @@ struct NativeAlternativePaymentItemView: View {
         case .title(let item):
             NativeAlternativePaymentTitleItemView(item: item)
         case .input(let item):
-            InputView(viewModel: item, focusedInputId: $focusedInputId).inputStyle(style.input)
+            InputView(viewModel: item, focusedInputId: $focusedInputId)
+                .inputStyle(style.input)
                 .padding(.horizontal, POSpacing.large)
         case .codeInput(let item):
             POCodeField(length: item.length, text: item.$value)
@@ -41,7 +42,8 @@ struct NativeAlternativePaymentItemView: View {
             .pickerStyle(POMenuPickerStyle(inputStyle: style.input))
             .padding(.horizontal, POSpacing.large)
         case .progress:
-            ProgressView().poProgressViewStyle(style.progressView)
+            ProgressView()
+                .poProgressViewStyle(style.progressView)
         case .submitted(let item):
             NativeAlternativePaymentSubmittedItemView(item: item)
         }
