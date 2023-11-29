@@ -19,32 +19,32 @@ public struct PONativeAlternativePaymentView: View {
     // MARK: - View
 
     public var body: some View {
-        let backgroundColor = viewModel.isCaptured ? style.background.success : style.background.regular
         VStack(spacing: 0) {
-            ScrollViewReader { scrollView in
-                ScrollView(showsIndicators: false) {
-                    // todo(andrii-vysotskyi): vertically center sections with inputs
-                    VStack(alignment: .leading, spacing: POSpacing.medium) {
-                        ForEach(viewModel.sections) { section in
-                            NativeAlternativePaymentSectionView(
-                                section: section, focusedInputId: $viewModel.focusedItemId
-                            )
-                        }
+            GeometryReader { geometry in
+                ScrollViewReader { scrollView in
+                    ScrollView(showsIndicators: false) {
+                        NativeAlternativePaymentSectionsView(
+                            sections: viewModel.sections, focusedItemId: $viewModel.focusedItemId
+                        )
+                        .frame(minHeight: geometry.size.height, alignment: .top)
                     }
-                    .padding(.vertical, POSpacing.large)
+                    .backport.onChange(of: viewModel.focusedItemId) {
+                        scrollToFocusedInput(scrollView: scrollView)
+                    }
+                    .clipped()
                 }
-                .backport.onChange(of: viewModel.focusedItemId) {
-                    scrollToFocusedInput(scrollView: scrollView)
-                }
-                .animation(.default, value: contentAnimationValue)
-                .clipped()
             }
             if !viewModel.actions.isEmpty {
                 POActionsContainerView(actions: viewModel.actions).actionsContainerStyle(style.actionsContainer)
             }
         }
-        .background(backgroundColor.ignoresSafeArea())
-        .animation(.default, value: viewAnimationValue)
+        .backport.background {
+            let backgroundColor = viewModel.isCaptured ? style.background.success : style.background.regular
+            backgroundColor
+                .ignoresSafeArea()
+                .animation(.default, value: viewModel.isCaptured)
+        }
+        .animation(.default, value: viewModel.actions.map(\.id))
     }
 
     // MARK: - Private Properties
@@ -62,15 +62,5 @@ public struct PONativeAlternativePaymentView: View {
             return
         }
         withAnimation { scrollView.scrollTo(id) }
-    }
-
-    /// Returns value that should trigger primary content animated update.
-    private var contentAnimationValue: AnyHashable {
-        viewModel.sections.map { [$0.id, $0.items.map(\.id), $0.error == nil] }
-    }
-
-    /// Returns value that should trigger whole view animated update.
-    private var viewAnimationValue: AnyHashable {
-        [AnyHashable(viewModel.actions.map(\.id)), viewModel.isCaptured]
     }
 }

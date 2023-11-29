@@ -14,7 +14,7 @@ struct NativeAlternativePaymentSectionView: View {
     let section: NativeAlternativePaymentViewModelSection
 
     @Binding
-    private(set) var focusedInputId: AnyHashable?
+    private(set) var focusedItemId: AnyHashable?
 
     var body: some View {
         let alignment: Alignment = section.isCentered ? .center : .leading
@@ -25,7 +25,7 @@ struct NativeAlternativePaymentSectionView: View {
                     .padding(.horizontal, POSpacing.large)
             }
             ForEach(section.items) { element in
-                NativeAlternativePaymentItemView(item: element, focusedInputId: $focusedInputId)
+                NativeAlternativePaymentItemView(item: element, focusedItemId: $focusedItemId)
             }
             if let error = section.error {
                 Text(error)

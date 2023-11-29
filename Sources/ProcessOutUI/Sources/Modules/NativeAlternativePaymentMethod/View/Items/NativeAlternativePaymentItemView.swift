@@ -14,19 +14,19 @@ struct NativeAlternativePaymentItemView: View {
     let item: NativeAlternativePaymentViewModelItem
 
     @Binding
-    private(set) var focusedInputId: AnyHashable?
+    private(set) var focusedItemId: AnyHashable?
 
     var body: some View {
         switch item {
         case .title(let item):
             NativeAlternativePaymentTitleItemView(item: item)
         case .input(let item):
-            InputView(viewModel: item, focusedInputId: $focusedInputId)
+            InputView(viewModel: item, focusedInputId: $focusedItemId)
                 .inputStyle(style.input)
                 .padding(.horizontal, POSpacing.large)
         case .codeInput(let item):
             POCodeField(length: item.length, text: item.$value)
-                .backport.focused($focusedInputId, equals: item.id)
+                .backport.focused($focusedItemId, equals: item.id)
                 .controlInvalid(item.isInvalid)
                 .disabled(!item.isEnabled)
                 .inputStyle(style.codeInput)
