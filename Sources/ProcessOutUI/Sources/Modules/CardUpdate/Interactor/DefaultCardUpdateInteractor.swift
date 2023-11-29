@@ -194,6 +194,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
              .generic(.cardInvalid),
              .generic(.cardBadTrackData),
              .generic(.cardMissingCvc),
+             .generic(.cardInvalidCvc),
              .generic(.cardFailedCvc),
              .generic(.cardFailedCvcAndAvs):
             errorMessage = .CardUpdate.Error.cvc
