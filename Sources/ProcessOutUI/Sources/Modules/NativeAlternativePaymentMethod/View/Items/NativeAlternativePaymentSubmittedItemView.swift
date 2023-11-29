@@ -24,7 +24,7 @@ struct NativeAlternativePaymentSubmittedItemView: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxHeight: min(Constants.maximumLogoImageHeight, image.size.height))
+                    .frame(height: min(Constants.maximumLogoImageHeight, image.size.height))
             }
             POMarkdown(item.message)
                 .textStyle(descriptionStyle)
@@ -35,7 +35,7 @@ struct NativeAlternativePaymentSubmittedItemView: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxHeight: min(Constants.maximumDecorationImageHeight, image.size.height))
+                    .frame(height: min(Constants.maximumDecorationImageHeight, image.size.height))
                     .foregroundColor(descriptionStyle.color)
             }
         }
