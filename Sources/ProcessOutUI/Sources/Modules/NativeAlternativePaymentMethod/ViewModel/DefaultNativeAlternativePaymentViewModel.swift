@@ -35,6 +35,9 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     @Published
     var focusedItemId: AnyHashable?
 
+    @Published
+    private(set) var isCaptured = false
+
     // MARK: - Private Nested Types
 
     private typealias InteractorState = PONativeAlternativePaymentMethodInteractorState
@@ -77,26 +80,31 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             updateSectionsWithStartingState()
             focusedItemId = nil
             actions = []
+            isCaptured = false
         case .started(let state):
             updateSections(state: state, isSubmitting: false)
             updateFocusedInputId(state: state)
             updateActions(state: state, isSubmitting: false)
+            isCaptured = false
         case .failure(let failure):
             completion?(.failure(failure))
         case .submitting(let state):
             updateSections(state: state, isSubmitting: true)
             focusedItemId = nil
             updateActions(state: state, isSubmitting: true)
+            isCaptured = false
         case .submitted:
             completion?(.success(()))
         case .awaitingCapture(let state):
             updateSections(state: state)
             focusedItemId = nil
             updateActions(state: state)
+            isCaptured = false
         case .captured(let state):
             updateSections(state: state)
             focusedItemId = nil
             actions = []
+            isCaptured = true
         default:
             break // Ignored
         }
