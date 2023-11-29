@@ -41,8 +41,8 @@ final class CodeField: UIControl, UITextInput {
     }
 
     override var intrinsicContentSize: CGSize {
-        let width = CGFloat(length) * (Constants.height + Constants.spacing) - Constants.spacing
-        return CGSize(width: width, height: Constants.height)
+        let width = CGFloat(length) * (Constants.componentSize.width + Constants.spacing) - Constants.spacing
+        return CGSize(width: width, height: Constants.componentSize.height)
     }
 
     // MARK: - UIControl
@@ -309,8 +309,8 @@ final class CodeField: UIControl, UITextInput {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let height: CGFloat = 44
-        static let spacing: CGFloat = 6
+        static let componentSize = CGSize(width: 42, height: 44)
+        static let spacing = POSpacing.extraSmall
     }
 
     private final class TextPosition: UITextPosition {
@@ -386,8 +386,7 @@ final class CodeField: UIControl, UITextInput {
     }
 
     private func createCodeFieldComponentView(index: Int) -> CodeFieldComponentView {
-        let size = CGSize(width: Constants.height, height: Constants.height)
-        let view = CodeFieldComponentView(size: size) { [weak self] position in
+        let view = CodeFieldComponentView(size: Constants.componentSize) { [weak self] position in
             self?.setCarretPosition(position: position, index: index)
         }
         return view
