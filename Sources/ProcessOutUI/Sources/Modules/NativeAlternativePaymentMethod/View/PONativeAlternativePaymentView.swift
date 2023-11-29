@@ -39,8 +39,9 @@ public struct PONativeAlternativePaymentView: View {
                 .animation(.default, value: contentAnimationValue)
                 .clipped()
             }
-            // todo(andrii-vysotskyi): hide container when there are no actions
-            POActionsContainerView(actions: viewModel.actions).actionsContainerStyle(style.actionsContainer)
+            if !viewModel.actions.isEmpty {
+                POActionsContainerView(actions: viewModel.actions).actionsContainerStyle(style.actionsContainer)
+            }
         }
         .background(backgroundColor.ignoresSafeArea())
         .animation(.default, value: viewAnimationValue)
