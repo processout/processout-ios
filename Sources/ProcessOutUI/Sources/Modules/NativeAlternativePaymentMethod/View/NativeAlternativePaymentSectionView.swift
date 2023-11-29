@@ -17,7 +17,8 @@ struct NativeAlternativePaymentSectionView: View {
     private(set) var focusedInputId: AnyHashable?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: POSpacing.small) {
+        let alignment: Alignment = section.isCentered ? .center : .leading
+        VStack(alignment: alignment.horizontal, spacing: POSpacing.small) {
             if let title = section.title {
                 Text(title)
                     .textStyle(style.sectionTitle)
@@ -32,6 +33,8 @@ struct NativeAlternativePaymentSectionView: View {
                     .padding(.horizontal, POSpacing.large)
             }
         }
+        .multilineTextAlignment(section.isCentered ? .center : .leading)
+        .frame(maxWidth: .infinity, alignment: alignment)
         .backport.geometryGroup()
     }
 
