@@ -47,7 +47,7 @@ struct NativeAlternativePaymentSubmittedItemView: View {
 
     private enum Constants {
         static let maximumLogoImageHeight: CGFloat = 32
-        static let maximumDecorationImageHeight: CGFloat = 500
+        static let maximumDecorationImageHeight: CGFloat = 260
         static let topInset: CGFloat = 68
         static let maximumCompactMessageLength = 150
     }
