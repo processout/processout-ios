@@ -29,7 +29,7 @@ struct NativeAlternativePaymentSectionsView: View {
             }
             .frame(maxHeight: .infinity)
         }
-        .padding(.vertical, POSpacing.large)
+        .padding(.vertical, POSpacing.medium)
         .animation(.default, value: bodyAnimationValue)
     }
 
