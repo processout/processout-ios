@@ -34,6 +34,10 @@ final class AnyNativeAlternativePaymentViewModel: NativeAlternativePaymentViewMo
         set { base.focusedItemId = newValue }
     }
 
+    var isCaptured: Bool {
+        base.isCaptured
+    }
+
     // MARK: - Private Properties
 
     private var cancellable: AnyCancellable?

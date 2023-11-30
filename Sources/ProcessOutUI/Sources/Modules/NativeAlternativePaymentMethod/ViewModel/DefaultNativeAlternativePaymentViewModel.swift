@@ -35,6 +35,9 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     @Published
     var focusedItemId: AnyHashable?
 
+    @Published
+    private(set) var isCaptured = false
+
     // MARK: - Private Nested Types
 
     private typealias InteractorState = PONativeAlternativePaymentMethodInteractorState
@@ -77,26 +80,31 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             updateSectionsWithStartingState()
             focusedItemId = nil
             actions = []
+            isCaptured = false
         case .started(let state):
             updateSections(state: state, isSubmitting: false)
             updateFocusedInputId(state: state)
             updateActions(state: state, isSubmitting: false)
+            isCaptured = false
         case .failure(let failure):
             completion?(.failure(failure))
         case .submitting(let state):
             updateSections(state: state, isSubmitting: true)
             focusedItemId = nil
             updateActions(state: state, isSubmitting: true)
+            isCaptured = false
         case .submitted:
             completion?(.success(()))
         case .awaitingCapture(let state):
             updateSections(state: state)
             focusedItemId = nil
             updateActions(state: state)
+            isCaptured = false
         case .captured(let state):
             updateSections(state: state)
             focusedItemId = nil
             actions = []
+            isCaptured = true
         default:
             break // Ignored
         }
@@ -151,9 +159,9 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             let submittedItem = NativeAlternativePaymentViewModelItem.Submitted(
                 id: "awaiting-capture",
                 title: state.logoImage == nil ? state.paymentProviderName : nil,
-                logoImage: state.logoImage.map(Image.init),
+                logoImage: state.logoImage,
                 message: expectedActionMessage,
-                image: state.actionImage.map(Image.init),
+                image: state.actionImage,
                 isCaptured: false
             )
             item = .submitted(submittedItem)
@@ -180,9 +188,9 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             let item = NativeAlternativePaymentViewModelItem.Submitted(
                 id: "captured",
                 title: state.logoImage == nil ? state.paymentProviderName : nil,
-                logoImage: state.logoImage.map(Image.init),
+                logoImage: state.logoImage,
                 message: String(resource: .NativeAlternativePayment.Success.message),
-                image: Image(.success),
+                image: UIImage(resource: .success),
                 isCaptured: true
             )
             let section = NativeAlternativePaymentViewModelSection(
@@ -220,7 +228,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             let pickerItem = NativeAlternativePaymentViewModelItem.Picker(
                 id: parameter.key,
                 options: parameter.availableValues?.map { availableValue in
-                    .init(id: availableValue.value, title: availableValue.displayName)
+                        .init(id: availableValue.value, title: availableValue.displayName)
                 } ?? [],
                 selectedOptionId: .init(
                     get: { parameterValue?.value },
@@ -246,14 +254,32 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
                 isEnabled: isEnabled,
                 icon: nil,
                 formatter: interactor.formatter(type: parameter.type),
-                keyboard: .default,
-                contentType: nil,
+                keyboard: keyboard(parameterType: parameter.type),
+                contentType: contentType(parameterType: parameter.type),
                 onSubmit: { [weak self] in
                     self?.submitFocusedInput()
                 }
             )
             return .input(inputItem)
         }
+    }
+
+    private func contentType(
+        parameterType: PONativeAlternativePaymentMethodParameter.ParameterType
+    ) -> UITextContentType? {
+        let contentTypes: [PONativeAlternativePaymentMethodParameter.ParameterType: UITextContentType] = [
+            .email: .emailAddress, .numeric: .oneTimeCode, .phone: .telephoneNumber
+        ]
+        return contentTypes[parameterType]
+    }
+
+    private func keyboard(
+        parameterType: PONativeAlternativePaymentMethodParameter.ParameterType
+    ) -> UIKeyboardType {
+        let keyboardTypes: [PONativeAlternativePaymentMethodParameter.ParameterType: UIKeyboardType] = [
+            .text: .asciiCapable, .email: .emailAddress, .numeric: .numberPad, .phone: .phonePad
+        ]
+        return keyboardTypes[parameterType] ?? .default
     }
 
     private func placeholder(for parameter: PONativeAlternativePaymentMethodParameter) -> String {

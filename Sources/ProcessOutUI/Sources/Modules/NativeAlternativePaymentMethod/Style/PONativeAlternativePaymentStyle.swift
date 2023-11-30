@@ -1,5 +1,5 @@
 //
-//  PONativeAlternativePaymentMethodStyle.swift
+//  PONativeAlternativePaymentStyle.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 23.11.2023.
@@ -10,7 +10,7 @@ import SwiftUI
 
 /// Defines style for native alternative payment method module.
 @available(iOS 14, *)
-public struct PONativeAlternativePaymentMethodStyle {
+public struct PONativeAlternativePaymentStyle {
 
     /// Title style.
     public let title: POTextStyle
@@ -30,12 +30,11 @@ public struct PONativeAlternativePaymentMethodStyle {
     /// Error description text style.
     public let errorDescription: POTextStyle
 
-    /// Actions style.
-    public let actions: POActionsContainerStyle
+    /// Actions container style.
+    public let actionsContainer: POActionsContainerStyle
 
-    /// Activity indicator style. Please note that maximum height of activity indicator
-    /// is limited to 256.
-    public let activityIndicator: any ProgressViewStyle
+    /// Progress view style.
+    public let progressView: any ProgressViewStyle
 
     /// Message style.
     ///
@@ -47,7 +46,7 @@ public struct PONativeAlternativePaymentMethodStyle {
     public let successMessage: POTextStyle
 
     /// Background style.
-    public let background: PONativeAlternativePaymentMethodBackgroundStyle
+    public let background: PONativeAlternativePaymentBackgroundStyle
 
     /// Separator color.
     public let separatorColor: Color
@@ -59,11 +58,11 @@ public struct PONativeAlternativePaymentMethodStyle {
         codeInput: POInputStyle,
         radioButton: some ButtonStyle,
         errorDescription: POTextStyle,
-        actions: POActionsContainerStyle,
-        activityIndicator: some ProgressViewStyle,
+        actionsContainer: POActionsContainerStyle,
+        progressView: some ProgressViewStyle,
         message: POTextStyle,
         successMessage: POTextStyle,
-        background: PONativeAlternativePaymentMethodBackgroundStyle,
+        background: PONativeAlternativePaymentBackgroundStyle,
         separatorColor: Color
     ) {
         self.title = title
@@ -72,8 +71,8 @@ public struct PONativeAlternativePaymentMethodStyle {
         self.codeInput = codeInput
         self.radioButton = radioButton
         self.errorDescription = errorDescription
-        self.actions = actions
-        self.activityIndicator = activityIndicator
+        self.actionsContainer = actionsContainer
+        self.progressView = progressView
         self.message = message
         self.successMessage = successMessage
         self.background = background
@@ -82,18 +81,18 @@ public struct PONativeAlternativePaymentMethodStyle {
 }
 
 @available(iOS 14, *)
-extension PONativeAlternativePaymentMethodStyle {
+extension PONativeAlternativePaymentStyle {
 
     /// Default native alternative payment style.
-    public static let `default` = PONativeAlternativePaymentMethodStyle(
+    public static let `default` = PONativeAlternativePaymentStyle(
         title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title),
         sectionTitle: POTextStyle(color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading),
         input: .medium,
         codeInput: .large,
         radioButton: .radio,
         errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
-        actions: .default,
-        activityIndicator: .circular,
+        actionsContainer: .default,
+        progressView: .circular,
         message: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
         successMessage: POTextStyle(color: Color(poResource: .Text.success), typography: .Fixed.body),
         background: .default,

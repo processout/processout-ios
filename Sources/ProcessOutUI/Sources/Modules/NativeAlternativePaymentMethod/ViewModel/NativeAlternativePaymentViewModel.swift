@@ -18,4 +18,7 @@ protocol NativeAlternativePaymentViewModel: ObservableObject {
 
     /// Currently focused item identifier.
     var focusedItemId: AnyHashable? { get set }
+
+    /// Boolean value that indicates whether payment is already captured.
+    var isCaptured: Bool { get }
 }

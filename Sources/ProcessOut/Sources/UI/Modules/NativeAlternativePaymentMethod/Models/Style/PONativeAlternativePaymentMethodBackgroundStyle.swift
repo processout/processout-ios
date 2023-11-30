@@ -1,5 +1,5 @@
 //
-//  PONativeAlternativePaymentMethodBackgroundStyle.swift
+//  PONativeAlternativePaymentBackgroundStyle.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 23.05.2023.

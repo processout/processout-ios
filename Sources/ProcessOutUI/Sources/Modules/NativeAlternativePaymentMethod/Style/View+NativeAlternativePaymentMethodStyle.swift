@@ -1,5 +1,5 @@
 //
-//  View+NativeAlternativePaymentMethodStyle.swift
+//  View+NativeAlternativePaymentStyle.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 23.11.2023.
@@ -11,15 +11,15 @@ extension View {
 
     /// Sets the style for native APM views within this view.
     @available(iOS 14, *)
-    public func nativeAlternativePaymentMethodStyle(_ style: PONativeAlternativePaymentMethodStyle) -> some View {
-        environment(\.nativeAlternativePaymentMethodStyle, style)
+    public func nativeAlternativePaymentStyle(_ style: PONativeAlternativePaymentStyle) -> some View {
+        environment(\.nativeAlternativePaymentStyle, style)
     }
 }
 
 @available(iOS 14, *)
 extension EnvironmentValues {
 
-    var nativeAlternativePaymentMethodStyle: PONativeAlternativePaymentMethodStyle {
+    var nativeAlternativePaymentStyle: PONativeAlternativePaymentStyle {
         get { self[Key.self] }
         set { self[Key.self] = newValue }
     }
@@ -27,6 +27,6 @@ extension EnvironmentValues {
     // MARK: - Private Nested Types
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = PONativeAlternativePaymentMethodStyle.default
+        static let defaultValue = PONativeAlternativePaymentStyle.default
     }
 }
