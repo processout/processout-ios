@@ -25,7 +25,7 @@ public struct POCodeField: View {
         // todo(andrii-vysotskyi): extract all UI from CodeField into SwiftUI view
         // and use UIKit view only as a data source
         CodeFieldRepresentable(length: length, text: text)
-            .overlay(CodeFieldOverlay(length: length))
+            .background(CodeFieldBackground(length: length))
             .animation(.default, value: isInvalid)
             .id(length)
     }

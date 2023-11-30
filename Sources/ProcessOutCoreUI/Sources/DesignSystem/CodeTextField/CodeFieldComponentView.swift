@@ -66,7 +66,6 @@ final class CodeFieldComponentView: UIView {
             if animated, valueLabel.attributedText != previousAttributedText {
                 valueLabel.addTransitionAnimation()
             }
-            backgroundColor = UIColor(viewModel.style.backgroundColor)
             carretView.backgroundColor = UIColor(viewModel.style.tintColor)
             UIView.performWithoutAnimation(layoutIfNeeded)
         }
