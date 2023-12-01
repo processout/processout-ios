@@ -56,7 +56,6 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
             .background(currentStyle.backgroundColor)
             .border(style: currentStyle.border)
             .shadow(style: currentStyle.shadow)
-            .backport.geometryGroup()
             .contentShape(.rect)
             .animation(.default, value: isLoading)
             .animation(.default, value: isEnabled)
