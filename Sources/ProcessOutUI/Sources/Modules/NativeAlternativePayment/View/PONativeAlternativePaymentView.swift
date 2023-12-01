@@ -36,7 +36,9 @@ public struct PONativeAlternativePaymentView: View {
                 }
             }
             if !viewModel.actions.isEmpty {
-                POActionsContainerView(actions: viewModel.actions).actionsContainerStyle(style.actionsContainer)
+                POActionsContainerView(actions: viewModel.actions)
+                    .actionsContainerStyle(style.actionsContainer)
+                    .layoutPriority(1)
             }
         }
         .backport.background {

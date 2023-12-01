@@ -53,6 +53,7 @@ public struct POCardTokenizationView: View {
             }
             POActionsContainerView(actions: viewModel.state.actions)
                 .actionsContainerStyle(style.actionsContainer)
+                .layoutPriority(1)
         }
         .background(style.backgroundColor.ignoresSafeArea())
     }

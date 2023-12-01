@@ -42,6 +42,7 @@ public struct POCardUpdateView: View {
             .clipped()
             POActionsContainerView(actions: viewModel.actions)
                 .actionsContainerStyle(style.actionsContainer)
+                .layoutPriority(1)
         }
         .background(style.backgroundColor.ignoresSafeArea())
     }
