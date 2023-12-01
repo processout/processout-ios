@@ -26,6 +26,7 @@ public struct PONativeAlternativePaymentView: View {
                         NativeAlternativePaymentSectionsView(
                             sections: viewModel.sections, focusedItemId: $viewModel.focusedItemId
                         )
+                        .backport.geometryGroup()
                         .frame(minHeight: geometry.size.height, alignment: .top)
                     }
                     .backport.onChange(of: viewModel.focusedItemId) {
@@ -44,7 +45,7 @@ public struct PONativeAlternativePaymentView: View {
                 .ignoresSafeArea()
                 .animation(.default, value: viewModel.isCaptured)
         }
-        .animation(.default, value: viewModel.actions.map(\.id))
+        .animation(.default, value: viewModel.actions.count)
     }
 
     // MARK: - Private Properties

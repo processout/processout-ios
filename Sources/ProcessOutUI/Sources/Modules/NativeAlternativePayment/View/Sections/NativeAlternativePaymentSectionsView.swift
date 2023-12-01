@@ -23,12 +23,15 @@ struct NativeAlternativePaymentSectionsView: View {
                 NativeAlternativePaymentSectionView(section: section, focusedItemId: $focusedItemId)
             }
             .layoutPriority(1)
-            VStack(spacing: POSpacing.medium) {
-                ForEach(partition.center) { section in
-                    NativeAlternativePaymentSectionView(section: section, focusedItemId: $focusedItemId)
+            if !partition.center.isEmpty {
+                VStack(spacing: POSpacing.medium) {
+                    ForEach(partition.center) { section in
+                        NativeAlternativePaymentSectionView(section: section, focusedItemId: $focusedItemId)
+                    }
                 }
+                .backport.geometryGroup()
+                .frame(maxHeight: .infinity)
             }
-            .frame(maxHeight: .infinity)
         }
         .padding(.vertical, POSpacing.medium)
         .animation(.default, value: bodyAnimationValue)

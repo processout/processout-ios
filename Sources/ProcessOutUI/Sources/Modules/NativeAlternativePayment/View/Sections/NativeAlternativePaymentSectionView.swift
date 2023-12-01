@@ -35,7 +35,6 @@ struct NativeAlternativePaymentSectionView: View {
         }
         .multilineTextAlignment(section.isCentered ? .center : .leading)
         .frame(maxWidth: .infinity, alignment: alignment)
-        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
