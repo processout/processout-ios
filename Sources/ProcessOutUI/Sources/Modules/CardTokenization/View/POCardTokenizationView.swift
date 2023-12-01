@@ -31,14 +31,12 @@ public struct POCardTokenizationView: View {
                                 .frame(height: 1)
                                 .overlay(style.separatorColor)
                         }
-                        VStack(alignment: .leading, spacing: Constants.spacing) {
-                            ForEach(viewModel.state.sections) { section in
-                                CardTokenizationSectionView(
-                                    section: section,
-                                    spacing: Constants.sectionSpacing,
-                                    focusedInputId: $viewModel.state.focusedInputId
-                                )
-                            }
+                        ForEach(viewModel.state.sections) { section in
+                            CardTokenizationSectionView(
+                                section: section,
+                                spacing: Constants.sectionSpacing,
+                                focusedInputId: $viewModel.state.focusedInputId
+                            )
                         }
                         .padding(.horizontal, Constants.horizontalPadding)
                     }
