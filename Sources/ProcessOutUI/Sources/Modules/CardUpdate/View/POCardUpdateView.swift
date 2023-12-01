@@ -21,11 +21,11 @@ public struct POCardUpdateView: View {
     public var body: some View {
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: Constants.spacing) {
+                VStack(alignment: .leading, spacing: POSpacing.medium) {
                     if let title = viewModel.title {
                         Text(title)
                             .textStyle(style.title)
-                            .padding(.horizontal, Constants.horizontalPadding)
+                            .padding(.horizontal, POSpacing.large)
                         Divider()
                             .frame(height: 1)
                             .overlay(style.separatorColor)
@@ -33,10 +33,10 @@ public struct POCardUpdateView: View {
                     ForEach(viewModel.items) { element in
                         CardUpdateItemView(item: element, focusedInputId: $viewModel.focusedItemId)
                     }
-                    .padding(.horizontal, Constants.horizontalPadding)
+                    .padding(.horizontal, POSpacing.large)
                     .backport.geometryGroup()
                 }
-                .padding(.vertical, Constants.spacing)
+                .padding(.vertical, POSpacing.medium)
                 .animation(.default, value: viewModel.items.map(\.id))
             }
             .clipped()
@@ -45,13 +45,6 @@ public struct POCardUpdateView: View {
                 .layoutPriority(1)
         }
         .background(style.backgroundColor.ignoresSafeArea())
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let spacing: CGFloat = 16
-        static let horizontalPadding: CGFloat = 24
     }
 
     // MARK: - Private Properties
