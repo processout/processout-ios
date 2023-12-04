@@ -22,7 +22,6 @@ struct NativeAlternativePaymentSectionsView: View {
             ForEach(partition.top) { section in
                 NativeAlternativePaymentSectionView(section: section, focusedItemId: $focusedItemId)
             }
-            .layoutPriority(1)
             if !partition.center.isEmpty {
                 VStack(spacing: POSpacing.medium) {
                     ForEach(partition.center) { section in
