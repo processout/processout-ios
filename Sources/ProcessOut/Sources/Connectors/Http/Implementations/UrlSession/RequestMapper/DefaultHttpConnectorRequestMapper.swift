@@ -23,6 +23,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     func urlRequest(from request: HttpConnectorRequest<some Decodable>) throws -> URLRequest {
         guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
+            logger.error("Unable to create a request with base URL \(configuration.baseUrl)")
             throw HttpConnectorFailure.internal
         }
         components.path = request.path
@@ -30,6 +31,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
             URLQueryItem(name: item.key, value: item.value.description)
         }
         guard let resourceURL = components.url else {
+            logger.error("Unable to encode request URL components")
             throw HttpConnectorFailure.internal
         }
         var sessionRequest = URLRequest(url: resourceURL)
@@ -69,6 +71,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         do {
             return try encoder.encode(decoratedBody)
         } catch {
+            logger.error("Did fail to encode request body: '\(error)'")
             throw HttpConnectorFailure.coding(error)
         }
     }
