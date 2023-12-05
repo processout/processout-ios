@@ -18,19 +18,8 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
     // MARK: - DeviceMetadataProvider
 
-    @MainActor
     var deviceMetadata: DeviceMetadata {
-        let metadata = DeviceMetadata(
-            id: .init(value: deviceId),
-            installationId: .init(value: device.identifierForVendor?.uuidString),
-            systemVersion: .init(value: device.systemVersion),
-            appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
-            appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
-            appScreenHeight: Int(screen.nativeBounds.height),
-            appTimeZoneOffset: TimeZone.current.secondsFromGMT() / 60,
-            channel: device.systemName.lowercased()
-        )
-        return metadata
+        get async { await deviceMetadata(deviceId: self.deviceId) }
     }
 
     // MARK: - Private Nested Types
@@ -55,5 +44,19 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
         let deviceId = UUID().uuidString
         keychain.add(genericPassword: deviceId, account: Constants.keychainDeviceId)
         return deviceId
+    }
+
+    @MainActor
+    private func deviceMetadata(deviceId: String?) -> DeviceMetadata {
+        DeviceMetadata(
+            id: .init(value: deviceId),
+            installationId: .init(value: device.identifierForVendor?.uuidString),
+            systemVersion: .init(value: device.systemVersion),
+            appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
+            appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
+            appScreenHeight: Int(screen.nativeBounds.height),
+            appTimeZoneOffset: TimeZone.current.secondsFromGMT() / 60,
+            channel: device.systemName.lowercased()
+        )
     }
 }
