@@ -21,7 +21,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         self.logger = logger
     }
 
-    func urlRequest(from request: HttpConnectorRequest<some Decodable>) throws -> URLRequest {
+    func urlRequest(from request: HttpConnectorRequest<some Decodable>) async throws -> URLRequest {
         guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
             logger.error("Unable to create a request with base URL \(configuration.baseUrl)")
             throw HttpConnectorFailure.internal
@@ -36,10 +36,10 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         }
         var sessionRequest = URLRequest(url: resourceURL)
         sessionRequest.httpMethod = request.method.rawValue.uppercased()
-        if let encodedBody = try encodedRequestBody(request) {
+        if let encodedBody = try await encodedRequestBody(request) {
             sessionRequest.httpBody = encodedBody
         }
-        defaultHeaders(for: request).forEach { field, value in
+        await defaultHeaders(for: request).forEach { field, value in
             sessionRequest.setValue(value, forHTTPHeaderField: field)
         }
         request.headers.forEach { field, value in
@@ -57,10 +57,10 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     // MARK: - Request Body Encoding
 
-    private func encodedRequestBody(_ request: HttpConnectorRequest<some Decodable>) throws -> Data? {
+    private func encodedRequestBody(_ request: HttpConnectorRequest<some Decodable>) async throws -> Data? {
         let decoratedBody: Encodable?
         if request.includesDeviceMetadata {
-            let metadata = deviceMetadataProvider.deviceMetadata
+            let metadata = await deviceMetadataProvider.deviceMetadata
             decoratedBody = DecoratedBody(body: request.body, deviceMetadata: metadata)
         } else {
             decoratedBody = request.body
@@ -90,8 +90,8 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         return "Basic " + Data(value.utf8).base64EncodedString()
     }
 
-    private func defaultHeaders(for request: HttpConnectorRequest<some Decodable>) -> [String: String] {
-        let deviceMetadata = deviceMetadataProvider.deviceMetadata
+    private func defaultHeaders(for request: HttpConnectorRequest<some Decodable>) async -> [String: String] {
+        let deviceMetadata = await deviceMetadataProvider.deviceMetadata
         let headers = [
             "Idempotency-Key": request.id,
             "User-Agent": userAgent(deviceMetadata: deviceMetadata),

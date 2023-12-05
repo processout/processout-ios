@@ -18,12 +18,19 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
     // MARK: - DeviceMetadataProvider
 
+    @MainActor
     var deviceMetadata: DeviceMetadata {
-        let deviceId = deviceId()
-        if Thread.isMainThread {
-            return deviceMetadata(deviceId: deviceId)
-        }
-        return DispatchQueue.main.sync { deviceMetadata(deviceId: deviceId) }
+        let metadata = DeviceMetadata(
+            id: .init(value: deviceId),
+            installationId: .init(value: device.identifierForVendor?.uuidString),
+            systemVersion: .init(value: device.systemVersion),
+            appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
+            appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
+            appScreenHeight: Int(screen.nativeBounds.height),
+            appTimeZoneOffset: TimeZone.current.secondsFromGMT() / 60,
+            channel: device.systemName.lowercased()
+        )
+        return metadata
     }
 
     // MARK: - Private Nested Types
@@ -41,27 +48,12 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
     // MARK: - Private Methods
 
-    private func deviceId() -> String? {
+    private var deviceId: String? {
         if let deviceId = keychain.genericPassword(forAccount: Constants.keychainDeviceId) {
             return deviceId
         }
         let deviceId = UUID().uuidString
         keychain.add(genericPassword: deviceId, account: Constants.keychainDeviceId)
         return deviceId
-    }
-
-    private func deviceMetadata(deviceId: String?) -> DeviceMetadata {
-        assert(Thread.isMainThread, "Method must be called only on main thread.")
-        let metadata = DeviceMetadata(
-            id: .init(value: deviceId),
-            installationId: .init(value: device.identifierForVendor?.uuidString),
-            systemVersion: .init(value: device.systemVersion),
-            appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
-            appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
-            appScreenHeight: Int(screen.nativeBounds.height),
-            appTimeZoneOffset: TimeZone.current.secondsFromGMT() / 60,
-            channel: device.systemName.lowercased()
-        )
-        return metadata
     }
 }
