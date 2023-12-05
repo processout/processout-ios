@@ -25,6 +25,8 @@ extension HttpConnector {
     ///   - request: request to execute.
     ///   - completion: completion is invoked after request execution completes with either success or failure.
     /// Will be called on main queue.
+    ///
+    /// - TODO: Remove this method when repositories are migrated to structured concurrency.
     @discardableResult
     func execute<Value>(
         request: HttpConnectorRequest<Value>, completion: @escaping (Result<Value, Failure>) -> Void
@@ -46,5 +48,3 @@ extension HttpConnector {
         return cancellable
     }
 }
-
-extension Task: POCancellable { }
