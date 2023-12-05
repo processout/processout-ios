@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
+actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
     init(screen: UIScreen, device: UIDevice, bundle: Bundle, keychain: Keychain) {
         self.screen = screen
