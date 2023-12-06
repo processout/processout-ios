@@ -91,8 +91,9 @@ final class HttpConnectorRetryDecoratorOperation<Value: Decodable>: POCancellabl
         switch failure {
         case .networkUnreachable, .timeout:
             return true
-        case .server(_, let statusCode):
-            return (500...599).contains(statusCode)
+        case .server(_, let statusCode),
+             .decoding(_, let statusCode):
+            return (500...599).contains(statusCode) || statusCode == 408
         default:
             return false
         }
