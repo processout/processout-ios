@@ -54,7 +54,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         // Given
         let codingError = NSError(domain: "", code: 1234)
         requestMapper.urlRequestFromClosure = {
-            throw HttpConnectorFailure.coding(codingError)
+            throw HttpConnectorFailure.encoding(codingError)
         }
         let expectation = XCTestExpectation()
 
@@ -62,7 +62,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         _ = sut.execute(request: defaultRequest) { result in
             // Then
             switch result {
-            case let .failure(.coding(error)):
+            case let .failure(.encoding(error)):
                 XCTAssertEqual(error as NSError, codingError)
             default:
                 XCTFail("Unexpected result")
@@ -154,7 +154,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         _ = sut.execute(request: defaultRequest) { result in
             // Then
             switch result {
-            case .failure(.coding):
+            case .failure(.decoding):
                 break
             default:
                 XCTFail("Expected coding failure")
@@ -180,7 +180,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         _ = sut.execute(request: defaultRequest) { result in
             // Then
             switch result {
-            case .failure(.coding):
+            case .failure(.decoding):
                 break
             default:
                 XCTFail("Expected coding failure")
@@ -206,7 +206,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         _ = sut.execute(request: request) { result in
             // Then
             switch result {
-            case .failure(.coding):
+            case .failure(.decoding):
                 break
             default:
                 XCTFail("Expected coding failure")
