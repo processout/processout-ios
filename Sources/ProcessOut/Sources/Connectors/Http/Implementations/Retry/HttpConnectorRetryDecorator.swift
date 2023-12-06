@@ -56,7 +56,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
             return true
         case .server(_, let statusCode),
              .decoding(_, let statusCode):
-            return (500...599).contains(statusCode)
+            return (500...599).contains(statusCode) || statusCode == 408
         default:
             return false
         }
