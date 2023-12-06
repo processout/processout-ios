@@ -69,7 +69,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         do {
             return try encoder.encode(decoratedBody)
         } catch {
-            throw HttpConnectorFailure.coding(error)
+            throw HttpConnectorFailure.encoding(error)
         }
     }
 
