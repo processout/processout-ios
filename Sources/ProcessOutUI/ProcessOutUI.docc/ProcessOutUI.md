@@ -28,3 +28,15 @@
 - ``POCardUpdateDelegate``
 - ``POCardUpdateInformation``
 - ``POCardUpdateEvent``
+
+### Native Alternative Payment Method
+
+- <doc:NativeAlternativePayment>
+- ``PONativeAlternativePaymentView``
+- ``PONativeAlternativePaymentViewController``
+- ``PONativeAlternativePaymentStyle``
+- ``PONativeAlternativePaymentBackgroundStyle``
+- ``SwiftUI/View/nativeAlternativePaymentStyle(_:)``
+- ``PONativeAlternativePaymentConfiguration``
+- ``PONativeAlternativePaymentDelegate``
+- ``PONativeAlternativePaymentEvent``

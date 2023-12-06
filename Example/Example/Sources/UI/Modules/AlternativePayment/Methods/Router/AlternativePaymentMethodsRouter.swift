@@ -16,13 +16,13 @@ final class AlternativePaymentMethodsRouter: RouterType {
     func trigger(route: AlternativePaymentMethodsRoute) -> Bool {
         switch route {
         case let .nativeAlternativePayment(route):
-            let configuration = PONativeAlternativePaymentMethodConfiguration(
+            let configuration = PONativeAlternativePaymentConfiguration(
+                invoiceId: route.invoiceId,
+                gatewayConfigurationId: route.gatewayConfigurationId,
                 secondaryAction: .cancel(),
                 paymentConfirmationSecondaryAction: .cancel(disabledFor: 10)
             )
             let viewController = PONativeAlternativePaymentViewController(
-                invoiceId: route.invoiceId,
-                gatewayConfigurationId: route.gatewayConfigurationId,
                 configuration: configuration,
                 completion: { [weak self] result in
                     self?.viewController?.dismiss(animated: true) {

@@ -63,14 +63,13 @@ public struct PORadioButtonStyle: ButtonStyle {
             .frame(maxWidth: .infinity, minHeight: Constants.minHeight, alignment: .leading)
             .animation(.default, value: isSelected)
             .contentShape(.rect)
-            .allowsHitTesting(!isSelected)
         }
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let minVerticalPadding: CGFloat = 4
+        static let minVerticalPadding = POSpacing.extraSmall
         static let minHeight: CGFloat = 44
         static let knobSize: CGFloat = 18
     }

@@ -14,17 +14,15 @@ extension PONativeAlternativePaymentView {
     /// - Parameters:
     ///   - completion: Completion to invoke when flow is completed.
     public init(
-        invoiceId: String,
-        gatewayConfigurationId: String,
-        configuration: PONativeAlternativePaymentConfiguration = .init(),
-        delegate: PONativeAlternativePaymentMethodDelegate? = nil,
+        configuration: PONativeAlternativePaymentConfiguration,
+        delegate: PONativeAlternativePaymentDelegate? = nil,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         var logger = ProcessOut.shared.logger
-        logger[attributeKey: "InvoiceId"] = invoiceId
+        logger[attributeKey: "InvoiceId"] = configuration.invoiceId
         let interactorConfiguration = PONativeAlternativePaymentMethodInteractorConfiguration(
-            gatewayConfigurationId: gatewayConfigurationId,
-            invoiceId: invoiceId,
+            gatewayConfigurationId: configuration.gatewayConfigurationId,
+            invoiceId: configuration.invoiceId,
             waitsPaymentConfirmation: configuration.waitsPaymentConfirmation,
             paymentConfirmationTimeout: configuration.paymentConfirmationTimeout
         )

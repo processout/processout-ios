@@ -44,6 +44,7 @@ struct NativeAlternativePaymentItemView: View {
         case .progress:
             ProgressView()
                 .poProgressViewStyle(style.progressView)
+                .padding(.horizontal, POSpacing.large)
         case .submitted(let item):
             NativeAlternativePaymentSubmittedItemView(item: item)
         }

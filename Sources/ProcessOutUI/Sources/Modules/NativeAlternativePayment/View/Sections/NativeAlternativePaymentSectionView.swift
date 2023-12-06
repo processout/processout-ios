@@ -33,9 +33,9 @@ struct NativeAlternativePaymentSectionView: View {
                     .padding(.horizontal, POSpacing.large)
             }
         }
+        .fixedSize(horizontal: false, vertical: true)
         .multilineTextAlignment(section.isCentered ? .center : .leading)
         .frame(maxWidth: .infinity, alignment: alignment)
-        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties

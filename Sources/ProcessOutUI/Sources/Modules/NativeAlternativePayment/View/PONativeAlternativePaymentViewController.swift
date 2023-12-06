@@ -15,18 +15,12 @@ public final class PONativeAlternativePaymentViewController: UIHostingController
     /// Creates native APM view controller.
     public init(
         style: PONativeAlternativePaymentStyle = .default,
-        invoiceId: String,
-        gatewayConfigurationId: String,
-        configuration: PONativeAlternativePaymentConfiguration = .init(),
-        delegate: PONativeAlternativePaymentMethodDelegate? = nil,
+        configuration: PONativeAlternativePaymentConfiguration,
+        delegate: PONativeAlternativePaymentDelegate? = nil,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         let view = PONativeAlternativePaymentView(
-            invoiceId: invoiceId,
-            gatewayConfigurationId: gatewayConfigurationId,
-            configuration: configuration,
-            delegate: delegate,
-            completion: completion
+            configuration: configuration, delegate: delegate, completion: completion
         )
         super.init(rootView: AnyView(view.nativeAlternativePaymentStyle(style)))
     }

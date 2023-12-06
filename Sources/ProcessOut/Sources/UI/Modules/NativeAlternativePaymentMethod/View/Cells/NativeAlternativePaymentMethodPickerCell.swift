@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 final class NativeAlternativePaymentMethodPickerCell: UICollectionViewCell {
 
     override init(frame: CGRect) {

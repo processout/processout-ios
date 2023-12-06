@@ -8,7 +8,7 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-/// Defines style for native alternative payment method module.
+/// Defines style for native alternative payment module.
 @available(iOS 14, *)
 public struct PONativeAlternativePaymentStyle {
 

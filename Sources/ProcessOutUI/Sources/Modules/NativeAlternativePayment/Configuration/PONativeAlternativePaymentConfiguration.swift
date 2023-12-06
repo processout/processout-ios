@@ -1,16 +1,16 @@
 //
-//  PONativeAlternativePaymentMethodConfiguration.swift
-//  ProcessOut
+//  PONativeAlternativePaymentConfiguration.swift
+//  ProcessOutUI
 //
-//  Created by Andrii Vysotskyi on 22.11.2022.
+//  Created by Andrii Vysotskyi on 23.11.2023.
 //
 
 import Foundation
+import ProcessOut
 
-/// A configuration object that defines how a native alternative payment view controller content's.
+/// A configuration object that defines how a native alternative payment view content.
 /// Use `nil` to indicate that default value should be used.
-@available(*, deprecated, message: "Use ProcessOutUI.PONativeAlternativePaymentConfiguration instead.")
-public struct PONativeAlternativePaymentMethodConfiguration {
+public struct PONativeAlternativePaymentConfiguration {
 
     public enum SecondaryAction {
 
@@ -22,6 +22,12 @@ public struct PONativeAlternativePaymentMethodConfiguration {
         ///   possible to make it initialy disabled for given amount of time.
         case cancel(title: String? = nil, disabledFor: TimeInterval = 0)
     }
+
+    /// Invoice that should be authorized/captured.
+    public let invoiceId: String
+
+    /// Gateway configuration id that should be used to initiate native alternative payment.
+    public let gatewayConfigurationId: String
 
     /// Custom title.
     public let title: String?
@@ -36,7 +42,7 @@ public struct PONativeAlternativePaymentMethodConfiguration {
     public let secondaryAction: SecondaryAction?
 
     /// For parameters where user should select single option from multiple values defines
-    /// maximum number of options that framework will display inline (e.g. using radio buttons). 
+    /// maximum number of options that framework will display inline (e.g. using radio buttons).
     ///
     /// Default value is `5`.
     public let inlineSingleSelectValuesLimit: Int
@@ -56,7 +62,10 @@ public struct PONativeAlternativePaymentMethodConfiguration {
     /// use `nil`, this is default behaviour.
     public let paymentConfirmationSecondaryAction: SecondaryAction?
 
+    /// Creates configuration instance.
     public init(
+        invoiceId: String,
+        gatewayConfigurationId: String,
         title: String? = nil,
         successMessage: String? = nil,
         primaryActionTitle: String? = nil,
@@ -67,6 +76,8 @@ public struct PONativeAlternativePaymentMethodConfiguration {
         paymentConfirmationTimeout: TimeInterval = 180,
         paymentConfirmationSecondaryAction: SecondaryAction? = nil
     ) {
+        self.invoiceId = invoiceId
+        self.gatewayConfigurationId = gatewayConfigurationId
         self.title = title
         self.successMessage = successMessage
         self.primaryActionTitle = primaryActionTitle

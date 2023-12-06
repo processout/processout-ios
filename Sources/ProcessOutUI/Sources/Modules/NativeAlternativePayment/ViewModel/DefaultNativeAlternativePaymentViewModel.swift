@@ -228,7 +228,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             let pickerItem = NativeAlternativePaymentViewModelItem.Picker(
                 id: parameter.key,
                 options: parameter.availableValues?.map { availableValue in
-                        .init(id: availableValue.value, title: availableValue.displayName)
+                    .init(id: availableValue.value, title: availableValue.displayName)
                 } ?? [],
                 selectedOptionId: .init(
                     get: { parameterValue?.value },
