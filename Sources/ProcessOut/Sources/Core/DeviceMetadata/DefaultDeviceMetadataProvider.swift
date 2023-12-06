@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
+actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
     init(screen: UIScreen, device: UIDevice, bundle: Bundle, keychain: Keychain) {
         self.screen = screen
@@ -19,11 +19,7 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
     // MARK: - DeviceMetadataProvider
 
     var deviceMetadata: DeviceMetadata {
-        let deviceId = deviceId()
-        if Thread.isMainThread {
-            return deviceMetadata(deviceId: deviceId)
-        }
-        return DispatchQueue.main.sync { deviceMetadata(deviceId: deviceId) }
+        get async { await deviceMetadata(deviceId: self.deviceId) }
     }
 
     // MARK: - Private Nested Types
@@ -41,7 +37,7 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
     // MARK: - Private Methods
 
-    private func deviceId() -> String? {
+    private var deviceId: String? {
         if let deviceId = keychain.genericPassword(forAccount: Constants.keychainDeviceId) {
             return deviceId
         }
@@ -50,9 +46,9 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
         return deviceId
     }
 
+    @MainActor
     private func deviceMetadata(deviceId: String?) -> DeviceMetadata {
-        assert(Thread.isMainThread, "Method must be called only on main thread.")
-        let metadata = DeviceMetadata(
+        DeviceMetadata(
             id: .init(value: deviceId),
             installationId: .init(value: device.identifierForVendor?.uuidString),
             systemVersion: .init(value: device.systemVersion),
@@ -62,6 +58,5 @@ final class DefaultDeviceMetadataProvider: DeviceMetadataProvider {
             appTimeZoneOffset: TimeZone.current.secondsFromGMT() / 60,
             channel: device.systemName.lowercased()
         )
-        return metadata
     }
 }

@@ -8,5 +8,5 @@
 protocol DeviceMetadataProvider {
 
     /// Returns device metadata.
-    var deviceMetadata: DeviceMetadata { get }
+    var deviceMetadata: DeviceMetadata { get async }
 }
