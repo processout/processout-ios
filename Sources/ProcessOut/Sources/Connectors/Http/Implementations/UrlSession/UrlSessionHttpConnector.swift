@@ -20,39 +20,26 @@ final class UrlSessionHttpConnector: HttpConnector {
         self.session = URLSession(configuration: sessionConfiguration)
         self.decoder = decoder
         self.logger = logger
-        workQueue = DispatchQueue(label: "process-out.http-connector", attributes: .concurrent)
         urlRequestFormatter = UrlRequestFormatter()
         urlResponseFormatter = UrlResponseFormatter(includesHeaders: false)
     }
 
     // MARK: - HttpConnectorType
 
-    func execute<Value>(
-        request: HttpConnectorRequest<Value>, completion: @escaping (Result<Value, Failure>) -> Void
-    ) -> POCancellable {
-        let cancellable = GroupCancellable()
-        workQueue.async { [self] in
-            do {
-                let sessionRequest = try requestMapper.urlRequest(from: request)
-                logger.debug("Sending \(urlRequestFormatter.string(from: sessionRequest))")
-                let dataTask = session.dataTask(with: sessionRequest) { [self] data, response, error in
-                    do {
-                        let value = try decodeValue(
-                            Value.self, from: data, response: response, error: error, requestId: request.id
-                        )
-                        complete(completion: completion, result: .success(value))
-                    } catch {
-                        complete(completion: completion, result: .failure(error))
-                    }
-                }
-                dataTask.resume()
-                cancellable.add(dataTask)
-            } catch {
-                logger.error("Did fail to create a request: '\(error)'")
-                complete(completion: completion, result: .failure(error))
-            }
+    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> Value {
+        let sessionRequest = try await requestMapper.urlRequest(from: request)
+        logger.debug("Sending \(urlRequestFormatter.string(from: sessionRequest))")
+        let (data, response): (Data, URLResponse)
+        do {
+            (data, response) = try await session.data(for: sessionRequest)
+        } catch let error as URLError {
+            logger.info("Request \(request.id) did fail with error: '\(error)'.")
+            throw convertToFailure(urlError: error)
+        } catch {
+            logger.info("Request \(request.id) did fail with unknown error '\(error)'.")
+            throw Failure.internal
         }
-        return cancellable
+        return try decodeValue(Value.self, from: data, response: response, requestId: request.id)
     }
 
     // MARK: - Private Properties
@@ -60,7 +47,6 @@ final class UrlSessionHttpConnector: HttpConnector {
     private let session: URLSession
     private let requestMapper: HttpConnectorRequestMapper
     private let decoder: JSONDecoder
-    private let workQueue: DispatchQueue
     private let logger: POLogger
     private let urlRequestFormatter: UrlRequestFormatter
     private let urlResponseFormatter: UrlResponseFormatter
@@ -68,13 +54,9 @@ final class UrlSessionHttpConnector: HttpConnector {
     // MARK: - Private Methods
 
     private func decodeValue<Value: Decodable>(
-        _ valueType: Value.Type, from data: Data?, response: URLResponse?, error: Error?, requestId: String
+        _ valueType: Value.Type, from data: Data, response: URLResponse, requestId: String
     ) throws -> Value {
-        if let error {
-            logger.info("Request \(requestId) did fail with error: '\(error)'.")
-            throw convertToFailure(urlError: error)
-        }
-        guard let data, let response = response as? HTTPURLResponse else {
+        guard let response = response as? HTTPURLResponse else {
             logger.error("Invalid url response for \(requestId).")
             throw Failure.internal
         }
@@ -92,17 +74,6 @@ final class UrlSessionHttpConnector: HttpConnector {
             logger.error("Did fail to decode response for \(requestId): '\(error)'.")
             throw Failure.coding(error)
         }
-    }
-
-    private func complete<Value>(completion: @escaping (Result<Value, Failure>) -> Void, result: Result<Value, Error>) {
-        let result = result.mapError { error -> Failure in
-            if let failure = error as? Failure {
-                return failure
-            }
-            logger.error("Attempted to complete request with unknown error: \(error)")
-            return .internal
-        }
-        DispatchQueue.main.async { completion(result) }
     }
 
     private func convertToFailure(urlError error: Error) -> Failure {
