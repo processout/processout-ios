@@ -28,8 +28,11 @@ enum HttpConnectorFailure: Error {
         let invalidFields: [InvalidField]?
     }
 
-    /// Unable to code data. Supplied error is going to be `DecodingError` or `EncodingError`.
-    case coding(Error)
+    /// Unable to encode data.
+    case encoding(Error)
+
+    /// Unable to decode data.
+    case decoding(Error, statusCode: Int)
 
     /// No network connection.
     case networkUnreachable

@@ -72,7 +72,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
             return try encoder.encode(decoratedBody)
         } catch {
             logger.error("Did fail to encode request body: '\(error)'")
-            throw HttpConnectorFailure.coding(error)
+            throw HttpConnectorFailure.encoding(error)
         }
     }
 

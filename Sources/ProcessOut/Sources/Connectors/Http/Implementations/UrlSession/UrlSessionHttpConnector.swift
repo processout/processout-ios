@@ -72,7 +72,7 @@ final class UrlSessionHttpConnector: HttpConnector {
             throw failure
         } catch let error as DecodingError {
             logger.error("Did fail to decode response for \(requestId): '\(error)'.")
-            throw Failure.coding(error)
+            throw Failure.decoding(error, statusCode: response.statusCode)
         }
     }
 
