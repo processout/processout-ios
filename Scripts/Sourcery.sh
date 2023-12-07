@@ -9,5 +9,6 @@ export PATH="/opt/homebrew/bin:$PATH"
 sourcery \
   --sources $PROJECT_DIR/Sources/$TARGET_NAME/Sources \
   --templates $PROJECT_DIR/Templates/AutoAsync.stencil \
+  --templates $PROJECT_DIR/Templates/AutoCompletion.stencil \
   --parseDocumentation \
   --output $PROJECT_DIR/Sources/$TARGET_NAME/Sources/Generated/Sourcery+Generated.swift
