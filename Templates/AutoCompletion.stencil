@@ -13,11 +13,12 @@ extension {{ type.name }} {
     {% for key, value in method.attributes %}
     {{ value.first }}
     {% endfor %}
+    @discardableResult
     public func {{ method.callName }}(
         {% for parameter in method.parameters %}{{ parameter.asSource }},{% endfor %}
         completion: @escaping ({% if method.throws %}Result<{{ method.returnTypeName.asSource }}, POFailure>{% else %}{{ method.returnTypeName.asSource }}{% endif %}) -> Void
     ) -> POCancellable {
-        invoke(completion: completion) {    
+        invoke(completion: completion) {
             {% if method.throws %}try {% endif %}await {{ method.callName }}({% for parameter in method.parameters %}{{ parameter.argumentLabel }}: {{ parameter.argumentLabel }}{% if not forloop.last %}, {% endif %}{% endfor %})
         }
     }
