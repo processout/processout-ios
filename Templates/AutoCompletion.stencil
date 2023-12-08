@@ -1,3 +1,6 @@
+import Foundation
+import UIKit
+
 // swiftlint:disable all
 {% for type in types.implementing.POAutoCompletion|protocol %}
 
@@ -15,11 +18,13 @@ extension {{ type.name }} {
     {% endfor %}
     @discardableResult
     public func {{ method.callName }}(
-        {% for parameter in method.parameters %}{{ parameter.asSource }},{% endfor %}
+        {% for parameter in method.parameters %}
+        {{ parameter.asSource }},
+        {% endfor %}
         completion: @escaping ({% if method.throws %}Result<{{ method.returnTypeName.asSource }}, POFailure>{% else %}{{ method.returnTypeName.asSource }}{% endif %}) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            {% if method.throws %}try {% endif %}await {{ method.callName }}({% for parameter in method.parameters %}{{ parameter.argumentLabel }}: {{ parameter.argumentLabel }}{% if not forloop.last %}, {% endif %}{% endfor %})
+            {% if method.throws %}try {% endif %}await {{ method.callName }}({% for parameter in method.parameters %}{% if parameter.argumentLabel %}{{ parameter.argumentLabel }}: {% endif %}{{ parameter.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
         }
     }
     {% endfor %}
