@@ -8,8 +8,9 @@
 @available(*, deprecated, renamed: "PORepository")
 public typealias PORepositoryType = PORepository
 
+// todo(andrii-vysotskyi): remove conformance to POAutoCompletion when services are migrated
 /// Common protocol that all repositories conform to.
-public protocol PORepository: POAutoAsync {
+public protocol PORepository: POAutoCompletion {
 
     /// Repository's failure type.
     typealias Failure = POFailure

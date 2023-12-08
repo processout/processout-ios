@@ -14,25 +14,27 @@ final class UrlSessionImagesRepository: ImagesRepository {
         self.session = session
     }
 
-    // MARK: - POImagesRepository
+    // MARK: - ImagesRepository
 
-    func images(at urls: [URL], completion: @escaping ([URL: UIImage]) -> Void) {
-        let lock = NSLock()
-        let dispatchGroup = DispatchGroup()
-        var images: [URL: UIImage] = [:]
-        urls.forEach { url in
-            dispatchGroup.enter()
-            let request = URLRequest(url: url)
-            let task = session.dataTask(with: request) { data, _, _ in
-                let image = data.flatMap(UIImage.init)
-                lock.withLock {
-                    images[url] = image
+    func images(at urls: [URL]) async -> [URL: UIImage] {
+        let images = await withTaskGroup(of: UIImage?.self, returning: [UIImage?].self) { [session] group in
+            for url in urls {
+                group.addTask {
+                    try? await UIImage(data: session.data(from: url).0)
                 }
-                dispatchGroup.leave()
             }
-            task.resume()
+            var images: [UIImage?] = []
+            for await image in group {
+                images.append(image)
+            }
+            return images
         }
-        dispatchGroup.notify(queue: .main) { completion(images) }
+        var groupedImages: [URL: UIImage] = [:]
+        for (offset, image) in images.enumerated() {
+            let url = urls[offset]
+            groupedImages[url] = image
+        }
+        return groupedImages
     }
 
     // MARK: - Private Properties
