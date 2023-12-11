@@ -35,7 +35,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
         }
         do {
             let delay = retryStrategy.interval(for: attempt)
-            try await Task.sleep(nanoseconds: UInt64(delay * 1e9))
+            try await Task.sleep(nanoseconds: UInt64(delay) * NSEC_PER_SEC)
         } catch {
             throw Failure.cancelled
         }
