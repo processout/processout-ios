@@ -31,115 +31,67 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
 
     // MARK: - Request Mapper
 
-    func test_execute_whenRequestMapperFails_failsOnMainThread() {
-        // Given
-        requestMapper.urlRequestFromClosure = {
-            throw HttpConnectorFailure.internal
-        }
-        let expectation = XCTestExpectation()
-
-        // When
-        _ = sut.execute(request: defaultRequest) { result in
-            // Then
-            if case .success = result {
-                XCTFail("Unexpected success")
-            }
-            XCTAssertTrue(Thread.isMainThread)
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
-    }
-
-    func test_execute_whenRequestMapperFailsWithHttpConnectorFailure_failsWithSameFailure() {
+    func test_execute_whenRequestMapperFailsWithHttpConnectorFailure_failsWithSameFailure() async throws {
         // Given
         let codingError = NSError(domain: "", code: 1234)
         requestMapper.urlRequestFromClosure = {
             throw HttpConnectorFailure.encoding(codingError)
         }
-        let expectation = XCTestExpectation()
 
         // When
-        _ = sut.execute(request: defaultRequest) { result in
-            // Then
-            switch result {
-            case let .failure(.encoding(error)):
-                XCTAssertEqual(error as NSError, codingError)
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
-    }
+        let error = await assertThrowsError(
+            try await sut.execute(request: defaultRequest)
+        )
 
-    func test_execute_whenRequestMapperFailsWithNonHttpConnectorFailure_completesWithInternalFailure() {
-        // Given
-        requestMapper.urlRequestFromClosure = {
-            throw NSError(domain: "", code: 1)
+        // Then
+        if let failure = error as? HttpConnectorFailure, case .encoding(let encodingError) = failure {
+            XCTAssertEqual(encodingError as NSError, codingError)
+            return
         }
-        let expectation = XCTestExpectation()
-
-        // When
-        _ = sut.execute(request: defaultRequest) { result in
-            // Then
-            switch result {
-            case .failure(.internal):
-                break
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
+        XCTFail("Unexpected result")
     }
 
     // MARK: - URLSession
 
-    func test_execute_whenUrlSessionTaskFails_fails() {
+    func test_execute_whenUrlSessionTaskFails_fails() async {
         // Given
         MockUrlProtocol.register(path: ".*") { _ in
             throw URLError(.notConnectedToInternet)
         }
         requestMapper.urlRequestFromClosure = defaultUrlRequest
-        let expectation = XCTestExpectation()
 
         // When
-        _ = sut.execute(request: defaultRequest) { result in
-            // Then
-            switch result {
-            case .failure(.networkUnreachable):
-                break
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
+        let error = await assertThrowsError(
+            try await sut.execute(request: defaultRequest)
+        )
+
+        // Then
+        if let failure = error as? HttpConnectorFailure, case .networkUnreachable = failure {
+            return
         }
-        wait(for: [expectation], timeout: 1)
+        XCTFail("Unexpected result")
     }
 
-    func test_execute_whenUrlSessionTaskCompletesWithUnsupportedUrlResponse_fails() {
+    func test_execute_whenUrlSessionTaskCompletesWithUnsupportedUrlResponse_fails() async {
         // Given
         MockUrlProtocol.register(path: ".*") { _ in
             (URLResponse(), Data())
         }
         requestMapper.urlRequestFromClosure = defaultUrlRequest
-        let expectation = XCTestExpectation()
 
         // When
-        _ = sut.execute(request: defaultRequest) { result in
-            // Then
-            switch result {
-            case .failure(.internal):
-                break
-            default:
-                XCTFail("Expected internal failure")
-            }
-            expectation.fulfill()
+        let error = await assertThrowsError(
+            try await sut.execute(request: defaultRequest)
+        )
+
+        // Then
+        if let failure = error as? HttpConnectorFailure, case .internal = failure {
+            return
         }
-        wait(for: [expectation], timeout: 1)
+        XCTFail("Expected internal failure")
     }
 
-    func test_execute_whenResponseSuccessIsInvalid_failsWithCodingFailure() {
+    func test_execute_whenResponseSuccessIsInvalid_failsWithCodingFailure() async {
         // Given
         MockUrlProtocol.register(path: ".*") { response in
             try MockUrlProtocolResponseBuilder()
@@ -148,23 +100,20 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
                 .build()
         }
         requestMapper.urlRequestFromClosure = defaultUrlRequest
-        let expectation = XCTestExpectation()
 
         // When
-        _ = sut.execute(request: defaultRequest) { result in
-            // Then
-            switch result {
-            case .failure(.decoding):
-                break
-            default:
-                XCTFail("Expected coding failure")
-            }
-            expectation.fulfill()
+        let error = await assertThrowsError(
+            try await sut.execute(request: defaultRequest)
+        )
+
+        // Then
+        if case let failure = error as? HttpConnectorFailure, case .decoding = failure {
+            return
         }
-        wait(for: [expectation], timeout: 1)
+        XCTFail("Unexpected result")
     }
 
-    func test_execute_whenUnsuccessfulResponseDoesntHaveErrorDetails_failsWithCodingFailure() {
+    func test_execute_whenUnsuccessfulResponseDoesntHaveErrorDetails_failsWithCodingFailure() async {
         // Given
         MockUrlProtocol.register(path: ".*") { response in
             try MockUrlProtocolResponseBuilder()
@@ -174,23 +123,20 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
                 .build()
         }
         requestMapper.urlRequestFromClosure = defaultUrlRequest
-        let expectation = XCTestExpectation()
 
         // When
-        _ = sut.execute(request: defaultRequest) { result in
-            // Then
-            switch result {
-            case .failure(.decoding):
-                break
-            default:
-                XCTFail("Expected coding failure")
-            }
-            expectation.fulfill()
+        let error = await assertThrowsError(
+            try await sut.execute(request: defaultRequest)
+        )
+
+        // Then
+        if case let failure = error as? HttpConnectorFailure, case .decoding = failure {
+            return
         }
-        wait(for: [expectation], timeout: 1)
+        XCTFail("Unexpected result")
     }
 
-    func test_execute_whenSuccessfulResponseDoesntHaveValue_failsWithCodingFailure() {
+    func test_execute_whenSuccessfulResponseDoesntHaveValue_failsWithCodingFailure() async {
         // Given
         MockUrlProtocol.register(path: ".*") { response in
             try MockUrlProtocolResponseBuilder()
@@ -200,25 +146,20 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         }
         requestMapper.urlRequestFromClosure = defaultUrlRequest
         let request = HttpConnectorRequest<Int>.get(path: "")
-        let expectation = XCTestExpectation()
 
         // When
-        _ = sut.execute(request: request) { result in
-            // Then
-            switch result {
-            case .failure(.decoding):
-                break
-            default:
-                XCTFail("Expected coding failure")
-            }
-            expectation.fulfill()
+        let error = await assertThrowsError(
+            try await sut.execute(request: request)
+        )
+
+        // Then
+        if case let failure = error as? HttpConnectorFailure, case .decoding = failure {
+            return
         }
-        wait(for: [expectation], timeout: 1)
+        XCTFail("Unexpected result")
     }
 
-    // MARK: - Unverified
-
-    func test_whenUnsuccessfulResponseHaveErrorDetails_completesWithServerFailure() {
+    func test_whenUnsuccessfulResponseHaveErrorDetails_completesWithServerFailure() async {
         // Given
         MockUrlProtocol.register(path: ".*") { response in
             try MockUrlProtocolResponseBuilder()
@@ -228,24 +169,22 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
                 .build()
         }
         requestMapper.urlRequestFromClosure = defaultUrlRequest
-        let expectation = XCTestExpectation()
 
         // When
-        _ = sut.execute(request: defaultRequest) { result in
-            // Then
-            switch result {
-            case let .failure(.server(serverError, statusCode)):
-                XCTAssertEqual(serverError.errorType, "card.invalid-number")
-                XCTAssertEqual(statusCode, 404)
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
+        let error = await assertThrowsError(
+            try await sut.execute(request: defaultRequest)
+        )
+
+        // Then
+        if let failure = error as? HttpConnectorFailure, case let .server(serverError, statusCode) = failure {
+            XCTAssertEqual(serverError.errorType, "card.invalid-number")
+            XCTAssertEqual(statusCode, 404)
+        } else {
+            XCTFail("Unexpected result")
         }
-        wait(for: [expectation], timeout: 1)
     }
 
-    func test_whenSuccessfulResponseHasValidValue_completesWithValue() {
+    func test_whenSuccessfulResponseHasValidValue_completesWithValue() async throws {
         struct Response: Decodable {
             let source: String
         }
@@ -259,46 +198,36 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         }
         requestMapper.urlRequestFromClosure = defaultUrlRequest
         let request = HttpConnectorRequest<Response>.get(path: "")
-        let expectation = XCTestExpectation()
 
         // When
-        _ = sut.execute(request: request) { result in
-            // Then
-            switch result {
-            case let .success(value):
-                XCTAssertEqual(value.source, "test")
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
+        let value = try await sut.execute(request: request)
+
+        // Then
+        XCTAssertEqual(value.source, "test")
     }
 
-    func test_execute_whenCancelled_completesWithCancellationError() {
+    func test_execute_whenCancelled_completesWithCancellationError() async throws {
         // Given
         MockUrlProtocol.register(path: ".*") { _ in
             try await Task.sleep(for: .seconds(2))
             throw URLError(.timedOut)
         }
         requestMapper.urlRequestFromClosure = defaultUrlRequest
-        let expectation = XCTestExpectation()
 
         // When
-        let cancellable = sut.execute(request: defaultRequest) { result in
-            // Then
-            switch result {
-            case .failure(.cancelled):
-                break
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
+        let task = Task {
+            _ = try await sut.execute(request: defaultRequest)
         }
         DispatchQueue.main.async {
-            cancellable.cancel()
+            task.cancel()
         }
-        wait(for: [expectation], timeout: 3)
+
+        // Then
+        let error = await assertThrowsError(try await task.value)
+        if case let failure = error as? HttpConnectorFailure, case .cancelled = failure {
+            return
+        }
+        XCTFail("Unexpected result")
     }
 
     // MARK: - Private Nested Types
