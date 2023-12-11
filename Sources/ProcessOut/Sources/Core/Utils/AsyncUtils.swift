@@ -7,47 +7,42 @@
 
 import Foundation
 
-// MARK: - Async + Completion
-
-/// Invokes given completion with a result of async operation.
-func invoke<T>(
-    completion: @escaping (Result<T, POFailure>) -> Void,
-    after operation: @escaping () async throws -> T
-) -> POCancellable {
-    Task { @MainActor in
-        do {
-            let returnValue = try await operation()
-            completion(.success(returnValue))
-        } catch let failure as POFailure {
-            completion(.failure(failure))
-        } catch {
-            let failure = POFailure(code: .internal(.mobile), underlyingError: error)
-            completion(.failure(failure))
-        }
-    }
-}
-
-/// Invokes given completion with a result of async operation.
-func invoke<T>(completion: @escaping (T) -> Void, after operation: @escaping () async -> T) -> Task<Void, Never> {
-    Task { @MainActor in
-        completion(await operation())
-    }
-}
-
 // MARK: - Timeout
 
+/// - Warning: operation should support cancellation, otherwise calling this method has no effect.
 func withTimeout<T: Sendable>(
     _ timeout: TimeInterval,
-    operation: @escaping @Sendable () async throws -> T
+    error timeoutError: @autoclosure () -> Error,
+    perform operation: @escaping @Sendable () async throws -> T
 ) async throws -> T {
+    let isTimedOut = POUnfairlyLocked(wrappedValue: false)
     let task = Task(operation: operation)
     let timeoutTask = Task {
         try await Task.sleep(nanoseconds: UInt64(timeout) * NSEC_PER_SEC)
+        isTimedOut.withLock { value in
+            value = true
+        }
+        guard !Task.isCancelled else {
+            return
+        }
         task.cancel()
     }
-    let value = try await task.value
-    timeoutTask.cancel()
-    return value
+    return try await withTaskCancellationHandler {
+        do {
+            let value = try await task.value
+            timeoutTask.cancel()
+            return value
+        } catch {
+            if task.isCancelled, isTimedOut.wrappedValue {
+                throw timeoutError()
+            }
+            timeoutTask.cancel()
+            throw error
+        }
+    } onCancel: {
+        task.cancel()
+        timeoutTask.cancel()
+    }
 }
 
 // MARK: - Retry
@@ -56,6 +51,7 @@ func retry<T: Sendable>(
     operation: @escaping @Sendable () async throws -> T,
     while condition: @escaping (Result<T, Error>) -> Bool,
     timeout: TimeInterval,
+    timeoutError: @autoclosure () -> Error,
     retryStrategy: RetryStrategy = .linear(maximumRetries: .max, interval: 3)
 ) async throws -> T {
     let operationBox = { @Sendable in
@@ -67,7 +63,7 @@ func retry<T: Sendable>(
             attempt: 0
         )
     }
-    return try await withTimeout(timeout, operation: operationBox)
+    return try await withTimeout(timeout, error: timeoutError(), perform: operationBox)
 }
 
 private func retry<T: Sendable>(

@@ -38,9 +38,8 @@ final class DefaultInvoicesService: POInvoicesService {
     }
 
     func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws {
-        // todo(andrii-vystoskyi): validate that timeout error is thrown when timeout is reached
         let captureTimeout = min(request.timeout ?? .greatestFiniteMagnitude, Constants.maximumCaptureTimeout)
-        let response = try await retry(
+        _ = try await retry(
             operation: { [repository] in
                 let request = NativeAlternativePaymentCaptureRequest(
                     invoiceId: request.invoiceId, source: request.gatewayConfigurationId
@@ -60,11 +59,9 @@ final class DefaultInvoicesService: POInvoicesService {
                     return false
                 }
             },
-            timeout: captureTimeout
+            timeout: captureTimeout,
+            timeoutError: POFailure(code: .timeout(.mobile))
         )
-        if response.nativeApm.state != .captured {
-            throw POFailure(code: .timeout(.mobile))
-        }
     }
 
     func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
