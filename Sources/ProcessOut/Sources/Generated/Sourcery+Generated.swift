@@ -1,201 +1,10 @@
 // Generated using Sourcery 2.1.2 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
-// swiftlint:disable all
-
-@available(iOS 13.0, *)
-extension POCardsService {
-
-    /// Tokenizes a card. You can use the card for a single payment by creating a card token with it. If you want
-    /// to use the card for multiple payments then you can use the card token to create a reusable customer token.
-    /// Note that once you have used the card token either for a payment or to create a customer token, the card
-    /// token becomes invalid and you cannot use it for any further actions.
-    @MainActor
-    public func tokenize(
-        request: POCardTokenizationRequest
-    ) async throws -> POCard {
-        return try await withUnsafeThrowingContinuation { continuation in
-            tokenize(request: request, completion: continuation.resume)
-        }
-    }
-
-    /// Updates card information.
-    @MainActor
-    public func updateCard(
-        request: POCardUpdateRequest
-    ) async throws -> POCard {
-        return try await withUnsafeThrowingContinuation { continuation in
-            updateCard(request: request, completion: continuation.resume)
-        }
-    }
-
-    /// Tokenize a card via ApplePay. You can use the card for a single payment by creating a card token with it.
-    @MainActor
-    public func tokenize(
-        request: POApplePayCardTokenizationRequest
-    ) async throws -> POCard {
-        return try await withUnsafeThrowingContinuation { continuation in
-            tokenize(request: request, completion: continuation.resume)
-        }
-    }
-}
-
-@available(iOS 13.0, *)
-extension POCustomerTokensService {
-
-    /// Assigns new source to existing customer token and optionaly verifies it.
-    @MainActor
-    public func assignCustomerToken(
-        request: POAssignCustomerTokenRequest, threeDSService: PO3DSService
-    ) async throws -> POCustomerToken {
-        return try await withUnsafeThrowingContinuation { continuation in
-            assignCustomerToken(request: request, threeDSService: threeDSService, completion: continuation.resume)
-        }
-    }
-
-    /// Creates customer token using given request.
-    @MainActor
-    @_spi(PO)
-    public func createCustomerToken(
-        request: POCreateCustomerTokenRequest
-    ) async throws -> POCustomerToken {
-        return try await withUnsafeThrowingContinuation { continuation in
-            createCustomerToken(request: request, completion: continuation.resume)
-        }
-    }
-}
-
-@available(iOS 13.0, *)
-extension POInvoicesService {
-
-    /// Requests information needed to continue existing payment or start new one.
-    @MainActor
-    public func nativeAlternativePaymentMethodTransactionDetails(
-        request: PONativeAlternativePaymentMethodTransactionDetailsRequest
-    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
-        return try await withUnsafeThrowingContinuation { continuation in
-            nativeAlternativePaymentMethodTransactionDetails(request: request, completion: continuation.resume)
-        }
-    }
-
-    /// Initiates native alternative payment with a given request.
-    /// 
-    /// Some Native APMs require further information to be collected back from the customer. You can inspect
-    /// `nativeApm` in response object to understand if additional data is required.
-    @MainActor
-    public func initiatePayment(
-        request: PONativeAlternativePaymentMethodRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse {
-        return try await withUnsafeThrowingContinuation { continuation in
-            initiatePayment(request: request, completion: continuation.resume)
-        }
-    }
-
-    /// Performs invoice authorization with given request.
-    @MainActor
-    public func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest, threeDSService: PO3DSService
-    ) async throws -> Void {
-        return try await withUnsafeThrowingContinuation { continuation in
-            authorizeInvoice(request: request, threeDSService: threeDSService, completion: continuation.resume)
-        }
-    }
-
-    /// Creates invoice with given parameters.
-    @MainActor
-    @_spi(PO)
-    public func createInvoice(
-        request: POInvoiceCreationRequest
-    ) async throws -> POInvoice {
-        return try await withUnsafeThrowingContinuation { continuation in
-            createInvoice(request: request, completion: continuation.resume)
-        }
-    }
-}
-
-@available(iOS 13.0, *)
-extension POService {
-}
-
 import Foundation
 import UIKit
 
 // swiftlint:disable all
-
-extension CardsRepository {
-
-    /// Allows to retrieve card issuer information based on iin.
-    /// 
-    /// - Parameters:
-    ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
-    @discardableResult
-    public func issuerInformation(
-        iin: String,
-        completion: @escaping (Result<POCardIssuerInformation, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await issuerInformation(iin: iin)
-        }
-    }
-
-    /// Tokenize a card.
-    @discardableResult
-    public func tokenize(
-        request: POCardTokenizationRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await tokenize(request: request)
-        }
-    }
-
-    /// Updates card information.
-    @discardableResult
-    public func updateCard(
-        request: POCardUpdateRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await updateCard(request: request)
-        }
-    }
-
-    /// Tokenize a card via ApplePay.
-    @discardableResult
-    public func tokenize(
-        request: ApplePayCardTokenizationRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await tokenize(request: request)
-        }
-    }
-}
-
-extension CustomerTokensRepository {
-
-    /// Assigns a token to a customer.
-    @discardableResult
-    public func assignCustomerToken(
-        request: POAssignCustomerTokenRequest,
-        completion: @escaping (Result<AssignCustomerTokenResponse, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await assignCustomerToken(request: request)
-        }
-    }
-
-    /// Create customer token.
-    @discardableResult
-    public func createCustomerToken(
-        request: POCreateCustomerTokenRequest,
-        completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await createCustomerToken(request: request)
-        }
-    }
-}
 
 extension ImagesRepository {
 
@@ -234,68 +43,84 @@ extension ImagesRepository {
     }
 }
 
-extension InvoicesRepository {
+extension POCardsService {
 
-    /// Requests information needed to continue existing payment or start new one.
-    @discardableResult
-    public func nativeAlternativePaymentMethodTransactionDetails(
-        request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await nativeAlternativePaymentMethodTransactionDetails(request: request)
-        }
-    }
-
-    /// Initiates native alternative payment with a given request.
+    /// Allows to retrieve card issuer information based on iin.
     /// 
-    /// Some Native APMs require further information to be collected back from the customer. You can inspect
-    /// `nativeApm` in response object to understand if additional data is required.
+    /// - Parameters:
+    ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
     @discardableResult
-    public func initiatePayment(
-        request: PONativeAlternativePaymentMethodRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, POFailure>) -> Void
+    public func issuerInformation(
+        iin: String,
+        completion: @escaping (Result<POCardIssuerInformation, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            try await initiatePayment(request: request)
+            try await issuerInformation(iin: iin)
         }
     }
 
-    /// Performs invoice authorization with given request.
+    /// Tokenizes a card. You can use the card for a single payment by creating a card token with it. If you want
+    /// to use the card for multiple payments then you can use the card token to create a reusable customer token.
+    /// Note that once you have used the card token either for a payment or to create a customer token, the card
+    /// token becomes invalid and you cannot use it for any further actions.
     @discardableResult
-    public func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest,
-        completion: @escaping (Result<ThreeDSCustomerAction?, POFailure>) -> Void
+    public func tokenize(
+        request: POCardTokenizationRequest,
+        completion: @escaping (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            try await authorizeInvoice(request: request)
+            try await tokenize(request: request)
         }
     }
 
-    /// Captures native alternative payment.
+    /// Updates card information.
     @discardableResult
-    public func captureNativeAlternativePayment(
-        request: NativeAlternativePaymentCaptureRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, POFailure>) -> Void
+    public func updateCard(
+        request: POCardUpdateRequest,
+        completion: @escaping (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            try await captureNativeAlternativePayment(request: request)
+            try await updateCard(request: request)
         }
     }
 
-    /// Creates invoice with given parameters.
+    /// Tokenize a card via ApplePay. You can use the card for a single payment by creating a card token with it.
     @discardableResult
-    public func createInvoice(
-        request: POInvoiceCreationRequest,
-        completion: @escaping (Result<POInvoice, POFailure>) -> Void
+    public func tokenize(
+        request: POApplePayCardTokenizationRequest,
+        completion: @escaping (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            try await createInvoice(request: request)
+            try await tokenize(request: request)
         }
     }
 }
 
-extension LogsRepository {
+extension POCustomerTokensService {
+
+    /// Assigns new source to existing customer token and optionaly verifies it.
+    @discardableResult
+    public func assignCustomerToken(
+        request: POAssignCustomerTokenRequest,
+        threeDSService: PO3DSService,
+        completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await assignCustomerToken(request: request, threeDSService: threeDSService)
+        }
+    }
+
+    /// Creates customer token using given request.
+    @_spi(PO)
+    @discardableResult
+    public func createCustomerToken(
+        request: POCreateCustomerTokenRequest,
+        completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await createCustomerToken(request: request)
+        }
+    }
 }
 
 extension POGatewayConfigurationsRepository {
@@ -333,5 +158,68 @@ extension POGatewayConfigurationsRepository {
     }
 }
 
-extension PORepository {
+extension POInvoicesService {
+
+    /// Requests information needed to continue existing payment or start new one.
+    @discardableResult
+    public func nativeAlternativePaymentMethodTransactionDetails(
+        request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
+        completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await nativeAlternativePaymentMethodTransactionDetails(request: request)
+        }
+    }
+
+    /// Initiates native alternative payment with a given request.
+    /// 
+    /// Some Native APMs require further information to be collected back from the customer. You can inspect
+    /// `nativeApm` in response object to understand if additional data is required.
+    @discardableResult
+    public func initiatePayment(
+        request: PONativeAlternativePaymentMethodRequest,
+        completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await initiatePayment(request: request)
+        }
+    }
+
+    /// Performs invoice authorization with given request.
+    @discardableResult
+    public func authorizeInvoice(
+        request: POInvoiceAuthorizationRequest,
+        threeDSService: PO3DSService,
+        completion: @escaping (Result<Void, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await authorizeInvoice(request: request, threeDSService: threeDSService)
+        }
+    }
+
+    /// Captures native alternative payament.
+    @discardableResult
+    public func captureNativeAlternativePayment(
+        request: PONativeAlternativePaymentCaptureRequest,
+        completion: @escaping (Result<Void, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await captureNativeAlternativePayment(request: request)
+        }
+    }
+
+    /// Creates invoice with given parameters.
+    @_spi(PO)
+    @discardableResult
+    public func createInvoice(
+        request: POInvoiceCreationRequest,
+        completion: @escaping (Result<POInvoice, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await createInvoice(request: request)
+        }
+    }
+}
+
+extension POService {
 }
