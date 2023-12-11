@@ -14,91 +14,67 @@ final class DefaultInvoicesService: POInvoicesService {
         self.threeDSService = threeDSService
     }
 
-    // MARK: - POCustomerTokensService
+    // MARK: - POInvoicesService
 
     func nativeAlternativePaymentMethodTransactionDetails(
-        request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, Failure>) -> Void
-    ) {
-        repository.nativeAlternativePaymentMethodTransactionDetails(request: request, completion: completion)
+        request: PONativeAlternativePaymentMethodTransactionDetailsRequest
+    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
+        try await repository.nativeAlternativePaymentMethodTransactionDetails(request: request)
     }
 
     func initiatePayment(
-        request: PONativeAlternativePaymentMethodRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, Failure>) -> Void
-    ) {
-        repository.initiatePayment(request: request, completion: completion)
+        request: PONativeAlternativePaymentMethodRequest
+    ) async throws -> PONativeAlternativePaymentMethodResponse {
+        try await repository.initiatePayment(request: request)
     }
 
-    func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest,
-        threeDSService threeDSServiceDelegate: PO3DSService,
-        completion: @escaping (Result<Void, Failure>) -> Void
-    ) {
-        repository.authorizeInvoice(request: request) { [threeDSService] result in
-            switch result {
-            case let .success(customerAction?):
-                threeDSService.handle(action: customerAction, delegate: threeDSServiceDelegate) { result in
-                    switch result {
-                    case let .success(newSource):
-                        self.authorizeInvoice(
-                            request: request.replacing(source: newSource),
-                            threeDSService: threeDSServiceDelegate,
-                            completion: completion
-                        )
-                    case let .failure(failure):
-                        completion(.failure(failure))
-                    }
-                }
-            case .success:
-                completion(.success(()))
-            case .failure(let failure):
-                completion(.failure(failure))
-            }
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DSService) async throws {
+        guard let customerAction = try await repository.authorizeInvoice(request: request) else {
+            return
         }
+        let newSource = try await self.threeDSService.handle(action: customerAction, delegate: threeDSService)
+        let newRequest = request.replacing(source: newSource)
+        try await authorizeInvoice(request: newRequest, threeDSService: threeDSService)
     }
 
-    func captureNativeAlternativePayment(
-        request: PONativeAlternativePaymentCaptureRequest, completion: @escaping (Result<Void, Failure>) -> Void
-    ) -> POCancellable {
-        let captureTimeout = min(request.timeout ?? Constants.maximumCaptureTimeout, Constants.maximumCaptureTimeout)
-        let request = NativeAlternativePaymentCaptureRequest(
-            invoiceId: request.invoiceId, source: request.gatewayConfigurationId
-        )
-        let pollingOperation = PollingOperation(
-            timeout: captureTimeout,
-            executeDelay: Constants.captureRetryDelay,
-            execute: { [repository] completion in
-                repository.captureNativeAlternativePayment(request: request, completion: completion)
+    func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws {
+        // todo(andrii-vystoskyi): validate that timeout error is thrown when timeout is reached
+        let captureTimeout = min(request.timeout ?? .greatestFiniteMagnitude, Constants.maximumCaptureTimeout)
+        let response = try await retry(
+            operation: { [repository] in
+                let request = NativeAlternativePaymentCaptureRequest(
+                    invoiceId: request.invoiceId, source: request.gatewayConfigurationId
+                )
+                return try await repository.captureNativeAlternativePayment(request: request)
             },
-            shouldContinue: { result in
+            while: { result in
                 switch result {
                 case let .success(response):
                     return response.nativeApm.state != .captured
-                case let .failure(failure):
+                case let .failure(failure as POFailure):
                     let retriableCodes: [POFailure.Code] = [
                         .networkUnreachable, .timeout(.mobile), .internal(.mobile)
                     ]
                     return retriableCodes.contains(failure.code)
+                case .failure:
+                    return false
                 }
             },
-            completion: { result in
-                completion(result.map { _ in () })
-            }
+            timeout: captureTimeout
         )
-        pollingOperation.start()
-        return pollingOperation
+        if response.nativeApm.state != .captured {
+            throw POFailure(code: .timeout(.mobile))
+        }
     }
 
-    func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void) {
-        repository.createInvoice(request: request, completion: completion)
+    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
+        try await repository.createInvoice(request: request)
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
         static let maximumCaptureTimeout: TimeInterval = 180
-        static let captureRetryDelay: TimeInterval = 3
     }
 
     // MARK: - Private Properties
