@@ -17,24 +17,19 @@ final class UrlSessionImagesRepository: ImagesRepository {
     // MARK: - ImagesRepository
 
     func images(at urls: [URL]) async -> [URL: UIImage] {
-        let images = await withTaskGroup(of: UIImage?.self, returning: [UIImage?].self) { [session] group in
+        await withTaskGroup(of: (URL, UIImage?).self, returning: [URL: UIImage].self) { [session] group in
             for url in urls {
                 group.addTask {
-                    try? await UIImage(data: session.data(from: url).0)
+                    let image = try? await UIImage(data: session.data(from: url).0)
+                    return (url, image)
                 }
             }
-            var images: [UIImage?] = []
-            for await image in group {
-                images.append(image)
+            var images: [URL: UIImage] = [:]
+            for await (url, image) in group {
+                images[url] = image
             }
             return images
         }
-        var groupedImages: [URL: UIImage] = [:]
-        for (offset, image) in images.enumerated() {
-            let url = urls[offset]
-            groupedImages[url] = image
-        }
-        return groupedImages
     }
 
     // MARK: - Private Properties
