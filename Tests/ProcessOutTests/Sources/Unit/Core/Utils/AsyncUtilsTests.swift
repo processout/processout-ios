@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 11.12.2023.
 //
 
-@testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 import XCTest
 
 final class AsyncUtilsTests: XCTestCase {
@@ -101,9 +101,192 @@ final class AsyncUtilsTests: XCTestCase {
         }
     }
 
+    // MARK: - Retry
+
+    func test_retry_whenTimeoutIsZero_executesOperationOnce() async throws {
+        // Given
+        @POUnfairlyLocked var isOperationExecuted = false
+
+        // When
+        try await retry(
+            operation: {
+                $isOperationExecuted.withLock { $0 = true }
+            },
+            while: { _ in
+                false
+            },
+            timeout: 0,
+            timeoutError: Failure.timeout
+        )
+
+        // Then
+        XCTAssertTrue(isOperationExecuted)
+    }
+
+    func test_retry_whenTimesOut_throwsTimeoutError() async {
+        // When
+        let error = await assertThrowsError(
+            try await retry(
+                operation: {
+                    try await Task.sleep(for: .seconds(3))
+                },
+                while: { _ in false },
+                timeout: 1,
+                timeoutError: Failure.timeout
+            )
+        )
+
+        // Then
+        if let failure = error as? Failure, failure == .timeout {
+            return
+        }
+        XCTFail("Expected timeout failure.")
+    }
+
+    func test_retry_checksRetryCondition_whenRetryStrategyIsSet() async throws {
+        // Given
+        @POUnfairlyLocked var isConditionChecked = false
+
+        // When
+        _ = try await retry(
+            operation: {
+                ""
+            },
+            while: { _ in
+                $isConditionChecked.withLock { $0 = true }
+                return false
+            },
+            timeout: 10,
+            timeoutError: Failure.timeout,
+            retryStrategy: .linear(maximumRetries: 1, interval: 0)
+        )
+
+        // Then
+        XCTAssertTrue(isConditionChecked)
+    }
+
+    func test_retry_retriesOperation_whenRetryStrategyIsSet() async throws {
+        // Given
+        @POUnfairlyLocked var operationStartsCount = 0
+
+        // When
+        _ = try await retry(
+            operation: {
+                $operationStartsCount.withLock { $0 += 1 }
+            },
+            while: { _ in
+                true
+            },
+            timeout: 10,
+            timeoutError: Failure.timeout,
+            retryStrategy: .linear(maximumRetries: 1, interval: 0)
+        )
+
+        // Then
+        XCTAssertEqual(operationStartsCount, 2)
+    }
+
+    // swiftlint:disable:next line_length
+    func test_retry_whenCancelledDuringRetryDelayAndOperationIsCancellable_completesWithCancellationError() async throws {
+        // Given
+        let task = Task {
+            try await retry(
+                operation: {
+                    try Task.checkCancellation()
+                    return ""
+                },
+                while: { _ in
+                    true
+                },
+                timeout: 10,
+                timeoutError: Failure.timeout,
+                retryStrategy: .linear(maximumRetries: 1, interval: 5)
+            )
+        }
+
+        // When
+        try await Task.sleep(for: .seconds(1))
+        task.cancel()
+
+        // Then
+        if case .failure(let failure) = await task.result, failure is CancellationError {
+            return
+        }
+        XCTFail("Expected cancellation error")
+    }
+
+    func test_retry_whenRetryCountIsExceeded_completesWithRecentResult() async throws {
+        // Given
+        @POUnfairlyLocked var recentOperationValue = ""
+
+        // When
+        let value = try await retry(
+            operation: {
+                $recentOperationValue.withLock { $0 = UUID().uuidString }
+                return recentOperationValue
+            },
+            while: { _ in
+                true
+            },
+            timeout: 10,
+            timeoutError: Failure.timeout,
+            retryStrategy: .linear(maximumRetries: 1, interval: 0)
+        )
+
+        // Then
+        XCTAssertEqual(recentOperationValue, value)
+    }
+
+    func test_retry_whenRetryConditionResolvesFalse_completesWithRecentResult() async throws {
+        // Given
+        @POUnfairlyLocked var recentOperationValue = ""
+
+        // When
+        let value = try await retry(
+            operation: {
+                $recentOperationValue.withLock { $0 = UUID().uuidString }
+                return recentOperationValue
+            },
+            while: { _ in
+                false
+            },
+            timeout: 10,
+            timeoutError: Failure.timeout,
+            retryStrategy: .linear(maximumRetries: 1, interval: 0)
+        )
+
+        // Then
+        XCTAssertEqual(recentOperationValue, value)
+    }
+
+    func test_retry_whenCancelledImmediately_completesWithCancellationError() async throws {
+        // Given
+        let task = Task {
+            try await retry(
+                operation: {
+                    try await Task.sleep(for: .seconds(1))
+                },
+                while: { _ in
+                    true
+                },
+                timeout: 10,
+                timeoutError: Failure.timeout
+            )
+        }
+
+        // When
+        task.cancel()
+
+        // Then
+        if case .failure(let failure) = await task.result, failure is CancellationError {
+            return
+        }
+        XCTFail("Expected cancellation error")
+    }
+
     // MARK: - Private Nested Types
 
     private enum Failure: Error {
-        case timeout, generic
+        case timeout, generic, cancel
     }
 }
