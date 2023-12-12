@@ -21,7 +21,6 @@ final class HttpConnectorRetryDecorator: HttpConnector {
             },
             while: { result in
                 guard case .failure(let failure as Failure) = result else {
-                    assertionFailure("Unexpected result type \(result).")
                     return false
                 }
                 switch failure {
@@ -34,7 +33,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
                     return false
                 }
             },
-            timeout: .greatestFiniteMagnitude,
+            timeout: 3600, // 1 hour
             timeoutError: HttpConnectorFailure.timeout,
             retryStrategy: retryStrategy
         )
