@@ -60,7 +60,8 @@ final class DefaultInvoicesService: POInvoicesService {
                 }
             },
             timeout: captureTimeout,
-            timeoutError: POFailure(code: .timeout(.mobile))
+            timeoutError: POFailure(code: .timeout(.mobile)),
+            retryStrategy: .linear(maximumRetries: .max, interval: 3)
         )
     }
 

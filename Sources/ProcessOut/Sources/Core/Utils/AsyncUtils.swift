@@ -15,11 +15,11 @@ func withTimeout<T: Sendable>(
     error timeoutError: @autoclosure () -> Error,
     perform operation: @escaping @Sendable () async throws -> T
 ) async throws -> T {
-    let isTimedOut = POUnfairlyLocked(wrappedValue: false)
+    @POUnfairlyLocked var isTimedOut = false
     let task = Task(operation: operation)
     let timeoutTask = Task {
         try await Task.sleep(nanoseconds: UInt64(timeout) * NSEC_PER_SEC)
-        isTimedOut.withLock { value in
+        $isTimedOut.withLock { value in
             value = true
         }
         guard !Task.isCancelled else {
@@ -33,7 +33,7 @@ func withTimeout<T: Sendable>(
             timeoutTask.cancel()
             return value
         } catch {
-            if task.isCancelled, isTimedOut.wrappedValue {
+            if task.isCancelled, isTimedOut {
                 throw timeoutError()
             }
             timeoutTask.cancel()
@@ -52,12 +52,12 @@ func retry<T: Sendable>(
     while condition: @escaping (Result<T, Error>) -> Bool,
     timeout: TimeInterval,
     timeoutError: @autoclosure () -> Error,
-    retryStrategy: RetryStrategy = .linear(maximumRetries: .max, interval: 3)
+    retryStrategy: RetryStrategy? = nil
 ) async throws -> T {
     let operationBox = { @Sendable in
         try await retry(
             operation: operation,
-            after: await Task(operation: operation).result,
+            after: await Result(catching: operation),
             while: condition,
             retryStrategy: retryStrategy,
             attempt: 0
@@ -70,23 +70,37 @@ private func retry<T: Sendable>(
     operation: @escaping @Sendable () async throws -> T,
     after result: Result<T, Error>,
     while condition: @escaping (Result<T, Error>) -> Bool,
-    retryStrategy: RetryStrategy,
+    retryStrategy: RetryStrategy?,
     attempt: Int
 ) async throws -> T {
-    guard condition(result), attempt < retryStrategy.maximumRetries, !Task.isCancelled else {
+    guard let retryStrategy, attempt < retryStrategy.maximumRetries, !Task.isCancelled, condition(result) else {
         return try result.get()
     }
     do {
         let delay = retryStrategy.interval(for: attempt)
         try await Task.sleep(nanoseconds: UInt64(delay) * NSEC_PER_SEC)
     } catch {
-        return try result.get()
+        // Ignored
     }
     return try await retry(
         operation: operation,
-        after: await Task(operation: operation).result,
+        after: await Result(catching: operation),
         while: condition,
         retryStrategy: retryStrategy,
         attempt: attempt + 1
     )
+}
+
+extension Result where Failure == Error {
+
+    /// Creates a new result by evaluating a throwing closure, capturing the
+    /// returned value as a success, or any thrown error as a failure.
+    fileprivate init(catching body: () async throws -> Success) async { // swiftlint:disable:this strict_fileprivate
+        do {
+            let success = try await body()
+            self = .success(success)
+        } catch {
+            self = .failure(error)
+        }
+    }
 }
