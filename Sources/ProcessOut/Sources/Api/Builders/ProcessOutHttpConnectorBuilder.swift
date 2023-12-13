@@ -51,7 +51,9 @@ final class ProcessOutHttpConnectorBuilder {
         if let retryStrategy {
             connector = HttpConnectorRetryDecorator(connector: connector, retryStrategy: retryStrategy)
         }
-        return connector
+        return HttpConnectorErrorDecorator(
+            connector: connector, failureMapper: DefaultHttpConnectorFailureMapper(logger: logger)
+        )
     }
 
     // MARK: - Private Nested Types

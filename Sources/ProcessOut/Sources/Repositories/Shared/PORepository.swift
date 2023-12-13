@@ -9,7 +9,7 @@
 public typealias PORepositoryType = PORepository
 
 /// Common protocol that all repositories conform to.
-public protocol PORepository: POAutoAsync {
+public protocol PORepository {
 
     /// Repository's failure type.
     typealias Failure = POFailure
