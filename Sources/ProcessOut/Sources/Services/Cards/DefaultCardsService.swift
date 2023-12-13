@@ -19,30 +19,21 @@ final class DefaultCardsService: POCardsService {
 
     // MARK: - POCardsService
 
-    func issuerInformation(
-        iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void
-    ) -> POCancellable {
-        repository.issuerInformation(iin: iin, completion: completion)
+    func issuerInformation(iin: String) async throws -> POCardIssuerInformation {
+        try await repository.issuerInformation(iin: iin)
     }
 
-    func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
-        repository.tokenize(request: request, completion: completion)
+    func tokenize(request: POCardTokenizationRequest) async throws -> POCard {
+        try await repository.tokenize(request: request)
     }
 
-    func updateCard(request: POCardUpdateRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
-        repository.updateCard(request: request, completion: completion)
+    func updateCard(request: POCardUpdateRequest) async throws -> POCard {
+        try await repository.updateCard(request: request)
     }
 
-    func tokenize(request: POApplePayCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
-        do {
-            let request = try applePayCardTokenizationRequestMapper.tokenizationRequest(from: request)
-            repository.tokenize(request: request, completion: completion)
-        } catch let failure as POFailure {
-            completion(.failure(failure))
-        } catch {
-            let failure = POFailure(message: nil, code: .internal(.mobile), underlyingError: error)
-            completion(.failure(failure))
-        }
+    func tokenize(request: POApplePayCardTokenizationRequest) async throws -> POCard {
+        let request = try applePayCardTokenizationRequestMapper.tokenizationRequest(from: request)
+        return try await repository.tokenize(request: request)
     }
 
     // MARK: - Private Properties

@@ -9,54 +9,42 @@ import Foundation
 
 final class HttpCardsRepository: CardsRepository {
 
-    init(connector: HttpConnector, failureMapper: HttpConnectorFailureMapper) {
+    init(connector: HttpConnector) {
         self.connector = connector
-        self.failureMapper = failureMapper
     }
 
     // MARK: - CardsRepository
 
-    func issuerInformation(
-        iin: String, completion: @escaping (Result<POCardIssuerInformation, Failure>) -> Void
-    ) -> POCancellable {
+    func issuerInformation(iin: String) async throws -> POCardIssuerInformation {
         struct Response: Decodable {
             let cardInformation: POCardIssuerInformation
         }
         let httpRequest = HttpConnectorRequest<Response>.get(path: "/iins/" + iin)
-        return connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.cardInformation).mapError(failureMapper.failure))
-        }
+        return try await connector.execute(request: httpRequest).cardInformation
     }
 
-    func tokenize(request: POCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
+    func tokenize(request: POCardTokenizationRequest) async throws -> POCard {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
             path: "/cards", body: request, includesDeviceMetadata: true
         )
-        connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.card).mapError(failureMapper.failure))
-        }
+        return try await connector.execute(request: httpRequest).card
     }
 
-    func updateCard(request: POCardUpdateRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
+    func updateCard(request: POCardUpdateRequest) async throws -> POCard {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.put(
             path: "/cards/" + request.cardId, body: request, includesDeviceMetadata: true
         )
-        connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.card).mapError(failureMapper.failure))
-        }
+        return try await connector.execute(request: httpRequest).card
     }
 
-    func tokenize(request: ApplePayCardTokenizationRequest, completion: @escaping (Result<POCard, Failure>) -> Void) {
+    func tokenize(request: ApplePayCardTokenizationRequest) async throws -> POCard {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
             path: "/cards", body: request, includesDeviceMetadata: true
         )
-        connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.card).mapError(failureMapper.failure))
-        }
+        return try await connector.execute(request: httpRequest).card
     }
 
     // MARK: - Private Properties
 
     private let connector: HttpConnector
-    private let failureMapper: HttpConnectorFailureMapper
 }

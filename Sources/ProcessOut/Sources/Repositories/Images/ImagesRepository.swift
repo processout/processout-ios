@@ -8,28 +8,24 @@
 import Foundation
 import UIKit
 
-protocol ImagesRepository {
+protocol ImagesRepository: POAutoCompletion {
 
     /// Attempts to download images at given URLs.
-    func images(at urls: [URL], completion: @escaping ([URL: UIImage]) -> Void)
+    func images(at urls: [URL]) async -> [URL: UIImage]
 }
 
 extension ImagesRepository {
 
     /// Downloads image at given URL and calls completion.
-    func image(at url: URL?, completion: @escaping (UIImage?) -> Void) {
+    func image(at url: URL?) async -> UIImage? {
         let urls = [url].compactMap { $0 }
-        images(at: urls) { images in
-            completion(images.values.first)
-        }
+        return await images(at: urls).values.first
     }
 
     /// Downloads two images at given URLs and calls completion.
-    func images(at url1: URL?, _ url2: URL?, completion: @escaping (UIImage?, UIImage?) -> Void) {
+    func images(at url1: URL?, _ url2: URL?) async -> (UIImage?, UIImage?) {
         let urls = [url1, url2].compactMap { $0 }
-        images(at: urls) { images in
-            let images = images as [URL?: UIImage]
-            completion(images[url1], images[url2])
-        }
+        let images = await images(at: urls) as [URL?: UIImage]
+        return (images[url1], images[url2])
     }
 }

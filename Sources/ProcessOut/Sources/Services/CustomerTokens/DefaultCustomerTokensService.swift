@@ -15,43 +15,22 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
     // MARK: - POCustomerTokensService
 
     func assignCustomerToken(
-        request: POAssignCustomerTokenRequest,
-        threeDSService threeDSServiceDelegate: PO3DSService,
-        completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
-    ) {
-        repository.assignCustomerToken(request: request) { [threeDSService] result in
-            switch result {
-            case let .success(response):
-                if let customerAction = response.customerAction {
-                    threeDSService.handle(action: customerAction, delegate: threeDSServiceDelegate) { result in
-                        switch result {
-                        case let .success(newSource):
-                            self.assignCustomerToken(
-                                request: request.replacing(source: newSource),
-                                threeDSService: threeDSServiceDelegate,
-                                completion: completion
-                            )
-                        case let .failure(failure):
-                            completion(.failure(failure))
-                        }
-                    }
-                } else if let token = response.token {
-                    completion(.success(token))
-                } else {
-                    let failure = POFailure(code: .internal(.mobile))
-                    completion(.failure(failure))
-                }
-            case .failure(let failure):
-                completion(.failure(failure))
-            }
+        request: POAssignCustomerTokenRequest, threeDSService: PO3DSService
+    ) async throws -> POCustomerToken {
+        let response = try await repository.assignCustomerToken(request: request)
+        if let customerAction = response.customerAction {
+            let newSource = try await self.threeDSService.handle(action: customerAction, delegate: threeDSService)
+            let newRequest = request.replacing(source: newSource)
+            return try await assignCustomerToken(request: newRequest, threeDSService: threeDSService)
         }
+        if let token = response.token {
+            return token
+        }
+        throw POFailure(code: .internal(.mobile)) // Either token or action should be set
     }
 
-    func createCustomerToken(
-        request: POCreateCustomerTokenRequest,
-        completion: @escaping (Result<POCustomerToken, Failure>) -> Void
-    ) {
-        repository.createCustomerToken(request: request, completion: completion)
+    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
+        try await repository.createCustomerToken(request: request)
     }
 
     // MARK: - Private Properties

@@ -7,6 +7,6 @@
 
 protocol HttpConnectorFailureMapper {
 
-    /// Creates repository failure with given ``HttpConnectorFailure`` instance.
+    /// Creates `POFailure` with given ``HttpConnectorFailure`` instance.
     func failure(from failure: HttpConnectorFailure) -> POFailure
 }

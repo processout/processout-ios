@@ -6,7 +6,7 @@
 //
 
 /// Common protocol that all services conform to.
-public protocol POService: POAutoAsync {
+public protocol POService: POAutoCompletion {
 
     /// Service's failure type.
     typealias Failure = POFailure

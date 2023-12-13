@@ -27,21 +27,19 @@ final class DefaultThreeDSService: ThreeDSService {
 
     // MARK: - ThreeDSService
 
-    func handle(action: ThreeDSCustomerAction, delegate: Delegate, completion: @escaping Completion) {
-        let completionTrampoline: Completion = { result in
-            DispatchQueue.main.async {
-                completion(result)
+    @MainActor
+    func handle(action: ThreeDSCustomerAction, delegate: Delegate) async throws -> String {
+        try await withUnsafeThrowingContinuation { continuation in
+            switch action.type {
+            case .fingerprintMobile:
+                fingerprint(encodedConfiguration: action.value, delegate: delegate, completion: continuation.resume)
+            case .challengeMobile:
+                challenge(encodedChallenge: action.value, delegate: delegate, completion: continuation.resume)
+            case .fingerprint:
+                fingerprint(url: action.value, delegate: delegate, completion: continuation.resume)
+            case .redirect, .url:
+                redirect(url: action.value, delegate: delegate, completion: continuation.resume)
             }
-        }
-        switch action.type {
-        case .fingerprintMobile:
-            fingerprint(encodedConfiguration: action.value, delegate: delegate, completion: completionTrampoline)
-        case .challengeMobile:
-            challenge(encodedChallenge: action.value, delegate: delegate, completion: completionTrampoline)
-        case .fingerprint:
-            fingerprint(url: action.value, delegate: delegate, completion: completionTrampoline)
-        case .redirect, .url:
-            redirect(url: action.value, delegate: delegate, completion: completionTrampoline)
         }
     }
 

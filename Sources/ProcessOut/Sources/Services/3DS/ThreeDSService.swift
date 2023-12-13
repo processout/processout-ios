@@ -13,8 +13,5 @@ protocol ThreeDSService {
     /// - Parameters:
     ///   - action: customer action to handle.
     ///   - delegate: delegate that would perform actual action handling.
-    ///   - completion: closure to invoke with a result of customer action handling.
-    func handle(
-        action: ThreeDSCustomerAction, delegate: Delegate, completion: @escaping (Result<String, POFailure>) -> Void
-    )
+    func handle(action: ThreeDSCustomerAction, delegate: Delegate) async throws -> String
 }

@@ -23,31 +23,29 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
     // MARK: - Fingerprint Mobile
 
-    func test_handle_whenFingerprintMobileValueIsNotBase64EncodedConfiguration_fails() {
+    func test_handle_whenFingerprintMobileValueIsNotBase64EncodedConfiguration_fails() async {
         // Given
         let values = ["%", "{}", "e10="]
-        let expectation = XCTestExpectation()
-        expectation.expectedFulfillmentCount = values.count
 
         for value in values {
             let customerAction = ThreeDSCustomerAction(type: .fingerprintMobile, value: value)
 
             // When
-            sut.handle(action: customerAction, delegate: delegate) { result in
-                // Then
-                switch result {
-                case let .failure(failure):
-                    XCTAssertEqual(failure.code, .internal(.mobile))
-                default:
-                    XCTFail("Unexpected result")
-                }
-                expectation.fulfill()
+            let handlingError = await assertThrowsError(
+                try await sut.handle(action: customerAction, delegate: delegate)
+            )
+
+            // Then
+            switch handlingError {
+            case let failure as POFailure:
+                XCTAssertEqual(failure.code, .internal(.mobile))
+            default:
+                XCTFail("Unexpected result")
             }
         }
-        wait(for: [expectation], timeout: 1)
     }
 
-    func test_handle_whenFingerprintMobileValueIsValid_callsDelegateAuthenticationRequest() {
+    func test_handle_whenFingerprintMobileValueIsValid_callsDelegateAuthenticationRequest() async {
         // Given
         let customerActions = [
             defaultFingerprintMobileCustomerAction(),
@@ -61,73 +59,72 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             scheme: .unknown("5"),
             messageVersion: "6"
         )
-        let expectation = XCTestExpectation()
-        expectation.expectedFulfillmentCount = customerActions.count
+        var delegateCallsCount = 0
 
         for customerAction in customerActions {
-            delegate.authenticationRequestFromClosure = { configuration, _ in
+            delegate.authenticationRequestFromClosure = { configuration, completion in
                 // Then
                 XCTAssertEqual(configuration, expectedConfiguration)
-                expectation.fulfill()
+                delegateCallsCount += 1
+                completion(.failure(.init(code: .generic(.mobile))))
             }
 
             // When
-            sut.handle(action: customerAction, delegate: delegate) { _ in }
+            _ = try? await sut.handle(action: customerAction, delegate: delegate)
         }
-        wait(for: [expectation], timeout: 1)
+        XCTAssertEqual(delegateCallsCount, customerActions.count)
     }
 
-    func test_handle_whenDelegateAuthenticationRequestFails_propagatesFailure() {
+    func test_handle_whenDelegateAuthenticationRequestFails_propagatesFailure() async {
         // Given
         let error = POFailure(code: .unknown(rawValue: "test-error"))
         delegate.authenticationRequestFromClosure = { _, completion in
             completion(.failure(error))
         }
         let customerAction = defaultFingerprintMobileCustomerAction()
-        let expectation = XCTestExpectation()
 
         // When
-        sut.handle(action: customerAction, delegate: delegate) { result in
-            // Then
-            switch result {
-            case .failure(let failure):
-                XCTAssertEqual(failure.code, error.code)
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
+        let handlingError = await assertThrowsError(
+            try await sut.handle(action: customerAction, delegate: delegate)
+        )
+
+        // Then
+        switch handlingError {
+        case let failure as POFailure:
+            XCTAssertEqual(failure.code, error.code)
+        default:
+            XCTFail("Unexpected result")
         }
-        wait(for: [expectation], timeout: 1)
     }
 
-    func test_handle_whenAuthenticationRequestPublicKeyIsEmpty_fails() {
+    func test_handle_whenAuthenticationRequestPublicKeyIsEmpty_fails() async {
         // Given
-        let expectation = XCTestExpectation()
-        expectation.expectedFulfillmentCount = 2
+        var isDelegateCalled = false
         delegate.authenticationRequestFromClosure = { _, completion in
             let invalidAuthenticationRequest = PO3DS2AuthenticationRequest(
                 deviceData: "", sdkAppId: "", sdkEphemeralPublicKey: "", sdkReferenceNumber: "", sdkTransactionId: ""
             )
-            expectation.fulfill()
+            isDelegateCalled = true
             completion(.success(invalidAuthenticationRequest))
         }
         let customerAction = defaultFingerprintMobileCustomerAction()
 
         // When
-        sut.handle(action: customerAction, delegate: delegate) { result in
-            // Then
-            switch result {
-            case .failure(let failure):
-                XCTAssertEqual(failure.code, .internal(.mobile))
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
+        let error = await assertThrowsError(
+            try await sut.handle(action: customerAction, delegate: delegate)
+        )
+
+        // Then
+        switch error {
+        case let failure as POFailure:
+            XCTAssertEqual(failure.code, .internal(.mobile))
+        default:
+            XCTFail("Unexpected result")
         }
-        wait(for: [expectation], timeout: 1)
+        XCTAssertTrue(isDelegateCalled)
     }
 
-    func test_handle_whenAuthenticationRequestIsValid_succeeds() {
+    func test_handle_whenAuthenticationRequestIsValid_succeeds() async throws {
         // Given
         let customerAction = defaultFingerprintMobileCustomerAction()
         delegate.authenticationRequestFromClosure = { _, completion in
@@ -140,69 +137,40 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             )
             completion(.success(authenticationRequest))
         }
-        let expectation = XCTestExpectation()
 
         // When
-        sut.handle(action: customerAction, delegate: delegate) { result in
-            // Then
-            switch result {
-            case .success(let token):
-                let expectedToken = """
-                    gway_req_eyJib2R5Ijoie1wiZGV2aWNlQ2hhbm5lbFwiOlwiYXBwXCIsXCJzZGtBcHBJRFwiOlwiMlwiLFwic2RrR\
-                    W5jRGF0YVwiOlwiMVwiLFwic2RrRXBoZW1QdWJLZXlcIjp7XCJrdHlcIjpcIkVDXCJ9LFwic2RrUmVmZXJlbmNlTnV\
-                    tYmVyXCI6XCIzXCIsXCJzZGtUcmFuc0lEXCI6XCI0XCJ9In0=
-                    """
-                XCTAssertEqual(token, expectedToken)
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
-    }
+        let token = try await sut.handle(action: customerAction, delegate: delegate)
 
-    func test_handle_whenDelegateCompletesOnBackground_completesOnMainThread() {
-        // Given
-        let customerAction = defaultFingerprintMobileCustomerAction()
-        delegate.authenticationRequestFromClosure = { _, completion in
-            let failure = POFailure(code: .cancelled)
-            DispatchQueue.global().async {
-                completion(.failure(failure))
-            }
-        }
-        let expectation = XCTestExpectation()
-
-        // When
-        sut.handle(action: customerAction, delegate: delegate) { _ in
-            // Then
-            XCTAssertTrue(Thread.isMainThread)
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
+        // Then
+        let expectedToken = """
+            gway_req_eyJib2R5Ijoie1wiZGV2aWNlQ2hhbm5lbFwiOlwiYXBwXCIsXCJzZGtBcHBJRFwiOlwiMlwiLFwic2RrR\
+            W5jRGF0YVwiOlwiMVwiLFwic2RrRXBoZW1QdWJLZXlcIjp7XCJrdHlcIjpcIkVDXCJ9LFwic2RrUmVmZXJlbmNlTnV\
+            tYmVyXCI6XCIzXCIsXCJzZGtUcmFuc0lEXCI6XCI0XCJ9In0=
+            """
+        XCTAssertEqual(token, expectedToken)
     }
 
     // MARK: - Challenge Mobile
 
-    func test_handle_whenChallengeMobileValueIsNotValid_fails() {
+    func test_handle_whenChallengeMobileValueIsNotValid_fails() async {
         // Given
-        let expectation = XCTestExpectation()
         let customerAction = ThreeDSCustomerAction(type: .challengeMobile, value: "")
 
         // When
-        sut.handle(action: customerAction, delegate: delegate) { result in
-            // Then
-            switch result {
-            case let .failure(failure):
-                XCTAssertEqual(failure.code, .internal(.mobile))
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
+        let error = await assertThrowsError(
+            try await sut.handle(action: customerAction, delegate: delegate)
+        )
+
+        // Then
+        switch error {
+        case let failure as POFailure:
+            XCTAssertEqual(failure.code, .internal(.mobile))
+        default:
+            XCTFail("Unexpected result")
         }
-        wait(for: [expectation], timeout: 1)
     }
 
-    func test_handle_whenChallengeMobileValueIsValid_callsDelegateDoChallenge() {
+    func test_handle_whenChallengeMobileValueIsValid_callsDelegateDoChallenge() async throws {
         // Given
         let expectedChallenge = PO3DS2Challenge(
             acsTransactionId: "1",
@@ -210,280 +178,238 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             acsSignedContent: "3",
             threeDSServerTransactionId: "4"
         )
-        let expectation = XCTestExpectation()
-        delegate.handleChallengeFromClosure = { challenge, _ in
+        var isDelegateCalled = false
+        delegate.handleChallengeFromClosure = { challenge, completion in
             // Then
             XCTAssertEqual(challenge, expectedChallenge)
-            expectation.fulfill()
+            isDelegateCalled = true
+            completion(.success(true))
         }
 
         // When
-        sut.handle(action: defaultChallengeMobileCustomerAction, delegate: delegate) { _ in }
-        wait(for: [expectation], timeout: 1)
+        _ = try await sut.handle(action: defaultChallengeMobileCustomerAction, delegate: delegate)
+        XCTAssertTrue(isDelegateCalled)
     }
 
-    func test_handle_whenDelegateDoChallengeFails_propagatesFailure() {
+    func test_handle_whenDelegateDoChallengeFails_propagatesFailure() async {
         // Given
         let error = POFailure(code: .unknown(rawValue: "test-error"))
         delegate.handleChallengeFromClosure = { _, completion in
             completion(.failure(error))
         }
-        let expectation = XCTestExpectation()
 
         // When
-        sut.handle(action: defaultChallengeMobileCustomerAction, delegate: delegate) { result in
-            // Then
-            switch result {
-            case .failure(let failure):
-                XCTAssertEqual(failure.code, error.code)
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
+        let handlingError = await assertThrowsError(
+            try await sut.handle(action: defaultChallengeMobileCustomerAction, delegate: delegate)
+        )
+
+        // Then
+        switch handlingError {
+        case let failure as POFailure:
+            XCTAssertEqual(failure.code, error.code)
+        default:
+            XCTFail("Unexpected result")
         }
-        wait(for: [expectation], timeout: 1)
     }
 
-    func test_handle_whenDelegateDoChallengeCompletesWithTrue_succeeds() {
+    func test_handle_whenDelegateDoChallengeCompletesWithTrue_succeeds() async throws {
         // Given
         delegate.handleChallengeFromClosure = { _, completion in
             completion(.success(true))
         }
-        let expectation = XCTestExpectation()
 
         // When
-        sut.handle(action: defaultChallengeMobileCustomerAction, delegate: delegate) { result in
-            // Then
-            switch result {
-            case .success(let token):
-                XCTAssertEqual(token, "gway_req_eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiWVwiIH0ifQ==")
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
+        let token = try await sut.handle(action: defaultChallengeMobileCustomerAction, delegate: delegate)
+
+        // Then
+        XCTAssertEqual(token, "gway_req_eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiWVwiIH0ifQ==")
     }
 
-    func test_handle_whenDelegateDoChallengeCompletesWithFalse_succeeds() {
+    func test_handle_whenDelegateDoChallengeCompletesWithFalse_succeeds() async throws {
         // Given
         delegate.handleChallengeFromClosure = { _, completion in
             completion(.success(false))
         }
-        let expectation = XCTestExpectation()
 
         // When
-        sut.handle(action: defaultChallengeMobileCustomerAction, delegate: delegate) { result in
-            // Then
-            switch result {
-            case .success(let token):
-                XCTAssertEqual(token, "gway_req_eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiTlwiIH0ifQ==")
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
+        let token = try await sut.handle(action: defaultChallengeMobileCustomerAction, delegate: delegate)
+
+        // Then
+        XCTAssertEqual(token, "gway_req_eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiTlwiIH0ifQ==")
     }
 
     // MARK: - Redirect
 
-    func test_handle_whenActionTypeIsUrlOrFingerprint_callsDelegateRedirect() {
+    func test_handle_whenActionTypeIsUrlOrFingerprint_callsDelegateRedirect() async throws {
         // Given
-        let expectation = XCTestExpectation()
-        delegate.handleRedirectFromClosure = { _, _ in
+        var delegateCallsCount = 0
+        delegate.handleRedirectFromClosure = { _, completion in
             // Then
-            expectation.fulfill()
+            delegateCallsCount += 1
+            completion(.success(""))
         }
         let actionTypes: [ThreeDSCustomerAction.ActionType] = [.url, .fingerprint]
-        expectation.expectedFulfillmentCount = actionTypes.count
 
         for actionType in actionTypes {
             let customerAction = ThreeDSCustomerAction(type: actionType, value: "example.com")
 
             // When
-            sut.handle(action: customerAction, delegate: delegate) { _ in }
+            _ = try await sut.handle(action: customerAction, delegate: delegate)
         }
-        wait(for: [expectation], timeout: 1)
+        XCTAssertEqual(delegateCallsCount, actionTypes.count)
     }
 
-    func test_handle_whenRedirectOrFingerprintValueIsNotValidUrl_fails() {
+    func test_handle_whenRedirectOrFingerprintValueIsNotValidUrl_fails() async {
         // Given
-        let expectation = XCTestExpectation()
         let actionTypes: [ThreeDSCustomerAction.ActionType] = [.redirect, .url, .fingerprint]
-        expectation.expectedFulfillmentCount = actionTypes.count
 
         for actionType in actionTypes {
             let action = ThreeDSCustomerAction(type: actionType, value: "http://:-1")
 
             // When
-            sut.handle(action: action, delegate: delegate) { result in
-                // Then
-                switch result {
-                case let .failure(failure):
-                    XCTAssertEqual(failure.code, .internal(.mobile))
-                default:
-                    XCTFail("Unexpected result")
-                }
-                expectation.fulfill()
+            let error = await assertThrowsError(
+                try await sut.handle(action: action, delegate: delegate)
+            )
+
+            // Then
+            switch error {
+            case let failure as POFailure:
+                XCTAssertEqual(failure.code, .internal(.mobile))
+            default:
+                XCTFail("Unexpected result")
             }
         }
-        wait(for: [expectation], timeout: 1)
     }
 
-    func test_handle_whenRedirectValueIsValidUrl_callsDelegateRedirect() {
+    func test_handle_whenRedirectValueIsValidUrl_callsDelegateRedirect() async throws {
         // Given
         let expectedRedirect = PO3DSRedirect(
             url: URL(string: "example.com")!, timeout: nil
         )
-        let expectation = XCTestExpectation()
-        delegate.handleRedirectFromClosure = { redirect, _ in
+        var isDelegateCalled = false
+        delegate.handleRedirectFromClosure = { redirect, completion in
             // Then
             XCTAssertEqual(redirect, expectedRedirect)
-            expectation.fulfill()
+            isDelegateCalled = true
+            completion(.success(""))
         }
         let customerAction = ThreeDSCustomerAction(type: .redirect, value: "example.com")
 
         // When
-        sut.handle(action: customerAction, delegate: delegate) { _ in }
-        wait(for: [expectation], timeout: 1)
+        _ = try await sut.handle(action: customerAction, delegate: delegate)
+        XCTAssertTrue(isDelegateCalled)
     }
 
-    func test_handle_whenRedirectCompletesWithNewToken_propagatesToken() {
+    func test_handle_whenRedirectCompletesWithNewToken_propagatesToken() async throws {
         // Given
         delegate.handleRedirectFromClosure = { _, completion in
             completion(.success("test"))
         }
-        let expectation = XCTestExpectation()
         let customerAction = ThreeDSCustomerAction(type: .redirect, value: "example.com")
 
         // When
-        sut.handle(action: customerAction, delegate: delegate) { result in
-            // Then
-            switch result {
-            case .success(let value):
-                XCTAssertEqual(value, "test")
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
+        let value = try await sut.handle(action: customerAction, delegate: delegate)
+
+        // Then
+        XCTAssertEqual(value, "test")
     }
 
-    func test_handle_whenRedirectFails_propagatesError() {
+    func test_handle_whenRedirectFails_propagatesError() async {
         // Given
         delegate.handleRedirectFromClosure = { _, completion in
             let failure = POFailure(code: .unknown(rawValue: "test-error"))
             completion(.failure(failure))
         }
-        let expectation = XCTestExpectation()
         let customerAction = ThreeDSCustomerAction(type: .redirect, value: "example.com")
 
         // When
-        sut.handle(action: customerAction, delegate: delegate) { result in
-            // Then
-            switch result {
-            case .failure(let failure):
-                XCTAssertEqual(failure.code, .unknown(rawValue: "test-error"))
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
+        let error = await assertThrowsError(
+            try await sut.handle(action: customerAction, delegate: delegate)
+        )
+
+        // Then
+        switch error {
+        case let failure as POFailure:
+            XCTAssertEqual(failure.code, .unknown(rawValue: "test-error"))
+        default:
+            XCTFail("Unexpected result")
         }
-        wait(for: [expectation], timeout: 1)
     }
 
     // MARK: - Fingerprint
 
-    func test_handle_whenFingerprintValueIsValidUrl_callsDelegateRedirect() {
+    func test_handle_whenFingerprintValueIsValidUrl_callsDelegateRedirect() async throws {
         // Given
         let expectedRedirect = PO3DSRedirect(
             url: URL(string: "example.com")!, timeout: 10
         )
-        let expectation = XCTestExpectation()
-        delegate.handleRedirectFromClosure = { redirect, _ in
+        var isDelegateCalled = false
+        delegate.handleRedirectFromClosure = { redirect, completion in
             // Then
             XCTAssertEqual(redirect, expectedRedirect)
-            expectation.fulfill()
+            isDelegateCalled = true
+            completion(.success(""))
         }
         let customerAction = ThreeDSCustomerAction(type: .fingerprint, value: "example.com")
 
         // When
-        sut.handle(action: customerAction, delegate: delegate) { _ in }
-        wait(for: [expectation], timeout: 1)
+        _ = try await sut.handle(action: customerAction, delegate: delegate)
+        XCTAssertTrue(isDelegateCalled)
     }
 
-    func test_handle_whenFingerprintCompletesWithNewToken_propagatesToken() {
+    func test_handle_whenFingerprintCompletesWithNewToken_propagatesToken() async throws {
         // Given
         delegate.handleRedirectFromClosure = { _, completion in
             completion(.success("test"))
         }
-        let expectation = XCTestExpectation()
         let customerAction = ThreeDSCustomerAction(type: .fingerprint, value: "example.com")
 
         // When
-        sut.handle(action: customerAction, delegate: delegate) { result in
-            // Then
-            switch result {
-            case .success(let value):
-                XCTAssertEqual(value, "test")
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
+        let value = try await sut.handle(action: customerAction, delegate: delegate)
+
+        // Then
+        XCTAssertEqual(value, "test")
     }
 
-    func test_handle_whenFingerprintFails_propagatesError() {
+    func test_handle_whenFingerprintFails_propagatesError() async {
         // Given
         delegate.handleRedirectFromClosure = { _, completion in
             let failure = POFailure(code: .unknown(rawValue: "test-error"))
             completion(.failure(failure))
         }
-        let expectation = XCTestExpectation()
         let customerAction = ThreeDSCustomerAction(type: .fingerprint, value: "example.com")
 
         // When
-        sut.handle(action: customerAction, delegate: delegate) { result in
-            // Then
-            switch result {
-            case .failure(let failure):
-                XCTAssertEqual(failure.code, .unknown(rawValue: "test-error"))
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
+        let error = await assertThrowsError(
+            try await sut.handle(action: customerAction, delegate: delegate)
+        )
+
+        // Then
+        switch error {
+        case let failure as POFailure:
+            XCTAssertEqual(failure.code, .unknown(rawValue: "test-error"))
+        default:
+            XCTFail("Unexpected result")
         }
-        wait(for: [expectation], timeout: 1)
     }
 
-    func test_handle_whenFingerprintFailsWithTimeoutError_succeeds() {
+    func test_handle_whenFingerprintFailsWithTimeoutError_succeeds() async throws {
         // Given
         delegate.handleRedirectFromClosure = { _, completion in
             let failure = POFailure(code: .timeout(.mobile))
             completion(.failure(failure))
         }
-        let expectation = XCTestExpectation()
         let customerAction = ThreeDSCustomerAction(type: .fingerprint, value: "example.com")
 
         // When
-        sut.handle(action: customerAction, delegate: delegate) { result in
+        let value = try await sut.handle(action: customerAction, delegate: delegate)
+
             // Then
-            switch result {
-            case .success(let value):
-                let expectedValue = """
-                    gway_req_eyJib2R5IjoieyBcInRocmVlRFMyRmluZ2VycHJpbnRUaW1\
-                    lb3V0XCI6IHRydWUgfSIsInVybCI6ImV4YW1wbGUuY29tIn0=
-                    """
-                XCTAssertEqual(value, expectedValue)
-            default:
-                XCTFail("Unexpected result")
-            }
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
+        let expectedValue = """
+            gway_req_eyJib2R5IjoieyBcInRocmVlRFMyRmluZ2VycHJpbnRUaW1\
+            lb3V0XCI6IHRydWUgfSIsInVybCI6ImV4YW1wbGUuY29tIn0=
+            """
+        XCTAssertEqual(value, expectedValue)
     }
 
     // MARK: - Private Properties

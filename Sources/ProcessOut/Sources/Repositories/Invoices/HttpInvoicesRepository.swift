@@ -9,32 +9,27 @@ import Foundation
 
 final class HttpInvoicesRepository: InvoicesRepository {
 
-    init(connector: HttpConnector, failureMapper: HttpConnectorFailureMapper) {
+    init(connector: HttpConnector) {
         self.connector = connector
-        self.failureMapper = failureMapper
     }
 
-    // MARK: - POInvoicesRepository
+    // MARK: - InvoicesRepository
 
     func nativeAlternativePaymentMethodTransactionDetails(
-        request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, Failure>) -> Void
-    ) {
+        request: PONativeAlternativePaymentMethodTransactionDetailsRequest
+    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
         struct Response: Decodable {
             let nativeApm: PONativeAlternativePaymentMethodTransactionDetails
         }
         let httpRequest = HttpConnectorRequest<Response>.get(
             path: "/invoices/\(request.invoiceId)/native-payment/\(request.gatewayConfigurationId)"
         )
-        connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.nativeApm).mapError(failureMapper.failure))
-        }
+        return try await connector.execute(request: httpRequest).nativeApm
     }
 
     func initiatePayment(
-        request: PONativeAlternativePaymentMethodRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, Failure>) -> Void
-    ) {
+        request: PONativeAlternativePaymentMethodRequest
+    ) async throws -> PONativeAlternativePaymentMethodResponse {
         let requestBox = NativeAlternativePaymentRequestBox(
             gatewayConfigurationId: request.gatewayConfigurationId,
             nativeApm: .init(parameterValues: request.parameters)
@@ -42,47 +37,36 @@ final class HttpInvoicesRepository: InvoicesRepository {
         let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentMethodResponse>.post(
             path: "/invoices/\(request.invoiceId)/native-payment", body: requestBox
         )
-        connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.mapError(failureMapper.failure))
-        }
+        return try await connector.execute(request: httpRequest)
     }
 
-    func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest, completion: @escaping (Result<ThreeDSCustomerAction?, Failure>) -> Void
-    ) {
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> ThreeDSCustomerAction? {
         struct Response: Decodable {
             let customerAction: ThreeDSCustomerAction?
         }
         let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/invoices/\(request.invoiceId)/authorize", body: request, includesDeviceMetadata: true
         )
-        connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.customerAction).mapError(failureMapper.failure))
-        }
+        return try await connector.execute(request: httpRequest).customerAction
     }
 
     func captureNativeAlternativePayment(
-        request: NativeAlternativePaymentCaptureRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, Failure>) -> Void
-    ) -> POCancellable {
+        request: NativeAlternativePaymentCaptureRequest
+    ) async throws -> PONativeAlternativePaymentMethodResponse {
         let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentMethodResponse>.post(
             path: "/invoices/\(request.invoiceId)/capture", body: request
         )
-        return connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.mapError(failureMapper.failure))
-        }
+        return try await connector.execute(request: httpRequest)
     }
 
-    func createInvoice(request: POInvoiceCreationRequest, completion: @escaping (Result<POInvoice, Failure>) -> Void) {
+    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
         struct Response: Decodable {
             let invoice: POInvoice
         }
         let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/invoices", body: request, includesDeviceMetadata: true, requiresPrivateKey: true
         )
-        connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.invoice).mapError(failureMapper.failure))
-        }
+        return try await connector.execute(request: httpRequest).invoice
     }
 
     // MARK: - Private Nested Types
@@ -98,5 +82,4 @@ final class HttpInvoicesRepository: InvoicesRepository {
     // MARK: - Private Properties
 
     private let connector: HttpConnector
-    private let failureMapper: HttpConnectorFailureMapper
 }
