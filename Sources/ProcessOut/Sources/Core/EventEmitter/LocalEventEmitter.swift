@@ -9,7 +9,8 @@ import Foundation
 
 final class LocalEventEmitter: EventEmitter, @unchecked Sendable {
 
-    init() {
+    init(logger: POLogger) {
+        self.logger = logger
         lock = NSLock()
         subscriptions = [:]
     }
@@ -18,18 +19,19 @@ final class LocalEventEmitter: EventEmitter, @unchecked Sendable {
 
     func emit<Event: EventEmitterEvent>(event: Event) -> Bool {
         lock.lock()
-        guard let eventSubscriptions = subscriptions[Event.name]?.values else {
+        guard let eventSubscriptions = subscriptions[Event.name]?.values, !eventSubscriptions.isEmpty else {
             lock.unlock()
+            logger.debug("No subscribers for '\(Event.name)' event, ignored")
             return false
         }
         lock.unlock()
-        guard !eventSubscriptions.isEmpty else {
-            return false
-        }
         var isHandled = false
         for subscription in eventSubscriptions {
             // Event should be delievered to all subscribers.
             isHandled = subscription.listener(event) || isHandled
+        }
+        if !isHandled {
+            logger.debug("Subscribers refused to handle '\(Event.name)' event")
         }
         return isHandled
     }
@@ -83,6 +85,7 @@ final class LocalEventEmitter: EventEmitter, @unchecked Sendable {
 
     // MARK: - Private Properties
 
+    private let logger: POLogger
     private let lock: NSLock
     private var subscriptions: [String: [AnyHashable: Subscription]]
 }
