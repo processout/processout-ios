@@ -77,8 +77,8 @@ public final class ProcessOut {
         return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService)
     }()
 
-    /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. You can pass
-    /// both custom scheme-based deep links and universal links.
+    /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. Only deep
+    /// links are supported.
     ///
     /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
     @discardableResult
