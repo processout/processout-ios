@@ -83,6 +83,7 @@ public final class ProcessOut {
     /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
     @discardableResult
     public func processDeepLink(url: URL) -> Bool {
+        logger.debug("Will process deep link: \(url)")
         let event = DeepLinkReceivedEvent(url: url)
         return eventEmitter.emit(event: event)
     }
@@ -101,7 +102,7 @@ public final class ProcessOut {
     // MARK: - Internal
 
     /// Event emitter to use for events exchange.
-    private(set) lazy var eventEmitter: EventEmitter = LocalEventEmitter()
+    private(set) lazy var eventEmitter: EventEmitter = LocalEventEmitter(logger: logger)
 
     init(configuration: ProcessOutConfiguration) {
         self.configuration = configuration
