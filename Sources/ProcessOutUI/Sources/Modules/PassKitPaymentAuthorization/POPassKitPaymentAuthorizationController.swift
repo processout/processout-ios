@@ -8,7 +8,7 @@
 import PassKit
 @_spi(PO) import ProcessOut
 
-public final class POPassKitPaymentAuthorizationController: NSObject {
+public final class POPassKitPaymentAuthorizationController: NSObject, PKPaymentAuthorizationControllerDelegate {
 
     /// Determine whether this device can process payment requests.
     public class func canMakePayments() -> Bool {
@@ -34,8 +34,12 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
         }
         self.paymentRequest = paymentRequest
         controller = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
+        contactMapper = DefaultPassKitContactMapper(logger: ProcessOut.shared.logger)
+        errorMapper = DefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger)
+        cardsService = ProcessOut.shared.cards
+        recentRequestUpdate = .init(request: paymentRequest)
         super.init()
-        commonInit()
+        controller.delegate = self
     }
 
     /// Presents the Apple Pay UI modally over your app. You are responsible for dismissal
@@ -50,9 +54,102 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     }
 
     /// The controller's delegate.
-    public weak var delegate: POPassKitPaymentAuthorizationControllerDelegate? {
-        get { coordinator.delegate }
-        set { coordinator.delegate = newValue }
+    public weak var delegate: POPassKitPaymentAuthorizationControllerDelegate?
+
+    // MARK: - PKPaymentAuthorizationControllerDelegate
+
+    public func paymentAuthorizationControllerDidFinish(_: PKPaymentAuthorizationController) {
+        delegate?.paymentAuthorizationControllerDidFinish(self)
+    }
+
+    public func paymentAuthorizationController(
+        _: PKPaymentAuthorizationController, didAuthorizePayment payment: PKPayment
+    ) async -> PKPaymentAuthorizationResult {
+        let request = POApplePayCardTokenizationRequest(
+            payment: payment,
+            contact: payment.billingContact.flatMap(contactMapper.map),
+            metadata: nil // todo(andrii-vysotskyi): decide if metadata injection should be allowed
+        )
+        let card: POCard
+        do {
+            card = try await cardsService.tokenize(request: request)
+        } catch {
+            if let result = await delegate?.paymentAuthorizationController(
+                self, didFailToTokenizePayment: payment, error: error
+            ) {
+                return result
+            }
+            let errors = errorMapper.map(poError: error)
+            return PKPaymentAuthorizationResult(status: .failure, errors: errors)
+        }
+        let result = await delegate?.paymentAuthorizationController(self, didTokenizePayment: payment, card: card)
+        return result ?? PKPaymentAuthorizationResult(status: .success, errors: nil)
+    }
+
+    public func paymentAuthorizationControllerWillAuthorizePayment(_: PKPaymentAuthorizationController) {
+        delegate?.paymentAuthorizationControllerWillAuthorizePayment(self)
+    }
+
+    @available(iOS 14.0, *)
+    public func paymentAuthorizationControllerDidRequestMerchantSessionUpdate(
+        controller _: PKPaymentAuthorizationController
+    ) async -> PKPaymentRequestMerchantSessionUpdate {
+        let result = await delegate?.paymentAuthorizationControllerDidRequestMerchantSessionUpdate(controller: self)
+        return result ?? .init(status: .success, merchantSession: nil)
+    }
+
+    @available(iOS 15.0, *)
+    public func paymentAuthorizationController(
+        _: PKPaymentAuthorizationController, didChangeCouponCode couponCode: String
+    ) async -> PKPaymentRequestCouponCodeUpdate {
+        if let update = await delegate?.paymentAuthorizationController(self, didChangeCouponCode: couponCode) {
+            recentRequestUpdate.update(with: update)
+            return update
+        }
+        return PKPaymentRequestCouponCodeUpdate(
+            errors: [],
+            paymentSummaryItems: recentRequestUpdate.paymentSummaryItems,
+            shippingMethods: recentRequestUpdate.shippingMethods
+        )
+    }
+
+    public func paymentAuthorizationController(
+        _: PKPaymentAuthorizationController, didSelectShippingMethod shippingMethod: PKShippingMethod
+    ) async -> PKPaymentRequestShippingMethodUpdate {
+        if let update = await delegate?.paymentAuthorizationController(self, didSelectShippingMethod: shippingMethod) {
+            recentRequestUpdate.update(with: update)
+            return update
+        }
+        return PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: recentRequestUpdate.paymentSummaryItems)
+    }
+
+    public func paymentAuthorizationController(
+        _: PKPaymentAuthorizationController, didSelectShippingContact contact: PKContact
+    ) async -> PKPaymentRequestShippingContactUpdate {
+        if let update = await delegate?.paymentAuthorizationController(self, didSelectShippingContact: contact) {
+            recentRequestUpdate.update(with: update)
+            recentRequestUpdate.shippingMethods = update.shippingMethods
+            return update
+        }
+        return PKPaymentRequestShippingContactUpdate(
+            errors: [],
+            paymentSummaryItems: recentRequestUpdate.paymentSummaryItems,
+            shippingMethods: recentRequestUpdate.shippingMethods
+        )
+    }
+
+    public func paymentAuthorizationController(
+        _: PKPaymentAuthorizationController, didSelectPaymentMethod paymentMethod: PKPaymentMethod
+    ) async -> PKPaymentRequestPaymentMethodUpdate {
+        if let update = await delegate?.paymentAuthorizationController(self, didSelectPaymentMethod: paymentMethod) {
+            recentRequestUpdate.update(with: update)
+            return update
+        }
+        return .init(errors: [], paymentSummaryItems: recentRequestUpdate.paymentSummaryItems)
+    }
+
+    public func presentationWindow(for _: PKPaymentAuthorizationController) -> UIWindow? {
+        delegate?.presentationWindow(for: self)
     }
 
     // MARK: - Private Properties
@@ -60,21 +157,11 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     private let paymentRequest: PKPaymentRequest
     private let controller: PKPaymentAuthorizationController
 
-    // swiftlint:disable:next implicitly_unwrapped_optional
-    private var coordinator: PassKitPaymentAuthorizationCoordinator!
+    private let contactMapper: PassKitContactMapper
+    private let errorMapper: PassKitPaymentErrorMapper
+    private let cardsService: POCardsService
 
-    // MARK: - Private Methods
-
-    private func commonInit() {
-        coordinator = PassKitPaymentAuthorizationCoordinator(
-            controller: self,
-            paymentRequest: paymentRequest,
-            contactMapper: DefaultPassKitContactMapper(logger: ProcessOut.shared.logger),
-            errorMapper: DefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger),
-            cardsService: ProcessOut.shared.cards
-        )
-        controller.delegate = coordinator
-    }
+    private var recentRequestUpdate: PassKitPaymentRequestUpdate
 }
 
 extension POPassKitPaymentAuthorizationController {
