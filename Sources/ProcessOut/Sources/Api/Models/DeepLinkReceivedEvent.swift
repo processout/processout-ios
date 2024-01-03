@@ -9,6 +9,6 @@ import Foundation
 
 struct DeepLinkReceivedEvent: EventEmitterEvent {
 
-    /// Url representing deep link or universal link.
+    /// Url representing deep link.
     let url: URL
 }

@@ -77,12 +77,13 @@ public final class ProcessOut {
         return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService)
     }()
 
-    /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. You can pass
-    /// both custom scheme-based deep links and universal links.
+    /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. Only deep
+    /// links are supported.
     ///
     /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
     @discardableResult
     public func processDeepLink(url: URL) -> Bool {
+        logger.debug("Will process deep link: \(url)")
         let event = DeepLinkReceivedEvent(url: url)
         return eventEmitter.emit(event: event)
     }
@@ -101,7 +102,7 @@ public final class ProcessOut {
     // MARK: - Internal
 
     /// Event emitter to use for events exchange.
-    private(set) lazy var eventEmitter: EventEmitter = LocalEventEmitter()
+    private(set) lazy var eventEmitter: EventEmitter = LocalEventEmitter(logger: logger)
 
     init(configuration: ProcessOutConfiguration) {
         self.configuration = configuration
