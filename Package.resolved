@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "checkout-3ds-sdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/checkout/checkout-3ds-sdk-ios",
+      "state" : {
+        "revision" : "b7f3e53150e45105de58b11e683254ee4ec30913",
+        "version" : "3.2.1"
+      }
+    },
+    {
       "identity" : "checkout-event-logger-ios-framework",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/checkout/checkout-event-logger-ios-framework.git",

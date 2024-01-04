@@ -34,10 +34,10 @@ public struct ProcessOutConfiguration {
     public let privateKey: String?
 
     /// Api base URL.
-    let apiBaseUrl = URL(string: "https://api.processout.ninja")! // swiftlint:disable:this force_unwrapping
+    let apiBaseUrl = URL(string: "https://api.processout.com")! // swiftlint:disable:this force_unwrapping
 
     /// Checkout base URL.
-    let checkoutBaseUrl = URL(string: "https://checkout.processout.ninja")! // swiftlint:disable:this force_unwrapping
+    let checkoutBaseUrl = URL(string: "https://checkout.processout.com")! // swiftlint:disable:this force_unwrapping
 }
 
 extension ProcessOutConfiguration {
