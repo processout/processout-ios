@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Atlantis
 @_spi(PO) import ProcessOut
 import ProcessOutUI
 
@@ -16,6 +17,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+        #if DEBUG
+        Atlantis.start()
+        #endif
         configureProcessOut()
         return true
     }

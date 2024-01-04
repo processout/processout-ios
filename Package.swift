@@ -15,9 +15,18 @@ let package = Package(
         .library(name: "ProcessOutCheckout3DS", targets: ["ProcessOutCheckout3DS"])
     ],
     dependencies: [
-        .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", exact: "3.2.1"),
+//        .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", exact: "3.2.1"),
+        .package(url: "https://github.com/checkout/checkout-event-logger-ios-framework.git", from: "1.2.4")
     ],
     targets: [
+        .binaryTarget(
+            name: "Checkout3DS",
+            path: "Vendor/Checkout3DS.xcframework"
+        ),
+        .binaryTarget(
+            name: "JOSESwift",
+            path: "Vendor/JOSESwift.xcframework"
+        ),
         .target(
             name: "ProcessOut",
             dependencies: [
@@ -32,7 +41,9 @@ let package = Package(
             name: "ProcessOutCheckout3DS",
             dependencies: [
                 .target(name: "ProcessOut"),
-                .product(name: "Checkout3DSPackages", package: "checkout-3ds-sdk-ios")
+                .target(name: "Checkout3DS"),
+                .target(name: "JOSESwift"),
+                .product(name: "CheckoutEventLoggerKit", package: "checkout-event-logger-ios-framework")
             ]
         ),
         .target(
