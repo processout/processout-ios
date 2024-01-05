@@ -31,6 +31,7 @@ final class CardSchemeImageProvider {
         "diners club united states & canada": .Schemes.diners,
         "discover": .Schemes.discover,
         "elo": .Schemes.elo,
+        "giropay": .Schemes.giropay,
         "jcb": .Schemes.JCB,
         "mada": .Schemes.mada,
         "maestro": .Schemes.maestro,

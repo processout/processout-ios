@@ -31,12 +31,12 @@ public struct POActionsContainerView: View {
             }
             .modify(when: style.axis == .horizontal) { content in
                 // The implementation considers that benign action that people are likely to
-                // want is first and when the axis is horizontal, we want it to be placed on
-                // the right, so layout direction is hardcoded to RTL.
+                // want is first and when the axis is horizontal and layout direction is LTR,
+                // we want it to be placed on the right.
                 HStack(spacing: spacing) {
                     content.environment(\.layoutDirection, layoutDirection)
                 }
-                .environment(\.layoutDirection, .rightToLeft)
+                .environment(\.layoutDirection, layoutDirection == .leftToRight ? .rightToLeft : .leftToRight)
             }
             .padding(.horizontal, horizontalPadding)
         }

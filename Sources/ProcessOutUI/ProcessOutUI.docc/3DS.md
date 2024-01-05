@@ -24,13 +24,13 @@ func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFai
 }
 ```
 
-When using `SFSafariViewController` your application should support deep and/or universal links. When
-application receives incoming URL you should allow ProcessOut SDK to handle it. For example if you are using scene
-delegate and universal links it may look like following:
+When using `SFSafariViewController` your application should support deep links. When
+application receives incoming URL you should allow ProcessOut SDK to handle it. For example
+if you are using scene delegate it may look like following:
 
 ```swift
-func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-   guard let url = userActivity.webpageURL else {
+func scene(_ scene: UIScene, openURLContexts urlContexts: Set<UIOpenURLContext>) {
+   guard let url = urlContexts.first?.url else {
       return
    }
    let isHandled = ProcessOut.shared.processDeepLink(url: url)

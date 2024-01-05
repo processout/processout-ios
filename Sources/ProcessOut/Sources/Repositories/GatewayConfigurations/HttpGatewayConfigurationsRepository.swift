@@ -9,17 +9,13 @@ import Foundation
 
 final class HttpGatewayConfigurationsRepository: POGatewayConfigurationsRepository {
 
-    init(connector: HttpConnector, failureMapper: HttpConnectorFailureMapper) {
+    init(connector: HttpConnector) {
         self.connector = connector
-        self.failureMapper = failureMapper
     }
 
     // MARK: - POGatewayConfigurationsRepository
 
-    func all(
-        request: POAllGatewayConfigurationsRequest,
-        completion: @escaping (Result<POAllGatewayConfigurationsResponse, Failure>) -> Void
-    ) {
+    func all(request: POAllGatewayConfigurationsRequest) async throws -> POAllGatewayConfigurationsResponse {
         var query = request.paginationOptions?.queryItems ?? [:]
         query["filter"] = request.filter?.rawValue
         query["with_disabled"] = request.includeDisabled
@@ -27,15 +23,10 @@ final class HttpGatewayConfigurationsRepository: POGatewayConfigurationsReposito
         let request = HttpConnectorRequest<POAllGatewayConfigurationsResponse>.get(
             path: "/gateway-configurations", query: query
         )
-        connector.execute(request: request) { [failureMapper] result in
-            completion(result.mapError(failureMapper.failure))
-        }
+        return try await connector.execute(request: request)
     }
 
-    func find(
-        request: POFindGatewayConfigurationRequest,
-        completion: @escaping (Result<POGatewayConfiguration, Failure>) -> Void
-    ) {
+    func find(request: POFindGatewayConfigurationRequest) async throws -> POGatewayConfiguration {
         struct Response: Decodable {
             let gatewayConfiguration: POGatewayConfiguration
         }
@@ -45,13 +36,10 @@ final class HttpGatewayConfigurationsRepository: POGatewayConfigurationsReposito
                 "expand": request.expand.map(\.rawValue).joined(separator: ",")
             ]
         )
-        connector.execute(request: httpRequest) { [failureMapper] result in
-            completion(result.map(\.gatewayConfiguration).mapError(failureMapper.failure))
-        }
+        return try await connector.execute(request: httpRequest).gatewayConfiguration
     }
 
     // MARK: - Private Properties
 
     private let connector: HttpConnector
-    private let failureMapper: HttpConnectorFailureMapper
 }

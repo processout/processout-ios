@@ -17,7 +17,9 @@ final class HttpLogsRepository: LogsRepository {
 
     func send(request: LogRequest) {
         let httpRequest = HttpConnectorRequest<VoidCodable>.post(path: "/logs", body: request)
-        connector.execute(request: httpRequest) { _ in }
+        Task {
+            _ = try? await connector.execute(request: httpRequest)
+        }
     }
 
     // MARK: - Private Properties

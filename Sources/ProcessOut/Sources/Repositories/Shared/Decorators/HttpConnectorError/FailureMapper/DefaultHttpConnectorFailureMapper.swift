@@ -20,7 +20,7 @@ final class DefaultHttpConnectorFailureMapper: HttpConnectorFailureMapper {
         let code: POFailure.Code
         let invalidFields: [POFailure.InvalidField]?
         switch failure {
-        case .coding, .internal:
+        case .decoding, .encoding, .internal:
             message = "An unexpected error occurred while processing your request."
             code = .internal(.mobile)
             invalidFields = nil
