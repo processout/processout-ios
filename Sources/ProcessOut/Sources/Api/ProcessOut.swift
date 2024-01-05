@@ -43,12 +43,12 @@ public final class ProcessOut {
 
     /// Returns gateway configurations repository.
     public private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepository = {
-        HttpGatewayConfigurationsRepository(connector: httpConnector, failureMapper: failureMapper)
+        HttpGatewayConfigurationsRepository(connector: httpConnector)
     }()
 
     /// Returns invoices service.
     public private(set) lazy var invoices: POInvoicesService = {
-        let repository = HttpInvoicesRepository(connector: httpConnector, failureMapper: failureMapper)
+        let repository = HttpInvoicesRepository(connector: httpConnector)
         return DefaultInvoicesService(repository: repository, threeDSService: threeDSService)
     }()
 
@@ -65,7 +65,7 @@ public final class ProcessOut {
             decoder: JSONDecoder(), logger: repositoryLogger
         )
         let service = DefaultCardsService(
-            repository: HttpCardsRepository(connector: httpConnector, failureMapper: failureMapper),
+            repository: HttpCardsRepository(connector: httpConnector),
             applePayCardTokenizationRequestMapper: requestMapper
         )
         return service
@@ -73,16 +73,17 @@ public final class ProcessOut {
 
     /// Returns customer tokens service.
     public private(set) lazy var customerTokens: POCustomerTokensService = {
-        let repository = HttpCustomerTokensRepository(connector: httpConnector, failureMapper: failureMapper)
+        let repository = HttpCustomerTokensRepository(connector: httpConnector)
         return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService)
     }()
 
-    /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. You can pass
-    /// both custom scheme-based deep links and universal links.
+    /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. Only deep
+    /// links are supported.
     ///
     /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
     @discardableResult
     public func processDeepLink(url: URL) -> Bool {
+        logger.debug("Will process deep link: \(url)")
         let event = DeepLinkReceivedEvent(url: url)
         return eventEmitter.emit(event: event)
     }
@@ -100,7 +101,7 @@ public final class ProcessOut {
     // MARK: - Internal
 
     /// Event emitter to use for events exchange.
-    private(set) lazy var eventEmitter: EventEmitter = LocalEventEmitter()
+    private(set) lazy var eventEmitter: EventEmitter = LocalEventEmitter(logger: logger)
 
     init(configuration: ProcessOutConfiguration) {
         self.configuration = configuration
@@ -144,8 +145,6 @@ public final class ProcessOut {
             .build()
         return connector
     }()
-
-    private lazy var failureMapper = DefaultHttpConnectorFailureMapper(logger: repositoryLogger)
 
     private lazy var threeDSService: ThreeDSService = {
         let decoder = JSONDecoder()

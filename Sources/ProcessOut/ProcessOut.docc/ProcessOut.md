@@ -125,6 +125,7 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``PORepository``
 - ``POService``
 - ``POAutoAsync``
+- ``POAutoCompletion``
 
 ### Legacy Declarations
 

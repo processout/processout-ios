@@ -55,7 +55,7 @@ public final class POTest3DSService: PO3DSService {
             .with(redirect: redirect)
             .with(returnUrl: returnUrl)
             .with { [weak self] result in
-                self?.viewController.dismiss(animated: true) {
+                self?.viewController.presentedViewController?.dismiss(animated: true) {
                     completion(result)
                 }
             }
