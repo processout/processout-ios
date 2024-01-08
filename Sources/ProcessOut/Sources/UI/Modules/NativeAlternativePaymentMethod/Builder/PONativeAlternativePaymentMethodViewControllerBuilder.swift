@@ -10,6 +10,7 @@ import UIKit
 /// Provides an ability to create view controller that could be used to handle Native
 /// Alternative Payment. Call ``PONativeAlternativePaymentMethodViewControllerBuilder/build()``
 /// to create view controller's instance.
+@available(*, deprecated, message: "Use ProcessOutUI.PONativeAlternativePaymentViewController instead.")
 public final class PONativeAlternativePaymentMethodViewControllerBuilder { // swiftlint:disable:this type_name
 
     @available(*, deprecated, message: "Use non static method instead.")
@@ -75,7 +76,7 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         var logger = api.logger
         logger[attributeKey: "InvoiceId"] = invoiceId
-        let interactor = DefaultNativeAlternativePaymentMethodInteractor(
+        let interactor = PODefaultNativeAlternativePaymentMethodInteractor(
             invoicesService: api.invoices,
             imagesRepository: api.images,
             configuration: .init(

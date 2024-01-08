@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 27.04.2023.
 //
 
+@available(*, deprecated)
 struct NativeAlternativePaymentMethodSubmittedCellStyle {
 
     /// Title style.

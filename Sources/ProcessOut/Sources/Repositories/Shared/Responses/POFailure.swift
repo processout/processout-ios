@@ -274,6 +274,9 @@ public struct POFailure: Error {
         /// The card CVC was missing, but needed to process the payment.
         case cardMissingCvc = "card.missing-cvc"
 
+        /// Invalid CVC.
+        case cardInvalidCvc = "card.invalid-cvc"
+
         /// The card expiry date was missing, but needed to process the payment.
         case cardMissingExpiry = "card.missing-expiry"
 

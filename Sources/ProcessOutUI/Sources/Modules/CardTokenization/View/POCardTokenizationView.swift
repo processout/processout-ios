@@ -22,51 +22,35 @@ public struct POCardTokenizationView: View {
         VStack(spacing: 0) {
             ScrollViewReader { scrollView in
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: Constants.spacing) {
+                    VStack(alignment: .leading, spacing: POSpacing.medium) {
                         if let title = viewModel.state.title {
                             Text(title)
                                 .textStyle(style.title)
-                                .padding(.horizontal, Constants.horizontalPadding)
+                                .padding(.horizontal, POSpacing.large)
                             Divider()
                                 .frame(height: 1)
                                 .overlay(style.separatorColor)
                         }
-                        VStack(alignment: .leading, spacing: Constants.spacing) {
-                            ForEach(viewModel.state.sections) { section in
-                                CardTokenizationSectionView(
-                                    section: section,
-                                    spacing: Constants.sectionSpacing,
-                                    focusedInputId: $viewModel.state.focusedInputId
-                                )
-                            }
+                        ForEach(viewModel.state.sections) { section in
+                            CardTokenizationSectionView(
+                                section: section, focusedInputId: $viewModel.state.focusedInputId
+                            )
                         }
-                        .padding(.horizontal, Constants.horizontalPadding)
+                        .padding(.horizontal, POSpacing.large)
                     }
                     .animation(.default, value: viewModel.state.sections.map(\.id))
                     .animation(.default, value: viewModel.state.sections.flatMap(\.items).map(\.id))
-                    .padding(.vertical, Constants.spacing)
+                    .padding(.vertical, POSpacing.medium)
                 }
                 .backport.onChange(of: viewModel.state.focusedInputId) {
                     scrollToFocusedInput(scrollView: scrollView)
                 }
                 .clipped()
             }
-            POActionsContainerView(
-                actions: viewModel.state.actions,
-                spacing: Constants.spacing,
-                horizontalPadding: Constants.horizontalPadding
-            )
-            .actionsContainerStyle(style.actionsContainer)
+            POActionsContainerView(actions: viewModel.state.actions)
+                .actionsContainerStyle(style.actionsContainer)
         }
         .background(style.backgroundColor.ignoresSafeArea())
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let spacing: CGFloat = 16
-        static let sectionSpacing: CGFloat = 8
-        static let horizontalPadding: CGFloat = 24
     }
 
     // MARK: - Private Properties

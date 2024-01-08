@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, NativeAlternativePaymentMethodCell {
 
     override func prepareForReuse() {
@@ -101,6 +102,7 @@ final class NativeAlternativePaymentMethodCodeInputCell: UICollectionViewCell, N
     }
 }
 
+@available(*, deprecated)
 extension NativeAlternativePaymentMethodCodeInputCell: CodeTextFieldDelegate {
 
     func codeTextFieldShouldBeginEditing(_ textField: CodeTextField) -> Bool {

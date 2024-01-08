@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, NativeAlternativePaymentMethodCell {
 
     override init(frame: CGRect) {
@@ -123,6 +124,7 @@ final class NativeAlternativePaymentMethodInputCell: UICollectionViewCell, Nativ
     }
 }
 
+@available(*, deprecated)
 extension NativeAlternativePaymentMethodInputCell: UITextFieldDelegate {
 
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {

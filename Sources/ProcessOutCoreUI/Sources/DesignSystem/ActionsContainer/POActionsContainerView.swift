@@ -11,14 +11,12 @@ import SwiftUI
 @_spi(PO)
 public struct POActionsContainerView: View {
 
-    public init(actions: [POActionsContainerActionViewModel], spacing: CGFloat, horizontalPadding: CGFloat) {
+    public init(actions: [POActionsContainerActionViewModel]) {
         self.actions = actions
-        self.spacing = spacing
-        self.horizontalPadding = horizontalPadding
     }
 
     public var body: some View {
-        VStack(spacing: spacing) {
+        VStack(spacing: POSpacing.medium) {
             Divider()
                 .frame(height: 1)
                 .overlay(style.separatorColor)
@@ -33,14 +31,14 @@ public struct POActionsContainerView: View {
                 // The implementation considers that benign action that people are likely to
                 // want is first and when the axis is horizontal and layout direction is LTR,
                 // we want it to be placed on the right.
-                HStack(spacing: spacing) {
+                HStack(spacing: POSpacing.medium) {
                     content.environment(\.layoutDirection, layoutDirection)
                 }
                 .environment(\.layoutDirection, layoutDirection == .leftToRight ? .rightToLeft : .leftToRight)
             }
-            .padding(.horizontal, horizontalPadding)
+            .padding(.horizontal, POSpacing.large)
         }
-        .padding(.bottom, spacing)
+        .padding(.bottom, POSpacing.medium)
         .background(
             style.backgroundColor.ignoresSafeArea()
         )
@@ -51,8 +49,6 @@ public struct POActionsContainerView: View {
     // MARK: - Private Properties
 
     private let actions: [POActionsContainerActionViewModel]
-    private let spacing: CGFloat
-    private let horizontalPadding: CGFloat
 
     @Environment(\.actionsContainerStyle) private var style
     @Environment(\.layoutDirection) private var layoutDirection
