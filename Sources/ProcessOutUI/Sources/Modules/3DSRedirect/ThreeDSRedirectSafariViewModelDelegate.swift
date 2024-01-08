@@ -5,9 +5,9 @@
 //  Created by Andrii Vysotskyi on 04.11.2022.
 //
 
-import WebKit
+import Foundation
+import ProcessOut
 
-@available(*, deprecated)
 final class ThreeDSRedirectSafariViewModelDelegate: DefaultSafariViewModelDelegate {
 
     typealias Completion = (Result<String, POFailure>) -> Void

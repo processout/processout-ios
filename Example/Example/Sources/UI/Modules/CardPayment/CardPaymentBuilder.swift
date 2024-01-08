@@ -24,7 +24,6 @@ final class CardPaymentBuilder {
         let viewController = POCardTokenizationViewController(
             configuration: configuration, delegate: delegate, completion: completion
         )
-        threeDSService.viewController = viewController
         objc_setAssociatedObject(viewController, &AssociatedObjectKeys.delegate, delegate, .OBJC_ASSOCIATION_RETAIN)
         return viewController
     }

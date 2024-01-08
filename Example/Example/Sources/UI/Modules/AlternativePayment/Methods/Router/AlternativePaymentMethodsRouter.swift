@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SafariServices
 import ProcessOut
 import ProcessOutUI
 
@@ -33,13 +34,13 @@ final class AlternativePaymentMethodsRouter: RouterType {
             viewController.isModalInPresentation = true
             self.viewController?.present(viewController, animated: true)
         case let .alternativePayment(request):
-            let viewController = POAlternativePaymentMethodViewControllerBuilder()
-                .with(request: request)
-                .with(returnUrl: Constants.returnUrl)
-                .with { [weak self] _ in
+            let viewController = SFSafariViewController(
+                request: request,
+                returnUrl: Constants.returnUrl,
+                completion: { [weak self] _ in
                     self?.viewController?.dismiss(animated: true)
                 }
-                .build()
+            )
             self.viewController?.present(viewController, animated: true)
         case let .authorizationtAmount(completion):
             let viewController = AuthorizationAmountBuilder(completion: completion).build()

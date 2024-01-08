@@ -1,14 +1,14 @@
 //
 //  DefaultSafariViewModel.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 10.05.2023.
 //
 
 import Foundation
 import SafariServices
+@_spi(PO) import ProcessOut
 
-@available(*, deprecated)
 final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     init(

@@ -1,13 +1,12 @@
 //
 //  SafariViewController+Extensions.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 10.05.2023.
 //
 
 import SafariServices
 
-@available(*, deprecated)
 extension SFSafariViewController {
 
     func setViewModel(_ viewModel: DefaultSafariViewModel) {

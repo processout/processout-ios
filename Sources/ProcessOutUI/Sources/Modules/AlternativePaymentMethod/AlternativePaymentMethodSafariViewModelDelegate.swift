@@ -1,13 +1,13 @@
 //
 //  AlternativePaymentMethodSafariViewModelDelegate.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 07.11.2022.
 //
 
-import WebKit
+import Foundation
+import ProcessOut
 
-@available(*, deprecated)
 final class AlternativePaymentMethodSafariViewModelDelegate: DefaultSafariViewModelDelegate {
 
     typealias Completion = (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void

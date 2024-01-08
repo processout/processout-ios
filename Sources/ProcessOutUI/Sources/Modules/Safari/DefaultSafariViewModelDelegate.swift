@@ -1,13 +1,13 @@
 //
 //  DefaultSafariViewModelDelegate.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 11.11.2022.
 //
 
 import Foundation
+import ProcessOut
 
-@available(*, deprecated)
 protocol DefaultSafariViewModelDelegate: AnyObject {
 
     /// Asks delegate to complete with given url.

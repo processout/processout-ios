@@ -1,13 +1,12 @@
 //
 //  DefaultSafariViewModelConfiguration.swift
-//  ProcessOut
+//  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 10.05.2023.
 //
 
 import Foundation
 
-@available(*, deprecated)
 struct DefaultSafariViewModelConfiguration {
 
     /// Return url specified when creating invoice.

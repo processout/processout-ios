@@ -6,20 +6,16 @@
 //
 
 import UIKit
+import ProcessOut
 
 /// Service that emulates the normal 3DS authentication flow but does not actually make any calls to a real Access
 /// Control Server (ACS). Should be used only for testing purposes in sandbox environment.
-@available(*, deprecated, message: "Use ProcessOutUI.POTest3DSService instead.")
 public final class POTest3DSService: PO3DSService {
 
     /// Creates service instance.
-    @_disfavoredOverload
     public init(returnUrl: URL) {
         self.returnUrl = returnUrl
     }
-
-    /// View controller to use for presentations.
-    public unowned var viewController: UIViewController! // swiftlint:disable:this implicitly_unwrapped_optional
 
     // MARK: - PO3DSService
 
@@ -38,31 +34,30 @@ public final class POTest3DSService: PO3DSService {
     }
 
     public func handle(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
+        guard let presentingViewController = PresentingViewControllerProvider.find() else {
+            completion(.success(false))
+            return
+        }
         let alertController = UIAlertController(
-            title: Strings.Test3DS.Challenge.title, message: "", preferredStyle: .alert
+            title: String(resource: .Test3DS.title), message: "", preferredStyle: .alert
         )
-        let acceptAction = UIAlertAction(title: Strings.Test3DS.Challenge.accept, style: .default) { _ in
+        let acceptAction = UIAlertAction(title: String(resource: .Test3DS.accept), style: .default) { _ in
             completion(.success(true))
         }
         alertController.addAction(acceptAction)
-        let rejectAction = UIAlertAction(title: Strings.Test3DS.Challenge.reject, style: .default) { _ in
+        let rejectAction = UIAlertAction(title: String(resource: .Test3DS.reject), style: .default) { _ in
             completion(.success(false))
         }
         alertController.addAction(rejectAction)
-        viewController.present(alertController, animated: true)
+        presentingViewController.present(alertController, animated: true)
     }
 
     public func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        let viewController = PO3DSRedirectViewControllerBuilder()
-            .with(redirect: redirect)
-            .with(returnUrl: returnUrl)
-            .with { [weak self] result in
-                self?.viewController.presentedViewController?.dismiss(animated: true) {
-                    completion(result)
-                }
-            }
-            .build()
-        self.viewController.present(viewController, animated: true)
+        let controller = PO3DSRedirectController(redirect: redirect, returnUrl: returnUrl)
+        controller.completion = { [weak controller] result in
+            controller?.dismiss { completion(result) }
+        }
+        controller.present()
     }
 
     // MARK: - Private Properties

@@ -84,7 +84,7 @@ public final class ProcessOut {
     @discardableResult
     public func processDeepLink(url: URL) -> Bool {
         logger.debug("Will process deep link: \(url)")
-        let event = DeepLinkReceivedEvent(url: url)
+        let event = PODeepLinkReceivedEvent(url: url)
         return eventEmitter.emit(event: event)
     }
 
@@ -94,14 +94,17 @@ public final class ProcessOut {
     @_spi(PO)
     public private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
 
+    /// Event emitter to use for events exchange.
+    @_spi(PO)
+    public private(set) lazy var eventEmitter: POEventEmitter = LocalEventEmitter(logger: logger)
+
+    // MARK: - Internal
+
     /// Images repository.
     @_spi(PO)
     public private(set) lazy var images: POImagesRepository = UrlSessionImagesRepository(session: .shared)
 
     // MARK: - Internal
-
-    /// Event emitter to use for events exchange.
-    private(set) lazy var eventEmitter: EventEmitter = LocalEventEmitter(logger: logger)
 
     init(configuration: ProcessOutConfiguration) {
         self.configuration = configuration
