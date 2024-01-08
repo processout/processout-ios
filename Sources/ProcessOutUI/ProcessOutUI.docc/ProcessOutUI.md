@@ -40,3 +40,15 @@
 
 - ``SafariServices/SFSafariViewController/init(request:returnUrl:safariConfiguration:completion:)``
 - ``SafariServices/SFSafariViewController/init(alternativePaymentMethodUrl:returnUrl:safariConfiguration:completion:)``
+
+### Native Alternative Payment Method
+
+- <doc:NativeAlternativePayment>
+- ``PONativeAlternativePaymentView``
+- ``PONativeAlternativePaymentViewController``
+- ``PONativeAlternativePaymentStyle``
+- ``PONativeAlternativePaymentBackgroundStyle``
+- ``SwiftUI/View/nativeAlternativePaymentStyle(_:)``
+- ``PONativeAlternativePaymentConfiguration``
+- ``PONativeAlternativePaymentDelegate``
+- ``PONativeAlternativePaymentEvent``

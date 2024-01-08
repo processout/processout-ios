@@ -101,7 +101,8 @@ public final class ProcessOut {
     // MARK: - Internal
 
     /// Images repository.
-    private(set) lazy var images: ImagesRepository = UrlSessionImagesRepository(session: .shared)
+    @_spi(PO)
+    public private(set) lazy var images: POImagesRepository = UrlSessionImagesRepository(session: .shared)
 
     // MARK: - Internal
 

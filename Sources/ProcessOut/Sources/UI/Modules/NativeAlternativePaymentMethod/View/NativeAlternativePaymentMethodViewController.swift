@@ -9,6 +9,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 final class NativeAlternativePaymentMethodViewController<ViewModel: NativeAlternativePaymentMethodViewModel>:
     BaseViewController<ViewModel>,
     CollectionViewDelegateCenterLayout,

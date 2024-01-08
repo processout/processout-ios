@@ -13,9 +13,6 @@ struct CardTokenizationItemView: View {
 
     let item: CardTokenizationViewModelState.Item
 
-    /// The distance between adjacent items.
-    let spacing: CGFloat
-
     @Binding
     private(set) var focusedInputId: AnyHashable?
 
@@ -37,9 +34,9 @@ struct CardTokenizationItemView: View {
             Text(errorItem.description)
                 .textStyle(style.errorDescription)
         case .group(let groupItem):
-            HStack(spacing: spacing) {
+            HStack(spacing: POSpacing.small) {
                 ForEach(groupItem.items) { item in
-                    CardTokenizationItemView(item: item, spacing: spacing, focusedInputId: $focusedInputId)
+                    CardTokenizationItemView(item: item, focusedInputId: $focusedInputId)
                 }
             }
             .backport.geometryGroup()
