@@ -99,13 +99,14 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         guard let cardNumber = state.cardNumber else {
             return nil
         }
+        let scheme = state.preferredScheme ?? state.scheme
         let item = CardUpdateViewModelItem.Input(
             id: ItemId.number,
             value: .constant(cardNumber),
             placeholder: "",
             isInvalid: false,
             isEnabled: false,
-            icon: state.scheme.flatMap(CardSchemeImageProvider.shared.image),
+            icon: scheme.flatMap(CardSchemeImageProvider.shared.image),
             formatter: nil,
             keyboard: .asciiCapableNumberPad,
             contentType: nil,

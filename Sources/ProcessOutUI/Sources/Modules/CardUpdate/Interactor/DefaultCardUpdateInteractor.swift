@@ -34,12 +34,12 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         delegate?.cardUpdateDidEmitEvent(.willStart)
         if let cardInfo = configuration.cardInformation {
             setStartedStateUnchecked(cardInfo: cardInfo)
-            return
-        }
-        state = .starting
-        Task {
-            let cardInfo = await delegate?.cardInformation(cardId: configuration.cardId)
-            setStartedStateUnchecked(cardInfo: cardInfo)
+        } else {
+            state = .starting
+            Task {
+                let cardInfo = await delegate?.cardInformation(cardId: configuration.cardId)
+                setStartedStateUnchecked(cardInfo: cardInfo)
+            }
         }
     }
 
@@ -59,6 +59,23 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         delegate?.cardUpdateDidEmitEvent(.parametersChanged)
     }
 
+    func setPreferredScheme(_ scheme: String) {
+        guard case .started(var startedState) = state, configuration.isSchemeSelectionAllowed else {
+            return
+        }
+        let supportedSchemes = [startedState.scheme, startedState.coScheme].compactMap { $0 }
+        logger.debug("Will change card scheme to \(scheme)")
+        guard supportedSchemes.contains(scheme) else {
+            logger.info(
+                "Aborting attempt to select unknown '\(scheme)' scheme, supported schemes are: \(supportedSchemes)"
+            )
+            return
+        }
+        startedState.preferredScheme = scheme
+        state = .started(startedState)
+        delegate?.cardUpdateDidEmitEvent(.parametersChanged)
+    }
+
     @MainActor
     func submit() {
         guard case .started(let startedState) = state else {
@@ -73,7 +90,9 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         state = .updating(snapshot: startedState)
         Task {
             do {
-                let request = POCardUpdateRequest(cardId: configuration.cardId, cvc: startedState.cvc)
+                let request = POCardUpdateRequest(
+                    cardId: configuration.cardId, cvc: startedState.cvc, preferredScheme: startedState.preferredScheme
+                )
                 setCompletedState(card: try await cardsService.updateCard(request: request))
             } catch {
                 recoverUpdate(from: error)
@@ -107,7 +126,9 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         cardSecurityCodeFormatter.scheme = cardInfo?.scheme
         let startedState = State.Started(
             cardNumber: cardInfo?.maskedNumber,
-            scheme: cardInfo?.preferredScheme ?? cardInfo?.scheme,
+            scheme: cardInfo?.scheme,
+            coScheme: cardInfo?.coScheme,
+            preferredScheme: cardInfo?.preferredScheme,
             formatter: cardSecurityCodeFormatter
         )
         self.state = .started(startedState)
@@ -122,8 +143,8 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     @MainActor
     private func updateSchemeIfNeeded(cardInfo: POCardUpdateInformation?) async {
-        guard cardInfo?.scheme == nil else {
-            logger.debug("Scheme is already set, ignored")
+        guard cardInfo?.scheme == nil || cardInfo?.coScheme == nil else {
+            logger.debug("Needed schemes information is already set, ignored")
             return
         }
         guard let iin = cardInfo?.iin ?? cardInfo?.maskedNumber.flatMap(issuerIdentificationNumber) else {
@@ -131,25 +152,30 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             return
         }
         do {
-            let scheme = try await cardsService.issuerInformation(iin: iin).scheme
-            logger.info("Did resolve card scheme: \(scheme)")
+            let issuerInformation = try await cardsService.issuerInformation(iin: iin)
+            logger.info("Did resolve issuer info: \(issuerInformation)")
             switch state {
             case .started(var startedState):
-                cardSecurityCodeFormatter.scheme = scheme
-                startedState.scheme = cardInfo?.preferredScheme ?? scheme
-                startedState.cvc = cardSecurityCodeFormatter.string(from: startedState.cvc)
+                update(state: &startedState, with: issuerInformation)
                 state = .started(startedState)
             case .updating(var startedState):
-                cardSecurityCodeFormatter.scheme = scheme
-                startedState.scheme = cardInfo?.preferredScheme ?? scheme
-                startedState.cvc = cardSecurityCodeFormatter.string(from: startedState.cvc)
+                update(state: &startedState, with: issuerInformation)
                 state = .updating(snapshot: startedState)
             default:
-                logger.debug("Unsupported state, resolved scheme is ignored.")
+                logger.debug("Unsupported state, resolved scheme info is ignored")
+                return
             }
         } catch {
             logger.info("Did fail to resolve scheme: \(error)")
         }
+    }
+
+    /// - NOTE: Method updates interactor's CSC formatter as well.
+    private func update(state: inout State.Started, with issuerInformation: POCardIssuerInformation) {
+        cardSecurityCodeFormatter.scheme = issuerInformation.scheme
+        state.scheme = issuerInformation.scheme
+        state.coScheme = issuerInformation.coScheme
+        state.cvc = cardSecurityCodeFormatter.string(from: startedState.cvc)
     }
 
     private func issuerIdentificationNumber(maskedNumber: String) -> String? {

@@ -15,20 +15,30 @@ public struct POCardUpdateInformation {
     ///
     /// When this property is nil implementation will attempt to extract IIN from ``maskedNumber``.
     /// You may want to set this property explicity if you know that masked number's iin may be unavailable.
+    ///
+    /// - NOTE: When this property is set, `scheme` and `coScheme` could be `nil`.
     public let iin: String?
 
     /// Scheme of the card.
     public let scheme: String?
 
+    /// Co-scheme of the card, such as Carte Bancaire.
+    public let coScheme: String?
+
     /// Preferred scheme previously selected by customer if any.
     public let preferredScheme: String?
 
     public init(
-        maskedNumber: String? = nil, iin: String? = nil, scheme: String? = nil, preferredScheme: String? = nil
+        maskedNumber: String? = nil,
+        iin: String? = nil,
+        scheme: String? = nil,
+        coScheme: String? = nil,
+        preferredScheme: String? = nil
     ) {
         self.maskedNumber = maskedNumber
         self.iin = iin
         self.scheme = scheme
+        self.coScheme = coScheme
         self.preferredScheme = preferredScheme
     }
 }
