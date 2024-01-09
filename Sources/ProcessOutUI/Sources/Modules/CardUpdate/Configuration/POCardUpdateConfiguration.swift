@@ -25,6 +25,10 @@ public struct POCardUpdateConfiguration {
     /// Primary action text, such as "Cancel". Use empty string to hide button.
     public let cancelActionTitle: String?
 
+    /// Boolean flag determines whether user will be aksed to select scheme if co-scheme is available.
+    /// Until feature is fully ready this is hardcoded to `false`.
+    let isSchemeSelectionAllowed: Bool
+
     public init(
         cardId: String,
         cardInformation: POCardUpdateInformation? = nil,
@@ -37,5 +41,6 @@ public struct POCardUpdateConfiguration {
         self.title = title
         self.primaryActionTitle = primaryActionTitle
         self.cancelActionTitle = cancelActionTitle
+        isSchemeSelectionAllowed = false
     }
 }
