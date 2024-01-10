@@ -66,6 +66,7 @@ private struct TextViewRepresentable: UIViewRepresentable {
             }
             .build()
         updateWidthConstraint(textView: textView)
+        textView.invalidateIntrinsicContentSize()
     }
 
     // MARK: - Private Nested Types

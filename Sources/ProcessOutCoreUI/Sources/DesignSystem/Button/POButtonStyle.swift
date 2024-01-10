@@ -53,10 +53,10 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
             }
             .padding(Constants.padding)
             .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
+            .fixedSize(horizontal: false, vertical: true)
             .background(currentStyle.backgroundColor)
             .border(style: currentStyle.border)
             .shadow(style: currentStyle.shadow)
-            .backport.geometryGroup()
             .contentShape(.rect)
             .animation(.default, value: isLoading)
             .animation(.default, value: isEnabled)
@@ -96,5 +96,7 @@ private struct ContentView<Content: View>: View {
 
 private enum Constants {
     static let minHeight: CGFloat = 44
-    static let padding = EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8)
+    static let padding = EdgeInsets(
+        top: POSpacing.extraSmall, leading: POSpacing.small, bottom: POSpacing.extraSmall, trailing: POSpacing.small
+    )
 }

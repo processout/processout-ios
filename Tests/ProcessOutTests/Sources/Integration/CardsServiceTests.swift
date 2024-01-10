@@ -24,7 +24,7 @@ import XCTest
         let information = try await sut.issuerInformation(iin: "400012")
 
         // Then
-        XCTAssertEqual(information.bankName, "BANK OF AMERICA NATIONAL ASSOCIATION")
+        XCTAssertEqual(information.bankName, "UNITED CITIZENS BANK OF SOUTHERN KENTUCKY")
         XCTAssertEqual(information.brand, "visa business")
         XCTAssertEqual(information.category, "commercial")
         XCTAssertEqual(information.scheme, "visa")

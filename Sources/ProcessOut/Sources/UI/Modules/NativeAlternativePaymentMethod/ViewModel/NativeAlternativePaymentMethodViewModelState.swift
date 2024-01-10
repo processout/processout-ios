@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 enum NativeAlternativePaymentMethodViewModelState {
 
     typealias TitleItem = CollectionViewTitleViewModel

@@ -52,7 +52,7 @@ extension POTypography {
 
         /// Use for body copy on larger screens, or smaller blocks of text.
         public static let body = POTypography(
-            font: UIFont(.WorkSans.regular, size: 16), lineHeight: 24, paragraphSpacing: 8
+            font: UIFont(.WorkSans.regular, size: 16), lineHeight: 24, paragraphSpacing: POSpacing.small
         )
 
         /// Use for form components, error text and key value data.

@@ -1,47 +1,10 @@
-// Generated using Sourcery 2.1.2 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 2.1.3 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 import Foundation
 import UIKit
 
 // swiftlint:disable all
-
-extension ImagesRepository {
-
-    /// Attempts to download images at given URLs.
-    @discardableResult
-    public func images(
-        at urls: [URL],
-        completion: @escaping ([URL: UIImage]) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            await images(at: urls)
-        }
-    }
-
-    /// Downloads image at given URL and calls completion.
-    @discardableResult
-    public func image(
-        at url: URL?,
-        completion: @escaping (UIImage?) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            await image(at: url)
-        }
-    }
-
-    /// Downloads two images at given URLs and calls completion.
-    @discardableResult
-    public func images(
-        at url1: URL?,
-        _ url2: URL?,
-        completion: @escaping ((UIImage?, UIImage?)) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            await images(at: url1, url2)
-        }
-    }
-}
 
 extension POCardsService {
 
@@ -154,6 +117,43 @@ extension POGatewayConfigurationsRepository {
     ) -> POCancellable {
         invoke(completion: completion) {
             try await all()
+        }
+    }
+}
+
+extension POImagesRepository {
+
+    /// Attempts to download images at given URLs.
+    @discardableResult
+    public func images(
+        at urls: [URL],
+        completion: @escaping ([URL: UIImage]) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            await images(at: urls)
+        }
+    }
+
+    /// Downloads image at given URL and calls completion.
+    @discardableResult
+    public func image(
+        at url: URL?,
+        completion: @escaping (UIImage?) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            await image(at: url)
+        }
+    }
+
+    /// Downloads two images at given URLs and calls completion.
+    @discardableResult
+    public func images(
+        at url1: URL?,
+        _ url2: URL?,
+        completion: @escaping ((UIImage?, UIImage?)) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            await images(at: url1, url2)
         }
     }
 }

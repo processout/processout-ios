@@ -9,10 +9,6 @@ import Foundation
 
 final class DefaultThreeDSService: ThreeDSService {
 
-    typealias Completion = (Result<String, POFailure>) -> Void
-
-    // MARK: -
-
     init(
         decoder: JSONDecoder,
         encoder: JSONEncoder,
@@ -27,19 +23,23 @@ final class DefaultThreeDSService: ThreeDSService {
 
     // MARK: - ThreeDSService
 
-    @MainActor
     func handle(action: ThreeDSCustomerAction, delegate: Delegate) async throws -> String {
-        try await withUnsafeThrowingContinuation { continuation in
+        do {
             switch action.type {
             case .fingerprintMobile:
-                fingerprint(encodedConfiguration: action.value, delegate: delegate, completion: continuation.resume)
+                return try await fingerprint(encodedConfiguration: action.value, delegate: delegate)
             case .challengeMobile:
-                challenge(encodedChallenge: action.value, delegate: delegate, completion: continuation.resume)
+                return try await challenge(encodedChallenge: action.value, delegate: delegate)
             case .fingerprint:
-                fingerprint(url: action.value, delegate: delegate, completion: continuation.resume)
+                return try await fingerprint(url: action.value, delegate: delegate)
             case .redirect, .url:
-                redirect(url: action.value, delegate: delegate, completion: continuation.resume)
+                return try await redirect(url: action.value, delegate: delegate)
             }
+        } catch {
+            // todo(andrii-vysotskyi): when async delegate methods are publically available ensure
+            // that thrown errors are mapped to POFailure if needed.
+            logger.debug("Failed to handle 3DS action: \(error)")
+            throw error
         }
     }
 
@@ -68,132 +68,98 @@ final class DefaultThreeDSService: ThreeDSService {
 
     // MARK: - Private Methods
 
-    private func fingerprint(encodedConfiguration: String, delegate: Delegate, completion: @escaping Completion) {
-        do {
-            let configuration = try decode(PO3DS2Configuration.self, from: encodedConfiguration)
-            delegate.authenticationRequest(configuration: configuration) { [logger] result in
-                switch result {
-                case let .success(request):
-                    let response = {
-                        ChallengeResponse(url: nil, body: try self.encode(request: request))
-                    }
-                    self.complete(with: response, completion: completion)
-                case let .failure(failure):
-                    logger.info("Failed to create authentication request: \(failure)")
-                    completion(.failure(failure))
-                }
-            }
-        } catch let error as POFailure {
-            logger.error("Did fail to decode configuration: '\(error.message ?? "")'.")
-            completion(.failure(error))
-        } catch {
-            logger.error("Did fail to decode configuration: '\(error)'.")
-            completion(.failure(.init(code: .internal(.mobile), underlyingError: error)))
-        }
+    private func fingerprint(encodedConfiguration: String, delegate: Delegate) async throws -> String {
+        let configuration = try decode(PO3DS2Configuration.self, from: encodedConfiguration)
+        let request = try await delegate.authenticationRequest(configuration: configuration)
+        let response = ChallengeResponse(url: nil, body: try self.encode(request: request))
+        return try encode(challengeResponse: response)
     }
 
-    private func challenge(encodedChallenge: String, delegate: Delegate, completion: @escaping Completion) {
-        do {
-            let challenge = try decode(PO3DS2Challenge.self, from: encodedChallenge)
-            delegate.handle(challenge: challenge) { [logger] result in
-                switch result {
-                case let .success(success):
-                    let encodedResponse = success
-                        ? Constants.challengeSuccessEncodedResponse
-                        : Constants.challengeFailureEncodedResponse
-                    completion(.success(Constants.tokenPrefix + encodedResponse))
-                case let .failure(failure):
-                    logger.info("Failed to handle challenge: \(failure)")
-                    completion(.failure(failure))
-                }
-            }
-        } catch let error as POFailure {
-            logger.error("Did fail to decode challenge: '\(error.message ?? "")'.")
-            completion(.failure(error))
-        } catch {
-            logger.error("Did fail to decode challenge: '\(error)'.")
-            completion(.failure(.init(code: .internal(.mobile), underlyingError: error)))
-        }
+    private func challenge(encodedChallenge: String, delegate: Delegate) async throws -> String {
+        let challenge = try decode(PO3DS2Challenge.self, from: encodedChallenge)
+        let success = try await delegate.handle(challenge: challenge)
+        let encodedResponse = success
+            ? Constants.challengeSuccessEncodedResponse
+            : Constants.challengeFailureEncodedResponse
+        return Constants.tokenPrefix + encodedResponse
     }
 
-    private func fingerprint(url: String, delegate: Delegate, completion: @escaping Completion) {
+    private func fingerprint(url: String, delegate: Delegate) async throws -> String {
         guard let url = URL(string: url) else {
             logger.error("Did fail to create fingerprint URL from raw value: '\(url)'.")
-            completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
-            return
+            throw POFailure(message: nil, code: .internal(.mobile), underlyingError: nil)
         }
         let context = PO3DSRedirect(url: url, timeout: Constants.webFingerprintTimeout)
-        delegate.handle(redirect: context) { result in
-            switch result {
-            case let .success(newSource):
-                completion(.success(newSource))
-            case let .failure(failure) where failure.code == .timeout(.mobile):
-                // Fingerprinting timeout is treated differently from other errors.
-                let response = {
-                    ChallengeResponse(url: url, body: Constants.fingerprintTimeoutResponseBody)
-                }
-                self.complete(with: response, completion: completion)
-            case let .failure(failure):
-                self.logger.info("Failed to handle url fingeprint: \(failure)")
-                completion(.failure(failure))
-            }
+        do {
+            return try await delegate.handle(redirect: context)
+        } catch let failure as POFailure where failure.code == .timeout(.mobile) {
+            // Fingerprinting timeout is treated differently from other errors.
+            let response = ChallengeResponse(url: url, body: Constants.fingerprintTimeoutResponseBody)
+            return try encode(challengeResponse: response)
         }
     }
 
-    private func redirect(url: String, delegate: Delegate, completion: @escaping Completion) {
+    private func redirect(url: String, delegate: Delegate) async throws -> String {
         guard let url = URL(string: url) else {
             logger.error("Did fail to create redirect URL from raw value: '\(url)'.")
-            completion(.failure(.init(message: nil, code: .internal(.mobile), underlyingError: nil)))
-            return
+            throw POFailure(message: nil, code: .internal(.mobile), underlyingError: nil)
         }
         let context = PO3DSRedirect(url: url, timeout: nil)
-        delegate.handle(redirect: context, completion: completion)
+        return try await delegate.handle(redirect: context)
     }
 
-    // MARK: - Utils
+    // MARK: - Coding
 
     private func decode<T: Decodable>(_ type: T.Type, from string: String) throws -> T {
         let paddedString = string.padding(
             toLength: string.count + (4 - string.count % 4) % 4, withPad: "=", startingAt: 0
         )
         guard let data = Data(base64Encoded: paddedString) else {
+            logger.error("Did fail to decode base64 string.")
             throw POFailure(message: "Invalid base64 encoding.", code: .internal(.mobile))
         }
-        return try decoder.decode(type, from: data)
+        do {
+            return try decoder.decode(type, from: data)
+        } catch {
+            logger.error("Did fail to decode given type: \(error)")
+            throw POFailure(code: .internal(.mobile), underlyingError: error)
+        }
     }
 
     private func encode(request: PO3DS2AuthenticationRequest) throws -> String {
-        // Using JSONSerialization helps avoid creating boilerplate objects for JSON Web Key for coding. Implementation
-        // doesn't validate JWK correctness and simply re-encodes given value.
-        let sdkEphemeralPublicKey = try JSONSerialization.jsonObject(
-            with: Data(request.sdkEphemeralPublicKey.utf8)
-        )
-        let requestParameters = [
-            "deviceChannel": Constants.deviceChannel,
-            "sdkAppID": request.sdkAppId,
-            "sdkEphemPubKey": sdkEphemeralPublicKey,
-            "sdkReferenceNumber": request.sdkReferenceNumber,
-            "sdkTransID": request.sdkTransactionId,
-            "sdkEncData": request.deviceData
-        ]
-        let requestParametersData = try JSONSerialization.data(
-            withJSONObject: requestParameters, options: jsonWritingOptions
-        )
-        return String(decoding: requestParametersData, as: UTF8.self)
+        do {
+            // Using JSONSerialization helps avoid creating boilerplate objects for JSON Web Key for coding.
+            // Implementation doesn't validate JWK correctness and simply re-encodes given value.
+            let sdkEphemeralPublicKey = try JSONSerialization.jsonObject(
+                with: Data(request.sdkEphemeralPublicKey.utf8)
+            )
+            let requestParameters = [
+                "deviceChannel": Constants.deviceChannel,
+                "sdkAppID": request.sdkAppId,
+                "sdkEphemPubKey": sdkEphemeralPublicKey,
+                "sdkReferenceNumber": request.sdkReferenceNumber,
+                "sdkTransID": request.sdkTransactionId,
+                "sdkEncData": request.deviceData
+            ]
+            let requestParametersData = try JSONSerialization.data(
+                withJSONObject: requestParameters, options: jsonWritingOptions
+            )
+            return String(decoding: requestParametersData, as: UTF8.self)
+        } catch {
+            logger.error("Did fail to encode authentication request: \(error)")
+            throw POFailure(code: .internal(.mobile), underlyingError: error)
+        }
     }
 
-    private func complete(with response: () throws -> ChallengeResponse, completion: @escaping Completion) {
-        let result: Result<String, POFailure>
+    // MARK: - Utils
+
+    /// Encodes given response and creates token with it.
+    private func encode(challengeResponse: ChallengeResponse) throws -> String {
         do {
-            /// Encodes given response and creates token with it.
-            let fingerprintResponse = try response()
-            let token = try Constants.tokenPrefix + encoder.encode(fingerprintResponse).base64EncodedString()
-            result = .success(token)
+            return try Constants.tokenPrefix + encoder.encode(challengeResponse).base64EncodedString()
         } catch {
             logger.error("Did fail to encode fingerprint: '\(error)'.")
-            let failure = POFailure(message: nil, code: .internal(.mobile), underlyingError: error)
-            result = .failure(failure)
+            throw POFailure(message: nil, code: .internal(.mobile), underlyingError: error)
         }
-        completion(result)
     }
 }

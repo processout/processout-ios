@@ -7,9 +7,10 @@
 
 @_spi(PO) import ProcessOutCoreUI
 
-/// Utility that provides a way to configure UI package. It is not mandatory to call
-/// ``ProcessOutUI/ProcessOutUI/configure()`` method, but it is highly recommended
-/// to avoid potential UI hangs.
+/// Utility that provides a way to configure UI package.
+///
+/// This method should be called when the application starts to ensure that all resources are loaded and available
+/// for SDK to use. It also allows to avoid potential UI hangs during runtime.
 public enum ProcessOutUI {
 
     /// Configures UI package and preloads needed resources.

@@ -12,5 +12,8 @@ xcuserdata/
 Tests/*/Sources/Generated/*.swift
 Tests/*/Resources/Constants.yml
 
+## Misc
+.env
+
 ## Brew
 Brewfile.lock.json

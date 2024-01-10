@@ -8,6 +8,7 @@
 import UIKit
 
 /// Defines style for native alternative payment method module.
+@available(*, deprecated, message: "Use ProcessOutUI.PONativeAlternativePaymentStyle instead.")
 public struct PONativeAlternativePaymentMethodStyle {
 
     /// Title style.

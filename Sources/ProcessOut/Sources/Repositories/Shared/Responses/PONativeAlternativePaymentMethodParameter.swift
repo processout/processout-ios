@@ -31,13 +31,13 @@ public struct PONativeAlternativePaymentMethodParameter: Decodable {
     public struct AvailableValue: Decodable, Hashable {
 
         /// Display name of value.
-        let displayName: String
+        public let displayName: String
 
         /// Actual value that should be sent to backend if selected.
-        let value: String
+        public let value: String
 
         /// Indicates whether value is selected by default.
-        let `default`: Bool?
+        public let `default`: Bool?
     }
 
     /// Name of the field that needs to be collected for the request e.g. blik_code.

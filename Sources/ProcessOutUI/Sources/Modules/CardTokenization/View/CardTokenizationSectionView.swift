@@ -13,19 +13,16 @@ struct CardTokenizationSectionView: View {
 
     let section: CardTokenizationViewModelState.Section
 
-    /// The distance between adjacent items.
-    let spacing: CGFloat
-
     @Binding
     private(set) var focusedInputId: AnyHashable?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: spacing) {
+        VStack(alignment: .leading, spacing: POSpacing.small) {
             if let title = section.title {
                 Text(title).textStyle(style.sectionTitle)
             }
             ForEach(section.items) { element in
-                CardTokenizationItemView(item: element, spacing: spacing, focusedInputId: $focusedInputId)
+                CardTokenizationItemView(item: element, focusedInputId: $focusedInputId)
             }
         }
         .backport.geometryGroup()

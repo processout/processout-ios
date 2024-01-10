@@ -7,6 +7,7 @@
 
 import Foundation
 
+@available(*, deprecated)
 protocol DefaultSafariViewModelDelegate: AnyObject {
 
     /// Asks delegate to complete with given url.

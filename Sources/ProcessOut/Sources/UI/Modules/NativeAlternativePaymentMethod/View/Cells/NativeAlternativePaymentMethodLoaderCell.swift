@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 final class NativeAlternativePaymentMethodLoaderCell: UICollectionViewCell {
 
     /// Implementation ignores 2nd and all subsequent calls to this method.

@@ -10,6 +10,7 @@ import SafariServices
 
 /// Provides an ability to create view controller that could be used to handle Alternative Payment. Call build() to
 /// create view controller’s instance.
+@available(*, deprecated, message: "Use ProcessOutUI.SFSafariViewController(request:returnUrl:safariConfiguration:completion:) instead") // swiftlint:disable:this line_length
 public final class POAlternativePaymentMethodViewControllerBuilder {
 
     /// Creates builder instance with given request.

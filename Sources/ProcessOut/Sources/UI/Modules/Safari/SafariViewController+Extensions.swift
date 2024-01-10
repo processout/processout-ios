@@ -7,6 +7,7 @@
 
 import SafariServices
 
+@available(*, deprecated)
 extension SFSafariViewController {
 
     func setViewModel(_ viewModel: DefaultSafariViewModel) {

@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 protocol NativeAlternativePaymentMethodCell: UICollectionViewCell {
 
     /// Tells the cell that it is about to be displayed.
@@ -22,6 +23,7 @@ protocol NativeAlternativePaymentMethodCell: UICollectionViewCell {
     var delegate: NativeAlternativePaymentMethodCellDelegate? { get set }
 }
 
+@available(*, deprecated)
 protocol NativeAlternativePaymentMethodCellDelegate: AnyObject {
 
     /// Should return boolean value indicating whether cells input should return ie resign first responder.

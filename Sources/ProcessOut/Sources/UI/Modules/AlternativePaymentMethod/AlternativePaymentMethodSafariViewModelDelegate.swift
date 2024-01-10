@@ -7,6 +7,7 @@
 
 import WebKit
 
+@available(*, deprecated)
 final class AlternativePaymentMethodSafariViewModelDelegate: DefaultSafariViewModelDelegate {
 
     typealias Completion = (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void

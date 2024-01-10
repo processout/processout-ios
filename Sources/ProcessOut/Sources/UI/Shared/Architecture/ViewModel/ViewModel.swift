@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 19.10.2022.
 //
 
+@available(*, deprecated)
 protocol ViewModel<State>: AnyObject {
 
     associatedtype State

@@ -28,9 +28,15 @@ public struct POTextField<Trailing: View>: View {
     public var body: some View {
         let style = isInvalid ? style.error : style.normal
         HStack {
-            TextFieldRepresentable(
-                text: text, formatter: formatter, prompt: prompt, style: style
-            )
+            HorizontalSizeReader { width in
+                TextFieldRepresentable(
+                    text: text,
+                    formatter: formatter,
+                    prompt: prompt,
+                    preferredWidth: width,
+                    style: style
+                )
+            }
             trailingView
         }
         .padding(Constants.padding)
@@ -66,26 +72,21 @@ private struct TextFieldRepresentable: UIViewRepresentable {
 
     let formatter: Formatter?
     let prompt: String
+    let preferredWidth: CGFloat
     let style: POInputStateStyle
 
     // MARK: - UIViewRepresentable
 
     typealias Coordinator = TextFieldCoordinator
 
-    func makeUIView(context: Context) -> UITextField {
-        let textField = UITextField()
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.setContentHuggingPriority(.required, for: .vertical)
-        textField.setContentCompressionResistancePriority(.required, for: .vertical)
-        textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        textField.adjustsFontForContentSizeCategory = false
+    func makeUIView(context: Context) -> TextField {
+        let textField = TextField()
         context.coordinator.configure(textField: textField)
         focusCoordinator?.track(control: textField)
         return textField
     }
 
-    func updateUIView(_ textField: UITextField, context: Context) {
+    func updateUIView(_ textField: TextField, context: Context) {
         context.coordinator.view = self
         let animated = context.transaction.animation != nil
         UIView.perform(withAnimation: animated, duration: 0.25) {
@@ -96,6 +97,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
         textField.keyboardType = keyboardType
         textField.textContentType = textContentType
         textField.returnKeyType = submitLabel.returnKeyType
+        textField.preferredWidth = preferredWidth
     }
 
     func makeCoordinator() -> Coordinator {
@@ -219,5 +221,51 @@ private final class TextFieldCoordinator: NSObject, UITextFieldDelegate {
 
     @objc private func editingChanged(textField: UITextField) {
         view.text = textField.text ?? ""
+    }
+}
+
+private final class TextField: UITextField {
+
+    init() {
+        super.init(frame: .zero)
+        commonInit()
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override var intrinsicContentSize: CGSize {
+        if #available(iOS 16, *) {
+            super.intrinsicContentSize
+        } else {
+            // On iOS < 16, SwiftUI framework sometimes ignores content hugging priority and shrinks view to its
+            // intrinsic size. This is undesired because makes TextField hard to select especially when placeholder is
+            // not set. Solution is to hardcode width to container width (set from parent via preferredWidth property).
+            CGSize(width: preferredWidth, height: super.intrinsicContentSize.height)
+        }
+    }
+
+    var preferredWidth: CGFloat = 0 {
+        didSet { didChangePreferredWidth() }
+    }
+
+    // MARK: - Private Methods
+
+    private func commonInit() {
+        translatesAutoresizingMaskIntoConstraints = false
+        setContentHuggingPriority(.required, for: .vertical)
+        setContentCompressionResistancePriority(.required, for: .vertical)
+        setContentHuggingPriority(.defaultLow, for: .horizontal)
+        setContentCompressionResistancePriority(.required, for: .horizontal)
+        adjustsFontForContentSizeCategory = false
+    }
+
+    private func didChangePreferredWidth() {
+        guard #unavailable(iOS 16) else {
+            return
+        }
+        invalidateIntrinsicContentSize()
     }
 }

@@ -9,6 +9,7 @@ import Foundation
 
 /// A configuration object that defines how a native alternative payment view controller content's.
 /// Use `nil` to indicate that default value should be used.
+@available(*, deprecated, message: "Use ProcessOutUI.PONativeAlternativePaymentConfiguration instead.")
 public struct PONativeAlternativePaymentMethodConfiguration {
 
     public enum SecondaryAction {

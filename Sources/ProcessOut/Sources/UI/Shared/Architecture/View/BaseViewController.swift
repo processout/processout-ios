@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 class BaseViewController<Model>: UIViewController where Model: ViewModel {
 
     init(viewModel: Model, logger: POLogger) {

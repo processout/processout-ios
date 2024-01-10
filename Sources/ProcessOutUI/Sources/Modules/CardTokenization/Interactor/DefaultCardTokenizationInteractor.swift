@@ -190,7 +190,10 @@ final class DefaultCardTokenizationInteractor:
         case .generic(.cardBadTrackData):
             invalidParameterIds.append(contentsOf: [\.expiration, \.cvc])
             errorMessage = .CardTokenization.Error.trackData
-        case .generic(.cardMissingCvc), .generic(.cardFailedCvc), .generic(.cardFailedCvcAndAvs):
+        case .generic(.cardMissingCvc),
+             .generic(.cardFailedCvc),
+             .generic(.cardFailedCvcAndAvs),
+             .generic(.cardInvalidCvc):
             invalidParameterIds.append(\.cvc)
             errorMessage = .CardTokenization.Error.cvc
         case .generic(.cardInvalidName):
