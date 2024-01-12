@@ -175,7 +175,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         cardSecurityCodeFormatter.scheme = issuerInformation.scheme
         state.scheme = issuerInformation.scheme
         state.coScheme = issuerInformation.coScheme
-        state.cvc = cardSecurityCodeFormatter.string(from: startedState.cvc)
+        state.cvc = cardSecurityCodeFormatter.string(from: state.cvc)
     }
 
     private func issuerIdentificationNumber(maskedNumber: String) -> String? {
