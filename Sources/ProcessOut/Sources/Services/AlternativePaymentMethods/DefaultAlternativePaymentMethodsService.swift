@@ -38,23 +38,25 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
     }
 
     func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-              let queryItems = components.queryItems else {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             let message = "Invalid or malformed Alternative Payment Mehod URL response provided."
             throw POFailure(message: message, code: .generic(.mobile), underlyingError: nil)
         }
+        let queryItems = components.queryItems ?? []
         if let errorCode = queryItems.queryItemValue(name: "error_code") {
             throw POFailure(code: createFailureCode(rawValue: errorCode))
         }
-        guard let gatewayToken = queryItems.queryItemValue(name: "token") else {
-            let message = "Mandatory gateway 'token' query item is not set in URL."
-            throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
+        let gatewayToken = queryItems.queryItemValue(name: "token")
+        if gatewayToken == nil {
+            logger.info("Gateway 'token' is not set in \(url), this may be an error.")
         }
         guard let customerId = queryItems.queryItemValue(name: "customer_id"),
               let tokenId = queryItems.queryItemValue(name: "token_id") else {
-            return .init(gatewayToken: gatewayToken, customerId: nil, tokenId: nil, returnType: .authorization)
+            return .init(gatewayToken: gatewayToken ?? "", customerId: nil, tokenId: nil, returnType: .authorization)
         }
-        return .init(gatewayToken: gatewayToken, customerId: customerId, tokenId: tokenId, returnType: .createToken)
+        return POAlternativePaymentMethodResponse(
+            gatewayToken: gatewayToken ?? "", customerId: customerId, tokenId: tokenId, returnType: .createToken
+        )
     }
 
     // MARK: - Private
