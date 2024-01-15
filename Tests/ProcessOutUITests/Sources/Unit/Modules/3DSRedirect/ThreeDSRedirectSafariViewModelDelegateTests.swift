@@ -18,7 +18,7 @@ final class ThreeDSRedirectSafariViewModelDelegateTests: XCTestCase {
         let sut = ThreeDSRedirectSafariViewModelDelegate { result = $0 }
 
         // When
-        let url = URL(string: #"test://return?token="#)!
+        let url = URL(string: #"test://return"#)!
         try sut.complete(with: url)
 
         // Then
