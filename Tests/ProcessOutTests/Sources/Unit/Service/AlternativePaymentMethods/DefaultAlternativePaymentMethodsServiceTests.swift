@@ -72,5 +72,14 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
         XCTAssertEqual(result?.customerId, "cust_test")
     }
 
+    func test_alternativePaymentMethodResponse_whenTokenIsNotSet_succeeds() throws {
+        // When
+        let url = URL(string: "test://return")!
+        let result = try sut.alternativePaymentMethodResponse(url: url)
+
+        // Then
+        XCTAssertTrue(result.gatewayToken.isEmpty)
+    }
+
     private var sut: DefaultAlternativePaymentMethodsService!
 }
