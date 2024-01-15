@@ -19,11 +19,13 @@ final class ThreeDSRedirectSafariViewModelDelegate: DefaultSafariViewModelDelega
     // MARK: - DefaultSafariViewModelDelegate
 
     func complete(with url: URL) throws {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-              let token = components.queryItems?.first(where: { $0.name == Constants.tokenQueryItemName }) else {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             throw POFailure(message: nil, code: .internal(.mobile), underlyingError: nil)
         }
-        completion(.success(token.value ?? ""))
+        let token = components.queryItems?.first { item in
+            item.name == Constants.tokenQueryItemName
+        }
+        completion(.success(token?.value ?? ""))
     }
 
     func complete(with failure: POFailure) {
