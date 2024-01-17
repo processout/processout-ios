@@ -1,5 +1,20 @@
 # Migration Guides
 
+## Migrating from versions < 4.11.0
+
+- UI available in `ProcessOut` package is deprecated. `ProcessOutUI` package should be imported instead. Please see
+[documentation](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutui) for details.
+
+    - `PONativeAlternativePaymentViewController` should be used instead of
+``PONativeAlternativePaymentMethodViewControllerBuilder``. Please note that new module is built on top of SwiftUI
+so existing styling is incompatible since no longer relies on UIKit types.
+
+    - ``POAlternativePaymentMethodViewControllerBuilder`` is deprecated, use `SFSafariViewController` init that accepts
+``POAlternativePaymentMethodRequest`` directly.
+
+    - ``PO3DSRedirectViewControllerBuilder`` is deprecated, use `SFSafariViewController` init that accepts
+``PO3DSRedirect`` directly.
+
 ## Migrating from versions < 4.0.0
 
 - `ProcessOutApiType` protocol was removed, instead ``ProcessOut/ProcessOut`` class should be used directly.
