@@ -21,6 +21,16 @@ struct CardUpdateItemView: View {
         case .input(let item):
             InputView(viewModel: item, focusedInputId: $focusedInputId)
                 .inputStyle(style.input)
+        case .picker(let pickerItem):
+            // todo(andrii-vysotskyi): use injected style when scheme selection is public
+            POPicker(pickerItem.options, selection: pickerItem.$selectedOptionId) { option in
+                Text(option.title)
+            }
+            .modify(when: pickerItem.preferrsInline) { view in
+                let style = PORadioGroupPickerStyle(radioButtonStyle: .radio)
+                view.pickerStyle(style)
+            }
+            .pickerStyle(POMenuPickerStyle(inputStyle: .medium))
         case .error(let errorItem):
             Text(errorItem.description)
                 .textStyle(style.errorDescription)
