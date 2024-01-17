@@ -13,7 +13,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     init(interactor: some CardUpdateInteractor, configuration: POCardUpdateConfiguration) {
         self.configuration = configuration
         self.interactor = interactor
-        items = []
+        sections = []
         actions = []
         observeChanges(interactor: interactor)
     }
@@ -26,7 +26,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     }()
 
     @Published
-    private(set) var items: [CardUpdateViewModelItem]
+    private(set) var sections: [CardUpdateViewModelSection]
 
     @Published
     private(set) var actions: [POActionsContainerActionViewModel]
@@ -38,10 +38,16 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
 
     private typealias InteractorState = CardUpdateInteractorState
 
+    private enum SectionId {
+        static let cardInformation = "card-info"
+        static let preferredScheme = "preferred-scheme"
+    }
+
     private enum ItemId {
         static let number = "card-number"
         static let cvc = "card-cvc"
         static let error = "error"
+        static let scheme = "scheme"
     }
 
     private enum ActionId {
@@ -68,15 +74,17 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         case .idle, .completed:
             break // Ignored
         case .starting:
-            items = [.progress]
+            sections = [
+                .init(id: SectionId.cardInformation, title: nil, items: [.progress])
+            ]
             updateActionsWithStartingState()
             focusedItemId = nil
         case .started(let state):
-            updateItems(with: state)
+            updateSections(with: state)
             updateActions(with: state)
             focusedItemId = ItemId.cvc
         case .updating(let state):
-            updateItems(with: state)
+            updateSections(with: state)
             updateActions(with: state, isSubmitting: true)
             focusedItemId = nil
         }
@@ -84,15 +92,19 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
 
     // MARK: - Inputs
 
-    private func updateItems(with state: InteractorState.Started) {
-        var items = [
+    private func updateSections(with state: InteractorState.Started) {
+        var cardItems = [
             createCardNumberItem(state: state), createCvcItem(state: state)
         ]
         if let error = state.recentErrorMessage {
             let errorItem = CardUpdateViewModelItem.Error(id: ItemId.error, description: error)
-            items.append(.error(errorItem))
+            cardItems.append(.error(errorItem))
         }
-        self.items = items.compactMap { $0 }
+        let cardSection = CardUpdateViewModelSection(
+            id: SectionId.cardInformation, title: nil, items: cardItems.compactMap { $0 }
+        )
+        let preferredSchemeSection = createPreferredSchemeSection(startedState: state)
+        self.sections = [cardSection, preferredSchemeSection].compactMap { $0 }
     }
 
     private func createCardNumberItem(state: InteractorState.Started) -> CardUpdateViewModelItem? {
@@ -136,6 +148,38 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
             }
         )
         return .input(item)
+    }
+
+    // MARK: - Preferred Scheme
+
+    private func createPreferredSchemeSection(
+        startedState: InteractorState.Started
+    ) -> CardUpdateViewModelSection? {
+        guard configuration.isSchemeSelectionAllowed,
+              let scheme = startedState.scheme,
+              let coScheme = startedState.coScheme else {
+            return nil
+        }
+        let pickerItem = CardUpdateViewModelItem.Picker(
+            id: ItemId.scheme,
+            options: [
+                .init(id: scheme, title: scheme.capitalized),
+                .init(id: coScheme, title: coScheme.capitalized)
+            ],
+            selectedOptionId: .init(
+                get: { startedState.preferredScheme },
+                set: { [weak self] newValue in
+                    self?.interactor.setPreferredScheme(newValue ?? scheme)
+                }
+            ),
+            preferrsInline: true
+        )
+        let section = CardUpdateViewModelSection(
+            id: SectionId.preferredScheme,
+            title: String(resource: .CardUpdate.preferredScheme),
+            items: [.picker(pickerItem)]
+        )
+        return section
     }
 
     // MARK: - Actions
