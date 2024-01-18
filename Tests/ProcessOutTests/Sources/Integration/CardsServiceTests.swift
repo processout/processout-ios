@@ -13,7 +13,7 @@ import XCTest
 
     override func setUp() {
         super.setUp()
-        let configuration = ProcessOutConfiguration.production(projectId: Constants.projectId, isDebug: true)
+        let configuration = ProcessOutConfiguration.production(projectId: Constants.projectId)
         sut = ProcessOut(configuration: configuration).cards
     }
 
