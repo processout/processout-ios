@@ -19,7 +19,7 @@ struct CardUpdateSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: POSpacing.small) {
             if let title = section.title {
-                // todo(andrii-vysotskyi): allow style change when related functionality is public
+                // todo(andrii-vysotskyi): use injected style when scheme selection is public
                 let textStyle = POTextStyle(color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading)
                 Text(title).textStyle(textStyle)
             }
