@@ -128,7 +128,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             cardNumber: cardInfo?.maskedNumber,
             scheme: cardInfo?.scheme,
             coScheme: cardInfo?.coScheme,
-            preferredScheme: cardInfo?.preferredScheme,
+            preferredScheme: preferredScheme(cardInfo: cardInfo),
             formatter: cardSecurityCodeFormatter
         )
         self.state = .started(startedState)
@@ -175,6 +175,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         cardSecurityCodeFormatter.scheme = issuerInformation.scheme
         state.scheme = issuerInformation.scheme
         state.coScheme = issuerInformation.coScheme
+        state.preferredScheme = state.preferredScheme ?? preferredScheme(issuerInformation: issuerInformation)
         state.cvc = cardSecurityCodeFormatter.string(from: state.cvc)
     }
 
@@ -249,5 +250,20 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         state = .completed
         delegate?.cardUpdateDidEmitEvent(.didComplete)
         completion(.success(card))
+    }
+
+    // MARK: - Preferred Scheme
+
+    private func preferredScheme(
+        cardInfo: POCardUpdateInformation? = nil,
+        issuerInformation: POCardIssuerInformation? = nil
+    ) -> String? {
+        if let scheme = cardInfo?.preferredScheme {
+            return scheme
+        }
+        guard configuration.isSchemeSelectionAllowed else {
+            return nil
+        }
+        return cardInfo?.scheme ?? issuerInformation?.scheme
     }
 }
