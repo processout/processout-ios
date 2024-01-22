@@ -33,6 +33,9 @@ let package = Package(
             dependencies: [
                 .target(name: "ProcessOut"),
                 .product(name: "Checkout3DSPackages", package: "checkout-3ds-sdk-ios")
+            ],
+            resources: [
+                .process("Resources")
             ]
         ),
         .target(
