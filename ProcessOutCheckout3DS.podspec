@@ -12,5 +12,5 @@ Pod::Spec.new do |s|
   s.source_files          = 'Sources/ProcessOutCheckout3DS/**/*.swift'
   s.pod_target_xcconfig   = { 'EXCLUDED_ARCHS' => 'x86_64' }
   s.dependency            'ProcessOut', s.version.to_s
-  s.dependency            'Checkout3DS', '3.2.2'
+  s.dependency            'Checkout3DS', '3.2.3'
 end
