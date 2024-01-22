@@ -9,6 +9,7 @@ Pod::Spec.new do |s|
   s.source                = { :git => 'https://github.com/processout/processout-ios.git', :tag => s.version.to_s }
   s.frameworks            = 'Foundation'
   s.ios.deployment_target = '13.0'
+  s.ios.resources         = 'Sources/ProcessOutCheckout3DS/Resources/**/*'
   s.source_files          = 'Sources/ProcessOutCheckout3DS/**/*.swift'
   s.pod_target_xcconfig   = { 'EXCLUDED_ARCHS' => 'x86_64' }
   s.dependency            'ProcessOut', s.version.to_s
