@@ -1,46 +1,46 @@
 //
-//  StringResource+NativeAlternativePayment.swift
+//  POStringResource+NativeAlternativePayment.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 23.11.2023.
 //
 
-import Foundation
+@_spi(PO) import ProcessOut
 
 // swiftlint:disable nesting
 
-extension StringResource {
+extension POStringResource {
 
     enum NativeAlternativePayment {
 
         /// Screen title.
-        static let title = StringResource("native-alternative-payment.title", comment: "")
+        static let title = POStringResource("native-alternative-payment.title", comment: "")
 
         enum Placeholder {
 
             /// Email placeholder.
-            static let email = StringResource("native-alternative-payment.email.placeholder", comment: "")
+            static let email = POStringResource("native-alternative-payment.email.placeholder", comment: "")
 
             /// Phone placeholder.
-            static let phone = StringResource("native-alternative-payment.phone.placeholder", comment: "")
+            static let phone = POStringResource("native-alternative-payment.phone.placeholder", comment: "")
         }
 
         enum Button {
 
             /// Pay.
-            static let submit = StringResource("native-alternative-payment.submit-button.default-title", comment: "")
+            static let submit = POStringResource("native-alternative-payment.submit-button.default-title", comment: "")
 
             /// Pay %@
-            static let submitAmount = StringResource("native-alternative-payment.submit-button.title", comment: "")
+            static let submitAmount = POStringResource("native-alternative-payment.submit-button.title", comment: "")
 
             /// Cancel button title.
-            static let cancel = StringResource("native-alternative-payment.cancel-button.title", comment: "")
+            static let cancel = POStringResource("native-alternative-payment.cancel-button.title", comment: "")
         }
 
         enum Success {
 
             /// Success message.
-            static let message = StringResource("native-alternative-payment.success.message", comment: "")
+            static let message = POStringResource("native-alternative-payment.success.message", comment: "")
         }
     }
 }
