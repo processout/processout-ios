@@ -313,13 +313,13 @@ import UIKit
                 // todo(andrii-vysotskyi): remove when backend is updated
                 switch parameter.type {
                 case .numeric:
-                    errorMessage = Strings.NativeAlternativePayment.Error.invalidNumber
+                    errorMessage = String(resource: .NativeAlternativePayment.Error.invalidNumber)
                 case .text, .singleSelect:
-                    errorMessage = Strings.NativeAlternativePayment.Error.invalidValue
+                    errorMessage = String(resource: .NativeAlternativePayment.Error.invalidValue)
                 case .email:
-                    errorMessage = Strings.NativeAlternativePayment.Error.invalidEmail
+                    errorMessage = String(resource: .NativeAlternativePayment.Error.invalidEmail)
                 case .phone:
-                    errorMessage = Strings.NativeAlternativePayment.Error.invalidPhone
+                    errorMessage = String(resource: .NativeAlternativePayment.Error.invalidPhone)
                 }
             } else {
                 errorMessage = nil
@@ -452,22 +452,22 @@ import UIKit
         let message: String?
         if value.isEmpty {
             if parameter.required {
-                message = Strings.NativeAlternativePayment.Error.requiredParameter
+                message = String(resource: .NativeAlternativePayment.Error.requiredParameter)
             } else {
                 message = nil
             }
         } else if let length = parameter.length, value.count != length {
-            message = Strings.NativeAlternativePayment.Error.invalidLength(length)
+            message = String(resource: .NativeAlternativePayment.Error.invalidLength, replacements: length)
         } else {
             switch parameter.type {
             case .numeric where !CharacterSet(charactersIn: value).isSubset(of: .decimalDigits):
-                message = Strings.NativeAlternativePayment.Error.invalidNumber
+                message = String(resource: .NativeAlternativePayment.Error.invalidNumber)
             case .email where value.range(of: Constants.emailRegex, options: .regularExpression) == nil:
-                message = Strings.NativeAlternativePayment.Error.invalidEmail
+                message = String(resource: .NativeAlternativePayment.Error.invalidEmail)
             case .phone where value.range(of: Constants.phoneRegex, options: .regularExpression) == nil:
-                message = Strings.NativeAlternativePayment.Error.invalidPhone
+                message = String(resource: .NativeAlternativePayment.Error.invalidPhone)
             case .singleSelect where parameter.availableValues?.map(\.value).contains(value) == false:
-                message = Strings.NativeAlternativePayment.Error.invalidValue
+                message = String(resource: .NativeAlternativePayment.Error.invalidValue)
             default:
                 message = nil
             }

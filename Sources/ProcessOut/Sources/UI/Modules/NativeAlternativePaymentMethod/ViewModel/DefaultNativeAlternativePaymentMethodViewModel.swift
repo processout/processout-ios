@@ -42,7 +42,6 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
     // MARK: - Private Nested Types
 
     private typealias InteractorState = PONativeAlternativePaymentMethodInteractorState
-    private typealias Text = Strings.NativeAlternativePayment
 
     private enum Constants {
         static let captureSuccessCompletionDelay: TimeInterval = 3
@@ -119,7 +118,8 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
     // swiftlint:disable:next function_body_length
     private func convertToState(startedState: InteractorState.Started, isSubmitting: Bool) -> State {
         let titleItem = State.TitleItem(
-            text: configuration.title ?? Text.title(startedState.gateway.displayName)
+            // swiftlint:disable:next line_length
+            text: configuration.title ?? String(resource: .NativeAlternativePayment.title, replacements: startedState.gateway.displayName)
         )
         var sections = [
             State.Section(id: .init(id: nil, header: nil, isTight: false), items: [.title(titleItem)])
@@ -215,7 +215,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             let submittedItem = State.SubmittedItem(
                 title: capturedState.logoImage == nil ? capturedState.paymentProviderName : nil,
                 logoImage: capturedState.logoImage,
-                message: Text.Success.message,
+                message: String(resource: .NativeAlternativePayment.Success.message),
                 image: UIImage(resource: .success),
                 isCaptured: true
             )
@@ -241,9 +241,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             priceFormatter.currencyCode = startedState.currencyCode
             // swiftlint:disable:next legacy_objc_type
             if let formattedAmount = priceFormatter.string(from: startedState.amount as NSDecimalNumber) {
-                title = Text.SubmitButton.title(formattedAmount)
+                title = String(resource: .NativeAlternativePayment.Button.submitAmount, replacements: formattedAmount)
             } else {
-                title = Text.SubmitButton.defaultTitle
+                title = String(resource: .NativeAlternativePayment.Button.submit)
             }
         }
         let action = State.Action(
@@ -265,7 +265,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
             return nil
         }
         let action = State.Action(
-            title: title ?? Text.CancelButton.title,
+            title: title ?? String(resource: .NativeAlternativePayment.Button.cancel),
             isEnabled: isEnabled,
             isExecuting: false,
             accessibilityIdentifier: "native-alternative-payment.secondary-button",
@@ -369,9 +369,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         case .numeric, .text, .singleSelect:
             return nil
         case .email:
-            return Text.Email.placeholder
+            return String(resource: .NativeAlternativePayment.Placeholder.email)
         case .phone:
-            return Text.Phone.placeholder
+            return String(resource: .NativeAlternativePayment.Placeholder.phone)
         }
     }
 
