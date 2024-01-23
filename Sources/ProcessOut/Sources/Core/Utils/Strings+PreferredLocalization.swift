@@ -1,5 +1,5 @@
 //
-//  Strings+Localized.swift
+//  Strings+PreferredLocalization.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 07.10.2022.
