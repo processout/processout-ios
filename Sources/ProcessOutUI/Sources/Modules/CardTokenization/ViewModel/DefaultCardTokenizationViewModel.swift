@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 // swiftlint:disable type_body_length file_length
