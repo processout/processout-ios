@@ -6,15 +6,16 @@
 //
 
 import Foundation
+@_spi(PO) import ProcessOut
 
 extension AddressSpecification.CityUnit {
 
-    var stringResource: StringResource {
-        let resources: [Self: StringResource] = [
-            .city: StringResource("address-spec.city", comment: ""),
-            .district: StringResource("address-spec.district", comment: ""),
-            .postTown: StringResource("address-spec.post-town", comment: ""),
-            .suburb: StringResource("address-spec.suburb", comment: "")
+    var stringResource: POStringResource {
+        let resources: [Self: POStringResource] = [
+            .city: POStringResource("address-spec.city", comment: ""),
+            .district: POStringResource("address-spec.district", comment: ""),
+            .postTown: POStringResource("address-spec.post-town", comment: ""),
+            .suburb: POStringResource("address-spec.suburb", comment: "")
         ]
         return resources[self]!  // swiftlint:disable:this force_unwrapping
     }
@@ -22,19 +23,19 @@ extension AddressSpecification.CityUnit {
 
 extension AddressSpecification.StateUnit {
 
-    var stringResource: StringResource {
-        let resources: [Self: StringResource] = [
-            .area: StringResource("address-spec.area", comment: ""),
-            .county: StringResource("address-spec.county", comment: ""),
-            .department: StringResource("address-spec.department", comment: ""),
-            .doSi: StringResource("address-spec.do-si", comment: ""),
-            .emirate: StringResource("address-spec.emirate", comment: ""),
-            .island: StringResource("address-spec.island", comment: ""),
-            .oblast: StringResource("address-spec.oblast", comment: ""),
-            .parish: StringResource("address-spec.parish", comment: ""),
-            .prefecture: StringResource("address-spec.prefecture", comment: ""),
-            .province: StringResource("address-spec.province", comment: ""),
-            .state: StringResource("address-spec.state", comment: "")
+    var stringResource: POStringResource {
+        let resources: [Self: POStringResource] = [
+            .area: POStringResource("address-spec.area", comment: ""),
+            .county: POStringResource("address-spec.county", comment: ""),
+            .department: POStringResource("address-spec.department", comment: ""),
+            .doSi: POStringResource("address-spec.do-si", comment: ""),
+            .emirate: POStringResource("address-spec.emirate", comment: ""),
+            .island: POStringResource("address-spec.island", comment: ""),
+            .oblast: POStringResource("address-spec.oblast", comment: ""),
+            .parish: POStringResource("address-spec.parish", comment: ""),
+            .prefecture: POStringResource("address-spec.prefecture", comment: ""),
+            .province: POStringResource("address-spec.province", comment: ""),
+            .state: POStringResource("address-spec.state", comment: "")
         ]
         return resources[self]!  // swiftlint:disable:this force_unwrapping
     }
@@ -42,12 +43,12 @@ extension AddressSpecification.StateUnit {
 
 extension AddressSpecification.PostcodeUnit {
 
-    var stringResource: StringResource {
-        let resources: [Self: StringResource] = [
-            .postcode: StringResource("address-spec.postcode", comment: ""),
-            .eircode: StringResource("address-spec.eircode", comment: ""),
-            .pin: StringResource("address-spec.pin", comment: ""),
-            .zip: StringResource("address-spec.zip", comment: "")
+    var stringResource: POStringResource {
+        let resources: [Self: POStringResource] = [
+            .postcode: POStringResource("address-spec.postcode", comment: ""),
+            .eircode: POStringResource("address-spec.eircode", comment: ""),
+            .pin: POStringResource("address-spec.pin", comment: ""),
+            .zip: POStringResource("address-spec.zip", comment: "")
         ]
         return resources[self]!  // swiftlint:disable:this force_unwrapping
     }
