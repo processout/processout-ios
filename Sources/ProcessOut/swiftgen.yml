@@ -1,19 +1,6 @@
 input_dir: ${TARGET_ROOT}/Resources/
 output_dir: ${TARGET_ROOT}/Sources/Generated/
 
-## Constants for Localized Strings.
-strings:
-  inputs:
-    - Strings/en.lproj/ProcessOut.strings
-    - Strings/en.lproj/ProcessOut.stringsdict
-  outputs:
-    - templateName: structured-swift5
-      params:
-        enumName: Strings
-        bundle: BundleLocator.bundle
-        lookupFunction: Strings.localized
-      output: Strings+Generated.swift
-
 ## Files
 files:
   inputs:

@@ -66,7 +66,6 @@ targets:
         name: SwiftGen
         outputFiles:
           - $(TARGET_ROOT)/Sources/Generated/Files+Generated.swift
-          - $(TARGET_ROOT)/Sources/Generated/Strings+Generated.swift
         basedOnDependencyAnalysis: false
       - path: Scripts/Sourcery.sh
         name: Sourcery
