@@ -6,6 +6,8 @@ settings:
   SWIFT_TREAT_WARNINGS_AS_ERRORS: true
   CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: true
   SUPPORTS_MACCATALYST: false
+  LOCALIZED_STRING_MACRO_NAMES: "$(inherited) POStringResource"
+  LOCALIZATION_PREFERS_STRING_CATALOGS: true
 options:
   transitivelyLinkDependencies: true
 packages:
@@ -35,8 +37,6 @@ targets:
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.ui
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutUI
-      LOCALIZED_STRING_MACRO_NAMES: "$(inherited) StringResource"
-      LOCALIZATION_PREFERS_STRING_CATALOGS: true
     preBuildScripts:
       - path: Scripts/Lint.sh
         name: Swiftlint
