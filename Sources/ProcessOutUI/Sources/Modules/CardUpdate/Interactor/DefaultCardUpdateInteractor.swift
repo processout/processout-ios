@@ -188,7 +188,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             setFailureStateUnchecked(failure: failure)
             return
         }
-        var errorMessage: StringResource
+        var errorMessage: POStringResource
         switch failure.code {
         case .generic(.requestInvalidCard),
              .generic(.cardInvalid),
