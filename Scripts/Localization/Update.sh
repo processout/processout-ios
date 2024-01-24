@@ -30,7 +30,7 @@ lokalise2 \
 
 # Preprocess imported XLIFFs and import them in project
 find $WORK_DIR/import -name '*.xliff' \
-  -exec ./Scripts/PreprocessLocalization.swift "$BASE_LANGUAGE_XLIFF" '{}' \; \
+  -exec ./Scripts/Localization/PreprocessXliff.swift "$BASE_LANGUAGE_XLIFF" '{}' \; \
   -exec xcodebuild -importLocalizations -project ProcessOut.xcodeproj -localizationPath '{}' \;
 
 function cleanup {
