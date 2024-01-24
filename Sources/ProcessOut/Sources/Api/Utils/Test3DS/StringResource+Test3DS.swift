@@ -10,12 +10,12 @@ extension POStringResource {
     enum Test3DS {
 
         /// 3DS challenge title.
-        static let title = POStringResource("test-3-d-s.challenge.title", comment: "")
+        static let title = POStringResource("test-3ds.challenge.title", comment: "")
 
         /// Accept button title.
-        static let accept = POStringResource("test-3-d-s.challenge.accept", comment: "")
+        static let accept = POStringResource("test-3ds.challenge.accept", comment: "")
 
         /// Reject button title.
-        static let reject = POStringResource("test-3-d-s.challenge.reject", comment: "")
+        static let reject = POStringResource("test-3ds.challenge.reject", comment: "")
     }
 }

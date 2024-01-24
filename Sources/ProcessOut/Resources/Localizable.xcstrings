@@ -323,7 +323,7 @@
         }
       }
     },
-    "test-3-d-s.challenge.accept" : {
+    "test-3ds.challenge.accept" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -345,7 +345,7 @@
         }
       }
     },
-    "test-3-d-s.challenge.reject" : {
+    "test-3ds.challenge.reject" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -367,7 +367,7 @@
         }
       }
     },
-    "test-3-d-s.challenge.title" : {
+    "test-3ds.challenge.title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
