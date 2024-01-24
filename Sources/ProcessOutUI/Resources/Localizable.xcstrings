@@ -21,12 +21,6 @@
             "value" : "Zone"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Obszar"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -53,12 +47,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ville"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Miejscowość"
           }
         },
         "pt-PT" : {
@@ -89,12 +77,6 @@
             "value" : "Comté"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hrabstwo"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -121,12 +103,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Département"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Departament"
           }
         },
         "pt-PT" : {
@@ -157,12 +133,6 @@
             "value" : "District"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dystrykt"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -191,12 +161,6 @@
             "value" : "Province et ville"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Do Si"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -220,12 +184,6 @@
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eircode"
-          }
-        },
-        "pl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eircode"
@@ -259,12 +217,6 @@
             "value" : "Émirat"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Emiraty"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -291,12 +243,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Île"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wyspa"
           }
         },
         "pt-PT" : {
@@ -327,12 +273,6 @@
             "value" : "Oblast"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Obwód"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -361,12 +301,6 @@
             "value" : "Paroisse"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Parafia"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -390,12 +324,6 @@
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PIN"
-          }
-        },
-        "pl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIN"
@@ -429,12 +357,6 @@
             "value" : "Ville"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Miejscowość"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -461,12 +383,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Code postal"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kod pocztowy"
           }
         },
         "pt-PT" : {
@@ -497,12 +413,6 @@
             "value" : "Préfecture"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prefektura"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -529,12 +439,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Province"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prowincja"
           }
         },
         "pt-PT" : {
@@ -565,12 +469,6 @@
             "value" : "État"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stan"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -597,12 +495,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Localité"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Przedmieścia"
           }
         },
         "pt-PT" : {
@@ -633,12 +525,6 @@
             "value" : "Code postal"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kod p"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -665,12 +551,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ligne d’adresse %d"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Linia adresu %d"
           }
         },
         "pt-PT" : {
@@ -701,12 +581,6 @@
             "value" : "Adresse de Facturation"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -733,12 +607,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Annuler"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anuluj"
           }
         },
         "pt-PT" : {
@@ -769,12 +637,6 @@
             "value" : "Nom du porteur de carte"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imię i nazwisko na karcie"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -801,12 +663,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CVV"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CVC"
           }
         },
         "pt-PT" : {
@@ -837,12 +693,6 @@
             "value" : "MM / AA"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MM / RR"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -866,12 +716,6 @@
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "4242 4242 4242 4242"
-          }
-        },
-        "pl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "4242 4242 4242 4242"
@@ -905,12 +749,6 @@
             "value" : "Les informations de votre carte sont incorrectes."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Niepoprawne dane karty."
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -937,12 +775,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La date d’expiration de votre carte est incorrecte."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Data ważności karty jest nieprawidłowa."
           }
         },
         "pt-PT" : {
@@ -973,12 +805,6 @@
             "value" : "Votre numéro de carte est incorrect."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nieprawidłowy numer karty."
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1005,12 +831,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le nom du porteur de carte est incorrect."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nieprawidłowe imię i nazwisko na karcie."
           }
         },
         "pt-PT" : {
@@ -1041,12 +861,6 @@
             "value" : "Le code CVV de votre carte est incorrect."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nieprawidłowy numer CVC."
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1073,12 +887,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Une erreur s’est produite, veuillez réessayer."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coś poszło nie tak, spróbuj ponownie."
           }
         },
         "pt-PT" : {
@@ -1109,12 +917,6 @@
             "value" : "La date d’expiration de votre carte ou son code CVV sont incorrects."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Data ważności karty oraz/lub kod CVC są nieprawidłowe."
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1141,12 +943,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réseau de Carte Préféré"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
           }
         },
         "pt-PT" : {
@@ -1177,12 +973,6 @@
             "value" : "Envoyer"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zatwierdź"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1209,12 +999,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter une nouvelle carte"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dodaj nową kartę"
           }
         },
         "pt-PT" : {
@@ -1245,12 +1029,6 @@
             "value" : "Annuler"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anuluj"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1277,12 +1055,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CVV"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CVC"
           }
         },
         "pt-PT" : {
@@ -1313,12 +1085,6 @@
             "value" : "Le code CVV de votre carte est incorrect."
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nieprawidłowy numer CVC."
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1345,12 +1111,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Une erreur s’est produite, veuillez réessayer."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coś poszło nie tak, spróbuj ponownie."
           }
         },
         "pt-PT" : {
@@ -1381,12 +1141,6 @@
             "value" : "Envoyer"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zatwierdź"
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1415,12 +1169,6 @@
             "value" : "Informations de Paiement"
           }
         },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1431,22 +1179,10 @@
     },
     "native-alternative-payment.cancel-button.title" : {
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إلغاء"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Annuler"
           }
         },
         "pl" : {
@@ -1465,22 +1201,10 @@
     },
     "native-alternative-payment.email.placeholder" : {
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "name@example.com"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "name@example.com"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "nom@exemple.fr"
           }
         },
         "pl" : {
@@ -1499,22 +1223,10 @@
     },
     "native-alternative-payment.phone.placeholder" : {
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أدخل رقم الهاتف"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter phone number"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entrez votre numéro de téléphone"
           }
         },
         "pl" : {
@@ -1533,22 +1245,10 @@
     },
     "native-alternative-payment.submit-button.default-title" : {
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الدفع"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pay"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Payer"
           }
         },
         "pl" : {
@@ -1567,22 +1267,10 @@
     },
     "native-alternative-payment.submit-button.title" : {
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الدفع %@"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pay %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Payer %@"
           }
         },
         "pl" : {
@@ -1601,56 +1289,32 @@
     },
     "native-alternative-payment.success.message" : {
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "نجاح! تمت الموافقة على الدفع"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Success!\\nPayment approved."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Succès !\\nPaiement confirmé."
+            "value" : "Success!\nPayment approved."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sukces!\\nPłatność przyjęta."
+            "value" : "Sukces!\nPłatność przyjęta."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Successo!\\nPagamento aprovado."
+            "value" : "Successo!\nPagamento aprovado."
           }
         }
       }
     },
     "native-alternative-payment.title" : {
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الدفع بواسطة %@"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pay with %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Payer avec %@"
           }
         },
         "pl" : {
