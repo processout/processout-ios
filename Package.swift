@@ -15,7 +15,7 @@ let package = Package(
         .library(name: "ProcessOutCheckout3DS", targets: ["ProcessOutCheckout3DS"])
     ],
     dependencies: [
-        .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", exact: "3.2.2"),
+        .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", exact: "3.2.3"),
     ],
     targets: [
         .target(
@@ -33,6 +33,9 @@ let package = Package(
             dependencies: [
                 .target(name: "ProcessOut"),
                 .product(name: "Checkout3DSPackages", package: "checkout-3ds-sdk-ios")
+            ],
+            resources: [
+                .process("Resources")
             ]
         ),
         .target(
