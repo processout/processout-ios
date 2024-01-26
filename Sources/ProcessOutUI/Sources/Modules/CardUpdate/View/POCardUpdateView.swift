@@ -30,14 +30,14 @@ public struct POCardUpdateView: View {
                             .frame(height: 1)
                             .overlay(style.separatorColor)
                     }
-                    ForEach(viewModel.items) { element in
-                        CardUpdateItemView(item: element, focusedInputId: $viewModel.focusedItemId)
+                    ForEach(viewModel.sections) { element in
+                        CardUpdateSectionView(section: element, focusedInputId: $viewModel.focusedItemId)
                     }
                     .padding(.horizontal, POSpacing.large)
                     .backport.geometryGroup()
                 }
+                .animation(.default, value: bodyAnimationValue)
                 .padding(.vertical, POSpacing.medium)
-                .animation(.default, value: viewModel.items.map(\.id))
             }
             .clipped()
             POActionsContainerView(actions: viewModel.actions)
@@ -53,4 +53,11 @@ public struct POCardUpdateView: View {
 
     @StateObject
     private var viewModel: AnyCardUpdateViewModel
+
+    // MARK: - Animation
+
+    /// Returns value that should trigger whole body animated update.
+    private var bodyAnimationValue: AnyHashable {
+        viewModel.sections.map { [$0.id, $0.items.map(\.id)] }
+    }
 }

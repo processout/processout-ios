@@ -1121,6 +1121,34 @@
         }
       }
     },
+    "card-update.preferred-scheme" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النظام المفضل للبطاقة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferred Scheme"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réseau de Carte Préféré"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rede de pagamento preferencial"
+          }
+        }
+      }
+    },
     "card-update.submit-button" : {
       "localizations" : {
         "ar" : {

@@ -13,11 +13,17 @@ public struct POCardUpdateRequest: Encodable {
     public var cardId: String
 
     /// New cvc.
-    public let cvc: String
+    /// Pass `nil` to keep existing value.
+    public let cvc: String?
+
+    /// Preferred scheme defined by the Customer. This gets priority when processing the Transaction.
+    /// Pass `nil` to keep existing value.
+    public let preferredScheme: String?
 
     /// Creates request instance.
-    public init(cardId: String, cvc: String) {
+    public init(cardId: String, cvc: String? = nil, preferredScheme: String? = nil) {
         self._cardId = .init(value: cardId)
         self.cvc = cvc
+        self.preferredScheme = preferredScheme
     }
 }

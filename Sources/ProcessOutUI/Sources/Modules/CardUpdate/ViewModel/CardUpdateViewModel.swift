@@ -13,8 +13,8 @@ protocol CardUpdateViewModel: ObservableObject {
     /// Screen title.
     var title: String? { get }
 
-    /// Available items.
-    var items: [CardUpdateViewModelItem] { get }
+    /// Available sections.
+    var sections: [CardUpdateViewModelSection] { get }
 
     /// Available actions.
     var actions: [POActionsContainerActionViewModel] { get }

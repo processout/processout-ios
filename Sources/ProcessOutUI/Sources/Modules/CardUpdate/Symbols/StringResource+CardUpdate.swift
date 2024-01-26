@@ -17,6 +17,9 @@ extension StringResource {
         /// Card CVC placeholder.
         static let cvc = StringResource("card-update.cvc", comment: "")
 
+        /// Preferred scheme section title.
+        static let preferredScheme = StringResource("card-update.preferred-scheme", comment: "")
+
         enum Button {
 
             /// Submit button title.

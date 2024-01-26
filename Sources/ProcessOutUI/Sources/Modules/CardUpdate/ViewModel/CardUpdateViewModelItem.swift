@@ -12,6 +12,30 @@ enum CardUpdateViewModelItem {
 
     typealias Input = InputViewModel
 
+    struct Picker: Identifiable {
+
+        /// Item identifier.
+        let id: AnyHashable
+
+        /// Availale options.
+        let options: [PickerOption]
+
+        /// Currently selected option id.
+        @Binding var selectedOptionId: String?
+
+        /// Boolean flag indicating whether inline style is preferred.
+        let preferrsInline: Bool
+    }
+
+    struct PickerOption: Identifiable {
+
+        /// Option id.
+        let id: String
+
+        /// Option title.
+        let title: String
+    }
+
     struct Error: Identifiable {
 
         /// Item identifier.
@@ -21,7 +45,7 @@ enum CardUpdateViewModelItem {
         let description: String
     }
 
-    case input(Input), error(Error), progress
+    case input(Input), picker(Picker), error(Error), progress
 }
 
 extension CardUpdateViewModelItem: Identifiable {
@@ -29,6 +53,8 @@ extension CardUpdateViewModelItem: Identifiable {
     var id: AnyHashable {
         switch self {
         case .input(let item):
+            return item.id
+        case .picker(let item):
             return item.id
         case .error(let item):
             return item.id

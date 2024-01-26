@@ -72,15 +72,34 @@ import XCTest
         await assertThrowsError(try await card(), "Unexpected success, card number is invalid")
     }
 
-    func test_updateCard() async throws {
+    func test_updateCard_whenCvcIsSet_updatesIt() async throws {
         // Given
         let card = try await sut.tokenize(
             request: .init(number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737")
         )
-        let cardUpdateRequest = POCardUpdateRequest(cardId: card.id, cvc: "123")
 
         // When
-        _ = try await sut.updateCard(request: cardUpdateRequest)
+        let updatedCard = try await sut.updateCard(
+            request: POCardUpdateRequest(cardId: card.id, cvc: "123")
+        )
+
+        // Then
+        XCTAssertEqual(updatedCard.updateType, "new-cvc2")
+    }
+
+    func test_updateCard_whenPreferredSchemeIsSet_updatesIt() async throws {
+        // Given
+        let card = try await sut.tokenize(
+            request: .init(number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737")
+        )
+
+        // When
+        let updatedCard = try await sut.updateCard(
+            request: POCardUpdateRequest(cardId: card.id, preferredScheme: "test")
+        )
+
+        // Then
+        XCTAssertEqual(updatedCard.preferredScheme, "test")
     }
 
     func test_tokenize_whenPreferredSchemeIsSet() async throws {

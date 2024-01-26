@@ -25,8 +25,8 @@ final class AnyCardUpdateViewModel: CardUpdateViewModel {
         base.title
     }
 
-    var items: [CardUpdateViewModelItem] {
-        base.items
+    var sections: [CardUpdateViewModelSection] {
+        base.sections
     }
 
     var actions: [POActionsContainerActionViewModel] {

@@ -50,6 +50,10 @@
         appendInterpolation(String(describing: error), privacy: privacy)
     }
 
+    public mutating func appendInterpolation<Value>(_ value: Value, privacy: Privacy = .public) {
+        appendInterpolation(String(describing: value), privacy: privacy)
+    }
+
     public init(literalCapacity: Int, interpolationCount: Int) {
         value = String()
         value.reserveCapacity(literalCapacity)

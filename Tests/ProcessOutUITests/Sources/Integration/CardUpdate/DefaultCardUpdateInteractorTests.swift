@@ -72,7 +72,8 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
             XCTFail("Unexpected state")
             return
         }
-        XCTAssertEqual(startedState.scheme, "carte bancaire")
+        XCTAssertEqual(startedState.scheme, "visa")
+        XCTAssertEqual(startedState.preferredScheme, "carte bancaire")
     }
 
     func test_start_whenCardSchemeIsNotSetAndIinIsSet_attemptsToResolve() {
