@@ -40,7 +40,7 @@ import PassKit
         cardsService = ProcessOut.shared.cards
         recentRequestUpdate = .init(request: paymentRequest)
         super.init()
-        controller.delegate = self
+        commonInit()
     }
 
     /// Presents the Apple Pay UI modally over your app. You are responsible for dismissal
@@ -153,6 +153,12 @@ import PassKit
         delegate?.presentationWindow(for: self)
     }
 
+    // MARK: - Private Nested Types
+
+    private enum AssociatedObjectKeys {
+        static var controller: UInt8 = 0
+    }
+
     // MARK: - Private Properties
 
     private let paymentRequest: PKPaymentRequest
@@ -163,6 +169,14 @@ import PassKit
     private let cardsService: POCardsService
 
     private var recentRequestUpdate: PassKitPaymentRequestUpdate
+
+    // MARK: - Private Methods
+
+    private func commonInit() {
+        controller.delegate = self
+        // Bound lifecycle of self to PKPaymentAuthorizationController.
+        objc_setAssociatedObject(controller, &AssociatedObjectKeys.controller, self, .OBJC_ASSOCIATION_RETAIN)
+    }
 }
 
 extension POPassKitPaymentAuthorizationController {
