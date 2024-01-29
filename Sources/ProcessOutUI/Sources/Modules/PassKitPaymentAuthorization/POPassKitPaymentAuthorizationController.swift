@@ -38,7 +38,6 @@ import PassKit
         contactMapper = DefaultPassKitContactMapper(logger: ProcessOut.shared.logger)
         errorMapper = DefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger)
         cardsService = ProcessOut.shared.cards
-        recentRequestUpdate = .init(request: paymentRequest)
         super.init()
         commonInit()
     }
@@ -103,50 +102,29 @@ import PassKit
     public func paymentAuthorizationController(
         _: PKPaymentAuthorizationController, didChangeCouponCode couponCode: String
     ) async -> PKPaymentRequestCouponCodeUpdate {
-        if let update = await delegate?.paymentAuthorizationController(self, didChangeCouponCode: couponCode) {
-            recentRequestUpdate.update(with: update)
-            return update
-        }
-        return PKPaymentRequestCouponCodeUpdate(
-            errors: [],
-            paymentSummaryItems: recentRequestUpdate.paymentSummaryItems,
-            shippingMethods: recentRequestUpdate.shippingMethods
-        )
+        let update = await delegate?.paymentAuthorizationController(self, didChangeCouponCode: couponCode)
+        return update ?? PKPaymentRequestCouponCodeUpdate()
     }
 
     public func paymentAuthorizationController(
         _: PKPaymentAuthorizationController, didSelectShippingMethod shippingMethod: PKShippingMethod
     ) async -> PKPaymentRequestShippingMethodUpdate {
-        if let update = await delegate?.paymentAuthorizationController(self, didSelectShippingMethod: shippingMethod) {
-            recentRequestUpdate.update(with: update)
-            return update
-        }
-        return PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: recentRequestUpdate.paymentSummaryItems)
+        let update = await delegate?.paymentAuthorizationController(self, didSelectShippingMethod: shippingMethod)
+        return update ?? PKPaymentRequestShippingMethodUpdate()
     }
 
     public func paymentAuthorizationController(
         _: PKPaymentAuthorizationController, didSelectShippingContact contact: PKContact
     ) async -> PKPaymentRequestShippingContactUpdate {
-        if let update = await delegate?.paymentAuthorizationController(self, didSelectShippingContact: contact) {
-            recentRequestUpdate.update(with: update)
-            recentRequestUpdate.shippingMethods = update.shippingMethods
-            return update
-        }
-        return PKPaymentRequestShippingContactUpdate(
-            errors: [],
-            paymentSummaryItems: recentRequestUpdate.paymentSummaryItems,
-            shippingMethods: recentRequestUpdate.shippingMethods
-        )
+        let update = await delegate?.paymentAuthorizationController(self, didSelectShippingContact: contact)
+        return update ?? PKPaymentRequestShippingContactUpdate()
     }
 
     public func paymentAuthorizationController(
         _: PKPaymentAuthorizationController, didSelectPaymentMethod paymentMethod: PKPaymentMethod
     ) async -> PKPaymentRequestPaymentMethodUpdate {
-        if let update = await delegate?.paymentAuthorizationController(self, didSelectPaymentMethod: paymentMethod) {
-            recentRequestUpdate.update(with: update)
-            return update
-        }
-        return .init(errors: [], paymentSummaryItems: recentRequestUpdate.paymentSummaryItems)
+        let update = await delegate?.paymentAuthorizationController(self, didSelectPaymentMethod: paymentMethod)
+        return update ?? PKPaymentRequestPaymentMethodUpdate()
     }
 
     public func presentationWindow(for _: PKPaymentAuthorizationController) -> UIWindow? {
@@ -167,8 +145,6 @@ import PassKit
     private let contactMapper: PassKitContactMapper
     private let errorMapper: PassKitPaymentErrorMapper
     private let cardsService: POCardsService
-
-    private var recentRequestUpdate: PassKitPaymentRequestUpdate
 
     // MARK: - Private Methods
 
