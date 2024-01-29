@@ -8,7 +8,7 @@
 import PassKit
 @_spi(PO) import ProcessOut
 
-@_spi(PO) public final class POPassKitPaymentAuthorizationController
+public final class POPassKitPaymentAuthorizationController
     : NSObject, PKPaymentAuthorizationControllerDelegate {
 
     /// Determine whether this device can process payment requests.
