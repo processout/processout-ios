@@ -95,7 +95,7 @@ import PassKit
         controller _: PKPaymentAuthorizationController
     ) async -> PKPaymentRequestMerchantSessionUpdate {
         let result = await delegate?.paymentAuthorizationControllerDidRequestMerchantSessionUpdate(controller: self)
-        return result ?? .init(status: .success, merchantSession: nil)
+        return result ?? .init(status: .failure, merchantSession: nil)
     }
 
     @available(iOS 15.0, *)
