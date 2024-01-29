@@ -51,7 +51,8 @@ final class DefaultPassKitPaymentErrorMapper: PassKitPaymentErrorMapper {
             return nil
         }
         // Apple documentation states that localizedDescription found in user info will be displayed to user
-        // but that seems to be wrong, so value is not set and we are relying on Apple to resolve proper description.
+        // but that seems to be wrong when returned error is used to initialize PKPaymentAuthorizationResult,
+        // so value is not set and we are relying on Apple to resolve proper description.
         return NSError(domain: PKPaymentError.errorDomain, code: pkCode.rawValue, userInfo: userInfo)
     }
 
