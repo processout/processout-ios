@@ -24,6 +24,11 @@
 - ``POCardTokenizationDelegate``
 - ``POCardTokenizationEvent``
 
+### Apple Pay
+
+- ``POPassKitPaymentAuthorizationController``
+- ``POPassKitPaymentAuthorizationControllerDelegate``
+
 ### Card Update
 
 - <doc:CardUpdate>

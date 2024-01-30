@@ -8,8 +8,8 @@
 import PassKit
 @_spi(PO) import ProcessOut
 
-public final class POPassKitPaymentAuthorizationController
-    : NSObject, PKPaymentAuthorizationControllerDelegate {
+/// An object that presents a sheet that prompts the user to authorize a payment request
+public final class POPassKitPaymentAuthorizationController: NSObject, PKPaymentAuthorizationControllerDelegate {
 
     /// Determine whether this device can process payment requests.
     public class func canMakePayments() -> Bool {
