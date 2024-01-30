@@ -33,7 +33,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
         if PKPaymentAuthorizationViewController(paymentRequest: paymentRequest) == nil {
             return nil
         }
-        didPresentApplePay = false
+        _didPresentApplePay = .init(wrappedValue: false)
         self.paymentRequest = paymentRequest
         controller = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
         contactMapper = DefaultPassKitContactMapper(logger: ProcessOut.shared.logger)
@@ -50,8 +50,8 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
             completion?(false)
             return
         }
-        didPresentApplePay = true
-        // Bound lifecycle of self to PKPaymentAuthorizationController.
+        $didPresentApplePay.withLock { $0 = true }
+        // Bound lifecycle of self to underlying PKPaymentAuthorizationController
         objc_setAssociatedObject(controller, &AssociatedObjectKeys.controller, self, .OBJC_ASSOCIATION_RETAIN)
         controller.present(completion: completion)
     }
@@ -94,6 +94,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     private let errorMapper: PassKitPaymentErrorMapper
     private let cardsService: POCardsService
 
+    @POUnfairlyLocked
     private var didPresentApplePay: Bool
 }
 
