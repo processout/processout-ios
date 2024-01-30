@@ -9,7 +9,7 @@ import PassKit
 @_spi(PO) import ProcessOut
 
 /// An object that presents a sheet that prompts the user to authorize a payment request
-public final class POPassKitPaymentAuthorizationController: NSObject, PKPaymentAuthorizationControllerDelegate {
+public final class POPassKitPaymentAuthorizationController: NSObject {
 
     /// Determine whether this device can process payment requests.
     public class func canMakePayments() -> Bool {
@@ -33,18 +33,34 @@ public final class POPassKitPaymentAuthorizationController: NSObject, PKPaymentA
         if PKPaymentAuthorizationViewController(paymentRequest: paymentRequest) == nil {
             return nil
         }
+        didPresentApplePay = false
         self.paymentRequest = paymentRequest
         controller = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
         contactMapper = DefaultPassKitContactMapper(logger: ProcessOut.shared.logger)
         errorMapper = DefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger)
         cardsService = ProcessOut.shared.cards
         super.init()
-        commonInit()
+        controller.delegate = self
     }
 
     /// Presents the Apple Pay UI modally over your app. You are responsible for dismissal
     public func present(completion: ((Bool) -> Void)? = nil) {
+        guard !didPresentApplePay else {
+            assertionFailure("POPassKitPaymentAuthorizationController must be presented only once.")
+            completion?(false)
+            return
+        }
+        didPresentApplePay = true
+        // Bound lifecycle of self to PKPaymentAuthorizationController.
+        objc_setAssociatedObject(controller, &AssociatedObjectKeys.controller, self, .OBJC_ASSOCIATION_RETAIN)
         controller.present(completion: completion)
+    }
+
+    /// Presents the payment sheet modally over your app.
+    public func present() async -> Bool {
+        await withUnsafeContinuation { continuation in
+            present(completion: continuation.resume)
+        }
     }
 
     /// Dismisses the Apple Pay UI. Call this when you receive the paymentAuthorizationControllerDidFinish delegate
@@ -53,10 +69,35 @@ public final class POPassKitPaymentAuthorizationController: NSObject, PKPaymentA
         controller.dismiss(completion: completion)
     }
 
+    /// Dismisses the payment sheet.
+    public func dismiss() async {
+        await withUnsafeContinuation { continuation in
+            dismiss(completion: continuation.resume)
+        }
+    }
+
     /// The controller's delegate.
     public weak var delegate: POPassKitPaymentAuthorizationControllerDelegate?
 
-    // MARK: - PKPaymentAuthorizationControllerDelegate
+    // MARK: - Private Nested Types
+
+    private enum AssociatedObjectKeys {
+        static var controller: UInt8 = 0
+    }
+
+    // MARK: - Private Properties
+
+    private let paymentRequest: PKPaymentRequest
+    private let controller: PKPaymentAuthorizationController
+
+    private let contactMapper: PassKitContactMapper
+    private let errorMapper: PassKitPaymentErrorMapper
+    private let cardsService: POCardsService
+
+    private var didPresentApplePay: Bool
+}
+
+extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControllerDelegate {
 
     public func paymentAuthorizationControllerDidFinish(_: PKPaymentAuthorizationController) {
         delegate?.paymentAuthorizationControllerDidFinish(self)
@@ -129,45 +170,5 @@ public final class POPassKitPaymentAuthorizationController: NSObject, PKPaymentA
 
     public func presentationWindow(for _: PKPaymentAuthorizationController) -> UIWindow? {
         delegate?.presentationWindow(for: self)
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum AssociatedObjectKeys {
-        static var controller: UInt8 = 0
-    }
-
-    // MARK: - Private Properties
-
-    private let paymentRequest: PKPaymentRequest
-    private let controller: PKPaymentAuthorizationController
-
-    private let contactMapper: PassKitContactMapper
-    private let errorMapper: PassKitPaymentErrorMapper
-    private let cardsService: POCardsService
-
-    // MARK: - Private Methods
-
-    private func commonInit() {
-        controller.delegate = self
-        // Bound lifecycle of self to PKPaymentAuthorizationController.
-        objc_setAssociatedObject(controller, &AssociatedObjectKeys.controller, self, .OBJC_ASSOCIATION_RETAIN)
-    }
-}
-
-extension POPassKitPaymentAuthorizationController {
-
-    /// Presents the payment sheet modally over your app.
-    public func present() async -> Bool {
-        await withUnsafeContinuation { continuation in
-            present(completion: continuation.resume)
-        }
-    }
-
-    /// Dismisses the payment sheet.
-    public func dismiss() async {
-        await withUnsafeContinuation { continuation in
-            dismiss(completion: continuation.resume)
-        }
     }
 }
