@@ -21,7 +21,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
         PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks)
     }
 
-    /// Determine whether this device can process payments using the specified networks and capabilities bitmask
+    /// Determine whether this device can process payments using the specified networks and capabilities bitmask.
     public class func canMakePayments(
         usingNetworks supportedNetworks: [PKPaymentNetwork], capabilities capabilties: PKMerchantCapability
     ) -> Bool {
@@ -43,7 +43,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
         controller.delegate = self
     }
 
-    /// Presents the Apple Pay UI modally over your app. You are responsible for dismissal
+    /// Presents the Apple Pay UI modally over your app. You are responsible for dismissal.
     public func present(completion: ((Bool) -> Void)? = nil) {
         guard !didPresentApplePay else {
             assertionFailure("POPassKitPaymentAuthorizationController must be presented only once.")
@@ -64,9 +64,11 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     }
 
     /// Dismisses the Apple Pay UI. Call this when you receive the paymentAuthorizationControllerDidFinish delegate
-    /// callback, or otherwise wish a dismissal to occur
+    /// callback, or otherwise wish a dismissal to occur.
     public func dismiss(completion: (() -> Void)? = nil) {
         controller.dismiss(completion: completion)
+        // Break retain cycle to allow de-initialization of self.
+        objc_removeAssociatedObjects(controller)
     }
 
     /// Dismisses the payment sheet.
