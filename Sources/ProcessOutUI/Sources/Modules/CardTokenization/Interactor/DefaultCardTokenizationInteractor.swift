@@ -172,7 +172,7 @@ final class DefaultCardTokenizationInteractor:
             setFailureStateUnchecked(failure: failure)
             return
         }
-        var errorMessage: StringResource
+        var errorMessage: POStringResource
         var invalidParameterIds: [State.ParameterId] = []
         switch failure.code {
         case .generic(.requestInvalidCard), .generic(.cardInvalid):

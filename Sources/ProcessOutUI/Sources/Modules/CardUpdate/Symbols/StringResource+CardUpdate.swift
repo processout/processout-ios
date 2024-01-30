@@ -5,17 +5,19 @@
 //  Created by Andrii Vysotskyi on 03.11.2023.
 //
 
+@_spi(PO) import ProcessOut
+
 // swiftlint:disable nesting
 
-extension StringResource {
+extension POStringResource {
 
     enum CardUpdate {
 
         /// Card update title.
-        static let title = StringResource("card-update.title", comment: "")
+        static let title = POStringResource("card-update.title", comment: "")
 
         /// Card CVC placeholder.
-        static let cvc = StringResource("card-update.cvc", comment: "")
+        static let cvc = POStringResource("card-update.cvc", comment: "")
 
         /// Preferred scheme section title.
         static let preferredScheme = StringResource("card-update.preferred-scheme", comment: "")
@@ -23,19 +25,19 @@ extension StringResource {
         enum Button {
 
             /// Submit button title.
-            static let submit = StringResource("card-update.submit-button", comment: "")
+            static let submit = POStringResource("card-update.submit-button", comment: "")
 
             /// Cancel button title.
-            static let cancel = StringResource("card-update.cancel-button", comment: "")
+            static let cancel = POStringResource("card-update.cancel-button", comment: "")
         }
 
         enum Error {
 
             /// Invalid CVC.
-            static let cvc = StringResource("card-update.error.cvc", comment: "")
+            static let cvc = POStringResource("card-update.error.cvc", comment: "")
 
             /// Generic error description.
-            static let generic = StringResource("card-update.error.generic", comment: "")
+            static let generic = POStringResource("card-update.error.generic", comment: "")
         }
     }
 }

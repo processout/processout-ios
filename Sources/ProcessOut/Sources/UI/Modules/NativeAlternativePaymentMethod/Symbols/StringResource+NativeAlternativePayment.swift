@@ -1,11 +1,11 @@
 //
-//  POStringResource+NativeAlternativePayment.swift
-//  ProcessOutUI
+//  StringResource+NativeAlternativePayment.swift
+//  ProcessOut
 //
-//  Created by Andrii Vysotskyi on 23.11.2023.
+//  Created by Andrii Vysotskyi on 23.01.2024.
 //
 
-@_spi(PO) import ProcessOut
+import Foundation
 
 // swiftlint:disable nesting
 
@@ -35,6 +35,31 @@ extension POStringResource {
 
             /// Cancel button title.
             static let cancel = POStringResource("native-alternative-payment.cancel-button.title", comment: "")
+        }
+
+        enum Error {
+
+            /// Email is not valid.
+            static let invalidEmail = POStringResource("native-alternative-payment.error.invalid-email", comment: "")
+
+            /// Plural format key: "%#@length@"
+            static let invalidLength = POStringResource(
+                "native-alternative-payment.error.invalid-length-%d", comment: ""
+            )
+
+            /// Number is not valid.
+            static let invalidNumber = POStringResource("native-alternative-payment.error.invalid-number", comment: "")
+
+            /// Phone number is not valid.
+            static let invalidPhone = POStringResource("native-alternative-payment.error.invalid-phone", comment: "")
+
+            /// Value is not valid.
+            static let invalidValue = POStringResource("native-alternative-payment.error.invalid-value", comment: "")
+
+            /// Parameter is required.
+            static let requiredParameter = POStringResource(
+                "native-alternative-payment.error.required-parameter", comment: ""
+            )
         }
 
         enum Success {

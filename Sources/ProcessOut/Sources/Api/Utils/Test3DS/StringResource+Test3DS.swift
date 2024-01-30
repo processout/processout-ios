@@ -1,11 +1,9 @@
 //
 //  StringResource+Test3DS.swift
-//  ProcessOutUI
+//  ProcessOut
 //
-//  Created by Andrii Vysotskyi on 21.11.2023.
+//  Created by Andrii Vysotskyi on 23.01.2024.
 //
-
-@_spi(PO) import ProcessOut
 
 extension POStringResource {
 
