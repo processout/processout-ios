@@ -20,7 +20,7 @@ extension POStringResource {
         static let cvc = POStringResource("card-update.cvc", comment: "")
 
         /// Preferred scheme section title.
-        static let preferredScheme = StringResource("card-update.preferred-scheme", comment: "")
+        static let preferredScheme = POStringResource("card-update.preferred-scheme", comment: "")
 
         enum Button {
 
