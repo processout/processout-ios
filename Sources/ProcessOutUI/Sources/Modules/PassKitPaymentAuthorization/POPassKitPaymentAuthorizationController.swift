@@ -8,8 +8,8 @@
 import PassKit
 @_spi(PO) import ProcessOut
 
-@_spi(PO) public final class POPassKitPaymentAuthorizationController
-    : NSObject, PKPaymentAuthorizationControllerDelegate {
+/// An object that presents a sheet that prompts the user to authorize a payment request
+public final class POPassKitPaymentAuthorizationController: NSObject {
 
     /// Determine whether this device can process payment requests.
     public class func canMakePayments() -> Bool {
@@ -21,7 +21,7 @@ import PassKit
         PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks)
     }
 
-    /// Determine whether this device can process payments using the specified networks and capabilities bitmask
+    /// Determine whether this device can process payments using the specified networks and capabilities bitmask.
     public class func canMakePayments(
         usingNetworks supportedNetworks: [PKPaymentNetwork], capabilities capabilties: PKMerchantCapability
     ) -> Bool {
@@ -33,31 +33,74 @@ import PassKit
         if PKPaymentAuthorizationViewController(paymentRequest: paymentRequest) == nil {
             return nil
         }
+        _didPresentApplePay = .init(wrappedValue: false)
         self.paymentRequest = paymentRequest
         controller = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
         contactMapper = DefaultPassKitContactMapper(logger: ProcessOut.shared.logger)
         errorMapper = DefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger)
         cardsService = ProcessOut.shared.cards
-        recentRequestUpdate = .init(request: paymentRequest)
         super.init()
         controller.delegate = self
     }
 
-    /// Presents the Apple Pay UI modally over your app. You are responsible for dismissal
+    /// Presents the Apple Pay UI modally over your app. You are responsible for dismissal.
     public func present(completion: ((Bool) -> Void)? = nil) {
+        guard !didPresentApplePay else {
+            assertionFailure("POPassKitPaymentAuthorizationController must be presented only once.")
+            completion?(false)
+            return
+        }
+        $didPresentApplePay.withLock { $0 = true }
+        // Bound lifecycle of self to underlying PKPaymentAuthorizationController
+        objc_setAssociatedObject(controller, &AssociatedObjectKeys.controller, self, .OBJC_ASSOCIATION_RETAIN)
         controller.present(completion: completion)
     }
 
+    /// Presents the payment sheet modally over your app.
+    public func present() async -> Bool {
+        await withUnsafeContinuation { continuation in
+            present(completion: continuation.resume)
+        }
+    }
+
     /// Dismisses the Apple Pay UI. Call this when you receive the paymentAuthorizationControllerDidFinish delegate
-    /// callback, or otherwise wish a dismissal to occur
+    /// callback, or otherwise wish a dismissal to occur.
     public func dismiss(completion: (() -> Void)? = nil) {
         controller.dismiss(completion: completion)
+        // Break retain cycle to allow de-initialization of self.
+        objc_removeAssociatedObjects(controller)
+    }
+
+    /// Dismisses the payment sheet.
+    public func dismiss() async {
+        await withUnsafeContinuation { continuation in
+            dismiss(completion: continuation.resume)
+        }
     }
 
     /// The controller's delegate.
     public weak var delegate: POPassKitPaymentAuthorizationControllerDelegate?
 
-    // MARK: - PKPaymentAuthorizationControllerDelegate
+    // MARK: - Private Nested Types
+
+    private enum AssociatedObjectKeys {
+        static var controller: UInt8 = 0
+    }
+
+    // MARK: - Private Properties
+
+    private let paymentRequest: PKPaymentRequest
+    private let controller: PKPaymentAuthorizationController
+
+    private let contactMapper: PassKitContactMapper
+    private let errorMapper: PassKitPaymentErrorMapper
+    private let cardsService: POCardsService
+
+    @POUnfairlyLocked
+    private var didPresentApplePay: Bool
+}
+
+extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControllerDelegate {
 
     public func paymentAuthorizationControllerDidFinish(_: PKPaymentAuthorizationController) {
         delegate?.paymentAuthorizationControllerDidFinish(self)
@@ -96,88 +139,39 @@ import PassKit
         controller _: PKPaymentAuthorizationController
     ) async -> PKPaymentRequestMerchantSessionUpdate {
         let result = await delegate?.paymentAuthorizationControllerDidRequestMerchantSessionUpdate(controller: self)
-        return result ?? .init(status: .success, merchantSession: nil)
+        return result ?? .init(status: .failure, merchantSession: nil)
     }
 
     @available(iOS 15.0, *)
     public func paymentAuthorizationController(
         _: PKPaymentAuthorizationController, didChangeCouponCode couponCode: String
     ) async -> PKPaymentRequestCouponCodeUpdate {
-        if let update = await delegate?.paymentAuthorizationController(self, didChangeCouponCode: couponCode) {
-            recentRequestUpdate.update(with: update)
-            return update
-        }
-        return PKPaymentRequestCouponCodeUpdate(
-            errors: [],
-            paymentSummaryItems: recentRequestUpdate.paymentSummaryItems,
-            shippingMethods: recentRequestUpdate.shippingMethods
-        )
+        let update = await delegate?.paymentAuthorizationController(self, didChangeCouponCode: couponCode)
+        return update ?? PKPaymentRequestCouponCodeUpdate()
     }
 
     public func paymentAuthorizationController(
         _: PKPaymentAuthorizationController, didSelectShippingMethod shippingMethod: PKShippingMethod
     ) async -> PKPaymentRequestShippingMethodUpdate {
-        if let update = await delegate?.paymentAuthorizationController(self, didSelectShippingMethod: shippingMethod) {
-            recentRequestUpdate.update(with: update)
-            return update
-        }
-        return PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: recentRequestUpdate.paymentSummaryItems)
+        let update = await delegate?.paymentAuthorizationController(self, didSelectShippingMethod: shippingMethod)
+        return update ?? PKPaymentRequestShippingMethodUpdate()
     }
 
     public func paymentAuthorizationController(
         _: PKPaymentAuthorizationController, didSelectShippingContact contact: PKContact
     ) async -> PKPaymentRequestShippingContactUpdate {
-        if let update = await delegate?.paymentAuthorizationController(self, didSelectShippingContact: contact) {
-            recentRequestUpdate.update(with: update)
-            recentRequestUpdate.shippingMethods = update.shippingMethods
-            return update
-        }
-        return PKPaymentRequestShippingContactUpdate(
-            errors: [],
-            paymentSummaryItems: recentRequestUpdate.paymentSummaryItems,
-            shippingMethods: recentRequestUpdate.shippingMethods
-        )
+        let update = await delegate?.paymentAuthorizationController(self, didSelectShippingContact: contact)
+        return update ?? PKPaymentRequestShippingContactUpdate()
     }
 
     public func paymentAuthorizationController(
         _: PKPaymentAuthorizationController, didSelectPaymentMethod paymentMethod: PKPaymentMethod
     ) async -> PKPaymentRequestPaymentMethodUpdate {
-        if let update = await delegate?.paymentAuthorizationController(self, didSelectPaymentMethod: paymentMethod) {
-            recentRequestUpdate.update(with: update)
-            return update
-        }
-        return .init(errors: [], paymentSummaryItems: recentRequestUpdate.paymentSummaryItems)
+        let update = await delegate?.paymentAuthorizationController(self, didSelectPaymentMethod: paymentMethod)
+        return update ?? PKPaymentRequestPaymentMethodUpdate()
     }
 
     public func presentationWindow(for _: PKPaymentAuthorizationController) -> UIWindow? {
         delegate?.presentationWindow(for: self)
-    }
-
-    // MARK: - Private Properties
-
-    private let paymentRequest: PKPaymentRequest
-    private let controller: PKPaymentAuthorizationController
-
-    private let contactMapper: PassKitContactMapper
-    private let errorMapper: PassKitPaymentErrorMapper
-    private let cardsService: POCardsService
-
-    private var recentRequestUpdate: PassKitPaymentRequestUpdate
-}
-
-extension POPassKitPaymentAuthorizationController {
-
-    /// Presents the payment sheet modally over your app.
-    public func present() async -> Bool {
-        await withUnsafeContinuation { continuation in
-            present(completion: continuation.resume)
-        }
-    }
-
-    /// Dismisses the payment sheet.
-    public func dismiss() async {
-        await withUnsafeContinuation { continuation in
-            dismiss(completion: continuation.resume)
-        }
     }
 }

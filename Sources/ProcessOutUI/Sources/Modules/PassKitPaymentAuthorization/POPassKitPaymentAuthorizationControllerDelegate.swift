@@ -8,7 +8,8 @@
 import PassKit
 import ProcessOut
 
-@_spi(PO) public protocol POPassKitPaymentAuthorizationControllerDelegate: AnyObject {
+/// Methods that let you respond to user interactions with payment authorization controller.
+public protocol POPassKitPaymentAuthorizationControllerDelegate: AnyObject {
 
     /// Sent to the delegate when payment authorization is finished.  This may occur when
     /// the user cancels the request, or after the PKPaymentAuthorizationStatus parameter of the
