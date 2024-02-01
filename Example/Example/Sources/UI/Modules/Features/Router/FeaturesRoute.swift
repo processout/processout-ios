@@ -13,7 +13,7 @@ enum FeaturesRoute: RouteType {
     case gatewayConfigurations(filter: POAllGatewayConfigurationsRequest.Filter)
 
     /// Card tokenization form.
-    case cardTokenization(completion: (Result<POCard, POFailure>) -> Void)
+    case cardTokenization(threeDSService: CardPayment3DSService, completion: (Result<POCard, POFailure>) -> Void)
 
     /// Alerty with given message.
     case alert(message: String)

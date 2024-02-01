@@ -15,11 +15,14 @@ public typealias ProcessOutApi = ProcessOut
 public final class ProcessOut {
 
     /// Shared instance.
-    public private(set) static var shared: ProcessOut! // swiftlint:disable:this implicitly_unwrapped_optional
+    public static var shared: ProcessOut {
+        precondition(isConfigured, "ProcessOut must be configured before the shared instance is accessed.")
+        return _shared
+    }
 
     /// Returns boolean value indicating whether SDK is configured and operational.
     public static var isConfigured: Bool {
-        shared != nil
+        _shared != nil
     }
 
     /// Configures ``ProcessOut/shared`` instance.
@@ -27,16 +30,16 @@ public final class ProcessOut {
     /// subsequent calls to this method are ignored.
     public static func configure(configuration: ProcessOutConfiguration) {
         assert(Thread.isMainThread, "Method must be called only from main thread")
-        if let shared {
+        if isConfigured {
             shared.logger.info("ProcessOut can be configured only once, ignored")
             return
         }
-        shared = ProcessOut(configuration: configuration)
+        _shared = ProcessOut(configuration: configuration)
         shared.prewarm()
         shared.logger.debug("Did complete ProcessOut configuration")
     }
 
-    // MARK: - ProcessOutType
+    // MARK: -
 
     /// Current configuration.
     public let configuration: ProcessOutConfiguration
@@ -98,8 +101,6 @@ public final class ProcessOut {
     @_spi(PO)
     public private(set) lazy var eventEmitter: POEventEmitter = LocalEventEmitter(logger: logger)
 
-    // MARK: - Internal
-
     /// Images repository.
     @_spi(PO)
     public private(set) lazy var images: POImagesRepository = UrlSessionImagesRepository(session: .shared)
@@ -157,6 +158,8 @@ public final class ProcessOut {
         encoder.keyEncodingStrategy = .useDefaultKeys
         return DefaultThreeDSService(decoder: decoder, encoder: encoder, logger: serviceLogger)
     }()
+
+    private static var _shared: ProcessOut! // swiftlint:disable:this implicitly_unwrapped_optional
 
     // MARK: - Private Methods
 
