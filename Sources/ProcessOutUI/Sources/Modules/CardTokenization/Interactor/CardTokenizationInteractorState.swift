@@ -116,3 +116,20 @@ enum CardTokenizationInteractorState {
     /// Card tokenization did end with unrecoverable failure. This is a sink state.
     case failure(POFailure)
 }
+
+extension CardTokenizationInteractorState.AddressParameters {
+
+    /// Boolean value that allows to determine whether all parameters are valid.
+    var areParametersValid: Bool {
+        [country, street1, street2, city, state, postalCode].allSatisfy(\.isValid)
+    }
+}
+
+extension CardTokenizationInteractorState.Started {
+
+    /// Boolean value that allows to determine whether all parameters are valid.
+    var areParametersValid: Bool {
+        let parameters = [number, expiration, cvc, cardholderName]
+        return parameters.allSatisfy(\.isValid) && address.areParametersValid
+    }
+}

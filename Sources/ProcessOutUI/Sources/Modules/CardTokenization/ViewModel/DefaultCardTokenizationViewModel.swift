@@ -315,7 +315,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         let action = POActionsContainerActionViewModel(
             id: "primary-button",
             title: configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit),
-            isEnabled: startedState.recentErrorMessage == nil,
+            isEnabled: startedState.areParametersValid,
             isLoading: isSubmitting,
             isPrimary: true,
             action: { [weak self] in
