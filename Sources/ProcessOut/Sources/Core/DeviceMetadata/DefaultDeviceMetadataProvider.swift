@@ -56,7 +56,7 @@ actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
             appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
             appScreenHeight: Int(screen.nativeBounds.height),
             appTimeZoneOffset: TimeZone.current.secondsFromGMT() / 60,
-            channel: device.systemName.lowercased()
+            channel: device.systemName
         )
     }
 }
