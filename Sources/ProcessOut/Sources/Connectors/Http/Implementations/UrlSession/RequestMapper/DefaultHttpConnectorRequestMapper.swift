@@ -100,7 +100,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
             "Authorization": authorization(request: request),
             "Installation-Id": deviceMetadata.installationId,
             "Device-Id": deviceMetadata.id,
-            "Device-System-Name": deviceMetadata.channel.lowercased(),
+            "Device-System-Name": deviceMetadata.channel,
             "Device-System-Version": deviceMetadata.systemVersion,
             "Product-Version": configuration.version,
             "Host-Application-Version": configuration.appVersion
