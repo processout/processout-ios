@@ -138,7 +138,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
                 }
             ),
             placeholder: String(resource: .CardUpdate.cvc),
-            isInvalid: state.recentErrorMessage != nil,
+            isInvalid: !state.areParametersValid,
             isEnabled: true,
             icon: Image(.Card.back),
             formatter: state.formatter,
@@ -195,7 +195,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
 
     private func updateActions(with state: InteractorState.Started, isSubmitting: Bool = false) {
         let actions = [
-            submitAction(isEnabled: state.recentErrorMessage == nil, isLoading: isSubmitting),
+            submitAction(isEnabled: state.areParametersValid, isLoading: isSubmitting),
             cancelAction(isEnabled: !isSubmitting)
         ]
         self.actions = actions.compactMap { $0 }

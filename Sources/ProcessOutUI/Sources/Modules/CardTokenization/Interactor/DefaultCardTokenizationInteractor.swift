@@ -68,7 +68,7 @@ final class DefaultCardTokenizationInteractor:
         }
         startedState[keyPath: parameterId].value = formattedValue
         startedState[keyPath: parameterId].isValid = true
-        if areParametersValid(startedState: startedState) {
+        if startedState.areParametersValid {
             logger.debug("Card information is no longer invalid, will reset error message")
             startedState.recentErrorMessage = nil
         }
@@ -105,7 +105,7 @@ final class DefaultCardTokenizationInteractor:
         guard case .started(let startedState) = state else {
             return
         }
-        guard areParametersValid(startedState: startedState), startedState.recentErrorMessage == nil else {
+        guard startedState.areParametersValid else {
             logger.debug("Ignoring attempt to tokenize invalid parameters.")
             return
         }
@@ -407,24 +407,6 @@ final class DefaultCardTokenizationInteractor:
             return parameter.value
         }
         return defaultValue
-    }
-
-    // MARK: - Utils
-
-    private func areParametersValid(startedState: State.Started) -> Bool {
-        let parameters = [
-            startedState.number,
-            startedState.expiration,
-            startedState.cvc,
-            startedState.cardholderName,
-            startedState.address.country,
-            startedState.address.street1,
-            startedState.address.street2,
-            startedState.address.city,
-            startedState.address.state,
-            startedState.address.postalCode
-        ]
-        return parameters.allSatisfy(\.isValid)
     }
 }
 
