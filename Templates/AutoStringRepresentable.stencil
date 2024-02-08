@@ -3,7 +3,7 @@
 
 extension {{ enum.name }}: RawRepresentable {
 
-    init(rawValue: String) {
+    {{ enum.accessLevel }} init(rawValue: String) {
         switch rawValue {
         {% for case in enum.cases where case.name != "unknown" %}
         case "{{ case.annotations.rawValue|default:case.name }}":
@@ -14,7 +14,7 @@ extension {{ enum.name }}: RawRepresentable {
         }
     }
 
-    var rawValue: String {
+    {{ enum.accessLevel }} var rawValue: String {
         switch self {
         {% for case in enum.cases where case.name != "unknown" %}
         case .{{ case.name }}:
