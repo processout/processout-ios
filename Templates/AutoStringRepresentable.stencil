@@ -1,0 +1,28 @@
+// MARK: - AutoStringRepresentable
+{% for enum in types.enums|annotated:"AutoStringRepresentable" %}
+
+extension {{ enum.name }}: RawRepresentable {
+
+    init(rawValue: String) {
+        switch rawValue {
+        {% for case in enum.cases where case.name != "unknown" %}
+        case "{{ case.annotations.rawValue|default:case.name }}":
+            self = .{{ case.name }}
+        {% endfor %}
+        default:
+            self = .unknown(rawValue)
+        }
+    }
+
+    var rawValue: String {
+        switch self {
+        {% for case in enum.cases where case.name != "unknown" %}
+        case .{{ case.name }}:
+            return "{{ case.annotations.rawValue|default:case.name }}"
+        {% endfor %}
+        case .unknown(let rawValue):
+            return rawValue
+        }
+    }
+}
+{% endfor %}
