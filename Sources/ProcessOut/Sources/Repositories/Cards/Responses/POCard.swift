@@ -56,7 +56,7 @@ public struct POCard: Decodable, Hashable {
     public let expYear: Int
 
     /// CVC check status.
-    public let cvcCheck: String
+    public let cvcCheck: POCardCvcCheck
 
     /// AVS check status.
     public let avsCheck: String

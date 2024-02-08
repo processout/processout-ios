@@ -303,3 +303,40 @@ extension PO3DS2ConfigurationCardScheme: RawRepresentable {
         }
     }
 }
+
+extension POCardCvcCheck: RawRepresentable {
+
+    public init(rawValue: String) {
+        switch rawValue {
+        case "passed":
+            self = .passed
+        case "failed":
+            self = .failed
+        case "unchecked":
+            self = .unchecked
+        case "unavailable":
+            self = .unavailable
+        case "`required`":
+            self = .`required`
+        default:
+            self = .unknown(rawValue)
+        }
+    }
+
+    public var rawValue: String {
+        switch self {
+        case .passed:
+            return "passed"
+        case .failed:
+            return "failed"
+        case .unchecked:
+            return "unchecked"
+        case .unavailable:
+            return "unavailable"
+        case .`required`:
+            return "`required`"
+        case .unknown(let rawValue):
+            return rawValue
+        }
+    }
+}
