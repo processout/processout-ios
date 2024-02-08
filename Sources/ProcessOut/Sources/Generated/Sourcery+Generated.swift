@@ -1,10 +1,10 @@
 // Generated using Sourcery 2.1.7 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
+// MARK: - AutoCompletion
+
 import Foundation
 import UIKit
-
-// swiftlint:disable all
 
 extension POCardsService {
 
@@ -246,5 +246,60 @@ private func invoke<T>(
 private func invoke<T>(completion: @escaping (T) -> Void, after operation: @escaping () async -> T) -> Task<Void, Never> {
     Task { @MainActor in
         completion(await operation())
+    }
+}
+
+// MARK: - AutoStringRepresentable
+
+extension PO3DS2ConfigurationCardScheme: RawRepresentable {
+
+    public init(rawValue: String) {
+        switch rawValue {
+        case "visa":
+            self = .visa
+        case "mastercard":
+            self = .mastercard
+        case "europay":
+            self = .europay
+        case "jcb":
+            self = .jcb
+        case "diners":
+            self = .diners
+        case "discover":
+            self = .discover
+        case "unionpay":
+            self = .unionpay
+        case "carte bancaire":
+            self = .carteBancaire
+        case "american express":
+            self = .americanExpress
+        default:
+            self = .unknown(rawValue)
+        }
+    }
+
+    public var rawValue: String {
+        switch self {
+        case .visa:
+            return "visa"
+        case .mastercard:
+            return "mastercard"
+        case .europay:
+            return "europay"
+        case .jcb:
+            return "jcb"
+        case .diners:
+            return "diners"
+        case .discover:
+            return "discover"
+        case .unionpay:
+            return "unionpay"
+        case .carteBancaire:
+            return "carte bancaire"
+        case .americanExpress:
+            return "american express"
+        case .unknown(let rawValue):
+            return rawValue
+        }
     }
 }
