@@ -53,6 +53,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             logger.debug("Ignoring same CVC value \(formatted)")
             return
         }
+        startedState.areParametersValid = true
         startedState.recentErrorMessage = nil
         startedState.cvc = formatted
         state = .started(startedState)
@@ -81,8 +82,8 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         guard case .started(let startedState) = state else {
             return
         }
-        guard startedState.recentErrorMessage == nil else {
-            logger.debug("Ignoring attempt to submit invalid CVC")
+        guard startedState.areParametersValid else {
+            logger.debug("Ignoring attempt to submit invalid parameters.")
             return
         }
         logger.debug("Will submit card information")
@@ -224,8 +225,10 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
              .generic(.cardInvalidCvc),
              .generic(.cardFailedCvc),
              .generic(.cardFailedCvcAndAvs):
+            startedState.areParametersValid = false
             errorMessage = .CardUpdate.Error.cvc
         default:
+            startedState.areParametersValid = true
             errorMessage = .CardUpdate.Error.generic
         }
         // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values

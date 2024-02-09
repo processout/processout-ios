@@ -125,7 +125,7 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
 
         // Then
         let userAgent = urlRequest.value(forHTTPHeaderField: "user-agent")
-        let userAgentRegex = /^test\/4 ProcessOut iOS-Bindings\/1\.2\.3$/
+        let userAgentRegex = /^iOS\/4 ProcessOut iOS-Bindings\/1\.2\.3$/
         XCTAssertNotNil(userAgent?.firstMatch(of: userAgentRegex))
     }
 

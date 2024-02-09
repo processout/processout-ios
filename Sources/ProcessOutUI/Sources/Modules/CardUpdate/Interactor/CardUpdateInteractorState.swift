@@ -30,6 +30,10 @@ enum CardUpdateInteractorState: Equatable {
         /// Formatter that should be used to format CVC.
         var formatter: Formatter?
 
+        /// Indicates whether parameters are valid.
+        /// - NOTE: CVC is the only parameter that could be invalid at a moment.
+        var areParametersValid = true
+
         /// The most recent error message.
         var recentErrorMessage: String?
     }

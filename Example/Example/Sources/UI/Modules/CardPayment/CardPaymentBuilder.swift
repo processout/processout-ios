@@ -8,15 +8,26 @@
 import UIKit
 import ProcessOut
 import ProcessOutUI
+import ProcessOutCheckout3DS
 
 final class CardPaymentBuilder {
 
-    init(completion: @escaping (Result<POCard, POFailure>) -> Void) {
+    init(threeDSService: CardPayment3DSService = .test, completion: @escaping (Result<POCard, POFailure>) -> Void) {
+        self.threeDSService = threeDSService
         self.completion = completion
     }
 
     func build() -> UIViewController {
-        let threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
+        let threeDSService: PO3DSService
+        switch self.threeDSService {
+        case .test:
+            threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
+        case .checkout:
+            threeDSService = POCheckout3DSServiceBuilder()
+                .with(delegate: CardPaymentCheckout3DSServiceDelegate())
+                .with(environment: .sandbox)
+                .build()
+        }
         let delegate = CardPaymentDelegate(
             invoicesService: ProcessOut.shared.invoices, threeDSService: threeDSService
         )
@@ -36,5 +47,6 @@ final class CardPaymentBuilder {
 
     // MARK: - Private Properties
 
+    private let threeDSService: CardPayment3DSService
     private let completion: (Result<POCard, POFailure>) -> Void
 }

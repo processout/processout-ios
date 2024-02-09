@@ -17,8 +17,8 @@ final class FeaturesRouter: RouterType {
         case .gatewayConfigurations(let filter):
             let viewController = AlternativePaymentMethodsBuilder(filter: filter).build()
             self.viewController?.navigationController?.pushViewController(viewController, animated: true)
-        case .cardTokenization(let completion):
-            let builder = CardPaymentBuilder { [weak self] result in
+        case let .cardTokenization(threeDSService, completion):
+            let builder = CardPaymentBuilder(threeDSService: threeDSService) { [weak self] result in
                 self?.viewController?.navigationController?.dismiss(animated: true) {
                     completion(result)
                 }

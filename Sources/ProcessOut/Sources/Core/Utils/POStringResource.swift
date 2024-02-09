@@ -12,8 +12,17 @@ import Foundation
     /// The key to use to look up a localized string.
     let key: String
 
-    public init(_ key: String, comment: String) {
+    /// The bundle containing the table’s strings file.
+    let bundle: Bundle
+
+    public init(_ key: String, bundle: Bundle, comment: String) {
         self.key = key
+        self.bundle = bundle
+    }
+
+    init(_ key: String, comment: String) {
+        self.key = key
+        self.bundle = BundleLocator.bundle
     }
 }
 
@@ -21,7 +30,7 @@ extension String {
 
     /// Creates string with given resource and replacements.
     @_spi(PO) public init(resource: POStringResource, replacements: CVarArg...) {
-        let format = Self.localized(resource.key)
+        let format = Self.localized(resource.key, bundle: resource.bundle)
         self = String(format: format, locale: .current, arguments: replacements)
     }
 
@@ -38,9 +47,9 @@ extension String {
     ///
     /// The implementation falls back to the framework's bundle in case the main application doesn't
     /// provide translations for missing languages to ensure that we don't display untranslated strings.
-    private static func localized(_ key: String) -> String {
-        if Bundle.main.preferredLocalizations.first == BundleLocator.bundle.preferredLocalizations.first {
-            return BundleLocator.bundle.localizedString(forKey: key, value: nil, table: nil)
+    private static func localized(_ key: String, bundle: Bundle) -> String {
+        if Bundle.main.preferredLocalizations.first == bundle.preferredLocalizations.first {
+            return bundle.localizedString(forKey: key, value: nil, table: nil)
         }
         let string = Bundle.main.localizedString(
             forKey: key, value: Constants.unknownString, table: Constants.externalTable
@@ -48,7 +57,7 @@ extension String {
         if string != Constants.unknownString {
             return string
         }
-        return BundleLocator.bundle.localizedString(forKey: key, value: nil, table: nil)
+        return bundle.localizedString(forKey: key, value: nil, table: nil)
     }
 
     // MARK: - Private Nested Types

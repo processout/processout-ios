@@ -37,7 +37,14 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
                 name: Strings.Features.CardPayment.title,
                 accessibilityId: "features.card-payment",
                 select: { [weak self] in
-                    self?.startCardTokenization()
+                    self?.startCardTokenization(threeDSService: .test)
+                }
+            ),
+            .init(
+                name: Strings.Features.CardPayment.Checkout.title,
+                accessibilityId: "features.card-payment",
+                select: { [weak self] in
+                    self?.startCardTokenization(threeDSService: .checkout)
                 }
             )
         ])
@@ -50,8 +57,8 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
 
     // MARK: - Private Methods
 
-    private func startCardTokenization() {
-        let route = FeaturesRoute.cardTokenization { [weak self] result in
+    private func startCardTokenization(threeDSService: CardPayment3DSService) {
+        let route = FeaturesRoute.cardTokenization(threeDSService: threeDSService) { [weak self] result in
             let message: String
             switch result {
             case .success(let card):
