@@ -6,7 +6,7 @@
 //
 
 /// Possible card schemes and co-schemes.
-public enum POCardScheme: Decodable, Hashable { // sourcery: AutoStringRepresentable
+public enum POCardScheme: Codable, Hashable { // sourcery: AutoStringRepresentable
 
     /// Visa is the largest global card network in the world by transaction value, ubiquitous worldwide.
     case visa
@@ -97,6 +97,9 @@ public enum POCardScheme: Decodable, Hashable { // sourcery: AutoStringRepresent
 
     /// Bancontact is the most popular online payment method in Belgium.
     case bancontact
+
+    /// Giropay is an Internet payment System in Germany
+    case giropay
 
     /// A private label credit card is a type of credit card that is branded for a specific retailer or brand.
     case privateLabel // sourcery: rawValue = "private label"

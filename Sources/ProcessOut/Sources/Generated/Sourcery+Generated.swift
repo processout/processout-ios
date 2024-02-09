@@ -413,6 +413,8 @@ extension POCardScheme: RawRepresentable {
             self = .mada
         case "bancontact":
             self = .bancontact
+        case "giropay":
+            self = .giropay
         case "private label":
             self = .privateLabel
         case "atos private label":
@@ -492,6 +494,8 @@ extension POCardScheme: RawRepresentable {
             return "mada"
         case .bancontact:
             return "bancontact"
+        case .giropay:
+            return "giropay"
         case .privateLabel:
             return "private label"
         case .atosPrivateLabel:
