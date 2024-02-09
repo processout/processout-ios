@@ -340,3 +340,164 @@ extension POCardCvcCheck: RawRepresentable {
         }
     }
 }
+
+extension POCardScheme: RawRepresentable {
+
+    public init(rawValue: String) {
+        switch rawValue {
+        case "visa":
+            self = .visa
+        case "carte bancaire":
+            self = .carteBancaire
+        case "mastercard":
+            self = .mastercard
+        case "american express":
+            self = .amex
+        case "china union pay":
+            self = .unionPay
+        case "diners club":
+            self = .dinersClub
+        case "diners club carte blanche":
+            self = .dinersClubCarteBlanche
+        case "diners club international":
+            self = .dinersClubInternational
+        case "diners club united states & canada":
+            self = .dinersClubUnitedStatesAndCanada
+        case "discover":
+            self = .discover
+        case "jcb":
+            self = .jcb
+        case "maestro":
+            self = .maestro
+        case "dankort":
+            self = .dankort
+        case "verve":
+            self = .verve
+        case "rupay":
+            self = .rupay
+        case "cielo":
+            self = .cielo
+        case "elo":
+            self = .elo
+        case "hipercard":
+            self = .hipercard
+        case "ourocard":
+            self = .ourocard
+        case "aura":
+            self = .aura
+        case "comprocard":
+            self = .comprocard
+        case "cabal":
+            self = .cabal
+        case "nyce":
+            self = .nyce
+        case "cirrus":
+            self = .cirrus
+        case "troy":
+            self = .troy
+        case "vpay":
+            self = .vPay
+        case "carnet":
+            self = .carnet
+        case "ge capital":
+            self = .geCapital
+        case "newday":
+            self = .newday
+        case "sodexo":
+            self = .sodexo
+        case "global bc":
+            self = .globalBc
+        case "dinacard":
+            self = .dinaCard
+        case "mada":
+            self = .mada
+        case "bancontact":
+            self = .bancontact
+        case "private label":
+            self = .privateLabel
+        case "atos private label":
+            self = .atosPrivateLabel
+        default:
+            self = .unknown(rawValue)
+        }
+    }
+
+    public var rawValue: String {
+        switch self {
+        case .visa:
+            return "visa"
+        case .carteBancaire:
+            return "carte bancaire"
+        case .mastercard:
+            return "mastercard"
+        case .amex:
+            return "american express"
+        case .unionPay:
+            return "china union pay"
+        case .dinersClub:
+            return "diners club"
+        case .dinersClubCarteBlanche:
+            return "diners club carte blanche"
+        case .dinersClubInternational:
+            return "diners club international"
+        case .dinersClubUnitedStatesAndCanada:
+            return "diners club united states & canada"
+        case .discover:
+            return "discover"
+        case .jcb:
+            return "jcb"
+        case .maestro:
+            return "maestro"
+        case .dankort:
+            return "dankort"
+        case .verve:
+            return "verve"
+        case .rupay:
+            return "rupay"
+        case .cielo:
+            return "cielo"
+        case .elo:
+            return "elo"
+        case .hipercard:
+            return "hipercard"
+        case .ourocard:
+            return "ourocard"
+        case .aura:
+            return "aura"
+        case .comprocard:
+            return "comprocard"
+        case .cabal:
+            return "cabal"
+        case .nyce:
+            return "nyce"
+        case .cirrus:
+            return "cirrus"
+        case .troy:
+            return "troy"
+        case .vPay:
+            return "vpay"
+        case .carnet:
+            return "carnet"
+        case .geCapital:
+            return "ge capital"
+        case .newday:
+            return "newday"
+        case .sodexo:
+            return "sodexo"
+        case .globalBc:
+            return "global bc"
+        case .dinaCard:
+            return "dinacard"
+        case .mada:
+            return "mada"
+        case .bancontact:
+            return "bancontact"
+        case .privateLabel:
+            return "private label"
+        case .atosPrivateLabel:
+            return "atos private label"
+        case .unknown(let rawValue):
+            return rawValue
+        }
+    }
+}
