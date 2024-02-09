@@ -9,10 +9,10 @@
 public struct POCardIssuerInformation: Decodable {
 
     /// Scheme of the card.
-    public let scheme: String
+    public let scheme: POCardScheme
 
     /// Co-scheme of the card, such as Carte Bancaire.
-    public let coScheme: String?
+    public let coScheme: POCardScheme?
 
     /// Card type.
     public let type: String?
@@ -27,8 +27,8 @@ public struct POCardIssuerInformation: Decodable {
     public let category: String?
 
     @_spi(PO) public init(
-        scheme: String,
-        coScheme: String? = nil,
+        scheme: POCardScheme,
+        coScheme: POCardScheme? = nil,
         type: String? = nil,
         bankName: String? = nil,
         brand: String? = nil,

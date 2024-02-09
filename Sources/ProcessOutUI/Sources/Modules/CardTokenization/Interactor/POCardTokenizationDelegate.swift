@@ -22,7 +22,7 @@ public protocol POCardTokenizationDelegate: AnyObject {
 
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
-    func preferredScheme(issuerInformation: POCardIssuerInformation) -> String?
+    func preferredScheme(issuerInformation: POCardIssuerInformation) -> POCardScheme?
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
@@ -39,7 +39,7 @@ extension POCardTokenizationDelegate {
         // Ignored
     }
 
-    public func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
+    public func preferredScheme(issuerInformation: POCardIssuerInformation) -> POCardScheme? {
         issuerInformation.scheme
     }
 

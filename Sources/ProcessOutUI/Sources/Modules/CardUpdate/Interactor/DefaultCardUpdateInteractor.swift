@@ -60,7 +60,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         delegate?.cardUpdateDidEmitEvent(.parametersChanged)
     }
 
-    func setPreferredScheme(_ scheme: String) {
+    func setPreferredScheme(_ scheme: POCardScheme) {
         guard case .started(var startedState) = state, configuration.isSchemeSelectionAllowed else {
             return
         }
@@ -260,7 +260,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
     private func preferredScheme(
         cardInfo: POCardUpdateInformation? = nil,
         issuerInformation: POCardIssuerInformation? = nil
-    ) -> String? {
+    ) -> POCardScheme? {
         if let scheme = cardInfo?.preferredScheme {
             return scheme
         }
