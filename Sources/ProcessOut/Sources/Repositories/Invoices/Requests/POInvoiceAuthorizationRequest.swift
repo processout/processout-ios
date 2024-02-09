@@ -23,7 +23,7 @@ public struct POInvoiceAuthorizationRequest: Encodable {
     public let enableThreeDS2: Bool
 
     /// Card scheme or co-scheme that should get priority if it is available.
-    public let preferredScheme: String?
+    public let preferredScheme: POCardScheme?
 
     /// Can be used for a 3DS2 request to indicate which third party SDK is used for the call.
     public let thirdPartySdkVersion: String?
@@ -64,7 +64,7 @@ public struct POInvoiceAuthorizationRequest: Encodable {
         source: String,
         incremental: Bool = false,
         enableThreeDS2: Bool = true,
-        preferredScheme: String? = nil,
+        preferredScheme: POCardScheme? = nil,
         thirdPartySdkVersion: String? = nil,
         invoiceDetailIds: [String]? = nil,
         overrideMacBlocking: Bool = false,
