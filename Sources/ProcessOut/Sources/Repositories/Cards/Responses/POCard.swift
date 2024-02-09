@@ -24,7 +24,7 @@ public struct POCard: Decodable, Hashable {
     public let coScheme: POCardScheme?
 
     /// Preferred scheme defined by the Customer.
-    public let preferredScheme: String?
+    public let preferredScheme: POCardScheme?
 
     /// Card type.
     public let type: String
