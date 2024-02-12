@@ -26,7 +26,7 @@ final class UrlSessionHttpConnector: HttpConnector {
 
     // MARK: - HttpConnector
 
-    func configure(configuration: HttpConnectorConfiguration) {
+    func configure(configuration: HttpConnectorRequestMapperConfiguration) {
         requestMapper.configure(configuration: configuration)
     }
 

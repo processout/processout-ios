@@ -17,7 +17,7 @@ final class HttpConnectorErrorDecorator: HttpConnector {
 
     // MARK: - HttpConnector
 
-    func configure(configuration: HttpConnectorConfiguration) {
+    func configure(configuration: HttpConnectorRequestMapperConfiguration) {
         connector.configure(configuration: configuration)
     }
 

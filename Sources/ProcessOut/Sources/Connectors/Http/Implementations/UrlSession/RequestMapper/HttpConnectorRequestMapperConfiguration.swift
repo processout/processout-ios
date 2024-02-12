@@ -1,5 +1,5 @@
 //
-//  HttpConnectorConfiguration.swift
+//  HttpConnectorRequestMapperConfiguration.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 31.03.2023.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct HttpConnectorConfiguration {
+struct HttpConnectorRequestMapperConfiguration {
 
     /// Base url to use to send requests to.
     let baseUrl: URL

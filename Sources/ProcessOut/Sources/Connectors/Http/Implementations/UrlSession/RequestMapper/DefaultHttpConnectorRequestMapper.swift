@@ -10,7 +10,7 @@ import Foundation
 final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     init(
-        configuration: HttpConnectorConfiguration,
+        configuration: HttpConnectorRequestMapperConfiguration,
         encoder: JSONEncoder,
         deviceMetadataProvider: DeviceMetadataProvider,
         logger: POLogger
@@ -23,7 +23,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     // MARK: - HttpConnectorRequestMapper
 
-    func configure(configuration: HttpConnectorConfiguration) {
+    func configure(configuration: HttpConnectorRequestMapperConfiguration) {
         self.$configuration.withLock { $0 = configuration }
     }
 
@@ -61,7 +61,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
     private let logger: POLogger
 
     @POUnfairlyLocked
-    private var configuration: HttpConnectorConfiguration
+    private var configuration: HttpConnectorRequestMapperConfiguration
 
     // MARK: - Request Body Encoding
 

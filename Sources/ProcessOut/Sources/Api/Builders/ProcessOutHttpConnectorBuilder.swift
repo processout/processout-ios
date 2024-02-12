@@ -11,7 +11,7 @@ import Foundation
 final class ProcessOutHttpConnectorBuilder {
 
     /// Connector configuration.
-    var configuration: HttpConnectorConfiguration?
+    var configuration: HttpConnectorRequestMapperConfiguration?
 
     /// Retry strategy to use for failing requests.
     var retryStrategy: RetryStrategy? = .exponential(maximumRetries: 3, interval: 0.1, rate: 3)
@@ -89,7 +89,7 @@ final class ProcessOutHttpConnectorBuilder {
 
 extension ProcessOutHttpConnectorBuilder {
 
-    func with(configuration: HttpConnectorConfiguration) -> Self {
+    func with(configuration: HttpConnectorRequestMapperConfiguration) -> Self {
         self.configuration = configuration
         return self
     }
