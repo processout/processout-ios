@@ -10,7 +10,7 @@ protocol HttpConnector: AnyObject {
     typealias Failure = HttpConnectorFailure
 
     /// Changes connector configuration.
-    func configure(configuration: HttpConnectorRequestMapperConfiguration)
+    func configure(configuration: HttpConnectorConfiguration)
 
     /// Executes given request.
     /// - Parameters:

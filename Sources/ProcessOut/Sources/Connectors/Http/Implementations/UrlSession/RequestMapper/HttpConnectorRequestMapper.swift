@@ -10,7 +10,7 @@ import Foundation
 protocol HttpConnectorRequestMapper {
 
     /// Changes request mapper configuration.
-    func configure(configuration: HttpConnectorRequestMapperConfiguration)
+    func configure(configuration: HttpConnectorConfiguration)
 
     /// Transforms given `HttpConnectorRequest` to `URLRequest`.
     func urlRequest(from request: HttpConnectorRequest<some Decodable>) async throws -> URLRequest

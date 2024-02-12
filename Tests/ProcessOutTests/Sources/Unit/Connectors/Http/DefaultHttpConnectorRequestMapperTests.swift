@@ -217,7 +217,7 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
     // MARK: - Private Methods
 
     private func createMapper(
-        configuration: HttpConnectorRequestMapperConfiguration
+        configuration: HttpConnectorConfiguration
     ) -> DefaultHttpConnectorRequestMapper {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys
@@ -230,7 +230,7 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         return mapper
     }
 
-    private var defaultConfiguration: HttpConnectorRequestMapperConfiguration {
+    private var defaultConfiguration: HttpConnectorConfiguration {
         .init(baseUrl: Constants.baseUrl, projectId: "<ID>", privateKey: "<KEY>", version: "1.2.3", appVersion: "4.5.6")
     }
 }

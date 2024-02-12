@@ -16,7 +16,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
 
     // MARK: - HttpConnector
 
-    func configure(configuration: HttpConnectorRequestMapperConfiguration) {
+    func configure(configuration: HttpConnectorConfiguration) {
         connector.configure(configuration: configuration)
     }
 

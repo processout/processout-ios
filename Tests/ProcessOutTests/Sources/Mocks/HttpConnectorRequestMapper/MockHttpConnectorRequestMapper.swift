@@ -13,7 +13,7 @@ final class MockHttpConnectorRequestMapper: HttpConnectorRequestMapper {
     var urlRequestFromCallsCount = 0
     var urlRequestFromClosure: (() throws -> URLRequest)!
 
-    func configure(configuration: HttpConnectorRequestMapperConfiguration) {
+    func configure(configuration: HttpConnectorConfiguration) {
         // Ignored
     }
 

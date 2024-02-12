@@ -127,7 +127,7 @@ public final class ProcessOut {
     private lazy var repositoryLogger = createLogger(for: Constants.repositoryLoggerCategory)
 
     private lazy var httpConnector: HttpConnector = {
-        let configuration = HttpConnectorRequestMapperConfiguration(
+        let configuration = HttpConnectorConfiguration(
             baseUrl: configuration.apiBaseUrl,
             projectId: configuration.projectId,
             privateKey: configuration.privateKey,
