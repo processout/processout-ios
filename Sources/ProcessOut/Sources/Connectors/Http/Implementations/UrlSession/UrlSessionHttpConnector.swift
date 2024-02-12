@@ -24,7 +24,11 @@ final class UrlSessionHttpConnector: HttpConnector {
         urlResponseFormatter = UrlResponseFormatter(includesHeaders: false)
     }
 
-    // MARK: - HttpConnectorType
+    // MARK: - HttpConnector
+
+    func configure(configuration: HttpConnectorRequestMapperConfiguration) {
+        requestMapper.configure(configuration: configuration)
+    }
 
     func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> Value {
         let sessionRequest = try await requestMapper.urlRequest(from: request)
