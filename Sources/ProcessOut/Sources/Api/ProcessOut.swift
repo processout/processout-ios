@@ -12,6 +12,7 @@ import UIKit
 public typealias ProcessOutApi = ProcessOut
 
 /// Provides access to shared api instance and a way to configure it.
+/// - NOTE: Methods and properties of this class **must** be only accessed from main thread.
 public final class ProcessOut {
 
     /// Shared instance.
@@ -26,17 +27,24 @@ public final class ProcessOut {
     }
 
     /// Configures ``ProcessOut/shared`` instance.
-    /// - NOTE: Method must be called from main thread. Only the first invocation takes effect, all
-    /// subsequent calls to this method are ignored.
-    public static func configure(configuration: ProcessOutConfiguration) {
+    /// - Parameters:
+    ///   - force: When set to `false` (the default) only the first invocation takes effect, all
+    /// subsequent calls to this method are ignored. Pass `true` to delete existing shared instance (if any)
+    /// and replace it with new one where configuration is set to given value.
+    public static func configure(configuration: ProcessOutConfiguration, force: Bool = false) {
         assert(Thread.isMainThread, "Method must be called only from main thread")
         if isConfigured {
-            shared.logger.info("ProcessOut can be configured only once, ignored")
-            return
+            if force {
+                _shared = ProcessOut(configuration: configuration)
+                shared.logger.debug("Did replace ProcessOut shared instance with new value")
+            } else {
+                shared.logger.info("ProcessOut can be configured only once, ignored")
+            }
+        } else {
+            Self.prewarm()
+            _shared = ProcessOut(configuration: configuration)
+            shared.logger.debug("Did complete ProcessOut configuration")
         }
-        _shared = ProcessOut(configuration: configuration)
-        shared.prewarm()
-        shared.logger.debug("Did complete ProcessOut configuration")
     }
 
     // MARK: -
@@ -177,7 +185,7 @@ public final class ProcessOut {
         return POLogger(destinations: destinations, category: category, minimumLevel: minimumLevel)
     }
 
-    private func prewarm() {
+    private static func prewarm() {
         FontFamily.registerAllCustomFonts()
         DefaultPhoneNumberMetadataProvider.shared.prewarm()
     }
