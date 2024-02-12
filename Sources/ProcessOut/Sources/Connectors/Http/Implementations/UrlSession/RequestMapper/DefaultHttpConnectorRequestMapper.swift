@@ -15,16 +15,10 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         deviceMetadataProvider: DeviceMetadataProvider,
         logger: POLogger
     ) {
-        self._configuration = .init(wrappedValue: configuration)
+        self.configuration = configuration
         self.encoder = encoder
         self.deviceMetadataProvider = deviceMetadataProvider
         self.logger = logger
-    }
-
-    // MARK: - HttpConnectorRequestMapper
-
-    func configure(configuration: HttpConnectorRequestMapperConfiguration) {
-        self.$configuration.withLock { $0 = configuration }
     }
 
     func urlRequest(from request: HttpConnectorRequest<some Decodable>) async throws -> URLRequest {
@@ -56,12 +50,10 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     // MARK: - Private Properties
 
+    private let configuration: HttpConnectorRequestMapperConfiguration
     private let encoder: JSONEncoder
     private let deviceMetadataProvider: DeviceMetadataProvider
     private let logger: POLogger
-
-    @POUnfairlyLocked
-    private var configuration: HttpConnectorRequestMapperConfiguration
 
     // MARK: - Request Body Encoding
 
