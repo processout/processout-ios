@@ -15,40 +15,6 @@ public typealias ProcessOutApi = ProcessOut
 /// - NOTE: Methods and properties of this class **must** be only accessed from main thread.
 public final class ProcessOut {
 
-    /// Shared instance.
-    public static var shared: ProcessOut {
-        precondition(isConfigured, "ProcessOut must be configured before the shared instance is accessed.")
-        return _shared
-    }
-
-    /// Returns boolean value indicating whether SDK is configured and operational.
-    public static var isConfigured: Bool {
-        _shared != nil
-    }
-
-    /// Configures ``ProcessOut/shared`` instance.
-    /// - Parameters:
-    ///   - force: When set to `false` (the default) only the first invocation takes effect, all
-    /// subsequent calls to this method are ignored. Pass `true` to allow existing shared instance
-    /// reconfiguration (if any).
-    public static func configure(configuration: ProcessOutConfiguration, force: Bool = false) {
-        assert(Thread.isMainThread, "Method must be called only from main thread")
-        if isConfigured {
-            if force {
-                shared.configuration = configuration
-                shared.logger.debug("Did change ProcessOut configuration")
-            } else {
-                shared.logger.info("ProcessOut can be configured only once, ignored")
-            }
-        } else {
-            Self.prewarm()
-            _shared = ProcessOut(configuration: configuration)
-            shared.logger.debug("Did complete ProcessOut configuration")
-        }
-    }
-
-    // MARK: -
-
     /// Current configuration.
     /// - TODO: Make property thread safe.
     public private(set) var configuration: ProcessOutConfiguration
@@ -170,8 +136,6 @@ public final class ProcessOut {
         return DefaultThreeDSService(decoder: decoder, encoder: encoder, logger: serviceLogger)
     }()
 
-    private static var _shared: ProcessOut! // swiftlint:disable:this implicitly_unwrapped_optional
-
     // MARK: - Private Methods
 
     private func createLogger(for category: String, includeRemoteDestination: Bool = true) -> POLogger {
@@ -189,6 +153,49 @@ public final class ProcessOut {
         }
         return POLogger(destinations: destinations, category: category, minimumLevel: minimumLevel)
     }
+}
+
+// MARK: - Singleton
+
+extension ProcessOut {
+
+    /// Returns boolean value indicating whether SDK is configured and operational.
+    public static var isConfigured: Bool {
+        _shared != nil
+    }
+
+    /// Shared instance.
+    public static var shared: ProcessOut {
+        precondition(isConfigured, "ProcessOut must be configured before the shared instance is accessed.")
+        return _shared
+    }
+
+    /// Configures ``ProcessOut/shared`` instance.
+    /// - Parameters:
+    ///   - force: When set to `false` (the default) only the first invocation takes effect, all
+    /// subsequent calls to this method are ignored. Pass `true` to allow existing shared instance
+    /// reconfiguration (if any).
+    public static func configure(configuration: ProcessOutConfiguration, force: Bool = false) {
+        assert(Thread.isMainThread, "Method must be called only from main thread")
+        if isConfigured {
+            if force {
+                shared.configuration = configuration
+                shared.logger.debug("Did change ProcessOut configuration")
+            } else {
+                shared.logger.info("ProcessOut can be configured only once, ignored")
+            }
+        } else {
+            Self.prewarm()
+            _shared = ProcessOut(configuration: configuration)
+            shared.logger.debug("Did complete ProcessOut configuration")
+        }
+    }
+
+    // MARK: - Private Properties
+
+    private static var _shared: ProcessOut! // swiftlint:disable:this implicitly_unwrapped_optional
+
+    // MARK: - Private Methods
 
     private static func prewarm() {
         FontFamily.registerAllCustomFonts()
