@@ -16,8 +16,9 @@ public typealias ProcessOutApi = ProcessOut
 public final class ProcessOut {
 
     /// Current configuration.
-    /// - TODO: Make property thread safe.
-    public private(set) var configuration: ProcessOutConfiguration
+    public var configuration: ProcessOutConfiguration {
+        _configuration
+    }
 
     /// Returns gateway configurations repository.
     public private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepository = {
@@ -83,7 +84,7 @@ public final class ProcessOut {
     // MARK: - Internal
 
     init(configuration: ProcessOutConfiguration) {
-        self.configuration = configuration
+        self.__configuration = .init(wrappedValue: configuration)
     }
 
     // MARK: - Private Nested Types
@@ -98,8 +99,11 @@ public final class ProcessOut {
 
     // MARK: - Private Properties
 
-    private lazy var serviceLogger = createLogger(for: Constants.serviceLoggerCategory)
+    @POUnfairlyLocked
+    private var _configuration: ProcessOutConfiguration
+
     private lazy var repositoryLogger = createLogger(for: Constants.repositoryLoggerCategory)
+    private lazy var serviceLogger = createLogger(for: Constants.serviceLoggerCategory)
 
     private lazy var httpConnector: HttpConnector = {
         let configuration = { [unowned self] in
@@ -179,7 +183,7 @@ extension ProcessOut {
         assert(Thread.isMainThread, "Method must be called only from main thread")
         if isConfigured {
             if force {
-                shared.configuration = configuration
+                shared.$_configuration.withLock { $0 = configuration }
                 shared.logger.debug("Did change ProcessOut configuration")
             } else {
                 shared.logger.info("ProcessOut can be configured only once, ignored")
