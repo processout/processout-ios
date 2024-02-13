@@ -90,12 +90,3 @@ private extension Array where Element == URLQueryItem { // swiftlint:disable:thi
         first { $0.name == name }?.value
     }
 }
-
-struct AlternativePaymentMethodsServiceConfiguration: Sendable {
-
-    /// Project ID.
-    let projectId: String
-
-    /// Base URL.
-    let baseUrl: URL
-}
