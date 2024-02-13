@@ -135,13 +135,15 @@ public final class ProcessOut {
     private lazy var repositoryLogger = createLogger(for: Constants.repositoryLoggerCategory)
 
     private lazy var httpConnector: HttpConnector = {
-        let configuration = HttpConnectorRequestMapperConfiguration(
-            baseUrl: configuration.apiBaseUrl,
-            projectId: configuration.projectId,
-            privateKey: configuration.privateKey,
-            version: ProcessOut.version,
-            appVersion: configuration.appVersion
-        )
+        let configuration = { [unowned self] in
+            HttpConnectorRequestMapperConfiguration(
+                baseUrl: self.configuration.apiBaseUrl,
+                projectId: self.configuration.projectId,
+                privateKey: self.configuration.privateKey,
+                version: ProcessOut.version,
+                appVersion: self.configuration.appVersion
+            )
+        }
         let keychain = Keychain(service: Constants.bundleIdentifier)
         let deviceMetadataProvider = DefaultDeviceMetadataProvider(
             screen: .main, device: .current, bundle: .main, keychain: keychain
