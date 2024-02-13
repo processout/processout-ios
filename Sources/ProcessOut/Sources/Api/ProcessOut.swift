@@ -184,7 +184,9 @@ public final class ProcessOut {
         //     let service = DefaultLogsService(repository: repository, minimumLevel: .error)
         //     destinations.append(service)
         // }
-        let minimumLevel: LogLevel = configuration.isDebug ? .debug : .info
+        let minimumLevel: () -> LogLevel = { [unowned self] in
+            configuration.isDebug ? .debug : .info
+        }
         return POLogger(destinations: destinations, category: category, minimumLevel: minimumLevel)
     }
 

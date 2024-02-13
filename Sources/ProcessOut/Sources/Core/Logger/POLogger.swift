@@ -11,12 +11,16 @@ import Foundation
 @_spi(PO)
 public struct POLogger {
 
-    init(destinations: [LoggerDestination] = [], category: String, minimumLevel: LogLevel = .debug) {
+    init(destinations: [LoggerDestination] = [], category: String, minimumLevel: @escaping () -> LogLevel) {
         self.destinations = destinations
         self.category = category
         self.minimumLevel = minimumLevel
         self.attributes = [:]
         lock = NSLock()
+    }
+
+    init(destinations: [LoggerDestination] = [], category: String) {
+        self.init(destinations: destinations, category: category) { .debug }
     }
 
     /// Add, change, or remove a logging attribute.
@@ -79,7 +83,7 @@ public struct POLogger {
     // MARK: - Private Properties
 
     private let destinations: [LoggerDestination]
-    private let minimumLevel: LogLevel
+    private let minimumLevel: () -> LogLevel
     private let lock: NSLock
     private var attributes: [String: String]
 
@@ -101,7 +105,7 @@ public struct POLogger {
         file: String,
         line: Int
     ) {
-        guard level >= minimumLevel else {
+        guard level >= minimumLevel() else {
             return
         }
         var attributes = lock.withLock { self.attributes }
