@@ -29,8 +29,8 @@ public final class ProcessOut {
     /// Configures ``ProcessOut/shared`` instance.
     /// - Parameters:
     ///   - force: When set to `false` (the default) only the first invocation takes effect, all
-    /// subsequent calls to this method are ignored. Pass `true` to delete existing shared instance (if any)
-    /// and replace it with new one where configuration is set to given value.
+    /// subsequent calls to this method are ignored. Pass `true` to allow existing shared instance
+    /// reconfiguration (if any).
     public static func configure(configuration: ProcessOutConfiguration, force: Bool = false) {
         assert(Thread.isMainThread, "Method must be called only from main thread")
         if isConfigured {
