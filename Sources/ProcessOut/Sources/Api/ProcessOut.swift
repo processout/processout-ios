@@ -65,9 +65,10 @@ public final class ProcessOut {
 
     /// Returns alternative payment methods service.
     public private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
-        DefaultAlternativePaymentMethodsService(
-            projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl, logger: serviceLogger
-        )
+        let serviceConfiguration: () -> AlternativePaymentMethodsServiceConfiguration = { [unowned self] in
+            .init(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
+        }
+        return DefaultAlternativePaymentMethodsService(configuration: serviceConfiguration, logger: serviceLogger)
     }()
 
     /// Returns cards repository.
