@@ -222,7 +222,7 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys
         let mapper = DefaultHttpConnectorRequestMapper(
-            configuration: configuration,
+            configuration: { configuration },
             encoder: encoder,
             deviceMetadataProvider: StubDeviceMetadataProvider(),
             logger: .stub

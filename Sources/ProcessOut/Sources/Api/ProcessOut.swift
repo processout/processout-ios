@@ -82,12 +82,6 @@ public final class ProcessOut {
     @_spi(PO)
     public private(set) lazy var images: POImagesRepository = UrlSessionImagesRepository(session: .shared)
 
-    // MARK: - Internal
-
-    init(configuration: ProcessOutConfiguration) {
-        self.__configuration = .init(wrappedValue: configuration)
-    }
-
     // MARK: - Private Nested Types
 
     private enum Constants {
@@ -143,6 +137,10 @@ public final class ProcessOut {
     }()
 
     // MARK: - Private Methods
+
+    private init(configuration: ProcessOutConfiguration) {
+        self.__configuration = .init(wrappedValue: configuration)
+    }
 
     private func createLogger(for category: String, includeRemoteDestination: Bool = true) -> POLogger {
         let destinations: [LoggerDestination] = [
