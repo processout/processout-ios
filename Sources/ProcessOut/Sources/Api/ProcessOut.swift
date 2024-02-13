@@ -35,8 +35,8 @@ public final class ProcessOut {
         assert(Thread.isMainThread, "Method must be called only from main thread")
         if isConfigured {
             if force {
-                _shared = ProcessOut(configuration: configuration)
-                shared.logger.debug("Did replace ProcessOut shared instance with new value")
+                shared.configuration = configuration
+                shared.logger.debug("Did change ProcessOut configuration")
             } else {
                 shared.logger.info("ProcessOut can be configured only once, ignored")
             }
@@ -50,7 +50,8 @@ public final class ProcessOut {
     // MARK: -
 
     /// Current configuration.
-    public let configuration: ProcessOutConfiguration
+    /// - TODO: Make property thread safe.
+    public private(set) var configuration: ProcessOutConfiguration
 
     /// Returns gateway configurations repository.
     public private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepository = {
@@ -96,8 +97,7 @@ public final class ProcessOut {
     @discardableResult
     public func processDeepLink(url: URL) -> Bool {
         logger.debug("Will process deep link: \(url)")
-        let event = PODeepLinkReceivedEvent(url: url)
-        return eventEmitter.emit(event: event)
+        return eventEmitter.emit(event: PODeepLinkReceivedEvent(url: url))
     }
 
     // MARK: - SPI
