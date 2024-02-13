@@ -34,7 +34,8 @@ public final class ProcessOut {
     /// Returns alternative payment methods service.
     public private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
         let serviceConfiguration: () -> AlternativePaymentMethodsServiceConfiguration = { [unowned self] in
-            .init(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
+            let configuration = self.configuration
+            return .init(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
         }
         return DefaultAlternativePaymentMethodsService(configuration: serviceConfiguration, logger: serviceLogger)
     }()
@@ -106,13 +107,14 @@ public final class ProcessOut {
     private lazy var serviceLogger = createLogger(for: Constants.serviceLoggerCategory)
 
     private lazy var httpConnector: HttpConnector = {
-        let configuration = { [unowned self] in
-            HttpConnectorRequestMapperConfiguration(
-                baseUrl: self.configuration.apiBaseUrl,
-                projectId: self.configuration.projectId,
-                privateKey: self.configuration.privateKey,
+        let connectorConfiguration = { [unowned self] in
+            let configuration = self.configuration
+            return HttpConnectorRequestMapperConfiguration(
+                baseUrl: configuration.apiBaseUrl,
+                projectId: configuration.projectId,
+                privateKey: configuration.privateKey,
                 version: ProcessOut.version,
-                appVersion: self.configuration.appVersion
+                appVersion: configuration.appVersion
             )
         }
         let keychain = Keychain(service: Constants.bundleIdentifier)
@@ -124,7 +126,7 @@ public final class ProcessOut {
         // as decoding failures so approach may be reconsidered in future.
         let logger = createLogger(for: Constants.connectorLoggerCategory, includeRemoteDestination: false)
         let connector = ProcessOutHttpConnectorBuilder()
-            .with(configuration: configuration)
+            .with(configuration: connectorConfiguration)
             .with(logger: logger)
             .with(deviceMetadataProvider: deviceMetadataProvider)
             .build()
