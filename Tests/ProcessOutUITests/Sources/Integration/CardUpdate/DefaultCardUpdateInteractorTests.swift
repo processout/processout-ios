@@ -13,8 +13,8 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        let configuration = ProcessOutConfiguration.production(projectId: Constants.projectId)
-        cardsService = ProcessOut(configuration: configuration).cards
+        ProcessOut.configure(configuration: .production(projectId: Constants.projectId), force: true)
+        cardsService = ProcessOut.shared.cards
     }
 
     // MARK: - Start
