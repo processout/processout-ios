@@ -9,23 +9,23 @@ import Foundation
 
 final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethodsService {
 
-    init(projectId: String, baseUrl: URL, logger: POLogger) {
-        self.projectId = projectId
-        self.baseUrl = baseUrl
+    init(configuration: @escaping () -> AlternativePaymentMethodsServiceConfiguration, logger: POLogger) {
+        self.configuration = configuration
         self.logger = logger
     }
 
     // MARK: - POAlternativePaymentMethodsService
 
     func alternativePaymentMethodUrl(request: POAlternativePaymentMethodRequest) -> URL {
-        guard var components = URLComponents(url: baseUrl, resolvingAgainstBaseURL: true) else {
+        let configuration = self.configuration()
+        guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
             preconditionFailure("Failed to create components from base url.")
         }
         let pathComponents: [String]
         if let tokenId = request.tokenId, let customerId = request.customerId {
-            pathComponents = [projectId, customerId, tokenId, "redirect", request.gatewayConfigurationId]
+            pathComponents = [configuration.projectId, customerId, tokenId, "redirect", request.gatewayConfigurationId]
         } else {
-            pathComponents = [projectId, request.invoiceId, "redirect", request.gatewayConfigurationId]
+            pathComponents = [configuration.projectId, request.invoiceId, "redirect", request.gatewayConfigurationId]
         }
         components.path = "/" + pathComponents.joined(separator: "/")
         components.queryItems = request.additionalData?.map { data in
@@ -61,8 +61,7 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
 
     // MARK: - Private
 
-    private let projectId: String
-    private let baseUrl: URL
+    private let configuration: () -> AlternativePaymentMethodsServiceConfiguration
     private let logger: POLogger
 
     // MARK: - Private Methods

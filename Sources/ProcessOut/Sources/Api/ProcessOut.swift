@@ -12,37 +12,13 @@ import UIKit
 public typealias ProcessOutApi = ProcessOut
 
 /// Provides access to shared api instance and a way to configure it.
+/// - NOTE: Methods and properties of this class **must** be only accessed from main thread.
 public final class ProcessOut {
 
-    /// Shared instance.
-    public static var shared: ProcessOut {
-        precondition(isConfigured, "ProcessOut must be configured before the shared instance is accessed.")
-        return _shared
-    }
-
-    /// Returns boolean value indicating whether SDK is configured and operational.
-    public static var isConfigured: Bool {
-        _shared != nil
-    }
-
-    /// Configures ``ProcessOut/shared`` instance.
-    /// - NOTE: Method must be called from main thread. Only the first invocation takes effect, all
-    /// subsequent calls to this method are ignored.
-    public static func configure(configuration: ProcessOutConfiguration) {
-        assert(Thread.isMainThread, "Method must be called only from main thread")
-        if isConfigured {
-            shared.logger.info("ProcessOut can be configured only once, ignored")
-            return
-        }
-        _shared = ProcessOut(configuration: configuration)
-        shared.prewarm()
-        shared.logger.debug("Did complete ProcessOut configuration")
-    }
-
-    // MARK: -
-
     /// Current configuration.
-    public let configuration: ProcessOutConfiguration
+    public var configuration: ProcessOutConfiguration {
+        _configuration
+    }
 
     /// Returns gateway configurations repository.
     public private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepository = {
@@ -57,9 +33,11 @@ public final class ProcessOut {
 
     /// Returns alternative payment methods service.
     public private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
-        DefaultAlternativePaymentMethodsService(
-            projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl, logger: serviceLogger
-        )
+        let serviceConfiguration: () -> AlternativePaymentMethodsServiceConfiguration = { [unowned self] in
+            let configuration = self.configuration
+            return .init(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
+        }
+        return DefaultAlternativePaymentMethodsService(configuration: serviceConfiguration, logger: serviceLogger)
     }()
 
     /// Returns cards repository.
@@ -87,8 +65,7 @@ public final class ProcessOut {
     @discardableResult
     public func processDeepLink(url: URL) -> Bool {
         logger.debug("Will process deep link: \(url)")
-        let event = PODeepLinkReceivedEvent(url: url)
-        return eventEmitter.emit(event: event)
+        return eventEmitter.emit(event: PODeepLinkReceivedEvent(url: url))
     }
 
     // MARK: - SPI
@@ -105,12 +82,6 @@ public final class ProcessOut {
     @_spi(PO)
     public private(set) lazy var images: POImagesRepository = UrlSessionImagesRepository(session: .shared)
 
-    // MARK: - Internal
-
-    init(configuration: ProcessOutConfiguration) {
-        self.configuration = configuration
-    }
-
     // MARK: - Private Nested Types
 
     private enum Constants {
@@ -123,17 +94,23 @@ public final class ProcessOut {
 
     // MARK: - Private Properties
 
-    private lazy var serviceLogger = createLogger(for: Constants.serviceLoggerCategory)
+    @POUnfairlyLocked
+    private var _configuration: ProcessOutConfiguration
+
     private lazy var repositoryLogger = createLogger(for: Constants.repositoryLoggerCategory)
+    private lazy var serviceLogger = createLogger(for: Constants.serviceLoggerCategory)
 
     private lazy var httpConnector: HttpConnector = {
-        let configuration = HttpConnectorRequestMapperConfiguration(
-            baseUrl: configuration.apiBaseUrl,
-            projectId: configuration.projectId,
-            privateKey: configuration.privateKey,
-            version: ProcessOut.version,
-            appVersion: configuration.appVersion
-        )
+        let connectorConfiguration = { [unowned self] in
+            let configuration = self.configuration
+            return HttpConnectorRequestMapperConfiguration(
+                baseUrl: configuration.apiBaseUrl,
+                projectId: configuration.projectId,
+                privateKey: configuration.privateKey,
+                version: ProcessOut.version,
+                appVersion: configuration.appVersion
+            )
+        }
         let keychain = Keychain(service: Constants.bundleIdentifier)
         let deviceMetadataProvider = DefaultDeviceMetadataProvider(
             screen: .main, device: .current, bundle: .main, keychain: keychain
@@ -143,7 +120,7 @@ public final class ProcessOut {
         // as decoding failures so approach may be reconsidered in future.
         let logger = createLogger(for: Constants.connectorLoggerCategory, includeRemoteDestination: false)
         let connector = ProcessOutHttpConnectorBuilder()
-            .with(configuration: configuration)
+            .with(configuration: connectorConfiguration)
             .with(logger: logger)
             .with(deviceMetadataProvider: deviceMetadataProvider)
             .build()
@@ -159,9 +136,11 @@ public final class ProcessOut {
         return DefaultThreeDSService(decoder: decoder, encoder: encoder, logger: serviceLogger)
     }()
 
-    private static var _shared: ProcessOut! // swiftlint:disable:this implicitly_unwrapped_optional
-
     // MARK: - Private Methods
+
+    private init(configuration: ProcessOutConfiguration) {
+        self.__configuration = .init(wrappedValue: configuration)
+    }
 
     private func createLogger(for category: String, includeRemoteDestination: Bool = true) -> POLogger {
         let destinations: [LoggerDestination] = [
@@ -173,11 +152,56 @@ public final class ProcessOut {
         //     let service = DefaultLogsService(repository: repository, minimumLevel: .error)
         //     destinations.append(service)
         // }
-        let minimumLevel: LogLevel = configuration.isDebug ? .debug : .info
+        let minimumLevel: () -> LogLevel = { [unowned self] in
+            configuration.isDebug ? .debug : .info
+        }
         return POLogger(destinations: destinations, category: category, minimumLevel: minimumLevel)
     }
+}
 
-    private func prewarm() {
+// MARK: - Singleton
+
+extension ProcessOut {
+
+    /// Returns boolean value indicating whether SDK is configured and operational.
+    public static var isConfigured: Bool {
+        _shared != nil
+    }
+
+    /// Shared instance.
+    public static var shared: ProcessOut {
+        precondition(isConfigured, "ProcessOut must be configured before the shared instance is accessed.")
+        return _shared
+    }
+
+    /// Configures ``ProcessOut/shared`` instance.
+    /// - Parameters:
+    ///   - force: When set to `false` (the default) only the first invocation takes effect, all
+    /// subsequent calls to this method are ignored. Pass `true` to allow existing shared instance
+    /// reconfiguration (if any).
+    public static func configure(configuration: ProcessOutConfiguration, force: Bool = false) {
+        assert(Thread.isMainThread, "Method must be called only from main thread")
+        if isConfigured {
+            if force {
+                shared.$_configuration.withLock { $0 = configuration }
+                shared.logger.debug("Did change ProcessOut configuration")
+            } else {
+                shared.logger.info("ProcessOut can be configured only once, ignored")
+            }
+        } else {
+            Self.prewarm()
+            _shared = ProcessOut(configuration: configuration)
+            shared.logger.debug("Did complete ProcessOut configuration")
+        }
+    }
+
+    // MARK: - Private Properties
+
+    private static var _shared: ProcessOut! // swiftlint:disable:this implicitly_unwrapped_optional
+
+    // MARK: - Private Methods
+
+    private static func prewarm() {
         FontFamily.registerAllCustomFonts()
         DefaultPhoneNumberMetadataProvider.shared.prewarm()
     }
