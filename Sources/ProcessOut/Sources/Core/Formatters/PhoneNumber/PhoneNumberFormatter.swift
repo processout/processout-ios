@@ -10,7 +10,7 @@ import Foundation
 final class PhoneNumberFormatter: Formatter {
 
     init(metadataProvider: PhoneNumberMetadataProvider = DefaultPhoneNumberMetadataProvider.shared) {
-        regexProvider = RegexProvider.shared
+        regexProvider = PORegexProvider.shared
         self.metadataProvider = metadataProvider
         super.init()
     }
@@ -100,7 +100,7 @@ final class PhoneNumberFormatter: Formatter {
 
     // MARK: - Private Properties
 
-    private let regexProvider: RegexProvider
+    private let regexProvider: PORegexProvider
     private let metadataProvider: PhoneNumberMetadataProvider
 
     // MARK: - Full National Number Formatting
