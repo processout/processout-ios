@@ -10,9 +10,9 @@ import CoreGraphics
 
 @_spi(PO) public struct POCameraPreviewOrientationPreferenceKey: PreferenceKey {
 
-    static var defaultValue: CGImagePropertyOrientation = .up
+    public static var defaultValue: CGImagePropertyOrientation = .up
 
-    static func reduce(value: inout Value, nextValue: () -> Value) {
+    public static func reduce(value: inout CGImagePropertyOrientation, nextValue: () -> CGImagePropertyOrientation) {
         value = nextValue()
     }
 }

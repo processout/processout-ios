@@ -21,7 +21,7 @@ import AVFoundation
 
     public var body: some View {
         CameraPreviewViewRepresentable(session: session, cameraOrientation: $cameraOrientation)
-            .preference(key: CameraPreviewOrientationPreferenceKey.self, value: cameraOrientation)
+            .preference(key: POCameraPreviewOrientationPreferenceKey.self, value: cameraOrientation)
     }
 
     // MARK: - Private Properties
