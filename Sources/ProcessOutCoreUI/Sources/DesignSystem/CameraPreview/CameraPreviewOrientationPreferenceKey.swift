@@ -1,6 +1,6 @@
 //
 //  CameraPreviewOrientationPreferenceKey.swift
-//  vision-test
+//  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 20.02.2024.
 //

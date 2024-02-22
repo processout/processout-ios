@@ -1,6 +1,6 @@
 //
 //  CameraPreviewView.swift
-//  vision-test
+//  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 26.01.2024.
 //
