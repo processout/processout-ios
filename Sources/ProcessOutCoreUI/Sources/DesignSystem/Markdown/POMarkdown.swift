@@ -16,7 +16,7 @@ public struct POMarkdown: View {
     }
 
     public var body: some View {
-        HorizontalSizeReader { width in
+        POHorizontalSizeReader { width in
             TextViewRepresentable(string: string, preferredWidth: width)
         }
     }

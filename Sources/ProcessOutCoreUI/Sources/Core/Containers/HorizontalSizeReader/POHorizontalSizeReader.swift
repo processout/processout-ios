@@ -1,5 +1,5 @@
 //
-//  HorizontalSizeReader.swift
+//  POHorizontalSizeReader.swift
 //  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 21.09.2023.
@@ -7,12 +7,14 @@
 
 import SwiftUI
 
-struct HorizontalSizeReader<Content: View>: View {
+@_spi(PO) public struct POHorizontalSizeReader<Content: View>: View {
 
-    @ViewBuilder
-    let content: (CGFloat) -> Content
+    public init(@ViewBuilder content: @escaping (CGFloat) -> Content) {
+        self.content = content
+        self.width = width
+    }
 
-    var body: some View {
+    public var body: some View {
         content(width)
             .frame(minWidth: 0, maxWidth: .infinity)
             .background(
@@ -26,6 +28,8 @@ struct HorizontalSizeReader<Content: View>: View {
     }
 
     // MARK: - Private Properties
+
+    private let content: (CGFloat) -> Content
 
     @State
     private var width: CGFloat = 0

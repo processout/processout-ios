@@ -28,7 +28,7 @@ public struct POTextField<Trailing: View>: View {
     public var body: some View {
         let style = isInvalid ? style.error : style.normal
         HStack {
-            HorizontalSizeReader { width in
+            POHorizontalSizeReader { width in
                 TextFieldRepresentable(
                     text: text,
                     formatter: formatter,
