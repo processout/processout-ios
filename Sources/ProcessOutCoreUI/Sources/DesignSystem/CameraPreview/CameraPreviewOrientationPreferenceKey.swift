@@ -8,11 +8,11 @@
 import SwiftUI
 import CoreGraphics
 
-struct CameraPreviewOrientationPreferenceKey: PreferenceKey {
+@_spi(PO) public struct POCameraPreviewOrientationPreferenceKey: PreferenceKey {
 
     static var defaultValue: CGImagePropertyOrientation = .up
 
-    static func reduce(value: inout CGImagePropertyOrientation, nextValue: () -> CGImagePropertyOrientation) {
+    static func reduce(value: inout Value, nextValue: () -> Value) {
         value = nextValue()
     }
 }

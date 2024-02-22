@@ -8,18 +8,18 @@
 import SwiftUI
 import AVFoundation
 
-struct CameraPreviewView: View {
+@_spi(PO) public struct POCameraPreviewView: View {
 
-    init(session: AVCaptureSession) {
+    public init(session: AVCaptureSession) {
         self.session = session
         self.cameraOrientation = .up
     }
 
-    let session: AVCaptureSession
+    public let session: AVCaptureSession
 
     // MARK: - View
 
-    var body: some View {
+    public var body: some View {
         CameraPreviewViewRepresentable(session: session, cameraOrientation: $cameraOrientation)
             .preference(key: CameraPreviewOrientationPreferenceKey.self, value: cameraOrientation)
     }
