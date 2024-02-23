@@ -10,8 +10,9 @@ import Foundation
 
 struct CardNumberDetector: CardAttributeDetector {
 
-    init(regexProvider: PORegexProvider) {
+    init(regexProvider: PORegexProvider, formatter: POCardNumberFormatter) {
         self.regexProvider = regexProvider
+        self.formatter = formatter
     }
 
     func firstMatch(in candidates: [String]) -> String? {
@@ -27,7 +28,7 @@ struct CardNumberDetector: CardAttributeDetector {
             guard isLengthValid(number: number), isChecksumValid(number: number) else {
                 continue
             }
-            return number
+            return formatter.string(from: number)
         }
         return nil
     }
@@ -35,6 +36,7 @@ struct CardNumberDetector: CardAttributeDetector {
     // MARK: - Private Properties
 
     private let regexProvider: PORegexProvider
+    private let formatter: POCardNumberFormatter
 
     // MARK: - Private Methods
 
