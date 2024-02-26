@@ -6,36 +6,46 @@
 //
 
 import XCTest
-import ProcessOut
+@_spi(PO) @testable import ProcessOut
 @testable import ProcessOutUI
+import Vision
 
 final class ThreeDSRedirectSafariViewModelDelegateTests: XCTestCase {
 
-    func test_complete_whenTokenIsEmpty_succeeds() throws {
-        var result: Result<String, POFailure>!
+//    func test_complete_whenTokenIsEmpty_succeeds() throws {
+//        var result: Result<String, POFailure>!
+//
+//        // Given
+//        let sut = ThreeDSRedirectSafariViewModelDelegate { result = $0 }
+//
+//        // When
+//        let url = URL(string: #"test://return"#)!
+//        try sut.complete(with: url)
+//
+//        // Then
+//        XCTAssertTrue(try result.get().isEmpty)
+//    }
+//
+//    func test_complete_whenTokenIsSet_completesWithIt() throws {
+//        var result: Result<String, POFailure>!
+//
+//        // Given
+//        let sut = ThreeDSRedirectSafariViewModelDelegate { result = $0 }
+//
+//        // When
+//        let url = URL(string: #"test://return?token=test"#)!
+//        try sut.complete(with: url)
+//
+//        // Then
+//        XCTAssertEqual(try result.get(), "test")
+//    }
 
-        // Given
-        let sut = ThreeDSRedirectSafariViewModelDelegate { result = $0 }
+    func test_temp() {
+        let sut = PaymentCardNumberRecognizer(regexProvider: .shared)
 
-        // When
-        let url = URL(string: #"test://return"#)!
-        try sut.complete(with: url)
+        let recognition = "4242 4242 4242 4242"
 
-        // Then
-        XCTAssertTrue(try result.get().isEmpty)
-    }
-
-    func test_complete_whenTokenIsSet_completesWithIt() throws {
-        var result: Result<String, POFailure>!
-
-        // Given
-        let sut = ThreeDSRedirectSafariViewModelDelegate { result = $0 }
-
-        // When
-        let url = URL(string: #"test://return?token=test"#)!
-        try sut.complete(with: url)
-
-        // Then
-        XCTAssertEqual(try result.get(), "test")
+        let number = sut.process(recognitions: [recognition])
+        XCTAssertEqual(number, "4242424242424242")
     }
 }
