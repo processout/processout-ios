@@ -6,4 +6,4 @@ set -euo pipefail
 export PATH="/opt/homebrew/bin:$PATH"
 
 # Run SwiftGen
-swiftgen config run --config "${TARGET_ROOT}/swiftgen.yml"
+mint run swiftgen config run --config "${TARGET_ROOT}/swiftgen.yml"
