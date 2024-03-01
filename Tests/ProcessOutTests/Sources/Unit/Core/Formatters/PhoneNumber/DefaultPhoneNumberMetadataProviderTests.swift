@@ -33,5 +33,5 @@ final class DefaultPhoneNumberMetadataProviderTests: XCTestCase {
 
     // MARK: - Private Properties
 
-    private var sut: DefaultPhoneNumberMetadataProvider!
+    private var sut: PODefaultPhoneNumberMetadataProvider!
 }

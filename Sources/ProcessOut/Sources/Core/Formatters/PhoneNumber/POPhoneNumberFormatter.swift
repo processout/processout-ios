@@ -1,5 +1,5 @@
 //
-//  PhoneNumberFormatter.swift
+//  POPhoneNumberFormatter.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 16.03.2023.
@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class PhoneNumberFormatter: Formatter {
+@_spi(PO) public final class POPhoneNumberFormatter: Formatter {
 
-    init(metadataProvider: PhoneNumberMetadataProvider = DefaultPhoneNumberMetadataProvider.shared) {
+    public init(metadataProvider: POPhoneNumberMetadataProvider = PODefaultPhoneNumberMetadataProvider.shared) {
         regexProvider = RegexProvider.shared
         self.metadataProvider = metadataProvider
         super.init()
@@ -20,7 +20,7 @@ final class PhoneNumberFormatter: Formatter {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func string(from partialNumber: String) -> String {
+    public func string(from partialNumber: String) -> String {
         let normalizedNumber = normalized(number: partialNumber)
         guard !normalizedNumber.isEmpty else {
             return ""
@@ -34,7 +34,7 @@ final class PhoneNumberFormatter: Formatter {
               !number.isEmpty else {
             return formatted(countryCode: metadata.countryCode, formattedNationalNumber: number)
         }
-        var potentialFormats: [PhoneNumberFormat] = []
+        var potentialFormats: [POPhoneNumberFormat] = []
         if let formatted = attemptToFormat(
             nationalNumber: number, metadata: metadata, potentialFormats: &potentialFormats
         ) {
@@ -50,20 +50,20 @@ final class PhoneNumberFormatter: Formatter {
         return formatted(countryCode: metadata.countryCode, formattedNationalNumber: number)
     }
 
-    func normalized(number: String) -> String {
+    public func normalized(number: String) -> String {
         number.removingCharacters(in: Constants.significantCharacters.inverted)
     }
 
     // MARK: - Formatter
 
-    override func string(for obj: Any?) -> String? {
+    override public func string(for obj: Any?) -> String? {
         guard let phoneNumber = obj as? String else {
             return nil
         }
         return string(from: phoneNumber)
     }
 
-    override func isPartialStringValid(
+    override public func isPartialStringValid(
         _ partialStringPtr: AutoreleasingUnsafeMutablePointer<NSString>, // swiftlint:disable:this legacy_objc_type
         proposedSelectedRange proposedSelRangePtr: NSRangePointer?,
         originalString origString: String,
@@ -101,12 +101,12 @@ final class PhoneNumberFormatter: Formatter {
     // MARK: - Private Properties
 
     private let regexProvider: RegexProvider
-    private let metadataProvider: PhoneNumberMetadataProvider
+    private let metadataProvider: POPhoneNumberMetadataProvider
 
     // MARK: - Full National Number Formatting
 
     private func attemptToFormat(
-        nationalNumber: String, metadata: PhoneNumberMetadata, potentialFormats: inout [PhoneNumberFormat]
+        nationalNumber: String, metadata: POPhoneNumberMetadata, potentialFormats: inout [POPhoneNumberFormat]
     ) -> String? {
         let range = NSRange(nationalNumber.startIndex ..< nationalNumber.endIndex, in: nationalNumber)
         for format in metadata.formats {
@@ -123,7 +123,7 @@ final class PhoneNumberFormatter: Formatter {
         return nil
     }
 
-    private func shouldAttemptUsing(format: PhoneNumberFormat, nationalNumber: String, range: NSRange) -> Bool {
+    private func shouldAttemptUsing(format: POPhoneNumberFormat, nationalNumber: String, range: NSRange) -> Bool {
         for pattern in format.leading {
             guard let regex = regexProvider.regex(with: pattern) else {
                 continue
@@ -135,7 +135,7 @@ final class PhoneNumberFormatter: Formatter {
         return false
     }
 
-    private func formatted(nationalNumber: String, countryCode: String, format: PhoneNumberFormat) -> String {
+    private func formatted(nationalNumber: String, countryCode: String, format: POPhoneNumberFormat) -> String {
         let formattedNationalNumber: String
         if let formatRegex = regexProvider.regex(with: format.pattern) {
             let range = NSRange(nationalNumber.startIndex ..< nationalNumber.endIndex, in: nationalNumber)
@@ -151,7 +151,7 @@ final class PhoneNumberFormatter: Formatter {
     // MARK: - Partial National Number Formatting
 
     private func attemptToFormat(
-        partialNationalNumber: String, formats: [PhoneNumberFormat], countryCode: String
+        partialNationalNumber: String, formats: [POPhoneNumberFormat], countryCode: String
     ) -> String? {
         let nationalNumber = partialNationalNumber.appending(
             String(
@@ -187,7 +187,7 @@ final class PhoneNumberFormatter: Formatter {
 
     // MARK: - Utils
 
-    private func extractMetadata(number: inout String) -> PhoneNumberMetadata? {
+    private func extractMetadata(number: inout String) -> POPhoneNumberMetadata? {
         let length = min(Constants.maxCountryPrefixLength, number.count)
         for i in stride(from: 1, through: length, by: 1) { // swiftlint:disable:this identifier_name
             let potentialCountryCode = String(number.prefix(i))

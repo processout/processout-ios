@@ -14,7 +14,7 @@ final class PhoneNumberFormatterTests: XCTestCase {
         super.setUp()
         metadataProvider = MockPhoneNumberMetadataProvider()
         metadataProvider.metadata = nil
-        sut = PhoneNumberFormatter(metadataProvider: metadataProvider)
+        sut = POPhoneNumberFormatter(metadataProvider: metadataProvider)
     }
 
     func test_normalized_retainsDigitsAndPlus() {
@@ -70,8 +70,8 @@ final class PhoneNumberFormatterTests: XCTestCase {
 
     func test_string_whenNumberIsComplete_returnsFormattedNumber() {
         // Given
-        let format = PhoneNumberFormat(pattern: "(\\d)(\\d)", leading: [".*"], format: "$1-$2")
-        metadataProvider.metadata = PhoneNumberMetadata(countryCode: "1", formats: [format])
+        let format = POPhoneNumberFormat(pattern: "(\\d)(\\d)", leading: [".*"], format: "$1-$2")
+        metadataProvider.metadata = POPhoneNumberMetadata(countryCode: "1", formats: [format])
 
         // When
         let formattedNumber = sut.string(from: "123#")
@@ -82,8 +82,8 @@ final class PhoneNumberFormatterTests: XCTestCase {
 
     func test_string_whenNationalNumberLeadingDigitsAreUnknown_formatsCountryCode() {
         // Given
-        let format = PhoneNumberFormat(pattern: "", leading: [""], format: "")
-        metadataProvider.metadata = PhoneNumberMetadata(countryCode: "1", formats: [format])
+        let format = POPhoneNumberFormat(pattern: "", leading: [""], format: "")
+        metadataProvider.metadata = POPhoneNumberMetadata(countryCode: "1", formats: [format])
 
         // When
         let formattedNumber = sut.string(from: "123")
@@ -94,8 +94,8 @@ final class PhoneNumberFormatterTests: XCTestCase {
 
     func test_string_whenNationalNumberLengthExceedsMaximumLength_formatsCountryCode() {
         // Given
-        let format = PhoneNumberFormat(pattern: "", leading: [], format: "")
-        metadataProvider.metadata = PhoneNumberMetadata(countryCode: "1", formats: [format])
+        let format = POPhoneNumberFormat(pattern: "", leading: [], format: "")
+        metadataProvider.metadata = POPhoneNumberMetadata(countryCode: "1", formats: [format])
 
         // When
         let formattedNumber = sut.string(from: "1123456789123456")
@@ -106,8 +106,8 @@ final class PhoneNumberFormatterTests: XCTestCase {
 
     func test_string_whenNumberContainsEasternArabicNumerals_returnsFormattedNumberWithLatinNumerals() {
         // Given
-        let format = PhoneNumberFormat(pattern: "(\\d)(\\d+)", leading: [".*"], format: "$1-$2")
-        metadataProvider.metadata = PhoneNumberMetadata(countryCode: "1", formats: [format])
+        let format = POPhoneNumberFormat(pattern: "(\\d)(\\d+)", leading: [".*"], format: "$1-$2")
+        metadataProvider.metadata = POPhoneNumberMetadata(countryCode: "1", formats: [format])
 
         // When
         let formattedNumber = sut.string(from: "١٢٣")
@@ -118,8 +118,8 @@ final class PhoneNumberFormatterTests: XCTestCase {
 
     func test_string_whenNumberIsPartial_returnsFormattedNumberWithoutTrailingSeparators() {
         // Given
-        let format = PhoneNumberFormat(pattern: "(\\d)(\\d)(\\d)", leading: [".*"], format: "$1-$2-$3")
-        metadataProvider.metadata = PhoneNumberMetadata(countryCode: "1", formats: [format])
+        let format = POPhoneNumberFormat(pattern: "(\\d)(\\d)(\\d)", leading: [".*"], format: "$1-$2-$3")
+        metadataProvider.metadata = POPhoneNumberMetadata(countryCode: "1", formats: [format])
 
         // When
         let formattedNumber = sut.string(from: "123")
@@ -185,5 +185,5 @@ final class PhoneNumberFormatterTests: XCTestCase {
     // MARK: - Private Properties
 
     private var metadataProvider: MockPhoneNumberMetadataProvider!
-    private var sut: PhoneNumberFormatter!
+    private var sut: POPhoneNumberFormatter!
 }

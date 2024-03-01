@@ -166,8 +166,8 @@ import UIKit
     private var logger: POLogger
     private weak var delegate: PONativeAlternativePaymentMethodDelegate?
 
-    private lazy var phoneNumberFormatter: PhoneNumberFormatter = {
-        PhoneNumberFormatter()
+    private lazy var phoneNumberFormatter: POPhoneNumberFormatter = {
+        POPhoneNumberFormatter()
     }()
 
     private var captureCancellable: POCancellable?
