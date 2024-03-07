@@ -38,8 +38,8 @@ public struct POLogger {
 
     /// Logs a message at the `debug` level.
     @_spi(PO) public func debug(
-        _ message: POLogMessage,
-        attributes: [String: String] = [:],
+        _ message: @autoclosure () -> POLogMessage,
+        attributes: @autoclosure () -> [String: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
         file: String = #file,
         line: Int = #line
@@ -49,8 +49,8 @@ public struct POLogger {
 
     /// Logs a message at the `info` level.
     @_spi(PO) public func info(
-        _ message: POLogMessage,
-        attributes: [String: String] = [:],
+        _ message: @autoclosure () -> POLogMessage,
+        attributes: @autoclosure () -> [String: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
         file: String = #file,
         line: Int = #line
@@ -60,8 +60,8 @@ public struct POLogger {
 
     /// Logs a message at the `error` level.
     @_spi(PO) public func error(
-        _ message: POLogMessage,
-        attributes: [String: String] = [:],
+        _ message: @autoclosure () -> POLogMessage,
+        attributes: @autoclosure () -> [String: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
         file: String = #file,
         line: Int = #line
@@ -71,8 +71,8 @@ public struct POLogger {
 
     /// Logs a message at the `fault` level.
     @_spi(PO) public func fault(
-        _ message: POLogMessage,
-        attributes: [String: String] = [:],
+        _ message: @autoclosure () -> POLogMessage,
+        attributes: @autoclosure () -> [String: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
         file: String = #file,
         line: Int = #line
@@ -97,10 +97,10 @@ public struct POLogger {
     ///   whether the system persists it to disk. You may specify a constant or variable for this parameter.
     ///   - message: the message you want to add to the logs.
     ///   - attributes: additional attributes to log alongside primary logger attributes.
-    private func log(
+    private func log( // swiftlint:disable:this function_parameter_count
         level: LogLevel,
-        _ message: POLogMessage,
-        attributes additionalAttributes: [String: String] = [:],
+        _ message: () -> POLogMessage,
+        attributes additionalAttributes: () -> [String: String],
         dso: UnsafeRawPointer?,
         file: String,
         line: Int
@@ -109,12 +109,12 @@ public struct POLogger {
             return
         }
         var attributes = lock.withLock { self.attributes }
-        additionalAttributes.forEach { key, value in
+        additionalAttributes().forEach { key, value in
             attributes[key] = value
         }
         let entry = LogEvent(
             level: level,
-            message: message.interpolation.value,
+            message: message().interpolation.value,
             category: category,
             timestamp: Date(),
             dso: dso,
