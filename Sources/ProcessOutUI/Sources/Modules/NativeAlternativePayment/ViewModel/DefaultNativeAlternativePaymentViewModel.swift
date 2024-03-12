@@ -14,7 +14,7 @@ import SwiftUI
 final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentViewModel {
 
     init(
-        interactor: some PONativeAlternativePaymentMethodInteractor,
+        interactor: some NativeAlternativePaymentInteractor,
         configuration: PONativeAlternativePaymentConfiguration,
         completion: ((Result<Void, POFailure>) -> Void)?
     ) {
@@ -22,6 +22,10 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         self.interactor = interactor
         self.completion = completion
         observeChanges(interactor: interactor)
+    }
+
+    deinit {
+        interactor.cancel()
     }
 
     // MARK: - NativeAlternativePaymentViewModel
@@ -40,7 +44,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     // MARK: - Private Nested Types
 
-    private typealias InteractorState = PONativeAlternativePaymentMethodInteractorState
+    private typealias InteractorState = NativeAlternativePaymentInteractorState
 
     private enum Constants {
         static let captureSuccessCompletionDelay: TimeInterval = 3
@@ -50,7 +54,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     // MARK: - Private Properties
 
     private let configuration: PONativeAlternativePaymentConfiguration
-    private let interactor: any PONativeAlternativePaymentMethodInteractor
+    private let interactor: any NativeAlternativePaymentInteractor
     private let completion: ((Result<Void, POFailure>) -> Void)?
 
     private lazy var priceFormatter: NumberFormatter = {
@@ -67,7 +71,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     // MARK: - Private Methods
 
-    private func observeChanges(interactor: some PONativeAlternativePaymentMethodInteractor) {
+    private func observeChanges(interactor: some NativeAlternativePaymentInteractor) {
         interactor.start()
         interactor.didChange = { [weak self] in
             self?.updateWithInteractorState()
@@ -133,20 +137,19 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             )
         ]
         for parameter in state.parameters {
-            let value = state.values[parameter.key]
             let items = [
-                createItem(parameter: parameter, value: value, isEnabled: !isSubmitting)
+                createItem(parameter: parameter, isEnabled: !isSubmitting)
             ]
             var isSectionCentered = false
             if case .codeInput = items.first, state.parameters.count == 1 {
                 isSectionCentered = true
             }
             let section = NativeAlternativePaymentViewModelSection(
-                id: parameter.key,
+                id: parameter.specification.key,
                 isCentered: isSectionCentered,
-                title: parameter.displayName,
+                title: parameter.specification.displayName,
                 items: items,
-                error: value?.recentErrorMessage
+                error: parameter.recentErrorMessage
             )
             sections.append(section)
         }
@@ -204,58 +207,56 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     // swiftlint:disable:next function_body_length
     private func createItem(
-        parameter: PONativeAlternativePaymentMethodParameter,
-        value parameterValue: InteractorState.ParameterValue?,
-        isEnabled: Bool
+        parameter: InteractorState.Parameter, isEnabled: Bool
     ) -> NativeAlternativePaymentViewModelItem {
-        switch parameter.type {
-        case .numeric where (parameter.length ?? .max) <= Constants.maximumCodeLength:
+        switch parameter.specification.type {
+        case .numeric where (parameter.specification.length ?? .max) <= Constants.maximumCodeLength:
             let codeInputItem = NativeAlternativePaymentViewModelItem.CodeInput(
-                id: parameter.key,
-                length: parameter.length!, // swiftlint:disable:this force_unwrapping
+                id: parameter.specification.key,
+                length: parameter.specification.length!, // swiftlint:disable:this force_unwrapping
                 value: .init(
-                    get: { parameterValue?.value ?? "" },
+                    get: { parameter.value ?? "" },
                     set: { [weak self] newValue in
-                        self?.interactor.updateValue(newValue, for: parameter.key)
+                        self?.interactor.updateValue(newValue, for: parameter.specification.key)
                     }
                 ),
-                isInvalid: parameterValue?.recentErrorMessage != nil,
+                isInvalid: parameter.recentErrorMessage != nil,
                 isEnabled: isEnabled
             )
             return .codeInput(codeInputItem)
         case .singleSelect:
-            let optionsCount = parameter.availableValues?.count ?? 0
+            let optionsCount = parameter.specification.availableValues?.count ?? 0
             let pickerItem = NativeAlternativePaymentViewModelItem.Picker(
-                id: parameter.key,
-                options: parameter.availableValues?.map { availableValue in
+                id: parameter.specification.key,
+                options: parameter.specification.availableValues?.map { availableValue in
                     .init(id: availableValue.value, title: availableValue.displayName)
                 } ?? [],
                 selectedOptionId: .init(
-                    get: { parameterValue?.value },
+                    get: { parameter.value },
                     set: { [weak self] newValue in
-                        self?.interactor.updateValue(newValue, for: parameter.key)
+                        self?.interactor.updateValue(newValue, for: parameter.specification.key)
                     }
                 ),
-                isInvalid: parameterValue?.recentErrorMessage != nil,
+                isInvalid: parameter.recentErrorMessage != nil,
                 preferrsInline: optionsCount <= configuration.inlineSingleSelectValuesLimit
             )
             return .picker(pickerItem)
         default:
             let inputItem = NativeAlternativePaymentViewModelItem.Input(
-                id: parameter.key,
+                id: parameter.specification.key,
                 value: .init(
-                    get: { parameterValue?.value ?? "" },
+                    get: { parameter.value ?? "" },
                     set: { [weak self] newValue in
-                        self?.interactor.updateValue(newValue, for: parameter.key)
+                        self?.interactor.updateValue(newValue, for: parameter.specification.key)
                     }
                 ),
-                placeholder: placeholder(for: parameter),
-                isInvalid: parameterValue?.recentErrorMessage != nil,
+                placeholder: placeholder(for: parameter.specification),
+                isInvalid: parameter.recentErrorMessage != nil,
                 isEnabled: isEnabled,
                 icon: nil,
-                formatter: interactor.formatter(type: parameter.type),
-                keyboard: keyboard(parameterType: parameter.type),
-                contentType: contentType(parameterType: parameter.type),
+                formatter: parameter.formatter,
+                keyboard: keyboard(parameterType: parameter.specification.type),
+                contentType: contentType(parameterType: parameter.specification.type),
                 onSubmit: { [weak self] in
                     self?.submitFocusedInput()
                 }
@@ -303,7 +304,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         guard case .started(let startedState) = interactor.state else {
             return
         }
-        let parameterIds = startedState.parameters.map(\.key)
+        let parameterIds = startedState.parameters.map(\.specification.key)
         guard let focusedInputIndex = parameterIds.map(AnyHashable.init).firstIndex(of: focusedItemId) else {
             return
         }
@@ -317,13 +318,13 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     // MARK: - Focus
 
     private func updateFocusedInputId(state: InteractorState.Started) {
-        if state.parameters.map(\.key).map(AnyHashable.init).contains(focusedItemId) {
+        if state.parameters.map(\.specification.key).map(AnyHashable.init).contains(focusedItemId) {
             return // Abort if there is already focused input
         }
-        if let parameter = state.parameters.first(where: { state.values[$0.key]?.recentErrorMessage != nil }) {
-            focusedItemId = parameter.key // Attempt to focus first invalid parameter if available.
+        if let parameter = state.parameters.first(where: { $0.recentErrorMessage != nil }) {
+            focusedItemId = parameter.specification.key // Attempt to focus first invalid parameter if available.
         } else {
-            focusedItemId = state.parameters.first?.key
+            focusedItemId = state.parameters.first?.specification.key
         }
     }
 
@@ -372,7 +373,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         let action = POActionsContainerActionViewModel(
             id: "native-alternative-payment.primary-button",
             title: title,
-            isEnabled: state.isSubmitAllowed,
+            isEnabled: state.areParametersValid,
             isLoading: isLoading,
             isPrimary: true,
             action: { [weak self] in
