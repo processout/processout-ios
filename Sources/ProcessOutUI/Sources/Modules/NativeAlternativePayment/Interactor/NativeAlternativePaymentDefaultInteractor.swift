@@ -14,7 +14,8 @@ import Combine
 
 final class NativeAlternativePaymentDefaultInteractor:
     BaseInteractor<NativeAlternativePaymentInteractorState>,
-    NativeAlternativePaymentInteractor {
+    NativeAlternativePaymentInteractor,
+    PONativeAlternativePaymentCoordinator {
 
     init(
         configuration: PONativeAlternativePaymentConfiguration,
@@ -32,6 +33,10 @@ final class NativeAlternativePaymentDefaultInteractor:
         self.completion = completion
         super.init(state: .idle)
     }
+
+    // MARK: - Coordinator
+
+    let configuration: PONativeAlternativePaymentConfiguration
 
     // MARK: - Interactor & Coordinator
 
@@ -112,7 +117,6 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Private Properties
 
-    private let configuration: PONativeAlternativePaymentConfiguration
     private let invoicesService: POInvoicesService
     private let imagesRepository: POImagesRepository
     private let logger: POLogger
@@ -347,7 +351,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func send(event: PONativeAlternativePaymentMethodEvent) {
         assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
-        delegate?.nativeAlternativePayment(didEmitEvent: event)
+        delegate?.nativeAlternativePayment(self, didEmitEvent: event)
     }
 
     @MainActor
@@ -407,7 +411,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         let defaultValues = await delegate?.nativeAlternativePayment(
-            defaultValuesFor: parameters.map(\.specification)
+            self, defaultValuesFor: parameters.map(\.specification)
         )
         for (offset, parameter) in parameters.enumerated() {
             let defaultValue: String?
