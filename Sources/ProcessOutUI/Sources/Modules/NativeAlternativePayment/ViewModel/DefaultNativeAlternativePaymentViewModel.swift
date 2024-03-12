@@ -332,13 +332,13 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     private func updateActions(state: InteractorState.Started, isSubmitting: Bool) {
         scheduleCancelActionEnabling(
-            configuration: configuration.secondaryAction,
+            configuration: configuration.cancelAction,
             isDisabled: \.isPaymentCancelDisabled
         )
         let actions = [
             submitAction(state: state, isLoading: isSubmitting),
             cancelAction(
-                configuration: configuration.secondaryAction,
+                configuration: configuration.cancelAction,
                 isEnabled: !isSubmitting && !isPaymentCancelDisabled
             )
         ]
@@ -347,11 +347,11 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     private func updateActions(state: InteractorState.AwaitingCapture) {
         scheduleCancelActionEnabling(
-            configuration: configuration.paymentConfirmationSecondaryAction,
+            configuration: configuration.paymentConfirmationCancelAction,
             isDisabled: \.isCaptureCancelDisabled
         )
         let cancelAction = self.cancelAction(
-            configuration: configuration.paymentConfirmationSecondaryAction,
+            configuration: configuration.paymentConfirmationCancelAction,
             isEnabled: !isCaptureCancelDisabled
         )
         self.actions = [cancelAction].compactMap { $0 }
@@ -384,14 +384,14 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     }
 
     private func cancelAction(
-        configuration: PONativeAlternativePaymentConfiguration.SecondaryAction?, isEnabled: Bool
+        configuration: PONativeAlternativePaymentConfiguration.CancelAction?, isEnabled: Bool
     ) -> POActionsContainerActionViewModel? {
-        guard case let .cancel(title, _) = configuration else {
+        guard let configuration else {
             return nil
         }
         let action = POActionsContainerActionViewModel(
             id: "native-alternative-payment.secondary-button",
-            title: title ?? String(resource: .NativeAlternativePayment.Button.cancel),
+            title: configuration.title ?? String(resource: .NativeAlternativePayment.Button.cancel),
             isEnabled: isEnabled,
             isLoading: false,
             isPrimary: false,
@@ -405,12 +405,12 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     // MARK: - Cancel Actions Enabling
 
     private func scheduleCancelActionEnabling(
-        configuration: PONativeAlternativePaymentConfiguration.SecondaryAction?,
+        configuration: PONativeAlternativePaymentConfiguration.CancelAction?,
         isDisabled: ReferenceWritableKeyPath<DefaultNativeAlternativePaymentViewModel, Bool>
     ) {
         let timerKey = AnyHashable(isDisabled)
         guard !cancelActionTimers.keys.contains(timerKey),
-              case .cancel(_, let interval) = configuration,
+              let interval = configuration?.disabledFor,
               interval > 0 else {
             return
         }

@@ -14,8 +14,7 @@ import Combine
 
 final class NativeAlternativePaymentDefaultInteractor:
     BaseInteractor<NativeAlternativePaymentInteractorState>,
-    NativeAlternativePaymentInteractor,
-    DynamicCheckoutAlternativePaymentCoordinator {
+    NativeAlternativePaymentInteractor {
 
     init(
         configuration: PONativeAlternativePaymentConfiguration,
