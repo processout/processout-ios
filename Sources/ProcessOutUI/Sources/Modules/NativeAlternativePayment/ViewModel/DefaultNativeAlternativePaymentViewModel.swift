@@ -13,14 +13,9 @@ import SwiftUI
 
 final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentViewModel {
 
-    init(
-        interactor: some NativeAlternativePaymentInteractor,
-        configuration: PONativeAlternativePaymentConfiguration,
-        completion: ((Result<Void, POFailure>) -> Void)?
-    ) {
+    init(interactor: some NativeAlternativePaymentInteractor, configuration: PONativeAlternativePaymentConfiguration) {
         self.configuration = configuration
         self.interactor = interactor
-        self.completion = completion
         observeChanges(interactor: interactor)
     }
 
@@ -47,7 +42,6 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     private typealias InteractorState = NativeAlternativePaymentInteractorState
 
     private enum Constants {
-        static let captureSuccessCompletionDelay: TimeInterval = 3
         static let maximumCodeLength = 6
     }
 
@@ -55,7 +49,6 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     private let configuration: PONativeAlternativePaymentConfiguration
     private let interactor: any NativeAlternativePaymentInteractor
-    private let completion: ((Result<Void, POFailure>) -> Void)?
 
     private lazy var priceFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -90,15 +83,11 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             updateFocusedInputId(state: state)
             updateActions(state: state, isSubmitting: false)
             isCaptured = false
-        case .failure(let failure):
-            completion?(.failure(failure))
         case .submitting(let state):
             updateSections(state: state, isSubmitting: true)
             focusedItemId = nil
             updateActions(state: state, isSubmitting: true)
             isCaptured = false
-        case .submitted:
-            completion?(.success(()))
         case .awaitingCapture(let state):
             updateSections(state: state)
             focusedItemId = nil
@@ -178,29 +167,21 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     }
 
     private func updateSections(state: InteractorState.Captured) {
-        if configuration.skipSuccessScreen {
-            completion?(.success(()))
-        } else {
-            Timer.scheduledTimer(
-                withTimeInterval: Constants.captureSuccessCompletionDelay,
-                repeats: false,
-                block: { [weak self] _ in
-                    self?.completion?(.success(()))
-                }
-            )
-            let item = NativeAlternativePaymentViewModelItem.Submitted(
-                id: "captured",
-                title: state.logoImage == nil ? state.paymentProviderName : nil,
-                logoImage: state.logoImage,
-                message: String(resource: .NativeAlternativePayment.Success.message),
-                image: UIImage(resource: .success),
-                isCaptured: true
-            )
-            let section = NativeAlternativePaymentViewModelSection(
-                id: "captured", isCentered: false, title: nil, items: [.submitted(item)], error: nil
-            )
-            sections = [section]
+        guard !configuration.skipSuccessScreen else {
+            return
         }
+        let item = NativeAlternativePaymentViewModelItem.Submitted(
+            id: "captured",
+            title: state.logoImage == nil ? state.paymentProviderName : nil,
+            logoImage: state.logoImage,
+            message: String(resource: .NativeAlternativePayment.Success.message),
+            image: UIImage(resource: .success),
+            isCaptured: true
+        )
+        let section = NativeAlternativePaymentViewModelSection(
+            id: "captured", isCentered: false, title: nil, items: [.submitted(item)], error: nil
+        )
+        sections = [section]
     }
 
     // MARK: - Input Items

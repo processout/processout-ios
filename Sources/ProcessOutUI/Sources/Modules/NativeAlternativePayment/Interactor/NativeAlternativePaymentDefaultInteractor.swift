@@ -21,13 +21,15 @@ final class NativeAlternativePaymentDefaultInteractor:
         delegate: PONativeAlternativePaymentDelegate?,
         invoicesService: POInvoicesService,
         imagesRepository: POImagesRepository,
-        logger: POLogger
+        logger: POLogger,
+        completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         self.configuration = configuration
         self.delegate = delegate
         self.invoicesService = invoicesService
         self.imagesRepository = imagesRepository
         self.logger = logger
+        self.completion = completion
         super.init(state: .idle)
     }
 
@@ -103,6 +105,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Private Nested Types
 
     private enum Constants {
+        static let captureCompletionDelay = NSEC_PER_SEC * 3
         static let emailRegex = #"^\S+@\S+$"#
         static let phoneRegex = #"^\+?\d{1,3}\d*$"#
     }
@@ -113,6 +116,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     private let invoicesService: POInvoicesService
     private let imagesRepository: POImagesRepository
     private let logger: POLogger
+    private let completion: (Result<Void, POFailure>) -> Void
 
     private var captureCancellable: AnyCancellable?
     private weak var delegate: PONativeAlternativePaymentDelegate?
@@ -197,7 +201,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     ) async {
         guard configuration.waitsPaymentConfirmation else {
             logger.info("Won't await payment capture because waitsPaymentConfirmation is set to false")
-            state = .submitted
+            setSubmittedUnchecked()
             return
         }
         let actionMessage = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
@@ -240,7 +244,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         logger.info("Did receive invoice capture confirmation")
         guard configuration.waitsPaymentConfirmation else {
             logger.info("Should't wait for confirmation, so setting submitted state instead of captured.")
-            state = .submitted
+            setSubmittedUnchecked()
             return
         }
         let capturedState: State.Captured
@@ -256,6 +260,10 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         state = .captured(capturedState)
         send(event: .didCompletePayment)
+        if !configuration.skipSuccessScreen {
+            try? await Task.sleep(nanoseconds: Constants.captureCompletionDelay)
+        }
+        completion(.success(()))
     }
 
     // MARK: - Started State Restoration
@@ -312,6 +320,13 @@ final class NativeAlternativePaymentDefaultInteractor:
         logger.debug("More parameters are expected, waiting for parameters to update")
     }
 
+    // MARK: - Submitted State
+
+    private func setSubmittedUnchecked() {
+        state = .submitted
+        completion(.success(()))
+    }
+
     // MARK: - Failure State
 
     private func setFailureStateUnchecked(error: Error) {
@@ -324,6 +339,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         state = .failure(failure)
         send(event: .didFail(failure: failure))
+        completion(.failure(failure))
     }
 
     // MARK: - Utils

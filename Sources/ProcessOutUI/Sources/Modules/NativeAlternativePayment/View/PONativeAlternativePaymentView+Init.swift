@@ -25,10 +25,11 @@ extension PONativeAlternativePaymentView {
             delegate: delegate,
             invoicesService: ProcessOut.shared.invoices,
             imagesRepository: ProcessOut.shared.images,
-            logger: logger
+            logger: logger,
+            completion: completion
         )
         let viewModel = DefaultNativeAlternativePaymentViewModel(
-            interactor: interactor, configuration: configuration, completion: completion
+            interactor: interactor, configuration: configuration
         )
         self = .init(viewModel: viewModel)
     }
