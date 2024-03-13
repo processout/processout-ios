@@ -1,7 +1,7 @@
+// MARK: - AutoCompletion
+
 import Foundation
 import UIKit
-
-// swiftlint:disable all
 {% for type in types.implementing.POAutoCompletion|protocol %}
 
 extension {{ type.name }} {

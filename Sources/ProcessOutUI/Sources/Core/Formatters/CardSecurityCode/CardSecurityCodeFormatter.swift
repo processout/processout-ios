@@ -11,13 +11,13 @@ import Foundation
 final class CardSecurityCodeFormatter: Formatter {
 
     /// Card scheme.
-    var scheme: String?
+    var scheme: POCardScheme?
 
     /// Returns formatted version of given cvc string.
     func string(from string: String) -> String {
         // When scheme is not available or AMEX, CSC could be up to 4 digits.
         var length = 4
-        if let scheme, scheme != "american express" {
+        if let scheme, scheme != .amex {
             length = 3
         }
         let formatted = string

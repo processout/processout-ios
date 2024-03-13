@@ -21,7 +21,7 @@ public struct PO3DS2Configuration: Decodable, Hashable {
     public let directoryServerTransactionId: String
 
     /// Card scheme from the card used to initiate the payment.
-    public let scheme: PO3DS2ConfigurationCardScheme?
+    public let scheme: POCardScheme?
 
     /// 3DS protocol version identifier.
     public let messageVersion: String

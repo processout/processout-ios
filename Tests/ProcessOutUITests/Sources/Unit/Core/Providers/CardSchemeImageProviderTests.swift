@@ -17,7 +17,7 @@ final class CardSchemeImageProviderTests: XCTestCase {
 
     func test_image_whenSchemeIsUnrecognized_returnsNil() {
         // When
-        let image = sut.image(for: "<?>")
+        let image = sut.image(for: .unknown("unknown"))
 
         // Then
         XCTAssertNil(image)
@@ -25,15 +25,7 @@ final class CardSchemeImageProviderTests: XCTestCase {
 
     func test_image_whenSchemeIsKnown_returnsImage() {
         // When
-        let image = sut.image(for: "visa")
-
-        // Then
-        XCTAssertNotNil(image)
-    }
-
-    func test_image_whenSchemeIsKnownButCaseIsDifferent_returnsImage() {
-        // When
-        let image = sut.image(for: "ViSa")
+        let image = sut.image(for: .visa)
 
         // Then
         XCTAssertNotNil(image)

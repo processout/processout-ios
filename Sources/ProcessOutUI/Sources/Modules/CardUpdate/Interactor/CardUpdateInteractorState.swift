@@ -16,13 +16,13 @@ enum CardUpdateInteractorState: Equatable {
         var cardNumber: String?
 
         /// Scheme of the card.
-        var scheme: String?
+        var scheme: POCardScheme?
 
         /// Co-scheme of the card.
-        var coScheme: String?
+        var coScheme: POCardScheme?
 
         /// Card scheme preferred by the customer.
-        var preferredScheme: String?
+        var preferredScheme: POCardScheme?
 
         /// Current CVC value.
         var cvc: String = ""

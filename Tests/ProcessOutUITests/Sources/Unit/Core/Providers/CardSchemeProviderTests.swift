@@ -13,9 +13,9 @@ final class CardSchemeProviderTests: XCTestCase {
     override func setUp() {
         super.setUp()
         let issuers: [CardSchemeProvider.Issuer] = [
-            .init(scheme: "range", numbers: .range(10...11), length: 2),
-            .init(scheme: "exact", numbers: .exact(1), length: 1),
-            .init(scheme: "set", numbers: .set([2, 4]), length: 1)
+            .init(scheme: .unknown("range"), numbers: .range(10...11), length: 2),
+            .init(scheme: .unknown("exact"), numbers: .exact(1), length: 1),
+            .init(scheme: .unknown("set"), numbers: .set([2, 4]), length: 1)
         ]
         sut = CardSchemeProvider(issuers: issuers)
     }
@@ -49,7 +49,7 @@ final class CardSchemeProviderTests: XCTestCase {
         let scheme = sut.scheme(cardNumber: "1")
 
         // Then
-        XCTAssertEqual(scheme, "exact")
+        XCTAssertEqual(scheme?.rawValue, "exact")
     }
 
     func test_scheme_whenNumberMatchesSetPattern_returnsScheme() {
@@ -57,7 +57,7 @@ final class CardSchemeProviderTests: XCTestCase {
         let scheme = sut.scheme(cardNumber: "2")
 
         // Then
-        XCTAssertEqual(scheme, "set")
+        XCTAssertEqual(scheme?.rawValue, "set")
     }
 
     func test_scheme_whenNumberMatchesRangePattern_returnsScheme() {
@@ -65,7 +65,7 @@ final class CardSchemeProviderTests: XCTestCase {
         let scheme = sut.scheme(cardNumber: "10")
 
         // Then
-        XCTAssertEqual(scheme, "range")
+        XCTAssertEqual(scheme?.rawValue, "range")
     }
 
     func test_scheme_whenNumberIsUnknown_returnsNil() {

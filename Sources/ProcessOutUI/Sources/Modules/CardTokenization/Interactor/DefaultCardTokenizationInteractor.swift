@@ -84,7 +84,7 @@ final class DefaultCardTokenizationInteractor:
         delegate?.cardTokenizationDidEmitEvent(.parametersChanged)
     }
 
-    func setPreferredScheme(_ scheme: String) {
+    func setPreferredScheme(_ scheme: POCardScheme) {
         guard case .started(var startedState) = state else {
             return
         }

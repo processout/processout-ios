@@ -161,13 +161,14 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         let pickerItem = State.PickerItem(
             id: ItemId.scheme,
             options: [
-                .init(id: issuerInformation.scheme, title: issuerInformation.scheme.capitalized),
-                .init(id: coScheme, title: coScheme.capitalized)
+                .init(id: issuerInformation.scheme.rawValue, title: issuerInformation.scheme.rawValue.capitalized),
+                .init(id: coScheme.rawValue, title: coScheme.rawValue.capitalized)
             ],
             selectedOptionId: .init(
-                get: { startedState.preferredScheme },
+                get: { startedState.preferredScheme?.rawValue },
                 set: { [weak self] newValue in
-                    self?.interactor.setPreferredScheme(newValue ?? issuerInformation.scheme)
+                    let newScheme = newValue.flatMap(POCardScheme.init)
+                    self?.interactor.setPreferredScheme(newScheme ?? issuerInformation.scheme)
                 }
             ),
             preferrsInline: true

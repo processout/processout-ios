@@ -23,7 +23,7 @@ public struct POAssignCustomerTokenRequest: Encodable {
     public let source: String
 
     /// Card scheme or co-scheme that should get priority if it is available.
-    public let preferredScheme: String?
+    public let preferredScheme: POCardScheme?
 
     /// Boolean value that indicates whether token should be verified. Make sure to also pass valid
     /// ``POAssignCustomerTokenRequest/invoiceId`` if you want verification to happen. Default value
@@ -47,7 +47,7 @@ public struct POAssignCustomerTokenRequest: Encodable {
         customerId: String,
         tokenId: String,
         source: String,
-        preferredScheme: String? = nil,
+        preferredScheme: POCardScheme? = nil,
         verify: Bool = false,
         invoiceId: String? = nil,
         enableThreeDS2: Bool = true,

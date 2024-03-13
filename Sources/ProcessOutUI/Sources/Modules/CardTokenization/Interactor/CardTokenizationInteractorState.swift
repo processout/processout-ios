@@ -84,7 +84,7 @@ enum CardTokenizationInteractorState {
         var issuerInformation: POCardIssuerInformation?
 
         /// Preferred scheme.
-        var preferredScheme: String?
+        var preferredScheme: POCardScheme?
 
         /// Billing address parameters.
         var address: AddressParameters
