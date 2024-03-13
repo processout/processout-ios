@@ -492,20 +492,17 @@ final class NativeAlternativePaymentDefaultInteractor:
         var validatedValues: [String: String] = [:]
         var invalidFields: [POFailure.InvalidField] = []
         parameters.forEach { parameter in
-            let value = parameter.value
-            let updatedValue: String? = {
-                if case .phone = parameter.specification.type, let value {
-                    return POPhoneNumberFormatter().normalized(number: value)
-                }
-                return value
-            }()
-            if let updatedValue, value != updatedValue {
-                logger.debug("Will use updated value '\(updatedValue)' for key '\(parameter.specification.key)'")
+            var normalizedValue = parameter.value
+            if case .phone = parameter.specification.type, let value = normalizedValue {
+                normalizedValue = POPhoneNumberFormatter().normalized(number: value)
             }
-            if let invalidField = validate(parameter: parameter) {
+            if let normalizedValue, normalizedValue != parameter.value {
+                logger.debug("Will use updated value '\(normalizedValue)' for key '\(parameter.specification.key)'")
+            }
+            if let invalidField = validate(value: normalizedValue ?? "", specification: parameter.specification) {
                 invalidFields.append(invalidField)
             } else {
-                validatedValues[parameter.specification.key] = updatedValue
+                validatedValues[parameter.specification.key] = normalizedValue
             }
         }
         if invalidFields.isEmpty {
@@ -515,33 +512,32 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     private func validate(
-        parameter: NativeAlternativePaymentInteractorState.Parameter
+        value: String, specification: PONativeAlternativePaymentMethodParameter
     ) -> POFailure.InvalidField? {
-        let value = parameter.value ?? ""
         let message: String?
         if value.isEmpty {
-            if parameter.specification.required {
+            if specification.required {
                 message = String(resource: .NativeAlternativePayment.Error.requiredParameter)
             } else {
                 message = nil
             }
-        } else if let length = parameter.specification.length, value.count != length {
+        } else if let length = specification.length, value.count != length {
             message = String(resource: .NativeAlternativePayment.Error.invalidLength, replacements: length)
         } else {
-            switch parameter.specification.type {
+            switch specification.type {
             case .numeric where !CharacterSet(charactersIn: value).isSubset(of: .decimalDigits):
                 message = String(resource: .NativeAlternativePayment.Error.invalidNumber)
             case .email where value.range(of: Constants.emailRegex, options: .regularExpression) == nil:
                 message = String(resource: .NativeAlternativePayment.Error.invalidEmail)
             case .phone where value.range(of: Constants.phoneRegex, options: .regularExpression) == nil:
                 message = String(resource: .NativeAlternativePayment.Error.invalidPhone)
-            case .singleSelect where parameter.specification.availableValues?.map(\.value).contains(value) == false:
+            case .singleSelect where specification.availableValues?.map(\.value).contains(value) == false:
                 message = String(resource: .NativeAlternativePayment.Error.invalidValue)
             default:
                 message = nil
             }
         }
-        return message.map { POFailure.InvalidField(name: parameter.specification.key, message: $0) }
+        return message.map { POFailure.InvalidField(name: specification.key, message: $0) }
     }
 }
 
