@@ -98,9 +98,9 @@ final class NativeAlternativePaymentDefaultInteractor:
     func cancel() {
         logger.debug("Will attempt to cancel payment.")
         switch state {
-        case .started:
+        case .started(let state) where state.isCancellable:
             setFailureStateUnchecked(error: POFailure(code: .cancelled))
-        case .awaitingCapture:
+        case .awaitingCapture(let state) where state.isCancellable:
             captureCancellable?.cancel()
         default:
             logger.debug("Ignored cancellation attempt from unsupported state: \(state)")
@@ -154,11 +154,13 @@ final class NativeAlternativePaymentDefaultInteractor:
                 gateway: details.gateway,
                 amount: details.invoice.amount,
                 currencyCode: details.invoice.currencyCode,
-                parameters: await createParameters(specifications: details.parameters)
+                parameters: await createParameters(specifications: details.parameters),
+                isCancellable: configuration.cancelAction.map { $0.disabledFor.isZero } ?? false
             )
             state = .started(startedState)
             send(event: .didStart)
             logger.info("Did start payment, waiting for parameters")
+            enableCancellationAfterDelay()
         }
     }
 
@@ -217,7 +219,8 @@ final class NativeAlternativePaymentDefaultInteractor:
             paymentProviderName: parameterValues?.providerName,
             logoImage: logoImage,
             actionMessage: actionMessage,
-            actionImage: actionImage
+            actionImage: actionImage,
+            isCancellable: configuration.paymentConfirmationCancelAction.map { $0.disabledFor.isZero } ?? false
         )
         state = .awaitingCapture(awaitingCaptureState)
         logger.info("Waiting for invoice capture confirmation")
@@ -226,7 +229,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             gatewayConfigurationId: configuration.gatewayConfigurationId,
             timeout: configuration.paymentConfirmationTimeout
         )
-        let task = Task { @MainActor in
+        let task = Task {
             do {
                 try await invoicesService.captureNativeAlternativePayment(request: request)
                 await setCapturedStateUnchecked(gateway: gateway, parameterValues: parameterValues)
@@ -236,6 +239,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
         }
         captureCancellable = AnyCancellable(task.cancel)
+        enableCaptureCancellationAfterDelay()
     }
 
     // MARK: - Captured State
@@ -344,6 +348,45 @@ final class NativeAlternativePaymentDefaultInteractor:
         state = .failure(failure)
         send(event: .didFail(failure: failure))
         completion(.failure(failure))
+    }
+
+    // MARK: - Cancellation Availability
+
+    @MainActor
+    private func enableCancellationAfterDelay() {
+        guard let action = configuration.cancelAction, action.disabledFor > 0 else {
+            logger.debug("Cancel action is not set or initiatly enabled.")
+            return
+        }
+        Task {
+            try? await Task.sleep(nanoseconds: UInt64(TimeInterval(NSEC_PER_SEC) * action.disabledFor))
+            switch state {
+            case .started(var state):
+                state.isCancellable = true
+                self.state = .started(state)
+            case .submitting(var state):
+                state.isCancellable = true
+                self.state = .started(state)
+            default:
+                break
+            }
+        }
+    }
+
+    @MainActor
+    private func enableCaptureCancellationAfterDelay() {
+        guard let action = configuration.paymentConfirmationCancelAction, action.disabledFor > 0 else {
+            logger.debug("Confirmation cancel action is not set or initiatly enabled.")
+            return
+        }
+        Task {
+            try? await Task.sleep(nanoseconds: UInt64(TimeInterval(NSEC_PER_SEC) * action.disabledFor))
+            guard case .awaitingCapture(var awaitingState) = state else {
+                return
+            }
+            awaitingState.isCancellable = true
+            state = .awaitingCapture(awaitingState)
+        }
     }
 
     // MARK: - Utils

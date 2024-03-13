@@ -9,7 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-// swiftlint:disable file_length type_body_length
+// swiftlint:disable type_body_length
 
 final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentViewModel {
 
@@ -58,10 +58,6 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         return formatter
     }()
 
-    private var cancelActionTimers: [AnyHashable: Timer] = [:]
-    private var isPaymentCancelDisabled = false
-    private var isCaptureCancelDisabled = false
-
     // MARK: - Private Methods
 
     private func observeChanges(interactor: some NativeAlternativePaymentInteractor) {
@@ -101,7 +97,6 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         default:
             break // Ignored
         }
-        invalidateCancelActionTimersIfNeeded(state: interactor.state)
     }
 
     // MARK: - Sections
@@ -312,28 +307,16 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     // MARK: - Actions
 
     private func updateActions(state: InteractorState.Started, isSubmitting: Bool) {
-        scheduleCancelActionEnabling(
-            configuration: configuration.cancelAction,
-            isDisabled: \.isPaymentCancelDisabled
-        )
         let actions = [
             submitAction(state: state, isLoading: isSubmitting),
-            cancelAction(
-                configuration: configuration.cancelAction,
-                isEnabled: !isSubmitting && !isPaymentCancelDisabled
-            )
+            cancelAction(configuration: configuration.cancelAction, isEnabled: !isSubmitting && state.isCancellable)
         ]
         self.actions = actions.compactMap { $0 }
     }
 
     private func updateActions(state: InteractorState.AwaitingCapture) {
-        scheduleCancelActionEnabling(
-            configuration: configuration.paymentConfirmationCancelAction,
-            isDisabled: \.isCaptureCancelDisabled
-        )
         let cancelAction = self.cancelAction(
-            configuration: configuration.paymentConfirmationCancelAction,
-            isEnabled: !isCaptureCancelDisabled
+            configuration: configuration.paymentConfirmationCancelAction, isEnabled: state.isCancellable
         )
         self.actions = [cancelAction].compactMap { $0 }
     }
@@ -382,39 +365,6 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         )
         return action
     }
-
-    // MARK: - Cancel Actions Enabling
-
-    private func scheduleCancelActionEnabling(
-        configuration: PONativeAlternativePaymentConfiguration.CancelAction?,
-        isDisabled: ReferenceWritableKeyPath<DefaultNativeAlternativePaymentViewModel, Bool>
-    ) {
-        let timerKey = AnyHashable(isDisabled)
-        guard !cancelActionTimers.keys.contains(timerKey),
-              let interval = configuration?.disabledFor,
-              interval > 0 else {
-            return
-        }
-        self[keyPath: isDisabled] = true
-        let timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
-            self?[keyPath: isDisabled] = false
-            self?.updateWithInteractorState()
-        }
-        cancelActionTimers[timerKey] = timer
-    }
-
-    private func invalidateCancelActionTimersIfNeeded(state interactorState: InteractorState) {
-        // If interactor is in a sink state timers should be invalidated to ensure that completion
-        // won't be called multiple times.
-        switch interactorState {
-        case .failure, .captured, .submitted:
-            break
-        default:
-            return
-        }
-        cancelActionTimers.values.forEach { $0.invalidate() }
-        cancelActionTimers = [:]
-    }
 }
 
-// swiftlint:enable file_length type_body_length
+// swiftlint:enable type_body_length

@@ -39,6 +39,9 @@ enum NativeAlternativePaymentInteractorState {
 
         /// Parameters that are expected from user.
         var parameters: [Parameter]
+
+        /// Boolean value indicating whether cancel is supported in the current state.
+        var isCancellable: Bool
     }
 
     struct AwaitingCapture {
@@ -54,6 +57,9 @@ enum NativeAlternativePaymentInteractorState {
 
         /// Action image.
         let actionImage: UIImage?
+
+        /// Boolean value indicating whether cancel is supported in the current state.
+        var isCancellable: Bool
     }
 
     struct Captured {
