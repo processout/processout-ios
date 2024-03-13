@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 12.05.2023.
 //
 
-@testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 
 final class MockPhoneNumberMetadataProvider: POPhoneNumberMetadataProvider {
 

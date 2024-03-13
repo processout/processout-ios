@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 
 final class DefaultPhoneNumberMetadataProviderTests: XCTestCase {
 
