@@ -1,5 +1,5 @@
 //
-//  DefaultPhoneNumberMetadataProvider.swift
+//  PODefaultPhoneNumberMetadataProvider.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 16.03.2023.
@@ -7,18 +7,18 @@
 
 import Foundation
 
-final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
+@_spi(PO) public final class PODefaultPhoneNumberMetadataProvider: POPhoneNumberMetadataProvider {
 
-    static let shared = DefaultPhoneNumberMetadataProvider()
+    public static let shared = PODefaultPhoneNumberMetadataProvider()
 
     /// - NOTE: Method is asynchronous.
-    func prewarm() {
+    public func prewarm() {
         loadMetadata(sync: false)
     }
 
     // MARK: - PhoneNumberMetadataProvider
 
-    func metadata(for countryCode: String) -> PhoneNumberMetadata? {
+    public func metadata(for countryCode: String) -> POPhoneNumberMetadata? {
         let transformedCountryCode = countryCode.applyingTransform(.toLatin, reverse: false) ?? countryCode
         if let metadata = metadata {
             return metadata[transformedCountryCode]
@@ -32,7 +32,7 @@ final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
     private let dispatchQueue: DispatchQueue
 
     @POUnfairlyLocked
-    private var metadata: [String: PhoneNumberMetadata]?
+    private var metadata: [String: POPhoneNumberMetadata]?
 
     // MARK: - Private Methods
 
@@ -45,13 +45,13 @@ final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
             guard let self, self.metadata == nil else {
                 return
             }
-            let groupedMetadata: [String: PhoneNumberMetadata]
+            let groupedMetadata: [String: POPhoneNumberMetadata]
             do {
                 let data = try Data(contentsOf: Files.phoneNumberMetadata.url)
-                let metadata = try JSONDecoder().decode([PhoneNumberMetadata].self, from: data)
+                let metadata = try JSONDecoder().decode([POPhoneNumberMetadata].self, from: data)
                 groupedMetadata = Dictionary(grouping: metadata, by: \.countryCode).compactMapValues { values in
                     let countryCode = values.first!.countryCode // swiftlint:disable:this force_unwrapping
-                    return PhoneNumberMetadata(countryCode: countryCode, formats: values.flatMap(\.formats))
+                    return POPhoneNumberMetadata(countryCode: countryCode, formats: values.flatMap(\.formats))
                 }
             } catch {
                 assertionFailure("Failed to load metadata: \(error)")

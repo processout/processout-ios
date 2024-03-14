@@ -20,21 +20,16 @@ extension PONativeAlternativePaymentView {
     ) {
         var logger = ProcessOut.shared.logger
         logger[attributeKey: "InvoiceId"] = configuration.invoiceId
-        let interactorConfiguration = PONativeAlternativePaymentMethodInteractorConfiguration(
-            gatewayConfigurationId: configuration.gatewayConfigurationId,
-            invoiceId: configuration.invoiceId,
-            waitsPaymentConfirmation: configuration.waitsPaymentConfirmation,
-            paymentConfirmationTimeout: configuration.paymentConfirmationTimeout
-        )
-        let interactor = PODefaultNativeAlternativePaymentMethodInteractor(
+        let interactor = NativeAlternativePaymentDefaultInteractor(
+            configuration: configuration,
+            delegate: delegate,
             invoicesService: ProcessOut.shared.invoices,
             imagesRepository: ProcessOut.shared.images,
-            configuration: interactorConfiguration,
             logger: logger,
-            delegate: delegate
+            completion: completion
         )
         let viewModel = DefaultNativeAlternativePaymentViewModel(
-            interactor: interactor, configuration: configuration, completion: completion
+            interactor: interactor, configuration: configuration
         )
         self = .init(viewModel: viewModel)
     }
