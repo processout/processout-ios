@@ -14,8 +14,8 @@ public struct POApplePayCardTokenizationRequest {
     /// Payment information.
     public let payment: PKPayment
 
-    /// Identifies the merchant, as previously agreed with Apple. Must match one of the merchant
-    /// identifiers in the application's entitlement.
+    /// Identifies the merchant, as previously agreed with Apple. Must match `PKPaymentRequest/merchantIdentifier`
+    /// that was used to produce `PKPayment`.
     public let merchantIdentifier: String?
 
     /// Contact information.
