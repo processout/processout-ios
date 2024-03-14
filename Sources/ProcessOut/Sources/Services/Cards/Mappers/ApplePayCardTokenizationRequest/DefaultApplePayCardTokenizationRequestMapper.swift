@@ -33,6 +33,7 @@ final class DefaultApplePayCardTokenizationRequestMapper: ApplePayCardTokenizati
                 tokenType: "applepay",
                 contact: request.contact,
                 metadata: request.metadata,
+                applepayMid: request.merchantIdentifier,
                 applepayResponse: .init(token: token)
             )
             return tokenizationRequest
