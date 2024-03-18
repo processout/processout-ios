@@ -36,6 +36,7 @@ extension SFSafariViewController {
                 self?.complete(completion, with: result)
             }
         )
+        self.delegate = viewModel
         setViewModel(viewModel)
         viewModel.start()
     }
