@@ -52,21 +52,41 @@ extension SFSafariViewController {
         commonInit(returnUrl: returnUrl, completion: completion)
     }
 
+    // MARK: - Private Nested Types
+
+    private typealias Completion = (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
+
     // MARK: - Private Methods
 
-    private func commonInit(
-        returnUrl: URL, completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
-    ) {
+    private func commonInit(returnUrl: URL, completion: @escaping Completion) {
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
-        let delegate = AlternativePaymentMethodSafariViewModelDelegate(
-            alternativePaymentMethodsService: api.alternativePaymentMethods, completion: completion
-        )
-        let configuration = DefaultSafariViewModelConfiguration(returnUrl: returnUrl, timeout: nil)
         let viewModel = DefaultSafariViewModel(
-            configuration: configuration, eventEmitter: api.eventEmitter, logger: api.logger, delegate: delegate
+            configuration: .init(returnUrl: returnUrl, timeout: nil),
+            eventEmitter: api.eventEmitter,
+            logger: api.logger,
+            completion: { [weak self] result in
+                self?.complete(completion, with: result)
+            }
         )
         self.delegate = viewModel
         self.setViewModel(viewModel)
         viewModel.start()
+    }
+
+    private func complete(_ completion: @escaping Completion, with result: Result<URL, POFailure>) {
+        let mappedResult = result.flatMap { url in
+            do {
+                let apmService = ProcessOut.shared.alternativePaymentMethods
+                let response = try apmService.alternativePaymentMethodResponse(url: url)
+                return .success(response)
+            } catch let failure as POFailure {
+                return .failure(failure)
+            } catch {
+                assertionFailure("Expected POFailure instance.")
+                let failure = POFailure(code: .generic(.mobile))
+                return .failure(failure)
+            }
+        }
+        completion(mappedResult)
     }
 }
