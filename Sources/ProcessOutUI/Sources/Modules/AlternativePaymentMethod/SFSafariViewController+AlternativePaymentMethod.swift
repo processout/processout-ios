@@ -64,8 +64,8 @@ extension SFSafariViewController {
             configuration: .init(returnUrl: returnUrl, timeout: nil),
             eventEmitter: api.eventEmitter,
             logger: api.logger,
-            completion: { [weak self] result in
-                self?.complete(completion, with: result)
+            completion: { result in
+                Self.complete(completion, with: result)
             }
         )
         self.delegate = viewModel
@@ -73,7 +73,7 @@ extension SFSafariViewController {
         viewModel.start()
     }
 
-    private func complete(_ completion: @escaping Completion, with result: Result<URL, POFailure>) {
+    private static func complete(_ completion: @escaping Completion, with result: Result<URL, POFailure>) {
         let mappedResult = result.flatMap { url in
             do {
                 let apmService = ProcessOut.shared.alternativePaymentMethods

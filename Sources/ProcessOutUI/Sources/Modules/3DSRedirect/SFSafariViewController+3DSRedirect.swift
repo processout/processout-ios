@@ -32,8 +32,8 @@ extension SFSafariViewController {
             configuration: .init(returnUrl: returnUrl, timeout: redirect.timeout),
             eventEmitter: api.eventEmitter,
             logger: api.logger,
-            completion: { [weak self] result in
-                self?.complete(completion, with: result)
+            completion: { result in
+                Self.complete(completion, with: result)
             }
         )
         self.delegate = viewModel
@@ -51,7 +51,7 @@ extension SFSafariViewController {
 
     // MARK: - Private Methods
 
-    private func complete(_ completion: @escaping Completion, with result: Result<URL, POFailure>) {
+    private static func complete(_ completion: @escaping Completion, with result: Result<URL, POFailure>) {
         let mappedResult = result.flatMap { url -> Result<String, POFailure> in
             guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
                 let failure = POFailure(message: nil, code: .internal(.mobile))
