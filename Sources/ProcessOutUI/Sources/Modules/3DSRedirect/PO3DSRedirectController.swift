@@ -14,6 +14,7 @@ import ProcessOut
 /// - Important: The PO3DSRedirectController class performs the same role as the SFSafariViewController
 /// class initialized with 3DSRedirect, but it does not depend on the UIKit framework. This means that
 /// the controller can be used in places where a view controller cannot (for example, in SwiftUI applications).
+///
 public final class PO3DSRedirectController {
 
     /// - Parameters:
@@ -67,6 +68,8 @@ public final class PO3DSRedirectController {
 
     /// Dismisses the Redirect UI.
     public func dismiss(completion: (() -> Void)? = nil) {
+        // todo(andrii-vysotskyi): automatically dismiss controller so behaviour
+        // matches `POAlternativePaymentMethodController`.
         if let safariViewController, safariViewController.presentingViewController != nil {
             self.safariViewController = nil
             safariViewController.dismiss(animated: true, completion: completion)
