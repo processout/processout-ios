@@ -21,7 +21,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
     /// Primary action text, such as "Pay".
     public var primaryActionTitle: String?
 
-    /// Cancel action title. To remove secondary action use `nil`, this is default behaviour.
+    /// Cancel action title. Use empty string to hide button.
     public var cancelActionTitle: String?
 
     /// For parameters where user should select single option from multiple values defines
