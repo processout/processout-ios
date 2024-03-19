@@ -10,7 +10,7 @@ import Foundation
 public struct PODynamicCheckoutAlternativePaymentConfiguration {
 
     /// Return URL to expect when handling OOB or web based payments.
-    public var returnUrl: URL
+    public var returnUrl: URL?
 
     /// Custom title.
     public var title: String?
