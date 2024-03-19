@@ -67,6 +67,8 @@ public final class PO3DSRedirectController {
 
     /// Dismisses the Redirect UI.
     public func dismiss(completion: (() -> Void)? = nil) {
+        // todo(andrii-vysotskyi): automatically dismiss controller so behaviour
+        // matches `POAlternativePaymentMethodController`.
         if let safariViewController, safariViewController.presentingViewController != nil {
             self.safariViewController = nil
             safariViewController.dismiss(animated: true, completion: completion)
