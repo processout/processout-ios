@@ -346,11 +346,11 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     private func updateActions(state: InteractorState.AwaitingCapture) {
         scheduleCancelActionEnabling(
-            configuration: configuration.paymentConfirmationSecondaryAction,
+            configuration: configuration.paymentConfirmation.secondaryAction,
             isDisabled: \.isCaptureCancelDisabled
         )
         let cancelAction = self.cancelAction(
-            configuration: configuration.paymentConfirmationSecondaryAction,
+            configuration: configuration.paymentConfirmation.secondaryAction,
             isEnabled: !isCaptureCancelDisabled
         )
         self.actions = [cancelAction].compactMap { $0 }
