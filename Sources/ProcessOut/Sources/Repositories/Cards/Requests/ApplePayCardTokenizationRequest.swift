@@ -64,6 +64,9 @@ struct ApplePayCardTokenizationRequest: Encodable {
     /// Additional metadata.
     let metadata: [String: String]?
 
+    /// Merchant identifier.
+    let applepayMid: String?
+
     /// Payment information.
     let applepayResponse: ApplePay
 }
