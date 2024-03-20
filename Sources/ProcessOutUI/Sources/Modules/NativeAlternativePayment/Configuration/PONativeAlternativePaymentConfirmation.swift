@@ -18,6 +18,9 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
     /// Maximum value is 180 seconds.
     public let timeout: TimeInterval
 
+    /// A delay before showing progress indicator during payment confirmation.
+    public let showProgressIndicatorAfter: TimeInterval?
+
     /// Action that could be optionally presented to user during payment confirmation stage. To remove action
     /// use `nil`, this is default behaviour.
     public let secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction?
@@ -26,10 +29,12 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
     public init(
         waitsConfirmation: Bool = true,
         timeout: TimeInterval = 180,
+        showProgressIndicatorAfter: TimeInterval? = nil,
         secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction? = nil
     ) {
         self.waitsConfirmation = waitsConfirmation
         self.timeout = timeout
+        self.showProgressIndicatorAfter = showProgressIndicatorAfter
         self.secondaryAction = secondaryAction
     }
 }
