@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+struct DynamicCheckoutAlternativePaymentControllerSource {
+
+    /// Parameters.
+    let url: URL, returnUrl: URL
+}
