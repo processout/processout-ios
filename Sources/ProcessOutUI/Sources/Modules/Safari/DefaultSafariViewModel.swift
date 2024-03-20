@@ -15,12 +15,12 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
         configuration: DefaultSafariViewModelConfiguration,
         eventEmitter: POEventEmitter,
         logger: POLogger,
-        delegate: DefaultSafariViewModelDelegate
+        completion: @escaping (Result<URL, POFailure>) -> Void
     ) {
         self.configuration = configuration
         self.eventEmitter = eventEmitter
         self.logger = logger
-        self.delegate = delegate
+        self.completion = completion
         state = .idle
     }
 
@@ -80,7 +80,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
     private let configuration: DefaultSafariViewModelConfiguration
     private let eventEmitter: POEventEmitter
     private let logger: POLogger
-    private let delegate: DefaultSafariViewModelDelegate
+    private let completion: (Result<URL, POFailure>) -> Void
 
     private var state: State
     private var deepLinkObserver: AnyObject?
@@ -93,43 +93,36 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
             logger.error("Can't change state to completed because already in sink state.")
             return false
         }
-        // todo(andrii-vysotskyi): consider validating whether url is related to initial request if possible
-        guard url.scheme == configuration.returnUrl.scheme,
-              url.host == configuration.returnUrl.host,
-              url.path == configuration.returnUrl.path else {
+        guard matchesUrl(url) else {
             logger.debug("Ignoring unrelated url: \(url)")
             return false
         }
-        do {
-            try delegate.complete(with: url)
-            invalidateObservers()
-            state = .completed
-            logger.info("Did complete with url: \(url)")
-        } catch {
-            setCompletedState(with: error)
-        }
+        invalidateObservers()
+        state = .completed
+        logger.info("Did complete with url: \(url)")
+        completion(.success(url))
         return true
     }
 
-    private func setCompletedState(with error: Error) {
+    private func setCompletedState(with failure: POFailure) {
         if case .completed = state {
             logger.error("Can't change state to completed because already in a sink state.")
             return
         }
-        let failure: POFailure
-        if let error = error as? POFailure {
-            failure = error
-        } else {
-            failure = POFailure(message: nil, code: .generic(.mobile), underlyingError: error)
-        }
         invalidateObservers()
         state = .completed
         logger.debug("Did complete with error: \(failure)")
-        delegate.complete(with: failure)
+        completion(.failure(failure))
     }
 
     private func invalidateObservers() {
         timeoutTimer?.invalidate()
         deepLinkObserver = nil
+    }
+
+    // todo(andrii-vysotskyi): consider validating whether url is related to initial request if possible
+    private func matchesUrl(_ url: URL) -> Bool {
+        let returnUrl = configuration.returnUrl
+        return url.scheme == returnUrl.scheme && url.host == returnUrl.host && url.path == returnUrl.path
     }
 }
