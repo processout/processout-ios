@@ -9,7 +9,7 @@ import SwiftUI
 
 enum NativeAlternativePaymentViewModelItem {
 
-    struct Title: Identifiable {
+    struct Title: Identifiable, Hashable {
 
         /// Item identifier.
         let id: AnyHashable
@@ -65,7 +65,7 @@ enum NativeAlternativePaymentViewModelItem {
         let isEnabled: Bool
     }
 
-    struct Submitted: Identifiable {
+    struct Submitted: Identifiable, Hashable {
 
         /// Item identifier.
         let id: AnyHashable
