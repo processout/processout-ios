@@ -26,6 +26,10 @@ struct NativeAlternativePaymentSubmittedItemView: View {
                     .scaledToFit()
                     .frame(height: min(Constants.maximumLogoImageHeight, image.size.height))
             }
+            if !item.isProgressViewHidden {
+                ProgressView()
+                    .poProgressViewStyle(style.progressView)
+            }
             POMarkdown(item.message)
                 .textStyle(descriptionStyle)
                 .multilineTextAlignment(isMessageCompact ? .center : .leading)

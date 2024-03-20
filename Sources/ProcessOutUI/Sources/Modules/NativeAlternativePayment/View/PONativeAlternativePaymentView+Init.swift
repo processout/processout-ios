@@ -24,7 +24,8 @@ extension PONativeAlternativePaymentView {
             gatewayConfigurationId: configuration.gatewayConfigurationId,
             invoiceId: configuration.invoiceId,
             waitsPaymentConfirmation: configuration.paymentConfirmation.waitsConfirmation,
-            paymentConfirmationTimeout: configuration.paymentConfirmation.timeout
+            paymentConfirmationTimeout: configuration.paymentConfirmation.timeout,
+            showPaymentConfirmationProgressIndicatorAfter: configuration.paymentConfirmation.showProgressIndicatorAfter
         )
         let interactor = PODefaultNativeAlternativePaymentMethodInteractor(
             invoicesService: ProcessOut.shared.invoices,

@@ -84,6 +84,9 @@ enum NativeAlternativePaymentViewModelItem {
 
         /// Boolean value that indicates whether payment is already captured.
         let isCaptured: Bool
+
+        /// Defines whether progress view should be hidden or not.
+        let isProgressViewHidden: Bool
     }
 
     case progress, title(Title), input(Input), codeInput(CodeInput), picker(Picker), submitted(Submitted)
