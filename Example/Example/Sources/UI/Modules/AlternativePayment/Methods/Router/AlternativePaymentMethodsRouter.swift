@@ -21,7 +21,10 @@ final class AlternativePaymentMethodsRouter: RouterType {
                 invoiceId: route.invoiceId,
                 gatewayConfigurationId: route.gatewayConfigurationId,
                 secondaryAction: .cancel(),
-                paymentConfirmationSecondaryAction: .cancel(disabledFor: 10)
+                paymentConfirmation: .init(
+                    showProgressIndicatorAfter: 5,
+                    secondaryAction: .cancel(disabledFor: 10)
+                )
             )
             let viewController = PONativeAlternativePaymentViewController(
                 configuration: configuration,
