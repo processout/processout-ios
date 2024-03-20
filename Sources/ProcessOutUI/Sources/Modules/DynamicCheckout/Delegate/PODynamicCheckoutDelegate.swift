@@ -20,6 +20,13 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
     ///
     /// - NOTE: default implementation returns unmodified request as is.
     func dynamicCheckout(willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest) async
+
+    /// Asks delegate whether user should be allowed to continue after failure or module should complete.
+    /// Default implementation returns `true`.
+    func dynamicCheckout(shouldContinueAfter failure: POFailure) -> Bool
+
+    /// Method should return 3DS service to perform
+    func dynamicCheckout3DSService() -> PO3DSService
 }
 
 extension PODynamicCheckoutDelegate {
@@ -30,5 +37,9 @@ extension PODynamicCheckoutDelegate {
 
     public func dynamicCheckout(willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest) async {
         // Ignored
+    }
+
+    public func dynamicCheckout(shouldContinueAfter failure: POFailure) -> Bool {
+        true
     }
 }
