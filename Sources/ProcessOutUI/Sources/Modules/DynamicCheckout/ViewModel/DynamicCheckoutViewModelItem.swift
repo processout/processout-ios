@@ -9,7 +9,7 @@ import SwiftUI
 
 enum DynamicCheckoutViewModelItem {
 
-    struct ExpressPaymentItem: Identifiable {
+    struct ExpressPayment: Identifiable {
 
         /// Item id.
         let id: String
@@ -18,7 +18,7 @@ enum DynamicCheckoutViewModelItem {
         let title: String?
 
         /// Payment icon image
-        let iconImage: Image?
+        let iconImage: UIImage?
 
         /// Brand color.
         let brandColor: Color
@@ -30,13 +30,13 @@ enum DynamicCheckoutViewModelItem {
         let action: () -> Void
     }
 
-    struct PaymentItem: Identifiable {
+    struct Payment: Identifiable, Hashable {
 
         /// Item identifier.
         let id: String
 
-        /// Payment icon image
-        let iconImage: Image?
+        // Payment icon image
+        let iconImage: UIImage?
 
         /// Item title.
         let title: String
@@ -48,18 +48,36 @@ enum DynamicCheckoutViewModelItem {
         let additionalInformation: String?
     }
 
-    /// Progress item.
-    case progress
+    struct AlternativePayment: Hashable {
 
-    /// Express payment item.
-    case expressPayment(ExpressPaymentItem)
+        /// Gateway configuration id that should be used to initiate native alternative payment.
+        let gatewayConfigurationId: String
+    }
 
-    /// Payment item.
-    case payment(PaymentItem)
+    case progress, expressPayment(ExpressPayment), payment(Payment), card, alternativePayment(AlternativePayment)
+}
 
-    /// Card item.
-    case card
+extension DynamicCheckoutViewModelItem: Identifiable {
 
-    /// Alternative payment.
-    case nativeAlternativePayment(gatewayId: String)
+    var id: AnyHashable {
+        switch self {
+        case .progress:
+            return Constants.progressId
+        case .expressPayment(let item):
+            return item.id
+        case .payment(let item):
+            return item.id
+        case .card:
+            return Constants.cardId
+        case .alternativePayment(let item):
+            return item.gatewayConfigurationId
+        }
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let cardId = UUID().uuidString
+        static let progressId = UUID().uuidString
+    }
 }
