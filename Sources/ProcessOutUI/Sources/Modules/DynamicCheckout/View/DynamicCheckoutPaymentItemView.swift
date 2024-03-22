@@ -14,7 +14,7 @@ struct DynamicCheckoutPaymentItemView: View {
     let item: DynamicCheckoutViewModelItem.Payment
 
     var body: some View {
-        VStack(spacing: POSpacing.large) {
+        VStack(spacing: POSpacing.small) {
             Button(
                 action: {
                     item.isSelected = true
@@ -35,9 +35,17 @@ struct DynamicCheckoutPaymentItemView: View {
             .environment(\.layoutDirection, layoutDirection.inverted)
             .buttonStyle(.radio)
             if let information = item.additionalInformation {
-                HStack {
-                    Text(information)
-                }
+                Label(
+                    title: {
+                        Text(information)
+                    },
+                    icon: {
+                        Image(.info)
+                            .renderingMode(.template)
+                            .foregroundColor(.orange)
+                    }
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding(20)
@@ -59,8 +67,8 @@ struct DynamicCheckoutPaymentItemView: View {
             id: "",
             iconImage: nil,
             title: "Hello",
-            isSelected: .constant(false),
-            additionalInformation: nil
+            isSelected: .constant(true),
+            additionalInformation: "You will be redirected to finalise this payment"
         )
     )
 }
