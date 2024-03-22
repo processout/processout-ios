@@ -5,13 +5,12 @@
 //  Created by Andrii Vysotskyi on 08.09.2023.
 //
 
-#if DEBUG
-
 import SwiftUI
 
 extension View {
 
-    func onSizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
+    @_spi(PO)
+    public func onSizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
         modifier(SizeModifier(action: action))
     }
 }
@@ -41,5 +40,3 @@ private struct SizePreferenceKey: PreferenceKey {
         value = nextValue()
     }
 }
-
-#endif
