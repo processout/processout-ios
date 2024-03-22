@@ -21,15 +21,20 @@ import Foundation
     /// Maximum amount of time to wait for payment confirmation if it is enabled.
     public let paymentConfirmationTimeout: TimeInterval
 
+    /// Time to wait before showing progress indicator after payment confirmation starts.
+    public let showPaymentConfirmationProgressIndicatorAfter: TimeInterval? // swiftlint:disable:this identifier_name
+
     public init(
         gatewayConfigurationId: String,
         invoiceId: String,
         waitsPaymentConfirmation: Bool,
-        paymentConfirmationTimeout: TimeInterval
+        paymentConfirmationTimeout: TimeInterval,
+        showPaymentConfirmationProgressIndicatorAfter: TimeInterval? // swiftlint:disable:this identifier_name
     ) {
         self.gatewayConfigurationId = gatewayConfigurationId
         self.invoiceId = invoiceId
         self.waitsPaymentConfirmation = waitsPaymentConfirmation
         self.paymentConfirmationTimeout = paymentConfirmationTimeout
+        self.showPaymentConfirmationProgressIndicatorAfter = showPaymentConfirmationProgressIndicatorAfter
     }
 }

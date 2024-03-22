@@ -60,6 +60,9 @@ enum NativeAlternativePaymentInteractorState {
 
         /// Boolean value indicating whether cancel is supported in the current state.
         var isCancellable: Bool
+
+        /// Boolean value indicating whether capture takes longer than anticipated.
+        var isDelayed: Bool
     }
 
     struct Captured {

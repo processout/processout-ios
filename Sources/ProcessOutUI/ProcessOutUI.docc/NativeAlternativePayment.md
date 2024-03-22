@@ -28,7 +28,7 @@ text you could do:
 
 ```swift
 PONativeAlternativePaymentConfiguration(
-..., title: "Pay here", primaryActionTitle: "Submit"
+   ..., title: "Pay here", primaryActionTitle: "Submit"
 )
 let view = PONativeAlternativePaymentView(configuration: configuration, ...)
 ```

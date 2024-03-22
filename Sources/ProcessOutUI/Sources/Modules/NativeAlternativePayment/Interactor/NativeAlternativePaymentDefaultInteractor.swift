@@ -205,7 +205,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway,
         parameterValues: PONativeAlternativePaymentMethodParameterValues?
     ) async {
-        guard configuration.waitsPaymentConfirmation else {
+        guard configuration.paymentConfirmation.waitsConfirmation else {
             logger.info("Won't await payment capture because waitsPaymentConfirmation is set to false")
             setSubmittedUnchecked()
             return
@@ -220,14 +220,15 @@ final class NativeAlternativePaymentDefaultInteractor:
             logoImage: logoImage,
             actionMessage: actionMessage,
             actionImage: actionImage,
-            isCancellable: configuration.paymentConfirmationCancelAction.map { $0.disabledFor.isZero } ?? false
+            isCancellable: configuration.paymentConfirmation.cancelAction.map { $0.disabledFor.isZero } ?? false,
+            isDelayed: false
         )
         state = .awaitingCapture(awaitingCaptureState)
         logger.info("Waiting for invoice capture confirmation")
         let request = PONativeAlternativePaymentCaptureRequest(
             invoiceId: configuration.invoiceId,
             gatewayConfigurationId: configuration.gatewayConfigurationId,
-            timeout: configuration.paymentConfirmationTimeout
+            timeout: configuration.paymentConfirmation.timeout
         )
         let task = Task {
             do {
@@ -240,6 +241,20 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         captureCancellable = AnyCancellable(task.cancel)
         enableCaptureCancellationAfterDelay()
+        schedulePaymentConfirmationDelay()
+    }
+
+    private func schedulePaymentConfirmationDelay() {
+        guard let timeInterval = configuration.paymentConfirmation.showProgressIndicatorAfter else {
+            return
+        }
+        Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
+            guard let self, case .awaitingCapture(var awaitingCaptureState) = self.state else {
+                return
+            }
+            awaitingCaptureState.isDelayed = true
+            self.state = .awaitingCapture(awaitingCaptureState)
+        }
     }
 
     // MARK: - Captured State
@@ -250,7 +265,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         parameterValues: PONativeAlternativePaymentMethodParameterValues?
     ) async {
         logger.info("Did receive invoice capture confirmation")
-        guard configuration.waitsPaymentConfirmation else {
+        guard configuration.paymentConfirmation.waitsConfirmation else {
             logger.info("Should't wait for confirmation, so setting submitted state instead of captured.")
             setSubmittedUnchecked()
             return
@@ -375,7 +390,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     @MainActor
     private func enableCaptureCancellationAfterDelay() {
-        guard let action = configuration.paymentConfirmationCancelAction, action.disabledFor > 0 else {
+        guard let action = configuration.paymentConfirmation.cancelAction, action.disabledFor > 0 else {
             logger.debug("Confirmation cancel action is not set or initiatly enabled.")
             return
         }

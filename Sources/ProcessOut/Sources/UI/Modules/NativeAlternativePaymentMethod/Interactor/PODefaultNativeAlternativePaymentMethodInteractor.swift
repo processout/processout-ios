@@ -243,10 +243,25 @@ import UIKit
                 paymentProviderName: parameterValues?.providerName,
                 logoImage: logo,
                 actionMessage: actionMessage,
-                actionImage: actionImage
+                actionImage: actionImage,
+                isDelayed: false
             )
             self.state = .awaitingCapture(awaitingCaptureState)
             self.logger.info("Waiting for invoice capture confirmation")
+            self.schedulePaymentConfirmationDelay()
+        }
+    }
+
+    private func schedulePaymentConfirmationDelay() {
+        guard let timeInterval = configuration.showPaymentConfirmationProgressIndicatorAfter else {
+            return
+        }
+        Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
+            guard let self, case .awaitingCapture(let awaitingCaptureState) = self.state else {
+                return
+            }
+            let updatedState = awaitingCaptureState.replacing(isDelayed: true)
+            self.state = .awaitingCapture(updatedState)
         }
     }
 
@@ -495,7 +510,8 @@ import UIKit
     }
 }
 
-// swiftlint:disable:next no_extension_access_modifier
+// swiftlint:disable no_extension_access_modifier
+
 private extension PONativeAlternativePaymentMethodInteractorState.Started {
 
     func replacing(
@@ -503,7 +519,7 @@ private extension PONativeAlternativePaymentMethodInteractorState.Started {
         values: [String: PONativeAlternativePaymentMethodInteractorState.ParameterValue],
         isSubmitAllowed: Bool
     ) -> Self {
-        let updatedState = Self(
+        .init(
             gateway: gateway,
             amount: amount,
             currencyCode: currencyCode,
@@ -511,8 +527,20 @@ private extension PONativeAlternativePaymentMethodInteractorState.Started {
             values: values,
             isSubmitAllowed: isSubmitAllowed
         )
-        return updatedState
     }
 }
 
-// swiftlint:enable file_length type_body_length
+private extension PONativeAlternativePaymentMethodInteractorState.AwaitingCapture {
+
+    func replacing(isDelayed: Bool) -> Self {
+        .init(
+            paymentProviderName: paymentProviderName,
+            logoImage: logoImage,
+            actionMessage: actionMessage,
+            actionImage: actionImage,
+            isDelayed: isDelayed
+        )
+    }
+}
+
+// swiftlint:enable file_length type_body_length no_extension_access_modifier

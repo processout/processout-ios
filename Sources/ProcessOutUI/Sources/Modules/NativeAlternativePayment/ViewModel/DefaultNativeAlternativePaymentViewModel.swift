@@ -149,7 +149,8 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
                 logoImage: state.logoImage,
                 message: expectedActionMessage,
                 image: state.actionImage,
-                isCaptured: false
+                isCaptured: false,
+                isProgressViewHidden: !state.isDelayed
             )
             item = .submitted(submittedItem)
         } else {
@@ -171,7 +172,8 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             logoImage: state.logoImage,
             message: String(resource: .NativeAlternativePayment.Success.message),
             image: UIImage(resource: .success),
-            isCaptured: true
+            isCaptured: true,
+            isProgressViewHidden: true
         )
         let section = NativeAlternativePaymentViewModelSection(
             id: "captured", isCentered: false, title: nil, items: [.submitted(item)], error: nil
@@ -316,7 +318,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     private func updateActions(state: InteractorState.AwaitingCapture) {
         let cancelAction = self.cancelAction(
-            configuration: configuration.paymentConfirmationCancelAction, isEnabled: state.isCancellable
+            configuration: configuration.paymentConfirmation.cancelAction, isEnabled: state.isCancellable
         )
         self.actions = [cancelAction].compactMap { $0 }
     }

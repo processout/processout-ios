@@ -2,7 +2,7 @@
 //  PONativeAlternativePaymentDelegate.swift
 //  ProcessOutUI
 //
-//  Created by Andrii Vysotskyi on 29.02.2024.
+//  Created by Andrii Vysotskyi on 23.11.2023.
 //
 
 import ProcessOut

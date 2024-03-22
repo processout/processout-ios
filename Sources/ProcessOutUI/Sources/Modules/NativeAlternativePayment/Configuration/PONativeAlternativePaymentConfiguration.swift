@@ -54,19 +54,32 @@ public struct PONativeAlternativePaymentConfiguration {
     /// Boolean value that indicates whether capture success screen should be skipped. Default value is `false`.
     public let skipSuccessScreen: Bool
 
+    /// Payment confirmation configuration.
+    public let paymentConfirmation: PONativeAlternativePaymentConfirmationConfiguration
+
     /// Boolean value that specifies whether module should wait for payment confirmation from PSP or will
     /// complete right after all user's input is submitted. Default value is `true`.
-    public let waitsPaymentConfirmation: Bool
+    @available(*, deprecated, renamed: "paymentConfirmation.waitsConfirmation")
+    public var waitsPaymentConfirmation: Bool {
+        paymentConfirmation.waitsConfirmation
+    }
 
     /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
     /// Maximum value is 180 seconds.
-    public let paymentConfirmationTimeout: TimeInterval
+    @available(*, deprecated, renamed: "paymentConfirmation.timeout")
+    public var paymentConfirmationTimeout: TimeInterval {
+        paymentConfirmation.timeout
+    }
 
     /// Action that could be optionally presented to user during payment confirmation stage. To remove action
     /// use `nil`, this is default behaviour.
-    public let paymentConfirmationCancelAction: CancelAction?
+    @available(*, deprecated, renamed: "paymentConfirmation.cancelAction")
+    public var paymentConfirmationCancelAction: CancelAction? {
+        paymentConfirmation.cancelAction
+    }
 
     /// Creates configuration instance.
+    @available(*, deprecated)
     public init(
         invoiceId: String,
         gatewayConfigurationId: String,
@@ -88,8 +101,33 @@ public struct PONativeAlternativePaymentConfiguration {
         self.cancelAction = cancelAction
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.skipSuccessScreen = skipSuccessScreen
-        self.waitsPaymentConfirmation = waitsPaymentConfirmation
-        self.paymentConfirmationTimeout = paymentConfirmationTimeout
-        self.paymentConfirmationCancelAction = paymentConfirmationCancelAction
+        self.paymentConfirmation = .init(
+            waitsConfirmation: waitsPaymentConfirmation,
+            timeout: paymentConfirmationTimeout,
+            cancelAction: paymentConfirmationCancelAction
+        )
+    }
+
+    /// Creates configuration instance.
+    public init(
+        invoiceId: String,
+        gatewayConfigurationId: String,
+        title: String? = nil,
+        successMessage: String? = nil,
+        primaryActionTitle: String? = nil,
+        cancelAction: CancelAction? = nil,
+        inlineSingleSelectValuesLimit: Int = 5,
+        skipSuccessScreen: Bool = false,
+        paymentConfirmation: PONativeAlternativePaymentConfirmationConfiguration = .init()
+    ) {
+        self.invoiceId = invoiceId
+        self.gatewayConfigurationId = gatewayConfigurationId
+        self.title = title
+        self.successMessage = successMessage
+        self.primaryActionTitle = primaryActionTitle
+        self.cancelAction = cancelAction
+        self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
+        self.skipSuccessScreen = skipSuccessScreen
+        self.paymentConfirmation = paymentConfirmation
     }
 }

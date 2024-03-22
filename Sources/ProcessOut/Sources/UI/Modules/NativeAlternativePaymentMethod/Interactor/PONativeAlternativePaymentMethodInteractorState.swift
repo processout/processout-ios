@@ -52,6 +52,9 @@ import UIKit
 
         /// Action image.
         public let actionImage: UIImage?
+
+        /// Boolean value indicating whether capture takes longer than anticipated.
+        public let isDelayed: Bool
     }
 
     public struct Captured {

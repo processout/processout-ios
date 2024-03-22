@@ -55,5 +55,6 @@
 - ``PONativeAlternativePaymentBackgroundStyle``
 - ``SwiftUI/View/nativeAlternativePaymentStyle(_:)``
 - ``PONativeAlternativePaymentConfiguration``
+- ``PONativeAlternativePaymentConfirmationConfiguration``
 - ``PONativeAlternativePaymentDelegate``
 - ``PONativeAlternativePaymentEvent``
