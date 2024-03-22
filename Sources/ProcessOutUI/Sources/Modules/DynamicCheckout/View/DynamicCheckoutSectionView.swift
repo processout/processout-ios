@@ -9,9 +9,10 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutSectionView: View {
+struct DynamicCheckoutSectionView<ViewRouter: Router>: View where ViewRouter.Route == DynamicCheckoutRoute {
 
     let section: DynamicCheckoutViewModelSection
+    let router: ViewRouter
 
     var body: some View {
         VStack(spacing: POSpacing.small) {
@@ -24,7 +25,7 @@ struct DynamicCheckoutSectionView: View {
             }
             let sectionItems = Array(section.items.enumerated())
             ForEach(sectionItems, id: \.element.id) { offset, element in
-                DynamicCheckoutItemView(item: element)
+                DynamicCheckoutItemView(item: element, router: router)
                 if section.areSeparatorsVisible, offset + 1 < sectionItems.count {
                     Divider()
                 }
