@@ -83,7 +83,8 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
                 gatewayConfigurationId: gatewayConfigurationId,
                 invoiceId: invoiceId,
                 waitsPaymentConfirmation: configuration.waitsPaymentConfirmation,
-                paymentConfirmationTimeout: configuration.paymentConfirmationTimeout
+                paymentConfirmationTimeout: configuration.paymentConfirmationTimeout,
+                showPaymentConfirmationProgressIndicatorAfter: nil
             ),
             logger: logger,
             delegate: delegate

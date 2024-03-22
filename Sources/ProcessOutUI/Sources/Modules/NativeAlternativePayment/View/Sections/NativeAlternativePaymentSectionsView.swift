@@ -40,7 +40,20 @@ struct NativeAlternativePaymentSectionsView: View {
 
     /// Returns value that should trigger whole body animated update.
     private var bodyAnimationValue: AnyHashable {
-        sections.map { [$0.id, $0.items.map(\.id), $0.error == nil] }
+        sections.map { section in
+            [section.id, section.items.map(animationValue), section.error]
+        }
+    }
+
+    private func animationValue(item: NativeAlternativePaymentViewModelItem) -> AnyHashable {
+        switch item {
+        case .title(let titleItem):
+            return titleItem
+        case .submitted(let submittedItem):
+            return submittedItem
+        default:
+            return item.id
+        }
     }
 
     // MARK: - Partition
