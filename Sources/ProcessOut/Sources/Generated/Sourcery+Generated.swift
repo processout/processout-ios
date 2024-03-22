@@ -185,6 +185,17 @@ extension POInvoicesService {
         }
     }
 
+    /// Requests information needed to initiate dynamic checkout session.
+    @discardableResult
+    public func dynamicCheckoutPaymentDetails(
+        request: PODynamicCheckoutPaymentDetailsRequest,
+        completion: @escaping (Result<PODynamicCheckoutPaymentDetails, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await dynamicCheckoutPaymentDetails(request: request)
+        }
+    }
+
     /// Performs invoice authorization with given request.
     @discardableResult
     public func authorizeInvoice(
