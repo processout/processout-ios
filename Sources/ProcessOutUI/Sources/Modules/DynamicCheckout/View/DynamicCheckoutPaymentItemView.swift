@@ -60,16 +60,3 @@ struct DynamicCheckoutPaymentItemView: View {
     @Environment(\.dynamicCheckoutStyle)
     private var style
 }
-
-@available(iOS 14, *)
-#Preview {
-    DynamicCheckoutPaymentItemView(
-        item: .init(
-            id: "",
-            iconImage: nil,
-            title: "Hello",
-            isSelected: .constant(true),
-            additionalInformation: "You will be redirected to finalise this payment"
-        )
-    )
-}
