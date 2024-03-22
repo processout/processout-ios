@@ -33,6 +33,9 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Gateway configuration.
         public let gatewayConfiguration: GatewayConfiguration
+
+        /// Payment flow.
+        public let flow: Flow
     }
 
     // MARK: - Card Customer Token
@@ -70,6 +73,10 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Logo URLs.
         public let square, rectangle: URL?
+    }
+
+    public enum Flow: Decodable {
+        case express
     }
 
     /// Apple Pay.
