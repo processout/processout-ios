@@ -8,18 +8,19 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
+@available(iOS 14, *)
 struct DynamicCheckoutSectionSeparatorView: View {
 
     var body: some View {
         let dividerThickness: CGFloat = 1
         HStack(spacing: POSpacing.small) {
             Rectangle()
-                .fill(Color.black)
+                .fill(style.separatorColor)
                 .frame(maxWidth: .infinity, maxHeight: dividerThickness)
             // todo(andrii-vysotskyi): replace with localized string
             Text("or")
             Rectangle()
-                .fill(Color.black)
+                .fill(style.separatorColor)
                 .frame(maxWidth: .infinity, maxHeight: dividerThickness)
         }
     }

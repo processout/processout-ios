@@ -12,20 +12,18 @@ import SwiftUI
 ///
 /// For more information about styling specific components, see
 /// [the dedicated documentation.](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutcoreui)
+@available(iOS 14, *)
 public struct PODynamicCheckoutStyle {
 
+    /// Payment item style.
+    public var payment = PODynamicCheckoutPaymentStyle()
+
+    /// Separator color.
+    public var separatorColor = Color(poResource: .Border.subtle)
+
     /// Background color.
-    public let backgroundColor: Color
+    public var backgroundColor = Color(poResource: .Surface.level1)
 
-    public init(backgroundColor: Color) {
-        self.backgroundColor = backgroundColor
-    }
-}
-
-extension PODynamicCheckoutStyle {
-
-    /// Default card tokenization style.
-    public static var `default`: PODynamicCheckoutStyle {
-        PODynamicCheckoutStyle(backgroundColor: Color(poResource: .Surface.level1))
-    }
+    /// Actions container style.
+    public var actionsContainer = POActionsContainerStyle.default
 }

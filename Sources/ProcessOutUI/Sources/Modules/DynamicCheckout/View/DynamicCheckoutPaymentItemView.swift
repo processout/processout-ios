@@ -38,11 +38,12 @@ struct DynamicCheckoutPaymentItemView: View {
                 Label(
                     title: {
                         Text(information)
+                            .textStyle(style.payment.informationText)
                     },
                     icon: {
                         Image(.info)
                             .renderingMode(.template)
-                            .foregroundColor(.orange)
+                            .foregroundColor(style.payment.informationText.color)
                     }
                 )
                 .frame(maxWidth: .infinity, alignment: .leading)

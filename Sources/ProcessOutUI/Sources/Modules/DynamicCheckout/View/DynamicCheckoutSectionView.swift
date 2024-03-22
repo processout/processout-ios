@@ -23,10 +23,10 @@ struct DynamicCheckoutSectionView<ViewRouter: Router>: View where ViewRouter.Rou
                         titleSize = size
                     }
             }
-            let sectionItems = Array(section.items.enumerated())
-            ForEach(sectionItems, id: \.element.id) { offset, element in
+            let items = Array(section.items.enumerated())
+            ForEach(items, id: \.element.id) { offset, element in
                 DynamicCheckoutItemView(item: element, router: router)
-                if section.areSeparatorsVisible, offset + 1 < sectionItems.count {
+                if section.areSeparatorsVisible, offset + 1 < items.count {
                     Divider()
                 }
             }

@@ -10,11 +10,13 @@ import SwiftUI
 extension View {
 
     /// Sets the style for card tokenization views within this view.
+    @available(iOS 14, *)
     public func dynamicCheckoutStyle(_ style: PODynamicCheckoutStyle) -> some View {
         environment(\.dynamicCheckoutStyle, style)
     }
 }
 
+@available(iOS 14, *)
 extension EnvironmentValues {
 
     var dynamicCheckoutStyle: PODynamicCheckoutStyle {
@@ -25,6 +27,6 @@ extension EnvironmentValues {
     // MARK: - Private Nested Types
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = PODynamicCheckoutStyle.default
+        static let defaultValue = PODynamicCheckoutStyle()
     }
 }

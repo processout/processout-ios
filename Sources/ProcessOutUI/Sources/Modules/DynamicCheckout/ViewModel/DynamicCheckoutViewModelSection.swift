@@ -5,7 +5,10 @@
 //  Created by Andrii Vysotskyi on 07.03.2024.
 //
 
-struct DynamicCheckoutViewModelSection {
+struct DynamicCheckoutViewModelSection: Identifiable {
+
+    /// Section ID.
+    let id: String
 
     /// Section title.
     let title: String?
