@@ -42,7 +42,8 @@ enum DynamicCheckoutViewModelItem {
         let title: String
 
         /// Defines whether item is currently selected.
-        var isSelected: Binding<Bool>
+        @Binding
+        var isSelected: Bool
 
         /// Payment details.
         let additionalInformation: String?
