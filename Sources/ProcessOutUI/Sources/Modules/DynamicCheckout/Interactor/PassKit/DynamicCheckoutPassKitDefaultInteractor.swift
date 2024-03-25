@@ -1,5 +1,5 @@
 //
-//  DynamicCheckoutApplePayController.swift
+//  DynamicCheckoutPassKitPaymentDefaultInteractor.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 17.03.2024.
@@ -10,28 +10,26 @@ import PassKit
 import ProcessOut
 
 @MainActor
-final class DynamicCheckoutApplePayController: DynamicCheckoutExternalPaymentController {
+final class DynamicCheckoutPassKitPaymentDefaultInteractor: DynamicCheckoutPassKitPaymentInteractor {
 
     init(
-        invoicesService: POInvoicesService,
         configuration: PODynamicCheckoutConfiguration,
         delegate: PODynamicCheckoutPassKitPaymentDelegate?,
-        dynamicCheckoutDelegate: PODynamicCheckoutDelegate
+        dynamicCheckoutDelegate: PODynamicCheckoutDelegate,
+        invoicesService: POInvoicesService
     ) {
-        self.invoicesService = invoicesService
         self.configuration = configuration
         self.delegate = delegate
         self.dynamicCheckoutDelegate = dynamicCheckoutDelegate
+        self.invoicesService = invoicesService
         didAuthorizeInvoice = false
     }
 
-    var canStart: Bool {
-        get async {
-            configuration.applePay != nil && POPassKitPaymentAuthorizationController.canMakePayments()
-        }
+    nonisolated var canStart: Bool {
+        configuration.applePay != nil && POPassKitPaymentAuthorizationController.canMakePayments()
     }
 
-    func start(source: Void) async throws {
+    func start() async throws {
         guard let paymentRequest = configuration.applePay?.paymentRequest,
               let controller = POPassKitPaymentAuthorizationController(paymentRequest: paymentRequest) else {
             assertionFailure("ApplePay payment shouldn't be attempted when unavailable.")
@@ -61,7 +59,7 @@ final class DynamicCheckoutApplePayController: DynamicCheckoutExternalPaymentCon
     private var didAuthorizeInvoice: Bool
 }
 
-extension DynamicCheckoutApplePayController: POPassKitPaymentAuthorizationControllerDelegate {
+extension DynamicCheckoutPassKitPaymentDefaultInteractor: POPassKitPaymentAuthorizationControllerDelegate {
 
     func paymentAuthorizationControllerDidFinish(_ controller: POPassKitPaymentAuthorizationController) {
         guard let didFinishContinuation else {

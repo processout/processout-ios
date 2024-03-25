@@ -14,18 +14,16 @@ final class DynamicCheckoutDefaultInteractor:
     init(
         configuration: PODynamicCheckoutConfiguration,
         delegate: PODynamicCheckoutDelegate,
-        passKitPaymentController: some DynamicCheckoutExternalPaymentController<Void>,
-        alternativePaymentController: some DynamicCheckoutExternalPaymentController<DynamicCheckoutAlternativePaymentControllerSource>, // swiftlint:disable:this line_length
+        passKitPaymentInteractor: DynamicCheckoutPassKitPaymentInteractor,
+        alternativePaymentInteractor: DynamicCheckoutAlternativePaymentInteractor,
         invoicesService: POInvoicesService,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         self.configuration = configuration
         self.delegate = delegate
-
-        self.passKitPaymentController = passKitPaymentController
-        self.alternativePaymentController = alternativePaymentController
-
+        self.passKitPaymentInteractor = passKitPaymentInteractor
+        self.alternativePaymentInteractor = alternativePaymentInteractor
         self.invoicesService = invoicesService
         self.logger = logger
         self.completion = completion
@@ -65,8 +63,8 @@ final class DynamicCheckoutDefaultInteractor:
     private let logger: POLogger
     private let completion: (Result<Void, POFailure>) -> Void
 
-    private let passKitPaymentController: any DynamicCheckoutExternalPaymentController<Void>
-    private let alternativePaymentController: any DynamicCheckoutExternalPaymentController<DynamicCheckoutAlternativePaymentControllerSource> // swiftlint:disable:this line_length
+    private let passKitPaymentInteractor: DynamicCheckoutPassKitPaymentInteractor
+    private let alternativePaymentInteractor: DynamicCheckoutAlternativePaymentInteractor
 
     private weak var delegate: PODynamicCheckoutDelegate?
     private weak var alternativePaymentCoordinator: PONativeAlternativePaymentCoordinator?
