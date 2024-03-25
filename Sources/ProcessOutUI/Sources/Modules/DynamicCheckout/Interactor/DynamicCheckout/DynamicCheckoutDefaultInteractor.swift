@@ -44,8 +44,20 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     func initiatePayment(methodId: String) -> Bool {
-        // todo(andrii-vysotskyi): implement me
-        false
+        guard case .started(let startedState) = state else {
+            return false
+        }
+        guard let paymentMethod = startedState.paymentMethods[methodId] else {
+            assertionFailure("Non existing payment method ID.")
+            return false
+        }
+        switch paymentMethod {
+        case .applePay:
+            initiatePassKitPayment(methodId: methodId, startedState: startedState)
+        default:
+            return false // todo(andrii-vysotskyi): handle other payment methods
+        }
+        return true
     }
 
     func submit() {
@@ -67,7 +79,6 @@ final class DynamicCheckoutDefaultInteractor:
     private let alternativePaymentInteractor: DynamicCheckoutAlternativePaymentInteractor
 
     private weak var delegate: PODynamicCheckoutDelegate?
-    private weak var alternativePaymentCoordinator: PONativeAlternativePaymentCoordinator?
 
     // MARK: - Starting State
 
@@ -121,6 +132,46 @@ final class DynamicCheckoutDefaultInteractor:
             _paymentMethods[paymentMethod.id] = paymentMethod
         }
         return _paymentMethods
+    }
+
+    // MARK: - Pass Kit Payment
+
+    private func initiatePassKitPayment(methodId: String, startedState: State.Started) {
+        let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
+            snapshot: startedState,
+            paymentMethodId: methodId,
+            submission: .submitting,
+            isCancellable: startedState.isCancellable ? false : nil
+        )
+        state = .paymentProcessing(paymentProcessingState)
+        Task { @MainActor in
+            do {
+                try await passKitPaymentInteractor.start()
+                state = .success(snapshot: paymentProcessingState)
+            } catch {
+                restoreStartedStateAfterPaymentProcessingFailureIfPossible(error)
+            }
+        }
+    }
+
+    // MARK: - Started State Restoration
+
+    /// - NOTE: Only cancellation errors are restored at a time.
+    private func restoreStartedStateAfterPaymentProcessingFailureIfPossible(_ error: Error) {
+        logger.info("Did fail to process payment: \(error)")
+        guard let failure = error as? POFailure, case .cancelled = failure.code else {
+            setFailureStateUnchecked(error: error)
+            return
+        }
+        let startedState: State.Started
+        switch state {
+        case .paymentProcessing(let paymentProcessingState):
+            startedState = paymentProcessingState.snapshot
+        default:
+            setFailureStateUnchecked(error: error)
+            return
+        }
+        state = .started(startedState)
     }
 
     // MARK: - Failure State
