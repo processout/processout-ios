@@ -130,7 +130,7 @@ final class DynamicCheckoutDefaultInteractor:
         if let error = error as? POFailure {
             failure = error
         } else {
-             logger.debug("Unexpected error type: \(error)")
+            logger.debug("Unexpected error type: \(error)")
             failure = POFailure(code: .generic(.mobile), underlyingError: error)
         }
         state = .failure(failure)
