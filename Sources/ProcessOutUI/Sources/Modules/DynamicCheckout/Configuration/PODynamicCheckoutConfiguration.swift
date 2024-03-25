@@ -22,6 +22,9 @@ public struct PODynamicCheckoutConfiguration {
     /// Apple pay configuration.
     public var applePay: PODynamicCheckoutApplePayConfiguration?
 
+    /// Cancel action. To remove action use empty string.
+    public var cancelActionTitle: String?
+
     /// Determines whether to enable skipping payment list step when there is only one non-instant payment method.
     /// Default value: `false`.
     public var allowsSkippingPaymentList = false
