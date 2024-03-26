@@ -10,6 +10,11 @@ import Foundation
 
 final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
 
+    init(interactor: some DynamicCheckoutInteractor) {
+        self.interactor = interactor
+        observeChanges(interactor: interactor)
+    }
+
     // MARK: - DynamicCheckoutViewModel
 
     @Published
@@ -17,4 +22,21 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
 
     @Published
     private(set) var actions: [POActionsContainerActionViewModel] = []
+
+    // MARK: - Private Properties
+
+    private let interactor: any DynamicCheckoutInteractor
+
+    // MARK: - Private Methods
+
+    private func observeChanges(interactor: some Interactor) {
+        interactor.start()
+        interactor.didChange = { [weak self] in
+            self?.updateWithInteractorState()
+        }
+    }
+
+    private func updateWithInteractorState() {
+        // TBD
+    }
 }
