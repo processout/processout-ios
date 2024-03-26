@@ -304,7 +304,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     ) -> [POActionsContainerActionViewModel] {
         let actions = [
             submitAction(startedState: startedState, isSubmitting: isSubmitting),
-            cancelAction(isEnabled: !isSubmitting)
+            cancelAction(startedState: startedState, isEnabled: !isSubmitting)
         ]
         return actions.compactMap { $0 }
     }
@@ -325,14 +325,15 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         return action
     }
 
-    private func cancelAction(isEnabled: Bool) -> POActionsContainerActionViewModel? {
-        let title = configuration.cancelActionTitle ?? String(resource: .CardTokenization.Button.cancel)
-        guard !title.isEmpty else {
+    private func cancelAction(
+        startedState: InteractorState.Started, isEnabled: Bool
+    ) -> POActionsContainerActionViewModel? {
+        guard startedState.isCancellable else {
             return nil
         }
         let action = POActionsContainerActionViewModel(
             id: "cancel-button",
-            title: title,
+            title: configuration.cancelActionTitle ?? String(resource: .CardTokenization.Button.cancel),
             isEnabled: isEnabled,
             isLoading: false,
             isPrimary: false,

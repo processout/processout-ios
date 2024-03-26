@@ -91,6 +91,9 @@ enum CardTokenizationInteractorState {
 
         /// The most recent error message.
         var recentErrorMessage: String?
+
+        /// Boolean value indicating whether tokenization could be cancelled.
+        let isCancellable: Bool
     }
 
     struct Tokenized {
