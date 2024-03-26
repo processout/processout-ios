@@ -304,17 +304,21 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     ) -> [POActionsContainerActionViewModel] {
         let actions = [
             submitAction(startedState: startedState, isSubmitting: isSubmitting),
-            cancelAction(startedState: startedState, isEnabled: !isSubmitting)
+            cancelAction(isEnabled: !isSubmitting)
         ]
         return actions.compactMap { $0 }
     }
 
     private func submitAction(
         startedState: InteractorState.Started, isSubmitting: Bool
-    ) -> POActionsContainerActionViewModel {
+    ) -> POActionsContainerActionViewModel? {
+        let title = configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit)
+        guard !title.isEmpty else {
+            return nil
+        }
         let action = POActionsContainerActionViewModel(
             id: "primary-button",
-            title: configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit),
+            title: title,
             isEnabled: startedState.areParametersValid,
             isLoading: isSubmitting,
             isPrimary: true,
@@ -325,15 +329,14 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         return action
     }
 
-    private func cancelAction(
-        startedState: InteractorState.Started, isEnabled: Bool
-    ) -> POActionsContainerActionViewModel? {
-        guard startedState.isCancellable else {
+    private func cancelAction(isEnabled: Bool) -> POActionsContainerActionViewModel? {
+        let title = configuration.cancelActionTitle ?? String(resource: .CardTokenization.Button.cancel)
+        guard !title.isEmpty else {
             return nil
         }
         let action = POActionsContainerActionViewModel(
             id: "cancel-button",
-            title: configuration.cancelActionTitle ?? String(resource: .CardTokenization.Button.cancel),
+            title: title,
             isEnabled: isEnabled,
             isLoading: false,
             isPrimary: false,

@@ -22,10 +22,10 @@ struct DefaultDynamicCheckoutRouter: Router {
         switch route {
         case .card:
             let cardTokenizationConfiguration = POCardTokenizationConfiguration(
-                title: nil,
+                title: "",
                 isCardholderNameInputVisible: configuration.card.isCardholderNameInputVisible,
-                primaryActionTitle: configuration.card.primaryActionTitle,
-                cancelActionTitle: configuration.card.cancelActionTitle,
+                primaryActionTitle: "",
+                cancelActionTitle: "",
                 billingAddress: configuration.card.billingAddress,
                 metadata: configuration.card.metadata
             )

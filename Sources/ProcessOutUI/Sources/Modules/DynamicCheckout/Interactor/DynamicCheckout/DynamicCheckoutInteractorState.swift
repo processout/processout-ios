@@ -55,7 +55,7 @@ enum DynamicCheckoutInteractorState {
         var submission: PaymentSubmission
 
         /// Defines whether payment is cancellable. Value is `Nil`when cancelation is not supported.
-        var isCancellable: Bool?
+        var isCancellable: Bool
     }
 
     /// Idle state.

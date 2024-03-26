@@ -48,8 +48,7 @@ final class DefaultCardTokenizationInteractor:
                 id: \.cvc, formatter: CardSecurityCodeFormatter()
             ),
             cardholderName: .init(id: \.cardholderName, shouldCollect: configuration.isCardholderNameInputVisible),
-            address: defaultAddressParameters,
-            isCancellable: configuration.cancelActionTitle?.isEmpty != true
+            address: defaultAddressParameters
         )
         setStateUnchecked(.started(startedState))
         delegate?.cardTokenization(coordinator: self, didEmitEvent: .didStart)
@@ -140,7 +139,7 @@ final class DefaultCardTokenizationInteractor:
     }
 
     func cancel() {
-        guard case .started(let startedState) = state, startedState.isCancellable else {
+        guard case .started = state else {
             return
         }
         let failure = POFailure(code: .cancelled)
@@ -427,22 +426,14 @@ extension DefaultCardTokenizationInteractor {
         case .idle:
             return .idle
         case .started(let startedState):
-            return .started(.init(state: startedState))
-        case .tokenizing(let snapshot):
-            return .tokenizing(snapshot: .init(state: snapshot))
+            return .started(isSubmittable: startedState.areParametersValid)
+        case .tokenizing:
+            return .tokenizing
         case .tokenized:
             return .tokenized
         case .failure(let failure):
             return .failure(failure)
         }
-    }
-}
-
-extension POCardTokenizationState.Started {
-
-    init(state: CardTokenizationInteractorState.Started) {
-        self.isSubmittable = state.areParametersValid
-        self.isCancellable = state.isCancellable
     }
 }
 

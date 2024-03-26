@@ -18,7 +18,7 @@ public struct POCardTokenizationConfiguration {
     /// Indicates if the input for entering the cardholder name should be displayed. Defaults to `true`.
     public let isCardholderNameInputVisible: Bool
 
-    /// Primary action text, such as "Submit".
+    /// Primary action text, such as "Submit". Use empty string to hide button.
     public let primaryActionTitle: String?
 
     /// Primary action text, such as "Cancel". Use empty string to hide button.

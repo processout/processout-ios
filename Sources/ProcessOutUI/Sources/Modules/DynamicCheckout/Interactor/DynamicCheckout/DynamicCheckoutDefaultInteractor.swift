@@ -170,10 +170,7 @@ final class DynamicCheckoutDefaultInteractor:
 
     private func initiatePassKitPayment(methodId: String, startedState: State.Started) {
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
-            snapshot: startedState,
-            paymentMethodId: methodId,
-            submission: .submitting,
-            isCancellable: startedState.isCancellable ? false : nil
+            snapshot: startedState, paymentMethodId: methodId, submission: .submitting, isCancellable: false
         )
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
@@ -265,18 +262,12 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         switch state {
         case .idle:
             break // Ignored
-        case .started(let started):
-            if started.isSubmittable {
-                paymentProcessingState.submission = .possible
-            } else {
-                paymentProcessingState.submission = .temporarilyUnavailable
-            }
-            if started.isCancellable {
-                paymentProcessingState.isCancellable = true
-            } else {
-                paymentProcessingState.isCancellable = nil
-            }
-        case .tokenizing(let snapshot):
+        case .started(let isSubmittable):
+            paymentProcessingState.submission = isSubmittable
+                ? .possible
+                : .temporarilyUnavailable
+            paymentProcessingState.isCancellable = paymentProcessingState.snapshot.isCancellable
+        case .tokenizing:
             paymentProcessingState.submission = .submitting
             paymentProcessingState.isCancellable = false
         case .tokenized, .failure:
