@@ -13,7 +13,7 @@ final class DynamicCheckoutDefaultInteractor:
 
     init(
         configuration: PODynamicCheckoutConfiguration,
-        delegate: PODynamicCheckoutDelegate,
+        delegate: PODynamicCheckoutDelegate?,
         passKitPaymentInteractor: DynamicCheckoutPassKitPaymentInteractor,
         alternativePaymentInteractor: DynamicCheckoutAlternativePaymentInteractor,
         invoicesService: POInvoicesService,
@@ -44,6 +44,7 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     func initiatePayment(methodId: String) -> Bool {
+        // todo(andrii-vysotskyi): support changing payment method when already paying
         guard case .started(let startedState) = state else {
             return false
         }
@@ -54,29 +55,60 @@ final class DynamicCheckoutDefaultInteractor:
         switch paymentMethod {
         case .applePay:
             initiatePassKitPayment(methodId: methodId, startedState: startedState)
+        case .card:
+            initiateCardPayment(methodId: methodId, startedState: startedState)
         default:
             return false // todo(andrii-vysotskyi): handle other payment methods
         }
+        delegate?.dynamicCheckout(didEmitEvent: .didSelectPaymentMethod)
         return true
     }
 
     func submit() {
-        // todo(andrii-vysotskyi): implement me
+        guard case .paymentProcessing(let paymentProcessingState) = state else {
+            return
+        }
+        let paymentMethods = paymentProcessingState.snapshot.paymentMethods
+        guard let paymentMethod = paymentMethods[paymentProcessingState.paymentMethodId] else {
+            assertionFailure("Unknown payment method ID.")
+            return
+        }
+        switch paymentMethod {
+        case .card:
+            cardTokenizationCoordinator?.tokenize()
+        default:
+            assertionFailure("Active payment method doesn't support forced submission.")
+        }
     }
 
     func cancel() {
-        // todo(andrii-vysotskyi): implement me
+        guard case .paymentProcessing(let paymentProcessingState) = state else {
+            return
+        }
+        let paymentMethods = paymentProcessingState.snapshot.paymentMethods
+        guard let paymentMethod = paymentMethods[paymentProcessingState.paymentMethodId] else {
+            assertionFailure("Unknown payment method ID.")
+            return
+        }
+        switch paymentMethod {
+        case .card:
+            cardTokenizationCoordinator?.cancel()
+        default:
+            assertionFailure("Active payment method doesn't support cancellation.")
+        }
     }
 
     // MARK: - Private Properties
 
     private let configuration: PODynamicCheckoutConfiguration
+    private let passKitPaymentInteractor: DynamicCheckoutPassKitPaymentInteractor
+    private let alternativePaymentInteractor: DynamicCheckoutAlternativePaymentInteractor
     private let invoicesService: POInvoicesService
     private let logger: POLogger
     private let completion: (Result<Void, POFailure>) -> Void
 
-    private let passKitPaymentInteractor: DynamicCheckoutPassKitPaymentInteractor
-    private let alternativePaymentInteractor: DynamicCheckoutAlternativePaymentInteractor
+    private weak var cardTokenizationCoordinator: POCardTokenizationCoordinator?
+    private weak var nativeAlternativePaymentCoordinator: PONativeAlternativePaymentCoordinator?
 
     private weak var delegate: PODynamicCheckoutDelegate?
 
@@ -154,6 +186,18 @@ final class DynamicCheckoutDefaultInteractor:
         }
     }
 
+    // MARK: - Card Payment
+
+    private func initiateCardPayment(methodId: String, startedState: State.Started) {
+        let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
+            snapshot: startedState,
+            paymentMethodId: methodId,
+            submission: .possible, // Submission is initially possible
+            isCancellable: startedState.isCancellable
+        )
+        state = .paymentProcessing(paymentProcessingState)
+    }
+
     // MARK: - Started State Restoration
 
     /// - NOTE: Only cancellation errors are restored at a time.
@@ -195,5 +239,22 @@ final class DynamicCheckoutDefaultInteractor:
         assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
         delegate?.dynamicCheckout(didEmitEvent: event)
+    }
+}
+
+extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
+
+    func cardTokenization(coordinator: any POCardTokenizationCoordinator, didTokenizeCard card: POCard) async throws {
+        guard let delegate else {
+            throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
+        }
+        var request = POInvoiceAuthorizationRequest(invoiceId: configuration.invoiceId, source: card.id)
+        let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request)
+        try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
+    }
+
+    func cardTokenization(coordinator: POCardTokenizationCoordinator, didChangeState state: POCardTokenizationState) {
+        // todo(andrii-vysotskyi): update state
+        self.cardTokenizationCoordinator = coordinator
     }
 }
