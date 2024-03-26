@@ -15,7 +15,7 @@ final class DynamicCheckoutPassKitPaymentDefaultInteractor: DynamicCheckoutPassK
     init(
         configuration: PODynamicCheckoutConfiguration,
         delegate: PODynamicCheckoutPassKitPaymentDelegate?,
-        dynamicCheckoutDelegate: PODynamicCheckoutDelegate,
+        dynamicCheckoutDelegate: PODynamicCheckoutDelegate?,
         invoicesService: POInvoicesService
     ) {
         self.configuration = configuration
@@ -73,11 +73,14 @@ extension DynamicCheckoutPassKitPaymentDefaultInteractor: POPassKitPaymentAuthor
         didTokenizePayment payment: PKPayment,
         card: POCard
     ) async -> PKPaymentAuthorizationResult {
-        let authorizationRequest = POInvoiceAuthorizationRequest(invoiceId: configuration.invoiceId, source: card.id)
+        var authorizationRequest = POInvoiceAuthorizationRequest(invoiceId: configuration.invoiceId, source: card.id)
         do {
-            guard let threeDSService = dynamicCheckoutDelegate?.dynamicCheckout3DSService() else {
-                throw POFailure(message: "Unable to resolve 3DS service, delegate is not set.", code: .generic(.mobile))
+            guard let dynamicCheckoutDelegate else {
+                throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
             }
+            let threeDSService = await dynamicCheckoutDelegate.dynamicCheckout(
+                willAuthorizeInvoiceWith: &authorizationRequest
+            )
             try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
             didAuthorizeInvoice = true
         } catch {
