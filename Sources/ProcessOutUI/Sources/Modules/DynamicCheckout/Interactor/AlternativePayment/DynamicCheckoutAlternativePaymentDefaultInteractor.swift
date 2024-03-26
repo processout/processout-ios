@@ -6,15 +6,19 @@
 //
 
 import Foundation
+import ProcessOut
 
 @MainActor
 final class DynamicCheckoutAlternativePaymentDefaultInteractor: DynamicCheckoutAlternativePaymentInteractor {
 
-    init(returnUrl: URL) {
-        self.returnUrl = returnUrl
+    init(configuration: PODynamicCheckoutAlternativePaymentConfiguration) {
+        self.configuration = configuration
     }
 
     func start(url: URL) async throws {
+        guard let returnUrl = configuration.returnUrl else {
+            throw POFailure(message: "Return URL must be set.", code: .generic(.mobile))
+        }
         // swiftlint:disable:next implicitly_unwrapped_optional
         var controller: POAlternativePaymentMethodController!
         // todo(andrii-vysotskyi): set tint colors and configuration
@@ -26,5 +30,5 @@ final class DynamicCheckoutAlternativePaymentDefaultInteractor: DynamicCheckoutA
 
     // MARK: - Private Properties
 
-    private let returnUrl: URL
+    private let configuration: PODynamicCheckoutAlternativePaymentConfiguration
 }
