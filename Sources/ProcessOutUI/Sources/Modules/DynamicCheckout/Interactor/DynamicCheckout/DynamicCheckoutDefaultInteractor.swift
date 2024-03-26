@@ -254,7 +254,36 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
     }
 
     func cardTokenization(coordinator: POCardTokenizationCoordinator, didChangeState state: POCardTokenizationState) {
-        // todo(andrii-vysotskyi): update state
+        guard case .paymentProcessing(var paymentProcessingState) = self.state else {
+            return
+        }
+        let paymentMethods = paymentProcessingState.snapshot.paymentMethods
+        guard case .card = paymentMethods[paymentProcessingState.paymentMethodId] else {
+            assertionFailure("Unexpected current payment method.")
+            return
+        }
+        switch state {
+        case .idle:
+            break // Ignored
+        case .started(let started):
+            if started.isSubmittable {
+                paymentProcessingState.submission = .possible
+            } else {
+                paymentProcessingState.submission = .temporarilyUnavailable
+            }
+            if started.isCancellable {
+                paymentProcessingState.isCancellable = true
+            } else {
+                paymentProcessingState.isCancellable = nil
+            }
+        case .tokenizing(let snapshot):
+            paymentProcessingState.submission = .submitting
+            paymentProcessingState.isCancellable = false
+        case .tokenized, .failure:
+            paymentProcessingState.submission = .unavailable
+            paymentProcessingState.isCancellable = false
+        }
+        self.state = .paymentProcessing(paymentProcessingState)
         self.cardTokenizationCoordinator = coordinator
     }
 }
