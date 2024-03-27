@@ -20,8 +20,8 @@ enum DynamicCheckoutInteractorState {
         /// Payment methods.
         let regularPaymentMethodIds: [String]
 
-        /// Defines whether payment is cancellable. `Nil` means that cancelation is not supported at all.
-        var isCancellable: Bool?
+        /// Defines whether payment is cancellable.
+        var isCancellable: Bool
 
         /// Most recent error description if any.
         var recentErrorDescription: String?
@@ -55,7 +55,7 @@ enum DynamicCheckoutInteractorState {
         var submission: PaymentSubmission
 
         /// Defines whether payment is cancellable. Value is `Nil`when cancelation is not supported.
-        var isCancellable: Bool?
+        var isCancellable: Bool
     }
 
     /// Idle state.

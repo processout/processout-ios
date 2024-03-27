@@ -6,26 +6,55 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOut
 
 @available(iOS 14, *)
 public struct PODynamicCheckoutView: View {
 
-    public init(configuration: PODynamicCheckoutConfiguration, delegate: PODynamicCheckoutDelegate) {
+    public init(
+        configuration: PODynamicCheckoutConfiguration,
+        delegate: PODynamicCheckoutDelegate,
+        completion: @escaping (Result<Void, POFailure>) -> Void
+    ) {
         self.configuration = configuration
         self.delegate = delegate
+        self.completion = completion
     }
 
     // MARK: - View
 
     public var body: some View {
         // todo(andrii-vysotskyi): ensure that view model is created only once, see https://stackoverflow.com/questions/62635914/initialize-stateobject-with-a-parameter-in-swiftui
-        let viewModel = DefaultDynamicCheckoutViewModel()
-        let router = DefaultDynamicCheckoutRouter(configuration: configuration)
-        DynamicCheckoutView(viewModel: viewModel, router: router)
+        var logger = ProcessOut.shared.logger
+        logger[attributeKey: "InvoiceId"] = configuration.invoiceId
+        let interactor = DynamicCheckoutDefaultInteractor(
+            configuration: configuration,
+            delegate: delegate,
+            passKitPaymentInteractor: DynamicCheckoutPassKitPaymentDefaultInteractor(
+                configuration: configuration,
+                delegate: nil, // todo(andrii-vysotskyi): forward delegate
+                dynamicCheckoutDelegate: delegate,
+                invoicesService: ProcessOut.shared.invoices
+            ),
+            alternativePaymentInteractor: DynamicCheckoutAlternativePaymentDefaultInteractor(
+                configuration: configuration.alternativePayment
+            ),
+            invoicesService: ProcessOut.shared.invoices,
+            logger: logger,
+            completion: completion
+        )
+        let viewModel = DefaultDynamicCheckoutViewModel(interactor: interactor)
+        let router = DefaultDynamicCheckoutRouter(
+            configuration: configuration,
+            cardTokenizationDelegate: interactor
+        )
+        return DynamicCheckoutView(viewModel: viewModel, router: router)
     }
 
     // MARK: - Private Properties
 
     private let configuration: PODynamicCheckoutConfiguration
+    private let completion: (Result<Void, POFailure>) -> Void
+
     private weak var delegate: PODynamicCheckoutDelegate?
 }

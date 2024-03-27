@@ -311,10 +311,14 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     private func submitAction(
         startedState: InteractorState.Started, isSubmitting: Bool
-    ) -> POActionsContainerActionViewModel {
+    ) -> POActionsContainerActionViewModel? {
+        let title = configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit)
+        guard !title.isEmpty else {
+            return nil
+        }
         let action = POActionsContainerActionViewModel(
             id: "primary-button",
-            title: configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit),
+            title: title,
             isEnabled: startedState.areParametersValid,
             isLoading: isSubmitting,
             isPrimary: true,

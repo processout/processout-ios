@@ -40,6 +40,15 @@ final class HttpInvoicesRepository: InvoicesRepository {
         return try await connector.execute(request: httpRequest)
     }
 
+    func dynamicCheckoutPaymentDetails(
+        request: PODynamicCheckoutPaymentDetailsRequest
+    ) async throws -> PODynamicCheckoutPaymentDetails {
+        let httpRequest = HttpConnectorRequest<PODynamicCheckoutPaymentDetails>.get(
+            path: "/invoices/\(request.invoiceId)/dynamic-checkout"
+        )
+        return try await connector.execute(request: httpRequest)
+    }
+
     func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> ThreeDSCustomerAction? {
         struct Response: Decodable {
             let customerAction: ThreeDSCustomerAction?

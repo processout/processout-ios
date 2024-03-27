@@ -20,6 +20,11 @@ protocol InvoicesRepository: PORepository {
         request: PONativeAlternativePaymentMethodRequest
     ) async throws -> PONativeAlternativePaymentMethodResponse
 
+    /// Requests information needed to initiate dynamic checkout session.
+    func dynamicCheckoutPaymentDetails(
+        request: PODynamicCheckoutPaymentDetailsRequest
+    ) async throws -> PODynamicCheckoutPaymentDetails
+
     /// Performs invoice authorization with given request.
     func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> ThreeDSCustomerAction?
 

@@ -13,9 +13,6 @@ public struct PODynamicCheckoutCardConfiguration {
     /// Primary action text, such as "Submit".
     public var primaryActionTitle: String?
 
-    /// Primary action text, such as "Cancel". Use empty string to hide button.
-    public var cancelActionTitle: String?
-
     /// Card billing address collection configuration.
     public var billingAddress = POBillingAddressConfiguration()
 
