@@ -32,7 +32,6 @@ public protocol POCardTokenizationDelegate: AnyObject {
     func cardTokenization(coordinator: POCardTokenizationCoordinator, shouldContinueAfter failure: POFailure) -> Bool
 
     /// Notifies delegate about state change.
-    @_spi(PO)
     func cardTokenization(coordinator: POCardTokenizationCoordinator, didChangeState state: POCardTokenizationState)
 }
 
@@ -63,7 +62,6 @@ extension POCardTokenizationDelegate {
         true
     }
 
-    @_spi(PO)
     public func cardTokenization(
         coordinator: POCardTokenizationCoordinator, didChangeState state: POCardTokenizationState
     ) {

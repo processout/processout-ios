@@ -10,7 +10,7 @@ import Foundation
 public protocol POCardTokenizationCoordinator: AnyObject {
 
     /// Tokenization state.
-    @_spi(PO) var tokenizationState: POCardTokenizationState { get }
+    var tokenizationState: POCardTokenizationState { get }
 
     /// Attempts to submit current form.
     @_spi(PO) func tokenize()

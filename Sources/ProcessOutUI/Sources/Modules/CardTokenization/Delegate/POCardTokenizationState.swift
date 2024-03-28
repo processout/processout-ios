@@ -7,7 +7,6 @@
 
 import ProcessOut
 
-@_spi(PO)
 public enum POCardTokenizationState {
 
     case idle
