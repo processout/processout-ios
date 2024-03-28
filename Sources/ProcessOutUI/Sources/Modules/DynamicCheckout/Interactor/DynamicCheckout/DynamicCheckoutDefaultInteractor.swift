@@ -270,7 +270,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         case .tokenizing:
             paymentProcessingState.submission = .submitting
             paymentProcessingState.isCancellable = false
-        case .tokenized, .failure:
+        case .completed:
             paymentProcessingState.submission = .unavailable
             paymentProcessingState.isCancellable = false
         }

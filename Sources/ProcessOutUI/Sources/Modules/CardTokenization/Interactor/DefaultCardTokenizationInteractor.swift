@@ -429,10 +429,10 @@ extension DefaultCardTokenizationInteractor: POCardTokenizationCoordinator {
             return .started(isSubmittable: startedState.areParametersValid)
         case .tokenizing:
             return .tokenizing
-        case .tokenized:
-            return .tokenized
+        case .tokenized(let tokenized):
+            return .completed(result: .success(tokenized.card))
         case .failure(let failure):
-            return .failure(failure)
+            return .completed(result: .failure(failure))
         }
     }
 }
