@@ -44,7 +44,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             "Starting native alternative payment", attributes: ["GatewayId": configuration.gatewayConfigurationId]
         )
         send(event: .willStart)
-        state = .starting
+        setState(.starting)
         Task {
             await continueStartUnchecked()
         }
@@ -69,7 +69,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         parameter.value = formattedValue
         parameter.recentErrorMessage = nil
         startedState.parameters[element.0] = parameter
-        state = .started(startedState)
+        setState(.started(startedState))
         send(event: .parametersChanged)
         logger.debug("Did update parameter value '\(value ?? "nil")' for '\(key)' key")
     }
@@ -82,7 +82,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         send(event: .willSubmitParameters)
         do {
             let values = try validatedValues(for: startedState.parameters)
-            state = .submitting(snapshot: startedState)
+            setState(.submitting(snapshot: startedState))
             Task {
                 await continueSubmissionUnchecked(startedState: startedState, values: values)
             }
@@ -153,7 +153,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 parameters: await createParameters(specifications: details.parameters),
                 isCancellable: configuration.cancelAction.map { $0.disabledFor.isZero } ?? true
             )
-            state = .started(startedState)
+            setState(.started(startedState))
             send(event: .didStart)
             logger.info("Did start payment, waiting for parameters")
             enableCancellationAfterDelay()
@@ -219,7 +219,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             isCancellable: configuration.paymentConfirmation.cancelAction.map { $0.disabledFor.isZero } ?? true,
             isDelayed: false
         )
-        state = .awaitingCapture(awaitingCaptureState)
+        setState(.awaitingCapture(awaitingCaptureState))
         logger.info("Waiting for invoice capture confirmation")
         let request = PONativeAlternativePaymentCaptureRequest(
             invoiceId: configuration.invoiceId,
@@ -249,7 +249,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 return
             }
             awaitingCaptureState.isDelayed = true
-            self.state = .awaitingCapture(awaitingCaptureState)
+            setState(.awaitingCapture(awaitingCaptureState))
         }
     }
 
@@ -277,7 +277,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             )
             capturedState = State.Captured(paymentProviderName: parameterValues?.providerName, logoImage: logoImage)
         }
-        state = .captured(capturedState)
+        setState(.captured(capturedState))
         send(event: .didCompletePayment)
         if !configuration.skipSuccessScreen {
             try? await Task.sleep(nanoseconds: Constants.captureCompletionDelay)
@@ -319,7 +319,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
             startedState.parameters[offset].recentErrorMessage = errorMessage
         }
-        self.state = .started(startedState)
+        setState(.started(startedState))
         send(event: .didFailToSubmitParameters(failure: failure))
         logger.debug("One or more parameters are not valid: \(invalidFields), waiting for parameters to update")
     }
@@ -334,7 +334,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         startedState.parameters = await createParameters(
             specifications: nativeApm.parameterDefinitions ?? []
         )
-        state = .started(startedState)
+        setState(.started(startedState))
         send(event: .didSubmitParameters(additionalParametersExpected: true))
         logger.debug("More parameters are expected, waiting for parameters to update")
     }
@@ -342,7 +342,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Submitted State
 
     private func setSubmittedUnchecked() {
-        state = .submitted
+        setState(.submitted)
         completion(.success(()))
     }
 
@@ -356,7 +356,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.debug("Unexpected error type: \(error)")
             failure = POFailure(code: .generic(.mobile), underlyingError: error)
         }
-        state = .failure(failure)
+        setState(.failure(failure))
         send(event: .didFail(failure: failure))
         completion(.failure(failure))
     }
@@ -374,10 +374,10 @@ final class NativeAlternativePaymentDefaultInteractor:
             switch state {
             case .started(var state):
                 state.isCancellable = true
-                self.state = .started(state)
+                setState(.started(state))
             case .submitting(var state):
                 state.isCancellable = true
-                self.state = .started(state)
+                setState(.started(state))
             default:
                 break
             }
@@ -396,16 +396,21 @@ final class NativeAlternativePaymentDefaultInteractor:
                 return
             }
             awaitingState.isCancellable = true
-            state = .awaitingCapture(awaitingState)
+            setState(.awaitingCapture(awaitingState))
         }
     }
 
     // MARK: - Utils
 
+    private func setState(_ state: NativeAlternativePaymentInteractorState) {
+        self.state = state
+        delegate?.nativeAlternativePayment(coordinator: self, didChangeState: paymentState)
+    }
+
     private func send(event: PONativeAlternativePaymentMethodEvent) {
         assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
-        delegate?.nativeAlternativePayment(self, didEmitEvent: event)
+        delegate?.nativeAlternativePayment(coordinator: self, didEmitEvent: event)
     }
 
     @MainActor
@@ -465,7 +470,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         let defaultValues = await delegate?.nativeAlternativePayment(
-            self, defaultValuesFor: parameters.map(\.specification)
+            coordinator: self, defaultValuesFor: parameters.map(\.specification)
         )
         for (offset, parameter) in parameters.enumerated() {
             let defaultValue: String?
