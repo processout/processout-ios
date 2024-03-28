@@ -87,22 +87,26 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     func cancel() {
-        guard case .paymentProcessing(let paymentProcessingState) = state else {
-            return
-        }
-        let paymentMethods = paymentProcessingState.snapshot.paymentMethods
-        guard let paymentMethod = paymentMethods[paymentProcessingState.paymentMethodId] else {
-            assertionFailure("Unknown payment method ID.")
-            return
-        }
-        switch paymentMethod {
-        case .card:
-            cardTokenizationCoordinator?.cancel()
-        case .alternativePayment:
-            // todo(andrii-vysotskyi): validate whether payment is native
-            nativeAlternativePaymentCoordinator?.cancel()
+        switch state {
+        case .paymentProcessing(let paymentProcessingState):
+            let paymentMethods = paymentProcessingState.snapshot.paymentMethods
+            guard let paymentMethod = paymentMethods[paymentProcessingState.paymentMethodId] else {
+                assertionFailure("Unknown payment method ID.")
+                return
+            }
+            switch paymentMethod {
+            case .card:
+                cardTokenizationCoordinator?.cancel()
+            case .alternativePayment:
+                // todo(andrii-vysotskyi): validate whether payment is native
+                nativeAlternativePaymentCoordinator?.cancel()
+            default:
+                assertionFailure("Active payment method doesn't support cancellation.")
+            }
+        case .started:
+            setFailureStateUnchecked(error: POFailure(code: .cancelled))
         default:
-            assertionFailure("Active payment method doesn't support cancellation.")
+            assertionFailure("Attempted to cancel payment from unsupported state.")
         }
     }
 
@@ -259,7 +263,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         state = .success
         send(event: .didCompletePayment)
-        completion(.success())
+        completion(.success(()))
     }
 
     // MARK: - Events
