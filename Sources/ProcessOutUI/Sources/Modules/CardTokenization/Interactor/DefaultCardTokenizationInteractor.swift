@@ -11,7 +11,7 @@ import Foundation
 // swiftlint:disable type_body_length file_length
 
 final class DefaultCardTokenizationInteractor:
-    BaseInteractor<CardTokenizationInteractorState>, CardTokenizationInteractor, POCardTokenizationCoordinator {
+    BaseInteractor<CardTokenizationInteractorState>, CardTokenizationInteractor {
 
     typealias Completion = (Result<POCard, POFailure>) -> Void
 
@@ -419,7 +419,7 @@ final class DefaultCardTokenizationInteractor:
     }
 }
 
-extension DefaultCardTokenizationInteractor {
+extension DefaultCardTokenizationInteractor: POCardTokenizationCoordinator {
 
     var tokenizationState: POCardTokenizationState {
         switch state {

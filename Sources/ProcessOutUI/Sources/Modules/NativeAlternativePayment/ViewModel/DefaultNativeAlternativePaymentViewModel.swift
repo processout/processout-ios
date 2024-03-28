@@ -13,8 +13,7 @@ import SwiftUI
 
 final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentViewModel {
 
-    init(interactor: some NativeAlternativePaymentInteractor, configuration: PONativeAlternativePaymentConfiguration) {
-        self.configuration = configuration
+    init(interactor: some NativeAlternativePaymentInteractor) {
         self.interactor = interactor
         observeChanges(interactor: interactor)
     }
@@ -47,7 +46,6 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     // MARK: - Private Properties
 
-    private let configuration: PONativeAlternativePaymentConfiguration
     private let interactor: any NativeAlternativePaymentInteractor
 
     private lazy var priceFormatter: NumberFormatter = {
@@ -57,6 +55,10 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         formatter.maximumFractionDigits = 2
         return formatter
     }()
+
+    private var configuration: PONativeAlternativePaymentConfiguration {
+        interactor.configuration
+    }
 
     // MARK: - Private Methods
 

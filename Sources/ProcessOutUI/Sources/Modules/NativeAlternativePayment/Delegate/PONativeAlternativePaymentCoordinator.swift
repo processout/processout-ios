@@ -10,6 +10,9 @@ public protocol PONativeAlternativePaymentCoordinator: AnyObject {
     /// Payment configuration.
     var configuration: PONativeAlternativePaymentConfiguration { get }
 
+    /// Payment state.
+    var paymentState: PONativeAlternativePaymentState { get }
+
     /// Attempts to submit current form.
     func submit()
 

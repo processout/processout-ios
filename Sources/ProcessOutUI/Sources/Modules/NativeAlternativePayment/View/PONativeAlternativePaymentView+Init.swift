@@ -28,9 +28,7 @@ extension PONativeAlternativePaymentView {
             logger: logger,
             completion: completion
         )
-        let viewModel = DefaultNativeAlternativePaymentViewModel(
-            interactor: interactor, configuration: configuration
-        )
+        let viewModel = DefaultNativeAlternativePaymentViewModel(interactor: interactor)
         self = .init(viewModel: viewModel)
     }
 }

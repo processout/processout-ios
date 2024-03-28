@@ -18,7 +18,7 @@ public enum PONativeAlternativePaymentState {
         public let isCancellable: Bool
     }
 
-    public struct AwaitingCapture {
+    public struct Submitting {
 
         /// Boolean value indicating whether cancel is supported in the current state.
         public let isCancellable: Bool
@@ -34,10 +34,7 @@ public enum PONativeAlternativePaymentState {
     case started(Started)
 
     /// Parameter values are being submitted.
-    case submitting
-
-    /// Parameters were submitted and accepted.
-    case awaitingCapture(AwaitingCapture)
+    case submitting(Submitting)
 
     /// Payment is completed.
     case completed(result: Result<Void, POFailure>)

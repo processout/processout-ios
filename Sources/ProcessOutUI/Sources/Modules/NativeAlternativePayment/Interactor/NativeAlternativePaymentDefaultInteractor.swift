@@ -13,9 +13,7 @@ import Combine
 @_spi(PO) import ProcessOut
 
 final class NativeAlternativePaymentDefaultInteractor:
-    BaseInteractor<NativeAlternativePaymentInteractorState>,
-    NativeAlternativePaymentInteractor,
-    PONativeAlternativePaymentCoordinator {
+    BaseInteractor<NativeAlternativePaymentInteractorState>, NativeAlternativePaymentInteractor {
 
     init(
         configuration: PONativeAlternativePaymentConfiguration,
@@ -34,11 +32,9 @@ final class NativeAlternativePaymentDefaultInteractor:
         super.init(state: .idle)
     }
 
-    // MARK: - Coordinator
+    // MARK: - Interactor
 
     let configuration: PONativeAlternativePaymentConfiguration
-
-    // MARK: - Interactor & Coordinator
 
     override func start() {
         guard case .idle = state else {
@@ -155,7 +151,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 amount: details.invoice.amount,
                 currencyCode: details.invoice.currencyCode,
                 parameters: await createParameters(specifications: details.parameters),
-                isCancellable: configuration.cancelAction.map { $0.disabledFor.isZero } ?? false
+                isCancellable: configuration.cancelAction.map { $0.disabledFor.isZero } ?? true
             )
             state = .started(startedState)
             send(event: .didStart)
@@ -220,7 +216,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             logoImage: logoImage,
             actionMessage: actionMessage,
             actionImage: actionImage,
-            isCancellable: configuration.paymentConfirmation.cancelAction.map { $0.disabledFor.isZero } ?? false,
+            isCancellable: configuration.paymentConfirmation.cancelAction.map { $0.disabledFor.isZero } ?? true,
             isDelayed: false
         )
         state = .awaitingCapture(awaitingCaptureState)
@@ -553,6 +549,31 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
         }
         return message.map { POFailure.InvalidField(name: specification.key, message: $0) }
+    }
+}
+
+extension NativeAlternativePaymentDefaultInteractor: PONativeAlternativePaymentCoordinator {
+
+    var paymentState: PONativeAlternativePaymentState {
+        switch state {
+        case .idle:
+            return .idle
+        case .starting:
+            return .starting
+        case .started(let startedState):
+            let state = PONativeAlternativePaymentState.Started(
+                isSubmittable: startedState.areParametersValid, isCancellable: startedState.isCancellable
+            )
+            return .started(state)
+        case .submitting:
+            return .submitting(.init(isCancellable: false))
+        case .awaitingCapture(let awaitingCaptureState):
+            return .submitting(.init(isCancellable: awaitingCaptureState.isCancellable))
+        case .submitted, .captured:
+            return .completed(result: .success(()))
+        case .failure(let failure):
+            return .completed(result: .failure(failure))
+        }
     }
 }
 

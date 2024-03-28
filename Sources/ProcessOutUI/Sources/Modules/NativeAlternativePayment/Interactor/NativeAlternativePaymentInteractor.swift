@@ -7,6 +7,9 @@
 
 protocol NativeAlternativePaymentInteractor: Interactor<NativeAlternativePaymentInteractorState> {
 
+    /// Configuration.
+    var configuration: PONativeAlternativePaymentConfiguration { get }
+
     /// Updates value for given key.
     func updateValue(_ value: String?, for key: String)
 
