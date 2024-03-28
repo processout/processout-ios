@@ -184,7 +184,7 @@ final class DynamicCheckoutDefaultInteractor:
         Task { @MainActor in
             do {
                 try await passKitPaymentInteractor.start()
-                state = .success(snapshot: paymentProcessingState)
+                setSuccessState()
             } catch {
                 restoreStartedStateAfterPaymentProcessingFailureIfPossible(error)
             }
@@ -250,6 +250,18 @@ final class DynamicCheckoutDefaultInteractor:
         completion(.failure(failure))
     }
 
+    // MARK: - Success State
+
+    private func setSuccessState() {
+        guard case .paymentProcessing = state else {
+            assertionFailure("Success state can be set only after payment processing start.")
+            return
+        }
+        state = .success
+        send(event: .didCompletePayment)
+        completion(.success())
+    }
+
     // MARK: - Events
 
     private func send(event: PODynamicCheckoutEvent) {
@@ -289,9 +301,12 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         case .tokenizing:
             paymentProcessingState.submission = .submitting
             paymentProcessingState.isCancellable = false
-        case .completed:
-            paymentProcessingState.submission = .unavailable
-            paymentProcessingState.isCancellable = false
+        case .completed(result: .success):
+            setSuccessState()
+            return
+        case .completed(result: .failure(let failure)):
+            restoreStartedStateAfterPaymentProcessingFailureIfPossible(failure)
+            return
         }
         self.state = .paymentProcessing(paymentProcessingState)
         self.cardTokenizationCoordinator = coordinator
@@ -325,9 +340,12 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
         case .submitting(let submittingState):
             paymentProcessingState.submission = .submitting
             paymentProcessingState.isCancellable = submittingState.isCancellable
-        case .completed:
-            paymentProcessingState.submission = .unavailable
-            paymentProcessingState.isCancellable = false
+        case .completed(result: .success):
+            setSuccessState()
+            return
+        case .completed(result: .failure(let failure)):
+            restoreStartedStateAfterPaymentProcessingFailureIfPossible(failure)
+            return
         }
         self.state = .paymentProcessing(paymentProcessingState)
         self.nativeAlternativePaymentCoordinator = coordinator

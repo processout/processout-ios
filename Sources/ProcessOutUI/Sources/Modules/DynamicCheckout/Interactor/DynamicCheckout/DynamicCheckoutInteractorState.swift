@@ -74,5 +74,5 @@ enum DynamicCheckoutInteractorState {
     case failure(POFailure)
 
     /// Payment was successfuly processed. This is a sink state.
-    case success(snapshot: PaymentProcessing)
+    case success
 }
