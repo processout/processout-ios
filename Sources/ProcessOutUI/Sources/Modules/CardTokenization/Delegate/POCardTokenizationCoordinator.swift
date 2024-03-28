@@ -13,8 +13,8 @@ public protocol POCardTokenizationCoordinator: AnyObject {
     var tokenizationState: POCardTokenizationState { get }
 
     /// Attempts to submit current form.
-    @_spi(PO) func tokenize()
+    func tokenize()
 
     /// Cancells payment if possible.
-    @_spi(PO) func cancel()
+    func cancel()
 }
