@@ -200,7 +200,7 @@ final class DynamicCheckoutDefaultInteractor:
                 try await passKitPaymentInteractor.start()
                 setSuccessState()
             } catch {
-                restoreStartedStateAfterPaymentProcessingFailureIfPossible(error)
+                restoreStateAfterPaymentProcessingFailureIfPossible(error)
             }
         }
     }
@@ -232,7 +232,8 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Started State Restoration
 
     /// - NOTE: Only cancellation errors are restored at a time.
-    private func restoreStartedStateAfterPaymentProcessingFailureIfPossible(_ error: Error) {
+    private func restoreStateAfterPaymentProcessingFailureIfPossible(_ error: Error) {
+        // todo(andrii-vysotskyi): ask delegate whether error should be restored
         logger.info("Did fail to process payment: \(error)")
         guard case .paymentProcessing(let paymentProcessingState) = state else {
             logger.debug("Failures are expected only when processing payment, aborted")
@@ -362,7 +363,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
             setSuccessState()
             return
         case .completed(result: .failure(let failure)):
-            restoreStartedStateAfterPaymentProcessingFailureIfPossible(failure)
+            restoreStateAfterPaymentProcessingFailureIfPossible(failure)
             return
         }
         self.state = .paymentProcessing(paymentProcessingState)
@@ -411,7 +412,7 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
             setSuccessState()
             return
         case .completed(result: .failure(let failure)):
-            restoreStartedStateAfterPaymentProcessingFailureIfPossible(failure)
+            restoreStateAfterPaymentProcessingFailureIfPossible(failure)
             return
         }
         self.state = .paymentProcessing(paymentProcessingState)
