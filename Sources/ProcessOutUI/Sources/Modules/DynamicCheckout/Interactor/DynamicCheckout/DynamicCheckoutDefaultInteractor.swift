@@ -170,7 +170,9 @@ final class DynamicCheckoutDefaultInteractor:
         for paymentMethod in paymentMethods {
             switch paymentMethod {
             case .applePay:
-                expressIds.append(paymentMethod.id)
+                if passKitPaymentInteractor.isSupported {
+                    expressIds.append(paymentMethod.id)
+                }
             case .alternativePayment(let alternativePaymentMethod):
                 // todo(andrii-vysotskyi): ensure that only redirect APMs are express
                 if alternativePaymentMethod.flow == .express {
@@ -179,7 +181,7 @@ final class DynamicCheckoutDefaultInteractor:
                     regularIds.append(paymentMethod.id)
                 }
             case .unknown:
-                break // todo(andrii-vysotskyi): log unknown payment method
+                continue // todo(andrii-vysotskyi): log unknown payment method
             default:
                 regularIds.append(paymentMethod.id)
             }

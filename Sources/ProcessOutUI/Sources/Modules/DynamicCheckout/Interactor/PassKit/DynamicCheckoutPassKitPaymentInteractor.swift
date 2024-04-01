@@ -9,8 +9,8 @@ import Foundation
 
 protocol DynamicCheckoutPassKitPaymentInteractor {
 
-    /// Boolean value indicating whether payment can be started.
-    var canStart: Bool { get }
+    /// Boolean value indicating whether PassKit payments are supported.
+    var isSupported: Bool { get }
 
     /// Starts payment.
     func start() async throws

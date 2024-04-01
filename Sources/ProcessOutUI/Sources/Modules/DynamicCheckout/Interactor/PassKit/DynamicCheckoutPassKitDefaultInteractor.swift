@@ -23,7 +23,7 @@ final class DynamicCheckoutPassKitPaymentDefaultInteractor: DynamicCheckoutPassK
         didAuthorizeInvoice = false
     }
 
-    nonisolated var canStart: Bool {
+    nonisolated var isSupported: Bool {
         configuration.applePay != nil && POPassKitPaymentAuthorizationController.canMakePayments()
     }
 
