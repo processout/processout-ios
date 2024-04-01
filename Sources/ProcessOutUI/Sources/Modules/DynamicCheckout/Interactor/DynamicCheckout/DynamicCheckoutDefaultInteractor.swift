@@ -94,14 +94,14 @@ final class DynamicCheckoutDefaultInteractor:
     @discardableResult
     func cancel() -> Bool {
         switch state {
-        case .paymentProcessing(let paymentProcessingState):
+        case .paymentProcessing:
             guard let paymentMethod = currentPaymentMethod else {
                 return false
             }
             switch paymentMethod {
             case .card:
                 if let coordinator = cardTokenizationCoordinator {
-                    cancel()
+                    coordinator.cancel()
                     return true
                 }
             case .alternativePayment:

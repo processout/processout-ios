@@ -22,6 +22,28 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
     func dynamicCheckout(shouldContinueAfter failure: POFailure) -> Bool
+
+    // MARK: - Card Payment
+
+    /// Invoked when module emits event.
+    func dynamicCheckout(didEmitCardTokenizationEvent event: POCardTokenizationEvent)
+
+    /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
+    /// implementation returns primary scheme.
+    func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String?
+
+    // MARK: - Alternative Payment
+
+    /// Invoked when module emits alternative payment event.
+    func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEvent)
+
+    /// Method provides an ability to supply default values for given parameters.
+    ///
+    /// - Returns: dictionary where key is a parameter key, and value is desired default. Please note that it is not
+    /// mandatory to provide defaults for all parameters.
+    func dynamicCheckout(
+        alternativePaymentDefaultsFor parameters: [PONativeAlternativePaymentMethodParameter]
+    ) async -> [String: String]
 }
 
 extension PODynamicCheckoutDelegate {
@@ -32,5 +54,23 @@ extension PODynamicCheckoutDelegate {
 
     public func dynamicCheckout(shouldContinueAfter failure: POFailure) -> Bool {
         true
+    }
+
+    public func dynamicCheckout(didEmitCardTokenizationEvent event: POCardTokenizationEvent) {
+        // Ignored
+    }
+
+    public func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String? {
+        issuerInformation.scheme
+    }
+
+    public func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEvent) {
+        // Ignored
+    }
+
+    public func dynamicCheckout(
+        alternativePaymentDefaultsFor parameters: [PONativeAlternativePaymentMethodParameter]
+    ) async -> [String: String] {
+        [:]
     }
 }

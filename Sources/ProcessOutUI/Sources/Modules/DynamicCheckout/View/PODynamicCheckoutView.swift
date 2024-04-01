@@ -31,10 +31,7 @@ public struct PODynamicCheckoutView: View {
             configuration: configuration,
             delegate: delegate,
             passKitPaymentInteractor: DynamicCheckoutPassKitPaymentDefaultInteractor(
-                configuration: configuration,
-                delegate: nil, // todo(andrii-vysotskyi): forward delegate
-                dynamicCheckoutDelegate: delegate,
-                invoicesService: ProcessOut.shared.invoices
+                configuration: configuration, delegate: delegate, invoicesService: ProcessOut.shared.invoices
             ),
             alternativePaymentInteractor: DynamicCheckoutAlternativePaymentDefaultInteractor(
                 configuration: configuration.alternativePayment

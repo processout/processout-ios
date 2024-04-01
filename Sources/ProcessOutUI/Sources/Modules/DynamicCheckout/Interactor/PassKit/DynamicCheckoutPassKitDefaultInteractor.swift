@@ -14,13 +14,11 @@ final class DynamicCheckoutPassKitPaymentDefaultInteractor: DynamicCheckoutPassK
 
     init(
         configuration: PODynamicCheckoutConfiguration,
-        delegate: PODynamicCheckoutPassKitPaymentDelegate?,
-        dynamicCheckoutDelegate: PODynamicCheckoutDelegate?,
+        delegate: PODynamicCheckoutDelegate?,
         invoicesService: POInvoicesService
     ) {
         self.configuration = configuration
         self.delegate = delegate
-        self.dynamicCheckoutDelegate = dynamicCheckoutDelegate
         self.invoicesService = invoicesService
         didAuthorizeInvoice = false
     }
@@ -51,9 +49,7 @@ final class DynamicCheckoutPassKitPaymentDefaultInteractor: DynamicCheckoutPassK
 
     private let invoicesService: POInvoicesService
     private let configuration: PODynamicCheckoutConfiguration
-
-    private weak var delegate: PODynamicCheckoutPassKitPaymentDelegate?
-    private weak var dynamicCheckoutDelegate: PODynamicCheckoutDelegate?
+    private weak var delegate: PODynamicCheckoutDelegate?
 
     private var didFinishContinuation: CheckedContinuation<Void, Never>?
     private var didAuthorizeInvoice: Bool
@@ -75,53 +71,15 @@ extension DynamicCheckoutPassKitPaymentDefaultInteractor: POPassKitPaymentAuthor
     ) async -> PKPaymentAuthorizationResult {
         var authorizationRequest = POInvoiceAuthorizationRequest(invoiceId: configuration.invoiceId, source: card.id)
         do {
-            guard let dynamicCheckoutDelegate else {
+            guard let delegate else {
                 throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
             }
-            let threeDSService = await dynamicCheckoutDelegate.dynamicCheckout(
-                willAuthorizeInvoiceWith: &authorizationRequest
-            )
+            let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &authorizationRequest)
             try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
             didAuthorizeInvoice = true
         } catch {
             return .init(status: .failure, errors: [error])
         }
         return .init(status: .success, errors: nil)
-    }
-
-    @available(iOS 14.0, *)
-    func paymentAuthorizationControllerDidRequestMerchantSessionUpdate(
-        controller: POPassKitPaymentAuthorizationController
-    ) async -> PKPaymentRequestMerchantSessionUpdate? {
-        await delegate?.dynamicCheckoutPassKitPaymentDidRequestMerchantSessionUpdate()
-    }
-
-    @available(iOS 15.0, *)
-    func paymentAuthorizationController(
-        _ controller: POPassKitPaymentAuthorizationController,
-        didChangeCouponCode couponCode: String
-    ) async -> PKPaymentRequestCouponCodeUpdate? {
-        await delegate?.dynamicCheckoutPassKitPayment(didChangeCouponCode: couponCode)
-    }
-
-    func paymentAuthorizationController(
-        _ controller: POPassKitPaymentAuthorizationController,
-        didSelectShippingMethod shippingMethod: PKShippingMethod
-    ) async -> PKPaymentRequestShippingMethodUpdate? {
-        await delegate?.dynamicCheckoutPassKitPayment(didSelectShippingMethod: shippingMethod)
-    }
-
-    func paymentAuthorizationController(
-        _ controller: POPassKitPaymentAuthorizationController,
-        didSelectShippingContact contact: PKContact
-    ) async -> PKPaymentRequestShippingContactUpdate? {
-        await delegate?.dynamicCheckoutPassKitPayment(didSelectShippingContact: contact)
-    }
-
-    func paymentAuthorizationController(
-        _ controller: POPassKitPaymentAuthorizationController,
-        didSelectPaymentMethod paymentMethod: PKPaymentMethod
-    ) async -> PKPaymentRequestPaymentMethodUpdate? {
-        await delegate?.dynamicCheckoutPassKitPayment(didSelectPaymentMethod: paymentMethod)
     }
 }
