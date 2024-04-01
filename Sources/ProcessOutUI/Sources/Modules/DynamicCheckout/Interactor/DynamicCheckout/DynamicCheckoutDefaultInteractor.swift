@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 05.03.2024.
 //
 
+// swiftlint:disable file_length
+
 import Foundation
 @_spi(PO) import ProcessOut
 
@@ -356,18 +358,29 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
     }
 }
 
-// todo(andrii-vysotskyi): forward other delegate methods
 extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
+
+    func nativeAlternativePayment(
+        coordinator: PONativeAlternativePaymentCoordinator,
+        didEmitEvent event: PONativeAlternativePaymentEvent
+    ) {
+        delegate?.dynamicCheckout(didEmitAlternativePaymentEvent: event)
+    }
+
+    func nativeAlternativePayment(
+        coordinator: PONativeAlternativePaymentCoordinator,
+        defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]
+    ) async -> [String: String] {
+        await delegate?.dynamicCheckout(alternativePaymentDefaultsFor: parameters) ?? [:]
+    }
 
     func nativeAlternativePayment(
         coordinator: PONativeAlternativePaymentCoordinator,
         didChangeState state: PONativeAlternativePaymentState
     ) {
-        guard case .paymentProcessing(var paymentProcessingState) = self.state else {
-            return
-        }
-        guard case .alternativePayment = currentPaymentMethod else {
-            assertionFailure("Unexpected current payment method.")
+        guard case .paymentProcessing(var paymentProcessingState) = self.state,
+              case .alternativePayment = currentPaymentMethod else {
+            assertionFailure("No currently active alternative payment")
             return
         }
         switch state {
@@ -393,3 +406,5 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
         self.nativeAlternativePaymentCoordinator = coordinator
     }
 }
+
+// swiftlint:enable file_length
