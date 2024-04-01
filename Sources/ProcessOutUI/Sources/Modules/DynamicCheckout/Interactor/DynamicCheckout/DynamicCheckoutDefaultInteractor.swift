@@ -40,6 +40,7 @@ final class DynamicCheckoutDefaultInteractor:
             assertionFailure("Interactor start must be attempted only once.")
             return
         }
+        delegate.dynamicCheckout(didEmitEvent: .willStart)
         state = .starting
         Task {
             await continueStartUnchecked()
@@ -65,6 +66,8 @@ final class DynamicCheckoutDefaultInteractor:
             default:
                 return false // todo(andrii-vysotskyi): handle other payment methods
             }
+            delegate?.dynamicCheckout(didEmitEvent: .didSelectPaymentMethod)
+            return true
         case .paymentProcessing(var paymentProcessingState) where paymentProcessingState.isCancellable:
             paymentProcessingState.pendingPaymentMethodId = methodId
             state = .paymentProcessing(paymentProcessingState)
@@ -73,8 +76,6 @@ final class DynamicCheckoutDefaultInteractor:
         default:
             return false
         }
-        delegate?.dynamicCheckout(didEmitEvent: .didSelectPaymentMethod)
-        return true
     }
 
     func submit() {
@@ -159,6 +160,8 @@ final class DynamicCheckoutDefaultInteractor:
             isCancellable: configuration.cancelActionTitle.map { !$0.isEmpty } ?? false
         )
         state = .started(startedState)
+        delegate?.dynamicCheckout(didEmitEvent: .didStart)
+        logger.debug("Did start dynamic checkout flow")
         // todo(andrii-vysotskyi): start non-express payment if needed
     }
 
