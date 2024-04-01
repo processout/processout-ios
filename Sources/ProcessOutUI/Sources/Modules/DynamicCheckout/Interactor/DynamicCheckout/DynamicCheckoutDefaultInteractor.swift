@@ -157,7 +157,26 @@ final class DynamicCheckoutDefaultInteractor:
         state = .started(startedState)
         delegate?.dynamicCheckout(didEmitEvent: .didStart)
         logger.debug("Did start dynamic checkout flow")
-        // todo(andrii-vysotskyi): start non-express payment if needed
+        initiateDefaultPaymentIfNeeded()
+    }
+
+    private func initiateDefaultPaymentIfNeeded() {
+        guard case .started(let startedState) = state else {
+            assertionFailure("Default payment could be initiated only from started state")
+            return
+        }
+        guard configuration.allowsSkippingPaymentList,
+              startedState.paymentMethods.count == 1,
+              let paymentMethod = startedState.paymentMethods.values.first else {
+            return
+        }
+        switch paymentMethod {
+        case .card, .alternativePayment:
+            break // todo(andrii-vysotskyi): only allow native APMs
+        default:
+            return
+        }
+        _ = initiatePayment(methodId: paymentMethod.id)
     }
 
     private func partitioned(
