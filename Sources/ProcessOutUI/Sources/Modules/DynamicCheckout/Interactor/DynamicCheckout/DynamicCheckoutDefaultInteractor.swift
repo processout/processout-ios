@@ -320,6 +320,10 @@ final class DynamicCheckoutDefaultInteractor:
 // todo(andrii-vysotskyi): forward other delegate methods
 extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
 
+    func cardTokenization(coordinator: POCardTokenizationCoordinator, didEmitEvent event: POCardTokenizationEvent) {
+        delegate?.dynamicCheckout(didEmitCardTokenizationEvent: event)
+    }
+
     func cardTokenization(coordinator: any POCardTokenizationCoordinator, didTokenizeCard card: POCard) async throws {
         guard let delegate else {
             throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
@@ -329,12 +333,20 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
     }
 
+    func cardTokenization(
+        coordinator: POCardTokenizationCoordinator,
+        preferredSchemeFor issuerInformation: POCardIssuerInformation
+    ) -> String? {
+        delegate?.dynamicCheckout(preferredSchemeFor: issuerInformation)
+    }
+
+    func cardTokenization(coordinator: POCardTokenizationCoordinator, shouldContinueAfter failure: POFailure) -> Bool {
+        delegate?.dynamicCheckout(shouldContinueAfter: failure) ?? true
+    }
+
     func cardTokenization(coordinator: POCardTokenizationCoordinator, didChangeState state: POCardTokenizationState) {
-        guard case .paymentProcessing(var paymentProcessingState) = self.state else {
-            return
-        }
-        guard case .card = currentPaymentMethod else {
-            assertionFailure("Unexpected current payment method.")
+        guard case .paymentProcessing(var paymentProcessingState) = self.state, case .card = currentPaymentMethod else {
+            assertionFailure("No currently active card payment")
             return
         }
         switch state {
