@@ -42,7 +42,6 @@ enum DynamicCheckoutInteractorState {
         case submitting
     }
 
-    // todo(andrii-vystoskyi): add card payment coordinator
     struct PaymentProcessing {
 
         /// Started state snapshot.
@@ -56,6 +55,9 @@ enum DynamicCheckoutInteractorState {
 
         /// Defines whether payment is cancellable.
         var isCancellable: Bool
+
+        /// This value is set when user decides to switch payment method during processing.
+        var pendingPaymentMethodId: String?
     }
 
     /// Idle state.
