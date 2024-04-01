@@ -49,7 +49,6 @@ final class DynamicCheckoutDefaultInteractor:
 
     @discardableResult
     func initiatePayment(methodId: String) -> Bool {
-        // todo(andrii-vysotskyi): support changing payment method when already paying
         switch state {
         case .started(let startedState):
             guard let paymentMethod = startedState.paymentMethods[methodId] else {
@@ -323,7 +322,6 @@ final class DynamicCheckoutDefaultInteractor:
     }
 }
 
-// todo(andrii-vysotskyi): forward other delegate methods
 extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
 
     func cardTokenization(coordinator: POCardTokenizationCoordinator, didEmitEvent event: POCardTokenizationEvent) {
