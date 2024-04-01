@@ -16,5 +16,6 @@ public protocol POCardTokenizationCoordinator: AnyObject {
     func tokenize()
 
     /// Cancells payment if possible.
-    func cancel()
+    @discardableResult
+    func cancel() -> Bool
 }

@@ -17,5 +17,6 @@ public protocol PONativeAlternativePaymentCoordinator: AnyObject {
     func submit()
 
     /// Cancells payment if possible.
-    func cancel()
+    @discardableResult
+    func cancel() -> Bool
 }

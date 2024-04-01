@@ -138,12 +138,13 @@ final class DefaultCardTokenizationInteractor:
         }
     }
 
-    func cancel() {
+    func cancel() -> Bool {
         guard case .started = state else {
-            return
+            return false
         }
         let failure = POFailure(code: .cancelled)
         setFailureStateUnchecked(failure: failure)
+        return true
     }
 
     // MARK: - Private Nested Types

@@ -5,8 +5,6 @@
 //  Created by Andrii Vysotskyi on 05.03.2024.
 //
 
-// swiftlint:disable file_length
-
 import Foundation
 @_spi(PO) import ProcessOut
 
@@ -101,14 +99,11 @@ final class DynamicCheckoutDefaultInteractor:
             switch paymentMethod {
             case .card:
                 if let coordinator = cardTokenizationCoordinator {
-                    coordinator.cancel()
-                    return true
+                    return coordinator.cancel()
                 }
             case .alternativePayment:
-                // todo(andrii-vysotskyi): validate whether payment is native
                 if let coordinator = nativeAlternativePaymentCoordinator {
-                    coordinator.cancel()
-                    return true
+                    return coordinator.cancel()
                 }
             default:
                 logger.info("Currently active payment method can't be cancelled.")
@@ -398,5 +393,3 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
         self.nativeAlternativePaymentCoordinator = coordinator
     }
 }
-
-// swiftlint:enable file_length
