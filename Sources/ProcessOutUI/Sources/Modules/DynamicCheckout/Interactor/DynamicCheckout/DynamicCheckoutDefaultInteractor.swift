@@ -40,7 +40,7 @@ final class DynamicCheckoutDefaultInteractor:
             assertionFailure("Interactor start must be attempted only once.")
             return
         }
-        delegate.dynamicCheckout(didEmitEvent: .willStart)
+        delegate?.dynamicCheckout(didEmitEvent: .willStart)
         state = .starting
         Task {
             await continueStartUnchecked()
@@ -94,19 +94,15 @@ final class DynamicCheckoutDefaultInteractor:
     @discardableResult
     func cancel() -> Bool {
         switch state {
-        case .paymentProcessing:
+        case .paymentProcessing(let paymentProcessingState) where paymentProcessingState.isCancellable:
             guard let paymentMethod = currentPaymentMethod else {
                 return false
             }
             switch paymentMethod {
             case .card:
-                if let coordinator = cardTokenizationCoordinator {
-                    return coordinator.cancel()
-                }
+                return cardTokenizationCoordinator?.cancel() ?? false
             case .alternativePayment:
-                if let coordinator = nativeAlternativePaymentCoordinator {
-                    return coordinator.cancel()
-                }
+                return nativeAlternativePaymentCoordinator?.cancel() ?? false
             default:
                 logger.info("Currently active payment method can't be cancelled.")
                 return false
@@ -116,8 +112,8 @@ final class DynamicCheckoutDefaultInteractor:
             return true
         default:
             assertionFailure("Attempted to cancel payment from unsupported state.")
+            return false
         }
-        return false
     }
 
     // MARK: - Private Properties
