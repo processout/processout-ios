@@ -11,7 +11,7 @@ import Foundation
 // swiftlint:disable type_body_length file_length
 
 final class DefaultCardTokenizationInteractor:
-    BaseInteractor<CardTokenizationInteractorState>, CardTokenizationInteractor, POCardTokenizationCoordinator {
+    BaseInteractor<CardTokenizationInteractorState>, CardTokenizationInteractor {
 
     typealias Completion = (Result<POCard, POFailure>) -> Void
 
@@ -138,12 +138,13 @@ final class DefaultCardTokenizationInteractor:
         }
     }
 
-    func cancel() {
+    func cancel() -> Bool {
         guard case .started = state else {
-            return
+            return false
         }
         let failure = POFailure(code: .cancelled)
         setFailureStateUnchecked(failure: failure)
+        return true
     }
 
     // MARK: - Private Nested Types
@@ -419,7 +420,7 @@ final class DefaultCardTokenizationInteractor:
     }
 }
 
-extension DefaultCardTokenizationInteractor {
+extension DefaultCardTokenizationInteractor: POCardTokenizationCoordinator {
 
     var tokenizationState: POCardTokenizationState {
         switch state {
@@ -429,10 +430,10 @@ extension DefaultCardTokenizationInteractor {
             return .started(isSubmittable: startedState.areParametersValid)
         case .tokenizing:
             return .tokenizing
-        case .tokenized:
-            return .tokenized
+        case .tokenized(let tokenized):
+            return .completed(result: .success(tokenized.card))
         case .failure(let failure):
-            return .failure(failure)
+            return .completed(result: .failure(failure))
         }
     }
 }

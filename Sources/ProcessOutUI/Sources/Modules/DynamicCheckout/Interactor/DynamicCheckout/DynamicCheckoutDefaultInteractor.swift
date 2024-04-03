@@ -5,9 +5,12 @@
 //  Created by Andrii Vysotskyi on 05.03.2024.
 //
 
+// swiftlint:disable file_length
+
 import Foundation
 @_spi(PO) import ProcessOut
 
+// swiftlint:disable:next type_body_length
 final class DynamicCheckoutDefaultInteractor:
     BaseInteractor<DynamicCheckoutInteractorState>, DynamicCheckoutInteractor {
 
@@ -37,64 +40,79 @@ final class DynamicCheckoutDefaultInteractor:
             assertionFailure("Interactor start must be attempted only once.")
             return
         }
+        delegate?.dynamicCheckout(didEmitEvent: .willStart)
         state = .starting
         Task {
             await continueStartUnchecked()
         }
     }
 
+    @discardableResult
     func initiatePayment(methodId: String) -> Bool {
-        // todo(andrii-vysotskyi): support changing payment method when already paying
-        guard case .started(let startedState) = state else {
-            return false
-        }
-        guard let paymentMethod = startedState.paymentMethods[methodId] else {
-            assertionFailure("Non existing payment method ID.")
-            return false
-        }
-        switch paymentMethod {
-        case .applePay:
-            initiatePassKitPayment(methodId: methodId, startedState: startedState)
-        case .card:
-            initiateCardPayment(methodId: methodId, startedState: startedState)
+        switch state {
+        case .started(let startedState):
+            guard let paymentMethod = startedState.paymentMethods[methodId] else {
+                assertionFailure("Non existing payment method ID.")
+                return false
+            }
+            switch paymentMethod {
+            case .applePay:
+                initiatePassKitPayment(methodId: methodId, startedState: startedState)
+            case .card:
+                initiateCardPayment(methodId: methodId, startedState: startedState)
+            case .alternativePayment(let payment):
+                initiateAlternativePayment(methodId: methodId, payment: payment, startedState: startedState)
+            default:
+                return false // todo(andrii-vysotskyi): handle other payment methods
+            }
+            delegate?.dynamicCheckout(didEmitEvent: .didSelectPaymentMethod)
+            return true
+        case .paymentProcessing(var paymentProcessingState) where paymentProcessingState.isCancellable:
+            paymentProcessingState.pendingPaymentMethodId = methodId
+            state = .paymentProcessing(paymentProcessingState)
+            cancel()
+            return true
         default:
-            return false // todo(andrii-vysotskyi): handle other payment methods
+            return false
         }
-        delegate?.dynamicCheckout(didEmitEvent: .didSelectPaymentMethod)
-        return true
     }
 
     func submit() {
-        guard case .paymentProcessing(let paymentProcessingState) = state else {
-            return
-        }
-        let paymentMethods = paymentProcessingState.snapshot.paymentMethods
-        guard let paymentMethod = paymentMethods[paymentProcessingState.paymentMethodId] else {
-            assertionFailure("Unknown payment method ID.")
-            return
-        }
-        switch paymentMethod {
+        switch currentPaymentMethod {
         case .card:
             cardTokenizationCoordinator?.tokenize()
+        case .alternativePayment:
+            // todo(andrii-vysotskyi): validate whether payment is native
+            nativeAlternativePaymentCoordinator?.submit()
+        case nil:
+            assertionFailure("No payment method to submit")
         default:
-            assertionFailure("Active payment method doesn't support forced submission.")
+            assertionFailure("Active payment method doesn't support forced submission")
         }
     }
 
-    func cancel() {
-        guard case .paymentProcessing(let paymentProcessingState) = state else {
-            return
-        }
-        let paymentMethods = paymentProcessingState.snapshot.paymentMethods
-        guard let paymentMethod = paymentMethods[paymentProcessingState.paymentMethodId] else {
-            assertionFailure("Unknown payment method ID.")
-            return
-        }
-        switch paymentMethod {
-        case .card:
-            cardTokenizationCoordinator?.cancel()
+    @discardableResult
+    func cancel() -> Bool {
+        switch state {
+        case .paymentProcessing(let paymentProcessingState) where paymentProcessingState.isCancellable:
+            guard let paymentMethod = currentPaymentMethod else {
+                return false
+            }
+            switch paymentMethod {
+            case .card:
+                return cardTokenizationCoordinator?.cancel() ?? false
+            case .alternativePayment:
+                return nativeAlternativePaymentCoordinator?.cancel() ?? false
+            default:
+                logger.info("Currently active payment method can't be cancelled.")
+                return false
+            }
+        case .started:
+            setFailureStateUnchecked(error: POFailure(code: .cancelled))
+            return true
         default:
-            assertionFailure("Active payment method doesn't support cancellation.")
+            assertionFailure("Attempted to cancel payment from unsupported state.")
+            return false
         }
     }
 
@@ -137,7 +155,28 @@ final class DynamicCheckoutDefaultInteractor:
             isCancellable: configuration.cancelActionTitle.map { !$0.isEmpty } ?? false
         )
         state = .started(startedState)
-        // todo(andrii-vysotskyi): start non-express payment if needed
+        delegate?.dynamicCheckout(didEmitEvent: .didStart)
+        logger.debug("Did start dynamic checkout flow")
+        initiateDefaultPaymentIfNeeded()
+    }
+
+    private func initiateDefaultPaymentIfNeeded() {
+        guard case .started(let startedState) = state else {
+            assertionFailure("Default payment could be initiated only from started state")
+            return
+        }
+        guard configuration.allowsSkippingPaymentList,
+              startedState.paymentMethods.count == 1,
+              let paymentMethod = startedState.paymentMethods.values.first else {
+            return
+        }
+        switch paymentMethod {
+        case .card, .alternativePayment:
+            break // todo(andrii-vysotskyi): only allow native APMs
+        default:
+            return
+        }
+        _ = initiatePayment(methodId: paymentMethod.id)
     }
 
     private func partitioned(
@@ -148,7 +187,9 @@ final class DynamicCheckoutDefaultInteractor:
         for paymentMethod in paymentMethods {
             switch paymentMethod {
             case .applePay:
-                expressIds.append(paymentMethod.id)
+                if passKitPaymentInteractor.isSupported {
+                    expressIds.append(paymentMethod.id)
+                }
             case .alternativePayment(let alternativePaymentMethod):
                 // todo(andrii-vysotskyi): ensure that only redirect APMs are express
                 if alternativePaymentMethod.flow == .express {
@@ -157,7 +198,7 @@ final class DynamicCheckoutDefaultInteractor:
                     regularIds.append(paymentMethod.id)
                 }
             case .unknown:
-                break // todo(andrii-vysotskyi): log unknown payment method
+                continue // todo(andrii-vysotskyi): log unknown payment method
             default:
                 regularIds.append(paymentMethod.id)
             }
@@ -176,9 +217,9 @@ final class DynamicCheckoutDefaultInteractor:
         Task { @MainActor in
             do {
                 try await passKitPaymentInteractor.start()
-                state = .success(snapshot: paymentProcessingState)
+                setSuccessState()
             } catch {
-                restoreStartedStateAfterPaymentProcessingFailureIfPossible(error)
+                restoreStateAfterPaymentProcessingFailureIfPossible(error)
             }
         }
     }
@@ -190,29 +231,59 @@ final class DynamicCheckoutDefaultInteractor:
             snapshot: startedState,
             paymentMethodId: methodId,
             submission: .possible, // Submission is initially possible
-            isCancellable: startedState.isCancellable
+            isCancellable: false
         )
         state = .paymentProcessing(paymentProcessingState)
+    }
+
+    // MARK: - Alternative Payment
+
+    private func initiateAlternativePayment(
+        methodId: String, payment: PODynamicCheckoutPaymentMethod.AlternativePayment, startedState: State.Started
+    ) {
+        let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
+            snapshot: startedState, paymentMethodId: methodId, submission: .possible, isCancellable: false
+        )
+        state = .paymentProcessing(paymentProcessingState)
+        // todo(andrii-vysotskyi): depending on payment type non-native APM start may be needed.
     }
 
     // MARK: - Started State Restoration
 
     /// - NOTE: Only cancellation errors are restored at a time.
-    private func restoreStartedStateAfterPaymentProcessingFailureIfPossible(_ error: Error) {
+    private func restoreStateAfterPaymentProcessingFailureIfPossible(_ error: Error) {
+        // todo(andrii-vysotskyi): ask delegate whether error should be restored
         logger.info("Did fail to process payment: \(error)")
-        guard let failure = error as? POFailure, case .cancelled = failure.code else {
+        guard case .paymentProcessing(let paymentProcessingState) = state else {
+            logger.debug("Failures are expected only when processing payment, aborted")
+            return
+        }
+        guard let failure = error as? POFailure else {
+            logger.debug("Won't recover unknown failure")
             setFailureStateUnchecked(error: error)
             return
         }
-        let startedState: State.Started
-        switch state {
-        case .paymentProcessing(let paymentProcessingState):
-            startedState = paymentProcessingState.snapshot
+        switch failure.code {
+        case .cancelled:
+            if let pendingPaymentMethodId = paymentProcessingState.pendingPaymentMethodId {
+                state = .started(paymentProcessingState.snapshot)
+                initiatePayment(methodId: pendingPaymentMethodId)
+                return
+            }
+            guard let paymentMethod = currentPaymentMethod else {
+                setFailureStateUnchecked(error: error)
+                return
+            }
+            // todo(andrii-vysotskyi): recover non-native APM cancellation errors
+            switch paymentMethod {
+            case .applePay:
+                state = .started(paymentProcessingState.snapshot)
+            default:
+                setFailureStateUnchecked(error: error)
+            }
         default:
             setFailureStateUnchecked(error: error)
-            return
         }
-        state = .started(startedState)
     }
 
     // MARK: - Failure State
@@ -230,6 +301,18 @@ final class DynamicCheckoutDefaultInteractor:
         completion(.failure(failure))
     }
 
+    // MARK: - Success State
+
+    private func setSuccessState() {
+        guard case .paymentProcessing = state else {
+            assertionFailure("Success state can be set only after payment processing start.")
+            return
+        }
+        state = .success
+        send(event: .didCompletePayment)
+        completion(.success(()))
+    }
+
     // MARK: - Events
 
     private func send(event: PODynamicCheckoutEvent) {
@@ -237,9 +320,28 @@ final class DynamicCheckoutDefaultInteractor:
         logger.debug("Did send event: '\(event)'")
         delegate?.dynamicCheckout(didEmitEvent: event)
     }
+
+    // MARK: - Utils
+
+    private var currentPaymentMethod: PODynamicCheckoutPaymentMethod? {
+        guard case .paymentProcessing(let paymentProcessingState) = state else {
+            logger.debug("Attempted to resolve payment method in unsupported state.")
+            return nil
+        }
+        let id = paymentProcessingState.paymentMethodId
+        guard let paymentMethod = paymentProcessingState.snapshot.paymentMethods[id] else {
+            assertionFailure("Non existing payment method ID.")
+            return nil
+        }
+        return paymentMethod
+    }
 }
 
 extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
+
+    func cardTokenization(coordinator: POCardTokenizationCoordinator, didEmitEvent event: POCardTokenizationEvent) {
+        delegate?.dynamicCheckout(didEmitCardTokenizationEvent: event)
+    }
 
     func cardTokenization(coordinator: any POCardTokenizationCoordinator, didTokenizeCard card: POCard) async throws {
         guard let delegate else {
@@ -250,31 +352,90 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
     }
 
+    func cardTokenization(
+        coordinator: POCardTokenizationCoordinator,
+        preferredSchemeFor issuerInformation: POCardIssuerInformation
+    ) -> String? {
+        delegate?.dynamicCheckout(preferredSchemeFor: issuerInformation)
+    }
+
+    func cardTokenization(coordinator: POCardTokenizationCoordinator, shouldContinueAfter failure: POFailure) -> Bool {
+        delegate?.dynamicCheckout(shouldContinueAfter: failure) ?? true
+    }
+
     func cardTokenization(coordinator: POCardTokenizationCoordinator, didChangeState state: POCardTokenizationState) {
-        guard case .paymentProcessing(var paymentProcessingState) = self.state else {
-            return
-        }
-        let paymentMethods = paymentProcessingState.snapshot.paymentMethods
-        guard case .card = paymentMethods[paymentProcessingState.paymentMethodId] else {
-            assertionFailure("Unexpected current payment method.")
+        guard case .paymentProcessing(var paymentProcessingState) = self.state, case .card = currentPaymentMethod else {
+            assertionFailure("No currently active card payment")
             return
         }
         switch state {
         case .idle:
             break // Ignored
         case .started(let isSubmittable):
-            paymentProcessingState.submission = isSubmittable
-                ? .possible
-                : .temporarilyUnavailable
+            paymentProcessingState.submission = isSubmittable ? .possible : .temporarilyUnavailable
             paymentProcessingState.isCancellable = paymentProcessingState.snapshot.isCancellable
         case .tokenizing:
             paymentProcessingState.submission = .submitting
             paymentProcessingState.isCancellable = false
-        case .tokenized, .failure:
-            paymentProcessingState.submission = .unavailable
-            paymentProcessingState.isCancellable = false
+        case .completed(result: .success):
+            setSuccessState()
+            return
+        case .completed(result: .failure(let failure)):
+            restoreStateAfterPaymentProcessingFailureIfPossible(failure)
+            return
         }
         self.state = .paymentProcessing(paymentProcessingState)
         self.cardTokenizationCoordinator = coordinator
     }
 }
+
+extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
+
+    func nativeAlternativePayment(
+        coordinator: PONativeAlternativePaymentCoordinator,
+        didEmitEvent event: PONativeAlternativePaymentEvent
+    ) {
+        delegate?.dynamicCheckout(didEmitAlternativePaymentEvent: event)
+    }
+
+    func nativeAlternativePayment(
+        coordinator: PONativeAlternativePaymentCoordinator,
+        defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]
+    ) async -> [String: String] {
+        await delegate?.dynamicCheckout(alternativePaymentDefaultsFor: parameters) ?? [:]
+    }
+
+    func nativeAlternativePayment(
+        coordinator: PONativeAlternativePaymentCoordinator,
+        didChangeState state: PONativeAlternativePaymentState
+    ) {
+        guard case .paymentProcessing(var paymentProcessingState) = self.state,
+              case .alternativePayment = currentPaymentMethod else {
+            assertionFailure("No currently active alternative payment")
+            return
+        }
+        switch state {
+        case .idle:
+            break // Ignored
+        case .starting:
+            paymentProcessingState.submission = .unavailable
+            paymentProcessingState.isCancellable = false
+        case .started(let startedState):
+            paymentProcessingState.submission = startedState.isSubmittable ? .possible : .temporarilyUnavailable
+            paymentProcessingState.isCancellable = startedState.isCancellable
+        case .submitting(let submittingState):
+            paymentProcessingState.submission = .submitting
+            paymentProcessingState.isCancellable = submittingState.isCancellable
+        case .completed(result: .success):
+            setSuccessState()
+            return
+        case .completed(result: .failure(let failure)):
+            restoreStateAfterPaymentProcessingFailureIfPossible(failure)
+            return
+        }
+        self.state = .paymentProcessing(paymentProcessingState)
+        self.nativeAlternativePaymentCoordinator = coordinator
+    }
+}
+
+// swiftlint:enable file_length

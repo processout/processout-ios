@@ -42,7 +42,6 @@ enum DynamicCheckoutInteractorState {
         case submitting
     }
 
-    // todo(andrii-vystoskyi): add card payment coordinator
     struct PaymentProcessing {
 
         /// Started state snapshot.
@@ -54,8 +53,11 @@ enum DynamicCheckoutInteractorState {
         /// Submission state.
         var submission: PaymentSubmission
 
-        /// Defines whether payment is cancellable. Value is `Nil`when cancelation is not supported.
+        /// Defines whether payment is cancellable.
         var isCancellable: Bool
+
+        /// This value is set when user decides to switch payment method during processing.
+        var pendingPaymentMethodId: String?
     }
 
     /// Idle state.
@@ -74,5 +76,5 @@ enum DynamicCheckoutInteractorState {
     case failure(POFailure)
 
     /// Payment was successfuly processed. This is a sink state.
-    case success(snapshot: PaymentProcessing)
+    case success
 }

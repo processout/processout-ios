@@ -1249,6 +1249,24 @@
         }
       }
     },
+    "native-alternative-payment.error.invalid-email" : {
+
+    },
+    "native-alternative-payment.error.invalid-length-%d" : {
+
+    },
+    "native-alternative-payment.error.invalid-number" : {
+
+    },
+    "native-alternative-payment.error.invalid-phone" : {
+
+    },
+    "native-alternative-payment.error.invalid-value" : {
+
+    },
+    "native-alternative-payment.error.required-parameter" : {
+
+    },
     "native-alternative-payment.phone.placeholder" : {
       "localizations" : {
         "en" : {
@@ -1358,6 +1376,9 @@
           }
         }
       }
+    },
+    "or" : {
+
     },
     "test-3ds.challenge.accept" : {
       "localizations" : {

@@ -20,5 +20,6 @@ protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState>
     func tokenize()
 
     /// Cancells tokenization if possible.
-    func cancel()
+    @discardableResult
+    func cancel() -> Bool
 }

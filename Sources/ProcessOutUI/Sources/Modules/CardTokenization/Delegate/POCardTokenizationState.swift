@@ -7,7 +7,6 @@
 
 import ProcessOut
 
-@_spi(PO)
 public enum POCardTokenizationState {
 
     case idle
@@ -18,9 +17,6 @@ public enum POCardTokenizationState {
     /// Card information is currently being tokenized.
     case tokenizing
 
-    /// Card was successfully tokenized. This is a sink state.
-    case tokenized
-
-    /// Card tokenization did end with unrecoverable failure. This is a sink state.
-    case failure(POFailure)
+    /// Card tokenization is completed.
+    case completed(result: Result<POCard, POFailure>)
 }

@@ -7,6 +7,9 @@
 
 protocol NativeAlternativePaymentInteractor: Interactor<NativeAlternativePaymentInteractorState> {
 
+    /// Configuration.
+    var configuration: PONativeAlternativePaymentConfiguration { get }
+
     /// Updates value for given key.
     func updateValue(_ value: String?, for key: String)
 
@@ -14,5 +17,6 @@ protocol NativeAlternativePaymentInteractor: Interactor<NativeAlternativePayment
     func submit()
 
     /// Cancells payment if possible.
-    func cancel()
+    @discardableResult
+    func cancel() -> Bool
 }
