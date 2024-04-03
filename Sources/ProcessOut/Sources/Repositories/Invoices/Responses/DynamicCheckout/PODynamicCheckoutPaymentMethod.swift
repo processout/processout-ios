@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 /// Dynamic checkout payment method description.
 public enum PODynamicCheckoutPaymentMethod {
@@ -67,6 +68,9 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Logos information.
         public let logo: DisplayLogo?
+
+        @POStringCodableColor
+        public private(set) var brandColor: UIColor
     }
 
     public struct DisplayLogo: Decodable {
