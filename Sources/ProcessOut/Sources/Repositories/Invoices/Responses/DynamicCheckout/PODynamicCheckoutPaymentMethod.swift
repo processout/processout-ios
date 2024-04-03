@@ -21,6 +21,18 @@ public enum PODynamicCheckoutPaymentMethod {
 
     // MARK: - APM
 
+    public struct AlternativePayment: Decodable {
+
+        /// Display information.
+        public let display: Display
+
+        /// Payment flow.
+        public let flow: Flow
+
+        /// Gateway configuration.
+        public let gatewayConfiguration: GatewayConfiguration
+    }
+
     public struct GatewayConfiguration: Decodable {
 
         /// Gateway ID.
@@ -28,15 +40,6 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Gateway subaccount.
         public let subaccount: String
-    }
-
-    public struct AlternativePayment: Decodable {
-
-        /// Gateway configuration.
-        public let gatewayConfiguration: GatewayConfiguration
-
-        /// Payment flow.
-        public let flow: Flow
     }
 
     // MARK: - Common
