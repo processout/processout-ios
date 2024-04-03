@@ -64,19 +64,13 @@ public enum PODynamicCheckoutPaymentMethod {
     public struct Display: Decodable {
 
         /// Display name.
-        public let name: String?
+        public let name: String
 
-        /// Logos information.
-        public let logo: DisplayLogo?
+        /// Payment method logo.
+        public let logo: POImageResource
 
         @POStringCodableColor
         public private(set) var brandColor: UIColor
-    }
-
-    public struct DisplayLogo: Decodable {
-
-        /// Logo URLs.
-        public let square, rectangle: URL?
     }
 
     public enum Flow: Decodable {
