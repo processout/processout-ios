@@ -39,26 +39,6 @@ public enum PODynamicCheckoutPaymentMethod {
         public let flow: Flow
     }
 
-    // MARK: - Card Customer Token
-
-    public struct CardToken: Decodable {
-
-        /// Customer token ID.
-        public let id: String
-
-        /// Card scheme.
-        public let scheme: String
-
-        /// Last 4 digits of the card.
-        public let last4Digits: String
-
-        /// Card expiration month.
-        public let expirationMonth: Int
-
-        /// Card expiration year.
-        public let expirationYear: Int
-    }
-
     // MARK: - Common
 
     public struct Display: Decodable {
@@ -86,9 +66,6 @@ public enum PODynamicCheckoutPaymentMethod {
     /// Card payment.
     case card
 
-    /// Card customer token.
-    case cardToken(CardToken)
-
     /// Unknown payment method.
     case unknown(type: String)
 }
@@ -101,11 +78,11 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
         case "applepay":
             let applePay = try ApplePay(from: decoder)
             self = .applePay(applePay)
-        case "card":
-            self = .card
         case "apm":
             let alternativePayment = try AlternativePayment(from: decoder)
             self = .alternativePayment(alternativePayment)
+        case "card":
+            self = .card
         default:
             self = .unknown(type: type)
         }
@@ -130,8 +107,6 @@ extension PODynamicCheckoutPaymentMethod: Identifiable {
             return "apm_" + configuration.id + "." + configuration.subaccount
         case .card:
             return "card"
-        case .cardToken(let token):
-            return token.id
         case .unknown(let type):
             return "unknown" + type
         }
