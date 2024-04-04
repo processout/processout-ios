@@ -127,6 +127,18 @@ extension POImagesRepository {
     @discardableResult
     public func images(
         at urls: [URL],
+        scale: CGFloat,
+        completion: @escaping ([URL: UIImage]) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            await images(at: urls, scale: scale)
+        }
+    }
+
+    /// Attempts to download images at given URLs.
+    @discardableResult
+    public func images(
+        at urls: [URL],
         completion: @escaping ([URL: UIImage]) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
@@ -134,26 +146,39 @@ extension POImagesRepository {
         }
     }
 
-    /// Downloads image at given URL and calls completion.
+    /// Downloads image at given URL.
     @discardableResult
     public func image(
         at url: URL?,
+        scale: CGFloat = 1,
         completion: @escaping (UIImage?) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            await image(at: url)
+            await image(at: url, scale: scale)
         }
     }
 
-    /// Downloads two images at given URLs and calls completion.
+    /// Downloads two images at given URLs.
     @discardableResult
     public func images(
         at url1: URL?,
         _ url2: URL?,
+        scale: CGFloat = 1,
         completion: @escaping ((UIImage?, UIImage?)) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            await images(at: url1, url2)
+            await images(at: url1, url2, scale: scale)
+        }
+    }
+
+    /// Downloads image for given resource.
+    @discardableResult
+    public func image(
+        resource: POImageRemoteResource,
+        completion: @escaping (UIImage?) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            await image(resource: resource)
         }
     }
 }
