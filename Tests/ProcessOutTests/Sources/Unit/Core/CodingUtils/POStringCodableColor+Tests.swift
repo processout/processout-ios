@@ -80,7 +80,7 @@ final class POStringCodableColorTests: XCTestCase {
             return
         }
         let expectedValue = CGFloat(value & 0xFF) / 255
-        let tolerance: CGFloat = 0.01
+        let tolerance: CGFloat = 0.01 // ~0.004% acceptable deviation
         XCTAssert(abs(componentValue - expectedValue) < tolerance)
     }
 }
