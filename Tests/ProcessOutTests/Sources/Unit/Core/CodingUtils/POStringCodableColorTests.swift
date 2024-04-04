@@ -1,5 +1,5 @@
 //
-//  POStringCodableColor+Tests.swift
+//  POStringCodableColorTests.swift
 //  ProcessOutTests
 //
 //  Created by Andrii Vysotskyi on 04.04.2024.
