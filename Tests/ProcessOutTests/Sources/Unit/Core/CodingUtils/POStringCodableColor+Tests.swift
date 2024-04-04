@@ -10,7 +10,7 @@ import XCTest
 
 final class POStringCodableColorTests: XCTestCase {
 
-    func test_excludedCodable_whenWrappedInContainer_isNotEncoded() throws {
+    func test_init_whenBothStylesAreAvailable_decodesColor() throws {
         // Given
         let decoder = JSONDecoder()
         let value = #"{ "dark": "FFDD007F", "light": "0x0057B7FF" }"#
@@ -21,6 +21,42 @@ final class POStringCodableColorTests: XCTestCase {
         // Then
         assertEqual(color: colorWrapper.wrappedValue, to: 0xFFDD007F, style: .dark)
         assertEqual(color: colorWrapper.wrappedValue, to: 0x0057B7FF, style: .light)
+    }
+
+    func test_init_whenOnlyLightStyleIsAvailable_decodesColor() throws {
+        // Given
+        let decoder = JSONDecoder()
+        let value = #"{ "light": "0x0057B7FF" }"#
+
+        // When
+        let colorWrapper = try decoder.decode(POStringCodableColor.self, from: Data(value.utf8))
+
+        // Then
+        assertEqual(color: colorWrapper.wrappedValue, to: 0x0057B7FF, style: .dark)
+        assertEqual(color: colorWrapper.wrappedValue, to: 0x0057B7FF, style: .light)
+    }
+
+    func test_init_whenLightStyleIsNotAvailable_fails() throws {
+        // Given
+        let decoder = JSONDecoder()
+        let value = #"{ "dark": "0x0057B7FF" }"#
+
+        // Then
+        XCTAssertThrowsError(
+            try decoder.decode(POStringCodableColor.self, from: Data(value.utf8))
+        )
+    }
+
+    func test_init_whenColorIsNotPrefixedWith0x_decodesColor() throws {
+        // Given
+        let decoder = JSONDecoder()
+        let value = #"{ "light": "0057B7FF" }"#
+
+        // When
+        let colorWrapper = try decoder.decode(POStringCodableColor.self, from: Data(value.utf8))
+
+        // Then
+        assertEqual(color: colorWrapper.wrappedValue, to: 0x0057B7FF, style: .dark)
     }
 
     // MARK: - Private Methods
