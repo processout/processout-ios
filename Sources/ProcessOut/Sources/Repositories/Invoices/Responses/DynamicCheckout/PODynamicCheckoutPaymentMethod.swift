@@ -50,7 +50,7 @@ public enum PODynamicCheckoutPaymentMethod {
         public let name: String
 
         /// Payment method logo.
-        public let logo: POImageResource
+        public let logo: POImageRemoteResource
 
         @POStringCodableColor
         public private(set) var brandColor: UIColor
