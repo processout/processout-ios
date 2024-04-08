@@ -18,8 +18,11 @@ public struct POApplePayCardTokenizationRequest {
     /// that was used to produce `PKPayment`.
     public let merchantIdentifier: String?
 
-    /// Contact information.
+    /// The user-selected billing address for this transaction.
     public let contact: POContact?
+
+    /// The user-selected shipping address for this transaction.
+    public let shippingContact: POContact?
 
     /// Additional matadata.
     public let metadata: [String: String]?
@@ -28,11 +31,13 @@ public struct POApplePayCardTokenizationRequest {
         payment: PKPayment,
         merchantIdentifier: String? = nil,
         contact: POContact? = nil,
+        shippingContact: POContact? = nil,
         metadata: [String: String]? = nil
     ) {
         self.payment = payment
         self.merchantIdentifier = merchantIdentifier
         self.contact = contact
+        self.shippingContact = shippingContact
         self.metadata = metadata
     }
 }
