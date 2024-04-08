@@ -90,7 +90,7 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
 
     private func authorizePassKitPayment() {
         let request = PKPaymentRequest()
-        request.merchantIdentifier = ""
+        request.merchantIdentifier = Constants.merchantId as? String ?? ""
         request.merchantCapabilities = [.threeDSecure]
         request.paymentSummaryItems = [
             .init(label: "Test", amount: 1)
