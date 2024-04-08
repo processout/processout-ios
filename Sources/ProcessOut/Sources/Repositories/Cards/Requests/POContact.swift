@@ -28,13 +28,17 @@ public struct POContact: Encodable {
     /// Country code of the delivery address.
     public let countryCode: String?
 
+    /// The contact’s telephone number, or nil if the contact’s phone number is not needed for the transaction.
+    public let phone: String?
+
     public init(
         address1: String? = nil,
         address2: String? = nil,
         city: String? = nil,
         state: String? = nil,
         zip: String? = nil,
-        countryCode: String? = nil
+        countryCode: String? = nil,
+        phone: String? = nil
     ) {
         self.address1 = address1
         self.address2 = address2
@@ -42,5 +46,6 @@ public struct POContact: Encodable {
         self.state = state
         self.zip = zip
         self.countryCode = countryCode
+        self.phone = phone
     }
 }
