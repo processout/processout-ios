@@ -113,6 +113,7 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
             payment: payment,
             merchantIdentifier: paymentRequest.merchantIdentifier,
             contact: payment.billingContact.flatMap(contactMapper.map),
+            shippingContact: payment.shippingContact.flatMap(contactMapper.map),
             metadata: nil // todo(andrii-vysotskyi): decide if metadata injection should be allowed
         )
         let card: POCard
