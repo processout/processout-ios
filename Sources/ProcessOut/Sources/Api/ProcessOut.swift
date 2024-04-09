@@ -107,8 +107,8 @@ public final class ProcessOut {
                 baseUrl: configuration.apiBaseUrl,
                 projectId: configuration.projectId,
                 privateKey: configuration.privateKey,
-                version: ProcessOut.version,
-                appVersion: configuration.appVersion
+                sessionId: configuration.sessionId,
+                version: ProcessOut.version
             )
         }
         let keychain = Keychain(service: Constants.bundleIdentifier)
