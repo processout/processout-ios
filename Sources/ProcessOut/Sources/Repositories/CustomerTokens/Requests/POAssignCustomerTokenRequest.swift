@@ -11,12 +11,10 @@ import Foundation
 public struct POAssignCustomerTokenRequest: Encodable { // sourcery: AutoCodingKeys
 
     /// Id of the customer who token belongs to.
-    @POImmutableExcludedCodable
-    public var customerId: String
+    public let customerId: String // sourcery:coding: skip
 
     /// Tokens that belong to the customer.
-    @POImmutableExcludedCodable
-    public var tokenId: String
+    public let tokenId: String // sourcery:coding: skip
 
     /// Payment source to associate with token. The source can be a card, an APM or a gateway request. For the source
     /// to be valid, you must not have used it for any previous payment or to create any other customer tokens.
@@ -54,8 +52,8 @@ public struct POAssignCustomerTokenRequest: Encodable { // sourcery: AutoCodingK
         thirdPartySdkVersion: String? = nil,
         metadata: [String: String]? = nil
     ) {
-        self._customerId = .init(value: customerId)
-        self._tokenId = .init(value: tokenId)
+        self.customerId = customerId
+        self.tokenId = tokenId
         self.source = source
         self.preferredScheme = preferredScheme
         self.verify = verify

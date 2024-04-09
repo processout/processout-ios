@@ -9,8 +9,6 @@ import UIKit
 extension POAssignCustomerTokenRequest {
 
     enum CodingKeys: String, CodingKey {
-        case customerId
-        case tokenId
         case source
         case preferredScheme
         case verify
@@ -24,7 +22,6 @@ extension POAssignCustomerTokenRequest {
 extension POInvoiceAuthorizationRequest {
 
     enum CodingKeys: String, CodingKey {
-        case invoiceId
         case source
         case incremental
         case enableThreeDS2 = "enable_three_d_s_2"

@@ -10,8 +10,7 @@ import Foundation
 public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCodingKeys
 
     /// Invoice identifier to to perform authorization for.
-    @POImmutableExcludedCodable
-    public var invoiceId: String
+    public let invoiceId: String // sourcery:coding: skip
 
     /// Payment source to use for authorization.
     public let source: String
@@ -75,7 +74,7 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
         allowFallbackToSale: Bool = false,
         metadata: [String: String]? = nil
     ) {
-        self._invoiceId = .init(value: invoiceId)
+        self.invoiceId = invoiceId
         self.source = source
         self.incremental = incremental
         self.enableThreeDS2 = enableThreeDS2
