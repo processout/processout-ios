@@ -41,7 +41,7 @@ public struct POLogger {
         _ message: @autoclosure () -> POLogMessage,
         attributes: @autoclosure () -> [String: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
-        file: String = #file,
+        file: String = #fileID,
         line: Int = #line
     ) {
         log(level: .debug, message, attributes: attributes, dso: dso, file: file, line: line)
@@ -52,7 +52,7 @@ public struct POLogger {
         _ message: @autoclosure () -> POLogMessage,
         attributes: @autoclosure () -> [String: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
-        file: String = #file,
+        file: String = #fileID,
         line: Int = #line
     ) {
         log(level: .info, message, attributes: attributes, dso: dso, file: file, line: line)
@@ -63,7 +63,7 @@ public struct POLogger {
         _ message: @autoclosure () -> POLogMessage,
         attributes: @autoclosure () -> [String: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
-        file: String = #file,
+        file: String = #fileID,
         line: Int = #line
     ) {
         log(level: .error, message, attributes: attributes, dso: dso, file: file, line: line)
@@ -74,7 +74,7 @@ public struct POLogger {
         _ message: @autoclosure () -> POLogMessage,
         attributes: @autoclosure () -> [String: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
-        file: String = #file,
+        file: String = #fileID,
         line: Int = #line
     ) {
         log(level: .fault, message, attributes: attributes, dso: dso, file: file, line: line)
