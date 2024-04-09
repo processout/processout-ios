@@ -8,7 +8,7 @@
 import XCTest
 @_spi(PO) @testable import ProcessOut
 
-@MainActor final class CustomerTokensServiceTests: XCTestCase {
+final class CustomerTokensServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
