@@ -5,7 +5,7 @@ extension {{ type.name }} {
 
     enum CodingKeys: String, CodingKey {
         {% for variable in type.instanceVariables %}
-        case {{ variable.name }}
+        case {{ variable.name }}{% if variable.annotations.coding.key %} = "{{ variable.annotations.coding.key }}"{% endif %}
         {% endfor %}
     }
 }

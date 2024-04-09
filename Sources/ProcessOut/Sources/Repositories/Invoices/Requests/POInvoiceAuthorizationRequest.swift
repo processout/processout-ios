@@ -20,7 +20,7 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
     public let incremental: Bool
 
     /// Boolean value indicating whether 3DS2 is enabled. Default value is `true`.
-    public let enableThreeDS2: Bool
+    public let enableThreeDS2: Bool // sourcery:coding: key="enable_three_d_s_2"
 
     /// Card scheme or co-scheme that should get priority if it is available.
     public let preferredScheme: String?

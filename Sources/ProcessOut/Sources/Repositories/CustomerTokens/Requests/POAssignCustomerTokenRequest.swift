@@ -34,7 +34,7 @@ public struct POAssignCustomerTokenRequest: Encodable { // sourcery: AutoCodingK
     public let invoiceId: String?
 
     /// Boolean value indicating whether 3DS2 is enabled. Default value is `true`.
-    public let enableThreeDS2: Bool
+    public let enableThreeDS2: Bool // sourcery:coding: key="enable_three_d_s_2"
 
     /// Can be used for a 3DS2 request to indicate which third party SDK is used for the call.
     public let thirdPartySdkVersion: String?

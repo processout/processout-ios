@@ -15,7 +15,7 @@ extension POAssignCustomerTokenRequest {
         case preferredScheme
         case verify
         case invoiceId
-        case enableThreeDS2
+        case enableThreeDS2 = "enable_three_d_s_2"
         case thirdPartySdkVersion
         case metadata
     }
@@ -27,7 +27,7 @@ extension POInvoiceAuthorizationRequest {
         case invoiceId
         case source
         case incremental
-        case enableThreeDS2
+        case enableThreeDS2 = "enable_three_d_s_2"
         case preferredScheme
         case thirdPartySdkVersion
         case invoiceDetailIds
