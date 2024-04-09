@@ -22,10 +22,17 @@ public struct ProcessOutConfiguration {
     /// issues.
     public let appVersion: String?
 
+    /// Session ID is a constant value
+    @_spi(PO)
+    public let sessionId = UUID().uuidString
+
     /// Boolean value that indicates whether SDK should operate in debug mode. At this moment it
     /// only affects logging level.
     /// - NOTE: Debug logs may contain sensitive data.
     public let isDebug: Bool
+
+    /// Boolean value indicating whether remote telemetry is enabled.
+    public let isTelemetryEnabled: Bool
 
     /// Project's private key.
     /// - Warning: this is only intended to be used for testing purposes storing your private key
@@ -43,13 +50,21 @@ public struct ProcessOutConfiguration {
 extension ProcessOutConfiguration {
 
     /// Creates production configuration.
-    public static func production(projectId: String, appVersion: String? = nil, isDebug: Bool = false) -> Self {
-        ProcessOutConfiguration(projectId: projectId, appVersion: appVersion, isDebug: isDebug, privateKey: nil)
+    public static func production(
+        projectId: String, appVersion: String? = nil, isDebug: Bool = false, isTelemetryEnabled: Bool = true
+    ) -> Self {
+        .init(
+            projectId: projectId,
+            appVersion: appVersion,
+            isDebug: isDebug,
+            isTelemetryEnabled: isTelemetryEnabled,
+            privateKey: nil
+        )
     }
 
     /// Creates debug production configuration with optional private key.
     @_spi(PO)
     public static func production(projectId: String, privateKey: String? = nil) -> Self {
-        ProcessOutConfiguration(projectId: projectId, appVersion: nil, isDebug: true, privateKey: privateKey)
+        .init(projectId: projectId, appVersion: nil, isDebug: true, isTelemetryEnabled: false, privateKey: privateKey)
     }
 }
