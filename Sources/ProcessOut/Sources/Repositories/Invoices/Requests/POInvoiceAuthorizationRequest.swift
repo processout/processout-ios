@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct POInvoiceAuthorizationRequest: Encodable {
+public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCodingKeys
 
     /// Invoice identifier to to perform authorization for.
     @POImmutableExcludedCodable
