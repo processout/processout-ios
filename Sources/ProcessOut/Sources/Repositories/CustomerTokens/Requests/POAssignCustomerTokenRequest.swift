@@ -8,15 +8,13 @@
 import Foundation
 
 /// Request to use to assign new source to existing customer token and potentially verify it.
-public struct POAssignCustomerTokenRequest: Encodable {
+public struct POAssignCustomerTokenRequest: Encodable { // sourcery: AutoCodingKeys
 
     /// Id of the customer who token belongs to.
-    @POImmutableExcludedCodable
-    public var customerId: String
+    public let customerId: String // sourcery:coding: skip
 
     /// Tokens that belong to the customer.
-    @POImmutableExcludedCodable
-    public var tokenId: String
+    public let tokenId: String // sourcery:coding: skip
 
     /// Payment source to associate with token. The source can be a card, an APM or a gateway request. For the source
     /// to be valid, you must not have used it for any previous payment or to create any other customer tokens.
@@ -34,7 +32,7 @@ public struct POAssignCustomerTokenRequest: Encodable {
     public let invoiceId: String?
 
     /// Boolean value indicating whether 3DS2 is enabled. Default value is `true`.
-    public let enableThreeDS2: Bool
+    public let enableThreeDS2: Bool // sourcery:coding: key="enable_three_d_s_2"
 
     /// Can be used for a 3DS2 request to indicate which third party SDK is used for the call.
     public let thirdPartySdkVersion: String?
@@ -54,8 +52,8 @@ public struct POAssignCustomerTokenRequest: Encodable {
         thirdPartySdkVersion: String? = nil,
         metadata: [String: String]? = nil
     ) {
-        self._customerId = .init(value: customerId)
-        self._tokenId = .init(value: tokenId)
+        self.customerId = customerId
+        self.tokenId = tokenId
         self.source = source
         self.preferredScheme = preferredScheme
         self.verify = verify
