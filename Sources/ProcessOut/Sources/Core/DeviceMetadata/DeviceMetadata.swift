@@ -21,6 +21,10 @@ struct DeviceMetadata: Encodable {
     @POImmutableExcludedCodable
     var systemVersion: String
 
+    /// Device model.
+    @POImmutableExcludedCodable
+    var model: String?
+
     /// Default app language.
     let appLanguage: String
 

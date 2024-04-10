@@ -18,8 +18,22 @@ actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
     // MARK: - DeviceMetadataProvider
 
-    var deviceMetadata: DeviceMetadata {
-        get async { await deviceMetadata(deviceId: self.deviceId) }
+    @MainActor var deviceMetadata: DeviceMetadata {
+        get async {
+            print(await machineName ?? "<unknown>")
+            let metadata = DeviceMetadata(
+                id: .init(value: await deviceId),
+                installationId: .init(value: device.identifierForVendor?.uuidString),
+                systemVersion: .init(value: device.systemVersion),
+                model: .init(value: await machineName),
+                appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
+                appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
+                appScreenHeight: Int(screen.nativeBounds.height),
+                appTimeZoneOffset: TimeZone.current.secondsFromGMT() / 60,
+                channel: "ios"
+            )
+            return metadata
+        }
     }
 
     // MARK: - Private Nested Types
@@ -35,28 +49,24 @@ actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
     private let bundle: Bundle
     private let keychain: Keychain
 
-    // MARK: - Private Methods
+    private lazy var machineName: String? = {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let description = withUnsafePointer(to: &systemInfo.machine) { pointer in
+            let capacity = Int(_SYS_NAMELEN)
+            return pointer.withMemoryRebound(to: CChar.self, capacity: capacity) { charPointer in
+                String(validatingUTF8: charPointer)
+            }
+        }
+        return description
+    }()
 
-    private var deviceId: String? {
+    private lazy var deviceId: String? = {
         if let deviceId = keychain.genericPassword(forAccount: Constants.keychainDeviceId) {
             return deviceId
         }
         let deviceId = UUID().uuidString
         keychain.add(genericPassword: deviceId, account: Constants.keychainDeviceId)
         return deviceId
-    }
-
-    @MainActor
-    private func deviceMetadata(deviceId: String?) -> DeviceMetadata {
-        DeviceMetadata(
-            id: .init(value: deviceId),
-            installationId: .init(value: device.identifierForVendor?.uuidString),
-            systemVersion: .init(value: device.systemVersion),
-            appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
-            appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
-            appScreenHeight: Int(screen.nativeBounds.height),
-            appTimeZoneOffset: TimeZone.current.secondsFromGMT() / 60,
-            channel: "ios"
-        )
-    }
+    }()
 }
