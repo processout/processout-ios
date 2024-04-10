@@ -48,7 +48,7 @@ struct Telemetry: Encodable {
         let level: String
 
         /// Event attributes.
-        let attributes: [String: AnyEncodable]
+        let attributes: [String: String] // todo(andrii-vysotskyi): encode primary attributes directly to event
 
         /// Event message.
         let message: String
