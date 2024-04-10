@@ -20,7 +20,6 @@ actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
     @MainActor var deviceMetadata: DeviceMetadata {
         get async {
-            print(await machineName ?? "<unknown>")
             let metadata = DeviceMetadata(
                 id: .init(value: await deviceId),
                 installationId: .init(value: device.identifierForVendor?.uuidString),
