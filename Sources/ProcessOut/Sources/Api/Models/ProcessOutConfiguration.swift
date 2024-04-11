@@ -15,12 +15,32 @@ public typealias ProcessOutApiConfiguration = ProcessOutConfiguration
 /// method.
 public struct ProcessOutConfiguration {
 
+    public struct Application {
+
+        /// Application name.
+        public let name: String?
+
+        /// Host application version. Providing this value helps ProcessOut to troubleshoot potential issues.
+        public let version: String?
+
+        public init(name: String? = nil, version: String? = nil) {
+            self.name = name
+            self.version = version
+        }
+    }
+
     /// Project id.
     public let projectId: String
 
+    /// Application name.
+    public let application: Application?
+
     /// Host application version. Providing this value helps ProcessOut to troubleshoot potential
     /// issues.
-    public let appVersion: String?
+    @available(*, deprecated, renamed: "application.version")
+    public var appVersion: String? {
+        application?.version
+    }
 
     /// Session ID is a constant value
     @_spi(PO)
@@ -50,12 +70,19 @@ public struct ProcessOutConfiguration {
 extension ProcessOutConfiguration {
 
     /// Creates production configuration.
+    ///
+    /// - Parameters:
+    ///   - appVersion: when application parameter is set, it takes precedance over this parameter.
     public static func production(
-        projectId: String, appVersion: String? = nil, isDebug: Bool = false, isTelemetryEnabled: Bool = true
+        projectId: String,
+        application: Application? = nil,
+        appVersion: String? = nil,
+        isDebug: Bool = false,
+        isTelemetryEnabled: Bool = true
     ) -> Self {
         .init(
             projectId: projectId,
-            appVersion: appVersion,
+            application: application ?? .init(name: nil, version: appVersion),
             isDebug: isDebug,
             isTelemetryEnabled: isTelemetryEnabled,
             privateKey: nil
@@ -65,6 +92,6 @@ extension ProcessOutConfiguration {
     /// Creates debug production configuration with optional private key.
     @_spi(PO)
     public static func production(projectId: String, privateKey: String? = nil) -> Self {
-        .init(projectId: projectId, appVersion: nil, isDebug: true, isTelemetryEnabled: false, privateKey: privateKey)
+        .init(projectId: projectId, application: nil, isDebug: true, isTelemetryEnabled: false, privateKey: privateKey)
     }
 }
