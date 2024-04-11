@@ -47,8 +47,14 @@ struct Telemetry: Encodable {
         /// Event level.
         let level: String
 
+        /// Invoice ID.
+        let invoiceId: String?
+
+        /// Card ID.
+        let cardId: String?
+
         /// Event attributes.
-        let attributes: [String: String] // todo(andrii-vysotskyi): encode primary attributes directly to event
+        let attributes: [String: String]
 
         /// Event message.
         let message: String

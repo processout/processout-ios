@@ -29,16 +29,22 @@ final class DefaultTelemetryService: POService, LoggerDestination {
             return
         }
         var attributes = [
-            "file": event.file,
-            "line": event.line.description,
-            "category": event.category
+            "File": event.file,
+            "Line": event.line.description,
+            "Category": event.category
         ]
         event.additionalAttributes.forEach { key, value in
+            let excludedAttributes: Set<POLogAttributeKey> = [.cardId, .invoiceId]
+            guard !excludedAttributes.contains(key) else {
+                return // Excluded attributes are encoded directly to event
+            }
             attributes[key.rawValue] = value
         }
         let telemetryEvent = Telemetry.Event(
             timestamp: event.timestamp,
             level: string(from: event.level),
+            invoiceId: event.additionalAttributes[.invoiceId],
+            cardId: event.additionalAttributes[.cardId],
             attributes: attributes,
             message: event.message
         )
