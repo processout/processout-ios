@@ -34,7 +34,7 @@ final class DefaultTelemetryService: POService, LoggerDestination {
             "category": event.category
         ]
         event.additionalAttributes.forEach { key, value in
-            attributes[key] = value
+            attributes[key.rawValue] = value
         }
         let telemetryEvent = Telemetry.Event(
             timestamp: event.timestamp,

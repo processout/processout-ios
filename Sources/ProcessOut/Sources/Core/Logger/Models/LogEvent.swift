@@ -31,5 +31,5 @@ struct LogEvent {
     let line: Int
 
     /// Additional attributes.
-    let additionalAttributes: [String: String]
+    let additionalAttributes: [POLogAttributeKey: String]
 }

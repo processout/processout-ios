@@ -75,7 +75,7 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         }
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         var logger = api.logger
-        logger[attributeKey: "InvoiceId"] = invoiceId
+        logger[attributeKey: .invoiceId] = invoiceId
         let interactor = PODefaultNativeAlternativePaymentMethodInteractor(
             invoicesService: api.invoices,
             imagesRepository: api.images,

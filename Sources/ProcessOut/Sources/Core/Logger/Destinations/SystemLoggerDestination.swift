@@ -68,7 +68,7 @@ final class SystemLoggerDestination: LoggerDestination {
             Attribute(key: event.file, value: event.line.description)
         ]
         event.additionalAttributes.forEach { key, value in
-            attributes.append(Attribute(key: key, value: value))
+            attributes.append(Attribute(key: key.rawValue, value: value))
         }
         return attributes.map { "[" + $0.key + ":" + $0.value + "]" } .joined()
     }
