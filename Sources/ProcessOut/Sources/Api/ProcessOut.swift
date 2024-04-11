@@ -100,6 +100,11 @@ public final class ProcessOut {
     private lazy var repositoryLogger = createLogger(for: Constants.repositoryLoggerCategory)
     private lazy var serviceLogger = createLogger(for: Constants.serviceLoggerCategory)
 
+    private lazy var deviceMetadataProvider: DefaultDeviceMetadataProvider = {
+        let keychain = Keychain(service: Constants.bundleIdentifier)
+        return DefaultDeviceMetadataProvider(screen: .main, device: .current, bundle: .main, keychain: keychain)
+    }()
+
     private lazy var httpConnector: HttpConnector = {
         let connectorConfiguration = { [unowned self] in
             let configuration = self.configuration
@@ -111,10 +116,6 @@ public final class ProcessOut {
                 version: ProcessOut.version
             )
         }
-        let keychain = Keychain(service: Constants.bundleIdentifier)
-        let deviceMetadataProvider = DefaultDeviceMetadataProvider(
-            screen: .main, device: .current, bundle: .main, keychain: keychain
-        )
         // Connector logs are not sent to backend to avoid recursion. This
         // may be not ideal because we may loose important events, such
         // as decoding failures so approach may be reconsidered in future.
@@ -125,6 +126,24 @@ public final class ProcessOut {
             .with(deviceMetadataProvider: deviceMetadataProvider)
             .build()
         return connector
+    }()
+
+    private lazy var telemetryService: DefaultTelemetryService = {
+        let repository = DefaultTelemetryRepository(connector: httpConnector)
+        let serviceConfiguration: () -> TelemetryServiceConfiguration = { [unowned self] in
+            let configuration = self.configuration
+            return TelemetryServiceConfiguration(
+                isTelemetryEnabled: configuration.isTelemetryEnabled,
+                minimumLevel: configuration.isDebug ? .info : .error,
+                applicationVersion: configuration.application?.version,
+                applicationName: configuration.application?.name
+            )
+        }
+        return DefaultTelemetryService(
+            configuration: serviceConfiguration,
+            repository: repository,
+            deviceMetadataProvider: deviceMetadataProvider
+        )
     }()
 
     private lazy var threeDSService: ThreeDSService = {
@@ -143,15 +162,12 @@ public final class ProcessOut {
     }
 
     private func createLogger(for category: String, includeRemoteDestination: Bool = true) -> POLogger {
-        let destinations: [LoggerDestination] = [
+        var destinations: [LoggerDestination] = [
             SystemLoggerDestination(subsystem: Constants.bundleIdentifier)
         ]
-        // todo(andrii-vysotskyi): uncomment code bellow when backend will support accepting SDK logs.
-        // if includeRemoteDestination {
-        //     let repository = HttpLogsRepository(connector: httpConnector)
-        //     let service = DefaultLogsService(repository: repository, minimumLevel: .error)
-        //     destinations.append(service)
-        // }
+        if includeRemoteDestination {
+            destinations.append(telemetryService)
+        }
         let minimumLevel: () -> LogLevel = { [unowned self] in
             configuration.isDebug ? .debug : .info
         }
