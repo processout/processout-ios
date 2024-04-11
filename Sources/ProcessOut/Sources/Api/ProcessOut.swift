@@ -106,31 +106,11 @@ public final class ProcessOut {
     }()
 
     private lazy var httpConnector: HttpConnector = {
-        let connectorConfiguration = { [unowned self] in
-            let configuration = self.configuration
-            return HttpConnectorRequestMapperConfiguration(
-                baseUrl: configuration.apiBaseUrl,
-                projectId: configuration.projectId,
-                privateKey: configuration.privateKey,
-                sessionId: configuration.sessionId,
-                version: ProcessOut.version
-            )
-        }
-        // Connector logs are not sent to backend to avoid recursion. This
-        // may be not ideal because we may loose important events, such
-        // as decoding failures so approach may be reconsidered in future.
-        let logger = createLogger(for: Constants.connectorLoggerCategory, includeRemoteDestination: false)
-        let connector = ProcessOutHttpConnectorBuilder()
-            .with(configuration: connectorConfiguration)
-            .with(logger: logger)
-            .with(deviceMetadataProvider: deviceMetadataProvider)
-            .build()
-        return connector
+        createConnector(includeLoggerRemoteDestination: true)
     }()
 
     private lazy var telemetryService: DefaultTelemetryService = {
-        let repository = DefaultTelemetryRepository(connector: httpConnector)
-        let serviceConfiguration: () -> TelemetryServiceConfiguration = { [unowned self] in
+        let configuration: () -> TelemetryServiceConfiguration = { [unowned self] in
             let configuration = self.configuration
             return TelemetryServiceConfiguration(
                 isTelemetryEnabled: configuration.isTelemetryEnabled,
@@ -139,10 +119,13 @@ public final class ProcessOut {
                 applicationName: configuration.application?.name
             )
         }
+        // Telemetry service uses repository with "special" connector. Its logs
+        // are not submitted to backend to avoid recursion.
+        let repository = DefaultTelemetryRepository(
+            connector: createConnector(includeLoggerRemoteDestination: false)
+        )
         return DefaultTelemetryService(
-            configuration: serviceConfiguration,
-            repository: repository,
-            deviceMetadataProvider: deviceMetadataProvider
+            configuration: configuration, repository: repository, deviceMetadataProvider: deviceMetadataProvider
         )
     }()
 
@@ -159,6 +142,29 @@ public final class ProcessOut {
 
     private init(configuration: ProcessOutConfiguration) {
         self.__configuration = .init(wrappedValue: configuration)
+    }
+
+    private func createConnector(includeLoggerRemoteDestination: Bool) -> HttpConnector {
+        let connectorConfiguration = { [unowned self] in
+            let configuration = self.configuration
+            return HttpConnectorRequestMapperConfiguration(
+                baseUrl: configuration.apiBaseUrl,
+                projectId: configuration.projectId,
+                privateKey: configuration.privateKey,
+                sessionId: configuration.sessionId,
+                version: ProcessOut.version
+            )
+        }
+        let logger = createLogger(
+            for: Constants.connectorLoggerCategory,
+            includeRemoteDestination: includeLoggerRemoteDestination
+        )
+        let connector = ProcessOutHttpConnectorBuilder()
+            .with(configuration: connectorConfiguration)
+            .with(logger: logger)
+            .with(deviceMetadataProvider: deviceMetadataProvider)
+            .build()
+        return connector
     }
 
     private func createLogger(for category: String, includeRemoteDestination: Bool = true) -> POLogger {
