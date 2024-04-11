@@ -9,49 +9,69 @@ import Foundation
 
 final class Batcher<Task> {
 
-    typealias Executor = (Array<Task>) async -> Void
+    typealias Executor = (Array<Task>) async -> Bool
 
     init(executor: @escaping Executor, executionInterval: TimeInterval = 10) {
         self.executor = executor
         self.executionInterval = executionInterval
+        lock = UnfairLock()
         pendingTasks = []
     }
 
+    deinit {
+        executionTimer?.invalidate()
+    }
+
     func submit(task: Task) {
-        // todo(andrii-vysotskyi): ensure batcher is thread safe
-        pendingTasks.append(task)
-        guard executionTimer == nil else {
-            return
+        lock.withLock {
+            pendingTasks.append(task)
+            guard executionTimer == nil else {
+                return
+            }
+            scheduleExecutionUnsafe()
         }
-        scheduleExecution()
     }
 
     // MARK: - Private Properties
 
     private let executor: Executor
     private let executionInterval: TimeInterval
+    private let lock: UnfairLock
 
     private var pendingTasks: [Task]
     private var executionTimer: Timer?
 
     // MARK: - Private Methods
 
-    private func scheduleExecution() {
+    /// - NOTE: method mutates self but is not thread safe.
+    private func scheduleExecutionUnsafe() {
         let timer = Timer.scheduledTimer(withTimeInterval: executionInterval, repeats: false) { [weak self] _ in
-            guard let self else {
+            guard let self = self else {
                 return
             }
-            let tasks = self.pendingTasks
-            self.pendingTasks.removeAll()
             _Concurrency.Task {
-                await self.executor(tasks)
-                self.executionTimer = nil
-                guard !self.pendingTasks.isEmpty else {
-                    return
-                }
-                self.scheduleExecution()
+                await self.executeTasks()
             }
         }
         self.executionTimer = timer
+    }
+
+    private func executeTasks() async {
+        let tasks = lock.withLock {
+            let tasks = self.pendingTasks
+            pendingTasks.removeAll()
+            return tasks
+        }
+        let didExecuteTasks = await !executor(tasks)
+        lock.withLock {
+            if !didExecuteTasks {
+                self.pendingTasks.insert(contentsOf: tasks, at: 0)
+            }
+            executionTimer = nil
+            guard !pendingTasks.isEmpty else {
+                return
+            }
+            scheduleExecutionUnsafe()
+        }
     }
 }
