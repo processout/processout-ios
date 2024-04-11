@@ -11,11 +11,11 @@ struct Telemetry: Encodable {
 
     struct ApplicationMetadata: Encodable {
 
-        /// Application version.
-        let version: String?
-
         /// Host application name.
         let name: String?
+
+        /// Application version.
+        let version: String?
     }
 
     struct DeviceMetadata: Encodable {
