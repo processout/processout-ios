@@ -25,7 +25,7 @@ final class DefaultTelemetryService: POService, LoggerDestination {
     func log(event: LogEvent) {
         // todo(andrii-vysotskyi): ignore logs if debugger is attached
         let configuration = self.configuration()
-        guard configuration.isTelemetryEnabled, event.level.rawValue >= configuration.minimumLevel.rawValue else {
+        guard configuration.isTelemetryEnabled, event.level.rawValue >= LogLevel.error.rawValue else {
             return
         }
         var attributes = [

@@ -10,8 +10,8 @@ struct TelemetryServiceConfiguration {
     /// Indicates whether telemetry is enabled.
     let isTelemetryEnabled: Bool
 
-    /// Minimum log level to persist.
-    let minimumLevel: LogLevel
+    /// Boolean value indicating whther this is a debug build.
+    let isDebug: Bool
 
     /// Application version.
     let applicationVersion: String?
