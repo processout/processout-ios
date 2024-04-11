@@ -109,7 +109,7 @@ public final class ProcessOut {
         createConnector(includeLoggerRemoteDestination: true)
     }()
 
-    private lazy var telemetryService: DefaultTelemetryService = {
+    private lazy var remoteLoggerDestination: LoggerDestination = {
         let configuration: () -> TelemetryServiceConfiguration = { [unowned self] in
             let configuration = self.configuration
             return TelemetryServiceConfiguration(
@@ -172,7 +172,7 @@ public final class ProcessOut {
             SystemLoggerDestination(subsystem: Constants.bundleIdentifier)
         ]
         if includeRemoteDestination {
-            destinations.append(telemetryService)
+            destinations.append(remoteLoggerDestination)
         }
         let minimumLevel: () -> LogLevel = { [unowned self] in
             configuration.isDebug ? .debug : .info
