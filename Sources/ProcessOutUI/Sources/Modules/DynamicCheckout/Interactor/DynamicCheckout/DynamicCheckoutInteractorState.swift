@@ -6,6 +6,7 @@
 //
 
 import ProcessOut
+import PassKit
 
 enum DynamicCheckoutInteractorState {
 
@@ -19,6 +20,9 @@ enum DynamicCheckoutInteractorState {
 
         /// Payment methods.
         let regularPaymentMethodIds: [String]
+
+        /// Pass Kit payment request.
+        let pkPaymentRequest: PKPaymentRequest?
 
         /// Defines whether payment is cancellable.
         var isCancellable: Bool

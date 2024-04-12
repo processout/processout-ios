@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 27.02.2024.
 //
 
+import PassKit
 import ProcessOut
 
 public protocol PODynamicCheckoutDelegate: AnyObject {
@@ -44,6 +45,10 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
     func dynamicCheckout(
         alternativePaymentDefaultsFor parameters: [PONativeAlternativePaymentMethodParameter]
     ) async -> [String: String]
+
+    // MARK: - Apple Pay
+
+    func dynamicCheckout(willBlahBlah: PODynamicCheckoutPaymentMethod.ApplePayConfiguration) async -> PKPaymentRequest?
 }
 
 extension PODynamicCheckoutDelegate {
@@ -72,5 +77,11 @@ extension PODynamicCheckoutDelegate {
         alternativePaymentDefaultsFor parameters: [PONativeAlternativePaymentMethodParameter]
     ) async -> [String: String] {
         [:]
+    }
+
+    private func dynamicCheckout(
+        willBlahBlah: PODynamicCheckoutPaymentMethod.ApplePayConfiguration
+    ) async -> PKPaymentRequest? {
+        nil
     }
 }

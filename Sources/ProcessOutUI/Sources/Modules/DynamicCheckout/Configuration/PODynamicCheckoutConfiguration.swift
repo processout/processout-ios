@@ -19,9 +19,6 @@ public struct PODynamicCheckoutConfiguration {
     /// Alternative payment method configuration.
     public var alternativePayment = PODynamicCheckoutAlternativePaymentConfiguration()
 
-    /// Apple pay configuration.
-    public var applePay: PODynamicCheckoutApplePayConfiguration?
-
     /// Cancel action. To remove action use empty string.
     public var cancelActionTitle: String?
 
