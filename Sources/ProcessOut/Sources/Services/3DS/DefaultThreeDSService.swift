@@ -38,7 +38,7 @@ final class DefaultThreeDSService: ThreeDSService {
         } catch {
             // todo(andrii-vysotskyi): when async delegate methods are publically available ensure
             // that thrown errors are mapped to POFailure if needed.
-            logger.debug("Failed to handle 3DS action: \(error)")
+            logger.error("Did fail to handle 3DS action: \(error)")
             throw error
         }
     }
@@ -86,7 +86,7 @@ final class DefaultThreeDSService: ThreeDSService {
 
     private func fingerprint(url: String, delegate: Delegate) async throws -> String {
         guard let url = URL(string: url) else {
-            logger.error("Did fail to create fingerprint URL from raw value: '\(url)'.")
+            logger.info("Did fail to create fingerprint URL from raw value: '\(url)'.")
             throw POFailure(message: nil, code: .internal(.mobile), underlyingError: nil)
         }
         let context = PO3DSRedirect(url: url, timeout: Constants.webFingerprintTimeout)
@@ -101,7 +101,7 @@ final class DefaultThreeDSService: ThreeDSService {
 
     private func redirect(url: String, delegate: Delegate) async throws -> String {
         guard let url = URL(string: url) else {
-            logger.error("Did fail to create redirect URL from raw value: '\(url)'.")
+            logger.info("Did fail to create redirect URL from raw value: '\(url)'.")
             throw POFailure(message: nil, code: .internal(.mobile), underlyingError: nil)
         }
         let context = PO3DSRedirect(url: url, timeout: nil)
@@ -115,13 +115,13 @@ final class DefaultThreeDSService: ThreeDSService {
             toLength: string.count + (4 - string.count % 4) % 4, withPad: "=", startingAt: 0
         )
         guard let data = Data(base64Encoded: paddedString) else {
-            logger.error("Did fail to decode base64 string.")
+            logger.info("Did fail to decode base64 string.")
             throw POFailure(message: "Invalid base64 encoding.", code: .internal(.mobile))
         }
         do {
             return try decoder.decode(type, from: data)
         } catch {
-            logger.error("Did fail to decode given type: \(error)")
+            logger.info("Did fail to decode given type: \(error)")
             throw POFailure(code: .internal(.mobile), underlyingError: error)
         }
     }
@@ -146,7 +146,7 @@ final class DefaultThreeDSService: ThreeDSService {
             )
             return String(decoding: requestParametersData, as: UTF8.self)
         } catch {
-            logger.error("Did fail to encode authentication request: \(error)")
+            logger.info("Did fail to encode authentication request: \(error)")
             throw POFailure(code: .internal(.mobile), underlyingError: error)
         }
     }
@@ -158,7 +158,7 @@ final class DefaultThreeDSService: ThreeDSService {
         do {
             return try Constants.tokenPrefix + encoder.encode(challengeResponse).base64EncodedString()
         } catch {
-            logger.error("Did fail to encode fingerprint: '\(error)'.")
+            logger.info("Did fail to encode fingerprint: '\(error)'.")
             throw POFailure(message: nil, code: .internal(.mobile), underlyingError: error)
         }
     }
