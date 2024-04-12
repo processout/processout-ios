@@ -1,0 +1,12 @@
+// MARK: - AutoCodingKeys
+{% for type in types.all|annotated:"AutoCodingKeys" %}
+
+extension {{ type.name }} {
+
+    enum CodingKeys: String, CodingKey {
+        {% for variable in type.instanceVariables where not variable.annotations.coding.skip %}
+        case {{ variable.name }}{% if variable.annotations.coding.key %} = "{{ variable.annotations.coding.key }}"{% endif %}
+        {% endfor %}
+    }
+}
+{% endfor %}
