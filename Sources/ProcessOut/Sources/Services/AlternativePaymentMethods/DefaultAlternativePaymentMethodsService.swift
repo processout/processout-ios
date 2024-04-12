@@ -48,7 +48,7 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
         }
         let gatewayToken = queryItems.queryItemValue(name: "token")
         if gatewayToken == nil {
-            logger.info("Gateway 'token' is not set in \(url), this may be an error.")
+            logger.debug("Gateway 'token' is not set in \(url), this may be an error.")
         }
         guard let customerId = queryItems.queryItemValue(name: "customer_id"),
               let tokenId = queryItems.queryItemValue(name: "token_id") else {

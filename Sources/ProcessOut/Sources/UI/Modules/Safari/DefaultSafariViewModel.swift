@@ -90,7 +90,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     private func setCompletedState(with url: URL) -> Bool {
         if case .completed = state {
-            logger.error("Can't change state to completed because already in sink state.")
+            logger.info("Can't change state to completed because already in sink state.")
             return false
         }
         // todo(andrii-vysotskyi): consider validating whether url is related to initial request if possible
@@ -113,7 +113,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     private func setCompletedState(with error: Error) {
         if case .completed = state {
-            logger.error("Can't change state to completed because already in a sink state.")
+            logger.info("Can't change state to completed because already in a sink state.")
             return
         }
         let failure: POFailure

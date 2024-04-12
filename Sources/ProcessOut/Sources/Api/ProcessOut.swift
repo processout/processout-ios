@@ -208,7 +208,7 @@ extension ProcessOut {
                 shared.$_configuration.withLock { $0 = configuration }
                 shared.logger.debug("Did change ProcessOut configuration")
             } else {
-                shared.logger.info("ProcessOut can be configured only once, ignored")
+                shared.logger.debug("ProcessOut can be configured only once, ignored")
             }
         } else {
             Self.prewarm()

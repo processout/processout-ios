@@ -46,9 +46,7 @@ import UIKit
         guard case .idle = state else {
             return
         }
-        logger.info(
-            "Starting native alternative payment", attributes: ["GatewayId": configuration.gatewayConfigurationId]
-        )
+        logger.debug("Starting native alternative payment")
         send(event: .willStart)
         state = .starting
         let request = PONativeAlternativePaymentMethodTransactionDetailsRequest(
@@ -61,7 +59,6 @@ import UIKit
                     self?.setStartedStateUnchecked(details: details, defaultValues: values)
                 }
             case .failure(let failure):
-                self?.logger.info("Failed to start payment: \(failure)")
                 self?.setFailureStateUnchecked(failure: failure)
             }
         }
@@ -102,7 +99,7 @@ import UIKit
         guard case let .started(startedState) = state, startedState.isSubmitAllowed else {
             return
         }
-        logger.info("Will submit payment parameters")
+        logger.debug("Will submit payment parameters")
         send(event: .willSubmitParameters)
         do {
             let values = try validated(values: startedState.values, for: startedState.parameters)
@@ -201,7 +198,7 @@ import UIKit
         )
         state = .started(startedState)
         send(event: .didStart)
-        logger.info("Did start payment, waiting for parameters")
+        logger.debug("Did start payment, waiting for parameters")
     }
 
     // MARK: - Awaiting Capture State
@@ -211,7 +208,7 @@ import UIKit
         parameterValues: PONativeAlternativePaymentMethodParameterValues?
     ) {
         guard configuration.waitsPaymentConfirmation else {
-            logger.info("Won't await payment capture because waitsPaymentConfirmation is set to false")
+            logger.debug("Won't await payment capture because waitsPaymentConfirmation is set to false")
             state = .submitted
             return
         }
@@ -234,7 +231,6 @@ import UIKit
                     case .success:
                         self?.setCapturedStateUnchecked(gateway: gateway, parameterValues: parameterValues)
                     case .failure(let failure):
-                        self?.logger.error("Did fail to capture invoice: \(failure)")
                         self?.setFailureStateUnchecked(failure: failure)
                     }
                 }
@@ -247,7 +243,7 @@ import UIKit
                 isDelayed: false
             )
             self.state = .awaitingCapture(awaitingCaptureState)
-            self.logger.info("Waiting for invoice capture confirmation")
+            self.logger.debug("Waiting for invoice capture confirmation")
             self.schedulePaymentConfirmationDelay()
         }
     }
@@ -271,9 +267,9 @@ import UIKit
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway,
         parameterValues: PONativeAlternativePaymentMethodParameterValues?
     ) {
-        logger.info("Did receive invoice capture confirmation")
+        logger.debug("Did receive invoice capture confirmation")
         guard configuration.waitsPaymentConfirmation else {
-            logger.info("Should't wait for confirmation, so setting submitted state instead of captured.")
+            logger.debug("Should't wait for confirmation, so setting submitted state instead of captured.")
             state = .submitted
             return
         }
@@ -301,7 +297,7 @@ import UIKit
     private func restoreStartedStateAfterSubmissionFailureIfPossible(
         _ failure: POFailure, replaceErrorMessages: Bool = false
     ) {
-        logger.info("Did fail to submit parameters: \(failure)")
+        logger.debug("Did fail to submit parameters: \(failure)")
         let startedState: State.Started
         switch state {
         case let .submitting(state), let .started(state):
@@ -368,6 +364,7 @@ import UIKit
     // MARK: - Failure State
 
     private func setFailureStateUnchecked(failure: POFailure) {
+        logger.error("Did fail to process native payment: \(failure)")
         state = .failure(failure)
         send(event: .didFail(failure: failure))
     }
