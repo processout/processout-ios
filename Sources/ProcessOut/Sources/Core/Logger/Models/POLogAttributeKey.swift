@@ -23,6 +23,9 @@ public struct POLogAttributeKey: RawRepresentable, ExpressibleByStringLiteral, H
 
 extension POLogAttributeKey {
 
+    /// Gateway configuration ID.
+    public static let gatewayConfigurationId: Self = "GatewayConfigurationId"
+
     /// Card ID.
     public static let cardId: Self = "CardId"
 

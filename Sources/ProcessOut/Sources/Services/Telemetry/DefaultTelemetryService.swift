@@ -34,7 +34,7 @@ final class DefaultTelemetryService: POService, LoggerDestination {
             "Category": event.category
         ]
         event.additionalAttributes.forEach { key, value in
-            let excludedAttributes: Set<POLogAttributeKey> = [.cardId, .invoiceId]
+            let excludedAttributes: Set<POLogAttributeKey> = [.gatewayConfigurationId, .cardId, .invoiceId]
             guard !excludedAttributes.contains(key) else {
                 return // Excluded attributes are encoded directly to event
             }
@@ -43,8 +43,9 @@ final class DefaultTelemetryService: POService, LoggerDestination {
         let telemetryEvent = Telemetry.Event(
             timestamp: event.timestamp,
             level: string(from: event.level),
-            invoiceId: event.additionalAttributes[.invoiceId],
+            gatewayConfigurationId: event.additionalAttributes[.gatewayConfigurationId],
             cardId: event.additionalAttributes[.cardId],
+            invoiceId: event.additionalAttributes[.invoiceId],
             attributes: attributes,
             message: event.message
         )
@@ -91,7 +92,7 @@ final class DefaultTelemetryService: POService, LoggerDestination {
 
     private func string(from level: LogLevel) -> String {
         let strings: [LogLevel: String] = [
-            .debug: "debug", .info: "info", .error: "error", .fault: "critical"
+            .debug: "debug", .info: "info", .error: "error", .fault: "error"
         ]
         return strings[level]! // swiftlint:disable:this force_unwrapping
     }

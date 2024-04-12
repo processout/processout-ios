@@ -47,11 +47,14 @@ struct Telemetry: Encodable {
         /// Event level.
         let level: String
 
-        /// Invoice ID.
-        let invoiceId: String?
+        /// Gateway configuration ID.
+        let gatewayConfigurationId: String?
 
         /// Card ID.
         let cardId: String?
+
+        /// Invoice ID.
+        let invoiceId: String?
 
         /// Event attributes.
         let attributes: [String: String]
