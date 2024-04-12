@@ -19,6 +19,25 @@ extension POAssignCustomerTokenRequest {
     }
 }
 
+extension PODynamicCheckoutPaymentMethod.AlternativePayment {
+
+    enum CodingKeys: String, CodingKey {
+        case display
+        case flow
+        case gatewayConfiguration
+        case configuration = "apm"
+    }
+}
+
+extension PODynamicCheckoutPaymentMethod.ApplePay {
+
+    enum CodingKeys: String, CodingKey {
+        case display
+        case flow
+        case configuration = "applepay"
+    }
+}
+
 extension POInvoiceAuthorizationRequest {
 
     enum CodingKeys: String, CodingKey {
