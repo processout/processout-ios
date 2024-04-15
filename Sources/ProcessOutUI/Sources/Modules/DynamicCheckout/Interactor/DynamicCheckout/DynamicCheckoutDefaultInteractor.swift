@@ -240,7 +240,7 @@ final class DynamicCheckoutDefaultInteractor:
         guard case .applePay(let applePayPaymentMethod) = paymentMethod else {
             return nil
         }
-        return await delegate?.dynamicCheckout(willBlahBlah: applePayPaymentMethod.configuration)
+        return await delegate?.dynamicCheckout(passKitPaymentRequestWith: applePayPaymentMethod.configuration)
     }
 
     // MARK: - Pass Kit Payment

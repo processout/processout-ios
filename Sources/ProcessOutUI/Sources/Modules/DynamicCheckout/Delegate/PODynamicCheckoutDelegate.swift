@@ -46,9 +46,11 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
         alternativePaymentDefaultsFor parameters: [PONativeAlternativePaymentMethodParameter]
     ) async -> [String: String]
 
-    // MARK: - Apple Pay
+    // MARK: - Pass Kit
 
-    func dynamicCheckout(willBlahBlah: PODynamicCheckoutPaymentMethod.ApplePayConfiguration) async -> PKPaymentRequest?
+    func dynamicCheckout(
+        passKitPaymentRequestWith configuration: PODynamicCheckoutPaymentMethod.ApplePayConfiguration
+    ) async -> PKPaymentRequest?
 }
 
 extension PODynamicCheckoutDelegate {
@@ -80,7 +82,7 @@ extension PODynamicCheckoutDelegate {
     }
 
     private func dynamicCheckout(
-        willBlahBlah: PODynamicCheckoutPaymentMethod.ApplePayConfiguration
+        passKitPaymentRequestWith configuration: PODynamicCheckoutPaymentMethod.ApplePayConfiguration
     ) async -> PKPaymentRequest? {
         nil
     }
