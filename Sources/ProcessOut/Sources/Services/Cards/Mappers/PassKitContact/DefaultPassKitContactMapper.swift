@@ -1,12 +1,11 @@
 //
 //  DefaultPassKitContactMapper.swift
-//  ProcessOutUI
+//  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 18.12.2023.
 //
 
 import PassKit
-@_spi(PO) import ProcessOut
 
 final class DefaultPassKitContactMapper: PassKitContactMapper {
 
