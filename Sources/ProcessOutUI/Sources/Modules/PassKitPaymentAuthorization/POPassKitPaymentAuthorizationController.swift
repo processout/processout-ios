@@ -110,8 +110,6 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
         let request = POApplePayCardTokenizationRequest(
             payment: payment,
             merchantIdentifier: paymentRequest.merchantIdentifier,
-            contact: nil,
-            shippingContact: nil,
             metadata: nil // todo(andrii-vysotskyi): decide if metadata injection should be allowed
         )
         let card: POCard

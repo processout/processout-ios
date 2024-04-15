@@ -32,8 +32,7 @@ final class DefaultPassKitContactMapper: PassKitContactMapper {
             city: address.city,
             state: address.state,
             zip: address.postalCode,
-            countryCode: address.isoCountryCode,
-            phone: pkContact.phoneNumber?.stringValue
+            countryCode: address.isoCountryCode
         )
         return contact
     }

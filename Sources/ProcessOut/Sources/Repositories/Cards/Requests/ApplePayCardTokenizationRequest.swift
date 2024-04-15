@@ -61,9 +61,6 @@ struct ApplePayCardTokenizationRequest: Encodable {
     /// Contact information.
     let contact: POContact?
 
-    /// The user-selected shipping details.
-    let shipping: POContact?
-
     /// Additional metadata.
     let metadata: [String: String]?
 
