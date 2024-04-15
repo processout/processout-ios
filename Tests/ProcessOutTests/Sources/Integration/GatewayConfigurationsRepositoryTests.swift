@@ -9,7 +9,7 @@ import Foundation
 import XCTest
 @testable import ProcessOut
 
-@MainActor final class GatewayConfigurationsRepositoryTests: XCTestCase {
+final class GatewayConfigurationsRepositoryTests: XCTestCase {
 
     override func setUp() {
         super.setUp()

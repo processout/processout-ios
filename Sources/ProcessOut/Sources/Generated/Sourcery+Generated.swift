@@ -4,7 +4,41 @@
 import Foundation
 import UIKit
 
-// swiftlint:disable all
+// MARK: - AutoCodingKeys
+
+extension POAssignCustomerTokenRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case source
+        case preferredScheme
+        case verify
+        case invoiceId
+        case enableThreeDS2 = "enable_three_d_s_2"
+        case thirdPartySdkVersion
+        case metadata
+    }
+}
+
+extension POInvoiceAuthorizationRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case source
+        case incremental
+        case enableThreeDS2 = "enable_three_d_s_2"
+        case preferredScheme
+        case thirdPartySdkVersion
+        case invoiceDetailIds
+        case overrideMacBlocking
+        case initialSchemeTransactionId
+        case autoCaptureAt
+        case captureAmount
+        case authorizeOnly
+        case allowFallbackToSale
+        case metadata
+    }
+}
+
+// MARK: - AutoCompletion
 
 extension POCardsService {
 
