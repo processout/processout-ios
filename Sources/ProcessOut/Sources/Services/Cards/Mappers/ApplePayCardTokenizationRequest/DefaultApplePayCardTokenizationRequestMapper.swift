@@ -10,7 +10,8 @@ import PassKit
 
 final class DefaultApplePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper {
 
-    init(decoder: JSONDecoder, logger: POLogger) {
+    init(contactMapper: PassKitContactMapper, decoder: JSONDecoder, logger: POLogger) {
+        self.contactMapper = contactMapper
         self.decoder = decoder
         self.logger = logger
     }
@@ -31,8 +32,8 @@ final class DefaultApplePayCardTokenizationRequestMapper: ApplePayCardTokenizati
             )
             let tokenizationRequest = ApplePayCardTokenizationRequest(
                 tokenType: "applepay",
-                contact: request.contact,
-                shipping: request.shippingContact,
+                contact: request.contact ?? request.payment.billingContact.map(contactMapper.map),
+                shipping: request.shippingContact ?? request.payment.shippingContact.map(contactMapper.map),
                 metadata: request.metadata,
                 applepayMid: request.merchantIdentifier,
                 applepayResponse: .init(token: token)
@@ -46,6 +47,7 @@ final class DefaultApplePayCardTokenizationRequestMapper: ApplePayCardTokenizati
 
     // MARK: - Private Properties
 
+    private let contactMapper: PassKitContactMapper
     private let decoder: JSONDecoder
     private let logger: POLogger
 
