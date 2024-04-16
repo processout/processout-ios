@@ -8,6 +8,7 @@
 // swiftlint:disable file_length
 
 import Foundation
+import PassKit
 @_spi(PO) import ProcessOut
 
 // swiftlint:disable:next type_body_length
@@ -61,7 +62,9 @@ final class DynamicCheckoutDefaultInteractor:
             case .card:
                 initiateCardPayment(methodId: methodId, startedState: startedState)
             case .alternativePayment(let payment):
-                initiateAlternativePayment(methodId: methodId, payment: payment, startedState: startedState)
+                initiateAlternativePayment(payment, methodId: methodId, startedState: startedState)
+            case .nativeAlternativePayment(let payment):
+                initiateNativeAlternativePayment(payment, methodId: methodId, startedState: startedState)
             default:
                 return false // todo(andrii-vysotskyi): handle other payment methods
             }
@@ -101,10 +104,10 @@ final class DynamicCheckoutDefaultInteractor:
             switch paymentMethod {
             case .card:
                 return cardTokenizationCoordinator?.cancel() ?? false
-            case .alternativePayment:
+            case .nativeAlternativePayment:
                 return nativeAlternativePaymentCoordinator?.cancel() ?? false
             default:
-                logger.info("Currently active payment method can't be cancelled.")
+                assertionFailure("Currently active payment method can't be cancelled.")
                 return false
             }
         case .started:
@@ -144,14 +147,21 @@ final class DynamicCheckoutDefaultInteractor:
             setFailureStateUnchecked(error: error)
             return
         }
+        let pkPaymentRequest = await pkPaymentRequest(
+            paymentMethods: paymentDetails.paymentMethods
+        )
         var expressMethodIds: [String] = [], regularMethodIds: [String] = []
         let paymentMethods = partitioned(
-            paymentMethods: paymentDetails.paymentMethods, expressIds: &expressMethodIds, regularIds: &regularMethodIds
+            paymentMethods: paymentDetails.paymentMethods,
+            expressIds: &expressMethodIds,
+            regularIds: &regularMethodIds,
+            ignorePassKit: pkPaymentRequest == nil
         )
         let startedState = DynamicCheckoutInteractorState.Started(
             paymentMethods: paymentMethods,
             expressPaymentMethodIds: expressMethodIds,
             regularPaymentMethodIds: regularMethodIds,
+            pkPaymentRequest: pkPaymentRequest,
             isCancellable: configuration.cancelActionTitle.map { !$0.isEmpty } ?? false
         )
         state = .started(startedState)
@@ -171,7 +181,7 @@ final class DynamicCheckoutDefaultInteractor:
             return
         }
         switch paymentMethod {
-        case .card, .alternativePayment:
+        case .card, .nativeAlternativePayment:
             break // todo(andrii-vysotskyi): only allow native APMs
         default:
             return
@@ -180,43 +190,73 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     private func partitioned(
-        paymentMethods: [PODynamicCheckoutPaymentMethod], expressIds: inout [String], regularIds: inout [String]
+        paymentMethods: [PODynamicCheckoutPaymentMethod],
+        expressIds: inout [String],
+        regularIds: inout [String],
+        ignorePassKit: Bool
     ) -> [String: PODynamicCheckoutPaymentMethod] {
         // swiftlint:disable:next identifier_name
         var _paymentMethods: [String: PODynamicCheckoutPaymentMethod] = [:]
         for paymentMethod in paymentMethods {
             switch paymentMethod {
-            case .applePay:
-                if passKitPaymentInteractor.isSupported {
-                    expressIds.append(paymentMethod.id)
-                }
-            case .alternativePayment(let alternativePaymentMethod):
-                // todo(andrii-vysotskyi): ensure that only redirect APMs are express
-                if alternativePaymentMethod.flow == .express {
+            case .applePay(let method) where passKitPaymentInteractor.isSupported && !ignorePassKit:
+                if method.flow == .express {
                     expressIds.append(paymentMethod.id)
                 } else {
                     regularIds.append(paymentMethod.id)
                 }
-            case .unknown:
-                continue // todo(andrii-vysotskyi): log unknown payment method
-            default:
+            case .alternativePayment(let method):
+                if method.flow == .express {
+                    expressIds.append(paymentMethod.id)
+                } else {
+                    regularIds.append(paymentMethod.id)
+                }
+            case .nativeAlternativePayment:
                 regularIds.append(paymentMethod.id)
+            case .card:
+                regularIds.append(paymentMethod.id)
+            case .unknown(let rawType):
+                logger.debug("Unknown payment method is ignored: \(rawType)")
+                continue
+            default:
+                continue
             }
             _paymentMethods[paymentMethod.id] = paymentMethod
         }
         return _paymentMethods
     }
 
+    private func pkPaymentRequest(paymentMethods: [PODynamicCheckoutPaymentMethod]) async -> PKPaymentRequest? {
+        guard passKitPaymentInteractor.isSupported else {
+            logger.debug("PassKit is not supported, won't attempt to resolve request.")
+            return nil
+        }
+        let paymentMethod = paymentMethods .first { paymentMethod in
+            if case .applePay = paymentMethod {
+                return true
+            }
+            return false
+        }
+        guard case .applePay(let applePayPaymentMethod) = paymentMethod else {
+            return nil
+        }
+        return await delegate?.dynamicCheckout(passKitPaymentRequestWith: applePayPaymentMethod.configuration)
+    }
+
     // MARK: - Pass Kit Payment
 
     private func initiatePassKitPayment(methodId: String, startedState: State.Started) {
+        guard let request = startedState.pkPaymentRequest else {
+            assertionFailure("Attempted to initiate PassKit payment without request.")
+            return
+        }
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState, paymentMethodId: methodId, submission: .submitting, isCancellable: false
         )
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
             do {
-                try await passKitPaymentInteractor.start()
+                try await passKitPaymentInteractor.start(request: request)
                 setSuccessState()
             } catch {
                 restoreStateAfterPaymentProcessingFailureIfPossible(error)
@@ -230,7 +270,7 @@ final class DynamicCheckoutDefaultInteractor:
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: methodId,
-            submission: .possible, // Submission is initially possible
+            submission: .unavailable,
             isCancellable: false
         )
         state = .paymentProcessing(paymentProcessingState)
@@ -239,13 +279,39 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Alternative Payment
 
     private func initiateAlternativePayment(
-        methodId: String, payment: PODynamicCheckoutPaymentMethod.AlternativePayment, startedState: State.Started
+        _ payment: PODynamicCheckoutPaymentMethod.AlternativePayment,
+        methodId: String,
+        startedState: State.Started
     ) {
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
-            snapshot: startedState, paymentMethodId: methodId, submission: .possible, isCancellable: false
+            snapshot: startedState,
+            paymentMethodId: methodId,
+            submission: .submitting,
+            isCancellable: false
         )
         state = .paymentProcessing(paymentProcessingState)
-        // todo(andrii-vysotskyi): depending on payment type non-native APM start may be needed.
+        Task { @MainActor in
+            do {
+                try await alternativePaymentInteractor.start(url: payment.configuration.redirectUrl)
+                setSuccessState()
+            } catch {
+                self.restoreStateAfterPaymentProcessingFailureIfPossible(error)
+            }
+        }
+    }
+
+    private func initiateNativeAlternativePayment(
+        _ payment: PODynamicCheckoutPaymentMethod.NativeAlternativePayment,
+        methodId: String,
+        startedState: State.Started
+    ) {
+        let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
+            snapshot: startedState,
+            paymentMethodId: methodId,
+            submission: .unavailable,
+            isCancellable: false
+        )
+        state = .paymentProcessing(paymentProcessingState)
     }
 
     // MARK: - Started State Restoration
@@ -274,9 +340,11 @@ final class DynamicCheckoutDefaultInteractor:
                 setFailureStateUnchecked(error: error)
                 return
             }
-            // todo(andrii-vysotskyi): recover non-native APM cancellation errors
+            // todo(andrii-vysotskyi): propagate error to user after recovery
             switch paymentMethod {
             case .applePay:
+                state = .started(paymentProcessingState.snapshot)
+            case .alternativePayment:
                 state = .started(paymentProcessingState.snapshot)
             default:
                 setFailureStateUnchecked(error: error)
@@ -299,6 +367,7 @@ final class DynamicCheckoutDefaultInteractor:
         state = .failure(failure)
         send(event: .didFail(failure: failure))
         completion(.failure(failure))
+        logger.error("Did fail to process dynamic checkout payment: '\(error)'")
     }
 
     // MARK: - Success State

@@ -13,24 +13,54 @@ public enum PODynamicCheckoutPaymentMethod {
 
     // MARK: - Apple Pay
 
-    public struct ApplePay: Decodable {
+    public struct ApplePayConfiguration: Decodable {
 
-        /// Display information.
-        public let display: Display
+        /// Merchant ID.
+        public let merchantIdentifier: String
     }
 
-    // MARK: - APM
-
-    public struct AlternativePayment: Decodable {
+    public struct ApplePay: Decodable { // sourcery: AutoCodingKeys
 
         /// Display information.
         public let display: Display
 
         /// Payment flow.
-        public let flow: Flow
+        public let flow: Flow?
+
+        /// Apple pay configuration.
+        public let configuration: ApplePayConfiguration // sourcery:coding: key="applepay"
+    }
+
+    // MARK: - APM
+
+    public struct NativeAlternativePayment: Decodable {
+
+        /// Display information.
+        public let display: Display
 
         /// Gateway configuration.
         public let gatewayConfiguration: GatewayConfiguration
+    }
+
+    public struct AlternativePayment: Decodable { // sourcery: AutoCodingKeys
+
+        /// Display information.
+        public let display: Display
+
+        /// Payment flow.
+        public let flow: Flow?
+
+        /// Gateway configuration.
+        public let gatewayConfiguration: GatewayConfiguration
+
+        /// Payment configuration.
+        public let configuration: AlternativePaymentConfiguration // sourcery:coding: key="apm"
+    }
+
+    public struct AlternativePaymentConfiguration: Decodable {
+
+        /// Redirect URL.
+        public let redirectUrl: URL
     }
 
     public struct GatewayConfiguration: Decodable {
@@ -63,10 +93,13 @@ public enum PODynamicCheckoutPaymentMethod {
     /// Apple Pay.
     case applePay(ApplePay)
 
-    /// Alternative Payment Method.
+    /// Alternative payment.
     case alternativePayment(AlternativePayment)
 
-    /// Card payment.
+    /// Native alternative payment.
+    case nativeAlternativePayment(NativeAlternativePayment)
+
+    /// Card.
     case card
 
     /// Unknown payment method.
@@ -82,8 +115,13 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
             let applePay = try ApplePay(from: decoder)
             self = .applePay(applePay)
         case "apm":
-            let alternativePayment = try AlternativePayment(from: decoder)
-            self = .alternativePayment(alternativePayment)
+            do {
+                let alternativePayment = try AlternativePayment(from: decoder)
+                self = .alternativePayment(alternativePayment)
+            } catch {
+                let nativeAlternativePayment = try NativeAlternativePayment(from: decoder)
+                self = .nativeAlternativePayment(nativeAlternativePayment)
+            }
         case "card":
             self = .card
         default:
@@ -105,9 +143,10 @@ extension PODynamicCheckoutPaymentMethod: Identifiable {
         switch self {
         case .applePay:
             return "applepay"
-        case .alternativePayment(let alternativePayment):
-            let configuration = alternativePayment.gatewayConfiguration
-            return "apm_" + configuration.id + "." + configuration.subaccount
+        case .alternativePayment(let payment):
+            return "apm_" + payment.gatewayConfiguration.id + "." + payment.gatewayConfiguration.subaccount
+        case .nativeAlternativePayment(let payment):
+            return "napm_" + payment.gatewayConfiguration.id + "." + payment.gatewayConfiguration.subaccount
         case .card:
             return "card"
         case .unknown(let type):

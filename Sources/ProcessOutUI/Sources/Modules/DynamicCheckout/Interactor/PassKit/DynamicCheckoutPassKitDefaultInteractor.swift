@@ -24,12 +24,11 @@ final class DynamicCheckoutPassKitPaymentDefaultInteractor: DynamicCheckoutPassK
     }
 
     nonisolated var isSupported: Bool {
-        configuration.applePay != nil && POPassKitPaymentAuthorizationController.canMakePayments()
+        POPassKitPaymentAuthorizationController.canMakePayments()
     }
 
-    func start() async throws {
-        guard let paymentRequest = configuration.applePay?.paymentRequest,
-              let controller = POPassKitPaymentAuthorizationController(paymentRequest: paymentRequest) else {
+    func start(request: PKPaymentRequest) async throws {
+        guard let controller = POPassKitPaymentAuthorizationController(paymentRequest: request) else {
             assertionFailure("ApplePay payment shouldn't be attempted when unavailable.")
             throw POFailure(code: .generic(.mobile))
         }

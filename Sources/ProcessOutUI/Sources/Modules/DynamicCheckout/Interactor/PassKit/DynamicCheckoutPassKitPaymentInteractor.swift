@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 25.03.2024.
 //
 
-import Foundation
+import PassKit
 
 protocol DynamicCheckoutPassKitPaymentInteractor {
 
@@ -13,5 +13,5 @@ protocol DynamicCheckoutPassKitPaymentInteractor {
     var isSupported: Bool { get }
 
     /// Starts payment.
-    func start() async throws
+    func start(request: PKPaymentRequest) async throws
 }
