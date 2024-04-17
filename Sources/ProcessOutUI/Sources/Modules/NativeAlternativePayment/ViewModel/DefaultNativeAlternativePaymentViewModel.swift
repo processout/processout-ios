@@ -111,16 +111,8 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     }
 
     private func updateSections(state: InteractorState.Started, isSubmitting: Bool) {
-        let titleItem = NativeAlternativePaymentViewModelItem.Title(
-            id: "title",
-            text: configuration.title ?? String(
-                resource: .NativeAlternativePayment.title, replacements: state.gateway.displayName
-            )
-        )
         var sections = [
-            NativeAlternativePaymentViewModelSection(
-                id: "title", isCentered: false, title: nil, items: [.title(titleItem)], error: nil
-            )
+            createTitleSection(state: state)
         ]
         for parameter in state.parameters {
             let items = [
@@ -139,7 +131,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             )
             sections.append(section)
         }
-        self.sections = sections
+        self.sections = sections.compactMap { $0 }
     }
 
     private func updateSections(state: InteractorState.AwaitingCapture) {
@@ -181,6 +173,19 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             id: "captured", isCentered: false, title: nil, items: [.submitted(item)], error: nil
         )
         sections = [section]
+    }
+
+    private func createTitleSection(state: InteractorState.Started) -> NativeAlternativePaymentViewModelSection? {
+        let title = configuration.title
+            ?? String(resource: .NativeAlternativePayment.title, replacements: state.gateway.displayName)
+        guard !title.isEmpty else {
+            return nil
+        }
+        let item = NativeAlternativePaymentViewModelItem.Title(id: "title", text: title)
+        let section = NativeAlternativePaymentViewModelSection(
+            id: "title", isCentered: false, title: nil, items: [.title(item)], error: nil
+        )
+        return section
     }
 
     // MARK: - Input Items
@@ -325,7 +330,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         self.actions = [cancelAction].compactMap { $0 }
     }
 
-    private func submitAction(state: InteractorState.Started, isLoading: Bool) -> POActionsContainerActionViewModel {
+    private func submitAction(state: InteractorState.Started, isLoading: Bool) -> POActionsContainerActionViewModel? {
         let title: String
         if let customTitle = configuration.primaryActionTitle {
             title = customTitle
@@ -337,6 +342,9 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             } else {
                 title = String(resource: .NativeAlternativePayment.Button.submit)
             }
+        }
+        guard !title.isEmpty else {
+            return nil
         }
         let action = POActionsContainerActionViewModel(
             id: "native-alternative-payment.primary-button",
