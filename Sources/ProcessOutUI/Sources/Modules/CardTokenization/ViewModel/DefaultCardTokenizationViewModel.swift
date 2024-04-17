@@ -13,7 +13,7 @@ import SwiftUI
 
 final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
-    init(interactor: some CardTokenizationInteractor) {
+    init(interactor: any CardTokenizationInteractor) {
         self.interactor = interactor
         state = .idle
         observeChanges(interactor: interactor)
@@ -51,7 +51,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     // MARK: - Private Methods
 
-    private func observeChanges(interactor: some CardTokenizationInteractor) {
+    private func observeChanges(interactor: any Interactor) {
         interactor.didChange = { [weak self] in
             self?.configureWithInteractorState()
         }
