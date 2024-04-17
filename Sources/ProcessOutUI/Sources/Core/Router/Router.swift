@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-protocol Router<Content, Route> {
+protocol Router<Route> {
 
     /// Route type that the router manages.
     associatedtype Route: Hashable
@@ -16,5 +16,6 @@ protocol Router<Content, Route> {
     associatedtype Content: View
 
     /// The content and behavior of the view for given route.
+    @ViewBuilder
     func view(for route: Route) -> Content
 }
