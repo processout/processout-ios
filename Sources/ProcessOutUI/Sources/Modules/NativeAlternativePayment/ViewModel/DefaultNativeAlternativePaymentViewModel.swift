@@ -13,7 +13,7 @@ import SwiftUI
 
 final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentViewModel {
 
-    init(interactor: some NativeAlternativePaymentInteractor) {
+    init(interactor: any NativeAlternativePaymentInteractor) {
         self.interactor = interactor
         observeChanges(interactor: interactor)
     }
@@ -62,7 +62,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     // MARK: - Private Methods
 
-    private func observeChanges(interactor: some NativeAlternativePaymentInteractor) {
+    private func observeChanges(interactor: any Interactor) {
         interactor.start()
         interactor.didChange = { [weak self] in
             self?.updateWithInteractorState()
