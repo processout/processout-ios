@@ -15,17 +15,20 @@ final class DynamicCheckoutAlternativePaymentDefaultInteractor: DynamicCheckoutA
         self.configuration = configuration
     }
 
-    func start(url: URL) async throws {
+    func start(url: URL) async throws -> POAlternativePaymentMethodResponse {
         guard let returnUrl = configuration.returnUrl else {
             throw POFailure(message: "Return URL must be set.", code: .generic(.mobile))
         }
         // swiftlint:disable:next implicitly_unwrapped_optional
-        var controller: POAlternativePaymentMethodController!
+        var continuation: UnsafeContinuation<POAlternativePaymentMethodResponse, Error>!
         // todo(andrii-vysotskyi): set tint colors and configuration
-        _ = try await withCheckedThrowingContinuation { continuation in
-            controller = .init(url: url, returnUrl: returnUrl, completion: continuation.resume(with:))
+        let controller = POAlternativePaymentMethodController(url: url, returnUrl: returnUrl) { result in
+            continuation.resume(with: result)
         }
         _ = await controller.present()
+        return try await withUnsafeThrowingContinuation { unsafeContinuation in
+            continuation = unsafeContinuation
+        }
     }
 
     // MARK: - Private Properties
