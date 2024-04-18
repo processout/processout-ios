@@ -10,6 +10,10 @@ import PassKit
 /// Dynamic checkout configuration.
 public struct PODynamicCheckoutConfiguration {
 
+    public init(invoiceId: String) {
+        self.invoiceId = invoiceId
+    }
+
     /// Invoice ID to use to initiate a payment.
     public var invoiceId: String
 
@@ -22,7 +26,7 @@ public struct PODynamicCheckoutConfiguration {
     /// Cancel action. To remove action use empty string.
     public var cancelActionTitle: String?
 
-    /// Determines whether to enable skipping payment list step when there is only one non-instant payment method.
-    /// Default value: `false`.
+    /// Determines whether to enable skipping payment list step when there is only
+    /// one non-instant payment method. Default value: `false`.
     public var allowsSkippingPaymentList = false
 }

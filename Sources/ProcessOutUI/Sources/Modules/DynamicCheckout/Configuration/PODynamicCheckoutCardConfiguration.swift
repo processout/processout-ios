@@ -7,7 +7,8 @@
 
 public struct PODynamicCheckoutCardConfiguration {
 
-    /// Indicates if the input for entering the cardholder name should be displayed. Defaults to `true`.
+    /// Indicates if the input for entering the cardholder name should be
+    /// displayed. Defaults to `true`.
     public var isCardholderNameInputVisible = true
 
     /// Primary action text, such as "Submit".
