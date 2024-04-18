@@ -16,7 +16,7 @@ public enum PODynamicCheckoutPaymentMethod {
     public struct ApplePayConfiguration: Decodable {
 
         /// Merchant ID.
-        public let merchantIdentifier: String
+        public let merchantId: String
     }
 
     public struct ApplePay: Decodable { // sourcery: AutoCodingKeys
@@ -31,16 +31,27 @@ public enum PODynamicCheckoutPaymentMethod {
         public let configuration: ApplePayConfiguration // sourcery:coding: key="applepay"
     }
 
-    // MARK: - APM
+    // MARK: - Native APM
 
-    public struct NativeAlternativePayment: Decodable {
+    public struct NativeAlternativePayment: Decodable { // sourcery: AutoCodingKeys
 
         /// Display information.
         public let display: Display
 
         /// Gateway configuration.
-        public let gatewayConfiguration: GatewayConfiguration
+        public let configuration: NativeAlternativePaymentConfiguration // sourcery:coding: key="apm"
     }
+
+    public struct NativeAlternativePaymentConfiguration: Decodable {
+
+        /// Gateway configuration ID.
+        public let gatewayConfigurationUid: String
+
+        /// Gateway name.
+        public let gatewayName: String
+    }
+
+    // MARK: - APM
 
     public struct AlternativePayment: Decodable { // sourcery: AutoCodingKeys
 
@@ -50,9 +61,6 @@ public enum PODynamicCheckoutPaymentMethod {
         /// Payment flow.
         public let flow: Flow?
 
-        /// Gateway configuration.
-        public let gatewayConfiguration: GatewayConfiguration
-
         /// Payment configuration.
         public let configuration: AlternativePaymentConfiguration // sourcery:coding: key="apm"
     }
@@ -61,15 +69,6 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Redirect URL.
         public let redirectUrl: URL
-    }
-
-    public struct GatewayConfiguration: Decodable {
-
-        /// Gateway ID.
-        public let id: String
-
-        /// Gateway subaccount.
-        public let subaccount: String
     }
 
     // MARK: - Common
@@ -86,7 +85,7 @@ public enum PODynamicCheckoutPaymentMethod {
         public private(set) var brandColor: UIColor
     }
 
-    public enum Flow: Decodable {
+    public enum Flow: String, Decodable {
         case express
     }
 
@@ -143,10 +142,10 @@ extension PODynamicCheckoutPaymentMethod: Identifiable {
         switch self {
         case .applePay:
             return "applepay"
-        case .alternativePayment(let payment):
-            return "apm_" + payment.gatewayConfiguration.id + "." + payment.gatewayConfiguration.subaccount
-        case .nativeAlternativePayment(let payment):
-            return "napm_" + payment.gatewayConfiguration.id + "." + payment.gatewayConfiguration.subaccount
+        case .alternativePayment(let method):
+            return "apm_" + method.configuration.redirectUrl.absoluteString
+        case .nativeAlternativePayment(let method):
+            return "napm_" + method.configuration.gatewayConfigurationUid + "." + method.configuration.gatewayName
         case .card:
             return "card"
         case .unknown(let type):

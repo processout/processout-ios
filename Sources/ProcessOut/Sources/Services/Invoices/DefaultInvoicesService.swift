@@ -28,11 +28,8 @@ final class DefaultInvoicesService: POInvoicesService {
         try await repository.initiatePayment(request: request)
     }
 
-    /// Requests information needed to initiate dynamic checkout session.
-    func dynamicCheckoutPaymentDetails(
-        request: PODynamicCheckoutPaymentDetailsRequest
-    ) async throws -> PODynamicCheckoutPaymentDetails {
-        try await repository.dynamicCheckoutPaymentDetails(request: request)
+    func invoice(request: POInvoiceRequest) async throws -> POInvoice {
+        try await repository.invoice(request: request)
     }
 
     func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DSService) async throws {
