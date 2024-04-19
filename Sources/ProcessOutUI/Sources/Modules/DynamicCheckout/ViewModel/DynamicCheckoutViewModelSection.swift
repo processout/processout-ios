@@ -18,4 +18,7 @@ struct DynamicCheckoutViewModelSection: Identifiable {
 
     /// Defines whether view should display separators.
     let areSeparatorsVisible: Bool
+
+    /// Defines whether view should render bezels (frame) around section content.
+    let areBezelsVisible: Bool
 }
