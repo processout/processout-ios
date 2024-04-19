@@ -39,6 +39,9 @@ public struct POAsyncImage<Content: View>: View {
     @State
     private var phase: POAsyncImagePhase
 
+    @Environment(\.colorScheme)
+    private var colorScheme
+
     // MARK: - Private Methods
 
     /// Implementation resolves image and updates phase.
