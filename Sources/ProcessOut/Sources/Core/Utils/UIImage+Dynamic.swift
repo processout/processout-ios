@@ -9,15 +9,23 @@ import UIKit
 
 extension UIImage {
 
-    static func dynamic(lightImage: UIImage?, darkImage: UIImage?) -> UIImage {
-        let asset = UIImageAsset()
-        if let image = lightImage {
-            register(image: image, with: .light, in: asset)
+    static func dynamic(lightImage: UIImage?, darkImage: UIImage?) -> UIImage? {
+        // When image with scale greater than 3 is registed asset created explicitly produced image
+        // is malformed and doesn't contain images for light nor dark styles.
+        guard let image = lightImage ?? darkImage else {
+            return nil
         }
-        if let image = darkImage {
-            register(image: image, with: .dark, in: asset)
+        guard let imageAsset = image.imageAsset else {
+            assertionFailure("Unable to create dynamic image for images without asset.")
+            return image
         }
-        return asset.image(with: .current)
+        if let lightImage {
+            register(image: lightImage, with: .light, in: imageAsset)
+        }
+        if let darkImage {
+            register(image: darkImage, with: .dark, in: imageAsset)
+        }
+        return image
     }
 
     // MARK: - Private Methods
