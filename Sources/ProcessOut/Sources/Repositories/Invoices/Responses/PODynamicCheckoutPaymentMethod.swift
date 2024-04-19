@@ -21,9 +21,6 @@ public enum PODynamicCheckoutPaymentMethod {
 
     public struct ApplePay: Decodable { // sourcery: AutoCodingKeys
 
-        /// Display information.
-        public let display: Display
-
         /// Payment flow.
         public let flow: Flow?
 
@@ -71,6 +68,14 @@ public enum PODynamicCheckoutPaymentMethod {
         public let redirectUrl: URL
     }
 
+    // MARK: - Card
+
+    public struct Card: Decodable {
+
+        /// Display information.
+        public let display: Display
+    }
+
     // MARK: - Common
 
     public struct Display: Decodable {
@@ -99,7 +104,7 @@ public enum PODynamicCheckoutPaymentMethod {
     case nativeAlternativePayment(NativeAlternativePayment)
 
     /// Card.
-    case card
+    case card(Card)
 
     /// Unknown payment method.
     case unknown(type: String)
@@ -122,7 +127,8 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
                 self = .nativeAlternativePayment(nativeAlternativePayment)
             }
         case "card":
-            self = .card
+            let card = try Card(from: decoder)
+            self = .card(card)
         default:
             self = .unknown(type: type)
         }
@@ -135,21 +141,29 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
     }
 }
 
-@_spi(PO)
+extension PODynamicCheckoutPaymentMethod.NativeAlternativePaymentConfiguration {
+
+    @_spi(PO)
+    public var gatewayId: String {
+        gatewayConfigurationUid + "." + gatewayName
+    }
+}
+
 extension PODynamicCheckoutPaymentMethod: Identifiable {
 
+    @_spi(PO)
     public var id: String {
         switch self {
-        case .applePay:
-            return "applepay"
+        case .applePay(let method):
+            return "applepay_" + method.configuration.merchantId
         case .alternativePayment(let method):
             return "apm_" + method.configuration.redirectUrl.absoluteString
         case .nativeAlternativePayment(let method):
-            return "napm_" + method.configuration.gatewayConfigurationUid + "." + method.configuration.gatewayName
+            return "napm_" + method.configuration.gatewayId
         case .card:
             return "card"
         case .unknown(let type):
-            return "unknown" + type
+            return "unknown_" + type
         }
     }
 }
