@@ -96,10 +96,10 @@ extension CardTokenizationViewModelState {
     /// - NOTE: When this property changes view should be updated with
     /// explicit animation.
     var animationIdentity: AnyHashable {
-        sections.map { section in
-            let itemIds = AnyHashable(section.items.map(\.id))
-            return [section.id, itemIds]
+        let sectionsIdentity = sections.map { section in
+            [section.id, section.items.map(\.id)]
         }
+        return [sectionsIdentity, AnyHashable(actions.map(\.id))]
     }
 }
 

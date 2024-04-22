@@ -45,8 +45,10 @@ public struct POCardTokenizationView: View {
                 }
                 .clipped()
             }
-            POActionsContainerView(actions: viewModel.state.actions)
-                .actionsContainerStyle(style.actionsContainer)
+            if !viewModel.state.actions.isEmpty {
+                POActionsContainerView(actions: viewModel.state.actions)
+                    .actionsContainerStyle(style.actionsContainer)
+            }
         }
         .background(style.backgroundColor.ignoresSafeArea())
     }
