@@ -117,3 +117,28 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
         static let progressId = UUID().uuidString
     }
 }
+
+extension NativeAlternativePaymentViewModelSection {
+
+    /// Section's animation identity. For now only properties that may affect layout
+    /// changes are part of identity.
+    ///
+    /// - NOTE: When this property changes view should be updated with
+    /// explicit animation.
+    var animationIdentity: AnyHashable {
+        [id, items.map(animationValue), error]
+    }
+
+    // MARK: - Private Methods
+
+    private func animationValue(of item: NativeAlternativePaymentViewModelItem) -> AnyHashable {
+        switch item {
+        case .title(let item):
+            return item
+        case .submitted(let item):
+            return item
+        default:
+            return item.id
+        }
+    }
+}

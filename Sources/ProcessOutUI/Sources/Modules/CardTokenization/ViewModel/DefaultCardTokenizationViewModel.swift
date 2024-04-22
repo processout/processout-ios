@@ -61,7 +61,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     private func configureWithInteractorState() {
         switch interactor.state {
         case .idle:
-            setState(.idle, animated: false)
+            state = .idle
         case .started(let startedState):
             let newState = convertToState(startedState: startedState, isSubmitting: false)
             setState(newState)
@@ -405,20 +405,17 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         return parameters.filter(\.shouldCollect)
     }
 
-    private func setState(_ newState: CardTokenizationViewModelState, animated: Bool? = nil) {
+    /// Changes state and animates changes if needed.
+    private func setState(_ newState: CardTokenizationViewModelState) {
         // Changes that may affect layout are animated explicitly to ensure whole view hierarchy
         // is animated properly. Using `withAnimation` inside view model is not perfect (ideally
         // it should be done by view only) but is simpler.
-        if let animated {
-            if animated {
-                withAnimation {
-                    self.state = newState
-                }
-            } else {
+        if state.animationIdentity != newState.animationIdentity {
+            withAnimation {
                 self.state = newState
             }
         } else {
-            setState(newState, animated: state.animationIdentity != newState.animationIdentity)
+            state = newState
         }
     }
 }

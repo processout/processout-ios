@@ -98,7 +98,7 @@ extension CardTokenizationViewModelState {
     var animationIdentity: AnyHashable {
         sections.map { section in
             let itemIds = AnyHashable(section.items.map(\.id))
-            return AnyHashable([section.id, itemIds])
+            return [section.id, itemIds]
         }
     }
 }

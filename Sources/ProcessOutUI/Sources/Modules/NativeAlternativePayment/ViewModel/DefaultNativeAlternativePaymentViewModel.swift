@@ -9,7 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-// swiftlint:disable type_body_length
+// swiftlint:disable type_body_length file_length
 
 final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentViewModel {
 
@@ -94,7 +94,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         case .captured(let state):
             updateSections(state: state)
             focusedItemId = nil
-            actions = []
+            setActions([])
             isCaptured = true
         default:
             break // Ignored
@@ -131,7 +131,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             )
             sections.append(section)
         }
-        self.sections = sections.compactMap { $0 }
+        setSections(sections.compactMap { $0 })
     }
 
     private func updateSections(state: InteractorState.AwaitingCapture) {
@@ -153,7 +153,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         let section = NativeAlternativePaymentViewModelSection(
             id: "awaiting-capture", isCentered: true, title: nil, items: [item], error: nil
         )
-        sections = [section]
+        setSections([section])
     }
 
     private func updateSections(state: InteractorState.Captured) {
@@ -172,7 +172,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         let section = NativeAlternativePaymentViewModelSection(
             id: "captured", isCentered: false, title: nil, items: [.submitted(item)], error: nil
         )
-        sections = [section]
+        setSections([section])
     }
 
     private func createTitleSection(state: InteractorState.Started) -> NativeAlternativePaymentViewModelSection? {
@@ -320,14 +320,14 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             submitAction(state: state, isLoading: isSubmitting),
             cancelAction(configuration: configuration.cancelAction, isEnabled: !isSubmitting && state.isCancellable)
         ]
-        self.actions = actions.compactMap { $0 }
+        setActions(actions.compactMap { $0 })
     }
 
     private func updateActions(state: InteractorState.AwaitingCapture) {
-        let cancelAction = self.cancelAction(
-            configuration: configuration.paymentConfirmation.cancelAction, isEnabled: state.isCancellable
-        )
-        self.actions = [cancelAction].compactMap { $0 }
+        let actions = [
+            cancelAction(configuration: configuration.paymentConfirmation.cancelAction, isEnabled: state.isCancellable)
+        ]
+        setActions(actions.compactMap { $0 })
     }
 
     private func submitAction(state: InteractorState.Started, isLoading: Bool) -> POActionsContainerActionViewModel? {
@@ -377,6 +377,28 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         )
         return action
     }
+
+    // MARK: - Utils
+
+    private func setSections(_ newSection: [NativeAlternativePaymentViewModelSection]) {
+        if sections.map(\.animationIdentity) != newSection.map(\.animationIdentity) {
+            withAnimation {
+                sections = newSection
+            }
+        } else {
+            sections = newSection
+        }
+    }
+
+    private func setActions(_ newActions: [POActionsContainerActionViewModel]) {
+        if actions.count != newActions.count {
+            withAnimation {
+                actions = newActions
+            }
+        } else {
+            actions = newActions
+        }
+    }
 }
 
-// swiftlint:enable type_body_length
+// swiftlint:enable type_body_length file_length

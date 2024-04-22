@@ -33,27 +33,6 @@ struct NativeAlternativePaymentSectionsView: View {
             }
         }
         .padding(.vertical, POSpacing.medium)
-        .animation(.default, value: bodyAnimationValue)
-    }
-
-    // MARK: - Animation
-
-    /// Returns value that should trigger whole body animated update.
-    private var bodyAnimationValue: AnyHashable {
-        sections.map { section in
-            [section.id, section.items.map(animationValue), section.error]
-        }
-    }
-
-    private func animationValue(item: NativeAlternativePaymentViewModelItem) -> AnyHashable {
-        switch item {
-        case .title(let titleItem):
-            return titleItem
-        case .submitted(let submittedItem):
-            return submittedItem
-        default:
-            return item.id
-        }
     }
 
     // MARK: - Partition
