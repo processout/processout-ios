@@ -15,21 +15,25 @@ struct DynamicCheckoutItemView<ViewRouter: Router>: View where ViewRouter.Route 
     let router: ViewRouter
 
     var body: some View {
+        let padding = POSpacing.medium
         switch item {
         case .progress:
             ProgressView()
                 .frame(maxWidth: .infinity)
-        case .expressPayment:
-            EmptyView()
-        case .payment(let paymentItem):
-            DynamicCheckoutPaymentItemView(item: paymentItem)
+                .padding(padding)
+        case .passKitPayment(let item):
+            POPassKitPaymentButton(action: item.action)
+                .padding(.horizontal, padding)
+        case .expressPayment(let item):
+            DynamicCheckoutExpressPaymentItemView(item: item)
+                .padding(.horizontal, padding)
+        case .payment(let item):
+            DynamicCheckoutPaymentItemView(item: item)
+                .padding(.horizontal, padding)
         case .card:
             router.view(for: .card)
-        case .alternativePayment(let alternativePayment):
-            let route = DynamicCheckoutRoute.AlternativePayment(
-                gatewayConfigurationId: alternativePayment.gatewayConfigurationId
-            )
-            router.view(for: .alternativePayment(route))
+        case .alternativePayment(let item):
+            router.view(for: .nativeAlternativePayment(gatewayConfigurationId: item.gatewayConfigurationId))
         }
     }
 
