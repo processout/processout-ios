@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
@@ -22,17 +23,8 @@ struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter: Rout
     var body: some View {
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: POSpacing.medium) {
-                    let sections = Array(viewModel.sections.enumerated())
-                    ForEach(sections, id: \.element.id) { offset, element in
-                        DynamicCheckoutSectionView(section: element, router: router)
-                        if offset + 1 < sections.count {
-                            DynamicCheckoutSectionSeparatorView()
-                        }
-                    }
-                }
-                .padding(.vertical, POSpacing.medium)
-                .backport.geometryGroup() // todo(andrii-vysotskyi): add animation
+                DynamicCheckoutSectionsView(sections: viewModel.sections, router: router)
+                    .backport.geometryGroup() // todo(andrii-vysotskyi): add animation
             }
             .clipped()
             if !viewModel.actions.isEmpty {
