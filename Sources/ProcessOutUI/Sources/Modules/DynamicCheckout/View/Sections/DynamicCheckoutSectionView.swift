@@ -15,6 +15,7 @@ struct DynamicCheckoutSectionView<ViewRouter: Router>: View where ViewRouter.Rou
     let router: ViewRouter
 
     var body: some View {
+        let horizontalPadding = section.areBezelsVisible ? POSpacing.small : 0
         VStack(spacing: POSpacing.small) {
             if let title = section.title, !title.isEmpty {
                 Text(title)
@@ -22,8 +23,11 @@ struct DynamicCheckoutSectionView<ViewRouter: Router>: View where ViewRouter.Rou
                     .onSizeChange { size in
                         titleSize = size
                     }
+                    .padding(.horizontal, horizontalPadding)
             }
-            let items = Array(section.items.enumerated())
+            let items = Array(
+                section.items.enumerated()
+            )
             ForEach(items, id: \.element.id) { offset, element in
                 DynamicCheckoutItemView(item: element, router: router)
                 if section.areSeparatorsVisible, offset + 1 < items.count {
@@ -31,15 +35,18 @@ struct DynamicCheckoutSectionView<ViewRouter: Router>: View where ViewRouter.Rou
                 }
             }
         }
-        .padding(POSpacing.small)
-        .frame(maxWidth: .infinity)
+        .padding(.vertical, section.areBezelsVisible ? POSpacing.small : 0)
         .overlay(borderOverlay)
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
 
     @State
     private var titleSize: CGSize = .zero
+
+    @Environment(\.dynamicCheckoutStyle)
+    private var style
 
     // MARK: - Private Methods
 
@@ -51,7 +58,7 @@ struct DynamicCheckoutSectionView<ViewRouter: Router>: View where ViewRouter.Rou
                 POTrimmedRoundedRectangle(
                     gapWidth: hasTitle ? titleSize.width + POSpacing.small * 2 : 0
                 ),
-                style: .regular(color: .black)
+                style: section.areBezelsVisible ? style.paymentsSection.border : .clear
             )
             .padding(.top, hasTitle ? titleSize.height / 2 + POSpacing.small : 0)
     }
