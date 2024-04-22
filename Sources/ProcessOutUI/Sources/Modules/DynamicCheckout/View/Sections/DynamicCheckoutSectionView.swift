@@ -9,7 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutSectionView<ViewRouter: Router>: View where ViewRouter.Route == DynamicCheckoutRoute {
+struct DynamicCheckoutSectionView<ViewRouter>: View where ViewRouter: Router<DynamicCheckoutRoute> {
 
     let section: DynamicCheckoutViewModelSection
     let router: ViewRouter

@@ -10,7 +10,7 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutSectionsView<ViewRouter: Router>: View where ViewRouter.Route == DynamicCheckoutRoute {
+struct DynamicCheckoutSectionsView<ViewRouter>: View where ViewRouter: Router<DynamicCheckoutRoute> {
 
     init(sections: [DynamicCheckoutViewModelSection], router: ViewRouter) {
         self.sections = sections
@@ -29,7 +29,7 @@ struct DynamicCheckoutSectionsView<ViewRouter: Router>: View where ViewRouter.Ro
                     .frame(maxWidth: .infinity)
                 if offset + 1 < sections.count {
                     POLabeledDivider(
-                        title: String(resource: .DynamicCheckout.Section.separatorText)
+                        title: String(resource: .DynamicCheckout.sectionsDivider)
                     )
                     .labeledDividerStyle(style.sectionsDivider)
                 }
