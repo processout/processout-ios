@@ -15,12 +15,18 @@ extension POStringResource {
 
         enum Button {
 
-            /// Submit button.
-            static let submit = POStringResource("dynamic-checkout.submit-button", comment: "")
+            /// Continue button.
+            static let `continue` = POStringResource("dynamic-checkout.continue-button", comment: "")
 
             /// Cancel button title.
             static let cancel = POStringResource("dynamic-checkout.cancel-button", comment: "")
         }
+
+        /// APM redirect information.
+        static let redirectWarning = POStringResource("dynamic-checkout.redirect-warning", comment: "")
+
+        /// Text to use with divider separating different sections.
+        static let sectionsDivider = POStringResource("dynamic-checkout.sections-divider", comment: "")
     }
 }
 
