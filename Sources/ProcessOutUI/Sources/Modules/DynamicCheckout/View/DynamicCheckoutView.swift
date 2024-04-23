@@ -24,16 +24,18 @@ struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter>: Vie
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
                 DynamicCheckoutSectionsView(sections: viewModel.sections, router: router)
-                    .backport.geometryGroup() // todo(andrii-vysotskyi): add animation
             }
             .clipped()
+            .frame(maxHeight: .infinity)
             if !viewModel.actions.isEmpty {
                 POActionsContainerView(actions: viewModel.actions)
                     .actionsContainerStyle(style.actionsContainer)
             }
         }
-        .background(style.backgroundColor)
-        .animation(.default, value: viewModel.actions.count)
+        .background(
+            style.backgroundColor.ignoresSafeArea()
+        )
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties

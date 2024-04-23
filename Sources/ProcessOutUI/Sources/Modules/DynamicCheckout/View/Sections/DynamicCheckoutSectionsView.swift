@@ -29,7 +29,7 @@ struct DynamicCheckoutSectionsView<ViewRouter>: View where ViewRouter: Router<Dy
                     .frame(maxWidth: .infinity)
                 if offset + 1 < sections.count {
                     POLabeledDivider(
-                        title: String(resource: .DynamicCheckout.sectionsDivider)
+                        title: String(resource: .DynamicCheckout.Section.divider)
                     )
                     .labeledDividerStyle(style.sectionsDivider)
                 }

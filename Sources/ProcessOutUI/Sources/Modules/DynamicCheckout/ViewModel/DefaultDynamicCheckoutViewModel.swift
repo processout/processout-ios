@@ -87,16 +87,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     }
 
     private func updateSectionsWithStartedState(_ state: DynamicCheckoutInteractorState.Started) {
-        let expressItems = state.expressPaymentMethodIds.compactMap { methodId in
-            createItem(paymentMethodId: methodId, state: state, isExpress: true, isProcessing: false)
-        }
-        let expressSection = DynamicCheckoutViewModelSection(
-            id: SectionId.expressMethods,
-            title: "Express Methods",
-            items: expressItems,
-            areSeparatorsVisible: false,
-            areBezelsVisible: true
-        )
+        let expressSection = createExpressMethodsSection(state: state)
         let regularItems = state.regularPaymentMethodIds.compactMap { methodId in
             createItem(paymentMethodId: methodId, state: state, isExpress: false, isProcessing: false)
         }
@@ -107,7 +98,24 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areSeparatorsVisible: true,
             areBezelsVisible: true
         )
-        sections = [expressSection, regularSection].filter { !$0.items.isEmpty }
+        setSections([expressSection, regularSection])
+    }
+
+    private func createExpressMethodsSection(
+        state: DynamicCheckoutInteractorState.Started, processedMethodId: String? = nil
+    ) -> DynamicCheckoutViewModelSection {
+        let expressItems = state.expressPaymentMethodIds.compactMap { methodId in
+            let isProcessing = processedMethodId == methodId
+            return createItem(paymentMethodId: methodId, state: state, isExpress: true, isProcessing: isProcessing)
+        }
+        let section = DynamicCheckoutViewModelSection(
+            id: SectionId.expressMethods,
+            title: String(resource: .DynamicCheckout.Section.expressMethods),
+            items: expressItems,
+            areSeparatorsVisible: false,
+            areBezelsVisible: true
+        )
+        return section
     }
 
     private func createItem(
@@ -178,7 +186,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         }
         var additionalInformation: String?
         if isExternal {
-            additionalInformation = "You will be redirected to finalise this payment"
+            additionalInformation = String(resource: .DynamicCheckout.redirectWarning)
         }
         let item = DynamicCheckoutViewModelItem.Payment(
             id: id,
@@ -192,12 +200,13 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     }
 
     private func updateActionsWithStartedState(_ state: DynamicCheckoutInteractorState.Started) {
-        guard state.isCancellable else {
-            actions = []
-            return
+        let newActions: [POActionsContainerActionViewModel]
+        if state.isCancellable {
+            newActions = [createCancelAction(isEnabled: true)]
+        } else {
+            newActions = []
         }
-        let cancelAction = createCancelAction(isEnabled: true)
-        actions = [cancelAction]
+        setActions(newActions)
     }
 
     // MARK: - Payment Processing
@@ -208,40 +217,20 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     }
 
     private func updateSectionsWithPaymentProcessingState(_ state: DynamicCheckoutInteractorState.PaymentProcessing) {
-        let processingPaymentMethodId = state.pendingPaymentMethodId ?? state.paymentMethodId
-        let expressItems = state.snapshot.expressPaymentMethodIds.compactMap { methodId in
-            let isProcessing = processingPaymentMethodId == methodId
-            return createItem(
-                paymentMethodId: methodId, state: state.snapshot, isExpress: true, isProcessing: isProcessing
-            )
-        }
-        let expressSection = DynamicCheckoutViewModelSection(
-            id: SectionId.expressMethods,
-            title: "Express Methods",
-            items: expressItems,
-            areSeparatorsVisible: false,
-            areBezelsVisible: true
+        let processedPaymentMethodId = state.pendingPaymentMethodId ?? state.paymentMethodId
+        let expressSection = createExpressMethodsSection(
+            state: state.snapshot, processedMethodId: processedPaymentMethodId
         )
-        // todo: for card / native APM that are being processed create another item
         let regularItems = state.snapshot.regularPaymentMethodIds.flatMap { methodId in
-            let isProcessing = processingPaymentMethodId == methodId
+            let isProcessing = state.paymentMethodId == methodId
             let item = createItem(
                 paymentMethodId: methodId, state: state.snapshot, isExpress: false, isProcessing: isProcessing
             )
             guard isProcessing else {
                 return [item]
             }
-            switch state.snapshot.paymentMethods[methodId] {
-            case .nativeAlternativePayment(let paymentMethod):
-                let anotherItem = DynamicCheckoutViewModelItem.alternativePayment(
-                    .init(gatewayConfigurationId: paymentMethod.configuration.gatewayId)
-                )
-                return [item, anotherItem]
-            case .card:
-                return [item, .card]
-            default:
-                return [item]
-            }
+            let itemContent = createProcessedItemContent(state: state.snapshot, methodId: state.paymentMethodId)
+            return [item, itemContent]
         }
         let regularSection = DynamicCheckoutViewModelSection(
             id: SectionId.regularMethods,
@@ -250,13 +239,32 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areSeparatorsVisible: true,
             areBezelsVisible: true
         )
-        sections = [expressSection, regularSection].filter { !$0.items.isEmpty }
+        setSections([expressSection, regularSection])
+    }
+
+    private func createProcessedItemContent(
+        state: DynamicCheckoutInteractorState.Started, methodId: String
+    ) -> DynamicCheckoutViewModelItem? {
+        guard let method = state.paymentMethods[methodId] else {
+            assertionFailure("Unable to resolve payment method by ID")
+            return nil
+        }
+        switch method {
+        case .nativeAlternativePayment(let paymentMethod):
+            return .alternativePayment(
+                .init(gatewayConfigurationId: paymentMethod.configuration.gatewayId)
+            )
+        case .card:
+            return .card
+        default:
+            return nil
+        }
     }
 
     private func updateActionsWithPaymentProcessingState(_ state: DynamicCheckoutInteractorState.PaymentProcessing) {
         let submitAction = createSubmitAction(state)
         let cancelAction = createCancelAction(state)
-        actions = [submitAction, cancelAction].compactMap { $0 }
+        setActions([submitAction, cancelAction].compactMap { $0 })
     }
 
     private func createSubmitAction(
@@ -278,7 +286,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         }
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.submit,
-            title: String(resource: .DynamicCheckout.Button.submit),
+            title: String(resource: .DynamicCheckout.Button.continue),
             isEnabled: isEnabled,
             isLoading: isLoading,
             isPrimary: true,
@@ -312,5 +320,22 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             }
         )
         return viewModel
+    }
+
+    private func setSections(_ newSections: [DynamicCheckoutViewModelSection]) {
+        let newSections = newSections.filter { section in
+            !section.items.isEmpty
+        }
+        let isAnimated = sections.map(\.animationIdentity) != newSections.map(\.animationIdentity)
+        withAnimation(isAnimated ? .default : nil) {
+            sections = newSections
+        }
+    }
+
+    private func setActions(_ newActions: [POActionsContainerActionViewModel]) {
+        let isAnimated = actions.map(\.id) != newActions.map(\.id)
+        withAnimation(isAnimated ? .default : nil) {
+            actions = newActions
+        }
     }
 }
