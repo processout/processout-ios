@@ -45,6 +45,7 @@ struct NativeAlternativePaymentSubmittedItemView: View {
         }
         .padding(.top, isMessageCompact ? Constants.topInset : POSpacing.large)
         .padding(.horizontal, POSpacing.large)
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Private Nested Types

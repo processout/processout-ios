@@ -38,8 +38,6 @@ public struct POCardTokenizationView: View {
                         }
                         .padding(.horizontal, POSpacing.large)
                     }
-                    .animation(.default, value: viewModel.state.sections.map(\.id))
-                    .animation(.default, value: viewModel.state.sections.flatMap(\.items).map(\.id))
                     .padding(.vertical, POSpacing.medium)
                 }
                 .backport.onChange(of: viewModel.state.focusedInputId) {
@@ -47,8 +45,10 @@ public struct POCardTokenizationView: View {
                 }
                 .clipped()
             }
-            POActionsContainerView(actions: viewModel.state.actions)
-                .actionsContainerStyle(style.actionsContainer)
+            if !viewModel.state.actions.isEmpty {
+                POActionsContainerView(actions: viewModel.state.actions)
+                    .actionsContainerStyle(style.actionsContainer)
+            }
         }
         .background(style.backgroundColor.ignoresSafeArea())
     }

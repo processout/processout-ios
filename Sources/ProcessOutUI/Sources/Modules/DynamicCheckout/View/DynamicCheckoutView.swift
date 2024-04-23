@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter: Router>: View
-    where ViewRouter.Route == DynamicCheckoutRoute {
+struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter>: View
+    where ViewRouter: Router<DynamicCheckoutRoute> {
 
     init(viewModel: ViewModel, router: ViewRouter) {
         self._viewModel = .init(wrappedValue: viewModel)
@@ -22,26 +23,19 @@ struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter: Rout
     var body: some View {
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: POSpacing.medium) {
-                    let sections = Array(viewModel.sections.enumerated())
-                    ForEach(sections, id: \.element.id) { offset, element in
-                        DynamicCheckoutSectionView(section: element, router: router)
-                        if offset + 1 < sections.count {
-                            DynamicCheckoutSectionSeparatorView()
-                        }
-                    }
-                }
-                .padding(.vertical, POSpacing.medium)
-                .backport.geometryGroup() // todo(andrii-vysotskyi): add animation
+                DynamicCheckoutSectionsView(sections: viewModel.sections, router: router)
             }
             .clipped()
+            .frame(maxHeight: .infinity)
             if !viewModel.actions.isEmpty {
                 POActionsContainerView(actions: viewModel.actions)
                     .actionsContainerStyle(style.actionsContainer)
             }
         }
-        .background(style.backgroundColor)
-        .animation(.default, value: viewModel.actions.count)
+        .background(
+            style.backgroundColor.ignoresSafeArea()
+        )
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties

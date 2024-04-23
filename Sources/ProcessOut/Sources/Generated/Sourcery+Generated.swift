@@ -1,4 +1,4 @@
-// Generated using Sourcery 2.2.2 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 2.2.3 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 import Foundation
@@ -24,7 +24,6 @@ extension PODynamicCheckoutPaymentMethod.AlternativePayment {
     enum CodingKeys: String, CodingKey {
         case display
         case flow
-        case gatewayConfiguration
         case configuration = "apm"
     }
 }
@@ -32,9 +31,16 @@ extension PODynamicCheckoutPaymentMethod.AlternativePayment {
 extension PODynamicCheckoutPaymentMethod.ApplePay {
 
     enum CodingKeys: String, CodingKey {
-        case display
         case flow
         case configuration = "applepay"
+    }
+}
+
+extension PODynamicCheckoutPaymentMethod.NativeAlternativePayment {
+
+    enum CodingKeys: String, CodingKey {
+        case display
+        case configuration = "apm"
     }
 }
 
@@ -225,6 +231,7 @@ extension POImagesRepository {
     }
 
     /// Downloads image for given resource.
+    @MainActor
     @discardableResult
     public func image(
         resource: POImageRemoteResource,
@@ -263,14 +270,14 @@ extension POInvoicesService {
         }
     }
 
-    /// Requests information needed to initiate dynamic checkout session.
+    /// Invoice details.
     @discardableResult
-    public func dynamicCheckoutPaymentDetails(
-        request: PODynamicCheckoutPaymentDetailsRequest,
-        completion: @escaping (Result<PODynamicCheckoutPaymentDetails, POFailure>) -> Void
+    public func invoice(
+        request: POInvoiceRequest,
+        completion: @escaping (Result<POInvoice, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            try await dynamicCheckoutPaymentDetails(request: request)
+            try await invoice(request: request)
         }
     }
 

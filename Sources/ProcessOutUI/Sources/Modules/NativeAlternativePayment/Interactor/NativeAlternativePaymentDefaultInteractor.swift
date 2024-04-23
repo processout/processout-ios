@@ -406,13 +406,13 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func setState(_ state: NativeAlternativePaymentInteractorState) {
         self.state = state
-        delegate?.nativeAlternativePayment(coordinator: self, didChangeState: paymentState)
+        delegate?.nativeAlternativePayment(didChangeState: .init(state: state))
     }
 
     private func send(event: PONativeAlternativePaymentMethodEvent) {
         assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
-        delegate?.nativeAlternativePayment(coordinator: self, didEmitEvent: event)
+        delegate?.nativeAlternativePayment(didEmitEvent: event)
     }
 
     @MainActor
@@ -472,7 +472,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         let defaultValues = await delegate?.nativeAlternativePayment(
-            coordinator: self, defaultValuesFor: parameters.map(\.specification)
+            defaultValuesFor: parameters.map(\.specification)
         )
         for (offset, parameter) in parameters.enumerated() {
             let defaultValue: String?
@@ -559,27 +559,27 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 }
 
-extension NativeAlternativePaymentDefaultInteractor: PONativeAlternativePaymentCoordinator {
+extension PONativeAlternativePaymentState {
 
-    var paymentState: PONativeAlternativePaymentState {
+    init(state: NativeAlternativePaymentInteractorState) {
         switch state {
         case .idle:
-            return .idle
+            self = .idle
         case .starting:
-            return .starting
+            self = .starting
         case .started(let startedState):
             let state = PONativeAlternativePaymentState.Started(
                 isSubmittable: startedState.areParametersValid, isCancellable: startedState.isCancellable
             )
-            return .started(state)
+            self = .started(state)
         case .submitting:
-            return .submitting(.init(isCancellable: false))
+            self = .submitting(.init(isCancellable: false))
         case .awaitingCapture(let awaitingCaptureState):
-            return .submitting(.init(isCancellable: awaitingCaptureState.isCancellable))
+            self = .submitting(.init(isCancellable: awaitingCaptureState.isCancellable))
         case .submitted, .captured:
-            return .completed(result: .success(()))
+            self = .completed(result: .success(()))
         case .failure(let failure):
-            return .completed(result: .failure(failure))
+            self = .completed(result: .failure(failure))
         }
     }
 }

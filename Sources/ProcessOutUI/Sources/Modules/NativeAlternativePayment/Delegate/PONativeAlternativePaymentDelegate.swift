@@ -13,42 +13,32 @@ import ProcessOut
 public protocol PONativeAlternativePaymentDelegate: AnyObject {
 
     /// Invoked when module emits event.
-    func nativeAlternativePayment(
-        coordinator: PONativeAlternativePaymentCoordinator, didEmitEvent event: PONativeAlternativePaymentEvent
-    )
+    func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentEvent)
 
     /// Method provides an ability to supply default values for given parameters. Completion expects dictionary
     /// where key is a parameter key, and value is desired default. It is not mandatory to provide defaults for
     /// all parameters.
     func nativeAlternativePayment(
-        coordinator: PONativeAlternativePaymentCoordinator,
         defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]
     ) async -> [String: String]
 
     /// Notifies delegate about state change.
-    func nativeAlternativePayment(
-        coordinator: PONativeAlternativePaymentCoordinator, didChangeState state: PONativeAlternativePaymentState
-    )
+    func nativeAlternativePayment(didChangeState state: PONativeAlternativePaymentState)
 }
 
 extension PONativeAlternativePaymentDelegate {
 
-    public func nativeAlternativePayment(
-        coordinator: PONativeAlternativePaymentCoordinator, didEmitEvent event: PONativeAlternativePaymentEvent
-    ) {
+    public func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentEvent) {
         // Ignored
     }
 
     public func nativeAlternativePayment(
-        coordinator: PONativeAlternativePaymentCoordinator,
         defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]
     ) async -> [String: String] {
         [:]
     }
 
-    public func nativeAlternativePayment(
-        coordinator: PONativeAlternativePaymentCoordinator, didChangeState state: PONativeAlternativePaymentState
-    ) {
+    public func nativeAlternativePayment(didChangeState state: PONativeAlternativePaymentState) {
         // Ignored
     }
 }

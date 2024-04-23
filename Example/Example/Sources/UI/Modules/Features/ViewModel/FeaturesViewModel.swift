@@ -6,10 +6,14 @@
 //
 
 import Foundation
+import PassKit
+@_spi(PO) import ProcessOut
+import ProcessOutUI
 
 final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesViewModelType {
 
-    init(router: any RouterType<FeaturesRoute>) {
+    init(invoicesService: POInvoicesService, router: any RouterType<FeaturesRoute>) {
+        self.invoicesService = invoicesService
         self.router = router
         super.init(state: .idle)
     }
@@ -46,6 +50,13 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
                 select: { [weak self] in
                     self?.startCardTokenization(threeDSService: .checkout)
                 }
+            ),
+            .init(
+                name: Strings.Features.DynamicCheckout.title,
+                accessibilityId: "features.dynamic-checkout",
+                select: { [weak self] in
+                    self?.startDynamicCheckout()
+                }
             )
         ])
         state = .started(startedState)
@@ -53,6 +64,7 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
 
     // MARK: - Private Properties
 
+    private let invoicesService: POInvoicesService
     private let router: any RouterType<FeaturesRoute>
 
     // MARK: - Private Methods
@@ -73,5 +85,35 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
             self?.router.trigger(route: .alert(message: message))
         }
         router.trigger(route: route)
+    }
+
+    private func startDynamicCheckout() {
+        Task { @MainActor in
+            let invoiceCreationRequest = POInvoiceCreationRequest(name: "Example", amount: "100", currency: "USD")
+            guard let invoice = try? await self.invoicesService.createInvoice(request: invoiceCreationRequest) else {
+                return
+            }
+            var configuraiton = PODynamicCheckoutConfiguration(invoiceId: invoice.id)
+            configuraiton.alternativePayment.returnUrl = Constants.returnUrl
+            self.router.trigger(route: .dynamicCheckout(configuration: configuraiton, delegate: self))
+        }
+    }
+}
+
+extension FeaturesViewModel: PODynamicCheckoutDelegate {
+
+    // swiftlint:disable:next unavailable_function
+    func dynamicCheckout(
+        willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest
+    ) async -> any PO3DSService {
+        preconditionFailure()
+    }
+
+    func dynamicCheckout(
+        passKitPaymentRequestWith configuration: PODynamicCheckoutPaymentMethod.ApplePayConfiguration
+    ) async -> PKPaymentRequest? {
+        let request = PKPaymentRequest()
+        request.merchantIdentifier = configuration.merchantId
+        return request
     }
 }

@@ -40,7 +40,7 @@ final class DefaultCardTokenizationInteractor:
         guard case .idle = state else {
             return
         }
-        delegate?.cardTokenization(coordinator: self, didEmitEvent: .willStart)
+        delegate?.cardTokenization(didEmitEvent: .willStart)
         let startedState = State.Started(
             number: .init(id: \.number, formatter: cardNumberFormatter),
             expiration: .init(id: \.expiration, formatter: cardExpirationFormatter),
@@ -51,7 +51,7 @@ final class DefaultCardTokenizationInteractor:
             address: defaultAddressParameters
         )
         setStateUnchecked(.started(startedState))
-        delegate?.cardTokenization(coordinator: self, didEmitEvent: .didStart)
+        delegate?.cardTokenization(didEmitEvent: .didStart)
         logger.debug("Did start card tokenization flow")
     }
 
@@ -81,7 +81,7 @@ final class DefaultCardTokenizationInteractor:
             break
         }
         setStateUnchecked(.started(startedState))
-        delegate?.cardTokenization(coordinator: self, didEmitEvent: .parametersChanged)
+        delegate?.cardTokenization(didEmitEvent: .parametersChanged)
     }
 
     func setPreferredScheme(_ scheme: String) {
@@ -98,7 +98,7 @@ final class DefaultCardTokenizationInteractor:
         }
         startedState.preferredScheme = scheme
         setStateUnchecked(.started(startedState))
-        delegate?.cardTokenization(coordinator: self, didEmitEvent: .parametersChanged)
+        delegate?.cardTokenization(didEmitEvent: .parametersChanged)
     }
 
     @MainActor func tokenize() {
@@ -110,7 +110,7 @@ final class DefaultCardTokenizationInteractor:
             return
         }
         logger.debug("Will tokenize card")
-        delegate?.cardTokenization(coordinator: self, didEmitEvent: .willTokenizeCard)
+        delegate?.cardTokenization(didEmitEvent: .willTokenizeCard)
         setStateUnchecked(.tokenizing(snapshot: startedState))
         let request = POCardTokenizationRequest(
             number: cardNumberFormatter.normalized(number: startedState.number.value),
@@ -126,8 +126,8 @@ final class DefaultCardTokenizationInteractor:
             do {
                 let card = try await cardsService.tokenize(request: request)
                 logger.debug("Did tokenize card: \(String(describing: card))")
-                delegate?.cardTokenization(coordinator: self, didEmitEvent: .didTokenize(card: card))
-                try await delegate?.cardTokenization(coordinator: self, didTokenizeCard: card)
+                delegate?.cardTokenization(didEmitEvent: .didTokenize(card: card))
+                try await delegate?.cardTokenization(didTokenizeCard: card)
                 setTokenizedState(card: card)
             } catch let error as POFailure {
                 restoreStartedState(tokenizationFailure: error)
@@ -168,7 +168,7 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - State Management
 
     private func restoreStartedState(tokenizationFailure failure: POFailure) {
-        let shouldContinue = delegate?.cardTokenization(coordinator: self, shouldContinueAfter: failure) ?? true
+        let shouldContinue = delegate?.cardTokenization(shouldContinueAfter: failure) ?? true
         guard shouldContinue, case .tokenizing(var startedState) = state else {
             setFailureStateUnchecked(failure: failure)
             return
@@ -219,7 +219,7 @@ final class DefaultCardTokenizationInteractor:
         let tokenizedState = State.Tokenized(card: card, cardNumber: snapshot.number.value)
         setStateUnchecked(.tokenized(tokenizedState))
         logger.info("Did tokenize and process card", attributes: ["CardId": card.id])
-        delegate?.cardTokenization(coordinator: self, didEmitEvent: .didComplete)
+        delegate?.cardTokenization(didEmitEvent: .didComplete)
         completion(.success(card))
     }
 
@@ -273,9 +273,7 @@ final class DefaultCardTokenizationInteractor:
         if !resolvePreferredScheme {
             startedState.preferredScheme = nil
         } else if let issuerInformation, let delegate = delegate {
-            startedState.preferredScheme = delegate.cardTokenization(
-                coordinator: self, preferredSchemeFor: issuerInformation
-            )
+            startedState.preferredScheme = delegate.cardTokenization(preferredSchemeFor: issuerInformation)
         } else {
             startedState.preferredScheme = issuerInformation?.scheme
         }
@@ -416,24 +414,24 @@ final class DefaultCardTokenizationInteractor:
 
     private func setStateUnchecked(_ state: State) {
         self.state = state
-        delegate?.cardTokenization(coordinator: self, didChangeState: tokenizationState)
+        delegate?.cardTokenization(didChangeState: POCardTokenizationState(state: state))
     }
 }
 
-extension DefaultCardTokenizationInteractor: POCardTokenizationCoordinator {
+extension POCardTokenizationState {
 
-    var tokenizationState: POCardTokenizationState {
+    fileprivate init(state: CardTokenizationInteractorState) { // swiftlint:disable:this strict_fileprivate
         switch state {
         case .idle:
-            return .idle
+            self = .idle
         case .started(let startedState):
-            return .started(isSubmittable: startedState.areParametersValid)
+            self = .started(isSubmittable: startedState.areParametersValid)
         case .tokenizing:
-            return .tokenizing
+            self = .tokenizing
         case .tokenized(let tokenized):
-            return .completed(result: .success(tokenized.card))
+            self = .completed(result: .success(tokenized.card))
         case .failure(let failure):
-            return .completed(result: .failure(failure))
+            self = .completed(result: .failure(failure))
         }
     }
 }

@@ -16,13 +16,10 @@ public enum PODynamicCheckoutPaymentMethod {
     public struct ApplePayConfiguration: Decodable {
 
         /// Merchant ID.
-        public let merchantIdentifier: String
+        public let merchantId: String
     }
 
     public struct ApplePay: Decodable { // sourcery: AutoCodingKeys
-
-        /// Display information.
-        public let display: Display
 
         /// Payment flow.
         public let flow: Flow?
@@ -31,16 +28,27 @@ public enum PODynamicCheckoutPaymentMethod {
         public let configuration: ApplePayConfiguration // sourcery:coding: key="applepay"
     }
 
-    // MARK: - APM
+    // MARK: - Native APM
 
-    public struct NativeAlternativePayment: Decodable {
+    public struct NativeAlternativePayment: Decodable { // sourcery: AutoCodingKeys
 
         /// Display information.
         public let display: Display
 
         /// Gateway configuration.
-        public let gatewayConfiguration: GatewayConfiguration
+        public let configuration: NativeAlternativePaymentConfiguration // sourcery:coding: key="apm"
     }
+
+    public struct NativeAlternativePaymentConfiguration: Decodable {
+
+        /// Gateway configuration ID.
+        public let gatewayConfigurationUid: String
+
+        /// Gateway name.
+        public let gatewayName: String
+    }
+
+    // MARK: - APM
 
     public struct AlternativePayment: Decodable { // sourcery: AutoCodingKeys
 
@@ -49,9 +57,6 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Payment flow.
         public let flow: Flow?
-
-        /// Gateway configuration.
-        public let gatewayConfiguration: GatewayConfiguration
 
         /// Payment configuration.
         public let configuration: AlternativePaymentConfiguration // sourcery:coding: key="apm"
@@ -63,13 +68,12 @@ public enum PODynamicCheckoutPaymentMethod {
         public let redirectUrl: URL
     }
 
-    public struct GatewayConfiguration: Decodable {
+    // MARK: - Card
 
-        /// Gateway ID.
-        public let id: String
+    public struct Card: Decodable {
 
-        /// Gateway subaccount.
-        public let subaccount: String
+        /// Display information.
+        public let display: Display
     }
 
     // MARK: - Common
@@ -86,7 +90,7 @@ public enum PODynamicCheckoutPaymentMethod {
         public private(set) var brandColor: UIColor
     }
 
-    public enum Flow: Decodable {
+    public enum Flow: String, Decodable {
         case express
     }
 
@@ -100,7 +104,7 @@ public enum PODynamicCheckoutPaymentMethod {
     case nativeAlternativePayment(NativeAlternativePayment)
 
     /// Card.
-    case card
+    case card(Card)
 
     /// Unknown payment method.
     case unknown(type: String)
@@ -123,7 +127,8 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
                 self = .nativeAlternativePayment(nativeAlternativePayment)
             }
         case "card":
-            self = .card
+            let card = try Card(from: decoder)
+            self = .card(card)
         default:
             self = .unknown(type: type)
         }
@@ -136,21 +141,29 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
     }
 }
 
-@_spi(PO)
+extension PODynamicCheckoutPaymentMethod.NativeAlternativePaymentConfiguration {
+
+    @_spi(PO)
+    public var gatewayId: String {
+        gatewayConfigurationUid + "." + gatewayName
+    }
+}
+
 extension PODynamicCheckoutPaymentMethod: Identifiable {
 
+    @_spi(PO)
     public var id: String {
         switch self {
-        case .applePay:
-            return "applepay"
-        case .alternativePayment(let payment):
-            return "apm_" + payment.gatewayConfiguration.id + "." + payment.gatewayConfiguration.subaccount
-        case .nativeAlternativePayment(let payment):
-            return "napm_" + payment.gatewayConfiguration.id + "." + payment.gatewayConfiguration.subaccount
+        case .applePay(let method):
+            return "applepay_" + method.configuration.merchantId
+        case .alternativePayment(let method):
+            return "apm_" + method.configuration.redirectUrl.absoluteString
+        case .nativeAlternativePayment(let method):
+            return "napm_" + method.configuration.gatewayId
         case .card:
             return "card"
         case .unknown(let type):
-            return "unknown" + type
+            return "unknown_" + type
         }
     }
 }

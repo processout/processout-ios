@@ -44,7 +44,9 @@ public struct PORadioButtonStyle: ButtonStyle {
             let style = currentStyle(isSelected: isSelected, isInvalid: isInvalid, isPressed: configuration.isPressed)
             Label(
                 title: {
-                    configuration.label.textStyle(style.value, addPadding: false)
+                     configuration.label
+                        .textStyle(style.value, addPadding: false)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 },
                 icon: {
                     ZStack {
@@ -60,7 +62,7 @@ public struct PORadioButtonStyle: ButtonStyle {
                 }
             )
             .padding(.vertical, Constants.minVerticalPadding)
-            .frame(maxWidth: .infinity, minHeight: Constants.minHeight, alignment: .leading)
+            .frame(minHeight: Constants.minHeight)
             .animation(.default, value: isSelected)
             .contentShape(.rect)
         }

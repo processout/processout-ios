@@ -36,14 +36,20 @@ public struct PODynamicCheckoutView: View {
             alternativePaymentInteractor: DynamicCheckoutAlternativePaymentDefaultInteractor(
                 configuration: configuration.alternativePayment
             ),
+            childProvider: DefaultDynamicCheckoutInteractorChildProvider(
+                configuration: configuration,
+                cardsService: ProcessOut.shared.cards,
+                invoicesService: ProcessOut.shared.invoices,
+                imagesRepository: ProcessOut.shared.images,
+                logger: logger
+            ),
             invoicesService: ProcessOut.shared.invoices,
             logger: logger,
             completion: completion
         )
         let viewModel = DefaultDynamicCheckoutViewModel(interactor: interactor)
         let router = DefaultDynamicCheckoutRouter(
-            configuration: configuration,
-            cardTokenizationDelegate: interactor
+            delegate: interactor
         )
         return DynamicCheckoutView(viewModel: viewModel, router: router)
     }

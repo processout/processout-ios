@@ -13,7 +13,7 @@ import SwiftUI
 
 final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
-    init(interactor: some CardTokenizationInteractor) {
+    init(interactor: any CardTokenizationInteractor) {
         self.interactor = interactor
         state = .idle
         observeChanges(interactor: interactor)
@@ -51,7 +51,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     // MARK: - Private Methods
 
-    private func observeChanges(interactor: some CardTokenizationInteractor) {
+    private func observeChanges(interactor: any Interactor) {
         interactor.didChange = { [weak self] in
             self?.configureWithInteractorState()
         }
@@ -63,9 +63,11 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         case .idle:
             state = .idle
         case .started(let startedState):
-            state = convertToState(startedState: startedState, isSubmitting: false)
+            let newState = convertToState(startedState: startedState, isSubmitting: false)
+            setState(newState)
         case .tokenizing(let startedState):
-            state = convertToState(startedState: startedState, isSubmitting: true)
+            let newState = convertToState(startedState: startedState, isSubmitting: true)
+            setState(newState)
         default:
             break
         }
@@ -401,6 +403,17 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             startedState.address.postalCode
         ]
         return parameters.filter(\.shouldCollect)
+    }
+
+    /// Changes state and animates changes if needed.
+    private func setState(_ newState: CardTokenizationViewModelState) {
+        // Changes that may affect layout are animated explicitly to ensure whole view hierarchy
+        // is animated properly. Using `withAnimation` inside view model is not perfect (ideally
+        // it should be done by view only) but is simpler.
+        let isAnimated = state.animationIdentity != newState.animationIdentity
+        withAnimation(isAnimated ? .default : nil) {
+            self.state = newState
+        }
     }
 }
 

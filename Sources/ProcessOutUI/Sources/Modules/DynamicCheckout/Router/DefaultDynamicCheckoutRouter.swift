@@ -10,32 +10,26 @@ import SwiftUI
 @available(iOS 14, *)
 struct DefaultDynamicCheckoutRouter: Router {
 
-    /// Configuration.
-    let configuration: PODynamicCheckoutConfiguration
+    init(delegate: DynamicCheckoutRouterDelegate) {
+        self.delegate = delegate
+    }
 
-    /// Card tokenization delegate.
-    weak var cardTokenizationDelegate: POCardTokenizationDelegate?
+    // MARK: - Router
 
-    @ViewBuilder
     func view(for route: DynamicCheckoutRoute) -> some View {
-        // todo(andrii-vysotskyi): finish routes configuration
         switch route {
         case .card:
-            let cardTokenizationConfiguration = POCardTokenizationConfiguration(
-                title: "",
-                isCardholderNameInputVisible: configuration.card.isCardholderNameInputVisible,
-                primaryActionTitle: "",
-                cancelActionTitle: "",
-                billingAddress: configuration.card.billingAddress,
-                metadata: configuration.card.metadata
-            )
-            POCardTokenizationView(
-                configuration: cardTokenizationConfiguration,
-                delegate: cardTokenizationDelegate,
-                completion: { _ in /* Ignored */ }
-            )
-        case .alternativePayment:
-            EmptyView()
+            if let interactor = delegate?.routerWillRouteToCardTokenization(self) {
+                POCardTokenizationView(interactor: interactor)
+            }
+        case .nativeAlternativePayment(let id):
+            if let interactor = delegate?.router(self, willRouteToNativeAlternativePaymentWith: id) {
+                PONativeAlternativePaymentView(interactor: interactor)
+            }
         }
     }
+
+    // MARK: - Private Properties
+
+    private weak var delegate: DynamicCheckoutRouterDelegate?
 }

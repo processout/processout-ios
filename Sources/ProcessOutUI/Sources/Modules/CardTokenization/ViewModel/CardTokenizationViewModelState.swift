@@ -89,6 +89,18 @@ extension CardTokenizationViewModelState {
     static var idle: Self {
         Self(title: nil, sections: [], actions: [], focusedInputId: nil)
     }
+
+    /// State's animation identity. For now only properties that may affect layout
+    /// changes are part of identity.
+    ///
+    /// - NOTE: When this property changes view should be updated with
+    /// explicit animation.
+    var animationIdentity: AnyHashable {
+        let sectionsIdentity = sections.map { section in
+            [section.id, section.items.map(\.id)]
+        }
+        return [sectionsIdentity, AnyHashable(actions.map(\.id))]
+    }
 }
 
 extension CardTokenizationViewModelState.Item: Identifiable {

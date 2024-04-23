@@ -6,8 +6,18 @@
 //
 
 import SwiftUI
+import ProcessOut
 
 enum DynamicCheckoutViewModelItem {
+
+    struct PassKitPayment {
+
+        /// Id.
+        let id: String
+
+        /// Action handler.
+        let action: () -> Void
+    }
 
     struct ExpressPayment: Identifiable {
 
@@ -15,16 +25,13 @@ enum DynamicCheckoutViewModelItem {
         let id: String
 
         /// Item title.
-        let title: String?
+        let title: String
 
         /// Payment icon image
-        let iconImage: UIImage?
+        let iconImageResource: POImageRemoteResource
 
         /// Brand color.
-        let brandColor: Color
-
-        /// Boolean value indicating whether button should display loading indicator.
-        let isLoading: Bool
+        let brandColor: UIColor
 
         /// Action handler.
         let action: () -> Void
@@ -35,8 +42,11 @@ enum DynamicCheckoutViewModelItem {
         /// Item identifier.
         let id: String
 
-        // Payment icon image
-        let iconImage: UIImage?
+        /// Payment icon image
+        let iconImageResource: POImageRemoteResource
+
+        /// Brand color.
+        let brandColor: UIColor
 
         /// Item title.
         let title: String
@@ -55,7 +65,8 @@ enum DynamicCheckoutViewModelItem {
         let gatewayConfigurationId: String
     }
 
-    case progress, expressPayment(ExpressPayment), payment(Payment), card, alternativePayment(AlternativePayment)
+    // swiftlint:disable:next line_length
+    case progress, passKitPayment(PassKitPayment), expressPayment(ExpressPayment), payment(Payment), card, alternativePayment(AlternativePayment)
 }
 
 extension DynamicCheckoutViewModelItem: Identifiable {
@@ -64,6 +75,8 @@ extension DynamicCheckoutViewModelItem: Identifiable {
         switch self {
         case .progress:
             return Constants.progressId
+        case .passKitPayment(let item):
+            return item.id
         case .expressPayment(let item):
             return item.id
         case .payment(let item):

@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import ProcessOut
 
 protocol DynamicCheckoutAlternativePaymentInteractor {
 
     /// Starts alternative payment.
-    func start(url: URL) async throws
+    func start(url: URL) async throws -> POAlternativePaymentMethodResponse
 }
