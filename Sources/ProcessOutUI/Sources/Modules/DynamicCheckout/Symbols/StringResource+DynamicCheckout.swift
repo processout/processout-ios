@@ -22,11 +22,17 @@ extension POStringResource {
             static let cancel = POStringResource("dynamic-checkout.cancel-button", comment: "")
         }
 
+        enum Section {
+
+            /// Express payment methods section title.
+            static let expressMethods = POStringResource("dynamic-checkout.express-methods", comment: "")
+
+            /// Text to use with divider separating different sections.
+            static let divider = POStringResource("dynamic-checkout.sections-divider", comment: "")
+        }
+
         /// APM redirect information.
         static let redirectWarning = POStringResource("dynamic-checkout.redirect-warning", comment: "")
-
-        /// Text to use with divider separating different sections.
-        static let sectionsDivider = POStringResource("dynamic-checkout.sections-divider", comment: "")
     }
 }
 
