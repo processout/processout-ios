@@ -9,7 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-// swiftlint:disable type_body_length file_length
+// swiftlint:disable type_body_length
 
 final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentViewModel {
 
@@ -380,25 +380,21 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     // MARK: - Utils
 
-    private func setSections(_ newSection: [NativeAlternativePaymentViewModelSection]) {
-        if sections.map(\.animationIdentity) != newSection.map(\.animationIdentity) {
-            withAnimation {
-                sections = newSection
-            }
-        } else {
-            sections = newSection
+    private func setSections(_ newSections: [NativeAlternativePaymentViewModelSection]) {
+        let isAnimated = sections.map(\.animationIdentity) != newSections.map(\.animationIdentity)
+        withAnimation(isAnimated ? .default : nil) {
+            sections = newSections
         }
+        sections = newSections
     }
 
     private func setActions(_ newActions: [POActionsContainerActionViewModel]) {
-        if actions.count != newActions.count {
-            withAnimation {
-                actions = newActions
-            }
-        } else {
+        let isAnimated = actions.count != newActions.count
+        withAnimation(isAnimated ? .default : nil) {
             actions = newActions
         }
+        actions = newActions
     }
 }
 
-// swiftlint:enable type_body_length file_length
+// swiftlint:enable type_body_length

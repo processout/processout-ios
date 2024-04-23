@@ -410,12 +410,9 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         // Changes that may affect layout are animated explicitly to ensure whole view hierarchy
         // is animated properly. Using `withAnimation` inside view model is not perfect (ideally
         // it should be done by view only) but is simpler.
-        if state.animationIdentity != newState.animationIdentity {
-            withAnimation {
-                self.state = newState
-            }
-        } else {
-            state = newState
+        let isAnimated = state.animationIdentity != newState.animationIdentity
+        withAnimation(isAnimated ? .default : nil) {
+            self.state = newState
         }
     }
 }
