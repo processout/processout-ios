@@ -25,7 +25,6 @@ public struct POAsyncImage<Content: View>: View {
         self.image = image
         self.transaction = transaction
         self.content = content
-        phase = .empty
     }
 
     public var body: some View {
@@ -43,7 +42,7 @@ public struct POAsyncImage<Content: View>: View {
     private let content: (POAsyncImagePhase) -> Content
 
     @State
-    private var phase: POAsyncImagePhase
+    private var phase: POAsyncImagePhase = .empty
 
     @Environment(\.colorScheme)
     private var colorScheme
