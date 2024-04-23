@@ -68,11 +68,14 @@ final class DynamicCheckoutDefaultInteractor:
             case .nativeAlternativePayment(let payment):
                 initiateNativeAlternativePayment(payment, methodId: methodId, startedState: startedState)
             default:
-                return false // todo(andrii-vysotskyi): handle other payment methods
+                return false
             }
             delegate?.dynamicCheckout(didEmitEvent: .didSelectPaymentMethod)
             return true
-        case .paymentProcessing(var paymentProcessingState) where paymentProcessingState.isCancellable && paymentProcessingState.paymentMethodId != methodId: // swiftlint:disable:this line_length
+        case .paymentProcessing(var paymentProcessingState):
+            guard paymentProcessingState.isCancellable, paymentProcessingState.paymentMethodId != methodId else {
+                return false
+            }
             paymentProcessingState.pendingPaymentMethodId = methodId
             state = .paymentProcessing(paymentProcessingState)
             cancel()
@@ -88,6 +91,15 @@ final class DynamicCheckoutDefaultInteractor:
             cardTokenizationInteractor?.tokenize()
         case .nativeAlternativePayment:
             nativeAlternativePaymentInteractor?.submit()
+        case .alternativePayment(let payment):
+            Task { @MainActor in
+                do {
+                    _ = try await alternativePaymentInteractor.start(url: payment.configuration.redirectUrl)
+                    setSuccessState()
+                } catch {
+                    self.restoreStateAfterPaymentProcessingFailureIfPossible(error)
+                }
+            }
         case nil:
             assertionFailure("No payment method to submit")
         default:
@@ -108,6 +120,11 @@ final class DynamicCheckoutDefaultInteractor:
                 return cardTokenizationInteractor?.cancel() ?? false
             case .nativeAlternativePayment:
                 return nativeAlternativePaymentInteractor?.cancel() ?? false
+            case .alternativePayment:
+                // todo: cancel only pending alternative payment
+                let failure = POFailure(code: .cancelled)
+                restoreStateAfterPaymentProcessingFailureIfPossible(failure)
+                return true
             default:
                 assertionFailure("Currently active payment method can't be cancelled.")
                 return false
@@ -271,6 +288,8 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Card Payment
 
     private func initiateCardPayment(methodId: String, startedState: State.Started) {
+        let interactor = childProvider.cardTokenizationInteractor(delegate: self)
+        cardTokenizationInteractor = interactor
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: methodId,
@@ -278,9 +297,7 @@ final class DynamicCheckoutDefaultInteractor:
             isCancellable: false
         )
         state = .paymentProcessing(paymentProcessingState)
-        let interactor = childProvider.cardTokenizationInteractor(delegate: self)
         interactor.start()
-        cardTokenizationInteractor = interactor
     }
 
     // MARK: - Alternative Payment
@@ -290,13 +307,26 @@ final class DynamicCheckoutDefaultInteractor:
         methodId: String,
         startedState: State.Started
     ) {
+        let isExpress = startedState.expressPaymentMethodIds.contains(methodId)
+        let submission: DynamicCheckoutInteractorState.PaymentSubmission
+        let isCancellable: Bool
+        if isExpress {
+            submission = .submitting
+            isCancellable = false
+        } else {
+            submission = .possible
+            isCancellable = true
+        }
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: methodId,
-            submission: .submitting,
-            isCancellable: false
+            submission: submission,
+            isCancellable: isCancellable
         )
         state = .paymentProcessing(paymentProcessingState)
+        guard isExpress else {
+            return
+        }
         Task { @MainActor in
             do {
                 _ = try await alternativePaymentInteractor.start(url: payment.configuration.redirectUrl)
@@ -312,6 +342,10 @@ final class DynamicCheckoutDefaultInteractor:
         methodId: String,
         startedState: State.Started
     ) {
+        let interactor = childProvider.nativeAlternativePaymentInteractor(
+            gatewayId: payment.configuration.gatewayId, delegate: self
+        )
+        self.nativeAlternativePaymentInteractor = interactor
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: methodId,
@@ -319,11 +353,7 @@ final class DynamicCheckoutDefaultInteractor:
             isCancellable: false
         )
         state = .paymentProcessing(paymentProcessingState)
-        let interactor = childProvider.nativeAlternativePaymentInteractor(
-            gatewayId: payment.configuration.gatewayId, delegate: self
-        )
         interactor.start()
-        self.nativeAlternativePaymentInteractor = interactor
     }
 
     // MARK: - Started State Restoration
