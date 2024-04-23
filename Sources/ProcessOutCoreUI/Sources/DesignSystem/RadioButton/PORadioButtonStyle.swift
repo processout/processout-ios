@@ -46,7 +46,7 @@ public struct PORadioButtonStyle: ButtonStyle {
                 title: {
                      configuration.label
                         .textStyle(style.value, addPadding: false)
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 },
                 icon: {
                     ZStack {
@@ -62,7 +62,7 @@ public struct PORadioButtonStyle: ButtonStyle {
                 }
             )
             .padding(.vertical, Constants.minVerticalPadding)
-            .frame(minHeight: Constants.minHeight, alignment: .leading)
+            .frame(minHeight: Constants.minHeight)
             .animation(.default, value: isSelected)
             .contentShape(.rect)
         }
