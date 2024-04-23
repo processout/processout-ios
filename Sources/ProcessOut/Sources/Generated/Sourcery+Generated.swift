@@ -31,7 +31,6 @@ extension PODynamicCheckoutPaymentMethod.AlternativePayment {
 extension PODynamicCheckoutPaymentMethod.ApplePay {
 
     enum CodingKeys: String, CodingKey {
-        case display
         case flow
         case configuration = "applepay"
     }
@@ -232,6 +231,7 @@ extension POImagesRepository {
     }
 
     /// Downloads image for given resource.
+    @MainActor
     @discardableResult
     public func image(
         resource: POImageRemoteResource,
