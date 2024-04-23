@@ -31,6 +31,6 @@ extension POAsyncImage {
                 return ViewBuilder.buildEither(second: placeholder())
             }
         }
-        self.init(image: image, transaction: transaction, content: _content)
+        self.init(id: resource, image: image, transaction: transaction, content: _content)
     }
 }

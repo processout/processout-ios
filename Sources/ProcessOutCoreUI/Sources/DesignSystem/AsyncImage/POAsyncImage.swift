@@ -16,10 +16,12 @@ public struct POAsyncImage<Content: View>: View {
     ///   - content: A closure that takes the load phase as an input,
     ///   and returns the view to display for the specified phase.
     public init(
+        id: AnyHashable,
         image: @Sendable @escaping () async throws -> Image?,
         transaction: Transaction,
         @ViewBuilder content: @escaping (POAsyncImagePhase) -> Content
     ) {
+        self.id = id
         self.image = image
         self.transaction = transaction
         self.content = content
@@ -27,11 +29,15 @@ public struct POAsyncImage<Content: View>: View {
     }
 
     public var body: some View {
-        content(phase).backport.task(priority: .userInitiated, resolveImage)
+        ZStack {
+            content(phase)
+        }
+        .backport.task(id: id, priority: .userInitiated, resolveImage)
     }
 
     // MARK: - Private Properties
 
+    private let id: AnyHashable
     private let image: @Sendable () async throws -> Image?
     private let transaction: Transaction
     private let content: (POAsyncImagePhase) -> Content
@@ -46,15 +52,26 @@ public struct POAsyncImage<Content: View>: View {
 
     /// Implementation resolves image and updates phase.
     @Sendable
+    @MainActor
     private func resolveImage() async {
+        guard !Task.isCancelled else {
+            return
+        }
+        withTransaction(transaction) {
+            phase = .empty
+        }
         let newPhase: POAsyncImagePhase
         do {
-            guard let image = try await image() else {
-                return
+            if let image = try await image() {
+                newPhase = .success(image)
+            } else {
+                newPhase = .empty
             }
-            newPhase = .success(image)
         } catch {
             newPhase = .failure(error)
+        }
+        guard !Task.isCancelled else {
+            return
         }
         withTransaction(transaction) { phase = newPhase }
     }
