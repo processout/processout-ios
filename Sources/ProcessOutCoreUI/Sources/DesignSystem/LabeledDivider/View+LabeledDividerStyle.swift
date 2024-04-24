@@ -26,6 +26,6 @@ extension EnvironmentValues {
     // MARK: - Private Properties
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = POLabeledDividerStyle()
+        static let defaultValue = POLabeledDividerStyle.default
     }
 }
