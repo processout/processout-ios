@@ -8,7 +8,7 @@
 @available(*, deprecated, renamed: "POInvoicesService")
 public typealias POInvoicesServiceType = POInvoicesService
 
-public protocol POInvoicesService: POService {
+public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 
     /// Requests information needed to continue existing payment or start new one.
     func nativeAlternativePaymentMethodTransactionDetails(
