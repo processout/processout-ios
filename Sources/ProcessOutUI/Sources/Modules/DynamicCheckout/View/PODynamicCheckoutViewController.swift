@@ -14,7 +14,7 @@ public final class PODynamicCheckoutViewController: UIHostingController<AnyView>
 
     /// Creates card tokenization view controller.
     public init(
-        style: PODynamicCheckoutStyle = PODynamicCheckoutStyle(),
+        style: PODynamicCheckoutStyle = PODynamicCheckoutStyle.default,
         configuration: PODynamicCheckoutConfiguration,
         delegate: PODynamicCheckoutDelegate,
         completion: @escaping (Result<Void, POFailure>) -> Void

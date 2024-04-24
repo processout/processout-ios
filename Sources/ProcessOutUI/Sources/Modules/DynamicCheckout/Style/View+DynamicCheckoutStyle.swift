@@ -27,6 +27,6 @@ extension EnvironmentValues {
     // MARK: - Private Nested Types
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = PODynamicCheckoutStyle()
+        static let defaultValue = PODynamicCheckoutStyle.default
     }
 }

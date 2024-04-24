@@ -58,7 +58,7 @@ struct DynamicCheckoutSectionView<ViewRouter>: View where ViewRouter: Router<Dyn
                 POTrimmedRoundedRectangle(
                     gapWidth: hasTitle ? titleSize.width + POSpacing.small * 2 : 0
                 ),
-                style: section.areBezelsVisible ? style.paymentsSection.border : .clear
+                style: section.areBezelsVisible ? style.section.border : .clear
             )
             .padding(.top, hasTitle ? titleSize.height / 2 + POSpacing.small : 0)
     }

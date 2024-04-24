@@ -31,7 +31,7 @@ struct DynamicCheckoutSectionsView<ViewRouter>: View where ViewRouter: Router<Dy
                     POLabeledDivider(
                         title: String(resource: .DynamicCheckout.Section.divider)
                     )
-                    .labeledDividerStyle(style.sectionsDivider)
+                    .labeledDividerStyle(style.section.divider)
                 }
             }
         }

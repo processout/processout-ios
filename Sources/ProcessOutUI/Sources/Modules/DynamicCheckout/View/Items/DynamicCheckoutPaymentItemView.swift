@@ -49,7 +49,7 @@ struct DynamicCheckoutPaymentItemView: View {
     @Environment(\.layoutDirection)
     private var layoutDirection
 
-    @Environment(\.dynamicCheckoutStyle.paymentHeader)
+    @Environment(\.dynamicCheckoutStyle)
     private var style
 
     // MARK: - Private Methods
@@ -59,12 +59,12 @@ struct DynamicCheckoutPaymentItemView: View {
         Label(
             title: {
                 Text(information)
-                    .textStyle(style.informationText)
+                    .textStyle(style.subsection.informationText)
             },
             icon: {
                 Image(.info)
                     .renderingMode(.template)
-                    .foregroundColor(style.informationText.color)
+                    .foregroundColor(style.subsection.informationText.color)
             }
         )
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -15,39 +15,100 @@ import SwiftUI
 @available(iOS 14, *)
 public struct PODynamicCheckoutStyle {
 
-    public struct PaymentsSection {
+    public struct Section {
 
-        /// Section title style if any.
-        public var title = POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title)
+        /// Section title style.
+        public let title: POTextStyle
 
         /// Section border style.
-        public var border = POBorderStyle.regular(color: Color(poResource: .Text.muted))
+        public let border: POBorderStyle
+
+        /// Style to apply to divider sepparating different sections.
+        public var divider: POLabeledDividerStyle
+
+        /// Creates section style instance.
+        public init(title: POTextStyle, border: POBorderStyle, divider: POLabeledDividerStyle) {
+            self.title = title
+            self.border = border
+            self.divider = divider
+        }
     }
 
-    public struct PaymentHeader {
+    public struct Subsection {
 
         /// Title style.
-        public var title = POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title)
+        public let title: POTextStyle
 
         /// Information text style.
-        public var informationText = POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body)
+        public let informationText: POTextStyle
+
+        /// Divider color.
+        public let dividerColor: Color
+
+        public init(title: POTextStyle, informationText: POTextStyle, dividerColor: Color) {
+            self.title = title
+            self.informationText = informationText
+            self.dividerColor = dividerColor
+        }
     }
 
-    /// Payments section style.
-    public var paymentsSection = PaymentsSection()
+    /// Title style.
+    public let title: POTextStyle // todo(andrii-vysotskyi): remove if unused
 
-    /// Style to apply to divider sepparating different sections.
-    public var sectionsDivider = POLabeledDividerStyle()
+    /// Section style.
+    public let section: Section
 
-    /// Payment item's header style.
-    public var paymentHeader = PaymentHeader()
+    /// Payment options are organized in subsections within same section.
+    public let subsection: Subsection
+
+    /// Progress view style.
+    public let progressView: any ProgressViewStyle
+
+    /// Input title text style.
+    public let inputTitle: POTextStyle
+
+    /// Input style.
+    public let input: POInputStyle
+
+    /// Input style.
+    public let codeInput: POInputStyle
+
+    /// Radio button style.
+    public let radioButton: any ButtonStyle
+
+    /// Error description text style.
+    public let errorText: POTextStyle
 
     /// Background color.
-    public var backgroundColor = Color(poResource: .Surface.level1)
+    public let backgroundColor: Color
 
     /// Actions container style.
-    public var actionsContainer = POActionsContainerStyle.default
+    public let actionsContainer: POActionsContainerStyle
 
-    /// Creates style instance.
-    public init() { }
+    /// Creates dynamic checkout style.
+    public init(
+        title: POTextStyle,
+        section: PODynamicCheckoutStyle.Section,
+        subsection: PODynamicCheckoutStyle.Subsection,
+        progressView: any ProgressViewStyle,
+        inputTitle: POTextStyle,
+        input: POInputStyle,
+        codeInput: POInputStyle,
+        radioButton: any ButtonStyle,
+        errorText: POTextStyle,
+        backgroundColor: Color,
+        actionsContainer: POActionsContainerStyle
+    ) {
+        self.title = title
+        self.section = section
+        self.subsection = subsection
+        self.progressView = progressView
+        self.inputTitle = inputTitle
+        self.input = input
+        self.codeInput = codeInput
+        self.radioButton = radioButton
+        self.errorText = errorText
+        self.backgroundColor = backgroundColor
+        self.actionsContainer = actionsContainer
+    }
 }
