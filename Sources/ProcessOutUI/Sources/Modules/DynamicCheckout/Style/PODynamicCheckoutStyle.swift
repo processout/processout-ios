@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 28.02.2024.
 //
 
+import PassKit
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
@@ -79,6 +80,13 @@ public struct PODynamicCheckoutStyle {
     /// Error description text style.
     public let errorText: POTextStyle
 
+    /// PassKit payment button style.
+    public let passKitPaymentButtonStyle: PKPaymentButtonStyle
+
+    /// Generic express payment button style. When default style is used,
+    /// equals to `POBrandButtonStyle.brand`.
+    public let expressPaymentButtonStyle: any ButtonStyle
+
     /// Background color.
     public let backgroundColor: Color
 
@@ -96,6 +104,8 @@ public struct PODynamicCheckoutStyle {
         codeInput: POInputStyle,
         radioButton: any ButtonStyle,
         errorText: POTextStyle,
+        passKitPaymentButtonStyle: PKPaymentButtonStyle,
+        expressPaymentButtonStyle: any ButtonStyle,
         backgroundColor: Color,
         actionsContainer: POActionsContainerStyle
     ) {
@@ -108,6 +118,8 @@ public struct PODynamicCheckoutStyle {
         self.codeInput = codeInput
         self.radioButton = radioButton
         self.errorText = errorText
+        self.passKitPaymentButtonStyle = passKitPaymentButtonStyle
+        self.expressPaymentButtonStyle = expressPaymentButtonStyle
         self.backgroundColor = backgroundColor
         self.actionsContainer = actionsContainer
     }

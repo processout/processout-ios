@@ -22,6 +22,8 @@ extension PODynamicCheckoutStyle {
         codeInput: .large,
         radioButton: PORadioButtonStyle.radio,
         errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
+        passKitPaymentButtonStyle: .automatic,
+        expressPaymentButtonStyle: .brand,
         backgroundColor: Color(poResource: .Surface.level1),
         actionsContainer: .default
     )
