@@ -23,10 +23,9 @@ struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter>: Vie
     var body: some View {
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
-                DynamicCheckoutSectionsView(sections: viewModel.sections, router: router)
+                DynamicCheckoutContentView(sections: viewModel.sections, router: router)
             }
             .clipped()
-            .frame(maxHeight: .infinity)
             if !viewModel.actions.isEmpty {
                 POActionsContainerView(actions: viewModel.actions)
                     .actionsContainerStyle(style.actionsContainer)

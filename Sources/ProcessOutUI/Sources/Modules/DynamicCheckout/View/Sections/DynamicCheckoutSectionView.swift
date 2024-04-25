@@ -19,6 +19,7 @@ struct DynamicCheckoutSectionView<ViewRouter>: View where ViewRouter: Router<Dyn
         VStack(spacing: POSpacing.small) {
             if let title = section.title, !title.isEmpty {
                 Text(title)
+                    .textStyle(style.title)
                     .multilineTextAlignment(.center)
                     .onSizeChange { size in
                         titleSize = size
@@ -32,6 +33,8 @@ struct DynamicCheckoutSectionView<ViewRouter>: View where ViewRouter: Router<Dyn
                 DynamicCheckoutItemView(item: element, router: router)
                 if section.areSeparatorsVisible, offset + 1 < items.count {
                     Divider()
+                        .frame(height: 1)
+                        .overlay(style.subsection.dividerColor)
                 }
             }
         }

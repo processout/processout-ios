@@ -21,6 +21,7 @@ struct DynamicCheckoutPaymentItemView: View {
                 }
                 Text(item.title)
                     .lineLimit(1)
+                    .textStyle(style.subsection.title)
                 Spacer()
                 Button(
                     action: {
@@ -30,7 +31,7 @@ struct DynamicCheckoutPaymentItemView: View {
                         EmptyView()
                     }
                 )
-                .buttonStyle(.radio) // todo(andrii-vysotskyi): fix style
+                .buttonStyle(POAnyButtonStyle(erasing: style.radioButton))
                 .radioButtonSelected(item.isSelected)
             }
             if let information = item.additionalInformation {
