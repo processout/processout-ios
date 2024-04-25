@@ -12,8 +12,8 @@ import SwiftUI
 @available(iOS 14, *)
 public struct POCardUpdateView: View {
 
-    init(viewModel: some CardUpdateViewModel) {
-        self._viewModel = .init(wrappedValue: .init(erasing: viewModel))
+    init(viewModel: @autoclosure @escaping () -> some CardUpdateViewModel) {
+        self._viewModel = .init(wrappedValue: .init(erasing: viewModel()))
     }
 
     // MARK: - View
