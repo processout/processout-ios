@@ -12,8 +12,8 @@ import SwiftUI
 @available(iOS 14, *)
 public struct POCardTokenizationView: View {
 
-    init(viewModel: some CardTokenizationViewModel) {
-        self._viewModel = .init(wrappedValue: .init(erasing: viewModel))
+    init(viewModel: @autoclosure @escaping () -> some CardTokenizationViewModel) {
+        self._viewModel = .init(wrappedValue: .init(erasing: viewModel()))
     }
 
     // MARK: - View
