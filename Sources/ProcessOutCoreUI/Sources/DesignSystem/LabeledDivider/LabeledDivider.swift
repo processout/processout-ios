@@ -36,7 +36,7 @@ public struct POLabeledDivider: View {
     private var divider: some View {
         // Divider is placed inside a VStack to make it horizontal when added to HStack.
         VStack {
-            Divider().background(style.color)
+            Divider().frame(height: 1).overlay(style.color)
         }
     }
 }
