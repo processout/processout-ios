@@ -28,9 +28,4 @@ extension POCardTokenizationView {
         let viewModel = DefaultCardTokenizationViewModel(interactor: interactor)
         self = .init(viewModel: viewModel)
     }
-
-    init(interactor: any CardTokenizationInteractor) {
-        let viewModel = DefaultCardTokenizationViewModel(interactor: interactor)
-        self = .init(viewModel: viewModel)
-    }
 }
