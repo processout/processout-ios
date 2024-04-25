@@ -31,9 +31,4 @@ extension PONativeAlternativePaymentView {
         let viewModel = DefaultNativeAlternativePaymentViewModel(interactor: interactor)
         self = .init(viewModel: viewModel)
     }
-
-    init(interactor: any NativeAlternativePaymentInteractor) {
-        let viewModel = DefaultNativeAlternativePaymentViewModel(interactor: interactor)
-        self = .init(viewModel: viewModel)
-    }
 }

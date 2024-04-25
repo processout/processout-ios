@@ -23,14 +23,8 @@ public struct PONativeAlternativePaymentView: View {
             GeometryReader { geometry in
                 ScrollViewReader { scrollView in
                     ScrollView(showsIndicators: false) {
-                        NativeAlternativePaymentSectionsView(
-                            sections: viewModel.sections, focusedItemId: $viewModel.focusedItemId
-                        )
-                        .backport.geometryGroup()
-                        .frame(minHeight: geometry.size.height, alignment: .top)
-                    }
-                    .backport.onChange(of: viewModel.focusedItemId) {
-                        scrollToFocusedInput(scrollView: scrollView)
+                        NativeAlternativePaymentContentView(scrollView: scrollView, viewModel: viewModel)
+                            .frame(minHeight: geometry.size.height, alignment: .top)
                     }
                     .clipped()
                 }
@@ -55,13 +49,4 @@ public struct PONativeAlternativePaymentView: View {
 
     @StateObject
     private var viewModel: AnyNativeAlternativePaymentViewModel
-
-    // MARK: - Private Methods
-
-    private func scrollToFocusedInput(scrollView: ScrollViewProxy) {
-        guard let id = viewModel.focusedItemId else {
-            return
-        }
-        withAnimation { scrollView.scrollTo(id) }
-    }
 }
