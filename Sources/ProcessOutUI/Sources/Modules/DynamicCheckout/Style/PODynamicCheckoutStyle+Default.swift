@@ -34,7 +34,7 @@ extension PODynamicCheckoutStyle.Section {
 
     /// Default dynamic checkout section style.
     public static let `default` = PODynamicCheckoutStyle.Section(
-        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title),
+        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
         border: POBorderStyle.regular(color: Color(poResource: .Text.muted)),
         divider: .default
     )
@@ -45,8 +45,8 @@ extension PODynamicCheckoutStyle.Subsection {
 
     /// Default dynamic checkout subsection style.
     public static let `default` = PODynamicCheckoutStyle.Subsection(
-        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title),
-        informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
+        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
+        informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label),
         dividerColor: Color(poResource: .Text.muted)
     )
 }
