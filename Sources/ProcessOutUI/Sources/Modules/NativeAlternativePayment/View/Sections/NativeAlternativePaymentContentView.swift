@@ -11,8 +11,6 @@ import SwiftUI
 @available(iOS 14, *)
 struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentViewModel>: View {
 
-    let scrollView: ScrollViewProxy
-
     @ObservedObject
     private(set) var viewModel: ViewModel
 
@@ -43,6 +41,9 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
 
     // MARK: - Private Properties
 
+    @Environment(\.scrollViewProxy)
+    private var scrollView
+
     // swiftlint:disable:next line_length
     private var sectionsPartition: (top: [NativeAlternativePaymentViewModelSection], center: [NativeAlternativePaymentViewModelSection]) {
         let sections = viewModel.sections
@@ -72,6 +73,6 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
         guard let id = viewModel.focusedItemId else {
             return
         }
-        withAnimation { scrollView.scrollTo(id) }
+        withAnimation { scrollView?.scrollTo(id) }
     }
 }

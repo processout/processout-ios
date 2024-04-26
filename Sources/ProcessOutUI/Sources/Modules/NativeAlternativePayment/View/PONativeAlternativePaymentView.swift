@@ -23,7 +23,8 @@ public struct PONativeAlternativePaymentView: View {
             GeometryReader { geometry in
                 ScrollViewReader { scrollView in
                     ScrollView(showsIndicators: false) {
-                        NativeAlternativePaymentContentView(scrollView: scrollView, viewModel: viewModel)
+                        NativeAlternativePaymentContentView(viewModel: viewModel)
+                            .scrollViewProxy(scrollView)
                             .frame(minHeight: geometry.size.height, alignment: .top)
                     }
                     .clipped()
