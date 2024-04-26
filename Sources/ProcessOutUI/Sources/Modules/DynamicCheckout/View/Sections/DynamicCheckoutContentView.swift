@@ -12,10 +12,8 @@ import SwiftUI
 @available(iOS 14, *)
 struct DynamicCheckoutContentView<ViewRouter>: View where ViewRouter: Router<DynamicCheckoutRoute> {
 
-    init(sections: [DynamicCheckoutViewModelSection], router: ViewRouter) {
-        self.sections = sections
-        self.router = router
-    }
+    let sections: [DynamicCheckoutViewModelSection]
+    let router: ViewRouter
 
     // MARK: - View
 
@@ -40,9 +38,6 @@ struct DynamicCheckoutContentView<ViewRouter>: View where ViewRouter: Router<Dyn
     }
 
     // MARK: - Private Properties
-
-    private let sections: [DynamicCheckoutViewModelSection]
-    private let router: ViewRouter
 
     @Environment(\.dynamicCheckoutStyle)
     private var style

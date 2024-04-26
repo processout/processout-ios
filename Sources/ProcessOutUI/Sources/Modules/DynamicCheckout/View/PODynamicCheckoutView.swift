@@ -47,11 +47,13 @@ public struct PODynamicCheckoutView: View {
             logger: logger,
             completion: completion
         )
-        let viewModel = DefaultDynamicCheckoutViewModel(interactor: interactor)
-        let router = DefaultDynamicCheckoutRouter(
-            delegate: interactor
-        )
-        return DynamicCheckoutView(viewModel: viewModel, router: router)
+        let viewModel = {
+            DefaultDynamicCheckoutViewModel(interactor: interactor)
+        }
+        let router = BlockRouter { [unowned interactor] route in
+            DynamicCheckoutRouterView(route: route, delegate: interactor)
+        }
+        return DynamicCheckoutView(viewModel: viewModel(), router: router)
     }
 
     // MARK: - Private Properties

@@ -13,8 +13,9 @@ import SwiftUI
 struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter>: View
     where ViewRouter: Router<DynamicCheckoutRoute> {
 
-    init(viewModel: ViewModel, router: ViewRouter) {
-        self._viewModel = .init(wrappedValue: viewModel)
+    // todo(andrii-vysotskyi): router should be inject with @autoclosure as well
+    init(viewModel: @autoclosure @escaping () -> ViewModel, router: ViewRouter) {
+        self._viewModel = .init(wrappedValue: viewModel())
         self.router = router
     }
 
@@ -23,7 +24,10 @@ struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter>: Vie
     var body: some View {
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
-                DynamicCheckoutContentView(sections: viewModel.sections, router: router)
+                ScrollViewReader { scrollView in
+                    DynamicCheckoutContentView(sections: viewModel.sections, router: router)
+                        .scrollViewProxy(scrollView)
+                }
             }
             .clipped()
             if !viewModel.actions.isEmpty {
