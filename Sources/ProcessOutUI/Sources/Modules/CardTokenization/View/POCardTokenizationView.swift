@@ -22,7 +22,8 @@ public struct POCardTokenizationView: View {
         VStack(spacing: 0) {
             ScrollViewReader { scrollView in
                 ScrollView(showsIndicators: false) {
-                    CardTokenizationContentView(scrollView: scrollView, viewModel: viewModel)
+                    CardTokenizationContentView(viewModel: viewModel)
+                        .scrollViewProxy(scrollView)
                 }
                 .clipped()
             }

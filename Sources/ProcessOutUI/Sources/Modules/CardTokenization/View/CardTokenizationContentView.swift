@@ -11,8 +11,6 @@ import SwiftUI
 @available(iOS 14.0, *)
 struct CardTokenizationContentView<ViewModel: CardTokenizationViewModel>: View {
 
-    let scrollView: ScrollViewProxy
-
     @ObservedObject
     private(set) var viewModel: ViewModel
 
@@ -46,12 +44,15 @@ struct CardTokenizationContentView<ViewModel: CardTokenizationViewModel>: View {
     @Environment(\.cardTokenizationStyle)
     private var style
 
+    @Environment(\.scrollViewProxy)
+    private var scrollView
+
     // MARK: - Private Methods
 
     private func scrollToFocusedInput() {
         guard let id = viewModel.state.focusedInputId else {
             return
         }
-        withAnimation { scrollView.scrollTo(id) }
+        withAnimation { scrollView?.scrollTo(id) }
     }
 }
