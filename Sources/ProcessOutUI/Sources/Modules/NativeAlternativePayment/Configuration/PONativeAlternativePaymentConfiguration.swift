@@ -61,7 +61,7 @@ public struct PONativeAlternativePaymentConfiguration {
     }
 
     /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
-    /// Maximum value is 180 seconds.
+    /// Default timeout is 3 minutes while maximum value is 12 minutes.
     @available(*, deprecated, renamed: "paymentConfirmation.timeout")
     public var paymentConfirmationTimeout: TimeInterval {
         paymentConfirmation.timeout
