@@ -21,7 +21,7 @@ struct DynamicCheckoutRouterView: View {
     var body: some View {
         switch route {
         case .card:
-            let viewModel = {
+            let viewModel: () -> DefaultCardTokenizationViewModel = {
                 let interactor = delegate.routerWillRouteToCardTokenization()
                 return DefaultCardTokenizationViewModel(interactor: interactor)
             }
@@ -30,7 +30,7 @@ struct DynamicCheckoutRouterView: View {
             }
             .cardTokenizationStyle(POCardTokenizationStyle(dynamicCheckoutStyle: style))
         case .nativeAlternativePayment(let id):
-            let viewModel = {
+            let viewModel: () -> DefaultNativeAlternativePaymentViewModel = {
                 let interactor = delegate.routerWillRouteToNativeAlternativePayment(with: id)
                 return DefaultNativeAlternativePaymentViewModel(interactor: interactor)
             }
