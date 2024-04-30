@@ -61,7 +61,7 @@ final class DefaultInvoicesService: POInvoicesService {
             },
             timeout: captureTimeout,
             timeoutError: POFailure(code: .timeout(.mobile)),
-            retryStrategy: .linear(maximumRetries: .max, interval: 3)
+            retryStrategy: .exponential(maximumRetries: .max, interval: 0.15, rate: 1.45, minimum: 3, maximum: 90)
         )
     }
 
@@ -72,7 +72,7 @@ final class DefaultInvoicesService: POInvoicesService {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let maximumCaptureTimeout: TimeInterval = 180
+        static let maximumCaptureTimeout: TimeInterval = 60 * 15 // 15 minutes
     }
 
     // MARK: - Private Properties
