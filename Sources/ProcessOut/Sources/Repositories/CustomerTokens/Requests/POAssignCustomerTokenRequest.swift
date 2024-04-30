@@ -31,8 +31,8 @@ public struct POAssignCustomerTokenRequest: Encodable { // sourcery: AutoCodingK
     /// Invoice identifier that will be used for token verification.
     public let invoiceId: String?
 
-    /// Boolean value indicating whether 3DS2 is enabled. Default value is `true`.
-    public let enableThreeDS2: Bool // sourcery:coding: key="enable_three_d_s_2"
+    /// Boolean value indicating whether 3DS2 is enabled. Value is hardcoded to `true`.
+    public let enableThreeDS2 = true // sourcery:coding: key="enable_three_d_s_2"
 
     /// Can be used for a 3DS2 request to indicate which third party SDK is used for the call.
     public let thirdPartySdkVersion: String?
@@ -48,7 +48,7 @@ public struct POAssignCustomerTokenRequest: Encodable { // sourcery: AutoCodingK
         preferredScheme: String? = nil,
         verify: Bool = false,
         invoiceId: String? = nil,
-        enableThreeDS2: Bool = true,
+        enableThreeDS2 _: Bool = true,
         thirdPartySdkVersion: String? = nil,
         metadata: [String: String]? = nil
     ) {
@@ -58,7 +58,6 @@ public struct POAssignCustomerTokenRequest: Encodable { // sourcery: AutoCodingK
         self.preferredScheme = preferredScheme
         self.verify = verify
         self.invoiceId = invoiceId
-        self.enableThreeDS2 = enableThreeDS2
         self.thirdPartySdkVersion = thirdPartySdkVersion
         self.metadata = metadata
     }

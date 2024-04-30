@@ -88,7 +88,6 @@ private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_e
             invoiceId: invoiceId,
             source: newSource,
             incremental: incremental,
-            enableThreeDS2: enableThreeDS2,
             preferredScheme: preferredScheme,
             thirdPartySdkVersion: thirdPartySdkVersion,
             invoiceDetailIds: invoiceDetailIds,
