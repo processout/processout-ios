@@ -72,7 +72,7 @@ final class DefaultInvoicesService: POInvoicesService {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let maximumCaptureTimeout: TimeInterval = 60 * 12 // 12 minutes
+        static let maximumCaptureTimeout: TimeInterval = 60 * 15 // 15 minutes
     }
 
     // MARK: - Private Properties

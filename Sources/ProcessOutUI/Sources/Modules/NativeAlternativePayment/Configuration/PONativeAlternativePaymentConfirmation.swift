@@ -15,7 +15,7 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
     public let waitsConfirmation: Bool
 
     /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
-    /// Default timeout is 3 minutes while maximum value is 12 minutes.
+    /// Default timeout is 3 minutes while maximum value is 15 minutes.
     public let timeout: TimeInterval
 
     /// A delay before showing progress indicator during payment confirmation.

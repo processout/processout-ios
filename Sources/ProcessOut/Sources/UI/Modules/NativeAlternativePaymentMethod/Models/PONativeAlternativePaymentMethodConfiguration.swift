@@ -49,7 +49,7 @@ public struct PONativeAlternativePaymentMethodConfiguration {
     public let waitsPaymentConfirmation: Bool
 
     /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
-    /// Default timeout is 3 minutes while maximum value is 12 minutes.
+    /// Default timeout is 3 minutes while maximum value is 15 minutes.
     public let paymentConfirmationTimeout: TimeInterval
 
     /// Action that could be optionally presented to user during payment confirmation stage. To remove action
