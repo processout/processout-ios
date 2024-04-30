@@ -1,5 +1,5 @@
 //
-//  DynamicCheckoutSectionsView.swift
+//  DynamicCheckoutContentView.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 19.04.2024.
@@ -10,17 +10,15 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutSectionsView<ViewRouter>: View where ViewRouter: Router<DynamicCheckoutRoute> {
+struct DynamicCheckoutContentView<ViewRouter>: View where ViewRouter: Router<DynamicCheckoutRoute> {
 
-    init(sections: [DynamicCheckoutViewModelSection], router: ViewRouter) {
-        self.sections = sections
-        self.router = router
-    }
+    let sections: [DynamicCheckoutViewModelSection]
+    let router: ViewRouter
 
     // MARK: - View
 
     var body: some View {
-        VStack(spacing: POSpacing.large) {
+        VStack(spacing: POSpacing.medium) {
             let sections = Array(
                 sections.enumerated()
             )
@@ -31,7 +29,7 @@ struct DynamicCheckoutSectionsView<ViewRouter>: View where ViewRouter: Router<Dy
                     POLabeledDivider(
                         title: String(resource: .DynamicCheckout.Section.divider)
                     )
-                    .labeledDividerStyle(style.sectionsDivider)
+                    .labeledDividerStyle(style.section.divider)
                 }
             }
         }
@@ -40,9 +38,6 @@ struct DynamicCheckoutSectionsView<ViewRouter>: View where ViewRouter: Router<Dy
     }
 
     // MARK: - Private Properties
-
-    private let sections: [DynamicCheckoutViewModelSection]
-    private let router: ViewRouter
 
     @Environment(\.dynamicCheckoutStyle)
     private var style

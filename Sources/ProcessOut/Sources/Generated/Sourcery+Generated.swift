@@ -317,9 +317,6 @@ extension POInvoicesService {
     }
 }
 
-extension POService {
-}
-
 /// Invokes given completion with a result of async operation.
 private func invoke<T>(
     completion: @escaping (Result<T, POFailure>) -> Void,

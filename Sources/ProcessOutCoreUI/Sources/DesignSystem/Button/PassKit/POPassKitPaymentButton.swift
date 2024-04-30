@@ -12,16 +12,22 @@ import PassKit
 @_spi(PO)
 public struct POPassKitPaymentButton: View {
 
-    public init(type: PKPaymentButtonType = .plain, action: @escaping () -> Void) {
+    public init(
+        type: PKPaymentButtonType = .plain,
+        style: PKPaymentButtonStyle = .automatic,
+        action: @escaping () -> Void
+    ) {
         self.buttonType = type
+        self.style = style
         self.action = action
     }
 
     // MARK: - View
 
     public var body: some View {
-        ButtonRepresentable(buttonType: buttonType, action: action)
+        ButtonRepresentable(buttonType: buttonType, style: style, action: action)
             .id(buttonType)
+            .id(style)
             .frame(height: Constants.minHeight)
             .frame(maxWidth: .infinity)
     }
@@ -35,6 +41,7 @@ public struct POPassKitPaymentButton: View {
     // MARK: - Private Properties
 
     private let buttonType: PKPaymentButtonType
+    private let style: PKPaymentButtonStyle
     private let action: () -> Void
 }
 
@@ -42,12 +49,13 @@ public struct POPassKitPaymentButton: View {
 private struct ButtonRepresentable: UIViewRepresentable {
 
     let buttonType: PKPaymentButtonType
+    let style: PKPaymentButtonStyle
     let action: () -> Void
 
     // MARK: - UIViewRepresentable
 
     func makeUIView(context: Context) -> PKPaymentButton {
-        let button = PKPaymentButton(paymentButtonType: buttonType, paymentButtonStyle: .automatic)
+        let button = PKPaymentButton(paymentButtonType: buttonType, paymentButtonStyle: style)
         context.coordinator.observeActions(control: button)
         return button
     }

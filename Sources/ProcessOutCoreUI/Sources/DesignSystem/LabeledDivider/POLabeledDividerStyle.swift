@@ -10,11 +10,23 @@ import SwiftUI
 public struct POLabeledDividerStyle {
 
     /// Divider color.
-    public var color = Color(poResource: .Text.muted)
+    public let color: Color
 
     /// Label style.
-    public var title = POTextStyle(color: Color(poResource: .Text.muted), typography: .Fixed.labelHeading)
+    public let title: POTextStyle
 
-    /// Creates default divider style.
-    public init() { }
+    /// Creates instance.
+    public init(color: Color, title: POTextStyle) {
+        self.color = color
+        self.title = title
+    }
+}
+
+extension POLabeledDividerStyle {
+
+    /// Default style.
+    public static let `default` = POLabeledDividerStyle(
+        color: Color(poResource: .Text.muted),
+        title: POTextStyle(color: Color(poResource: .Text.muted), typography: .Fixed.labelHeading)
+    )
 }

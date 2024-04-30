@@ -19,7 +19,7 @@ struct DynamicCheckoutExpressPaymentItemView: View {
         Button(action: item.action) {
             Label(
                 title: {
-                    Text(item.title).lineLimit(1)
+                    Text(item.title)
                 },
                 icon: {
                     POAsyncImage(resource: item.iconImageResource) {
@@ -28,8 +28,7 @@ struct DynamicCheckoutExpressPaymentItemView: View {
                 }
             )
         }
-        // todo(andrii-vysotskyi): add button style that could work find with only brand color
-        .buttonStyle(.primary)
+        .buttonStyle(POAnyButtonStyle(erasing: style.expressPaymentButtonStyle))
     }
 
     // MARK: - Private Properties

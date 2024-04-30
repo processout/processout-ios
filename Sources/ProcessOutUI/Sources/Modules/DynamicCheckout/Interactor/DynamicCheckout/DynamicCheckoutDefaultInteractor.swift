@@ -542,9 +542,8 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
 
 extension DynamicCheckoutDefaultInteractor: DynamicCheckoutRouterDelegate {
 
-    func router(
-        _ router: any Router<DynamicCheckoutRoute>,
-        willRouteToNativeAlternativePaymentWith gatewayConfigurationId: String
+    func routerWillRouteToNativeAlternativePayment(
+        with gatewayConfigurationId: String
     ) -> any NativeAlternativePaymentInteractor {
         guard let interactor = nativeAlternativePaymentInteractor else {
             preconditionFailure("Unable to resolve native APM interactor.")
@@ -553,9 +552,7 @@ extension DynamicCheckoutDefaultInteractor: DynamicCheckoutRouterDelegate {
         return interactor
     }
 
-    func routerWillRouteToCardTokenization(
-        _ router: any Router<DynamicCheckoutRoute>
-    ) -> any CardTokenizationInteractor {
+    func routerWillRouteToCardTokenization() -> any CardTokenizationInteractor {
         guard let interactor = cardTokenizationInteractor else {
             preconditionFailure("Unable to resolve card tokenization interactor.")
         }

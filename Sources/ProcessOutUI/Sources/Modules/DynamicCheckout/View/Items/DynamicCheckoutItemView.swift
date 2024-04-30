@@ -21,11 +21,13 @@ struct DynamicCheckoutItemView<ViewRouter>: View where ViewRouter: Router<Dynami
             ProgressView()
                 .frame(maxWidth: .infinity)
                 .padding(padding)
+                .poProgressViewStyle(style.progressView)
         case .passKitPayment(let item):
-            POPassKitPaymentButton(action: item.action)
+            POPassKitPaymentButton(style: style.passKitPaymentButtonStyle, action: item.action)
                 .padding(.horizontal, padding)
         case .expressPayment(let item):
             DynamicCheckoutExpressPaymentItemView(item: item)
+                .buttonStyle(POAnyButtonStyle(erasing: style.expressPaymentButtonStyle))
                 .padding(.horizontal, padding)
         case .payment(let item):
             DynamicCheckoutPaymentItemView(item: item)

@@ -1,8 +1,8 @@
 //
-//  View+DynamicCheckoutStyle.swift
-//  ProcessOutUI
+//  View+ScrollViewProxy.swift
+//  ProcessOutCoreUI
 //
-//  Created by Andrii Vysotskyi on 28.02.2024.
+//  Created by Andrii Vysotskyi on 26.04.2024.
 //
 
 import SwiftUI
@@ -10,16 +10,18 @@ import SwiftUI
 extension View {
 
     /// Sets the style for card tokenization views within this view.
+    @_spi(PO)
     @available(iOS 14, *)
-    public func dynamicCheckoutStyle(_ style: PODynamicCheckoutStyle) -> some View {
-        environment(\.dynamicCheckoutStyle, style)
+    public func scrollViewProxy(_ scrollView: ScrollViewProxy?) -> some View {
+        environment(\.scrollViewProxy, scrollView)
     }
 }
 
 @available(iOS 14, *)
 extension EnvironmentValues {
 
-    var dynamicCheckoutStyle: PODynamicCheckoutStyle {
+    @_spi(PO)
+    public var scrollViewProxy: ScrollViewProxy? {
         get { self[Key.self] }
         set { self[Key.self] = newValue }
     }
@@ -27,6 +29,6 @@ extension EnvironmentValues {
     // MARK: - Private Nested Types
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = PODynamicCheckoutStyle.default
+        static let defaultValue: ScrollViewProxy? = nil
     }
 }

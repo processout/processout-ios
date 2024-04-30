@@ -12,8 +12,8 @@ import SwiftUI
 @available(iOS 14, *)
 public struct PONativeAlternativePaymentView: View {
 
-    init(viewModel: some NativeAlternativePaymentViewModel) {
-        self._viewModel = .init(wrappedValue: .init(erasing: viewModel))
+    init(viewModel: @autoclosure @escaping () -> some NativeAlternativePaymentViewModel) {
+        self._viewModel = .init(wrappedValue: .init(erasing: viewModel()))
     }
 
     // MARK: - View
@@ -23,14 +23,9 @@ public struct PONativeAlternativePaymentView: View {
             GeometryReader { geometry in
                 ScrollViewReader { scrollView in
                     ScrollView(showsIndicators: false) {
-                        NativeAlternativePaymentSectionsView(
-                            sections: viewModel.sections, focusedItemId: $viewModel.focusedItemId
-                        )
-                        .backport.geometryGroup()
-                        .frame(minHeight: geometry.size.height, alignment: .top)
-                    }
-                    .backport.onChange(of: viewModel.focusedItemId) {
-                        scrollToFocusedInput(scrollView: scrollView)
+                        NativeAlternativePaymentContentView(viewModel: viewModel)
+                            .scrollViewProxy(scrollView)
+                            .frame(minHeight: geometry.size.height, alignment: .top)
                     }
                     .clipped()
                 }
@@ -55,13 +50,4 @@ public struct PONativeAlternativePaymentView: View {
 
     @StateObject
     private var viewModel: AnyNativeAlternativePaymentViewModel
-
-    // MARK: - Private Methods
-
-    private func scrollToFocusedInput(scrollView: ScrollViewProxy) {
-        guard let id = viewModel.focusedItemId else {
-            return
-        }
-        withAnimation { scrollView.scrollTo(id) }
-    }
 }

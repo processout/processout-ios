@@ -1,5 +1,5 @@
 // MARK: - AutoCompletion
-{% for type in types.implementing.POAutoCompletion|protocol %}
+{% for type in types.protocols|annotated:"AutoCompletion" %}
 
 extension {{ type.name }} {
     {% for method in type.methods %}
@@ -26,7 +26,7 @@ extension {{ type.name }} {
     }
     {% endfor %}
 }
-{% endfor %}
+{% if forloop.last %}
 
 /// Invokes given completion with a result of async operation.
 private func invoke<T>(
@@ -52,3 +52,5 @@ private func invoke<T>(completion: @escaping (T) -> Void, after operation: @esca
         completion(await operation())
     }
 }
+{% endif %}
+{% endfor %}
