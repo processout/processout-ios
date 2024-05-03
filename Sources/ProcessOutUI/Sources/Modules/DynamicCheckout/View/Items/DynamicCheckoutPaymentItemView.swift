@@ -42,6 +42,7 @@ struct DynamicCheckoutPaymentItemView: View {
         .onTapGesture {
             item.isSelected = true
         }
+        .background(style.backgroundColor)
         .backport.geometryGroup()
     }
 
