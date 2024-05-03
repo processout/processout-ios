@@ -38,6 +38,7 @@ struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter>: Vie
         .background(
             style.backgroundColor.ignoresSafeArea()
         )
+        .onAppear(perform: viewModel.start)
         .backport.geometryGroup()
     }
 

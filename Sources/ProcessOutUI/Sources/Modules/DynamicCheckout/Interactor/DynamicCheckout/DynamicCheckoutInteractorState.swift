@@ -31,19 +31,13 @@ enum DynamicCheckoutInteractorState {
         var recentErrorDescription: String?
     }
 
-    enum PaymentSubmission {
+    struct Selected {
 
-        /// Payment submission can't be forced.
-        case unavailable
+        /// Started state snapshot.
+        let snapshot: Started
 
-        /// Submission is currently unavailable.
-        case temporarilyUnavailable
-
-        /// Submission is currently possible.
-        case possible
-
-        /// Payment is already being processed.
-        case submitting
+        /// Selected payment method ID.
+        let paymentMethodId: String
     }
 
     struct PaymentProcessing {
@@ -59,9 +53,21 @@ enum DynamicCheckoutInteractorState {
 
         /// Defines whether payment is cancellable.
         var isCancellable: Bool
+    }
 
-        /// This value is set when user decides to switch payment method during processing.
-        var pendingPaymentMethodId: String?
+    enum PaymentSubmission {
+
+        /// Payment submission can't be forced.
+        case unavailable
+
+        /// Submission is currently unavailable.
+        case temporarilyUnavailable
+
+        /// Submission is currently possible.
+        case possible
+
+        /// Payment is already being processed.
+        case submitting
     }
 
     /// Idle state.
@@ -72,6 +78,9 @@ enum DynamicCheckoutInteractorState {
 
     /// Started state.
     case started(Started)
+
+    /// There is currently selected payment method.
+    case selected(Selected)
 
     /// Payment is being processed.
     case paymentProcessing(PaymentProcessing)

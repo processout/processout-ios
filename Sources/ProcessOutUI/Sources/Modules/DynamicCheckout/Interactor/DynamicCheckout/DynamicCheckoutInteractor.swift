@@ -7,9 +7,13 @@
 
 protocol DynamicCheckoutInteractor: Interactor<DynamicCheckoutInteractorState> {
 
+    /// Selects payment method with Given ID.
+    func select(paymentMethodId: String)
+
     /// Starts payment using payment method with ID.
+    /// Please note that only selected payment method can be started.
     @discardableResult
-    func initiatePayment(methodId: String) -> Bool
+    func startPayment(methodId: String) -> Bool
 
     /// Submits current payment method's data.
     func submit()

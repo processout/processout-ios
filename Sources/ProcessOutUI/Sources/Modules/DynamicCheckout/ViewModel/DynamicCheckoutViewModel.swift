@@ -15,4 +15,7 @@ protocol DynamicCheckoutViewModel: ObservableObject {
 
     /// Available actions.
     var actions: [POActionsContainerActionViewModel] { get }
+
+    /// Starts view model.
+    func start()
 }
