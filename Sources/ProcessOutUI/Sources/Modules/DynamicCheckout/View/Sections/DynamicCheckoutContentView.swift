@@ -34,6 +34,7 @@ struct DynamicCheckoutContentView<ViewRouter>: View where ViewRouter: Router<Dyn
             }
         }
         .padding(POSpacing.medium)
+        .frame(maxWidth: .infinity)
         .backport.geometryGroup()
     }
 
