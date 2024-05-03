@@ -9,7 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-// swiftlint:disable type_body_length
+// swiftlint:disable type_body_length file_length
 
 final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentViewModel {
 
@@ -35,6 +35,10 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     @Published
     private(set) var isCaptured = false
+
+    func start() {
+        interactor.start()
+    }
 
     // MARK: - Private Nested Types
 
@@ -63,7 +67,6 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     // MARK: - Private Methods
 
     private func observeChanges(interactor: any Interactor) {
-        interactor.start()
         interactor.didChange = { [weak self] in
             self?.updateWithInteractorState()
         }
@@ -397,4 +400,4 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     }
 }
 
-// swiftlint:enable type_body_length
+// swiftlint:enable type_body_length file_length

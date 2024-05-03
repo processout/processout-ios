@@ -38,6 +38,10 @@ final class AnyNativeAlternativePaymentViewModel: NativeAlternativePaymentViewMo
         base.isCaptured
     }
 
+    func start() {
+        base.start()
+    }
+
     // MARK: - Private Properties
 
     private var cancellable: AnyCancellable?

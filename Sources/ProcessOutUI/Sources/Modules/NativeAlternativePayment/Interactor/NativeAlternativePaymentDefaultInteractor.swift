@@ -17,14 +17,12 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     init(
         configuration: PONativeAlternativePaymentConfiguration,
-        delegate: PONativeAlternativePaymentDelegate?,
         invoicesService: POInvoicesService,
         imagesRepository: POImagesRepository,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         self.configuration = configuration
-        self.delegate = delegate
         self.invoicesService = invoicesService
         self.imagesRepository = imagesRepository
         self.logger = logger
@@ -35,14 +33,13 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Interactor
 
     let configuration: PONativeAlternativePaymentConfiguration
+    weak var delegate: PONativeAlternativePaymentDelegate?
 
     override func start() {
         guard case .idle = state else {
             return
         }
-        logger.info(
-            "Starting native alternative payment", attributes: ["GatewayId": configuration.gatewayConfigurationId]
-        )
+        logger.info("Starting native alternative payment")
         send(event: .willStart)
         setState(.starting)
         Task {
@@ -121,7 +118,6 @@ final class NativeAlternativePaymentDefaultInteractor:
     private let completion: (Result<Void, POFailure>) -> Void
 
     private var captureCancellable: AnyCancellable?
-    private weak var delegate: PONativeAlternativePaymentDelegate?
 
     // MARK: - Starting State
 

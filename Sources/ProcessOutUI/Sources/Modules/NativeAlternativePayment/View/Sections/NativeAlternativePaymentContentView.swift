@@ -36,6 +36,7 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
             scrollToFocusedInput()
         }
         .padding(.vertical, POSpacing.medium)
+        .frame(maxWidth: .infinity)
         .backport.geometryGroup()
     }
 

@@ -41,6 +41,7 @@ public struct PONativeAlternativePaymentView: View {
                 .ignoresSafeArea()
                 .animation(.default, value: viewModel.isCaptured)
         }
+        .onAppear(perform: viewModel.start)
     }
 
     // MARK: - Private Properties
