@@ -12,7 +12,7 @@ protocol Interactor<State>: AnyObject {
     /// Interactor's state.
     var state: State { get }
 
-    /// A closure that is invoked after the object has changed.
+    /// A closure that is invoked after the object's state has changed.
     var didChange: (() -> Void)? { get set }
 
     /// Starts interactor.
