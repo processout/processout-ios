@@ -21,13 +21,11 @@ final class DefaultCardTokenizationInteractor:
         cardsService: POCardsService,
         logger: POLogger,
         configuration: POCardTokenizationConfiguration,
-        delegate: POCardTokenizationDelegate?,
         completion: @escaping Completion
     ) {
         self.cardsService = cardsService
         self.logger = logger
         self.configuration = configuration
-        self.delegate = delegate
         self.completion = completion
         super.init(state: .idle)
     }
@@ -35,6 +33,7 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - CardTokenizationInteractor
 
     let configuration: POCardTokenizationConfiguration
+    weak var delegate: POCardTokenizationDelegate?
 
     override func start() {
         guard case .idle = state else {
@@ -101,7 +100,7 @@ final class DefaultCardTokenizationInteractor:
         delegate?.cardTokenization(didEmitEvent: .parametersChanged)
     }
 
-    @MainActor func tokenize() {
+    func tokenize() {
         guard case .started(let startedState) = state else {
             return
         }
@@ -122,7 +121,7 @@ final class DefaultCardTokenizationInteractor:
             preferredScheme: startedState.preferredScheme,
             metadata: configuration.metadata
         )
-        Task {
+        Task { @MainActor in
             do {
                 let card = try await cardsService.tokenize(request: request)
                 logger.debug("Did tokenize card: \(String(describing: card))")
@@ -162,7 +161,6 @@ final class DefaultCardTokenizationInteractor:
     private lazy var cardNumberFormatter = POCardNumberFormatter()
     private lazy var cardExpirationFormatter = POCardExpirationFormatter()
 
-    private weak var delegate: POCardTokenizationDelegate?
     private var issuerInformationCancellable: POCancellable?
 
     // MARK: - State Management

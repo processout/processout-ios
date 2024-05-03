@@ -32,7 +32,10 @@ public struct POCardTokenizationView: View {
                     .actionsContainerStyle(style.actionsContainer)
             }
         }
-        .background(style.backgroundColor.ignoresSafeArea())
+        .backport.background {
+            style.backgroundColor.ignoresSafeArea()
+        }
+        .onAppear(perform: viewModel.start)
     }
 
     // MARK: - Private Properties

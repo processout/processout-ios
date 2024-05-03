@@ -37,6 +37,7 @@ struct CardTokenizationContentView<ViewModel: CardTokenizationViewModel>: View {
             scrollToFocusedInput()
         }
         .padding(.vertical, POSpacing.medium)
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Private Properties

@@ -7,6 +7,9 @@
 
 protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState> {
 
+    /// Delegate.
+    var delegate: POCardTokenizationDelegate? { get set }
+
     /// Tokenization configuration.
     var configuration: POCardTokenizationConfiguration { get }
 

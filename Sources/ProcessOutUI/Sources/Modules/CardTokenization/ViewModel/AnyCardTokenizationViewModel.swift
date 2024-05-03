@@ -20,6 +20,10 @@ final class AnyCardTokenizationViewModel: CardTokenizationViewModel {
 
     // MARK: - CardTokenizationViewModel
 
+    func start() {
+        base.start()
+    }
+
     var state: CardTokenizationViewModelState {
         get { base.state }
         set { base.state = newValue }

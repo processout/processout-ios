@@ -28,9 +28,9 @@ extension POCardTokenizationView {
                 cardsService: ProcessOut.shared.cards,
                 logger: ProcessOut.shared.logger,
                 configuration: configuration,
-                delegate: delegate,
                 completion: completion
             )
+            interactor.delegate = delegate
             return DefaultCardTokenizationViewModel(interactor: interactor)
         }
         self = .init(viewModel: viewModel())
