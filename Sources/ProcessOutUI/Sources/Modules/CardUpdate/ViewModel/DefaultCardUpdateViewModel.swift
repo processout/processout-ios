@@ -35,6 +35,10 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     @Published
     var focusedItemId: AnyHashable?
 
+    func start() {
+        interactor.start()
+    }
+
     // MARK: - Private Nested Types
 
     private typealias InteractorState = CardUpdateInteractorState
@@ -64,7 +68,6 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     // MARK: - Private Methods
 
     private func observeChanges(interactor: some Interactor) {
-        interactor.start()
         interactor.didChange = { [weak self] in
             self?.configureWithInteractorState()
         }

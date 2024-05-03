@@ -38,6 +38,10 @@ final class AnyCardUpdateViewModel: CardUpdateViewModel {
         set { base.focusedItemId = newValue }
     }
 
+    func start() {
+        base.start()
+    }
+
     // MARK: - Private Properties
 
     private var cancellable: AnyCancellable?
