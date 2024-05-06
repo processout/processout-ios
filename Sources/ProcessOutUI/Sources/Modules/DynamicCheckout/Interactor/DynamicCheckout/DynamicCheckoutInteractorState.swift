@@ -25,7 +25,7 @@ enum DynamicCheckoutInteractorState {
         let pkPaymentRequest: PKPaymentRequest?
 
         /// Defines whether payment is cancellable.
-        var isCancellable: Bool
+        let isCancellable: Bool
 
         /// Most recent error description if any.
         var recentErrorDescription: String?
