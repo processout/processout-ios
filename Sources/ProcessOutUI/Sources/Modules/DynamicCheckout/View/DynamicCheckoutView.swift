@@ -10,13 +10,10 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter>: View
-    where ViewRouter: Router<DynamicCheckoutRoute> {
+struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel>: View {
 
-    // todo(andrii-vysotskyi): router should be inject with @autoclosure as well
-    init(viewModel: @autoclosure @escaping () -> ViewModel, router: ViewRouter) {
+    init(viewModel: @autoclosure @escaping () -> ViewModel) {
         self._viewModel = .init(wrappedValue: viewModel())
-        self.router = router
     }
 
     // MARK: - View
@@ -25,7 +22,7 @@ struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter>: Vie
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
                 ScrollViewReader { scrollView in
-                    DynamicCheckoutContentView(sections: viewModel.sections, router: router)
+                    DynamicCheckoutContentView(sections: viewModel.sections)
                         .scrollViewProxy(scrollView)
                 }
             }
@@ -43,8 +40,6 @@ struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter>: Vie
     }
 
     // MARK: - Private Properties
-
-    private let router: ViewRouter
 
     @StateObject
     private var viewModel: ViewModel

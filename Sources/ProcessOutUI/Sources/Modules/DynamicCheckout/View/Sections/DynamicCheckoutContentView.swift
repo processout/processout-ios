@@ -10,10 +10,9 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutContentView<ViewRouter>: View where ViewRouter: Router<DynamicCheckoutRoute> {
+struct DynamicCheckoutContentView: View {
 
     let sections: [DynamicCheckoutViewModelSection]
-    let router: ViewRouter
 
     // MARK: - View
 
@@ -23,7 +22,7 @@ struct DynamicCheckoutContentView<ViewRouter>: View where ViewRouter: Router<Dyn
                 sections.enumerated()
             )
             ForEach(sections, id: \.element.id) { offset, element in
-                DynamicCheckoutSectionView(section: element, router: router)
+                DynamicCheckoutSectionView(section: element)
                     .frame(maxWidth: .infinity)
                 if offset + 1 < sections.count {
                     POLabeledDivider(

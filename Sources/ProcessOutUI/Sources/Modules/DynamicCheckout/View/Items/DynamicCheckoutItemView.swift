@@ -9,10 +9,9 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutItemView<ViewRouter>: View where ViewRouter: Router<DynamicCheckoutRoute> {
+struct DynamicCheckoutItemView: View {
 
     let item: DynamicCheckoutViewModelItem
-    let router: ViewRouter
 
     var body: some View {
         let padding = POSpacing.medium
@@ -32,10 +31,10 @@ struct DynamicCheckoutItemView<ViewRouter>: View where ViewRouter: Router<Dynami
         case .payment(let item):
             DynamicCheckoutPaymentItemView(item: item)
                 .padding(.horizontal, padding)
-        case .card:
-            router.view(for: .card)
+        case .card(let item):
+            DynamicCheckoutCardItemView(item: item)
         case .alternativePayment(let item):
-            router.view(for: .nativeAlternativePayment(gatewayConfigurationId: item.gatewayConfigurationId))
+            DynamicCheckoutAlternativePaymentItemView(item: item)
         }
     }
 

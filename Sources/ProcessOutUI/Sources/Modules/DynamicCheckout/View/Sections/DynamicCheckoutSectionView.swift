@@ -9,10 +9,9 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutSectionView<ViewRouter>: View where ViewRouter: Router<DynamicCheckoutRoute> {
+struct DynamicCheckoutSectionView: View {
 
     let section: DynamicCheckoutViewModelSection
-    let router: ViewRouter
 
     var body: some View {
         let horizontalPadding = section.areBezelsVisible ? POSpacing.small : 0
@@ -30,7 +29,7 @@ struct DynamicCheckoutSectionView<ViewRouter>: View where ViewRouter: Router<Dyn
                 section.items.enumerated()
             )
             ForEach(items, id: \.element.id) { offset, element in
-                DynamicCheckoutItemView(item: element, router: router)
+                DynamicCheckoutItemView(item: element)
                 if section.areSeparatorsVisible, offset + 1 < items.count {
                     Divider()
                         .frame(height: 1)

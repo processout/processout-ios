@@ -10,7 +10,7 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-// swiftlint:disable type_body_length
+// swiftlint:disable type_body_length file_length
 
 final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
 
@@ -285,7 +285,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             guard isSelected, state.isReady else {
                 return [item]
             }
-            let itemContent = createProcessedItemContent(state: state.snapshot, methodId: state.paymentMethodId)
+            let itemContent = createProcessedItemContent(state: state, methodId: state.paymentMethodId)
             return [item, itemContent]
         }
         let regularSection = DynamicCheckoutViewModelSection(
@@ -299,19 +299,33 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     }
 
     private func createProcessedItemContent(
-        state: DynamicCheckoutInteractorState.Started, methodId: String
+        state: DynamicCheckoutInteractorState.PaymentProcessing, methodId: String
     ) -> DynamicCheckoutViewModelItem? {
-        guard let method = state.paymentMethods[methodId] else {
+        guard let method = state.snapshot.paymentMethods[methodId] else {
             assertionFailure("Unable to resolve payment method by ID")
             return nil
         }
         switch method {
-        case .nativeAlternativePayment(let paymentMethod):
-            return .alternativePayment(
-                .init(gatewayConfigurationId: paymentMethod.configuration.gatewayId)
-            )
+        case .nativeAlternativePayment:
+            guard let interactor = state.nativeAlternativePaymentInteractor else {
+                assertionFailure("Interactor must be set.")
+                return nil
+            }
+            let item = DynamicCheckoutViewModelItem.AlternativePayment(id: "content_" + methodId) {
+                let viewModel = DefaultNativeAlternativePaymentViewModel(interactor: interactor)
+                return AnyNativeAlternativePaymentViewModel(erasing: viewModel)
+            }
+            return .alternativePayment(item)
         case .card:
-            return .card
+            guard let interactor = state.cardTokenizationInteractor else {
+                assertionFailure("Interactor must be set.")
+                return nil
+            }
+            let item = DynamicCheckoutViewModelItem.Card(id: "content_" + methodId) {
+                let viewModel = DefaultCardTokenizationViewModel(interactor: interactor)
+                return AnyCardTokenizationViewModel(erasing: viewModel)
+            }
+            return .card(item)
         default:
             return nil
         }

@@ -56,6 +56,12 @@ enum DynamicCheckoutInteractorState {
 
         /// For payment methods that need preloading this is initially set to `false`. Default value is `true`.
         var isReady = true
+
+        /// Card tokenization interactor.
+        var cardTokenizationInteractor: (any CardTokenizationInteractor)?
+
+        /// Native APM interactor.
+        var nativeAlternativePaymentInteractor: (any NativeAlternativePaymentInteractor)?
     }
 
     enum PaymentSubmission {

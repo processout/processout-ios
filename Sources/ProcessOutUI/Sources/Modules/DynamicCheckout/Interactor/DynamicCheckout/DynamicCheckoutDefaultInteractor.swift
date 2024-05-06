@@ -64,10 +64,8 @@ final class DynamicCheckoutDefaultInteractor:
             state = .selected(newState)
         case .paymentProcessing(let paymentProcessingState):
             // todo(andrii-vysotskyi): ensure active payment can be actually cancelled
-            cardTokenizationInteractor?.delegate = nil
-            cardTokenizationInteractor = nil
-            nativeAlternativePaymentInteractor?.delegate = nil
-            nativeAlternativePaymentInteractor = nil
+            paymentProcessingState.cardTokenizationInteractor?.delegate = nil
+            paymentProcessingState.nativeAlternativePaymentInteractor?.delegate = nil
             let newState = State.Selected(snapshot: paymentProcessingState.snapshot, paymentMethodId: paymentMethodId)
             state = .selected(newState)
         default:
@@ -109,11 +107,14 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     func submit() {
+        guard case .paymentProcessing(let processingState) = state else {
+            return
+        }
         switch currentPaymentMethod {
         case .card:
-            cardTokenizationInteractor?.tokenize()
+            processingState.cardTokenizationInteractor?.tokenize()
         case .nativeAlternativePayment:
-            nativeAlternativePaymentInteractor?.submit()
+            processingState.nativeAlternativePaymentInteractor?.submit()
         case nil:
             assertionFailure("No payment method to submit")
         default:
@@ -131,9 +132,9 @@ final class DynamicCheckoutDefaultInteractor:
             // todo(andrii-vysotskyi): potentially cancelation could be immediate
             switch paymentMethod {
             case .card:
-                return cardTokenizationInteractor?.cancel() ?? false
+                return paymentProcessingState.cardTokenizationInteractor?.cancel() ?? false
             case .nativeAlternativePayment:
-                return nativeAlternativePaymentInteractor?.cancel() ?? false
+                return paymentProcessingState.nativeAlternativePaymentInteractor?.cancel() ?? false
             default:
                 assertionFailure("Currently active payment method can't be cancelled.")
                 return false
@@ -156,9 +157,6 @@ final class DynamicCheckoutDefaultInteractor:
     private let invoicesService: POInvoicesService
     private let logger: POLogger
     private let completion: (Result<Void, POFailure>) -> Void
-
-    private var cardTokenizationInteractor: (any CardTokenizationInteractor)?
-    private var nativeAlternativePaymentInteractor: (any NativeAlternativePaymentInteractor)?
 
     private weak var delegate: PODynamicCheckoutDelegate?
 
@@ -299,12 +297,12 @@ final class DynamicCheckoutDefaultInteractor:
     private func initiateCardPayment(methodId: String, startedState: State.Started) {
         let interactor = childProvider.cardTokenizationInteractor()
         interactor.delegate = self
-        cardTokenizationInteractor = interactor
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: methodId,
             submission: .temporarilyUnavailable,
-            isCancellable: false
+            isCancellable: false,
+            cardTokenizationInteractor: interactor
         )
         state = .paymentProcessing(paymentProcessingState)
         interactor.start()
@@ -338,13 +336,13 @@ final class DynamicCheckoutDefaultInteractor:
     ) {
         let interactor = childProvider.nativeAlternativePaymentInteractor(gatewayId: payment.configuration.gatewayId)
         interactor.delegate = self
-        self.nativeAlternativePaymentInteractor = interactor
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: methodId,
             submission: .submitting,
             isCancellable: false,
-            isReady: false
+            isReady: false,
+            nativeAlternativePaymentInteractor: interactor
         )
         state = .paymentProcessing(paymentProcessingState)
         interactor.start()
@@ -477,12 +475,10 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
             paymentProcessingState.isCancellable = false
             self.state = .paymentProcessing(paymentProcessingState)
         case .completed(result: .success):
-            cardTokenizationInteractor?.delegate = nil
-            cardTokenizationInteractor = nil
+            paymentProcessingState.cardTokenizationInteractor?.delegate = nil
             setSuccessState()
         case .completed(result: .failure(let failure)):
-            cardTokenizationInteractor?.delegate = nil
-            cardTokenizationInteractor = nil
+            paymentProcessingState.cardTokenizationInteractor?.delegate = nil
             restoreStateAfterPaymentProcessingFailureIfPossible(failure)
         }
     }
@@ -526,34 +522,12 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
             paymentProcessingState.isReady = true
             self.state = .paymentProcessing(paymentProcessingState)
         case .completed(result: .success):
-            nativeAlternativePaymentInteractor?.delegate = nil
-            nativeAlternativePaymentInteractor = nil
+            paymentProcessingState.nativeAlternativePaymentInteractor?.delegate = nil
             setSuccessState()
         case .completed(result: .failure(let failure)):
-            nativeAlternativePaymentInteractor?.delegate = nil
-            nativeAlternativePaymentInteractor = nil
+            paymentProcessingState.nativeAlternativePaymentInteractor?.delegate = nil
             restoreStateAfterPaymentProcessingFailureIfPossible(failure)
         }
-    }
-}
-
-extension DynamicCheckoutDefaultInteractor: DynamicCheckoutRouterDelegate {
-
-    func routerWillRouteToNativeAlternativePayment(
-        with gatewayConfigurationId: String
-    ) -> any NativeAlternativePaymentInteractor {
-        guard let interactor = nativeAlternativePaymentInteractor else {
-            preconditionFailure("Unable to resolve native APM interactor.")
-        }
-        assert(interactor.configuration.gatewayConfigurationId == gatewayConfigurationId)
-        return interactor
-    }
-
-    func routerWillRouteToCardTokenization() -> any CardTokenizationInteractor {
-        guard let interactor = cardTokenizationInteractor else {
-            preconditionFailure("Unable to resolve card tokenization interactor.")
-        }
-        return interactor
     }
 }
 

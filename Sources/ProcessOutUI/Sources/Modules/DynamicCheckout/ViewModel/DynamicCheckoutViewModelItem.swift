@@ -62,14 +62,26 @@ enum DynamicCheckoutViewModelItem {
         let additionalInformation: String?
     }
 
-    struct AlternativePayment: Equatable {
+    struct AlternativePayment: Identifiable {
 
-        /// Gateway configuration id that should be used to initiate native alternative payment.
-        let gatewayConfigurationId: String
+        /// Alternative payment item ID.
+        let id: AnyHashable
+
+        /// Creates alternative payment view model.
+        let viewModel: () -> AnyNativeAlternativePaymentViewModel
+    }
+
+    struct Card: Identifiable {
+
+        /// Card item ID.
+        let id: AnyHashable
+
+        /// Creates card tokenization view model.
+        let viewModel: () -> AnyCardTokenizationViewModel
     }
 
     // swiftlint:disable:next line_length
-    case progress, passKitPayment(PassKitPayment), expressPayment(ExpressPayment), payment(Payment), card, alternativePayment(AlternativePayment)
+    case progress, passKitPayment(PassKitPayment), expressPayment(ExpressPayment), payment(Payment), card(Card), alternativePayment(AlternativePayment)
 }
 
 extension DynamicCheckoutViewModelItem: Identifiable {
@@ -84,17 +96,16 @@ extension DynamicCheckoutViewModelItem: Identifiable {
             return item.id
         case .payment(let item):
             return item.id
-        case .card:
-            return Constants.cardId
+        case .card(let item):
+            return item.id
         case .alternativePayment(let item):
-            return item.gatewayConfigurationId
+            return item.id
         }
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let cardId = UUID().uuidString
         static let progressId = UUID().uuidString
     }
 }
