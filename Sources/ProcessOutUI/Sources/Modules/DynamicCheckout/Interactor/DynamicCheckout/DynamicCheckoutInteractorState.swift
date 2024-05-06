@@ -53,12 +53,12 @@ enum DynamicCheckoutInteractorState {
 
         /// Defines whether payment is cancellable.
         var isCancellable: Bool
+
+        /// For payment methods that need preloading this is initially set to `false`. Default value is `true`.
+        var isReady = true
     }
 
     enum PaymentSubmission {
-
-        /// Payment submission can't be forced.
-        case unavailable
 
         /// Submission is currently unavailable.
         case temporarilyUnavailable

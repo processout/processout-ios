@@ -40,7 +40,6 @@ final class DynamicCheckoutDefaultInteractor:
 
     override func start() {
         guard case .idle = state else {
-            assertionFailure("Interactor start must be attempted only once.")
             return
         }
         delegate?.dynamicCheckout(didEmitEvent: .willStart)
@@ -79,7 +78,7 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     @discardableResult
-    func startPayment(methodId: String) -> Bool { // swiftlint:disable:this cyclomatic_complexity
+    func startPayment(methodId: String) -> Bool {
         switch state {
         case .selected(let selectedState) where selectedState.paymentMethodId == methodId:
             let startedState = selectedState.snapshot
@@ -344,7 +343,8 @@ final class DynamicCheckoutDefaultInteractor:
             snapshot: startedState,
             paymentMethodId: methodId,
             submission: .submitting,
-            isCancellable: false
+            isCancellable: false,
+            isReady: false
         )
         state = .paymentProcessing(paymentProcessingState)
         interactor.start()
@@ -477,9 +477,11 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
             paymentProcessingState.isCancellable = false
             self.state = .paymentProcessing(paymentProcessingState)
         case .completed(result: .success):
+            cardTokenizationInteractor?.delegate = nil
             cardTokenizationInteractor = nil
             setSuccessState()
         case .completed(result: .failure(let failure)):
+            cardTokenizationInteractor?.delegate = nil
             cardTokenizationInteractor = nil
             restoreStateAfterPaymentProcessingFailureIfPossible(failure)
         }
@@ -489,6 +491,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
 extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
 
     func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentEvent) {
+        // todo(andrii-vysotskyi): when user submits parameters all other nAPM shouldn't be selectable
         delegate?.dynamicCheckout(didEmitAlternativePaymentEvent: event)
     }
 
@@ -508,21 +511,26 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
         case .idle:
             break // Ignored
         case .starting:
-            paymentProcessingState.submission = .unavailable
+            paymentProcessingState.submission = .temporarilyUnavailable
             paymentProcessingState.isCancellable = false
+            paymentProcessingState.isReady = false
             self.state = .paymentProcessing(paymentProcessingState)
         case .started(let startedState):
             paymentProcessingState.submission = startedState.isSubmittable ? .possible : .temporarilyUnavailable
             paymentProcessingState.isCancellable = startedState.isCancellable
+            paymentProcessingState.isReady = true
             self.state = .paymentProcessing(paymentProcessingState)
         case .submitting(let submittingState):
             paymentProcessingState.submission = .submitting
             paymentProcessingState.isCancellable = submittingState.isCancellable
+            paymentProcessingState.isReady = true
             self.state = .paymentProcessing(paymentProcessingState)
         case .completed(result: .success):
+            nativeAlternativePaymentInteractor?.delegate = nil
             nativeAlternativePaymentInteractor = nil
             setSuccessState()
         case .completed(result: .failure(let failure)):
+            nativeAlternativePaymentInteractor?.delegate = nil
             nativeAlternativePaymentInteractor = nil
             restoreStateAfterPaymentProcessingFailureIfPossible(failure)
         }

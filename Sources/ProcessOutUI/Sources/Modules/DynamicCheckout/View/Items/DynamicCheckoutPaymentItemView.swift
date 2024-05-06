@@ -14,8 +14,8 @@ struct DynamicCheckoutPaymentItemView: View {
     let item: DynamicCheckoutViewModelItem.Payment
 
     var body: some View {
-        VStack {
-            HStack {
+        VStack(spacing: POSpacing.small) {
+            HStack(spacing: POSpacing.small) {
                 POAsyncImage(resource: item.iconImageResource) {
                     Color(item.brandColor).frame(width: 24, height: 24)
                 }
@@ -23,6 +23,10 @@ struct DynamicCheckoutPaymentItemView: View {
                     .lineLimit(1)
                     .textStyle(style.subsection.title)
                 Spacer()
+                if item.isLoading {
+                    ProgressView()
+                        .poProgressViewStyle(style.progressView)
+                }
                 Button(
                     action: {
                         item.isSelected = true
@@ -43,6 +47,7 @@ struct DynamicCheckoutPaymentItemView: View {
             item.isSelected = true
         }
         .background(style.backgroundColor)
+        .animation(.default, value: item.isLoading)
         .backport.geometryGroup()
     }
 

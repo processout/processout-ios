@@ -37,7 +37,7 @@ enum DynamicCheckoutViewModelItem {
         let action: () -> Void
     }
 
-    struct Payment: Identifiable, Hashable {
+    struct Payment: Identifiable, Equatable {
 
         /// Item identifier.
         let id: String
@@ -51,6 +51,9 @@ enum DynamicCheckoutViewModelItem {
         /// Item title.
         let title: String
 
+        /// Indicates whether loading indicator should be visible.
+        let isLoading: Bool
+
         /// Defines whether item is currently selected.
         @Binding
         var isSelected: Bool
@@ -59,7 +62,7 @@ enum DynamicCheckoutViewModelItem {
         let additionalInformation: String?
     }
 
-    struct AlternativePayment: Hashable {
+    struct AlternativePayment: Equatable {
 
         /// Gateway configuration id that should be used to initiate native alternative payment.
         let gatewayConfigurationId: String

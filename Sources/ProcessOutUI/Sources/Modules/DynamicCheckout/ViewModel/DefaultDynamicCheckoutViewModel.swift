@@ -10,10 +10,12 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-// swiftlint:disable:next type_body_length
+// swiftlint:disable type_body_length
+
 final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
 
     init(interactor: some DynamicCheckoutInteractor) {
+        // todo(andrii-vysotskyi): set state to proper value
         self.interactor = interactor
         observeChanges(interactor: interactor)
     }
@@ -97,7 +99,9 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         let expressSection = createExpressMethodsSection(state: state)
         let regularItems = state.regularPaymentMethodIds.compactMap { methodId in
             let isSelected = selectedMethodId == methodId
-            return createItem(paymentMethodId: methodId, state: state, isExpress: false, isSelected: isSelected)
+            return createItem(
+                paymentMethodId: methodId, state: state, isExpress: false, isSelected: isSelected, isLoading: false
+            )
         }
         let regularSection = DynamicCheckoutViewModelSection(
             id: SectionId.regularMethods,
@@ -113,7 +117,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         state: DynamicCheckoutInteractorState.Started
     ) -> DynamicCheckoutViewModelSection {
         let expressItems = state.expressPaymentMethodIds.compactMap { methodId in
-            createItem(paymentMethodId: methodId, state: state, isExpress: true, isSelected: false)
+            createItem(paymentMethodId: methodId, state: state, isExpress: true, isSelected: false, isLoading: false)
         }
         let section = DynamicCheckoutViewModelSection(
             id: SectionId.expressMethods,
@@ -129,7 +133,8 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         paymentMethodId methodId: String,
         state: DynamicCheckoutInteractorState.Started,
         isExpress: Bool,
-        isSelected: Bool
+        isSelected: Bool,
+        isLoading: Bool
     ) -> DynamicCheckoutViewModelItem? {
         guard let method = state.paymentMethods[methodId] else {
             assertionFailure("Unable to resolve payment method by ID")
@@ -160,7 +165,9 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         if isExpress {
             return createExpressPaymentItem(id: methodId, display: display)
         }
-        return createRegularPaymentItem(id: methodId, display: display, isExternal: isExternal, isSelected: isSelected)
+        return createRegularPaymentItem(
+            id: methodId, display: display, isExternal: isExternal, isSelected: isSelected, isLoading: isLoading
+        )
     }
 
     private func createExpressPaymentItem(
@@ -179,7 +186,11 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     }
 
     private func createRegularPaymentItem(
-        id: String, display: PODynamicCheckoutPaymentMethod.Display, isExternal: Bool, isSelected selected: Bool
+        id: String,
+        display: PODynamicCheckoutPaymentMethod.Display,
+        isExternal: Bool,
+        isSelected selected: Bool,
+        isLoading: Bool
     ) -> DynamicCheckoutViewModelItem {
         let isSelected = Binding<Bool> {
             selected
@@ -202,6 +213,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             iconImageResource: display.logo,
             brandColor: display.brandColor,
             title: display.name,
+            isLoading: isLoading,
             isSelected: isSelected,
             additionalInformation: additionalInformation
         )
@@ -254,6 +266,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     // MARK: - Payment Processing
 
     private func updateWithPaymentProcessingState(_ state: DynamicCheckoutInteractorState.PaymentProcessing) {
+        // todo(andrii-vysotskyi): fix action state
         updateSectionsWithPaymentProcessingState(state)
         updateActionsWithPaymentProcessingState(state)
     }
@@ -261,11 +274,15 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     private func updateSectionsWithPaymentProcessingState(_ state: DynamicCheckoutInteractorState.PaymentProcessing) {
         let expressSection = createExpressMethodsSection(state: state.snapshot)
         let regularItems = state.snapshot.regularPaymentMethodIds.flatMap { methodId in
-            let isProcessing = state.paymentMethodId == methodId
+            let isSelected = state.paymentMethodId == methodId
             let item = createItem(
-                paymentMethodId: methodId, state: state.snapshot, isExpress: false, isSelected: isProcessing
+                paymentMethodId: methodId,
+                state: state.snapshot,
+                isExpress: false,
+                isSelected: isSelected,
+                isLoading: isSelected && !state.isReady
             )
-            guard isProcessing else {
+            guard isSelected, state.isReady else {
                 return [item]
             }
             let itemContent = createProcessedItemContent(state: state.snapshot, methodId: state.paymentMethodId)
@@ -311,8 +328,6 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     ) -> POActionsContainerActionViewModel? {
         let isEnabled, isLoading: Bool
         switch state.submission {
-        case .unavailable:
-            return nil
         case .temporarilyUnavailable:
             isEnabled = false
             isLoading = false
@@ -378,3 +393,5 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         }
     }
 }
+
+// swiftlint:enable type_body_length
