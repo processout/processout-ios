@@ -55,6 +55,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         interactor.didChange = { [weak self] in
             self?.updateWithInteractorState()
         }
+        updateWithInteractorState()
     }
 
     private func updateWithInteractorState() {

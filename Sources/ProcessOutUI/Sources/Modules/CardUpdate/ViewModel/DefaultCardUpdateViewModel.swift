@@ -71,6 +71,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         interactor.didChange = { [weak self] in
             self?.configureWithInteractorState()
         }
+        configureWithInteractorState()
     }
 
     private func configureWithInteractorState() {

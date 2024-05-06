@@ -70,6 +70,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         interactor.didChange = { [weak self] in
             self?.updateWithInteractorState()
         }
+        updateWithInteractorState()
     }
 
     private func updateWithInteractorState() {

@@ -19,7 +19,6 @@ struct DynamicCheckoutCardItemView: View {
     var body: some View {
         CardTokenizationContentView(viewModel: viewModel)
             .cardTokenizationStyle(.init(dynamicCheckoutStyle: style))
-            .onAppear(perform: viewModel.start)
     }
 
     // MARK: - Private Properties

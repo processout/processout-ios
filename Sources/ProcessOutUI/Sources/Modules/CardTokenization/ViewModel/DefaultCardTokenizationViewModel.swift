@@ -59,6 +59,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         interactor.didChange = { [weak self] in
             self?.configureWithInteractorState()
         }
+        configureWithInteractorState()
     }
 
     private func configureWithInteractorState() {

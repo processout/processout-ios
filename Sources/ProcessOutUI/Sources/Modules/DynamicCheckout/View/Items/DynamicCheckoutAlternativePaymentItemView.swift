@@ -19,7 +19,6 @@ struct DynamicCheckoutAlternativePaymentItemView: View {
     var body: some View {
         NativeAlternativePaymentContentView(viewModel: viewModel)
             .nativeAlternativePaymentStyle(.init(dynamicCheckoutStyle: style))
-            .onAppear(perform: viewModel.start)
     }
 
     // MARK: - Private Properties
