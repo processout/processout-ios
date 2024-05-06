@@ -38,6 +38,7 @@ struct CardTokenizationContentView<ViewModel: CardTokenizationViewModel>: View {
         }
         .padding(.vertical, POSpacing.medium)
         .frame(maxWidth: .infinity)
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
