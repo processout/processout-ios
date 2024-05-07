@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14.0, *)
 struct DynamicCheckoutCardItemView: View {
@@ -17,7 +18,7 @@ struct DynamicCheckoutCardItemView: View {
     // MARK: - View
 
     var body: some View {
-        CardTokenizationContentView(viewModel: viewModel)
+        CardTokenizationContentView(viewModel: viewModel, horizontalPadding: POSpacing.medium)
             .cardTokenizationStyle(.init(dynamicCheckoutStyle: style))
     }
 

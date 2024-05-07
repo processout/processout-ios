@@ -11,8 +11,10 @@ import SwiftUI
 @available(iOS 14.0, *)
 struct CardTokenizationContentView<ViewModel: CardTokenizationViewModel>: View {
 
-    @ObservedObject
-    private(set) var viewModel: ViewModel
+    init(viewModel: ViewModel, horizontalPadding: CGFloat = POSpacing.large) {
+        self.viewModel = viewModel
+        self.horizontalPadding = horizontalPadding
+    }
 
     // MARK: - View
 
@@ -21,7 +23,7 @@ struct CardTokenizationContentView<ViewModel: CardTokenizationViewModel>: View {
             if let title = viewModel.state.title {
                 Text(title)
                     .textStyle(style.title)
-                    .padding(.horizontal, POSpacing.large)
+                    .padding(.horizontal, horizontalPadding)
                 Divider()
                     .frame(height: 1)
                     .overlay(style.separatorColor)
@@ -31,7 +33,7 @@ struct CardTokenizationContentView<ViewModel: CardTokenizationViewModel>: View {
                     section: section, focusedInputId: $viewModel.state.focusedInputId
                 )
             }
-            .padding(.horizontal, POSpacing.large)
+            .padding(.horizontal, horizontalPadding)
         }
         .backport.onChange(of: viewModel.state.focusedInputId) {
             scrollToFocusedInput()
@@ -43,11 +45,16 @@ struct CardTokenizationContentView<ViewModel: CardTokenizationViewModel>: View {
 
     // MARK: - Private Properties
 
+    private let horizontalPadding: CGFloat
+
     @Environment(\.cardTokenizationStyle)
     private var style
 
     @Environment(\.scrollViewProxy)
     private var scrollView
+
+    @ObservedObject
+    private var viewModel: ViewModel
 
     // MARK: - Private Methods
 
