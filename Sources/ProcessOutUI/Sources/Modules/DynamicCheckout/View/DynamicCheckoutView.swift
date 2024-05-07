@@ -20,8 +20,8 @@ struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel>: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ScrollView(showsIndicators: false) {
-                ScrollViewReader { scrollView in
+            ScrollViewReader { scrollView in
+                ScrollView(showsIndicators: true) {
                     DynamicCheckoutContentView(sections: viewModel.sections)
                         .scrollViewProxy(scrollView)
                 }
