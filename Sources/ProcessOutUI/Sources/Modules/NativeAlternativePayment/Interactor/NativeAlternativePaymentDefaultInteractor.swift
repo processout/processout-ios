@@ -1,5 +1,5 @@
 //
-//  DefaultDynamicCheckoutAlternativePaymentInteractor.swift
+//  NativeAlternativePaymentDefaultInteractor.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 29.02.2024.
@@ -135,12 +135,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         switch details.state {
-        case .pendingCapture:
-            logger.debug("No more parameters to submit, waiting for capture")
-            await setAwaitingCaptureStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
-        case .captured:
-            await setCapturedStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
-        default:
+        case .customerInput, nil:
             if details.parameters.isEmpty {
                 logger.debug("Will set started state with empty inputs, this may be unexpected")
             }
@@ -155,6 +150,14 @@ final class NativeAlternativePaymentDefaultInteractor:
             send(event: .didStart)
             logger.info("Did start payment, waiting for parameters")
             enableCancellationAfterDelay()
+        case .pendingCapture:
+            logger.debug("No more parameters to submit, waiting for capture")
+            await setAwaitingCaptureStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
+        case .captured:
+            await setCapturedStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
+        case .failed:
+            let failure = POFailure(code: .generic(.mobile))
+            setFailureStateUnchecked(error: failure)
         }
     }
 
@@ -187,8 +190,11 @@ final class NativeAlternativePaymentDefaultInteractor:
             await setCapturedStateUnchecked(
                 gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
             )
-        default:
+        case .customerInput:
             await restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
+        case .failed:
+            let failure = POFailure(code: .generic(.mobile))
+            setFailureStateUnchecked(error: failure)
         }
     }
 

@@ -379,6 +379,7 @@ final class DynamicCheckoutDefaultInteractor:
                 setFailureStateUnchecked(error: error)
             }
         default:
+            // todo(andrii-vysotskyi): decide if user should be able to continue
             setFailureStateUnchecked(error: error)
         }
     }
