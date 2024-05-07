@@ -389,7 +389,6 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         withAnimation(isAnimated ? .default : nil) {
             sections = newSections
         }
-        sections = newSections
     }
 
     private func setActions(_ newActions: [POActionsContainerActionViewModel]) {
@@ -397,7 +396,6 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         withAnimation(isAnimated ? .default : nil) {
             actions = newActions
         }
-        actions = newActions
     }
 }
 
