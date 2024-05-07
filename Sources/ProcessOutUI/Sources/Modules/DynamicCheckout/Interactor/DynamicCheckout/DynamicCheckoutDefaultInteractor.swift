@@ -300,7 +300,7 @@ final class DynamicCheckoutDefaultInteractor:
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: methodId,
-            submission: .temporarilyUnavailable,
+            submission: .possible,
             isCancellable: false,
             cardTokenizationInteractor: interactor
         )
