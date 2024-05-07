@@ -14,8 +14,7 @@ struct DynamicCheckoutSectionView: View {
     let section: DynamicCheckoutViewModelSection
 
     var body: some View {
-        let horizontalPadding = section.areBezelsVisible ? POSpacing.small : 0
-        VStack(spacing: POSpacing.small) {
+        VStack(spacing: 0) {
             if let title = section.title, !title.isEmpty {
                 Text(title)
                     .textStyle(style.title)
@@ -23,21 +22,23 @@ struct DynamicCheckoutSectionView: View {
                     .onSizeChange { size in
                         titleSize = size
                     }
-                    .padding(.horizontal, horizontalPadding)
+                    .padding(.horizontal, POSpacing.small)
             }
-            let items = Array(
-                section.items.enumerated()
-            )
-            ForEach(items, id: \.element.id) { offset, element in
-                DynamicCheckoutItemView(item: element)
-                if section.areSeparatorsVisible, offset + 1 < items.count {
-                    Divider()
-                        .frame(height: 1)
-                        .overlay(style.subsection.dividerColor)
+            VStack(spacing: section.areSeparatorsVisible ? 0 : POSpacing.small) {
+                let items = Array(
+                    section.items.enumerated()
+                )
+                ForEach(items, id: \.element.id) { offset, element in
+                    DynamicCheckoutItemView(item: element)
+                    if section.areSeparatorsVisible, offset + 1 < items.count {
+                        Divider()
+                            .frame(height: 1)
+                            .overlay(style.subsection.dividerColor)
+                    }
                 }
             }
+            .padding(section.areSeparatorsVisible ? 0 : POSpacing.medium)
         }
-        .padding(.vertical, section.areBezelsVisible ? POSpacing.small : 0)
         .overlay(borderOverlay)
         .backport.geometryGroup()
     }
@@ -62,6 +63,6 @@ struct DynamicCheckoutSectionView: View {
                 ),
                 style: section.areBezelsVisible ? style.section.border : .clear
             )
-            .padding(.top, hasTitle ? titleSize.height / 2 + POSpacing.small : 0)
+            .padding(.top, hasTitle ? titleSize.height / 2 : 0)
     }
 }

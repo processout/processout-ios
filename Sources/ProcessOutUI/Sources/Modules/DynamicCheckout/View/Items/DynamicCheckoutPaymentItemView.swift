@@ -14,7 +14,7 @@ struct DynamicCheckoutPaymentItemView: View {
     let item: DynamicCheckoutViewModelItem.Payment
 
     var body: some View {
-        VStack(spacing: POSpacing.small) {
+        VStack(spacing: 0) {
             HStack(spacing: POSpacing.small) {
                 POAsyncImage(resource: item.iconImageResource) {
                     Color(item.brandColor).frame(width: 24, height: 24)
@@ -35,9 +35,13 @@ struct DynamicCheckoutPaymentItemView: View {
                         EmptyView()
                     }
                 )
-                .buttonStyle(POAnyButtonStyle(erasing: style.radioButton))
+                .buttonStyle(
+                    POAnyButtonStyle(erasing: style.radioButton)
+                )
                 .radioButtonSelected(item.isSelected)
             }
+            .animation(.default, value: item.isLoading)
+            .padding(.vertical, 6) // Custom value to make sure that total padding is 16
             if let information = item.additionalInformation {
                 body(information: information)
             }
@@ -46,8 +50,8 @@ struct DynamicCheckoutPaymentItemView: View {
         .onTapGesture {
             item.isSelected = true
         }
+        .padding(.horizontal, POSpacing.medium)
         .background(style.backgroundColor)
-        .animation(.default, value: item.isLoading)
         .backport.geometryGroup()
     }
 
@@ -74,6 +78,7 @@ struct DynamicCheckoutPaymentItemView: View {
                     .foregroundColor(style.subsection.informationText.color)
             }
         )
+        .padding(.bottom, POSpacing.medium)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

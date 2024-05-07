@@ -14,23 +14,19 @@ struct DynamicCheckoutItemView: View {
     let item: DynamicCheckoutViewModelItem
 
     var body: some View {
-        let padding = POSpacing.medium
         switch item {
         case .progress:
             ProgressView()
                 .frame(maxWidth: .infinity)
-                .padding(padding)
+                .padding(POSpacing.medium)
                 .poProgressViewStyle(style.progressView)
         case .passKitPayment(let item):
             POPassKitPaymentButton(style: style.passKitPaymentButtonStyle, action: item.action)
-                .padding(.horizontal, padding)
         case .expressPayment(let item):
             DynamicCheckoutExpressPaymentItemView(item: item)
                 .buttonStyle(POAnyButtonStyle(erasing: style.expressPaymentButtonStyle))
-                .padding(.horizontal, padding)
         case .payment(let item):
             DynamicCheckoutPaymentItemView(item: item)
-                .padding(.horizontal, padding)
         case .card(let item):
             DynamicCheckoutCardItemView(item: item)
         case .alternativePayment(let item):

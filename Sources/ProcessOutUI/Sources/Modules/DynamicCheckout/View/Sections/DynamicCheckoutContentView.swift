@@ -17,7 +17,7 @@ struct DynamicCheckoutContentView: View {
     // MARK: - View
 
     var body: some View {
-        VStack(spacing: POSpacing.medium) {
+        VStack(spacing: POSpacing.small) {
             let sections = Array(
                 sections.enumerated()
             )
