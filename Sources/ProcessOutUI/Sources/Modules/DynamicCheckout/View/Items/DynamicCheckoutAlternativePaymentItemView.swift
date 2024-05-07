@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14.0, *)
 struct DynamicCheckoutAlternativePaymentItemView: View {
@@ -17,7 +18,7 @@ struct DynamicCheckoutAlternativePaymentItemView: View {
     // MARK: - View
 
     var body: some View {
-        NativeAlternativePaymentContentView(viewModel: viewModel)
+        NativeAlternativePaymentContentView(viewModel: viewModel, horizontalPadding: POSpacing.medium)
             .nativeAlternativePaymentStyle(.init(dynamicCheckoutStyle: style))
     }
 

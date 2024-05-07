@@ -12,6 +12,7 @@ import SwiftUI
 struct NativeAlternativePaymentItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem
+    let horizontalPadding: CGFloat
 
     @Binding
     private(set) var focusedItemId: AnyHashable?
@@ -19,18 +20,18 @@ struct NativeAlternativePaymentItemView: View {
     var body: some View {
         switch item {
         case .title(let item):
-            NativeAlternativePaymentTitleItemView(item: item)
+            NativeAlternativePaymentTitleItemView(item: item, horizontalPadding: horizontalPadding)
         case .input(let item):
             InputView(viewModel: item, focusedInputId: $focusedItemId)
                 .inputStyle(style.input)
-                .padding(.horizontal, POSpacing.large)
+                .padding(.horizontal, horizontalPadding)
         case .codeInput(let item):
             POCodeField(length: item.length, text: item.$value)
                 .backport.focused($focusedItemId, equals: item.id)
                 .controlInvalid(item.isInvalid)
                 .disabled(!item.isEnabled)
                 .inputStyle(style.codeInput)
-                .padding(.horizontal, POSpacing.large)
+                .padding(.horizontal, horizontalPadding)
         case .picker(let pickerItem):
             POPicker(pickerItem.options, selection: pickerItem.$selectedOptionId) { option in
                 Text(option.title)
@@ -40,13 +41,13 @@ struct NativeAlternativePaymentItemView: View {
                 view.pickerStyle(style)
             }
             .pickerStyle(POMenuPickerStyle(inputStyle: style.input))
-            .padding(.horizontal, POSpacing.large)
+            .padding(.horizontal, horizontalPadding)
         case .progress:
             ProgressView()
                 .poProgressViewStyle(style.progressView)
-                .padding(.horizontal, POSpacing.large)
+                .padding(.horizontal, horizontalPadding)
         case .submitted(let item):
-            NativeAlternativePaymentSubmittedItemView(item: item)
+            NativeAlternativePaymentSubmittedItemView(item: item, horizontalPadding: horizontalPadding)
         }
     }
 
