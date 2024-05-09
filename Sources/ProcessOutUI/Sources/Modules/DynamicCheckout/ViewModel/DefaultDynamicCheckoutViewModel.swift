@@ -424,10 +424,14 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
 
     // MARK: - Utils
 
-    private func createCancelAction(isEnabled: Bool) -> POActionsContainerActionViewModel {
+    private func createCancelAction(isEnabled: Bool) -> POActionsContainerActionViewModel? {
+        let title = interactor.configuration.cancelActionTitle ?? String(resource: .DynamicCheckout.Button.cancel)
+        guard !title.isEmpty else {
+            return nil
+        }
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.cancel,
-            title: String(resource: .DynamicCheckout.Button.cancel),
+            title: title,
             isEnabled: isEnabled,
             isLoading: false,
             isPrimary: false,

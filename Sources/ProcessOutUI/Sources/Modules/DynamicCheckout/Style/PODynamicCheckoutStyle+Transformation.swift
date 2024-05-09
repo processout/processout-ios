@@ -35,12 +35,10 @@ extension PONativeAlternativePaymentStyle {
         errorDescription = style.errorText
         actionsContainer = style.actionsContainer
         progressView = style.progressView
-        // todo(andrii-vysotskyi): replace values with information from input stylr
-        // begin
+        // todo(andrii-vysotskyi): resolve message style from input style
         message = POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body)
-        successMessage = POTextStyle(color: Color(poResource: .Text.success), typography: .Fixed.body)
-        background = .default
-        // end
+        successMessage = style.success.message
+        background = .init(regular: style.backgroundColor, success: style.success.backgroundColor)
         separatorColor = style.subsection.dividerColor
     }
 }
