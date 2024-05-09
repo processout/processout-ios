@@ -513,7 +513,7 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
         case .idle:
             break // Ignored
         case .starting:
-            paymentProcessingState.submission = .temporarilyUnavailable
+            paymentProcessingState.submission = .submitting
             paymentProcessingState.isCancellable = false
             paymentProcessingState.isReady = false
             self.state = .paymentProcessing(paymentProcessingState)
