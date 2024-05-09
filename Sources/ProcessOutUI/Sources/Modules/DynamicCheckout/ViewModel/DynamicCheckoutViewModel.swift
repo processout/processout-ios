@@ -11,10 +11,7 @@ import Combine
 protocol DynamicCheckoutViewModel: ObservableObject {
 
     /// Available sections.
-    var sections: [DynamicCheckoutViewModelSection] { get }
-
-    /// Available actions.
-    var actions: [POActionsContainerActionViewModel] { get }
+    var state: DynamicCheckoutViewModelState { get }
 
     /// Starts view model.
     func start()

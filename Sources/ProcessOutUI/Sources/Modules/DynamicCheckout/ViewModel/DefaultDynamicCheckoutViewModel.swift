@@ -23,10 +23,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     // MARK: - DynamicCheckoutViewModel
 
     @Published
-    private(set) var sections: [DynamicCheckoutViewModelSection] = []
-
-    @Published
-    private(set) var actions: [POActionsContainerActionViewModel] = []
+    private(set) var state: DynamicCheckoutViewModelState = .idle
 
     func start() {
         interactor.start()
@@ -89,20 +86,25 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areSeparatorsVisible: false,
             areBezelsVisible: false
         )
-        sections = [section]
-        actions = []
+        let newState = DynamicCheckoutViewModelState(
+            sections: [section], actions: []
+        )
+        setState(newState)
     }
 
     // MARK: - Started
 
     private func updateWithStartedState(_ state: DynamicCheckoutInteractorState.Started) {
-        updateSectionsWithStartedState(state, selectedMethodId: nil)
-        updateActionsWithStartedState(state)
+        let newState = DynamicCheckoutViewModelState(
+            sections: createSectionsWithStartedState(state, selectedMethodId: nil),
+            actions: createActionsWithStartedState(state)
+        )
+        setState(newState)
     }
 
-    private func updateSectionsWithStartedState(
+    private func createSectionsWithStartedState(
         _ state: DynamicCheckoutInteractorState.Started, selectedMethodId: String?
-    ) {
+    ) -> [DynamicCheckoutViewModelSection] {
         let expressSection = createExpressMethodsSection(state: state)
         let regularItems = state.regularPaymentMethodIds.compactMap { methodId in
             let isSelected = selectedMethodId == methodId
@@ -117,7 +119,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areSeparatorsVisible: true,
             areBezelsVisible: true
         )
-        setSections([expressSection, regularSection])
+        return [expressSection, regularSection]
     }
 
     private func createExpressMethodsSection(
@@ -227,9 +229,11 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         return .payment(item)
     }
 
-    private func updateActionsWithStartedState(_ state: DynamicCheckoutInteractorState.Started) {
+    private func createActionsWithStartedState(
+        _ state: DynamicCheckoutInteractorState.Started
+    ) -> [POActionsContainerActionViewModel] {
         let cancelAction = createCancelAction(state)
-        setActions([cancelAction].compactMap { $0 })
+        return [cancelAction].compactMap { $0 }
     }
 
     private func createCancelAction(
@@ -244,14 +248,19 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     // MARK: - Selected
 
     private func updateWithSelectedState(_ state: DynamicCheckoutInteractorState.Selected) {
-        updateSectionsWithStartedState(state.snapshot, selectedMethodId: state.paymentMethodId)
-        updateActionsWithSelectedState(state)
+        let newState = DynamicCheckoutViewModelState(
+            sections: createSectionsWithStartedState(state.snapshot, selectedMethodId: state.paymentMethodId),
+            actions: createActionsWithSelectedState(state)
+        )
+        setState(newState)
     }
 
-    private func updateActionsWithSelectedState(_ state: DynamicCheckoutInteractorState.Selected) {
+    private func createActionsWithSelectedState(
+        _ state: DynamicCheckoutInteractorState.Selected
+    ) -> [POActionsContainerActionViewModel] {
         let submitAction = createSubmitAction(state)
         let cancelAction = createCancelAction(state.snapshot)
-        setActions([submitAction, cancelAction].compactMap { $0 })
+        return [submitAction, cancelAction].compactMap { $0 }
     }
 
     private func createSubmitAction(
@@ -273,12 +282,16 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     // MARK: - Payment Processing
 
     private func updateWithPaymentProcessingState(_ state: DynamicCheckoutInteractorState.PaymentProcessing) {
-        // todo(andrii-vysotskyi): fix action state
-        updateSectionsWithPaymentProcessingState(state)
-        updateActionsWithPaymentProcessingState(state)
+        let newState = DynamicCheckoutViewModelState(
+            sections: createSectionsWithPaymentProcessingState(state),
+            actions: createActionsWithPaymentProcessingState(state)
+        )
+        setState(newState)
     }
 
-    private func updateSectionsWithPaymentProcessingState(_ state: DynamicCheckoutInteractorState.PaymentProcessing) {
+    private func createSectionsWithPaymentProcessingState(
+        _ state: DynamicCheckoutInteractorState.PaymentProcessing
+    ) -> [DynamicCheckoutViewModelSection] {
         let expressSection = createExpressMethodsSection(state: state.snapshot)
         let regularItems = state.snapshot.regularPaymentMethodIds.flatMap { methodId in
             let isSelected = state.paymentMethodId == methodId
@@ -302,7 +315,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areSeparatorsVisible: true,
             areBezelsVisible: true
         )
-        setSections([expressSection, regularSection])
+        return [expressSection, regularSection]
     }
 
     private func createProcessedItemContent(
@@ -339,10 +352,12 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         }
     }
 
-    private func updateActionsWithPaymentProcessingState(_ state: DynamicCheckoutInteractorState.PaymentProcessing) {
+    private func createActionsWithPaymentProcessingState(
+        _ state: DynamicCheckoutInteractorState.PaymentProcessing
+    ) -> [POActionsContainerActionViewModel] {
         let submitAction = createSubmitAction(state)
         let cancelAction = createCancelAction(state)
-        setActions([submitAction, cancelAction].compactMap { $0 })
+        return [submitAction, cancelAction].compactMap { $0 }
     }
 
     private func createSubmitAction(
@@ -401,8 +416,10 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areSeparatorsVisible: false,
             areBezelsVisible: false
         )
-        setSections([section])
-        setActions([])
+        let newState = DynamicCheckoutViewModelState(
+            sections: [section], actions: []
+        )
+        setState(newState)
     }
 
     // MARK: - Utils
@@ -421,20 +438,10 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         return viewModel
     }
 
-    private func setSections(_ newSections: [DynamicCheckoutViewModelSection]) {
-        let newSections = newSections.filter { section in
-            !section.items.isEmpty
-        }
-        let isAnimated = sections.map(\.animationIdentity) != newSections.map(\.animationIdentity)
+    private func setState(_ newState: DynamicCheckoutViewModelState) {
+        let isAnimated = newState.animationIdentity != state.animationIdentity
         withAnimation(isAnimated ? .default : nil) {
-            sections = newSections
-        }
-    }
-
-    private func setActions(_ newActions: [POActionsContainerActionViewModel]) {
-        let isAnimated = actions.map(\.id) != newActions.map(\.id)
-        withAnimation(isAnimated ? .default : nil) {
-            actions = newActions
+            state = newState
         }
     }
 }

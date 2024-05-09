@@ -22,14 +22,14 @@ struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel>: View {
         VStack(spacing: 0) {
             ScrollViewReader { scrollView in
                 ScrollView(showsIndicators: true) {
-                    DynamicCheckoutContentView(sections: viewModel.sections)
+                    DynamicCheckoutContentView(sections: viewModel.state.sections)
                         .scrollViewProxy(scrollView)
                 }
                 .backport.geometryGroup()
             }
             .clipped()
-            if !viewModel.actions.isEmpty {
-                POActionsContainerView(actions: viewModel.actions)
+            if !viewModel.state.actions.isEmpty {
+                POActionsContainerView(actions: viewModel.state.actions)
                     .actionsContainerStyle(style.actionsContainer)
             }
         }

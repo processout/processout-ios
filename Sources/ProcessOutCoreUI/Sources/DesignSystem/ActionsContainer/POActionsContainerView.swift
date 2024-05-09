@@ -16,6 +16,7 @@ public struct POActionsContainerView: View {
     }
 
     public var body: some View {
+        // todo(andrii-vysotskyi): ensure that are not empty
         VStack(spacing: POSpacing.medium) {
             Divider()
                 .frame(height: 1)
