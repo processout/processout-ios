@@ -153,9 +153,13 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         let isExternal: Bool
         switch method {
         case .applePay:
-            let item = DynamicCheckoutViewModelItem.PassKitPayment(id: methodId) { [weak self] in
-                self?.interactor.startPayment(methodId: methodId)
-            }
+            let item = DynamicCheckoutViewModelItem.PassKitPayment(
+                id: methodId,
+                buttonType: interactor.configuration.passKitPaymentButtonType,
+                action: { [weak self] in
+                    self?.interactor.startPayment(methodId: methodId)
+                }
+            )
             return .passKitPayment(item)
         case .alternativePayment(let method):
             display = method.display

@@ -12,11 +12,7 @@ import PassKit
 @_spi(PO)
 public struct POPassKitPaymentButton: View {
 
-    public init(
-        type: PKPaymentButtonType = .plain,
-        style: PKPaymentButtonStyle = .automatic,
-        action: @escaping () -> Void
-    ) {
+    public init(type: PKPaymentButtonType, style: PKPaymentButtonStyle, action: @escaping () -> Void) {
         self.buttonType = type
         self.style = style
         self.action = action
@@ -62,7 +58,7 @@ private struct ButtonRepresentable: UIViewRepresentable {
 
     func updateUIView(_ rootView: PKPaymentButton, context: Context) {
         // todo(andrii-vysotskyi): allow configuring corner radius
-        rootView.cornerRadius = 8
+        rootView.cornerRadius = POSpacing.small
         context.coordinator.action = action
     }
 

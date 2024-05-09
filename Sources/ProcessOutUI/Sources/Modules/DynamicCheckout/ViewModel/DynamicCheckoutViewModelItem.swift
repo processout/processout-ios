@@ -6,14 +6,18 @@
 //
 
 import SwiftUI
+import PassKit
 import ProcessOut
 
 enum DynamicCheckoutViewModelItem {
 
-    struct PassKitPayment {
+    struct PassKitPayment: Identifiable {
 
         /// Id.
         let id: String
+
+        /// Payment button type.
+        let buttonType: PKPaymentButtonType
 
         /// Action handler.
         let action: () -> Void

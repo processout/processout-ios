@@ -36,7 +36,6 @@ public struct PODynamicCheckoutConfiguration {
     public var alternativePayment = PODynamicCheckoutAlternativePaymentConfiguration()
 
     /// PassKit payment button type.
-    /// - TODO: respect this configuration in UI.
     public var passKitPaymentButtonType = PKPaymentButtonType.plain
 
     /// Cancel action. To remove action use empty string.
