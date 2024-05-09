@@ -156,6 +156,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         case .captured:
             await setCapturedStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
         case .failed:
+            fallthrough // swiftlint:disable:this fallthrough
+        @unknown default:
             let failure = POFailure(code: .generic(.mobile))
             setFailureStateUnchecked(error: failure)
         }
@@ -193,6 +195,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         case .customerInput:
             await restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
         case .failed:
+            fallthrough // swiftlint:disable:this fallthrough
+        @unknown default:
             let failure = POFailure(code: .generic(.mobile))
             setFailureStateUnchecked(error: failure)
         }
