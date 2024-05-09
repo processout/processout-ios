@@ -1,0 +1,47 @@
+//
+//  DynamicCheckoutSuccessItemView.swift
+//  ProcessOutUI
+//
+//  Created by Andrii Vysotskyi on 09.05.2024.
+//
+
+import SwiftUI
+@_spi(PO) import ProcessOutCoreUI
+
+@available(iOS 14, *)
+struct DynamicCheckoutSuccessItemView: View {
+
+    let item: DynamicCheckoutViewModelItem.Success
+
+    var body: some View {
+        VStack(spacing: POSpacing.medium) {
+            Text(item.message)
+                .textStyle(style.success.message)
+                .multilineTextAlignment(.center)
+            Spacer()
+                .frame(height: POSpacing.large)
+            if let image = item.image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: min(Constants.maximumDecorationImageHeight, image.size.height))
+                    .foregroundColor(style.success.message.color)
+            }
+        }
+        .padding(POSpacing.medium)
+        .frame(maxWidth: .infinity)
+        .background(style.success.backgroundColor)
+        .backport.geometryGroup()
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let maximumDecorationImageHeight: CGFloat = 260
+    }
+
+    // MARK: - Private Properties
+
+    @Environment(\.dynamicCheckoutStyle)
+    private var style
+}

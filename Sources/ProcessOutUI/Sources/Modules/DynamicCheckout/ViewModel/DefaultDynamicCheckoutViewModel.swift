@@ -45,6 +45,10 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         static let regularMethods = "RegularMethods"
     }
 
+    public enum ItemId {
+        static let success = "Success"
+    }
+
     // MARK: - Private Properties
 
     private let interactor: any DynamicCheckoutInteractor
@@ -60,7 +64,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
 
     private func updateWithInteractorState() {
         switch interactor.state {
-        case .idle, .failure, .success:
+        case .idle, .failure:
             break // Ignored
         case .starting:
             updateWithStartingState()
@@ -70,6 +74,8 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             updateWithSelectedState(state)
         case .paymentProcessing(let state):
             updateWithPaymentProcessingState(state)
+        case .success:
+            updateWithSuccessState()
         }
     }
 
@@ -374,6 +380,29 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             return nil
         }
         return createCancelAction(isEnabled: state.isCancellable)
+    }
+
+    // MARK: - Success
+
+    private func updateWithSuccessState() {
+        guard !interactor.configuration.success.skipScreen else {
+            return
+        }
+        // todo(andrii-vysotskyi): define string in dynamic checkout namespace
+        let message = interactor.configuration.success.message
+            ?? String(resource: .NativeAlternativePayment.Success.message)
+        let item = DynamicCheckoutViewModelItem.Success(
+            id: ItemId.success, message: message, image: UIImage(resource: .success)
+        )
+        let section = DynamicCheckoutViewModelSection(
+            id: SectionId.regularMethods,
+            title: nil,
+            items: [.success(item)],
+            areSeparatorsVisible: false,
+            areBezelsVisible: false
+        )
+        setSections([section])
+        setActions([])
     }
 
     // MARK: - Utils

@@ -25,6 +25,7 @@ extension PODynamicCheckoutStyle {
         passKitPaymentButtonStyle: .automatic,
         expressPaymentButtonStyle: .brand,
         backgroundColor: Color(poResource: .Surface.level1),
+        success: .default,
         actionsContainer: .default
     )
 }
@@ -48,5 +49,15 @@ extension PODynamicCheckoutStyle.Subsection {
         title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
         informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label),
         dividerColor: Color(poResource: .Text.muted)
+    )
+}
+
+@available(iOS 14, *)
+extension PODynamicCheckoutStyle.Success {
+
+    /// Default dynamic checkout subsection style.
+    public static let `default` = PODynamicCheckoutStyle.Success(
+        message: POTextStyle(color: Color(poResource: .Text.success), typography: .Fixed.body),
+        backgroundColor: Color(poResource: .Surface.success)
     )
 }

@@ -38,6 +38,8 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - DynamicCheckoutInteractor
 
+    let configuration: PODynamicCheckoutConfiguration
+
     override func start() {
         guard case .idle = state else {
             return
@@ -150,7 +152,6 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Private Properties
 
-    private let configuration: PODynamicCheckoutConfiguration
     private let passKitPaymentInteractor: DynamicCheckoutPassKitPaymentInteractor
     private let alternativePaymentInteractor: DynamicCheckoutAlternativePaymentInteractor
     private let childProvider: DynamicCheckoutInteractorChildProvider
@@ -410,7 +411,10 @@ final class DynamicCheckoutDefaultInteractor:
         }
         state = .success
         send(event: .didCompletePayment)
-        completion(.success(()))
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: NSEC_PER_SEC * UInt64(configuration.success.duration))
+            completion(.success(()))
+        }
     }
 
     // MARK: - Events

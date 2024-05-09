@@ -80,8 +80,38 @@ enum DynamicCheckoutViewModelItem {
         let viewModel: () -> AnyCardTokenizationViewModel
     }
 
-    // swiftlint:disable:next line_length
-    case progress, passKitPayment(PassKitPayment), expressPayment(ExpressPayment), payment(Payment), card(Card), alternativePayment(AlternativePayment)
+    struct Success: Identifiable {
+
+        /// Item ID.
+        let id: AnyHashable
+
+        /// Success message.
+        let message: String
+
+        /// Decoration image.
+        let image: UIImage?
+    }
+
+    /// Progress item.
+    case progress
+
+    /// PassKit button item.
+    case passKitPayment(PassKitPayment)
+
+    /// Express payment button item.
+    case expressPayment(ExpressPayment)
+
+    /// Regular payment item info.
+    case payment(Payment)
+
+    /// Card collection item.
+    case card(Card)
+
+    /// Native alternative payment collection item.
+    case alternativePayment(AlternativePayment)
+
+    /// Success item.
+    case success(Success)
 }
 
 extension DynamicCheckoutViewModelItem: Identifiable {
@@ -99,6 +129,8 @@ extension DynamicCheckoutViewModelItem: Identifiable {
         case .card(let item):
             return item.id
         case .alternativePayment(let item):
+            return item.id
+        case .success(let item):
             return item.id
         }
     }

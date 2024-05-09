@@ -53,6 +53,21 @@ public struct PODynamicCheckoutStyle {
         }
     }
 
+    public struct Success {
+
+        /// Success message style.
+        public let message: POTextStyle
+
+        /// Success background style.
+        public let backgroundColor: Color
+
+        /// Creates style instance.
+        public init(message: POTextStyle, backgroundColor: Color) {
+            self.message = message
+            self.backgroundColor = backgroundColor
+        }
+    }
+
     /// Title style.
     public let title: POTextStyle // todo(andrii-vysotskyi): remove if unused
 
@@ -90,6 +105,9 @@ public struct PODynamicCheckoutStyle {
     /// Background color.
     public let backgroundColor: Color
 
+    /// Success style.
+    public let success: Success
+
     /// Actions container style.
     public let actionsContainer: POActionsContainerStyle
 
@@ -107,6 +125,7 @@ public struct PODynamicCheckoutStyle {
         passKitPaymentButtonStyle: PKPaymentButtonStyle,
         expressPaymentButtonStyle: any ButtonStyle,
         backgroundColor: Color,
+        success: Success,
         actionsContainer: POActionsContainerStyle
     ) {
         self.title = title
@@ -121,6 +140,7 @@ public struct PODynamicCheckoutStyle {
         self.passKitPaymentButtonStyle = passKitPaymentButtonStyle
         self.expressPaymentButtonStyle = expressPaymentButtonStyle
         self.backgroundColor = backgroundColor
+        self.success = success
         self.actionsContainer = actionsContainer
     }
 }

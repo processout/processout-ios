@@ -10,8 +10,20 @@ import PassKit
 /// Dynamic checkout configuration.
 public struct PODynamicCheckoutConfiguration {
 
-    public init(invoiceId: String) {
-        self.invoiceId = invoiceId
+    public struct Success {
+
+        /// Custom success message to display user when payment completes.
+        public var message: String?
+
+        /// Boolean value that indicates whether capture success screen should be skipped.
+        /// Default value is `false`.
+        public var skipScreen = false
+
+        /// Defines for how long implementation delays calling completion in case of success.
+        public var duration: TimeInterval = 3.0
+
+        /// Creates configuration instance.
+        public init() { }
     }
 
     /// Invoice ID to use to initiate a payment.
@@ -33,4 +45,12 @@ public struct PODynamicCheckoutConfiguration {
     /// Determines whether to enable skipping payment list step when there is only
     /// one non-instant payment method. Default value: `false`.
     public var allowsSkippingPaymentList = false
+
+    /// Success stage configuration.
+    public var success: Success = .init()
+
+    /// Creates configuration instance.
+    public init(invoiceId: String) {
+        self.invoiceId = invoiceId
+    }
 }

@@ -25,6 +25,7 @@ struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel>: View {
                     DynamicCheckoutContentView(sections: viewModel.sections)
                         .scrollViewProxy(scrollView)
                 }
+                .backport.geometryGroup()
             }
             .clipped()
             if !viewModel.actions.isEmpty {

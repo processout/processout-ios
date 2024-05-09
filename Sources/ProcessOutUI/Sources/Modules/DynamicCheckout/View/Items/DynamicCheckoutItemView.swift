@@ -31,6 +31,8 @@ struct DynamicCheckoutItemView: View {
             DynamicCheckoutCardItemView(item: item)
         case .alternativePayment(let item):
             DynamicCheckoutAlternativePaymentItemView(item: item)
+        case .success(let item):
+            DynamicCheckoutSuccessItemView(item: item)
         }
     }
 

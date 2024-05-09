@@ -7,6 +7,9 @@
 
 protocol DynamicCheckoutInteractor: Interactor<DynamicCheckoutInteractorState> {
 
+    /// Configuration.
+    var configuration: PODynamicCheckoutConfiguration { get }
+
     /// Selects payment method with Given ID.
     func select(paymentMethodId: String)
 
