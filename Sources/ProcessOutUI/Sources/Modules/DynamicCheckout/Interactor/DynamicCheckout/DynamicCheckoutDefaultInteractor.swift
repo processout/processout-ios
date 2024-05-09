@@ -172,9 +172,8 @@ final class DynamicCheckoutDefaultInteractor:
             setFailureStateUnchecked(error: error)
             return
         }
-        let pkPaymentRequest = await pkPaymentRequest(
-            paymentMethods: invoice.paymentMethods ?? []
-        )
+        // todo(andrii-vysotskyi): decide if multiple Apple Pay payment methods should be supported.
+        let pkPaymentRequest = await pkPaymentRequest(invoice: invoice)
         var expressMethodIds: [String] = [], regularMethodIds: [String] = []
         let paymentMethods = partitioned(
             paymentMethods: invoice.paymentMethods ?? [],
@@ -224,7 +223,7 @@ final class DynamicCheckoutDefaultInteractor:
         var _paymentMethods: [String: PODynamicCheckoutPaymentMethod] = [:]
         for paymentMethod in paymentMethods {
             switch paymentMethod {
-            case .applePay(let method) where passKitPaymentInteractor.isSupported && !ignorePassKit:
+            case .applePay(let method) where !ignorePassKit:
                 if method.flow == .express {
                     expressIds.append(paymentMethod.id)
                 } else {
@@ -251,21 +250,23 @@ final class DynamicCheckoutDefaultInteractor:
         return _paymentMethods
     }
 
-    private func pkPaymentRequest(paymentMethods: [PODynamicCheckoutPaymentMethod]) async -> PKPaymentRequest? {
+    private func pkPaymentRequest(invoice: POInvoice) async -> PKPaymentRequest? {
         guard passKitPaymentInteractor.isSupported else {
             logger.debug("PassKit is not supported, won't attempt to resolve request.")
             return nil
         }
-        let paymentMethod = paymentMethods .first { paymentMethod in
-            if case .applePay = paymentMethod {
-                return true
+        for paymentMethod in invoice.paymentMethods ?? [] {
+            guard case .applePay(let paymentMethod) = paymentMethod else {
+                continue
             }
-            return false
+            let request = PKPaymentRequest()
+            request.merchantIdentifier = paymentMethod.configuration.merchantId
+            request.currencyCode = invoice.currency
+            request.merchantCapabilities = paymentMethod.configuration.merchantCapabilities
+            // todo(andrii-vysotskyi): set supported networks
+            return request
         }
-        guard case .applePay(let applePayPaymentMethod) = paymentMethod else {
-            return nil
-        }
-        return await delegate?.dynamicCheckout(passKitPaymentRequestWith: applePayPaymentMethod.configuration)
+        return nil
     }
 
     // MARK: - Pass Kit Payment

@@ -48,9 +48,8 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
 
     // MARK: - Pass Kit
 
-    func dynamicCheckout(
-        passKitPaymentRequestWith configuration: PODynamicCheckoutPaymentMethod.ApplePayConfiguration
-    ) async -> PKPaymentRequest?
+    /// Gives implementation an oportunity to modify payment request before it is used to authorize invoice.
+    func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async
 }
 
 extension PODynamicCheckoutDelegate {
@@ -81,9 +80,7 @@ extension PODynamicCheckoutDelegate {
         [:]
     }
 
-    private func dynamicCheckout(
-        passKitPaymentRequestWith configuration: PODynamicCheckoutPaymentMethod.ApplePayConfiguration
-    ) async -> PKPaymentRequest? {
-        nil
+    public func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {
+        // Ignored
     }
 }

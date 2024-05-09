@@ -28,6 +28,7 @@ final class DynamicCheckoutPassKitPaymentDefaultInteractor: DynamicCheckoutPassK
     }
 
     func start(request: PKPaymentRequest) async throws {
+        await delegate?.dynamicCheckout(willAuthorizeInvoiceWith: request)
         guard let controller = POPassKitPaymentAuthorizationController(paymentRequest: request) else {
             assertionFailure("ApplePay payment shouldn't be attempted when unavailable.")
             throw POFailure(code: .generic(.mobile))

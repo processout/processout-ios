@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import PassKit
 
 /// Dynamic checkout payment method description.
 public enum PODynamicCheckoutPaymentMethod {
@@ -17,6 +18,13 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Merchant ID.
         public let merchantId: String
+
+        /// The merchant’s two-letter ISO 3166 country code.
+        public let countryCode: String
+
+        /// Merchant capabilities.
+        @POStringDecodableMerchantCapability
+        public var merchantCapabilities: PKMerchantCapability
     }
 
     public struct ApplePay: Decodable { // sourcery: AutoCodingKeys
