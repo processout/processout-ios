@@ -11,7 +11,8 @@ protocol DynamicCheckoutInteractor: Interactor<DynamicCheckoutInteractorState> {
     var configuration: PODynamicCheckoutConfiguration { get }
 
     /// Selects payment method with Given ID.
-    func select(paymentMethodId: String)
+    @discardableResult
+    func select(paymentMethodId: String) -> Bool
 
     /// Starts payment using payment method with ID.
     /// Please note that only selected payment method can be started.

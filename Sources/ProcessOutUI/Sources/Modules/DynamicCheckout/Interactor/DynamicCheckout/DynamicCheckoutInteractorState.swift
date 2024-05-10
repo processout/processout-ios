@@ -27,6 +27,9 @@ enum DynamicCheckoutInteractorState {
         /// Defines whether payment is cancellable.
         let isCancellable: Bool
 
+        /// During module lifecycle certain payment methods may become unavailable.
+        var unavailablePaymentMethodIds: Set<String> = []
+
         /// Most recent error description if any.
         var recentErrorDescription: String?
     }
@@ -43,7 +46,7 @@ enum DynamicCheckoutInteractorState {
     struct PaymentProcessing {
 
         /// Started state snapshot.
-        let snapshot: Started
+        var snapshot: Started
 
         /// Payment method ID that is currently being processed.
         let paymentMethodId: String

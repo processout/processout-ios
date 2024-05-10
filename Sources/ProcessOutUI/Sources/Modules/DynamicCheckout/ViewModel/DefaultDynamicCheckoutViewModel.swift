@@ -152,14 +152,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         let isExternal: Bool
         switch method {
         case .applePay:
-            let item = DynamicCheckoutViewModelItem.PassKitPayment(
-                id: methodId,
-                buttonType: interactor.configuration.passKitPaymentButtonType,
-                action: { [weak self] in
-                    self?.interactor.startPayment(methodId: methodId)
-                }
-            )
-            return .passKitPayment(item)
+            return createPassKitPaymentItem(paymentMethodId: methodId)
         case .alternativePayment(let method):
             display = method.display
             isExternal = true
@@ -171,15 +164,32 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             assert(!isExpress, "Card is not expected to be an express")
             display = method.display
             isExternal = false
-        default:
+        case .unknown:
+            assertionFailure("Unexpected unknown payment method")
             return nil
         }
         if isExpress {
             return createExpressPaymentItem(id: methodId, display: display)
         }
         return createRegularPaymentItem(
-            id: methodId, display: display, isExternal: isExternal, isSelected: isSelected, isLoading: isLoading
+            id: methodId,
+            display: display,
+            isExternal: isExternal,
+            isSelectable: !state.unavailablePaymentMethodIds.contains(methodId),
+            isSelected: isSelected,
+            isLoading: isLoading
         )
+    }
+
+    private func createPassKitPaymentItem(paymentMethodId: String) -> DynamicCheckoutViewModelItem {
+        let item = DynamicCheckoutViewModelItem.PassKitPayment(
+            id: paymentMethodId,
+            buttonType: interactor.configuration.passKitPaymentButtonType,
+            action: { [weak self] in
+                self?.interactor.startPayment(methodId: paymentMethodId)
+            }
+        )
+        return .passKitPayment(item)
     }
 
     private func createExpressPaymentItem(
@@ -197,10 +207,12 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         return .expressPayment(item)
     }
 
+    // swiftlint:disable:next function_parameter_count
     private func createRegularPaymentItem(
         id: String,
         display: PODynamicCheckoutPaymentMethod.Display,
         isExternal: Bool,
+        isSelectable: Bool,
         isSelected selected: Bool,
         isLoading: Bool
     ) -> DynamicCheckoutViewModelItem {
@@ -226,7 +238,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             brandColor: display.brandColor,
             title: display.name,
             isLoading: isLoading,
-            isSelectable: true, // todo(andrii-vysotskyi): set to proper value
+            isSelectable: isSelectable,
             isSelected: isSelected,
             additionalInformation: additionalInformation
         )
