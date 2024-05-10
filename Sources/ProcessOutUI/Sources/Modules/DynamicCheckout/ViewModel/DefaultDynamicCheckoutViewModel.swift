@@ -226,6 +226,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             brandColor: display.brandColor,
             title: display.name,
             isLoading: isLoading,
+            isSelectable: true, // todo(andrii-vysotskyi): set to proper value
             isSelected: isSelected,
             additionalInformation: additionalInformation
         )

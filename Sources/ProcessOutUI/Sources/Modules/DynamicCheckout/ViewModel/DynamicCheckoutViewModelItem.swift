@@ -58,6 +58,9 @@ enum DynamicCheckoutViewModelItem {
         /// Indicates whether loading indicator should be visible.
         let isLoading: Bool
 
+        /// Defines whether selection could be changed.
+        let isSelectable: Bool
+
         /// Defines whether item is currently selected.
         @Binding
         var isSelected: Bool

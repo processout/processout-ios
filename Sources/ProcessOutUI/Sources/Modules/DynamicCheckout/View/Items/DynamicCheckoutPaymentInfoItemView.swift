@@ -31,14 +31,14 @@ struct DynamicCheckoutPaymentInfoItemView: View {
                     action: {
                         item.isSelected = true
                     },
-                    label: {
-                        EmptyView()
-                    }
+                    label: { }
                 )
                 .buttonStyle(
                     POAnyButtonStyle(erasing: style.radioButton)
                 )
                 .radioButtonSelected(item.isSelected)
+                .opacity(item.isSelectable ? 1 : 0)
+                .animation(.default, value: item.isSelectable)
             }
             .animation(.default, value: item.isLoading)
             .padding(.vertical, 6) // Custom value to make sure that total padding is 16
