@@ -15,7 +15,6 @@ import SwiftUI
 final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
 
     init(interactor: some DynamicCheckoutInteractor) {
-        // todo(andrii-vysotskyi): set state to proper value
         self.interactor = interactor
         observeChanges(interactor: interactor)
     }
@@ -407,9 +406,8 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         guard !interactor.configuration.success.skipScreen else {
             return
         }
-        // todo(andrii-vysotskyi): define string in dynamic checkout namespace
         let message = interactor.configuration.success.message
-            ?? String(resource: .NativeAlternativePayment.Success.message)
+            ?? String(resource: .DynamicCheckout.successMessage)
         let item = DynamicCheckoutViewModelItem.Success(
             id: ItemId.success, message: message, image: UIImage(resource: .success)
         )
