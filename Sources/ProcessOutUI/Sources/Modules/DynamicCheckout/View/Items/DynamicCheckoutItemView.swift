@@ -26,7 +26,7 @@ struct DynamicCheckoutItemView: View {
             DynamicCheckoutExpressPaymentItemView(item: item)
                 .buttonStyle(POAnyButtonStyle(erasing: style.expressPaymentButtonStyle))
         case .payment(let item):
-            DynamicCheckoutPaymentItemView(item: item)
+            DynamicCheckoutPaymentInfoItemView(item: item)
         case .card(let item):
             DynamicCheckoutCardItemView(item: item)
         case .alternativePayment(let item):

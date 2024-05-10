@@ -41,7 +41,7 @@ enum DynamicCheckoutViewModelItem {
         let action: () -> Void
     }
 
-    struct Payment: Identifiable, Equatable {
+    struct PaymentInfo: Identifiable, Equatable {
 
         /// Item identifier.
         let id: String
@@ -106,7 +106,7 @@ enum DynamicCheckoutViewModelItem {
     case expressPayment(ExpressPayment)
 
     /// Regular payment item info.
-    case payment(Payment)
+    case payment(PaymentInfo)
 
     /// Card collection item.
     case card(Card)

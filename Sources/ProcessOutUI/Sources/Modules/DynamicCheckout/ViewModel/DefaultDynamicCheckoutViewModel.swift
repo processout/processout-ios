@@ -221,7 +221,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         if isExternal {
             additionalInformation = String(resource: .DynamicCheckout.redirectWarning)
         }
-        let item = DynamicCheckoutViewModelItem.Payment(
+        let item = DynamicCheckoutViewModelItem.PaymentInfo(
             id: id,
             iconImageResource: display.logo,
             brandColor: display.brandColor,
