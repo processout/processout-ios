@@ -33,9 +33,12 @@ struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel>: View {
                     .actionsContainerStyle(style.actionsContainer)
             }
         }
-        .background(
-            style.backgroundColor.ignoresSafeArea()
-        )
+        .backport.background {
+            let backgroundColor = viewModel.state.isCompleted ? style.success.backgroundColor : style.backgroundColor
+            backgroundColor
+                .ignoresSafeArea()
+                .animation(.default, value: viewModel.state.isCompleted)
+        }
         .onAppear(perform: viewModel.start)
         .backport.geometryGroup()
     }

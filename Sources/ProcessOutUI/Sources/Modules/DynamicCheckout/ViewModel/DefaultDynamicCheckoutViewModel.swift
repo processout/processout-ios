@@ -86,7 +86,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areBezelsVisible: false
         )
         let newState = DynamicCheckoutViewModelState(
-            sections: [section], actions: []
+            sections: [section], actions: [], isCompleted: false
         )
         setState(newState)
     }
@@ -96,7 +96,8 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     private func updateWithStartedState(_ state: DynamicCheckoutInteractorState.Started) {
         let newState = DynamicCheckoutViewModelState(
             sections: createSectionsWithStartedState(state, selectedMethodId: nil),
-            actions: createActionsWithStartedState(state)
+            actions: createActionsWithStartedState(state),
+            isCompleted: false
         )
         setState(newState)
     }
@@ -268,7 +269,8 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     private func updateWithSelectedState(_ state: DynamicCheckoutInteractorState.Selected) {
         let newState = DynamicCheckoutViewModelState(
             sections: createSectionsWithStartedState(state.snapshot, selectedMethodId: state.paymentMethodId),
-            actions: createActionsWithSelectedState(state)
+            actions: createActionsWithSelectedState(state),
+            isCompleted: false
         )
         setState(newState)
     }
@@ -302,7 +304,8 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     private func updateWithPaymentProcessingState(_ state: DynamicCheckoutInteractorState.PaymentProcessing) {
         let newState = DynamicCheckoutViewModelState(
             sections: createSectionsWithPaymentProcessingState(state),
-            actions: createActionsWithPaymentProcessingState(state)
+            actions: createActionsWithPaymentProcessingState(state),
+            isCompleted: false
         )
         setState(newState)
     }
@@ -434,7 +437,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areBezelsVisible: false
         )
         let newState = DynamicCheckoutViewModelState(
-            sections: [section], actions: []
+            sections: [section], actions: [], isCompleted: true
         )
         setState(newState)
     }

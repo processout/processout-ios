@@ -14,13 +14,14 @@ struct DynamicCheckoutViewModelState {
 
     /// Available actions.
     let actions: [POActionsContainerActionViewModel]
+
+    /// Indicates whether state represents final success state.
+    let isCompleted: Bool
 }
 
 extension DynamicCheckoutViewModelState {
 
-    static let idle = DynamicCheckoutViewModelState(
-        sections: [], actions: []
-    )
+    static let idle = DynamicCheckoutViewModelState(sections: [], actions: [], isCompleted: false)
 
     /// Section's animation identity. For now only properties that may affect layout
     /// changes are part of identity.

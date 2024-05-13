@@ -30,7 +30,6 @@ struct DynamicCheckoutSuccessItemView: View {
         }
         .padding(POSpacing.medium)
         .frame(maxWidth: .infinity)
-        .background(style.success.backgroundColor)
         .backport.geometryGroup()
     }
 
