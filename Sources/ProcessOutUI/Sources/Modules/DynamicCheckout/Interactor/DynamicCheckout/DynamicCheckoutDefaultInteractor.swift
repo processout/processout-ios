@@ -436,9 +436,8 @@ final class DynamicCheckoutDefaultInteractor:
             default:
                 unavailableIds = []
             }
-            unavailableIds.remove(processingState.paymentMethodId)
-            startedState.pendingUnavailablePaymentMethodIds.formUnion(unavailableIds)
-            startedState.unavailablePaymentMethodIds.insert(processingState.paymentMethodId)
+            startedState.pendingUnavailablePaymentMethodIds.subtract(unavailableIds)
+            startedState.unavailablePaymentMethodIds.formUnion(unavailableIds)
         }
         self.state = .started(startedState)
         // todo(andrii-vysotskyi): comunicate error to user
