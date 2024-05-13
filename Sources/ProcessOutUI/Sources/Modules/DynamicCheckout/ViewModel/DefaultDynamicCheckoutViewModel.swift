@@ -430,7 +430,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             id: ItemId.success, message: message, image: UIImage(resource: .success)
         )
         let section = DynamicCheckoutViewModelSection(
-            id: SectionId.regularMethods,
+            id: SectionId.default,
             title: nil,
             items: [.success(item)],
             areSeparatorsVisible: false,
