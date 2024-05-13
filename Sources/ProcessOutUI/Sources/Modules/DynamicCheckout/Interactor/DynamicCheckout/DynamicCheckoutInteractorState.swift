@@ -54,11 +54,20 @@ enum DynamicCheckoutInteractorState {
         /// Payment method ID that is currently being processed.
         let paymentMethodId: String
 
+        /// Card tokenization interactor.
+        let cardTokenizationInteractor: (any CardTokenizationInteractor)?
+
+        /// Native APM interactor.
+        let nativeAlternativePaymentInteractor: (any NativeAlternativePaymentInteractor)?
+
         /// Submission state.
         var submission: PaymentSubmission
 
         /// Defines whether payment is cancellable.
         var isCancellable: Bool
+
+        /// Indicates whether cancellation was forced (if at all).
+        var isForcelyCancelled = false
 
         /// For payment methods that need preloading this is initially set to `false`. Default value is `true`.
         var isReady = true
@@ -72,12 +81,6 @@ enum DynamicCheckoutInteractorState {
 
         /// Payment methods that will be set unavailable when this payment method fails.
         var pendingUnavailablePaymentMethodIds: Set<String> = []
-
-        /// Card tokenization interactor.
-        let cardTokenizationInteractor: (any CardTokenizationInteractor)?
-
-        /// Native APM interactor.
-        let nativeAlternativePaymentInteractor: (any NativeAlternativePaymentInteractor)?
     }
 
     enum PaymentSubmission {

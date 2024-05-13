@@ -71,7 +71,7 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.pendingPaymentMethodId = methodId
             currentState.shouldStartPendingPaymentMethod = false
             state = .paymentProcessing(currentState)
-            cancel()
+            cancel(force: false)
         default:
             logger.debug("Unable to change selection in unsupported state: \(state)")
         }
@@ -94,7 +94,7 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.pendingPaymentMethodId = methodId
             currentState.shouldStartPendingPaymentMethod = true
             state = .paymentProcessing(currentState)
-            cancel()
+            cancel(force: false)
         default:
             logger.debug("Unable to start payment in unsupported state: \(state)")
         }
@@ -115,27 +115,7 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     override func cancel() {
-        switch state {
-        case .paymentProcessing(let currentState):
-            let interactor: (any Interactor)?
-            switch currentPaymentMethod(state: currentState) {
-            case .card:
-                interactor = currentState.cardTokenizationInteractor
-            case .nativeAlternativePayment:
-                interactor = currentState.nativeAlternativePaymentInteractor
-            default:
-                interactor = nil
-            }
-            guard let interactor, currentState.isCancellable else {
-                logger.debug("Current payment method is not cancellable.")
-                return
-            }
-            interactor.cancel()
-        case .started, .selected:
-            setFailureStateUnchecked(error: POFailure(code: .cancelled))
-        default:
-            assertionFailure("Attempted to cancel payment from unsupported state.")
-        }
+        cancel(force: true)
     }
 
     // MARK: - Private Nested Types
@@ -260,6 +240,37 @@ final class DynamicCheckoutDefaultInteractor:
         return nil
     }
 
+    // MARK: - Cancel
+
+    /// - Parameter force: When set to `true` implementation won't attempt to restore started state.
+    private func cancel(force: Bool) {
+        switch state {
+        case .paymentProcessing(var currentState):
+            if force {
+                currentState.isForcelyCancelled = true
+                state = .paymentProcessing(currentState)
+            }
+            let interactor: (any Interactor)?
+            switch currentPaymentMethod(state: currentState) {
+            case .card:
+                interactor = currentState.cardTokenizationInteractor
+            case .nativeAlternativePayment:
+                interactor = currentState.nativeAlternativePaymentInteractor
+            default:
+                interactor = nil
+            }
+            guard let interactor, currentState.isCancellable else {
+                logger.debug("Current payment method is not cancellable.")
+                return
+            }
+            interactor.cancel()
+        case .started, .selected:
+            setFailureStateUnchecked(error: POFailure(code: .cancelled))
+        default:
+            assertionFailure("Attempted to cancel payment from unsupported state.")
+        }
+    }
+
     // MARK: - Selected State
 
     private func setSelectedStateUnchecked(methodId: String, startedState: State.Started) {
@@ -315,10 +326,10 @@ final class DynamicCheckoutDefaultInteractor:
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: methodId,
-            submission: .submitting,
-            isCancellable: false,
             cardTokenizationInteractor: nil,
-            nativeAlternativePaymentInteractor: nil
+            nativeAlternativePaymentInteractor: nil,
+            submission: .submitting,
+            isCancellable: false
         )
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
@@ -339,10 +350,10 @@ final class DynamicCheckoutDefaultInteractor:
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: methodId,
-            submission: .possible,
-            isCancellable: true,
             cardTokenizationInteractor: interactor,
-            nativeAlternativePaymentInteractor: nil
+            nativeAlternativePaymentInteractor: nil,
+            submission: .possible,
+            isCancellable: true
         )
         state = .paymentProcessing(paymentProcessingState)
         interactor.start()
@@ -356,10 +367,10 @@ final class DynamicCheckoutDefaultInteractor:
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: methodId,
-            submission: .submitting,
-            isCancellable: false,
             cardTokenizationInteractor: nil,
-            nativeAlternativePaymentInteractor: nil
+            nativeAlternativePaymentInteractor: nil,
+            submission: .submitting,
+            isCancellable: false
         )
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
@@ -382,11 +393,11 @@ final class DynamicCheckoutDefaultInteractor:
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: methodId,
+            cardTokenizationInteractor: nil,
+            nativeAlternativePaymentInteractor: interactor,
             submission: .submitting,
             isCancellable: false,
-            isReady: false,
-            cardTokenizationInteractor: nil,
-            nativeAlternativePaymentInteractor: interactor
+            isReady: false
         )
         state = .paymentProcessing(paymentProcessingState)
         interactor.start()
@@ -412,7 +423,7 @@ final class DynamicCheckoutDefaultInteractor:
             } else {
                 select(methodId: methodId)
             }
-        } else if case .cancelled = failure.code {
+        } else if case .cancelled = failure.code, currentState.isForcelyCancelled {
             setFailureStateUnchecked(error: error)
         } else {
             restoreStartedStateUnchecked(failure: failure, processingState: currentState)
