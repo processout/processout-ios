@@ -19,4 +19,7 @@ protocol Interactor<State>: AnyObject {
     /// It's expected that implementation of this method should have logic responsible for
     /// interactor starting process, e.g. loading initial content.
     func start()
+
+    /// Requests cancellation.
+    func cancel()
 }

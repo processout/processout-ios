@@ -18,8 +18,4 @@ protocol NativeAlternativePaymentInteractor: Interactor<NativeAlternativePayment
 
     /// Submits parameters.
     func submit()
-
-    /// Cancells payment if possible.
-    @discardableResult
-    func cancel() -> Bool
 }

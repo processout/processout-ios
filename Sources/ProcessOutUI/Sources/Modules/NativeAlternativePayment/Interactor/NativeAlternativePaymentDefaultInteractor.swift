@@ -88,7 +88,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
     }
 
-    func cancel() -> Bool {
+    override func cancel() {
         logger.debug("Will attempt to cancel payment.")
         switch state {
         case .started(let state) where state.isCancellable:
@@ -97,9 +97,8 @@ final class NativeAlternativePaymentDefaultInteractor:
             captureCancellable?.cancel()
         default:
             logger.debug("Ignored cancellation attempt from unsupported state: \(state)")
-            return false
+            return
         }
-        return true
     }
 
     // MARK: - Private Nested Types
@@ -411,8 +410,8 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Utils
 
     private func setState(_ state: NativeAlternativePaymentInteractorState) {
+        delegate?.nativeAlternativePayment(willChangeState: .init(state: state))
         self.state = state
-        delegate?.nativeAlternativePayment(didChangeState: .init(state: state))
     }
 
     private func send(event: PONativeAlternativePaymentMethodEvent) {

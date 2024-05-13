@@ -21,4 +21,8 @@ class BaseInteractor<State>: Interactor {
     func start() {
         // Does nothing
     }
+
+    func cancel() {
+        // Does nothing
+    }
 }

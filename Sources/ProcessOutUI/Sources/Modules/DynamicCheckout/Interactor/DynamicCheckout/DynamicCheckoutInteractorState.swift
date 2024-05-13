@@ -30,6 +30,9 @@ enum DynamicCheckoutInteractorState {
         /// During module lifecycle certain payment methods may become unavailable.
         var unavailablePaymentMethodIds: Set<String> = []
 
+        /// Payment methods that will be set unavailable when this payment method ends.
+        var pendingUnavailablePaymentMethodIds: Set<String> = []
+
         /// Most recent error description if any.
         var recentErrorDescription: String?
     }
@@ -46,7 +49,7 @@ enum DynamicCheckoutInteractorState {
     struct PaymentProcessing {
 
         /// Started state snapshot.
-        var snapshot: Started
+        let snapshot: Started
 
         /// Payment method ID that is currently being processed.
         let paymentMethodId: String
@@ -60,11 +63,21 @@ enum DynamicCheckoutInteractorState {
         /// For payment methods that need preloading this is initially set to `false`. Default value is `true`.
         var isReady = true
 
+        /// Payment method that should be selected in case of processing failure.
+        var pendingPaymentMethodId: String?
+
+        /// When processing fails and this property is set to `true`, pending payment method (if present) is
+        /// started after selection.
+        var shouldStartPendingPaymentMethod = false
+
+        /// Payment methods that will be set unavailable when this payment method fails.
+        var pendingUnavailablePaymentMethodIds: Set<String> = []
+
         /// Card tokenization interactor.
-        var cardTokenizationInteractor: (any CardTokenizationInteractor)?
+        let cardTokenizationInteractor: (any CardTokenizationInteractor)?
 
         /// Native APM interactor.
-        var nativeAlternativePaymentInteractor: (any NativeAlternativePaymentInteractor)?
+        let nativeAlternativePaymentInteractor: (any NativeAlternativePaymentInteractor)?
     }
 
     enum PaymentSubmission {

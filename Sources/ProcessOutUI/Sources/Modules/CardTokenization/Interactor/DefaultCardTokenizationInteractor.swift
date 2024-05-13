@@ -137,13 +137,12 @@ final class DefaultCardTokenizationInteractor:
         }
     }
 
-    func cancel() -> Bool {
+    override func cancel() {
         guard case .started = state else {
-            return false
+            return
         }
         let failure = POFailure(code: .cancelled)
         setFailureStateUnchecked(failure: failure)
-        return true
     }
 
     // MARK: - Private Nested Types
@@ -237,6 +236,8 @@ final class DefaultCardTokenizationInteractor:
         case .networkUnreachable, .timeout, .validation, .notFound, .generic, .internal, .unknown, .cancelled:
             true
         case .authentication:
+            false
+        @unknown default:
             false
         }
     }
@@ -433,9 +434,8 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - Utils
 
     private func setStateUnchecked(_ state: State) {
-        // todo(andrii-vysotskyi): notify delegate about state change first
+        delegate?.cardTokenization(willChangeState: POCardTokenizationState(state: state))
         self.state = state
-        delegate?.cardTokenization(didChangeState: POCardTokenizationState(state: state))
     }
 }
 

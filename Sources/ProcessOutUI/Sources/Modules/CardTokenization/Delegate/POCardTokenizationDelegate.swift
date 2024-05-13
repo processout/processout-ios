@@ -29,7 +29,7 @@ public protocol POCardTokenizationDelegate: AnyObject {
     func cardTokenization(shouldContinueAfter failure: POFailure) -> Bool
 
     /// Notifies delegate about state change.
-    func cardTokenization(didChangeState state: POCardTokenizationState)
+    func cardTokenization(willChangeState state: POCardTokenizationState)
 }
 
 extension POCardTokenizationDelegate {
@@ -50,7 +50,7 @@ extension POCardTokenizationDelegate {
         true
     }
 
-    public func cardTokenization(didChangeState state: POCardTokenizationState) {
+    public func cardTokenization(willChangeState state: POCardTokenizationState) {
         // Ignored
     }
 }
