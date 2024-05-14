@@ -10,14 +10,18 @@ import PassKit
 @available(iOS 14.0, *)
 extension PKPaymentNetwork {
 
-    init(poScheme: String) {
-        self = Self.schemes[poScheme] ?? .init(poScheme)
+    init?(poScheme: String) {
+        if let scheme = Self.schemes[poScheme] {
+            self = scheme
+        } else {
+            return nil
+        }
     }
 
     // MARK: - Private Properties
 
     private static let schemes: [String: PKPaymentNetwork] = {
-        // todo(andrii-vysotskyi): decide if pagoBancomat, postFinance, tmoney and meeza should be supported
+        // todo(andrii-vysotskyi): decide if pagoBancomat, tmoney and meeza should be supported
         var schemes: [String: PKPaymentNetwork] = [
             "american express": .amex,
             "cartesBancaires": .cartesBancaires,
@@ -40,6 +44,9 @@ extension PKPaymentNetwork {
             "barcode": .barcode,
             "girocard": .girocard
         ]
+        if #available(iOS 16.4, *) {
+            schemes["postFinance"] = .postFinance
+        }
         if #available(iOS 16.0, *) {
             schemes["bancontact"] = .bancontact
         }

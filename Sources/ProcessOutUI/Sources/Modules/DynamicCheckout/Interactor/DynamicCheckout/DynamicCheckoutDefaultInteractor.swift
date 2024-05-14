@@ -221,6 +221,7 @@ final class DynamicCheckoutDefaultInteractor:
         return _paymentMethods
     }
 
+    @MainActor
     private func pkPaymentRequest(invoice: POInvoice) async -> PKPaymentRequest? {
         guard passKitPaymentInteractor.isSupported else {
             logger.debug("PassKit is not supported, won't attempt to resolve request.")
@@ -232,11 +233,12 @@ final class DynamicCheckoutDefaultInteractor:
             }
             let request = PKPaymentRequest()
             request.merchantIdentifier = paymentMethod.configuration.merchantId
-            request.currencyCode = invoice.currency
+            request.countryCode = paymentMethod.configuration.countryCode
             request.merchantCapabilities = paymentMethod.configuration.merchantCapabilities
-            request.supportedNetworks = paymentMethod.configuration.supportedNetworks.map { network in
+            request.supportedNetworks = paymentMethod.configuration.supportedNetworks.compactMap { network in
                 PKPaymentNetwork(poScheme: network)
             }
+            request.currencyCode = invoice.currency
             return request
         }
         return nil
