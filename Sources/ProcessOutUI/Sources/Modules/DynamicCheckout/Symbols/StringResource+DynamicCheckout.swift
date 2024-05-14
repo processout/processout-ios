@@ -31,6 +31,9 @@ extension POStringResource {
             static let divider = POStringResource("dynamic-checkout.sections-divider", comment: "")
         }
 
+        /// Success message.
+        static let successMessage = POStringResource("dynamic-checkout.success-message", comment: "")
+
         /// APM redirect information.
         static let redirectWarning = POStringResource("dynamic-checkout.redirect-warning", comment: "")
     }

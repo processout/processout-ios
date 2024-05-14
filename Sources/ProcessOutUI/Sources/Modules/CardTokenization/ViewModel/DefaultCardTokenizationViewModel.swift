@@ -24,6 +24,10 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     @Published
     var state: CardTokenizationViewModelState
 
+    func start() {
+        interactor.start()
+    }
+
     // MARK: - Private Nested Types
 
     private typealias InteractorState = CardTokenizationInteractorState
@@ -55,7 +59,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         interactor.didChange = { [weak self] in
             self?.configureWithInteractorState()
         }
-        interactor.start()
+        configureWithInteractorState()
     }
 
     private func configureWithInteractorState() {

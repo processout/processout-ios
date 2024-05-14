@@ -1,5 +1,5 @@
 //
-//  DefaultDynamicCheckoutAlternativePaymentInteractor.swift
+//  NativeAlternativePaymentDefaultInteractor.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 29.02.2024.
@@ -17,14 +17,12 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     init(
         configuration: PONativeAlternativePaymentConfiguration,
-        delegate: PONativeAlternativePaymentDelegate?,
         invoicesService: POInvoicesService,
         imagesRepository: POImagesRepository,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         self.configuration = configuration
-        self.delegate = delegate
         self.invoicesService = invoicesService
         self.imagesRepository = imagesRepository
         self.logger = logger
@@ -35,14 +33,13 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Interactor
 
     let configuration: PONativeAlternativePaymentConfiguration
+    weak var delegate: PONativeAlternativePaymentDelegate?
 
     override func start() {
         guard case .idle = state else {
             return
         }
-        logger.info(
-            "Starting native alternative payment", attributes: ["GatewayId": configuration.gatewayConfigurationId]
-        )
+        logger.info("Starting native alternative payment")
         send(event: .willStart)
         setState(.starting)
         Task {
@@ -91,7 +88,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
     }
 
-    func cancel() -> Bool {
+    override func cancel() {
         logger.debug("Will attempt to cancel payment.")
         switch state {
         case .started(let state) where state.isCancellable:
@@ -100,9 +97,8 @@ final class NativeAlternativePaymentDefaultInteractor:
             captureCancellable?.cancel()
         default:
             logger.debug("Ignored cancellation attempt from unsupported state: \(state)")
-            return false
+            return
         }
-        return true
     }
 
     // MARK: - Private Nested Types
@@ -121,7 +117,6 @@ final class NativeAlternativePaymentDefaultInteractor:
     private let completion: (Result<Void, POFailure>) -> Void
 
     private var captureCancellable: AnyCancellable?
-    private weak var delegate: PONativeAlternativePaymentDelegate?
 
     // MARK: - Starting State
 
@@ -139,12 +134,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         switch details.state {
-        case .pendingCapture:
-            logger.debug("No more parameters to submit, waiting for capture")
-            await setAwaitingCaptureStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
-        case .captured:
-            await setCapturedStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
-        default:
+        case .customerInput, nil:
             if details.parameters.isEmpty {
                 logger.debug("Will set started state with empty inputs, this may be unexpected")
             }
@@ -159,6 +149,16 @@ final class NativeAlternativePaymentDefaultInteractor:
             send(event: .didStart)
             logger.info("Did start payment, waiting for parameters")
             enableCancellationAfterDelay()
+        case .pendingCapture:
+            logger.debug("No more parameters to submit, waiting for capture")
+            await setAwaitingCaptureStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
+        case .captured:
+            await setCapturedStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
+        case .failed:
+            fallthrough // swiftlint:disable:this fallthrough
+        @unknown default:
+            let failure = POFailure(code: .generic(.mobile))
+            setFailureStateUnchecked(error: failure)
         }
     }
 
@@ -191,8 +191,13 @@ final class NativeAlternativePaymentDefaultInteractor:
             await setCapturedStateUnchecked(
                 gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
             )
-        default:
+        case .customerInput:
             await restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
+        case .failed:
+            fallthrough // swiftlint:disable:this fallthrough
+        @unknown default:
+            let failure = POFailure(code: .generic(.mobile))
+            setFailureStateUnchecked(error: failure)
         }
     }
 
@@ -405,8 +410,8 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Utils
 
     private func setState(_ state: NativeAlternativePaymentInteractorState) {
+        delegate?.nativeAlternativePayment(willChangeState: .init(state: state))
         self.state = state
-        delegate?.nativeAlternativePayment(didChangeState: .init(state: state))
     }
 
     private func send(event: PONativeAlternativePaymentMethodEvent) {

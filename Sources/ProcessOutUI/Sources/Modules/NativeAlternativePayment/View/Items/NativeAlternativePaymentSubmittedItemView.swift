@@ -12,6 +12,7 @@ import SwiftUI
 struct NativeAlternativePaymentSubmittedItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem.Submitted
+    let horizontalPadding: CGFloat
 
     var body: some View {
         VStack(spacing: POSpacing.medium) {
@@ -44,7 +45,7 @@ struct NativeAlternativePaymentSubmittedItemView: View {
             }
         }
         .padding(.top, isMessageCompact ? Constants.topInset : POSpacing.large)
-        .padding(.horizontal, POSpacing.large)
+        .padding(.horizontal, horizontalPadding)
     }
 
     // MARK: - Private Nested Types

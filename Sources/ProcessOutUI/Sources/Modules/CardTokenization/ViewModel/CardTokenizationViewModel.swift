@@ -14,6 +14,9 @@ protocol CardTokenizationViewModel: ObservableObject {
 
     /// Current state.
     var state: State { get set }
+
+    /// Starts view model.
+    func start()
 }
 
 // TODOs:

@@ -13,6 +13,7 @@ extension View {
     @_spi(PO)
     @available(iOS 14, *)
     public func scrollViewProxy(_ scrollView: ScrollViewProxy?) -> some View {
+        // todo(andrii-vysotskyi): it seems that ScrollViewReader could be added directly so this may not be needed.
         environment(\.scrollViewProxy, scrollView)
     }
 }

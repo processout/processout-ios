@@ -10,40 +10,40 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel, ViewRouter>: View
-    where ViewRouter: Router<DynamicCheckoutRoute> {
+struct DynamicCheckoutView<ViewModel: DynamicCheckoutViewModel>: View {
 
-    // todo(andrii-vysotskyi): router should be inject with @autoclosure as well
-    init(viewModel: @autoclosure @escaping () -> ViewModel, router: ViewRouter) {
+    init(viewModel: @autoclosure @escaping () -> ViewModel) {
         self._viewModel = .init(wrappedValue: viewModel())
-        self.router = router
     }
 
     // MARK: - View
 
     var body: some View {
         VStack(spacing: 0) {
-            ScrollView(showsIndicators: false) {
-                ScrollViewReader { scrollView in
-                    DynamicCheckoutContentView(sections: viewModel.sections, router: router)
+            ScrollViewReader { scrollView in
+                ScrollView(showsIndicators: true) {
+                    DynamicCheckoutContentView(sections: viewModel.state.sections)
                         .scrollViewProxy(scrollView)
                 }
+                .backport.geometryGroup()
             }
             .clipped()
-            if !viewModel.actions.isEmpty {
-                POActionsContainerView(actions: viewModel.actions)
+            if !viewModel.state.actions.isEmpty {
+                POActionsContainerView(actions: viewModel.state.actions)
                     .actionsContainerStyle(style.actionsContainer)
             }
         }
-        .background(
-            style.backgroundColor.ignoresSafeArea()
-        )
+        .backport.background {
+            let backgroundColor = viewModel.state.isCompleted ? style.success.backgroundColor : style.backgroundColor
+            backgroundColor
+                .ignoresSafeArea()
+                .animation(.default, value: viewModel.state.isCompleted)
+        }
+        .onAppear(perform: viewModel.start)
         .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
-
-    private let router: ViewRouter
 
     @StateObject
     private var viewModel: ViewModel

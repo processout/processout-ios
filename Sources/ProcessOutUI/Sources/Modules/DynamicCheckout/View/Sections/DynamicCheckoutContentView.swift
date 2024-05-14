@@ -10,20 +10,19 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutContentView<ViewRouter>: View where ViewRouter: Router<DynamicCheckoutRoute> {
+struct DynamicCheckoutContentView: View {
 
     let sections: [DynamicCheckoutViewModelSection]
-    let router: ViewRouter
 
     // MARK: - View
 
     var body: some View {
-        VStack(spacing: POSpacing.medium) {
+        VStack(spacing: POSpacing.small) {
             let sections = Array(
                 sections.enumerated()
             )
             ForEach(sections, id: \.element.id) { offset, element in
-                DynamicCheckoutSectionView(section: element, router: router)
+                DynamicCheckoutSectionView(section: element)
                     .frame(maxWidth: .infinity)
                 if offset + 1 < sections.count {
                     POLabeledDivider(
@@ -34,6 +33,7 @@ struct DynamicCheckoutContentView<ViewRouter>: View where ViewRouter: Router<Dyn
             }
         }
         .padding(POSpacing.medium)
+        .frame(maxWidth: .infinity)
         .backport.geometryGroup()
     }
 

@@ -21,13 +21,11 @@ final class DefaultCardTokenizationInteractor:
         cardsService: POCardsService,
         logger: POLogger,
         configuration: POCardTokenizationConfiguration,
-        delegate: POCardTokenizationDelegate?,
         completion: @escaping Completion
     ) {
         self.cardsService = cardsService
         self.logger = logger
         self.configuration = configuration
-        self.delegate = delegate
         self.completion = completion
         super.init(state: .idle)
     }
@@ -35,6 +33,7 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - CardTokenizationInteractor
 
     let configuration: POCardTokenizationConfiguration
+    weak var delegate: POCardTokenizationDelegate?
 
     override func start() {
         guard case .idle = state else {
@@ -101,7 +100,7 @@ final class DefaultCardTokenizationInteractor:
         delegate?.cardTokenization(didEmitEvent: .parametersChanged)
     }
 
-    @MainActor func tokenize() {
+    func tokenize() {
         guard case .started(let startedState) = state else {
             return
         }
@@ -122,7 +121,7 @@ final class DefaultCardTokenizationInteractor:
             preferredScheme: startedState.preferredScheme,
             metadata: configuration.metadata
         )
-        Task {
+        Task { @MainActor in
             do {
                 let card = try await cardsService.tokenize(request: request)
                 logger.debug("Did tokenize card: \(String(describing: card))")
@@ -138,13 +137,12 @@ final class DefaultCardTokenizationInteractor:
         }
     }
 
-    func cancel() -> Bool {
+    override func cancel() {
         guard case .started = state else {
-            return false
+            return
         }
         let failure = POFailure(code: .cancelled)
         setFailureStateUnchecked(failure: failure)
-        return true
     }
 
     // MARK: - Private Nested Types
@@ -162,17 +160,42 @@ final class DefaultCardTokenizationInteractor:
     private lazy var cardNumberFormatter = POCardNumberFormatter()
     private lazy var cardExpirationFormatter = POCardExpirationFormatter()
 
-    private weak var delegate: POCardTokenizationDelegate?
     private var issuerInformationCancellable: POCancellable?
 
-    // MARK: - State Management
+    // MARK: - Tokenized State
+
+    private func setTokenizedState(card: POCard) {
+        guard case .tokenizing(let snapshot) = state else {
+            return
+        }
+        let tokenizedState = State.Tokenized(card: card, cardNumber: snapshot.number.value)
+        setStateUnchecked(.tokenized(tokenizedState))
+        logger.info("Did tokenize and process card", attributes: ["CardId": card.id])
+        delegate?.cardTokenization(didEmitEvent: .didComplete)
+        completion(.success(card))
+    }
+
+    // MARK: - Failure Restoration
 
     private func restoreStartedState(tokenizationFailure failure: POFailure) {
-        let shouldContinue = delegate?.cardTokenization(shouldContinueAfter: failure) ?? true
-        guard shouldContinue, case .tokenizing(var startedState) = state else {
+        guard case .tokenizing(var startedState) = state,
+              isRecoverable(failure: failure),
+              delegate?.cardTokenization(shouldContinueAfter: failure) != false else {
             setFailureStateUnchecked(failure: failure)
             return
         }
+        var invalidParameterIds: [State.ParameterId] = []
+        let errorMessage = errorMessage(for: failure, invalidParameterIds: &invalidParameterIds)
+        for keyPath in invalidParameterIds {
+            startedState[keyPath: keyPath].isValid = false
+        }
+        startedState.recentErrorMessage = errorMessage
+        setStateUnchecked(.started(startedState))
+        logger.debug("Did recover started state after failure: \(failure)")
+    }
+
+    private func errorMessage(for failure: POFailure, invalidParameterIds: inout [State.ParameterId]) -> String {
+        // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
         var errorMessage: POStringResource
         var invalidParameterIds: [State.ParameterId] = []
         switch failure.code {
@@ -203,25 +226,23 @@ final class DefaultCardTokenizationInteractor:
         default:
             errorMessage = .CardTokenization.Error.generic
         }
-        for keyPath in invalidParameterIds {
-            startedState[keyPath: keyPath].isValid = false
-        }
-        // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
-        startedState.recentErrorMessage = String(resource: errorMessage)
-        setStateUnchecked(.started(startedState))
-        logger.debug("Did recover started state after failure: \(failure)")
+        return String(resource: errorMessage)
     }
 
-    private func setTokenizedState(card: POCard) {
-        guard case .tokenizing(let snapshot) = state else {
-            return
+    private func isRecoverable(failure: POFailure) -> Bool {
+        switch failure.code {
+        case .generic(let genericCode) where genericCode == .cardFailed3DS:
+            false
+        case .networkUnreachable, .timeout, .validation, .notFound, .generic, .internal, .unknown, .cancelled:
+            true
+        case .authentication:
+            false
+        @unknown default:
+            false
         }
-        let tokenizedState = State.Tokenized(card: card, cardNumber: snapshot.number.value)
-        setStateUnchecked(.tokenized(tokenizedState))
-        logger.info("Did tokenize and process card", attributes: ["CardId": card.id])
-        delegate?.cardTokenization(didEmitEvent: .didComplete)
-        completion(.success(card))
     }
+
+    // MARK: - Failure State
 
     private func setFailureStateUnchecked(failure: POFailure) {
         setStateUnchecked(.failure(failure))
@@ -413,8 +434,8 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - Utils
 
     private func setStateUnchecked(_ state: State) {
+        delegate?.cardTokenization(willChangeState: POCardTokenizationState(state: state))
         self.state = state
-        delegate?.cardTokenization(didChangeState: POCardTokenizationState(state: state))
     }
 }
 

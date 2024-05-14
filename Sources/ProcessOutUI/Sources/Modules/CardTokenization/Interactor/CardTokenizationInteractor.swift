@@ -7,6 +7,9 @@
 
 protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState> {
 
+    /// Delegate.
+    var delegate: POCardTokenizationDelegate? { get set }
+
     /// Tokenization configuration.
     var configuration: POCardTokenizationConfiguration { get }
 
@@ -20,6 +23,5 @@ protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState>
     func tokenize()
 
     /// Cancells tokenization if possible.
-    @discardableResult
-    func cancel() -> Bool
+    func cancel()
 }

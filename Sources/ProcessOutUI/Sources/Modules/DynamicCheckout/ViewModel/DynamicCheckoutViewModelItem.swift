@@ -6,14 +6,18 @@
 //
 
 import SwiftUI
+import PassKit
 import ProcessOut
 
 enum DynamicCheckoutViewModelItem {
 
-    struct PassKitPayment {
+    struct PassKitPayment: Identifiable {
 
         /// Id.
         let id: String
+
+        /// Payment button type.
+        let buttonType: PKPaymentButtonType
 
         /// Action handler.
         let action: () -> Void
@@ -37,7 +41,7 @@ enum DynamicCheckoutViewModelItem {
         let action: () -> Void
     }
 
-    struct Payment: Identifiable, Hashable {
+    struct PaymentInfo: Identifiable, Equatable {
 
         /// Item identifier.
         let id: String
@@ -51,6 +55,12 @@ enum DynamicCheckoutViewModelItem {
         /// Item title.
         let title: String
 
+        /// Indicates whether loading indicator should be visible.
+        let isLoading: Bool
+
+        /// Defines whether selection could be changed.
+        let isSelectable: Bool
+
         /// Defines whether item is currently selected.
         @Binding
         var isSelected: Bool
@@ -59,14 +69,56 @@ enum DynamicCheckoutViewModelItem {
         let additionalInformation: String?
     }
 
-    struct AlternativePayment: Hashable {
+    struct AlternativePayment: Identifiable {
 
-        /// Gateway configuration id that should be used to initiate native alternative payment.
-        let gatewayConfigurationId: String
+        /// Alternative payment item ID.
+        let id: AnyHashable
+
+        /// Creates alternative payment view model.
+        let viewModel: () -> AnyNativeAlternativePaymentViewModel
     }
 
-    // swiftlint:disable:next line_length
-    case progress, passKitPayment(PassKitPayment), expressPayment(ExpressPayment), payment(Payment), card, alternativePayment(AlternativePayment)
+    struct Card: Identifiable {
+
+        /// Card item ID.
+        let id: AnyHashable
+
+        /// Creates card tokenization view model.
+        let viewModel: () -> AnyCardTokenizationViewModel
+    }
+
+    struct Success: Identifiable {
+
+        /// Item ID.
+        let id: AnyHashable
+
+        /// Success message.
+        let message: String
+
+        /// Decoration image.
+        let image: UIImage?
+    }
+
+    /// Progress item.
+    case progress
+
+    /// PassKit button item.
+    case passKitPayment(PassKitPayment)
+
+    /// Express payment button item.
+    case expressPayment(ExpressPayment)
+
+    /// Regular payment item info.
+    case payment(PaymentInfo)
+
+    /// Card collection item.
+    case card(Card)
+
+    /// Native alternative payment collection item.
+    case alternativePayment(AlternativePayment)
+
+    /// Success item.
+    case success(Success)
 }
 
 extension DynamicCheckoutViewModelItem: Identifiable {
@@ -81,17 +133,18 @@ extension DynamicCheckoutViewModelItem: Identifiable {
             return item.id
         case .payment(let item):
             return item.id
-        case .card:
-            return Constants.cardId
+        case .card(let item):
+            return item.id
         case .alternativePayment(let item):
-            return item.gatewayConfigurationId
+            return item.id
+        case .success(let item):
+            return item.id
         }
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let cardId = UUID().uuidString
         static let progressId = UUID().uuidString
     }
 }

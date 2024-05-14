@@ -7,9 +7,15 @@
 
 protocol DynamicCheckoutInteractor: Interactor<DynamicCheckoutInteractorState> {
 
+    /// Configuration.
+    var configuration: PODynamicCheckoutConfiguration { get }
+
+    /// Selects payment method with Given ID.
+    func select(methodId: String)
+
     /// Starts payment using payment method with ID.
-    @discardableResult
-    func initiatePayment(methodId: String) -> Bool
+    /// Please note that only selected payment method can be started.
+    func startPayment(methodId: String)
 
     /// Submits current payment method's data.
     func submit()
@@ -17,6 +23,5 @@ protocol DynamicCheckoutInteractor: Interactor<DynamicCheckoutInteractorState> {
     /// Attempts to cancel dynamic checkout payment.
     /// - Returns: `true` if payment cancellation was started.
     /// - NOTE: Cancellation is not necessarily immediate and may happen after some time.
-    @discardableResult
-    func cancel() -> Bool
+    func cancel()
 }

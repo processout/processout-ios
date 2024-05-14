@@ -23,7 +23,7 @@ public protocol PONativeAlternativePaymentDelegate: AnyObject {
     ) async -> [String: String]
 
     /// Notifies delegate about state change.
-    func nativeAlternativePayment(didChangeState state: PONativeAlternativePaymentState)
+    func nativeAlternativePayment(willChangeState state: PONativeAlternativePaymentState)
 }
 
 extension PONativeAlternativePaymentDelegate {
@@ -38,7 +38,7 @@ extension PONativeAlternativePaymentDelegate {
         [:]
     }
 
-    public func nativeAlternativePayment(didChangeState state: PONativeAlternativePaymentState) {
+    public func nativeAlternativePayment(willChangeState state: PONativeAlternativePaymentState) {
         // Ignored
     }
 }

@@ -25,16 +25,65 @@ enum DynamicCheckoutInteractorState {
         let pkPaymentRequest: PKPaymentRequest?
 
         /// Defines whether payment is cancellable.
-        var isCancellable: Bool
+        let isCancellable: Bool
+
+        /// During module lifecycle certain payment methods may become unavailable.
+        var unavailablePaymentMethodIds: Set<String> = []
+
+        /// Payment methods that will be set unavailable when this payment method ends.
+        var pendingUnavailablePaymentMethodIds: Set<String> = []
 
         /// Most recent error description if any.
         var recentErrorDescription: String?
     }
 
-    enum PaymentSubmission {
+    struct Selected {
 
-        /// Payment submission can't be forced.
-        case unavailable
+        /// Started state snapshot.
+        let snapshot: Started
+
+        /// Selected payment method ID.
+        let paymentMethodId: String
+    }
+
+    struct PaymentProcessing {
+
+        /// Started state snapshot.
+        let snapshot: Started
+
+        /// Payment method ID that is currently being processed.
+        let paymentMethodId: String
+
+        /// Card tokenization interactor.
+        let cardTokenizationInteractor: (any CardTokenizationInteractor)?
+
+        /// Native APM interactor.
+        let nativeAlternativePaymentInteractor: (any NativeAlternativePaymentInteractor)?
+
+        /// Submission state.
+        var submission: PaymentSubmission
+
+        /// Defines whether payment is cancellable.
+        var isCancellable: Bool
+
+        /// Indicates whether cancellation was forced (if at all).
+        var isForcelyCancelled = false
+
+        /// For payment methods that need preloading this is initially set to `false`. Default value is `true`.
+        var isReady = true
+
+        /// Payment method that should be selected in case of processing failure.
+        var pendingPaymentMethodId: String?
+
+        /// When processing fails and this property is set to `true`, pending payment method (if present) is
+        /// started after selection.
+        var shouldStartPendingPaymentMethod = false
+
+        /// Payment methods that will be set unavailable when this payment method fails.
+        var pendingUnavailablePaymentMethodIds: Set<String> = []
+    }
+
+    enum PaymentSubmission {
 
         /// Submission is currently unavailable.
         case temporarilyUnavailable
@@ -46,24 +95,6 @@ enum DynamicCheckoutInteractorState {
         case submitting
     }
 
-    struct PaymentProcessing {
-
-        /// Started state snapshot.
-        let snapshot: Started
-
-        /// Payment method ID that is currently being processed.
-        let paymentMethodId: String
-
-        /// Submission state.
-        var submission: PaymentSubmission
-
-        /// Defines whether payment is cancellable.
-        var isCancellable: Bool
-
-        /// This value is set when user decides to switch payment method during processing.
-        var pendingPaymentMethodId: String?
-    }
-
     /// Idle state.
     case idle
 
@@ -72,6 +103,9 @@ enum DynamicCheckoutInteractorState {
 
     /// Started state.
     case started(Started)
+
+    /// There is currently selected payment method.
+    case selected(Selected)
 
     /// Payment is being processed.
     case paymentProcessing(PaymentProcessing)

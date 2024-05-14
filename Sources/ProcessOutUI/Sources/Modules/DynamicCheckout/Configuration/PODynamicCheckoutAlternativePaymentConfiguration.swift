@@ -39,9 +39,6 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
     /// Custom title.
     public var title: String?
 
-    /// Custom success message to display user when payment completes.
-    public var successMessage: String?
-
     /// Primary action text, such as "Pay".
     public var primaryActionTitle: String?
 

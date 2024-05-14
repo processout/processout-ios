@@ -43,7 +43,10 @@ public struct POCardUpdateView: View {
             POActionsContainerView(actions: viewModel.actions)
                 .actionsContainerStyle(style.actionsContainer)
         }
-        .background(style.backgroundColor.ignoresSafeArea())
+        .backport.background {
+            style.backgroundColor.ignoresSafeArea()
+        }
+        .onAppear(perform: viewModel.start)
     }
 
     // MARK: - Private Properties

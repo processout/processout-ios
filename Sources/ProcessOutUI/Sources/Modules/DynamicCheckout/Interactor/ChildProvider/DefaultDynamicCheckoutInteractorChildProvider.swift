@@ -26,25 +26,21 @@ final class DefaultDynamicCheckoutInteractorChildProvider: DynamicCheckoutIntera
 
     // MARK: - DynamicCheckoutInteractorChildProvider
 
-    func cardTokenizationInteractor(delegate: POCardTokenizationDelegate) -> any CardTokenizationInteractor {
+    func cardTokenizationInteractor() -> any CardTokenizationInteractor {
         let interactor = DefaultCardTokenizationInteractor(
             cardsService: cardsService,
             logger: logger,
             configuration: cardTokenizationConfiguration(),
-            delegate: delegate,
             completion: { _ in }
         )
         return interactor
     }
 
-    func nativeAlternativePaymentInteractor(
-        gatewayId: String, delegate: PONativeAlternativePaymentDelegate
-    ) -> any NativeAlternativePaymentInteractor {
+    func nativeAlternativePaymentInteractor(gatewayId: String) -> any NativeAlternativePaymentInteractor {
         var logger = self.logger
-        logger[attributeKey: "GatewayConfigurationId"] = gatewayId
+        logger[attributeKey: "GatewayId"] = gatewayId
         let interactor = NativeAlternativePaymentDefaultInteractor(
             configuration: alternativePaymentConfiguration(gatewayId: gatewayId),
-            delegate: delegate,
             invoicesService: invoicesService,
             imagesRepository: imagesRepository,
             logger: logger,

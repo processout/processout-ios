@@ -11,8 +11,10 @@ import SwiftUI
 @available(iOS 14, *)
 struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentViewModel>: View {
 
-    @ObservedObject
-    private(set) var viewModel: ViewModel
+    init(viewModel: ViewModel, horizontalPadding: CGFloat = POSpacing.large) {
+        self.viewModel = viewModel
+        self.horizontalPadding = horizontalPadding
+    }
 
     // MARK: - View
 
@@ -20,12 +22,18 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
         VStack(spacing: POSpacing.medium) {
             let partition = sectionsPartition
             ForEach(partition.top) { section in
-                NativeAlternativePaymentSectionView(section: section, focusedItemId: $viewModel.focusedItemId)
+                NativeAlternativePaymentSectionView(
+                    section: section, horizontalPadding: horizontalPadding, focusedItemId: $viewModel.focusedItemId
+                )
             }
             if !partition.center.isEmpty {
                 VStack(spacing: POSpacing.medium) {
                     ForEach(partition.center) { section in
-                        NativeAlternativePaymentSectionView(section: section, focusedItemId: $viewModel.focusedItemId)
+                        NativeAlternativePaymentSectionView(
+                            section: section,
+                            horizontalPadding: horizontalPadding,
+                            focusedItemId: $viewModel.focusedItemId
+                        )
                     }
                 }
                 .backport.geometryGroup()
@@ -36,13 +44,19 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
             scrollToFocusedInput()
         }
         .padding(.vertical, POSpacing.medium)
+        .frame(maxWidth: .infinity)
         .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
 
+    private let horizontalPadding: CGFloat
+
     @Environment(\.scrollViewProxy)
     private var scrollView
+
+    @ObservedObject
+    private var viewModel: ViewModel
 
     // swiftlint:disable:next line_length
     private var sectionsPartition: (top: [NativeAlternativePaymentViewModelSection], center: [NativeAlternativePaymentViewModelSection]) {
