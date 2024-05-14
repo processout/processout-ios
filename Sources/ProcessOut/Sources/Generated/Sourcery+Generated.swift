@@ -36,6 +36,14 @@ extension PODynamicCheckoutPaymentMethod.ApplePay {
     }
 }
 
+extension PODynamicCheckoutPaymentMethod.Card {
+
+    enum CodingKeys: String, CodingKey {
+        case display
+        case configuration = "card"
+    }
+}
+
 extension PODynamicCheckoutPaymentMethod.NativeAlternativePayment {
 
     enum CodingKeys: String, CodingKey {

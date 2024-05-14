@@ -78,10 +78,28 @@ public enum PODynamicCheckoutPaymentMethod {
 
     // MARK: - Card
 
-    public struct Card: Decodable {
+    public struct Card: Decodable { // sourcery: AutoCodingKeys
 
         /// Display information.
         public let display: Display
+
+        /// Payment method configuration.
+        public let configuration: CardConfiguration // sourcery:coding: key="card"
+    }
+
+    public struct CardConfiguration: Decodable {
+
+        /// Defines whether user will be aksed to select scheme if co-scheme is available.
+        let allowSchemeSelection: Bool
+
+        /// Indicates whether should collect card CVC.
+        public let requireCvc: Bool
+
+        /// Indicates whether should collect cardholder name.
+        public let requireCardholderName: Bool
+
+        /// Card billing address collection configuration.
+        public let billingAddress: BillingAddressConfiguration
     }
 
     // MARK: - Common
@@ -96,6 +114,29 @@ public enum PODynamicCheckoutPaymentMethod {
 
         @POStringCodableColor
         public private(set) var brandColor: UIColor
+    }
+
+    public struct BillingAddressConfiguration: Decodable {
+
+        /// List of ISO country codes that is supported for the billing address. When nil, all countries are supported.
+        public let restrictToCountryCodes: Set<String>?
+
+        /// Billing address collection mode.
+        public let collectionMode: BillingAddressCollectionMode
+    }
+
+    // todo(andrii-vysotskyi): maybe extract it and reuse when configuring
+    // card tokenization module to reduce code duplication.
+    public enum BillingAddressCollectionMode: String, Decodable {
+
+        /// Only collect address components that are needed for particular payment method.
+        case automatic
+
+        /// Never collect address.
+        case never
+
+        /// Collect the full billing address.
+        case full
     }
 
     public enum Flow: String, Decodable {
