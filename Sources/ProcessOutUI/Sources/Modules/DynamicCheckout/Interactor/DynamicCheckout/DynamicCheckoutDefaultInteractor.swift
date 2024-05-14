@@ -5,13 +5,13 @@
 //  Created by Andrii Vysotskyi on 05.03.2024.
 //
 
-// swiftlint:disable file_length
+// swiftlint:disable file_length type_body_length
 
 import Foundation
 import PassKit
 @_spi(PO) import ProcessOut
 
-// swiftlint:disable:next type_body_length
+@available(iOS 14.0, *)
 final class DynamicCheckoutDefaultInteractor:
     BaseInteractor<DynamicCheckoutInteractorState>, DynamicCheckoutInteractor {
 
@@ -234,7 +234,9 @@ final class DynamicCheckoutDefaultInteractor:
             request.merchantIdentifier = paymentMethod.configuration.merchantId
             request.currencyCode = invoice.currency
             request.merchantCapabilities = paymentMethod.configuration.merchantCapabilities
-            // todo(andrii-vysotskyi): set supported networks
+            request.supportedNetworks = paymentMethod.configuration.supportedNetworks.map { network in
+                PKPaymentNetwork(poScheme: network)
+            }
             return request
         }
         return nil
@@ -531,6 +533,7 @@ final class DynamicCheckoutDefaultInteractor:
     }
 }
 
+@available(iOS 14.0, *)
 extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
 
     func cardTokenization(didEmitEvent event: POCardTokenizationEvent) {
@@ -579,6 +582,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
     }
 }
 
+@available(iOS 14.0, *)
 extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
 
     func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentEvent) {
@@ -641,4 +645,4 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
     }
 }
 
-// swiftlint:enable file_length
+// swiftlint:enable file_length type_body_length

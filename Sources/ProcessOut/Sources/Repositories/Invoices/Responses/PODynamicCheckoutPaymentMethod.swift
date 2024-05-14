@@ -25,6 +25,9 @@ public enum PODynamicCheckoutPaymentMethod {
         /// Merchant capabilities.
         @POStringDecodableMerchantCapability
         public var merchantCapabilities: PKMerchantCapability
+
+        /// The payment methods that are supported.
+        public let supportedNetworks: Set<String>
     }
 
     public struct ApplePay: Decodable { // sourcery: AutoCodingKeys
