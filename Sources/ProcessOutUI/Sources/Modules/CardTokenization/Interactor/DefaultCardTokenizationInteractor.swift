@@ -44,7 +44,7 @@ final class DefaultCardTokenizationInteractor:
             number: .init(id: \.number, formatter: cardNumberFormatter),
             expiration: .init(id: \.expiration, formatter: cardExpirationFormatter),
             cvc: .init(
-                id: \.cvc, formatter: CardSecurityCodeFormatter()
+                id: \.cvc, shouldCollect: configuration.shouldCollectCvc, formatter: CardSecurityCodeFormatter()
             ),
             cardholderName: .init(id: \.cardholderName, shouldCollect: configuration.isCardholderNameInputVisible),
             address: defaultAddressParameters

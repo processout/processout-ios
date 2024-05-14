@@ -18,6 +18,9 @@ public struct POCardTokenizationConfiguration {
     /// Indicates if the input for entering the cardholder name should be displayed. Defaults to `true`.
     public let isCardholderNameInputVisible: Bool
 
+    /// Indicates whether card's CVC should be collected.
+    public let shouldCollectCvc: Bool
+
     /// Primary action text, such as "Submit". Use empty string to hide button.
     public let primaryActionTitle: String?
 
@@ -37,6 +40,7 @@ public struct POCardTokenizationConfiguration {
     public init(
         title: String? = nil,
         isCardholderNameInputVisible: Bool = true,
+        shouldCollectCvc: Bool = true,
         primaryActionTitle: String? = nil,
         cancelActionTitle: String? = nil,
         billingAddress: POBillingAddressConfiguration = .init(),
@@ -44,6 +48,7 @@ public struct POCardTokenizationConfiguration {
     ) {
         self.title = title
         self.isCardholderNameInputVisible = isCardholderNameInputVisible
+        self.shouldCollectCvc = shouldCollectCvc
         self.primaryActionTitle = primaryActionTitle
         self.cancelActionTitle = cancelActionTitle
         self.billingAddress = billingAddress
