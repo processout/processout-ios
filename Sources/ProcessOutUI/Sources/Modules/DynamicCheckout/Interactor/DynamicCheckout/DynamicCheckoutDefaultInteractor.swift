@@ -235,9 +235,10 @@ final class DynamicCheckoutDefaultInteractor:
             request.merchantIdentifier = paymentMethod.configuration.merchantId
             request.countryCode = paymentMethod.configuration.countryCode
             request.merchantCapabilities = paymentMethod.configuration.merchantCapabilities
-            request.supportedNetworks = paymentMethod.configuration.supportedNetworks.compactMap { network in
-                PKPaymentNetwork(poScheme: network)
-            }
+            let availableNetworks = Set(PKPaymentRequest.availableNetworks())
+            request.supportedNetworks = paymentMethod.configuration.supportedNetworks
+                .compactMap(PKPaymentNetwork.init(poScheme:))
+                .filter(availableNetworks.contains)
             request.currencyCode = invoice.currency
             return request
         }
