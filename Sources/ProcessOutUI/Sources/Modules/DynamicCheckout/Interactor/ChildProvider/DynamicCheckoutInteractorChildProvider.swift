@@ -12,7 +12,9 @@
 protocol DynamicCheckoutInteractorChildProvider {
 
     /// Creates and returns card tokenization interactor.
-    func cardTokenizationInteractor() -> any CardTokenizationInteractor
+    func cardTokenizationInteractor(
+        configuration: PODynamicCheckoutPaymentMethod.CardConfiguration
+    ) -> any CardTokenizationInteractor
 
     /// Creates and returns card tokenization interactor.
     func nativeAlternativePaymentInteractor(gatewayId: String) -> any NativeAlternativePaymentInteractor

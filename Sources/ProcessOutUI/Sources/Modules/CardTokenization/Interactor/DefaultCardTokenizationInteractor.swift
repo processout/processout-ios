@@ -356,7 +356,7 @@ final class DefaultCardTokenizationInteractor:
             logger.info("Default country code \(code) is not supported, ignored")
             defaultCountryCode = values.first?.value
         }
-        let supportedModes: Set<POBillingAddressConfiguration.CollectionMode> = [.automatic, .full]
+        let supportedModes: Set<POBillingAddressCollectionMode> = [.automatic, .full]
         let parameter = State.Parameter(
             id: \.address.country,
             value: defaultCountryCode ?? "",
@@ -402,6 +402,8 @@ final class DefaultCardTokenizationInteractor:
             return false
         case .full:
             return true
+        @unknown default:
+            return false
         }
     }
 

@@ -125,21 +125,7 @@ public enum PODynamicCheckoutPaymentMethod {
         public let restrictToCountryCodes: Set<String>?
 
         /// Billing address collection mode.
-        public let collectionMode: BillingAddressCollectionMode
-    }
-
-    // todo(andrii-vysotskyi): maybe extract it and reuse when configuring
-    // card tokenization module to reduce code duplication.
-    public enum BillingAddressCollectionMode: String, Decodable {
-
-        /// Only collect address components that are needed for particular payment method.
-        case automatic
-
-        /// Never collect address.
-        case never
-
-        /// Collect the full billing address.
-        case full
+        public let collectionMode: POBillingAddressCollectionMode
     }
 
     public enum Flow: String, Decodable {
