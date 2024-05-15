@@ -22,7 +22,7 @@ enum DynamicCheckoutInteractorState {
         let regularPaymentMethodIds: [String]
 
         /// Pass Kit payment request.
-        let pkPaymentRequest: PKPaymentRequest?
+        let pkPaymentRequests: [String: PKPaymentRequest]
 
         /// Defines whether payment is cancellable.
         let isCancellable: Bool

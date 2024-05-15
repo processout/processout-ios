@@ -147,20 +147,19 @@ final class DynamicCheckoutDefaultInteractor:
             setFailureStateUnchecked(error: error)
             return
         }
-        // todo(andrii-vysotskyi): decide if multiple Apple Pay payment methods should be supported.
-        let pkPaymentRequest = await pkPaymentRequest(invoice: invoice)
+        let pkPaymentRequests = pkPaymentRequests(invoice: invoice)
         var expressMethodIds: [String] = [], regularMethodIds: [String] = []
         let paymentMethods = partitioned(
             paymentMethods: invoice.paymentMethods ?? [],
             expressIds: &expressMethodIds,
             regularIds: &regularMethodIds,
-            ignorePassKit: pkPaymentRequest == nil
+            includedApplePayPaymentMethodIds: Set(pkPaymentRequests.keys)
         )
         let startedState = DynamicCheckoutInteractorState.Started(
             paymentMethods: paymentMethods,
             expressPaymentMethodIds: expressMethodIds,
             regularPaymentMethodIds: regularMethodIds,
-            pkPaymentRequest: pkPaymentRequest,
+            pkPaymentRequests: pkPaymentRequests,
             isCancellable: configuration.cancelActionTitle.map { !$0.isEmpty } ?? true
         )
         state = .started(startedState)
@@ -192,13 +191,13 @@ final class DynamicCheckoutDefaultInteractor:
         paymentMethods: [PODynamicCheckoutPaymentMethod],
         expressIds: inout [String],
         regularIds: inout [String],
-        ignorePassKit: Bool
+        includedApplePayPaymentMethodIds: Set<String>
     ) -> [String: PODynamicCheckoutPaymentMethod] {
         // swiftlint:disable:next identifier_name
         var _paymentMethods: [String: PODynamicCheckoutPaymentMethod] = [:]
         for paymentMethod in paymentMethods {
             switch paymentMethod {
-            case .applePay where !ignorePassKit:
+            case .applePay where includedApplePayPaymentMethodIds.contains(paymentMethod.id):
                 expressIds.append(paymentMethod.id)
             case .alternativePayment(let method):
                 if method.flow == .express {
@@ -221,28 +220,28 @@ final class DynamicCheckoutDefaultInteractor:
         return _paymentMethods
     }
 
-    @MainActor
-    private func pkPaymentRequest(invoice: POInvoice) async -> PKPaymentRequest? {
+    private func pkPaymentRequests(invoice: POInvoice) -> [String: PKPaymentRequest] {
         guard passKitPaymentInteractor.isSupported else {
             logger.debug("PassKit is not supported, won't attempt to resolve request.")
-            return nil
+            return [:]
         }
-        for paymentMethod in invoice.paymentMethods ?? [] {
-            guard case .applePay(let paymentMethod) = paymentMethod else {
-                continue
+        let availableNetworks = Set(PKPaymentRequest.availableNetworks())
+        var requests: [String: PKPaymentRequest] = [:]
+        invoice.paymentMethods?.forEach { method in
+            guard case .applePay(let method) = method else {
+                return
             }
             let request = PKPaymentRequest()
-            request.merchantIdentifier = paymentMethod.configuration.merchantId
-            request.countryCode = paymentMethod.configuration.countryCode
-            request.merchantCapabilities = paymentMethod.configuration.merchantCapabilities
-            let availableNetworks = Set(PKPaymentRequest.availableNetworks())
-            request.supportedNetworks = paymentMethod.configuration.supportedNetworks
+            request.merchantIdentifier = method.configuration.merchantId
+            request.countryCode = method.configuration.countryCode
+            request.merchantCapabilities = method.configuration.merchantCapabilities
+            request.supportedNetworks = method.configuration.supportedNetworks
                 .compactMap(PKPaymentNetwork.init(poScheme:))
                 .filter(availableNetworks.contains)
             request.currencyCode = invoice.currency
-            return request
+            requests[method.id] = request
         }
-        return nil
+        return requests
     }
 
     // MARK: - Cancel
@@ -328,7 +327,7 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Pass Kit Payment
 
     private func startPassKitPayment(methodId: String, startedState: State.Started) {
-        guard let request = startedState.pkPaymentRequest else {
+        guard let request = startedState.pkPaymentRequests[methodId] else {
             assertionFailure("Attempted to initiate PassKit payment without request.")
             return
         }
