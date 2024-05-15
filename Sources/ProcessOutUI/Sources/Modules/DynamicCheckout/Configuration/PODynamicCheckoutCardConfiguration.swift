@@ -9,9 +9,6 @@ import ProcessOut
 
 public struct PODynamicCheckoutCardConfiguration {
 
-    /// Primary action text, such as "Submit".
-    public var primaryActionTitle: String?
-
     /// Card billing address collection configuration.
     public var billingAddress = PODynamicCheckoutCardBillingAddressConfiguration()
 
