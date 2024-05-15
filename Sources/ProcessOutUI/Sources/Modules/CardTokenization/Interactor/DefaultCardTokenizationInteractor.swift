@@ -196,8 +196,7 @@ final class DefaultCardTokenizationInteractor:
 
     private func errorMessage(for failure: POFailure, invalidParameterIds: inout [State.ParameterId]) -> String {
         // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
-        var errorMessage: POStringResource
-        var invalidParameterIds: [State.ParameterId] = []
+        let errorMessage: POStringResource
         switch failure.code {
         case .generic(.requestInvalidCard), .generic(.cardInvalid):
             invalidParameterIds.append(contentsOf: [\.number, \.expiration, \.cvc, \.cardholderName])
@@ -236,8 +235,6 @@ final class DefaultCardTokenizationInteractor:
         case .networkUnreachable, .timeout, .validation, .notFound, .generic, .internal, .unknown, .cancelled:
             true
         case .authentication:
-            false
-        @unknown default:
             false
         }
     }
