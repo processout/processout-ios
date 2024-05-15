@@ -14,6 +14,19 @@ public enum PODynamicCheckoutPaymentMethod {
 
     // MARK: - Apple Pay
 
+    public struct ApplePay: Decodable { // sourcery: AutoCodingKeys
+
+        /// Transient ID assigned to method during decoding.
+        @_spi(PO)
+        public let id = UUID().uuidString // sourcery:coding: skip
+
+        /// Payment flow.
+        public let flow: Flow?
+
+        /// Apple pay configuration.
+        public let configuration: ApplePayConfiguration // sourcery:coding: key="applepay"
+    }
+
     public struct ApplePayConfiguration: Decodable {
 
         /// Merchant ID.
@@ -30,18 +43,13 @@ public enum PODynamicCheckoutPaymentMethod {
         public let supportedNetworks: Set<String>
     }
 
-    public struct ApplePay: Decodable { // sourcery: AutoCodingKeys
-
-        /// Payment flow.
-        public let flow: Flow?
-
-        /// Apple pay configuration.
-        public let configuration: ApplePayConfiguration // sourcery:coding: key="applepay"
-    }
-
     // MARK: - Native APM
 
     public struct NativeAlternativePayment: Decodable { // sourcery: AutoCodingKeys
+
+        /// Transient ID assigned to method during decoding.
+        @_spi(PO)
+        public let id = UUID().uuidString // sourcery:coding: skip
 
         /// Display information.
         public let display: Display
@@ -63,6 +71,10 @@ public enum PODynamicCheckoutPaymentMethod {
 
     public struct AlternativePayment: Decodable { // sourcery: AutoCodingKeys
 
+        /// Transient ID assigned to method during decoding.
+        @_spi(PO)
+        public let id = UUID().uuidString // sourcery:coding: skip
+
         /// Display information.
         public let display: Display
 
@@ -82,6 +94,10 @@ public enum PODynamicCheckoutPaymentMethod {
     // MARK: - Card
 
     public struct Card: Decodable { // sourcery: AutoCodingKeys
+
+        /// Transient ID assigned to method during decoding.
+        @_spi(PO)
+        public let id = UUID().uuidString // sourcery:coding: skip
 
         /// Display information.
         public let display: Display
@@ -103,6 +119,18 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Card billing address collection configuration.
         public let billingAddress: BillingAddressConfiguration
+    }
+
+    // MARK: - Unknown
+
+    public struct Unknown {
+
+        /// Transient ID assigned to method during decoding.
+        @_spi(PO)
+        public let id = UUID().uuidString
+
+        /// Unknown payment method raw type.
+        public let type: String
     }
 
     // MARK: - Common
@@ -145,7 +173,7 @@ public enum PODynamicCheckoutPaymentMethod {
     case card(Card)
 
     /// Unknown payment method.
-    case unknown(type: String)
+    case unknown(Unknown)
 }
 
 extension PODynamicCheckoutPaymentMethod: Decodable {
@@ -154,8 +182,7 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
         let type = try decoder.container(keyedBy: CodingKeys.self).decode(String.self, forKey: .type)
         switch type {
         case "applepay":
-            let applePay = try ApplePay(from: decoder)
-            self = .applePay(applePay)
+            self = .applePay(try ApplePay(from: decoder))
         case "apm":
             do {
                 let alternativePayment = try AlternativePayment(from: decoder)
@@ -165,10 +192,9 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
                 self = .nativeAlternativePayment(nativeAlternativePayment)
             }
         case "card":
-            let card = try Card(from: decoder)
-            self = .card(card)
+            self = .card(try Card(from: decoder))
         default:
-            self = .unknown(type: type)
+            self = .unknown(Unknown(type: type))
         }
     }
 
@@ -187,21 +213,22 @@ extension PODynamicCheckoutPaymentMethod.NativeAlternativePaymentConfiguration {
     }
 }
 
-extension PODynamicCheckoutPaymentMethod: Identifiable {
+extension PODynamicCheckoutPaymentMethod {
 
+    /// Transient method ID.
     @_spi(PO)
     public var id: String {
         switch self {
         case .applePay(let method):
-            return "applepay_" + method.configuration.merchantId
+            return method.id
         case .alternativePayment(let method):
-            return "apm_" + method.configuration.redirectUrl.absoluteString
+            return method.id
         case .nativeAlternativePayment(let method):
-            return "napm_" + method.configuration.gatewayId
-        case .card:
-            return "card"
-        case .unknown(let type):
-            return "unknown_" + type
+            return method.id
+        case .card(let method):
+            return method.id
+        case .unknown(let method):
+            return method.id
         }
     }
 }
