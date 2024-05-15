@@ -90,7 +90,11 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
     private func startDynamicCheckout() {
         Task { @MainActor in
             let invoiceCreationRequest = POInvoiceCreationRequest(
-                name: "Example", amount: "100", currency: "EUR", customerId: Constants.customerId
+                name: "Example",
+                amount: "100",
+                currency: "EUR",
+                returnUrl: Constants.returnUrl,
+                customerId: Constants.customerId
             )
             guard let invoice = try? await self.invoicesService.createInvoice(request: invoiceCreationRequest) else {
                 return
