@@ -307,15 +307,11 @@ final class DynamicCheckoutDefaultInteractor:
             case .applePay:
                 startPassKitPayment(methodId: methodId, startedState: startedState)
             case .card(let method):
-                startCardPayment(methodId: methodId, configuration: method.configuration, startedState: startedState)
+                startCardPayment(method: method, startedState: startedState)
             case .alternativePayment(let method):
-                startAlternativePayment(
-                    methodId: methodId, configuration: method.configuration, startedState: startedState
-                )
+                startAlternativePayment(method: method, startedState: startedState)
             case .nativeAlternativePayment(let method):
-                startNativeAlternativePayment(
-                    methodId: methodId, configuration: method.configuration, startedState: startedState
-                )
+                startNativeAlternativePayment(method: method, startedState: startedState)
             default:
                 preconditionFailure("Attempted to start unknown payment method")
             }
@@ -352,16 +348,12 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Card Payment
 
-    private func startCardPayment(
-        methodId: String,
-        configuration: PODynamicCheckoutPaymentMethod.CardConfiguration,
-        startedState: State.Started
-    ) {
-        let interactor = childProvider.cardTokenizationInteractor(configuration: configuration)
+    private func startCardPayment(method: PODynamicCheckoutPaymentMethod.Card, startedState: State.Started) {
+        let interactor = childProvider.cardTokenizationInteractor(configuration: method.configuration)
         interactor.delegate = self
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
-            paymentMethodId: methodId,
+            paymentMethodId: method.id,
             cardTokenizationInteractor: interactor,
             nativeAlternativePaymentInteractor: nil,
             submission: .possible,
@@ -374,13 +366,11 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Alternative Payment
 
     private func startAlternativePayment(
-        methodId: String,
-        configuration: PODynamicCheckoutPaymentMethod.AlternativePaymentConfiguration,
-        startedState: State.Started
+        method: PODynamicCheckoutPaymentMethod.AlternativePayment, startedState: State.Started
     ) {
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
-            paymentMethodId: methodId,
+            paymentMethodId: method.id,
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: nil,
             submission: .submitting,
@@ -389,7 +379,7 @@ final class DynamicCheckoutDefaultInteractor:
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
             do {
-                _ = try await alternativePaymentInteractor.start(url: configuration.redirectUrl)
+                _ = try await alternativePaymentInteractor.start(url: method.configuration.redirectUrl)
                 setSuccessState()
             } catch {
                 self.restoreStateAfterPaymentProcessingFailureIfPossible(error)
@@ -398,15 +388,15 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     private func startNativeAlternativePayment(
-        methodId: String,
-        configuration: PODynamicCheckoutPaymentMethod.NativeAlternativePaymentConfiguration,
-        startedState: State.Started
+        method: PODynamicCheckoutPaymentMethod.NativeAlternativePayment, startedState: State.Started
     ) {
-        let interactor = childProvider.nativeAlternativePaymentInteractor(gatewayId: configuration.gatewayId)
+        let interactor = childProvider.nativeAlternativePaymentInteractor(
+            gatewayId: method.configuration.gatewayConfigurationUid + "." + method.configuration.gatewayName
+        )
         interactor.delegate = self
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
-            paymentMethodId: methodId,
+            paymentMethodId: method.id,
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: interactor,
             submission: .submitting,

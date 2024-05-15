@@ -205,14 +205,6 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
     }
 }
 
-extension PODynamicCheckoutPaymentMethod.NativeAlternativePaymentConfiguration {
-
-    @_spi(PO)
-    public var gatewayId: String {
-        gatewayConfigurationUid + "." + gatewayName
-    }
-}
-
 extension PODynamicCheckoutPaymentMethod {
 
     /// Transient method ID.
