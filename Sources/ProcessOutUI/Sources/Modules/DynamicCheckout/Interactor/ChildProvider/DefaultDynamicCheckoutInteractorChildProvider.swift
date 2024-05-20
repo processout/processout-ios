@@ -26,11 +26,13 @@ final class DefaultDynamicCheckoutInteractorChildProvider: DynamicCheckoutIntera
 
     // MARK: - DynamicCheckoutInteractorChildProvider
 
-    func cardTokenizationInteractor() -> any CardTokenizationInteractor {
+    func cardTokenizationInteractor(
+        configuration: PODynamicCheckoutPaymentMethod.CardConfiguration
+    ) -> any CardTokenizationInteractor {
         let interactor = DefaultCardTokenizationInteractor(
             cardsService: cardsService,
             logger: logger,
-            configuration: cardTokenizationConfiguration(),
+            configuration: cardTokenizationConfiguration(configuration: configuration),
             completion: { _ in }
         )
         return interactor
@@ -59,14 +61,23 @@ final class DefaultDynamicCheckoutInteractorChildProvider: DynamicCheckoutIntera
 
     // MARK: - Private Methods
 
-    private func cardTokenizationConfiguration() -> POCardTokenizationConfiguration {
+    private func cardTokenizationConfiguration(
+        configuration: PODynamicCheckoutPaymentMethod.CardConfiguration
+    ) -> POCardTokenizationConfiguration {
+        let billingAddressConfiguration = POBillingAddressConfiguration(
+            mode: configuration.billingAddress.collectionMode,
+            countryCodes: configuration.billingAddress.restrictToCountryCodes,
+            defaultAddress: self.configuration.card.billingAddress.defaultAddress,
+            attachDefaultsToPaymentMethod: self.configuration.card.billingAddress.attachDefaultsToPaymentMethod
+        )
         let cardConfiguration = POCardTokenizationConfiguration(
             title: "",
-            isCardholderNameInputVisible: configuration.card.isCardholderNameInputVisible,
+            isCardholderNameInputVisible: configuration.requireCardholderName,
+            shouldCollectCvc: configuration.requireCvc,
             primaryActionTitle: "",
             cancelActionTitle: "",
-            billingAddress: configuration.card.billingAddress,
-            metadata: configuration.card.metadata
+            billingAddress: billingAddressConfiguration,
+            metadata: self.configuration.card.metadata
         )
         return cardConfiguration
     }

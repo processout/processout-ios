@@ -288,7 +288,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     ) -> POActionsContainerActionViewModel? {
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.submit,
-            title: String(resource: .DynamicCheckout.Button.continue),
+            title: interactor.configuration.primaryActionTitle ?? String(resource: .DynamicCheckout.Button.continue),
             isEnabled: true,
             isLoading: false,
             isPrimary: true,
@@ -398,7 +398,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         }
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.submit,
-            title: String(resource: .DynamicCheckout.Button.continue),
+            title: interactor.configuration.primaryActionTitle ?? String(resource: .DynamicCheckout.Button.continue),
             isEnabled: isEnabled,
             isLoading: isLoading,
             isPrimary: true,

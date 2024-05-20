@@ -38,6 +38,9 @@ public struct PODynamicCheckoutConfiguration {
     /// PassKit payment button type.
     public var passKitPaymentButtonType = PKPaymentButtonType.plain
 
+    /// Primary action text, such as "Submit".
+    public var primaryActionTitle: String?
+
     /// Cancel action. To remove action use empty string.
     public var cancelActionTitle: String?
 

@@ -1,62 +1,53 @@
 //
-//  PODynamicCheckoutView.swift
+//  DynamicCheckoutView.swift
 //  ProcessOutUI
 //
-//  Created by Andrii Vysotskyi on 29.02.2024.
+//  Created by Andrii Vysotskyi on 28.02.2024.
 //
 
 import SwiftUI
 @_spi(PO) import ProcessOut
+@_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
 public struct PODynamicCheckoutView: View {
 
-    public init(
-        configuration: PODynamicCheckoutConfiguration,
-        delegate: PODynamicCheckoutDelegate,
-        completion: @escaping (Result<Void, POFailure>) -> Void
-    ) {
-        self.configuration = configuration
-        self.delegate = delegate
-        self.completion = completion
+    init(viewModel: @autoclosure @escaping () -> some DynamicCheckoutViewModel) {
+        self._viewModel = .init(wrappedValue: .init(erasing: viewModel()))
     }
 
     // MARK: - View
 
     public var body: some View {
-        // todo(andrii-vysotskyi): ensure that view model is created only once, see https://stackoverflow.com/questions/62635914/initialize-stateobject-with-a-parameter-in-swiftui
-        var logger = ProcessOut.shared.logger
-        logger[attributeKey: "InvoiceId"] = configuration.invoiceId
-        let interactor = DynamicCheckoutDefaultInteractor(
-            configuration: configuration,
-            delegate: delegate,
-            passKitPaymentInteractor: DynamicCheckoutPassKitPaymentDefaultInteractor(
-                configuration: configuration, delegate: delegate, invoicesService: ProcessOut.shared.invoices
-            ),
-            alternativePaymentInteractor: DynamicCheckoutAlternativePaymentDefaultInteractor(
-                configuration: configuration.alternativePayment
-            ),
-            childProvider: DefaultDynamicCheckoutInteractorChildProvider(
-                configuration: configuration,
-                cardsService: ProcessOut.shared.cards,
-                invoicesService: ProcessOut.shared.invoices,
-                imagesRepository: ProcessOut.shared.images,
-                logger: logger
-            ),
-            invoicesService: ProcessOut.shared.invoices,
-            logger: logger,
-            completion: completion
-        )
-        let viewModel = {
-            DefaultDynamicCheckoutViewModel(interactor: interactor)
+        VStack(spacing: 0) {
+            ScrollViewReader { scrollView in
+                ScrollView(showsIndicators: true) {
+                    DynamicCheckoutContentView(sections: viewModel.state.sections)
+                        .scrollViewProxy(scrollView)
+                }
+                .backport.geometryGroup()
+            }
+            .clipped()
+            if !viewModel.state.actions.isEmpty {
+                POActionsContainerView(actions: viewModel.state.actions)
+                    .actionsContainerStyle(style.actionsContainer)
+            }
         }
-        return DynamicCheckoutView(viewModel: viewModel())
+        .backport.background {
+            let backgroundColor = viewModel.state.isCompleted ? style.success.backgroundColor : style.backgroundColor
+            backgroundColor
+                .ignoresSafeArea()
+                .animation(.default, value: viewModel.state.isCompleted)
+        }
+        .onAppear(perform: viewModel.start)
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
 
-    private let configuration: PODynamicCheckoutConfiguration
-    private let completion: (Result<Void, POFailure>) -> Void
+    @StateObject
+    private var viewModel: AnyDynamicCheckoutViewModel
 
-    private weak var delegate: PODynamicCheckoutDelegate?
+    @Environment(\.dynamicCheckoutStyle)
+    private var style
 }

@@ -89,7 +89,13 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
 
     private func startDynamicCheckout() {
         Task { @MainActor in
-            let invoiceCreationRequest = POInvoiceCreationRequest(name: "Example", amount: "100", currency: "USD")
+            let invoiceCreationRequest = POInvoiceCreationRequest(
+                name: "Example",
+                amount: "100",
+                currency: "EUR",
+                returnUrl: Constants.returnUrl,
+                customerId: Constants.customerId
+            )
             guard let invoice = try? await self.invoicesService.createInvoice(request: invoiceCreationRequest) else {
                 return
             }
@@ -102,18 +108,15 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
 
 extension FeaturesViewModel: PODynamicCheckoutDelegate {
 
-    // swiftlint:disable:next unavailable_function
     func dynamicCheckout(
         willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest
     ) async -> any PO3DSService {
-        preconditionFailure()
+        POTest3DSService(returnUrl: Constants.returnUrl)
     }
 
-    func dynamicCheckout(
-        passKitPaymentRequestWith configuration: PODynamicCheckoutPaymentMethod.ApplePayConfiguration
-    ) async -> PKPaymentRequest? {
-        let request = PKPaymentRequest()
-        request.merchantIdentifier = configuration.merchantId
-        return request
+    func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {
+        request.paymentSummaryItems = [
+            .init(label: "Something", amount: 100, type: .final)
+        ]
     }
 }

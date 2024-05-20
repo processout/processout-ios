@@ -44,7 +44,7 @@ final class DefaultCardTokenizationInteractor:
             number: .init(id: \.number, formatter: cardNumberFormatter),
             expiration: .init(id: \.expiration, formatter: cardExpirationFormatter),
             cvc: .init(
-                id: \.cvc, formatter: CardSecurityCodeFormatter()
+                id: \.cvc, shouldCollect: configuration.shouldCollectCvc, formatter: CardSecurityCodeFormatter()
             ),
             cardholderName: .init(id: \.cardholderName, shouldCollect: configuration.isCardholderNameInputVisible),
             address: defaultAddressParameters
@@ -196,8 +196,7 @@ final class DefaultCardTokenizationInteractor:
 
     private func errorMessage(for failure: POFailure, invalidParameterIds: inout [State.ParameterId]) -> String {
         // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
-        var errorMessage: POStringResource
-        var invalidParameterIds: [State.ParameterId] = []
+        let errorMessage: POStringResource
         switch failure.code {
         case .generic(.requestInvalidCard), .generic(.cardInvalid):
             invalidParameterIds.append(contentsOf: [\.number, \.expiration, \.cvc, \.cardholderName])
@@ -356,7 +355,7 @@ final class DefaultCardTokenizationInteractor:
             logger.info("Default country code \(code) is not supported, ignored")
             defaultCountryCode = values.first?.value
         }
-        let supportedModes: Set<POBillingAddressConfiguration.CollectionMode> = [.automatic, .full]
+        let supportedModes: Set<POBillingAddressCollectionMode> = [.automatic, .full]
         let parameter = State.Parameter(
             id: \.address.country,
             value: defaultCountryCode ?? "",
@@ -402,6 +401,8 @@ final class DefaultCardTokenizationInteractor:
             return false
         case .full:
             return true
+        @unknown default:
+            return false
         }
     }
 

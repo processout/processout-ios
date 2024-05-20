@@ -21,7 +21,6 @@ protocol DynamicCheckoutInteractor: Interactor<DynamicCheckoutInteractorState> {
     func submit()
 
     /// Attempts to cancel dynamic checkout payment.
-    /// - Returns: `true` if payment cancellation was started.
     /// - NOTE: Cancellation is not necessarily immediate and may happen after some time.
     func cancel()
 }
