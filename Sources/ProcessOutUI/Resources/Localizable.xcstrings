@@ -1227,6 +1227,36 @@
         }
       }
     },
+    "native-alternative-payment.cancel-confirmation.cancel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        }
+      }
+    },
+    "native-alternative-payment.cancel-confirmation.confirm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel payment"
+          }
+        }
+      }
+    },
+    "native-alternative-payment.cancel-confirmation.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel payment?"
+          }
+        }
+      }
+    },
     "native-alternative-payment.email.placeholder" : {
       "localizations" : {
         "en" : {
