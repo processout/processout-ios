@@ -31,6 +31,7 @@ private struct ContentModifier: ViewModifier {
             }
             .backport.onChange(of: confirmationDialog != nil) {
                 isPresented = confirmationDialog != nil
+                confirmationDialogSnapshot = confirmationDialog
             }
             .alert(isPresented: $isPresented) { confirmationAlert }
     }
@@ -40,8 +41,11 @@ private struct ContentModifier: ViewModifier {
     @State
     private var isPresented = false
 
+    @State
+    private var confirmationDialogSnapshot: POConfirmationDialog?
+
     private var confirmationAlert: Alert {
-        guard let dialog = confirmationDialog else {
+        guard let dialog = confirmationDialogSnapshot else {
             preconditionFailure("Confirmation dialog must be set.")
         }
         let alert = Alert(
