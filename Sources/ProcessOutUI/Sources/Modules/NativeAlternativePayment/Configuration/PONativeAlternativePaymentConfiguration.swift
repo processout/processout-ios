@@ -20,7 +20,35 @@ public struct PONativeAlternativePaymentConfiguration {
         ///   - title: Action title. Pass `nil` title to use default value.
         ///   - disabledFor: By default user can interact with action immediately after it becomes visible, it is
         ///   possible to make it initialy disabled for given amount of time.
-        case cancel(title: String? = nil, disabledFor: TimeInterval = 0)
+        ///   - confirmation: When property is set implementation asks user to confirm cancel.
+        case cancel(title: String? = nil, disabledFor: TimeInterval = 0, confirmation: CancelConfirmation? = nil)
+    }
+
+    public struct CancelConfirmation {
+
+        /// Confirmation title.
+        public let title: String?
+
+        /// Message. Use empty string to hide message.
+        public let message: String?
+
+        /// Button that confirms cancellation.
+        public let confirmActionTitle: String?
+
+        /// Button that aborts cancelation.
+        public let cancelActionTitle: String?
+
+        public init(
+            title: String? = nil,
+            message: String? = nil,
+            confirmActionTitle: String? = nil,
+            cancelActionTitle: String? = nil
+        ) {
+            self.title = title
+            self.message = message
+            self.confirmActionTitle = confirmActionTitle
+            self.cancelActionTitle = cancelActionTitle
+        }
     }
 
     /// Invoice that should be authorized/captured.
