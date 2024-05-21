@@ -1234,6 +1234,12 @@
             "state" : "translated",
             "value" : "Not now"
           }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agora não"
+          }
         }
       }
     },
@@ -1244,6 +1250,12 @@
             "state" : "translated",
             "value" : "Cancel payment"
           }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar pagamento"
+          }
         }
       }
     },
@@ -1253,6 +1265,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel payment?"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar pagamento?"
           }
         }
       }
