@@ -410,18 +410,15 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     private func setCancelConfirmationDialog(
         configuration: PONativeAlternativePaymentConfiguration.CancelConfirmation?
     ) {
-        let dialogMessage: String?
-        if let message = configuration?.message, !message.isEmpty {
-            dialogMessage = message
-        } else {
-            dialogMessage = nil
+        guard let configuration else {
+            return
         }
         let dialog = POConfirmationDialog(
-            title: configuration?.title ?? String(resource: .NativeAlternativePayment.CancelConfirmation.title),
-            message: dialogMessage,
+            title: configuration.title ?? String(resource: .NativeAlternativePayment.CancelConfirmation.title),
+            message: configuration.message.flatMap { $0.isEmpty ? nil : $0 },
             primaryButton: .init(
                 // swiftlint:disable:next line_length
-                title: configuration?.confirmActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.confirm),
+                title: configuration.confirmActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.confirm),
                 role: .destructive,
                 action: { [weak self] in
                     self?.interactor.cancel()
@@ -429,7 +426,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             ),
             secondaryButton: .init(
                 // swiftlint:disable:next line_length
-                title: configuration?.cancelActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.cancel),
+                title: configuration.cancelActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.cancel),
                 role: .cancel
             )
         )
