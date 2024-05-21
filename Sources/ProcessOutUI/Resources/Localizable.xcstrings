@@ -1235,6 +1235,12 @@
             "value" : "Not now"
           }
         },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie teraz"
+          }
+        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1251,6 +1257,12 @@
             "value" : "Cancel payment"
           }
         },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anuluj płatność"
+          }
+        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1265,6 +1277,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel payment?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anulować płatność?"
           }
         },
         "pt-PT" : {
