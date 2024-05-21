@@ -15,7 +15,7 @@ final class MarkdownDocument: MarkdownBaseNode {
 
     // MARK: - MarkdownBaseNode
 
-    override class var cmarkNodeType: cmark_node_type {
+    override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_DOCUMENT
     }
 
