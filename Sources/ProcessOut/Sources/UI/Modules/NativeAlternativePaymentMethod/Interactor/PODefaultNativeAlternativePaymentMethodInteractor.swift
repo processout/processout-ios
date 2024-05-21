@@ -140,6 +140,10 @@ import UIKit
         }
     }
 
+    public func didRequestCancelConfirmation() {
+        send(event: .didRequestCancelConfirmation)
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {

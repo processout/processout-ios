@@ -15,6 +15,13 @@ public enum PONativeAlternativePaymentMethodEvent {
     /// to fulfill needed info.
     case didStart
 
+    /// This event is emitted when a user clicks the "Cancel payment" button, prompting the system to display a
+    /// confirmation dialog. This event signifies the initiation of the cancellation confirmation process.
+    ///
+    /// This event can be used for tracking user interactions related to payment cancellations. It helps in
+    /// understanding user behavior, particularly the frequency and context in which users consider canceling a payment.
+    case didRequestCancelConfirmation
+
     /// Event is sent when the user changes any editable value.
     case parametersChanged
 

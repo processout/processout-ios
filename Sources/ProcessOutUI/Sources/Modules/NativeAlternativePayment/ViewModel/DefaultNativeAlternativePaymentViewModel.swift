@@ -433,6 +433,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
                 role: .cancel
             )
         )
+        interactor.didRequestCancelConfirmation()
         confirmationDialog = dialog
     }
 
