@@ -416,7 +416,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             interactor.didRequestCancelConfirmation()
             confirmationDialog = POConfirmationDialog(
                 title: configuration.title ?? String(resource: .NativeAlternativePayment.CancelConfirmation.title),
-                message: configuration.message.flatMap { $0.isEmpty ? nil : $0 },
+                message: configuration.message,
                 primaryButton: .init(
                     // swiftlint:disable:next line_length
                     title: configuration.confirmActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.confirm),
