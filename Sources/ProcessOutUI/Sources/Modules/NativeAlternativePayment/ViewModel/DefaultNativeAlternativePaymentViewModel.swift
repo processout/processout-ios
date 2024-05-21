@@ -401,7 +401,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             isLoading: false,
             isPrimary: false,
             action: { [weak self] in
-                self?.cancelPayment(configuration: confirmation)
+                self?.cancelPayment(confirmationConfiguration: confirmation)
             }
         )
         return action
@@ -409,10 +409,8 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     /// Depending on configuration this method either shows confirmation dialog prior to cancelling payment
     /// or does that immediatelly.
-    private func cancelPayment(
-        configuration: PONativeAlternativePaymentConfiguration.CancelConfirmation?
-    ) {
-        if let configuration {
+    private func cancelPayment(confirmationConfiguration: POConfirmationDialogConfiguration?) {
+        if let configuration = confirmationConfiguration {
             interactor.didRequestCancelConfirmation()
             confirmationDialog = POConfirmationDialog(
                 title: configuration.title ?? String(resource: .NativeAlternativePayment.CancelConfirmation.title),
