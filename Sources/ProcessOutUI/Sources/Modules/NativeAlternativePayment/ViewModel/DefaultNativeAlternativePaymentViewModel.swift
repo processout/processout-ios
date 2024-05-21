@@ -401,37 +401,39 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             isLoading: false,
             isPrimary: false,
             action: { [weak self] in
-                self?.setCancelConfirmationDialog(configuration: confirmation)
+                self?.cancelPayment(configuration: confirmation)
             }
         )
         return action
     }
 
-    private func setCancelConfirmationDialog(
+    /// Depending on configuration this method either shows confirmation dialog prior to cancelling payment
+    /// or does that immediatelly.
+    private func cancelPayment(
         configuration: PONativeAlternativePaymentConfiguration.CancelConfirmation?
     ) {
-        guard let configuration else {
-            return
-        }
-        let dialog = POConfirmationDialog(
-            title: configuration.title ?? String(resource: .NativeAlternativePayment.CancelConfirmation.title),
-            message: configuration.message.flatMap { $0.isEmpty ? nil : $0 },
-            primaryButton: .init(
-                // swiftlint:disable:next line_length
-                title: configuration.confirmActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.confirm),
-                role: .destructive,
-                action: { [weak self] in
-                    self?.interactor.cancel()
-                }
-            ),
-            secondaryButton: .init(
-                // swiftlint:disable:next line_length
-                title: configuration.cancelActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.cancel),
-                role: .cancel
+        if let configuration {
+            interactor.didRequestCancelConfirmation()
+            confirmationDialog = POConfirmationDialog(
+                title: configuration.title ?? String(resource: .NativeAlternativePayment.CancelConfirmation.title),
+                message: configuration.message.flatMap { $0.isEmpty ? nil : $0 },
+                primaryButton: .init(
+                    // swiftlint:disable:next line_length
+                    title: configuration.confirmActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.confirm),
+                    role: .destructive,
+                    action: { [weak self] in
+                        self?.interactor.cancel()
+                    }
+                ),
+                secondaryButton: .init(
+                    // swiftlint:disable:next line_length
+                    title: configuration.cancelActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.cancel),
+                    role: .cancel
+                )
             )
-        )
-        interactor.didRequestCancelConfirmation()
-        confirmationDialog = dialog
+        } else {
+            interactor.cancel()
+        }
     }
 
     // MARK: - Cancel Actions Enabling
