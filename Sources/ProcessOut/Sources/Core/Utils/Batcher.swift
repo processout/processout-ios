@@ -11,9 +11,9 @@ final class Batcher<Task> {
 
     typealias Executor = (Array<Task>) async -> Bool
 
-    init(executor: @escaping Executor, executionInterval: TimeInterval = 10) {
-        self.executor = executor
+    init(executionInterval: TimeInterval = 10, executor: @escaping Executor) {
         self.executionInterval = executionInterval
+        self.executor = executor
         lock = UnfairLock()
         pendingTasks = []
     }
@@ -62,7 +62,7 @@ final class Batcher<Task> {
             pendingTasks.removeAll()
             return tasks
         }
-        let didExecuteTasks = await !executor(tasks)
+        let didExecuteTasks = await executor(tasks)
         lock.withLock {
             if !didExecuteTasks {
                 self.pendingTasks.insert(contentsOf: tasks, at: 0)
