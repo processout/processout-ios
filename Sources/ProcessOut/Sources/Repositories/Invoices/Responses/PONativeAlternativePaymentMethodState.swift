@@ -17,4 +17,7 @@ public enum PONativeAlternativePaymentMethodState: String, Decodable {
 
     /// Invoice is captured.
     case captured = "CAPTURED"
+
+    /// Payment did fail.
+    case failed = "FAILED"
 }

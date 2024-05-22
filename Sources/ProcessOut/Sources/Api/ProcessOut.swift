@@ -42,8 +42,13 @@ public final class ProcessOut {
 
     /// Returns cards repository.
     public private(set) lazy var cards: POCardsService = {
+        let contactMapper = DefaultPassKitContactMapper(
+            logger: serviceLogger
+        )
         let requestMapper = DefaultApplePayCardTokenizationRequestMapper(
-            decoder: JSONDecoder(), logger: repositoryLogger
+            contactMapper: contactMapper,
+            decoder: JSONDecoder(),
+            logger: serviceLogger
         )
         let service = DefaultCardsService(
             repository: HttpCardsRepository(connector: httpConnector),
@@ -97,8 +102,9 @@ public final class ProcessOut {
     @POUnfairlyLocked
     private var _configuration: ProcessOutConfiguration
 
-    private lazy var repositoryLogger = createLogger(for: Constants.repositoryLoggerCategory)
-    private lazy var serviceLogger = createLogger(for: Constants.serviceLoggerCategory)
+    private lazy var serviceLogger: POLogger = {
+        createLogger(for: Constants.serviceLoggerCategory)
+    }()
 
     private lazy var deviceMetadataProvider: DefaultDeviceMetadataProvider = {
         let keychain = Keychain(service: Constants.bundleIdentifier)

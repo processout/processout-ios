@@ -18,7 +18,8 @@ public struct POApplePayCardTokenizationRequest {
     /// that was used to produce `PKPayment`.
     public let merchantIdentifier: String?
 
-    /// Contact information.
+    /// The user-selected billing address for this transaction. You can set
+    /// this value to override billing address value from `PKPayment`.
     public let contact: POContact?
 
     /// Additional matadata.

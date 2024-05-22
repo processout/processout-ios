@@ -34,4 +34,7 @@ import Foundation
 
     /// Cancells payment if possible.
     func cancel()
+
+    /// Notifies interactor that user requested cancel confirmation.
+    func didRequestCancelConfirmation()
 }

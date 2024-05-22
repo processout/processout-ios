@@ -36,6 +36,9 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     var focusedItemId: AnyHashable?
 
     @Published
+    var confirmationDialog: POConfirmationDialog?
+
+    @Published
     private(set) var isCaptured = false
 
     // MARK: - Private Nested Types
@@ -109,6 +112,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             break // Ignored
         }
         invalidateCancelActionTimersIfNeeded(state: interactor.state)
+        confirmationDialog = nil // Dialog is dismissed when interactor changes
     }
 
     // MARK: - Sections
@@ -387,7 +391,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     private func cancelAction(
         configuration: PONativeAlternativePaymentConfiguration.SecondaryAction?, isEnabled: Bool
     ) -> POActionsContainerActionViewModel? {
-        guard case let .cancel(title, _) = configuration else {
+        guard case let .cancel(title, _, confirmation) = configuration else {
             return nil
         }
         let action = POActionsContainerActionViewModel(
@@ -397,10 +401,37 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             isLoading: false,
             isPrimary: false,
             action: { [weak self] in
-                self?.interactor.cancel()
+                self?.cancelPayment(confirmationConfiguration: confirmation)
             }
         )
         return action
+    }
+
+    /// Depending on configuration this method either shows confirmation dialog prior to cancelling payment
+    /// or does that immediatelly.
+    private func cancelPayment(confirmationConfiguration: POConfirmationDialogConfiguration?) {
+        if let configuration = confirmationConfiguration {
+            interactor.didRequestCancelConfirmation()
+            confirmationDialog = POConfirmationDialog(
+                title: configuration.title ?? String(resource: .NativeAlternativePayment.CancelConfirmation.title),
+                message: configuration.message,
+                primaryButton: .init(
+                    // swiftlint:disable:next line_length
+                    title: configuration.confirmActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.confirm),
+                    role: .destructive,
+                    action: { [weak self] in
+                        self?.interactor.cancel()
+                    }
+                ),
+                secondaryButton: .init(
+                    // swiftlint:disable:next line_length
+                    title: configuration.cancelActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.cancel),
+                    role: .cancel
+                )
+            )
+        } else {
+            interactor.cancel()
+        }
     }
 
     // MARK: - Cancel Actions Enabling
@@ -411,7 +442,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     ) {
         let timerKey = AnyHashable(isDisabled)
         guard !cancelActionTimers.keys.contains(timerKey),
-              case .cancel(_, let interval) = configuration,
+              case .cancel(_, let interval, _) = configuration,
               interval > 0 else {
             return
         }
