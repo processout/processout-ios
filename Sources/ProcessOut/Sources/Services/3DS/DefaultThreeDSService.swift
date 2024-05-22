@@ -54,7 +54,7 @@ final class DefaultThreeDSService: ThreeDSService {
         static let webFingerprintTimeout: TimeInterval = 10
     }
 
-    private struct ChallengeResponse: Encodable {
+    private struct AuthenticationResponse: Encodable {
         let url: URL?
         let body: String
     }
@@ -71,8 +71,8 @@ final class DefaultThreeDSService: ThreeDSService {
     private func fingerprint(encodedConfiguration: String, delegate: Delegate) async throws -> String {
         let configuration = try decode(PO3DS2Configuration.self, from: encodedConfiguration)
         let request = try await delegate.authenticationRequest(configuration: configuration)
-        let response = ChallengeResponse(url: nil, body: try self.encode(request: request))
-        return try encode(challengeResponse: response)
+        let response = AuthenticationResponse(url: nil, body: try self.encode(request: request))
+        return try encode(authenticationResponse: response)
     }
 
     private func challenge(encodedChallenge: String, delegate: Delegate) async throws -> String {
@@ -86,23 +86,23 @@ final class DefaultThreeDSService: ThreeDSService {
 
     private func fingerprint(url: String, delegate: Delegate) async throws -> String {
         guard let url = URL(string: url) else {
-            logger.info("Did fail to create fingerprint URL from raw value: '\(url)'.")
-            throw POFailure(message: nil, code: .internal(.mobile), underlyingError: nil)
+            let message = "Unable to create URL from string: \(url)."
+            throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
         let context = PO3DSRedirect(url: url, timeout: Constants.webFingerprintTimeout)
         do {
             return try await delegate.handle(redirect: context)
         } catch let failure as POFailure where failure.code == .timeout(.mobile) {
             // Fingerprinting timeout is treated differently from other errors.
-            let response = ChallengeResponse(url: url, body: Constants.fingerprintTimeoutResponseBody)
-            return try encode(challengeResponse: response)
+            let response = AuthenticationResponse(url: url, body: Constants.fingerprintTimeoutResponseBody)
+            return try encode(authenticationResponse: response)
         }
     }
 
     private func redirect(url: String, delegate: Delegate) async throws -> String {
         guard let url = URL(string: url) else {
-            logger.info("Did fail to create redirect URL from raw value: '\(url)'.")
-            throw POFailure(message: nil, code: .internal(.mobile), underlyingError: nil)
+            let message = "Unable to create URL from string: \(url)."
+            throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
         let context = PO3DSRedirect(url: url, timeout: nil)
         return try await delegate.handle(redirect: context)
@@ -115,14 +115,13 @@ final class DefaultThreeDSService: ThreeDSService {
             toLength: string.count + (4 - string.count % 4) % 4, withPad: "=", startingAt: 0
         )
         guard let data = Data(base64Encoded: paddedString) else {
-            logger.info("Did fail to decode base64 string.")
             throw POFailure(message: "Invalid base64 encoding.", code: .internal(.mobile))
         }
         do {
             return try decoder.decode(type, from: data)
         } catch {
-            logger.info("Did fail to decode given type: \(error)")
-            throw POFailure(code: .internal(.mobile), underlyingError: error)
+            let message = "Did fail to decode given type."
+            throw POFailure(message: message, code: .internal(.mobile), underlyingError: error)
         }
     }
 
@@ -146,20 +145,20 @@ final class DefaultThreeDSService: ThreeDSService {
             )
             return String(decoding: requestParametersData, as: UTF8.self)
         } catch {
-            logger.info("Did fail to encode authentication request: \(error)")
-            throw POFailure(code: .internal(.mobile), underlyingError: error)
+            let message = "Did fail to encode AREQ parameters."
+            throw POFailure(message: message, code: .internal(.mobile), underlyingError: error)
         }
     }
 
     // MARK: - Utils
 
     /// Encodes given response and creates token with it.
-    private func encode(challengeResponse: ChallengeResponse) throws -> String {
+    private func encode(authenticationResponse: AuthenticationResponse) throws -> String {
         do {
-            return try Constants.tokenPrefix + encoder.encode(challengeResponse).base64EncodedString()
+            return try Constants.tokenPrefix + encoder.encode(authenticationResponse).base64EncodedString()
         } catch {
-            logger.info("Did fail to encode fingerprint: '\(error)'.")
-            throw POFailure(message: nil, code: .internal(.mobile), underlyingError: error)
+            let message = "Did fail to encode AREQ parameters."
+            throw POFailure(message: message, code: .internal(.mobile), underlyingError: error)
         }
     }
 }
