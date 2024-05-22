@@ -12,17 +12,17 @@ import PassKit
 public final class POPassKitPaymentAuthorizationController: NSObject {
 
     /// Determine whether this device can process payment requests.
-    public class func canMakePayments() -> Bool {
+    public static func canMakePayments() -> Bool {
         PKPaymentAuthorizationController.canMakePayments()
     }
 
     /// Determine whether this device can process payment requests using specific payment network brands.
-    public class func canMakePayments(usingNetworks supportedNetworks: [PKPaymentNetwork]) -> Bool {
+    public static func canMakePayments(usingNetworks supportedNetworks: [PKPaymentNetwork]) -> Bool {
         PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks)
     }
 
     /// Determine whether this device can process payments using the specified networks and capabilities bitmask.
-    public class func canMakePayments(
+    public static func canMakePayments(
         usingNetworks supportedNetworks: [PKPaymentNetwork], capabilities capabilties: PKMerchantCapability
     ) -> Bool {
         PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks, capabilities: capabilties)

@@ -47,6 +47,7 @@ public struct PONativeAlternativePaymentView: View {
                 .animation(.default, value: viewModel.isCaptured)
         }
         .animation(.default, value: viewModel.actions.count)
+        .poConfirmationDialog(item: $viewModel.confirmationDialog)
     }
 
     // MARK: - Private Properties

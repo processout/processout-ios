@@ -20,7 +20,10 @@ public struct PONativeAlternativePaymentConfiguration {
         ///   - title: Action title. Pass `nil` title to use default value.
         ///   - disabledFor: By default user can interact with action immediately after it becomes visible, it is
         ///   possible to make it initialy disabled for given amount of time.
-        case cancel(title: String? = nil, disabledFor: TimeInterval = 0)
+        ///   - confirmation: When property is set implementation asks user to confirm cancel.
+        case cancel(
+            title: String? = nil, disabledFor: TimeInterval = 0, confirmation: POConfirmationDialogConfiguration? = nil
+        )
     }
 
     /// Invoice that should be authorized/captured.
@@ -61,7 +64,7 @@ public struct PONativeAlternativePaymentConfiguration {
     }
 
     /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
-    /// Maximum value is 180 seconds.
+    /// Default timeout is 3 minutes while maximum value is 15 minutes.
     @available(*, deprecated, renamed: "paymentConfirmation.timeout")
     public var paymentConfirmationTimeout: TimeInterval {
         paymentConfirmation.timeout

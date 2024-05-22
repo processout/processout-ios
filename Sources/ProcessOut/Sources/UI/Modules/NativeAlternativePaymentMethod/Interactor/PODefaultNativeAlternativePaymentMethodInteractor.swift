@@ -114,19 +114,8 @@ import UIKit
             state = .submitting(snapshot: startedState)
             invoicesService.initiatePayment(request: request) { [weak self] result in
                 switch result {
-                case let .success(response) where response.nativeApm.state == .pendingCapture:
-                    self?.send(event: .didSubmitParameters(additionalParametersExpected: false))
-                    self?.setAwaitingCaptureStateUnchecked(
-                        gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
-                    )
-                case let .success(response) where response.nativeApm.state == .captured:
-                    self?.setCapturedStateUnchecked(
-                        gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
-                    )
                 case let .success(response):
-                    self?.defaultValues(for: response.nativeApm.parameterDefinitions) { values in
-                        self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm, defaultValues: values)
-                    }
+                    self?.completeSubmissionUnchecked(with: response, startedState: startedState)
                 case let .failure(failure):
                     self?.restoreStartedStateAfterSubmissionFailureIfPossible(failure, replaceErrorMessages: true)
                 }
@@ -149,6 +138,10 @@ import UIKit
         default:
             logger.info("Ignored cancellation attempt from unsupported state: \(String(describing: state))")
         }
+    }
+
+    public func didRequestCancelConfirmation() {
+        send(event: .didRequestCancelConfirmation)
     }
 
     // MARK: - Private Nested Types
@@ -187,6 +180,9 @@ import UIKit
         case .captured:
             setCapturedStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
             return
+        case .failed:
+            setFailureStateUnchecked(failure: POFailure(code: .generic(.mobile)))
+            return
         }
         if details.parameters.isEmpty {
             logger.debug("Will set started state with empty inputs, this may be unexpected")
@@ -202,6 +198,31 @@ import UIKit
         state = .started(startedState)
         send(event: .didStart)
         logger.info("Did start payment, waiting for parameters")
+    }
+
+    // MARK: - Submission
+
+    private func completeSubmissionUnchecked(
+        with response: PONativeAlternativePaymentMethodResponse, startedState: State.Started
+    ) {
+        switch response.nativeApm.state {
+        case .customerInput:
+            defaultValues(for: response.nativeApm.parameterDefinitions) { [weak self] values in
+                self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm, defaultValues: values)
+            }
+        case .pendingCapture:
+            send(event: .didSubmitParameters(additionalParametersExpected: false))
+            setAwaitingCaptureStateUnchecked(
+                gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
+            )
+        case .captured:
+            setCapturedStateUnchecked(
+                gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
+            )
+        case .failed:
+            let failure = POFailure(code: .generic(.mobile))
+            setFailureStateUnchecked(failure: failure)
+        }
     }
 
     // MARK: - Awaiting Capture State

@@ -18,8 +18,12 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
     /// Boolean value indicating if authorization is incremental. Default value is `false`.
     public let incremental: Bool
 
-    /// Boolean value indicating whether 3DS2 is enabled. Default value is `true`.
-    public let enableThreeDS2: Bool // sourcery:coding: key="enable_three_d_s_2"
+    /// Boolean value used as flag that when set to `true` indicates that a request is coming directly
+    /// from the frontend.  It is used to understand if we can instantly step-up to 3DS or not.
+    ///
+    /// Value is hardcoded to `true`.
+    @available(*, deprecated, message: "Property is an implementation detail and shouldn't be used.")
+    public let enableThreeDS2 = true // sourcery:coding: key="enable_three_d_s_2"
 
     /// Card scheme or co-scheme that should get priority if it is available.
     public let preferredScheme: String?
@@ -62,7 +66,7 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
         invoiceId: String,
         source: String,
         incremental: Bool = false,
-        enableThreeDS2: Bool = true,
+        enableThreeDS2 _: Bool = true,
         preferredScheme: String? = nil,
         thirdPartySdkVersion: String? = nil,
         invoiceDetailIds: [String]? = nil,
@@ -77,7 +81,6 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
         self.invoiceId = invoiceId
         self.source = source
         self.incremental = incremental
-        self.enableThreeDS2 = enableThreeDS2
         self.preferredScheme = preferredScheme
         self.thirdPartySdkVersion = thirdPartySdkVersion
         self.invoiceDetailIds = invoiceDetailIds
