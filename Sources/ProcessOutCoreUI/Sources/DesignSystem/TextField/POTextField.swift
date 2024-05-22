@@ -19,7 +19,7 @@ public struct POTextField<Trailing: View>: View {
     public init(
         text: Binding<String>, formatter: Formatter? = nil, prompt: String = "", trailingView: Trailing = EmptyView()
     ) {
-        self.text = text
+        self._text = text
         self.formatter = formatter
         self.prompt = prompt
         self.trailingView = trailingView
@@ -28,14 +28,18 @@ public struct POTextField<Trailing: View>: View {
     public var body: some View {
         let style = isInvalid ? style.error : style.normal
         HStack {
-            HorizontalSizeReader { width in
-                TextFieldRepresentable(
-                    text: text,
-                    formatter: formatter,
-                    prompt: prompt,
-                    preferredWidth: width,
-                    style: style
-                )
+            ZStack(alignment: .leading) {
+                HorizontalSizeReader { width in
+                    TextFieldRepresentable(text: $text, formatter: formatter, preferredWidth: width, style: style)
+                }
+                Text(prompt)
+                    .lineLimit(1)
+                    .textStyle(style.placeholder)
+                    .allowsHitTesting(false)
+                    .opacity(text.isEmpty ? 1 : 0)
+                    .transaction { transaction in
+                        transaction.animation = nil
+                    }
             }
             trailingView
         }
@@ -51,13 +55,18 @@ public struct POTextField<Trailing: View>: View {
 
     // MARK: - Private Properties
 
-    private let text: Binding<String>
     private let formatter: Formatter?
     private let prompt: String
     private let trailingView: Trailing
 
-    @Environment(\.inputStyle) private var style
-    @Environment(\.isControlInvalid) private var isInvalid
+    @Binding
+    private var text: String
+
+    @Environment(\.inputStyle)
+    private var style
+
+    @Environment(\.isControlInvalid)
+    private var isInvalid
 }
 
 private enum Constants {
@@ -68,10 +77,10 @@ private enum Constants {
 @available(iOS 14, *)
 private struct TextFieldRepresentable: UIViewRepresentable {
 
-    @Binding var text: String
+    @Binding
+    var text: String
 
     let formatter: Formatter?
-    let prompt: String
     let preferredWidth: CGFloat
     let style: POInputStateStyle
 
@@ -91,7 +100,6 @@ private struct TextFieldRepresentable: UIViewRepresentable {
         let animated = context.transaction.animation != nil
         UIView.perform(withAnimation: animated, duration: 0.25) {
             updateText(textField)
-            updatePlaceholder(textField)
             UIView.performWithoutAnimation(textField.layoutIfNeeded)
         }
         textField.keyboardType = keyboardType
@@ -128,8 +136,6 @@ private struct TextFieldRepresentable: UIViewRepresentable {
 
     // MARK: - Private Methods
 
-    /// Internal implementation changes `defaultTextAttributes` which overwrites placeholder
-    /// attributes so placeholder must be configured after text.
     private func updateText(_ textField: UITextField) {
         if textField.text != text {
             textField.text = text
@@ -143,21 +149,6 @@ private struct TextFieldRepresentable: UIViewRepresentable {
             .buildAttributes()
             .filter { Constants.includedTextAttributes.contains($0.key) }
         textField.defaultTextAttributes = textAttributes
-    }
-
-    private func updatePlaceholder(_ textField: UITextField) {
-        let placeholderAttributes = AttributedStringBuilder()
-            .with { builder in
-                builder.typography = style.placeholder.typography
-                builder.sizeCategory = .init(sizeCategory)
-                builder.color = UIColor(style.placeholder.color)
-            }
-            .buildAttributes()
-            .filter { Constants.includedTextAttributes.contains($0.key) }
-        let updatedPlaceholder = NSAttributedString(string: prompt, attributes: placeholderAttributes)
-        if textField.attributedPlaceholder != updatedPlaceholder {
-            textField.attributedPlaceholder = updatedPlaceholder
-        }
     }
 }
 
