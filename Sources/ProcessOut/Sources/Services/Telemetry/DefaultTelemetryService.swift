@@ -23,9 +23,7 @@ final class DefaultTelemetryService: POService, LoggerDestination {
     // MARK: - LoggerDestination
 
     func log(event: LogEvent) {
-        // todo(andrii-vysotskyi): ignore logs if debugger is attached
-        let configuration = self.configuration()
-        guard configuration.isTelemetryEnabled, event.level.rawValue >= LogLevel.error.rawValue else {
+        guard event.level.rawValue >= LogLevel.error.rawValue else {
             return
         }
         var attributes = [
@@ -63,11 +61,16 @@ final class DefaultTelemetryService: POService, LoggerDestination {
     // MARK: - Private Methods
 
     private func initBatcher() {
-        let batcher = Batcher<Telemetry.Event> { [weak self] events in
+        let batcher = Batcher<Telemetry.Event>(executionInterval: 3) { [weak self] events in
             guard let self else {
-                return true // self no longer exists, return true to "drop" pending events
+                return true // Self no longer exists, return true to "drop" pending events
             }
-            let telemetry = Telemetry(metadata: await telemetryMetadata(), events: events)
+            // todo(andrii-vysotskyi): ignore logs if debugger is attached
+            let configuration = self.configuration()
+            guard configuration.isTelemetryEnabled else {
+                return true // Events shouldn't be submitted, return true to "drop" pending
+            }
+            let telemetry = Telemetry(metadata: await telemetryMetadata(configuration: configuration), events: events)
             do {
                 try await repository.submit(telemetry: telemetry)
             } catch {
@@ -78,11 +81,10 @@ final class DefaultTelemetryService: POService, LoggerDestination {
         self.batcher = batcher
     }
 
-    private func telemetryMetadata() async -> Telemetry.Metadata {
-        let application: Telemetry.ApplicationMetadata = {
-            let configuration = self.configuration()
-            return .init(name: configuration.applicationVersion, version: configuration.applicationVersion)
-        }()
+    private func telemetryMetadata(configuration: TelemetryServiceConfiguration) async -> Telemetry.Metadata {
+        let application = Telemetry.ApplicationMetadata(
+            name: configuration.applicationVersion, version: configuration.applicationVersion
+        )
         let device: Telemetry.DeviceMetadata = await {
             let metadata = await deviceMetadataProvider.deviceMetadata
             return .init(language: metadata.appLanguage, model: metadata.model, timeZone: metadata.appTimeZoneOffset)
