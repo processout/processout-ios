@@ -56,6 +56,12 @@ struct Telemetry: Encodable {
         /// Invoice ID.
         let invoiceId: String?
 
+        /// Customer ID.
+        let customerId: String?
+
+        /// Customer token ID.
+        let customerTokenId: String?
+
         /// Event attributes.
         let attributes: [String: String]
 

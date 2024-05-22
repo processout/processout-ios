@@ -31,4 +31,10 @@ extension POLogAttributeKey {
 
     /// Invoice ID.
     public static let invoiceId: Self = "InvoiceId"
+
+    /// Invoice ID.
+    public static let customerId: Self = "CustomerId"
+
+    /// Invoice ID.
+    public static let customerTokenId: Self = "CustomerTokenId"
 }

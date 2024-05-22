@@ -32,7 +32,9 @@ final class DefaultTelemetryService: POService, LoggerDestination {
             "Category": event.category
         ]
         event.additionalAttributes.forEach { key, value in
-            let excludedAttributes: Set<POLogAttributeKey> = [.gatewayConfigurationId, .cardId, .invoiceId]
+            let excludedAttributes: Set<POLogAttributeKey> = [
+                .gatewayConfigurationId, .cardId, .invoiceId, .customerId, .customerTokenId
+            ]
             guard !excludedAttributes.contains(key) else {
                 return // Excluded attributes are encoded directly to event
             }
@@ -44,6 +46,8 @@ final class DefaultTelemetryService: POService, LoggerDestination {
             gatewayConfigurationId: event.additionalAttributes[.gatewayConfigurationId],
             cardId: event.additionalAttributes[.cardId],
             invoiceId: event.additionalAttributes[.invoiceId],
+            customerId: event.additionalAttributes[.customerId],
+            customerTokenId: event.additionalAttributes[.customerTokenId],
             attributes: attributes,
             message: event.message
         )
