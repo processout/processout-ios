@@ -36,7 +36,6 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
         _didPresentApplePay = .init(wrappedValue: false)
         self.paymentRequest = paymentRequest
         controller = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
-        contactMapper = DefaultPassKitContactMapper(logger: ProcessOut.shared.logger)
         errorMapper = DefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger)
         cardsService = ProcessOut.shared.cards
         super.init()
@@ -92,7 +91,6 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     private let paymentRequest: PKPaymentRequest
     private let controller: PKPaymentAuthorizationController
 
-    private let contactMapper: PassKitContactMapper
     private let errorMapper: PassKitPaymentErrorMapper
     private let cardsService: POCardsService
 
@@ -112,7 +110,6 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
         let request = POApplePayCardTokenizationRequest(
             payment: payment,
             merchantIdentifier: paymentRequest.merchantIdentifier,
-            contact: payment.billingContact.flatMap(contactMapper.map),
             metadata: nil // todo(andrii-vysotskyi): decide if metadata injection should be allowed
         )
         let card: POCard

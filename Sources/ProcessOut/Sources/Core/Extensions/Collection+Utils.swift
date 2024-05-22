@@ -1,11 +1,9 @@
 //
 //  Collection+Utils.swift
-//  ProcessOutUI
+//  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 18.12.2023.
 //
-
-import Foundation
 
 extension Collection {
 
