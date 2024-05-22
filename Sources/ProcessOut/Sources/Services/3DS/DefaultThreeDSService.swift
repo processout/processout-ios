@@ -9,37 +9,26 @@ import Foundation
 
 final class DefaultThreeDSService: ThreeDSService {
 
-    init(
-        decoder: JSONDecoder,
-        encoder: JSONEncoder,
-        jsonWritingOptions: JSONSerialization.WritingOptions = [],
-        logger: POLogger
-    ) {
+    init(decoder: JSONDecoder, encoder: JSONEncoder, jsonWritingOptions: JSONSerialization.WritingOptions = []) {
         self.decoder = decoder
         self.encoder = encoder
         self.jsonWritingOptions = jsonWritingOptions
-        self.logger = logger
     }
 
     // MARK: - ThreeDSService
 
     func handle(action: ThreeDSCustomerAction, delegate: Delegate) async throws -> String {
-        do {
-            switch action.type {
-            case .fingerprintMobile:
-                return try await fingerprint(encodedConfiguration: action.value, delegate: delegate)
-            case .challengeMobile:
-                return try await challenge(encodedChallenge: action.value, delegate: delegate)
-            case .fingerprint:
-                return try await fingerprint(url: action.value, delegate: delegate)
-            case .redirect, .url:
-                return try await redirect(url: action.value, delegate: delegate)
-            }
-        } catch {
-            // todo(andrii-vysotskyi): when async delegate methods are publically available ensure
-            // that thrown errors are mapped to POFailure if needed.
-            logger.error("Did fail to handle 3DS action: \(error)")
-            throw error
+        // todo(andrii-vysotskyi): when async delegate methods are publically available ensure
+        // that thrown errors are mapped to POFailure if needed.
+        switch action.type {
+        case .fingerprintMobile:
+            return try await fingerprint(encodedConfiguration: action.value, delegate: delegate)
+        case .challengeMobile:
+            return try await challenge(encodedChallenge: action.value, delegate: delegate)
+        case .fingerprint:
+            return try await fingerprint(url: action.value, delegate: delegate)
+        case .redirect, .url:
+            return try await redirect(url: action.value, delegate: delegate)
         }
     }
 
@@ -64,7 +53,6 @@ final class DefaultThreeDSService: ThreeDSService {
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
     private let jsonWritingOptions: JSONSerialization.WritingOptions
-    private let logger: POLogger
 
     // MARK: - Private Methods
 

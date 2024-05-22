@@ -28,7 +28,7 @@ public final class ProcessOut {
     /// Returns invoices service.
     public private(set) lazy var invoices: POInvoicesService = {
         let repository = HttpInvoicesRepository(connector: httpConnector)
-        return DefaultInvoicesService(repository: repository, threeDSService: threeDSService)
+        return DefaultInvoicesService(repository: repository, threeDSService: threeDSService, logger: serviceLogger)
     }()
 
     /// Returns alternative payment methods service.
@@ -60,7 +60,9 @@ public final class ProcessOut {
     /// Returns customer tokens service.
     public private(set) lazy var customerTokens: POCustomerTokensService = {
         let repository = HttpCustomerTokensRepository(connector: httpConnector)
-        return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService)
+        return DefaultCustomerTokensService(
+            repository: repository, threeDSService: threeDSService, logger: serviceLogger
+        )
     }()
 
     /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. Only deep
@@ -140,7 +142,7 @@ public final class ProcessOut {
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        return DefaultThreeDSService(decoder: decoder, encoder: encoder, logger: serviceLogger)
+        return DefaultThreeDSService(decoder: decoder, encoder: encoder)
     }()
 
     // MARK: - Private Methods
