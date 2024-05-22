@@ -120,7 +120,6 @@ public final class ProcessOut {
             let configuration = self.configuration
             return TelemetryServiceConfiguration(
                 isTelemetryEnabled: configuration.isTelemetryEnabled,
-                isDebug: configuration.isDebug,
                 applicationVersion: configuration.application?.version,
                 applicationName: configuration.application?.name
             )

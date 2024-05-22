@@ -65,7 +65,6 @@ final class DefaultTelemetryService: POService, LoggerDestination {
             guard let self else {
                 return true // Self no longer exists, return true to "drop" pending events
             }
-            // todo(andrii-vysotskyi): ignore logs if debugger is attached
             let configuration = self.configuration()
             guard configuration.isTelemetryEnabled else {
                 return true // Events shouldn't be submitted, return true to "drop" pending
