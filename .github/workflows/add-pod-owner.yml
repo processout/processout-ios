@@ -1,0 +1,16 @@
+name: 'Add Pod Owner'
+on:
+  workflow_dispatch:
+    inputs:
+        owner_email:
+          description: 'Owner email'
+          required: true
+          type: string
+jobs:
+  add-owner:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v3
+      - name: Add Owner
+        run: |
+          source Scripts/AddPodOwner.sh ${{ inputs.owner_email }}
