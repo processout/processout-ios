@@ -12,5 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Add Owner
-        run: |
-          source Scripts/AddPodOwner.sh ${{ inputs.owner_email }}
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+        run: source Scripts/AddPodOwner.sh ${{ inputs.owner_email }}
