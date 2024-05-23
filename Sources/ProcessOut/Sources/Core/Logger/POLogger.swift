@@ -25,7 +25,7 @@ public struct POLogger {
 
     /// Add, change, or remove a logging attribute.
     @_spi(PO)
-    public subscript(attributeKey attributeKey: String) -> String? {
+    public subscript(attributeKey attributeKey: POLogAttributeKey) -> String? {
         get {
             lock.withLock { attributes[attributeKey] }
         }
@@ -39,9 +39,9 @@ public struct POLogger {
     /// Logs a message at the `debug` level.
     @_spi(PO) public func debug(
         _ message: @autoclosure () -> POLogMessage,
-        attributes: @autoclosure () -> [String: String] = [:],
+        attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
-        file: String = #file,
+        file: String = #fileID,
         line: Int = #line
     ) {
         log(level: .debug, message, attributes: attributes, dso: dso, file: file, line: line)
@@ -50,9 +50,9 @@ public struct POLogger {
     /// Logs a message at the `info` level.
     @_spi(PO) public func info(
         _ message: @autoclosure () -> POLogMessage,
-        attributes: @autoclosure () -> [String: String] = [:],
+        attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
-        file: String = #file,
+        file: String = #fileID,
         line: Int = #line
     ) {
         log(level: .info, message, attributes: attributes, dso: dso, file: file, line: line)
@@ -61,9 +61,9 @@ public struct POLogger {
     /// Logs a message at the `error` level.
     @_spi(PO) public func error(
         _ message: @autoclosure () -> POLogMessage,
-        attributes: @autoclosure () -> [String: String] = [:],
+        attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
-        file: String = #file,
+        file: String = #fileID,
         line: Int = #line
     ) {
         log(level: .error, message, attributes: attributes, dso: dso, file: file, line: line)
@@ -72,9 +72,9 @@ public struct POLogger {
     /// Logs a message at the `fault` level.
     @_spi(PO) public func fault(
         _ message: @autoclosure () -> POLogMessage,
-        attributes: @autoclosure () -> [String: String] = [:],
+        attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
-        file: String = #file,
+        file: String = #fileID,
         line: Int = #line
     ) {
         log(level: .fault, message, attributes: attributes, dso: dso, file: file, line: line)
@@ -85,7 +85,7 @@ public struct POLogger {
     private let destinations: [LoggerDestination]
     private let minimumLevel: () -> LogLevel
     private let lock: NSLock
-    private var attributes: [String: String]
+    private var attributes: [POLogAttributeKey: String]
 
     // MARK: - Private Methods
 
@@ -100,7 +100,7 @@ public struct POLogger {
     private func log( // swiftlint:disable:this function_parameter_count
         level: LogLevel,
         _ message: () -> POLogMessage,
-        attributes additionalAttributes: () -> [String: String],
+        attributes additionalAttributes: () -> [POLogAttributeKey: String],
         dso: UnsafeRawPointer?,
         file: String,
         line: Int

@@ -28,18 +28,22 @@ final class UrlSessionHttpConnector: HttpConnector {
 
     func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> Value {
         let sessionRequest = try await requestMapper.urlRequest(from: request)
-        logger.debug("Sending \(urlRequestFormatter.string(from: sessionRequest))")
+        var logger = self.logger
+        logger[attributeKey: "RequestId"] = request.id
+        logger.debug(
+            "Will send request: \(urlRequestFormatter.string(from: sessionRequest))"
+        )
         let (data, response): (Data, URLResponse)
         do {
             (data, response) = try await session.data(for: sessionRequest)
         } catch let error as URLError {
-            logger.info("Request \(request.id) did fail with error: '\(error)'.")
+            logger.info("Request did fail with error: '\(error)'.")
             throw convertToFailure(urlError: error)
         } catch {
-            logger.info("Request \(request.id) did fail with unknown error '\(error)'.")
+            logger.error("Request did fail with unknown error '\(error)'.")
             throw Failure.internal
         }
-        return try decodeValue(Value.self, from: data, response: response, requestId: request.id)
+        return try decodeValue(Value.self, from: data, response: response, logger: logger)
     }
 
     // MARK: - Private Properties
@@ -54,14 +58,14 @@ final class UrlSessionHttpConnector: HttpConnector {
     // MARK: - Private Methods
 
     private func decodeValue<Value: Decodable>(
-        _ valueType: Value.Type, from data: Data, response: URLResponse, requestId: String
+        _ valueType: Value.Type, from data: Data, response: URLResponse, logger: POLogger
     ) throws -> Value {
         guard let response = response as? HTTPURLResponse else {
-            logger.error("Invalid url response for \(requestId).")
+            logger.error("Unexpected url response type")
             throw Failure.internal
         }
         let responseDescription = urlResponseFormatter.string(from: response, data: data)
-        logger.debug("Received response for \(requestId): \(responseDescription)")
+        logger.debug("Received response: \(responseDescription)")
         do {
             if try decoder.decode(Response.self, from: data).success {
                 return try decoder.decode(Value.self, from: data)
@@ -71,7 +75,7 @@ final class UrlSessionHttpConnector: HttpConnector {
             )
             throw failure
         } catch let error as DecodingError {
-            logger.error("Did fail to decode response for \(requestId): '\(error)'.")
+            logger.error("Did fail to decode response: '\(error)'")
             throw Failure.decoding(error, statusCode: response.statusCode)
         }
     }

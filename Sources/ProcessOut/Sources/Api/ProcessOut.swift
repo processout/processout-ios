@@ -28,7 +28,7 @@ public final class ProcessOut {
     /// Returns invoices service.
     public private(set) lazy var invoices: POInvoicesService = {
         let repository = HttpInvoicesRepository(connector: httpConnector)
-        return DefaultInvoicesService(repository: repository, threeDSService: threeDSService)
+        return DefaultInvoicesService(repository: repository, threeDSService: threeDSService, logger: serviceLogger)
     }()
 
     /// Returns alternative payment methods service.
@@ -60,7 +60,9 @@ public final class ProcessOut {
     /// Returns customer tokens service.
     public private(set) lazy var customerTokens: POCustomerTokensService = {
         let repository = HttpCustomerTokensRepository(connector: httpConnector)
-        return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService)
+        return DefaultCustomerTokensService(
+            repository: repository, threeDSService: threeDSService, logger: serviceLogger
+        )
     }()
 
     /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. Only deep
@@ -106,31 +108,32 @@ public final class ProcessOut {
         createLogger(for: Constants.serviceLoggerCategory)
     }()
 
+    private lazy var deviceMetadataProvider: DefaultDeviceMetadataProvider = {
+        let keychain = Keychain(service: Constants.bundleIdentifier)
+        return DefaultDeviceMetadataProvider(screen: .main, device: .current, bundle: .main, keychain: keychain)
+    }()
+
     private lazy var httpConnector: HttpConnector = {
-        let connectorConfiguration = { [unowned self] in
+        createConnector(includeLoggerRemoteDestination: true)
+    }()
+
+    private lazy var remoteLoggerDestination: LoggerDestination = {
+        let configuration: () -> TelemetryServiceConfiguration = { [unowned self] in
             let configuration = self.configuration
-            return HttpConnectorRequestMapperConfiguration(
-                baseUrl: configuration.apiBaseUrl,
-                projectId: configuration.projectId,
-                privateKey: configuration.privateKey,
-                version: ProcessOut.version,
-                appVersion: configuration.appVersion
+            return TelemetryServiceConfiguration(
+                isTelemetryEnabled: configuration.isTelemetryEnabled,
+                applicationVersion: configuration.application?.version,
+                applicationName: configuration.application?.name
             )
         }
-        let keychain = Keychain(service: Constants.bundleIdentifier)
-        let deviceMetadataProvider = DefaultDeviceMetadataProvider(
-            screen: .main, device: .current, bundle: .main, keychain: keychain
+        // Telemetry service uses repository with "special" connector. Its logs
+        // are not submitted to backend to avoid recursion.
+        let repository = DefaultTelemetryRepository(
+            connector: createConnector(includeLoggerRemoteDestination: false)
         )
-        // Connector logs are not sent to backend to avoid recursion. This
-        // may be not ideal because we may loose important events, such
-        // as decoding failures so approach may be reconsidered in future.
-        let logger = createLogger(for: Constants.connectorLoggerCategory, includeRemoteDestination: false)
-        let connector = ProcessOutHttpConnectorBuilder()
-            .with(configuration: connectorConfiguration)
-            .with(logger: logger)
-            .with(deviceMetadataProvider: deviceMetadataProvider)
-            .build()
-        return connector
+        return DefaultTelemetryService(
+            configuration: configuration, repository: repository, deviceMetadataProvider: deviceMetadataProvider
+        )
     }()
 
     private lazy var threeDSService: ThreeDSService = {
@@ -139,7 +142,7 @@ public final class ProcessOut {
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        return DefaultThreeDSService(decoder: decoder, encoder: encoder, logger: serviceLogger)
+        return DefaultThreeDSService(decoder: decoder, encoder: encoder)
     }()
 
     // MARK: - Private Methods
@@ -148,16 +151,36 @@ public final class ProcessOut {
         self.__configuration = .init(wrappedValue: configuration)
     }
 
+    private func createConnector(includeLoggerRemoteDestination: Bool) -> HttpConnector {
+        let connectorConfiguration = { [unowned self] in
+            let configuration = self.configuration
+            return HttpConnectorRequestMapperConfiguration(
+                baseUrl: configuration.apiBaseUrl,
+                projectId: configuration.projectId,
+                privateKey: configuration.privateKey,
+                sessionId: configuration.sessionId,
+                version: ProcessOut.version
+            )
+        }
+        let logger = createLogger(
+            for: Constants.connectorLoggerCategory,
+            includeRemoteDestination: includeLoggerRemoteDestination
+        )
+        let connector = ProcessOutHttpConnectorBuilder()
+            .with(configuration: connectorConfiguration)
+            .with(logger: logger)
+            .with(deviceMetadataProvider: deviceMetadataProvider)
+            .build()
+        return connector
+    }
+
     private func createLogger(for category: String, includeRemoteDestination: Bool = true) -> POLogger {
-        let destinations: [LoggerDestination] = [
+        var destinations: [LoggerDestination] = [
             SystemLoggerDestination(subsystem: Constants.bundleIdentifier)
         ]
-        // todo(andrii-vysotskyi): uncomment code bellow when backend will support accepting SDK logs.
-        // if includeRemoteDestination {
-        //     let repository = HttpLogsRepository(connector: httpConnector)
-        //     let service = DefaultLogsService(repository: repository, minimumLevel: .error)
-        //     destinations.append(service)
-        // }
+        if includeRemoteDestination {
+            destinations.append(remoteLoggerDestination)
+        }
         let minimumLevel: () -> LogLevel = { [unowned self] in
             configuration.isDebug ? .debug : .info
         }
@@ -192,7 +215,7 @@ extension ProcessOut {
                 shared.$_configuration.withLock { $0 = configuration }
                 shared.logger.debug("Did change ProcessOut configuration")
             } else {
-                shared.logger.info("ProcessOut can be configured only once, ignored")
+                shared.logger.debug("ProcessOut can be configured only once, ignored")
             }
         } else {
             Self.prewarm()

@@ -18,9 +18,9 @@ struct HttpConnectorRequestMapperConfiguration: Sendable {
     /// Project's private key.
     let privateKey: String?
 
+    /// Current session ID.
+    let sessionId: String
+
     /// SDK version.
     let version: String
-
-    /// Host application version.
-    let appVersion: String?
 }

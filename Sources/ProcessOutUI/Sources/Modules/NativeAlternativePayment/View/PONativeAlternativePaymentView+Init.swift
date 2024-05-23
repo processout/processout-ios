@@ -19,7 +19,8 @@ extension PONativeAlternativePaymentView {
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         var logger = ProcessOut.shared.logger
-        logger[attributeKey: "InvoiceId"] = configuration.invoiceId
+        logger[attributeKey: .invoiceId] = configuration.invoiceId
+        logger[attributeKey: .gatewayConfigurationId] = configuration.gatewayConfigurationId
         let interactorConfiguration = PONativeAlternativePaymentMethodInteractorConfiguration(
             gatewayConfigurationId: configuration.gatewayConfigurationId,
             invoiceId: configuration.invoiceId,
