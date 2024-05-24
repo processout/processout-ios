@@ -96,6 +96,6 @@ final class UrlSessionHttpConnector: HttpConnector {
 
 private struct Response: Decodable {
 
-    /// Indicates whether request was processed successfuly.
+    /// Indicates whether request was processed successfully.
     let success: Bool
 }

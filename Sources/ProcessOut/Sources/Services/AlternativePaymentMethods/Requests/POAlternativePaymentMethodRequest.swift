@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// Request describing parameters that are used to creat URL that user can be redirected to initiate
+/// Request describing parameters that are used to create URL that user can be redirected to initiate
 /// alternative payment.
 ///
 /// - NOTE: Make sure to supply proper`additionalData` specific for particular payment

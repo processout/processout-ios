@@ -14,7 +14,7 @@
         self.interpolation = stringInterpolation
     }
 
-    /// Creates an instance initialized to the given string value.
+    /// Creates an instance initialised to the given string value.
     ///
     /// - Parameter value: The value of the new instance.
     public init(stringLiteral value: String) {

@@ -15,7 +15,7 @@ struct LogEvent {
     /// Actual log message.
     let message: String
 
-    /// The string that categorizes event.
+    /// The string that categorises event.
     let category: String
 
     /// Date associated with message.

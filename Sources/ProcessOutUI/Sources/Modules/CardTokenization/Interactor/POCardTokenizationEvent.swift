@@ -14,7 +14,7 @@ public enum POCardTokenizationEvent {
     case willStart
 
     /// Indicates that implementation successfully loaded initial portion of data and currently waiting for user
-    /// to fulfill needed info.
+    /// to fulfil needed info.
     case didStart
 
     /// Event is sent when the user changes any editable value.

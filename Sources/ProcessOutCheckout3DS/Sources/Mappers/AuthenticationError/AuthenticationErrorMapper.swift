@@ -10,6 +10,6 @@ import Checkout3DS
 
 protocol AuthenticationErrorMapper {
 
-    /// Converts given authentication error to processout error.
+    /// Converts given authentication error to ProcessOut error.
     func convert(error: Checkout3DS.AuthenticationError) -> POFailure
 }

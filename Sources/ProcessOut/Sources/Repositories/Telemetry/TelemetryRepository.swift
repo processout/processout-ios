@@ -7,6 +7,6 @@
 
 protocol TelemetryRepository: PORepository {
 
-    /// Submits telemetery.
+    /// Submits telemetry.
     func submit(telemetry: Telemetry) async throws
 }

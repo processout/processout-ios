@@ -51,7 +51,7 @@ public final class PO3DSRedirectViewControllerBuilder {
         return self
     }
 
-    /// Returns view controller that caller should encorporate into view controllers hierarchy.
+    /// Returns view controller that caller should incorporate into view controllers hierarchy.
     ///
     /// - Note: Caller should dismiss view controller after completion is called.
     /// - Note: Returned object's delegate shouldn't be modified.

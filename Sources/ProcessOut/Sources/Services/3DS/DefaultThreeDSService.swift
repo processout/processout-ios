@@ -18,7 +18,7 @@ final class DefaultThreeDSService: ThreeDSService {
     // MARK: - ThreeDSService
 
     func handle(action: ThreeDSCustomerAction, delegate: Delegate) async throws -> String {
-        // todo(andrii-vysotskyi): when async delegate methods are publically available ensure
+        // todo(andrii-vysotskyi): when async delegate methods are publicly available ensure
         // that thrown errors are mapped to POFailure if needed.
         switch action.type {
         case .fingerprintMobile:

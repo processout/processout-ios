@@ -31,7 +31,7 @@ struct DeviceMetadata: Encodable {
     /// Width of the screen in pixels.
     let appScreenWidth: Int
 
-    /// Height of the screen in pixles.
+    /// Height of the screen in pixels.
     let appScreenHeight: Int
 
     /// Time zone offset in minutes.

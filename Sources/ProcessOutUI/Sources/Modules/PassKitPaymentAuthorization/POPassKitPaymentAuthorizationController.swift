@@ -23,9 +23,9 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
 
     /// Determine whether this device can process payments using the specified networks and capabilities bitmask.
     public static func canMakePayments(
-        usingNetworks supportedNetworks: [PKPaymentNetwork], capabilities capabilties: PKMerchantCapability
+        usingNetworks supportedNetworks: [PKPaymentNetwork], capabilities: PKMerchantCapability
     ) -> Bool {
-        PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks, capabilities: capabilties)
+        PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks, capabilities: capabilities)
     }
 
     /// Initialize the controller with a payment request.
