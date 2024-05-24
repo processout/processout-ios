@@ -10,7 +10,7 @@ protocol ViewModel<State>: AnyObject {
 
     associatedtype State
 
-    /// Interactor's state.
+    /// View model's state.
     var state: State { get }
 
     /// A closure that is invoked after the object has changed.

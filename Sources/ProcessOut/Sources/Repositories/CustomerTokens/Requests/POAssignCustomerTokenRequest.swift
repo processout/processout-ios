@@ -41,7 +41,7 @@ public struct POAssignCustomerTokenRequest: Encodable { // sourcery: AutoCodingK
     /// Can be used for a 3DS2 request to indicate which third party SDK is used for the call.
     public let thirdPartySdkVersion: String?
 
-    /// Additional matadata.
+    /// Additional metadata.
     public let metadata: [String: String]?
 
     /// Creates request instance.

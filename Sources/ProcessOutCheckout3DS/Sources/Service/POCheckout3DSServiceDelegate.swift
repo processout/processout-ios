@@ -15,7 +15,7 @@ public protocol POCheckout3DSServiceDelegate: AnyObject {
     func willCreateAuthenticationRequest(configuration: PO3DS2Configuration)
 
     /// Asks implementation to create `ThreeDS2ServiceConfiguration` using `configParameters`. This method
-    /// could be used to customize underlying 3DS SDK appearance and bahaviour.
+    /// could be used to customize underlying 3DS SDK appearance and behavior.
     func configuration(
         with parameters: Checkout3DS.ThreeDS2ServiceConfiguration.ConfigParameters
     ) -> Checkout3DS.ThreeDS2ServiceConfiguration

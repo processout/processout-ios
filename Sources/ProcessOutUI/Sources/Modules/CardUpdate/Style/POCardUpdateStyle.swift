@@ -58,7 +58,7 @@ public struct POCardUpdateStyle {
 @available(iOS 14, *)
 extension POCardUpdateStyle {
 
-    /// Default card tokenization style.
+    /// Default card update style.
     public static var `default`: POCardUpdateStyle {
         POCardUpdateStyle(
             title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title),

@@ -32,7 +32,7 @@ public protocol POCardTokenizationDelegate: AnyObject {
 extension POCardTokenizationDelegate {
 
     public func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent) {
-        // Ignroed
+        // Ignored
     }
 
     public func processTokenizedCard(card: POCard) async throws {

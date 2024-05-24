@@ -10,7 +10,7 @@ import UIKit
 /// Holds typesetting information that could be applied to displayed text.
 public struct POTypography {
 
-    /// Font assosiated with given typography.
+    /// Font associated with given typography.
     public let font: UIFont
 
     /// Line height. If not set explicitly equals to font's line height.

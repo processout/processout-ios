@@ -9,51 +9,51 @@ protocol MarkdownVisitor<Result> {
 
     associatedtype Result
 
-    /// Vists unknown node.
+    /// Visits unknown node.
     func visit(node: MarkdownUnknown) -> Result
 
-    /// Vists document.
+    /// Visits document.
     func visit(document: MarkdownDocument) -> Result
 
-    /// Vists emphasis node.
+    /// Visits emphasis node.
     func visit(emphasis: MarkdownEmphasis) -> Result
 
-    /// Vists list node.
+    /// Visits list node.
     func visit(list: MarkdownList) -> Result
 
-    /// Vists list item.
+    /// Visits list item.
     func visit(listItem: MarkdownListItem) -> Result
 
-    /// Vists paragraph node.
+    /// Visits paragraph node.
     func visit(paragraph: MarkdownParagraph) -> Result
 
-    /// Vists strong node.
+    /// Visits strong node.
     func visit(strong: MarkdownStrong) -> Result
 
-    /// Vists text node.
+    /// Visits text node.
     func visit(text: MarkdownText) -> Result
 
-    /// Vists softbreak node.
+    /// Visits softbreak node.
     func visit(softbreak: MarkdownSoftbreak) -> Result
 
-    /// Vists linebreak node.
+    /// Visits linebreak node.
     func visit(linebreak: MarkdownLinebreak) -> Result
 
-    /// Vists heading node.
+    /// Visits heading node.
     func visit(heading: MarkdownHeading) -> Result
 
-    /// Vists block quote.
+    /// Visits block quote.
     func visit(blockQuote: MarkdownBlockQuote) -> Result
 
-    /// Vists code block
+    /// Visits code block
     func visit(codeBlock: MarkdownCodeBlock) -> Result
 
-    /// Vists thematic break.
+    /// Visits thematic break.
     func visit(thematicBreak: MarkdownThematicBreak) -> Result
 
-    /// Vists code span.
+    /// Visits code span.
     func visit(codeSpan: MarkdownCodeSpan) -> Result
 
-    /// Vists link node.
+    /// Visits link node.
     func visit(link: MarkdownLink) -> Result
 }

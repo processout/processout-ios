@@ -72,7 +72,7 @@ extension ProcessOutConfiguration {
     /// Creates production configuration.
     ///
     /// - Parameters:
-    ///   - appVersion: when application parameter is set, it takes precedance over this parameter.
+    ///   - appVersion: when application parameter is set, it takes precedence over this parameter.
     public static func production(
         projectId: String,
         application: Application? = nil,

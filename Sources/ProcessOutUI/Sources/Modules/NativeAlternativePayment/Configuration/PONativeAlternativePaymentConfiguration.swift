@@ -19,7 +19,7 @@ public struct PONativeAlternativePaymentConfiguration {
         /// - Parameters:
         ///   - title: Action title. Pass `nil` title to use default value.
         ///   - disabledFor: By default user can interact with action immediately after it becomes visible, it is
-        ///   possible to make it initialy disabled for given amount of time.
+        ///   possible to make it initially disabled for given amount of time.
         ///   - confirmation: When property is set implementation asks user to confirm cancel.
         case cancel(
             title: String? = nil, disabledFor: TimeInterval = 0, confirmation: POConfirmationDialogConfiguration? = nil
