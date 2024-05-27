@@ -40,3 +40,12 @@ public struct POStringDecodableMerchantCapability: Decodable {
         case threeDS = "supports3DS", credit = "supportsCredit", debit = "supportsDebit"
     }
 }
+
+extension KeyedDecodingContainer {
+
+    public func decode(
+        _ type: POStringDecodableMerchantCapability.Type, forKey key: K
+    ) throws -> POStringDecodableMerchantCapability {
+        try type.init(from: try superDecoder(forKey: key))
+    }
+}
