@@ -100,8 +100,8 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
             guard let invoice = try? await self.invoicesService.createInvoice(request: invoiceCreationRequest) else {
                 return
             }
-            var configuraiton = PODynamicCheckoutConfiguration(invoiceId: invoice.id)
-            configuraiton.alternativePayment.returnUrl = Constants.returnUrl
+            var configuration = PODynamicCheckoutConfiguration(invoiceId: invoice.id)
+            configuration.alternativePayment.returnUrl = Constants.returnUrl
             self.router.trigger(route: .dynamicCheckout(configuration: configuraiton, delegate: self))
         }
     }
