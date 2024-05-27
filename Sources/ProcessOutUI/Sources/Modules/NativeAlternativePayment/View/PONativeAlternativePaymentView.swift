@@ -27,10 +27,8 @@ public struct PONativeAlternativePaymentView: View {
                 }
                 .clipped()
             }
-            if !viewModel.actions.isEmpty {
-                POActionsContainerView(actions: viewModel.actions)
-                    .actionsContainerStyle(style.actionsContainer)
-            }
+            POActionsContainerView(actions: viewModel.actions)
+                .actionsContainerStyle(style.actionsContainer)
         }
         .backport.background {
             let backgroundColor = viewModel.isCaptured ? style.background.success : style.background.regular

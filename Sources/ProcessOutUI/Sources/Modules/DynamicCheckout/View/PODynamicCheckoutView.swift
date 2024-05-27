@@ -25,10 +25,8 @@ public struct PODynamicCheckoutView: View {
             }
             .clipped()
             .backport.geometryGroup()
-            if !viewModel.state.actions.isEmpty {
-                POActionsContainerView(actions: viewModel.state.actions)
-                    .actionsContainerStyle(style.actionsContainer)
-            }
+            POActionsContainerView(actions: viewModel.state.actions)
+                .actionsContainerStyle(style.actionsContainer)
         }
         .backport.background {
             let backgroundColor = viewModel.state.isCompleted ? style.success.backgroundColor : style.backgroundColor
