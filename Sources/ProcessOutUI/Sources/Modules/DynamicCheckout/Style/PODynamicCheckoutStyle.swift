@@ -93,7 +93,7 @@ public struct PODynamicCheckoutStyle {
     public let errorText: POTextStyle
 
     /// PassKit payment button style.
-    public let passKitPaymentButtonStyle: PKPaymentButtonStyle
+    public let passKitPaymentButtonStyle: POPassKitPaymentButtonStyle
 
     /// Generic express payment button style. When default style is used,
     /// equals to `POBrandButtonStyle.brand`.
@@ -118,7 +118,7 @@ public struct PODynamicCheckoutStyle {
         codeInput: POInputStyle,
         radioButton: any ButtonStyle,
         errorText: POTextStyle,
-        passKitPaymentButtonStyle: PKPaymentButtonStyle,
+        passKitPaymentButtonStyle: POPassKitPaymentButtonStyle,
         expressPaymentButtonStyle: any ButtonStyle,
         backgroundColor: Color,
         success: Success,

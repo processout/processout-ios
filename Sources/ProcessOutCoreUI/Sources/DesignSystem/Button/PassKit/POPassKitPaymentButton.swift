@@ -12,9 +12,8 @@ import PassKit
 @_spi(PO)
 public struct POPassKitPaymentButton: View {
 
-    public init(type: PKPaymentButtonType, style: PKPaymentButtonStyle, action: @escaping () -> Void) {
+    public init(type: PKPaymentButtonType, action: @escaping () -> Void) {
         self.buttonType = type
-        self.style = style
         self.action = action
     }
 
@@ -23,7 +22,7 @@ public struct POPassKitPaymentButton: View {
     public var body: some View {
         ButtonRepresentable(buttonType: buttonType, style: style, action: action)
             .id(buttonType)
-            .id(style)
+            .id(style.style)
             .frame(height: Constants.minHeight)
             .frame(maxWidth: .infinity)
     }
@@ -37,28 +36,29 @@ public struct POPassKitPaymentButton: View {
     // MARK: - Private Properties
 
     private let buttonType: PKPaymentButtonType
-    private let style: PKPaymentButtonStyle
     private let action: () -> Void
+
+    @Environment(\.passKitPaymentButtonStyle)
+    private var style
 }
 
 @available(iOS 14.0, *)
 private struct ButtonRepresentable: UIViewRepresentable {
 
     let buttonType: PKPaymentButtonType
-    let style: PKPaymentButtonStyle
+    let style: POPassKitPaymentButtonStyle
     let action: () -> Void
 
     // MARK: - UIViewRepresentable
 
     func makeUIView(context: Context) -> PKPaymentButton {
-        let button = PKPaymentButton(paymentButtonType: buttonType, paymentButtonStyle: style)
+        let button = PKPaymentButton(paymentButtonType: buttonType, paymentButtonStyle: style.style)
         context.coordinator.observeActions(control: button)
         return button
     }
 
     func updateUIView(_ rootView: PKPaymentButton, context: Context) {
-        // todo(andrii-vysotskyi): allow configuring corner radius
-        rootView.cornerRadius = POSpacing.small
+        rootView.cornerRadius = style.cornerRadius
         context.coordinator.action = action
     }
 
