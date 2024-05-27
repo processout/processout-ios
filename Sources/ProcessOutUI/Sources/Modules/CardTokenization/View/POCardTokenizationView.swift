@@ -20,13 +20,10 @@ public struct POCardTokenizationView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            ScrollViewReader { scrollView in
-                ScrollView(showsIndicators: false) {
-                    CardTokenizationContentView(viewModel: viewModel)
-                        .scrollViewProxy(scrollView)
-                }
-                .clipped()
+            ScrollView(showsIndicators: false) {
+                CardTokenizationContentView(viewModel: viewModel)
             }
+            .clipped()
             if !viewModel.state.actions.isEmpty {
                 POActionsContainerView(actions: viewModel.state.actions)
                     .actionsContainerStyle(style.actionsContainer)

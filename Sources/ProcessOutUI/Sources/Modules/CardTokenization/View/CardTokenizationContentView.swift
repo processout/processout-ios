@@ -19,27 +19,29 @@ struct CardTokenizationContentView<ViewModel: CardTokenizationViewModel>: View {
     // MARK: - View
 
     var body: some View {
-        VStack(alignment: .leading, spacing: POSpacing.medium) {
-            if let title = viewModel.state.title {
-                Text(title)
-                    .textStyle(style.title)
-                    .padding(.horizontal, horizontalPadding)
-                Divider()
-                    .frame(height: 1)
-                    .overlay(style.separatorColor)
+        ScrollViewReader { scrollView in
+            VStack(alignment: .leading, spacing: POSpacing.medium) {
+                if let title = viewModel.state.title {
+                    Text(title)
+                        .textStyle(style.title)
+                        .padding(.horizontal, horizontalPadding)
+                    Divider()
+                        .frame(height: 1)
+                        .overlay(style.separatorColor)
+                }
+                ForEach(viewModel.state.sections) { section in
+                    CardTokenizationSectionView(
+                        section: section, focusedInputId: $viewModel.state.focusedInputId
+                    )
+                }
+                .padding(.horizontal, horizontalPadding)
             }
-            ForEach(viewModel.state.sections) { section in
-                CardTokenizationSectionView(
-                    section: section, focusedInputId: $viewModel.state.focusedInputId
-                )
+            .backport.onChange(of: viewModel.state.focusedInputId) {
+                scrollToFocusedInput(scrollView: scrollView)
             }
-            .padding(.horizontal, horizontalPadding)
+            .padding(.vertical, POSpacing.medium)
+            .frame(maxWidth: .infinity)
         }
-        .backport.onChange(of: viewModel.state.focusedInputId) {
-            scrollToFocusedInput()
-        }
-        .padding(.vertical, POSpacing.medium)
-        .frame(maxWidth: .infinity)
         .backport.geometryGroup()
     }
 
@@ -50,18 +52,15 @@ struct CardTokenizationContentView<ViewModel: CardTokenizationViewModel>: View {
     @Environment(\.cardTokenizationStyle)
     private var style
 
-    @Environment(\.scrollViewProxy)
-    private var scrollView
-
     @ObservedObject
     private var viewModel: ViewModel
 
     // MARK: - Private Methods
 
-    private func scrollToFocusedInput() {
+    private func scrollToFocusedInput(scrollView: ScrollViewProxy) {
         guard let id = viewModel.state.focusedInputId else {
             return
         }
-        withAnimation { scrollView?.scrollTo(id) }
+        withAnimation { scrollView.scrollTo(id) }
     }
 }

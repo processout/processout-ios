@@ -19,41 +19,40 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
     // MARK: - View
 
     var body: some View {
-        VStack(spacing: POSpacing.medium) {
-            let partition = sectionsPartition
-            ForEach(partition.top) { section in
-                NativeAlternativePaymentSectionView(
-                    section: section, horizontalPadding: horizontalPadding, focusedItemId: $viewModel.focusedItemId
-                )
-            }
-            if !partition.center.isEmpty {
-                VStack(spacing: POSpacing.medium) {
-                    ForEach(partition.center) { section in
-                        NativeAlternativePaymentSectionView(
-                            section: section,
-                            horizontalPadding: horizontalPadding,
-                            focusedItemId: $viewModel.focusedItemId
-                        )
-                    }
+        ScrollViewReader { scrollView in
+            VStack(spacing: POSpacing.medium) {
+                let partition = sectionsPartition
+                ForEach(partition.top) { section in
+                    NativeAlternativePaymentSectionView(
+                        section: section, horizontalPadding: horizontalPadding, focusedItemId: $viewModel.focusedItemId
+                    )
                 }
-                .backport.geometryGroup()
-                .frame(maxHeight: .infinity)
+                if !partition.center.isEmpty {
+                    VStack(spacing: POSpacing.medium) {
+                        ForEach(partition.center) { section in
+                            NativeAlternativePaymentSectionView(
+                                section: section,
+                                horizontalPadding: horizontalPadding,
+                                focusedItemId: $viewModel.focusedItemId
+                            )
+                        }
+                    }
+                    .backport.geometryGroup()
+                    .frame(maxHeight: .infinity)
+                }
             }
+            .backport.onChange(of: viewModel.focusedItemId) {
+                scrollToFocusedInput(scrollView: scrollView)
+            }
+            .padding(.vertical, POSpacing.medium)
+            .frame(maxWidth: .infinity)
         }
-        .backport.onChange(of: viewModel.focusedItemId) {
-            scrollToFocusedInput()
-        }
-        .padding(.vertical, POSpacing.medium)
-        .frame(maxWidth: .infinity)
         .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
 
     private let horizontalPadding: CGFloat
-
-    @Environment(\.scrollViewProxy)
-    private var scrollView
 
     @ObservedObject
     private var viewModel: ViewModel
@@ -83,10 +82,10 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
         }
     }
 
-    private func scrollToFocusedInput() {
+    private func scrollToFocusedInput(scrollView: ScrollViewProxy) {
         guard let id = viewModel.focusedItemId else {
             return
         }
-        withAnimation { scrollView?.scrollTo(id) }
+        withAnimation { scrollView.scrollTo(id) }
     }
 }
