@@ -16,7 +16,7 @@ protocol CodeTextFieldDelegate: AnyObject {
 
     /// Asks the delegate whether to process the pressing of the Return button for the text field.
     ///
-    /// - Returns: `true` if the text field should implement its default behavior for the return button;
+    /// - Returns: `true` if the text field should implement its default behaviour for the return button;
     /// otherwise, `false`.
     func codeTextFieldShouldReturn(_ textField: CodeTextField) -> Bool
 }

@@ -18,12 +18,20 @@ public struct PONativeAlternativePaymentConfiguration {
         public let title: String?
 
         /// By default user can interact with action immediately after it becomes visible, it is
-        /// possible to make it initialy disabled for given amount of time.
+        /// possible to make it initially disabled for given amount of time.
         public let disabledFor: TimeInterval
 
-        public init(title: String? = nil, disabledFor: TimeInterval = 0) {
+        /// When property is set implementation asks user to confirm cancel.
+        public let confirmation: POConfirmationDialogConfiguration?
+
+        public init(
+            title: String? = nil,
+            disabledFor: TimeInterval = 0,
+            confirmation: POConfirmationDialogConfiguration? = nil
+        ) {
             self.title = title
             self.disabledFor = disabledFor
+            self.confirmation = confirmation
         }
     }
 

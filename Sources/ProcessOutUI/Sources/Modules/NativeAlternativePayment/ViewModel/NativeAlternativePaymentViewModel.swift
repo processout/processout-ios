@@ -22,6 +22,9 @@ protocol NativeAlternativePaymentViewModel: ObservableObject {
     /// Boolean value that indicates whether payment is already captured.
     var isCaptured: Bool { get }
 
+    /// Confirmation dialog to present to user.
+    var confirmationDialog: POConfirmationDialog? { get set }
+
     /// Starts view model.
     func start()
 }

@@ -38,6 +38,11 @@ final class AnyNativeAlternativePaymentViewModel: NativeAlternativePaymentViewMo
         base.isCaptured
     }
 
+    var confirmationDialog: POConfirmationDialog? {
+        get { base.confirmationDialog }
+        set { base.confirmationDialog = newValue }
+    }
+
     func start() {
         base.start()
     }

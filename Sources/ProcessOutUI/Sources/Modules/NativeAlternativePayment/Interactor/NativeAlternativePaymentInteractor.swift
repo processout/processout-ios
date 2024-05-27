@@ -18,4 +18,7 @@ protocol NativeAlternativePaymentInteractor: Interactor<NativeAlternativePayment
 
     /// Submits parameters.
     func submit()
+
+    /// Notifies interactor that user requested cancel confirmation.
+    func didRequestCancelConfirmation()
 }

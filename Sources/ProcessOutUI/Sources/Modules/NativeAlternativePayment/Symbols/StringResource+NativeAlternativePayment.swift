@@ -67,6 +67,18 @@ extension POStringResource {
                 "native-alternative-payment.error.required-parameter", comment: ""
             )
         }
+
+        enum CancelConfirmation {
+
+            /// Success message.
+            static let title = POStringResource("native-alternative-payment.cancel-confirmation.title", comment: "")
+
+            /// Confirm button title..
+            static let confirm = POStringResource("native-alternative-payment.cancel-confirmation.confirm", comment: "")
+
+            /// Cancel button title.
+            static let cancel = POStringResource("native-alternative-payment.cancel-confirmation.cancel", comment: "")
+        }
     }
 }
 

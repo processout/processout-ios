@@ -65,7 +65,7 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         return self
     }
 
-    /// Returns view controller that caller should encorporate into view controllers hierarchy.
+    /// Returns view controller that caller should incorporate into view controllers hierarchy.
     /// If instance can't be created assertion failure is triggered.
     ///
     /// - NOTE: Caller should dismiss view controller after completion is called.
@@ -75,7 +75,8 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         }
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         var logger = api.logger
-        logger[attributeKey: "InvoiceId"] = invoiceId
+        logger[attributeKey: .invoiceId] = invoiceId
+        logger[attributeKey: .gatewayConfigurationId] = gatewayConfigurationId
         let interactor = PODefaultNativeAlternativePaymentMethodInteractor(
             invoicesService: api.invoices,
             imagesRepository: api.images,

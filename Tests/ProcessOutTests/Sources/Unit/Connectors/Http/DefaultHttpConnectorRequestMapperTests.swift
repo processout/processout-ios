@@ -231,6 +231,6 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
     }
 
     private var defaultConfiguration: HttpConnectorRequestMapperConfiguration {
-        .init(baseUrl: Constants.baseUrl, projectId: "<ID>", privateKey: "<KEY>", version: "1.2.3", appVersion: "4.5.6")
+        .init(baseUrl: Constants.baseUrl, projectId: "<ID>", privateKey: "<KEY>", sessionId: "<SID>", version: "1.2.3")
     }
 }

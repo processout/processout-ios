@@ -1205,6 +1205,24 @@
         }
       }
     },
+    "dynamic-checkout.cancel-button" : {
+
+    },
+    "dynamic-checkout.continue-button" : {
+
+    },
+    "dynamic-checkout.express-methods" : {
+
+    },
+    "dynamic-checkout.redirect-warning" : {
+
+    },
+    "dynamic-checkout.sections-divider" : {
+
+    },
+    "dynamic-checkout.success-message" : {
+
+    },
     "native-alternative-payment.cancel-button.title" : {
       "localizations" : {
         "en" : {
@@ -1223,6 +1241,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancelar"
+          }
+        }
+      }
+    },
+    "native-alternative-payment.cancel-confirmation.cancel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie teraz"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agora não"
+          }
+        }
+      }
+    },
+    "native-alternative-payment.cancel-confirmation.confirm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel payment"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anuluj płatność"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar pagamento"
+          }
+        }
+      }
+    },
+    "native-alternative-payment.cancel-confirmation.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel payment?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anulować płatność?"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar pagamento?"
           }
         }
       }
@@ -1376,9 +1460,6 @@
           }
         }
       }
-    },
-    "or" : {
-
     },
     "test-3ds.challenge.accept" : {
       "localizations" : {

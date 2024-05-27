@@ -15,7 +15,7 @@ public typealias POCustomerTokensServiceType = POCustomerTokensService
 /// for Merchant Initiated Transactions (MITs).
 public protocol POCustomerTokensService: POService { // sourcery: AutoCompletion
 
-    /// Assigns new source to existing customer token and optionaly verifies it.
+    /// Assigns new source to existing customer token and optionally verifies it.
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DSService
     ) async throws -> POCustomerToken

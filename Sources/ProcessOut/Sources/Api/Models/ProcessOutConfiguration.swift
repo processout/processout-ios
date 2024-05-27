@@ -15,17 +15,44 @@ public typealias ProcessOutApiConfiguration = ProcessOutConfiguration
 /// method.
 public struct ProcessOutConfiguration {
 
+    public struct Application {
+
+        /// Application name.
+        public let name: String?
+
+        /// Host application version. Providing this value helps ProcessOut to troubleshoot potential issues.
+        public let version: String?
+
+        public init(name: String? = nil, version: String? = nil) {
+            self.name = name
+            self.version = version
+        }
+    }
+
     /// Project id.
     public let projectId: String
 
+    /// Application name.
+    public let application: Application?
+
     /// Host application version. Providing this value helps ProcessOut to troubleshoot potential
     /// issues.
-    public let appVersion: String?
+    @available(*, deprecated, renamed: "application.version")
+    public var appVersion: String? {
+        application?.version
+    }
+
+    /// Session ID is a constant value
+    @_spi(PO)
+    public let sessionId = UUID().uuidString
 
     /// Boolean value that indicates whether SDK should operate in debug mode. At this moment it
     /// only affects logging level.
     /// - NOTE: Debug logs may contain sensitive data.
     public let isDebug: Bool
+
+    /// Boolean value indicating whether remote telemetry is enabled.
+    public let isTelemetryEnabled: Bool
 
     /// Project's private key.
     /// - Warning: this is only intended to be used for testing purposes storing your private key
@@ -43,13 +70,28 @@ public struct ProcessOutConfiguration {
 extension ProcessOutConfiguration {
 
     /// Creates production configuration.
-    public static func production(projectId: String, appVersion: String? = nil, isDebug: Bool = false) -> Self {
-        ProcessOutConfiguration(projectId: projectId, appVersion: appVersion, isDebug: isDebug, privateKey: nil)
+    ///
+    /// - Parameters:
+    ///   - appVersion: when application parameter is set, it takes precedence over this parameter.
+    public static func production(
+        projectId: String,
+        application: Application? = nil,
+        appVersion: String? = nil,
+        isDebug: Bool = false,
+        isTelemetryEnabled: Bool = true
+    ) -> Self {
+        .init(
+            projectId: projectId,
+            application: application ?? .init(name: nil, version: appVersion),
+            isDebug: isDebug,
+            isTelemetryEnabled: isTelemetryEnabled,
+            privateKey: nil
+        )
     }
 
     /// Creates debug production configuration with optional private key.
     @_spi(PO)
     public static func production(projectId: String, privateKey: String? = nil) -> Self {
-        ProcessOutConfiguration(projectId: projectId, appVersion: nil, isDebug: true, privateKey: privateKey)
+        .init(projectId: projectId, application: nil, isDebug: true, isTelemetryEnabled: false, privateKey: privateKey)
     }
 }

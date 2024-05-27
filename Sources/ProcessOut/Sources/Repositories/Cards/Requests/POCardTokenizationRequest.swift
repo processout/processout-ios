@@ -31,7 +31,7 @@ public struct POCardTokenizationRequest: Encodable {
     /// Preferred scheme defined by the Customer.
     public let preferredScheme: String?
 
-    /// Metada related to the card.
+    /// Metadata related to the card.
     public let metadata: [String: String]?
 
     public init(

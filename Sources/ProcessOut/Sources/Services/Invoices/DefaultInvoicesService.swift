@@ -9,9 +9,10 @@ import Foundation
 
 final class DefaultInvoicesService: POInvoicesService {
 
-    init(repository: InvoicesRepository, threeDSService: ThreeDSService) {
+    init(repository: InvoicesRepository, threeDSService: ThreeDSService, logger: POLogger) {
         self.repository = repository
         self.threeDSService = threeDSService
+        self.logger = logger
     }
 
     // MARK: - POInvoicesService
@@ -36,8 +37,14 @@ final class DefaultInvoicesService: POInvoicesService {
         guard let customerAction = try await repository.authorizeInvoice(request: request) else {
             return
         }
-        let newSource = try await self.threeDSService.handle(action: customerAction, delegate: threeDSService)
-        let newRequest = request.replacing(source: newSource)
+        let newRequest: POInvoiceAuthorizationRequest
+        do {
+            let newSource = try await self.threeDSService.handle(action: customerAction, delegate: threeDSService)
+            newRequest = request.replacing(source: newSource)
+        } catch {
+            logger.error("Did fail to authorize invoice: \(error)", attributes: [.invoiceId: request.invoiceId])
+            throw error
+        }
         try await authorizeInvoice(request: newRequest, threeDSService: threeDSService)
     }
 
@@ -83,6 +90,7 @@ final class DefaultInvoicesService: POInvoicesService {
 
     private let repository: InvoicesRepository
     private let threeDSService: ThreeDSService
+    private let logger: POLogger
 }
 
 private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_extension_access_modifier

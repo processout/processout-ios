@@ -36,11 +36,11 @@ private struct ContentModifier: ViewModifier {
     init(style: POTextStyle, addPadding: Bool) {
         self.style = style
         self.addPadding = addPadding
-        _multipler = .init(wrappedValue: 1, relativeTo: style.typography.textStyle)
+        _multiplier = .init(wrappedValue: 1, relativeTo: style.typography.textStyle)
     }
 
     func body(content: Content) -> some View {
-        let font = style.typography.font.withSize(style.typography.font.pointSize * multipler)
+        let font = style.typography.font.withSize(style.typography.font.pointSize * multiplier)
         let lineSpacing = (style.typography.lineHeight / style.typography.font.lineHeight - 1) * font.lineHeight
         return content
             .font(Font(font))
@@ -56,5 +56,5 @@ private struct ContentModifier: ViewModifier {
     private let addPadding: Bool
 
     @POBackport.ScaledMetric
-    private var multipler: CGFloat
+    private var multiplier: CGFloat
 }

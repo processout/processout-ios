@@ -9,7 +9,7 @@
 
 final class MarkdownLinebreak: MarkdownBaseNode {
 
-    override class var cmarkNodeType: cmark_node_type {
+    override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_LINEBREAK
     }
 

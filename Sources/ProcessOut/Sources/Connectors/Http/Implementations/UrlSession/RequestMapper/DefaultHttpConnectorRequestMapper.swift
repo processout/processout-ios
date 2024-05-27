@@ -105,12 +105,12 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
             "Accept-Language": Strings.preferredLocalization,
             "Content-Type": "application/json",
             "Authorization": authorization(request: request, configuration: configuration),
+            "Session-Id": configuration.sessionId,
             "Installation-Id": deviceMetadata.installationId,
             "Device-Id": deviceMetadata.id,
             "Device-System-Name": deviceMetadata.channel,
             "Device-System-Version": deviceMetadata.systemVersion,
-            "Product-Version": configuration.version,
-            "Host-Application-Version": configuration.appVersion
+            "Product-Version": configuration.version
         ]
         return headers.compactMapValues { $0 }
     }

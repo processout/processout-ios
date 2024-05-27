@@ -11,7 +11,7 @@ public typealias POCardsServiceType = POCardsService
 /// Provides set of methods to tokenize and manipulate cards.
 public protocol POCardsService: POService { // sourcery: AutoCompletion
 
-    /// Allows to retrieve card issuer information based on iin.
+    /// Allows to retrieve card issuer information based on IIN.
     ///
     /// - Parameters:
     ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
