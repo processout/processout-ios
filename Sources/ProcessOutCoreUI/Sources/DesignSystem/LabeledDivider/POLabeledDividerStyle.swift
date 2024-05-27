@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// Defines divider style with title in the middle.
 public struct POLabeledDividerStyle {
 
     /// Divider color.
