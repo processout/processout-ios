@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Invoice details.
 public struct POInvoice: Decodable {
 
     /// String value that uniquely identifies this invoice.

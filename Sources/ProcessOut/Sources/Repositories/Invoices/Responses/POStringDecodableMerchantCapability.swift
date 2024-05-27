@@ -7,6 +7,7 @@
 
 import PassKit
 
+/// Property wrapper allowing to decode `PKMerchantCapability`.
 @propertyWrapper
 public struct POStringDecodableMerchantCapability: Decodable {
 
