@@ -7,12 +7,13 @@
 
 import ProcessOut
 
+/// Card specific dynamic checkout configuration.
 public struct PODynamicCheckoutCardConfiguration {
 
     /// Card billing address collection configuration.
     public var billingAddress = PODynamicCheckoutCardBillingAddressConfiguration()
 
-    /// Metada related to the card.
+    /// Metadata related to the card.
     public var metadata: [String: String]?
 }
 
@@ -25,7 +26,7 @@ public struct PODynamicCheckoutCardBillingAddressConfiguration {
     /// Whether the values included in ``POBillingAddressConfiguration/defaultAddress`` should be attached to the
     /// card, this includes fields that aren't displayed in the form.
     ///
-    /// If `false` (the default), those values will only be used to prefill the corresponding fields in the form.
+    /// If `false` (the default), those values will only be used to pre-fill the corresponding fields in the form.
     public let attachDefaultsToPaymentMethod: Bool
 
     /// Creates billing address configuration.
