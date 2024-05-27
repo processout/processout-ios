@@ -13,7 +13,6 @@ extension PODynamicCheckoutStyle {
 
     /// Default dynamic checkout style.
     public static let `default` = PODynamicCheckoutStyle(
-        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title),
         section: .default,
         subsection: .default,
         progressView: .circular,
