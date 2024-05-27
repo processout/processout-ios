@@ -11,9 +11,10 @@ import SwiftUI
 @available(iOS 14, *)
 struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentViewModel>: View {
 
-    init(viewModel: ViewModel, horizontalPadding: CGFloat = POSpacing.large) {
+    init(viewModel: ViewModel, horizontalPadding: CGFloat = POSpacing.large, shouldCenterParameters: Bool = true) {
         self.viewModel = viewModel
         self.horizontalPadding = horizontalPadding
+        self.shouldCenterParameters = shouldCenterParameters
     }
 
     // MARK: - View
@@ -53,6 +54,7 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
     // MARK: - Private Properties
 
     private let horizontalPadding: CGFloat
+    private let shouldCenterParameters: Bool
 
     @ObservedObject
     private var viewModel: ViewModel
@@ -60,6 +62,9 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
     // swiftlint:disable:next line_length
     private var sectionsPartition: (top: [NativeAlternativePaymentViewModelSection], center: [NativeAlternativePaymentViewModelSection]) {
         let sections = viewModel.sections
+        guard shouldCenterParameters else {
+            return (top: sections, center: [])
+        }
         let index = sections.firstIndex { section in
             section.items.contains(where: shouldCenter)
         }
