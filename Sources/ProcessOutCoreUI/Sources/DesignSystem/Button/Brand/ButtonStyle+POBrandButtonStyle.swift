@@ -13,6 +13,6 @@ extension ButtonStyle where Self == POBrandButtonStyle {
     /// Simple style
     @_disfavoredOverload
     public static var brand: POBrandButtonStyle {
-        .init(title: .init(color: Color(.Text.on), typography: .Fixed.button), border: .clear, shadow: .clear)
+        .init(title: .init(color: Color(.Text.secondary), typography: .Fixed.button), border: .clear, shadow: .clear)
     }
 }
