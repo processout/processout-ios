@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@_implementationOnly import os
+import os
 
 final class SystemLoggerDestination: LoggerDestination {
 
