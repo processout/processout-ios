@@ -180,11 +180,10 @@ final class DynamicCheckoutDefaultInteractor:
         }
         switch paymentMethod {
         case .card, .nativeAlternativePayment:
-            break
+            startPayment(methodId: paymentMethod.id)
         default:
             return
         }
-        startPayment(methodId: paymentMethod.id)
     }
 
     private func partitioned(
