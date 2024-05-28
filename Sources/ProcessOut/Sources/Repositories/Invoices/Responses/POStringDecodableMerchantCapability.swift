@@ -26,6 +26,8 @@ public struct POStringDecodableMerchantCapability: Decodable {
                 capabilities.insert(.debit)
             case .threeDS:
                 capabilities.insert(.threeDSecure)
+            case .emv:
+                capabilities.insert(.emv)
             case nil:
                 capabilities = []
             }
@@ -36,6 +38,6 @@ public struct POStringDecodableMerchantCapability: Decodable {
     // MARK: - Private
 
     private enum MerchantCapability: String, Decodable {
-        case threeDS = "supports3DS", credit = "supportsCredit", debit = "supportsDebit"
+        case threeDS = "supports3DS", credit = "supportsCredit", debit = "supportsDebit", emv = "supportsEMV"
     }
 }
