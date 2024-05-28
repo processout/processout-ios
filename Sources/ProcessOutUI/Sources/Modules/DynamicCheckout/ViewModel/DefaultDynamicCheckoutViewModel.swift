@@ -119,14 +119,17 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areSeparatorsVisible: true,
             areBezelsVisible: true
         )
-        return [expressSection, regularSection]
+        return [expressSection, regularSection].compactMap { $0 }
     }
 
     private func createExpressMethodsSection(
         state: DynamicCheckoutInteractorState.Started
-    ) -> DynamicCheckoutViewModelSection {
+    ) -> DynamicCheckoutViewModelSection? {
         let expressItems = state.expressPaymentMethodIds.compactMap { methodId in
             createItem(paymentMethodId: methodId, state: state, isExpress: true, isSelected: false, isLoading: false)
+        }
+        guard !expressItems.isEmpty else {
+            return nil
         }
         let section = DynamicCheckoutViewModelSection(
             id: SectionId.expressMethods,
@@ -336,7 +339,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areSeparatorsVisible: true,
             areBezelsVisible: true
         )
-        return [expressSection, regularSection]
+        return [expressSection, regularSection].compactMap { $0 }
     }
 
     private func createProcessedItemContent(
