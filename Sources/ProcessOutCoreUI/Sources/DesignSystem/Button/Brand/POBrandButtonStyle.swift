@@ -71,7 +71,6 @@ public struct POBrandButtonStyle: ButtonStyle {
     // MARK: - Private Methods
 
     private func brightnessAdjustment(isPressed: Bool, isBrandColorLight: Bool) -> Double {
-        // todo(andrii-vysotskyi): check whether dark/light variations are supported
         guard isPressed else {
             return 0
         }

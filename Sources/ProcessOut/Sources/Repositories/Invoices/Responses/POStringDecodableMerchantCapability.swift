@@ -18,7 +18,6 @@ public struct POStringDecodableMerchantCapability: Decodable {
         var unkeyedContainer = try decoder.unkeyedContainer()
         var capabilities: PKMerchantCapability = []
         while !unkeyedContainer.isAtEnd {
-            // todo(andrii-vysotskyi): decide if instantFundsOut and emv should be supported
             switch try? unkeyedContainer.decode(MerchantCapability.self) {
             case .credit:
                 capabilities.insert(.credit)
