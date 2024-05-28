@@ -171,8 +171,6 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         case .unknown:
             assertionFailure("Unexpected unknown payment method")
             return nil
-        @unknown default:
-            return nil
         }
         if isExpress {
             return createExpressPaymentItem(id: methodId, display: display)
