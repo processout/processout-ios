@@ -17,9 +17,8 @@ extension View {
 
 extension EnvironmentValues {
 
-    /// Indicates whether button is currently in loading state. It is expected that
-    /// `ButtonStyle` implementation should respond to this environment
-    /// changes (see ``POButtonStyle`` as a reference).
+    /// Indicates whether button is currently in loading state. It is expected that `ButtonStyle` implementation
+    /// should respond to this environment changes (see ``POButtonStyle`` as a reference).
     public var poButtonBrandColor: Color {
         get { self[Key.self] }
         set { self[Key.self] = newValue }
