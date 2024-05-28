@@ -48,7 +48,8 @@ public struct POBrandButtonStyle: ButtonStyle {
                 .border(style: border)
                 .shadow(style: shadow)
                 .contentShape(.rect)
-                .animation(.default, value: isEnabled) // todo(andrii-vysotskii): animate brand color changes
+                .animation(.default, value: isEnabled)
+                .animation(.default, value: AnyHashable(brandColor))
                 .allowsHitTesting(isEnabled)
         }
         .backport.geometryGroup()

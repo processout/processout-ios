@@ -9,6 +9,7 @@ import SwiftUI
 
 extension UIColor {
 
+    /// - NOTE: Alpha is ignored
     var brightness: CGFloat? {
         let colorSpace = CGColorSpace(name: CGColorSpace.sRGB)! // swiftlint:disable:this force_unwrapping
         let convertedColor = cgColor.converted(
