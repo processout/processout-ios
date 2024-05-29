@@ -12,12 +12,14 @@ import SafariServices
 final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     init(
-        configuration: DefaultSafariViewModelConfiguration,
+        callback: POWebAuthenticationSessionCallback,
+        timeout: TimeInterval? = nil,
         eventEmitter: POEventEmitter,
         logger: POLogger,
         completion: @escaping (Result<URL, POFailure>) -> Void
     ) {
-        self.configuration = configuration
+        self.callback = callback
+        self.timeout = timeout
         self.eventEmitter = eventEmitter
         self.logger = logger
         self.completion = completion
@@ -28,7 +30,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
         guard case .idle = state else {
             return
         }
-        if let timeout = configuration.timeout {
+        if let timeout {
             timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
                 self?.setCompletedState(with: POFailure(code: .timeout(.mobile)))
             }
@@ -77,7 +79,8 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     // MARK: - Private Properties
 
-    private let configuration: DefaultSafariViewModelConfiguration
+    private let callback: POWebAuthenticationSessionCallback
+    private let timeout: TimeInterval?
     private let eventEmitter: POEventEmitter
     private let logger: POLogger
     private let completion: (Result<URL, POFailure>) -> Void
@@ -93,7 +96,8 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
             logger.info("Can't change state to completed because already in sink state.")
             return false
         }
-        guard matchesUrl(url) else {
+        // todo(andrii-vysotskyi): consider validating whether url is related to initial request if possible
+        guard callback.matchesURL(url) else {
             logger.debug("Ignoring unrelated url: \(url)")
             return false
         }
@@ -118,11 +122,5 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
     private func invalidateObservers() {
         timeoutTimer?.invalidate()
         deepLinkObserver = nil
-    }
-
-    // todo(andrii-vysotskyi): consider validating whether url is related to initial request if possible
-    private func matchesUrl(_ url: URL) -> Bool {
-        let returnUrl = configuration.returnUrl
-        return url.scheme == returnUrl.scheme && url.host == returnUrl.host && url.path == returnUrl.path
     }
 }
