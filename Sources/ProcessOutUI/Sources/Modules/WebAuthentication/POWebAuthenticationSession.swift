@@ -10,7 +10,6 @@ import AuthenticationServices
 @_spi(PO) import ProcessOut
 
 /// A session that an app uses to authenticate a payment.
-@MainActor
 public final class POWebAuthenticationSession {
 
     /// A completion handler for the web authentication session.
@@ -20,6 +19,7 @@ public final class POWebAuthenticationSession {
     ///
     /// Start can only be called once for an `POWebAuthenticationController` instance. This also means calling start on a
     /// canceled session will fail.
+    @MainActor
     public func start() async -> Bool {
         guard state == nil else {
             preconditionFailure("Controller start must be attempted only once.")
@@ -38,6 +38,7 @@ public final class POWebAuthenticationSession {
 
     /// Cancel an `POWebAuthenticationController`. If the view controller is already presented to load the webpage for
     /// authentication, it will be dismissed. Calling cancel on an already canceled session will have no effect.
+    @MainActor
     public func cancel() async {
         guard case .started(let viewController) = state else {
             return
