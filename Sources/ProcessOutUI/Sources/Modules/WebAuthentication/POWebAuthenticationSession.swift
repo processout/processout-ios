@@ -23,7 +23,7 @@ public final class POWebAuthenticationSession {
     @MainActor
     public func start() async -> Bool {
         guard state == nil else {
-            preconditionFailure("Controller start must be attempted only once.")
+            preconditionFailure("Session start must be attempted only once.")
         }
         guard let presentingViewController = PresentingViewControllerProvider.find() else {
             return false

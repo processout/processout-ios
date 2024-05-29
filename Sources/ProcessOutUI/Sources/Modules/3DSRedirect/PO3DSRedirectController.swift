@@ -14,7 +14,7 @@ import ProcessOut
 /// - Important: The PO3DSRedirectController class performs the same role as the SFSafariViewController
 /// class initialized with 3DSRedirect, but it does not depend on the UIKit framework. This means that
 /// the controller can be used in places where a view controller cannot (for example, in SwiftUI applications).
-@available(*, deprecated, renamed: "POWebAuthenticationSession", message: "Use authentication session instead.")
+@available(*, deprecated, message: "Use POWebAuthenticationSession instead.")
 public final class PO3DSRedirectController {
 
     /// - Parameters:
