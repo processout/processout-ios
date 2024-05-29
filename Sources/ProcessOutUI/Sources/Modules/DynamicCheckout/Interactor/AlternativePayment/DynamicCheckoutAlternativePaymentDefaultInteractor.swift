@@ -25,7 +25,7 @@ final class DynamicCheckoutAlternativePaymentDefaultInteractor: DynamicCheckoutA
         let controller = POAlternativePaymentMethodController(url: url, returnUrl: returnUrl) { result in
             continuation.resume(with: result)
         }
-        _ = await controller.present()
+        _ = await controller.present() // todo(andrii-vysotskyi): handle case when present completes early
         return try await withUnsafeThrowingContinuation { unsafeContinuation in
             continuation = unsafeContinuation
         }
