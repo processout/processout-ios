@@ -68,7 +68,6 @@ extension SFSafariViewController {
                 completion(result.flatMap(Self.response(with:)))
             }
         )
-        self.delegate = viewModel
         self.setViewModel(viewModel)
         viewModel.start()
     }
