@@ -10,6 +10,8 @@ import ProcessOut
 
 extension POWebAuthenticationSession {
 
+    /// Creates POWebAuthenticationSession that is able to handle 3DS redirects.
+    ///
     /// - Parameters:
     ///   - redirect: redirect to handle.
     ///   - returnUrl: Return URL specified when creating invoice or customer token.

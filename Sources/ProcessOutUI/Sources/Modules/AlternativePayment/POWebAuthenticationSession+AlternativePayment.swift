@@ -10,8 +10,6 @@ import ProcessOut
 
 extension POWebAuthenticationSession {
 
-    public typealias AlternativePaymentCompletion = (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
-
     /// Creates session that is capable of handling alternative payment.
     /// 
     /// - Parameters:
@@ -21,7 +19,7 @@ extension POWebAuthenticationSession {
     public convenience init(
         request: POAlternativePaymentMethodRequest,
         returnUrl: URL,
-        completion: @escaping AlternativePaymentCompletion
+        completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
     ) {
         let url = ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodUrl(request: request)
         self.init(alternativePaymentMethodUrl: url, returnUrl: returnUrl, completion: completion)
@@ -37,7 +35,7 @@ extension POWebAuthenticationSession {
     public convenience init(
         alternativePaymentMethodUrl url: URL,
         returnUrl: URL,
-        completion: @escaping AlternativePaymentCompletion
+        completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
     ) {
         let completionBox: Completion = { result in
             completion(result.flatMap(Self.response(with:)))

@@ -43,8 +43,12 @@ This means that the controller can be used in places where a view controller can
 applications).
 
 ```swift
-let session = POWebAuthenticationSession(redirect: redirect, returnUrl: Constants.returnUrl) { result in 
-    // todo: handle completion
+let session = POWebAuthenticationSession(
+    redirect: redirect, returnUrl: Constants.returnUrl, completion: completion
+)
+if await session.start() {
+    return
 }
-Task { await session.start() }
+let failure = POFailure(message: "Unable to process redirect", code: .generic(.mobile))
+completion(.failure(failure))
 ```

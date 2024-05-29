@@ -13,7 +13,7 @@ import AuthenticationServices
 public final class POWebAuthenticationSession {
 
     /// A completion handler for the web authentication session.
-    public typealias Completion = (Result<URL, POFailure>) -> Void
+    typealias Completion = (Result<URL, POFailure>) -> Void
 
     /// Only call this method once for a given POWebAuthenticationSession instance after initialization.
     /// Calling the start() method on a canceled session results in a failure.
