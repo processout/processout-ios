@@ -19,6 +19,8 @@
 - ``SwiftUI/EnvironmentValues/isButtonLoading``
 - ``POButtonStyle/primary``
 - ``POButtonStyle/secondary``
+- ``POBrandButtonStyle``
+- ``POBrandButtonStyle/brand``
 
 ### Radio Button
 
@@ -36,3 +38,7 @@
 
 - ``POInputStyle``
 - ``POInputStateStyle``
+
+### Divider
+
+- ``POLabeledDividerStyle``

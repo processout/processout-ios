@@ -35,7 +35,7 @@ public protocol POCardTokenizationDelegate: AnyObject {
 extension POCardTokenizationDelegate {
 
     public func cardTokenization(didEmitEvent event: POCardTokenizationEvent) {
-        // Ignroed
+        // Ignored
     }
 
     public func cardTokenization(didTokenizeCard card: POCard) async throws {

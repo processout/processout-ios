@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Alternative payment specific dynamic checkout configuration.
 public struct PODynamicCheckoutAlternativePaymentConfiguration {
 
     public struct CancelAction {
@@ -15,7 +16,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
         public var title: String?
 
         /// By default user can interact with action immediately after it becomes visible, it is
-        /// possible to make it initialy disabled for given amount of time.
+        /// possible to make it initially disabled for given amount of time.
         public var disabledFor: TimeInterval = 0
     }
 

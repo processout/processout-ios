@@ -7,6 +7,7 @@
 
 import PassKit
 
+/// Property wrapper allowing to decode `PKMerchantCapability`.
 @propertyWrapper
 public struct POStringDecodableMerchantCapability: Decodable {
 
@@ -37,5 +38,14 @@ public struct POStringDecodableMerchantCapability: Decodable {
 
     private enum MerchantCapability: String, Decodable {
         case threeDS = "supports3DS", credit = "supportsCredit", debit = "supportsDebit"
+    }
+}
+
+extension KeyedDecodingContainer {
+
+    public func decode(
+        _ type: POStringDecodableMerchantCapability.Type, forKey key: K
+    ) throws -> POStringDecodableMerchantCapability {
+        try type.init(from: try superDecoder(forKey: key))
     }
 }

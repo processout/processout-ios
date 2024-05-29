@@ -8,6 +8,7 @@
 import PassKit
 import ProcessOut
 
+/// Dynamic checkout module delegate.
 public protocol PODynamicCheckoutDelegate: AnyObject {
 
     /// Invoked when module emits dynamic checkout event.
@@ -48,7 +49,7 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
 
     // MARK: - Pass Kit
 
-    /// Gives implementation an oportunity to modify payment request before it is used to authorize invoice.
+    /// Gives implementation an opportunity to modify payment request before it is used to authorize invoice.
     func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async
 }
 

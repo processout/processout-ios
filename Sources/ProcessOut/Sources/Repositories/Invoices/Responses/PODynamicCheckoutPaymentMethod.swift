@@ -108,7 +108,7 @@ public enum PODynamicCheckoutPaymentMethod {
 
     public struct CardConfiguration: Decodable {
 
-        /// Defines whether user will be aksed to select scheme if co-scheme is available.
+        /// Defines whether user will be asked to select scheme if co-scheme is available.
         let allowSchemeSelection: Bool
 
         /// Indicates whether should collect card CVC.
