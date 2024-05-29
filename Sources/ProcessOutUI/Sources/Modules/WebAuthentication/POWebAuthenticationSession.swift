@@ -15,10 +15,11 @@ public final class POWebAuthenticationSession {
     /// A completion handler for the web authentication session.
     public typealias Completion = (Result<URL, POFailure>) -> Void
 
-    /// Starts the `POWebAuthenticationController` instance after it is instantiated.
+    /// Only call this method once for a given POWebAuthenticationSession instance after initialization.
+    /// Calling the start() method on a canceled session results in a failure.
     ///
-    /// Start can only be called once for an `POWebAuthenticationController` instance. This also means calling start on a
-    /// canceled session will fail.
+    /// After you call start(), the session instance stores a strong reference to itself. To avoid deallocation during
+    /// the authentication process, the session keeps the reference until after it calls the completion handler.
     @MainActor
     public func start() async -> Bool {
         guard state == nil else {
@@ -28,7 +29,6 @@ public final class POWebAuthenticationSession {
             return false
         }
         let viewController = createViewController()
-        associate(controller: self, with: viewController)
         state = .started(viewController: viewController)
         await withCheckedContinuation { continuation in
             presentingViewController.present(viewController, animated: true, completion: continuation.resume)
@@ -36,19 +36,21 @@ public final class POWebAuthenticationSession {
         return true
     }
 
-    /// Cancel an `POWebAuthenticationController`. If the view controller is already presented to load the webpage for
-    /// authentication, it will be dismissed. Calling cancel on an already canceled session will have no effect.
+    /// Cancels a web authentication session.
+    ///
+    /// If the session has already presented a view with the authentication webpage, calling this method dismisses
+    /// that view. Calling cancel() on an already canceled/completed session has no effect.
     @MainActor
     public func cancel() async {
         guard case .started(let viewController) = state else {
             return
         }
         // Break retain cycle to allow de-initialization of self.
-        associate(controller: nil, with: viewController)
         await withCheckedContinuation { continuation in
             viewController.dismiss(animated: true, completion: continuation.resume)
         }
         state = .cancelling
+        associate(controller: nil, with: viewController)
     }
 
     // MARK: -
@@ -103,7 +105,7 @@ public final class POWebAuthenticationSession {
     }
 
     private func complete(with result: Result<URL, POFailure>) {
-        Task {
+        Task { @MainActor in
             await self.cancel()
             state = .completed
             completion(result)
