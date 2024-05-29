@@ -47,7 +47,7 @@ public final class POWebAuthenticationSession {
         await withCheckedContinuation { continuation in
             viewController.dismiss(animated: true, completion: continuation.resume)
         }
-        state = .completed
+        state = .cancelling
     }
 
     // MARK: -
@@ -71,7 +71,7 @@ public final class POWebAuthenticationSession {
     }
 
     private enum State {
-        case started(viewController: SFSafariViewController), completed
+        case started(viewController: SFSafariViewController), cancelling, completed
     }
 
     // MARK: - Private Properties
@@ -104,8 +104,9 @@ public final class POWebAuthenticationSession {
     private func complete(with result: Result<URL, POFailure>) {
         Task {
             await self.cancel()
+            state = .completed
+            completion(result)
         }
-        completion(result)
     }
 
     private func associate(controller: POWebAuthenticationSession?, with object: Any) {
