@@ -74,15 +74,9 @@ extension SFSafariViewController {
     }
 
     private static func response(with url: URL) -> Result<POAlternativePaymentMethodResponse, POFailure> {
-        do {
-            let response = try ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodResponse(url: url)
-            return .success(response)
-        } catch let failure as POFailure {
-            return .failure(failure)
-        } catch {
-            assertionFailure("Expected POFailure instance.")
-            let failure = POFailure(code: .generic(.mobile))
-            return .failure(failure)
+        let result = Result {
+            try ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodResponse(url: url)
         }
+        return result.mapError { $0 as! POFailure } // swiftlint:disable:this force_cast
     }
 }
