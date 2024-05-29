@@ -1,13 +1,15 @@
 //
-//  POWebAuthenticationController.swift
+//  POWebAuthenticationSession.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 29.05.2024.
 //
 
 import SafariServices
+import AuthenticationServices
 @_spi(PO) import ProcessOut
 
+/// A session that an app uses to authenticate a payment.
 @MainActor
 public final class POWebAuthenticationSession {
 

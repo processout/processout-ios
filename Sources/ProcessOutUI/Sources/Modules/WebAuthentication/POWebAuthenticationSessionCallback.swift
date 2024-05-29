@@ -1,5 +1,5 @@
 //
-//  POWebAuthenticationControllerCallback.swift
+//  POWebAuthenticationSessionCallback.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 29.05.2024.
