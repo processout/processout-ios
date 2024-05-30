@@ -41,7 +41,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         logger.info("Starting native alternative payment")
         send(event: .willStart)
-        setState(.starting)
+        setStateUnchecked(.starting)
         Task {
             await continueStartUnchecked()
         }
@@ -66,7 +66,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         parameter.value = formattedValue
         parameter.recentErrorMessage = nil
         startedState.parameters[element.0] = parameter
-        setState(.started(startedState))
+        setStateUnchecked(.started(startedState))
         send(event: .parametersChanged)
         logger.debug("Did update parameter value '\(value ?? "nil")' for '\(key)' key")
     }
@@ -79,7 +79,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         send(event: .willSubmitParameters)
         do {
             let values = try validatedValues(for: startedState.parameters)
-            setState(.submitting(snapshot: startedState))
+            setStateUnchecked(.submitting(snapshot: startedState))
             Task {
                 await continueSubmissionUnchecked(startedState: startedState, values: values)
             }
@@ -149,7 +149,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 parameters: await createParameters(specifications: details.parameters),
                 isCancellable: configuration.cancelAction.map { $0.disabledFor.isZero } ?? true
             )
-            setState(.started(startedState))
+            setStateUnchecked(.started(startedState))
             send(event: .didStart)
             logger.info("Did start payment, waiting for parameters")
             enableCancellationAfterDelay()
@@ -230,7 +230,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             isCancellable: configuration.paymentConfirmation.cancelAction.map { $0.disabledFor.isZero } ?? true,
             isDelayed: false
         )
-        setState(.awaitingCapture(awaitingCaptureState))
+        setStateUnchecked(.awaitingCapture(awaitingCaptureState))
         logger.info("Waiting for invoice capture confirmation")
         let request = PONativeAlternativePaymentCaptureRequest(
             invoiceId: configuration.invoiceId,
@@ -260,7 +260,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 return
             }
             awaitingCaptureState.isDelayed = true
-            setState(.awaitingCapture(awaitingCaptureState))
+            setStateUnchecked(.awaitingCapture(awaitingCaptureState))
         }
     }
 
@@ -288,7 +288,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             )
             capturedState = State.Captured(paymentProviderName: parameterValues?.providerName, logoImage: logoImage)
         }
-        setState(.captured(capturedState))
+        setStateUnchecked(.captured(capturedState))
         send(event: .didCompletePayment)
         if !configuration.skipSuccessScreen {
             try? await Task.sleep(nanoseconds: Constants.captureCompletionDelay)
@@ -330,7 +330,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
             startedState.parameters[offset].recentErrorMessage = errorMessage
         }
-        setState(.started(startedState))
+        setStateUnchecked(.started(startedState))
         send(event: .didFailToSubmitParameters(failure: failure))
         logger.debug("One or more parameters are not valid: \(invalidFields), waiting for parameters to update")
     }
@@ -345,7 +345,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         startedState.parameters = await createParameters(
             specifications: nativeApm.parameterDefinitions ?? []
         )
-        setState(.started(startedState))
+        setStateUnchecked(.started(startedState))
         send(event: .didSubmitParameters(additionalParametersExpected: true))
         logger.debug("More parameters are expected, waiting for parameters to update")
     }
@@ -353,7 +353,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Submitted State
 
     private func setSubmittedUnchecked() {
-        setState(.submitted)
+        setStateUnchecked(.submitted)
         completion(.success(()))
     }
 
@@ -367,7 +367,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.debug("Unexpected error type: \(error)")
             failure = POFailure(code: .generic(.mobile), underlyingError: error)
         }
-        setState(.failure(failure))
+        setStateUnchecked(.failure(failure))
         send(event: .didFail(failure: failure))
         completion(.failure(failure))
     }
@@ -385,10 +385,10 @@ final class NativeAlternativePaymentDefaultInteractor:
             switch state {
             case .started(var state):
                 state.isCancellable = true
-                setState(.started(state))
+                setStateUnchecked(.started(state))
             case .submitting(var state):
                 state.isCancellable = true
-                setState(.started(state))
+                setStateUnchecked(.started(state))
             default:
                 break
             }
@@ -407,14 +407,13 @@ final class NativeAlternativePaymentDefaultInteractor:
                 return
             }
             awaitingState.isCancellable = true
-            setState(.awaitingCapture(awaitingState))
+            setStateUnchecked(.awaitingCapture(awaitingState))
         }
     }
 
     // MARK: - Utils
 
-    private func setState(_ state: NativeAlternativePaymentInteractorState) {
-        delegate?.nativeAlternativePayment(willChangeState: .init(state: state))
+    private func setStateUnchecked(_ state: NativeAlternativePaymentInteractorState) {
         self.state = state
     }
 
@@ -565,31 +564,6 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
         }
         return message.map { POFailure.InvalidField(name: specification.key, message: $0) }
-    }
-}
-
-extension PONativeAlternativePaymentState {
-
-    init(state: NativeAlternativePaymentInteractorState) {
-        switch state {
-        case .idle:
-            self = .idle
-        case .starting:
-            self = .starting
-        case .started(let startedState):
-            let state = PONativeAlternativePaymentState.Started(
-                isSubmittable: startedState.areParametersValid, isCancellable: startedState.isCancellable
-            )
-            self = .started(state)
-        case .submitting:
-            self = .submitting(.init(isCancellable: false))
-        case .awaitingCapture(let awaitingCaptureState):
-            self = .submitting(.init(isCancellable: awaitingCaptureState.isCancellable))
-        case .submitted, .captured:
-            self = .completed(result: .success(()))
-        case .failure(let failure):
-            self = .completed(result: .failure(failure))
-        }
     }
 }
 

@@ -12,10 +12,16 @@ class BaseInteractor<State>: Interactor {
     }
 
     var state: State {
-        didSet { didChange?() }
+        willSet {
+            willChange?(newValue)
+        }
+        didSet {
+            didChange?()
+        }
     }
 
     var didChange: (() -> Void)?
+    var willChange: ((State) -> Void)?
 
     @MainActor
     func start() {

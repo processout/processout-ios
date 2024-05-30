@@ -12,6 +12,9 @@ protocol Interactor<State>: AnyObject {
     /// Interactor's state.
     var state: State { get }
 
+    /// A closure that is invoked right before the object's state is changed.
+    var willChange: ((_ newState: State) -> Void)? { get set }
+
     /// A closure that is invoked after the object's state has changed.
     var didChange: (() -> Void)? { get set }
 

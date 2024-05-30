@@ -350,6 +350,9 @@ final class DynamicCheckoutDefaultInteractor:
     private func startCardPayment(method: PODynamicCheckoutPaymentMethod.Card, startedState: State.Started) {
         let interactor = childProvider.cardTokenizationInteractor(configuration: method.configuration)
         interactor.delegate = self
+        interactor.willChange = { [weak self] state in
+            self?.cardTokenization(willChangeState: state)
+        }
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: method.id,
@@ -360,6 +363,30 @@ final class DynamicCheckoutDefaultInteractor:
         )
         state = .paymentProcessing(paymentProcessingState)
         interactor.start()
+    }
+
+    private func cardTokenization(willChangeState state: CardTokenizationInteractorState) {
+        guard case .paymentProcessing(var currentState) = self.state,
+              case .card = currentPaymentMethod(state: currentState) else {
+            assertionFailure("No currently active card payment")
+            return
+        }
+        switch state {
+        case .idle:
+            break // Ignored
+        case .started(let startedState):
+            currentState.submission = startedState.areParametersValid ? .possible : .temporarilyUnavailable
+            currentState.isCancellable = currentState.snapshot.isCancellable
+            self.state = .paymentProcessing(currentState)
+        case .tokenizing:
+            currentState.submission = .submitting
+            currentState.isCancellable = false
+            self.state = .paymentProcessing(currentState)
+        case .tokenized:
+            setSuccessState()
+        case .failure(let failure):
+            restoreStateAfterPaymentProcessingFailureIfPossible(failure)
+        }
     }
 
     // MARK: - Alternative Payment
@@ -386,6 +413,8 @@ final class DynamicCheckoutDefaultInteractor:
         }
     }
 
+    // MARK: - Native Alternative Payment
+
     private func startNativeAlternativePayment(
         method: PODynamicCheckoutPaymentMethod.NativeAlternativePayment, startedState: State.Started
     ) {
@@ -394,6 +423,9 @@ final class DynamicCheckoutDefaultInteractor:
             gatewayConfigurationId: method.configuration.gatewayConfigurationUid + "." + method.configuration.gatewayName
         )
         interactor.delegate = self
+        interactor.willChange = { [weak self] state in
+            self?.nativeAlternativePayment(willChangeState: state)
+        }
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
             paymentMethodId: method.id,
@@ -405,6 +437,42 @@ final class DynamicCheckoutDefaultInteractor:
         )
         state = .paymentProcessing(paymentProcessingState)
         interactor.start()
+    }
+
+    private func nativeAlternativePayment(willChangeState state: NativeAlternativePaymentInteractorState) {
+        guard case .paymentProcessing(var currentState) = self.state,
+              case .nativeAlternativePayment = currentPaymentMethod(state: currentState) else {
+            assertionFailure("No currently active alternative payment")
+            return
+        }
+        switch state {
+        case .idle:
+            break // Ignored
+        case .starting:
+            currentState.submission = .submitting
+            currentState.isCancellable = false
+            currentState.isReady = false
+            self.state = .paymentProcessing(currentState)
+        case .started(let startedState):
+            currentState.submission = startedState.areParametersValid ? .possible : .temporarilyUnavailable
+            currentState.isCancellable = startedState.isCancellable
+            currentState.isReady = true
+            self.state = .paymentProcessing(currentState)
+        case .awaitingCapture(let awaitingCaptureState):
+            currentState.submission = .submitting
+            currentState.isCancellable = awaitingCaptureState.isCancellable
+            currentState.isReady = true
+            self.state = .paymentProcessing(currentState)
+        case .submitting(let submittingState):
+            currentState.submission = .submitting
+            currentState.isCancellable = submittingState.isCancellable
+            currentState.isReady = true
+            self.state = .paymentProcessing(currentState)
+        case .submitted, .captured:
+            setSuccessState()
+        case .failure(let failure):
+            restoreStateAfterPaymentProcessingFailureIfPossible(failure)
+        }
     }
 
     // MARK: - Started State Restoration
@@ -455,7 +523,7 @@ final class DynamicCheckoutDefaultInteractor:
             startedState.unavailablePaymentMethodIds.formUnion(unavailableIds)
         }
         self.state = .started(startedState)
-        // todo(andrii-vysotskyi): comunicate error to user
+        // todo(andrii-vysotskyi): communicate error to user
     }
 
     // MARK: - Failure State
@@ -558,30 +626,6 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
     func shouldContinueTokenization(after failure: POFailure) -> Bool {
          true // All recoverable errors should be recovered
     }
-
-    func cardTokenization(willChangeState state: POCardTokenizationState) {
-        guard case .paymentProcessing(var currentState) = self.state,
-              case .card = currentPaymentMethod(state: currentState) else {
-            assertionFailure("No currently active card payment")
-            return
-        }
-        switch state {
-        case .idle:
-            break // Ignored
-        case .started(let isSubmittable):
-            currentState.submission = isSubmittable ? .possible : .temporarilyUnavailable
-            currentState.isCancellable = currentState.snapshot.isCancellable
-            self.state = .paymentProcessing(currentState)
-        case .tokenizing:
-            currentState.submission = .submitting
-            currentState.isCancellable = false
-            self.state = .paymentProcessing(currentState)
-        case .completed(result: .success):
-            setSuccessState()
-        case .completed(result: .failure(let failure)):
-            restoreStateAfterPaymentProcessingFailureIfPossible(failure)
-        }
-    }
 }
 
 @available(iOS 14.0, *)
@@ -601,37 +645,6 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
         defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]
     ) async -> [String: String] {
         await delegate?.dynamicCheckout(alternativePaymentDefaultsFor: parameters) ?? [:]
-    }
-
-    func nativeAlternativePayment(willChangeState state: PONativeAlternativePaymentState) {
-        guard case .paymentProcessing(var currentState) = self.state,
-              case .nativeAlternativePayment = currentPaymentMethod(state: currentState) else {
-            assertionFailure("No currently active alternative payment")
-            return
-        }
-        switch state {
-        case .idle:
-            break // Ignored
-        case .starting:
-            currentState.submission = .submitting
-            currentState.isCancellable = false
-            currentState.isReady = false
-            self.state = .paymentProcessing(currentState)
-        case .started(let startedState):
-            currentState.submission = startedState.isSubmittable ? .possible : .temporarilyUnavailable
-            currentState.isCancellable = startedState.isCancellable
-            currentState.isReady = true
-            self.state = .paymentProcessing(currentState)
-        case .submitting(let submittingState):
-            currentState.submission = .submitting
-            currentState.isCancellable = submittingState.isCancellable
-            currentState.isReady = true
-            self.state = .paymentProcessing(currentState)
-        case .completed(result: .success):
-            setSuccessState()
-        case .completed(result: .failure(let failure)):
-            restoreStateAfterPaymentProcessingFailureIfPossible(failure)
-        }
     }
 
     // MARK: - Private Methods

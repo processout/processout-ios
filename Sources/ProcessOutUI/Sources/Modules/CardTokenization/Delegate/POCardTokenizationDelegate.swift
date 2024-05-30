@@ -27,9 +27,6 @@ public protocol POCardTokenizationDelegate: AnyObject {
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
     func shouldContinueTokenization(after failure: POFailure) -> Bool
-
-    /// Notifies delegate about state change.
-    func cardTokenization(willChangeState state: POCardTokenizationState)
 }
 
 extension POCardTokenizationDelegate {
@@ -48,9 +45,5 @@ extension POCardTokenizationDelegate {
 
     public func shouldContinueTokenization(after failure: POFailure) -> Bool {
         true
-    }
-
-    public func cardTokenization(willChangeState state: POCardTokenizationState) {
-        // Ignored
     }
 }

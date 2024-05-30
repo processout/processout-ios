@@ -431,26 +431,7 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - Utils
 
     private func setStateUnchecked(_ state: State) {
-        delegate?.cardTokenization(willChangeState: POCardTokenizationState(state: state))
         self.state = state
-    }
-}
-
-extension POCardTokenizationState {
-
-    fileprivate init(state: CardTokenizationInteractorState) { // swiftlint:disable:this strict_fileprivate
-        switch state {
-        case .idle:
-            self = .idle
-        case .started(let startedState):
-            self = .started(isSubmittable: startedState.areParametersValid)
-        case .tokenizing:
-            self = .tokenizing
-        case .tokenized(let tokenized):
-            self = .completed(result: .success(tokenized.card))
-        case .failure(let failure):
-            self = .completed(result: .failure(failure))
-        }
     }
 }
 

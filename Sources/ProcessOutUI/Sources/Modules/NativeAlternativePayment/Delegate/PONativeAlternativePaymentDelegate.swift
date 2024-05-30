@@ -21,9 +21,6 @@ public protocol PONativeAlternativePaymentDelegate: AnyObject {
     func nativeAlternativePayment(
         defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]
     ) async -> [String: String]
-
-    /// Notifies delegate about state change.
-    func nativeAlternativePayment(willChangeState state: PONativeAlternativePaymentState)
 }
 
 extension PONativeAlternativePaymentDelegate {
@@ -36,9 +33,5 @@ extension PONativeAlternativePaymentDelegate {
         defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]
     ) async -> [String: String] {
         [:]
-    }
-
-    public func nativeAlternativePayment(willChangeState state: PONativeAlternativePaymentState) {
-        // Ignored
     }
 }
