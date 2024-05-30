@@ -13,12 +13,15 @@ import ProcessOutCheckout3DS
 final class CardPaymentCheckout3DSServiceDelegate: POCheckout3DSServiceDelegate {
 
     func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        let controller = PO3DSRedirectController(redirect: redirect, returnUrl: Constants.returnUrl)
-        controller.completion = { [weak controller] result in
-            controller?.dismiss {
-                completion(result)
+        Task { @MainActor in
+            let session = POWebAuthenticationSession(
+                redirect: redirect, returnUrl: Constants.returnUrl, completion: completion
+            )
+            if await session.start() {
+                return
             }
+            let failure = POFailure(message: "Unable to process redirect", code: .generic(.mobile))
+            completion(.failure(failure))
         }
-        controller.present()
     }
 }

@@ -11,6 +11,7 @@ extension SFSafariViewController {
 
     func setViewModel(_ viewModel: DefaultSafariViewModel) {
         objc_setAssociatedObject(self, &Keys.viewModel, viewModel, .OBJC_ASSOCIATION_RETAIN)
+        delegate = viewModel
     }
 
     // MARK: - Private Nested Types

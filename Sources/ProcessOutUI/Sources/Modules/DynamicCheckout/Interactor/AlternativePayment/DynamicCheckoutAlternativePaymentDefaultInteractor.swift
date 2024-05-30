@@ -21,14 +21,13 @@ final class DynamicCheckoutAlternativePaymentDefaultInteractor: DynamicCheckoutA
         }
         // swiftlint:disable:next implicitly_unwrapped_optional
         var continuation: UnsafeContinuation<POAlternativePaymentMethodResponse, Error>!
-        // todo(andrii-vysotskyi): set tint colors and configuration
-        let controller = POAlternativePaymentMethodController(url: url, returnUrl: returnUrl) { result in
+        let session = POWebAuthenticationSession(alternativePaymentMethodUrl: url, returnUrl: returnUrl) { result in
             continuation.resume(with: result)
         }
-        _ = await controller.present() // todo(andrii-vysotskyi): handle case when present completes early
-        return try await withUnsafeThrowingContinuation { unsafeContinuation in
-            continuation = unsafeContinuation
+        guard await session.start() else {
+            throw POFailure(message: "Unable to start alternative payment.", code: .generic(.mobile))
         }
+        return try await withUnsafeThrowingContinuation { continuation = $0 }
     }
 
     // MARK: - Private Properties

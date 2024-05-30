@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Alternative payment specific dynamic checkout configuration.
 public struct PODynamicCheckoutAlternativePaymentConfiguration {
 
     public struct CancelAction {

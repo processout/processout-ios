@@ -7,6 +7,7 @@
 
 import ProcessOut
 
+/// Card specific dynamic checkout configuration.
 public struct PODynamicCheckoutCardConfiguration {
 
     /// Card billing address collection configuration.

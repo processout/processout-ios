@@ -60,7 +60,7 @@ public struct POStringCodableColor: Decodable {
 
 extension KeyedDecodingContainer {
 
-    func decode(_ type: POStringCodableColor.Type, forKey key: K) throws -> POStringCodableColor {
+    public func decode(_ type: POStringCodableColor.Type, forKey key: K) throws -> POStringCodableColor {
         try type.init(from: try superDecoder(forKey: key))
     }
 }
