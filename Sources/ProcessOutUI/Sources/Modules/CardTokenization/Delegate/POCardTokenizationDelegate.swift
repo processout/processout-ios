@@ -11,22 +11,22 @@ import ProcessOut
 public protocol POCardTokenizationDelegate: AnyObject {
 
     /// Invoked when module emits event.
-    func cardTokenization(didEmitEvent event: POCardTokenizationEvent)
+    func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent)
 
     /// Allows delegate to additionally process tokenized card before ending module's lifecycle. For example
     /// it is possible to authorize an invoice or assign customer token.
     /// Default implementation does nothing.
     ///
     /// - NOTE: When possible please prefer throwing `POFailure` instead of other error types.
-    func cardTokenization(didTokenizeCard card: POCard) async throws
+    func processTokenizedCard(card: POCard) async throws
 
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
-    func cardTokenization(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String?
+    func preferredScheme(issuerInformation: POCardIssuerInformation) -> String?
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
-    func cardTokenization(shouldContinueAfter failure: POFailure) -> Bool
+    func shouldContinueTokenization(after failure: POFailure) -> Bool
 
     /// Notifies delegate about state change.
     func cardTokenization(willChangeState state: POCardTokenizationState)
@@ -34,19 +34,19 @@ public protocol POCardTokenizationDelegate: AnyObject {
 
 extension POCardTokenizationDelegate {
 
-    public func cardTokenization(didEmitEvent event: POCardTokenizationEvent) {
+    public func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent) {
         // Ignored
     }
 
-    public func cardTokenization(didTokenizeCard card: POCard) async throws {
+    public func processTokenizedCard(card: POCard) async throws {
         // Ignored
     }
 
-    public func cardTokenization(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String? {
+    public func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
         issuerInformation.scheme
     }
 
-    public func cardTokenization(shouldContinueAfter failure: POFailure) -> Bool {
+    public func shouldContinueTokenization(after failure: POFailure) -> Bool {
         true
     }
 

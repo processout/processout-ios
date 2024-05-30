@@ -538,11 +538,11 @@ final class DynamicCheckoutDefaultInteractor:
 @available(iOS 14.0, *)
 extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
 
-    func cardTokenization(didEmitEvent event: POCardTokenizationEvent) {
+    func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent) {
         delegate?.dynamicCheckout(didEmitCardTokenizationEvent: event)
     }
 
-    func cardTokenization(didTokenizeCard card: POCard) async throws {
+    func processTokenizedCard(card: POCard) async throws {
         guard let delegate else {
             throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
         }
@@ -551,11 +551,11 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
     }
 
-    func cardTokenization(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String? {
+    func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
         delegate?.dynamicCheckout(preferredSchemeFor: issuerInformation)
     }
 
-    func cardTokenization(shouldContinueAfter failure: POFailure) -> Bool {
+    func shouldContinueTokenization(after failure: POFailure) -> Bool {
          true // All recoverable errors should be recovered
     }
 
