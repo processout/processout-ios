@@ -29,37 +29,22 @@ extension SFSafariViewController {
         self.init(url: redirect.url, configuration: safariConfiguration)
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         let viewModel = DefaultSafariViewModel(
-            configuration: .init(returnUrl: returnUrl, timeout: redirect.timeout),
+            callback: .customScheme(returnUrl.scheme ?? ""),
+            timeout: redirect.timeout,
             eventEmitter: api.eventEmitter,
             logger: api.logger,
             completion: { result in
-                Self.complete(completion, with: result)
+                completion(result.map(Self.token(with:)))
             }
         )
-        self.delegate = viewModel
         setViewModel(viewModel)
         viewModel.start()
     }
 
-    // MARK: - Private Nested Types
-
-    private typealias Completion = (Result<String, POFailure>) -> Void
-
-    private enum Constants {
-        static let tokenQueryItemName = "token"
-    }
-
     // MARK: - Private Methods
 
-    private static func complete(_ completion: @escaping Completion, with result: Result<URL, POFailure>) {
-        let mappedResult = result.flatMap { url -> Result<String, POFailure> in
-            guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
-                let failure = POFailure(message: nil, code: .internal(.mobile))
-                return .failure(failure)
-            }
-            let token = components.queryItems?.first { $0.name == Constants.tokenQueryItemName }?.value
-            return .success(token ?? "")
-        }
-        completion(mappedResult)
+    private static func token(with url: URL) -> String {
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        return components?.queryItems?.first { $0.name == "token" }?.value ?? ""
     }
 }
