@@ -44,7 +44,7 @@ public struct PORadioButtonStyle: ButtonStyle {
             let style = currentStyle(isSelected: isSelected, isInvalid: isInvalid, isPressed: configuration.isPressed)
             Label(
                 title: {
-                     configuration.label
+                    configuration.label
                         .textStyle(style.value, addPadding: false)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 },
