@@ -1,5 +1,5 @@
 //
-//  DynamicCheckoutPassKitPaymentDefaultInteractor.swift
+//  DynamicCheckoutPassKitPaymentDefaultSession.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 17.03.2024.
@@ -10,7 +10,7 @@ import PassKit
 import ProcessOut
 
 @MainActor
-final class DynamicCheckoutPassKitPaymentDefaultInteractor: DynamicCheckoutPassKitPaymentInteractor {
+final class DynamicCheckoutPassKitPaymentDefaultSession: DynamicCheckoutPassKitPaymentSession {
 
     init(
         configuration: PODynamicCheckoutConfiguration,
@@ -55,7 +55,7 @@ final class DynamicCheckoutPassKitPaymentDefaultInteractor: DynamicCheckoutPassK
     private var didAuthorizeInvoice: Bool
 }
 
-extension DynamicCheckoutPassKitPaymentDefaultInteractor: POPassKitPaymentAuthorizationControllerDelegate {
+extension DynamicCheckoutPassKitPaymentDefaultSession: POPassKitPaymentAuthorizationControllerDelegate {
 
     func paymentAuthorizationControllerDidFinish(_ controller: POPassKitPaymentAuthorizationController) {
         guard let didFinishContinuation else {

@@ -1,5 +1,5 @@
 //
-//  DefaultDynamicCheckoutInteractorChildProvider.swift
+//  DynamicCheckoutInteractorDefaultChildProvider.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 17.04.2024.
@@ -8,7 +8,7 @@
 import Foundation
 @_spi(PO) import ProcessOut
 
-final class DefaultDynamicCheckoutInteractorChildProvider: DynamicCheckoutInteractorChildProvider {
+final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutInteractorChildProvider {
 
     init(
         configuration: PODynamicCheckoutConfiguration,

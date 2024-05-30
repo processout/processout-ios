@@ -1,5 +1,5 @@
 //
-//  DynamicCheckoutAlternativePaymentDefaultInteractor.swift
+//  DynamicCheckoutAlternativePaymentDefaultSession.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 25.03.2024.
@@ -9,7 +9,7 @@ import Foundation
 import ProcessOut
 
 @MainActor
-final class DynamicCheckoutAlternativePaymentDefaultInteractor: DynamicCheckoutAlternativePaymentInteractor {
+final class DynamicCheckoutAlternativePaymentDefaultSession: DynamicCheckoutAlternativePaymentSession {
 
     init(configuration: PODynamicCheckoutAlternativePaymentConfiguration) {
         self.configuration = configuration
