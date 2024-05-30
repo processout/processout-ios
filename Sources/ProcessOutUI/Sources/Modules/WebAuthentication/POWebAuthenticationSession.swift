@@ -33,6 +33,7 @@ public final class POWebAuthenticationSession {
         await withCheckedContinuation { continuation in
             presentingViewController.present(viewController, animated: true, completion: continuation.resume)
         }
+        associate(controller: self, with: viewController)
         return true
     }
 
