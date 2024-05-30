@@ -21,7 +21,6 @@ extension PKPaymentNetwork {
     // MARK: - Private Properties
 
     private static let schemes: [String: PKPaymentNetwork] = {
-        // todo(andrii-vysotskyi): decide if pagoBancomat, tmoney and meeza should be supported
         var schemes: [String: PKPaymentNetwork] = [
             "american express": .amex,
             "cartesBancaires": .cartesBancaires,
@@ -44,6 +43,13 @@ extension PKPaymentNetwork {
             "barcode": .barcode,
             "girocard": .girocard
         ]
+        if #available(iOS 17.4, *) {
+            schemes["meeza"] = .meeza
+        }
+        if #available(iOS 17.0, *) {
+            schemes["pagoBancomat"] = .pagoBancomat
+            schemes["tmoney"] = .tmoney
+        }
         if #available(iOS 16.4, *) {
             schemes["postFinance"] = .postFinance
         }
