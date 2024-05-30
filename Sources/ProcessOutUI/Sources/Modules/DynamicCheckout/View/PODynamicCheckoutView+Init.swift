@@ -22,7 +22,7 @@ extension PODynamicCheckoutView {
     ) {
         let viewModel = {
             var logger = ProcessOut.shared.logger
-            logger[attributeKey: "InvoiceId"] = configuration.invoiceId
+            logger[attributeKey: .invoiceId] = configuration.invoiceId
             let interactor = DynamicCheckoutDefaultInteractor(
                 configuration: configuration,
                 delegate: delegate,

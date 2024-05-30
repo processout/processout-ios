@@ -390,7 +390,8 @@ final class DynamicCheckoutDefaultInteractor:
         method: PODynamicCheckoutPaymentMethod.NativeAlternativePayment, startedState: State.Started
     ) {
         let interactor = childProvider.nativeAlternativePaymentInteractor(
-            gatewayId: method.configuration.gatewayConfigurationUid + "." + method.configuration.gatewayName
+            // swiftlint:disable:next line_length
+            gatewayConfigurationId: method.configuration.gatewayConfigurationUid + "." + method.configuration.gatewayName
         )
         interactor.delegate = self
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(

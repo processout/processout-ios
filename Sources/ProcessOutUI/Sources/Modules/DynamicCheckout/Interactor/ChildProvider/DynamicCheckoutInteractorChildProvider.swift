@@ -7,7 +7,7 @@
 
 @_spi(PO) import ProcessOut
 
-/// - NOTE: Your implementation should expect that instanes created
+/// - NOTE: Your implementation should expect that instances created
 /// by provider are going to be different every time you call a method.
 protocol DynamicCheckoutInteractorChildProvider {
 
@@ -17,5 +17,5 @@ protocol DynamicCheckoutInteractorChildProvider {
     ) -> any CardTokenizationInteractor
 
     /// Creates and returns card tokenization interactor.
-    func nativeAlternativePaymentInteractor(gatewayId: String) -> any NativeAlternativePaymentInteractor
+    func nativeAlternativePaymentInteractor(gatewayConfigurationId: String) -> any NativeAlternativePaymentInteractor
 }

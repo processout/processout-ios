@@ -38,11 +38,11 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         return interactor
     }
 
-    func nativeAlternativePaymentInteractor(gatewayId: String) -> any NativeAlternativePaymentInteractor {
+    func nativeAlternativePaymentInteractor(gatewayConfigurationId: String) -> any NativeAlternativePaymentInteractor {
         var logger = self.logger
-        logger[attributeKey: "GatewayId"] = gatewayId
+        logger[attributeKey: .gatewayConfigurationId] = gatewayConfigurationId
         let interactor = NativeAlternativePaymentDefaultInteractor(
-            configuration: alternativePaymentConfiguration(gatewayId: gatewayId),
+            configuration: alternativePaymentConfiguration(gatewayId: gatewayConfigurationId),
             invoicesService: invoicesService,
             imagesRepository: imagesRepository,
             logger: logger,
