@@ -37,14 +37,10 @@ final class AlternativePaymentMethodsRouter: RouterType {
             viewController.isModalInPresentation = true
             self.viewController?.present(viewController, animated: true)
         case let .alternativePayment(request):
-            let viewController = SFSafariViewController(
-                request: request,
-                returnUrl: Constants.returnUrl,
-                completion: { [weak self] _ in
-                    self?.viewController?.dismiss(animated: true)
-                }
-            )
-            self.viewController?.present(viewController, animated: true)
+            let session = POWebAuthenticationSession(request: request, returnUrl: Constants.returnUrl) { _ in }
+            Task {
+                _ = await session.start()
+            }
         case let .authorizationtAmount(completion):
             let viewController = AuthorizationAmountBuilder(completion: completion).build()
             self.viewController?.present(viewController, animated: true)

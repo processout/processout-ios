@@ -1,5 +1,5 @@
 //
-//  SFSafariViewController+AlternativePaymentMethod.swift
+//  SFSafariViewController+AlternativePayment.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 17.11.2023.
@@ -61,32 +61,21 @@ extension SFSafariViewController {
     private func commonInit(returnUrl: URL, completion: @escaping Completion) {
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         let viewModel = DefaultSafariViewModel(
-            configuration: .init(returnUrl: returnUrl, timeout: nil),
+            callback: .customScheme(returnUrl.scheme ?? ""),
             eventEmitter: api.eventEmitter,
             logger: api.logger,
             completion: { result in
-                Self.complete(completion, with: result)
+                completion(result.flatMap(Self.response(with:)))
             }
         )
-        self.delegate = viewModel
         self.setViewModel(viewModel)
         viewModel.start()
     }
 
-    private static func complete(_ completion: @escaping Completion, with result: Result<URL, POFailure>) {
-        let mappedResult = result.flatMap { url in
-            do {
-                let apmService = ProcessOut.shared.alternativePaymentMethods
-                let response = try apmService.alternativePaymentMethodResponse(url: url)
-                return .success(response)
-            } catch let failure as POFailure {
-                return .failure(failure)
-            } catch {
-                assertionFailure("Expected POFailure instance.")
-                let failure = POFailure(code: .generic(.mobile))
-                return .failure(failure)
-            }
+    private static func response(with url: URL) -> Result<POAlternativePaymentMethodResponse, POFailure> {
+        let result = Result {
+            try ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodResponse(url: url)
         }
-        completion(mappedResult)
+        return result.mapError { $0 as! POFailure } // swiftlint:disable:this force_cast
     }
 }

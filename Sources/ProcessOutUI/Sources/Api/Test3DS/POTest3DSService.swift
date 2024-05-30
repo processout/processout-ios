@@ -53,11 +53,14 @@ public final class POTest3DSService: PO3DSService {
     }
 
     public func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        let controller = PO3DSRedirectController(redirect: redirect, returnUrl: returnUrl)
-        controller.completion = { [weak controller] result in
-            controller?.dismiss { completion(result) }
+        Task { @MainActor in
+            let session = POWebAuthenticationSession(redirect: redirect, returnUrl: returnUrl, completion: completion)
+            if await session.start() {
+                return
+            }
+            let failure = POFailure(message: "Unable to process redirect", code: .generic(.mobile))
+            completion(.failure(failure))
         }
-        controller.present()
     }
 
     // MARK: - Private Properties

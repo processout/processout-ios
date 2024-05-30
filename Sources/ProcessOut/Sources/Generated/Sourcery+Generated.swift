@@ -42,7 +42,7 @@ extension POInvoiceAuthorizationRequest {
 
 extension POCardsService {
 
-    /// Allows to retrieve card issuer information based on iin.
+    /// Allows to retrieve card issuer information based on IIN.
     /// 
     /// - Parameters:
     ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
@@ -95,7 +95,7 @@ extension POCardsService {
 
 extension POCustomerTokensService {
 
-    /// Assigns new source to existing customer token and optionaly verifies it.
+    /// Assigns new source to existing customer token and optionally verifies it.
     @discardableResult
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
