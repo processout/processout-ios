@@ -33,22 +33,24 @@ public struct POBrandButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         // todo(andrii-vysotskyi): add overlay or accept configuration for disabled state if needed
         ContentView { isEnabled, brandColor in
+            let isBrandColorLight = UIColor(brandColor).isLight() != false
             configuration.label
                 .textStyle(title)
-                .preferredColorScheme(
-                    UIColor(brandColor).isLight() == true ? .light : .dark
-                )
+                .colorScheme(isBrandColorLight ? .light : .dark)
                 .multilineTextAlignment(.center)
                 .padding(Constants.padding)
                 .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
                 .backport.background {
-                    let adjustment = brightnessAdjustment(isPressed: configuration.isPressed, brandColor: brandColor)
+                    let adjustment = brightnessAdjustment(
+                        isPressed: configuration.isPressed, isBrandColorLight: isBrandColorLight
+                    )
                     brandColor.brightness(adjustment)
                 }
                 .border(style: border)
                 .shadow(style: shadow)
                 .contentShape(.rect)
-                .animation(.default, value: isEnabled) // todo(andrii-vysotskii): animate brand color changes
+                .animation(.default, value: isEnabled)
+                .animation(.default, value: AnyHashable(brandColor))
                 .allowsHitTesting(isEnabled)
         }
         .backport.geometryGroup()
@@ -68,9 +70,8 @@ public struct POBrandButtonStyle: ButtonStyle {
 
     // MARK: - Private Methods
 
-    private func brightnessAdjustment(isPressed: Bool, brandColor: Color) -> Double {
-        // todo(andrii-vysotskyi): check whether dark/light variations are supported
-        guard isPressed, let isBrandColorLight = UIColor(brandColor).isLight() else {
+    private func brightnessAdjustment(isPressed: Bool, isBrandColorLight: Bool) -> Double {
+        guard isPressed else {
             return 0
         }
         return isBrandColorLight ? -0.08 : 0.15 // Darken if color is light or brighten otherwise

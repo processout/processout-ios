@@ -8,6 +8,7 @@
 import SwiftUI
 
 /// Only horizontal layout is supported at a moment.
+@available(iOS 14.0, *)
 @_spi(PO)
 public struct POLabeledDivider: View {
 

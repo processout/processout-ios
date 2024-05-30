@@ -24,7 +24,7 @@ public struct PODynamicCheckoutStyle {
         /// Section border style.
         public let border: POBorderStyle
 
-        /// Style to apply to divider sepparating different sections.
+        /// Style to apply to divider separating different sections.
         public var divider: POLabeledDividerStyle
 
         /// Creates section style instance.
@@ -68,9 +68,6 @@ public struct PODynamicCheckoutStyle {
         }
     }
 
-    /// Title style.
-    public let title: POTextStyle // todo(andrii-vysotskyi): remove if unused
-
     /// Section style.
     public let section: Section
 
@@ -96,7 +93,7 @@ public struct PODynamicCheckoutStyle {
     public let errorText: POTextStyle
 
     /// PassKit payment button style.
-    public let passKitPaymentButtonStyle: PKPaymentButtonStyle
+    public let passKitPaymentButtonStyle: POPassKitPaymentButtonStyle
 
     /// Generic express payment button style. When default style is used,
     /// equals to `POBrandButtonStyle.brand`.
@@ -113,7 +110,6 @@ public struct PODynamicCheckoutStyle {
 
     /// Creates dynamic checkout style.
     public init(
-        title: POTextStyle,
         section: PODynamicCheckoutStyle.Section,
         subsection: PODynamicCheckoutStyle.Subsection,
         progressView: any ProgressViewStyle,
@@ -122,13 +118,12 @@ public struct PODynamicCheckoutStyle {
         codeInput: POInputStyle,
         radioButton: any ButtonStyle,
         errorText: POTextStyle,
-        passKitPaymentButtonStyle: PKPaymentButtonStyle,
+        passKitPaymentButtonStyle: POPassKitPaymentButtonStyle,
         expressPaymentButtonStyle: any ButtonStyle,
         backgroundColor: Color,
         success: Success,
         actionsContainer: POActionsContainerStyle
     ) {
-        self.title = title
         self.section = section
         self.subsection = subsection
         self.progressView = progressView

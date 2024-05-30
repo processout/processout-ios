@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 14.07.2023.
 //
 
-@_implementationOnly import os
+import os
 
 /// A thread-safe wrapper around a value.
 @propertyWrapper

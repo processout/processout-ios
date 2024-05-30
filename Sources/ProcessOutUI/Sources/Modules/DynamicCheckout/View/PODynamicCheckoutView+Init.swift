@@ -14,7 +14,7 @@ extension PODynamicCheckoutView {
     ///
     /// - NOTE: Use caution when using this view, because SwiftUI only initializes
     /// its state once during the lifetime of the view — even if you call the initializer
-    /// more than once — which might result in unexpected behavior.
+    /// more than once — which might result in unexpected behaviour.
     public init(
         configuration: PODynamicCheckoutConfiguration,
         delegate: PODynamicCheckoutDelegate,
@@ -22,17 +22,17 @@ extension PODynamicCheckoutView {
     ) {
         let viewModel = {
             var logger = ProcessOut.shared.logger
-            logger[attributeKey: "InvoiceId"] = configuration.invoiceId
+            logger[attributeKey: .invoiceId] = configuration.invoiceId
             let interactor = DynamicCheckoutDefaultInteractor(
                 configuration: configuration,
                 delegate: delegate,
-                passKitPaymentInteractor: DynamicCheckoutPassKitPaymentDefaultInteractor(
+                passKitPaymentSession: DynamicCheckoutPassKitPaymentDefaultSession(
                     configuration: configuration, delegate: delegate, invoicesService: ProcessOut.shared.invoices
                 ),
-                alternativePaymentInteractor: DynamicCheckoutAlternativePaymentDefaultInteractor(
+                alternativePaymentSession: DynamicCheckoutAlternativePaymentDefaultSession(
                     configuration: configuration.alternativePayment
                 ),
-                childProvider: DefaultDynamicCheckoutInteractorChildProvider(
+                childProvider: DynamicCheckoutInteractorDefaultChildProvider(
                     configuration: configuration,
                     cardsService: ProcessOut.shared.cards,
                     invoicesService: ProcessOut.shared.invoices,

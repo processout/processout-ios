@@ -13,7 +13,6 @@ extension PODynamicCheckoutStyle {
 
     /// Default dynamic checkout style.
     public static let `default` = PODynamicCheckoutStyle(
-        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title),
         section: .default,
         subsection: .default,
         progressView: .circular,
@@ -22,7 +21,7 @@ extension PODynamicCheckoutStyle {
         codeInput: .large,
         radioButton: PORadioButtonStyle.radio,
         errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
-        passKitPaymentButtonStyle: .automatic,
+        passKitPaymentButtonStyle: POPassKitPaymentButtonStyle(),
         expressPaymentButtonStyle: .brand,
         backgroundColor: Color(poResource: .Surface.level1),
         success: .default,

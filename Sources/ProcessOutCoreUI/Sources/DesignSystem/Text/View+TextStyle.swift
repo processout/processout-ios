@@ -1,5 +1,5 @@
 //
-//  Text+Style.swift
+//  View+TextStyle.swift
 //  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 05.09.2023.
@@ -12,11 +12,14 @@ extension View {
     /// Applies given `style` to text.
     ///
     /// - NOTE: When `addPadding` is set to true this method has a cumulative effect.
-    @_spi(PO) public func textStyle(_ style: POTextStyle, addPadding: Bool = true) -> some View {
+    @available(iOS 14.0, *)
+    @_spi(PO)
+    public func textStyle(_ style: POTextStyle, addPadding: Bool = true) -> some View {
         modifier(ContentModifier(style: style, addPadding: addPadding))
     }
 }
 
+@available(iOS 14.0, *)
 extension EnvironmentValues {
 
     var textStyle: POTextStyle {
@@ -31,6 +34,7 @@ extension EnvironmentValues {
     }
 }
 
+@available(iOS 14.0, *)
 private struct ContentModifier: ViewModifier {
 
     init(style: POTextStyle, addPadding: Bool) {

@@ -21,19 +21,14 @@ public struct PONativeAlternativePaymentView: View {
     public var body: some View {
         VStack(spacing: 0) {
             GeometryReader { geometry in
-                ScrollViewReader { scrollView in
-                    ScrollView(showsIndicators: false) {
-                        NativeAlternativePaymentContentView(viewModel: viewModel)
-                            .scrollViewProxy(scrollView)
-                            .frame(minHeight: geometry.size.height, alignment: .top)
-                    }
-                    .clipped()
+                ScrollView(showsIndicators: false) {
+                    NativeAlternativePaymentContentView(viewModel: viewModel)
+                        .frame(minHeight: geometry.size.height, alignment: .top)
                 }
+                .clipped()
             }
-            if !viewModel.actions.isEmpty {
-                POActionsContainerView(actions: viewModel.actions)
-                    .actionsContainerStyle(style.actionsContainer)
-            }
+            POActionsContainerView(actions: viewModel.actions)
+                .actionsContainerStyle(style.actionsContainer)
         }
         .backport.background {
             let backgroundColor = viewModel.isCaptured ? style.background.success : style.background.regular

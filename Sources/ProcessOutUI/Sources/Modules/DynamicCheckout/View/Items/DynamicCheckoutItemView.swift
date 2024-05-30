@@ -21,7 +21,8 @@ struct DynamicCheckoutItemView: View {
                 .padding(POSpacing.medium)
                 .poProgressViewStyle(style.progressView)
         case .passKitPayment(let item):
-            POPassKitPaymentButton(type: item.buttonType, style: style.passKitPaymentButtonStyle, action: item.action)
+            POPassKitPaymentButton(type: item.buttonType, action: item.action)
+                .passKitPaymentButtonStyle(style.passKitPaymentButtonStyle)
         case .expressPayment(let item):
             DynamicCheckoutExpressPaymentItemView(item: item)
                 .buttonStyle(POAnyButtonStyle(erasing: style.expressPaymentButtonStyle))

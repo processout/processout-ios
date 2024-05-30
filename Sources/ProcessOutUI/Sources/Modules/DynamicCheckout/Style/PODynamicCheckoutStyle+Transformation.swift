@@ -12,7 +12,7 @@ import SwiftUI
 extension POCardTokenizationStyle {
 
     init(dynamicCheckoutStyle style: PODynamicCheckoutStyle) {
-        title = style.title
+        title = POCardTokenizationStyle.default.title
         sectionTitle = style.inputTitle
         input = style.input
         radioButton = style.radioButton
@@ -27,7 +27,7 @@ extension POCardTokenizationStyle {
 extension PONativeAlternativePaymentStyle {
 
     init(dynamicCheckoutStyle style: PODynamicCheckoutStyle) {
-        title = style.title
+        title = PONativeAlternativePaymentStyle.default.title
         sectionTitle = style.subsection.title
         input = style.input
         codeInput = style.codeInput

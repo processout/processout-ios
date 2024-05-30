@@ -21,18 +21,13 @@ public struct PODynamicCheckoutView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            ScrollViewReader { scrollView in
-                ScrollView(showsIndicators: true) {
-                    DynamicCheckoutContentView(sections: viewModel.state.sections)
-                        .scrollViewProxy(scrollView)
-                }
-                .backport.geometryGroup()
+            ScrollView(showsIndicators: true) {
+                DynamicCheckoutContentView(sections: viewModel.state.sections)
             }
             .clipped()
-            if !viewModel.state.actions.isEmpty {
-                POActionsContainerView(actions: viewModel.state.actions)
-                    .actionsContainerStyle(style.actionsContainer)
-            }
+            .backport.geometryGroup()
+            POActionsContainerView(actions: viewModel.state.actions)
+                .actionsContainerStyle(style.actionsContainer)
         }
         .backport.background {
             let backgroundColor = viewModel.state.isCompleted ? style.success.backgroundColor : style.backgroundColor

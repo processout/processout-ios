@@ -18,8 +18,8 @@ final class DynamicCheckoutDefaultInteractor:
     init(
         configuration: PODynamicCheckoutConfiguration,
         delegate: PODynamicCheckoutDelegate?,
-        passKitPaymentInteractor: DynamicCheckoutPassKitPaymentInteractor,
-        alternativePaymentInteractor: DynamicCheckoutAlternativePaymentInteractor,
+        passKitPaymentSession: DynamicCheckoutPassKitPaymentSession,
+        alternativePaymentSession: DynamicCheckoutAlternativePaymentSession,
         childProvider: DynamicCheckoutInteractorChildProvider,
         invoicesService: POInvoicesService,
         logger: POLogger,
@@ -27,8 +27,8 @@ final class DynamicCheckoutDefaultInteractor:
     ) {
         self.configuration = configuration
         self.delegate = delegate
-        self.passKitPaymentInteractor = passKitPaymentInteractor
-        self.alternativePaymentInteractor = alternativePaymentInteractor
+        self.passKitPaymentSession = passKitPaymentSession
+        self.alternativePaymentSession = alternativePaymentSession
         self.childProvider = childProvider
         self.invoicesService = invoicesService
         self.logger = logger
@@ -126,8 +126,8 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Private Properties
 
-    private let passKitPaymentInteractor: DynamicCheckoutPassKitPaymentInteractor
-    private let alternativePaymentInteractor: DynamicCheckoutAlternativePaymentInteractor
+    private let passKitPaymentSession: DynamicCheckoutPassKitPaymentSession
+    private let alternativePaymentSession: DynamicCheckoutAlternativePaymentSession
     private let childProvider: DynamicCheckoutInteractorChildProvider
     private let invoicesService: POInvoicesService
     private let logger: POLogger
@@ -180,11 +180,10 @@ final class DynamicCheckoutDefaultInteractor:
         }
         switch paymentMethod {
         case .card, .nativeAlternativePayment:
-            break
+            startPayment(methodId: paymentMethod.id)
         default:
             return
         }
-        startPayment(methodId: paymentMethod.id)
     }
 
     private func partitioned(
@@ -221,7 +220,7 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     private func pkPaymentRequests(invoice: POInvoice) -> [String: PKPaymentRequest] {
-        guard passKitPaymentInteractor.isSupported else {
+        guard passKitPaymentSession.isSupported else {
             logger.debug("PassKit is not supported, won't attempt to resolve request.")
             return [:]
         }
@@ -338,7 +337,7 @@ final class DynamicCheckoutDefaultInteractor:
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
             do {
-                try await passKitPaymentInteractor.start(request: request)
+                try await passKitPaymentSession.start(request: request)
                 setSuccessState()
             } catch {
                 restoreStateAfterPaymentProcessingFailureIfPossible(error)
@@ -379,7 +378,7 @@ final class DynamicCheckoutDefaultInteractor:
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
             do {
-                _ = try await alternativePaymentInteractor.start(url: method.configuration.redirectUrl)
+                _ = try await alternativePaymentSession.start(url: method.configuration.redirectUrl)
                 setSuccessState()
             } catch {
                 self.restoreStateAfterPaymentProcessingFailureIfPossible(error)
@@ -391,7 +390,8 @@ final class DynamicCheckoutDefaultInteractor:
         method: PODynamicCheckoutPaymentMethod.NativeAlternativePayment, startedState: State.Started
     ) {
         let interactor = childProvider.nativeAlternativePaymentInteractor(
-            gatewayId: method.configuration.gatewayConfigurationUid + "." + method.configuration.gatewayName
+            // swiftlint:disable:next line_length
+            gatewayConfigurationId: method.configuration.gatewayConfigurationUid + "." + method.configuration.gatewayName
         )
         interactor.delegate = self
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(

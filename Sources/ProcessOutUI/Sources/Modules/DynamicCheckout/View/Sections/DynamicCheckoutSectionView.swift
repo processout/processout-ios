@@ -17,7 +17,7 @@ struct DynamicCheckoutSectionView: View {
         VStack(spacing: 0) {
             if let title = section.title, !title.isEmpty {
                 Text(title)
-                    .textStyle(style.title)
+                    .textStyle(style.section.title)
                     .multilineTextAlignment(.center)
                     .onSizeChange { size in
                         titleSize = size

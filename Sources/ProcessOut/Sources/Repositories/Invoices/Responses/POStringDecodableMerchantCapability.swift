@@ -19,7 +19,6 @@ public struct POStringDecodableMerchantCapability: Decodable {
         var unkeyedContainer = try decoder.unkeyedContainer()
         var capabilities: PKMerchantCapability = []
         while !unkeyedContainer.isAtEnd {
-            // todo(andrii-vysotskyi): decide if instantFundsOut and emv should be supported
             switch try? unkeyedContainer.decode(MerchantCapability.self) {
             case .credit:
                 capabilities.insert(.credit)
@@ -27,6 +26,8 @@ public struct POStringDecodableMerchantCapability: Decodable {
                 capabilities.insert(.debit)
             case .threeDS:
                 capabilities.insert(.threeDSecure)
+            case .emv:
+                capabilities.insert(.emv)
             case nil:
                 capabilities = []
             }
@@ -37,7 +38,7 @@ public struct POStringDecodableMerchantCapability: Decodable {
     // MARK: - Private
 
     private enum MerchantCapability: String, Decodable {
-        case threeDS = "supports3DS", credit = "supportsCredit", debit = "supportsDebit"
+        case threeDS = "supports3DS", credit = "supportsCredit", debit = "supportsDebit", emv = "supportsEMV"
     }
 }
 

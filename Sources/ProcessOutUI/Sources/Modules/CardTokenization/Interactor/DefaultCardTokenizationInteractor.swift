@@ -236,8 +236,6 @@ final class DefaultCardTokenizationInteractor:
             true
         case .authentication:
             false
-        @unknown default:
-            false
         }
     }
 
@@ -401,8 +399,6 @@ final class DefaultCardTokenizationInteractor:
             return false
         case .full:
             return true
-        @unknown default:
-            return false
         }
     }
 
