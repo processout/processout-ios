@@ -108,7 +108,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let captureCompletionDelay = NSEC_PER_SEC * 3
+        static let captureCompletionDelay: TimeInterval = 3
         static let emailRegex = #"^\S+@\S+$"#
         static let phoneRegex = #"^\+?\d{1,3}\d*$"#
     }
@@ -291,7 +291,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         setStateUnchecked(.captured(capturedState))
         send(event: .didCompletePayment)
         if !configuration.skipSuccessScreen {
-            try? await Task.sleep(nanoseconds: Constants.captureCompletionDelay)
+            try? await Task.sleep(seconds: Constants.captureCompletionDelay)
         }
         completion(.success(()))
     }
@@ -382,7 +382,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         Task {
-            try? await Task.sleep(nanoseconds: UInt64(TimeInterval(NSEC_PER_SEC) * disabledFor))
+            try? await Task.sleep(seconds: disabledFor)
             switch state {
             case .started(var state):
                 state.isCancellable = true
@@ -404,7 +404,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         Task {
-            try? await Task.sleep(nanoseconds: UInt64(TimeInterval(NSEC_PER_SEC) * disabledFor))
+            try? await Task.sleep(seconds: disabledFor)
             guard case .awaitingCapture(var awaitingState) = state else {
                 return
             }

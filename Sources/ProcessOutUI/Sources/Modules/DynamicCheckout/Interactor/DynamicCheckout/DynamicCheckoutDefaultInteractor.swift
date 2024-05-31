@@ -552,7 +552,7 @@ final class DynamicCheckoutDefaultInteractor:
         state = .success
         send(event: .didCompletePayment)
         Task { @MainActor in
-            try? await Task.sleep(nanoseconds: NSEC_PER_SEC * UInt64(configuration.captureSuccess?.duration ?? 0))
+            try? await Task.sleep(seconds: configuration.captureSuccess?.duration ?? 0)
             completion(.success(()))
         }
     }

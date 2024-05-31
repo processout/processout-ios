@@ -18,7 +18,7 @@ func withTimeout<T: Sendable>(
     @POUnfairlyLocked var isTimedOut = false
     let task = Task(operation: operation)
     let timeoutTask = Task {
-        try await Task.sleep(nanoseconds: UInt64(timeout) * NSEC_PER_SEC)
+        try await Task.sleep(seconds: timeout)
         $isTimedOut.withLock { value in
             value = true
         }
@@ -78,7 +78,7 @@ private func retry<T: Sendable>(
     }
     do {
         let delay = retryStrategy.interval(for: attempt)
-        try await Task.sleep(nanoseconds: UInt64(delay) * NSEC_PER_SEC)
+        try await Task.sleep(seconds: delay)
     } catch {
         // Ignored
     }
