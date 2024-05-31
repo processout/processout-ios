@@ -389,7 +389,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 setStateUnchecked(.started(state))
             case .submitting(var state):
                 state.isCancellable = true
-                setStateUnchecked(.started(state))
+                setStateUnchecked(.submitting(snapshot: state))
             default:
                 break
             }
