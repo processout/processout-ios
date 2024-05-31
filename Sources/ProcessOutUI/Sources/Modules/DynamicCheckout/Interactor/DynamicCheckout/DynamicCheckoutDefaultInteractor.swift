@@ -160,7 +160,7 @@ final class DynamicCheckoutDefaultInteractor:
             expressPaymentMethodIds: expressMethodIds,
             regularPaymentMethodIds: regularMethodIds,
             pkPaymentRequests: pkPaymentRequests,
-            isCancellable: configuration.cancelActionTitle.map { !$0.isEmpty } ?? true
+            isCancellable: configuration.cancelButton?.title.map { !$0.isEmpty } ?? true
         )
         state = .started(startedState)
         delegate?.dynamicCheckout(didEmitEvent: .didStart)
@@ -552,7 +552,7 @@ final class DynamicCheckoutDefaultInteractor:
         state = .success
         send(event: .didCompletePayment)
         Task { @MainActor in
-            try? await Task.sleep(nanoseconds: NSEC_PER_SEC * UInt64(configuration.success.duration))
+            try? await Task.sleep(nanoseconds: NSEC_PER_SEC * UInt64(configuration.captureSuccess?.duration ?? 0))
             completion(.success(()))
         }
     }

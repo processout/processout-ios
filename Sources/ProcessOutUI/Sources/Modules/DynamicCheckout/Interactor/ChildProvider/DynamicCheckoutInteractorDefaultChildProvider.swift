@@ -85,10 +85,10 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
     private func alternativePaymentConfiguration(gatewayId: String) -> PONativeAlternativePaymentConfiguration {
         let confirmationConfiguration = PONativeAlternativePaymentConfirmationConfiguration(
             waitsConfirmation: true,
-            timeout: configuration.alternativePayment.paymentConfirmation.timeout,
-            showProgressIndicatorAfter: configuration.alternativePayment.paymentConfirmation.showProgressIndicatorAfter,
+            timeout: configuration.alternativePayment.captureConfirmation.timeout,
+            showProgressIndicatorAfter: configuration.alternativePayment.captureConfirmation.showProgressIndicatorAfter,
             secondaryAction: secondaryActionConfiguration(
-                with: configuration.alternativePayment.paymentConfirmation.cancelAction
+                with: configuration.alternativePayment.captureConfirmation.cancelButton
             )
         )
         let alternativePaymentConfiguration = PONativeAlternativePaymentConfiguration(
@@ -97,10 +97,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             title: "",
             successMessage: "",
             primaryActionTitle: "",
-            secondaryAction: configuration.alternativePayment.cancelActionTitle.map { title in
-                // todo(andrii-vysotskyi): pass disabledFor if needed
-                .cancel(title: title, disabledFor: 0, confirmation: nil)
-            },
+            secondaryAction: secondaryActionConfiguration(with: configuration.alternativePayment.cancelButton),
             inlineSingleSelectValuesLimit: configuration.alternativePayment.inlineSingleSelectValuesLimit,
             skipSuccessScreen: true,
             paymentConfirmation: confirmationConfiguration
@@ -109,11 +106,8 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
     }
 
     private func secondaryActionConfiguration(
-        with configuration: PODynamicCheckoutAlternativePaymentConfiguration.CancelAction?
+        with configuration: PODynamicCheckoutAlternativePaymentConfiguration.CancelButton?
     ) -> PONativeAlternativePaymentConfiguration.SecondaryAction? {
-        guard let configuration else {
-            return nil
-        }
-        return .cancel(title: configuration.title, disabledFor: configuration.disabledFor, confirmation: nil)
+        configuration.map { .cancel(title: "", disabledFor: $0.disabledFor, confirmation: nil) }
     }
 }

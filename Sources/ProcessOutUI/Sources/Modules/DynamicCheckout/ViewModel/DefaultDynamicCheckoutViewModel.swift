@@ -289,7 +289,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     ) -> POActionsContainerActionViewModel? {
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.submit,
-            title: interactor.configuration.primaryActionTitle ?? String(resource: .DynamicCheckout.Button.continue),
+            title: interactor.configuration.primaryButtonTitle ?? String(resource: .DynamicCheckout.Button.continue),
             isEnabled: true,
             isLoading: false,
             isPrimary: true,
@@ -399,7 +399,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         }
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.submit,
-            title: interactor.configuration.primaryActionTitle ?? String(resource: .DynamicCheckout.Button.continue),
+            title: interactor.configuration.primaryButtonTitle ?? String(resource: .DynamicCheckout.Button.continue),
             isEnabled: isEnabled,
             isLoading: isLoading,
             isPrimary: true,
@@ -422,11 +422,10 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     // MARK: - Success
 
     private func updateWithSuccessState() {
-        guard !interactor.configuration.success.skipScreen else {
+        guard let configuration = interactor.configuration.captureSuccess else {
             return
         }
-        let message = interactor.configuration.success.message
-            ?? String(resource: .DynamicCheckout.successMessage)
+        let message = configuration.message ?? String(resource: .DynamicCheckout.successMessage)
         let item = DynamicCheckoutViewModelItem.Success(
             id: ItemId.success, message: message, image: UIImage(resource: .success)
         )
@@ -437,22 +436,20 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areSeparatorsVisible: false,
             areBezelsVisible: false
         )
-        let newState = DynamicCheckoutViewModelState(
-            sections: [section], actions: [], isCompleted: true
-        )
+        let newState = DynamicCheckoutViewModelState(sections: [section], actions: [], isCompleted: true)
         setState(newState)
     }
 
     // MARK: - Utils
 
     private func createCancelAction(isEnabled: Bool) -> POActionsContainerActionViewModel? {
-        let title = interactor.configuration.cancelActionTitle ?? String(resource: .DynamicCheckout.Button.cancel)
-        guard !title.isEmpty else {
+        // todo(andrii-vysotskyi): hide button for nAPM if needed
+        guard let configuration = interactor.configuration.cancelButton else {
             return nil
         }
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.cancel,
-            title: title,
+            title: configuration.title ?? String(resource: .DynamicCheckout.Button.cancel),
             isEnabled: isEnabled,
             isLoading: false,
             isPrimary: false,
