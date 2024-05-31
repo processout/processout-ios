@@ -30,10 +30,10 @@ public struct POCardTokenizationConfiguration {
     /// Card billing address collection configuration.
     public let billingAddress: POBillingAddressConfiguration
 
-    /// Metada related to the card.
+    /// Metadata related to the card.
     public let metadata: [String: String]?
 
-    /// Boolean flag determines whether user will be aksed to select scheme if co-scheme is available.
+    /// Boolean flag determines whether user will be asked to select scheme if co-scheme is available.
     /// Until feature is fully ready this is hardcoded to `false`.
     let isSchemeSelectionAllowed: Bool
 
