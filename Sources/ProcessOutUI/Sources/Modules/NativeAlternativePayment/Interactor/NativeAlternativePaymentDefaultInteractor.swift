@@ -147,7 +147,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 amount: details.invoice.amount,
                 currencyCode: details.invoice.currencyCode,
                 parameters: await createParameters(specifications: details.parameters),
-                isCancellable: configuration.cancelAction.map { $0.disabledFor.isZero } ?? true
+                isCancellable: disableDuration(of: configuration.secondaryAction).isZero
             )
             setStateUnchecked(.started(startedState))
             send(event: .didStart)
@@ -227,7 +227,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             logoImage: logoImage,
             actionMessage: actionMessage,
             actionImage: actionImage,
-            isCancellable: configuration.paymentConfirmation.cancelAction.map { $0.disabledFor.isZero } ?? true,
+            isCancellable: disableDuration(of: configuration.paymentConfirmation.secondaryAction).isZero,
             isDelayed: false
         )
         setStateUnchecked(.awaitingCapture(awaitingCaptureState))
@@ -376,12 +376,13 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     @MainActor
     private func enableCancellationAfterDelay() {
-        guard let action = configuration.cancelAction, action.disabledFor > 0 else {
-            logger.debug("Cancel action is not set or initiatly enabled.")
+        let disabledFor = disableDuration(of: configuration.secondaryAction)
+        guard disabledFor > 0 else {
+            logger.debug("Cancel action is not set or initially enabled.")
             return
         }
         Task {
-            try? await Task.sleep(nanoseconds: UInt64(TimeInterval(NSEC_PER_SEC) * action.disabledFor))
+            try? await Task.sleep(nanoseconds: UInt64(TimeInterval(NSEC_PER_SEC) * disabledFor))
             switch state {
             case .started(var state):
                 state.isCancellable = true
@@ -397,12 +398,13 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     @MainActor
     private func enableCaptureCancellationAfterDelay() {
-        guard let action = configuration.paymentConfirmation.cancelAction, action.disabledFor > 0 else {
-            logger.debug("Confirmation cancel action is not set or initiatly enabled.")
+        let disabledFor = disableDuration(of: configuration.paymentConfirmation.secondaryAction)
+        guard disabledFor > 0 else {
+            logger.debug("Confirmation cancel action is not set or initially enabled.")
             return
         }
         Task {
-            try? await Task.sleep(nanoseconds: UInt64(TimeInterval(NSEC_PER_SEC) * action.disabledFor))
+            try? await Task.sleep(nanoseconds: UInt64(TimeInterval(NSEC_PER_SEC) * disabledFor))
             guard case .awaitingCapture(var awaitingState) = state else {
                 return
             }
@@ -420,7 +422,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func send(event: PONativeAlternativePaymentMethodEvent) {
         assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
-        delegate?.nativeAlternativePayment(didEmitEvent: event)
+        delegate?.nativeAlternativePaymentMethodDidEmitEvent(event)
     }
 
     @MainActor
@@ -469,6 +471,13 @@ final class NativeAlternativePaymentDefaultInteractor:
         return gateway.logoUrl
     }
 
+    private func disableDuration(of action: PONativeAlternativePaymentConfiguration.SecondaryAction?) -> TimeInterval {
+        guard case .cancel(_, let disabledFor, _) = action else {
+            return 0
+        }
+        return disabledFor
+    }
+
     // MARK: - Default Values
 
     /// Updates parameters with default values.
@@ -479,12 +488,14 @@ final class NativeAlternativePaymentDefaultInteractor:
         guard !parameters.isEmpty else {
             return
         }
-        let defaultValues = await delegate?.nativeAlternativePayment(
-            defaultValuesFor: parameters.map(\.specification)
-        )
+        let defaultValues = await withCheckedContinuation { continuation in
+            delegate?.nativeAlternativePaymentMethodDefaultValues(
+                for: parameters.map(\.specification), completion: continuation.resume
+            )
+        }
         for (offset, parameter) in parameters.enumerated() {
             let defaultValue: String?
-            if let value = defaultValues?[parameter.specification.key] {
+            if let value = defaultValues[parameter.specification.key] {
                 switch parameter.specification.type {
                 case .singleSelect:
                     let availableValues = parameter.specification.availableValues?.map(\.value) ?? []

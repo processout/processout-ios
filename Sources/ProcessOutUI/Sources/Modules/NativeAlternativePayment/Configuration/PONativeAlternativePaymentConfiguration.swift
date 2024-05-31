@@ -12,27 +12,18 @@ import ProcessOut
 /// Use `nil` to indicate that default value should be used.
 public struct PONativeAlternativePaymentConfiguration {
 
-    public struct CancelAction {
+    public enum SecondaryAction {
 
-        /// Action title. Pass `nil` title to use default value.
-        public let title: String?
-
-        /// By default user can interact with action immediately after it becomes visible, it is
-        /// possible to make it initially disabled for given amount of time.
-        public let disabledFor: TimeInterval
-
-        /// When property is set implementation asks user to confirm cancel.
-        public let confirmation: POConfirmationDialogConfiguration?
-
-        public init(
-            title: String? = nil,
-            disabledFor: TimeInterval = 0,
-            confirmation: POConfirmationDialogConfiguration? = nil
-        ) {
-            self.title = title
-            self.disabledFor = disabledFor
-            self.confirmation = confirmation
-        }
+        /// Cancel action.
+        ///
+        /// - Parameters:
+        ///   - title: Action title. Pass `nil` title to use default value.
+        ///   - disabledFor: By default user can interact with action immediately after it becomes visible, it is
+        ///   possible to make it initially disabled for given amount of time.
+        ///   - confirmation: When property is set implementation asks user to confirm cancel.
+        case cancel(
+            title: String? = nil, disabledFor: TimeInterval = 0, confirmation: POConfirmationDialogConfiguration? = nil
+        )
     }
 
     /// Invoice that should be authorized/captured.
@@ -51,7 +42,7 @@ public struct PONativeAlternativePaymentConfiguration {
     public let primaryActionTitle: String?
 
     /// Secondary action. To remove secondary action use `nil`, this is default behaviour.
-    public let cancelAction: CancelAction?
+    public let secondaryAction: SecondaryAction?
 
     /// For parameters where user should select single option from multiple values defines
     /// maximum number of options that framework will display inline (e.g. using radio buttons).
@@ -81,9 +72,9 @@ public struct PONativeAlternativePaymentConfiguration {
 
     /// Action that could be optionally presented to user during payment confirmation stage. To remove action
     /// use `nil`, this is default behaviour.
-    @available(*, deprecated, renamed: "paymentConfirmation.cancelAction")
-    public var paymentConfirmationCancelAction: CancelAction? {
-        paymentConfirmation.cancelAction
+    @available(*, deprecated, renamed: "paymentConfirmation.secondaryAction")
+    public var paymentConfirmationSecondaryAction: SecondaryAction? {
+        paymentConfirmation.secondaryAction
     }
 
     /// Creates configuration instance.
@@ -94,25 +85,25 @@ public struct PONativeAlternativePaymentConfiguration {
         title: String? = nil,
         successMessage: String? = nil,
         primaryActionTitle: String? = nil,
-        cancelAction: CancelAction? = nil,
+        secondaryAction: SecondaryAction? = nil,
         inlineSingleSelectValuesLimit: Int = 5,
         skipSuccessScreen: Bool = false,
         waitsPaymentConfirmation: Bool = true,
         paymentConfirmationTimeout: TimeInterval = 180,
-        paymentConfirmationCancelAction: CancelAction? = nil
+        paymentConfirmationSecondaryAction: SecondaryAction? = nil
     ) {
         self.invoiceId = invoiceId
         self.gatewayConfigurationId = gatewayConfigurationId
         self.title = title
         self.successMessage = successMessage
         self.primaryActionTitle = primaryActionTitle
-        self.cancelAction = cancelAction
+        self.secondaryAction = secondaryAction
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.skipSuccessScreen = skipSuccessScreen
         self.paymentConfirmation = .init(
             waitsConfirmation: waitsPaymentConfirmation,
             timeout: paymentConfirmationTimeout,
-            cancelAction: paymentConfirmationCancelAction
+            secondaryAction: paymentConfirmationSecondaryAction
         )
     }
 
@@ -123,7 +114,7 @@ public struct PONativeAlternativePaymentConfiguration {
         title: String? = nil,
         successMessage: String? = nil,
         primaryActionTitle: String? = nil,
-        cancelAction: CancelAction? = nil,
+        secondaryAction: SecondaryAction? = nil,
         inlineSingleSelectValuesLimit: Int = 5,
         skipSuccessScreen: Bool = false,
         paymentConfirmation: PONativeAlternativePaymentConfirmationConfiguration = .init()
@@ -133,7 +124,7 @@ public struct PONativeAlternativePaymentConfiguration {
         self.title = title
         self.successMessage = successMessage
         self.primaryActionTitle = primaryActionTitle
-        self.cancelAction = cancelAction
+        self.secondaryAction = secondaryAction
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.skipSuccessScreen = skipSuccessScreen
         self.paymentConfirmation = paymentConfirmation

@@ -87,7 +87,9 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             waitsConfirmation: true,
             timeout: configuration.alternativePayment.paymentConfirmation.timeout,
             showProgressIndicatorAfter: configuration.alternativePayment.paymentConfirmation.showProgressIndicatorAfter,
-            cancelAction: nil
+            secondaryAction: secondaryActionConfiguration(
+                with: configuration.alternativePayment.paymentConfirmation.cancelAction
+            )
         )
         let alternativePaymentConfiguration = PONativeAlternativePaymentConfiguration(
             invoiceId: configuration.invoiceId,
@@ -95,11 +97,23 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             title: "",
             successMessage: "",
             primaryActionTitle: "",
-            cancelAction: nil,
+            secondaryAction: configuration.alternativePayment.cancelActionTitle.map { title in
+                // todo(andrii-vysotskyi): pass disabledFor if needed
+                .cancel(title: title, disabledFor: 0, confirmation: nil)
+            },
             inlineSingleSelectValuesLimit: configuration.alternativePayment.inlineSingleSelectValuesLimit,
             skipSuccessScreen: true,
             paymentConfirmation: confirmationConfiguration
         )
         return alternativePaymentConfiguration
+    }
+
+    private func secondaryActionConfiguration(
+        with configuration: PODynamicCheckoutAlternativePaymentConfiguration.CancelAction?
+    ) -> PONativeAlternativePaymentConfiguration.SecondaryAction? {
+        guard let configuration else {
+            return nil
+        }
+        return .cancel(title: configuration.title, disabledFor: configuration.disabledFor, confirmation: nil)
     }
 }

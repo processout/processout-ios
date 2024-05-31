@@ -326,14 +326,16 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     private func updateActions(state: InteractorState.Started, isSubmitting: Bool) {
         let actions = [
             submitAction(state: state, isLoading: isSubmitting),
-            cancelAction(configuration: configuration.cancelAction, isEnabled: !isSubmitting && state.isCancellable)
+            cancelAction(configuration: configuration.secondaryAction, isEnabled: !isSubmitting && state.isCancellable)
         ]
         setActions(actions.compactMap { $0 })
     }
 
     private func updateActions(state: InteractorState.AwaitingCapture) {
         let actions = [
-            cancelAction(configuration: configuration.paymentConfirmation.cancelAction, isEnabled: state.isCancellable)
+            cancelAction(
+                configuration: configuration.paymentConfirmation.secondaryAction, isEnabled: state.isCancellable
+            )
         ]
         setActions(actions.compactMap { $0 })
     }
@@ -368,19 +370,19 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     }
 
     private func cancelAction(
-        configuration: PONativeAlternativePaymentConfiguration.CancelAction?, isEnabled: Bool
+        configuration: PONativeAlternativePaymentConfiguration.SecondaryAction?, isEnabled: Bool
     ) -> POActionsContainerActionViewModel? {
-        guard let configuration else {
+        guard case let .cancel(title, _, confirmation) = configuration else {
             return nil
         }
         let action = POActionsContainerActionViewModel(
             id: "native-alternative-payment.secondary-button",
-            title: configuration.title ?? String(resource: .NativeAlternativePayment.Button.cancel),
+            title: title ?? String(resource: .NativeAlternativePayment.Button.cancel),
             isEnabled: isEnabled,
             isLoading: false,
             isPrimary: false,
             action: { [weak self] in
-                self?.cancelPayment(confirmationConfiguration: configuration.confirmation)
+                self?.cancelPayment(confirmationConfiguration: confirmation)
             }
         )
         return action
