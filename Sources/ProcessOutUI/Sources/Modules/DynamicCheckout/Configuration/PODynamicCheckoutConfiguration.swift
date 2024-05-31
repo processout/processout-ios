@@ -30,8 +30,12 @@ public struct PODynamicCheckoutConfiguration {
         /// Cancel button title.
         public let title: String?
 
-        public init(title: String? = nil) {
+        /// When property is set implementation asks user to confirm cancel.
+        public let confirmation: POConfirmationDialogConfiguration?
+
+        public init(title: String? = nil, confirmation: POConfirmationDialogConfiguration? = nil) {
             self.title = title
+            self.confirmation = confirmation
         }
     }
 

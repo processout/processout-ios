@@ -97,7 +97,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             title: "",
             successMessage: "",
             primaryActionTitle: "",
-            secondaryAction: secondaryActionConfiguration(with: configuration.alternativePayment.cancelButton),
+            secondaryAction: nil,
             inlineSingleSelectValuesLimit: configuration.alternativePayment.inlineSingleSelectValuesLimit,
             skipSuccessScreen: true,
             paymentConfirmation: confirmationConfiguration

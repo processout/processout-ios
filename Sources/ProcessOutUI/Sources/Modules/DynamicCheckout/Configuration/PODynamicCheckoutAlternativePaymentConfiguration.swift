@@ -10,21 +10,6 @@ import Foundation
 /// Alternative payment specific dynamic checkout configuration.
 public struct PODynamicCheckoutAlternativePaymentConfiguration {
 
-    public struct CancelButton {
-
-        /// By default user can interact with action immediately after it becomes visible, it is
-        /// possible to make it initially disabled for given amount of time.
-        public let disabledFor: TimeInterval
-
-        /// When property is set implementation asks user to confirm cancel.
-        public let confirmation: POConfirmationDialogConfiguration?
-
-        public init(disabledFor: TimeInterval, confirmation: POConfirmationDialogConfiguration? = nil) {
-            self.disabledFor = disabledFor
-            self.confirmation = confirmation
-        }
-    }
-
     public struct CaptureConfirmation {
 
         /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
@@ -50,11 +35,23 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
         }
     }
 
+    public struct CancelButton {
+
+        /// By default user can interact with action immediately after it becomes visible, it is
+        /// possible to make it initially disabled for given amount of time.
+        public let disabledFor: TimeInterval
+
+        /// When property is set implementation asks user to confirm cancel.
+        public let confirmation: POConfirmationDialogConfiguration?
+
+        public init(disabledFor: TimeInterval, confirmation: POConfirmationDialogConfiguration? = nil) {
+            self.disabledFor = disabledFor
+            self.confirmation = confirmation
+        }
+    }
+
     /// Return URL to expect when handling OOB or web based payments.
     public let returnUrl: URL?
-
-    /// Cancel button configuration.
-    public let cancelButton: CancelButton?
 
     /// For parameters where user should select single option from multiple values defines
     /// maximum number of options that framework will display inline (e.g. using radio buttons).
@@ -68,12 +65,10 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
     /// Creates configuration.
     public init(
         returnUrl: URL? = nil,
-        cancelButton: CancelButton? = nil,
         inlineSingleSelectValuesLimit: Int = 5,
         captureConfirmation: CaptureConfirmation = .init()
     ) {
         self.returnUrl = returnUrl
-        self.cancelButton = cancelButton
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.captureConfirmation = captureConfirmation
     }
