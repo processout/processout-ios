@@ -17,6 +17,9 @@ struct DynamicCheckoutViewModelState {
 
     /// Indicates whether state represents final success state.
     let isCompleted: Bool
+
+    /// Confirmation dialog to present to user.
+    var confirmationDialog: POConfirmationDialog?
 }
 
 extension DynamicCheckoutViewModelState {

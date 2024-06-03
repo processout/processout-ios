@@ -25,7 +25,8 @@ final class AnyDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     }
 
     var state: DynamicCheckoutViewModelState {
-        base.state
+        get { base.state }
+        set { base.state = newValue }
     }
 
     // MARK: - Private Properties

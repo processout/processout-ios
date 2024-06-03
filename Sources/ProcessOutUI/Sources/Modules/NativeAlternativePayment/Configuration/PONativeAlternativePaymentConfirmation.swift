@@ -23,18 +23,18 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
 
     /// Action that could be optionally presented to user during payment confirmation stage. To remove action
     /// use `nil`, this is default behaviour.
-    public let cancelAction: PONativeAlternativePaymentConfiguration.CancelAction?
+    public let secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction?
 
     /// Creates configuration instance.
     public init(
         waitsConfirmation: Bool = true,
         timeout: TimeInterval = 180,
         showProgressIndicatorAfter: TimeInterval? = nil,
-        cancelAction: PONativeAlternativePaymentConfiguration.CancelAction? = nil
+        secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction? = nil
     ) {
         self.waitsConfirmation = waitsConfirmation
         self.timeout = timeout
         self.showProgressIndicatorAfter = showProgressIndicatorAfter
-        self.cancelAction = cancelAction
+        self.secondaryAction = secondaryAction
     }
 }

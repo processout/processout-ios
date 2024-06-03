@@ -10,28 +10,34 @@ import ProcessOut
 /// Card specific dynamic checkout configuration.
 public struct PODynamicCheckoutCardConfiguration {
 
+    /// Billing address collection configuration.
+    public struct BillingAddress {
+
+        /// Default address information.
+        public let defaultAddress: POContact?
+
+        /// Whether the values included in ``POBillingAddressConfiguration/defaultAddress`` should be attached to the
+        /// card, this includes fields that aren't displayed in the form.
+        ///
+        /// If `false` (the default), those values will only be used to pre-fill the corresponding fields in the form.
+        public let attachDefaultsToPaymentMethod: Bool
+
+        /// Creates billing address configuration.
+        public init(defaultAddress: POContact? = nil, attachDefaultsToPaymentMethod: Bool = false) {
+            self.defaultAddress = defaultAddress
+            self.attachDefaultsToPaymentMethod = attachDefaultsToPaymentMethod
+        }
+    }
+
     /// Card billing address collection configuration.
-    public var billingAddress = PODynamicCheckoutCardBillingAddressConfiguration()
+    public let billingAddress: BillingAddress
 
     /// Metadata related to the card.
-    public var metadata: [String: String]?
-}
+    public let metadata: [String: String]?
 
-/// Billing address collection configuration.
-public struct PODynamicCheckoutCardBillingAddressConfiguration {
-
-    /// Default address information.
-    public let defaultAddress: POContact?
-
-    /// Whether the values included in ``POBillingAddressConfiguration/defaultAddress`` should be attached to the
-    /// card, this includes fields that aren't displayed in the form.
-    ///
-    /// If `false` (the default), those values will only be used to pre-fill the corresponding fields in the form.
-    public let attachDefaultsToPaymentMethod: Bool
-
-    /// Creates billing address configuration.
-    public init(defaultAddress: POContact? = nil, attachDefaultsToPaymentMethod: Bool = false) {
-        self.defaultAddress = defaultAddress
-        self.attachDefaultsToPaymentMethod = attachDefaultsToPaymentMethod
+    /// Creates configuration instance.
+    public init(billingAddress: BillingAddress = BillingAddress(), metadata: [String: String]? = nil) {
+        self.billingAddress = billingAddress
+        self.metadata = metadata
     }
 }

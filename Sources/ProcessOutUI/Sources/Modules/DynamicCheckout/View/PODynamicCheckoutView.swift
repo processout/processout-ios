@@ -37,6 +37,7 @@ public struct PODynamicCheckoutView: View {
         }
         .onAppear(perform: viewModel.start)
         .backport.geometryGroup()
+        .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
     }
 
     // MARK: - Private Properties

@@ -20,7 +20,6 @@ protocol DynamicCheckoutInteractor: Interactor<DynamicCheckoutInteractorState> {
     /// Submits current payment method's data.
     func submit()
 
-    /// Attempts to cancel dynamic checkout payment.
-    /// - NOTE: Cancellation is not necessarily immediate and may happen after some time.
-    func cancel()
+    /// Notifies interactor that user requested cancel confirmation.
+    func didRequestCancelConfirmation()
 }

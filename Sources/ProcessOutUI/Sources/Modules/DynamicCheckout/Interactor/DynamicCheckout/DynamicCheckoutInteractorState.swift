@@ -72,6 +72,13 @@ enum DynamicCheckoutInteractorState {
         /// For payment methods that need preloading this is initially set to `false`. Default value is `true`.
         var isReady = true
 
+        /// Boolean flag indicating whether interactor is currently processing native APM and it is
+        /// in `awaitingCapture` state
+        ///
+        /// Normally consumer of state should be able to inspect interactor state directly, but since it is not
+        /// currently possible because state update is perform on `willChange`.
+        var isAwaitingNativeAlternativePaymentCapture = false // swiftlint:disable:this identifier_name
+
         /// Payment method that should be selected in case of processing failure.
         var pendingPaymentMethodId: String?
 
@@ -113,6 +120,6 @@ enum DynamicCheckoutInteractorState {
     /// Failure state. This is a sink state.
     case failure(POFailure)
 
-    /// Payment was successfuly processed. This is a sink state.
+    /// Payment was successfully processed. This is a sink state.
     case success
 }
