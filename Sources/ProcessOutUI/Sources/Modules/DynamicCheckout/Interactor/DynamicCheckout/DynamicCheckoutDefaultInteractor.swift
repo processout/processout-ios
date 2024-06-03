@@ -119,7 +119,11 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     func didRequestCancelConfirmation() {
-        // todo(andrii-vysotskyi): notify current payment delegate about cancel confirmation
+        guard case .paymentProcessing(let currentState) = state else {
+            return
+        }
+        // Only nAPM interactor should be notified for now.
+        currentState.nativeAlternativePaymentInteractor?.didRequestCancelConfirmation()
     }
 
     // MARK: - Private Nested Types
