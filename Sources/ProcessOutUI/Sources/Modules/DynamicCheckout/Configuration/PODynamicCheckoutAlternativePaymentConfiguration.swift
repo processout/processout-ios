@@ -37,6 +37,9 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
 
     public struct CancelButton {
 
+        /// Cancel button title. Use `nil` for default title.
+        public let title: String?
+
         /// By default user can interact with action immediately after it becomes visible, it is
         /// possible to make it initially disabled for given amount of time.
         public let disabledFor: TimeInterval
@@ -44,7 +47,12 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
         /// When property is set implementation asks user to confirm cancel.
         public let confirmation: POConfirmationDialogConfiguration?
 
-        public init(disabledFor: TimeInterval, confirmation: POConfirmationDialogConfiguration? = nil) {
+        public init(
+            title: String? = nil,
+            disabledFor: TimeInterval,
+            confirmation: POConfirmationDialogConfiguration? = nil
+        ) {
+            self.title = title
             self.disabledFor = disabledFor
             self.confirmation = confirmation
         }

@@ -51,10 +51,10 @@ public struct PODynamicCheckoutConfiguration {
     /// PassKit payment button type.
     public let passKitPaymentButtonType: PKPaymentButtonType
 
-    /// Primary action text, such as "Submit".
+    /// Primary button text, such as "Submit".
     public let primaryButtonTitle: String?
 
-    /// Cancel action. To remove button use `nil`.
+    /// Cancel button. To remove button use `nil`.
     public let cancelButton: CancelButton?
 
     /// Determines whether to enable skipping payment list step when there is only

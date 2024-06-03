@@ -22,7 +22,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     // MARK: - DynamicCheckoutViewModel
 
     @Published
-    private(set) var state: DynamicCheckoutViewModelState = .idle
+    var state: DynamicCheckoutViewModelState = .idle
 
     func start() {
         interactor.start()
@@ -85,8 +85,9 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areSeparatorsVisible: false,
             areBezelsVisible: false
         )
+        // Confirmation dialog is dismissed when interactor changes
         let newState = DynamicCheckoutViewModelState(
-            sections: [section], actions: [], isCompleted: false
+            sections: [section], actions: [], isCompleted: false, confirmationDialog: nil
         )
         setState(newState)
     }
@@ -94,9 +95,12 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     // MARK: - Started
 
     private func updateWithStartedState(_ state: DynamicCheckoutInteractorState.Started) {
+        let newActions = [
+            createCancelAction(state)
+        ]
         let newState = DynamicCheckoutViewModelState(
             sections: createSectionsWithStartedState(state, selectedMethodId: nil),
-            actions: createActionsWithStartedState(state),
+            actions: newActions.compactMap { $0 },
             isCompleted: false
         )
         setState(newState)
@@ -249,39 +253,33 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         return .payment(item)
     }
 
-    private func createActionsWithStartedState(
-        _ state: DynamicCheckoutInteractorState.Started
-    ) -> [POActionsContainerActionViewModel] {
-        let cancelAction = createCancelAction(state)
-        return [cancelAction].compactMap { $0 }
-    }
-
     private func createCancelAction(
         _ state: DynamicCheckoutInteractorState.Started
     ) -> POActionsContainerActionViewModel? {
         guard state.isCancellable else {
             return nil
         }
-        return createCancelAction(isEnabled: true)
+        let cancelAction = createCancelAction(
+            title: interactor.configuration.cancelButton?.title,
+            isEnabled: true,
+            confirmation: interactor.configuration.cancelButton?.confirmation
+        )
+        return cancelAction
     }
 
     // MARK: - Selected
 
     private func updateWithSelectedState(_ state: DynamicCheckoutInteractorState.Selected) {
+        let newActions = [
+            createSubmitAction(state),
+            createCancelAction(state.snapshot)
+        ]
         let newState = DynamicCheckoutViewModelState(
             sections: createSectionsWithStartedState(state.snapshot, selectedMethodId: state.paymentMethodId),
-            actions: createActionsWithSelectedState(state),
+            actions: newActions.compactMap { $0 },
             isCompleted: false
         )
         setState(newState)
-    }
-
-    private func createActionsWithSelectedState(
-        _ state: DynamicCheckoutInteractorState.Selected
-    ) -> [POActionsContainerActionViewModel] {
-        let submitAction = createSubmitAction(state)
-        let cancelAction = createCancelAction(state.snapshot)
-        return [submitAction, cancelAction].compactMap { $0 }
     }
 
     private func createSubmitAction(
@@ -303,9 +301,13 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     // MARK: - Payment Processing
 
     private func updateWithPaymentProcessingState(_ state: DynamicCheckoutInteractorState.PaymentProcessing) {
+        let newActions = [
+            createSubmitAction(state),
+            createCancelAction(state)
+        ]
         let newState = DynamicCheckoutViewModelState(
             sections: createSectionsWithPaymentProcessingState(state),
-            actions: createActionsWithPaymentProcessingState(state),
+            actions: newActions.compactMap { $0 },
             isCompleted: false
         )
         setState(newState)
@@ -374,14 +376,6 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         }
     }
 
-    private func createActionsWithPaymentProcessingState(
-        _ state: DynamicCheckoutInteractorState.PaymentProcessing
-    ) -> [POActionsContainerActionViewModel] {
-        let submitAction = createSubmitAction(state)
-        let cancelAction = createCancelAction(state)
-        return [submitAction, cancelAction].compactMap { $0 }
-    }
-
     private func createSubmitAction(
         _ state: DynamicCheckoutInteractorState.PaymentProcessing
     ) -> POActionsContainerActionViewModel? {
@@ -416,7 +410,18 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         guard state.isCancellable || state.snapshot.isCancellable else {
             return nil
         }
-        return createCancelAction(isEnabled: state.isCancellable)
+        let title: String?
+        let confirmation: POConfirmationDialogConfiguration?
+        if state.isAwaitingNativeAlternativePaymentCapture {
+            let configuration = interactor.configuration.alternativePayment.captureConfirmation.cancelButton
+            title = configuration?.title
+            confirmation = configuration?.confirmation
+        } else {
+            let configuration = interactor.configuration.cancelButton
+            title = configuration?.title
+            confirmation = configuration?.confirmation
+        }
+        return createCancelAction(title: title, isEnabled: state.isCancellable, confirmation: confirmation)
     }
 
     // MARK: - Success
@@ -442,19 +447,17 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
 
     // MARK: - Utils
 
-    private func createCancelAction(isEnabled: Bool) -> POActionsContainerActionViewModel? {
-        // todo(andrii-vysotskyi): hide button for nAPM if needed
-        guard let configuration = interactor.configuration.cancelButton else {
-            return nil
-        }
+    private func createCancelAction(
+        title: String?, isEnabled: Bool, confirmation: POConfirmationDialogConfiguration?
+    ) -> POActionsContainerActionViewModel? {
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.cancel,
-            title: configuration.title ?? String(resource: .DynamicCheckout.Button.cancel),
+            title: title ?? String(resource: .DynamicCheckout.Button.cancel),
             isEnabled: isEnabled,
             isLoading: false,
             isPrimary: false,
             action: { [weak self] in
-                self?.interactor.cancel()
+                self?.cancelCheckout(configuration: confirmation)
             }
         )
         return viewModel
@@ -464,6 +467,32 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         let isAnimated = newState.animationIdentity != state.animationIdentity
         withAnimation(isAnimated ? .default : nil) {
             state = newState
+        }
+    }
+
+    private func cancelCheckout(configuration: POConfirmationDialogConfiguration?) {
+        if let configuration = configuration {
+            interactor.didRequestCancelConfirmation()
+            let confirmationDialog = POConfirmationDialog(
+                title: configuration.title ?? String(resource: .DynamicCheckout.CancelConfirmation.title),
+                message: configuration.message,
+                primaryButton: .init(
+                    // swiftlint:disable:next line_length
+                    title: configuration.confirmActionTitle ?? String(resource: .DynamicCheckout.CancelConfirmation.confirm),
+                    role: .destructive,
+                    action: { [weak self] in
+                        self?.interactor.cancel()
+                    }
+                ),
+                secondaryButton: .init(
+                    // swiftlint:disable:next line_length
+                    title: configuration.cancelActionTitle ?? String(resource: .DynamicCheckout.CancelConfirmation.cancel),
+                    role: .cancel
+                )
+            )
+            state.confirmationDialog = confirmationDialog
+        } else {
+            interactor.cancel()
         }
     }
 }

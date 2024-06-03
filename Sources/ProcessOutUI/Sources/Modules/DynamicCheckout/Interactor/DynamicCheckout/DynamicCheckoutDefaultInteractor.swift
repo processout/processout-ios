@@ -118,6 +118,10 @@ final class DynamicCheckoutDefaultInteractor:
         cancel(force: true)
     }
 
+    func didRequestCancelConfirmation() {
+        // todo(andrii-vysotskyi): notify current payment delegate about cancel confirmation
+    }
+
     // MARK: - Private Nested Types
 
     private enum PaymentMethodKind: Hashable {
@@ -452,21 +456,25 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.submission = .submitting
             currentState.isCancellable = false
             currentState.isReady = false
+            currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)
         case .started(let startedState):
             currentState.submission = startedState.areParametersValid ? .possible : .temporarilyUnavailable
             currentState.isCancellable = startedState.isCancellable
             currentState.isReady = true
-            self.state = .paymentProcessing(currentState)
-        case .awaitingCapture(let awaitingCaptureState):
-            currentState.submission = .submitting
-            currentState.isCancellable = awaitingCaptureState.isCancellable
-            currentState.isReady = true
+            currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)
         case .submitting(let submittingState):
             currentState.submission = .submitting
             currentState.isCancellable = submittingState.isCancellable
             currentState.isReady = true
+            currentState.isAwaitingNativeAlternativePaymentCapture = false
+            self.state = .paymentProcessing(currentState)
+        case .awaitingCapture(let awaitingCaptureState):
+            currentState.submission = .submitting
+            currentState.isCancellable = awaitingCaptureState.isCancellable
+            currentState.isReady = true
+            currentState.isAwaitingNativeAlternativePaymentCapture = true
             self.state = .paymentProcessing(currentState)
         case .submitted, .captured:
             setSuccessState()
