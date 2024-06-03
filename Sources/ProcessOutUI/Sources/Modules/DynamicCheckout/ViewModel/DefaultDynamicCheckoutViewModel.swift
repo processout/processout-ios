@@ -80,7 +80,6 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     private func updateWithStartingState() {
         let section = DynamicCheckoutViewModelSection(
             id: SectionId.default,
-            title: nil,
             items: [.progress],
             areSeparatorsVisible: false,
             areBezelsVisible: false
@@ -118,7 +117,6 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         }
         let regularSection = DynamicCheckoutViewModelSection(
             id: SectionId.regularMethods,
-            title: nil,
             items: regularItems,
             areSeparatorsVisible: true,
             areBezelsVisible: true
@@ -137,7 +135,6 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         }
         let section = DynamicCheckoutViewModelSection(
             id: SectionId.expressMethods,
-            title: String(resource: .DynamicCheckout.Section.expressMethods),
             items: expressItems,
             areSeparatorsVisible: false,
             areBezelsVisible: true
@@ -334,7 +331,6 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         }
         let regularSection = DynamicCheckoutViewModelSection(
             id: SectionId.regularMethods,
-            title: nil,
             items: regularItems.compactMap { $0 },
             areSeparatorsVisible: true,
             areBezelsVisible: true
@@ -436,7 +432,6 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         )
         let section = DynamicCheckoutViewModelSection(
             id: SectionId.default,
-            title: nil,
             items: [.success(item)],
             areSeparatorsVisible: false,
             areBezelsVisible: false

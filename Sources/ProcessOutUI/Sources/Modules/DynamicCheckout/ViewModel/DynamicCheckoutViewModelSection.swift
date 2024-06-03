@@ -10,9 +10,6 @@ struct DynamicCheckoutViewModelSection: Identifiable {
     /// Section ID.
     let id: String
 
-    /// Section title.
-    let title: String?
-
     /// Items.
     let items: [DynamicCheckoutViewModelItem]
 
@@ -31,6 +28,6 @@ extension DynamicCheckoutViewModelSection {
     /// - NOTE: When this property changes view should be updated with
     /// explicit animation.
     var animationIdentity: AnyHashable {
-        [id, title, items.map(\.id), AnyHashable(areSeparatorsVisible), AnyHashable(areBezelsVisible)]
+        [id, items.map(\.id), AnyHashable(areSeparatorsVisible), AnyHashable(areBezelsVisible)]
     }
 }

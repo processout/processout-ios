@@ -17,7 +17,7 @@ struct DynamicCheckoutPaymentInfoItemView: View {
         VStack(spacing: 0) {
             HStack(spacing: POSpacing.small) {
                 POAsyncImage(resource: item.iconImageResource) {
-                    Color(item.brandColor).frame(width: 24, height: 24)
+                    style.subsection.title.color.frame(width: 24, height: 24)
                 }
                 Text(item.title)
                     .lineLimit(1)

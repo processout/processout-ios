@@ -18,18 +18,8 @@ struct DynamicCheckoutContentView: View {
 
     var body: some View {
         VStack(spacing: POSpacing.small) {
-            let sections = Array(
-                sections.enumerated()
-            )
-            ForEach(sections, id: \.element.id) { offset, element in
-                DynamicCheckoutSectionView(section: element)
-                    .frame(maxWidth: .infinity)
-                if offset + 1 < sections.count {
-                    POLabeledDivider(
-                        title: String(resource: .DynamicCheckout.Section.divider)
-                    )
-                    .labeledDividerStyle(style.section.divider)
-                }
+            ForEach(sections) { section in
+                DynamicCheckoutSectionView(section: section).frame(maxWidth: .infinity)
             }
         }
         .padding(POSpacing.medium)

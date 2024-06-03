@@ -17,7 +17,8 @@ extension View {
     }
 
     /// Applies border of a given style to view.
-    func border(style: POBorderStyle) -> some View {
+    @_spi(PO)
+    public func border(style: POBorderStyle) -> some View {
         border(RoundedRectangle(cornerRadius: style.radius), style: style)
     }
 }

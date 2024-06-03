@@ -19,7 +19,7 @@ extension POCardTokenizationStyle {
         errorDescription = style.errorText
         backgroundColor = style.backgroundColor
         actionsContainer = style.actionsContainer
-        separatorColor = style.section.divider.color
+        separatorColor = POCardTokenizationStyle.default.separatorColor
     }
 }
 

@@ -34,15 +34,6 @@ extension POStringResource {
             static let cancel = POStringResource("dynamic-checkout.cancel-confirmation.cancel", comment: "")
         }
 
-        enum Section {
-
-            /// Express payment methods section title.
-            static let expressMethods = POStringResource("dynamic-checkout.express-methods", comment: "")
-
-            /// Text to use with divider separating different sections.
-            static let divider = POStringResource("dynamic-checkout.sections-divider", comment: "")
-        }
-
         /// Success message.
         static let successMessage = POStringResource("dynamic-checkout.success-message", comment: "")
 

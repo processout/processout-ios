@@ -34,9 +34,7 @@ extension PODynamicCheckoutStyle.Section {
 
     /// Default dynamic checkout section style.
     public static let `default` = PODynamicCheckoutStyle.Section(
-        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
-        border: POBorderStyle.regular(color: Color(poResource: .Text.muted)),
-        divider: .default
+        border: POBorderStyle.regular(color: Color(poResource: .Text.muted))
     )
 }
 

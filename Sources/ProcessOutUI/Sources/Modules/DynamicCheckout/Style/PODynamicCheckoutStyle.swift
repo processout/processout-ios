@@ -18,20 +18,12 @@ public struct PODynamicCheckoutStyle {
 
     public struct Section {
 
-        /// Section title style.
-        public let title: POTextStyle
-
         /// Section border style.
         public let border: POBorderStyle
 
-        /// Style to apply to divider separating different sections.
-        public var divider: POLabeledDividerStyle
-
         /// Creates section style instance.
-        public init(title: POTextStyle, border: POBorderStyle, divider: POLabeledDividerStyle) {
-            self.title = title
+        public init(border: POBorderStyle) {
             self.border = border
-            self.divider = divider
         }
     }
 
