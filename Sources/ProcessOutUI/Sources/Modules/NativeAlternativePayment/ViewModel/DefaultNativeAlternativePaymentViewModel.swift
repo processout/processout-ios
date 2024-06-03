@@ -172,7 +172,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             id: "captured",
             title: state.logoImage == nil ? state.paymentProviderName : nil,
             logoImage: state.logoImage,
-            message: String(resource: .NativeAlternativePayment.Success.message),
+            message: configuration.successMessage ?? String(resource: .NativeAlternativePayment.Success.message),
             image: UIImage(resource: .success),
             isCaptured: true,
             isProgressViewHidden: true

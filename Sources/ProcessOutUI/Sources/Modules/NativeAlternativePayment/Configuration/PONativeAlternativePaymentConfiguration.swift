@@ -35,7 +35,7 @@ public struct PONativeAlternativePaymentConfiguration {
     /// Custom title.
     public let title: String?
 
-    /// Custom success message to display user when payment completes.
+    /// Custom success message **markdown** to display user when payment completes.
     public let successMessage: String?
 
     /// Primary action text, such as "Pay".
