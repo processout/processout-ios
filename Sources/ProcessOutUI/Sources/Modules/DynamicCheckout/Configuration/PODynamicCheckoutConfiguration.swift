@@ -72,7 +72,7 @@ public struct PODynamicCheckoutConfiguration {
         passKitPaymentButtonType: PKPaymentButtonType = .plain,
         primaryButtonTitle: String? = nil,
         cancelButton: CancelButton? = nil,
-        allowsSkippingPaymentList: Bool,
+        allowsSkippingPaymentList: Bool = true,
         captureSuccess: CaptureSuccess? = .init()
     ) {
         self.invoiceId = invoiceId
