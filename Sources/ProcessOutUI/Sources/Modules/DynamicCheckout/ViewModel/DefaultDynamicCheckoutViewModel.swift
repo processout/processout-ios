@@ -368,6 +368,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             assertionFailure("Unable to resolve payment method by ID")
             return nil
         }
+        // todo(andrii-vysotskyi): move submit button to dynamic checkout/card content 
         switch method {
         case .nativeAlternativePayment:
             guard let interactor = state.nativeAlternativePaymentInteractor else {
