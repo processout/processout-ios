@@ -526,22 +526,25 @@ final class DynamicCheckoutDefaultInteractor:
             setFailureStateUnchecked(error: failure)
             return
         }
-        var startedState = processingState.snapshot
+        var newStartedState = processingState.snapshot
         if failure.code != .cancelled {
-            var unavailableIds: Set<String>
             switch currentPaymentMethod(state: processingState) {
             case .nativeAlternativePayment:
-                unavailableIds = paymentMethodIds(of: .nativeAlternativePayment, state: processingState.snapshot)
+                var pendingUnavailableIds = paymentMethodIds(
+                    of: .nativeAlternativePayment, state: processingState.snapshot
+                )
+                pendingUnavailableIds.remove(processingState.paymentMethodId)
+                newStartedState.pendingUnavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
+                newStartedState.unavailablePaymentMethodIds.insert(processingState.paymentMethodId)
             case .card where .generic(.cardFailed3DS) == failure.code:
-                unavailableIds = paymentMethodIds(of: .card, state: processingState.snapshot)
+                let unavailableIds = paymentMethodIds(of: .card, state: processingState.snapshot)
+                newStartedState.unavailablePaymentMethodIds.formUnion(unavailableIds)
             default:
-                unavailableIds = []
+                break
             }
-            startedState.pendingUnavailablePaymentMethodIds.subtract(unavailableIds)
-            startedState.unavailablePaymentMethodIds.formUnion(unavailableIds)
+            newStartedState.recentErrorDescription = String(resource: .DynamicCheckout.Error.generic)
         }
-        self.state = .started(startedState)
-        // todo(andrii-vysotskyi): communicate error to user
+        self.state = .started(newStartedState)
     }
 
     // MARK: - Failure State
