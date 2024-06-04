@@ -5,8 +5,13 @@
 //  Created by Andrii Vysotskyi on 03.06.2024.
 //
 
+import Foundation
+
 @_spi(PO)
-public struct POMessage {
+public struct POMessage: Identifiable {
+
+    /// Message ID.
+    public let id: String
 
     /// Message text.
     public let text: String
@@ -14,7 +19,8 @@ public struct POMessage {
     /// Severity
     public let severity: POMessageSeverity
 
-    public init(text: String, severity: POMessageSeverity = .error) {
+    public init(id: String = UUID().uuidString, text: String, severity: POMessageSeverity = .error) {
+        self.id = id
         self.text = text
         self.severity = severity
     }

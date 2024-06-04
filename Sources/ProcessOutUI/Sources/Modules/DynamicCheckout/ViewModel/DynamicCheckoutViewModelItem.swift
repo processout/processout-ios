@@ -8,6 +8,7 @@
 import SwiftUI
 import PassKit
 import ProcessOut
+@_spi(PO) import ProcessOutCoreUI
 
 enum DynamicCheckoutViewModelItem {
 
@@ -117,6 +118,9 @@ enum DynamicCheckoutViewModelItem {
     /// Native alternative payment collection item.
     case alternativePayment(AlternativePayment)
 
+    /// Info message.
+    case message(POMessage)
+
     /// Success item.
     case success(Success)
 }
@@ -136,6 +140,8 @@ extension DynamicCheckoutViewModelItem: Identifiable {
         case .card(let item):
             return item.id
         case .alternativePayment(let item):
+            return item.id
+        case .message(let item):
             return item.id
         case .success(let item):
             return item.id

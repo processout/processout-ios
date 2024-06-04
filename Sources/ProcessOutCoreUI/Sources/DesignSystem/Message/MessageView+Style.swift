@@ -12,7 +12,7 @@ extension View {
     /// Sets the style for picker views within this view.
     @_spi(PO)
     @available(iOS 14.0, *)
-    public func messageViewStyle<Style: POMessageViewStyle>(_ style: Style) -> some View {
+    public func messageViewStyle(_ style: any POMessageViewStyle) -> some View {
         environment(\.messageViewStyle, AnyMessageViewStyle(erasing: style))
     }
 }
