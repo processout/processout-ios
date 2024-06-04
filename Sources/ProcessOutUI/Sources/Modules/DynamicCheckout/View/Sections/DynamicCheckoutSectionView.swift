@@ -14,21 +14,18 @@ struct DynamicCheckoutSectionView: View {
     let section: DynamicCheckoutViewModelSection
 
     var body: some View {
-        VStack(spacing: 0) {
-            VStack(spacing: section.areSeparatorsVisible ? 0 : POSpacing.small) {
-                let items = Array(
-                    section.items.enumerated()
-                )
-                ForEach(items, id: \.element.id) { offset, element in
-                    DynamicCheckoutItemView(item: element)
-                    if section.areSeparatorsVisible, offset + 1 < items.count {
-                        Divider()
-                            .frame(height: 1)
-                            .overlay(style.subsection.dividerColor)
-                    }
+        VStack(spacing: section.areSeparatorsVisible ? 0 : POSpacing.small) {
+            let items = Array(
+                section.items.enumerated()
+            )
+            ForEach(items, id: \.element.id) { offset, element in
+                DynamicCheckoutItemView(item: element)
+                if section.areSeparatorsVisible, offset + 1 < items.count {
+                    Divider()
+                        .frame(height: 1)
+                        .overlay(style.subsection.dividerColor)
                 }
             }
-            .padding(section.areSeparatorsVisible ? 0 : POSpacing.medium)
         }
         .border(style: section.areBezelsVisible ? style.section.border : .clear)
         .backport.geometryGroup()

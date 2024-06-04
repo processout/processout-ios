@@ -17,12 +17,14 @@ struct DynamicCheckoutContentView: View {
     // MARK: - View
 
     var body: some View {
-        VStack(spacing: POSpacing.small) {
+        VStack(spacing: POSpacing.large) {
             ForEach(sections) { section in
                 DynamicCheckoutSectionView(section: section).frame(maxWidth: .infinity)
             }
         }
-        .padding(POSpacing.medium)
+        .padding(
+            .init(top: POSpacing.large, leading: POSpacing.medium, bottom: POSpacing.medium, trailing: POSpacing.medium)
+        )
         .frame(maxWidth: .infinity)
         .backport.geometryGroup()
     }
