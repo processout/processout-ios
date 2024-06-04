@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// The properties of a message view instance.
 public struct POMessageViewStyleConfiguration {
 
     /// A view that describes the message text.

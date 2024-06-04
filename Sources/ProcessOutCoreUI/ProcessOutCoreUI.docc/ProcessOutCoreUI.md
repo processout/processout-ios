@@ -21,6 +21,7 @@
 - ``POButtonStyle/secondary``
 - ``POBrandButtonStyle``
 - ``POBrandButtonStyle/brand``
+- ``POPassKitPaymentButtonStyle``
 
 ### Radio Button
 
@@ -39,6 +40,9 @@
 - ``POInputStyle``
 - ``POInputStateStyle``
 
-### Divider
+### Message
 
-- ``POLabeledDividerStyle``
+- ``POMessageViewStyle``
+- ``POMessageViewStyleConfiguration``
+- ``POMessageSeverity``
+- ``POToastMessageStyle``

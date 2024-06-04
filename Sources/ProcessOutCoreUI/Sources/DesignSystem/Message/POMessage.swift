@@ -20,6 +20,7 @@ public struct POMessage {
     }
 }
 
+/// Message severity.
 public enum POMessageSeverity {
 
     /// An error.
