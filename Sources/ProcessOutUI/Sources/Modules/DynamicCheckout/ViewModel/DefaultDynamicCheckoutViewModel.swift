@@ -127,8 +127,12 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     private func createExpressMethodsSection(
         state: DynamicCheckoutInteractorState.Started
     ) -> DynamicCheckoutViewModelSection? {
-        let expressItems = state.expressPaymentMethodIds.compactMap { methodId in
+        var expressItems = state.expressPaymentMethodIds.compactMap { methodId in
             createItem(paymentMethodId: methodId, state: state, isExpress: true, isSelected: false, isLoading: false)
+        }
+        if let description = state.recentErrorDescription {
+            let item = POMessage(id: description, text: description, severity: .error)
+            expressItems.insert(.message(item), at: 0)
         }
         guard !expressItems.isEmpty else {
             return nil
