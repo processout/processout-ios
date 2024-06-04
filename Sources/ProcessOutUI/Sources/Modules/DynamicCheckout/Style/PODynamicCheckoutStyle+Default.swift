@@ -23,6 +23,7 @@ extension PODynamicCheckoutStyle {
         errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
         passKitPaymentButtonStyle: POPassKitPaymentButtonStyle(),
         expressPaymentButtonStyle: .brand,
+        message: .toast,
         backgroundColor: Color(poResource: .Surface.level1),
         success: .default,
         actionsContainer: .default

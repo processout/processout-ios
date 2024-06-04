@@ -91,6 +91,9 @@ public struct PODynamicCheckoutStyle {
     /// equals to `POBrandButtonStyle.brand`.
     public let expressPaymentButtonStyle: any ButtonStyle
 
+    /// Informational message style.
+    public let message: any POMessageViewStyle
+
     /// Background color.
     public let backgroundColor: Color
 
@@ -112,6 +115,7 @@ public struct PODynamicCheckoutStyle {
         errorText: POTextStyle,
         passKitPaymentButtonStyle: POPassKitPaymentButtonStyle,
         expressPaymentButtonStyle: any ButtonStyle,
+        message: some POMessageViewStyle,
         backgroundColor: Color,
         success: Success,
         actionsContainer: POActionsContainerStyle
@@ -126,6 +130,7 @@ public struct PODynamicCheckoutStyle {
         self.errorText = errorText
         self.passKitPaymentButtonStyle = passKitPaymentButtonStyle
         self.expressPaymentButtonStyle = expressPaymentButtonStyle
+        self.message = message
         self.backgroundColor = backgroundColor
         self.success = success
         self.actionsContainer = actionsContainer
