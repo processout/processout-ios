@@ -282,16 +282,22 @@ final class DynamicCheckoutDefaultInteractor:
         }
     }
 
+    // MARK: - Started State
+
+    private func setStartedStateAfterSelectionFailure(startedState: State.Started) {
+        var newState = startedState
+        newState.unavailablePaymentMethodIds.formUnion(startedState.pendingUnavailablePaymentMethodIds)
+        newState.pendingUnavailablePaymentMethodIds = []
+        newState.recentErrorDescription = String(resource: .DynamicCheckout.Error.unavailableMethod)
+        state = .started(newState)
+    }
+
     // MARK: - Selected State
 
     private func setSelectedStateUnchecked(methodId: String, startedState: State.Started) {
         _ = paymentMethod(withId: methodId, state: startedState)
         if startedState.pendingUnavailablePaymentMethodIds.contains(methodId) {
-            var newState = startedState
-            newState.unavailablePaymentMethodIds.formUnion(newState.pendingUnavailablePaymentMethodIds)
-            newState.pendingUnavailablePaymentMethodIds.removeAll()
-            newState.recentErrorDescription = String(resource: .DynamicCheckout.Error.unavailableMethod)
-            state = .started(newState)
+            setStartedStateAfterSelectionFailure(startedState: startedState)
         } else if !startedState.unavailablePaymentMethodIds.contains(methodId) {
             var newStartedState = startedState
             newStartedState.recentErrorDescription = nil
@@ -306,17 +312,12 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Payment Processing
 
     private func setPaymentProcessingUnchecked(methodId: String, startedState: State.Started) {
-        _ = paymentMethod(withId: methodId, state: startedState)
         if startedState.pendingUnavailablePaymentMethodIds.contains(methodId) {
-            var newState = startedState
-            newState.unavailablePaymentMethodIds.formUnion(newState.pendingUnavailablePaymentMethodIds)
-            newState.pendingUnavailablePaymentMethodIds.removeAll()
-            newState.recentErrorDescription = String(resource: .DynamicCheckout.Error.unavailableMethod)
-            state = .started(newState)
+            setStartedStateAfterSelectionFailure(startedState: startedState)
         } else if !startedState.unavailablePaymentMethodIds.contains(methodId) {
             var newStartedState = startedState
             newStartedState.recentErrorDescription = nil
-            switch paymentMethod(withId: methodId, state: newStartedState) {
+            switch paymentMethod(withId: methodId, state: startedState) {
             case .applePay:
                 startPassKitPayment(methodId: methodId, startedState: newStartedState)
             case .card(let method):
