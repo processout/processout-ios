@@ -293,7 +293,9 @@ final class DynamicCheckoutDefaultInteractor:
             newState.recentErrorDescription = String(resource: .DynamicCheckout.Error.unavailableMethod)
             state = .started(newState)
         } else if !startedState.unavailablePaymentMethodIds.contains(methodId) {
-            let newState = State.Selected(snapshot: startedState, paymentMethodId: methodId)
+            var newStartedState = startedState
+            newStartedState.recentErrorDescription = nil
+            let newState = State.Selected(snapshot: newStartedState, paymentMethodId: methodId)
             state = .selected(newState)
             delegate?.dynamicCheckout(didEmitEvent: .didSelectPaymentMethod)
         } else {
@@ -312,15 +314,17 @@ final class DynamicCheckoutDefaultInteractor:
             newState.recentErrorDescription = String(resource: .DynamicCheckout.Error.unavailableMethod)
             state = .started(newState)
         } else if !startedState.unavailablePaymentMethodIds.contains(methodId) {
-            switch paymentMethod(withId: methodId, state: startedState) {
+            var newStartedState = startedState
+            newStartedState.recentErrorDescription = nil
+            switch paymentMethod(withId: methodId, state: newStartedState) {
             case .applePay:
-                startPassKitPayment(methodId: methodId, startedState: startedState)
+                startPassKitPayment(methodId: methodId, startedState: newStartedState)
             case .card(let method):
-                startCardPayment(method: method, startedState: startedState)
+                startCardPayment(method: method, startedState: newStartedState)
             case .alternativePayment(let method):
-                startAlternativePayment(method: method, startedState: startedState)
+                startAlternativePayment(method: method, startedState: newStartedState)
             case .nativeAlternativePayment(let method):
-                startNativeAlternativePayment(method: method, startedState: startedState)
+                startNativeAlternativePayment(method: method, startedState: newStartedState)
             default:
                 preconditionFailure("Attempted to start unknown payment method")
             }
