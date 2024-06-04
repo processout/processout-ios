@@ -34,6 +34,12 @@ extension POStringResource {
             static let cancel = POStringResource("dynamic-checkout.cancel-confirmation.cancel", comment: "")
         }
 
+        enum Error {
+
+            /// Indicates that selected payment method is not available.
+            static let unavailableMethod = POStringResource("dynamic-checkout.error.unavailable-method", comment: "")
+        }
+
         /// Success message.
         static let successMessage = POStringResource("dynamic-checkout.success-message", comment: "")
 

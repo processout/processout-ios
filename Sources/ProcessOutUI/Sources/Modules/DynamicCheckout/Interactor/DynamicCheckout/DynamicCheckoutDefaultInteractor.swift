@@ -290,7 +290,8 @@ final class DynamicCheckoutDefaultInteractor:
             var newState = startedState
             newState.unavailablePaymentMethodIds.formUnion(newState.pendingUnavailablePaymentMethodIds)
             newState.pendingUnavailablePaymentMethodIds.removeAll()
-            state = .started(newState) // todo(andrii-vysotskyi): inform user why selection didn't occur
+            newState.recentErrorDescription = String(resource: .DynamicCheckout.Error.unavailableMethod)
+            state = .started(newState)
         } else if !startedState.unavailablePaymentMethodIds.contains(methodId) {
             let newState = State.Selected(snapshot: startedState, paymentMethodId: methodId)
             state = .selected(newState)
@@ -308,7 +309,8 @@ final class DynamicCheckoutDefaultInteractor:
             var newState = startedState
             newState.unavailablePaymentMethodIds.formUnion(newState.pendingUnavailablePaymentMethodIds)
             newState.pendingUnavailablePaymentMethodIds.removeAll()
-            state = .started(newState) // todo(andrii-vysotskyi): inform user why selection didn't occur
+            newState.recentErrorDescription = String(resource: .DynamicCheckout.Error.unavailableMethod)
+            state = .started(newState)
         } else if !startedState.unavailablePaymentMethodIds.contains(methodId) {
             switch paymentMethod(withId: methodId, state: startedState) {
             case .applePay:
@@ -520,7 +522,6 @@ final class DynamicCheckoutDefaultInteractor:
             return
         }
         var startedState = processingState.snapshot
-        startedState.pendingUnavailablePaymentMethodIds.formUnion(processingState.pendingUnavailablePaymentMethodIds)
         if failure.code != .cancelled {
             var unavailableIds: Set<String>
             switch currentPaymentMethod(state: processingState) {
@@ -670,7 +671,7 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
         }
         var unavailableIds = paymentMethodIds(of: .nativeAlternativePayment, state: currentState.snapshot)
         unavailableIds.remove(currentState.paymentMethodId)
-        currentState.pendingUnavailablePaymentMethodIds.formUnion(unavailableIds)
+        currentState.snapshot.pendingUnavailablePaymentMethodIds.formUnion(unavailableIds)
         state = .paymentProcessing(currentState)
     }
 }
