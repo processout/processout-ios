@@ -37,6 +37,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
 
     public enum SectionId {
         static let `default` = "Default"
+        static let error = "Error"
         static let expressMethods = "ExpressMethods"
         static let regularMethods = "RegularMethods"
     }
@@ -108,7 +109,10 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     private func createSectionsWithStartedState(
         _ state: DynamicCheckoutInteractorState.Started, selectedMethodId: String?
     ) -> [DynamicCheckoutViewModelSection] {
-        let expressSection = createExpressMethodsSection(state: state)
+        var sections = [
+            createErrorSection(state: state),
+            createExpressMethodsSection(state: state)
+        ]
         let regularItems = state.regularPaymentMethodIds.compactMap { methodId in
             let isSelected = selectedMethodId == methodId
             return createItem(
@@ -121,18 +125,29 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areSeparatorsVisible: true,
             areBezelsVisible: true
         )
-        return [expressSection, regularSection].compactMap { $0 }
+        sections.append(regularSection)
+        return sections.compactMap { $0 }
+    }
+
+    private func createErrorSection(state: DynamicCheckoutInteractorState.Started) -> DynamicCheckoutViewModelSection? {
+        guard let description = state.recentErrorDescription else {
+            return nil
+        }
+        let item = POMessage(id: description, text: description, severity: .error)
+        let section = DynamicCheckoutViewModelSection(
+            id: SectionId.error,
+            items: [.message(item)],
+            areSeparatorsVisible: false,
+            areBezelsVisible: false
+        )
+        return section
     }
 
     private func createExpressMethodsSection(
         state: DynamicCheckoutInteractorState.Started
     ) -> DynamicCheckoutViewModelSection? {
-        var expressItems = state.expressPaymentMethodIds.compactMap { methodId in
+        let expressItems = state.expressPaymentMethodIds.compactMap { methodId in
             createItem(paymentMethodId: methodId, state: state, isExpress: true, isSelected: false, isLoading: false)
-        }
-        if let description = state.recentErrorDescription {
-            let item = POMessage(id: description, text: description, severity: .error)
-            expressItems.insert(.message(item), at: 0)
         }
         guard !expressItems.isEmpty else {
             return nil
@@ -141,7 +156,7 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             id: SectionId.expressMethods,
             items: expressItems,
             areSeparatorsVisible: false,
-            areBezelsVisible: true
+            areBezelsVisible: false
         )
         return section
     }
@@ -317,7 +332,10 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
     private func createSectionsWithPaymentProcessingState(
         _ state: DynamicCheckoutInteractorState.PaymentProcessing
     ) -> [DynamicCheckoutViewModelSection] {
-        let expressSection = createExpressMethodsSection(state: state.snapshot)
+        var sections = [
+            createErrorSection(state: state.snapshot),
+            createExpressMethodsSection(state: state.snapshot)
+        ]
         let regularItems = state.snapshot.regularPaymentMethodIds.flatMap { methodId in
             let isSelected = state.paymentMethodId == methodId
             let item = createItem(
@@ -339,7 +357,8 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
             areSeparatorsVisible: true,
             areBezelsVisible: true
         )
-        return [expressSection, regularSection].compactMap { $0 }
+        sections.append(regularSection)
+        return sections.compactMap { $0 }
     }
 
     private func createProcessedItemContent(
