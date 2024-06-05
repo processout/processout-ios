@@ -45,7 +45,7 @@ public struct POToastMessageStyle: POMessageViewStyle {
                 style.icon?.foregroundColor(style.text.color)
             }
         )
-        .padding(POSpacing.small)
+        .padding(POSpacing.medium)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(style.backgroundColor)
         .border(style: style.border)
