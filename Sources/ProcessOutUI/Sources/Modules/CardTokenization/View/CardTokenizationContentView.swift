@@ -9,9 +9,9 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14.0, *)
-struct CardTokenizationContentView<ViewModel: CardTokenizationViewModel>: View {
+struct CardTokenizationContentView: View {
 
-    init(viewModel: ViewModel, horizontalPadding: CGFloat = POSpacing.large) {
+    init(viewModel: AnyViewModel<CardTokenizationViewModelState>, horizontalPadding: CGFloat = POSpacing.large) {
         self.viewModel = viewModel
         self.horizontalPadding = horizontalPadding
     }
@@ -53,7 +53,7 @@ struct CardTokenizationContentView<ViewModel: CardTokenizationViewModel>: View {
     private var style
 
     @ObservedObject
-    private var viewModel: ViewModel
+    private var viewModel: AnyViewModel<CardTokenizationViewModelState>
 
     // MARK: - Private Methods
 

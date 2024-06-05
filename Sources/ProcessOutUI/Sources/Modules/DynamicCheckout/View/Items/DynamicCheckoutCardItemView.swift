@@ -28,5 +28,5 @@ struct DynamicCheckoutCardItemView: View {
     private var style
 
     @StateObject
-    private var viewModel: AnyCardTokenizationViewModel
+    private var viewModel: AnyViewModel<CardTokenizationViewModelState>
 }

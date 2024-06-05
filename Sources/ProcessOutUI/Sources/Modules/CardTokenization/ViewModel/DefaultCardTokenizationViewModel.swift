@@ -11,7 +11,7 @@ import SwiftUI
 
 // swiftlint:disable type_body_length file_length
 
-final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
+final class DefaultCardTokenizationViewModel: ViewModel {
 
     init(interactor: any CardTokenizationInteractor) {
         self.interactor = interactor

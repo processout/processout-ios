@@ -390,7 +390,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             }
             let item = DynamicCheckoutViewModelItem.Card(id: "content_" + methodId) {
                 let viewModel = DefaultCardTokenizationViewModel(interactor: interactor)
-                return AnyCardTokenizationViewModel(erasing: viewModel)
+                return AnyViewModel(erasing: viewModel)
             }
             return .card(item)
         default:

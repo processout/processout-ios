@@ -12,7 +12,7 @@ import SwiftUI
 @available(iOS 14, *)
 public struct POCardTokenizationView: View {
 
-    init(viewModel: @autoclosure @escaping () -> some CardTokenizationViewModel) {
+    init(viewModel: @autoclosure @escaping () -> some ViewModel<CardTokenizationViewModelState>) {
         self._viewModel = .init(wrappedValue: .init(erasing: viewModel()))
     }
 
@@ -39,5 +39,5 @@ public struct POCardTokenizationView: View {
     private var style
 
     @StateObject
-    private var viewModel: AnyCardTokenizationViewModel
+    private var viewModel: AnyViewModel<CardTokenizationViewModelState>
 }

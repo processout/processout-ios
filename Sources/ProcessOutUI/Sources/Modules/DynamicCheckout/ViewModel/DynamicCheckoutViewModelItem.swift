@@ -85,7 +85,7 @@ enum DynamicCheckoutViewModelItem {
         let id: AnyHashable
 
         /// Creates card tokenization view model.
-        let viewModel: () -> AnyCardTokenizationViewModel
+        let viewModel: () -> AnyViewModel<CardTokenizationViewModelState>
     }
 
     struct Success: Identifiable {
