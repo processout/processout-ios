@@ -1,22 +1,22 @@
 //
-//  AnyDynamicCheckoutViewModel.swift
+//  AnyViewModel.swift
 //  ProcessOutUI
 //
-//  Created by Andrii Vysotskyi on 15.05.2024.
+//  Created by Andrii Vysotskyi on 05.06.2024.
 //
 
 import Combine
 
-final class AnyDynamicCheckoutViewModel: DynamicCheckoutViewModel {
+final class AnyViewModel<State>: ViewModel {
 
-    init(erasing viewModel: some DynamicCheckoutViewModel) {
+    init(erasing viewModel: some ViewModel<State>) {
         self.base = viewModel
         cancellable = viewModel.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
         }
     }
 
-    let base: any DynamicCheckoutViewModel
+    let base: any ViewModel<State>
 
     // MARK: - CardTokenizationViewModel
 
@@ -24,7 +24,7 @@ final class AnyDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         base.start()
     }
 
-    var state: DynamicCheckoutViewModelState {
+    var state: State {
         get { base.state }
         set { base.state = newValue }
     }

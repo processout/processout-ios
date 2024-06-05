@@ -12,7 +12,7 @@ import SwiftUI
 
 // swiftlint:disable type_body_length file_length
 
-final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
+final class DefaultDynamicCheckoutViewModel: ViewModel {
 
     init(interactor: some DynamicCheckoutInteractor) {
         self.interactor = interactor

@@ -13,7 +13,7 @@ import SwiftUI
 @available(iOS 14, *)
 public struct PODynamicCheckoutView: View {
 
-    init(viewModel: @autoclosure @escaping () -> some DynamicCheckoutViewModel) {
+    init(viewModel: @autoclosure @escaping () -> some ViewModel<DynamicCheckoutViewModelState>) {
         self._viewModel = .init(wrappedValue: .init(erasing: viewModel()))
     }
 
@@ -43,7 +43,7 @@ public struct PODynamicCheckoutView: View {
     // MARK: - Private Properties
 
     @StateObject
-    private var viewModel: AnyDynamicCheckoutViewModel
+    private var viewModel: AnyViewModel<DynamicCheckoutViewModelState>
 
     @Environment(\.dynamicCheckoutStyle)
     private var style
