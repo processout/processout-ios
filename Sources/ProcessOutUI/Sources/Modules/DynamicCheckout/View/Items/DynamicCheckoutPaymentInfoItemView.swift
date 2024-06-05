@@ -22,6 +22,7 @@ struct DynamicCheckoutPaymentInfoItemView: View {
                 Text(item.title)
                     .lineLimit(1)
                     .textStyle(style.subsection.title)
+                    .padding(.vertical, POSpacing.medium)
                 Spacer()
                 if item.isLoading {
                     ProgressView()
@@ -41,7 +42,6 @@ struct DynamicCheckoutPaymentInfoItemView: View {
                 .animation(.default, value: item.isSelectable)
             }
             .animation(.default, value: item.isLoading)
-            .padding(.vertical, 6) // Custom value to make sure that total padding is 16
             if let information = item.additionalInformation {
                 body(information: information)
             }
