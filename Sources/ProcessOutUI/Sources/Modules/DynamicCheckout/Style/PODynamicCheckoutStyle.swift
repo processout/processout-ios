@@ -35,13 +35,9 @@ public struct PODynamicCheckoutStyle {
         /// Information text style.
         public let informationText: POTextStyle
 
-        /// Divider color.
-        public let dividerColor: Color
-
-        public init(title: POTextStyle, informationText: POTextStyle, dividerColor: Color) {
+        public init(title: POTextStyle, informationText: POTextStyle) {
             self.title = title
             self.informationText = informationText
-            self.dividerColor = dividerColor
         }
     }
 
@@ -87,8 +83,8 @@ public struct PODynamicCheckoutStyle {
     /// PassKit payment button style.
     public let passKitPaymentButtonStyle: POPassKitPaymentButtonStyle
 
-    /// Generic express payment button style. When default style is used,
-    /// equals to `POBrandButtonStyle.brand`.
+    /// Generic express payment button style. When default style is used, equals to
+    /// `POBrandButtonStyle.brand` that automatically resolves styling based on branding.
     public let expressPaymentButtonStyle: any ButtonStyle
 
     /// Informational message style.

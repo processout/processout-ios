@@ -45,8 +45,7 @@ extension PODynamicCheckoutStyle.Subsection {
     /// Default dynamic checkout subsection style.
     public static let `default` = PODynamicCheckoutStyle.Subsection(
         title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
-        informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label),
-        dividerColor: Color(poResource: .Text.muted)
+        informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label)
     )
 }
 

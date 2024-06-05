@@ -39,6 +39,6 @@ extension PONativeAlternativePaymentStyle {
         message = POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body)
         successMessage = style.success.message
         background = .init(regular: style.backgroundColor, success: style.success.backgroundColor)
-        separatorColor = style.subsection.dividerColor
+        separatorColor = PONativeAlternativePaymentStyle.default.separatorColor
     }
 }

@@ -23,7 +23,7 @@ enum NativeAlternativePaymentViewModelItem {
         /// Item identifier.
         let id: AnyHashable
 
-        /// Availale options.
+        /// Available options.
         let options: [PickerOption]
 
         /// Currently selected option id.

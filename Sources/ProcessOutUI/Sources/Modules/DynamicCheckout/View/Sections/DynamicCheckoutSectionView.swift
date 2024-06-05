@@ -22,8 +22,8 @@ struct DynamicCheckoutSectionView: View {
                 DynamicCheckoutItemView(item: element)
                 if section.areSeparatorsVisible, offset + 1 < items.count {
                     Divider()
-                        .frame(height: 1)
-                        .overlay(style.subsection.dividerColor)
+                        .frame(height: style.section.border.width)
+                        .overlay(style.section.border.color)
                 }
             }
         }
