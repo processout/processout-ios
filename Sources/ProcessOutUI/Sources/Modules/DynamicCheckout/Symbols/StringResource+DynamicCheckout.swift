@@ -43,11 +43,17 @@ extension POStringResource {
             static let generic = POStringResource("dynamic-checkout.error.generic", comment: "")
         }
 
+        enum Warning {
+
+            /// APM redirect information.
+            static let redirect = POStringResource("dynamic-checkout.redirect-warning", comment: "")
+
+            /// Warns user that payment method is unavailable.
+            static let paymentUnavailable = POStringResource("dynamic-checkout.unavailable-warning", comment: "")
+        }
+
         /// Success message.
         static let successMessage = POStringResource("dynamic-checkout.success-message", comment: "")
-
-        /// APM redirect information.
-        static let redirectWarning = POStringResource("dynamic-checkout.redirect-warning", comment: "")
     }
 }
 

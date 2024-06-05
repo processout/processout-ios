@@ -254,9 +254,9 @@ final class DefaultDynamicCheckoutViewModel: DynamicCheckoutViewModel {
         }
         var additionalInformation: String?
         if !isSelectable {
-            additionalInformation = String(resource: .DynamicCheckout.Warning.redirect)
-        } else if isExternal {
             additionalInformation = String(resource: .DynamicCheckout.Warning.paymentUnavailable)
+        } else if isExternal {
+            additionalInformation = String(resource: .DynamicCheckout.Warning.redirect)
         }
         let item = DynamicCheckoutViewModelItem.PaymentInfo(
             id: id,
