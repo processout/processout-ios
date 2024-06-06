@@ -533,9 +533,14 @@ final class DynamicCheckoutDefaultInteractor:
                 var pendingUnavailableIds = paymentMethodIds(
                     of: .nativeAlternativePayment, state: processingState.snapshot
                 )
-                pendingUnavailableIds.remove(processingState.paymentMethodId)
-                newStartedState.pendingUnavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
-                newStartedState.unavailablePaymentMethodIds.insert(processingState.paymentMethodId)
+                if processingState.isReady {
+                    pendingUnavailableIds.remove(processingState.paymentMethodId)
+                    newStartedState.pendingUnavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
+                    newStartedState.unavailablePaymentMethodIds.insert(processingState.paymentMethodId)
+                } else {
+                    newStartedState.pendingUnavailablePaymentMethodIds.subtract(pendingUnavailableIds)
+                    newStartedState.unavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
+                }
             case .card where .generic(.cardFailed3DS) == failure.code:
                 let unavailableIds = paymentMethodIds(of: .card, state: processingState.snapshot)
                 newStartedState.unavailablePaymentMethodIds.formUnion(unavailableIds)
@@ -654,10 +659,10 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
 
     func nativeAlternativePaymentMethodDidEmitEvent(_ event: PONativeAlternativePaymentMethodEvent) {
         switch event {
-        case .didSubmitParameters, .didFailToSubmitParameters:
+        case .didSubmitParameters:
             updateUnavailablePaymentMethods()
         default:
-            return
+            break
         }
         delegate?.dynamicCheckout(didEmitAlternativePaymentEvent: event)
     }
