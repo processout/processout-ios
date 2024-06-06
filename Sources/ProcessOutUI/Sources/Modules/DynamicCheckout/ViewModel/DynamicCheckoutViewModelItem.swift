@@ -134,7 +134,7 @@ enum DynamicCheckoutViewModelItem {
     case success(Success)
 }
 
-extension DynamicCheckoutViewModelItem: Identifiable {
+extension DynamicCheckoutViewModelItem: Identifiable, AnimationIdentityProvider {
 
     var id: AnyHashable {
         switch self {

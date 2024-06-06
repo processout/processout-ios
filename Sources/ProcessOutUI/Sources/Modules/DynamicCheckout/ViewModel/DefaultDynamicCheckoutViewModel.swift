@@ -21,7 +21,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
 
     // MARK: - DynamicCheckoutViewModel
 
-    @Published
+    @AnimatablePublished
     var state: DynamicCheckoutViewModelState = .idle
 
     func start() {
@@ -82,8 +82,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         let section = DynamicCheckoutViewModelState.Section(
             id: SectionId.default, items: [.progress], isTight: false, areBezelsVisible: false
         )
-        let newState = DynamicCheckoutViewModelState(sections: [section], actions: [], isCompleted: false)
-        setState(newState)
+        state = DynamicCheckoutViewModelState(sections: [section], actions: [], isCompleted: false)
     }
 
     // MARK: - Started
@@ -97,7 +96,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             actions: newActions.compactMap { $0 },
             isCompleted: false
         )
-        setState(newState)
+        self.state = newState
     }
 
     private func createSectionsWithStartedState(
@@ -277,7 +276,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             actions: newActions.compactMap { $0 },
             isCompleted: false
         )
-        setState(newState)
+        self.state = newState
     }
 
     private func createSubmitAction(methodId: String, selectedMethodId: String?) -> POActionsContainerActionViewModel? {
@@ -308,7 +307,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             actions: newActions.compactMap { $0 },
             isCompleted: false
         )
-        setState(newState)
+        self.state = newState
     }
 
     private func createSectionsWithPaymentProcessingState(
@@ -441,8 +440,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         let section = DynamicCheckoutViewModelState.Section(
             id: SectionId.default, items: [.success(item)], isTight: false, areBezelsVisible: false
         )
-        let newState = DynamicCheckoutViewModelState(sections: [section], actions: [], isCompleted: true)
-        setState(newState)
+        state = DynamicCheckoutViewModelState(sections: [section], actions: [], isCompleted: true)
     }
 
     // MARK: - Utils
@@ -461,13 +459,6 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             }
         )
         return viewModel
-    }
-
-    private func setState(_ newState: DynamicCheckoutViewModelState) {
-        let isAnimated = newState.animationIdentity != state.animationIdentity
-        withAnimation(isAnimated ? .default : nil) {
-            state = newState
-        }
     }
 
     private func cancelCheckout(configuration: POConfirmationDialogConfiguration?) {

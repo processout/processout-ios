@@ -118,13 +118,8 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
     }
 }
 
-extension NativeAlternativePaymentViewModelSection {
+extension NativeAlternativePaymentViewModelSection: AnimationIdentityProvider {
 
-    /// Section's animation identity. For now only properties that may affect layout
-    /// changes are part of identity.
-    ///
-    /// - NOTE: When this property changes view should be updated with
-    /// explicit animation.
     var animationIdentity: AnyHashable {
         [id, items.map(animationValue), error]
     }

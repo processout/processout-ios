@@ -39,22 +39,16 @@ struct DynamicCheckoutViewModelState {
     var confirmationDialog: POConfirmationDialog?
 }
 
-// todo(andrii-vysotskyi): add protocol to avoid duplicating comment every time
-extension DynamicCheckoutViewModelState {
+extension DynamicCheckoutViewModelState: AnimationIdentityProvider {
 
-    static let idle = DynamicCheckoutViewModelState(sections: [], actions: [], isCompleted: false)
-
-    /// Section's animation identity. For now only properties that may affect layout
-    /// changes are part of identity.
-    ///
-    /// - NOTE: When this property changes view should be updated with
-    /// explicit animation.
     var animationIdentity: AnyHashable {
         [sections.map(\.animationIdentity), actions.map(\.id)]
     }
+
+    static let idle = DynamicCheckoutViewModelState(sections: [], actions: [], isCompleted: false)
 }
 
-extension DynamicCheckoutViewModelState.Section {
+extension DynamicCheckoutViewModelState.Section: AnimationIdentityProvider {
 
     var animationIdentity: AnyHashable {
         [id, items.map(\.animationIdentity), AnyHashable(isTight), AnyHashable(areBezelsVisible)]

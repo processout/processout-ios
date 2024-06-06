@@ -11,6 +11,7 @@ import SwiftUI
 
 // swiftlint:disable type_body_length file_length
 
+// todo(andrii-vysotskyi): migrate to AnimatablePublished
 final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentViewModel {
 
     init(interactor: any NativeAlternativePaymentInteractor) {
