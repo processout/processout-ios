@@ -25,7 +25,6 @@ public struct PODynamicCheckoutView: View {
                 DynamicCheckoutContentView(sections: viewModel.state.sections)
             }
             .clipped()
-            .backport.geometryGroup()
             POActionsContainerView(actions: viewModel.state.actions)
                 .actionsContainerStyle(style.actionsContainer)
         }
@@ -35,8 +34,8 @@ public struct PODynamicCheckoutView: View {
                 .ignoresSafeArea()
                 .animation(.default, value: viewModel.state.isCompleted)
         }
-        .onAppear(perform: viewModel.start)
         .backport.geometryGroup()
+        .onAppear(perform: viewModel.start)
         .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
     }
 
