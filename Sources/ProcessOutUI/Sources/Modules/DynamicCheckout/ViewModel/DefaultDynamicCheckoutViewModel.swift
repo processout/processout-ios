@@ -113,9 +113,11 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             guard let info = createPaymentInfo(id: methodId, isSelected: isSelected, isLoading: false, state: state) else {
                 return nil
             }
-            let submitButton = createSubmitAction(selectedMethodId: selectedMethodId)
             let payment = DynamicCheckoutViewModelItem.RegularPayment(
-                id: methodId, info: info, content: nil, submitButton: submitButton
+                id: methodId,
+                info: info,
+                content: nil,
+                submitButton: createSubmitAction(methodId: methodId, selectedMethodId: selectedMethodId)
             )
             return .regularPayment(payment)
         }
@@ -278,18 +280,18 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         setState(newState)
     }
 
-    private func createSubmitAction(selectedMethodId: String?) -> POActionsContainerActionViewModel? {
-        guard let selectedMethodId else {
+    private func createSubmitAction(methodId: String, selectedMethodId: String?) -> POActionsContainerActionViewModel? {
+        guard methodId == selectedMethodId else {
             return nil
         }
         let viewModel = POActionsContainerActionViewModel(
-            id: ButtonId.submit + selectedMethodId,
+            id: ButtonId.submit,
             title: interactor.configuration.primaryButtonTitle ?? String(resource: .DynamicCheckout.Button.continue),
             isEnabled: true,
             isLoading: false,
             isPrimary: true,
             action: { [weak self] in
-                self?.interactor.startPayment(methodId: selectedMethodId)
+                self?.interactor.startPayment(methodId: methodId)
             }
         )
         return viewModel
@@ -394,7 +396,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             isLoading = true
         }
         let viewModel = POActionsContainerActionViewModel(
-            id: ButtonId.submit + state.paymentMethodId,
+            id: ButtonId.submit,
             title: interactor.configuration.primaryButtonTitle ?? String(resource: .DynamicCheckout.Button.continue),
             isEnabled: isEnabled,
             isLoading: isLoading,

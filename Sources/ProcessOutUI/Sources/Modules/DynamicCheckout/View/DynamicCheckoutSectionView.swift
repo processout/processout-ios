@@ -25,8 +25,9 @@ struct DynamicCheckoutSectionView: View {
                     }
                     DynamicCheckoutItemView(item: item)
                         .padding(section.areBezelsVisible ? POSpacing.medium : 0)
-                        .background(style.backgroundColor)
                 }
+                .background(style.backgroundColor)
+                .backport.geometryGroup()
             }
         }
         .border(style: section.areBezelsVisible ? style.section.border : .clear)
