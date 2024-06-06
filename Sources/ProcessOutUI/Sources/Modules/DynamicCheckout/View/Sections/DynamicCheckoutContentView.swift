@@ -12,14 +12,15 @@ import SwiftUI
 @available(iOS 14, *)
 struct DynamicCheckoutContentView: View {
 
-    let sections: [DynamicCheckoutViewModelSection]
+    let sections: [DynamicCheckoutViewModelState.Section]
 
     // MARK: - View
 
     var body: some View {
         VStack(spacing: POSpacing.large) {
             ForEach(sections) { section in
-                DynamicCheckoutSectionView(section: section).frame(maxWidth: .infinity)
+                DynamicCheckoutSectionView(section: section)
+                    .frame(maxWidth: .infinity)
             }
         }
         .padding(

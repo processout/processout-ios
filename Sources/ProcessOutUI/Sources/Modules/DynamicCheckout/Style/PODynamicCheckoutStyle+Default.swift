@@ -14,7 +14,7 @@ extension PODynamicCheckoutStyle {
     /// Default dynamic checkout style.
     public static let `default` = PODynamicCheckoutStyle(
         section: .default,
-        subsection: .default,
+        paymentMethod: .default,
         progressView: .circular,
         inputTitle: POTextStyle(color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading),
         input: .medium,
@@ -40,10 +40,10 @@ extension PODynamicCheckoutStyle.Section {
 }
 
 @available(iOS 14, *)
-extension PODynamicCheckoutStyle.Subsection {
+extension PODynamicCheckoutStyle.PaymentMethod {
 
     /// Default dynamic checkout subsection style.
-    public static let `default` = PODynamicCheckoutStyle.Subsection(
+    public static let `default` = PODynamicCheckoutStyle.PaymentMethod(
         title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
         informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label)
     )

@@ -11,9 +11,9 @@ import SwiftUI
 @available(iOS 14, *)
 struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentViewModel>: View {
 
-    init(viewModel: ViewModel, horizontalPadding: CGFloat = POSpacing.large, shouldCenterParameters: Bool = true) {
+    init(viewModel: ViewModel, insets: EdgeInsets, shouldCenterParameters: Bool = true) {
         self.viewModel = viewModel
-        self.horizontalPadding = horizontalPadding
+        self.insets = insets
         self.shouldCenterParameters = shouldCenterParameters
     }
 
@@ -25,7 +25,9 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
                 let partition = sectionsPartition
                 ForEach(partition.top) { section in
                     NativeAlternativePaymentSectionView(
-                        section: section, horizontalPadding: horizontalPadding, focusedItemId: $viewModel.focusedItemId
+                        section: section,
+                        horizontalPadding: max(insets.leading, insets.trailing),
+                        focusedItemId: $viewModel.focusedItemId
                     )
                 }
                 if !partition.center.isEmpty {
@@ -33,7 +35,7 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
                         ForEach(partition.center) { section in
                             NativeAlternativePaymentSectionView(
                                 section: section,
-                                horizontalPadding: horizontalPadding,
+                                horizontalPadding: max(insets.leading, insets.trailing),
                                 focusedItemId: $viewModel.focusedItemId
                             )
                         }
@@ -45,7 +47,7 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
             .backport.onChange(of: viewModel.focusedItemId) {
                 scrollToFocusedInput(scrollView: scrollView)
             }
-            .padding(.vertical, POSpacing.medium)
+            .padding(EdgeInsets(top: insets.top, leading: 0, bottom: insets.bottom, trailing: 0))
             .frame(maxWidth: .infinity)
         }
         .backport.geometryGroup()
@@ -53,7 +55,7 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
 
     // MARK: - Private Properties
 
-    private let horizontalPadding: CGFloat
+    private let insets: EdgeInsets
     private let shouldCenterParameters: Bool
 
     @ObservedObject

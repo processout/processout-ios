@@ -11,9 +11,9 @@ import SwiftUI
 @available(iOS 14.0, *)
 struct CardTokenizationContentView: View {
 
-    init(viewModel: AnyViewModel<CardTokenizationViewModelState>, horizontalPadding: CGFloat = POSpacing.large) {
+    init(viewModel: AnyViewModel<CardTokenizationViewModelState>, insets: EdgeInsets) {
         self.viewModel = viewModel
-        self.horizontalPadding = horizontalPadding
+        self.insets = insets
     }
 
     // MARK: - View
@@ -24,7 +24,7 @@ struct CardTokenizationContentView: View {
                 if let title = viewModel.state.title {
                     Text(title)
                         .textStyle(style.title)
-                        .padding(.horizontal, horizontalPadding)
+                        .padding(EdgeInsets(top: 0, leading: insets.leading, bottom: 0, trailing: insets.trailing))
                     Divider()
                         .frame(height: 1)
                         .overlay(style.separatorColor)
@@ -34,12 +34,12 @@ struct CardTokenizationContentView: View {
                         section: section, focusedInputId: $viewModel.state.focusedInputId
                     )
                 }
-                .padding(.horizontal, horizontalPadding)
+                .padding(EdgeInsets(top: 0, leading: insets.leading, bottom: 0, trailing: insets.trailing))
             }
             .backport.onChange(of: viewModel.state.focusedInputId) {
                 scrollToFocusedInput(scrollView: scrollView)
             }
-            .padding(.vertical, POSpacing.medium)
+            .padding(EdgeInsets(top: insets.top, leading: 0, bottom: insets.bottom, trailing: 0))
             .frame(maxWidth: .infinity)
         }
         .backport.geometryGroup()
@@ -47,7 +47,7 @@ struct CardTokenizationContentView: View {
 
     // MARK: - Private Properties
 
-    private let horizontalPadding: CGFloat
+    private let insets: EdgeInsets
 
     @Environment(\.cardTokenizationStyle)
     private var style

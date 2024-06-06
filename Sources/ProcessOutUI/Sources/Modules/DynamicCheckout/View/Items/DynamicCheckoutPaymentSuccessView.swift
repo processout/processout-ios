@@ -1,5 +1,5 @@
 //
-//  DynamicCheckoutSuccessItemView.swift
+//  DynamicCheckoutPaymentSuccessView.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 09.05.2024.
@@ -9,7 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutSuccessItemView: View {
+struct DynamicCheckoutPaymentSuccessView: View {
 
     let item: DynamicCheckoutViewModelItem.Success
 

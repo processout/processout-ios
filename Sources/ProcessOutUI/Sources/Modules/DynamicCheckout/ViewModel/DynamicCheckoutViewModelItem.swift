@@ -42,10 +42,22 @@ enum DynamicCheckoutViewModelItem {
         let action: () -> Void
     }
 
-    struct PaymentInfo: Identifiable {
+    struct RegularPayment {
 
-        /// Item identifier.
+        /// Payment ID.
         let id: String
+
+        /// Payment info.
+        let info: RegularPaymentInfo
+
+        /// Payment content.
+        let content: RegularPaymentContent?
+
+        /// Submits payment information.
+        let submitButton: POActionsContainerActionViewModel?
+    }
+
+    struct RegularPaymentInfo {
 
         /// Payment icon image
         let iconImageResource: POImageRemoteResource
@@ -70,19 +82,22 @@ enum DynamicCheckoutViewModelItem {
         let additionalInformation: String?
     }
 
-    struct AlternativePayment: Identifiable {
+    enum RegularPaymentContent {
 
-        /// Alternative payment item ID.
-        let id: AnyHashable
+        /// Card payment content.
+        case card(Card)
+
+        /// Native alternative payment content.
+        case alternativePayment(AlternativePayment)
+    }
+
+    struct AlternativePayment {
 
         /// Creates alternative payment view model.
         let viewModel: () -> AnyNativeAlternativePaymentViewModel
     }
 
-    struct Card: Identifiable {
-
-        /// Card item ID.
-        let id: AnyHashable
+    struct Card {
 
         /// Creates card tokenization view model.
         let viewModel: () -> AnyViewModel<CardTokenizationViewModelState>
@@ -110,13 +125,7 @@ enum DynamicCheckoutViewModelItem {
     case expressPayment(ExpressPayment)
 
     /// Regular payment item info.
-    case payment(PaymentInfo)
-
-    /// Card collection item.
-    case card(Card)
-
-    /// Native alternative payment collection item.
-    case alternativePayment(AlternativePayment)
+    case regularPayment(RegularPayment)
 
     /// Info message.
     case message(POMessage)
@@ -135,16 +144,21 @@ extension DynamicCheckoutViewModelItem: Identifiable {
             return item.id
         case .expressPayment(let item):
             return item.id
-        case .payment(let item):
-            return item.id
-        case .card(let item):
-            return item.id
-        case .alternativePayment(let item):
+        case .regularPayment(let item):
             return item.id
         case .message(let item):
             return item.id
         case .success(let item):
             return item.id
+        }
+    }
+
+    var animationIdentity: AnyHashable {
+        switch self {
+        case .regularPayment(let item):
+            return [item.id, AnyHashable(item.content == nil), item.submitButton?.id]
+        default:
+            return self.id
         }
     }
 

@@ -27,7 +27,7 @@ public struct PODynamicCheckoutStyle {
         }
     }
 
-    public struct Subsection {
+    public struct PaymentMethod {
 
         /// Title style.
         public let title: POTextStyle
@@ -59,8 +59,8 @@ public struct PODynamicCheckoutStyle {
     /// Section style.
     public let section: Section
 
-    /// Payment options are organized in subsections within same section.
-    public let subsection: Subsection
+    /// Payment method info.
+    public let paymentMethod: PaymentMethod
 
     /// Progress view style.
     public let progressView: any ProgressViewStyle
@@ -102,7 +102,7 @@ public struct PODynamicCheckoutStyle {
     /// Creates dynamic checkout style.
     public init(
         section: PODynamicCheckoutStyle.Section,
-        subsection: PODynamicCheckoutStyle.Subsection,
+        paymentMethod: PODynamicCheckoutStyle.PaymentMethod,
         progressView: some ProgressViewStyle,
         inputTitle: POTextStyle,
         input: POInputStyle,
@@ -117,7 +117,7 @@ public struct PODynamicCheckoutStyle {
         actionsContainer: POActionsContainerStyle
     ) {
         self.section = section
-        self.subsection = subsection
+        self.paymentMethod = paymentMethod
         self.progressView = progressView
         self.inputTitle = inputTitle
         self.input = input

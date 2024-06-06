@@ -11,19 +11,21 @@ import SwiftUI
 @available(iOS 14, *)
 struct DynamicCheckoutSectionView: View {
 
-    let section: DynamicCheckoutViewModelSection
+    let section: DynamicCheckoutViewModelState.Section
 
     var body: some View {
-        VStack(spacing: section.areSeparatorsVisible ? 0 : POSpacing.small) {
-            let items = Array(
-                section.items.enumerated()
-            )
-            ForEach(items, id: \.element.id) { offset, element in
-                DynamicCheckoutItemView(item: element)
-                if section.areSeparatorsVisible, offset + 1 < items.count {
-                    Divider()
-                        .frame(height: style.section.border.width)
-                        .overlay(style.section.border.color)
+        VStack(spacing: section.isTight ? 0 : POSpacing.small) {
+            let items = Array(section.items.enumerated())
+            ForEach(items, id: \.element.id) { offset, item in
+                VStack(spacing: 0) {
+                    if section.areBezelsVisible, offset != 0 {
+                        Divider()
+                            .frame(height: style.section.border.width)
+                            .overlay(style.section.border.color)
+                    }
+                    DynamicCheckoutItemView(item: item)
+                        .padding(section.areBezelsVisible ? POSpacing.medium : 0)
+                        .background(style.backgroundColor)
                 }
             }
         }

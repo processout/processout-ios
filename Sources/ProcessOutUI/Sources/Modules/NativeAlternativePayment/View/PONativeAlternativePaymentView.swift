@@ -22,8 +22,11 @@ public struct PONativeAlternativePaymentView: View {
         VStack(spacing: 0) {
             GeometryReader { geometry in
                 ScrollView(showsIndicators: false) {
-                    NativeAlternativePaymentContentView(viewModel: viewModel)
-                        .frame(minHeight: geometry.size.height, alignment: .top)
+                    NativeAlternativePaymentContentView(
+                        viewModel: viewModel,
+                        insets: EdgeInsets(horizontal: POSpacing.large, vertical: POSpacing.medium)
+                    )
+                    .frame(minHeight: geometry.size.height, alignment: .top)
                 }
                 .clipped()
             }
