@@ -222,7 +222,6 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         let isAvailable = !state.unavailablePaymentMethodIds.contains(id)
         let item = DynamicCheckoutViewModelItem.RegularPaymentInfo(
             iconImageResource: display.logo,
-            brandColor: display.brandColor,
             title: display.name,
             isLoading: isLoading,
             isSelectable: isAvailable,
@@ -285,7 +284,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.submit,
-            title: interactor.configuration.primaryButtonTitle ?? String(resource: .DynamicCheckout.Button.continue),
+            title: interactor.configuration.primaryButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
             isEnabled: true,
             isLoading: false,
             isPrimary: true,
@@ -396,7 +395,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.submit,
-            title: interactor.configuration.primaryButtonTitle ?? String(resource: .DynamicCheckout.Button.continue),
+            title: interactor.configuration.primaryButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
             isEnabled: isEnabled,
             isLoading: isLoading,
             isPrimary: true,

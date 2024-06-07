@@ -62,9 +62,6 @@ enum DynamicCheckoutViewModelItem {
         /// Payment icon image
         let iconImageResource: POImageRemoteResource
 
-        /// Brand color.
-        let brandColor: UIColor
-
         /// Item title.
         let title: String
 
