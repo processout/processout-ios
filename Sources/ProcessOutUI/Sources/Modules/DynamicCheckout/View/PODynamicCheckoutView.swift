@@ -24,7 +24,6 @@ public struct PODynamicCheckoutView: View {
             GeometryReader { geometry in
                 ScrollView(showsIndicators: true) {
                     DynamicCheckoutContentView(sections: viewModel.state.sections)
-                        .fixedSize(horizontal: false, vertical: true)
                         .frame(minHeight: geometry.size.height, alignment: .top)
                 }
                 .clipped()

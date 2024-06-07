@@ -25,6 +25,7 @@ struct DynamicCheckoutSectionView: View {
                     }
                     DynamicCheckoutItemView(item: item)
                         .padding(section.areBezelsVisible ? POSpacing.medium : 0)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .background(section.areBezelsVisible ? style.backgroundColor : .clear)
                 .backport.geometryGroup()
