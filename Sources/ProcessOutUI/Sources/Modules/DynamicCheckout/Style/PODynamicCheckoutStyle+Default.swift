@@ -13,19 +13,19 @@ extension PODynamicCheckoutStyle {
 
     /// Default dynamic checkout style.
     public static let `default` = PODynamicCheckoutStyle(
-        paymentMethod: .default,
+        passKitPaymentButtonStyle: POPassKitPaymentButtonStyle(),
+        expressPaymentButtonStyle: .brand,
+        regularPaymentMethod: .default,
         progressView: .circular,
         inputTitle: POTextStyle(color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading),
         input: .medium,
         codeInput: .large,
         radioButton: PORadioButtonStyle.radio,
         errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
-        passKitPaymentButtonStyle: POPassKitPaymentButtonStyle(),
-        expressPaymentButtonStyle: .brand,
         message: .toast,
         backgroundColor: Color(poResource: .Surface.level1),
-        captureSuccess: .default,
-        actionsContainer: .default
+        actionsContainer: .default,
+        captureSuccess: .default
     )
 }
 

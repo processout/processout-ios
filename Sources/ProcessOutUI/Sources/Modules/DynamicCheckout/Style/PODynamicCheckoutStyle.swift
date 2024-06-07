@@ -91,32 +91,32 @@ public struct PODynamicCheckoutStyle {
 
     /// Creates dynamic checkout style.
     public init(
-        paymentMethod: PODynamicCheckoutStyle.RegularPaymentMethod,
+        passKitPaymentButtonStyle: POPassKitPaymentButtonStyle,
+        expressPaymentButtonStyle: some ButtonStyle,
+        regularPaymentMethod: RegularPaymentMethod,
         progressView: some ProgressViewStyle,
         inputTitle: POTextStyle,
         input: POInputStyle,
         codeInput: POInputStyle,
         radioButton: some ButtonStyle,
         errorText: POTextStyle,
-        passKitPaymentButtonStyle: POPassKitPaymentButtonStyle,
-        expressPaymentButtonStyle: some ButtonStyle,
         message: some POMessageViewStyle,
         backgroundColor: Color,
-        captureSuccess: CaptureSuccess,
-        actionsContainer: POActionsContainerStyle
+        actionsContainer: POActionsContainerStyle,
+        captureSuccess: CaptureSuccess
     ) {
-        self.regularPaymentMethod = paymentMethod
+        self.passKitPaymentButtonStyle = passKitPaymentButtonStyle
+        self.expressPaymentButtonStyle = expressPaymentButtonStyle
+        self.regularPaymentMethod = regularPaymentMethod
         self.progressView = progressView
         self.inputTitle = inputTitle
         self.input = input
         self.codeInput = codeInput
         self.radioButton = radioButton
         self.errorText = errorText
-        self.passKitPaymentButtonStyle = passKitPaymentButtonStyle
-        self.expressPaymentButtonStyle = expressPaymentButtonStyle
         self.message = message
         self.backgroundColor = backgroundColor
-        self.captureSuccess = captureSuccess
         self.actionsContainer = actionsContainer
+        self.captureSuccess = captureSuccess
     }
 }
