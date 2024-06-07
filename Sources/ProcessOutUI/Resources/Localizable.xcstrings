@@ -1206,22 +1206,104 @@
       }
     },
     "dynamic-checkout.cancel-button" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
     },
-    "dynamic-checkout.continue-button" : {
-
+    "dynamic-checkout.cancel-confirmation.cancel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        }
+      }
     },
-    "dynamic-checkout.express-methods" : {
-
+    "dynamic-checkout.cancel-confirmation.confirm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel payment"
+          }
+        }
+      }
+    },
+    "dynamic-checkout.cancel-confirmation.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel payment?"
+          }
+        }
+      }
+    },
+    "dynamic-checkout.error.generic" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We were unable to process your payment.  Please check your payment details or try another payment method."
+          }
+        }
+      }
+    },
+    "dynamic-checkout.error.unavailable-method" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The requested payment method is not available, please try another payment method."
+          }
+        }
+      }
+    },
+    "dynamic-checkout.pay-button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay"
+          }
+        }
+      }
     },
     "dynamic-checkout.redirect-warning" : {
-
-    },
-    "dynamic-checkout.sections-divider" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You will be redirected to finalise this payment."
+          }
+        }
+      }
     },
     "dynamic-checkout.success-message" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Success!\nPayment approved."
+          }
+        }
+      }
+    },
+    "dynamic-checkout.unavailable-warning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This payment method is unavailable."
+          }
+        }
+      }
     },
     "native-alternative-payment.cancel-button.title" : {
       "localizations" : {

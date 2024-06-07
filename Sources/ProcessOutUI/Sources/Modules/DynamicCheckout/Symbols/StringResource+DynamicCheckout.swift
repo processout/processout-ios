@@ -15,8 +15,8 @@ extension POStringResource {
 
         enum Button {
 
-            /// Continue button.
-            static let `continue` = POStringResource("dynamic-checkout.continue-button", comment: "")
+            /// Submit button title.
+            static let pay = POStringResource("dynamic-checkout.pay-button", comment: "")
 
             /// Cancel button title.
             static let cancel = POStringResource("dynamic-checkout.cancel-button", comment: "")
