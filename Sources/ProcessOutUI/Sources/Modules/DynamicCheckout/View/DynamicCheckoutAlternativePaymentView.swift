@@ -39,7 +39,7 @@ extension PONativeAlternativePaymentStyle {
     // swiftlint:disable:next strict_fileprivate
     fileprivate init(dynamicCheckoutStyle style: PODynamicCheckoutStyle) {
         title = PONativeAlternativePaymentStyle.default.title
-        sectionTitle = style.paymentMethod.title
+        sectionTitle = style.regularPaymentMethod.title
         input = style.input
         codeInput = style.codeInput
         radioButton = style.radioButton
@@ -48,8 +48,8 @@ extension PONativeAlternativePaymentStyle {
         progressView = style.progressView
         // todo(andrii-vysotskyi): resolve message style from input style
         message = POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body)
-        successMessage = style.success.message
-        background = .init(regular: style.backgroundColor, success: style.success.backgroundColor)
+        successMessage = style.captureSuccess.message
+        background = .init(regular: style.backgroundColor, success: style.captureSuccess.backgroundColor)
         separatorColor = PONativeAlternativePaymentStyle.default.separatorColor
     }
 }

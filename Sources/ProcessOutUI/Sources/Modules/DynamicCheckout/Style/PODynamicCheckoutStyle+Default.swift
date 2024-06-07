@@ -13,7 +13,6 @@ extension PODynamicCheckoutStyle {
 
     /// Default dynamic checkout style.
     public static let `default` = PODynamicCheckoutStyle(
-        section: .default,
         paymentMethod: .default,
         progressView: .circular,
         inputTitle: POTextStyle(color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading),
@@ -25,35 +24,27 @@ extension PODynamicCheckoutStyle {
         expressPaymentButtonStyle: .brand,
         message: .toast,
         backgroundColor: Color(poResource: .Surface.level1),
-        success: .default,
+        captureSuccess: .default,
         actionsContainer: .default
     )
 }
 
 @available(iOS 14, *)
-extension PODynamicCheckoutStyle.Section {
+extension PODynamicCheckoutStyle.RegularPaymentMethod {
 
-    /// Default dynamic checkout section style.
-    public static let `default` = PODynamicCheckoutStyle.Section(
+    /// Default dynamic checkout subsection style.
+    public static let `default` = PODynamicCheckoutStyle.RegularPaymentMethod(
+        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
+        informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label),
         border: POBorderStyle.regular(color: Color(poResource: .Text.muted))
     )
 }
 
 @available(iOS 14, *)
-extension PODynamicCheckoutStyle.PaymentMethod {
+extension PODynamicCheckoutStyle.CaptureSuccess {
 
     /// Default dynamic checkout subsection style.
-    public static let `default` = PODynamicCheckoutStyle.PaymentMethod(
-        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
-        informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label)
-    )
-}
-
-@available(iOS 14, *)
-extension PODynamicCheckoutStyle.Success {
-
-    /// Default dynamic checkout subsection style.
-    public static let `default` = PODynamicCheckoutStyle.Success(
+    public static let `default` = PODynamicCheckoutStyle.CaptureSuccess(
         message: POTextStyle(color: Color(poResource: .Text.success), typography: .Fixed.body),
         backgroundColor: Color(poResource: .Surface.success)
     )

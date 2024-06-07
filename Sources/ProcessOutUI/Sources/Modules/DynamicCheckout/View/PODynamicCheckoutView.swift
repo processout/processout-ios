@@ -32,7 +32,8 @@ public struct PODynamicCheckoutView: View {
                 .actionsContainerStyle(style.actionsContainer)
         }
         .backport.background {
-            let backgroundColor = viewModel.state.isCompleted ? style.success.backgroundColor : style.backgroundColor
+            let backgroundColor = viewModel.state.isCompleted
+                ? style.captureSuccess.backgroundColor : style.backgroundColor
             backgroundColor
                 .ignoresSafeArea()
                 .animation(.default, value: viewModel.state.isCompleted)

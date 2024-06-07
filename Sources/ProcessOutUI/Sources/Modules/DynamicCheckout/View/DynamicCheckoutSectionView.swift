@@ -20,8 +20,8 @@ struct DynamicCheckoutSectionView: View {
                 VStack(spacing: 0) {
                     if section.areBezelsVisible, offset != 0 {
                         Divider()
-                            .frame(height: style.section.border.width)
-                            .overlay(style.section.border.color)
+                            .frame(height: style.regularPaymentMethod.border.width)
+                            .overlay(style.regularPaymentMethod.border.color)
                     }
                     DynamicCheckoutItemView(item: item)
                         .padding(section.areBezelsVisible ? POSpacing.medium : 0)
@@ -30,7 +30,7 @@ struct DynamicCheckoutSectionView: View {
                 .backport.geometryGroup()
             }
         }
-        .border(style: section.areBezelsVisible ? style.section.border : .clear)
+        .border(style: section.areBezelsVisible ? style.regularPaymentMethod.border : .clear)
         .backport.geometryGroup()
     }
 
