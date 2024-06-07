@@ -21,10 +21,13 @@ public struct PODynamicCheckoutView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            ScrollView(showsIndicators: true) {
-                DynamicCheckoutContentView(sections: viewModel.state.sections)
+            GeometryReader { geometry in
+                ScrollView(showsIndicators: true) {
+                    DynamicCheckoutContentView(sections: viewModel.state.sections)
+                        .frame(minHeight: geometry.size.height, alignment: .top)
+                }
+                .clipped()
             }
-            .clipped()
             POActionsContainerView(actions: viewModel.state.actions)
                 .actionsContainerStyle(style.actionsContainer)
         }
