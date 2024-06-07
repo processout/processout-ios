@@ -26,7 +26,6 @@ public struct PONativeAlternativePaymentView: View {
                         viewModel: viewModel,
                         insets: EdgeInsets(horizontal: POSpacing.large, vertical: POSpacing.medium)
                     )
-                    .fixedSize(horizontal: false, vertical: true)
                     .frame(minHeight: geometry.size.height, alignment: .top)
                 }
                 .clipped()
