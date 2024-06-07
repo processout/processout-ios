@@ -25,6 +25,7 @@ extension PODynamicCheckoutStyle {
         message: .toast,
         backgroundColor: Color(poResource: .Surface.level1),
         actionsContainer: .default,
+        pendingCapture: .default,
         captureSuccess: .default
     )
 }
@@ -32,8 +33,8 @@ extension PODynamicCheckoutStyle {
 @available(iOS 14, *)
 extension PODynamicCheckoutStyle.RegularPaymentMethod {
 
-    /// Default dynamic checkout subsection style.
-    public static let `default` = PODynamicCheckoutStyle.RegularPaymentMethod(
+    /// Default dynamic checkout regular payment method style.
+    public static let `default` = Self(
         title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
         informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label),
         border: POBorderStyle.regular(color: Color(poResource: .Text.muted))
@@ -41,10 +42,19 @@ extension PODynamicCheckoutStyle.RegularPaymentMethod {
 }
 
 @available(iOS 14, *)
+extension PODynamicCheckoutStyle.PendingCapture {
+
+    /// Default dynamic checkout pending capture style.
+    public static let `default` = Self(
+        message: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body)
+    )
+}
+
+@available(iOS 14, *)
 extension PODynamicCheckoutStyle.CaptureSuccess {
 
-    /// Default dynamic checkout subsection style.
-    public static let `default` = PODynamicCheckoutStyle.CaptureSuccess(
+    /// Default dynamic checkout capture success style.
+    public static let `default` = Self(
         message: POTextStyle(color: Color(poResource: .Text.success), typography: .Fixed.body),
         backgroundColor: Color(poResource: .Surface.success)
     )
