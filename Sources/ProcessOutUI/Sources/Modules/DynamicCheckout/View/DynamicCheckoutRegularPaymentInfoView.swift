@@ -19,9 +19,9 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
                 // todo(andrii-vysotskyi): decide if separate style should exist for AsyncImage
                 POAsyncImage(resource: item.iconImageResource) {
                     style.regularPaymentMethod.title.color
-                        .frame(width: 24, height: 24)
-                        .clipShape(RoundedRectangle(cornerRadius: POSpacing.small))
+                        .clipShape(RoundedRectangle(cornerRadius: POSpacing.extraSmall))
                 }
+                .frame(width: 24, height: 24)
                 Text(item.title)
                     .lineLimit(1)
                     .textStyle(style.regularPaymentMethod.title)
