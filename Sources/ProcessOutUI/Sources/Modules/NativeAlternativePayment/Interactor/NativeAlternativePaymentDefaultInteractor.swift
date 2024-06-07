@@ -489,9 +489,13 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         let defaultValues = await withCheckedContinuation { continuation in
-            delegate?.nativeAlternativePaymentMethodDefaultValues(
-                for: parameters.map(\.specification), completion: continuation.resume
-            )
+            if let delegate {
+                delegate.nativeAlternativePaymentMethodDefaultValues(
+                    for: parameters.map(\.specification), completion: continuation.resume
+                )
+            } else {
+                continuation.resume(returning: [:])
+            }
         }
         for (offset, parameter) in parameters.enumerated() {
             let defaultValue: String?

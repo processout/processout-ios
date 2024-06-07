@@ -49,7 +49,7 @@ enum DynamicCheckoutInteractorState {
     struct PaymentProcessing {
 
         /// Started state snapshot.
-        let snapshot: Started
+        var snapshot: Started
 
         /// Payment method ID that is currently being processed.
         let paymentMethodId: String
@@ -85,9 +85,6 @@ enum DynamicCheckoutInteractorState {
         /// When processing fails and this property is set to `true`, pending payment method (if present) is
         /// started after selection.
         var shouldStartPendingPaymentMethod = false
-
-        /// Payment methods that will be set unavailable when this payment method fails.
-        var pendingUnavailablePaymentMethodIds: Set<String> = []
     }
 
     enum PaymentSubmission {

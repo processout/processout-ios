@@ -18,24 +18,16 @@ public struct PODynamicCheckoutStyle {
 
     public struct Section {
 
-        /// Section title style.
-        public let title: POTextStyle
-
         /// Section border style.
         public let border: POBorderStyle
 
-        /// Style to apply to divider separating different sections.
-        public var divider: POLabeledDividerStyle
-
         /// Creates section style instance.
-        public init(title: POTextStyle, border: POBorderStyle, divider: POLabeledDividerStyle) {
-            self.title = title
+        public init(border: POBorderStyle) {
             self.border = border
-            self.divider = divider
         }
     }
 
-    public struct Subsection {
+    public struct PaymentMethod {
 
         /// Title style.
         public let title: POTextStyle
@@ -43,13 +35,9 @@ public struct PODynamicCheckoutStyle {
         /// Information text style.
         public let informationText: POTextStyle
 
-        /// Divider color.
-        public let dividerColor: Color
-
-        public init(title: POTextStyle, informationText: POTextStyle, dividerColor: Color) {
+        public init(title: POTextStyle, informationText: POTextStyle) {
             self.title = title
             self.informationText = informationText
-            self.dividerColor = dividerColor
         }
     }
 
@@ -71,8 +59,8 @@ public struct PODynamicCheckoutStyle {
     /// Section style.
     public let section: Section
 
-    /// Payment options are organized in subsections within same section.
-    public let subsection: Subsection
+    /// Payment method info.
+    public let paymentMethod: PaymentMethod
 
     /// Progress view style.
     public let progressView: any ProgressViewStyle
@@ -95,9 +83,12 @@ public struct PODynamicCheckoutStyle {
     /// PassKit payment button style.
     public let passKitPaymentButtonStyle: POPassKitPaymentButtonStyle
 
-    /// Generic express payment button style. When default style is used,
-    /// equals to `POBrandButtonStyle.brand`.
+    /// Generic express payment button style. When default style is used, equals to
+    /// `POBrandButtonStyle.brand` that automatically resolves styling based on branding.
     public let expressPaymentButtonStyle: any ButtonStyle
+
+    /// Informational message style.
+    public let message: any POMessageViewStyle
 
     /// Background color.
     public let backgroundColor: Color
@@ -111,21 +102,22 @@ public struct PODynamicCheckoutStyle {
     /// Creates dynamic checkout style.
     public init(
         section: PODynamicCheckoutStyle.Section,
-        subsection: PODynamicCheckoutStyle.Subsection,
-        progressView: any ProgressViewStyle,
+        paymentMethod: PODynamicCheckoutStyle.PaymentMethod,
+        progressView: some ProgressViewStyle,
         inputTitle: POTextStyle,
         input: POInputStyle,
         codeInput: POInputStyle,
-        radioButton: any ButtonStyle,
+        radioButton: some ButtonStyle,
         errorText: POTextStyle,
         passKitPaymentButtonStyle: POPassKitPaymentButtonStyle,
-        expressPaymentButtonStyle: any ButtonStyle,
+        expressPaymentButtonStyle: some ButtonStyle,
+        message: some POMessageViewStyle,
         backgroundColor: Color,
         success: Success,
         actionsContainer: POActionsContainerStyle
     ) {
         self.section = section
-        self.subsection = subsection
+        self.paymentMethod = paymentMethod
         self.progressView = progressView
         self.inputTitle = inputTitle
         self.input = input
@@ -134,6 +126,7 @@ public struct PODynamicCheckoutStyle {
         self.errorText = errorText
         self.passKitPaymentButtonStyle = passKitPaymentButtonStyle
         self.expressPaymentButtonStyle = expressPaymentButtonStyle
+        self.message = message
         self.backgroundColor = backgroundColor
         self.success = success
         self.actionsContainer = actionsContainer

@@ -1,5 +1,5 @@
 //
-//  DynamicCheckoutPaymentInfoItemView.swift
+//  DynamicCheckoutRegularPaymentInfoView.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 22.03.2024.
@@ -9,19 +9,19 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutPaymentInfoItemView: View {
+struct DynamicCheckoutRegularPaymentInfoView: View {
 
-    let item: DynamicCheckoutViewModelItem.PaymentInfo
+    let item: DynamicCheckoutViewModelItem.RegularPaymentInfo
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: POSpacing.medium) {
             HStack(spacing: POSpacing.small) {
                 POAsyncImage(resource: item.iconImageResource) {
-                    Color(item.brandColor).frame(width: 24, height: 24)
+                    style.paymentMethod.title.color.frame(width: 24, height: 24)
                 }
                 Text(item.title)
                     .lineLimit(1)
-                    .textStyle(style.subsection.title)
+                    .textStyle(style.paymentMethod.title)
                 Spacer()
                 if item.isLoading {
                     ProgressView()
@@ -41,7 +41,6 @@ struct DynamicCheckoutPaymentInfoItemView: View {
                 .animation(.default, value: item.isSelectable)
             }
             .animation(.default, value: item.isLoading)
-            .padding(.vertical, 6) // Custom value to make sure that total padding is 16
             if let information = item.additionalInformation {
                 body(information: information)
             }
@@ -50,8 +49,6 @@ struct DynamicCheckoutPaymentInfoItemView: View {
         .onTapGesture {
             item.isSelected = true
         }
-        .padding(.horizontal, POSpacing.medium)
-        .background(style.backgroundColor)
         .backport.geometryGroup()
     }
 
@@ -70,15 +67,14 @@ struct DynamicCheckoutPaymentInfoItemView: View {
         Label(
             title: {
                 Text(information)
-                    .textStyle(style.subsection.informationText)
+                    .textStyle(style.paymentMethod.informationText)
             },
             icon: {
                 Image(.info)
                     .renderingMode(.template)
-                    .foregroundColor(style.subsection.informationText.color)
+                    .foregroundColor(style.paymentMethod.informationText.color)
             }
         )
-        .padding(.bottom, POSpacing.medium)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

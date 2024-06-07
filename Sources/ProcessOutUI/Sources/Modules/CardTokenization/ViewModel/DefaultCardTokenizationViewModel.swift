@@ -11,7 +11,7 @@ import SwiftUI
 
 // swiftlint:disable type_body_length file_length
 
-final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
+final class DefaultCardTokenizationViewModel: ViewModel {
 
     init(interactor: any CardTokenizationInteractor) {
         self.interactor = interactor
@@ -21,7 +21,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     // MARK: - CardTokenizationViewModel
 
-    @Published
+    @AnimatablePublished
     var state: CardTokenizationViewModelState
 
     func start() {
@@ -68,10 +68,10 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             state = .idle
         case .started(let startedState):
             let newState = convertToState(startedState: startedState, isSubmitting: false)
-            setState(newState)
+            self.state = newState
         case .tokenizing(let startedState):
             let newState = convertToState(startedState: startedState, isSubmitting: true)
-            setState(newState)
+            self.state = newState
         default:
             break
         }
@@ -407,17 +407,6 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             startedState.address.postalCode
         ]
         return parameters.filter(\.shouldCollect)
-    }
-
-    /// Changes state and animates changes if needed.
-    private func setState(_ newState: CardTokenizationViewModelState) {
-        // Changes that may affect layout are animated explicitly to ensure whole view hierarchy
-        // is animated properly. Using `withAnimation` inside view model is not perfect (ideally
-        // it should be done by view only) but is simpler.
-        let isAnimated = state.animationIdentity != newState.animationIdentity
-        withAnimation(isAnimated ? .default : nil) {
-            self.state = newState
-        }
     }
 }
 

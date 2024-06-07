@@ -42,7 +42,7 @@ final class DynamicCheckoutPassKitPaymentDefaultSession: DynamicCheckoutPassKitP
         if didAuthorizeInvoice {
             return
         }
-        throw POFailure(code: .generic(.mobile))
+        throw POFailure(code: .cancelled)
     }
 
     // MARK: - Private Properties

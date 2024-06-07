@@ -34,20 +34,26 @@ extension POStringResource {
             static let cancel = POStringResource("dynamic-checkout.cancel-confirmation.cancel", comment: "")
         }
 
-        enum Section {
+        enum Error {
 
-            /// Express payment methods section title.
-            static let expressMethods = POStringResource("dynamic-checkout.express-methods", comment: "")
+            /// Indicates that selected payment method is not available.
+            static let unavailableMethod = POStringResource("dynamic-checkout.error.unavailable-method", comment: "")
 
-            /// Text to use with divider separating different sections.
-            static let divider = POStringResource("dynamic-checkout.sections-divider", comment: "")
+            /// Indicates that implementation is unable to process payment.
+            static let generic = POStringResource("dynamic-checkout.error.generic", comment: "")
+        }
+
+        enum Warning {
+
+            /// APM redirect information.
+            static let redirect = POStringResource("dynamic-checkout.redirect-warning", comment: "")
+
+            /// Warns user that payment method is unavailable.
+            static let paymentUnavailable = POStringResource("dynamic-checkout.unavailable-warning", comment: "")
         }
 
         /// Success message.
         static let successMessage = POStringResource("dynamic-checkout.success-message", comment: "")
-
-        /// APM redirect information.
-        static let redirectWarning = POStringResource("dynamic-checkout.redirect-warning", comment: "")
     }
 }
 

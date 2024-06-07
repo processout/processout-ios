@@ -61,18 +61,13 @@ public struct PORadioButtonStyle: ButtonStyle {
                     .frame(width: Constants.knobSize, height: Constants.knobSize)
                 }
             )
-            .padding(.vertical, Constants.minVerticalPadding)
-            .frame(minHeight: Constants.minHeight)
             .animation(.default, value: isSelected)
-            .contentShape(.rect)
         }
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let minVerticalPadding = POSpacing.extraSmall
-        static let minHeight: CGFloat = 44
         static let knobSize: CGFloat = 18
     }
 
@@ -104,6 +99,9 @@ private struct ContentView<Content: View>: View {
 
     // MARK: - Private Properties
 
-    @Environment(\.isRadioButtonSelected) private var isSelected
-    @Environment(\.isControlInvalid) private var isInvalid
+    @Environment(\.isRadioButtonSelected)
+    private var isSelected
+
+    @Environment(\.isControlInvalid)
+    private var isInvalid
 }

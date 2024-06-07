@@ -9,8 +9,25 @@
 
 struct DynamicCheckoutViewModelState {
 
+    struct Section: Identifiable {
+
+        /// Section ID.
+        let id: String
+
+        /// Items.
+        let items: [Item]
+
+        /// Defines whether view should be tightly displayed.
+        let isTight: Bool
+
+        /// Defines whether view should render bezels (frame) around section content.
+        let areBezelsVisible: Bool
+    }
+
+    typealias Item = DynamicCheckoutViewModelItem
+
     /// Available sections.
-    let sections: [DynamicCheckoutViewModelSection]
+    let sections: [Section]
 
     /// Available actions.
     let actions: [POActionsContainerActionViewModel]
@@ -22,16 +39,18 @@ struct DynamicCheckoutViewModelState {
     var confirmationDialog: POConfirmationDialog?
 }
 
-extension DynamicCheckoutViewModelState {
+extension DynamicCheckoutViewModelState: AnimationIdentityProvider {
 
-    static let idle = DynamicCheckoutViewModelState(sections: [], actions: [], isCompleted: false)
-
-    /// Section's animation identity. For now only properties that may affect layout
-    /// changes are part of identity.
-    ///
-    /// - NOTE: When this property changes view should be updated with
-    /// explicit animation.
     var animationIdentity: AnyHashable {
         [sections.map(\.animationIdentity), actions.map(\.id)]
+    }
+
+    static let idle = DynamicCheckoutViewModelState(sections: [], actions: [], isCompleted: false)
+}
+
+extension DynamicCheckoutViewModelState.Section: AnimationIdentityProvider {
+
+    var animationIdentity: AnyHashable {
+        [id, items.map(\.animationIdentity), AnyHashable(isTight), AnyHashable(areBezelsVisible)]
     }
 }

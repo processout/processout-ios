@@ -12,7 +12,7 @@ import ProcessOut
 @available(iOS 14, *)
 public final class PODynamicCheckoutViewController: UIHostingController<AnyView> {
 
-    /// Creates card tokenization view controller.
+    /// Creates dynamic checkout view controller.
     public init(
         style: PODynamicCheckoutStyle = PODynamicCheckoutStyle.default,
         configuration: PODynamicCheckoutConfiguration,

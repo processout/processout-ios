@@ -12,7 +12,7 @@ import SwiftUI
 @available(iOS 14, *)
 public struct POCardTokenizationView: View {
 
-    init(viewModel: @autoclosure @escaping () -> some CardTokenizationViewModel) {
+    init(viewModel: @autoclosure @escaping () -> some ViewModel<CardTokenizationViewModelState>) {
         self._viewModel = .init(wrappedValue: .init(erasing: viewModel()))
     }
 
@@ -21,7 +21,10 @@ public struct POCardTokenizationView: View {
     public var body: some View {
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
-                CardTokenizationContentView(viewModel: viewModel)
+                CardTokenizationContentView(
+                    viewModel: viewModel,
+                    insets: EdgeInsets(horizontal: POSpacing.large, vertical: POSpacing.medium)
+                )
             }
             .clipped()
             POActionsContainerView(actions: viewModel.state.actions)
@@ -39,5 +42,5 @@ public struct POCardTokenizationView: View {
     private var style
 
     @StateObject
-    private var viewModel: AnyCardTokenizationViewModel
+    private var viewModel: AnyViewModel<CardTokenizationViewModelState>
 }

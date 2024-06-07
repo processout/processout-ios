@@ -13,7 +13,7 @@ import SwiftUI
 @available(iOS 14, *)
 public struct PODynamicCheckoutView: View {
 
-    init(viewModel: @autoclosure @escaping () -> some DynamicCheckoutViewModel) {
+    init(viewModel: @autoclosure @escaping () -> some ViewModel<DynamicCheckoutViewModelState>) {
         self._viewModel = .init(wrappedValue: .init(erasing: viewModel()))
     }
 
@@ -25,7 +25,6 @@ public struct PODynamicCheckoutView: View {
                 DynamicCheckoutContentView(sections: viewModel.state.sections)
             }
             .clipped()
-            .backport.geometryGroup()
             POActionsContainerView(actions: viewModel.state.actions)
                 .actionsContainerStyle(style.actionsContainer)
         }
@@ -35,15 +34,15 @@ public struct PODynamicCheckoutView: View {
                 .ignoresSafeArea()
                 .animation(.default, value: viewModel.state.isCompleted)
         }
-        .onAppear(perform: viewModel.start)
         .backport.geometryGroup()
+        .onAppear(perform: viewModel.start)
         .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
     }
 
     // MARK: - Private Properties
 
     @StateObject
-    private var viewModel: AnyDynamicCheckoutViewModel
+    private var viewModel: AnyViewModel<DynamicCheckoutViewModelState>
 
     @Environment(\.dynamicCheckoutStyle)
     private var style

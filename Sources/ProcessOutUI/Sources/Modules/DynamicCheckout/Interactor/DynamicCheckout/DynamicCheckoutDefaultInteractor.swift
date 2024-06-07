@@ -282,17 +282,26 @@ final class DynamicCheckoutDefaultInteractor:
         }
     }
 
+    // MARK: - Started State
+
+    private func setStartedStateAfterSelectionFailure(startedState: State.Started) {
+        var newState = startedState
+        newState.unavailablePaymentMethodIds.formUnion(startedState.pendingUnavailablePaymentMethodIds)
+        newState.pendingUnavailablePaymentMethodIds = []
+        newState.recentErrorDescription = String(resource: .DynamicCheckout.Error.unavailableMethod)
+        state = .started(newState)
+    }
+
     // MARK: - Selected State
 
     private func setSelectedStateUnchecked(methodId: String, startedState: State.Started) {
         _ = paymentMethod(withId: methodId, state: startedState)
         if startedState.pendingUnavailablePaymentMethodIds.contains(methodId) {
-            var newState = startedState
-            newState.unavailablePaymentMethodIds.formUnion(newState.pendingUnavailablePaymentMethodIds)
-            newState.pendingUnavailablePaymentMethodIds.removeAll()
-            state = .started(newState) // todo(andrii-vysotskyi): inform user why selection didn't occur
+            setStartedStateAfterSelectionFailure(startedState: startedState)
         } else if !startedState.unavailablePaymentMethodIds.contains(methodId) {
-            let newState = State.Selected(snapshot: startedState, paymentMethodId: methodId)
+            var newStartedState = startedState
+            newStartedState.recentErrorDescription = nil
+            let newState = State.Selected(snapshot: newStartedState, paymentMethodId: methodId)
             state = .selected(newState)
             delegate?.dynamicCheckout(didEmitEvent: .didSelectPaymentMethod)
         } else {
@@ -303,22 +312,20 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Payment Processing
 
     private func setPaymentProcessingUnchecked(methodId: String, startedState: State.Started) {
-        _ = paymentMethod(withId: methodId, state: startedState)
         if startedState.pendingUnavailablePaymentMethodIds.contains(methodId) {
-            var newState = startedState
-            newState.unavailablePaymentMethodIds.formUnion(newState.pendingUnavailablePaymentMethodIds)
-            newState.pendingUnavailablePaymentMethodIds.removeAll()
-            state = .started(newState) // todo(andrii-vysotskyi): inform user why selection didn't occur
+            setStartedStateAfterSelectionFailure(startedState: startedState)
         } else if !startedState.unavailablePaymentMethodIds.contains(methodId) {
+            var newStartedState = startedState
+            newStartedState.recentErrorDescription = nil
             switch paymentMethod(withId: methodId, state: startedState) {
             case .applePay:
-                startPassKitPayment(methodId: methodId, startedState: startedState)
+                startPassKitPayment(methodId: methodId, startedState: newStartedState)
             case .card(let method):
-                startCardPayment(method: method, startedState: startedState)
+                startCardPayment(method: method, startedState: newStartedState)
             case .alternativePayment(let method):
-                startAlternativePayment(method: method, startedState: startedState)
+                startAlternativePayment(method: method, startedState: newStartedState)
             case .nativeAlternativePayment(let method):
-                startNativeAlternativePayment(method: method, startedState: startedState)
+                startNativeAlternativePayment(method: method, startedState: newStartedState)
             default:
                 preconditionFailure("Attempted to start unknown payment method")
             }
@@ -519,23 +526,30 @@ final class DynamicCheckoutDefaultInteractor:
             setFailureStateUnchecked(error: failure)
             return
         }
-        var startedState = processingState.snapshot
-        startedState.pendingUnavailablePaymentMethodIds.formUnion(processingState.pendingUnavailablePaymentMethodIds)
+        var newStartedState = processingState.snapshot
         if failure.code != .cancelled {
-            var unavailableIds: Set<String>
             switch currentPaymentMethod(state: processingState) {
             case .nativeAlternativePayment:
-                unavailableIds = paymentMethodIds(of: .nativeAlternativePayment, state: processingState.snapshot)
+                var pendingUnavailableIds = paymentMethodIds(
+                    of: .nativeAlternativePayment, state: processingState.snapshot
+                )
+                if processingState.isReady {
+                    pendingUnavailableIds.remove(processingState.paymentMethodId)
+                    newStartedState.pendingUnavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
+                    newStartedState.unavailablePaymentMethodIds.insert(processingState.paymentMethodId)
+                } else {
+                    newStartedState.pendingUnavailablePaymentMethodIds.subtract(pendingUnavailableIds)
+                    newStartedState.unavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
+                }
             case .card where .generic(.cardFailed3DS) == failure.code:
-                unavailableIds = paymentMethodIds(of: .card, state: processingState.snapshot)
+                let unavailableIds = paymentMethodIds(of: .card, state: processingState.snapshot)
+                newStartedState.unavailablePaymentMethodIds.formUnion(unavailableIds)
             default:
-                unavailableIds = []
+                break
             }
-            startedState.pendingUnavailablePaymentMethodIds.subtract(unavailableIds)
-            startedState.unavailablePaymentMethodIds.formUnion(unavailableIds)
+            newStartedState.recentErrorDescription = String(resource: .DynamicCheckout.Error.generic)
         }
-        self.state = .started(startedState)
-        // todo(andrii-vysotskyi): communicate error to user
+        self.state = .started(newStartedState)
     }
 
     // MARK: - Failure State
@@ -645,10 +659,10 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
 
     func nativeAlternativePaymentMethodDidEmitEvent(_ event: PONativeAlternativePaymentMethodEvent) {
         switch event {
-        case .didSubmitParameters, .didFailToSubmitParameters:
+        case .didSubmitParameters:
             updateUnavailablePaymentMethods()
         default:
-            return
+            break
         }
         delegate?.dynamicCheckout(didEmitAlternativePaymentEvent: event)
     }
@@ -670,7 +684,7 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
         }
         var unavailableIds = paymentMethodIds(of: .nativeAlternativePayment, state: currentState.snapshot)
         unavailableIds.remove(currentState.paymentMethodId)
-        currentState.pendingUnavailablePaymentMethodIds.formUnion(unavailableIds)
+        currentState.snapshot.pendingUnavailablePaymentMethodIds.formUnion(unavailableIds)
         state = .paymentProcessing(currentState)
     }
 }

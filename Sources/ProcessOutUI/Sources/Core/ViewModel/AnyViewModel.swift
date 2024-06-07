@@ -1,22 +1,22 @@
 //
-//  AnyCardTokenizationViewModel.swift
+//  AnyViewModel.swift
 //  ProcessOutUI
 //
-//  Created by Andrii Vysotskyi on 18.10.2023.
+//  Created by Andrii Vysotskyi on 05.06.2024.
 //
 
 import Combine
 
-final class AnyCardTokenizationViewModel: CardTokenizationViewModel {
+final class AnyViewModel<State>: ViewModel {
 
-    init<ViewModel: CardTokenizationViewModel>(erasing viewModel: ViewModel) {
+    init(erasing viewModel: some ViewModel<State>) {
         self.base = viewModel
         cancellable = viewModel.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
         }
     }
 
-    let base: any CardTokenizationViewModel
+    let base: any ViewModel<State>
 
     // MARK: - CardTokenizationViewModel
 
@@ -24,7 +24,7 @@ final class AnyCardTokenizationViewModel: CardTokenizationViewModel {
         base.start()
     }
 
-    var state: CardTokenizationViewModelState {
+    var state: State {
         get { base.state }
         set { base.state = newValue }
     }

@@ -19,6 +19,9 @@ public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerSt
         VStack(alignment: .leading, spacing: 0) {
             ForEach(configuration.elements) { element in
                 Button(action: element.select, label: element.makeBody)
+                    .padding(.vertical, POSpacing.extraSmall)
+                    .frame(minHeight: Constants.minHeight)
+                    .contentShape(.rect)
                     .radioButtonSelected(element.isSelected)
             }
         }
@@ -37,4 +40,8 @@ extension POPickerStyle where Self == PORadioGroupPickerStyle<PORadioButtonStyle
     public static var radioGroup: PORadioGroupPickerStyle<PORadioButtonStyle> {
         PORadioGroupPickerStyle()
     }
+}
+
+private enum Constants {
+    static let minHeight: CGFloat = 44
 }

@@ -13,6 +13,8 @@ struct DynamicCheckoutItemView: View {
 
     let item: DynamicCheckoutViewModelItem
 
+    // MARK: - View
+
     var body: some View {
         switch item {
         case .progress:
@@ -24,16 +26,14 @@ struct DynamicCheckoutItemView: View {
             POPassKitPaymentButton(type: item.buttonType, action: item.action)
                 .passKitPaymentButtonStyle(style.passKitPaymentButtonStyle)
         case .expressPayment(let item):
-            DynamicCheckoutExpressPaymentItemView(item: item)
-                .buttonStyle(POAnyButtonStyle(erasing: style.expressPaymentButtonStyle))
-        case .payment(let item):
-            DynamicCheckoutPaymentInfoItemView(item: item)
-        case .card(let item):
-            DynamicCheckoutCardItemView(item: item)
-        case .alternativePayment(let item):
-            DynamicCheckoutAlternativePaymentItemView(item: item)
+            DynamicCheckoutExpressPaymentView(item: item)
+        case .regularPayment(let item):
+            DynamicCheckoutRegularPaymentView(item: item)
+        case .message(let item):
+            POMessageView(message: item)
+                .messageViewStyle(style.message)
         case .success(let item):
-            DynamicCheckoutSuccessItemView(item: item)
+            DynamicCheckoutPaymentSuccessView(item: item)
         }
     }
 
