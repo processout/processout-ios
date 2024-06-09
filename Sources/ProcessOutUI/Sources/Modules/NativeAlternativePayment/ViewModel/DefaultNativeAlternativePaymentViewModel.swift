@@ -426,7 +426,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     }
 
     private func setActions(_ newActions: [POActionsContainerActionViewModel]) {
-        let isAnimated = actions.count != newActions.count
+        let isAnimated = actions.map(\.id) != newActions.map(\.id)
         withAnimation(isAnimated ? .default : nil) {
             actions = newActions
         }
