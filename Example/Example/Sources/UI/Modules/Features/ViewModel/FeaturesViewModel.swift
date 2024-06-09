@@ -102,7 +102,8 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
             }
             let configuration = PODynamicCheckoutConfiguration(
                 invoiceId: invoice.id,
-                alternativePayment: .init(returnUrl: Constants.returnUrl)
+                alternativePayment: .init(returnUrl: Constants.returnUrl),
+                cancelButton: .init(confirmation: .init())
             )
             self.router.trigger(route: .dynamicCheckout(configuration: configuration, delegate: self))
         }
