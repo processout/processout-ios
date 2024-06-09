@@ -91,7 +91,7 @@ enum DynamicCheckoutViewModelItem {
     struct AlternativePayment {
 
         /// Creates alternative payment view model.
-        let viewModel: () -> AnyNativeAlternativePaymentViewModel
+        let viewModel: () -> AnyViewModel<NativeAlternativePaymentViewModelState>
     }
 
     struct Card {

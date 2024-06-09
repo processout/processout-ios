@@ -9,9 +9,13 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentViewModel>: View {
+struct NativeAlternativePaymentContentView: View {
 
-    init(viewModel: ViewModel, insets: EdgeInsets, shouldCenterParameters: Bool = true) {
+    init(
+        viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>,
+        insets: EdgeInsets,
+        shouldCenterParameters: Bool = true
+    ) {
         self.viewModel = viewModel
         self.insets = insets
         self.shouldCenterParameters = shouldCenterParameters
@@ -27,7 +31,7 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
                     NativeAlternativePaymentSectionView(
                         section: section,
                         horizontalPadding: max(insets.leading, insets.trailing),
-                        focusedItemId: $viewModel.focusedItemId
+                        focusedItemId: $viewModel.state.focusedItemId
                     )
                 }
                 if !partition.center.isEmpty {
@@ -36,7 +40,7 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
                             NativeAlternativePaymentSectionView(
                                 section: section,
                                 horizontalPadding: max(insets.leading, insets.trailing),
-                                focusedItemId: $viewModel.focusedItemId
+                                focusedItemId: $viewModel.state.focusedItemId
                             )
                         }
                     }
@@ -44,7 +48,7 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
                     .frame(maxHeight: .infinity)
                 }
             }
-            .backport.onChange(of: viewModel.focusedItemId) {
+            .backport.onChange(of: viewModel.state.focusedItemId) {
                 scrollToFocusedInput(scrollView: scrollView)
             }
             .padding(EdgeInsets(top: insets.top, leading: 0, bottom: insets.bottom, trailing: 0))
@@ -59,11 +63,11 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
     private let shouldCenterParameters: Bool
 
     @ObservedObject
-    private var viewModel: ViewModel
+    private var viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>
 
     // swiftlint:disable:next line_length
     private var sectionsPartition: (top: [NativeAlternativePaymentViewModelSection], center: [NativeAlternativePaymentViewModelSection]) {
-        let sections = viewModel.sections
+        let sections = viewModel.state.sections
         guard shouldCenterParameters else {
             return (top: sections, center: [])
         }
@@ -90,7 +94,7 @@ struct NativeAlternativePaymentContentView<ViewModel: NativeAlternativePaymentVi
     }
 
     private func scrollToFocusedInput(scrollView: ScrollViewProxy) {
-        guard let id = viewModel.focusedItemId else {
+        guard let id = viewModel.state.focusedItemId else {
             return
         }
         withAnimation { scrollView.scrollTo(id) }

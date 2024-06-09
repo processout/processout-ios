@@ -30,7 +30,7 @@ struct DynamicCheckoutAlternativePaymentView: View {
     private var style
 
     @StateObject
-    private var viewModel: AnyNativeAlternativePaymentViewModel
+    private var viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>
 }
 
 @available(iOS 14, *)

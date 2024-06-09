@@ -357,7 +357,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             let item = DynamicCheckoutViewModelItem.AlternativePayment {
                 // todo(andrii-vysotskyi): decide if it is okay to create view model directly here
                 let viewModel = DefaultNativeAlternativePaymentViewModel(interactor: interactor)
-                return AnyNativeAlternativePaymentViewModel(erasing: viewModel)
+                return AnyViewModel(erasing: viewModel)
             }
             return .alternativePayment(item)
         case .card:

@@ -11,8 +11,7 @@ import SwiftUI
 
 // swiftlint:disable type_body_length file_length
 
-// todo(andrii-vysotskyi): migrate to AnimatablePublished
-final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentViewModel {
+final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     init(interactor: any NativeAlternativePaymentInteractor) {
         self.interactor = interactor
@@ -25,20 +24,8 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     // MARK: - NativeAlternativePaymentViewModel
 
-    @Published
-    private(set) var sections: [NativeAlternativePaymentViewModelSection] = []
-
-    @Published
-    private(set) var actions: [POActionsContainerActionViewModel] = []
-
-    @Published
-    var focusedItemId: AnyHashable?
-
-    @Published
-    var confirmationDialog: POConfirmationDialog?
-
-    @Published
-    private(set) var isCaptured = false
+    @AnimatablePublished
+    var state: NativeAlternativePaymentViewModelState = .idle
 
     func start() {
         interactor.start()
@@ -80,46 +67,45 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     private func updateWithInteractorState() {
         switch interactor.state {
         case .starting:
-            updateSectionsWithStartingState()
-            actions = []
-            isCaptured = false
-            focusedItemId = nil
+            updateWithStartingState()
         case .started(let state):
-            updateSections(state: state, isSubmitting: false)
-            updateActions(state: state, isSubmitting: false)
-            isCaptured = false
-            updateFocusedInputId(state: state)
+            update(with: state)
         case .submitting(let state):
-            updateSections(state: state, isSubmitting: true)
-            updateActions(state: state, isSubmitting: true)
-            isCaptured = false
-            focusedItemId = nil
+            update(withSubmittingState: state)
         case .awaitingCapture(let state):
-            updateSections(state: state)
-            updateActions(state: state)
-            isCaptured = false
-            focusedItemId = nil
-        case .captured(let state):
-            updateSections(state: state)
-            setActions([])
-            isCaptured = true
-            focusedItemId = nil
+            update(with: state)
+        case .captured(let state) where !configuration.skipSuccessScreen:
+            update(with: state)
         default:
             break // Ignored
         }
-        confirmationDialog = nil // Dialog is dismissed when interactor changes
     }
 
-    // MARK: - Sections
+    // MARK: - Starting State
 
-    private func updateSectionsWithStartingState() {
-        let section = NativeAlternativePaymentViewModelSection(
-            id: "starting", isCentered: true, title: nil, items: [.progress], error: nil
+    private func updateWithStartingState() {
+        let sections: [NativeAlternativePaymentViewModelSection] = [
+            .init(id: "starting", isCentered: true, title: nil, items: [.progress], error: nil)
+        ]
+        self.state = NativeAlternativePaymentViewModelState(sections: sections, actions: [], isCaptured: false)
+    }
+
+    // MARK: - Started State
+
+    private func update(with state: InteractorState.Started) {
+        let newState = NativeAlternativePaymentViewModelState(
+            sections: createSections(state: state, isSubmitting: false),
+            actions: createActions(state: state, isSubmitting: false),
+            isCaptured: false,
+            focusedItemId: createFocusedInputId(state: state),
+            confirmationDialog: nil
         )
-        sections = [section]
+        self.state = newState
     }
 
-    private func updateSections(state: InteractorState.Started, isSubmitting: Bool) {
+    private func createSections(
+        state: InteractorState.Started, isSubmitting: Bool
+    ) -> [NativeAlternativePaymentViewModelSection] {
         var sections = [
             createTitleSection(state: state)
         ]
@@ -140,10 +126,69 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             )
             sections.append(section)
         }
-        setSections(sections.compactMap { $0 })
+        return sections.compactMap { $0 }
     }
 
-    private func updateSections(state: InteractorState.AwaitingCapture) {
+    private func createActions(
+        state: InteractorState.Started, isSubmitting: Bool
+    ) -> [POActionsContainerActionViewModel] {
+        let actions = [
+            submitAction(state: state, isLoading: isSubmitting),
+            cancelAction(configuration: configuration.secondaryAction, isEnabled: !isSubmitting && state.isCancellable)
+        ]
+        return actions.compactMap { $0 }
+    }
+
+    private func createTitleSection(state: InteractorState.Started) -> NativeAlternativePaymentViewModelSection? {
+        let title = configuration.title
+        ?? String(resource: .NativeAlternativePayment.title, replacements: state.gateway.displayName)
+        guard !title.isEmpty else {
+            return nil
+        }
+        let item = NativeAlternativePaymentViewModelItem.Title(id: "title", text: title)
+        let section = NativeAlternativePaymentViewModelSection(
+            id: "title", isCentered: false, title: nil, items: [.title(item)], error: nil
+        )
+        return section
+    }
+
+    private func createFocusedInputId(state: InteractorState.Started) -> AnyHashable? {
+        if state.parameters.map(\.specification.key).map(AnyHashable.init).contains(self.state.focusedItemId) {
+            return self.state.focusedItemId // Return already focused input
+        }
+        if let parameter = state.parameters.first(where: { $0.recentErrorMessage != nil }) {
+            return parameter.specification.key // Attempt to focus first invalid parameter if available.
+        }
+        return state.parameters.first?.specification.key
+    }
+
+    // MARK: - Submitting State
+
+    private func update(withSubmittingState state: InteractorState.Started) {
+        let newState = NativeAlternativePaymentViewModelState(
+            sections: createSections(state: state, isSubmitting: true),
+            actions: createActions(state: state, isSubmitting: true),
+            isCaptured: false,
+            focusedItemId: nil,
+            confirmationDialog: nil
+        )
+        self.state = newState
+    }
+
+    // MARK: - Awaiting Capture State
+
+    private func update(with state: InteractorState.AwaitingCapture) {
+        let newState = NativeAlternativePaymentViewModelState(
+            sections: createSections(state: state),
+            actions: createActions(state: state),
+            isCaptured: false,
+            focusedItemId: nil,
+            confirmationDialog: nil
+        )
+        self.state = newState
+    }
+
+    private func createSections(state: InteractorState.AwaitingCapture) -> [NativeAlternativePaymentViewModelSection] {
         let item: NativeAlternativePaymentViewModelItem
         if let expectedActionMessage = state.actionMessage {
             let submittedItem = NativeAlternativePaymentViewModelItem.Submitted(
@@ -162,13 +207,32 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         let section = NativeAlternativePaymentViewModelSection(
             id: "awaiting-capture", isCentered: true, title: nil, items: [item], error: nil
         )
-        setSections([section])
+        return [section]
     }
 
-    private func updateSections(state: InteractorState.Captured) {
-        guard !configuration.skipSuccessScreen else {
-            return
-        }
+    private func createActions(state: InteractorState.AwaitingCapture) -> [POActionsContainerActionViewModel] {
+        let actions = [
+            cancelAction(
+                configuration: configuration.paymentConfirmation.secondaryAction, isEnabled: state.isCancellable
+            )
+        ]
+        return actions.compactMap { $0 }
+    }
+
+    // MARK: - Captured State
+
+    private func update(with state: InteractorState.Captured) {
+        let newState = NativeAlternativePaymentViewModelState(
+            sections: createSections(state: state),
+            actions: [],
+            isCaptured: true,
+            focusedItemId: nil,
+            confirmationDialog: nil
+        )
+        self.state = newState
+    }
+
+    private func createSections(state: InteractorState.Captured) -> [NativeAlternativePaymentViewModelSection] {
         let item = NativeAlternativePaymentViewModelItem.Submitted(
             id: "captured",
             title: state.logoImage == nil ? state.paymentProviderName : nil,
@@ -181,20 +245,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         let section = NativeAlternativePaymentViewModelSection(
             id: "captured", isCentered: false, title: nil, items: [.submitted(item)], error: nil
         )
-        setSections([section])
-    }
-
-    private func createTitleSection(state: InteractorState.Started) -> NativeAlternativePaymentViewModelSection? {
-        let title = configuration.title
-            ?? String(resource: .NativeAlternativePayment.title, replacements: state.gateway.displayName)
-        guard !title.isEmpty else {
-            return nil
-        }
-        let item = NativeAlternativePaymentViewModelItem.Title(id: "title", text: title)
-        let section = NativeAlternativePaymentViewModelSection(
-            id: "title", isCentered: false, title: nil, items: [.title(item)], error: nil
-        )
-        return section
+        return [section]
     }
 
     // MARK: - Input Items
@@ -291,7 +342,7 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
     // MARK: - Parameters Submission
 
     private func submitFocusedInput() {
-        guard let focusedItemId else {
+        guard let focusedItemId = state.focusedItemId else {
             assertionFailure("Unable to identify focused input.")
             return
         }
@@ -303,43 +354,13 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             return
         }
         if parameterIds.indices.contains(focusedInputIndex + 1) {
-            self.focusedItemId = parameterIds[focusedInputIndex + 1]
+            self.state.focusedItemId = parameterIds[focusedInputIndex + 1]
         } else {
             interactor.submit()
         }
     }
 
-    // MARK: - Focus
-
-    private func updateFocusedInputId(state: InteractorState.Started) {
-        if state.parameters.map(\.specification.key).map(AnyHashable.init).contains(focusedItemId) {
-            return // Abort if there is already focused input
-        }
-        if let parameter = state.parameters.first(where: { $0.recentErrorMessage != nil }) {
-            focusedItemId = parameter.specification.key // Attempt to focus first invalid parameter if available.
-        } else {
-            focusedItemId = state.parameters.first?.specification.key
-        }
-    }
-
     // MARK: - Actions
-
-    private func updateActions(state: InteractorState.Started, isSubmitting: Bool) {
-        let actions = [
-            submitAction(state: state, isLoading: isSubmitting),
-            cancelAction(configuration: configuration.secondaryAction, isEnabled: !isSubmitting && state.isCancellable)
-        ]
-        setActions(actions.compactMap { $0 })
-    }
-
-    private func updateActions(state: InteractorState.AwaitingCapture) {
-        let actions = [
-            cancelAction(
-                configuration: configuration.paymentConfirmation.secondaryAction, isEnabled: state.isCancellable
-            )
-        ]
-        setActions(actions.compactMap { $0 })
-    }
 
     private func submitAction(state: InteractorState.Started, isLoading: Bool) -> POActionsContainerActionViewModel? {
         let title: String
@@ -391,19 +412,12 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
 
     // MARK: - Utils
 
-    private func setSections(_ newSections: [NativeAlternativePaymentViewModelSection]) {
-        let isAnimated = sections.map(\.animationIdentity) != newSections.map(\.animationIdentity)
-        withAnimation(isAnimated ? .default : nil) {
-            sections = newSections
-        }
-    }
-
     /// Depending on configuration this method either shows confirmation dialog prior to cancelling payment
     /// or does that immediately.
     private func cancelPayment(confirmationConfiguration: POConfirmationDialogConfiguration?) {
         if let configuration = confirmationConfiguration {
             interactor.didRequestCancelConfirmation()
-            confirmationDialog = POConfirmationDialog(
+            state.confirmationDialog = POConfirmationDialog(
                 title: configuration.title ?? String(resource: .NativeAlternativePayment.CancelConfirmation.title),
                 message: configuration.message,
                 primaryButton: .init(
@@ -422,13 +436,6 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             )
         } else {
             interactor.cancel()
-        }
-    }
-
-    private func setActions(_ newActions: [POActionsContainerActionViewModel]) {
-        let isAnimated = actions.map(\.id) != newActions.map(\.id)
-        withAnimation(isAnimated ? .default : nil) {
-            actions = newActions
         }
     }
 }
