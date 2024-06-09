@@ -81,29 +81,29 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
         switch interactor.state {
         case .starting:
             updateSectionsWithStartingState()
-            focusedItemId = nil
             actions = []
             isCaptured = false
+            focusedItemId = nil
         case .started(let state):
             updateSections(state: state, isSubmitting: false)
-            updateFocusedInputId(state: state)
             updateActions(state: state, isSubmitting: false)
             isCaptured = false
+            updateFocusedInputId(state: state)
         case .submitting(let state):
             updateSections(state: state, isSubmitting: true)
-            focusedItemId = nil
             updateActions(state: state, isSubmitting: true)
             isCaptured = false
+            focusedItemId = nil
         case .awaitingCapture(let state):
             updateSections(state: state)
-            focusedItemId = nil
             updateActions(state: state)
             isCaptured = false
+            focusedItemId = nil
         case .captured(let state):
             updateSections(state: state)
-            focusedItemId = nil
             setActions([])
             isCaptured = true
+            focusedItemId = nil
         default:
             break // Ignored
         }
