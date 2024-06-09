@@ -127,10 +127,9 @@ final class DefaultNativeAlternativePaymentViewModel: NativeAlternativePaymentVi
             let items = [
                 createItem(parameter: parameter, isEnabled: !isSubmitting)
             ]
-            // todo(andrii-vysotskyi): make centring customizable for dynamic checkout
             var isSectionCentered = false
             if case .codeInput = items.first, state.parameters.count == 1 {
-                isSectionCentered = true
+                isSectionCentered = configuration.shouldHorizontallyCenterCodeInput
             }
             let section = NativeAlternativePaymentViewModelSection(
                 id: parameter.specification.key,
