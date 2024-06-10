@@ -562,10 +562,10 @@ final class DynamicCheckoutDefaultInteractor:
             logger.debug("Unexpected error type: \(error)")
             failure = POFailure(code: .generic(.mobile), underlyingError: error)
         }
+        logger.error("Did fail to process dynamic checkout payment: '\(error)'")
         state = .failure(failure)
         send(event: .didFail(failure: failure))
         completion(.failure(failure))
-        logger.error("Did fail to process dynamic checkout payment: '\(error)'")
     }
 
     // MARK: - Success State
