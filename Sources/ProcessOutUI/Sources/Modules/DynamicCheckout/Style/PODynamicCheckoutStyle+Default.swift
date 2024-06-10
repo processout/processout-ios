@@ -37,7 +37,8 @@ extension PODynamicCheckoutStyle.RegularPaymentMethod {
     public static let `default` = Self(
         title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
         informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label),
-        border: POBorderStyle.regular(color: Color(poResource: .Text.muted))
+        border: POBorderStyle.regular(color: Color(poResource: .Text.muted)),
+        disabledBackgroundColor: Color(poResource: .Surface.neutral)
     )
 }
 
