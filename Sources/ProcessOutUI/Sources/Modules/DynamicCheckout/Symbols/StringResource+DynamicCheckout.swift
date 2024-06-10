@@ -19,7 +19,7 @@ extension POStringResource {
             static let pay = POStringResource("dynamic-checkout.pay-button", comment: "")
 
             /// Cancel button title.
-            static let cancel = POStringResource("dynamic-checkout.cancel-button", comment: "")
+            static let cancel = POStringResource("native-alternative-payment.cancel-button.title", comment: "")
         }
 
         enum CancelConfirmation {
@@ -53,7 +53,7 @@ extension POStringResource {
         }
 
         /// Success message.
-        static let successMessage = POStringResource("dynamic-checkout.success-message", comment: "")
+        static let successMessage = POStringResource("native-alternative-payment.success.message", comment: "")
     }
 }
 
