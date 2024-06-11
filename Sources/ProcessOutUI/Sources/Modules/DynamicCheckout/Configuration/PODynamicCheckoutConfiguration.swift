@@ -11,7 +11,7 @@ import PassKit
 @_spi(PO)
 public struct PODynamicCheckoutConfiguration {
 
-    public struct CaptureSuccess {
+    public struct PaymentSuccess {
 
         /// Custom success message to display user when payment completes.
         public let message: String?
@@ -53,7 +53,7 @@ public struct PODynamicCheckoutConfiguration {
     public let passKitPaymentButtonType: PKPaymentButtonType
 
     /// Primary button text, such as "Submit".
-    public let primaryButtonTitle: String?
+    public let submitButtonTitle: String?
 
     /// Cancel button. To remove button use `nil`.
     public let cancelButton: CancelButton?
@@ -63,7 +63,7 @@ public struct PODynamicCheckoutConfiguration {
     public let allowsSkippingPaymentList: Bool
 
     /// Capture success screen configuration. In order to avoid showing success screen to user pass `nil`.
-    public let captureSuccess: CaptureSuccess?
+    public let paymentSuccess: PaymentSuccess?
 
     /// Creates configuration instance.
     public init(
@@ -71,18 +71,18 @@ public struct PODynamicCheckoutConfiguration {
         card: PODynamicCheckoutCardConfiguration = .init(),
         alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .init(),
         passKitPaymentButtonType: PKPaymentButtonType = .plain,
-        primaryButtonTitle: String? = nil,
+        submitButtonTitle: String? = nil,
         cancelButton: CancelButton? = nil,
         allowsSkippingPaymentList: Bool = true,
-        captureSuccess: CaptureSuccess? = .init()
+        paymentSuccess: PaymentSuccess? = .init()
     ) {
         self.invoiceId = invoiceId
         self.card = card
         self.alternativePayment = alternativePayment
         self.passKitPaymentButtonType = passKitPaymentButtonType
-        self.primaryButtonTitle = primaryButtonTitle
+        self.submitButtonTitle = submitButtonTitle
         self.cancelButton = cancelButton
         self.allowsSkippingPaymentList = allowsSkippingPaymentList
-        self.captureSuccess = captureSuccess
+        self.paymentSuccess = paymentSuccess
     }
 }
