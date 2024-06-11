@@ -27,13 +27,11 @@ final class DefaultConfigurationMapper: ConfigurationMapper {
     // MARK: - Private Methods
 
     private func convert(scheme: POCardScheme) -> String {
-        switch scheme {
-        case .mastercard:
-            return "mastercard"
-        case .visa:
-            return "visa"
-        default:
+        // todo(andrii-vysotskyi): fail mapping if scheme is unsupported
+        let supportedSchemes: Set<POCardScheme> = [.visa, .mastercard]
+        guard supportedSchemes.contains(scheme) else {
             return ""
         }
+        return scheme.rawValue
     }
 }
