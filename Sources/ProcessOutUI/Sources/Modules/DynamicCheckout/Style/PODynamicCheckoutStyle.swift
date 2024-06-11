@@ -44,16 +44,6 @@ public struct PODynamicCheckoutStyle {
         }
     }
 
-    public struct PendingCapture {
-
-        /// Pending capture info style.
-        public let message: POTextStyle
-
-        public init(message: POTextStyle) {
-            self.message = message
-        }
-    }
-
     public struct PaymentSuccess {
 
         /// Success message style.
@@ -94,6 +84,10 @@ public struct PODynamicCheckoutStyle {
     /// Radio button style.
     public let radioButton: any ButtonStyle
 
+    /// Main content text style. For example in context of native alternative payment method
+    /// this is used to style instruction user needs to follow in order to capture payment.
+    public let bodyText: POTextStyle
+
     /// Error description text style.
     public let errorText: POTextStyle
 
@@ -105,9 +99,6 @@ public struct PODynamicCheckoutStyle {
 
     /// Actions container style.
     public let actionsContainer: POActionsContainerStyle
-
-    /// Pending capture style.
-    public let pendingCapture: PendingCapture
 
     /// Success style.
     public let paymentSuccess: PaymentSuccess
@@ -122,11 +113,11 @@ public struct PODynamicCheckoutStyle {
         input: POInputStyle,
         codeInput: POInputStyle,
         radioButton: some ButtonStyle,
+        bodyText: POTextStyle,
         errorText: POTextStyle,
         message: some POMessageViewStyle,
         backgroundColor: Color,
         actionsContainer: POActionsContainerStyle,
-        pendingCapture: PendingCapture,
         paymentSuccess: PaymentSuccess
     ) {
         self.passKitPaymentButtonStyle = passKitPaymentButtonStyle
@@ -137,11 +128,11 @@ public struct PODynamicCheckoutStyle {
         self.input = input
         self.codeInput = codeInput
         self.radioButton = radioButton
+        self.bodyText = bodyText
         self.errorText = errorText
         self.message = message
         self.backgroundColor = backgroundColor
         self.actionsContainer = actionsContainer
-        self.pendingCapture = pendingCapture
         self.paymentSuccess = paymentSuccess
     }
 }
