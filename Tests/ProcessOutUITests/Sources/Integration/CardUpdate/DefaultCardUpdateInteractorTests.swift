@@ -43,7 +43,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
 
     func test_start_whenCardSchemeIsSetInConfiguration_setsStartedStateWithIt() {
         // Given
-        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: .visa))
+        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
         let sut = createSut(configuration: configuration)
 
         // When
@@ -54,13 +54,13 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
             XCTFail("Unexpected state")
             return
         }
-        XCTAssertEqual(startedState.scheme?.rawValue, "visa")
+        XCTAssertEqual(startedState.scheme, .visa)
     }
 
     func test_start_whenPreferredCardSchemeIsAvailable_setsStartedStateWithIt() {
         // Given
         let configuration = POCardUpdateConfiguration(
-            cardId: "", cardInformation: .init(scheme: .visa, preferredScheme: .carteBancaire)
+            cardId: "", cardInformation: .init(scheme: "visa", preferredScheme: "carte bancaire")
         )
         let sut = createSut(configuration: configuration)
 
@@ -118,7 +118,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
 
     func test_cancel_whenStarted() {
         // Given
-        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: .visa))
+        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
         let sut = createSut(configuration: configuration)
         sut.start()
 
@@ -147,7 +147,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
 
     func test_updateCvc_whenStarted_updatesState() {
         // Given
-        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: .visa))
+        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
         let sut = createSut(configuration: configuration)
         sut.start()
 
@@ -165,7 +165,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
 
     func test_submit_whenCvcIsNotSet_causesError() {
         // Given
-        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: .visa))
+        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
         let sut = createSut(configuration: configuration)
         sut.start()
 
@@ -185,7 +185,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
     func test_submit_whenValidCvcIsSet_completes() {
         // Given
         let configuration = POCardUpdateConfiguration(
-            cardId: "card_ZbHkl2Uh3Udafx2cbb2uN4pP2evwHPyf", cardInformation: .init(scheme: .visa)
+            cardId: "card_ZbHkl2Uh3Udafx2cbb2uN4pP2evwHPyf", cardInformation: .init(scheme: "visa")
         )
         let sut = createSut(configuration: configuration)
         sut.start()
