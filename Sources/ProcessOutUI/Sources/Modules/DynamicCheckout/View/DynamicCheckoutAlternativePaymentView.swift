@@ -47,8 +47,8 @@ extension PONativeAlternativePaymentStyle {
         actionsContainer = style.actionsContainer
         progressView = style.progressView
         message = style.pendingCapture.message
-        successMessage = style.captureSuccess.message
-        background = .init(regular: style.backgroundColor, success: style.captureSuccess.backgroundColor)
+        successMessage = style.paymentSuccess.message
+        background = .init(regular: style.backgroundColor, success: style.paymentSuccess.backgroundColor)
         separatorColor = PONativeAlternativePaymentStyle.default.separatorColor
     }
 }

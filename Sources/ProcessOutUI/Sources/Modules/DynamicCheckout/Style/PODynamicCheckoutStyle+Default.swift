@@ -26,7 +26,7 @@ extension PODynamicCheckoutStyle {
         backgroundColor: Color(poResource: .Surface.level1),
         actionsContainer: .default,
         pendingCapture: .default,
-        captureSuccess: .default
+        paymentSuccess: .default
     )
 }
 
@@ -52,7 +52,7 @@ extension PODynamicCheckoutStyle.PendingCapture {
 }
 
 @available(iOS 14, *)
-extension PODynamicCheckoutStyle.CaptureSuccess {
+extension PODynamicCheckoutStyle.PaymentSuccess {
 
     /// Default dynamic checkout capture success style.
     public static let `default` = Self(

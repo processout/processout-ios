@@ -54,7 +54,7 @@ public struct PODynamicCheckoutStyle {
         }
     }
 
-    public struct CaptureSuccess {
+    public struct PaymentSuccess {
 
         /// Success message style.
         public let message: POTextStyle
@@ -110,7 +110,7 @@ public struct PODynamicCheckoutStyle {
     public let pendingCapture: PendingCapture
 
     /// Success style.
-    public let captureSuccess: CaptureSuccess
+    public let paymentSuccess: PaymentSuccess
 
     /// Creates dynamic checkout style.
     public init(
@@ -127,7 +127,7 @@ public struct PODynamicCheckoutStyle {
         backgroundColor: Color,
         actionsContainer: POActionsContainerStyle,
         pendingCapture: PendingCapture,
-        captureSuccess: CaptureSuccess
+        paymentSuccess: PaymentSuccess
     ) {
         self.passKitPaymentButtonStyle = passKitPaymentButtonStyle
         self.expressPaymentButtonStyle = expressPaymentButtonStyle
@@ -142,6 +142,6 @@ public struct PODynamicCheckoutStyle {
         self.backgroundColor = backgroundColor
         self.actionsContainer = actionsContainer
         self.pendingCapture = pendingCapture
-        self.captureSuccess = captureSuccess
+        self.paymentSuccess = paymentSuccess
     }
 }
