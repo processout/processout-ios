@@ -17,8 +17,8 @@ public enum PODynamicCheckoutEvent {
     /// to fulfil needed info.
     case didStart
 
-    /// Invoked when users changes payment method selection.
-    case didSelectPaymentMethod
+    /// Invoked when users requests selection of another payment method.
+    case willSelectPaymentMethod
 
     /// Event is sent after payment was confirmed to be captured. This is a final event.
     case didCompletePayment

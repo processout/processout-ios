@@ -44,7 +44,7 @@ final class DynamicCheckoutDefaultInteractor:
         guard case .idle = state else {
             return
         }
-        delegate?.dynamicCheckout(didEmitEvent: .willStart)
+        send(event: .willStart)
         state = .starting
         Task {
             await continueStartUnchecked()
@@ -54,11 +54,13 @@ final class DynamicCheckoutDefaultInteractor:
     func select(methodId: String) {
         switch state {
         case .started(let currentState):
+            send(event: .willSelectPaymentMethod)
             setSelectedStateUnchecked(methodId: methodId, startedState: currentState)
         case .selected(let currentState):
             guard currentState.paymentMethodId != methodId else {
                 return
             }
+            send(event: .willSelectPaymentMethod)
             setSelectedStateUnchecked(methodId: methodId, startedState: currentState.snapshot)
         case .paymentProcessing(var currentState):
             guard currentState.paymentMethodId != methodId else {
@@ -80,6 +82,7 @@ final class DynamicCheckoutDefaultInteractor:
     func startPayment(methodId: String) {
         switch state {
         case .started(let currentState):
+            send(event: .willSelectPaymentMethod)
             setPaymentProcessingUnchecked(methodId: methodId, startedState: currentState)
         case .selected(let currentState):
             setPaymentProcessingUnchecked(methodId: methodId, startedState: currentState.snapshot)
@@ -171,7 +174,7 @@ final class DynamicCheckoutDefaultInteractor:
             isCancellable: configuration.cancelButton?.title.map { !$0.isEmpty } ?? true
         )
         state = .started(startedState)
-        delegate?.dynamicCheckout(didEmitEvent: .didStart)
+        send(event: .didStart)
         logger.debug("Did start dynamic checkout flow")
         initiateDefaultPaymentIfNeeded()
     }
@@ -303,7 +306,6 @@ final class DynamicCheckoutDefaultInteractor:
             newStartedState.recentErrorDescription = nil
             let newState = State.Selected(snapshot: newStartedState, paymentMethodId: methodId)
             state = .selected(newState)
-            delegate?.dynamicCheckout(didEmitEvent: .didSelectPaymentMethod)
         } else {
             logger.debug("Ignoring attempt to select unavailable payment method")
         }
