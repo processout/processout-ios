@@ -8,7 +8,7 @@
 import Foundation
 import PassKit
 @_spi(PO) import ProcessOut
-import ProcessOutUI
+@_spi(PO) import ProcessOutUI
 
 final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesViewModelType {
 
@@ -102,7 +102,8 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
             }
             let configuration = PODynamicCheckoutConfiguration(
                 invoiceId: invoice.id,
-                alternativePayment: .init(returnUrl: Constants.returnUrl)
+                alternativePayment: .init(returnUrl: Constants.returnUrl),
+                cancelButton: .init(confirmation: .init())
             )
             self.router.trigger(route: .dynamicCheckout(configuration: configuration, delegate: self))
         }
@@ -152,7 +153,7 @@ extension FeaturesViewModel: PODynamicCheckoutDelegate {
 
     func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {
         request.paymentSummaryItems = [
-            .init(label: "Something", amount: 100, type: .final)
+            .init(label: "Test", amount: 100, type: .final)
         ]
     }
 }

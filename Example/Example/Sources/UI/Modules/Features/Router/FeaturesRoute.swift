@@ -6,7 +6,7 @@
 //
 
 import ProcessOut
-import ProcessOutUI
+@_spi(PO) import ProcessOutUI
 
 enum FeaturesRoute: RouteType {
 
@@ -19,6 +19,6 @@ enum FeaturesRoute: RouteType {
     /// Dynamic checkout flow.
     case dynamicCheckout(configuration: PODynamicCheckoutConfiguration, delegate: PODynamicCheckoutDelegate)
 
-    /// Alerty with given message.
+    /// Alert with given message.
     case alert(message: String)
 }

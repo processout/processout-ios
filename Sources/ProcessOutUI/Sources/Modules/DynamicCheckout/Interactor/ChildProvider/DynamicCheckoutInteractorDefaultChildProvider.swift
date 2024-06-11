@@ -98,6 +98,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             invoiceId: configuration.invoiceId,
             gatewayConfigurationId: gatewayId,
             title: "",
+            shouldHorizontallyCenterCodeInput: false,
             successMessage: "",
             primaryActionTitle: "",
             secondaryAction: nil,

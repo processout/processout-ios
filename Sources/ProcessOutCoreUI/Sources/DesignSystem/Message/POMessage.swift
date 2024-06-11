@@ -19,7 +19,7 @@ public struct POMessage: Identifiable {
     /// Severity
     public let severity: POMessageSeverity
 
-    public init(id: String = UUID().uuidString, text: String, severity: POMessageSeverity = .error) {
+    public init(id: String, text: String, severity: POMessageSeverity = .error) {
         self.id = id
         self.text = text
         self.severity = severity

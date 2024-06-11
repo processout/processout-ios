@@ -16,7 +16,7 @@ extension POAsyncImage {
     /// - NOTE: implementation uses shared `ProcessOut` instance to load image.
     init<Placeholder: View>(
         resource: POImageRemoteResource,
-        transaction: Transaction = Transaction(),
+        transaction: Transaction = Transaction(animation: .default),
         @ViewBuilder placeholder: @escaping () -> Placeholder
     ) where Content == _ConditionalContent<Image, Placeholder> {
         let image = { @Sendable @MainActor in

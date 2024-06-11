@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 05.03.2024.
 //
 
-import ProcessOut
+@_spi(PO) import ProcessOut
 import PassKit
 
 enum DynamicCheckoutInteractorState {

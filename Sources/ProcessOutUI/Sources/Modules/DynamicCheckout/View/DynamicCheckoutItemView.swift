@@ -33,7 +33,7 @@ struct DynamicCheckoutItemView: View {
             POMessageView(message: item)
                 .messageViewStyle(style.message)
         case .success(let item):
-            DynamicCheckoutPaymentSuccessView(item: item)
+            DynamicCheckoutCaptureSuccessView(item: item)
         }
     }
 

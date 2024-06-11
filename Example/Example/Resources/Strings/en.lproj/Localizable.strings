@@ -15,7 +15,7 @@
 "features.card-payment.error" = "Card tokenization did fail with error: '%@'.";
 "features.card-payment.error-generic" = "Unable to tokenize card.";
 "features.card-payment.success" = "Card %@ was successfully tokenized.";
-"features.dynamic-checkout.title" = "Dynamic Checkout";
+"features.dynamic-checkout.title" = "Dynamic Checkout (Beta)";
 "features.continue" = "Continue";
 
 "alternative-payment-methods.title" = "Alternative Payment Methods";

@@ -11,6 +11,7 @@ import SwiftUI
 
 /// Dynamic checkout root view.
 @available(iOS 14, *)
+@_spi(PO)
 public struct PODynamicCheckoutView: View {
 
     init(viewModel: @autoclosure @escaping () -> some ViewModel<DynamicCheckoutViewModelState>) {
@@ -21,15 +22,19 @@ public struct PODynamicCheckoutView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            ScrollView(showsIndicators: true) {
-                DynamicCheckoutContentView(sections: viewModel.state.sections)
+            GeometryReader { geometry in
+                ScrollView(showsIndicators: true) {
+                    DynamicCheckoutContentView(sections: viewModel.state.sections)
+                        .frame(minHeight: geometry.size.height, alignment: .top)
+                }
+                .clipped()
             }
-            .clipped()
             POActionsContainerView(actions: viewModel.state.actions)
                 .actionsContainerStyle(style.actionsContainer)
         }
         .backport.background {
-            let backgroundColor = viewModel.state.isCompleted ? style.success.backgroundColor : style.backgroundColor
+            let backgroundColor = viewModel.state.isCompleted
+                ? style.captureSuccess.backgroundColor : style.backgroundColor
             backgroundColor
                 .ignoresSafeArea()
                 .animation(.default, value: viewModel.state.isCompleted)

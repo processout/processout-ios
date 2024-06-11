@@ -62,9 +62,6 @@ enum DynamicCheckoutViewModelItem {
         /// Payment icon image
         let iconImageResource: POImageRemoteResource
 
-        /// Brand color.
-        let brandColor: UIColor
-
         /// Item title.
         let title: String
 
@@ -94,7 +91,7 @@ enum DynamicCheckoutViewModelItem {
     struct AlternativePayment {
 
         /// Creates alternative payment view model.
-        let viewModel: () -> AnyNativeAlternativePaymentViewModel
+        let viewModel: () -> AnyViewModel<NativeAlternativePaymentViewModelState>
     }
 
     struct Card {

@@ -15,23 +15,23 @@ extension POStringResource {
 
         enum Button {
 
-            /// Continue button.
-            static let `continue` = POStringResource("dynamic-checkout.continue-button", comment: "")
+            /// Submit button title.
+            static let pay = POStringResource("dynamic-checkout.pay-button", comment: "")
 
             /// Cancel button title.
-            static let cancel = POStringResource("dynamic-checkout.cancel-button", comment: "")
+            static let cancel = POStringResource("native-alternative-payment.cancel-button.title", comment: "")
         }
 
         enum CancelConfirmation {
 
             /// Success message.
-            static let title = POStringResource("dynamic-checkout.cancel-confirmation.title", comment: "")
+            static let title = POStringResource("cancel-confirmation.title", comment: "")
 
             /// Confirm button title..
-            static let confirm = POStringResource("dynamic-checkout.cancel-confirmation.confirm", comment: "")
+            static let confirm = POStringResource("cancel-confirmation.confirm", comment: "")
 
             /// Cancel button title.
-            static let cancel = POStringResource("dynamic-checkout.cancel-confirmation.cancel", comment: "")
+            static let cancel = POStringResource("cancel-confirmation.cancel", comment: "")
         }
 
         enum Error {
@@ -53,7 +53,7 @@ extension POStringResource {
         }
 
         /// Success message.
-        static let successMessage = POStringResource("dynamic-checkout.success-message", comment: "")
+        static let successMessage = POStringResource("native-alternative-payment.success.message", comment: "")
     }
 }
 

@@ -8,6 +8,7 @@
 import PassKit
 
 /// Dynamic checkout configuration.
+@_spi(PO)
 public struct PODynamicCheckoutConfiguration {
 
     public struct CaptureSuccess {

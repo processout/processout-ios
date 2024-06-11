@@ -12,8 +12,8 @@ import SwiftUI
 @available(iOS 14, *)
 public struct PONativeAlternativePaymentView: View {
 
-    init(viewModel: @autoclosure @escaping () -> some NativeAlternativePaymentViewModel) {
-        self._viewModel = .init(wrappedValue: .init(erasing: viewModel()))
+    init(viewModel: @autoclosure @escaping () -> AnyViewModel<NativeAlternativePaymentViewModelState>) {
+        self._viewModel = .init(wrappedValue: viewModel())
     }
 
     // MARK: - View
@@ -30,17 +30,17 @@ public struct PONativeAlternativePaymentView: View {
                 }
                 .clipped()
             }
-            POActionsContainerView(actions: viewModel.actions)
+            POActionsContainerView(actions: viewModel.state.actions)
                 .actionsContainerStyle(style.actionsContainer)
         }
         .backport.background {
-            let backgroundColor = viewModel.isCaptured ? style.background.success : style.background.regular
+            let backgroundColor = viewModel.state.isCaptured ? style.background.success : style.background.regular
             backgroundColor
                 .ignoresSafeArea()
-                .animation(.default, value: viewModel.isCaptured)
+                .animation(.default, value: viewModel.state.isCaptured)
         }
         .onAppear(perform: viewModel.start)
-        .poConfirmationDialog(item: $viewModel.confirmationDialog)
+        .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
     }
 
     // MARK: - Private Properties
@@ -49,5 +49,5 @@ public struct PONativeAlternativePaymentView: View {
     private var style
 
     @StateObject
-    private var viewModel: AnyNativeAlternativePaymentViewModel
+    private var viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>
 }

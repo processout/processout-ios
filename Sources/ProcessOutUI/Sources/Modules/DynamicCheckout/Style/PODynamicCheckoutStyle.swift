@@ -14,34 +14,47 @@ import SwiftUI
 /// For more information about styling specific components, see
 /// [the dedicated documentation.](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutcoreui)
 @available(iOS 14, *)
+@_spi(PO)
 public struct PODynamicCheckoutStyle {
 
-    public struct Section {
+    public struct RegularPaymentMethod {
 
-        /// Section border style.
-        public let border: POBorderStyle
-
-        /// Creates section style instance.
-        public init(border: POBorderStyle) {
-            self.border = border
-        }
-    }
-
-    public struct PaymentMethod {
-
-        /// Title style.
+        /// Payment method title.
         public let title: POTextStyle
 
         /// Information text style.
         public let informationText: POTextStyle
 
-        public init(title: POTextStyle, informationText: POTextStyle) {
+        /// Border style to apply to regular payments.
+        public let border: POBorderStyle
+
+        /// Background color to use when payment method is unavailable.
+        public let disabledBackgroundColor: Color
+
+        public init(
+            title: POTextStyle,
+            informationText: POTextStyle,
+            border: POBorderStyle,
+            disabledBackgroundColor: Color
+        ) {
             self.title = title
             self.informationText = informationText
+            self.border = border
+            self.disabledBackgroundColor = disabledBackgroundColor
         }
     }
 
-    public struct Success {
+    public struct PendingCapture {
+
+        /// Pending capture info style.
+        public let message: POTextStyle
+
+        public init(message: POTextStyle) {
+            self.message = message
+        }
+    }
+
+    public struct CaptureSuccess {
 
         /// Success message style.
         public let message: POTextStyle
@@ -56,11 +69,15 @@ public struct PODynamicCheckoutStyle {
         }
     }
 
-    /// Section style.
-    public let section: Section
+    /// PassKit payment button style.
+    public let passKitPaymentButtonStyle: POPassKitPaymentButtonStyle
 
-    /// Payment method info.
-    public let paymentMethod: PaymentMethod
+    /// Generic express payment button style. When default style is used, equals to
+    /// `POBrandButtonStyle.brand` that automatically resolves styling based on branding.
+    public let expressPaymentButtonStyle: any ButtonStyle
+
+    /// Regular payment method style.
+    public let regularPaymentMethod: RegularPaymentMethod
 
     /// Progress view style.
     public let progressView: any ProgressViewStyle
@@ -80,55 +97,51 @@ public struct PODynamicCheckoutStyle {
     /// Error description text style.
     public let errorText: POTextStyle
 
-    /// PassKit payment button style.
-    public let passKitPaymentButtonStyle: POPassKitPaymentButtonStyle
-
-    /// Generic express payment button style. When default style is used, equals to
-    /// `POBrandButtonStyle.brand` that automatically resolves styling based on branding.
-    public let expressPaymentButtonStyle: any ButtonStyle
-
     /// Informational message style.
     public let message: any POMessageViewStyle
 
     /// Background color.
     public let backgroundColor: Color
 
-    /// Success style.
-    public let success: Success
-
     /// Actions container style.
     public let actionsContainer: POActionsContainerStyle
 
+    /// Pending capture style.
+    public let pendingCapture: PendingCapture
+
+    /// Success style.
+    public let captureSuccess: CaptureSuccess
+
     /// Creates dynamic checkout style.
     public init(
-        section: PODynamicCheckoutStyle.Section,
-        paymentMethod: PODynamicCheckoutStyle.PaymentMethod,
+        passKitPaymentButtonStyle: POPassKitPaymentButtonStyle,
+        expressPaymentButtonStyle: some ButtonStyle,
+        regularPaymentMethod: RegularPaymentMethod,
         progressView: some ProgressViewStyle,
         inputTitle: POTextStyle,
         input: POInputStyle,
         codeInput: POInputStyle,
         radioButton: some ButtonStyle,
         errorText: POTextStyle,
-        passKitPaymentButtonStyle: POPassKitPaymentButtonStyle,
-        expressPaymentButtonStyle: some ButtonStyle,
         message: some POMessageViewStyle,
         backgroundColor: Color,
-        success: Success,
-        actionsContainer: POActionsContainerStyle
+        actionsContainer: POActionsContainerStyle,
+        pendingCapture: PendingCapture,
+        captureSuccess: CaptureSuccess
     ) {
-        self.section = section
-        self.paymentMethod = paymentMethod
+        self.passKitPaymentButtonStyle = passKitPaymentButtonStyle
+        self.expressPaymentButtonStyle = expressPaymentButtonStyle
+        self.regularPaymentMethod = regularPaymentMethod
         self.progressView = progressView
         self.inputTitle = inputTitle
         self.input = input
         self.codeInput = codeInput
         self.radioButton = radioButton
         self.errorText = errorText
-        self.passKitPaymentButtonStyle = passKitPaymentButtonStyle
-        self.expressPaymentButtonStyle = expressPaymentButtonStyle
         self.message = message
         self.backgroundColor = backgroundColor
-        self.success = success
         self.actionsContainer = actionsContainer
+        self.pendingCapture = pendingCapture
+        self.captureSuccess = captureSuccess
     }
 }

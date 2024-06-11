@@ -35,7 +35,8 @@ extension PONativeAlternativePaymentView {
                 completion: completion
             )
             interactor.delegate = delegate
-            return DefaultNativeAlternativePaymentViewModel(interactor: interactor)
+            let viewModel = DefaultNativeAlternativePaymentViewModel(interactor: interactor)
+            return AnyViewModel(erasing: viewModel)
         }
         self = .init(viewModel: viewModel())
     }

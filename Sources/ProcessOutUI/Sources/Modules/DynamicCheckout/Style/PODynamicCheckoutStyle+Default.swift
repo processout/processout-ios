@@ -13,47 +13,49 @@ extension PODynamicCheckoutStyle {
 
     /// Default dynamic checkout style.
     public static let `default` = PODynamicCheckoutStyle(
-        section: .default,
-        paymentMethod: .default,
+        passKitPaymentButtonStyle: POPassKitPaymentButtonStyle(),
+        expressPaymentButtonStyle: .brand,
+        regularPaymentMethod: .default,
         progressView: .circular,
         inputTitle: POTextStyle(color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading),
         input: .medium,
         codeInput: .large,
         radioButton: PORadioButtonStyle.radio,
         errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
-        passKitPaymentButtonStyle: POPassKitPaymentButtonStyle(),
-        expressPaymentButtonStyle: .brand,
         message: .toast,
         backgroundColor: Color(poResource: .Surface.level1),
-        success: .default,
-        actionsContainer: .default
+        actionsContainer: .default,
+        pendingCapture: .default,
+        captureSuccess: .default
     )
 }
 
 @available(iOS 14, *)
-extension PODynamicCheckoutStyle.Section {
+extension PODynamicCheckoutStyle.RegularPaymentMethod {
 
-    /// Default dynamic checkout section style.
-    public static let `default` = PODynamicCheckoutStyle.Section(
-        border: POBorderStyle.regular(color: Color(poResource: .Text.muted))
-    )
-}
-
-@available(iOS 14, *)
-extension PODynamicCheckoutStyle.PaymentMethod {
-
-    /// Default dynamic checkout subsection style.
-    public static let `default` = PODynamicCheckoutStyle.PaymentMethod(
+    /// Default dynamic checkout regular payment method style.
+    public static let `default` = Self(
         title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
-        informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label)
+        informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label),
+        border: POBorderStyle.regular(color: Color(poResource: .Text.muted)),
+        disabledBackgroundColor: Color(poResource: .Surface.neutral)
     )
 }
 
 @available(iOS 14, *)
-extension PODynamicCheckoutStyle.Success {
+extension PODynamicCheckoutStyle.PendingCapture {
 
-    /// Default dynamic checkout subsection style.
-    public static let `default` = PODynamicCheckoutStyle.Success(
+    /// Default dynamic checkout pending capture style.
+    public static let `default` = Self(
+        message: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body)
+    )
+}
+
+@available(iOS 14, *)
+extension PODynamicCheckoutStyle.CaptureSuccess {
+
+    /// Default dynamic checkout capture success style.
+    public static let `default` = Self(
         message: POTextStyle(color: Color(poResource: .Text.success), typography: .Fixed.body),
         backgroundColor: Color(poResource: .Surface.success)
     )

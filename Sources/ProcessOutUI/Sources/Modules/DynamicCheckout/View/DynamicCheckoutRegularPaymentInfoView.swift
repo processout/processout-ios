@@ -16,12 +16,15 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
     var body: some View {
         VStack(spacing: POSpacing.medium) {
             HStack(spacing: POSpacing.small) {
+                // todo(andrii-vysotskyi): decide if separate style should exist for AsyncImage
                 POAsyncImage(resource: item.iconImageResource) {
-                    style.paymentMethod.title.color.frame(width: 24, height: 24)
+                    style.regularPaymentMethod.title.color
+                        .clipShape(RoundedRectangle(cornerRadius: POSpacing.extraSmall))
                 }
+                .frame(width: 24, height: 24)
                 Text(item.title)
                     .lineLimit(1)
-                    .textStyle(style.paymentMethod.title)
+                    .textStyle(style.regularPaymentMethod.title)
                 Spacer()
                 if item.isLoading {
                     ProgressView()
@@ -67,12 +70,12 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
         Label(
             title: {
                 Text(information)
-                    .textStyle(style.paymentMethod.informationText)
+                    .textStyle(style.regularPaymentMethod.informationText)
             },
             icon: {
                 Image(.info)
                     .renderingMode(.template)
-                    .foregroundColor(style.paymentMethod.informationText.color)
+                    .foregroundColor(style.regularPaymentMethod.informationText.color)
             }
         )
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -97,7 +97,6 @@ final class NativeAlternativePaymentDefaultInteractor:
             captureCancellable?.cancel()
         default:
             logger.debug("Ignored cancellation attempt from unsupported state: \(state)")
-            return
         }
     }
 
@@ -133,7 +132,6 @@ final class NativeAlternativePaymentDefaultInteractor:
             )
             details = try await invoicesService.nativeAlternativePaymentMethodTransactionDetails(request: request)
         } catch {
-            logger.info("Failed to start payment: \(error)")
             setFailureStateUnchecked(error: error)
             return
         }
@@ -360,6 +358,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Failure State
 
     private func setFailureStateUnchecked(error: Error) {
+        logger.error("Did fail to process native payment: \(error)")
         let failure: POFailure
         if let error = error as? POFailure {
             failure = error

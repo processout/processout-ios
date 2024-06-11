@@ -7,7 +7,7 @@
 
 import UIKit
 import ProcessOut
-import ProcessOutUI
+@_spi(PO) import ProcessOutUI
 
 final class FeaturesRouter: RouterType {
 

@@ -30,7 +30,7 @@ struct DynamicCheckoutAlternativePaymentView: View {
     private var style
 
     @StateObject
-    private var viewModel: AnyNativeAlternativePaymentViewModel
+    private var viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>
 }
 
 @available(iOS 14, *)
@@ -39,17 +39,16 @@ extension PONativeAlternativePaymentStyle {
     // swiftlint:disable:next strict_fileprivate
     fileprivate init(dynamicCheckoutStyle style: PODynamicCheckoutStyle) {
         title = PONativeAlternativePaymentStyle.default.title
-        sectionTitle = style.paymentMethod.title
+        sectionTitle = style.regularPaymentMethod.title
         input = style.input
         codeInput = style.codeInput
         radioButton = style.radioButton
         errorDescription = style.errorText
         actionsContainer = style.actionsContainer
         progressView = style.progressView
-        // todo(andrii-vysotskyi): resolve message style from input style
-        message = POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body)
-        successMessage = style.success.message
-        background = .init(regular: style.backgroundColor, success: style.success.backgroundColor)
+        message = style.pendingCapture.message
+        successMessage = style.captureSuccess.message
+        background = .init(regular: style.backgroundColor, success: style.captureSuccess.backgroundColor)
         separatorColor = PONativeAlternativePaymentStyle.default.separatorColor
     }
 }

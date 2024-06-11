@@ -20,17 +20,18 @@ struct DynamicCheckoutSectionView: View {
                 VStack(spacing: 0) {
                     if section.areBezelsVisible, offset != 0 {
                         Divider()
-                            .frame(height: style.section.border.width)
-                            .overlay(style.section.border.color)
+                            .frame(height: style.regularPaymentMethod.border.width)
+                            .overlay(style.regularPaymentMethod.border.color)
                     }
                     DynamicCheckoutItemView(item: item)
                         .padding(section.areBezelsVisible ? POSpacing.medium : 0)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .background(style.backgroundColor)
+                .background(background(for: item))
                 .backport.geometryGroup()
             }
         }
-        .border(style: section.areBezelsVisible ? style.section.border : .clear)
+        .border(style: section.areBezelsVisible ? style.regularPaymentMethod.border : .clear)
         .backport.geometryGroup()
     }
 
@@ -38,4 +39,17 @@ struct DynamicCheckoutSectionView: View {
 
     @Environment(\.dynamicCheckoutStyle)
     private var style
+
+    // MARK: - Private Methods
+
+    @ViewBuilder
+    private func background(for item: DynamicCheckoutViewModelState.Item) -> some View {
+        if !section.areBezelsVisible {
+            style.backgroundColor.opacity(0)
+        } else if case .regularPayment(let item) = item, !item.info.isSelectable {
+            style.regularPaymentMethod.disabledBackgroundColor
+        } else {
+            style.backgroundColor
+        }
+    }
 }

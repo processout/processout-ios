@@ -121,12 +121,12 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
 extension NativeAlternativePaymentViewModelSection: AnimationIdentityProvider {
 
     var animationIdentity: AnyHashable {
-        [id, items.map(animationValue), error]
+        [id, items.map(animationIdentity), error]
     }
 
     // MARK: - Private Methods
 
-    private func animationValue(of item: NativeAlternativePaymentViewModelItem) -> AnyHashable {
+    private func animationIdentity(of item: NativeAlternativePaymentViewModelItem) -> AnyHashable {
         switch item {
         case .title(let item):
             return item
