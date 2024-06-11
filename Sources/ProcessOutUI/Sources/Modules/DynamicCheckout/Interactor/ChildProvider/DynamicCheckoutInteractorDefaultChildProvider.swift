@@ -88,9 +88,9 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
     private func alternativePaymentConfiguration(gatewayId: String) -> PONativeAlternativePaymentConfiguration {
         let confirmationConfiguration = PONativeAlternativePaymentConfirmationConfiguration(
             waitsConfirmation: true,
-            timeout: configuration.alternativePayment.captureConfirmation.timeout,
-            showProgressIndicatorAfter: configuration.alternativePayment.captureConfirmation.showProgressIndicatorAfter,
-            secondaryAction: configuration.alternativePayment.captureConfirmation.cancelButton.map { configuration in
+            timeout: configuration.alternativePayment.paymentConfirmation.timeout,
+            showProgressIndicatorAfter: configuration.alternativePayment.paymentConfirmation.showProgressIndicatorAfter,
+            secondaryAction: configuration.alternativePayment.paymentConfirmation.cancelButton.map { configuration in
                 .cancel(title: "", disabledFor: configuration.disabledFor, confirmation: nil)
             }
         )
