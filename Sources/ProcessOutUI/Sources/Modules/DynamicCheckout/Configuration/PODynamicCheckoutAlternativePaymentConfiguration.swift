@@ -8,6 +8,7 @@
 import Foundation
 
 /// Alternative payment specific dynamic checkout configuration.
+@_spi(PO)
 public struct PODynamicCheckoutAlternativePaymentConfiguration {
 
     public struct CaptureConfirmation {
