@@ -153,7 +153,7 @@ extension FeaturesViewModel: PODynamicCheckoutDelegate {
 
     func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {
         request.paymentSummaryItems = [
-            .init(label: "Something", amount: 100, type: .final)
+            .init(label: "Test", amount: 100, type: .final)
         ]
     }
 }
