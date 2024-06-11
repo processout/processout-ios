@@ -8,7 +8,7 @@
 import Foundation
 import PassKit
 @_spi(PO) import ProcessOut
-import ProcessOutUI
+@_spi(PO) import ProcessOutUI
 
 final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesViewModelType {
 

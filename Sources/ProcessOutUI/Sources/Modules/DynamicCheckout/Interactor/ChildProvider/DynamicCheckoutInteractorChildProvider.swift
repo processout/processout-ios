@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 17.04.2024.
 //
 
-import ProcessOut
+@_spi(PO) import ProcessOut
 
 /// - NOTE: Your implementation should expect that instances created
 /// by provider are going to be different every time you call a method.
