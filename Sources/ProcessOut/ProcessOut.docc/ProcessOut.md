@@ -94,7 +94,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``PONativeAlternativePaymentMethodTransactionDetailsRequest``
 - ``PONativeAlternativePaymentMethodParameterValues``
 - ``PONativeAlternativePaymentMethodState``
-- ``PODynamicCheckoutPaymentMethod``
+<!--- ``PODynamicCheckoutPaymentMethod``-->
 
 ### Appearance
 

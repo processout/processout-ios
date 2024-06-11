@@ -23,5 +23,6 @@ public struct POInvoice: Decodable {
     public let returnUrl: URL?
 
     /// Dynamic checkout details resolved for specific invoice.
+    @_spi(PO)
     public let paymentMethods: [PODynamicCheckoutPaymentMethod]?
 }
