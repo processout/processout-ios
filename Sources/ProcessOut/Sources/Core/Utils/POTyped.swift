@@ -8,6 +8,7 @@
 import Foundation
 
 /// Introduces typed version of a property in a backward compatible way.
+/// todo(andrii-vysotskyi): remove when updating to 5.0.0
 @propertyWrapper
 public struct POTyped<Wrapped, Representation: RawRepresentable> {
 
