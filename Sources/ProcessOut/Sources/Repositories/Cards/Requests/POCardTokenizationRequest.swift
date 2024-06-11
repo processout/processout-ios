@@ -29,7 +29,8 @@ public struct POCardTokenizationRequest: Encodable {
     public let contact: POContact?
 
     /// Preferred scheme defined by the Customer.
-    public let preferredScheme: POCardScheme?
+    @POTyped<String?, POCardScheme>
+    public private(set) var preferredScheme: String?
 
     /// Metadata related to the card.
     public let metadata: [String: String]?
@@ -41,7 +42,7 @@ public struct POCardTokenizationRequest: Encodable {
         cvc: String? = nil,
         name: String? = nil,
         contact: POContact? = nil,
-        preferredScheme: POCardScheme? = nil,
+        preferredScheme: String? = nil,
         metadata: [String: String]? = nil
     ) {
         self.number = number

@@ -18,13 +18,16 @@ public struct POCard: Decodable, Hashable {
     public let projectId: String
 
     /// Scheme of the card.
-    public let scheme: POCardScheme
+    @POTyped<String, POCardScheme>
+    public private(set) var scheme: String
 
     /// Co-scheme of the card, such as Carte Bancaire.
-    public let coScheme: POCardScheme?
+    @POTyped<String?, POCardScheme>
+    public private(set) var coScheme: String?
 
     /// Preferred scheme defined by the Customer.
-    public let preferredScheme: POCardScheme?
+    @POTyped<String?, POCardScheme>
+    public private(set) var preferredScheme: String?
 
     /// Card type.
     @POFallbackDecodable<POEmptyStringProvider>
@@ -57,7 +60,8 @@ public struct POCard: Decodable, Hashable {
     public let expYear: Int
 
     /// CVC check status.
-    public let cvcCheck: POCardCvcCheck
+    @POTyped<String, POCardCvcCheck>
+    public var cvcCheck: String
 
     /// AVS check status.
     public let avsCheck: String

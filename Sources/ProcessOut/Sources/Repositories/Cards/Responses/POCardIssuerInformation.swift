@@ -9,10 +9,12 @@
 public struct POCardIssuerInformation: Decodable {
 
     /// Scheme of the card.
-    public let scheme: POCardScheme
+    @POTyped<String, POCardScheme>
+    public private(set) var scheme: String
 
     /// Co-scheme of the card, such as Carte Bancaire.
-    public let coScheme: POCardScheme?
+    @POTyped<String?, POCardScheme>
+    public private(set) var coScheme: String?
 
     /// Card type.
     public let type: String?
@@ -34,8 +36,8 @@ public struct POCardIssuerInformation: Decodable {
         brand: String? = nil,
         category: String? = nil
     ) {
-        self.scheme = scheme
-        self.coScheme = coScheme
+        self.scheme = scheme.rawValue
+        self.coScheme = coScheme?.rawValue
         self.type = type
         self.bankName = bankName
         self.brand = brand

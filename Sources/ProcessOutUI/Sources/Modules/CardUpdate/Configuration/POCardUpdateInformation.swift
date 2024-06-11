@@ -22,20 +22,23 @@ public struct POCardUpdateInformation {
     public let iin: String?
 
     /// Scheme of the card.
-    public let scheme: POCardScheme?
+    @POTyped<String?, POCardScheme>
+    public private(set) var scheme: String?
 
     /// Co-scheme of the card, such as Carte Bancaire.
-    public let coScheme: POCardScheme?
+    @POTyped<String?, POCardScheme>
+    public private(set) var coScheme: String?
 
     /// Preferred scheme previously selected by customer if any.
-    public let preferredScheme: POCardScheme?
+    @POTyped<String?, POCardScheme>
+    public private(set) var preferredScheme: String?
 
     public init(
         maskedNumber: String? = nil,
         iin: String? = nil,
-        scheme: POCardScheme? = nil,
-        coScheme: POCardScheme? = nil,
-        preferredScheme: POCardScheme? = nil
+        scheme: String? = nil,
+        coScheme: String? = nil,
+        preferredScheme: String? = nil
     ) {
         self.maskedNumber = maskedNumber
         self.iin = iin
