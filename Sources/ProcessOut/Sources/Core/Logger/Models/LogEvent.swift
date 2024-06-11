@@ -15,7 +15,7 @@ struct LogEvent {
     /// Actual log message.
     let message: String
 
-    /// The string that categorizes event.
+    /// The string that categorises event.
     let category: String
 
     /// Date associated with message.
@@ -31,5 +31,5 @@ struct LogEvent {
     let line: Int
 
     /// Additional attributes.
-    let additionalAttributes: [String: String]
+    let additionalAttributes: [POLogAttributeKey: String]
 }

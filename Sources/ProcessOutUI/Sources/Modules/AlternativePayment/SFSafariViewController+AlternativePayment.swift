@@ -1,5 +1,5 @@
 //
-//  SFSafariViewController+AlternativePaymentMethod.swift
+//  SFSafariViewController+AlternativePayment.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 17.11.2023.
@@ -52,21 +52,30 @@ extension SFSafariViewController {
         commonInit(returnUrl: returnUrl, completion: completion)
     }
 
+    // MARK: - Private Nested Types
+
+    private typealias Completion = (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
+
     // MARK: - Private Methods
 
-    private func commonInit(
-        returnUrl: URL, completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
-    ) {
+    private func commonInit(returnUrl: URL, completion: @escaping Completion) {
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
-        let delegate = AlternativePaymentMethodSafariViewModelDelegate(
-            alternativePaymentMethodsService: api.alternativePaymentMethods, completion: completion
-        )
-        let configuration = DefaultSafariViewModelConfiguration(returnUrl: returnUrl, timeout: nil)
         let viewModel = DefaultSafariViewModel(
-            configuration: configuration, eventEmitter: api.eventEmitter, logger: api.logger, delegate: delegate
+            callback: .customScheme(returnUrl.scheme ?? ""),
+            eventEmitter: api.eventEmitter,
+            logger: api.logger,
+            completion: { result in
+                completion(result.flatMap(Self.response(with:)))
+            }
         )
-        self.delegate = viewModel
         self.setViewModel(viewModel)
         viewModel.start()
+    }
+
+    private static func response(with url: URL) -> Result<POAlternativePaymentMethodResponse, POFailure> {
+        let result = Result {
+            try ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodResponse(url: url)
+        }
+        return result.mapError { $0 as! POFailure } // swiftlint:disable:this force_cast
     }
 }

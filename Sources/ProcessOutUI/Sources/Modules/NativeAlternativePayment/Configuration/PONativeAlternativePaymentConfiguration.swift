@@ -19,8 +19,11 @@ public struct PONativeAlternativePaymentConfiguration {
         /// - Parameters:
         ///   - title: Action title. Pass `nil` title to use default value.
         ///   - disabledFor: By default user can interact with action immediately after it becomes visible, it is
-        ///   possible to make it initialy disabled for given amount of time.
-        case cancel(title: String? = nil, disabledFor: TimeInterval = 0)
+        ///   possible to make it initially disabled for given amount of time.
+        ///   - confirmation: When property is set implementation asks user to confirm cancel.
+        case cancel(
+            title: String? = nil, disabledFor: TimeInterval = 0, confirmation: POConfirmationDialogConfiguration? = nil
+        )
     }
 
     /// Invoice that should be authorized/captured.
@@ -32,7 +35,7 @@ public struct PONativeAlternativePaymentConfiguration {
     /// Custom title.
     public let title: String?
 
-    /// Custom success message to display user when payment completes.
+    /// Custom success message **markdown** to display user when payment completes.
     public let successMessage: String?
 
     /// Primary action text, such as "Pay".
@@ -50,19 +53,32 @@ public struct PONativeAlternativePaymentConfiguration {
     /// Boolean value that indicates whether capture success screen should be skipped. Default value is `false`.
     public let skipSuccessScreen: Bool
 
+    /// Payment confirmation configuration.
+    public let paymentConfirmation: PONativeAlternativePaymentConfirmationConfiguration
+
     /// Boolean value that specifies whether module should wait for payment confirmation from PSP or will
     /// complete right after all user's input is submitted. Default value is `true`.
-    public let waitsPaymentConfirmation: Bool
+    @available(*, deprecated, renamed: "paymentConfirmation.waitsConfirmation")
+    public var waitsPaymentConfirmation: Bool {
+        paymentConfirmation.waitsConfirmation
+    }
 
     /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
-    /// Maximum value is 180 seconds.
-    public let paymentConfirmationTimeout: TimeInterval
+    /// Default timeout is 3 minutes while maximum value is 15 minutes.
+    @available(*, deprecated, renamed: "paymentConfirmation.timeout")
+    public var paymentConfirmationTimeout: TimeInterval {
+        paymentConfirmation.timeout
+    }
 
     /// Action that could be optionally presented to user during payment confirmation stage. To remove action
     /// use `nil`, this is default behaviour.
-    public let paymentConfirmationSecondaryAction: SecondaryAction?
+    @available(*, deprecated, renamed: "paymentConfirmation.secondaryAction")
+    public var paymentConfirmationSecondaryAction: SecondaryAction? {
+        paymentConfirmation.secondaryAction
+    }
 
     /// Creates configuration instance.
+    @available(*, deprecated)
     public init(
         invoiceId: String,
         gatewayConfigurationId: String,
@@ -84,8 +100,33 @@ public struct PONativeAlternativePaymentConfiguration {
         self.secondaryAction = secondaryAction
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.skipSuccessScreen = skipSuccessScreen
-        self.waitsPaymentConfirmation = waitsPaymentConfirmation
-        self.paymentConfirmationTimeout = paymentConfirmationTimeout
-        self.paymentConfirmationSecondaryAction = paymentConfirmationSecondaryAction
+        self.paymentConfirmation = .init(
+            waitsConfirmation: waitsPaymentConfirmation,
+            timeout: paymentConfirmationTimeout,
+            secondaryAction: paymentConfirmationSecondaryAction
+        )
+    }
+
+    /// Creates configuration instance.
+    public init(
+        invoiceId: String,
+        gatewayConfigurationId: String,
+        title: String? = nil,
+        successMessage: String? = nil,
+        primaryActionTitle: String? = nil,
+        secondaryAction: SecondaryAction? = nil,
+        inlineSingleSelectValuesLimit: Int = 5,
+        skipSuccessScreen: Bool = false,
+        paymentConfirmation: PONativeAlternativePaymentConfirmationConfiguration = .init()
+    ) {
+        self.invoiceId = invoiceId
+        self.gatewayConfigurationId = gatewayConfigurationId
+        self.title = title
+        self.successMessage = successMessage
+        self.primaryActionTitle = primaryActionTitle
+        self.secondaryAction = secondaryAction
+        self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
+        self.skipSuccessScreen = skipSuccessScreen
+        self.paymentConfirmation = paymentConfirmation
     }
 }

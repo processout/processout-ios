@@ -9,7 +9,7 @@ import SwiftUI
 
 enum NativeAlternativePaymentViewModelItem {
 
-    struct Title: Identifiable {
+    struct Title: Identifiable, Hashable {
 
         /// Item identifier.
         let id: AnyHashable
@@ -65,7 +65,7 @@ enum NativeAlternativePaymentViewModelItem {
         let isEnabled: Bool
     }
 
-    struct Submitted: Identifiable {
+    struct Submitted: Identifiable, Hashable {
 
         /// Item identifier.
         let id: AnyHashable
@@ -84,6 +84,9 @@ enum NativeAlternativePaymentViewModelItem {
 
         /// Boolean value that indicates whether payment is already captured.
         let isCaptured: Bool
+
+        /// Defines whether progress view should be hidden or not.
+        let isProgressViewHidden: Bool
     }
 
     case progress, title(Title), input(Input), codeInput(CodeInput), picker(Picker), submitted(Submitted)

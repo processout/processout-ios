@@ -16,7 +16,7 @@ public struct POCardUpdateInformation {
     /// Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
     ///
     /// When this property is nil implementation will attempt to extract IIN from ``maskedNumber``.
-    /// You may want to set this property explicity if you know that masked number's iin may be unavailable.
+    /// You may want to set this property explicitly if you know that masked number's IIN may be unavailable.
     ///
     /// - NOTE: When this property is set, `scheme` and `coScheme` could be `nil`.
     public let iin: String?

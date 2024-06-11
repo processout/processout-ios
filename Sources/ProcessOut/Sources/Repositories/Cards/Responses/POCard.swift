@@ -27,7 +27,8 @@ public struct POCard: Decodable, Hashable {
     public let preferredScheme: POCardScheme?
 
     /// Card type.
-    public let type: String
+    @POFallbackDecodable<POEmptyStringProvider>
+    public private(set) var type: String
 
     /// Name of the card’s issuing bank.
     public let bankName: String?

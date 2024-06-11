@@ -10,6 +10,6 @@ import Checkout3DS
 
 protocol ConfigurationMapper {
 
-    /// Converts given processout configuration to Checkout config parameters.
+    /// Converts given ProcessOut configuration to Checkout config parameters.
     func convert(configuration: PO3DS2Configuration) -> ThreeDS2ServiceConfiguration.ConfigParameters
 }

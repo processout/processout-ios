@@ -1,14 +1,48 @@
-// Generated using Sourcery 2.1.7 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 2.2.4 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
-
-// MARK: - AutoCompletion
 
 import Foundation
 import UIKit
 
+// MARK: - AutoCodingKeys
+
+extension POAssignCustomerTokenRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case source
+        case preferredScheme
+        case verify
+        case invoiceId
+        case enableThreeDS2 = "enable_three_d_s_2"
+        case thirdPartySdkVersion
+        case metadata
+    }
+}
+
+extension POInvoiceAuthorizationRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case source
+        case incremental
+        case enableThreeDS2 = "enable_three_d_s_2"
+        case preferredScheme
+        case thirdPartySdkVersion
+        case invoiceDetailIds
+        case overrideMacBlocking
+        case initialSchemeTransactionId
+        case autoCaptureAt
+        case captureAmount
+        case authorizeOnly
+        case allowFallbackToSale
+        case metadata
+    }
+}
+
+// MARK: - AutoCompletion
+
 extension POCardsService {
 
-    /// Allows to retrieve card issuer information based on iin.
+    /// Allows to retrieve card issuer information based on IIN.
     /// 
     /// - Parameters:
     ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
@@ -61,7 +95,7 @@ extension POCardsService {
 
 extension POCustomerTokensService {
 
-    /// Assigns new source to existing customer token and optionaly verifies it.
+    /// Assigns new source to existing customer token and optionally verifies it.
     @discardableResult
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest,

@@ -27,7 +27,7 @@ final class LocalEventEmitter: POEventEmitter, @unchecked Sendable {
         lock.unlock()
         var isHandled = false
         for subscription in eventSubscriptions {
-            // Event should be delievered to all subscribers.
+            // Event should be delivered to all subscribers.
             isHandled = subscription.listener(event) || isHandled
         }
         if !isHandled {

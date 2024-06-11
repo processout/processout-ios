@@ -9,7 +9,7 @@ import Foundation
 import XCTest
 @testable import ProcessOut
 
-@MainActor final class CardsServiceTests: XCTestCase {
+final class CardsServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()

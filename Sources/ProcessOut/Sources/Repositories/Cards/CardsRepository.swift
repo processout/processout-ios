@@ -7,7 +7,7 @@
 
 protocol CardsRepository: PORepository {
 
-    /// Allows to retrieve card issuer information based on iin.
+    /// Allows to retrieve card issuer information based on IIN.
     /// 
     /// - Parameters:
     ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.

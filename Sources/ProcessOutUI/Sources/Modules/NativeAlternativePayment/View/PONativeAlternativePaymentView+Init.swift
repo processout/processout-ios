@@ -19,12 +19,14 @@ extension PONativeAlternativePaymentView {
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         var logger = ProcessOut.shared.logger
-        logger[attributeKey: "InvoiceId"] = configuration.invoiceId
+        logger[attributeKey: .invoiceId] = configuration.invoiceId
+        logger[attributeKey: .gatewayConfigurationId] = configuration.gatewayConfigurationId
         let interactorConfiguration = PONativeAlternativePaymentMethodInteractorConfiguration(
             gatewayConfigurationId: configuration.gatewayConfigurationId,
             invoiceId: configuration.invoiceId,
-            waitsPaymentConfirmation: configuration.waitsPaymentConfirmation,
-            paymentConfirmationTimeout: configuration.paymentConfirmationTimeout
+            waitsPaymentConfirmation: configuration.paymentConfirmation.waitsConfirmation,
+            paymentConfirmationTimeout: configuration.paymentConfirmation.timeout,
+            showPaymentConfirmationProgressIndicatorAfter: configuration.paymentConfirmation.showProgressIndicatorAfter
         )
         let interactor = PODefaultNativeAlternativePaymentMethodInteractor(
             invoicesService: ProcessOut.shared.invoices,
