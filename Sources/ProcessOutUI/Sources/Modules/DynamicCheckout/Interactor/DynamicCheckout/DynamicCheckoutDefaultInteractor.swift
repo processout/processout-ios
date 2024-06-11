@@ -509,48 +509,46 @@ final class DynamicCheckoutDefaultInteractor:
             setFailureStateUnchecked(error: error)
             return
         }
-        if let methodId = currentState.pendingPaymentMethodId {
-            restoreStartedStateUnchecked(failure: failure, processingState: currentState)
-            if currentState.shouldStartPendingPaymentMethod {
-                startPayment(methodId: methodId)
+        if case .cancelled = failure.code {
+            if currentState.isForcelyCancelled {
+                setFailureStateUnchecked(error: error)
+            } else if let methodId = currentState.pendingPaymentMethodId {
+                self.state = .started(currentState.snapshot)
+                if currentState.shouldStartPendingPaymentMethod {
+                    startPayment(methodId: methodId)
+                } else {
+                    select(methodId: methodId)
+                }
             } else {
-                select(methodId: methodId)
+                setFailureStateUnchecked(error: error)
             }
-        } else if case .cancelled = failure.code, currentState.isForcelyCancelled {
-            setFailureStateUnchecked(error: error)
+        } else if delegate?.dynamicCheckout(shouldContinueAfter: failure) != false {
+            restoreStartedStateUnchecked(after: failure, currentState: currentState)
         } else {
-            restoreStartedStateUnchecked(failure: failure, processingState: currentState)
+            setFailureStateUnchecked(error: failure)
         }
     }
 
-    private func restoreStartedStateUnchecked(failure: POFailure, processingState: State.PaymentProcessing) {
-        guard delegate?.dynamicCheckout(shouldContinueAfter: failure) != false else {
-            setFailureStateUnchecked(error: failure)
-            return
-        }
-        var newStartedState = processingState.snapshot
-        if failure.code != .cancelled {
-            switch currentPaymentMethod(state: processingState) {
-            case .nativeAlternativePayment:
-                var pendingUnavailableIds = paymentMethodIds(
-                    of: .nativeAlternativePayment, state: processingState.snapshot
-                )
-                if processingState.isReady {
-                    pendingUnavailableIds.remove(processingState.paymentMethodId)
-                    newStartedState.pendingUnavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
-                    newStartedState.unavailablePaymentMethodIds.insert(processingState.paymentMethodId)
-                } else {
-                    newStartedState.pendingUnavailablePaymentMethodIds.subtract(pendingUnavailableIds)
-                    newStartedState.unavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
-                }
-            case .card where .generic(.cardFailed3DS) == failure.code:
-                let unavailableIds = paymentMethodIds(of: .card, state: processingState.snapshot)
-                newStartedState.unavailablePaymentMethodIds.formUnion(unavailableIds)
-            default:
-                break
+    private func restoreStartedStateUnchecked(after failure: POFailure, currentState: State.PaymentProcessing) {
+        var newStartedState = currentState.snapshot
+        switch currentPaymentMethod(state: currentState) {
+        case .nativeAlternativePayment:
+            var pendingUnavailableIds = paymentMethodIds(of: .nativeAlternativePayment, state: currentState.snapshot)
+            if currentState.isReady {
+                pendingUnavailableIds.remove(currentState.paymentMethodId)
+                newStartedState.pendingUnavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
+                newStartedState.unavailablePaymentMethodIds.insert(currentState.paymentMethodId)
+            } else {
+                newStartedState.pendingUnavailablePaymentMethodIds.subtract(pendingUnavailableIds)
+                newStartedState.unavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
             }
-            newStartedState.recentErrorDescription = String(resource: .DynamicCheckout.Error.generic)
+        case .card where .generic(.cardFailed3DS) == failure.code:
+            let unavailableIds = paymentMethodIds(of: .card, state: currentState.snapshot)
+            newStartedState.unavailablePaymentMethodIds.formUnion(unavailableIds)
+        default:
+            break
         }
+        newStartedState.recentErrorDescription = String(resource: .DynamicCheckout.Error.generic)
         self.state = .started(newStartedState)
     }
 
