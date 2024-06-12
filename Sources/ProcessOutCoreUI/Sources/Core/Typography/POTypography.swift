@@ -40,37 +40,29 @@ public struct POTypography {
     }
 }
 
+@_spi(PO)
 extension POTypography {
 
-    @_spi(PO) public enum Fixed {
+    /// Use for titles.
+    public static let title = POTypography(font: UIFont(.WorkSans.medium, size: 20), lineHeight: 24)
 
-        /// Use for buttons.
-        static let button = POTypography(font: UIFont(.WorkSans.medium, size: 14), lineHeight: 18)
+    /// Primary body text for readability and consistency.
+    public static let body1 = POTypography(font: UIFont(.WorkSans.medium, size: 16), lineHeight: 20)
 
-        /// Use for form components, error text and key value data.
-        public static let label = POTypography(font: UIFont(.WorkSans.regular, size: 14), lineHeight: 18)
+    /// Secondary body text for supporting content.
+    public static let body2 = POTypography(font: UIFont(.WorkSans.regular, size: 16), lineHeight: 20)
 
-        /// Use for body copy on larger screens, or smaller blocks of text.
-        public static let body = POTypography(
-            font: UIFont(.WorkSans.regular, size: 16), lineHeight: 24, paragraphSpacing: POSpacing.small
-        )
+    /// Text used on buttons or interactive elements.
+    public static let button = POTypography(font: UIFont(.WorkSans.medium, size: 16), lineHeight: 24)
 
-        /// Use for form components, error text and key value data.
-        public static let labelHeading = POTypography(
-            font: UIFont(.WorkSans.medium, size: 14), textStyle: .subheadline, lineHeight: 18
-        )
-    }
+    /// Large text for prominent labels or headings.
+    public static let label1 = POTypography(font: UIFont(.WorkSans.medium, size: 16), lineHeight: 24)
 
-    @_spi(PO) public enum Medium {
-
-        /// Use for page titles.
-        public static let title = POTypography(
-            font: UIFont(.WorkSans.medium, size: 20), textStyle: .title1, lineHeight: 28
-        )
-    }
+    /// Smaller text for secondary labels or headings.
+    public static let label2 = POTypography(font: UIFont(.WorkSans.regular, size: 16), lineHeight: 24)
 
     /// Registers all custom fonts.
-    @_spi(PO) public static func registerFonts() {
+    public static func registerFonts() {
         FontResource.register()
     }
 }

@@ -39,7 +39,7 @@ extension PONativeAlternativePaymentStyle {
     // swiftlint:disable:next strict_fileprivate
     fileprivate init(dynamicCheckoutStyle style: PODynamicCheckoutStyle) {
         title = PONativeAlternativePaymentStyle.default.title
-        sectionTitle = style.regularPaymentMethod.title
+        sectionTitle = style.inputTitle
         input = style.input
         codeInput = style.codeInput
         radioButton = style.radioButton

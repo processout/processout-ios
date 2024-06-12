@@ -17,12 +17,12 @@ extension PODynamicCheckoutStyle {
         expressPaymentButtonStyle: .brand,
         regularPaymentMethod: .default,
         progressView: .circular,
-        inputTitle: POTextStyle(color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading),
+        inputTitle: POTextStyle(color: Color(poResource: .Text.secondary), typography: .label1),
         input: .medium,
         codeInput: .large,
         radioButton: PORadioButtonStyle.radio,
-        bodyText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
-        errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
+        bodyText: POTextStyle(color: Color(poResource: .Text.primary), typography: .body2),
+        errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
         message: .toast,
         backgroundColor: Color(poResource: .Surface.level1),
         actionsContainer: .default,
@@ -35,8 +35,8 @@ extension PODynamicCheckoutStyle.RegularPaymentMethod {
 
     /// Default dynamic checkout regular payment method style.
     public static let `default` = Self(
-        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
-        informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label),
+        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
+        informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .body2),
         border: POBorderStyle.regular(color: Color(poResource: .Text.muted)),
         disabledBackgroundColor: Color(poResource: .Surface.neutral)
     )
@@ -47,7 +47,7 @@ extension PODynamicCheckoutStyle.PaymentSuccess {
 
     /// Default dynamic checkout capture success style.
     public static let `default` = Self(
-        message: POTextStyle(color: Color(poResource: .Text.success), typography: .Fixed.body),
+        message: POTextStyle(color: Color(poResource: .Text.success), typography: .body2),
         backgroundColor: Color(poResource: .Surface.success)
     )
 }

@@ -56,6 +56,6 @@ extension ButtonStyle where Self == PORadioButtonStyle {
     // MARK: - Private Properties
 
     private static var valueStyle: POTextStyle {
-        POTextStyle(color: Color(.Text.primary), typography: .Fixed.label)
+        POTextStyle(color: Color(.Text.primary), typography: .button)
     }
 }

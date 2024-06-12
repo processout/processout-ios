@@ -76,6 +76,6 @@ extension POToastMessageStyle.Severity {
         icon: Image(.info).renderingMode(.template),
         border: .regular(color: Color(poResource: .Text.error)),
         backgroundColor: Color(poResource: .Surface.error),
-        text: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label)
+        text: POTextStyle(color: Color(poResource: .Text.primary), typography: .body2)
     )
 }
