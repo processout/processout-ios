@@ -17,7 +17,7 @@ extension PODynamicCheckoutStyle {
         expressPaymentButtonStyle: .brand,
         regularPaymentMethod: .default,
         progressView: .circular,
-        inputTitle: POTextStyle(color: Color(poResource: .Text.secondary), typography: .label1),
+        inputTitle: POTextStyle(color: Color(poResource: .Text.primary), typography: .label1),
         input: .medium,
         codeInput: .large,
         radioButton: PORadioButtonStyle.radio,
@@ -36,7 +36,7 @@ extension PODynamicCheckoutStyle.RegularPaymentMethod {
     /// Default dynamic checkout regular payment method style.
     public static let `default` = Self(
         title: POTextStyle(color: Color(poResource: .Text.primary), typography: .subheading),
-        informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .body2),
+        informationText: POTextStyle(color: Color(poResource: .Text.muted), typography: .body2),
         border: POBorderStyle.regular(color: Color(poResource: .Text.muted)),
         disabledBackgroundColor: Color(poResource: .Surface.neutral)
     )

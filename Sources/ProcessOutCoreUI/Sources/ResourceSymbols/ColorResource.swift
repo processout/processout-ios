@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-// swiftlint:disable strict_fileprivate identifier_name
+// swiftlint:disable strict_fileprivate
 
 /// A color resource.
 /// - NOTE: This type wraps natively generated `ColorResource` to make resources publicly accessible.
@@ -63,20 +63,14 @@ extension POColorResource {
         /// The "Text/Muted" asset catalog color resource.
         public static let muted = POColorResource(.Text.muted)
 
-        /// The "Text/OnColor" asset catalog color resource.
-        public static let on = POColorResource(.Text.on)
+        /// The "Text/Inverse" asset catalog color resource.
+        public static let inverse = POColorResource(.Text.inverse)
 
         /// The "Text/Primary" asset catalog color resource.
         public static let primary = POColorResource(.Text.primary)
 
-        /// The "Text/Secondary" asset catalog color resource.
-        public static let secondary = POColorResource(.Text.secondary)
-
         /// The "Text/Success" asset catalog color resource.
         public static let success = POColorResource(.Text.success)
-
-        /// The "Text/Tertiary" asset catalog color resource.
-        public static let tertiary = POColorResource(.Text.tertiary)
 
         /// The "Text/Warning" asset catalog color resource.
         public static let warning = POColorResource(.Text.warning)
@@ -91,4 +85,4 @@ extension SwiftUI.Color {
     }
 }
 
-// swiftlint:enable strict_fileprivate identifier_name
+// swiftlint:enable strict_fileprivate

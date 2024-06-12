@@ -49,7 +49,7 @@ extension POInputStyle {
                 backgroundColor: Color(.Surface.default),
                 border: .regular(color: Color(.Text.error)),
                 shadow: .clear,
-                tintColor: Color(.Text.error)
+                tintColor: Color(.Text.primary)
             )
         )
     }

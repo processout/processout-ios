@@ -67,7 +67,7 @@ extension POCardTokenizationStyle {
     public static var `default`: POCardTokenizationStyle {
         POCardTokenizationStyle(
             title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
-            sectionTitle: POTextStyle(color: Color(poResource: .Text.secondary), typography: .label1),
+            sectionTitle: POTextStyle(color: Color(poResource: .Text.primary), typography: .label1),
             input: .medium,
             radioButton: .radio,
             errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),

@@ -15,13 +15,13 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
     public static var primary: POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(
-                title: .init(color: Color(.Text.on), typography: .button),
+                title: .init(color: Color(.Text.inverse), typography: .button),
                 border: .clear,
                 shadow: .clear,
                 backgroundColor: Color(.Action.Primary.default)
             ),
             highlighted: .init(
-                title: .init(color: Color(.Text.on), typography: .button),
+                title: .init(color: Color(.Text.inverse), typography: .button),
                 border: .clear,
                 shadow: .clear,
                 backgroundColor: Color(.Action.Primary.pressed)
@@ -32,7 +32,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                 shadow: .clear,
                 backgroundColor: Color(.Action.Primary.disabled)
             ),
-            progressStyle: CircularProgressViewStyle(tint: Color(.Text.on))
+            progressStyle: CircularProgressViewStyle(tint: Color(.Text.inverse))
         )
     }
 
@@ -41,13 +41,13 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
     public static var secondary: POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(
-                title: .init(color: Color(.Text.secondary), typography: .button),
+                title: .init(color: Color(.Text.primary), typography: .button),
                 border: .regular(color: Color(.Border.default)),
                 shadow: .clear,
                 backgroundColor: Color(.Action.Secondary.default)
             ),
             highlighted: .init(
-                title: .init(color: Color(.Text.secondary), typography: .button),
+                title: .init(color: Color(.Text.primary), typography: .button),
                 border: .regular(color: Color(.Border.default)),
                 shadow: .clear,
                 backgroundColor: Color(.Action.Secondary.pressed)
@@ -58,7 +58,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                 shadow: .clear,
                 backgroundColor: Color(.Action.Secondary.default).opacity(0)
             ),
-            progressStyle: CircularProgressViewStyle(tint: Color(.Text.secondary))
+            progressStyle: CircularProgressViewStyle(tint: Color(.Text.primary))
         )
     }
 }

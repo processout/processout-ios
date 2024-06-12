@@ -86,7 +86,7 @@ extension PONativeAlternativePaymentStyle {
     /// Default native alternative payment style.
     public static let `default` = PONativeAlternativePaymentStyle(
         title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
-        sectionTitle: POTextStyle(color: Color(poResource: .Text.secondary), typography: .label1),
+        sectionTitle: POTextStyle(color: Color(poResource: .Text.primary), typography: .label1),
         input: .medium,
         codeInput: .large,
         radioButton: .radio,
