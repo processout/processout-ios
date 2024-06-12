@@ -49,7 +49,7 @@ public struct POImmutableStringCodableDecimal: Codable {
 
 extension KeyedEncodingContainer {
 
-    mutating func encode(
+    public mutating func encode(
         _ value: POImmutableStringCodableDecimal, forKey key: KeyedEncodingContainer<K>.Key
     ) throws {
         try value.encode(to: superEncoder(forKey: key))
@@ -58,7 +58,7 @@ extension KeyedEncodingContainer {
 
 extension KeyedDecodingContainer {
 
-    func decode(
+    public func decode(
         _ type: POImmutableStringCodableDecimal.Type, forKey key: KeyedDecodingContainer<K>.Key
     ) throws -> POImmutableStringCodableDecimal {
         try type.init(from: try superDecoder(forKey: key))

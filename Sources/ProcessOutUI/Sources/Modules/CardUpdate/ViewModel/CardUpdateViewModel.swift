@@ -21,4 +21,7 @@ protocol CardUpdateViewModel: ObservableObject {
 
     /// Currently focused item identifier.
     var focusedItemId: AnyHashable? { get set }
+
+    /// Starts view model.
+    func start()
 }

@@ -12,12 +12,13 @@ import SwiftUI
 struct NativeAlternativePaymentTitleItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem.Title
+    let horizontalPadding: CGFloat
 
     var body: some View {
         VStack(alignment: .leading, spacing: POSpacing.medium) {
             Text(item.text)
                 .textStyle(style.title)
-                .padding(.horizontal, POSpacing.large)
+                .padding(.horizontal, horizontalPadding)
             Divider()
                 .frame(height: 1)
                 .overlay(style.separatorColor)

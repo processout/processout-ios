@@ -7,6 +7,7 @@
 
 import UIKit
 import ProcessOut
+@_spi(PO) import ProcessOutUI
 
 final class FeaturesRouter: RouterType {
 
@@ -24,6 +25,16 @@ final class FeaturesRouter: RouterType {
                 }
             }
             let viewController = builder.build()
+            viewController.isModalInPresentation = true
+            self.viewController?.navigationController?.present(viewController, animated: true)
+        case let .dynamicCheckout(configuration, delegate):
+            let viewController = PODynamicCheckoutViewController(
+                configuration: configuration,
+                delegate: delegate,
+                completion: { [weak self] _ in
+                    self?.viewController?.navigationController?.dismiss(animated: true)
+                }
+            )
             viewController.isModalInPresentation = true
             self.viewController?.navigationController?.present(viewController, animated: true)
         case .alert(let message):

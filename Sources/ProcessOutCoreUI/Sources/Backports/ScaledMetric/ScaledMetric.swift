@@ -10,6 +10,7 @@ import SwiftUI
 extension POBackport where Wrapped == Any {
 
     /// A dynamic property that scales a numeric value.
+    @available(iOS 14.0, *)
     @propertyWrapper
     struct ScaledMetric<Value: BinaryFloatingPoint>: DynamicProperty {
 

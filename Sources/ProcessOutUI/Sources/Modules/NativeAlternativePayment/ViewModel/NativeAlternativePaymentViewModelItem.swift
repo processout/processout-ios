@@ -23,7 +23,7 @@ enum NativeAlternativePaymentViewModelItem {
         /// Item identifier.
         let id: AnyHashable
 
-        /// Availale options.
+        /// Available options.
         let options: [PickerOption]
 
         /// Currently selected option id.
@@ -115,5 +115,25 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
 
     private enum Constants {
         static let progressId = UUID().uuidString
+    }
+}
+
+extension NativeAlternativePaymentViewModelSection: AnimationIdentityProvider {
+
+    var animationIdentity: AnyHashable {
+        [id, items.map(animationIdentity), error]
+    }
+
+    // MARK: - Private Methods
+
+    private func animationIdentity(of item: NativeAlternativePaymentViewModelItem) -> AnyHashable {
+        switch item {
+        case .title(let item):
+            return item
+        case .submitted(let item):
+            return item
+        default:
+            return item.id
+        }
     }
 }

@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 21.05.2024.
 //
 
+/// Confirmation dialog configuration.
 public struct POConfirmationDialogConfiguration {
 
     /// Confirmation title. Use empty string to hide title.

@@ -6,6 +6,7 @@
 //
 
 import ProcessOut
+@_spi(PO) import ProcessOutUI
 
 enum FeaturesRoute: RouteType {
 
@@ -15,6 +16,9 @@ enum FeaturesRoute: RouteType {
     /// Card tokenization form.
     case cardTokenization(threeDSService: CardPayment3DSService, completion: (Result<POCard, POFailure>) -> Void)
 
-    /// Alerty with given message.
+    /// Dynamic checkout flow.
+    case dynamicCheckout(configuration: PODynamicCheckoutConfiguration, delegate: PODynamicCheckoutDelegate)
+
+    /// Alert with given message.
     case alert(message: String)
 }

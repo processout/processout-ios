@@ -18,7 +18,10 @@ public struct POCardTokenizationConfiguration {
     /// Indicates if the input for entering the cardholder name should be displayed. Defaults to `true`.
     public let isCardholderNameInputVisible: Bool
 
-    /// Primary action text, such as "Submit".
+    /// Indicates whether card's CVC should be collected.
+    public let shouldCollectCvc: Bool
+
+    /// Primary action text, such as "Submit". Use empty string to hide button.
     public let primaryActionTitle: String?
 
     /// Primary action text, such as "Cancel". Use empty string to hide button.
@@ -27,16 +30,17 @@ public struct POCardTokenizationConfiguration {
     /// Card billing address collection configuration.
     public let billingAddress: POBillingAddressConfiguration
 
-    /// Metada related to the card.
+    /// Metadata related to the card.
     public let metadata: [String: String]?
 
-    /// Boolean flag determines whether user will be aksed to select scheme if co-scheme is available.
+    /// Boolean flag determines whether user will be asked to select scheme if co-scheme is available.
     /// Until feature is fully ready this is hardcoded to `false`.
     let isSchemeSelectionAllowed: Bool
 
     public init(
         title: String? = nil,
         isCardholderNameInputVisible: Bool = true,
+        shouldCollectCvc: Bool = true,
         primaryActionTitle: String? = nil,
         cancelActionTitle: String? = nil,
         billingAddress: POBillingAddressConfiguration = .init(),
@@ -44,6 +48,7 @@ public struct POCardTokenizationConfiguration {
     ) {
         self.title = title
         self.isCardholderNameInputVisible = isCardholderNameInputVisible
+        self.shouldCollectCvc = shouldCollectCvc
         self.primaryActionTitle = primaryActionTitle
         self.cancelActionTitle = cancelActionTitle
         self.billingAddress = billingAddress

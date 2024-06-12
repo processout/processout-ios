@@ -40,6 +40,16 @@ final class HttpInvoicesRepository: InvoicesRepository {
         return try await connector.execute(request: httpRequest)
     }
 
+    func invoice(request: POInvoiceRequest) async throws -> POInvoice {
+        struct Response: Decodable {
+            let invoice: POInvoice
+        }
+        let httpRequest = HttpConnectorRequest<Response>.get(
+            path: "/invoices/\(request.id)"
+        )
+        return try await connector.execute(request: httpRequest).invoice
+    }
+
     func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> ThreeDSCustomerAction? {
         struct Response: Decodable {
             let customerAction: ThreeDSCustomerAction?

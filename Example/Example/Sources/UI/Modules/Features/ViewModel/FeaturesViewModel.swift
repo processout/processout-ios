@@ -7,12 +7,13 @@
 
 import Foundation
 import PassKit
-import ProcessOut
-import ProcessOutUI
+@_spi(PO) import ProcessOut
+@_spi(PO) import ProcessOutUI
 
 final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesViewModelType {
 
-    init(router: any RouterType<FeaturesRoute>) {
+    init(invoicesService: POInvoicesService, router: any RouterType<FeaturesRoute>) {
+        self.invoicesService = invoicesService
         self.router = router
         super.init(state: .idle)
     }
@@ -21,7 +22,7 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
         guard case .idle = state else {
             return
         }
-        var features: [State.Feature] = [
+        let features: [State.Feature] = [
             .init(
                 name: Strings.Features.NativeAlternativePayment.title,
                 accessibilityId: "features.native-alternative-payment",
@@ -49,26 +50,25 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
                 select: { [weak self] in
                     self?.startCardTokenization(threeDSService: .checkout)
                 }
-            )
-        ]
-        if POPassKitPaymentAuthorizationController.canMakePayments() {
-            let feature = State.Feature(
-                name: Strings.Features.ApplePay.title,
-                accessibilityId: "features.apple-pay",
+            ),
+            .init(
+                name: Strings.Features.DynamicCheckout.title,
+                accessibilityId: "features.dynamic-checkout",
                 select: { [weak self] in
-                    self?.authorizePassKitPayment()
+                    self?.startDynamicCheckout()
                 }
-            )
-            features.append(feature)
-        }
+            ),
+            createPassKitPaymentFeature()
+        ].compactMap { $0 }
         state = .started(State.Started(features: features))
     }
 
     // MARK: - Private Properties
 
+    private let invoicesService: POInvoicesService
     private let router: any RouterType<FeaturesRoute>
 
-    // MARK: - Private Methods
+    // MARK: - Payments
 
     private func startCardTokenization(threeDSService: CardPayment3DSService) {
         let route = FeaturesRoute.cardTokenization(threeDSService: threeDSService) { [weak self] result in
@@ -88,7 +88,28 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
         router.trigger(route: route)
     }
 
-    private func authorizePassKitPayment() {
+    private func startDynamicCheckout() {
+        Task { @MainActor in
+            let invoiceCreationRequest = POInvoiceCreationRequest(
+                name: "Example",
+                amount: "100",
+                currency: "EUR",
+                returnUrl: Constants.returnUrl,
+                customerId: Constants.customerId
+            )
+            guard let invoice = try? await self.invoicesService.createInvoice(request: invoiceCreationRequest) else {
+                return
+            }
+            let configuration = PODynamicCheckoutConfiguration(
+                invoiceId: invoice.id,
+                alternativePayment: .init(returnUrl: Constants.returnUrl),
+                cancelButton: .init(confirmation: .init())
+            )
+            self.router.trigger(route: .dynamicCheckout(configuration: configuration, delegate: self))
+        }
+    }
+
+    private func startPassKitPayment() {
         let request = PKPaymentRequest()
         request.merchantIdentifier = Constants.merchantId as? String ?? ""
         request.merchantCapabilities = [.threeDSecure]
@@ -103,6 +124,37 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
         }
         controller.delegate = self
         controller.present()
+    }
+
+    // MARK: - Utils
+
+    private func createPassKitPaymentFeature() -> State.Feature? {
+        guard POPassKitPaymentAuthorizationController.canMakePayments() else {
+            return nil
+        }
+        let feature = State.Feature(
+            name: Strings.Features.ApplePay.title,
+            accessibilityId: "features.apple-pay",
+            select: { [weak self] in
+                self?.startPassKitPayment()
+            }
+        )
+        return feature
+    }
+}
+
+extension FeaturesViewModel: PODynamicCheckoutDelegate {
+
+    func dynamicCheckout(
+        willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest
+    ) async -> any PO3DSService {
+        POTest3DSService(returnUrl: Constants.returnUrl)
+    }
+
+    func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {
+        request.paymentSummaryItems = [
+            .init(label: "Test", amount: 100, type: .final)
+        ]
     }
 }
 

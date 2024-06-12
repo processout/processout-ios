@@ -12,8 +12,8 @@ import SwiftUI
 @available(iOS 14, *)
 public struct PONativeAlternativePaymentView: View {
 
-    init(viewModel: some NativeAlternativePaymentViewModel) {
-        self._viewModel = .init(wrappedValue: .init(erasing: viewModel))
+    init(viewModel: @autoclosure @escaping () -> AnyViewModel<NativeAlternativePaymentViewModelState>) {
+        self._viewModel = .init(wrappedValue: viewModel())
     }
 
     // MARK: - View
@@ -21,33 +21,26 @@ public struct PONativeAlternativePaymentView: View {
     public var body: some View {
         VStack(spacing: 0) {
             GeometryReader { geometry in
-                ScrollViewReader { scrollView in
-                    ScrollView(showsIndicators: false) {
-                        NativeAlternativePaymentSectionsView(
-                            sections: viewModel.sections, focusedItemId: $viewModel.focusedItemId
-                        )
-                        .backport.geometryGroup()
-                        .frame(minHeight: geometry.size.height, alignment: .top)
-                    }
-                    .backport.onChange(of: viewModel.focusedItemId) {
-                        scrollToFocusedInput(scrollView: scrollView)
-                    }
-                    .clipped()
+                ScrollView(showsIndicators: false) {
+                    NativeAlternativePaymentContentView(
+                        viewModel: viewModel,
+                        insets: EdgeInsets(horizontal: POSpacing.large, vertical: POSpacing.medium)
+                    )
+                    .frame(minHeight: geometry.size.height, alignment: .top)
                 }
+                .clipped()
             }
-            if !viewModel.actions.isEmpty {
-                POActionsContainerView(actions: viewModel.actions)
-                    .actionsContainerStyle(style.actionsContainer)
-            }
+            POActionsContainerView(actions: viewModel.state.actions)
+                .actionsContainerStyle(style.actionsContainer)
         }
         .backport.background {
-            let backgroundColor = viewModel.isCaptured ? style.background.success : style.background.regular
+            let backgroundColor = viewModel.state.isCaptured ? style.background.success : style.background.regular
             backgroundColor
                 .ignoresSafeArea()
-                .animation(.default, value: viewModel.isCaptured)
+                .animation(.default, value: viewModel.state.isCaptured)
         }
-        .animation(.default, value: viewModel.actions.count)
-        .poConfirmationDialog(item: $viewModel.confirmationDialog)
+        .onAppear(perform: viewModel.start)
+        .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
     }
 
     // MARK: - Private Properties
@@ -56,14 +49,5 @@ public struct PONativeAlternativePaymentView: View {
     private var style
 
     @StateObject
-    private var viewModel: AnyNativeAlternativePaymentViewModel
-
-    // MARK: - Private Methods
-
-    private func scrollToFocusedInput(scrollView: ScrollViewProxy) {
-        guard let id = viewModel.focusedItemId else {
-            return
-        }
-        withAnimation { scrollView.scrollTo(id) }
-    }
+    private var viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>
 }

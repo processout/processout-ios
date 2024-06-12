@@ -44,7 +44,9 @@ public struct PORadioButtonStyle: ButtonStyle {
             let style = currentStyle(isSelected: isSelected, isInvalid: isInvalid, isPressed: configuration.isPressed)
             Label(
                 title: {
-                    configuration.label.textStyle(style.value, addPadding: false)
+                    configuration.label
+                        .textStyle(style.value, addPadding: false)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 },
                 icon: {
                     ZStack {
@@ -59,18 +61,13 @@ public struct PORadioButtonStyle: ButtonStyle {
                     .frame(width: Constants.knobSize, height: Constants.knobSize)
                 }
             )
-            .padding(.vertical, Constants.minVerticalPadding)
-            .frame(maxWidth: .infinity, minHeight: Constants.minHeight, alignment: .leading)
             .animation(.default, value: isSelected)
-            .contentShape(.rect)
         }
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let minVerticalPadding = POSpacing.extraSmall
-        static let minHeight: CGFloat = 44
         static let knobSize: CGFloat = 18
     }
 
@@ -102,6 +99,9 @@ private struct ContentView<Content: View>: View {
 
     // MARK: - Private Properties
 
-    @Environment(\.isRadioButtonSelected) private var isSelected
-    @Environment(\.isControlInvalid) private var isInvalid
+    @Environment(\.isRadioButtonSelected)
+    private var isSelected
+
+    @Environment(\.isControlInvalid)
+    private var isInvalid
 }

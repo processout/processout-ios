@@ -8,7 +8,7 @@
 @available(*, deprecated, renamed: "POInvoicesService")
 public typealias POInvoicesServiceType = POInvoicesService
 
-public protocol POInvoicesService: POService {
+public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 
     /// Requests information needed to continue existing payment or start new one.
     func nativeAlternativePaymentMethodTransactionDetails(
@@ -22,6 +22,9 @@ public protocol POInvoicesService: POService {
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
     ) async throws -> PONativeAlternativePaymentMethodResponse
+
+    /// Invoice details.
+    func invoice(request: POInvoiceRequest) async throws -> POInvoice
 
     /// Performs invoice authorization with given request.
     func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DSService) async throws

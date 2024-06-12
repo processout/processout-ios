@@ -19,6 +19,39 @@ extension POAssignCustomerTokenRequest {
     }
 }
 
+extension PODynamicCheckoutPaymentMethod.AlternativePayment {
+
+    enum CodingKeys: String, CodingKey {
+        case display
+        case flow
+        case configuration = "apm"
+    }
+}
+
+extension PODynamicCheckoutPaymentMethod.ApplePay {
+
+    enum CodingKeys: String, CodingKey {
+        case flow
+        case configuration = "applepay"
+    }
+}
+
+extension PODynamicCheckoutPaymentMethod.Card {
+
+    enum CodingKeys: String, CodingKey {
+        case display
+        case configuration = "card"
+    }
+}
+
+extension PODynamicCheckoutPaymentMethod.NativeAlternativePayment {
+
+    enum CodingKeys: String, CodingKey {
+        case display
+        case configuration = "apm"
+    }
+}
+
 extension POInvoiceAuthorizationRequest {
 
     enum CodingKeys: String, CodingKey {
@@ -161,6 +194,18 @@ extension POImagesRepository {
     @discardableResult
     public func images(
         at urls: [URL],
+        scale: CGFloat,
+        completion: @escaping ([URL: UIImage]) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            await images(at: urls, scale: scale)
+        }
+    }
+
+    /// Attempts to download images at given URLs.
+    @discardableResult
+    public func images(
+        at urls: [URL],
         completion: @escaping ([URL: UIImage]) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
@@ -168,26 +213,40 @@ extension POImagesRepository {
         }
     }
 
-    /// Downloads image at given URL and calls completion.
+    /// Downloads image at given URL.
     @discardableResult
     public func image(
         at url: URL?,
+        scale: CGFloat = 1,
         completion: @escaping (UIImage?) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            await image(at: url)
+            await image(at: url, scale: scale)
         }
     }
 
-    /// Downloads two images at given URLs and calls completion.
+    /// Downloads two images at given URLs.
     @discardableResult
     public func images(
         at url1: URL?,
         _ url2: URL?,
+        scale: CGFloat = 1,
         completion: @escaping ((UIImage?, UIImage?)) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            await images(at: url1, url2)
+            await images(at: url1, url2, scale: scale)
+        }
+    }
+
+    /// Downloads image for given resource.
+    @MainActor
+    @discardableResult
+    public func image(
+        resource: POImageRemoteResource,
+        completion: @escaping (UIImage?) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            await image(resource: resource)
         }
     }
 }
@@ -216,6 +275,17 @@ extension POInvoicesService {
     ) -> POCancellable {
         invoke(completion: completion) {
             try await initiatePayment(request: request)
+        }
+    }
+
+    /// Invoice details.
+    @discardableResult
+    public func invoice(
+        request: POInvoiceRequest,
+        completion: @escaping (Result<POInvoice, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await invoice(request: request)
         }
     }
 
@@ -253,9 +323,6 @@ extension POInvoicesService {
             try await createInvoice(request: request)
         }
     }
-}
-
-extension POService {
 }
 
 /// Invokes given completion with a result of async operation.

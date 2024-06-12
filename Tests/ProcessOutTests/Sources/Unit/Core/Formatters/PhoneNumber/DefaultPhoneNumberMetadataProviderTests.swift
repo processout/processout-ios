@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 
 final class DefaultPhoneNumberMetadataProviderTests: XCTestCase {
 
@@ -33,5 +33,5 @@ final class DefaultPhoneNumberMetadataProviderTests: XCTestCase {
 
     // MARK: - Private Properties
 
-    private var sut: DefaultPhoneNumberMetadataProvider!
+    private var sut: PODefaultPhoneNumberMetadataProvider!
 }

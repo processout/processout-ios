@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@_spi(PO) @testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 
 final class CustomerTokensServiceTests: XCTestCase {
 
