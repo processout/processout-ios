@@ -284,7 +284,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.submit,
-            title: interactor.configuration.primaryButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
+            title: interactor.configuration.submitButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
             isEnabled: true,
             isLoading: false,
             isPrimary: true,
@@ -395,7 +395,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.submit,
-            title: interactor.configuration.primaryButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
+            title: interactor.configuration.submitButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
             isEnabled: isEnabled,
             isLoading: isLoading,
             isPrimary: true,
@@ -415,7 +415,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         let title: String?
         let confirmation: POConfirmationDialogConfiguration?
         if state.isAwaitingNativeAlternativePaymentCapture {
-            let configuration = interactor.configuration.alternativePayment.captureConfirmation.cancelButton
+            let configuration = interactor.configuration.alternativePayment.paymentConfirmation.cancelButton
             title = configuration?.title
             confirmation = configuration?.confirmation
         } else {
@@ -429,7 +429,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     // MARK: - Success
 
     private func updateWithSuccessState() {
-        guard let configuration = interactor.configuration.captureSuccess else {
+        guard let configuration = interactor.configuration.paymentSuccess else {
             return
         }
         let message = configuration.message ?? String(resource: .DynamicCheckout.successMessage)

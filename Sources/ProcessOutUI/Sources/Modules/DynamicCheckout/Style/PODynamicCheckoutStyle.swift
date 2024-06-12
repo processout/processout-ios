@@ -44,17 +44,7 @@ public struct PODynamicCheckoutStyle {
         }
     }
 
-    public struct PendingCapture {
-
-        /// Pending capture info style.
-        public let message: POTextStyle
-
-        public init(message: POTextStyle) {
-            self.message = message
-        }
-    }
-
-    public struct CaptureSuccess {
+    public struct PaymentSuccess {
 
         /// Success message style.
         public let message: POTextStyle
@@ -94,6 +84,10 @@ public struct PODynamicCheckoutStyle {
     /// Radio button style.
     public let radioButton: any ButtonStyle
 
+    /// Main content text style. For example in context of native alternative payment method
+    /// this is used to style instruction user needs to follow in order to capture payment.
+    public let bodyText: POTextStyle
+
     /// Error description text style.
     public let errorText: POTextStyle
 
@@ -106,11 +100,8 @@ public struct PODynamicCheckoutStyle {
     /// Actions container style.
     public let actionsContainer: POActionsContainerStyle
 
-    /// Pending capture style.
-    public let pendingCapture: PendingCapture
-
     /// Success style.
-    public let captureSuccess: CaptureSuccess
+    public let paymentSuccess: PaymentSuccess
 
     /// Creates dynamic checkout style.
     public init(
@@ -122,12 +113,12 @@ public struct PODynamicCheckoutStyle {
         input: POInputStyle,
         codeInput: POInputStyle,
         radioButton: some ButtonStyle,
+        bodyText: POTextStyle,
         errorText: POTextStyle,
         message: some POMessageViewStyle,
         backgroundColor: Color,
         actionsContainer: POActionsContainerStyle,
-        pendingCapture: PendingCapture,
-        captureSuccess: CaptureSuccess
+        paymentSuccess: PaymentSuccess
     ) {
         self.passKitPaymentButtonStyle = passKitPaymentButtonStyle
         self.expressPaymentButtonStyle = expressPaymentButtonStyle
@@ -137,11 +128,11 @@ public struct PODynamicCheckoutStyle {
         self.input = input
         self.codeInput = codeInput
         self.radioButton = radioButton
+        self.bodyText = bodyText
         self.errorText = errorText
         self.message = message
         self.backgroundColor = backgroundColor
         self.actionsContainer = actionsContainer
-        self.pendingCapture = pendingCapture
-        self.captureSuccess = captureSuccess
+        self.paymentSuccess = paymentSuccess
     }
 }

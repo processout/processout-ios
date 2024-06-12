@@ -1,5 +1,5 @@
 //
-//  DynamicCheckoutCaptureSuccessView.swift
+//  DynamicCheckoutPaymentSuccessView.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 09.05.2024.
@@ -9,14 +9,14 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct DynamicCheckoutCaptureSuccessView: View {
+struct DynamicCheckoutPaymentSuccessView: View {
 
     let item: DynamicCheckoutViewModelItem.Success
 
     var body: some View {
         VStack(spacing: POSpacing.medium) {
             Text(item.message)
-                .textStyle(style.captureSuccess.message)
+                .textStyle(style.paymentSuccess.message)
                 .multilineTextAlignment(.center)
             Spacer()
                 .frame(height: POSpacing.large)
@@ -25,7 +25,7 @@ struct DynamicCheckoutCaptureSuccessView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(height: min(Constants.maximumDecorationImageHeight, image.size.height))
-                    .foregroundColor(style.captureSuccess.message.color)
+                    .foregroundColor(style.paymentSuccess.message.color)
             }
         }
         .padding(POSpacing.medium)

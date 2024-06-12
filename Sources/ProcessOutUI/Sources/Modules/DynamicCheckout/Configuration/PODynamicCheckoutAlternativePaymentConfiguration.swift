@@ -11,7 +11,7 @@ import Foundation
 @_spi(PO)
 public struct PODynamicCheckoutAlternativePaymentConfiguration {
 
-    public struct CaptureConfirmation {
+    public struct PaymentConfirmation {
 
         /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
         /// Default timeout is 3 minutes while maximum value is 15 minutes.
@@ -68,17 +68,17 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
     /// Default value is `5`.
     public let inlineSingleSelectValuesLimit: Int
 
-    /// Payment confirmation configuration.
-    public let captureConfirmation: CaptureConfirmation
+    /// Payment confirmation configuration for payment method where available.
+    public let paymentConfirmation: PaymentConfirmation
 
     /// Creates configuration.
     public init(
         returnUrl: URL? = nil,
         inlineSingleSelectValuesLimit: Int = 5,
-        captureConfirmation: CaptureConfirmation = .init()
+        paymentConfirmation: PaymentConfirmation = .init()
     ) {
         self.returnUrl = returnUrl
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
-        self.captureConfirmation = captureConfirmation
+        self.paymentConfirmation = paymentConfirmation
     }
 }

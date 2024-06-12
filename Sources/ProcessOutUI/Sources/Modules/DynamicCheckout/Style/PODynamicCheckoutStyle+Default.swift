@@ -21,12 +21,12 @@ extension PODynamicCheckoutStyle {
         input: .medium,
         codeInput: .large,
         radioButton: PORadioButtonStyle.radio,
+        bodyText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
         errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
         message: .toast,
         backgroundColor: Color(poResource: .Surface.level1),
         actionsContainer: .default,
-        pendingCapture: .default,
-        captureSuccess: .default
+        paymentSuccess: .default
     )
 }
 
@@ -43,16 +43,7 @@ extension PODynamicCheckoutStyle.RegularPaymentMethod {
 }
 
 @available(iOS 14, *)
-extension PODynamicCheckoutStyle.PendingCapture {
-
-    /// Default dynamic checkout pending capture style.
-    public static let `default` = Self(
-        message: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body)
-    )
-}
-
-@available(iOS 14, *)
-extension PODynamicCheckoutStyle.CaptureSuccess {
+extension PODynamicCheckoutStyle.PaymentSuccess {
 
     /// Default dynamic checkout capture success style.
     public static let `default` = Self(
