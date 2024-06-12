@@ -227,7 +227,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             isSelectable: isAvailable,
             isSelected: isSelected,
             additionalInformation: additionalPaymentInformation(
-                methodId: id, isAvailable: isAvailable, isExternal: isExternal
+                methodId: id, isAvailable: isAvailable, isExternal: isExternal, isSelected: selected
             )
         )
         return item
@@ -241,10 +241,12 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
     }
 
-    private func additionalPaymentInformation(methodId: String, isAvailable: Bool, isExternal: Bool) -> String? {
+    private func additionalPaymentInformation(
+        methodId: String, isAvailable: Bool, isExternal: Bool, isSelected: Bool
+    ) -> String? {
         if !isAvailable {
             return String(resource: .DynamicCheckout.Warning.paymentUnavailable)
-        } else if isExternal {
+        } else if isExternal, isSelected {
             return String(resource: .DynamicCheckout.Warning.redirect)
         }
         return nil
