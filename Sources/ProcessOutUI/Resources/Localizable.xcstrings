@@ -1534,7 +1534,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "We were unable to process your payment.  Please check your payment details or try another payment method."
+            "value" : "We were unable to process your payment. Please check your payment details or try another payment method."
           }
         },
         "pl" : {
