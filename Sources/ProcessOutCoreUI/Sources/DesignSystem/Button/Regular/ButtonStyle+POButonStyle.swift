@@ -18,19 +18,19 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                 title: .init(color: Color(.Text.inverse), typography: .button),
                 border: .clear,
                 shadow: .clear,
-                backgroundColor: Color(.Action.Primary.default)
+                backgroundColor: Color(.Button.Primary.Background.default)
             ),
             highlighted: .init(
                 title: .init(color: Color(.Text.inverse), typography: .button),
                 border: .clear,
                 shadow: .clear,
-                backgroundColor: Color(.Action.Primary.pressed)
+                backgroundColor: Color(.Button.Primary.Background.pressed)
             ),
             disabled: .init(
                 title: .init(color: Color(.Text.disabled), typography: .button),
                 border: .clear,
                 shadow: .clear,
-                backgroundColor: Color(.Action.Primary.disabled)
+                backgroundColor: Color(.Button.Primary.Background.disabled)
             ),
             progressStyle: CircularProgressViewStyle(tint: Color(.Text.inverse))
         )
@@ -42,21 +42,21 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(
                 title: .init(color: Color(.Text.primary), typography: .button),
-                border: .regular(color: Color(.Border.default)),
+                border: .regular(color: Color(.Button.Secondary.Border.default)),
                 shadow: .clear,
-                backgroundColor: Color(.Action.Secondary.default)
+                backgroundColor: Color(.Button.Secondary.Background.default)
             ),
             highlighted: .init(
                 title: .init(color: Color(.Text.primary), typography: .button),
-                border: .regular(color: Color(.Border.default)),
+                border: .regular(color: Color(.Button.Secondary.Border.selected)),
                 shadow: .clear,
-                backgroundColor: Color(.Action.Secondary.pressed)
+                backgroundColor: Color(.Button.Secondary.Background.pressed)
             ),
             disabled: .init(
                 title: .init(color: Color(.Text.disabled), typography: .button),
-                border: .regular(color: Color(.Action.Border.disabled)),
+                border: .regular(color: Color(.Button.Secondary.Border.disabled)),
                 shadow: .clear,
-                backgroundColor: Color(.Action.Secondary.default).opacity(0)
+                backgroundColor: Color(.Button.Secondary.Background.disabled)
             ),
             progressStyle: CircularProgressViewStyle(tint: Color(.Text.primary))
         )

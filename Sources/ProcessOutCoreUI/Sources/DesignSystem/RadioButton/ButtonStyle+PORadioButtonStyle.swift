@@ -17,8 +17,8 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             normal: .init(
                 knob: .init(
                     backgroundColor: .clear,
-                    border: .regular(color: Color(.Border.default)),
-                    innerCircleColor: Color(.Action.Primary.default).opacity(0),
+                    border: .regular(color: Color(.Input.Border.default)),
+                    innerCircleColor: Color(.Input.Border.default).opacity(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
@@ -26,8 +26,8 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             selected: .init(
                 knob: .init(
                     backgroundColor: .clear,
-                    border: .regular(color: Color(.Action.Primary.default)),
-                    innerCircleColor: Color(.Action.Primary.default),
+                    border: .regular(color: Color(.Button.Primary.Background.default)),
+                    innerCircleColor: Color(.Button.Primary.Background.default),
                     innerCircleRadius: 4
                 ),
                 value: valueStyle
@@ -35,8 +35,8 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             highlighted: .init(
                 knob: .init(
                     backgroundColor: .clear,
-                    border: .regular(color: Color(.Text.muted)),
-                    innerCircleColor: Color(.Action.Primary.default).opacity(0),
+                    border: .regular(color: Color(.Input.Border.hover)),
+                    innerCircleColor: Color(.Input.Border.hover).opacity(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
@@ -45,7 +45,7 @@ extension ButtonStyle where Self == PORadioButtonStyle {
                 knob: .init(
                     backgroundColor: .clear,
                     border: .regular(color: Color(.Text.error)),
-                    innerCircleColor: Color(.Action.Primary.default).opacity(0),
+                    innerCircleColor: Color(.Text.error).opacity(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
