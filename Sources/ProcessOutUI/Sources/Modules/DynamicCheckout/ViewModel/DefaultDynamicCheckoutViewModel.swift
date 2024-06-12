@@ -434,7 +434,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let message = configuration.message ?? String(resource: .DynamicCheckout.successMessage)
         let item = DynamicCheckoutViewModelItem.Success(
-            id: ItemId.success, message: message, image: UIImage(resource: .success)
+            id: ItemId.success,
+            message: message,
+            image: UIImage(resource: .success).withRenderingMode(.alwaysTemplate)
         )
         let section = DynamicCheckoutViewModelState.Section(
             id: SectionId.default, items: [.success(item)], isTight: false, areBezelsVisible: false
