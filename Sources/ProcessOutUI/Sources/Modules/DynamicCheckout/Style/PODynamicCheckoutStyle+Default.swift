@@ -24,7 +24,7 @@ extension PODynamicCheckoutStyle {
         bodyText: POTextStyle(color: Color(poResource: .Text.primary), typography: .body2),
         errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
         message: .toast,
-        backgroundColor: Color(poResource: .Surface.level1),
+        backgroundColor: Color(poResource: .Surface.default),
         actionsContainer: .default,
         paymentSuccess: .default
     )

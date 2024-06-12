@@ -38,7 +38,7 @@ extension POInputStyle {
             normal: POInputStateStyle(
                 text: .init(color: Color(.Text.primary), typography: typography),
                 placeholder: .init(color: Color(.Text.muted), typography: typography),
-                backgroundColor: Color(.Surface.background),
+                backgroundColor: Color(.Surface.default),
                 border: .regular(color: Color(.Border.default)),
                 shadow: .clear,
                 tintColor: Color(.Text.primary)
@@ -46,7 +46,7 @@ extension POInputStyle {
             error: POInputStateStyle(
                 text: .init(color: Color(.Text.primary), typography: typography),
                 placeholder: .init(color: Color(.Text.muted), typography: typography),
-                backgroundColor: Color(.Surface.background),
+                backgroundColor: Color(.Surface.default),
                 border: .regular(color: Color(.Text.error)),
                 shadow: .clear,
                 tintColor: Color(.Text.error)

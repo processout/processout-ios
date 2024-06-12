@@ -32,14 +32,8 @@ extension POColorResource {
     /// The "Surface" asset catalog resource namespace.
     public enum Surface {
 
-        /// The "Surface/Background" asset catalog color resource.
-        public static let background = POColorResource(.Surface.background)
-
-        /// The "Surface/Error" asset catalog color resource.
-        public static let error = POColorResource(.Surface.error)
-
-        /// The "Surface/Level1" asset catalog color resource.
-        public static let level1 = POColorResource(.Surface.level1)
+        /// The "Surface/Default" asset catalog color resource.
+        public static let `default` = POColorResource(.Surface.default)
 
         /// The "Surface/Neutral" asset catalog color resource.
         public static let neutral = POColorResource(.Surface.neutral)
@@ -49,6 +43,12 @@ extension POColorResource {
 
         /// The "Surface/Warning" asset catalog color resource.
         public static let warning = POColorResource(.Surface.warning)
+
+        /// The "Surface/Error" asset catalog color resource.
+        public static let error = POColorResource(.Surface.error)
+
+        /// The "Surface/Informative" asset catalog color resource.
+        public static let informative = POColorResource(.Surface.informative)
     }
 
     /// The "Text" asset catalog resource namespace.

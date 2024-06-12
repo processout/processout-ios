@@ -64,7 +64,7 @@ extension POCardUpdateStyle {
             title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
             input: .medium,
             errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
-            backgroundColor: Color(poResource: .Surface.level1),
+            backgroundColor: Color(poResource: .Surface.default),
             actionsContainer: .default,
             progress: .circular,
             separatorColor: Color(poResource: .Border.subtle)

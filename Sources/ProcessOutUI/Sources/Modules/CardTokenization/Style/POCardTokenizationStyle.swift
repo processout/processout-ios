@@ -71,7 +71,7 @@ extension POCardTokenizationStyle {
             input: .medium,
             radioButton: .radio,
             errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
-            backgroundColor: Color(poResource: .Surface.level1),
+            backgroundColor: Color(poResource: .Surface.default),
             actionsContainer: .default,
             separatorColor: Color(poResource: .Border.subtle)
         )
