@@ -46,6 +46,9 @@ extension POTypography {
     /// Use for titles.
     public static let title = POTypography(font: UIFont(.WorkSans.medium, size: 20), lineHeight: 24)
 
+    /// Subheading typography.
+    public static let subheading = POTypography(font: UIFont(.WorkSans.medium, size: 18), lineHeight: 24)
+
     /// Primary body text for readability and consistency.
     public static let body1 = POTypography(font: UIFont(.WorkSans.medium, size: 16), lineHeight: 20)
 
