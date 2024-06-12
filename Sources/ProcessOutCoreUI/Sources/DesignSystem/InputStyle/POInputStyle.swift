@@ -39,7 +39,7 @@ extension POInputStyle {
                 text: .init(color: Color(.Text.primary), typography: typography),
                 placeholder: .init(color: Color(.Text.muted), typography: typography),
                 backgroundColor: Color(.Surface.default),
-                border: .regular(color: Color(.Border.default)),
+                border: .regular(color: Color(.Input.Border.default)),
                 shadow: .clear,
                 tintColor: Color(.Text.primary)
             ),
@@ -47,7 +47,7 @@ extension POInputStyle {
                 text: .init(color: Color(.Text.primary), typography: typography),
                 placeholder: .init(color: Color(.Text.muted), typography: typography),
                 backgroundColor: Color(.Surface.default),
-                border: .regular(color: Color(.Text.error)),
+                border: .regular(color: Color(.Input.Border.error)),
                 shadow: .clear,
                 tintColor: Color(.Text.primary)
             )
