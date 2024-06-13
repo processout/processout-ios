@@ -48,7 +48,7 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
                     .opacity(isLoading ? 1 : 0)
                 configuration.label
                     .textStyle(currentStyle.title)
-                    .multilineTextAlignment(.center)
+                    .lineLimit(1)
                     .opacity(isLoading ? 0 : 1)
             }
             .padding(Constants.padding)

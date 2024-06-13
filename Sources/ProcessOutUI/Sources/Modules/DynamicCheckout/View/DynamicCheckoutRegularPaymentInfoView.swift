@@ -14,7 +14,7 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
     let item: DynamicCheckoutViewModelItem.RegularPaymentInfo
 
     var body: some View {
-        VStack(spacing: POSpacing.medium) {
+        VStack(spacing: POSpacing.large) {
             HStack(spacing: POSpacing.small) {
                 // todo(andrii-vysotskyi): decide if separate style should exist for AsyncImage
                 POAsyncImage(resource: item.iconImageResource) {

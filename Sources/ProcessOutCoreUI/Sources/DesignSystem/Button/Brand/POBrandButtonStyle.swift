@@ -37,7 +37,7 @@ public struct POBrandButtonStyle: ButtonStyle {
             configuration.label
                 .textStyle(title)
                 .colorScheme(isBrandColorLight ? .light : .dark)
-                .multilineTextAlignment(.center)
+                .lineLimit(1)
                 .padding(Constants.padding)
                 .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
                 .backport.background {

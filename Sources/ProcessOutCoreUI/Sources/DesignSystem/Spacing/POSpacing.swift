@@ -20,5 +20,8 @@ import Foundation
     public static let medium: CGFloat = 16
 
     /// Large spacing.
-    public static let large: CGFloat = 24
+    public static let large: CGFloat = 20
+
+    /// Extra large spacing.
+    public static let extraLarge: CGFloat = 40
 }
