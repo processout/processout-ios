@@ -59,12 +59,7 @@ public struct POBrandButtonStyle: ButtonStyle {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let padding = EdgeInsets(
-            top: POSpacing.extraSmall,
-            leading: POSpacing.small,
-            bottom: POSpacing.extraSmall,
-            trailing: POSpacing.small
-        )
+        static let padding = EdgeInsets(horizontal: POSpacing.small, vertical: POSpacing.extraSmall)
         static let minHeight: CGFloat = 44
     }
 

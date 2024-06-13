@@ -69,7 +69,7 @@ public struct POTextField<Trailing: View>: View {
 
 private enum Constants {
     static let minHeight: CGFloat = 48
-    static let padding = EdgeInsets(horizontal: POSpacing.medium, vertical: 4)
+    static let padding = EdgeInsets(horizontal: POSpacing.medium, vertical: POSpacing.extraSmall)
 }
 
 @available(iOS 14, *)

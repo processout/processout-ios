@@ -30,7 +30,7 @@ public struct POMenuPickerStyle: POPickerStyle {
 
     private enum Constants {
         static let minHeight: CGFloat = 48
-        static let padding = EdgeInsets(horizontal: POSpacing.medium, vertical: 4)
+        static let padding = EdgeInsets(horizontal: POSpacing.medium, vertical: POSpacing.extraSmall)
     }
 
     // MARK: - Private Properties
