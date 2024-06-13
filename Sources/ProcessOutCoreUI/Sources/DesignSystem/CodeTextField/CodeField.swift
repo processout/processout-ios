@@ -309,7 +309,7 @@ final class CodeField: UIControl, UITextInput {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let componentSize = CGSize(width: 42, height: 44)
+        static let componentSize = CGSize(width: 42, height: 48)
         static let spacing = POSpacing.extraSmall
     }
 
