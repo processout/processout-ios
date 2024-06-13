@@ -302,6 +302,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 formatter: parameter.formatter,
                 keyboard: keyboard(parameterType: parameter.specification.type),
                 contentType: contentType(parameterType: parameter.specification.type),
+                submitLabel: .next,
                 onSubmit: { [weak self] in
                     self?.submitFocusedInput()
                 }

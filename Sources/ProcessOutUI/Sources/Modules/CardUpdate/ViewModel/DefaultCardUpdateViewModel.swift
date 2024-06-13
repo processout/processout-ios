@@ -127,6 +127,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
             formatter: nil,
             keyboard: .asciiCapableNumberPad,
             contentType: nil,
+            submitLabel: .default,
             onSubmit: { }
         )
         return .input(item)
@@ -148,6 +149,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
             formatter: state.formatter,
             keyboard: .asciiCapableNumberPad,
             contentType: nil,
+            submitLabel: .default,
             onSubmit: { [weak self] in
                 self?.interactor.submit()
             }
