@@ -41,14 +41,8 @@ extension POColorResource {
         /// The "Surface/Success" asset catalog color resource.
         public static let success = POColorResource(.Surface.success)
 
-        /// The "Surface/Warning" asset catalog color resource.
-        public static let warning = POColorResource(.Surface.warning)
-
         /// The "Surface/Error" asset catalog color resource.
         public static let error = POColorResource(.Surface.error)
-
-        /// The "Surface/Informative" asset catalog color resource.
-        public static let informative = POColorResource(.Surface.informative)
     }
 
     /// The "Text" asset catalog resource namespace.
@@ -71,9 +65,6 @@ extension POColorResource {
 
         /// The "Text/Success" asset catalog color resource.
         public static let success = POColorResource(.Text.success)
-
-        /// The "Text/Warning" asset catalog color resource.
-        public static let warning = POColorResource(.Text.warning)
     }
 }
 
