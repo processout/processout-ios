@@ -21,7 +21,7 @@ extension PODynamicCheckoutStyle {
         input: .medium,
         codeInput: .large,
         radioButton: PORadioButtonStyle.radio,
-        bodyText: POTextStyle(color: Color(poResource: .Text.primary), typography: .body2),
+        bodyText: POTextStyle(color: Color(poResource: .Text.primary), typography: .body1),
         errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
         message: .toast,
         backgroundColor: Color(poResource: .Surface.default),
@@ -47,7 +47,7 @@ extension PODynamicCheckoutStyle.PaymentSuccess {
 
     /// Default dynamic checkout capture success style.
     public static let `default` = Self(
-        message: POTextStyle(color: Color(poResource: .Text.success), typography: .body2),
+        message: POTextStyle(color: Color(poResource: .Text.success), typography: .body1),
         backgroundColor: Color(poResource: .Surface.success)
     )
 }

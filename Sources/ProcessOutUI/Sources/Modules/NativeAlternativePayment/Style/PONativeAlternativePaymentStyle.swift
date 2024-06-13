@@ -93,8 +93,8 @@ extension PONativeAlternativePaymentStyle {
         errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
         actionsContainer: .default,
         progressView: .circular,
-        message: POTextStyle(color: Color(poResource: .Text.primary), typography: .body2),
-        successMessage: POTextStyle(color: Color(poResource: .Text.success), typography: .body2),
+        message: POTextStyle(color: Color(poResource: .Text.primary), typography: .body1),
+        successMessage: POTextStyle(color: Color(poResource: .Text.success), typography: .body1),
         background: .default,
         separatorColor: Color(poResource: .Border.subtle)
     )
