@@ -21,7 +21,4 @@ import Foundation
 
     /// Large spacing.
     public static let large: CGFloat = 20
-
-    /// Extra large spacing.
-    public static let extraLarge: CGFloat = 40
 }

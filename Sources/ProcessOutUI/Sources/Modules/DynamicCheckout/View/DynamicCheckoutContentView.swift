@@ -17,7 +17,7 @@ struct DynamicCheckoutContentView: View {
     // MARK: - View
 
     var body: some View {
-        VStack(spacing: POSpacing.extraLarge) {
+        VStack(spacing: POSpacing.large) {
             ForEach(sections) { section in
                 DynamicCheckoutSectionView(section: section)
                     .frame(maxWidth: .infinity)
