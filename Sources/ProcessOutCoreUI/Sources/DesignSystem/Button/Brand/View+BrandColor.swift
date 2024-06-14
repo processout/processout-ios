@@ -26,6 +26,6 @@ extension EnvironmentValues {
     // MARK: - Private Nested Types
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = Color(poResource: .Surface.default) // todo(andrii-vysotskyi): change to button color
+        static let defaultValue = Color(.Button.Primary.Background.default)
     }
 }
