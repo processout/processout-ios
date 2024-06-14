@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 11.04.2024.
 //
 
-@_implementationOnly import os
+import os
 
 /// An `os_unfair_lock` wrapper.
 final class UnfairLock {

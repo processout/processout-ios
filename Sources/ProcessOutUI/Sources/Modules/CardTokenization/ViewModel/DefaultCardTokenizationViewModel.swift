@@ -11,9 +11,9 @@ import SwiftUI
 
 // swiftlint:disable type_body_length file_length
 
-final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
+final class DefaultCardTokenizationViewModel: ViewModel {
 
-    init(interactor: some CardTokenizationInteractor) {
+    init(interactor: any CardTokenizationInteractor) {
         self.interactor = interactor
         state = .idle
         observeChanges(interactor: interactor)
@@ -21,8 +21,12 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     // MARK: - CardTokenizationViewModel
 
-    @Published
+    @AnimatablePublished
     var state: CardTokenizationViewModelState
+
+    func start() {
+        interactor.start()
+    }
 
     // MARK: - Private Nested Types
 
@@ -51,11 +55,11 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     // MARK: - Private Methods
 
-    private func observeChanges(interactor: some CardTokenizationInteractor) {
+    private func observeChanges(interactor: any Interactor) {
         interactor.didChange = { [weak self] in
             self?.configureWithInteractorState()
         }
-        interactor.start()
+        configureWithInteractorState()
     }
 
     private func configureWithInteractorState() {
@@ -63,9 +67,11 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         case .idle:
             state = .idle
         case .started(let startedState):
-            state = convertToState(startedState: startedState, isSubmitting: false)
+            let newState = convertToState(startedState: startedState, isSubmitting: false)
+            self.state = newState
         case .tokenizing(let startedState):
-            state = convertToState(startedState: startedState, isSubmitting: true)
+            let newState = convertToState(startedState: startedState, isSubmitting: true)
+            self.state = newState
         default:
             break
         }
@@ -312,10 +318,14 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     private func submitAction(
         startedState: InteractorState.Started, isSubmitting: Bool
-    ) -> POActionsContainerActionViewModel {
+    ) -> POActionsContainerActionViewModel? {
+        let title = configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit)
+        guard !title.isEmpty else {
+            return nil
+        }
         let action = POActionsContainerActionViewModel(
             id: "primary-button",
-            title: configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit),
+            title: title,
             isEnabled: startedState.areParametersValid,
             isLoading: isSubmitting,
             isPrimary: true,

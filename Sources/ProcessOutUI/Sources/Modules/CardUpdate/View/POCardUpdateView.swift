@@ -12,8 +12,8 @@ import SwiftUI
 @available(iOS 14, *)
 public struct POCardUpdateView: View {
 
-    init(viewModel: some CardUpdateViewModel) {
-        self._viewModel = .init(wrappedValue: .init(erasing: viewModel))
+    init(viewModel: @autoclosure @escaping () -> some CardUpdateViewModel) {
+        self._viewModel = .init(wrappedValue: .init(erasing: viewModel()))
     }
 
     // MARK: - View
@@ -43,7 +43,10 @@ public struct POCardUpdateView: View {
             POActionsContainerView(actions: viewModel.actions)
                 .actionsContainerStyle(style.actionsContainer)
         }
-        .background(style.backgroundColor.ignoresSafeArea())
+        .backport.background {
+            style.backgroundColor.ignoresSafeArea()
+        }
+        .onAppear(perform: viewModel.start)
     }
 
     // MARK: - Private Properties

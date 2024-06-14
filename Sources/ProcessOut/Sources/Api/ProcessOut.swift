@@ -232,6 +232,6 @@ extension ProcessOut {
 
     private static func prewarm() {
         FontFamily.registerAllCustomFonts()
-        DefaultPhoneNumberMetadataProvider.shared.prewarm()
+        PODefaultPhoneNumberMetadataProvider.shared.prewarm()
     }
 }

@@ -137,10 +137,6 @@ import UIKit
         }
     }
 
-    public func didRequestCancelConfirmation() {
-        send(event: .didRequestCancelConfirmation)
-    }
-
     // MARK: - Private Nested Types
 
     private enum Constants {
@@ -156,8 +152,8 @@ import UIKit
     private var logger: POLogger
     private weak var delegate: PONativeAlternativePaymentMethodDelegate?
 
-    private lazy var phoneNumberFormatter: PhoneNumberFormatter = {
-        PhoneNumberFormatter()
+    private lazy var phoneNumberFormatter: POPhoneNumberFormatter = {
+        POPhoneNumberFormatter()
     }()
 
     private var captureCancellable: POCancellable?

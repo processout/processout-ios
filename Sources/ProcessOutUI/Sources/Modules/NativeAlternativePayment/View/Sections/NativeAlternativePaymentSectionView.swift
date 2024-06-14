@@ -12,6 +12,7 @@ import SwiftUI
 struct NativeAlternativePaymentSectionView: View {
 
     let section: NativeAlternativePaymentViewModelSection
+    let horizontalPadding: CGFloat
 
     @Binding
     private(set) var focusedItemId: AnyHashable?
@@ -22,20 +23,23 @@ struct NativeAlternativePaymentSectionView: View {
             if let title = section.title {
                 Text(title)
                     .textStyle(style.sectionTitle)
-                    .padding(.horizontal, POSpacing.large)
+                    .padding(.horizontal, horizontalPadding)
             }
             ForEach(section.items) { element in
-                NativeAlternativePaymentItemView(item: element, focusedItemId: $focusedItemId)
+                NativeAlternativePaymentItemView(
+                    item: element, horizontalPadding: horizontalPadding, focusedItemId: $focusedItemId
+                )
             }
             if let error = section.error {
                 Text(error)
                     .textStyle(style.errorDescription)
-                    .padding(.horizontal, POSpacing.large)
+                    .padding(.horizontal, horizontalPadding)
             }
         }
         .fixedSize(horizontal: false, vertical: true)
         .multilineTextAlignment(section.isCentered ? .center : .leading)
         .frame(maxWidth: .infinity, alignment: alignment)
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties

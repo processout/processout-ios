@@ -19,6 +19,9 @@
 - ``SwiftUI/EnvironmentValues/isButtonLoading``
 - ``POButtonStyle/primary``
 - ``POButtonStyle/secondary``
+- ``POBrandButtonStyle``
+- ``POBrandButtonStyle/brand``
+- ``POPassKitPaymentButtonStyle``
 
 ### Radio Button
 
@@ -36,3 +39,10 @@
 
 - ``POInputStyle``
 - ``POInputStateStyle``
+
+### Message
+
+- ``POMessageViewStyle``
+- ``POMessageViewStyleConfiguration``
+- ``POMessageSeverity``
+- ``POToastMessageStyle``

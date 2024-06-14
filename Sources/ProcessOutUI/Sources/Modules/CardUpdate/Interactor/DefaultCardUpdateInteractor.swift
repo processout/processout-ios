@@ -103,7 +103,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         }
     }
 
-    func cancel() {
+    override func cancel() {
         guard case .started = state else {
             return
         }

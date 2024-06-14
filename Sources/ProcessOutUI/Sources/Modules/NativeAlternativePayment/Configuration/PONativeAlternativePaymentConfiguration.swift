@@ -35,6 +35,11 @@ public struct PONativeAlternativePaymentConfiguration {
     /// Custom title.
     public let title: String?
 
+    /// A Boolean property that indicates whether the code input should be horizontally centered. This property
+    /// is only applicable when there is a single code input. If there are multiple inputs the alignment is always
+    /// leading. Default value is `true`.
+    public let shouldHorizontallyCenterCodeInput: Bool
+
     /// Custom success message **markdown** to display user when payment completes.
     public let successMessage: String?
 
@@ -95,6 +100,7 @@ public struct PONativeAlternativePaymentConfiguration {
         self.invoiceId = invoiceId
         self.gatewayConfigurationId = gatewayConfigurationId
         self.title = title
+        self.shouldHorizontallyCenterCodeInput = true
         self.successMessage = successMessage
         self.primaryActionTitle = primaryActionTitle
         self.secondaryAction = secondaryAction
@@ -112,6 +118,7 @@ public struct PONativeAlternativePaymentConfiguration {
         invoiceId: String,
         gatewayConfigurationId: String,
         title: String? = nil,
+        shouldHorizontallyCenterCodeInput: Bool = true,
         successMessage: String? = nil,
         primaryActionTitle: String? = nil,
         secondaryAction: SecondaryAction? = nil,
@@ -122,6 +129,7 @@ public struct PONativeAlternativePaymentConfiguration {
         self.invoiceId = invoiceId
         self.gatewayConfigurationId = gatewayConfigurationId
         self.title = title
+        self.shouldHorizontallyCenterCodeInput = shouldHorizontallyCenterCodeInput
         self.successMessage = successMessage
         self.primaryActionTitle = primaryActionTitle
         self.secondaryAction = secondaryAction

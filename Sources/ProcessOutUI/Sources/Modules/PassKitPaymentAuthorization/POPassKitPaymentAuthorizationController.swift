@@ -124,8 +124,12 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
             let errors = errorMapper.map(poError: error)
             return PKPaymentAuthorizationResult(status: .failure, errors: errors)
         }
-        let result = await delegate?.paymentAuthorizationController(self, didTokenizePayment: payment, card: card)
-        return result ?? PKPaymentAuthorizationResult(status: .success, errors: nil)
+        // todo(andrii-vysotskyi): decide if errors should be mapped with other results
+        if let result = await delegate?.paymentAuthorizationController(self, didTokenizePayment: payment, card: card) {
+            result.errors = result.errors.flatMap(errorMapper.map)
+            return result
+        }
+        return PKPaymentAuthorizationResult(status: .success, errors: nil)
     }
 
     public func paymentAuthorizationControllerWillAuthorizePayment(_: PKPaymentAuthorizationController) {

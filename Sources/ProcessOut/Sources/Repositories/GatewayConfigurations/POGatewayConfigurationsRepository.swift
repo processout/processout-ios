@@ -10,7 +10,7 @@ import Foundation
 @available(*, deprecated, renamed: "POGatewayConfigurationsRepository")
 public typealias POGatewayConfigurationsRepositoryType = POGatewayConfigurationsRepository
 
-public protocol POGatewayConfigurationsRepository: PORepository, POAutoCompletion {
+public protocol POGatewayConfigurationsRepository: PORepository { // sourcery: AutoCompletion
 
     /// Returns available gateway configurations.
     func all(request: POAllGatewayConfigurationsRequest) async throws -> POAllGatewayConfigurationsResponse

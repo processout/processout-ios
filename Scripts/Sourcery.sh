@@ -7,7 +7,7 @@ export PATH="/opt/homebrew/bin:$PATH"
 
 # Run sourcery
 sourcery \
-  --sources $PROJECT_DIR/Sources/$TARGET_NAME/Sources \
+  --sources $TARGET_ROOT/Sources \
   --templates $PROJECT_DIR/Templates \
   --parseDocumentation \
-  --output $PROJECT_DIR/Sources/$TARGET_NAME/Sources/Generated/Sourcery+Generated.swift
+  --output $TARGET_ROOT/Sources/Generated/Sourcery+Generated.swift

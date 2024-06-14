@@ -52,7 +52,7 @@ or ``POAlternativePaymentMethodViewControllerBuilder``.
 ## Migrating from versions < 3.0.0
 
 - Instead of `ProcessOut.Setup(projectId: String)` there is new method that should be used to configure
-SDK ``ProcessOut/configure(configuration:)``.
+SDK ``ProcessOut/configure(configuration:force:).
 
 - `ProcessOut` was renamed to ``ProcessOutLegacyApi`` to avoid shadowing module name as it may cause issues. For more
 information, see [Swift Issue](https://github.com/apple/swift/issues/56573).
