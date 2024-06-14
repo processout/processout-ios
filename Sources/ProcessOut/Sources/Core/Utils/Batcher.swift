@@ -45,13 +45,16 @@ final class Batcher<Task> {
 
     /// - NOTE: method mutates self but is not thread safe.
     private func scheduleExecutionUnsafe() {
-        let timer = Timer.scheduledTimer(withTimeInterval: executionInterval, repeats: false) { [weak self] _ in
+        let timer = Timer(timeInterval: executionInterval, repeats: false) { [weak self] _ in
             guard let self = self else {
                 return
             }
             _Concurrency.Task {
                 await self.executeTasks()
             }
+        }
+        DispatchQueue.main.async {
+            RunLoop.main.add(timer, forMode: .default)
         }
         self.executionTimer = timer
     }
