@@ -63,6 +63,7 @@ public struct PORadioButtonStyle: ButtonStyle {
             )
             .animation(.default, value: isSelected)
         }
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Nested Types
