@@ -34,7 +34,7 @@ final class CodeFieldViewCoordinator {
         } else {
             insertionIndex = representable.text.endIndex
         }
-        var newText = representable.$text.wrappedValue
+        var newText = representable.text
         newText.insert(contentsOf: text, at: insertionIndex)
         newText = String(newText.prefix(representable.length))
         let newIndex = newText.index(insertionIndex, offsetBy: text.count, limitedBy: newText.endIndex)
