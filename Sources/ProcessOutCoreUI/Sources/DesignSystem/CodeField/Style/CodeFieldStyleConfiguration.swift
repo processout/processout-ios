@@ -19,7 +19,7 @@ struct CodeFieldStyleConfiguration {
     let index: Index?
 
     /// Changes current index.
-    func setIndex(_ index: Index?) {
+    func setIndex(_ index: Index) {
         _setIndex(index)
     }
 
@@ -32,5 +32,5 @@ struct CodeFieldStyleConfiguration {
 
     // MARK: - Private Properties
 
-    private let _setIndex: (_ index: Index?) -> Void
+    private let _setIndex: (_ index: Index) -> Void
 }
