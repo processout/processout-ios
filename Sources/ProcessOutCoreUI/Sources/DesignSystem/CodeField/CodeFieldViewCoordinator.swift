@@ -28,13 +28,13 @@ final class CodeFieldViewCoordinator {
         }
         let insertionIndex: String.Index
         if text.count == representable.length {
-            insertionIndex = representable.text.startIndex
-        } else if let index = representable.textIndex, text.indices.contains(index) {
+            insertionIndex = self.text.startIndex
+        } else if let index = representable.textIndex, self.text.indices.contains(index) {
             insertionIndex = index
         } else {
-            insertionIndex = representable.text.endIndex
+            insertionIndex = self.text.endIndex
         }
-        var newText = representable.text
+        var newText = self.text
         newText.insert(contentsOf: text, at: insertionIndex)
         newText = String(newText.prefix(representable.length))
         let newIndex = newText.index(insertionIndex, offsetBy: text.count, limitedBy: newText.endIndex)
@@ -43,10 +43,10 @@ final class CodeFieldViewCoordinator {
     }
 
     func deleteBackward() {
-        guard let currentIndex = representable.textIndex, currentIndex != representable.text.startIndex else {
+        guard let currentIndex = representable.textIndex, currentIndex != text.startIndex else {
             return
         }
-        let index = representable.text.index(before: currentIndex)
+        let index = text.index(before: currentIndex)
         representable.text.remove(at: index)
         representable.textIndex = index
     }
@@ -64,7 +64,6 @@ final class CodeFieldViewCoordinator {
     func didEndEditing() {
         RunLoop.main.perform {
             self.representable.textIndex = nil
-            self.representable.isMenuVisible = false
         }
     }
 }

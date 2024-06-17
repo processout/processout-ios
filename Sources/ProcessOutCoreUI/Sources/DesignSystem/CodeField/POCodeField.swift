@@ -34,6 +34,11 @@ public struct POCodeField: View {
             .backport.onChange(of: text) {
                 isMenuVisible = false
             }
+            .backport.onChange(of: textIndex) {
+                if textIndex == nil {
+                    isMenuVisible = false
+                }
+            }
             .backport.geometryGroup()
     }
 

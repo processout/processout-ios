@@ -18,7 +18,7 @@ struct CodeFieldRepresentable: UIViewRepresentable {
     var textIndex: String.Index?
 
     @Binding
-    var isMenuVisible: Bool
+    private(set) var isMenuVisible: Bool
 
     // MARK: - UIViewRepresentable
 
