@@ -31,6 +31,9 @@ public struct POCodeField: View {
                 )
             )
             .onLongPressGesture(perform: showMenu)
+            .backport.onChange(of: text) {
+                isMenuVisible = false
+            }
             .backport.geometryGroup()
     }
 

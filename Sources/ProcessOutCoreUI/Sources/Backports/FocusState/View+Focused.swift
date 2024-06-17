@@ -35,8 +35,6 @@ private struct FocusModifier<Value: Hashable>: ViewModifier {
     init(binding: Binding<Value?>, value: Value) {
         self._binding = binding
         self.value = value
-        _coordinator = .init(wrappedValue: FocusCoordinator())
-        _isVisible = .init(initialValue: false)
     }
 
     func body(content: Content) -> some View {
@@ -70,13 +68,15 @@ private struct FocusModifier<Value: Hashable>: ViewModifier {
     private let value: Value
 
     /// The state binding to register.
-    @Binding private var binding: Value?
+    @Binding
+    private var binding: Value?
 
     /// Indicates whether
-    @State private var isVisible: Bool
+    @State
+    private var isVisible = false
 
     @StateObject
-    private var coordinator: FocusCoordinator
+    private var coordinator = FocusCoordinator()
 
     // MARK: - Private Methods
 

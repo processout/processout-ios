@@ -40,7 +40,6 @@ final class CodeFieldViewCoordinator {
         let newIndex = newText.index(insertionIndex, offsetBy: text.count, limitedBy: newText.endIndex)
         representable.text = newText
         representable.textIndex = newIndex ?? newText.endIndex
-        representable.isMenuVisible = false
     }
 
     func deleteBackward() {
@@ -50,7 +49,6 @@ final class CodeFieldViewCoordinator {
         let index = representable.text.index(before: currentIndex)
         representable.text.remove(at: index)
         representable.textIndex = index
-        representable.isMenuVisible = false
     }
 
     // MARK: - Editing
