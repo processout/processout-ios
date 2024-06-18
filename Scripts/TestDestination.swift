@@ -17,7 +17,8 @@ func supportedDeviceId(attempt: Int = 0) throws -> String? {
         .filter { $0.version.starts(with: "17") && $0.platform == "iOS" }
         .compactMap { devices[$0.identifier] }
         .flatMap { $0 }
-    if let device = supportedDevices.first {
+    // Grab last device to get the most recent iOS version
+    if let device = supportedDevices.last {
         return device.udid
     }
     guard attempt < 3 else {
