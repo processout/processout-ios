@@ -51,17 +51,3 @@ final class FocusCoordinator: ObservableObject {
         isEditing = false
     }
 }
-
-extension EnvironmentValues {
-
-    var focusCoordinator: FocusCoordinator? {
-        get { self[Key.self] }
-        set { self[Key.self] = newValue }
-    }
-
-    // MARK: - Private Properties
-
-    private struct Key: EnvironmentKey {
-        static let defaultValue: FocusCoordinator? = nil
-    }
-}

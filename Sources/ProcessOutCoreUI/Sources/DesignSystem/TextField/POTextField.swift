@@ -91,7 +91,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
         textField.setContentHuggingPriority(.defaultHigh, for: .vertical)
         textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         context.coordinator.configure(textField: textField)
-        focusCoordinator?.track(control: textField)
+        focusCoordinator.track(control: textField)
         return textField
     }
 
@@ -126,12 +126,23 @@ private struct TextFieldRepresentable: UIViewRepresentable {
 
     // MARK: - Private Properties
 
-    @Environment(\.sizeCategory) private var sizeCategory
-    @Environment(\.poKeyboardType) private var keyboardType
-    @Environment(\.poTextContentType) private var textContentType
-    @Environment(\.backportSubmitLabel) private var submitLabel
-    @Environment(\.backportSubmitAction) private var submitAction
-    @Environment(\.focusCoordinator) private var focusCoordinator
+    @Environment(\.sizeCategory)
+    private var sizeCategory
+
+    @Environment(\.poKeyboardType)
+    private var keyboardType
+
+    @Environment(\.poTextContentType)
+    private var textContentType
+
+    @Environment(\.backportSubmitLabel)
+    private var submitLabel
+
+    @Environment(\.backportSubmitAction)
+    private var submitAction
+
+    @EnvironmentObject
+    private var focusCoordinator: FocusCoordinator
 
     // MARK: - Private Methods
 
