@@ -24,15 +24,14 @@ struct CodeFieldRepresentable: UIViewRepresentable {
 
     func makeUIView(context: Context) -> CodeFieldView {
         let codeField = CodeFieldView(coordinator: context.coordinator)
-        focusCoordinator?.track(control: codeField)
+        focusCoordinator.track(control: codeField)
         return codeField
     }
 
     func updateUIView(_ uiView: CodeFieldView, context: Context) {
-        // Since coordinator is referencing `representable` which is a struct. New instance should be injected every
-        // time runtime asks us to update uiView.
+        // Since coordinator is referencing `representable` which is a struct, new
+        // instance should be injected every time runtime asks us to update uiView.
         context.coordinator.representable = self
-        updateFirstResponder(uiView: uiView)
         updateMenu(uiView: uiView)
     }
 
@@ -42,18 +41,10 @@ struct CodeFieldRepresentable: UIViewRepresentable {
 
     // MARK: - Private Properties
 
-    @Environment(\.focusCoordinator)
-    private var focusCoordinator
+    @EnvironmentObject
+    private var focusCoordinator: FocusCoordinator
 
     // MARK: - Private Methods
-
-    private func updateFirstResponder(uiView: CodeFieldView) {
-        if textIndex == nil {
-            uiView.resignFirstResponder()
-        } else {
-            uiView.becomeFirstResponder()
-        }
-    }
 
     private func updateMenu(uiView: CodeFieldView) {
         if isMenuVisible, uiView.isFirstResponder {

@@ -21,6 +21,7 @@ public struct POCodeField: View {
 
     public var body: some View {
         let configuration = CodeFieldStyleConfiguration(length: length, text: text, index: textIndex) { newIndex in
+            focusCoordinator.beginEditing()
             textIndex = newIndex
         }
         style
@@ -30,12 +31,20 @@ public struct POCodeField: View {
                     length: length, text: $text, textIndex: $textIndex, isMenuVisible: $isMenuVisible
                 )
             )
-            .onLongPressGesture(perform: showMenu)
+            .onLongPressGesture {
+                isMenuVisible = true
+            }
             .backport.onChange(of: text) {
                 isMenuVisible = false
             }
-            .backport.onChange(of: textIndex) {
-                if textIndex == nil {
+            .onReceive(notification: UIMenuController.didHideMenuNotification) { _ in
+                isMenuVisible = false
+            }
+            .backport.onChange(of: focusCoordinator.isEditing) {
+                if focusCoordinator.isEditing {
+                    textIndex = text.endIndex
+                } else {
+                    textIndex = nil
                     isMenuVisible = false
                 }
             }
@@ -58,12 +67,6 @@ public struct POCodeField: View {
     @Environment(\.codeFieldStyle)
     private var style
 
-    // MARK: - Private Methods
-
-    private func showMenu() {
-        // UIMenuController that is used by representable doesn't report when
-        // it becomes hidden which makes `isMenuVisible == true` unreliable.
-        isMenuVisible = false
-        isMenuVisible = true
-    }
+    @EnvironmentObject
+    private var focusCoordinator: FocusCoordinator
 }

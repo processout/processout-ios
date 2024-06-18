@@ -29,7 +29,6 @@ struct NativeAlternativePaymentItemView: View {
             POCodeField(text: item.$value, length: item.length)
                 .backport.focused($focusedItemId, equals: item.id)
                 .controlInvalid(item.isInvalid)
-                .allowsHitTesting(item.isEnabled)
                 .inputStyle(style.codeInput)
                 .padding(.horizontal, horizontalPadding)
         case .picker(let pickerItem):

@@ -22,10 +22,6 @@ final class CodeFieldViewCoordinator {
     }
 
     func insertText(_ text: String) {
-        if let character = text.last, character.isNewline {
-            representable.textIndex = nil
-            return
-        }
         let insertionIndex: String.Index
         if text.count == representable.length {
             insertionIndex = self.text.startIndex
@@ -49,21 +45,5 @@ final class CodeFieldViewCoordinator {
         let index = text.index(before: currentIndex)
         representable.text.remove(at: index)
         representable.textIndex = index
-    }
-
-    // MARK: - Editing
-
-    func didBeginEditing() {
-        RunLoop.main.perform {
-            if self.representable.textIndex == nil {
-                self.representable.textIndex = self.representable.text.endIndex
-            }
-        }
-    }
-
-    func didEndEditing() {
-        RunLoop.main.perform {
-            self.representable.textIndex = nil
-        }
     }
 }

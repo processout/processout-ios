@@ -35,7 +35,6 @@ final class CodeFieldView: UIControl, UITextInput {
             return true
         }
         if super.becomeFirstResponder() {
-            coordinator.didBeginEditing()
             sendActions(for: .editingDidBegin)
             return true
         }
@@ -48,7 +47,6 @@ final class CodeFieldView: UIControl, UITextInput {
             return false
         }
         if super.resignFirstResponder() {
-            coordinator.didEndEditing()
             sendActions(for: .editingDidEnd)
             return true
         }
@@ -57,7 +55,7 @@ final class CodeFieldView: UIControl, UITextInput {
 
     override func paste(_ sender: Any?) {
         if let string = UIPasteboard.general.string {
-            coordinator.insertText(string)
+            insertText(string)
         }
     }
 
@@ -242,7 +240,11 @@ final class CodeFieldView: UIControl, UITextInput {
     }
 
     func insertText(_ text: String) {
-        coordinator.insertText(text)
+        if let character = text.last, character.isNewline {
+            resignFirstResponder()
+        } else {
+            coordinator.insertText(text)
+        }
     }
 
     func deleteBackward() {
