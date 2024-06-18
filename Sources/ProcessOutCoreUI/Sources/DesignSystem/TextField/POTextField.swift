@@ -47,8 +47,8 @@ public struct POTextField<Trailing: View>: View {
         .border(style: style.border)
         .shadow(style: style.shadow)
         .accentColor(style.tintColor)
-        .backport.geometryGroup()
         .animation(.default, value: isInvalid)
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties

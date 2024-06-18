@@ -10,7 +10,7 @@ import SwiftUI
 @available(iOS 14.0, *)
 struct DefaultCodeFieldStyleCharacterView: View {
 
-    enum CaretPosition {
+    enum CaretPosition: Equatable {
         case before, after
     }
 
