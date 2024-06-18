@@ -107,6 +107,45 @@ public enum POCardScheme: Codable, Hashable { // sourcery: AutoStringRepresentab
     /// A private label credit card that is branded for Atos.
     case atosPrivateLabel // sourcery: rawValue = "atos private label"
 
+    /// An Electron debit card.
+    case electron
+
+    /// An iD payment card.
+    case idCredit
+
+    /// The Interac payment method.
+    case interac
+
+    /// A QUICPay payment card.
+    case quicPay
+
+    /// A Suica payment card.
+    case suica
+
+    /// A Girocard payment method.
+    case girocard
+
+    /// A Meeza payment card.
+    case meeza
+
+    /// A Bancomat payment card.
+    case pagoBancomat
+
+    /// The TMoney card.
+    case tmoney
+
+    /// A PostFinance AG payment card.
+    case postFinance
+
+    /// A Nanaco payment card.
+    case nanaco
+
+    /// A WAON payment card.
+    case waon
+
+    /// A Mir payment card.
+    case mir // rawValue = "nspk mir"
+
     /// Unknown card scheme.
     case unknown(String)
 }

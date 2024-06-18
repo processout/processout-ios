@@ -467,6 +467,32 @@ extension POCardScheme: RawRepresentable {
             self = .privateLabel
         case "atos private label":
             self = .atosPrivateLabel
+        case "electron":
+            self = .electron
+        case "idCredit":
+            self = .idCredit
+        case "interac":
+            self = .interac
+        case "quicPay":
+            self = .quicPay
+        case "suica":
+            self = .suica
+        case "girocard":
+            self = .girocard
+        case "meeza":
+            self = .meeza
+        case "pagoBancomat":
+            self = .pagoBancomat
+        case "tmoney":
+            self = .tmoney
+        case "postFinance":
+            self = .postFinance
+        case "nanaco":
+            self = .nanaco
+        case "waon":
+            self = .waon
+        case "mir":
+            self = .mir
         default:
             self = .unknown(rawValue)
         }
@@ -548,6 +574,32 @@ extension POCardScheme: RawRepresentable {
             return "private label"
         case .atosPrivateLabel:
             return "atos private label"
+        case .electron:
+            return "electron"
+        case .idCredit:
+            return "idCredit"
+        case .interac:
+            return "interac"
+        case .quicPay:
+            return "quicPay"
+        case .suica:
+            return "suica"
+        case .girocard:
+            return "girocard"
+        case .meeza:
+            return "meeza"
+        case .pagoBancomat:
+            return "pagoBancomat"
+        case .tmoney:
+            return "tmoney"
+        case .postFinance:
+            return "postFinance"
+        case .nanaco:
+            return "nanaco"
+        case .waon:
+            return "waon"
+        case .mir:
+            return "mir"
         case .unknown(let rawValue):
             return rawValue
         }
