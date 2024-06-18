@@ -16,7 +16,7 @@ public struct POInputStyle {
     /// Style for error state.
     public let error: POInputStateStyle
 
-    /// Style for error state.
+    /// Style for focused state.
     public let focused: POInputStateStyle
 
     /// Creates style instance.
