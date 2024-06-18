@@ -26,7 +26,7 @@ public struct POTextField<Trailing: View>: View {
     }
 
     public var body: some View {
-        let style = isInvalid ? style.error : style.normal
+        let style = style.resolve(isInvalid: isInvalid, isFocused: focusCoordinator.isEditing)
         HStack {
             ZStack(alignment: .leading) {
                 TextFieldRepresentable(text: $text, formatter: formatter, style: style)
@@ -65,6 +65,9 @@ public struct POTextField<Trailing: View>: View {
 
     @Environment(\.isControlInvalid)
     private var isInvalid
+
+    @EnvironmentObject
+    private var focusCoordinator: FocusCoordinator
 }
 
 private enum Constants {
