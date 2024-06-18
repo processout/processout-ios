@@ -25,6 +25,7 @@ struct CardTokenizationSectionView: View {
                 CardTokenizationItemView(item: element, focusedInputId: $focusedInputId)
             }
         }
+        .fixedSize(horizontal: false, vertical: true)
         .backport.geometryGroup()
     }
 

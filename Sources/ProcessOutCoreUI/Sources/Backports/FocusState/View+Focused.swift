@@ -35,21 +35,15 @@ private struct FocusModifier<Value: Hashable>: ViewModifier {
     init(binding: Binding<Value?>, value: Value) {
         self._binding = binding
         self.value = value
-        _coordinator = .init(wrappedValue: FocusCoordinator())
-        _isVisible = .init(initialValue: false)
     }
 
     func body(content: Content) -> some View {
         content
             .onDidAppear {
                 isVisible = true
-                updateFirstResponder()
             }
             .onDisappear {
                 isVisible = false
-                if binding == value {
-                    binding = nil
-                }
             }
             .backport.onChange(of: binding) {
                 updateFirstResponder()
@@ -61,7 +55,10 @@ private struct FocusModifier<Value: Hashable>: ViewModifier {
                     binding = nil
                 }
             }
-            .environment(\.focusCoordinator, coordinator)
+            .backport.onChange(of: isVisible) {
+                updateFirstResponder()
+            }
+            .environmentObject(coordinator)
     }
 
     // MARK: - Private Properties
@@ -70,24 +67,27 @@ private struct FocusModifier<Value: Hashable>: ViewModifier {
     private let value: Value
 
     /// The state binding to register.
-    @Binding private var binding: Value?
+    @Binding
+    private var binding: Value?
 
     /// Indicates whether
-    @State private var isVisible: Bool
+    @State
+    private var isVisible = false
 
     @StateObject
-    private var coordinator: FocusCoordinator
+    private var coordinator = FocusCoordinator()
 
     // MARK: - Private Methods
 
     private func updateFirstResponder() {
-        guard isVisible else {
-            return
-        }
-        if binding == value {
-            coordinator.beginEditing()
-        } else if binding == nil {
-            coordinator.endEditing()
+        if isVisible {
+            if binding == value {
+                coordinator.beginEditing()
+            } else if binding == nil {
+                coordinator.endEditing()
+            }
+        } else if binding == value {
+            binding = nil
         }
     }
 }

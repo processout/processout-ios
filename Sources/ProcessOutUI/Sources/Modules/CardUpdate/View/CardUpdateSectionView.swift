@@ -27,6 +27,7 @@ struct CardUpdateSectionView: View {
                 CardUpdateItemView(item: element, focusedInputId: $focusedInputId)
             }
         }
+        .fixedSize(horizontal: false, vertical: true)
         .backport.geometryGroup()
     }
 }
