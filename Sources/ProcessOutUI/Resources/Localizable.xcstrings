@@ -1910,40 +1910,16 @@
         "ar" : {
           "variations" : {
             "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "new",
-                  "value" : "Invalid length, expected %d characters."
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "new",
-                  "value" : "Invalid length, expected %d characters."
-                }
-              },
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "الطول غير صالح، المتوقع %d حرف"
+                  "value" : "إن الطول غير صالح، الرجاء التقيد بحرف واحد فقط."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "الطول غير صالح، المتوقع %d أحرف"
-                }
-              },
-              "two" : {
-                "stringUnit" : {
-                  "state" : "new",
-                  "value" : "Invalid length, expected %d characters."
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "new",
-                  "value" : "Invalid length, expected %d characters."
+                  "value" : "إن الطول غير صالح، الرجاء التقيد بـ %d حرفًا."
                 }
               }
             }
@@ -1988,18 +1964,6 @@
         "pl" : {
           "variations" : {
             "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nieprawidłowa długość. Oczekiwano %d znaków."
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nieprawidłowa długość. Oczekiwano %d znaków."
-                }
-              },
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
