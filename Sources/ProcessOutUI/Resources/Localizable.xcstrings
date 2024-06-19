@@ -1529,6 +1529,9 @@
         }
       }
     },
+    "dynamic-checkout.cancel-button" : {
+
+    },
     "dynamic-checkout.error.generic" : {
       "localizations" : {
         "en" : {
@@ -1616,6 +1619,9 @@
           }
         }
       }
+    },
+    "dynamic-checkout.success-message" : {
+
     },
     "dynamic-checkout.unavailable-warning" : {
       "localizations" : {
