@@ -50,17 +50,15 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
         if let errorCode = queryItems.queryItemValue(name: "error_code") {
             throw POFailure(code: createFailureCode(rawValue: errorCode))
         }
-        let gatewayToken = queryItems.queryItemValue(name: "token")
-        if gatewayToken == nil {
+        let gatewayToken = queryItems.queryItemValue(name: "token") ?? ""
+        if gatewayToken.isEmpty {
             logger.debug("Gateway 'token' is not set in \(url), this may be an error.")
         }
-        guard let customerId = queryItems.queryItemValue(name: "customer_id"),
-              let tokenId = queryItems.queryItemValue(name: "token_id") else {
-            return .init(gatewayToken: gatewayToken ?? "", customerId: nil, tokenId: nil, returnType: .authorization)
+        let tokenId = queryItems.queryItemValue(name: "token_id")
+        if let customerId = queryItems.queryItemValue(name: "customer_id"), let tokenId {
+            return .init(gatewayToken: gatewayToken, customerId: customerId, tokenId: tokenId, returnType: .createToken)
         }
-        return POAlternativePaymentMethodResponse(
-            gatewayToken: gatewayToken ?? "", customerId: customerId, tokenId: tokenId, returnType: .createToken
-        )
+        return .init(gatewayToken: gatewayToken, customerId: nil, tokenId: tokenId, returnType: .authorization)
     }
 
     // MARK: - Private
