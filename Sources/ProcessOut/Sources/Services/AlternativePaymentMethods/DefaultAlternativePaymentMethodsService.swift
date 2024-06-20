@@ -22,10 +22,7 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
             preconditionFailure("Failed to create components from base url.")
         }
         var pathComponents: [String]
-        if let customerId = request.customerId {
-            guard let tokenId = request.tokenId, !tokenId.isEmpty else {
-                preconditionFailure("Token ID must be set when tokenizing APM.")
-            }
+        if let customerId = request.customerId, let tokenId = request.tokenId {
             pathComponents = [configuration.projectId, customerId, tokenId, "redirect", request.gatewayConfigurationId]
         } else {
             precondition(!request.invoiceId.isEmpty, "Invoice ID must be set.")
