@@ -42,10 +42,9 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
 
     func test_alternativePaymentMethodUrl_withToken_succeeds() throws {
         let request = POAlternativePaymentMethodRequest(
-            invoiceId: "iv_test",
-            gatewayConfigurationId: "gway_conf_test",
             customerId: "cust_test",
-            tokenId: "tok_test"
+            tokenId: "tok_test",
+            gatewayConfigurationId: "gway_conf_test"
         )
 
         // When
