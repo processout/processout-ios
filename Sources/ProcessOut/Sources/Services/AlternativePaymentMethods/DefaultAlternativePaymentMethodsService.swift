@@ -21,11 +21,18 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
         guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
             preconditionFailure("Failed to create components from base url.")
         }
-        let pathComponents: [String]
-        if let tokenId = request.tokenId, let customerId = request.customerId {
+        var pathComponents: [String]
+        if let customerId = request.customerId {
+            guard let tokenId = request.tokenId, !tokenId.isEmpty else {
+                preconditionFailure("Token ID must be set when tokenizing APM.")
+            }
             pathComponents = [configuration.projectId, customerId, tokenId, "redirect", request.gatewayConfigurationId]
         } else {
+            precondition(!request.invoiceId.isEmpty, "Invoice ID must be set.")
             pathComponents = [configuration.projectId, request.invoiceId, "redirect", request.gatewayConfigurationId]
+            if let tokenId = request.tokenId {
+                pathComponents += ["tokenized", tokenId]
+            }
         }
         components.path = "/" + pathComponents.joined(separator: "/")
         components.queryItems = request.additionalData?.map { data in
