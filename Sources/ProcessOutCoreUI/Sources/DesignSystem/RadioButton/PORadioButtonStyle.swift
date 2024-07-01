@@ -69,7 +69,7 @@ public struct PORadioButtonStyle: ButtonStyle {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let knobSize: CGFloat = 24
+        static let knobSize: CGFloat = 22
     }
 
     // MARK: - Private Methods

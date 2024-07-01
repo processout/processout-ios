@@ -28,7 +28,7 @@ extension ButtonStyle where Self == PORadioButtonStyle {
                     backgroundColor: .clear,
                     border: .regular(color: Color(.Button.Primary.Background.default)),
                     innerCircleColor: Color(.Button.Primary.Background.default),
-                    innerCircleRadius: 6
+                    innerCircleRadius: 5
                 ),
                 value: valueStyle
             ),
