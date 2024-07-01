@@ -34,7 +34,7 @@ struct DefaultCodeFieldStyleCharacterView: View {
             .padding(.horizontal, POSpacing.extraSmall)
             .overlay(caretPosition.map(makeCaretOverlay))
             .padding(POSpacing.extraSmall)
-            .frame(maxWidth: 42, idealHeight: 48)
+            .frame(maxWidth: 44, idealHeight: 48)
             .fixedSize(horizontal: false, vertical: true)
             .background(style.backgroundColor)
             .border(style: style.border)
