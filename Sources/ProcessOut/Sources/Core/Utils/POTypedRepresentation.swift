@@ -1,5 +1,5 @@
 //
-//  POTyped.swift
+//  POTypedRepresentation.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 11.06.2024.
@@ -10,7 +10,7 @@ import Foundation
 /// Introduces typed version of a property in a backward compatible way.
 /// todo(andrii-vysotskyi): remove when updating to 5.0.0
 @propertyWrapper
-public struct POTyped<Wrapped, Representation: RawRepresentable> {
+public struct POTypedRepresentation<Wrapped, Representation: RawRepresentable> {
 
     public init(wrappedValue: Wrapped) {
         self.wrappedValue = wrappedValue
@@ -33,28 +33,28 @@ public struct POTyped<Wrapped, Representation: RawRepresentable> {
     }
 }
 
-extension POTyped: Hashable where Wrapped: Hashable {
+extension POTypedRepresentation: Hashable where Wrapped: Hashable {
 
     public func hash(into hasher: inout Hasher) {
         wrappedValue.hash(into: &hasher)
     }
 }
 
-extension POTyped: Equatable where Wrapped: Equatable {
+extension POTypedRepresentation: Equatable where Wrapped: Equatable {
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.wrappedValue == rhs.wrappedValue
     }
 }
 
-extension POTyped: Encodable where Wrapped: Encodable {
+extension POTypedRepresentation: Encodable where Wrapped: Encodable {
 
     public func encode(to encoder: any Encoder) throws {
         try wrappedValue.encode(to: encoder)
     }
 }
 
-extension POTyped: Decodable where Wrapped: Decodable {
+extension POTypedRepresentation: Decodable where Wrapped: Decodable {
 
     public init(from decoder: any Decoder) throws {
         let wrappedValue = try Wrapped(from: decoder)
@@ -65,7 +65,7 @@ extension POTyped: Decodable where Wrapped: Decodable {
 extension KeyedEncodingContainer {
 
     public mutating func encode<Wrapped: Encodable, Representation: RawRepresentable>(
-        _ value: POTyped<Wrapped, Representation>, forKey key: KeyedEncodingContainer<K>.Key
+        _ value: POTypedRepresentation<Wrapped, Representation>, forKey key: KeyedEncodingContainer<K>.Key
     ) throws {
         try value.encode(to: superEncoder(forKey: key))
     }
@@ -74,8 +74,8 @@ extension KeyedEncodingContainer {
 extension KeyedDecodingContainer {
 
     public func decode<Wrapped: Decodable, Representation: RawRepresentable>(
-        _ type: POTyped<Wrapped, Representation>.Type, forKey key: KeyedDecodingContainer<K>.Key
-    ) throws -> POTyped<Wrapped, Representation> {
+        _ type: POTypedRepresentation<Wrapped, Representation>.Type, forKey key: KeyedDecodingContainer<K>.Key
+    ) throws -> POTypedRepresentation<Wrapped, Representation> {
         try type.init(from: try superDecoder(forKey: key))
     }
 }

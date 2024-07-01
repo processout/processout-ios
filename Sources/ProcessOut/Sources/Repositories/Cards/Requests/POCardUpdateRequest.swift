@@ -18,7 +18,7 @@ public struct POCardUpdateRequest: Encodable {
 
     /// Preferred scheme defined by the Customer. This gets priority when processing the Transaction.
     /// Pass `nil` to keep existing value.
-    @POTyped<String?, POCardScheme>
+    @POTypedRepresentation<String?, POCardScheme>
     public private(set) var preferredScheme: String?
 
     /// Creates request instance.

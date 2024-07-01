@@ -9,11 +9,11 @@
 public struct POCardIssuerInformation: Decodable {
 
     /// Scheme of the card.
-    @POTyped<String, POCardScheme>
+    @POTypedRepresentation<String, POCardScheme>
     public private(set) var scheme: String
 
     /// Co-scheme of the card, such as Carte Bancaire.
-    @POTyped<String?, POCardScheme>
+    @POTypedRepresentation<String?, POCardScheme>
     public private(set) var coScheme: String?
 
     /// Card type.
