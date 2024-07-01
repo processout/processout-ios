@@ -21,11 +21,15 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
         guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
             preconditionFailure("Failed to create components from base url.")
         }
-        let pathComponents: [String]
-        if let tokenId = request.tokenId, let customerId = request.customerId {
+        var pathComponents: [String]
+        if let customerId = request.customerId, let tokenId = request.tokenId {
             pathComponents = [configuration.projectId, customerId, tokenId, "redirect", request.gatewayConfigurationId]
         } else {
+            precondition(!request.invoiceId.isEmpty, "Invoice ID must be set.")
             pathComponents = [configuration.projectId, request.invoiceId, "redirect", request.gatewayConfigurationId]
+            if let tokenId = request.tokenId {
+                pathComponents += ["tokenized", tokenId]
+            }
         }
         components.path = "/" + pathComponents.joined(separator: "/")
         components.queryItems = request.additionalData?.map { data in
@@ -46,17 +50,15 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
         if let errorCode = queryItems.queryItemValue(name: "error_code") {
             throw POFailure(code: createFailureCode(rawValue: errorCode))
         }
-        let gatewayToken = queryItems.queryItemValue(name: "token")
-        if gatewayToken == nil {
+        let gatewayToken = queryItems.queryItemValue(name: "token") ?? ""
+        if gatewayToken.isEmpty {
             logger.debug("Gateway 'token' is not set in \(url), this may be an error.")
         }
-        guard let customerId = queryItems.queryItemValue(name: "customer_id"),
-              let tokenId = queryItems.queryItemValue(name: "token_id") else {
-            return .init(gatewayToken: gatewayToken ?? "", customerId: nil, tokenId: nil, returnType: .authorization)
+        let tokenId = queryItems.queryItemValue(name: "token_id")
+        if let customerId = queryItems.queryItemValue(name: "customer_id"), let tokenId {
+            return .init(gatewayToken: gatewayToken, customerId: customerId, tokenId: tokenId, returnType: .createToken)
         }
-        return POAlternativePaymentMethodResponse(
-            gatewayToken: gatewayToken ?? "", customerId: customerId, tokenId: tokenId, returnType: .createToken
-        )
+        return .init(gatewayToken: gatewayToken, customerId: nil, tokenId: tokenId, returnType: .authorization)
     }
 
     // MARK: - Private
