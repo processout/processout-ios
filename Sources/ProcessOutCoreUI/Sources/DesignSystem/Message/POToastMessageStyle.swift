@@ -74,8 +74,8 @@ extension POToastMessageStyle.Severity {
     /// Error style.
     public static let error = Self(
         icon: Image(.info).renderingMode(.template),
-        border: .regular(color: Color(poResource: .Text.error)),
-        backgroundColor: Color(poResource: .Surface.error),
-        text: POTextStyle(color: Color(poResource: .Text.primary), typography: .body2)
+        border: .regular(color: Color(.Input.Border.error)),
+        backgroundColor: Color(.Surface.error),
+        text: POTextStyle(color: Color(.Text.primary), typography: .body2)
     )
 }
