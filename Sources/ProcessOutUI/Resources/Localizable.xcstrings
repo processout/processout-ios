@@ -1876,7 +1876,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "البريد الإلكتروني غير صالح"
+            "value" : "البريد الإلكتروني غير صالح."
           }
         },
         "en" : {
@@ -2004,7 +2004,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الرقم غير صحيح"
+            "value" : "الرقم غير صحيح."
           }
         },
         "en" : {
@@ -2038,7 +2038,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "رقم الهاتف غير صحيح"
+            "value" : "رقم الهاتف غير صحيح."
           }
         },
         "en" : {
@@ -2072,7 +2072,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "القيمة غير صحيحة"
+            "value" : "القيمة غير صحيحة."
           }
         },
         "en" : {
@@ -2106,7 +2106,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "البيانات مطلوبة"
+            "value" : "البيانات مطلوبة."
           }
         },
         "en" : {
