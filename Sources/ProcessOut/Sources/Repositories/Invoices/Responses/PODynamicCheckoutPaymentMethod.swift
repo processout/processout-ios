@@ -41,7 +41,7 @@ public enum PODynamicCheckoutPaymentMethod {
         public var merchantCapabilities: PKMerchantCapability
 
         /// The payment methods that are supported.
-        public let supportedNetworks: Set<String>
+        public let supportedNetworks: Set<POCardScheme>
     }
 
     // MARK: - Native APM

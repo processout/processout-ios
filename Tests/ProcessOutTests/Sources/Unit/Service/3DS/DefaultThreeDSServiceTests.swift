@@ -56,7 +56,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             directoryServerPublicKey: "2",
             directoryServerRootCertificates: ["3"],
             directoryServerTransactionId: "4",
-            scheme: .unknown("5"),
+            scheme: "5",
             messageVersion: "6"
         )
         var delegateCallsCount = 0

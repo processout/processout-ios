@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 06.11.2023.
 //
 
+import ProcessOut
+
 /// Short card information necessary for CVC update.
 public struct POCardUpdateInformation {
 
@@ -20,13 +22,16 @@ public struct POCardUpdateInformation {
     public let iin: String?
 
     /// Scheme of the card.
-    public let scheme: String?
+    @POTypedRepresentation<String?, POCardScheme>
+    public private(set) var scheme: String?
 
     /// Co-scheme of the card, such as Carte Bancaire.
-    public let coScheme: String?
+    @POTypedRepresentation<String?, POCardScheme>
+    public private(set) var coScheme: String?
 
     /// Preferred scheme previously selected by customer if any.
-    public let preferredScheme: String?
+    @POTypedRepresentation<String?, POCardScheme>
+    public private(set) var preferredScheme: String?
 
     public init(
         maskedNumber: String? = nil,

@@ -54,7 +54,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
             XCTFail("Unexpected state")
             return
         }
-        XCTAssertEqual(startedState.scheme, "visa")
+        XCTAssertEqual(startedState.scheme, .visa)
     }
 
     func test_start_whenPreferredCardSchemeIsAvailable_setsStartedStateWithIt() {
@@ -72,8 +72,8 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
             XCTFail("Unexpected state")
             return
         }
-        XCTAssertEqual(startedState.scheme, "visa")
-        XCTAssertEqual(startedState.preferredScheme, "carte bancaire")
+        XCTAssertEqual(startedState.scheme, .visa)
+        XCTAssertEqual(startedState.preferredScheme, .carteBancaire)
     }
 
     func test_start_whenCardSchemeIsNotSetAndIinIsSet_attemptsToResolve() {
@@ -87,7 +87,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
         // Then
         let expectation = XCTestExpectation()
         sut.didChange = { [weak sut] in
-            if case .started(let startedState) = sut?.state, startedState.scheme == "visa" {
+            if case .started(let startedState) = sut?.state, startedState.scheme == .visa {
                 expectation.fulfill()
             }
         }
@@ -107,7 +107,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
         // Then
         let expectation = XCTestExpectation()
         sut.didChange = { [weak sut] in
-            if case .started(let startedState) = sut?.state, startedState.scheme == "visa" {
+            if case .started(let startedState) = sut?.state, startedState.scheme == .visa {
                 expectation.fulfill()
             }
         }

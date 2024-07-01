@@ -41,7 +41,7 @@ final class CardSecurityCodeFormatterTests: XCTestCase {
 
     func test_string_whenSchemeIsAmexAndInputLengthExceeds4_removesRedundantSuffix() {
         // When
-        sut.scheme = "american express"
+        sut.scheme = .amex
         let formatted = sut.string(from: "12345")
 
         // Then
@@ -50,7 +50,7 @@ final class CardSecurityCodeFormatterTests: XCTestCase {
 
     func test_string_whenSchemeIsNotAmexAndInputLengthExceeds3_removesRedundantSuffix() {
         // When
-        sut.scheme = "visa"
+        sut.scheme = .visa
         let formatted = sut.string(from: "12345")
 
         // Then
