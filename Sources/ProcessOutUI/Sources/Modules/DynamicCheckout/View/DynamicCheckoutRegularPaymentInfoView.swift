@@ -40,8 +40,6 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
                     POAnyButtonStyle(erasing: style.radioButton)
                 )
                 .radioButtonSelected(item.isSelected)
-                .opacity(item.isSelectable ? 1 : 0)
-                .animation(.default, value: item.isSelectable)
             }
             .animation(.default, value: item.isLoading)
             if let information = item.additionalInformation {
@@ -52,6 +50,7 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
         .onTapGesture {
             item.isSelected = true
         }
+        .disabled(!item.isSelectable)
         .backport.geometryGroup()
     }
 
