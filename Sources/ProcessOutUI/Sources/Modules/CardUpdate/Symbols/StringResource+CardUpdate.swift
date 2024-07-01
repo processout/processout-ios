@@ -16,11 +16,17 @@ extension POStringResource {
         /// Card update title.
         static let title = POStringResource("card-update.title", comment: "")
 
-        /// Card CVC placeholder.
-        static let cvc = POStringResource("card-update.cvc", comment: "")
+        enum CardDetails {
 
-        /// Preferred scheme section title.
-        static let preferredScheme = POStringResource("card-update.preferred-scheme", comment: "")
+            /// Card CVC placeholder.
+            static let cvc = POStringResource("card-update.cvc", comment: "")
+        }
+
+        enum PreferredScheme {
+
+            /// Preferred scheme section title.
+            static let title = POStringResource("card-update.preferred-scheme", comment: "")
+        }
 
         enum Button {
 
