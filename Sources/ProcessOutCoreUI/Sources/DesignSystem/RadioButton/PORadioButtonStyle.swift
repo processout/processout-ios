@@ -24,24 +24,31 @@ public struct PORadioButtonStyle: ButtonStyle {
     /// Style to use when radio button is in error state.
     public let error: PORadioButtonStateStyle
 
+    /// Style to use when radio button is disabled.
+    public let disabled: PORadioButtonStateStyle
+
     /// Creates style instance.
     public init(
         normal: PORadioButtonStateStyle,
         selected: PORadioButtonStateStyle,
         highlighted: PORadioButtonStateStyle,
-        error: PORadioButtonStateStyle
+        error: PORadioButtonStateStyle,
+        disabled: PORadioButtonStateStyle? = nil
     ) {
         self.normal = normal
         self.selected = selected
         self.highlighted = highlighted
         self.error = error
+        self.disabled = disabled ?? normal
     }
 
     // MARK: - ButtonStyle
 
     public func makeBody(configuration: Configuration) -> some View {
-        ContentView { isSelected, isInvalid in
-            let style = currentStyle(isSelected: isSelected, isInvalid: isInvalid, isPressed: configuration.isPressed)
+        ContentView { isSelected, isInvalid, isEnabled in
+            let style = resolveStyle(
+                isSelected: isSelected, isInvalid: isInvalid, isPressed: configuration.isPressed, isEnabled: isEnabled
+            )
             Label(
                 title: {
                     configuration.label
@@ -62,6 +69,7 @@ public struct PORadioButtonStyle: ButtonStyle {
                 }
             )
             .animation(.default, value: isSelected)
+            .animation(.default, value: isEnabled)
         }
         .backport.geometryGroup()
     }
@@ -74,7 +82,12 @@ public struct PORadioButtonStyle: ButtonStyle {
 
     // MARK: - Private Methods
 
-    private func currentStyle(isSelected: Bool, isInvalid: Bool, isPressed: Bool) -> PORadioButtonStateStyle {
+    private func resolveStyle(
+        isSelected: Bool, isInvalid: Bool, isPressed: Bool, isEnabled: Bool
+    ) -> PORadioButtonStateStyle {
+        if !isEnabled {
+            return disabled
+        }
         if isSelected {
             return selected
         }
@@ -92,10 +105,10 @@ public struct PORadioButtonStyle: ButtonStyle {
 private struct ContentView<Content: View>: View {
 
     @ViewBuilder
-    let content: (_ isSelected: Bool, _ isInvalid: Bool) -> Content
+    let content: (_ isSelected: Bool, _ isInvalid: Bool, _ isEnabled: Bool) -> Content
 
     var body: some View {
-        content(isSelected, isInvalid)
+        content(isSelected, isInvalid, isEnabled)
     }
 
     // MARK: - Private Properties
@@ -105,4 +118,7 @@ private struct ContentView<Content: View>: View {
 
     @Environment(\.isControlInvalid)
     private var isInvalid
+
+    @Environment(\.isEnabled)
+    private var isEnabled
 }

@@ -49,6 +49,15 @@ extension ButtonStyle where Self == PORadioButtonStyle {
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
+            ),
+            disabled: .init(
+                knob: .init(
+                    backgroundColor: .clear,
+                    border: .regular(color: Color(.Input.Border.disabled)),
+                    innerCircleColor: Color(.Input.Border.disabled).opacity(0),
+                    innerCircleRadius: 0
+                ),
+                value: valueStyle
             )
         )
     }
