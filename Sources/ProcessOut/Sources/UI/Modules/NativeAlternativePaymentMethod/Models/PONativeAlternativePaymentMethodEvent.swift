@@ -8,6 +8,36 @@
 /// Describes events that could happen during native alternative payment module lifecycle.
 public enum PONativeAlternativePaymentMethodEvent {
 
+    public struct WillSubmitParameters {
+
+        /// Available parameters.
+        public let parameters: [PONativeAlternativePaymentMethodParameter]
+
+        /// Parameter values.
+        public let values: [String: String]
+
+        @_spi(PO)
+        public init(parameters: [PONativeAlternativePaymentMethodParameter], values: [String: String]) {
+            self.parameters = parameters
+            self.values = values
+        }
+    }
+
+    public struct ParametersChanged {
+
+        /// Parameter definition.
+        public let parameter: PONativeAlternativePaymentMethodParameter
+
+        /// Parameter value.
+        public let value: String
+
+        @_spi(PO)
+        public init(parameter: PONativeAlternativePaymentMethodParameter, value: String) {
+            self.parameter = parameter
+            self.value = value
+        }
+    }
+
     /// Initial event that is sent prior any other event.
     case willStart
 
@@ -23,10 +53,10 @@ public enum PONativeAlternativePaymentMethodEvent {
     case didRequestCancelConfirmation
 
     /// Event is sent when the user changes any editable value.
-    case parametersChanged
+    case parametersChanged(ParametersChanged)
 
     /// Event is sent just before sending user input, this is usually a result of a user action, e.g. button press.
-    case willSubmitParameters
+    case willSubmitParameters(WillSubmitParameters)
 
     /// Sent in case parameters were submitted successfully. You could inspect the associated value to understand
     /// whether additional input is required.

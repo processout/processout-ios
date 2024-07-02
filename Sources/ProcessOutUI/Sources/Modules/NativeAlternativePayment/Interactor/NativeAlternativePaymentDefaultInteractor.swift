@@ -67,16 +67,14 @@ final class NativeAlternativePaymentDefaultInteractor:
         parameter.recentErrorMessage = nil
         startedState.parameters[element.0] = parameter
         setStateUnchecked(.started(startedState))
-        send(event: .parametersChanged)
-        logger.debug("Did update parameter value '\(value ?? "nil")' for '\(key)' key")
+        didUpdate(parameter: parameter, to: formattedValue ?? "")
     }
 
     func submit() {
         guard case let .started(startedState) = state, startedState.areParametersValid else {
             return
         }
-        logger.info("Will submit payment parameters")
-        send(event: .willSubmitParameters)
+        willSubmit(parameters: startedState.parameters)
         do {
             let values = try validatedValues(for: startedState.parameters)
             setStateUnchecked(.submitting(snapshot: startedState))
@@ -412,16 +410,36 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
     }
 
-    // MARK: - Utils
-
-    private func setStateUnchecked(_ state: NativeAlternativePaymentInteractorState) {
-        self.state = state
-    }
+    // MARK: - Events
 
     private func send(event: PONativeAlternativePaymentMethodEvent) {
         assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
         delegate?.nativeAlternativePaymentMethodDidEmitEvent(event)
+    }
+
+    private func didUpdate(parameter: NativeAlternativePaymentInteractorState.Parameter, to value: String) {
+        logger.debug("Did update parameter value '\(value)' for '\(parameter.specification.key)' key")
+        let parametersChangedEvent = PONativeAlternativePaymentEvent.ParametersChanged(
+            parameter: parameter.specification, value: value
+        )
+        send(event: .parametersChanged(parametersChangedEvent))
+    }
+
+    private func willSubmit(parameters: [NativeAlternativePaymentInteractorState.Parameter]) {
+        logger.info("Will submit payment parameters")
+        let values = Dictionary(grouping: parameters, by: \.specification.key)
+            .compactMapValues(\.first?.value)
+        let willSubmitParametersEvent = PONativeAlternativePaymentEvent.WillSubmitParameters(
+            parameters: parameters.map(\.specification), values: values
+        )
+        send(event: .willSubmitParameters(willSubmitParametersEvent))
+    }
+
+    // MARK: - Utils
+
+    private func setStateUnchecked(_ state: NativeAlternativePaymentInteractorState) {
+        self.state = state
     }
 
     @MainActor
