@@ -111,7 +111,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         ]
         for parameter in state.parameters {
             let items = [
-                createItem(parameter: parameter, isEnabled: !isSubmitting)
+                createItem(parameter: parameter)
             ]
             var isSectionCentered = false
             if case .codeInput = items.first, state.parameters.count == 1 {
@@ -251,9 +251,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     // MARK: - Input Items
 
     // swiftlint:disable:next function_body_length
-    private func createItem(
-        parameter: InteractorState.Parameter, isEnabled: Bool
-    ) -> NativeAlternativePaymentViewModelItem {
+    private func createItem(parameter: InteractorState.Parameter) -> NativeAlternativePaymentViewModelItem {
         switch parameter.specification.type {
         case .numeric where (parameter.specification.length ?? .max) <= Constants.maximumCodeLength:
             let codeInputItem = NativeAlternativePaymentViewModelItem.CodeInput(
@@ -265,8 +263,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                         self?.interactor.updateValue(newValue, for: parameter.specification.key)
                     }
                 ),
-                isInvalid: parameter.recentErrorMessage != nil,
-                isEnabled: isEnabled
+                isInvalid: parameter.recentErrorMessage != nil
             )
             return .codeInput(codeInputItem)
         case .singleSelect:
@@ -297,7 +294,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 ),
                 placeholder: placeholder(for: parameter.specification),
                 isInvalid: parameter.recentErrorMessage != nil,
-                isEnabled: isEnabled,
+                isEnabled: true,
                 icon: nil,
                 formatter: parameter.formatter,
                 keyboard: keyboard(parameterType: parameter.specification.type),

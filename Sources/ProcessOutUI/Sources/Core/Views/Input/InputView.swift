@@ -29,6 +29,7 @@ struct InputView: View {
         .poTextContentType(viewModel.contentType)
         .poKeyboardType(viewModel.keyboard)
         .controlInvalid(viewModel.isInvalid)
+        .disabled(!viewModel.isEnabled)
         .animation(.default, value: viewModel.icon == nil)
     }
 }
