@@ -60,9 +60,6 @@ enum NativeAlternativePaymentViewModelItem {
 
         /// Boolean value indicating whether value is valid.
         let isInvalid: Bool
-
-        /// Boolean value indicating whether input is currently enabled.
-        let isEnabled: Bool
     }
 
     struct Submitted: Identifiable, Hashable {

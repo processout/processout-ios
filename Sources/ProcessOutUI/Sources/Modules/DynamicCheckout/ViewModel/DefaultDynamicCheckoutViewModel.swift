@@ -227,7 +227,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             isSelectable: isAvailable,
             isSelected: isSelected,
             additionalInformation: additionalPaymentInformation(
-                methodId: id, isAvailable: isAvailable, isExternal: isExternal
+                methodId: id, isAvailable: isAvailable, isExternal: isExternal, isSelected: selected
             )
         )
         return item
@@ -241,10 +241,12 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
     }
 
-    private func additionalPaymentInformation(methodId: String, isAvailable: Bool, isExternal: Bool) -> String? {
+    private func additionalPaymentInformation(
+        methodId: String, isAvailable: Bool, isExternal: Bool, isSelected: Bool
+    ) -> String? {
         if !isAvailable {
             return String(resource: .DynamicCheckout.Warning.paymentUnavailable)
-        } else if isExternal {
+        } else if isExternal, isSelected {
             return String(resource: .DynamicCheckout.Warning.redirect)
         }
         return nil
@@ -434,7 +436,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let message = configuration.message ?? String(resource: .DynamicCheckout.successMessage)
         let item = DynamicCheckoutViewModelItem.Success(
-            id: ItemId.success, message: message, image: UIImage(resource: .success)
+            id: ItemId.success,
+            message: message,
+            image: UIImage(resource: .success).withRenderingMode(.alwaysTemplate)
         )
         let section = DynamicCheckoutViewModelState.Section(
             id: SectionId.default, items: [.success(item)], isTight: false, areBezelsVisible: false

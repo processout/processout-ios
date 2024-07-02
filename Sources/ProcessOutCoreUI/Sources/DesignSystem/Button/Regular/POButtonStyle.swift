@@ -48,7 +48,7 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
                     .opacity(isLoading ? 1 : 0)
                 configuration.label
                     .textStyle(currentStyle.title)
-                    .multilineTextAlignment(.center)
+                    .lineLimit(1)
                     .opacity(isLoading ? 0 : 1)
             }
             .padding(Constants.padding)
@@ -96,7 +96,5 @@ private struct ContentView<Content: View>: View {
 
 private enum Constants {
     static let minHeight: CGFloat = 44
-    static let padding = EdgeInsets(
-        top: POSpacing.extraSmall, leading: POSpacing.small, bottom: POSpacing.extraSmall, trailing: POSpacing.small
-    )
+    static let padding = EdgeInsets(horizontal: POSpacing.small, vertical: POSpacing.extraSmall)
 }

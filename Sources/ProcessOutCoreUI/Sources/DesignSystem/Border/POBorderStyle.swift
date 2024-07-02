@@ -29,17 +29,16 @@ public struct POBorderStyle {
 extension POBorderStyle {
 
     /// Clear border with default corner radius.
-    public static let clear = POBorderStyle(radius: Constants.radius, width: 0, color: .clear)
+    public static let clear = POBorderStyle(radius: POSpacing.extraSmall, width: 0, color: .clear)
 
     /// Border style with default width and corner radius.
     public static func regular(color: Color) -> POBorderStyle {
-        .init(radius: Constants.radius, width: Constants.width, color: color)
+        .init(radius: POSpacing.extraSmall, width: Constants.width, color: color)
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
         static let width: CGFloat = 1
-        static let radius: CGFloat = 8
     }
 }

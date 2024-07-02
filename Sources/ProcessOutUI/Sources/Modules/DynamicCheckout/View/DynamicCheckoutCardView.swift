@@ -18,10 +18,8 @@ struct DynamicCheckoutCardView: View {
     // MARK: - View
 
     var body: some View {
-        CardTokenizationContentView(
-            viewModel: viewModel, insets: EdgeInsets()
-        )
-        .cardTokenizationStyle(.init(dynamicCheckoutStyle: style))
+        CardTokenizationContentView(viewModel: viewModel, insets: 0)
+            .cardTokenizationStyle(.init(dynamicCheckoutStyle: style))
     }
 
     // MARK: - Private Properties

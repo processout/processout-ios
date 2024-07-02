@@ -15,7 +15,7 @@ struct NativeAlternativePaymentTitleItemView: View {
     let horizontalPadding: CGFloat
 
     var body: some View {
-        VStack(alignment: .leading, spacing: POSpacing.medium) {
+        VStack(alignment: .leading, spacing: POSpacing.large) {
             Text(item.text)
                 .textStyle(style.title)
                 .padding(.horizontal, horizontalPadding)

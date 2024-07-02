@@ -10,7 +10,7 @@ import SwiftUI
 @available(iOS 14.0, *)
 struct DefaultCodeFieldStyleCharacterView: View {
 
-    enum CaretPosition {
+    enum CaretPosition: Equatable {
         case before, after
     }
 
@@ -26,7 +26,7 @@ struct DefaultCodeFieldStyleCharacterView: View {
     // MARK: - View
 
     var body: some View {
-        let style = isInvalid ? style.error : style.normal
+        let style = style.resolve(isInvalid: isInvalid, isFocused: focusCoordinator.isEditing && caretPosition != nil)
         Text(value.description)
             .textStyle(style.text)
             .lineLimit(1)
@@ -34,7 +34,7 @@ struct DefaultCodeFieldStyleCharacterView: View {
             .padding(.horizontal, POSpacing.extraSmall)
             .overlay(caretPosition.map(makeCaretOverlay))
             .padding(POSpacing.extraSmall)
-            .frame(maxWidth: 42, idealHeight: 48)
+            .frame(maxWidth: 44, idealHeight: 48)
             .fixedSize(horizontal: false, vertical: true)
             .background(style.backgroundColor)
             .border(style: style.border)
@@ -51,6 +51,9 @@ struct DefaultCodeFieldStyleCharacterView: View {
 
     @Environment(\.isControlInvalid)
     private var isInvalid
+
+    @EnvironmentObject
+    private var focusCoordinator: FocusCoordinator
 
     // MARK: -
 

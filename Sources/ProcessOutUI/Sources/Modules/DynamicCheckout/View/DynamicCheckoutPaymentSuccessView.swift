@@ -14,7 +14,7 @@ struct DynamicCheckoutPaymentSuccessView: View {
     let item: DynamicCheckoutViewModelItem.Success
 
     var body: some View {
-        VStack(spacing: POSpacing.medium) {
+        VStack(spacing: POSpacing.large) {
             Text(item.message)
                 .textStyle(style.paymentSuccess.message)
                 .multilineTextAlignment(.center)
@@ -28,7 +28,7 @@ struct DynamicCheckoutPaymentSuccessView: View {
                     .foregroundColor(style.paymentSuccess.message.color)
             }
         }
-        .padding(POSpacing.medium)
+        .padding(POSpacing.large)
         .frame(maxWidth: .infinity)
         .backport.geometryGroup()
     }

@@ -141,7 +141,8 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                 parameter: startedState.cardholderName,
                 placeholder: String(resource: .CardTokenization.CardDetails.cardholder),
                 keyboard: .asciiCapable,
-                contentType: .name
+                contentType: .name,
+                submitLabel: .done
             )
         ]
         return items.compactMap { $0 }
@@ -246,14 +247,20 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         placeholder: String,
         icon: Image? = nil,
         keyboard: UIKeyboardType = .default,
-        contentType: UITextContentType? = nil
+        contentType: UITextContentType? = nil,
+        submitLabel: POBackport<Any>.SubmitLabel = .default
     ) -> CardTokenizationViewModelState.Item? {
         guard parameter.shouldCollect else {
             return nil
         }
         if parameter.availableValues.isEmpty {
             return createInputItem(
-                parameter: parameter, placeholder: placeholder, icon: icon, keyboard: keyboard, contentType: contentType
+                parameter: parameter,
+                placeholder: placeholder,
+                icon: icon,
+                keyboard: keyboard,
+                contentType: contentType,
+                submitLabel: submitLabel
             )
         }
         return createPickerItem(parameter: parameter)
@@ -264,7 +271,8 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         placeholder: String,
         icon: Image? = nil,
         keyboard: UIKeyboardType = .default,
-        contentType: UITextContentType? = nil
+        contentType: UITextContentType? = nil,
+        submitLabel: POBackport<Any>.SubmitLabel
     ) -> CardTokenizationViewModelState.Item {
         let value = Binding<String>(
             get: { parameter.value },
@@ -280,6 +288,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             formatter: parameter.formatter,
             keyboard: keyboard,
             contentType: contentType,
+            submitLabel: submitLabel,
             onSubmit: { [weak self] in
                 self?.submitFocusedInput()
             }

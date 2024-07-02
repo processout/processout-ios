@@ -13,7 +13,7 @@ struct NativeAlternativePaymentContentView: View {
 
     init(
         viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>,
-        insets: EdgeInsets,
+        insets: CGFloat,
         shouldCenterParameters: Bool = true
     ) {
         self.viewModel = viewModel
@@ -25,21 +25,21 @@ struct NativeAlternativePaymentContentView: View {
 
     var body: some View {
         ScrollViewReader { scrollView in
-            VStack(spacing: POSpacing.medium) {
+            VStack(spacing: POSpacing.large) {
                 let partition = sectionsPartition
                 ForEach(partition.top) { section in
                     NativeAlternativePaymentSectionView(
                         section: section,
-                        horizontalPadding: max(insets.leading, insets.trailing),
+                        horizontalPadding: insets,
                         focusedItemId: $viewModel.state.focusedItemId
                     )
                 }
                 if !partition.center.isEmpty {
-                    VStack(spacing: POSpacing.medium) {
+                    VStack(spacing: POSpacing.large) {
                         ForEach(partition.center) { section in
                             NativeAlternativePaymentSectionView(
                                 section: section,
-                                horizontalPadding: max(insets.leading, insets.trailing),
+                                horizontalPadding: insets,
                                 focusedItemId: $viewModel.state.focusedItemId
                             )
                         }
@@ -51,7 +51,7 @@ struct NativeAlternativePaymentContentView: View {
             .backport.onChange(of: viewModel.state.focusedItemId) {
                 scrollToFocusedInput(scrollView: scrollView)
             }
-            .padding(EdgeInsets(top: insets.top, leading: 0, bottom: insets.bottom, trailing: 0))
+            .padding(.vertical, insets)
             .frame(maxWidth: .infinity)
         }
         .backport.geometryGroup()
@@ -59,7 +59,7 @@ struct NativeAlternativePaymentContentView: View {
 
     // MARK: - Private Properties
 
-    private let insets: EdgeInsets
+    private let insets: CGFloat
     private let shouldCenterParameters: Bool
 
     @ObservedObject

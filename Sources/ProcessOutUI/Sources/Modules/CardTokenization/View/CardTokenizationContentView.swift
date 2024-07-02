@@ -11,7 +11,7 @@ import SwiftUI
 @available(iOS 14.0, *)
 struct CardTokenizationContentView: View {
 
-    init(viewModel: AnyViewModel<CardTokenizationViewModelState>, insets: EdgeInsets) {
+    init(viewModel: AnyViewModel<CardTokenizationViewModelState>, insets: CGFloat) {
         self.viewModel = viewModel
         self.insets = insets
     }
@@ -20,11 +20,11 @@ struct CardTokenizationContentView: View {
 
     var body: some View {
         ScrollViewReader { scrollView in
-            VStack(alignment: .leading, spacing: POSpacing.medium) {
+            VStack(alignment: .leading, spacing: POSpacing.large) {
                 if let title = viewModel.state.title {
                     Text(title)
                         .textStyle(style.title)
-                        .padding(EdgeInsets(top: 0, leading: insets.leading, bottom: 0, trailing: insets.trailing))
+                        .padding(EdgeInsets(horizontal: insets, vertical: 0))
                     Divider()
                         .frame(height: 1)
                         .overlay(style.separatorColor)
@@ -34,12 +34,12 @@ struct CardTokenizationContentView: View {
                         section: section, focusedInputId: $viewModel.state.focusedInputId
                     )
                 }
-                .padding(EdgeInsets(top: 0, leading: insets.leading, bottom: 0, trailing: insets.trailing))
+                .padding(EdgeInsets(horizontal: insets, vertical: 0))
             }
             .backport.onChange(of: viewModel.state.focusedInputId) {
                 scrollToFocusedInput(scrollView: scrollView)
             }
-            .padding(EdgeInsets(top: insets.top, leading: 0, bottom: insets.bottom, trailing: 0))
+            .padding(EdgeInsets(horizontal: 0, vertical: insets))
             .frame(maxWidth: .infinity)
         }
         .backport.geometryGroup()
@@ -47,7 +47,7 @@ struct CardTokenizationContentView: View {
 
     // MARK: - Private Properties
 
-    private let insets: EdgeInsets
+    private let insets: CGFloat
 
     @Environment(\.cardTokenizationStyle)
     private var style
