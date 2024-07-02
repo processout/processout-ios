@@ -142,7 +142,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
                     self?.interactor.update(cvc: newValue)
                 }
             ),
-            placeholder: String(resource: .CardUpdate.cvc),
+            placeholder: String(resource: .CardUpdate.CardDetails.cvc),
             isInvalid: !state.areParametersValid,
             isEnabled: true,
             icon: Image(.Card.back),
@@ -183,7 +183,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         )
         let section = CardUpdateViewModelSection(
             id: SectionId.preferredScheme,
-            title: String(resource: .CardUpdate.preferredScheme),
+            title: String(resource: .CardUpdate.PreferredScheme.title),
             items: [.picker(pickerItem)]
         )
         return section

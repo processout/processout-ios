@@ -649,10 +649,22 @@
     },
     "cancel-confirmation.cancel" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ليس الآن"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Not now"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas maintenant"
           }
         },
         "pl" : {
@@ -671,10 +683,22 @@
     },
     "cancel-confirmation.confirm" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء الدفع"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel payment"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler le paiement"
           }
         },
         "pl" : {
@@ -693,10 +717,22 @@
     },
     "cancel-confirmation.title" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء الدفع؟"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel payment?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler le paiement ?"
           }
         },
         "pl" : {
@@ -1529,12 +1565,58 @@
         }
       }
     },
+    "dynamic-checkout.cancel-button" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anuluj"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        }
+      }
+    },
     "dynamic-checkout.error.generic" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم نتمكن من إتمام دفعتك. يرجى التحقق من التفاصيل أو تجربة طريقة دفع أخرى."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "We were unable to process your payment. Please check your payment details or try another payment method."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nous n'avons pas pu finaliser votre paiement. Veuillez vérifier vos informations ou essayer un autre mode de paiement."
           }
         },
         "pl" : {
@@ -1553,10 +1635,22 @@
     },
     "dynamic-checkout.error.unavailable-method" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "طريقة الدفع المطلوبة غير متاحة، يرجى تجربة طريقة دفع أخرى."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "The requested payment method is not available, please try another payment method."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mode de paiement demandé n'est pas disponible, veuillez essayer un autre mode de paiement."
           }
         },
         "pl" : {
@@ -1575,10 +1669,22 @@
     },
     "dynamic-checkout.pay-button" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الدفع"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pay"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payer"
           }
         },
         "pl" : {
@@ -1597,10 +1703,22 @@
     },
     "dynamic-checkout.redirect-warning" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيتم إعادة توجيهك لإتمام هذه الدفعة."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "You will be redirected to finalise this payment."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous serez redirigé pour finaliser ce paiement."
           }
         },
         "pl" : {
@@ -1617,12 +1735,58 @@
         }
       }
     },
+    "dynamic-checkout.success-message" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نجاح! تمت الموافقة على الدفع"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Success!\nPayment approved."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Succès !\nPaiement confirmé."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sukces!\nPłatność przyjęta."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Successo!\nPagamento aprovado."
+          }
+        }
+      }
+    },
     "dynamic-checkout.unavailable-warning" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "طريقة الدفع هذه غير متاحة."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This payment method is unavailable."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce mode de paiement est indisponible."
           }
         },
         "pl" : {
@@ -1641,10 +1805,22 @@
     },
     "native-alternative-payment.cancel-button.title" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
           }
         },
         "pl" : {
@@ -1663,10 +1839,22 @@
     },
     "native-alternative-payment.email.placeholder" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "name@example.com"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "name@example.com"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nom@exemple.fr"
           }
         },
         "pl" : {
@@ -1685,10 +1873,22 @@
     },
     "native-alternative-payment.error.invalid-email" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "البريد الإلكتروني غير صالح."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Email is not valid."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre adresse e-mail est invalide."
           }
         },
         "pl" : {
@@ -1707,6 +1907,24 @@
     },
     "native-alternative-payment.error.invalid-length-%d" : {
       "localizations" : {
+        "ar" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "إن الطول غير صالح، الرجاء التقيد بحرف واحد فقط."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "إن الطول غير صالح، الرجاء التقيد بـ %d حرفًا."
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "variations" : {
             "plural" : {
@@ -1725,21 +1943,27 @@
             }
           }
         },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Longueur incorrecte, %d caractère est attendu."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Longueur incorrecte, %d caractères sont attendus."
+                }
+              }
+            }
+          }
+        },
         "pl" : {
           "variations" : {
             "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nieprawidłowa długość. Oczekiwano %d znaków."
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nieprawidłowa długość. Oczekiwano %d znaków."
-                }
-              },
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -1777,10 +2001,22 @@
     },
     "native-alternative-payment.error.invalid-number" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الرقم غير صحيح."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Number is not valid."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numéro invalide."
           }
         },
         "pl" : {
@@ -1799,10 +2035,22 @@
     },
     "native-alternative-payment.error.invalid-phone" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رقم الهاتف غير صحيح."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Phone number is not valid."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre numéro de téléphone est invalide."
           }
         },
         "pl" : {
@@ -1821,10 +2069,22 @@
     },
     "native-alternative-payment.error.invalid-value" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "القيمة غير صحيحة."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Value is not valid."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valeur invalide."
           }
         },
         "pl" : {
@@ -1843,10 +2103,22 @@
     },
     "native-alternative-payment.error.required-parameter" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "البيانات مطلوبة."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Parameter is required."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paramètre requis."
           }
         },
         "pl" : {
@@ -1865,10 +2137,22 @@
     },
     "native-alternative-payment.phone.placeholder" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل رقم الهاتف"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter phone number"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrez votre numéro de téléphone"
           }
         },
         "pl" : {
@@ -1887,10 +2171,22 @@
     },
     "native-alternative-payment.submit-button.default-title" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الدفع"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pay"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payer"
           }
         },
         "pl" : {
@@ -1909,10 +2205,22 @@
     },
     "native-alternative-payment.submit-button.title" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الدفع %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pay %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payer %@"
           }
         },
         "pl" : {
@@ -1931,10 +2239,22 @@
     },
     "native-alternative-payment.success.message" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نجاح! تمت الموافقة على الدفع"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Success!\nPayment approved."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Succès !\nPaiement confirmé."
           }
         },
         "pl" : {
@@ -1953,10 +2273,22 @@
     },
     "native-alternative-payment.title" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الدفع بواسطة %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pay with %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payer avec %@"
           }
         },
         "pl" : {
