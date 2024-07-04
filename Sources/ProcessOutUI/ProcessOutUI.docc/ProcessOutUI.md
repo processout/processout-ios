@@ -62,18 +62,17 @@
 - ``PONativeAlternativePaymentDelegate``
 - ``PONativeAlternativePaymentEvent``
 
-<!--### Dynamic Checkout-->
-<!---->
-<!--- ``PODynamicCheckoutView``-->
-<!--- ``PODynamicCheckoutViewController``-->
-<!--- ``PODynamicCheckoutStyle``-->
-<!--- ``SwiftUI/View/dynamicCheckoutStyle(_:)``-->
-<!--- ``PODynamicCheckoutConfiguration``-->
-<!--- ``PODynamicCheckoutCardConfiguration``-->
-<!--- ``PODynamicCheckoutCardBillingAddressConfiguration``-->
-<!--- ``PODynamicCheckoutAlternativePaymentConfiguration``-->
-<!--- ``PODynamicCheckoutDelegate``-->
-<!--- ``PODynamicCheckoutEvent``-->
+### Dynamic Checkout
+
+- ``PODynamicCheckoutView``
+- ``PODynamicCheckoutViewController``
+- ``PODynamicCheckoutStyle``
+- ``SwiftUI/View/dynamicCheckoutStyle(_:)``
+- ``PODynamicCheckoutConfiguration``
+- ``PODynamicCheckoutCardConfiguration``
+- ``PODynamicCheckoutAlternativePaymentConfiguration``
+- ``PODynamicCheckoutDelegate``
+- ``PODynamicCheckoutEvent``
 
 ### Web Authentication
 
