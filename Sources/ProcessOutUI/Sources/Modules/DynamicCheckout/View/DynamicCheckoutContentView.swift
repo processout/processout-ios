@@ -23,9 +23,7 @@ struct DynamicCheckoutContentView: View {
                     .frame(maxWidth: .infinity)
             }
         }
-        .padding(
-            .init(top: POSpacing.large, leading: POSpacing.medium, bottom: POSpacing.medium, trailing: POSpacing.medium)
-        )
+        .padding(POSpacing.large)
         .frame(maxWidth: .infinity)
         .backport.geometryGroup()
     }

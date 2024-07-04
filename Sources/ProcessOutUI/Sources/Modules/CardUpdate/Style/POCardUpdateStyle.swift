@@ -61,10 +61,10 @@ extension POCardUpdateStyle {
     /// Default card update style.
     public static var `default`: POCardUpdateStyle {
         POCardUpdateStyle(
-            title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title),
+            title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
             input: .medium,
-            errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
-            backgroundColor: Color(poResource: .Surface.level1),
+            errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
+            backgroundColor: Color(poResource: .Surface.default),
             actionsContainer: .default,
             progress: .circular,
             separatorColor: Color(poResource: .Border.subtle)

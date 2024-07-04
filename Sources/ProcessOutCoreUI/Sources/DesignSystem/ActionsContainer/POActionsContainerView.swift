@@ -17,10 +17,7 @@ public struct POActionsContainerView: View {
 
     public var body: some View {
         if !actions.isEmpty {
-            VStack(spacing: POSpacing.medium) {
-                Divider()
-                    .frame(height: 1)
-                    .overlay(style.separatorColor)
+            VStack(spacing: POSpacing.small) {
                 ForEach(actions) { element in
                     Button(element.title, action: element.action)
                         .buttonStyle(POAnyButtonStyle(erasing: element.isPrimary ? style.primary : style.secondary))
@@ -32,14 +29,19 @@ public struct POActionsContainerView: View {
                     // The implementation considers that benign action that people are likely to
                     // want is first and when the axis is horizontal and layout direction is LTR,
                     // we want it to be placed on the right.
-                    HStack(spacing: POSpacing.medium) {
+                    HStack(spacing: POSpacing.small) {
                         content.environment(\.layoutDirection, layoutDirection)
                     }
                     .environment(\.layoutDirection, layoutDirection == .leftToRight ? .rightToLeft : .leftToRight)
                 }
-                .padding(.horizontal, POSpacing.large)
             }
-            .padding(.bottom, POSpacing.medium)
+            .padding(POSpacing.large)
+            .overlay(
+                Divider()
+                    .frame(height: 1)
+                    .overlay(style.separatorColor)
+                    .frame(maxHeight: .infinity, alignment: .top)
+            )
             .background(
                 style.backgroundColor.ignoresSafeArea()
             )

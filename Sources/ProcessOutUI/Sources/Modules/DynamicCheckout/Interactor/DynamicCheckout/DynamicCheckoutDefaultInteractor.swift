@@ -520,7 +520,7 @@ final class DynamicCheckoutDefaultInteractor:
                     select(methodId: methodId)
                 }
             } else {
-                setFailureStateUnchecked(error: error)
+                self.state = .started(currentState.snapshot)
             }
         } else if delegate?.dynamicCheckout(shouldContinueAfter: failure) != false {
             restoreStartedStateUnchecked(after: failure, currentState: currentState)

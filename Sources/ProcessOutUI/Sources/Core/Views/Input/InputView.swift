@@ -25,10 +25,11 @@ struct InputView: View {
         )
         .backport.focused($focusedInputId, equals: viewModel.id)
         .backport.onSubmit(viewModel.onSubmit)
-        .backport.submitLabel(.next)
+        .backport.submitLabel(viewModel.submitLabel)
         .poTextContentType(viewModel.contentType)
         .poKeyboardType(viewModel.keyboard)
         .controlInvalid(viewModel.isInvalid)
+        .disabled(!viewModel.isEnabled)
         .animation(.default, value: viewModel.icon == nil)
     }
 }

@@ -21,6 +21,9 @@ extension POBackport where Wrapped == Any {
         // MARK: -
 
         /// Defines a submit label with text of "Done".
+        public static let `default` = Self(.default)
+
+        /// Defines a submit label with text of "Done".
         public static let done = Self(.done)
 
         /// Defines a submit label with text of "Next".
@@ -71,6 +74,6 @@ extension EnvironmentValues {
     // MARK: - Private Properties
 
     private struct LabelKey: EnvironmentKey {
-        static let defaultValue = POBackport.SubmitLabel.done
+        static let defaultValue = POBackport.SubmitLabel.default
     }
 }
