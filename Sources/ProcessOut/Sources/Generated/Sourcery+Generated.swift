@@ -1,4 +1,4 @@
-// Generated using Sourcery 2.2.4 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 2.2.5 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 import Foundation
@@ -364,7 +364,7 @@ extension POCardCvcCheck: RawRepresentable {
             self = .unchecked
         case "unavailable":
             self = .unavailable
-        case "`required`":
+        case "required":
             self = .`required`
         default:
             self = .unknown(rawValue)
@@ -382,7 +382,7 @@ extension POCardCvcCheck: RawRepresentable {
         case .unavailable:
             return "unavailable"
         case .`required`:
-            return "`required`"
+            return "required"
         case .unknown(let rawValue):
             return rawValue
         }
