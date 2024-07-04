@@ -11,7 +11,7 @@ import SwiftUI
 struct DefaultCodeFieldStyle: CodeFieldStyle {
 
     func makeBody(configuration: Configuration) -> some View {
-        let text = paddingText(configuration: configuration)
+        let text = paddedText(configuration: configuration)
         HStack(spacing: POSpacing.extraSmall) {
             ForEach(Array(text.indices), id: \.self) { index in
                 let caretPosition = caretPosition(at: index, configuration: configuration)
@@ -20,7 +20,6 @@ struct DefaultCodeFieldStyle: CodeFieldStyle {
                 }
             }
         }
-        .backport.geometryGroup()
     }
 
     // MARK: - Private Nested Types
@@ -31,7 +30,7 @@ struct DefaultCodeFieldStyle: CodeFieldStyle {
 
     // MARK: - Private Methods
 
-    private func paddingText(configuration: Configuration) -> String {
+    private func paddedText(configuration: Configuration) -> String {
         configuration.text.padding(toLength: configuration.length, withPad: Constants.pad, startingAt: 0)
     }
 

@@ -18,10 +18,8 @@ struct DynamicCheckoutAlternativePaymentView: View {
     // MARK: - View
 
     var body: some View {
-        NativeAlternativePaymentContentView(
-            viewModel: viewModel, insets: EdgeInsets(), shouldCenterParameters: false
-        )
-        .nativeAlternativePaymentStyle(.init(dynamicCheckoutStyle: style))
+        NativeAlternativePaymentContentView(viewModel: viewModel, insets: 0, shouldCenterParameters: false)
+            .nativeAlternativePaymentStyle(.init(dynamicCheckoutStyle: style))
     }
 
     // MARK: - Private Properties
@@ -39,7 +37,7 @@ extension PONativeAlternativePaymentStyle {
     // swiftlint:disable:next strict_fileprivate
     fileprivate init(dynamicCheckoutStyle style: PODynamicCheckoutStyle) {
         title = PONativeAlternativePaymentStyle.default.title
-        sectionTitle = style.regularPaymentMethod.title
+        sectionTitle = style.inputTitle
         input = style.input
         codeInput = style.codeInput
         radioButton = style.radioButton

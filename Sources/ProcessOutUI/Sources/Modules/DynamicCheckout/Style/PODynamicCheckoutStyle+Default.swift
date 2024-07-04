@@ -17,14 +17,14 @@ extension PODynamicCheckoutStyle {
         expressPaymentButtonStyle: .brand,
         regularPaymentMethod: .default,
         progressView: .circular,
-        inputTitle: POTextStyle(color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading),
+        inputTitle: POTextStyle(color: Color(poResource: .Text.primary), typography: .label1),
         input: .medium,
         codeInput: .large,
         radioButton: PORadioButtonStyle.radio,
-        bodyText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
-        errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
+        bodyText: POTextStyle(color: Color(poResource: .Text.primary), typography: .body1),
+        errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
         message: .toast,
-        backgroundColor: Color(poResource: .Surface.level1),
+        backgroundColor: Color(poResource: .Surface.default),
         actionsContainer: .default,
         paymentSuccess: .default
     )
@@ -35,9 +35,9 @@ extension PODynamicCheckoutStyle.RegularPaymentMethod {
 
     /// Default dynamic checkout regular payment method style.
     public static let `default` = Self(
-        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.body),
-        informationText: POTextStyle(color: Color(poResource: .Text.primary), typography: .Fixed.label),
-        border: POBorderStyle.regular(color: Color(poResource: .Text.muted)),
+        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .subheading),
+        informationText: POTextStyle(color: Color(poResource: .Text.muted), typography: .body2),
+        border: POBorderStyle.regular(color: Color(poResource: .Border.subtle)),
         disabledBackgroundColor: Color(poResource: .Surface.neutral)
     )
 }
@@ -47,7 +47,7 @@ extension PODynamicCheckoutStyle.PaymentSuccess {
 
     /// Default dynamic checkout capture success style.
     public static let `default` = Self(
-        message: POTextStyle(color: Color(poResource: .Text.success), typography: .Fixed.body),
+        message: POTextStyle(color: Color(poResource: .Text.success), typography: .body1),
         backgroundColor: Color(poResource: .Surface.success)
     )
 }

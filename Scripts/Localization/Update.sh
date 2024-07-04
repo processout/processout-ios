@@ -28,20 +28,26 @@ function import_localization {
 export $(cat .env | xargs)
 export -f import_localization
 
+# Validates arguments acount
+test $# -eq 1
+
+IMPORT_DIR=$1
+
 # Create directories
 mkdir -p $WORK_DIR/import
 mkdir -p $WORK_DIR/export
 
+# todo(andrii-vysotskyi): uncomment when access to API is restored
 # Download strings
-lokalise2 \
-    --token $LOKALISE_TOKEN \
-    --project-id "20942964654390ceed1ab9.44453861" \
-    file download \
-    --format xliff \
-    --unzip-to $WORK_DIR/import
+# lokalise2 \
+#     --token $LOKALISE_TOKEN \
+#     --project-id "20942964654390ceed1ab9.44453861" \
+#     file download \
+#     --format xliff \
+#     --unzip-to $WORK_DIR/import
 
 # Import available localizations
-find $WORK_DIR/import -name '*.xliff' -exec /bin/bash -c 'import_localization "$0"' {} \;
+find $IMPORT_DIR -name '*.xliff' -exec /bin/bash -c 'import_localization "$0"' {} \;
 
 function cleanup {
   rm -rf $WORK_DIR

@@ -24,7 +24,7 @@ struct DynamicCheckoutSectionView: View {
                             .overlay(style.regularPaymentMethod.border.color)
                     }
                     DynamicCheckoutItemView(item: item)
-                        .padding(section.areBezelsVisible ? POSpacing.medium : 0)
+                        .padding(section.areBezelsVisible ? POSpacing.large : 0)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .background(background(for: item))
