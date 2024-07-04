@@ -9,7 +9,6 @@ import PassKit
 import ProcessOut
 
 /// Dynamic checkout module delegate.
-@_spi(PO)
 public protocol PODynamicCheckoutDelegate: AnyObject {
 
     /// Invoked when module emits dynamic checkout event.

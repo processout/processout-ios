@@ -8,7 +8,6 @@
 import ProcessOut
 
 /// Events emitted by dynamic checkout module during its lifecycle.
-@_spi(PO)
 public enum PODynamicCheckoutEvent {
 
     /// Initial event that is sent prior any other event.

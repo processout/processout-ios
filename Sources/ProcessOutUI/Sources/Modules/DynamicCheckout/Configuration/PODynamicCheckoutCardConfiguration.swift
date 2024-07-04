@@ -8,7 +8,6 @@
 import ProcessOut
 
 /// Card specific dynamic checkout configuration.
-@_spi(PO)
 public struct PODynamicCheckoutCardConfiguration {
 
     /// Billing address collection configuration.

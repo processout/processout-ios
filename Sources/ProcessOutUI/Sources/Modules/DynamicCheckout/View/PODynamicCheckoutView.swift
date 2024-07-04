@@ -11,7 +11,6 @@ import SwiftUI
 
 /// Dynamic checkout root view.
 @available(iOS 14, *)
-@_spi(PO)
 public struct PODynamicCheckoutView: View {
 
     init(viewModel: @autoclosure @escaping () -> some ViewModel<DynamicCheckoutViewModelState>) {
