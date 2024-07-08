@@ -62,10 +62,7 @@ public enum PODynamicCheckoutPaymentMethod {
     public struct NativeAlternativePaymentConfiguration: Decodable {
 
         /// Gateway configuration ID.
-        public let gatewayConfigurationUid: String
-
-        /// Gateway name.
-        public let gatewayName: String
+        public let gatewayConfigurationId: String
     }
 
     // MARK: - APM
