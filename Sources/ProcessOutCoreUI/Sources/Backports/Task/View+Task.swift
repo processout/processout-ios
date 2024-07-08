@@ -23,9 +23,9 @@ extension POBackport where Wrapped: View {
         }
     }
 
-    @ViewBuilder
     @available(iOS, deprecated: 15)
     @available(iOS 14, *)
+    @ViewBuilder
     public func task(
         priority: TaskPriority = .userInitiated, _ action: @escaping @Sendable () async -> Void
     ) -> some View {
@@ -34,6 +34,7 @@ extension POBackport where Wrapped: View {
 }
 
 @available(iOS 14, *)
+@MainActor
 private struct TaskModifier<Id: Equatable>: ViewModifier {
 
     let id: Id
