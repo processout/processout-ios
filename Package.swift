@@ -54,6 +54,9 @@ let package = Package(
             ],
             resources: [
                 .process("Resources")
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("IsolatedAny"),
             ]
         ),
         .binaryTarget(name: "cmark", path: "Vendor/cmark.xcframework")
