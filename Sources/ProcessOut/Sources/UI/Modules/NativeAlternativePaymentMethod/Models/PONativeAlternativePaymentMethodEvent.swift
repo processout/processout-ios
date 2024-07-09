@@ -14,7 +14,8 @@ public enum PONativeAlternativePaymentMethodEvent {
         public let parameters: [PONativeAlternativePaymentMethodParameter]
 
         /// Parameter values.
-        /// - NOTE: for parameters other than `singleSelect` values are user facing including formatting.
+        /// - NOTE: For parameters other than `singleSelect` values are user facing including formatting.
+        /// - WARNING: Values could include sensitive information so make sure to protect them accordingly.
         public let values: [String: String]
 
         @_spi(PO)
@@ -30,7 +31,8 @@ public enum PONativeAlternativePaymentMethodEvent {
         public let parameter: PONativeAlternativePaymentMethodParameter
 
         /// Parameter value.
-        /// - NOTE: for parameters other than `singleSelect` this is user facing value including formatting.
+        /// - NOTE: For parameters other than `singleSelect` this is user facing value including formatting
+        /// - WARNING: Value could include sensitive information so make sure to protect it accordingly.
         public let value: String
 
         @_spi(PO)
