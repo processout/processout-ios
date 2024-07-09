@@ -41,11 +41,11 @@ public struct POCodeField: View {
                 isMenuVisible = false
             }
             .backport.onChange(of: focusCoordinator.isEditing) {
-                if focusCoordinator.isEditing {
-                    textIndex = text.endIndex
-                } else {
+                if !focusCoordinator.isEditing {
                     textIndex = nil
                     isMenuVisible = false
+                } else if textIndex == nil {
+                    textIndex = text.endIndex
                 }
             }
             .backport.geometryGroup()

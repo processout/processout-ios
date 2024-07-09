@@ -15,7 +15,7 @@ struct NativeAlternativePaymentSubmittedItemView: View {
     let horizontalPadding: CGFloat
 
     var body: some View {
-        VStack(spacing: POSpacing.medium) {
+        VStack(spacing: POSpacing.large) {
             if let title = item.title {
                 Text(title)
                     .textStyle(POTextStyle(color: descriptionStyle.color, typography: style.title.typography))
@@ -34,8 +34,6 @@ struct NativeAlternativePaymentSubmittedItemView: View {
             POMarkdown(item.message)
                 .textStyle(descriptionStyle)
                 .multilineTextAlignment(isMessageCompact ? .center : .leading)
-            Spacer()
-                .frame(height: POSpacing.large)
             if let image = item.image {
                 Image(uiImage: image)
                     .resizable()

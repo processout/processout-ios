@@ -29,5 +29,5 @@ extension POPassKitPaymentButtonStyle {
 
     /// Default value of corner radius.
     @usableFromInline
-    static let defaultCornerRadius = POSpacing.small
+    static let defaultCornerRadius = POSpacing.extraSmall
 }

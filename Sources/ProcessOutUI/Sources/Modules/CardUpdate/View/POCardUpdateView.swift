@@ -21,7 +21,7 @@ public struct POCardUpdateView: View {
     public var body: some View {
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: POSpacing.medium) {
+                VStack(alignment: .leading, spacing: POSpacing.large) {
                     if let title = viewModel.title {
                         Text(title)
                             .textStyle(style.title)
@@ -37,7 +37,7 @@ public struct POCardUpdateView: View {
                     .backport.geometryGroup()
                 }
                 .animation(.default, value: bodyAnimationValue)
-                .padding(.vertical, POSpacing.medium)
+                .padding(.vertical, POSpacing.large)
             }
             .clipped()
             POActionsContainerView(actions: viewModel.actions)

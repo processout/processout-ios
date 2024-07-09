@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOutCoreUI
 
 struct InputViewModel: Identifiable {
 
@@ -35,6 +36,9 @@ struct InputViewModel: Identifiable {
 
     /// Text content type.
     let contentType: UITextContentType?
+
+    /// Submit label.
+    let submitLabel: POBackport<Any>.SubmitLabel
 
     /// Action to perform when the user submits a value to this input.
     let onSubmit: () -> Void

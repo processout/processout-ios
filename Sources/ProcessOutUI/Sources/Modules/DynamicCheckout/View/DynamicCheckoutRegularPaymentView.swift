@@ -14,7 +14,7 @@ struct DynamicCheckoutRegularPaymentView: View {
     let item: DynamicCheckoutViewModelItem.RegularPayment
 
     var body: some View {
-        VStack(spacing: POSpacing.medium) {
+        VStack(spacing: POSpacing.large) {
             DynamicCheckoutRegularPaymentInfoView(item: item.info)
             if case .card(let item) = item.content {
                 DynamicCheckoutCardView(item: item)

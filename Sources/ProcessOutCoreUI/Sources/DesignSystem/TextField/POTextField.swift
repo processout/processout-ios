@@ -26,7 +26,7 @@ public struct POTextField<Trailing: View>: View {
     }
 
     public var body: some View {
-        let style = isInvalid ? style.error : style.normal
+        let style = style.resolve(isInvalid: isInvalid, isFocused: focusCoordinator.isEditing)
         HStack {
             ZStack(alignment: .leading) {
                 TextFieldRepresentable(text: $text, formatter: formatter, style: style)
@@ -47,8 +47,8 @@ public struct POTextField<Trailing: View>: View {
         .border(style: style.border)
         .shadow(style: style.shadow)
         .accentColor(style.tintColor)
-        .backport.geometryGroup()
         .animation(.default, value: isInvalid)
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
@@ -65,11 +65,14 @@ public struct POTextField<Trailing: View>: View {
 
     @Environment(\.isControlInvalid)
     private var isInvalid
+
+    @EnvironmentObject
+    private var focusCoordinator: FocusCoordinator
 }
 
 private enum Constants {
-    static let minHeight: CGFloat = 44
-    static let padding = EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)
+    static let minHeight: CGFloat = 48
+    static let padding = EdgeInsets(horizontal: POSpacing.medium, vertical: POSpacing.extraSmall)
 }
 
 @available(iOS 14, *)
