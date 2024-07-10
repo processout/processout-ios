@@ -27,6 +27,9 @@ enum DynamicCheckoutInteractorState {
         /// Defines whether payment is cancellable.
         let isCancellable: Bool
 
+        /// Current invoice.
+        var invoice: POInvoice
+
         /// During module lifecycle certain payment methods may become unavailable.
         var unavailablePaymentMethodIds: Set<String> = []
 

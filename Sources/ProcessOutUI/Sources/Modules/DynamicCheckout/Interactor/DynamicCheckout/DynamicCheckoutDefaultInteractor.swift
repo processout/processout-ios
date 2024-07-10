@@ -141,23 +141,25 @@ final class DynamicCheckoutDefaultInteractor:
     private let alternativePaymentSession: DynamicCheckoutAlternativePaymentSession
     private let childProvider: DynamicCheckoutInteractorChildProvider
     private let invoicesService: POInvoicesService
-    private let logger: POLogger
     private let completion: (Result<Void, POFailure>) -> Void
 
+    private var logger: POLogger
     private weak var delegate: PODynamicCheckoutDelegate?
 
     // MARK: - Starting State
 
     @MainActor
     private func continueStartUnchecked() async {
-        let invoice: POInvoice
         do {
             let request = POInvoiceRequest(id: configuration.invoiceId)
-            invoice = try await invoicesService.invoice(request: request)
+            let invoice = try await invoicesService.invoice(request: request)
+            setStartedStateUnchecked(invoice: invoice)
         } catch {
             setFailureStateUnchecked(error: error)
-            return
         }
+    }
+
+    private func setStartedStateUnchecked(invoice: POInvoice, errorDescription: String? = nil) {
         let pkPaymentRequests = pkPaymentRequests(invoice: invoice)
         var expressMethodIds: [String] = [], regularMethodIds: [String] = []
         let paymentMethods = partitioned(
@@ -171,10 +173,13 @@ final class DynamicCheckoutDefaultInteractor:
             expressPaymentMethodIds: expressMethodIds,
             regularPaymentMethodIds: regularMethodIds,
             pkPaymentRequests: pkPaymentRequests,
-            isCancellable: configuration.cancelButton?.title.map { !$0.isEmpty } ?? true
+            isCancellable: configuration.cancelButton?.title.map { !$0.isEmpty } ?? true,
+            invoice: invoice,
+            recentErrorDescription: errorDescription
         )
         state = .started(startedState)
         send(event: .didStart)
+        logger[attributeKey: .invoiceId] = invoice.id
         logger.debug("Did start dynamic checkout flow")
         initiateDefaultPaymentIfNeeded()
     }
@@ -354,7 +359,7 @@ final class DynamicCheckoutDefaultInteractor:
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
             do {
-                try await passKitPaymentSession.start(request: request)
+                try await passKitPaymentSession.start(invoiceId: startedState.invoice.id, request: request)
                 setSuccessState()
             } catch {
                 restoreStateAfterPaymentProcessingFailureIfPossible(error)
@@ -365,7 +370,9 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Card Payment
 
     private func startCardPayment(method: PODynamicCheckoutPaymentMethod.Card, startedState: State.Started) {
-        let interactor = childProvider.cardTokenizationInteractor(configuration: method.configuration)
+        let interactor = childProvider.cardTokenizationInteractor(
+            invoiceId: startedState.invoice.id, configuration: method.configuration
+        )
         interactor.delegate = self
         interactor.willChange = { [weak self] state in
             self?.cardTokenization(willChangeState: state)
@@ -444,6 +451,7 @@ final class DynamicCheckoutDefaultInteractor:
         method: PODynamicCheckoutPaymentMethod.NativeAlternativePayment, startedState: State.Started
     ) {
         let interactor = childProvider.nativeAlternativePaymentInteractor(
+            invoiceId: startedState.invoice.id,
             gatewayConfigurationId: method.configuration.gatewayConfigurationId
         )
         interactor.delegate = self
@@ -520,6 +528,7 @@ final class DynamicCheckoutDefaultInteractor:
             if currentState.isForcelyCancelled {
                 setFailureStateUnchecked(error: error)
             } else if let methodId = currentState.pendingPaymentMethodId {
+                // todo(andrii-vysotskyi): if invoice is "dirty" it should be recreated before continuing
                 self.state = .started(currentState.snapshot)
                 if currentState.shouldStartPendingPaymentMethod {
                     startPayment(methodId: methodId)
@@ -530,33 +539,30 @@ final class DynamicCheckoutDefaultInteractor:
                 self.state = .started(currentState.snapshot)
             }
         } else if delegate?.dynamicCheckout(shouldContinueAfter: failure) != false {
-            restoreStartedStateUnchecked(after: failure, currentState: currentState)
+            Task {
+                await setRecoveringStateUnchecked(after: failure)
+            }
         } else {
             setFailureStateUnchecked(error: failure)
         }
     }
 
-    private func restoreStartedStateUnchecked(after failure: POFailure, currentState: State.PaymentProcessing) {
-        var newStartedState = currentState.snapshot
-        switch currentPaymentMethod(state: currentState) {
-        case .nativeAlternativePayment:
-            var pendingUnavailableIds = paymentMethodIds(of: .nativeAlternativePayment, state: currentState.snapshot)
-            if currentState.isReady {
-                pendingUnavailableIds.remove(currentState.paymentMethodId)
-                newStartedState.pendingUnavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
-                newStartedState.unavailablePaymentMethodIds.insert(currentState.paymentMethodId)
-            } else {
-                newStartedState.pendingUnavailablePaymentMethodIds.subtract(pendingUnavailableIds)
-                newStartedState.unavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
-            }
-        case .card where !canRecoverCardTokenization(from: failure):
-            let unavailableIds = paymentMethodIds(of: .card, state: currentState.snapshot)
-            newStartedState.unavailablePaymentMethodIds.formUnion(unavailableIds)
-        default:
-            break
+    @MainActor
+    private func setRecoveringStateUnchecked(after failure: POFailure) async {
+        guard case .paymentProcessing(let currentState) = state else {
+            assertionFailure("Error could be recovered only when processing payment.")
+            return
         }
-        newStartedState.recentErrorDescription = String(resource: .DynamicCheckout.Error.generic)
-        self.state = .started(newStartedState)
+        // todo(andrii-vysotskyi): set recovering state if needed
+        // todo(andrii-vysotskyi): new invoice should be created only for some errors
+        if let newInvoice = await delegate?.dynamicCheckout(newInvoiceFor: currentState.snapshot.invoice) {
+            // todo(andrii-vysotskyi): change error message
+            let errorDescription = String(resource: .DynamicCheckout.Error.generic)
+            setStartedStateUnchecked(invoice: newInvoice, errorDescription: errorDescription)
+        } else {
+            setFailureStateUnchecked(error: failure)
+        }
+        // todo(andrii-vysotskyi): for card tokenization attempt to preserve user input
     }
 
     // MARK: - Failure State
@@ -644,10 +650,14 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
     }
 
     func processTokenizedCard(card: POCard) async throws {
+        guard case .paymentProcessing(let currentState) = state else {
+            assertionFailure("Unable to process card in unsupported state.")
+            throw POFailure(code: .internal(.mobile))
+        }
         guard let delegate else {
             throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
         }
-        var request = POInvoiceAuthorizationRequest(invoiceId: configuration.invoiceId, source: card.id)
+        var request = POInvoiceAuthorizationRequest(invoiceId: currentState.snapshot.invoice.id, source: card.id)
         let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request)
         try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
     }
