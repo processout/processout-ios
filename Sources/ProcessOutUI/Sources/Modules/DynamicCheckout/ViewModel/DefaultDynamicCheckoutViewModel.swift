@@ -112,11 +112,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             guard let info = createPaymentInfo(id: methodId, isSelected: isSelected, isLoading: false, state: state) else {
                 return nil
             }
+            let submitButton = createSubmitAction(methodId: methodId, selectedMethodId: selectedMethodId)
             let payment = DynamicCheckoutViewModelItem.RegularPayment(
-                id: methodId,
-                info: info,
-                content: nil,
-                submitButton: createSubmitAction(methodId: methodId, selectedMethodId: selectedMethodId)
+                id: methodId, info: info, content: nil, contentId: "", submitButton: submitButton
             )
             return .regularPayment(payment)
         }
@@ -325,10 +323,12 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             guard let info = createPaymentInfo(id: methodId, isSelected: isSelected, isLoading: isSelected && !state.isReady, state: state.snapshot) else {
                 return nil
             }
+            let paymentContent = createRegularPaymentContent(state: state, methodId: methodId)
             let payment = DynamicCheckoutViewModelItem.RegularPayment(
                 id: methodId,
                 info: info,
-                content: createRegularPaymentContent(state: state, methodId: methodId),
+                content: paymentContent,
+                contentId: state.snapshot.invoice.id,
                 submitButton: createSubmitAction(methodId: methodId, state: state)
             )
             return .regularPayment(payment)
