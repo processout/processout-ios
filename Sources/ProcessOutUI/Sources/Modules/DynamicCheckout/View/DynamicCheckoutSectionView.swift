@@ -27,7 +27,9 @@ struct DynamicCheckoutSectionView: View {
                         .padding(section.areBezelsVisible ? POSpacing.large : 0)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                .background(background(for: item))
+                .background(
+                    style.backgroundColor.opacity(section.areBezelsVisible ? 1 : 0)
+                )
                 .backport.geometryGroup()
             }
         }
@@ -39,17 +41,4 @@ struct DynamicCheckoutSectionView: View {
 
     @Environment(\.dynamicCheckoutStyle)
     private var style
-
-    // MARK: - Private Methods
-
-    @ViewBuilder
-    private func background(for item: DynamicCheckoutViewModelState.Item) -> some View {
-        if !section.areBezelsVisible {
-            style.backgroundColor.opacity(0)
-        } else if case .regularPayment(let item) = item, !item.info.isSelectable {
-            style.regularPaymentMethod.disabledBackgroundColor
-        } else {
-            style.backgroundColor
-        }
-    }
 }

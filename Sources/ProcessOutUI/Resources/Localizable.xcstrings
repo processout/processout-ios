@@ -1634,6 +1634,7 @@
       }
     },
     "dynamic-checkout.error.unavailable-method" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1770,6 +1771,7 @@
       }
     },
     "dynamic-checkout.unavailable-warning" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

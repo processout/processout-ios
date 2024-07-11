@@ -35,9 +35,6 @@ extension POColorResource {
         /// The "Surface/Default" asset catalog color resource.
         public static let `default` = POColorResource(.Surface.default)
 
-        /// The "Surface/Neutral" asset catalog color resource.
-        public static let neutral = POColorResource(.Surface.neutral)
-
         /// The "Surface/Success" asset catalog color resource.
         public static let success = POColorResource(.Surface.success)
 

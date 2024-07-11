@@ -217,15 +217,13 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 self?.didSelectPaymentItem(id: id, isExternal: isExternal)
             }
         }
-        let isAvailable = !state.unavailablePaymentMethodIds.contains(id)
         let item = DynamicCheckoutViewModelItem.RegularPaymentInfo(
             iconImageResource: display.logo,
             title: display.name,
             isLoading: isLoading,
-            isSelectable: isAvailable,
             isSelected: isSelected,
             additionalInformation: additionalPaymentInformation(
-                methodId: id, isAvailable: isAvailable, isExternal: isExternal, isSelected: selected
+                methodId: id, isExternal: isExternal, isSelected: selected
             )
         )
         return item
@@ -239,12 +237,8 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
     }
 
-    private func additionalPaymentInformation(
-        methodId: String, isAvailable: Bool, isExternal: Bool, isSelected: Bool
-    ) -> String? {
-        if !isAvailable {
-            return String(resource: .DynamicCheckout.Warning.paymentUnavailable)
-        } else if isExternal, isSelected {
+    private func additionalPaymentInformation(methodId: String, isExternal: Bool, isSelected: Bool) -> String? {
+        if isExternal, isSelected {
             return String(resource: .DynamicCheckout.Warning.redirect)
         }
         return nil
