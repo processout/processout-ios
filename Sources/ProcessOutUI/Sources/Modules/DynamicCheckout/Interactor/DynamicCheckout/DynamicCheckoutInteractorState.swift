@@ -30,12 +30,6 @@ enum DynamicCheckoutInteractorState {
         /// Current invoice.
         var invoice: POInvoice
 
-        /// During module lifecycle certain payment methods may become unavailable.
-        var unavailablePaymentMethodIds: Set<String> = []
-
-        /// Payment methods that will be set unavailable when this payment method ends.
-        var pendingUnavailablePaymentMethodIds: Set<String> = []
-
         /// Most recent error description if any.
         var recentErrorDescription: String?
     }
@@ -52,7 +46,7 @@ enum DynamicCheckoutInteractorState {
     struct PaymentProcessing {
 
         /// Started state snapshot.
-        var snapshot: Started
+        let snapshot: Started
 
         /// Payment method ID that is currently being processed.
         let paymentMethodId: String
@@ -88,6 +82,10 @@ enum DynamicCheckoutInteractorState {
         /// When processing fails and this property is set to `true`, pending payment method (if present) is
         /// started after selection.
         var shouldStartPendingPaymentMethod = false
+
+        /// Boolean value indicating whether invoice should be invalidated when interactor transitions back
+        /// to started from this state.
+        var shouldInvalidateInvoice = false
     }
 
     enum PaymentSubmission {
