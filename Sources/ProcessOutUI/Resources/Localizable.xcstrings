@@ -766,7 +766,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ligne d’adresse %d"
+            "value" : "Ligne d'adresse %d"
           }
         },
         "pl" : {
@@ -1038,7 +1038,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La date d’expiration de votre carte est incorrecte."
+            "value" : "La date d'expiration de votre carte est incorrecte."
           }
         },
         "pl" : {
@@ -1174,7 +1174,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une erreur s’est produite, veuillez réessayer."
+            "value" : "Une erreur s'est produite, veuillez réessayer."
           }
         },
         "pl" : {
@@ -1208,7 +1208,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La date d’expiration de votre carte ou son code CVV sont incorrects."
+            "value" : "La date d'expiration de votre carte ou son code CVV sont incorrects."
           }
         },
         "pl" : {
@@ -1446,7 +1446,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une erreur s’est produite, veuillez réessayer."
+            "value" : "Une erreur s'est produite, veuillez réessayer."
           }
         },
         "pl" : {
