@@ -179,7 +179,6 @@ final class DefaultCardTokenizationInteractor:
 
     private func restoreStartedState(tokenizationFailure failure: POFailure) {
         guard case .tokenizing(var startedState) = state,
-              isRecoverable(failure: failure),
               delegate?.shouldContinueTokenization(after: failure) != false else {
             setFailureStateUnchecked(failure: failure)
             return
@@ -194,7 +193,7 @@ final class DefaultCardTokenizationInteractor:
         logger.debug("Did recover started state after failure: \(failure)")
     }
 
-    private func errorMessage(for failure: POFailure, invalidParameterIds: inout [State.ParameterId]) -> String {
+    private func errorMessage(for failure: POFailure, invalidParameterIds: inout [State.ParameterId]) -> String? {
         // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
         let errorMessage: POStringResource
         switch failure.code {
@@ -222,21 +221,12 @@ final class DefaultCardTokenizationInteractor:
         case .generic(.cardInvalidName):
             invalidParameterIds.append(\.cardholderName)
             errorMessage = .CardTokenization.Error.cardholderName
+        case .cancelled:
+            return nil
         default:
             errorMessage = .CardTokenization.Error.generic
         }
         return String(resource: errorMessage)
-    }
-
-    private func isRecoverable(failure: POFailure) -> Bool {
-        switch failure.code {
-        case .generic(let genericCode) where genericCode == .cardFailed3DS:
-            false
-        case .networkUnreachable, .timeout, .validation, .notFound, .generic, .internal, .unknown, .cancelled:
-            true
-        case .authentication:
-            false
-        }
     }
 
     // MARK: - Failure State

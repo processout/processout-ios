@@ -406,6 +406,14 @@ final class DynamicCheckoutDefaultInteractor:
         }
     }
 
+    private func canRecoverCardTokenization(from failure: POFailure) -> Bool {
+        if case .generic(let code) = failure.code {
+            let unrecoverableCodes: Set<POFailure.GenericCode> = [.cardFailed3DS, .cardPending3DS]
+            return !unrecoverableCodes.contains(code)
+        }
+        return true
+    }
+
     // MARK: - Alternative Payment
 
     private func startAlternativePayment(
@@ -541,7 +549,7 @@ final class DynamicCheckoutDefaultInteractor:
                 newStartedState.pendingUnavailablePaymentMethodIds.subtract(pendingUnavailableIds)
                 newStartedState.unavailablePaymentMethodIds.formUnion(pendingUnavailableIds)
             }
-        case .card where .generic(.cardFailed3DS) == failure.code:
+        case .card where !canRecoverCardTokenization(from: failure):
             let unavailableIds = paymentMethodIds(of: .card, state: currentState.snapshot)
             newStartedState.unavailablePaymentMethodIds.formUnion(unavailableIds)
         default:
@@ -649,7 +657,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
     }
 
     func shouldContinueTokenization(after failure: POFailure) -> Bool {
-         true // All recoverable errors should be recovered
+        canRecoverCardTokenization(from: failure)
     }
 }
 
