@@ -589,7 +589,6 @@ final class DynamicCheckoutDefaultInteractor:
         if case .cancelled = failure.code {
             return nil
         }
-        // todo(andrii-vysotskyi): change error message to say that user could retry same payment method as well
         return String(resource: .DynamicCheckout.Error.generic)
     }
 
