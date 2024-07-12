@@ -12,12 +12,7 @@ import ProcessOut
 @MainActor
 final class DynamicCheckoutPassKitPaymentDefaultSession: DynamicCheckoutPassKitPaymentSession {
 
-    init(
-        configuration: PODynamicCheckoutConfiguration,
-        delegate: PODynamicCheckoutDelegate?,
-        invoicesService: POInvoicesService
-    ) {
-        self.configuration = configuration
+    init(delegate: PODynamicCheckoutDelegate?, invoicesService: POInvoicesService) {
         self.delegate = delegate
         self.invoicesService = invoicesService
         didAuthorizeInvoice = false
@@ -27,12 +22,13 @@ final class DynamicCheckoutPassKitPaymentDefaultSession: DynamicCheckoutPassKitP
         POPassKitPaymentAuthorizationController.canMakePayments()
     }
 
-    func start(request: PKPaymentRequest) async throws {
+    func start(invoiceId: String, request: PKPaymentRequest) async throws {
         await delegate?.dynamicCheckout(willAuthorizeInvoiceWith: request)
         guard let controller = POPassKitPaymentAuthorizationController(paymentRequest: request) else {
             assertionFailure("ApplePay payment shouldn't be attempted when unavailable.")
             throw POFailure(code: .generic(.mobile))
         }
+        self.invoiceId = invoiceId
         controller.delegate = self
         _ = await controller.present()
         await withCheckedContinuation { continuation in
@@ -48,11 +44,12 @@ final class DynamicCheckoutPassKitPaymentDefaultSession: DynamicCheckoutPassKitP
     // MARK: - Private Properties
 
     private let invoicesService: POInvoicesService
-    private let configuration: PODynamicCheckoutConfiguration
-    private weak var delegate: PODynamicCheckoutDelegate?
 
     private var didFinishContinuation: CheckedContinuation<Void, Never>?
     private var didAuthorizeInvoice: Bool
+    private var invoiceId: String?
+
+    private weak var delegate: PODynamicCheckoutDelegate?
 }
 
 extension DynamicCheckoutPassKitPaymentDefaultSession: POPassKitPaymentAuthorizationControllerDelegate {
@@ -69,7 +66,10 @@ extension DynamicCheckoutPassKitPaymentDefaultSession: POPassKitPaymentAuthoriza
         didTokenizePayment payment: PKPayment,
         card: POCard
     ) async -> PKPaymentAuthorizationResult {
-        var authorizationRequest = POInvoiceAuthorizationRequest(invoiceId: configuration.invoiceId, source: card.id)
+        guard let invoiceId else {
+            preconditionFailure("Invoice ID must be set.")
+        }
+        var authorizationRequest = POInvoiceAuthorizationRequest(invoiceId: invoiceId, source: card.id)
         do {
             guard let delegate else {
                 throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))

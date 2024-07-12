@@ -27,10 +27,10 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
     // MARK: - DynamicCheckoutInteractorChildProvider
 
     func cardTokenizationInteractor(
-        configuration: PODynamicCheckoutPaymentMethod.CardConfiguration
+        invoiceId: String, configuration: PODynamicCheckoutPaymentMethod.CardConfiguration
     ) -> any CardTokenizationInteractor {
         var logger = logger
-        logger[attributeKey: .invoiceId] = self.configuration.invoiceId
+        logger[attributeKey: .invoiceId] = invoiceId
         let interactor = DefaultCardTokenizationInteractor(
             cardsService: cardsService,
             logger: logger,
@@ -40,12 +40,16 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         return interactor
     }
 
-    func nativeAlternativePaymentInteractor(gatewayConfigurationId: String) -> any NativeAlternativePaymentInteractor {
+    func nativeAlternativePaymentInteractor(
+        invoiceId: String, gatewayConfigurationId: String
+    ) -> any NativeAlternativePaymentInteractor {
         var logger = self.logger
-        logger[attributeKey: .invoiceId] = configuration.invoiceId
+        logger[attributeKey: .invoiceId] = invoiceId
         logger[attributeKey: .gatewayConfigurationId] = gatewayConfigurationId
         let interactor = NativeAlternativePaymentDefaultInteractor(
-            configuration: alternativePaymentConfiguration(gatewayId: gatewayConfigurationId),
+            configuration: alternativePaymentConfiguration(
+                invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId
+            ),
             invoicesService: invoicesService,
             imagesRepository: imagesRepository,
             logger: logger,
@@ -85,7 +89,9 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         return cardConfiguration
     }
 
-    private func alternativePaymentConfiguration(gatewayId: String) -> PONativeAlternativePaymentConfiguration {
+    private func alternativePaymentConfiguration(
+        invoiceId: String, gatewayConfigurationId: String
+    ) -> PONativeAlternativePaymentConfiguration {
         let confirmationConfiguration = PONativeAlternativePaymentConfirmationConfiguration(
             waitsConfirmation: true,
             timeout: configuration.alternativePayment.paymentConfirmation.timeout,
@@ -95,8 +101,8 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             }
         )
         let alternativePaymentConfiguration = PONativeAlternativePaymentConfiguration(
-            invoiceId: configuration.invoiceId,
-            gatewayConfigurationId: gatewayId,
+            invoiceId: invoiceId,
+            gatewayConfigurationId: gatewayConfigurationId,
             title: "",
             shouldHorizontallyCenterCodeInput: false,
             successMessage: "",

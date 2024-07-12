@@ -17,9 +17,11 @@ public enum PODynamicCheckoutPaymentMethod {
 
     public struct ApplePay: Decodable { // sourcery: AutoCodingKeys
 
-        /// Transient ID assigned to method during decoding.
+        /// Payment method ID.
         @_spi(PO)
-        public let id = UUID().uuidString // sourcery:coding: skip
+        public var id: String { // sourcery:coding: skip
+            configuration.merchantId
+        }
 
         /// Payment flow.
         public let flow: Flow?
@@ -48,9 +50,11 @@ public enum PODynamicCheckoutPaymentMethod {
 
     public struct NativeAlternativePayment: Decodable { // sourcery: AutoCodingKeys
 
-        /// Transient ID assigned to method during decoding.
+        /// Payment method ID.
         @_spi(PO)
-        public let id = UUID().uuidString // sourcery:coding: skip
+        public var id: String { // sourcery:coding: skip
+            configuration.gatewayConfigurationId
+        }
 
         /// Display information.
         public let display: Display
@@ -69,9 +73,11 @@ public enum PODynamicCheckoutPaymentMethod {
 
     public struct AlternativePayment: Decodable { // sourcery: AutoCodingKeys
 
-        /// Transient ID assigned to method during decoding.
+        /// Payment method ID.
         @_spi(PO)
-        public let id = UUID().uuidString // sourcery:coding: skip
+        public var id: String { // sourcery:coding: skip
+            configuration.gatewayConfigurationId
+        }
 
         /// Display information.
         public let display: Display
@@ -85,6 +91,9 @@ public enum PODynamicCheckoutPaymentMethod {
 
     public struct AlternativePaymentConfiguration: Decodable {
 
+        /// Gateway configuration ID.
+        public let gatewayConfigurationId: String
+
         /// Redirect URL.
         public let redirectUrl: URL
     }
@@ -93,9 +102,9 @@ public enum PODynamicCheckoutPaymentMethod {
 
     public struct Card: Decodable { // sourcery: AutoCodingKeys
 
-        /// Transient ID assigned to method during decoding.
+        /// Payment method ID.
         @_spi(PO)
-        public let id = UUID().uuidString // sourcery:coding: skip
+        public let id = "card" // sourcery:coding: skip
 
         /// Display information.
         public let display: Display
@@ -117,6 +126,15 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Card billing address collection configuration.
         public let billingAddress: BillingAddressConfiguration
+    }
+
+    public struct BillingAddressConfiguration: Decodable {
+
+        /// List of ISO country codes that is supported for the billing address. When nil, all countries are supported.
+        public let restrictToCountryCodes: Set<String>?
+
+        /// Billing address collection mode.
+        public let collectionMode: POBillingAddressCollectionMode
     }
 
     // MARK: - Unknown
@@ -143,15 +161,6 @@ public enum PODynamicCheckoutPaymentMethod {
 
         @POStringCodableColor
         public private(set) var brandColor: UIColor
-    }
-
-    public struct BillingAddressConfiguration: Decodable {
-
-        /// List of ISO country codes that is supported for the billing address. When nil, all countries are supported.
-        public let restrictToCountryCodes: Set<String>?
-
-        /// Billing address collection mode.
-        public let collectionMode: POBillingAddressCollectionMode
     }
 
     public enum Flow: String, Decodable {
@@ -218,6 +227,7 @@ extension PODynamicCheckoutPaymentMethod {
         case .card(let method):
             return method.id
         case .unknown(let method):
+            assertionFailure("It is considered an error to request an ID for unknown payment method.")
             return method.id
         }
     }
