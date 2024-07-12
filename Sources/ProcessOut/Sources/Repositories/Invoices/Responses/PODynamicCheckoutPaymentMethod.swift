@@ -19,7 +19,7 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Payment method ID.
         @_spi(PO)
-        public var id: String {
+        public var id: String { // sourcery:coding: skip
             configuration.merchantId
         }
 
@@ -52,7 +52,7 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Payment method ID.
         @_spi(PO)
-        public var id: String {
+        public var id: String { // sourcery:coding: skip
             configuration.gatewayConfigurationId
         }
 
@@ -75,7 +75,7 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Payment method ID.
         @_spi(PO)
-        public var id: String {
+        public var id: String { // sourcery:coding: skip
             configuration.gatewayConfigurationId
         }
 
@@ -104,7 +104,7 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Payment method ID.
         @_spi(PO)
-        public let id: String = "card"
+        public let id = "card" // sourcery:coding: skip
 
         /// Display information.
         public let display: Display
