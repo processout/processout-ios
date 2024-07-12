@@ -70,6 +70,10 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.shouldStartPendingPaymentMethod = false
             state = .paymentProcessing(currentState)
             cancel(force: false)
+        case .recovering(var currentState):
+            currentState.pendingPaymentMethodId = methodId
+            currentState.shouldStartPendingPaymentMethod = false
+            state = .recovering(currentState)
         default:
             logger.debug("Unable to change selection in unsupported state: \(state)")
         }
@@ -90,6 +94,10 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.shouldStartPendingPaymentMethod = true
             state = .paymentProcessing(currentState)
             cancel(force: false)
+        case .recovering(var currentState):
+            currentState.pendingPaymentMethodId = methodId
+            currentState.shouldStartPendingPaymentMethod = true
+            state = .recovering(currentState)
         default:
             logger.debug("Unable to start payment in unsupported state: \(state)")
         }
@@ -277,6 +285,8 @@ final class DynamicCheckoutDefaultInteractor:
             interactor.cancel()
         case .started, .selected:
             setFailureStateUnchecked(error: POFailure(code: .cancelled))
+        case .recovering:
+            logger.debug("Ignoring attempt to cancel payment during error recovery.")
         default:
             assertionFailure("Attempted to cancel payment from unsupported state.")
         }
@@ -519,11 +529,16 @@ final class DynamicCheckoutDefaultInteractor:
             assertionFailure("Error could be recovered only when processing payment.")
             return
         }
-        // todo(andrii-vysotskyi): for card tokenization attempt to preserve user input
-        // todo(andrii-vysotskyi): set recovering state if needed
+        let recoveringState = State.Recovering(
+            failure: failure,
+            snapshot: currentState.snapshot,
+            failedPaymentMethodId: currentState.paymentMethodId,
+            pendingPaymentMethodId: currentState.pendingPaymentMethodId,
+            shouldStartPendingPaymentMethod: currentState.shouldStartPendingPaymentMethod
+        )
+        state = .recovering(recoveringState)
         let newInvoice: POInvoice
         if shouldCreateNewInvoice(toRecoverFrom: failure, in: currentState) {
-            // technically this is full restart
             if let invoice = await delegate?.dynamicCheckout(newInvoiceFor: currentState.snapshot.invoice) {
                 newInvoice = invoice
             } else {
@@ -533,10 +548,26 @@ final class DynamicCheckoutDefaultInteractor:
         } else {
             newInvoice = currentState.snapshot.invoice
         }
+        finishPaymentFailureRecovery(with: newInvoice)
+    }
+
+    private func finishPaymentFailureRecovery(with newInvoice: POInvoice) {
+        guard case .recovering(let currentState) = state else {
+            assertionFailure("Unexpected state")
+            return
+        }
         setStartedStateUnchecked(
-            invoice: newInvoice, errorDescription: failureDescription(failure)
+            invoice: newInvoice, errorDescription: failureDescription(currentState.failure)
         )
-        selectPendingPaymentMethodIfNeeded(state: currentState)
+        guard let pendingPaymentMethodId = currentState.pendingPaymentMethodId else {
+            return
+        }
+        if currentState.shouldStartPendingPaymentMethod {
+            startPayment(methodId: pendingPaymentMethodId)
+        } else {
+            select(methodId: pendingPaymentMethodId)
+        }
+        // todo(andrii-vysotskyi): decide whether input should be preserved for card tokenization
     }
 
     private func shouldCreateNewInvoice(
@@ -560,17 +591,6 @@ final class DynamicCheckoutDefaultInteractor:
         }
         // todo(andrii-vysotskyi): change error message to say that user could retry same payment method as well
         return String(resource: .DynamicCheckout.Error.generic)
-    }
-
-    private func selectPendingPaymentMethodIfNeeded(state: State.PaymentProcessing) {
-        guard let methodId = state.pendingPaymentMethodId else {
-            return
-        }
-        if state.shouldStartPendingPaymentMethod {
-            startPayment(methodId: methodId)
-        } else {
-            select(methodId: methodId)
-        }
     }
 
     // MARK: - Failure State

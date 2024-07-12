@@ -100,6 +100,25 @@ enum DynamicCheckoutInteractorState {
         case submitting
     }
 
+    struct Recovering {
+
+        /// Failure that caused recovery process to happen.
+        let failure: POFailure
+
+        /// Started state snapshot.
+        let snapshot: Started
+
+        /// Failed payment method ID.
+        let failedPaymentMethodId: String
+
+        /// Payment method that should be selected in case of processing failure.
+        var pendingPaymentMethodId: String?
+
+        /// When processing fails and this property is set to `true`, pending payment method (if present) is
+        /// started after selection.
+        var shouldStartPendingPaymentMethod = false
+    }
+
     /// Idle state.
     case idle
 
@@ -114,6 +133,9 @@ enum DynamicCheckoutInteractorState {
 
     /// Payment is being processed.
     case paymentProcessing(PaymentProcessing)
+
+    /// Payment recovering state.
+    case recovering(Recovering)
 
     /// Failure state. This is a sink state.
     case failure(POFailure)
