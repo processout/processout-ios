@@ -300,6 +300,10 @@ public struct POFailure: Error {
         /// The card does not support 3DS authentication (but a 3DS authentication was requested).
         case cardUnsupported3DS = "card.unsupported-3ds"
 
+        /// The transaction was blocked from authorization due to the 3DS transaction status being in
+        /// the authenticating phase.
+        case cardPending3DS = "card.pending-3ds"
+
         /// The card 3DS check failed.
         case cardFailed3DS = "card.failed-3ds"
 

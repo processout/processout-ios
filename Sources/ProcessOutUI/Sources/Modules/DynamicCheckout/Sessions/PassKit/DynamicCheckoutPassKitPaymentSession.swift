@@ -13,5 +13,5 @@ protocol DynamicCheckoutPassKitPaymentSession {
     var isSupported: Bool { get }
 
     /// Starts payment.
-    func start(request: PKPaymentRequest) async throws
+    func start(invoiceId: String, request: PKPaymentRequest) async throws
 }

@@ -50,7 +50,6 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
         .onTapGesture {
             item.isSelected = true
         }
-        .disabled(!item.isSelectable)
         .backport.geometryGroup()
     }
 

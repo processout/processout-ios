@@ -9,6 +9,8 @@ import SwiftUI
 
 /// Brand button style that only requires base style information and resolves
 /// styling for other states automatically.
+///
+/// - NOTE: SDK uses light color variation with light brand colors and dark otherwise.
 @available(iOS 14, *)
 public struct POBrandButtonStyle: ButtonStyle {
 
@@ -36,7 +38,6 @@ public struct POBrandButtonStyle: ButtonStyle {
             let isBrandColorLight = UIColor(brandColor).isLight() != false
             configuration.label
                 .textStyle(title)
-                .colorScheme(isBrandColorLight ? .light : .dark)
                 .lineLimit(1)
                 .padding(Constants.padding)
                 .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
@@ -48,6 +49,7 @@ public struct POBrandButtonStyle: ButtonStyle {
                 }
                 .border(style: border)
                 .shadow(style: shadow)
+                .colorScheme(isBrandColorLight ? .light : .dark)
                 .contentShape(.rect)
                 .animation(.default, value: isEnabled)
                 .animation(.default, value: AnyHashable(brandColor))
@@ -75,6 +77,7 @@ public struct POBrandButtonStyle: ButtonStyle {
 
 // Environments are not propagated directly to ButtonStyle in any iOS before 14.5 workaround is
 // to wrap content into additional view and extract them.
+@available(iOS 14, *)
 private struct ContentView<Content: View>: View {
 
     @ViewBuilder
@@ -86,6 +89,20 @@ private struct ContentView<Content: View>: View {
 
     // MARK: - Private Properties
 
-    @Environment(\.isEnabled) private var isEnabled
-    @Environment(\.poButtonBrandColor) private var brandColor
+    @Environment(\.isEnabled)
+    private var isEnabled
+
+    @Environment(\.poButtonBrandColor)
+    private var uiBrandColor
+
+    @Environment(\.colorScheme)
+    private var colorScheme
+
+    // MARK: - Private Methods
+
+    private var brandColor: Color {
+        let interfaceStyle = UIUserInterfaceStyle(colorScheme)
+        let traitCollection = UITraitCollection(userInterfaceStyle: interfaceStyle)
+        return Color(uiBrandColor.resolvedColor(with: traitCollection))
+    }
 }

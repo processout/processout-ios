@@ -156,6 +156,17 @@ extension FeaturesViewModel: PODynamicCheckoutDelegate {
             .init(label: "Test", amount: 100, type: .final)
         ]
     }
+
+    func dynamicCheckout(newInvoiceFor invoice: POInvoice) async -> POInvoice? {
+        let request = POInvoiceCreationRequest(
+            name: "Example",
+            amount: invoice.amount.description,
+            currency: invoice.currency,
+            returnUrl: invoice.returnUrl,
+            customerId: Constants.customerId
+        )
+        return try? await invoicesService.createInvoice(request: request)
+    }
 }
 
 extension FeaturesViewModel: POPassKitPaymentAuthorizationControllerDelegate {

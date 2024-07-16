@@ -27,11 +27,8 @@ enum DynamicCheckoutInteractorState {
         /// Defines whether payment is cancellable.
         let isCancellable: Bool
 
-        /// During module lifecycle certain payment methods may become unavailable.
-        var unavailablePaymentMethodIds: Set<String> = []
-
-        /// Payment methods that will be set unavailable when this payment method ends.
-        var pendingUnavailablePaymentMethodIds: Set<String> = []
+        /// Current invoice.
+        var invoice: POInvoice
 
         /// Most recent error description if any.
         var recentErrorDescription: String?
@@ -49,7 +46,7 @@ enum DynamicCheckoutInteractorState {
     struct PaymentProcessing {
 
         /// Started state snapshot.
-        var snapshot: Started
+        let snapshot: Started
 
         /// Payment method ID that is currently being processed.
         let paymentMethodId: String
@@ -85,6 +82,10 @@ enum DynamicCheckoutInteractorState {
         /// When processing fails and this property is set to `true`, pending payment method (if present) is
         /// started after selection.
         var shouldStartPendingPaymentMethod = false
+
+        /// Boolean value indicating whether invoice should be invalidated when interactor transitions back
+        /// to started from this state.
+        var shouldInvalidateInvoice = false
     }
 
     enum PaymentSubmission {
@@ -97,6 +98,25 @@ enum DynamicCheckoutInteractorState {
 
         /// Payment is already being processed.
         case submitting
+    }
+
+    struct Recovering {
+
+        /// Failure that caused recovery process to happen.
+        let failure: POFailure
+
+        /// Started state snapshot.
+        let snapshot: Started
+
+        /// Failed payment method ID.
+        let failedPaymentMethodId: String
+
+        /// Payment method that should be selected in case of processing failure.
+        var pendingPaymentMethodId: String?
+
+        /// When processing fails and this property is set to `true`, pending payment method (if present) is
+        /// started after selection.
+        var shouldStartPendingPaymentMethod = false
     }
 
     /// Idle state.
@@ -113,6 +133,9 @@ enum DynamicCheckoutInteractorState {
 
     /// Payment is being processed.
     case paymentProcessing(PaymentProcessing)
+
+    /// Payment recovering state.
+    case recovering(Recovering)
 
     /// Failure state. This is a sink state.
     case failure(POFailure)
