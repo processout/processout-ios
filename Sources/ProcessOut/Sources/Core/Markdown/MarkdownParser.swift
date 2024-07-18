@@ -17,7 +17,9 @@ enum MarkdownParser {
         guard let document else {
             preconditionFailure("Failed to parse markdown document")
         }
-        return MarkdownDocument(cmarkNode: document)
+        let markdownDocument = MarkdownDocument(cmarkNode: document)
+        cmark_node_free(document)
+        return markdownDocument
     }
 
     /// Escapes given plain text so it can be represented as is, in markdown.

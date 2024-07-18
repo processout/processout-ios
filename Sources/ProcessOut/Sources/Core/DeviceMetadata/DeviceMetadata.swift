@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct DeviceMetadata: Encodable {
+struct DeviceMetadata: Encodable, Sendable {
 
     /// Current device identifier.
     @POImmutableExcludedCodable

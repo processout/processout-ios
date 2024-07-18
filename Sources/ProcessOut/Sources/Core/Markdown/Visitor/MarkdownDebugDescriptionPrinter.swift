@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 14.06.2023.
 //
 
-import Foundation
+#if DEBUG
 
 final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
 
@@ -71,11 +71,7 @@ final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
     }
 
     func visit(codeBlock: MarkdownCodeBlock) -> String {
-        var attributes: [String: CustomStringConvertible] = [:]
-        if let info = codeBlock.info {
-            attributes["info"] = info
-        }
-        return description(node: codeBlock, nodeName: "Code Block", attributes: attributes, content: codeBlock.code)
+        return description(node: codeBlock, nodeName: "Code Block", content: codeBlock.code)
     }
 
     func visit(thematicBreak: MarkdownThematicBreak) -> String {
@@ -144,3 +140,5 @@ extension MarkdownBaseNode: CustomDebugStringConvertible {
         return self.accept(visitor: visitor)
     }
 }
+
+#endif

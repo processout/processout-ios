@@ -5,7 +5,8 @@
 //  Created by Andrii Vysotskyi on 10.05.2023.
 //
 
-@_spi(PO) public protocol POEventEmitterEvent: Sendable {
+@_spi(PO)
+public protocol POEventEmitterEvent: Sendable {
 
     /// Event name.
     static var name: String { get }

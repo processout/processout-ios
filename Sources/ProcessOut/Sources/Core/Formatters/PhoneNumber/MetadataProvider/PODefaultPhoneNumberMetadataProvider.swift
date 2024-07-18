@@ -7,7 +7,8 @@
 
 import Foundation
 
-@_spi(PO) public final class PODefaultPhoneNumberMetadataProvider: POPhoneNumberMetadataProvider {
+@_spi(PO) 
+public final class PODefaultPhoneNumberMetadataProvider: POPhoneNumberMetadataProvider {
 
     public static let shared = PODefaultPhoneNumberMetadataProvider()
 
@@ -20,19 +21,17 @@ import Foundation
 
     public func metadata(for countryCode: String) -> POPhoneNumberMetadata? {
         let transformedCountryCode = countryCode.applyingTransform(.toLatin, reverse: false) ?? countryCode
-        if let metadata = metadata {
+        if let metadata = metadata.wrappedValue {
             return metadata[transformedCountryCode]
         }
         loadMetadata(sync: true)
-        return metadata?[transformedCountryCode]
+        return metadata.wrappedValue?[transformedCountryCode]
     }
 
     // MARK: - Private Properties
 
     private let dispatchQueue: DispatchQueue
-
-    @POUnfairlyLocked
-    private var metadata: [String: POPhoneNumberMetadata]?
+    private let metadata = POUnfairlyLocked<[String: POPhoneNumberMetadata]?>(wrappedValue: nil)
 
     // MARK: - Private Methods
 
@@ -42,7 +41,7 @@ import Foundation
 
     private func loadMetadata(sync: Bool) {
         let dispatchWorkItem = DispatchWorkItem { [weak self] in
-            guard let self, self.metadata == nil else {
+            guard let self, self.metadata.wrappedValue == nil else {
                 return
             }
             let groupedMetadata: [String: POPhoneNumberMetadata]
@@ -57,7 +56,7 @@ import Foundation
                 assertionFailure("Failed to load metadata: \(error)")
                 groupedMetadata = [:]
             }
-            self.$metadata.withLock { $0 = groupedMetadata }
+            self.metadata.withLock { $0 = groupedMetadata }
         }
         let executor = sync ? dispatchQueue.sync : dispatchQueue.async
         executor(dispatchWorkItem)

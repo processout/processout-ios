@@ -7,7 +7,7 @@
 
 import Foundation
 
-@_spi(PO) public struct POStringResource {
+@_spi(PO) public struct POStringResource: Sendable {
 
     /// The key to use to look up a localized string.
     let key: String

@@ -7,11 +7,11 @@
 
 import Foundation
 
-/// An object for writing interpolated string messages to the processout logging system.
+/// An object for writing interpolated string messages to the ProcessOut logging system.
 @_spi(PO)
-public struct POLogger {
+public struct POLogger: Sendable {
 
-    init(destinations: [LoggerDestination] = [], category: String, minimumLevel: @escaping () -> LogLevel) {
+    init(destinations: [LoggerDestination] = [], category: String, minimumLevel: @escaping @Sendable () -> LogLevel) {
         self.destinations = destinations
         self.category = category
         self.minimumLevel = minimumLevel
@@ -83,7 +83,7 @@ public struct POLogger {
     // MARK: - Private Properties
 
     private let destinations: [LoggerDestination]
-    private let minimumLevel: () -> LogLevel
+    private let minimumLevel: @Sendable () -> LogLevel
     private let lock: NSLock
     private var attributes: [POLogAttributeKey: String]
 

@@ -8,8 +8,9 @@
 import os
 
 /// A thread-safe wrapper around a value.
+@_spi(PO)
 @propertyWrapper
-@_spi(PO) public final class POUnfairlyLocked<Value>: @unchecked Sendable {
+public final class POUnfairlyLocked<Value>: @unchecked Sendable {
 
     public init(wrappedValue: Value) {
         value = wrappedValue

@@ -9,7 +9,7 @@ import Foundation
 
 // swiftlint:disable legacy_objc_type
 
-final class RegexProvider {
+final class RegexProvider: Sendable {
 
     static let shared = RegexProvider()
 
@@ -35,7 +35,7 @@ final class RegexProvider {
 
     // MARK: - Private Properties
 
-    private let cache: NSCache<NSString, NSRegularExpression>
+    private nonisolated(unsafe) let cache: NSCache<NSString, NSRegularExpression>
 }
 
 // swiftlint:enable legacy_objc_type

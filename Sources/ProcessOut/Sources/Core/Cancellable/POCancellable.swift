@@ -9,7 +9,7 @@
 public typealias POCancellableType = POCancellable
 
 /// A protocol indicating that an activity or action supports cancellation.
-public protocol POCancellable {
+public protocol POCancellable: Sendable {
 
     /// Cancel the activity.
     func cancel()

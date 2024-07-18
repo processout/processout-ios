@@ -31,7 +31,7 @@ final class SystemLoggerDestination: LoggerDestination {
 
     private let subsystem: String
     private let lock: NSLock
-    private var logs: [String: OSLog]
+    private nonisolated(unsafe) var logs: [String: OSLog]
 
     // MARK: - Private Methods
 

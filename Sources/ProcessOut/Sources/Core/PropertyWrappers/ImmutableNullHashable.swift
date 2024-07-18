@@ -18,3 +18,5 @@ struct ImmutableNullHashable<Value>: Hashable {
         // Ignored
     }
 }
+
+extension ImmutableNullHashable: Sendable where Value: Sendable { }

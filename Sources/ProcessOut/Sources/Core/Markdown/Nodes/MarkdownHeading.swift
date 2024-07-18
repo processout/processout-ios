@@ -7,13 +7,16 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownHeading: MarkdownBaseNode {
+final class MarkdownHeading: MarkdownBaseNode, @unchecked Sendable {
 
-    private(set) lazy var level: Int = {
-        Int(cmarkNode.pointee.as.heading.level)
-    }()
+    let level: Int
 
     // MARK: - MarkdownBaseNode
+
+    required init(cmarkNode: MarkdownBaseNode.CmarkNode, validatesType: Bool = true) {
+        level = Int(cmarkNode.pointee.as.heading.level)
+        super.init(cmarkNode: cmarkNode, validatesType: validatesType)
+    }
 
     override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_HEADING
