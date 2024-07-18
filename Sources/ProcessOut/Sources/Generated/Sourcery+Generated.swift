@@ -82,7 +82,7 @@ extension POCardsService {
     @discardableResult
     public func issuerInformation(
         iin: String,
-        completion: @escaping (Result<POCardIssuerInformation, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POCardIssuerInformation, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await issuerInformation(iin: iin)
@@ -96,7 +96,7 @@ extension POCardsService {
     @discardableResult
     public func tokenize(
         request: POCardTokenizationRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await tokenize(request: request)
@@ -107,7 +107,7 @@ extension POCardsService {
     @discardableResult
     public func updateCard(
         request: POCardUpdateRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await updateCard(request: request)
@@ -118,7 +118,7 @@ extension POCardsService {
     @discardableResult
     public func tokenize(
         request: POApplePayCardTokenizationRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await tokenize(request: request)
@@ -133,7 +133,7 @@ extension POCustomerTokensService {
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
         threeDSService: PO3DSService,
-        completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POCustomerToken, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await assignCustomerToken(request: request, threeDSService: threeDSService)
@@ -145,7 +145,7 @@ extension POCustomerTokensService {
     @discardableResult
     public func createCustomerToken(
         request: POCreateCustomerTokenRequest,
-        completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POCustomerToken, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await createCustomerToken(request: request)
@@ -159,7 +159,7 @@ extension POGatewayConfigurationsRepository {
     @discardableResult
     public func all(
         request: POAllGatewayConfigurationsRequest,
-        completion: @escaping (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await all(request: request)
@@ -170,7 +170,7 @@ extension POGatewayConfigurationsRepository {
     @discardableResult
     public func find(
         request: POFindGatewayConfigurationRequest,
-        completion: @escaping (Result<POGatewayConfiguration, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POGatewayConfiguration, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await find(request: request)
@@ -180,7 +180,7 @@ extension POGatewayConfigurationsRepository {
     /// Returns available gateway configurations.
     @discardableResult
     public func all(
-        completion: @escaping (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await all()
@@ -195,7 +195,7 @@ extension POImagesRepository {
     public func images(
         at urls: [URL],
         scale: CGFloat,
-        completion: @escaping ([URL: UIImage]) -> Void
+        completion: @escaping @Sendable ([URL: UIImage]) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             await images(at: urls, scale: scale)
@@ -206,7 +206,7 @@ extension POImagesRepository {
     @discardableResult
     public func images(
         at urls: [URL],
-        completion: @escaping ([URL: UIImage]) -> Void
+        completion: @escaping @Sendable ([URL: UIImage]) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             await images(at: urls)
@@ -218,7 +218,7 @@ extension POImagesRepository {
     public func image(
         at url: URL?,
         scale: CGFloat = 1,
-        completion: @escaping (UIImage?) -> Void
+        completion: @escaping @Sendable (UIImage?) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             await image(at: url, scale: scale)
@@ -231,7 +231,7 @@ extension POImagesRepository {
         at url1: URL?,
         _ url2: URL?,
         scale: CGFloat = 1,
-        completion: @escaping ((UIImage?, UIImage?)) -> Void
+        completion: @escaping @Sendable ((UIImage?, UIImage?)) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             await images(at: url1, url2, scale: scale)
@@ -243,7 +243,7 @@ extension POImagesRepository {
     @discardableResult
     public func image(
         resource: POImageRemoteResource,
-        completion: @escaping (UIImage?) -> Void
+        completion: @escaping @Sendable (UIImage?) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             await image(resource: resource)
@@ -257,7 +257,7 @@ extension POInvoicesService {
     @discardableResult
     public func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<PONativeAlternativePaymentMethodTransactionDetails, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await nativeAlternativePaymentMethodTransactionDetails(request: request)
@@ -271,7 +271,7 @@ extension POInvoicesService {
     @discardableResult
     public func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<PONativeAlternativePaymentMethodResponse, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await initiatePayment(request: request)
@@ -282,7 +282,7 @@ extension POInvoicesService {
     @discardableResult
     public func invoice(
         request: POInvoiceRequest,
-        completion: @escaping (Result<POInvoice, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POInvoice, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await invoice(request: request)
@@ -294,7 +294,7 @@ extension POInvoicesService {
     public func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
         threeDSService: PO3DSService,
-        completion: @escaping (Result<Void, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<Void, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await authorizeInvoice(request: request, threeDSService: threeDSService)
@@ -305,7 +305,7 @@ extension POInvoicesService {
     @discardableResult
     public func captureNativeAlternativePayment(
         request: PONativeAlternativePaymentCaptureRequest,
-        completion: @escaping (Result<Void, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<Void, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await captureNativeAlternativePayment(request: request)
@@ -317,7 +317,7 @@ extension POInvoicesService {
     @discardableResult
     public func createInvoice(
         request: POInvoiceCreationRequest,
-        completion: @escaping (Result<POInvoice, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POInvoice, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await createInvoice(request: request)
@@ -326,9 +326,9 @@ extension POInvoicesService {
 }
 
 /// Invokes given completion with a result of async operation.
-private func invoke<T>(
-    completion: @escaping (Result<T, POFailure>) -> Void,
-    after operation: @escaping () async throws -> T
+private func invoke<T: Sendable>(
+    completion: @escaping @Sendable (Result<T, POFailure>) -> Void,
+    after operation: @escaping @Sendable () async throws -> T
 ) -> POCancellable {
     Task { @MainActor in
         do {
@@ -344,7 +344,10 @@ private func invoke<T>(
 }
 
 /// Invokes given completion with a result of async operation.
-private func invoke<T>(completion: @escaping (T) -> Void, after operation: @escaping () async -> T) -> Task<Void, Never> {
+private func invoke<T: Sendable>(
+    completion: @escaping @Sendable (T) -> Void,
+    after operation: @escaping @Sendable () async -> T
+) -> Task<Void, Never> {
     Task { @MainActor in
         completion(await operation())
     }
