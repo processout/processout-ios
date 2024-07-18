@@ -14,7 +14,7 @@ import Foundation
 ///
 /// - NOTE: Make sure to supply proper `additionalData` specific for particular payment
 /// method.
-public struct POAlternativePaymentMethodRequest {
+public struct POAlternativePaymentMethodRequest: Sendable {
 
     /// Invoice identifier to to perform APM payment for.
     public let invoiceId: String

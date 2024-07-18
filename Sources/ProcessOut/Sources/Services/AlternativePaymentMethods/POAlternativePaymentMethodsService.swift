@@ -11,7 +11,7 @@ import Foundation
 public typealias POAlternativePaymentMethodsServiceType = POAlternativePaymentMethodsService
 
 /// Service that provides set of methods to work with alternative payments.
-public protocol POAlternativePaymentMethodsService {
+public protocol POAlternativePaymentMethodsService: POService {
 
     /// Creates the redirection URL for APM Payments and APM token creation.
     ///

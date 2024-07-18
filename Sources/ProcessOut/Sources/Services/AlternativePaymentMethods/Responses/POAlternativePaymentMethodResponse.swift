@@ -8,9 +8,9 @@
 import Foundation
 
 /// Result of alternative payment.
-public struct POAlternativePaymentMethodResponse {
+public struct POAlternativePaymentMethodResponse: Sendable {
 
-    public enum APMReturnType {
+    public enum APMReturnType: Sendable {
         case authorization, createToken
     }
 

@@ -9,6 +9,7 @@ import Foundation
 import PassKit
 
 /// Apple pay card details.
+@MainActor
 public struct POApplePayCardTokenizationRequest {
 
     /// Payment information.
