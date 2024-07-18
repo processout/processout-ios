@@ -94,7 +94,7 @@ final class UrlSessionHttpConnector: HttpConnector {
     }
 }
 
-private struct Response: Decodable {
+private struct Response: Decodable, Sendable {
 
     /// Indicates whether request was processed successfully.
     let success: Bool
