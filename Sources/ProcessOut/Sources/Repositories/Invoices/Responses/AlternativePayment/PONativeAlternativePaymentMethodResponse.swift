@@ -7,12 +7,12 @@
 
 import Foundation
 
-public struct PONativeAlternativePaymentMethodResponse: Decodable {
+public struct PONativeAlternativePaymentMethodResponse: Decodable, Sendable {
 
     @available(*, deprecated, message: "Use PONativeAlternativePaymentMethodParameterValues directly.")
     public typealias NativeAlternativePaymentMethodParameterValues = PONativeAlternativePaymentMethodParameterValues
 
-    public struct NativeApm: Decodable {
+    public struct NativeApm: Decodable, Sendable {
 
         /// Payment's state.
         public let state: PONativeAlternativePaymentMethodState

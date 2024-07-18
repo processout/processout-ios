@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct ThreeDSCustomerAction: Decodable {
+struct ThreeDSCustomerAction: Decodable, Sendable {
 
-    enum ActionType: String, Decodable {
+    enum ActionType: String, Decodable, Sendable {
 
         /// Device fingerprint is required.
         case fingerprintMobile = "fingerprint-mobile"

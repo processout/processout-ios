@@ -8,7 +8,7 @@
 import Foundation
 
 /// Native alternative payment parameter values.
-public struct PONativeAlternativePaymentMethodParameterValues: Decodable {
+public struct PONativeAlternativePaymentMethodParameterValues: Decodable, Sendable {
 
     /// Message.
     public let message: String?
