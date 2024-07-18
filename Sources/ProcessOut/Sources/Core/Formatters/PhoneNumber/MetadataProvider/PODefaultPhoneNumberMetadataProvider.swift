@@ -7,7 +7,7 @@
 
 import Foundation
 
-@_spi(PO) 
+@_spi(PO)
 public final class PODefaultPhoneNumberMetadataProvider: POPhoneNumberMetadataProvider {
 
     public static let shared = PODefaultPhoneNumberMetadataProvider()
