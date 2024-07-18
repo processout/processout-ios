@@ -8,6 +8,7 @@ settings:
   SUPPORTS_MACCATALYST: false
   LOCALIZED_STRING_MACRO_NAMES: "$(inherited) POStringResource"
   LOCALIZATION_PREFERS_STRING_CATALOGS: true
+  SWIFT_STRICT_CONCURRENCY: complete
 options:
   transitivelyLinkDependencies: true
 packages:
