@@ -13,9 +13,9 @@ public typealias ProcessOutApiConfiguration = ProcessOutConfiguration
 /// Defines configuration parameters that are used to create API singleton. In order to create instance
 /// of this structure one should use ``ProcessOutConfiguration/production(projectId:appVersion:isDebug:)``
 /// method.
-public struct ProcessOutConfiguration {
+public struct ProcessOutConfiguration: Sendable {
 
-    public struct Application {
+    public struct Application: Sendable {
 
         /// Application name.
         public let name: String?
