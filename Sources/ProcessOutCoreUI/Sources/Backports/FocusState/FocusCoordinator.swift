@@ -7,10 +7,12 @@
 
 import SwiftUI
 
+@MainActor
 final class FocusCoordinator: ObservableObject {
 
     /// Holds boolean value indicating whether tracked control is currently being edited.
-    @Published private(set) var isEditing = false
+    @Published
+    private(set) var isEditing = false
 
     func track(control: UIControl) {
         guard self.control == nil else {
