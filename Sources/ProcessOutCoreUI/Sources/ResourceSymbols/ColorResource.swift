@@ -11,7 +11,7 @@ import SwiftUI
 
 /// A color resource.
 /// - NOTE: This type wraps natively generated `ColorResource` to make resources publicly accessible.
-@_spi(PO) public struct POColorResource {
+@_spi(PO) public struct POColorResource: Sendable {
 
     fileprivate init(_ colorResource: ColorResource) {
         self.colorResource = colorResource
