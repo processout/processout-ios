@@ -31,5 +31,6 @@ private struct BlinkViewModifier: ViewModifier {
 
     // MARK: - Private Properties
 
-    @State private var isVisible = true
+    @State
+    private var isVisible = true
 }

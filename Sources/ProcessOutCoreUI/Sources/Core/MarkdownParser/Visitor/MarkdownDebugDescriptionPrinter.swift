@@ -7,17 +7,7 @@
 
 #if DEBUG
 
-import Foundation
-
-extension MarkdownBaseNode: CustomDebugStringConvertible {
-
-    var debugDescription: String {
-        let visitor = MarkdownDebugDescriptionPrinter()
-        return self.accept(visitor: visitor)
-    }
-}
-
-private final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
+final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
 
     init(level: Int = 0) {
         self.level = level
@@ -81,11 +71,7 @@ private final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
     }
 
     func visit(codeBlock: MarkdownCodeBlock) -> String {
-        var attributes: [String: CustomStringConvertible] = [:]
-        if let info = codeBlock.info {
-            attributes["info"] = info
-        }
-        return description(node: codeBlock, nodeName: "Code Block", attributes: attributes, content: codeBlock.code)
+        description(node: codeBlock, nodeName: "Code Block", content: codeBlock.code)
     }
 
     func visit(thematicBreak: MarkdownThematicBreak) -> String {
@@ -144,6 +130,14 @@ private final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
             descriptionComponents.append(node.accept(visitor: childVisitor))
         }
         return descriptionComponents.joined(separator: "\n")
+    }
+}
+
+extension MarkdownBaseNode: CustomDebugStringConvertible {
+
+    var debugDescription: String {
+        let visitor = MarkdownDebugDescriptionPrinter()
+        return self.accept(visitor: visitor)
     }
 }
 
