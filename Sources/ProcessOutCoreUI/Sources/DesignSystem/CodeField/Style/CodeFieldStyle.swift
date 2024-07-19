@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 protocol CodeFieldStyle {
 
     /// A view that represents the body of a button.

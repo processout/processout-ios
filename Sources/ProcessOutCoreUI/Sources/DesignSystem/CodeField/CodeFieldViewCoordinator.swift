@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 final class CodeFieldViewCoordinator {
 
     var representable: CodeFieldRepresentable! // swiftlint:disable:this implicitly_unwrapped_optional

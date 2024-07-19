@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Defines input control style in both normal and error states.
-public struct POInputStyle {
+public struct POInputStyle: Sendable {
 
     /// Style for normal state.
     public let normal: POInputStateStyle

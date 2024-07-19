@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Describes radio button knob style in a particular state.
-public struct PORadioButtonKnobStateStyle {
+public struct PORadioButtonKnobStateStyle: Sendable {
 
     /// Background color.
     public let backgroundColor: Color

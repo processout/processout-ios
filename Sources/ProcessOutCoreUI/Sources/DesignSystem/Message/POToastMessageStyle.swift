@@ -11,7 +11,7 @@ import SwiftUI
 public struct POToastMessageStyle: POMessageViewStyle {
 
     /// Style for specific severity.
-    public struct Severity {
+    public struct Severity: Sendable {
 
         /// Icon image.
         public let icon: Image?

@@ -24,8 +24,7 @@ public struct POCodeField: View {
             focusCoordinator.beginEditing()
             textIndex = newIndex
         }
-        style
-            .makeBody(configuration: configuration)
+        AnyView(style.makeBody(configuration: configuration))
             .background(
                 CodeFieldRepresentable(
                     length: length, text: $text, textIndex: $textIndex, isMenuVisible: $isMenuVisible

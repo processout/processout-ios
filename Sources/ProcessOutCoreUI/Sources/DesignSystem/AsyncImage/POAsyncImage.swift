@@ -8,7 +8,6 @@
 import SwiftUI
 
 @_spi(PO)
-@MainActor
 @available(iOS 14, *)
 public struct POAsyncImage<Content: View>: View {
 
