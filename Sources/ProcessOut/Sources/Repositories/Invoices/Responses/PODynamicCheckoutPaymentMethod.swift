@@ -137,6 +137,35 @@ public enum PODynamicCheckoutPaymentMethod {
         public let collectionMode: POBillingAddressCollectionMode
     }
 
+    // MARK: - Customer Tokens
+
+    public struct CustomerToken {
+
+        /// Payment method ID.
+        @_spi(PO)
+        public var id: String {
+            configuration.customerTokenId
+        }
+
+        /// Display information.
+        public let display: Display
+
+        /// Payment flow.
+        public let flow: Flow?
+
+        /// Payment configuration.
+        public let configuration: CustomerTokenConfiguration
+    }
+
+    public struct CustomerTokenConfiguration: Decodable {
+
+        /// Customer token ID.
+        public let customerTokenId: String
+
+        /// Redirect URL.
+        public let redirectUrl: URL?
+    }
+
     // MARK: - Unknown
 
     public struct Unknown {
@@ -179,6 +208,9 @@ public enum PODynamicCheckoutPaymentMethod {
     /// Card.
     case card(Card)
 
+    /// Customer token.
+    case customerToken(CustomerToken)
+
     /// Unknown payment method.
     case unknown(Unknown)
 }
@@ -200,6 +232,17 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
             }
         case "card":
             self = .card(try Card(from: decoder))
+        case "card_customer_token":
+            let customerToken = try CustomerToken(from: decoder)
+            self = .customerToken(customerToken)
+        case "apm_customer_token":
+            do {
+                let alternativePayment = try AlternativePayment(from: decoder)
+                self = .alternativePayment(alternativePayment)
+            } catch {
+                let customerToken = try CustomerToken(from: decoder)
+                self = .customerToken(customerToken)
+            }
         default:
             self = .unknown(Unknown(type: type))
         }
@@ -209,6 +252,32 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
 
     private enum CodingKeys: String, CodingKey {
         case type
+    }
+}
+
+extension PODynamicCheckoutPaymentMethod.CustomerToken: Decodable {
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        display = try container.decode(
+            PODynamicCheckoutPaymentMethod.Display.self, forKey: .display
+        )
+        flow = try container.decodeIfPresent(
+            PODynamicCheckoutPaymentMethod.Flow.self, forKey: .flow
+        )
+        do {
+            configuration = try container.decode(Configuration.self, forKey: .cardCustomerToken)
+        } catch {
+            configuration = try container.decode(Configuration.self, forKey: .apmCustomerToken)
+        }
+    }
+
+    // MARK: - Private Nested Types
+
+    private typealias Configuration = PODynamicCheckoutPaymentMethod.CustomerTokenConfiguration
+
+    private enum CodingKeys: String, CodingKey {
+        case display, flow, cardCustomerToken, apmCustomerToken
     }
 }
 
@@ -225,6 +294,8 @@ extension PODynamicCheckoutPaymentMethod {
         case .nativeAlternativePayment(let method):
             return method.id
         case .card(let method):
+            return method.id
+        case .customerToken(let method):
             return method.id
         case .unknown(let method):
             assertionFailure("It is considered an error to request an ID for unknown payment method.")
