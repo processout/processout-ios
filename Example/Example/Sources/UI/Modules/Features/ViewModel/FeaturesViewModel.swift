@@ -157,7 +157,7 @@ extension FeaturesViewModel: PODynamicCheckoutDelegate {
         ]
     }
 
-    func dynamicCheckout(newInvoiceFor invoice: POInvoice) async -> POInvoice? {
+    func dynamicCheckout(newInvoiceFor invoice: POInvoice) async -> String? {
         let request = POInvoiceCreationRequest(
             name: "Example",
             amount: invoice.amount.description,
@@ -165,7 +165,7 @@ extension FeaturesViewModel: PODynamicCheckoutDelegate {
             returnUrl: invoice.returnUrl,
             customerId: Constants.customerId
         )
-        return try? await invoicesService.createInvoice(request: request)
+        return try? await invoicesService.createInvoice(request: request).id
     }
 }
 
