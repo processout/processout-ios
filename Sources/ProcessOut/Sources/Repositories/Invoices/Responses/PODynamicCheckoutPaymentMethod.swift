@@ -232,17 +232,9 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
             }
         case "card":
             self = .card(try Card(from: decoder))
-        case "card_customer_token":
+        case "card_customer_token", "apm_customer_token":
             let customerToken = try CustomerToken(from: decoder)
             self = .customerToken(customerToken)
-        case "apm_customer_token":
-            do {
-                let alternativePayment = try AlternativePayment(from: decoder)
-                self = .alternativePayment(alternativePayment)
-            } catch {
-                let customerToken = try CustomerToken(from: decoder)
-                self = .customerToken(customerToken)
-            }
         default:
             self = .unknown(Unknown(type: type))
         }
