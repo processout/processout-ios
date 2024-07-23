@@ -162,7 +162,7 @@ public enum PODynamicCheckoutPaymentMethod {
         /// Customer token ID.
         public let customerTokenId: String
 
-        /// Redirect URL.
+        /// Property is set to non-nil value when redirect is required to authorize alternative payment.
         public let redirectUrl: URL?
     }
 
