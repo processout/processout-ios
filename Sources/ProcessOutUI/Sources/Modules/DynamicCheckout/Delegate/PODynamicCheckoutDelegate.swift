@@ -28,9 +28,9 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
     /// Default implementation returns `true`.
     func dynamicCheckout(shouldContinueAfter failure: POFailure) -> Bool
 
-    /// Your implementation could return new invoice to replace existing one to be able to recover from
+    /// Your implementation could return new invoice ID to replace existing one to be able to recover from
     /// normally unrecoverable payment failure.
-    func dynamicCheckout(newInvoiceFor invoice: POInvoice) async -> POInvoice?
+    func dynamicCheckout(newInvoiceFor invoice: POInvoice) async -> String?
 
     // MARK: - Card Payment
 
@@ -70,7 +70,7 @@ extension PODynamicCheckoutDelegate {
         true
     }
 
-    public func dynamicCheckout(newInvoiceFor invoice: POInvoice) async -> POInvoice? {
+    public func dynamicCheckout(newInvoiceFor invoice: POInvoice) async -> String? {
         nil
     }
 
