@@ -9,7 +9,7 @@
 public struct POInvoiceRequest {
 
     /// Requested invoice ID.
-    public let id: String
+    public let invoiceId: String
 
     /// A secret key associated with the client making the request.
     ///
@@ -18,8 +18,8 @@ public struct POInvoiceRequest {
     public let clientSecret: String?
 
     /// Creates request instance.
-    public init(id: String, clientSecret: String? = nil) {
-        self.id = id
+    public init(invoiceId: String, clientSecret: String? = nil) {
+        self.invoiceId = invoiceId
         self.clientSecret = clientSecret
     }
 }

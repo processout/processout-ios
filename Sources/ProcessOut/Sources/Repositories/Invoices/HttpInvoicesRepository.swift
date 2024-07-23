@@ -48,7 +48,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
             "X-Processout-Client-Secret": request.clientSecret
         ]
         let httpRequest = HttpConnectorRequest<Response>.get(
-            path: "/invoices/\(request.id)",
+            path: "/invoices/\(request.invoiceId)",
             headers: headers.compactMapValues { $0 }
         )
         return try await connector.execute(request: httpRequest).invoice

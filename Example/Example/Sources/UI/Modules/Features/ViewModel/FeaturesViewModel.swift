@@ -101,7 +101,7 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
                 return
             }
             let configuration = PODynamicCheckoutConfiguration(
-                invoiceRequest: .init(id: invoice.id, clientSecret: invoice.clientSecret),
+                invoiceRequest: .init(invoiceId: invoice.id, clientSecret: invoice.clientSecret),
                 alternativePayment: .init(returnUrl: Constants.returnUrl),
                 cancelButton: .init(confirmation: .init())
             )
@@ -168,7 +168,7 @@ extension FeaturesViewModel: PODynamicCheckoutDelegate {
         guard let invoice = try? await invoicesService.createInvoice(request: request) else {
             return nil
         }
-        return .init(id: invoice.id, clientSecret: invoice.clientSecret)
+        return .init(invoiceId: invoice.id, clientSecret: invoice.clientSecret)
     }
 }
 
