@@ -41,8 +41,8 @@ extension PKPaymentNetwork {
             .visa: .visa,
             .vPay: .vPay,
             .girocard: .girocard,
-            .unknown("eftpos"): .eftpos,
-            .unknown("barcode"): .barcode
+            "eftpos": .eftpos,
+            "barcode": .barcode
         ]
         if #available(iOS 17.4, *) {
             schemes[.meeza] = .meeza

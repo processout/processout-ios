@@ -6,146 +6,180 @@
 //
 
 /// Possible card schemes and co-schemes.
-public enum POCardScheme: Codable, Hashable { // sourcery: AutoStringRepresentable
+public struct POCardScheme: Hashable, RawRepresentable, ExpressibleByStringLiteral, Sendable {
+
+    public init(rawValue: String) {
+        self.rawValue = rawValue
+    }
+
+    @_disfavoredOverload
+    public init(stringLiteral value: String) {
+        self.rawValue = value
+    }
+
+    public let rawValue: String
+}
+
+extension POCardScheme {
 
     /// Visa is the largest global card network in the world by transaction value, ubiquitous worldwide.
-    case visa
+    public static let visa: POCardScheme = "visa"
 
     /// Cartes Bancaires is France's local card scheme and the most widely used payment method in the region.
-    case carteBancaire // sourcery: rawValue = "carte bancaire"
+    public static let carteBancaire: POCardScheme = "carte bancaire"
 
     /// Mastercard is a market leading card scheme worldwide.
-    case mastercard
+    public static let mastercard: POCardScheme = "mastercard"
 
     /// American Express is a key credit card around the world.
-    case amex // sourcery: rawValue = "american express"
+    public static let amex: POCardScheme = "american express"
 
     /// UnionPay is the world’s biggest card network with more than 7 billion cards issued.
-    case unionPay // sourcery: rawValue = "china union pay"
+    public static let unionPay: POCardScheme = "china union pay"
 
     /// Diners charge card.
-    case dinersClub // sourcery: rawValue = "diners club"
+    public static let dinersClub: POCardScheme = "diners club"
 
     /// Diners charge card.
-    case dinersClubCarteBlanche // sourcery: rawValue = "diners club carte blanche"
+    public static let dinersClubCarteBlanche: POCardScheme = "diners club carte blanche"
 
     /// Diners charge card.
-    case dinersClubInternational // sourcery: rawValue = "diners club international"
+    public static let dinersClubInternational: POCardScheme = "diners club international"
 
     /// Diners charge card.
-    case dinersClubUnitedStatesAndCanada // sourcery: rawValue = "diners club united states & canada"
+    public static let dinersClubUnitedStatesAndCanada: POCardScheme = "diners club united states & canada"
 
     /// Discover is a credit card brand issued primarily in the United States.
-    case discover
+    public static let discover: POCardScheme = "discover"
 
     /// JCB is a major card issuer and acquirer from Japan.
-    case jcb
+    public static let jcb: POCardScheme = "jcb"
 
     /// Maestro is a brand of debit cards and prepaid cards owned by Mastercard.
-    case maestro
+    public static let maestro: POCardScheme = "maestro"
 
     /// The Dankort is the national debit card of Denmark.
-    case dankort
+    public static let dankort: POCardScheme = "dankort"
 
     /// Verve is Africa's most successful card brand.
-    case verve
+    public static let verve: POCardScheme = "verve"
 
     /// RuPay is an Indian multinational financial services and payment service system.
-    case rupay
+    public static let rupay: POCardScheme = "rupay"
 
     /// Domestic debit and credit card brand of Brazil.
-    case cielo, elo, hipercard, ourocard, aura, comprocard
+    public static let cielo: POCardScheme = "cielo"
+
+    /// Domestic debit and credit card brand of Brazil.
+    public static let elo: POCardScheme = "elp"
+
+    /// Domestic debit and credit card brand of Brazil.
+    public static let hipercard: POCardScheme = "hipercard"
+
+    /// Domestic debit and credit card brand of Brazil.
+    public static let ourocard: POCardScheme = "ourocard"
+
+    /// Domestic debit and credit card brand of Brazil.
+    public static let aura: POCardScheme = "aura"
+
+    /// Domestic debit and credit card brand of Brazil.
+    public static let comprocard: POCardScheme = "comprocard"
 
     /// Cabal is a local credit and debit card payment method based in Argentina.
-    case cabal
+    public static let cabal: POCardScheme = "cabal"
 
     /// The New York Currency Exchange (NYCE) is an interbank network connecting the ATMs of various
     /// financial institutions in the United States and Canada.
-    case nyce
+    public static let nyce: POCardScheme = "nyce"
 
     /// Mastercard Cirrus is a worldwide interbank network that provides cash to Mastercard cardholders.
-    case cirrus
+    public static let cirrus: POCardScheme = "cirrus"
 
     /// TROY (acronym of Türkiye’nin Ödeme Yöntemi) is a Turkish card scheme
-    case troy
+    public static let troy: POCardScheme = "troy"
 
     /// Pay is a Single Euro Payments Area (SEPA) debit card for use in Europe, issued by Visa Europe.
     /// It uses the EMV chip and PIN system and may be co-branded with various national debit card schemes
     /// such as the German Girocard.
-    case vPay // sourcery: rawValue = "vpay"
+    public static let vPay: POCardScheme = "vpay"
 
     /// Carnet is a leading brand of Mexican acceptance, with more than 50 years of experience.
-    case carnet
+    public static let carnet: POCardScheme = "carnet"
 
     /// GE Capital is the financial services division of General Electric.
-    case geCapital // sourcery: rawValue = "ge capital"
+    public static let geCapital: POCardScheme = "ge capital"
 
     /// UK Credit Cards issued by NewDay.
-    case newday
+    public static let newday: POCardScheme = "newday"
 
     /// Sodexo is a company that offers prepaid meal cards and other prepaid services.
-    case sodexo
+    public static let sodexo: POCardScheme = "sodexo"
 
     /// South Korean domestic card brand with international acceptance.
-    case globalBc // sourcery: rawValue = "global bc"
+    public static let globalBc: POCardScheme = "global bc"
 
     /// DinaCard is a national payment card of the Republic of Serbia.
-    case dinaCard // sourcery: rawValue = "dinacard"
+    public static let dinaCard: POCardScheme = "dinacard"
 
     /// Mada is the national payment scheme of Saudi Arabia
-    case mada
+    public static let mada: POCardScheme = "mada"
 
     /// Bancontact is the most popular online payment method in Belgium.
-    case bancontact
+    public static let bancontact: POCardScheme = "bancontact"
 
     /// Giropay is an Internet payment System in Germany
-    case giropay
+    public static let giropay: POCardScheme = "giropay"
 
     /// A private label credit card is a type of credit card that is branded for a specific retailer or brand.
-    case privateLabel // sourcery: rawValue = "private label"
+    public static let privateLabel: POCardScheme = "private label"
 
     /// A private label credit card that is branded for Atos.
-    case atosPrivateLabel // sourcery: rawValue = "atos private label"
+    public static let atosPrivateLabel: POCardScheme = "atos private label"
 
     /// An Electron debit card.
-    case electron
+    public static let electron: POCardScheme = "electron"
 
     /// An iD payment card.
-    case idCredit
+    public static let idCredit: POCardScheme = "idCredit"
 
     /// The Interac payment method.
-    case interac
+    public static let interac: POCardScheme = "interac"
 
     /// A QUICPay payment card.
-    case quicPay
+    public static let quicPay: POCardScheme = "quicPay"
 
     /// A Suica payment card.
-    case suica
+    public static let suica: POCardScheme = "suica"
 
     /// A Girocard payment method.
-    case girocard
+    public static let girocard: POCardScheme = "girocard"
 
     /// A Meeza payment card.
-    case meeza
+    public static let meeza: POCardScheme = "meeza"
 
     /// A Bancomat payment card.
-    case pagoBancomat
+    public static let pagoBancomat: POCardScheme = "pagoBancomat"
 
     /// The TMoney card.
-    case tmoney
+    public static let tmoney: POCardScheme = "tmoney"
 
     /// A PostFinance AG payment card.
-    case postFinance
+    public static let postFinance: POCardScheme = "postFinance"
 
     /// A Nanaco payment card.
-    case nanaco
+    public static let nanaco: POCardScheme = "nanaco"
 
     /// A WAON payment card.
-    case waon
+    public static let waon: POCardScheme = "waon"
 
     /// A Mir payment card.
-    case mir // rawValue = "nspk mir"
+    public static let mir: POCardScheme = "nspk mir"
+}
 
-    /// Unknown card scheme.
-    case unknown(String)
+extension POCardScheme: Decodable {
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        rawValue = try container.decode(String.self)
+    }
 }
