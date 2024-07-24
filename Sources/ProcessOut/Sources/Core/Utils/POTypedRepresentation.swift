@@ -16,7 +16,7 @@ public struct POTypedRepresentation<Wrapped, Representation: RawRepresentable> {
         self._wrappedValue = wrappedValue
     }
 
-    @available(*, deprecated, message: "Use typed representation accessible via projectedValue.typed() instead.")
+    @available(*, deprecated, message: "Use typed representation accessible via projectedValue.typed instead.")
     public var wrappedValue: Wrapped {
         get { _wrappedValue }
         set { _wrappedValue = newValue }
@@ -26,19 +26,25 @@ public struct POTypedRepresentation<Wrapped, Representation: RawRepresentable> {
         self
     }
 
-    /// Returns typed representation of self.
-    public func typed() -> Representation where Representation.RawValue == Wrapped {
-        Representation(rawValue: _wrappedValue)! // swiftlint:disable:this force_unwrapping
-    }
-
-    /// Returns typed representation of self.
-    public func typed<T>() -> Representation? where Wrapped == T?, Representation.RawValue == T {
-        _wrappedValue.flatMap { Representation(rawValue: $0) }
-    }
-
     // MARK: - Private Properties
 
     private var _wrappedValue: Wrapped
+}
+
+extension POTypedRepresentation where Representation.RawValue == Wrapped {
+
+    /// Returns typed representation of self.
+    public var typed: Representation {
+        Representation(rawValue: _wrappedValue)! // swiftlint:disable:this force_unwrapping
+    }
+}
+
+extension POTypedRepresentation where Representation.RawValue? == Wrapped {
+
+    /// Returns typed representation of self.
+    public var typed: Representation? {
+        _wrappedValue.flatMap { Representation(rawValue: $0) }
+    }
 }
 
 extension POTypedRepresentation: Hashable where Wrapped: Hashable {

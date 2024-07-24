@@ -151,7 +151,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func cardNumberIcon(startedState: InteractorState.Started) -> Image? {
         let scheme = startedState.issuerInformation?.coScheme != nil
             ? startedState.preferredScheme
-            : startedState.issuerInformation?.$scheme.typed()
+            : startedState.issuerInformation?.$scheme.typed
         return scheme.flatMap(CardSchemeImageProvider.shared.image)
     }
 
@@ -175,7 +175,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                 get: { startedState.preferredScheme?.rawValue },
                 set: { [weak self] newValue in
                     let newScheme = newValue.map(POCardScheme.init)
-                    self?.interactor.setPreferredScheme(newScheme ?? issuerInformation.$scheme.typed())
+                    self?.interactor.setPreferredScheme(newScheme ?? issuerInformation.$scheme.typed)
                 }
             ),
             preferrsInline: true

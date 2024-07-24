@@ -126,11 +126,11 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     @MainActor
     private func setStartedStateUnchecked(cardInfo: POCardUpdateInformation?) {
-        cardSecurityCodeFormatter.scheme = cardInfo?.$scheme.typed()
+        cardSecurityCodeFormatter.scheme = cardInfo?.$scheme.typed
         let startedState = State.Started(
             cardNumber: cardInfo?.maskedNumber,
-            scheme: cardInfo?.$scheme.typed(),
-            coScheme: cardInfo?.$coScheme.typed(),
+            scheme: cardInfo?.$scheme.typed,
+            coScheme: cardInfo?.$coScheme.typed,
             preferredScheme: preferredScheme(cardInfo: cardInfo),
             formatter: cardSecurityCodeFormatter
         )
@@ -175,9 +175,9 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     /// - NOTE: Method updates interactor's CSC formatter as well.
     private func update(state: inout State.Started, with issuerInformation: POCardIssuerInformation) {
-        cardSecurityCodeFormatter.scheme = issuerInformation.$scheme.typed()
-        state.scheme = issuerInformation.$scheme.typed()
-        state.coScheme = issuerInformation.$coScheme.typed()
+        cardSecurityCodeFormatter.scheme = issuerInformation.$scheme.typed
+        state.scheme = issuerInformation.$scheme.typed
+        state.coScheme = issuerInformation.$coScheme.typed
         state.preferredScheme = state.preferredScheme ?? preferredScheme(issuerInformation: issuerInformation)
         state.cvc = cardSecurityCodeFormatter.string(from: state.cvc)
     }
@@ -263,12 +263,12 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         cardInfo: POCardUpdateInformation? = nil,
         issuerInformation: POCardIssuerInformation? = nil
     ) -> POCardScheme? {
-        if let scheme = cardInfo?.$preferredScheme.typed() {
+        if let scheme = cardInfo?.$preferredScheme.typed {
             return scheme
         }
         guard configuration.isSchemeSelectionAllowed else {
             return nil
         }
-        return cardInfo?.$scheme.typed() ?? issuerInformation?.$scheme.typed()
+        return cardInfo?.$scheme.typed ?? issuerInformation?.$scheme.typed
     }
 }

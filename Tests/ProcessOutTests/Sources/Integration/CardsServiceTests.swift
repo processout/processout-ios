@@ -27,7 +27,7 @@ final class CardsServiceTests: XCTestCase {
         XCTAssertEqual(information.bankName, "UNITED CITIZENS BANK OF SOUTHERN KENTUCKY")
         XCTAssertEqual(information.brand, "visa business")
         XCTAssertEqual(information.category, "commercial")
-        XCTAssertEqual(information.$scheme.typed(), .visa)
+        XCTAssertEqual(information.$scheme, .visa)
         XCTAssertEqual(information.type, "debit")
     }
 
@@ -99,7 +99,7 @@ final class CardsServiceTests: XCTestCase {
         )
 
         // Then
-        XCTAssertEqual(updatedCard.$preferredScheme.typed(), .unknown("test"))
+        XCTAssertEqual(updatedCard.$preferredScheme, .unknown("test"))
     }
 
     func test_tokenize_whenPreferredSchemeIsSet() async throws {
