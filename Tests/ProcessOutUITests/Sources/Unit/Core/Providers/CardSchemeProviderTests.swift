@@ -13,9 +13,9 @@ final class CardSchemeProviderTests: XCTestCase {
     override func setUp() {
         super.setUp()
         let issuers: [CardSchemeProvider.Issuer] = [
-            .init(scheme: .unknown("range"), numbers: .range(10...11), length: 2),
-            .init(scheme: .unknown("exact"), numbers: .exact(1), length: 1),
-            .init(scheme: .unknown("set"), numbers: .set([2, 4]), length: 1)
+            .init(scheme: "range", numbers: .range(10...11), length: 2),
+            .init(scheme: "exact", numbers: .exact(1), length: 1),
+            .init(scheme: "set", numbers: .set([2, 4]), length: 1)
         ]
         sut = CardSchemeProvider(issuers: issuers)
     }
