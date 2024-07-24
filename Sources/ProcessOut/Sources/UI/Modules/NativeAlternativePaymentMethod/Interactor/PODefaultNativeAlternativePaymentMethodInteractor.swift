@@ -91,7 +91,7 @@ import UIKit
             isSubmitAllowed: isSubmitAllowed(values: updatedValues)
         )
         state = .started(updatedStartedState)
-        send(event: .parametersChanged)
+        send(event: .parametersChanged(.init(parameter: parameter, value: formattedValue)))
         logger.debug("Did update parameter value '\(value ?? "nil")' for '\(key)' key")
     }
 
@@ -100,7 +100,10 @@ import UIKit
             return
         }
         logger.debug("Will submit payment parameters")
-        send(event: .willSubmitParameters)
+        let willSubmitParametersEvent = PONativeAlternativePaymentMethodEvent.WillSubmitParameters(
+            parameters: startedState.parameters, values: startedState.values.compactMapValues(\.value)
+        )
+        send(event: .willSubmitParameters(willSubmitParametersEvent))
         do {
             let values = try validated(values: startedState.values, for: startedState.parameters)
             let request = PONativeAlternativePaymentMethodRequest(

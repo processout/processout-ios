@@ -10,7 +10,7 @@ import SwiftUI
 extension View {
 
     /// Adds a condition that controls whether button with a `POButtonStyle` should show loading indicator.
-    @_spi(PO) public func buttonBrandColor(_ color: Color) -> some View {
+    @_spi(PO) public func buttonBrandColor(_ color: UIColor) -> some View {
         environment(\.poButtonBrandColor, color)
     }
 }
@@ -18,7 +18,7 @@ extension View {
 extension EnvironmentValues {
 
     /// Brand color of associated third party service. Only ``POBrandButtonStyle`` responds to this property changes.
-    public var poButtonBrandColor: Color {
+    public var poButtonBrandColor: UIColor {
         get { self[Key.self] }
         set { self[Key.self] = newValue }
     }
@@ -26,6 +26,6 @@ extension EnvironmentValues {
     // MARK: - Private Nested Types
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = Color(.Button.Primary.Background.default)
+        static let defaultValue = UIColor(resource: .Button.Primary.Background.default)
     }
 }

@@ -18,8 +18,10 @@ struct DynamicCheckoutRegularPaymentView: View {
             DynamicCheckoutRegularPaymentInfoView(item: item.info)
             if case .card(let item) = item.content {
                 DynamicCheckoutCardView(item: item)
+                    .id(self.item.contentId)
             } else if case .alternativePayment(let item) = item.content {
                 DynamicCheckoutAlternativePaymentView(item: item)
+                    .id(self.item.contentId)
             }
             if let item = item.submitButton {
                 Button(item.title, action: item.action)

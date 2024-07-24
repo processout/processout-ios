@@ -28,19 +28,10 @@ public struct PODynamicCheckoutStyle {
         /// Border style to apply to regular payments.
         public let border: POBorderStyle
 
-        /// Background color to use when payment method is unavailable.
-        public let disabledBackgroundColor: Color
-
-        public init(
-            title: POTextStyle,
-            informationText: POTextStyle,
-            border: POBorderStyle,
-            disabledBackgroundColor: Color
-        ) {
+        public init(title: POTextStyle, informationText: POTextStyle, border: POBorderStyle) {
             self.title = title
             self.informationText = informationText
             self.border = border
-            self.disabledBackgroundColor = disabledBackgroundColor
         }
     }
 

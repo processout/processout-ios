@@ -200,7 +200,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         let request = HttpConnectorRequest<Response>.get(path: "")
 
         // When
-        let value = try await sut.execute(request: request)
+        let value = try await sut.execute(request: request) as Response
 
         // Then
         XCTAssertEqual(value.source, "test")

@@ -53,6 +53,9 @@ enum DynamicCheckoutViewModelItem {
         /// Payment content.
         let content: RegularPaymentContent?
 
+        /// Content ID.
+        let contentId: String
+
         /// Submits payment information.
         let submitButton: POActionsContainerActionViewModel?
     }
@@ -67,9 +70,6 @@ enum DynamicCheckoutViewModelItem {
 
         /// Indicates whether loading indicator should be visible.
         let isLoading: Bool
-
-        /// Defines whether selection could be changed.
-        let isSelectable: Bool
 
         /// Defines whether item is currently selected.
         @Binding

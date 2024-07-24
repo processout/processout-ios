@@ -17,9 +17,11 @@ public enum PODynamicCheckoutPaymentMethod {
 
     public struct ApplePay: Decodable { // sourcery: AutoCodingKeys
 
-        /// Transient ID assigned to method during decoding.
+        /// Payment method ID.
         @_spi(PO)
-        public let id = UUID().uuidString // sourcery:coding: skip
+        public var id: String { // sourcery:coding: skip
+            configuration.merchantId
+        }
 
         /// Payment flow.
         public let flow: Flow?
@@ -48,9 +50,11 @@ public enum PODynamicCheckoutPaymentMethod {
 
     public struct NativeAlternativePayment: Decodable { // sourcery: AutoCodingKeys
 
-        /// Transient ID assigned to method during decoding.
+        /// Payment method ID.
         @_spi(PO)
-        public let id = UUID().uuidString // sourcery:coding: skip
+        public var id: String { // sourcery:coding: skip
+            configuration.gatewayConfigurationId
+        }
 
         /// Display information.
         public let display: Display
@@ -62,19 +66,18 @@ public enum PODynamicCheckoutPaymentMethod {
     public struct NativeAlternativePaymentConfiguration: Decodable {
 
         /// Gateway configuration ID.
-        public let gatewayConfigurationUid: String
-
-        /// Gateway name.
-        public let gatewayName: String
+        public let gatewayConfigurationId: String
     }
 
     // MARK: - APM
 
     public struct AlternativePayment: Decodable { // sourcery: AutoCodingKeys
 
-        /// Transient ID assigned to method during decoding.
+        /// Payment method ID.
         @_spi(PO)
-        public let id = UUID().uuidString // sourcery:coding: skip
+        public var id: String { // sourcery:coding: skip
+            configuration.gatewayConfigurationId
+        }
 
         /// Display information.
         public let display: Display
@@ -88,6 +91,9 @@ public enum PODynamicCheckoutPaymentMethod {
 
     public struct AlternativePaymentConfiguration: Decodable {
 
+        /// Gateway configuration ID.
+        public let gatewayConfigurationId: String
+
         /// Redirect URL.
         public let redirectUrl: URL
     }
@@ -96,9 +102,9 @@ public enum PODynamicCheckoutPaymentMethod {
 
     public struct Card: Decodable { // sourcery: AutoCodingKeys
 
-        /// Transient ID assigned to method during decoding.
+        /// Payment method ID.
         @_spi(PO)
-        public let id = UUID().uuidString // sourcery:coding: skip
+        public let id = "card" // sourcery:coding: skip
 
         /// Display information.
         public let display: Display
@@ -120,6 +126,44 @@ public enum PODynamicCheckoutPaymentMethod {
 
         /// Card billing address collection configuration.
         public let billingAddress: BillingAddressConfiguration
+    }
+
+    public struct BillingAddressConfiguration: Decodable {
+
+        /// List of ISO country codes that is supported for the billing address. When nil, all countries are supported.
+        public let restrictToCountryCodes: Set<String>?
+
+        /// Billing address collection mode.
+        public let collectionMode: POBillingAddressCollectionMode
+    }
+
+    // MARK: - Customer Tokens
+
+    public struct CustomerToken {
+
+        /// Payment method ID.
+        @_spi(PO)
+        public var id: String {
+            configuration.customerTokenId
+        }
+
+        /// Display information.
+        public let display: Display
+
+        /// Payment flow.
+        public let flow: Flow?
+
+        /// Payment configuration.
+        public let configuration: CustomerTokenConfiguration
+    }
+
+    public struct CustomerTokenConfiguration: Decodable {
+
+        /// Customer token ID.
+        public let customerTokenId: String
+
+        /// Property is set to non-nil value when redirect is required to authorize alternative payment.
+        public let redirectUrl: URL?
     }
 
     // MARK: - Unknown
@@ -148,15 +192,6 @@ public enum PODynamicCheckoutPaymentMethod {
         public private(set) var brandColor: UIColor
     }
 
-    public struct BillingAddressConfiguration: Decodable {
-
-        /// List of ISO country codes that is supported for the billing address. When nil, all countries are supported.
-        public let restrictToCountryCodes: Set<String>?
-
-        /// Billing address collection mode.
-        public let collectionMode: POBillingAddressCollectionMode
-    }
-
     public enum Flow: String, Decodable {
         case express
     }
@@ -172,6 +207,9 @@ public enum PODynamicCheckoutPaymentMethod {
 
     /// Card.
     case card(Card)
+
+    /// Customer token.
+    case customerToken(CustomerToken)
 
     /// Unknown payment method.
     case unknown(Unknown)
@@ -194,6 +232,9 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
             }
         case "card":
             self = .card(try Card(from: decoder))
+        case "card_customer_token", "apm_customer_token":
+            let customerToken = try CustomerToken(from: decoder)
+            self = .customerToken(customerToken)
         default:
             self = .unknown(Unknown(type: type))
         }
@@ -203,6 +244,32 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
 
     private enum CodingKeys: String, CodingKey {
         case type
+    }
+}
+
+extension PODynamicCheckoutPaymentMethod.CustomerToken: Decodable {
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        display = try container.decode(
+            PODynamicCheckoutPaymentMethod.Display.self, forKey: .display
+        )
+        flow = try container.decodeIfPresent(
+            PODynamicCheckoutPaymentMethod.Flow.self, forKey: .flow
+        )
+        do {
+            configuration = try container.decode(Configuration.self, forKey: .cardCustomerToken)
+        } catch {
+            configuration = try container.decode(Configuration.self, forKey: .apmCustomerToken)
+        }
+    }
+
+    // MARK: - Private Nested Types
+
+    private typealias Configuration = PODynamicCheckoutPaymentMethod.CustomerTokenConfiguration
+
+    private enum CodingKeys: String, CodingKey {
+        case display, flow, cardCustomerToken, apmCustomerToken
     }
 }
 
@@ -220,7 +287,10 @@ extension PODynamicCheckoutPaymentMethod {
             return method.id
         case .card(let method):
             return method.id
+        case .customerToken(let method):
+            return method.id
         case .unknown(let method):
+            assertionFailure("It is considered an error to request an ID for unknown payment method.")
             return method.id
         }
     }

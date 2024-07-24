@@ -20,11 +20,17 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
     ///
     /// Your implementation may alter request parameters and return new request but make
     /// sure that invoice id and source stay the same.
-    func dynamicCheckout(willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest) async -> PO3DSService
+    func dynamicCheckout(
+        willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest
+    ) async -> PO3DSService
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
     func dynamicCheckout(shouldContinueAfter failure: POFailure) -> Bool
+
+    /// Your implementation could return a request that will be used to fetch new invoice to replace existing one
+    /// to be able to recover from normally unrecoverable payment failure.
+    func dynamicCheckout(newInvoiceFor invoice: POInvoice) async -> POInvoiceRequest?
 
     // MARK: - Card Payment
 
@@ -62,6 +68,10 @@ extension PODynamicCheckoutDelegate {
 
     public func dynamicCheckout(shouldContinueAfter failure: POFailure) -> Bool {
         true
+    }
+
+    public func dynamicCheckout(newInvoiceFor invoice: POInvoice) async -> POInvoiceRequest? {
+        nil
     }
 
     public func dynamicCheckout(didEmitCardTokenizationEvent event: POCardTokenizationEvent) {
