@@ -99,7 +99,7 @@ final class CardsServiceTests: XCTestCase {
         )
 
         // Then
-        XCTAssertEqual(updatedCard.$preferredScheme.typed, .unknown("test"))
+        XCTAssertEqual(updatedCard.$preferredScheme.typed, "test")
     }
 
     func test_tokenize_whenPreferredSchemeIsSet() async throws {
