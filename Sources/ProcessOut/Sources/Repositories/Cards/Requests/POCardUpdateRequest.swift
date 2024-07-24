@@ -25,6 +25,6 @@ public struct POCardUpdateRequest: Encodable {
     public init(cardId: String, cvc: String? = nil, preferredScheme: String? = nil) {
         self._cardId = .init(value: cardId)
         self.cvc = cvc
-        self.preferredScheme = preferredScheme
+        self._preferredScheme = .init(wrappedValue: preferredScheme)
     }
 }

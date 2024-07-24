@@ -51,7 +51,7 @@ public struct POCardTokenizationRequest: Encodable {
         self.cvc = cvc
         self.name = name
         self.contact = contact
-        self.preferredScheme = preferredScheme
+        self._preferredScheme = .init(wrappedValue: preferredScheme)
         self.metadata = metadata
     }
 }

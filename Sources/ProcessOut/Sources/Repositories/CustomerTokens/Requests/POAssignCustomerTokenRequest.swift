@@ -60,7 +60,7 @@ public struct POAssignCustomerTokenRequest: Encodable { // sourcery: AutoCodingK
         self.customerId = customerId
         self.tokenId = tokenId
         self.source = source
-        self.preferredScheme = preferredScheme
+        self._preferredScheme = .init(wrappedValue: preferredScheme)
         self.verify = verify
         self.invoiceId = invoiceId
         self.thirdPartySdkVersion = thirdPartySdkVersion

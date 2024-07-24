@@ -42,8 +42,8 @@ public struct POCardUpdateInformation {
     ) {
         self.maskedNumber = maskedNumber
         self.iin = iin
-        self.scheme = scheme
-        self.coScheme = coScheme
-        self.preferredScheme = preferredScheme
+        self._scheme = .init(wrappedValue: scheme)
+        self._coScheme = .init(wrappedValue: coScheme)
+        self._preferredScheme = .init(wrappedValue: preferredScheme)
     }
 }

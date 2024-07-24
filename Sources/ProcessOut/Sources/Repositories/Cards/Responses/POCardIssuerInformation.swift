@@ -36,8 +36,8 @@ public struct POCardIssuerInformation: Decodable {
         brand: String? = nil,
         category: String? = nil
     ) {
-        self.scheme = scheme.rawValue
-        self.coScheme = coScheme?.rawValue
+        self._scheme = .init(wrappedValue: scheme.rawValue)
+        self._coScheme = .init(wrappedValue: coScheme?.rawValue)
         self.type = type
         self.bankName = bankName
         self.brand = brand

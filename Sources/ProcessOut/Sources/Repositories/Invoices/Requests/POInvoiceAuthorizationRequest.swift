@@ -82,7 +82,7 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
         self.invoiceId = invoiceId
         self.source = source
         self.incremental = incremental
-        self.preferredScheme = preferredScheme
+        self._preferredScheme = .init(wrappedValue: preferredScheme)
         self.thirdPartySdkVersion = thirdPartySdkVersion
         self.invoiceDetailIds = invoiceDetailIds
         self.overrideMacBlocking = overrideMacBlocking

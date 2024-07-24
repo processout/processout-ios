@@ -13,10 +13,14 @@ import Foundation
 public struct POTypedRepresentation<Wrapped, Representation: RawRepresentable> {
 
     public init(wrappedValue: Wrapped) {
-        self.wrappedValue = wrappedValue
+        self._wrappedValue = wrappedValue
     }
 
-    public var wrappedValue: Wrapped
+    @available(*, deprecated, message: "Use typed representation accessible via projectedValue.typed() instead.")
+    public var wrappedValue: Wrapped {
+        get { _wrappedValue }
+        set { _wrappedValue = newValue }
+    }
 
     public var projectedValue: Self {
         self
@@ -24,33 +28,37 @@ public struct POTypedRepresentation<Wrapped, Representation: RawRepresentable> {
 
     /// Returns typed representation of self.
     public func typed() -> Representation where Representation.RawValue == Wrapped {
-        Representation(rawValue: wrappedValue)! // swiftlint:disable:this force_unwrapping
+        Representation(rawValue: _wrappedValue)! // swiftlint:disable:this force_unwrapping
     }
 
     /// Returns typed representation of self.
     public func typed<T>() -> Representation? where Wrapped == T?, Representation.RawValue == T {
-        wrappedValue.flatMap { Representation(rawValue: $0) }
+        _wrappedValue.flatMap { Representation(rawValue: $0) }
     }
+
+    // MARK: - Private Properties
+
+    private var _wrappedValue: Wrapped
 }
 
 extension POTypedRepresentation: Hashable where Wrapped: Hashable {
 
     public func hash(into hasher: inout Hasher) {
-        wrappedValue.hash(into: &hasher)
+        _wrappedValue.hash(into: &hasher)
     }
 }
 
 extension POTypedRepresentation: Equatable where Wrapped: Equatable {
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.wrappedValue == rhs.wrappedValue
+        lhs._wrappedValue == rhs._wrappedValue
     }
 }
 
 extension POTypedRepresentation: Encodable where Wrapped: Encodable {
 
     public func encode(to encoder: any Encoder) throws {
-        try wrappedValue.encode(to: encoder)
+        try _wrappedValue.encode(to: encoder)
     }
 }
 
