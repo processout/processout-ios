@@ -349,5 +349,3 @@ private func invoke<T>(completion: @escaping (T) -> Void, after operation: @esca
         completion(await operation())
     }
 }
-
-// MARK: - AutoStringRepresentable
