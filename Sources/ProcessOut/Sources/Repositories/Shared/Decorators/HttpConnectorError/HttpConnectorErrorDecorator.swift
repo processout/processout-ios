@@ -15,7 +15,7 @@ final class HttpConnectorErrorDecorator: HttpConnector {
         self.failureMapper = failureMapper
     }
 
-    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> Value {
+    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value> {
         do {
             return try await connector.execute(request: request)
         } catch let error as HttpConnectorFailure {

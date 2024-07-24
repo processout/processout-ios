@@ -6,6 +6,7 @@
 //
 
 import PassKit
+import ProcessOut
 
 /// Dynamic checkout configuration.
 @_spi(PO)
@@ -40,8 +41,8 @@ public struct PODynamicCheckoutConfiguration {
         }
     }
 
-    /// Invoice ID to use to initiate a payment.
-    public let invoiceId: String
+    /// Request to fetch invoice to initiate a payment.
+    public let invoiceRequest: POInvoiceRequest
 
     /// Card collection configuration.
     public let card: PODynamicCheckoutCardConfiguration
@@ -67,7 +68,7 @@ public struct PODynamicCheckoutConfiguration {
 
     /// Creates configuration instance.
     public init(
-        invoiceId: String,
+        invoiceRequest: POInvoiceRequest,
         card: PODynamicCheckoutCardConfiguration = .init(),
         alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .init(),
         passKitPaymentButtonType: PKPaymentButtonType = .plain,
@@ -76,7 +77,7 @@ public struct PODynamicCheckoutConfiguration {
         allowsSkippingPaymentList: Bool = true,
         paymentSuccess: PaymentSuccess? = .init()
     ) {
-        self.invoiceId = invoiceId
+        self.invoiceRequest = invoiceRequest
         self.card = card
         self.alternativePayment = alternativePayment
         self.passKitPaymentButtonType = passKitPaymentButtonType

@@ -26,7 +26,7 @@ final class UrlSessionHttpConnector: HttpConnector {
 
     // MARK: - HttpConnectorType
 
-    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> Value {
+    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value> {
         let sessionRequest = try await requestMapper.urlRequest(from: request)
         var logger = self.logger
         logger[attributeKey: "RequestId"] = request.id
@@ -43,7 +43,7 @@ final class UrlSessionHttpConnector: HttpConnector {
             logger.error("Request did fail with unknown error '\(error)'.")
             throw Failure.internal
         }
-        return try decodeValue(Value.self, from: data, response: response, logger: logger)
+        return try decodeResponse(Value.self, from: data, response: response, logger: logger)
     }
 
     // MARK: - Private Properties
@@ -57,9 +57,9 @@ final class UrlSessionHttpConnector: HttpConnector {
 
     // MARK: - Private Methods
 
-    private func decodeValue<Value: Decodable>(
+    private func decodeResponse<Value: Decodable>(
         _ valueType: Value.Type, from data: Data, response: URLResponse, logger: POLogger
-    ) throws -> Value {
+    ) throws -> HttpConnectorResponse<Value> {
         guard let response = response as? HTTPURLResponse else {
             logger.error("Unexpected url response type")
             throw Failure.internal
@@ -68,7 +68,9 @@ final class UrlSessionHttpConnector: HttpConnector {
         logger.debug("Received response: \(responseDescription)")
         do {
             if try decoder.decode(Response.self, from: data).success {
-                return try decoder.decode(Value.self, from: data)
+                let value = try decoder.decode(Value.self, from: data)
+                let headers = response.allHeaderFields as? [String: String] ?? [:]
+                return HttpConnectorResponse(value: value, headers: headers)
             }
             let failure = Failure.server(
                 try decoder.decode(HttpConnectorFailure.Server.self, from: data), statusCode: response.statusCode
