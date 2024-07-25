@@ -5,10 +5,11 @@
 //  Created by Andrii Vysotskyi on 11.06.2024.
 //
 
+// todo(andrii-vysotskyi): remove when updating to 5.0.0
+
 import Foundation
 
 /// Introduces typed version of a property in a backward compatible way.
-/// todo(andrii-vysotskyi): remove when updating to 5.0.0
 @propertyWrapper
 public struct POTypedRepresentation<Wrapped, Representation: RawRepresentable> {
 
@@ -44,6 +45,14 @@ extension POTypedRepresentation where Representation.RawValue? == Wrapped {
     /// Returns typed representation of self.
     public var typed: Representation? {
         _wrappedValue.flatMap { Representation(rawValue: $0) }
+    }
+}
+
+extension POTypedRepresentation {
+
+    /// Returns typed representation of self.
+    public func typed<T>(wrappedType: T.Type = T.self) -> Representation? where Wrapped == T?, T: RawRepresentable, T.RawValue == Representation.RawValue { // swiftlint:disable:this line_length
+        _wrappedValue.flatMap { Representation(rawValue: $0.rawValue) }
     }
 }
 
