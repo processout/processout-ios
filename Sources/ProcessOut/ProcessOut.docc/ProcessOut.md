@@ -65,6 +65,8 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``POCard``
 - ``POCardUpdateRequest``
 - ``POCardIssuerInformation``
+- ``POCardCvcCheck``
+- ``POCardScheme``
 
 ### Customer Tokens
 
@@ -130,6 +132,7 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POFallbackDecodable``
 - ``POFallbackValueProvider``
 - ``POEmptyStringProvider``
+- ``POTypedRepresentation``
 - ``POStringDecodableMerchantCapability``
 - ``POBillingAddressCollectionMode``
 - ``PORepository``

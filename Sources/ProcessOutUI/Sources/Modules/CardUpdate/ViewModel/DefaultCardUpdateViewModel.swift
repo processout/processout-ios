@@ -170,13 +170,14 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         let pickerItem = CardUpdateViewModelItem.Picker(
             id: ItemId.scheme,
             options: [
-                .init(id: scheme, title: scheme.capitalized),
-                .init(id: coScheme, title: coScheme.capitalized)
+                .init(id: scheme.rawValue, title: scheme.rawValue.capitalized),
+                .init(id: coScheme.rawValue, title: coScheme.rawValue.capitalized)
             ],
             selectedOptionId: .init(
-                get: { startedState.preferredScheme },
+                get: { startedState.preferredScheme?.rawValue },
                 set: { [weak self] newValue in
-                    self?.interactor.setPreferredScheme(newValue ?? scheme)
+                    let newScheme = newValue.flatMap(POCardScheme.init)
+                    self?.interactor.setPreferredScheme(newScheme ?? scheme)
                 }
             ),
             preferrsInline: true

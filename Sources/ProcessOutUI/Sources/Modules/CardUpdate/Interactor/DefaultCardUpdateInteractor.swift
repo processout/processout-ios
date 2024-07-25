@@ -60,7 +60,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         delegate?.cardUpdateDidEmitEvent(.parametersChanged)
     }
 
-    func setPreferredScheme(_ scheme: String) {
+    func setPreferredScheme(_ scheme: POCardScheme) {
         guard case .started(var startedState) = state, configuration.isSchemeSelectionAllowed else {
             return
         }
@@ -92,7 +92,9 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         Task {
             do {
                 let request = POCardUpdateRequest(
-                    cardId: configuration.cardId, cvc: startedState.cvc, preferredScheme: startedState.preferredScheme
+                    cardId: configuration.cardId,
+                    cvc: startedState.cvc,
+                    preferredScheme: startedState.preferredScheme?.rawValue
                 )
                 setCompletedState(card: try await cardsService.updateCard(request: request))
             } catch {
@@ -124,11 +126,11 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     @MainActor
     private func setStartedStateUnchecked(cardInfo: POCardUpdateInformation?) {
-        cardSecurityCodeFormatter.scheme = cardInfo?.scheme
+        cardSecurityCodeFormatter.scheme = cardInfo?.$scheme.typed
         let startedState = State.Started(
             cardNumber: cardInfo?.maskedNumber,
-            scheme: cardInfo?.scheme,
-            coScheme: cardInfo?.coScheme,
+            scheme: cardInfo?.$scheme.typed,
+            coScheme: cardInfo?.$coScheme.typed,
             preferredScheme: preferredScheme(cardInfo: cardInfo),
             formatter: cardSecurityCodeFormatter
         )
@@ -173,9 +175,9 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     /// - NOTE: Method updates interactor's CSC formatter as well.
     private func update(state: inout State.Started, with issuerInformation: POCardIssuerInformation) {
-        cardSecurityCodeFormatter.scheme = issuerInformation.scheme
-        state.scheme = issuerInformation.scheme
-        state.coScheme = issuerInformation.coScheme
+        cardSecurityCodeFormatter.scheme = issuerInformation.$scheme.typed
+        state.scheme = issuerInformation.$scheme.typed
+        state.coScheme = issuerInformation.$coScheme.typed
         state.preferredScheme = state.preferredScheme ?? preferredScheme(issuerInformation: issuerInformation)
         state.cvc = cardSecurityCodeFormatter.string(from: state.cvc)
     }
@@ -260,13 +262,13 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
     private func preferredScheme(
         cardInfo: POCardUpdateInformation? = nil,
         issuerInformation: POCardIssuerInformation? = nil
-    ) -> String? {
-        if let scheme = cardInfo?.preferredScheme {
+    ) -> POCardScheme? {
+        if let scheme = cardInfo?.$preferredScheme.typed {
             return scheme
         }
         guard configuration.isSchemeSelectionAllowed else {
             return nil
         }
-        return cardInfo?.scheme ?? issuerInformation?.scheme
+        return cardInfo?.$scheme.typed ?? issuerInformation?.$scheme.typed
     }
 }

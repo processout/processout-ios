@@ -49,7 +49,7 @@ final class CardSchemeProviderTests: XCTestCase {
         let scheme = sut.scheme(cardNumber: "1")
 
         // Then
-        XCTAssertEqual(scheme, "exact")
+        XCTAssertEqual(scheme?.rawValue, "exact")
     }
 
     func test_scheme_whenNumberMatchesSetPattern_returnsScheme() {
@@ -57,7 +57,7 @@ final class CardSchemeProviderTests: XCTestCase {
         let scheme = sut.scheme(cardNumber: "2")
 
         // Then
-        XCTAssertEqual(scheme, "set")
+        XCTAssertEqual(scheme?.rawValue, "set")
     }
 
     func test_scheme_whenNumberMatchesRangePattern_returnsScheme() {
@@ -65,7 +65,7 @@ final class CardSchemeProviderTests: XCTestCase {
         let scheme = sut.scheme(cardNumber: "10")
 
         // Then
-        XCTAssertEqual(scheme, "range")
+        XCTAssertEqual(scheme?.rawValue, "range")
     }
 
     func test_scheme_whenNumberIsUnknown_returnsNil() {
