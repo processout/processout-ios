@@ -29,7 +29,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
                     .customerId: request.customerId, .customerTokenId: request.tokenId
                 ]
                 attributes[.invoiceId] = request.invoiceId
-                logger.warn("Did fail to assign customer token: \(error)", attributes: attributes)
+                logger.error("Did fail to assign customer token: \(error)", attributes: attributes)
                 throw error
             }
             return try await assignCustomerToken(request: newRequest, threeDSService: threeDSService)

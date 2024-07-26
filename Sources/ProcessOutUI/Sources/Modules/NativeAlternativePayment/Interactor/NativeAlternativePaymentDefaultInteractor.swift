@@ -238,6 +238,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 try await invoicesService.captureNativeAlternativePayment(request: request)
                 await setCapturedStateUnchecked(gateway: gateway, parameterValues: parameterValues)
             } catch {
+                logger.error("Did fail to capture invoice: \(error)")
                 setFailureStateUnchecked(error: error)
             }
         }
@@ -355,7 +356,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Failure State
 
     private func setFailureStateUnchecked(error: Error) {
-        logger.warn("Did fail to process native payment: \(error)")
+        logger.error("Did fail to process native payment: \(error)")
         let failure: POFailure
         if let error = error as? POFailure {
             failure = error

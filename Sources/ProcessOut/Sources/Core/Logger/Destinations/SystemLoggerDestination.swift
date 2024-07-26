@@ -41,10 +41,10 @@ final class SystemLoggerDestination: LoggerDestination {
             return .info
         case .debug:
             return .debug
-        case .warn:
-            return .error
         case .error:
             return .error
+        case .fault:
+            return .fault
         }
     }
 

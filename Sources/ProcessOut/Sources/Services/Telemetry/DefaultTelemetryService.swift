@@ -23,7 +23,7 @@ final class DefaultTelemetryService: POService, LoggerDestination {
     // MARK: - LoggerDestination
 
     func log(event: LogEvent) {
-        guard event.level.rawValue >= LogLevel.warn.rawValue else {
+        guard event.level.rawValue >= LogLevel.error.rawValue else {
             return
         }
         var attributes = [
@@ -97,7 +97,7 @@ final class DefaultTelemetryService: POService, LoggerDestination {
 
     private func string(from level: LogLevel) -> String {
         let strings: [LogLevel: String] = [
-            .debug: "debug", .info: "info", .warn: "warn", .error: "error"
+            .debug: "debug", .info: "info", .error: "error", .fault: "error"
         ]
         return strings[level]! // swiftlint:disable:this force_unwrapping
     }
