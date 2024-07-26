@@ -8,22 +8,13 @@
 import ProcessOut
 
 /// Billing address collection configuration.
-public struct POBillingAddressConfiguration {
+public struct POBillingAddressConfiguration: Sendable {
 
-    public enum CollectionMode {
-
-        /// Only collect address components that are needed for particular payment method.
-        case automatic
-
-        /// Never collect address.
-        case never
-
-        /// Collect the full billing address.
-        case full
-    }
+    @available(*, deprecated, message: "Use POBillingAddressCollectionMode directly.")
+    public typealias CollectionMode = POBillingAddressCollectionMode
 
     /// Billing address collection mode.
-    public let mode: CollectionMode
+    public let mode: POBillingAddressCollectionMode
 
     /// List of ISO country codes that is supported for the billing address. When nil, all countries are provided.
     public let countryCodes: Set<String>?
@@ -39,7 +30,7 @@ public struct POBillingAddressConfiguration {
 
     /// Creates billing address configuration.
     public init(
-        mode: CollectionMode = .automatic,
+        mode: POBillingAddressCollectionMode = .automatic,
         countryCodes: Set<String>? = nil,
         defaultAddress: POContact? = nil,
         attachDefaultsToPaymentMethod: Bool = false

@@ -7,34 +7,50 @@
 
 import SwiftUI
 
+extension POBackport where Wrapped: Any {
+
+    @MainActor
+    final class SubmitAction: Sendable {
+
+        typealias Action = () -> Void // swiftlint:disable:this nesting
+
+        nonisolated init() {
+            actions = []
+        }
+
+        func callAsFunction() {
+            actions.forEach { $0() }
+        }
+
+        func append(action: @escaping Action) {
+            actions.append(action)
+        }
+
+        // MARK: - Private Properties
+
+        private nonisolated(unsafe) var actions: [Action]
+    }
+}
+
 extension POBackport where Wrapped: View {
 
     /// Adds an action to perform when the user submits a value to this view.
     /// - NOTE: Only works with `POTextField`.
     public func onSubmit(_ action: @escaping () -> Void) -> some View {
-        wrapped.environment(\.backportSubmitAction, action)
+        wrapped.transformEnvironment(\.backportSubmitAction) { $0.append(action: action) }
     }
 }
 
 extension EnvironmentValues {
 
-    var backportSubmitAction: (() -> Void)? {
-        get {
-            self[Key.self]
-        }
-        set {
-            let oldValue = backportSubmitAction
-            let box = {
-                oldValue?()
-                newValue?()
-            }
-            self[Key.self] = box
-        }
+    var backportSubmitAction: POBackport<Any>.SubmitAction {
+        get { self[Key.self] }
+        set { self[Key.self] = newValue }
     }
 
     // MARK: - Private Properties
 
     private struct Key: EnvironmentKey {
-        static let defaultValue: (() -> Void)? = nil
+        static let defaultValue = POBackport<Any>.SubmitAction()
     }
 }

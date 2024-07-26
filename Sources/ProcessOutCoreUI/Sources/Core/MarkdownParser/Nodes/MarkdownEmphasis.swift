@@ -7,11 +7,9 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownEmphasis: MarkdownBaseNode {
+final class MarkdownEmphasis: MarkdownBaseNode, @unchecked Sendable {
 
-    // MARK: - MarkdownBaseNode
-
-    override class var cmarkNodeType: cmark_node_type {
+    override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_EMPH
     }
 

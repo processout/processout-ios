@@ -9,34 +9,34 @@ import PassKit
 @_spi(PO) import ProcessOut
 
 /// An object that presents a sheet that prompts the user to authorize a payment request
+@MainActor
 public final class POPassKitPaymentAuthorizationController: NSObject {
 
     /// Determine whether this device can process payment requests.
-    public class func canMakePayments() -> Bool {
+    public nonisolated static func canMakePayments() -> Bool {
         PKPaymentAuthorizationController.canMakePayments()
     }
 
     /// Determine whether this device can process payment requests using specific payment network brands.
-    public class func canMakePayments(usingNetworks supportedNetworks: [PKPaymentNetwork]) -> Bool {
+    public nonisolated static func canMakePayments(usingNetworks supportedNetworks: [PKPaymentNetwork]) -> Bool {
         PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks)
     }
 
     /// Determine whether this device can process payments using the specified networks and capabilities bitmask.
-    public class func canMakePayments(
-        usingNetworks supportedNetworks: [PKPaymentNetwork], capabilities capabilties: PKMerchantCapability
+    public nonisolated static func canMakePayments(
+        usingNetworks supportedNetworks: [PKPaymentNetwork], capabilities: PKMerchantCapability
     ) -> Bool {
-        PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks, capabilities: capabilties)
+        PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks, capabilities: capabilities)
     }
 
     /// Initialize the controller with a payment request.
     public init?(paymentRequest: PKPaymentRequest) {
-        if PKPaymentAuthorizationViewController(paymentRequest: paymentRequest) == nil {
+        guard Self.canMakePayments() else {
             return nil
         }
-        _didPresentApplePay = .init(wrappedValue: false)
+        didPresentApplePay = false
         self.paymentRequest = paymentRequest
         controller = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
-        contactMapper = DefaultPassKitContactMapper(logger: ProcessOut.shared.logger)
         errorMapper = DefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger)
         cardsService = ProcessOut.shared.cards
         super.init()
@@ -50,7 +50,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
             completion?(false)
             return
         }
-        $didPresentApplePay.withLock { $0 = true }
+        didPresentApplePay = true
         // Bound lifecycle of self to underlying PKPaymentAuthorizationController
         objc_setAssociatedObject(controller, &AssociatedObjectKeys.controller, self, .OBJC_ASSOCIATION_RETAIN)
         controller.present(completion: completion)
@@ -84,7 +84,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     // MARK: - Private Nested Types
 
     private enum AssociatedObjectKeys {
-        static var controller: UInt8 = 0
+        nonisolated(unsafe) static var controller: UInt8 = 0
     }
 
     // MARK: - Private Properties
@@ -92,11 +92,8 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     private let paymentRequest: PKPaymentRequest
     private let controller: PKPaymentAuthorizationController
 
-    private let contactMapper: PassKitContactMapper
     private let errorMapper: PassKitPaymentErrorMapper
     private let cardsService: POCardsService
-
-    @POUnfairlyLocked
     private var didPresentApplePay: Bool
 }
 
@@ -111,7 +108,7 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
     ) async -> PKPaymentAuthorizationResult {
         let request = POApplePayCardTokenizationRequest(
             payment: payment,
-            contact: payment.billingContact.flatMap(contactMapper.map),
+            merchantIdentifier: paymentRequest.merchantIdentifier,
             metadata: nil // todo(andrii-vysotskyi): decide if metadata injection should be allowed
         )
         let card: POCard
@@ -126,8 +123,12 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
             let errors = errorMapper.map(poError: error)
             return PKPaymentAuthorizationResult(status: .failure, errors: errors)
         }
-        let result = await delegate?.paymentAuthorizationController(self, didTokenizePayment: payment, card: card)
-        return result ?? PKPaymentAuthorizationResult(status: .success, errors: nil)
+        // todo(andrii-vysotskyi): decide if errors should be mapped with other results
+        if let result = await delegate?.paymentAuthorizationController(self, didTokenizePayment: payment, card: card) {
+            result.errors = result.errors.flatMap(errorMapper.map)
+            return result
+        }
+        return PKPaymentAuthorizationResult(status: .success, errors: nil)
     }
 
     public func paymentAuthorizationControllerWillAuthorizePayment(_: PKPaymentAuthorizationController) {
@@ -171,7 +172,9 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
         return update ?? PKPaymentRequestPaymentMethodUpdate()
     }
 
-    public func presentationWindow(for _: PKPaymentAuthorizationController) -> UIWindow? {
-        delegate?.presentationWindow(for: self)
+    public nonisolated func presentationWindow(for _: PKPaymentAuthorizationController) -> UIWindow? {
+        MainActor.assumeIsolated {
+            delegate?.presentationWindow(for: self)
+        }
     }
 }

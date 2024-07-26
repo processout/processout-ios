@@ -7,18 +7,22 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownLink: MarkdownBaseNode {
+final class MarkdownLink: MarkdownBaseNode, @unchecked Sendable {
 
-    private(set) lazy var url: String? = {
-        if let url = cmarkNode.pointee.as.link.url {
-            return String(cString: url)
-        }
-        return nil
-    }()
+    let url: String?
 
     // MARK: - MarkdownBaseNode
 
-    override class var cmarkNodeType: cmark_node_type {
+    required init(cmarkNode: MarkdownBaseNode.CmarkNode, validatesType: Bool = true) {
+        if let url = cmarkNode.pointee.as.link.url {
+            self.url = String(cString: url)
+        } else {
+            url = nil
+        }
+        super.init(cmarkNode: cmarkNode, validatesType: validatesType)
+    }
+
+    override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_LINK
     }
 

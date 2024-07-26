@@ -7,9 +7,10 @@
 
 import UIKit
 
-@_spi(PO) public enum PONativeAlternativePaymentMethodInteractorState {
+@_spi(PO)
+public enum PONativeAlternativePaymentMethodInteractorState {
 
-    public struct ParameterValue {
+    public struct ParameterValue: Sendable {
 
         /// Actual parameter value.
         public let value: String?
@@ -52,6 +53,9 @@ import UIKit
 
         /// Action image.
         public let actionImage: UIImage?
+
+        /// Boolean value indicating whether capture takes longer than anticipated.
+        public let isDelayed: Bool
     }
 
     public struct Captured {
@@ -88,3 +92,6 @@ import UIKit
     /// Payment is completed.
     case captured(Captured)
 }
+
+@available(*, unavailable)
+extension PONativeAlternativePaymentMethodInteractorState: Sendable { }

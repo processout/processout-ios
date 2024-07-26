@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Defines input's styling information in a specific state.
-public struct POInputStateStyle {
+public struct POInputStateStyle: Sendable {
 
     /// Text style.
     public let text: POTextStyle

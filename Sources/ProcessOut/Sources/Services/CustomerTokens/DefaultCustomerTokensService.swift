@@ -7,9 +7,10 @@
 
 final class DefaultCustomerTokensService: POCustomerTokensService {
 
-    init(repository: CustomerTokensRepository, threeDSService: ThreeDSService) {
+    init(repository: CustomerTokensRepository, threeDSService: ThreeDSService, logger: POLogger) {
         self.repository = repository
         self.threeDSService = threeDSService
+        self.logger = logger
     }
 
     // MARK: - POCustomerTokensService
@@ -19,8 +20,18 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
     ) async throws -> POCustomerToken {
         let response = try await repository.assignCustomerToken(request: request)
         if let customerAction = response.customerAction {
-            let newSource = try await self.threeDSService.handle(action: customerAction, delegate: threeDSService)
-            let newRequest = request.replacing(source: newSource)
+            let newRequest: POAssignCustomerTokenRequest
+            do {
+                let newSource = try await self.threeDSService.handle(action: customerAction, delegate: threeDSService)
+                newRequest = request.replacing(source: newSource)
+            } catch {
+                var attributes: [POLogAttributeKey: String] = [
+                    .customerId: request.customerId, .customerTokenId: request.tokenId
+                ]
+                attributes[.invoiceId] = request.invoiceId
+                logger.warn("Did fail to assign customer token: \(error)", attributes: attributes)
+                throw error
+            }
             return try await assignCustomerToken(request: newRequest, threeDSService: threeDSService)
         }
         if let token = response.token {
@@ -37,6 +48,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
 
     private let repository: CustomerTokensRepository
     private let threeDSService: ThreeDSService
+    private let logger: POLogger
 }
 
 private extension POAssignCustomerTokenRequest { // swiftlint:disable:this no_extension_access_modifier
@@ -49,7 +61,6 @@ private extension POAssignCustomerTokenRequest { // swiftlint:disable:this no_ex
             preferredScheme: preferredScheme,
             verify: verify,
             invoiceId: invoiceId,
-            enableThreeDS2: enableThreeDS2,
             thirdPartySdkVersion: thirdPartySdkVersion
         )
         return updatedRequest

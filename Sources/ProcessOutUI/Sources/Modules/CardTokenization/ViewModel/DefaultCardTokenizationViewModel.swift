@@ -11,9 +11,9 @@ import SwiftUI
 
 // swiftlint:disable type_body_length file_length
 
-final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
+final class DefaultCardTokenizationViewModel: ViewModel {
 
-    init(interactor: some CardTokenizationInteractor) {
+    init(interactor: any CardTokenizationInteractor) {
         self.interactor = interactor
         state = .idle
         observeChanges(interactor: interactor)
@@ -21,8 +21,16 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     // MARK: - CardTokenizationViewModel
 
-    @Published
+    @AnimatablePublished
     var state: CardTokenizationViewModelState
+
+    func start() {
+        interactor.start()
+    }
+
+    func stop() {
+        interactor.cancel()
+    }
 
     // MARK: - Private Nested Types
 
@@ -51,11 +59,11 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     // MARK: - Private Methods
 
-    private func observeChanges(interactor: some CardTokenizationInteractor) {
+    private func observeChanges(interactor: any Interactor) {
         interactor.didChange = { [weak self] in
             self?.configureWithInteractorState()
         }
-        interactor.start()
+        configureWithInteractorState()
     }
 
     private func configureWithInteractorState() {
@@ -63,9 +71,11 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         case .idle:
             state = .idle
         case .started(let startedState):
-            state = convertToState(startedState: startedState, isSubmitting: false)
+            let newState = convertToState(startedState: startedState, isSubmitting: false)
+            self.state = newState
         case .tokenizing(let startedState):
-            state = convertToState(startedState: startedState, isSubmitting: true)
+            let newState = convertToState(startedState: startedState, isSubmitting: true)
+            self.state = newState
         default:
             break
         }
@@ -135,7 +145,8 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
                 parameter: startedState.cardholderName,
                 placeholder: String(resource: .CardTokenization.CardDetails.cardholder),
                 keyboard: .asciiCapable,
-                contentType: .name
+                contentType: .name,
+                submitLabel: .done
             )
         ]
         return items.compactMap { $0 }
@@ -144,7 +155,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
     private func cardNumberIcon(startedState: InteractorState.Started) -> Image? {
         let scheme = startedState.issuerInformation?.coScheme != nil
             ? startedState.preferredScheme
-            : startedState.issuerInformation?.scheme
+            : startedState.issuerInformation?.$scheme.typed
         return scheme.flatMap(CardSchemeImageProvider.shared.image)
     }
 
@@ -165,9 +176,10 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
                 .init(id: coScheme, title: coScheme.capitalized)
             ],
             selectedOptionId: .init(
-                get: { startedState.preferredScheme },
+                get: { startedState.preferredScheme?.rawValue },
                 set: { [weak self] newValue in
-                    self?.interactor.setPreferredScheme(newValue ?? issuerInformation.scheme)
+                    let newScheme = newValue.map(POCardScheme.init)
+                    self?.interactor.setPreferredScheme(newScheme ?? issuerInformation.$scheme.typed)
                 }
             ),
             preferrsInline: true
@@ -240,14 +252,20 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         placeholder: String,
         icon: Image? = nil,
         keyboard: UIKeyboardType = .default,
-        contentType: UITextContentType? = nil
+        contentType: UITextContentType? = nil,
+        submitLabel: POBackport<Any>.SubmitLabel = .default
     ) -> CardTokenizationViewModelState.Item? {
         guard parameter.shouldCollect else {
             return nil
         }
         if parameter.availableValues.isEmpty {
             return createInputItem(
-                parameter: parameter, placeholder: placeholder, icon: icon, keyboard: keyboard, contentType: contentType
+                parameter: parameter,
+                placeholder: placeholder,
+                icon: icon,
+                keyboard: keyboard,
+                contentType: contentType,
+                submitLabel: submitLabel
             )
         }
         return createPickerItem(parameter: parameter)
@@ -258,7 +276,8 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
         placeholder: String,
         icon: Image? = nil,
         keyboard: UIKeyboardType = .default,
-        contentType: UITextContentType? = nil
+        contentType: UITextContentType? = nil,
+        submitLabel: POBackport<Any>.SubmitLabel
     ) -> CardTokenizationViewModelState.Item {
         let value = Binding<String>(
             get: { parameter.value },
@@ -274,6 +293,7 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
             formatter: parameter.formatter,
             keyboard: keyboard,
             contentType: contentType,
+            submitLabel: submitLabel,
             onSubmit: { [weak self] in
                 self?.submitFocusedInput()
             }
@@ -311,10 +331,14 @@ final class DefaultCardTokenizationViewModel: CardTokenizationViewModel {
 
     private func submitAction(
         startedState: InteractorState.Started, isSubmitting: Bool
-    ) -> POActionsContainerActionViewModel {
+    ) -> POActionsContainerActionViewModel? {
+        let title = configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit)
+        guard !title.isEmpty else {
+            return nil
+        }
         let action = POActionsContainerActionViewModel(
             id: "primary-button",
-            title: configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit),
+            title: title,
             isEnabled: startedState.areParametersValid,
             isLoading: isSubmitting,
             isPrimary: true,

@@ -7,19 +7,24 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownCodeSpan: MarkdownBaseNode {
+final class MarkdownCodeSpan: MarkdownBaseNode, @unchecked Sendable {
 
-    private(set) lazy var code: String = {
-        guard let literal = cmark_node_get_literal(cmarkNode) else {
-            assertionFailure("Unable to get text node value")
-            return ""
-        }
-        return String(cString: literal)
-    }()
+    /// Code.
+    let code: String
 
     // MARK: - MarkdownBaseNode
 
-    override class var cmarkNodeType: cmark_node_type {
+    required init(cmarkNode: MarkdownBaseNode.CmarkNode, validatesType: Bool = true) {
+        if let literal = cmark_node_get_literal(cmarkNode) {
+            code = String(cString: literal)
+        } else {
+            assertionFailure("Unable to get text node value")
+            code = ""
+        }
+        super.init(cmarkNode: cmarkNode, validatesType: validatesType)
+    }
+
+    override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_CODE
     }
 

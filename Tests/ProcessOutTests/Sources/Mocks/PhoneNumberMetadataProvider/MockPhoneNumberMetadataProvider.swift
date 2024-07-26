@@ -5,14 +5,14 @@
 //  Created by Andrii Vysotskyi on 12.05.2023.
 //
 
-@testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 
-final class MockPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
+final class MockPhoneNumberMetadataProvider: POPhoneNumberMetadataProvider {
 
     var metadataCallsCount = 0
-    var metadata: PhoneNumberMetadata?
+    var metadata: POPhoneNumberMetadata?
 
-    func metadata(for countryCode: String) -> PhoneNumberMetadata? {
+    func metadata(for countryCode: String) -> POPhoneNumberMetadata? {
         metadataCallsCount += 1
         return metadata
     }

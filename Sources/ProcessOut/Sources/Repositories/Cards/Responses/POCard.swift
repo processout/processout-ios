@@ -9,7 +9,7 @@ import Foundation
 
 /// A card object represents a credit or debit card. It contains many useful pieces of information about the card but
 /// it does not contain the full card number and CVC (which are kept securely in the ProcessOut Vault).
-public struct POCard: Decodable, Hashable {
+public struct POCard: Decodable, Hashable, @unchecked Sendable {
 
     /// Value that uniquely identifies the card.
     public let id: String
@@ -18,16 +18,20 @@ public struct POCard: Decodable, Hashable {
     public let projectId: String
 
     /// Scheme of the card.
-    public let scheme: String
+    @POTypedRepresentation<String, POCardScheme>
+    public private(set) var scheme: String
 
     /// Co-scheme of the card, such as Carte Bancaire.
-    public let coScheme: String?
+    @POTypedRepresentation<String?, POCardScheme>
+    public private(set) var coScheme: String?
 
     /// Preferred scheme defined by the Customer.
-    public let preferredScheme: String?
+    @POTypedRepresentation<String?, POCardScheme>
+    public private(set) var preferredScheme: String?
 
     /// Card type.
-    public let type: String
+    @POFallbackDecodable<POEmptyStringProvider>
+    public private(set) var type: String
 
     /// Name of the card’s issuing bank.
     public let bankName: String?
@@ -56,7 +60,8 @@ public struct POCard: Decodable, Hashable {
     public let expYear: Int
 
     /// CVC check status.
-    public let cvcCheck: String
+    @POTypedRepresentation<String, POCardCvcCheck>
+    public var cvcCheck: String
 
     /// AVS check status.
     public let avsCheck: String

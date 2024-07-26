@@ -6,14 +6,14 @@
 //
 
 import SwiftUI
+import ProcessOut
 
-final class CardSchemeImageProvider {
+final class CardSchemeImageProvider: Sendable {
 
     static let shared = CardSchemeImageProvider()
 
-    func image(for scheme: String) -> Image? {
-        let normalizedScheme = scheme.lowercased()
-        guard let resource = resources[normalizedScheme] else {
+    func image(for scheme: POCardScheme) -> Image? {
+        guard let resource = resources[scheme] else {
             return nil
         }
         return Image(resource)
@@ -21,27 +21,27 @@ final class CardSchemeImageProvider {
 
     // MARK: - Private Properties
 
-    private let resources: [String: ImageResource] = [
-        "american express": .Schemes.amex,
-        "carte bancaire": .Schemes.carteBancaire,
-        "dinacard": .Schemes.dinacard,
-        "diners club": .Schemes.diners,
-        "diners club carte blanche": .Schemes.diners,
-        "diners club international": .Schemes.diners,
-        "diners club united states & canada": .Schemes.diners,
-        "discover": .Schemes.discover,
-        "elo": .Schemes.elo,
-        "giropay": .Schemes.giropay,
-        "jcb": .Schemes.JCB,
-        "mada": .Schemes.mada,
-        "maestro": .Schemes.maestro,
-        "mastercard": .Schemes.mastercard,
-        "rupay": .Schemes.rupay,
-        "sodexo": .Schemes.sodexo,
-        "china union pay": .Schemes.unionPay,
-        "verve": .Schemes.verve,
-        "visa": .Schemes.visa,
-        "vpay": .Schemes.vpay
+    private let resources: [POCardScheme: ImageResource] = [
+        .amex: .Schemes.amex,
+        .carteBancaire: .Schemes.carteBancaire,
+        .dinaCard: .Schemes.dinacard,
+        .dinersClub: .Schemes.diners,
+        .dinersClubCarteBlanche: .Schemes.diners,
+        .dinersClubInternational: .Schemes.diners,
+        .dinersClubUnitedStatesAndCanada: .Schemes.diners,
+        .discover: .Schemes.discover,
+        .elo: .Schemes.elo,
+        .giropay: .Schemes.giropay,
+        .jcb: .Schemes.JCB,
+        .mada: .Schemes.mada,
+        .maestro: .Schemes.maestro,
+        .mastercard: .Schemes.mastercard,
+        .rupay: .Schemes.rupay,
+        .sodexo: .Schemes.sodexo,
+        .unionPay: .Schemes.unionPay,
+        .verve: .Schemes.verve,
+        .visa: .Schemes.visa,
+        .vPay: .Schemes.vpay
     ]
 
     // MARK: - Private Methods

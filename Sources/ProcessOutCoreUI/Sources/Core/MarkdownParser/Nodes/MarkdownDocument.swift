@@ -7,15 +7,9 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownDocument: MarkdownBaseNode {
+final class MarkdownDocument: MarkdownBaseNode, @unchecked Sendable {
 
-    deinit {
-        cmark_node_free(cmarkNode)
-    }
-
-    // MARK: - MarkdownBaseNode
-
-    override class var cmarkNodeType: cmark_node_type {
+    override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_DOCUMENT
     }
 

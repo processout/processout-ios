@@ -8,7 +8,7 @@
 import Foundation
 
 /// Card details that should be tokenized.
-public struct POCardTokenizationRequest: Encodable {
+public struct POCardTokenizationRequest: Encodable, Sendable {
 
     /// Number of the card.
     public let number: String
@@ -29,9 +29,10 @@ public struct POCardTokenizationRequest: Encodable {
     public let contact: POContact?
 
     /// Preferred scheme defined by the Customer.
-    public let preferredScheme: String?
+    @POTypedRepresentation<String?, POCardScheme>
+    public private(set) var preferredScheme: String?
 
-    /// Metada related to the card.
+    /// Metadata related to the card.
     public let metadata: [String: String]?
 
     public init(
@@ -50,7 +51,7 @@ public struct POCardTokenizationRequest: Encodable {
         self.cvc = cvc
         self.name = name
         self.contact = contact
-        self.preferredScheme = preferredScheme
+        self._preferredScheme = .init(wrappedValue: preferredScheme)
         self.metadata = metadata
     }
 }

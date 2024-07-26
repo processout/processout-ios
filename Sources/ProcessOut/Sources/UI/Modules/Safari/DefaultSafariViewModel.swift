@@ -9,7 +9,8 @@ import Foundation
 import SafariServices
 
 @available(*, deprecated)
-final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
+@MainActor
+final class DefaultSafariViewModel: NSObject, @preconcurrency SFSafariViewControllerDelegate {
 
     init(
         configuration: DefaultSafariViewModelConfiguration,
@@ -30,7 +31,9 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
         }
         if let timeout = configuration.timeout {
             timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
-                self?.setCompletedState(with: POFailure(code: .timeout(.mobile)))
+                MainActor.assumeIsolated {
+                    self?.setCompletedState(with: POFailure(code: .timeout(.mobile)))
+                }
             }
         }
         deepLinkObserver = eventEmitter.on(PODeepLinkReceivedEvent.self) { [weak self] event in
@@ -90,7 +93,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     private func setCompletedState(with url: URL) -> Bool {
         if case .completed = state {
-            logger.error("Can't change state to completed because already in sink state.")
+            logger.info("Can't change state to completed because already in sink state.")
             return false
         }
         // todo(andrii-vysotskyi): consider validating whether url is related to initial request if possible
@@ -113,7 +116,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     private func setCompletedState(with error: Error) {
         if case .completed = state {
-            logger.error("Can't change state to completed because already in a sink state.")
+            logger.info("Can't change state to completed because already in a sink state.")
             return
         }
         let failure: POFailure

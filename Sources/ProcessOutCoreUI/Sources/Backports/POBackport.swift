@@ -8,7 +8,9 @@
 import SwiftUI
 
 /// Provides a convenient method for backporting API.
-@_spi(PO) public struct POBackport<Wrapped> {
+@_spi(PO)
+@MainActor
+public struct POBackport<Wrapped> {
 
     /// The underlying content this backport represents.
     public let wrapped: Wrapped
@@ -23,7 +25,8 @@ import SwiftUI
 extension View {
 
     /// Wraps a SwiftUI `View` that can be extended to provide backport functionality.
-    @_spi(PO) public var backport: POBackport<Self> {
+    @_spi(PO)
+    public var backport: POBackport<Self> {
         .init(self)
     }
 }

@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 07.10.2022.
 //
 
+// swiftlint:disable implicitly_unwrapped_optional force_unwrapping
+
 import Foundation
 import UIKit
 
@@ -12,73 +14,28 @@ import UIKit
 public typealias ProcessOutApi = ProcessOut
 
 /// Provides access to shared api instance and a way to configure it.
-public final class ProcessOut {
-
-    /// Shared instance.
-    public static var shared: ProcessOut {
-        precondition(isConfigured, "ProcessOut must be configured before the shared instance is accessed.")
-        return _shared
-    }
-
-    /// Returns boolean value indicating whether SDK is configured and operational.
-    public static var isConfigured: Bool {
-        _shared != nil
-    }
-
-    /// Configures ``ProcessOut/shared`` instance.
-    /// - NOTE: Method must be called from main thread. Only the first invocation takes effect, all
-    /// subsequent calls to this method are ignored.
-    public static func configure(configuration: ProcessOutConfiguration) {
-        assert(Thread.isMainThread, "Method must be called only from main thread")
-        if isConfigured {
-            shared.logger.info("ProcessOut can be configured only once, ignored")
-            return
-        }
-        _shared = ProcessOut(configuration: configuration)
-        shared.prewarm()
-        shared.logger.debug("Did complete ProcessOut configuration")
-    }
-
-    // MARK: -
+/// - NOTE: Instance methods and properties of this class could be access from any thread.
+public final class ProcessOut: @unchecked Sendable {
 
     /// Current configuration.
-    public let configuration: ProcessOutConfiguration
+    public var configuration: ProcessOutConfiguration {
+        _configuration.wrappedValue
+    }
 
     /// Returns gateway configurations repository.
-    public private(set) lazy var gatewayConfigurations: POGatewayConfigurationsRepository = {
-        HttpGatewayConfigurationsRepository(connector: httpConnector)
-    }()
+    public private(set) var gatewayConfigurations: POGatewayConfigurationsRepository!
 
-    /// Returns invoices service.
-    public private(set) lazy var invoices: POInvoicesService = {
-        let repository = HttpInvoicesRepository(connector: httpConnector)
-        return DefaultInvoicesService(repository: repository, threeDSService: threeDSService)
-    }()
+    /// Invoices service.
+    public private(set) var invoices: POInvoicesService!
 
-    /// Returns alternative payment methods service.
-    public private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
-        DefaultAlternativePaymentMethodsService(
-            projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl, logger: serviceLogger
-        )
-    }()
+    /// Alternative payment methods service.
+    public private(set) var alternativePaymentMethods: POAlternativePaymentMethodsService!
 
-    /// Returns cards repository.
-    public private(set) lazy var cards: POCardsService = {
-        let requestMapper = DefaultApplePayCardTokenizationRequestMapper(
-            decoder: JSONDecoder(), logger: repositoryLogger
-        )
-        let service = DefaultCardsService(
-            repository: HttpCardsRepository(connector: httpConnector),
-            applePayCardTokenizationRequestMapper: requestMapper
-        )
-        return service
-    }()
+    /// Cards service.
+    public private(set) var cards: POCardsService!
 
     /// Returns customer tokens service.
-    public private(set) lazy var customerTokens: POCustomerTokensService = {
-        let repository = HttpCustomerTokensRepository(connector: httpConnector)
-        return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService)
-    }()
+    public private(set) var customerTokens: POCustomerTokensService!
 
     /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. Only deep
     /// links are supported.
@@ -87,29 +44,22 @@ public final class ProcessOut {
     @discardableResult
     public func processDeepLink(url: URL) -> Bool {
         logger.debug("Will process deep link: \(url)")
-        let event = PODeepLinkReceivedEvent(url: url)
-        return eventEmitter.emit(event: event)
+        return eventEmitter.emit(event: PODeepLinkReceivedEvent(url: url))
     }
 
     // MARK: - SPI
 
     /// Logger with application category.
     @_spi(PO)
-    public private(set) lazy var logger: POLogger = createLogger(for: Constants.applicationLoggerCategory)
+    public private(set) var logger: POLogger!
 
     /// Event emitter to use for events exchange.
     @_spi(PO)
-    public private(set) lazy var eventEmitter: POEventEmitter = LocalEventEmitter(logger: logger)
+    public private(set) var eventEmitter: POEventEmitter!
 
     /// Images repository.
     @_spi(PO)
-    public private(set) lazy var images: POImagesRepository = UrlSessionImagesRepository(session: .shared)
-
-    // MARK: - Internal
-
-    init(configuration: ProcessOutConfiguration) {
-        self.configuration = configuration
-    }
+    public let images: POImagesRepository = UrlSessionImagesRepository(session: .shared)
 
     // MARK: - Private Nested Types
 
@@ -123,62 +73,212 @@ public final class ProcessOut {
 
     // MARK: - Private Properties
 
-    private lazy var serviceLogger = createLogger(for: Constants.serviceLoggerCategory)
-    private lazy var repositoryLogger = createLogger(for: Constants.repositoryLoggerCategory)
+    private var _configuration: POUnfairlyLocked<ProcessOutConfiguration>
 
-    private lazy var httpConnector: HttpConnector = {
-        let configuration = HttpConnectorRequestMapperConfiguration(
-            baseUrl: configuration.apiBaseUrl,
-            projectId: configuration.projectId,
-            privateKey: configuration.privateKey,
-            version: ProcessOut.version,
-            appVersion: configuration.appVersion
-        )
-        let keychain = Keychain(service: Constants.bundleIdentifier)
-        let deviceMetadataProvider = DefaultDeviceMetadataProvider(
-            screen: .main, device: .current, bundle: .main, keychain: keychain
-        )
-        // Connector logs are not sent to backend to avoid recursion. This
-        // may be not ideal because we may loose important events, such
-        // as decoding failures so approach may be reconsidered in future.
-        let logger = createLogger(for: Constants.connectorLoggerCategory, includeRemoteDestination: false)
-        let connector = ProcessOutHttpConnectorBuilder()
-            .with(configuration: configuration)
-            .with(logger: logger)
-            .with(deviceMetadataProvider: deviceMetadataProvider)
-            .build()
-        return connector
-    }()
+    // MARK: - Private Methods
 
-    private lazy var threeDSService: ThreeDSService = {
+    @MainActor
+    private init(configuration: ProcessOutConfiguration) {
+        self._configuration = .init(wrappedValue: configuration)
+        commonInit()
+    }
+
+    @MainActor
+    private func commonInit() {
+        let deviceMetadataProvider = Self.createDeviceMetadataProvider()
+        let remoteLoggerDestination = createRemoteLoggerDestination(deviceMetadataProvider: deviceMetadataProvider)
+        let serviceLogger = createLogger(
+            for: Constants.serviceLoggerCategory,
+            additionalDestinations: remoteLoggerDestination
+        )
+        logger = createLogger(
+            for: Constants.applicationLoggerCategory,
+            additionalDestinations: remoteLoggerDestination
+        )
+        let httpConnector = createConnector(deviceMetadataProvider: deviceMetadataProvider)
+        let threeDSService = Self.create3DSService()
+        initServices(httpConnector: httpConnector, threeDSService: threeDSService, logger: serviceLogger)
+    }
+
+    private func initServices(httpConnector: HttpConnector, threeDSService: ThreeDSService, logger: POLogger) {
+        gatewayConfigurations = HttpGatewayConfigurationsRepository(
+            connector: httpConnector
+        )
+        invoices = Self.createInvoicesService(
+            httpConnector: httpConnector, threeDSService: threeDSService, logger: logger
+        )
+        alternativePaymentMethods = createAlternativePaymentsService()
+        cards = Self.createCardsService(
+            httpConnector: httpConnector, logger: logger
+        )
+        customerTokens = Self.createCustomerTokensService(
+            httpConnector: httpConnector, threeDSService: threeDSService, logger: logger
+        )
+        eventEmitter = LocalEventEmitter(logger: logger)
+    }
+
+    // MARK: -
+
+    private static func createCardsService(httpConnector: HttpConnector, logger: POLogger) -> POCardsService {
+        let contactMapper = DefaultPassKitContactMapper(logger: logger)
+        let requestMapper = DefaultApplePayCardTokenizationRequestMapper(
+            contactMapper: contactMapper, decoder: JSONDecoder(), logger: logger
+        )
+        let service = DefaultCardsService(
+            repository: HttpCardsRepository(connector: httpConnector),
+            applePayCardTokenizationRequestMapper: requestMapper
+        )
+        return service
+    }
+
+    private static func createInvoicesService(
+        httpConnector: HttpConnector, threeDSService: ThreeDSService, logger: POLogger
+    ) -> POInvoicesService {
+        let repository = HttpInvoicesRepository(connector: httpConnector)
+        return DefaultInvoicesService(repository: repository, threeDSService: threeDSService, logger: logger)
+    }
+
+    private static func createCustomerTokensService(
+        httpConnector: HttpConnector, threeDSService: ThreeDSService, logger: POLogger
+    ) -> POCustomerTokensService {
+        let repository = HttpCustomerTokensRepository(connector: httpConnector)
+        return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService, logger: logger)
+    }
+
+    private func createAlternativePaymentsService() -> POAlternativePaymentMethodsService {
+        let serviceConfiguration = { @Sendable [unowned self] () -> AlternativePaymentMethodsServiceConfiguration in
+            let configuration = self.configuration
+            return .init(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
+        }
+        return DefaultAlternativePaymentMethodsService(configuration: serviceConfiguration, logger: logger)
+    }
+
+    private static func create3DSService() -> DefaultThreeDSService {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .useDefaultKeys
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        return DefaultThreeDSService(decoder: decoder, encoder: encoder, logger: serviceLogger)
-    }()
+        return DefaultThreeDSService(decoder: decoder, encoder: encoder)
+    }
 
-    private static var _shared: ProcessOut! // swiftlint:disable:this implicitly_unwrapped_optional
+    private func createConnector(
+        deviceMetadataProvider: DeviceMetadataProvider, remoteLoggerDestination: LoggerDestination? = nil
+    ) -> HttpConnector {
+        let connectorConfiguration = { @Sendable [unowned self] in
+            let configuration = self.configuration
+            return HttpConnectorRequestMapperConfiguration(
+                baseUrl: configuration.apiBaseUrl,
+                projectId: configuration.projectId,
+                privateKey: configuration.privateKey,
+                sessionId: configuration.sessionId,
+                version: ProcessOut.version
+            )
+        }
+        let logger = createLogger(
+            for: Constants.connectorLoggerCategory, additionalDestinations: remoteLoggerDestination
+        )
+        let connector = ProcessOutHttpConnectorBuilder()
+            .with(configuration: connectorConfiguration)
+            .with(logger: logger)
+            .with(deviceMetadataProvider: deviceMetadataProvider)
+            .build()
+        return connector
+    }
 
-    // MARK: - Private Methods
-
-    private func createLogger(for category: String, includeRemoteDestination: Bool = true) -> POLogger {
-        let destinations: [LoggerDestination] = [
+    private func createLogger(
+        for category: String, additionalDestinations: LoggerDestination?...
+    ) -> POLogger {
+        var destinations: [LoggerDestination] = [
             SystemLoggerDestination(subsystem: Constants.bundleIdentifier)
         ]
-        // todo(andrii-vysotskyi): uncomment code bellow when backend will support accepting SDK logs.
-        // if includeRemoteDestination {
-        //     let repository = HttpLogsRepository(connector: httpConnector)
-        //     let service = DefaultLogsService(repository: repository, minimumLevel: .error)
-        //     destinations.append(service)
-        // }
-        let minimumLevel: LogLevel = configuration.isDebug ? .debug : .info
+        destinations.append(
+            contentsOf: additionalDestinations.compactMap { $0 }
+        )
+        let minimumLevel = { @Sendable [unowned self] () -> LogLevel in
+            configuration.isDebug ? .debug : .info
+        }
         return POLogger(destinations: destinations, category: category, minimumLevel: minimumLevel)
     }
 
-    private func prewarm() {
-        FontFamily.registerAllCustomFonts()
-        DefaultPhoneNumberMetadataProvider.shared.prewarm()
+    private func createRemoteLoggerDestination(
+        deviceMetadataProvider: DeviceMetadataProvider
+    ) -> DefaultTelemetryService {
+        let configuration = { @Sendable [unowned self] () -> TelemetryServiceConfiguration in
+            let configuration = self.configuration
+            return TelemetryServiceConfiguration(
+                isTelemetryEnabled: configuration.isTelemetryEnabled,
+                applicationVersion: configuration.application?.version,
+                applicationName: configuration.application?.name
+            )
+        }
+        // Telemetry service uses repository with "special" connector. Its logs
+        // are not submitted to backend to avoid recursion.
+        let repository = DefaultTelemetryRepository(
+            connector: createConnector(deviceMetadataProvider: deviceMetadataProvider)
+        )
+        return DefaultTelemetryService(
+            configuration: configuration, repository: repository, deviceMetadataProvider: deviceMetadataProvider
+        )
+    }
+
+    @MainActor
+    private static func createDeviceMetadataProvider() -> DeviceMetadataProvider {
+        let keychain = Keychain(service: Constants.bundleIdentifier)
+        return DefaultDeviceMetadataProvider(screen: .main, device: .current, bundle: .main, keychain: keychain)
     }
 }
+
+// MARK: - Singleton
+
+extension ProcessOut {
+
+    /// Returns boolean value indicating whether SDK is configured and operational.
+    public static var isConfigured: Bool {
+        _shared.wrappedValue != nil
+    }
+
+    /// Shared instance.
+    public static var shared: ProcessOut {
+        precondition(isConfigured, "ProcessOut must be configured before the shared instance is accessed.")
+        return _shared.wrappedValue!
+    }
+
+    /// Configures ``ProcessOut/shared`` instance.
+    /// - Parameters:
+    ///   - force: When set to `false` (the default) only the first invocation takes effect, all
+    /// subsequent calls to this method are ignored. Pass `true` to allow existing shared instance
+    /// reconfiguration (if any).
+    @MainActor
+    public static func configure(configuration: ProcessOutConfiguration, force: Bool = false) {
+        MainActor.preconditionIsolated("Shared instance must be configured from main thread.")
+        if isConfigured {
+            if force {
+                shared._configuration.withLock { $0 = configuration }
+                shared.logger.debug("Did change ProcessOut configuration")
+            } else {
+                shared.logger.debug("ProcessOut can be configured only once, ignored")
+            }
+        } else {
+            Self.prewarm()
+            _shared.withLock { instance in
+                instance = ProcessOut(configuration: configuration)
+            }
+            shared.logger.debug("Did complete ProcessOut configuration")
+        }
+    }
+
+    // MARK: - Private Properties
+
+    private static let _shared = POUnfairlyLocked<ProcessOut?>(wrappedValue: nil)
+
+    // MARK: - Private Methods
+
+    @MainActor
+    private static func prewarm() {
+        FontFamily.registerAllCustomFonts()
+        PODefaultPhoneNumberMetadataProvider.shared.prewarm()
+    }
+}
+
+// swiftlint:enable implicitly_unwrapped_optional force_unwrapping

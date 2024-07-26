@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@_implementationOnly import os
+import os
 
 final class SystemLoggerDestination: LoggerDestination {
 
@@ -31,7 +31,7 @@ final class SystemLoggerDestination: LoggerDestination {
 
     private let subsystem: String
     private let lock: NSLock
-    private var logs: [String: OSLog]
+    private nonisolated(unsafe) var logs: [String: OSLog]
 
     // MARK: - Private Methods
 
@@ -41,10 +41,10 @@ final class SystemLoggerDestination: LoggerDestination {
             return .info
         case .debug:
             return .debug
+        case .warn:
+            return .error
         case .error:
             return .error
-        case .fault:
-            return .fault
         }
     }
 
@@ -68,7 +68,7 @@ final class SystemLoggerDestination: LoggerDestination {
             Attribute(key: event.file, value: event.line.description)
         ]
         event.additionalAttributes.forEach { key, value in
-            attributes.append(Attribute(key: key, value: value))
+            attributes.append(Attribute(key: key.rawValue, value: value))
         }
         return attributes.map { "[" + $0.key + ":" + $0.value + "]" } .joined()
     }

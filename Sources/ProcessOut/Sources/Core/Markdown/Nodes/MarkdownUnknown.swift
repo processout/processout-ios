@@ -6,7 +6,7 @@
 //
 
 /// Unknown node.
-final class MarkdownUnknown: MarkdownBaseNode {
+final class MarkdownUnknown: MarkdownBaseNode, @unchecked Sendable {
 
     required init(cmarkNode: CmarkNode, validatesType: Bool = false) {
         super.init(cmarkNode: cmarkNode, validatesType: false)

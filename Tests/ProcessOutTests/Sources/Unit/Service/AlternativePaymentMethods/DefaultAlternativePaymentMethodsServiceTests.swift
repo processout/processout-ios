@@ -13,11 +13,13 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        let baseUrl = URL(string: "https://example.com")!
-        sut = DefaultAlternativePaymentMethodsService(projectId: "proj_test", baseUrl: baseUrl, logger: .stub)
+        let configuration = AlternativePaymentMethodsServiceConfiguration(
+            projectId: "proj_test", baseUrl: URL(string: "https://example.com")!
+        )
+        sut = DefaultAlternativePaymentMethodsService(configuration: { configuration }, logger: .stub)
     }
 
-    func test_alternativePaymentMethodUrl_withAdditionalData_succeeds() throws {
+    func test_alternativePaymentMethodUrl_authorizationWithAdditionalData_succeeds() throws {
         let request = POAlternativePaymentMethodRequest(
             invoiceId: "iv_test",
             gatewayConfigurationId: "gway_conf_test",
@@ -38,12 +40,11 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
         XCTAssertTrue(isUrlExpected)
     }
 
-    func test_alternativePaymentMethodUrl_withToken_succeeds() throws {
+    func test_alternativePaymentMethodUrl_tokenization_succeeds() throws {
         let request = POAlternativePaymentMethodRequest(
-            invoiceId: "iv_test",
-            gatewayConfigurationId: "gway_conf_test",
             customerId: "cust_test",
-            tokenId: "tok_test"
+            tokenId: "tok_test",
+            gatewayConfigurationId: "gway_conf_test"
         )
 
         // When
@@ -51,6 +52,19 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
 
         // Then
         let expectedUrl = "https://example.com/proj_test/cust_test/tok_test/redirect/gway_conf_test"
+        XCTAssertEqual(url.absoluteString, expectedUrl)
+    }
+
+    func test_alternativePaymentMethodUrl_authorizationWithToken_succeeds() throws {
+        let request = POAlternativePaymentMethodRequest(
+            invoiceId: "iv_test", gatewayConfigurationId: "gway_conf_test", tokenId: "tok_test"
+        )
+
+        // When
+        let url = sut.alternativePaymentMethodUrl(request: request)
+
+        // Then
+        let expectedUrl = "https://example.com/proj_test/iv_test/redirect/gway_conf_test/tokenized/tok_test"
         XCTAssertEqual(url.absoluteString, expectedUrl)
     }
 

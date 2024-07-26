@@ -18,3 +18,6 @@ struct CardUpdateViewModelSection: Identifiable {
     /// Section items.
     let items: [CardUpdateViewModelItem]
 }
+
+@available(*, unavailable)
+extension CardUpdateViewModelSection: Sendable { }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct LogEvent {
+struct LogEvent: Sendable {
 
     /// Logging level.
     let level: LogLevel
@@ -15,14 +15,14 @@ struct LogEvent {
     /// Actual log message.
     let message: String
 
-    /// The string that categorizes event.
+    /// The string that categorises event.
     let category: String
 
     /// Date associated with message.
     let timestamp: Date
 
     /// DSO handle.
-    let dso: UnsafeRawPointer?
+    nonisolated(unsafe) let dso: UnsafeRawPointer?
 
     /// File name.
     let file: String
@@ -31,5 +31,5 @@ struct LogEvent {
     let line: Int
 
     /// Additional attributes.
-    let additionalAttributes: [String: String]
+    let additionalAttributes: [POLogAttributeKey: String]
 }

@@ -13,9 +13,9 @@ public typealias POCustomerTokensServiceType = POCustomerTokensService
 /// You can only use a card or APM token once but you can make payments as many times as necessary with a customer
 /// token. This is a useful way to store payment details for a customer as a convenience but it is also essential
 /// for Merchant Initiated Transactions (MITs).
-public protocol POCustomerTokensService: POService {
+public protocol POCustomerTokensService: POService { // sourcery: AutoCompletion
 
-    /// Assigns new source to existing customer token and optionaly verifies it.
+    /// Assigns new source to existing customer token and optionally verifies it.
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DSService
     ) async throws -> POCustomerToken

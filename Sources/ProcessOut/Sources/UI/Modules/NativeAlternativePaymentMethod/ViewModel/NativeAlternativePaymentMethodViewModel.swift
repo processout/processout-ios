@@ -6,6 +6,7 @@
 //
 
 @available(*, deprecated)
+@MainActor
 protocol NativeAlternativePaymentMethodViewModel: ViewModel<NativeAlternativePaymentMethodViewModelState> {
 
     /// Submits parameter values.

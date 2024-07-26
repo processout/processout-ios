@@ -35,6 +35,10 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     @Published
     var focusedItemId: AnyHashable?
 
+    func start() {
+        interactor.start()
+    }
+
     // MARK: - Private Nested Types
 
     private typealias InteractorState = CardUpdateInteractorState
@@ -64,10 +68,10 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     // MARK: - Private Methods
 
     private func observeChanges(interactor: some Interactor) {
-        interactor.start()
         interactor.didChange = { [weak self] in
             self?.configureWithInteractorState()
         }
+        configureWithInteractorState()
     }
 
     private func configureWithInteractorState() {
@@ -123,6 +127,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
             formatter: nil,
             keyboard: .asciiCapableNumberPad,
             contentType: nil,
+            submitLabel: .default,
             onSubmit: { }
         )
         return .input(item)
@@ -137,13 +142,14 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
                     self?.interactor.update(cvc: newValue)
                 }
             ),
-            placeholder: String(resource: .CardUpdate.cvc),
+            placeholder: String(resource: .CardUpdate.CardDetails.cvc),
             isInvalid: !state.areParametersValid,
             isEnabled: true,
             icon: Image(.Card.back),
             formatter: state.formatter,
             keyboard: .asciiCapableNumberPad,
             contentType: nil,
+            submitLabel: .default,
             onSubmit: { [weak self] in
                 self?.interactor.submit()
             }
@@ -164,20 +170,21 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         let pickerItem = CardUpdateViewModelItem.Picker(
             id: ItemId.scheme,
             options: [
-                .init(id: scheme, title: scheme.capitalized),
-                .init(id: coScheme, title: coScheme.capitalized)
+                .init(id: scheme.rawValue, title: scheme.rawValue.capitalized),
+                .init(id: coScheme.rawValue, title: coScheme.rawValue.capitalized)
             ],
             selectedOptionId: .init(
-                get: { startedState.preferredScheme },
+                get: { startedState.preferredScheme?.rawValue },
                 set: { [weak self] newValue in
-                    self?.interactor.setPreferredScheme(newValue ?? scheme)
+                    let newScheme = newValue.flatMap(POCardScheme.init)
+                    self?.interactor.setPreferredScheme(newScheme ?? scheme)
                 }
             ),
             preferrsInline: true
         )
         let section = CardUpdateViewModelSection(
             id: SectionId.preferredScheme,
-            title: String(resource: .CardUpdate.preferredScheme),
+            title: String(resource: .CardUpdate.PreferredScheme.title),
             items: [.picker(pickerItem)]
         )
         return section

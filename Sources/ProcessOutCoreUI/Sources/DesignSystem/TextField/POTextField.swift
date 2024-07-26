@@ -19,23 +19,25 @@ public struct POTextField<Trailing: View>: View {
     public init(
         text: Binding<String>, formatter: Formatter? = nil, prompt: String = "", trailingView: Trailing = EmptyView()
     ) {
-        self.text = text
+        self._text = text
         self.formatter = formatter
         self.prompt = prompt
         self.trailingView = trailingView
     }
 
     public var body: some View {
-        let style = isInvalid ? style.error : style.normal
+        let style = style.resolve(isInvalid: isInvalid, isFocused: focusCoordinator.isEditing)
         HStack {
-            HorizontalSizeReader { width in
-                TextFieldRepresentable(
-                    text: text,
-                    formatter: formatter,
-                    prompt: prompt,
-                    preferredWidth: width,
-                    style: style
-                )
+            ZStack(alignment: .leading) {
+                TextFieldRepresentable(text: $text, formatter: formatter, style: style)
+                Text(prompt)
+                    .lineLimit(1)
+                    .textStyle(style.placeholder)
+                    .allowsHitTesting(false)
+                    .opacity(text.isEmpty ? 1 : 0)
+                    .transaction { transaction in
+                        transaction.animation = nil
+                    }
             }
             trailingView
         }
@@ -45,59 +47,67 @@ public struct POTextField<Trailing: View>: View {
         .border(style: style.border)
         .shadow(style: style.shadow)
         .accentColor(style.tintColor)
-        .backport.geometryGroup()
         .animation(.default, value: isInvalid)
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
 
-    private let text: Binding<String>
     private let formatter: Formatter?
     private let prompt: String
     private let trailingView: Trailing
 
-    @Environment(\.inputStyle) private var style
-    @Environment(\.isControlInvalid) private var isInvalid
+    @Binding
+    private var text: String
+
+    @Environment(\.inputStyle)
+    private var style
+
+    @Environment(\.isControlInvalid)
+    private var isInvalid
+
+    @EnvironmentObject
+    private var focusCoordinator: FocusCoordinator
 }
 
 private enum Constants {
-    static let minHeight: CGFloat = 44
-    static let padding = EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)
+    static let minHeight: CGFloat = 48
+    static let padding = EdgeInsets(horizontal: POSpacing.medium, vertical: POSpacing.extraSmall)
 }
 
 @available(iOS 14, *)
 private struct TextFieldRepresentable: UIViewRepresentable {
 
-    @Binding var text: String
+    @Binding
+    var text: String
 
     let formatter: Formatter?
-    let prompt: String
-    let preferredWidth: CGFloat
     let style: POInputStateStyle
 
     // MARK: - UIViewRepresentable
 
     typealias Coordinator = TextFieldCoordinator
 
-    func makeUIView(context: Context) -> TextField {
-        let textField = TextField()
+    func makeUIView(context: Context) -> UITextField {
+        let textField = UITextField()
+        textField.adjustsFontForContentSizeCategory = false
+        textField.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         context.coordinator.configure(textField: textField)
-        focusCoordinator?.track(control: textField)
+        focusCoordinator.track(control: textField)
         return textField
     }
 
-    func updateUIView(_ textField: TextField, context: Context) {
+    func updateUIView(_ textField: UITextField, context: Context) {
         context.coordinator.view = self
         let animated = context.transaction.animation != nil
         UIView.perform(withAnimation: animated, duration: 0.25) {
             updateText(textField)
-            updatePlaceholder(textField)
             UIView.performWithoutAnimation(textField.layoutIfNeeded)
         }
         textField.keyboardType = keyboardType
         textField.textContentType = textContentType
         textField.returnKeyType = submitLabel.returnKeyType
-        textField.preferredWidth = preferredWidth
     }
 
     func makeCoordinator() -> Coordinator {
@@ -107,7 +117,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
     // MARK: -
 
     func willReturn() {
-        submitAction?()
+        submitAction()
     }
 
     // MARK: - Private Nested Types
@@ -119,17 +129,26 @@ private struct TextFieldRepresentable: UIViewRepresentable {
 
     // MARK: - Private Properties
 
-    @Environment(\.sizeCategory) private var sizeCategory
-    @Environment(\.poKeyboardType) private var keyboardType
-    @Environment(\.poTextContentType) private var textContentType
-    @Environment(\.backportSubmitLabel) private var submitLabel
-    @Environment(\.backportSubmitAction) private var submitAction
-    @Environment(\.focusCoordinator) private var focusCoordinator
+    @Environment(\.sizeCategory)
+    private var sizeCategory
+
+    @Environment(\.poKeyboardType)
+    private var keyboardType
+
+    @Environment(\.poTextContentType)
+    private var textContentType
+
+    @Environment(\.backportSubmitLabel)
+    private var submitLabel
+
+    @Environment(\.backportSubmitAction)
+    private var submitAction
+
+    @EnvironmentObject
+    private var focusCoordinator: FocusCoordinator
 
     // MARK: - Private Methods
 
-    /// Internal implementation changes `defaultTextAttributes` which overwrites placeholder
-    /// attributes so placeholder must be configured after text.
     private func updateText(_ textField: UITextField) {
         if textField.text != text {
             textField.text = text
@@ -143,21 +162,6 @@ private struct TextFieldRepresentable: UIViewRepresentable {
             .buildAttributes()
             .filter { Constants.includedTextAttributes.contains($0.key) }
         textField.defaultTextAttributes = textAttributes
-    }
-
-    private func updatePlaceholder(_ textField: UITextField) {
-        let placeholderAttributes = AttributedStringBuilder()
-            .with { builder in
-                builder.typography = style.placeholder.typography
-                builder.sizeCategory = .init(sizeCategory)
-                builder.color = UIColor(style.placeholder.color)
-            }
-            .buildAttributes()
-            .filter { Constants.includedTextAttributes.contains($0.key) }
-        let updatedPlaceholder = NSAttributedString(string: prompt, attributes: placeholderAttributes)
-        if textField.attributedPlaceholder != updatedPlaceholder {
-            textField.attributedPlaceholder = updatedPlaceholder
-        }
     }
 }
 
@@ -221,51 +225,5 @@ private final class TextFieldCoordinator: NSObject, UITextFieldDelegate {
 
     @objc private func editingChanged(textField: UITextField) {
         view.text = textField.text ?? ""
-    }
-}
-
-private final class TextField: UITextField {
-
-    init() {
-        super.init(frame: .zero)
-        commonInit()
-    }
-
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override var intrinsicContentSize: CGSize {
-        if #available(iOS 16, *) {
-            super.intrinsicContentSize
-        } else {
-            // On iOS < 16, SwiftUI framework sometimes ignores content hugging priority and shrinks view to its
-            // intrinsic size. This is undesired because makes TextField hard to select especially when placeholder is
-            // not set. Solution is to hardcode width to container width (set from parent via preferredWidth property).
-            CGSize(width: preferredWidth, height: super.intrinsicContentSize.height)
-        }
-    }
-
-    var preferredWidth: CGFloat = 0 {
-        didSet { didChangePreferredWidth() }
-    }
-
-    // MARK: - Private Methods
-
-    private func commonInit() {
-        translatesAutoresizingMaskIntoConstraints = false
-        setContentHuggingPriority(.required, for: .vertical)
-        setContentCompressionResistancePriority(.required, for: .vertical)
-        setContentHuggingPriority(.defaultLow, for: .horizontal)
-        setContentCompressionResistancePriority(.required, for: .horizontal)
-        adjustsFontForContentSizeCategory = false
-    }
-
-    private func didChangePreferredWidth() {
-        guard #unavailable(iOS 16) else {
-            return
-        }
-        invalidateIntrinsicContentSize()
     }
 }

@@ -10,7 +10,7 @@ import Foundation
 final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     init(
-        configuration: HttpConnectorRequestMapperConfiguration,
+        configuration: @escaping @Sendable () -> HttpConnectorRequestMapperConfiguration,
         encoder: JSONEncoder,
         deviceMetadataProvider: DeviceMetadataProvider,
         logger: POLogger
@@ -22,6 +22,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
     }
 
     func urlRequest(from request: HttpConnectorRequest<some Decodable>) async throws -> URLRequest {
+        let configuration = self.configuration()
         guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
             logger.error("Unable to create a request with base URL \(configuration.baseUrl)")
             throw HttpConnectorFailure.internal
@@ -36,10 +37,10 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         }
         var sessionRequest = URLRequest(url: resourceURL)
         sessionRequest.httpMethod = request.method.rawValue.uppercased()
-        if let encodedBody = try await encodedRequestBody(request) {
+        if let encodedBody = try await encodedRequestBody(request, configuration: configuration) {
             sessionRequest.httpBody = encodedBody
         }
-        await defaultHeaders(for: request).forEach { field, value in
+        await defaultHeaders(for: request, configuration: configuration).forEach { field, value in
             sessionRequest.setValue(value, forHTTPHeaderField: field)
         }
         request.headers.forEach { field, value in
@@ -50,14 +51,16 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     // MARK: - Private Properties
 
-    private let configuration: HttpConnectorRequestMapperConfiguration
+    private let configuration: @Sendable () -> HttpConnectorRequestMapperConfiguration
     private let encoder: JSONEncoder
     private let deviceMetadataProvider: DeviceMetadataProvider
     private let logger: POLogger
 
     // MARK: - Request Body Encoding
 
-    private func encodedRequestBody(_ request: HttpConnectorRequest<some Decodable>) async throws -> Data? {
+    private func encodedRequestBody(
+        _ request: HttpConnectorRequest<some Decodable>, configuration: HttpConnectorRequestMapperConfiguration
+    ) async throws -> Data? {
         let decoratedBody: Encodable?
         if request.includesDeviceMetadata {
             let metadata = await deviceMetadataProvider.deviceMetadata
@@ -78,7 +81,9 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     // MARK: - Request Headers
 
-    private func authorization(request: HttpConnectorRequest<some Decodable>) -> String {
+    private func authorization(
+        request: HttpConnectorRequest<some Decodable>, configuration: HttpConnectorRequestMapperConfiguration
+    ) -> String {
         var value = configuration.projectId + ":"
         if request.requiresPrivateKey {
             if let privateKey = configuration.privateKey {
@@ -90,25 +95,29 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         return "Basic " + Data(value.utf8).base64EncodedString()
     }
 
-    private func defaultHeaders(for request: HttpConnectorRequest<some Decodable>) async -> [String: String] {
+    private func defaultHeaders(
+        for request: HttpConnectorRequest<some Decodable>, configuration: HttpConnectorRequestMapperConfiguration
+    ) async -> [String: String] {
         let deviceMetadata = await deviceMetadataProvider.deviceMetadata
         let headers = [
             "Idempotency-Key": request.id,
-            "User-Agent": userAgent(deviceMetadata: deviceMetadata),
+            "User-Agent": userAgent(deviceMetadata: deviceMetadata, configuration: configuration),
             "Accept-Language": Strings.preferredLocalization,
             "Content-Type": "application/json",
-            "Authorization": authorization(request: request),
+            "Authorization": authorization(request: request, configuration: configuration),
+            "Session-Id": configuration.sessionId,
             "Installation-Id": deviceMetadata.installationId,
             "Device-Id": deviceMetadata.id,
             "Device-System-Name": deviceMetadata.channel,
             "Device-System-Version": deviceMetadata.systemVersion,
-            "Product-Version": configuration.version,
-            "Host-Application-Version": configuration.appVersion
+            "Product-Version": configuration.version
         ]
         return headers.compactMapValues { $0 }
     }
 
-    private func userAgent(deviceMetadata: DeviceMetadata) -> String {
+    private func userAgent(
+        deviceMetadata: DeviceMetadata, configuration: HttpConnectorRequestMapperConfiguration
+    ) -> String {
         let components = [
             "iOS",
             deviceMetadata.systemVersion + " ProcessOut iOS-Bindings",

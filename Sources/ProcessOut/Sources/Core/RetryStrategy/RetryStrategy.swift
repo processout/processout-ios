@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct RetryStrategy {
+struct RetryStrategy: Sendable {
 
     /// Returns time interval to void for given retry.
     func interval(for retry: Int) -> TimeInterval {
@@ -18,7 +18,7 @@ struct RetryStrategy {
     let maximumRetries: Int
 
     /// Function to use to calculate delay for given attempt number.
-    let intervalFunction: (_ retry: Int) -> TimeInterval
+    let intervalFunction: @Sendable (_ retry: Int) -> TimeInterval
 }
 
 extension RetryStrategy {
@@ -27,7 +27,16 @@ extension RetryStrategy {
         .init(maximumRetries: maximumRetries) { _ in interval }
     }
 
-    static func exponential(maximumRetries: Int, interval: TimeInterval, rate: Double) -> Self {
-        .init(maximumRetries: maximumRetries) { interval * pow(rate, Double($0)) }
+    static func exponential(
+        maximumRetries: Int,
+        interval: TimeInterval,
+        rate: Double,
+        minimum: TimeInterval = 0,
+        maximum: TimeInterval = .greatestFiniteMagnitude
+    ) -> Self {
+        RetryStrategy(maximumRetries: maximumRetries) { retry in
+            let delay = interval * pow(rate, Double(retry))
+            return max(min(delay, maximum), minimum)
+        }
     }
 }

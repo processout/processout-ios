@@ -16,7 +16,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys
         sut = DefaultThreeDSService(
-            decoder: JSONDecoder(), encoder: encoder, jsonWritingOptions: [.sortedKeys], logger: POLogger.stub
+            decoder: JSONDecoder(), encoder: encoder, jsonWritingOptions: [.sortedKeys]
         )
         delegate = Mock3DSService()
     }

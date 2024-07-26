@@ -14,7 +14,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
         self.retryStrategy = retryStrategy
     }
 
-    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> Value {
+    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value> {
         try await retry(
             operation: { [connector] in
                 try await connector.execute(request: request)
@@ -26,9 +26,10 @@ final class HttpConnectorRetryDecorator: HttpConnector {
                 switch failure {
                 case .networkUnreachable, .timeout:
                     return true
-                case .server(_, let statusCode),
-                     .decoding(_, let statusCode):
-                    return (500...599).contains(statusCode) || statusCode == 408
+                case .server(_, let statusCode), .decoding(_, let statusCode):
+                    let clientErrors: Set = [408, 409, 425, 429]
+                    let serverErrors = (500...599)
+                    return clientErrors.contains(statusCode) || serverErrors.contains(statusCode)
                 default:
                     return false
                 }

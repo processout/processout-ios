@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct HttpConnectorRequestMapperConfiguration {
+struct HttpConnectorRequestMapperConfiguration: Sendable {
 
     /// Base url to use to send requests to.
     let baseUrl: URL
@@ -18,9 +18,9 @@ struct HttpConnectorRequestMapperConfiguration {
     /// Project's private key.
     let privateKey: String?
 
+    /// Current session ID.
+    let sessionId: String
+
     /// SDK version.
     let version: String
-
-    /// Host application version.
-    let appVersion: String?
 }

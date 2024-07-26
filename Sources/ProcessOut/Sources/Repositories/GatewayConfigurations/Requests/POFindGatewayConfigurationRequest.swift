@@ -5,11 +5,9 @@
 //  Created by Andrii Vysotskyi on 27.10.2022.
 //
 
-import Foundation
+public struct POFindGatewayConfigurationRequest: Sendable {
 
-public struct POFindGatewayConfigurationRequest {
-
-    public enum ExpandedProperty: String, Hashable {
+    public enum ExpandedProperty: String, Hashable, Sendable {
         case gateway
     }
 

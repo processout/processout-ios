@@ -6,12 +6,15 @@
 //
 
 import UIKit
+import ProcessOut
 
 final class FeaturesBuilder {
 
     func build() -> UIViewController {
         let router = FeaturesRouter()
-        let viewModel = FeaturesViewModel(router: router)
+        let viewModel = FeaturesViewModel(
+            invoicesService: ProcessOut.shared.invoices, router: router
+        )
         let viewController = FeaturesViewController(viewModel: viewModel)
         router.viewController = viewController
         let navigationController = UINavigationController(rootViewController: viewController)

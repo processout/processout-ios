@@ -84,7 +84,7 @@ enum CardTokenizationInteractorState {
         var issuerInformation: POCardIssuerInformation?
 
         /// Preferred scheme.
-        var preferredScheme: String?
+        var preferredScheme: POCardScheme?
 
         /// Billing address parameters.
         var address: AddressParameters
@@ -133,3 +133,6 @@ extension CardTokenizationInteractorState.Started {
         return parameters.allSatisfy(\.isValid) && address.areParametersValid
     }
 }
+
+@available(*, unavailable)
+extension CardTokenizationInteractorState: Sendable { }

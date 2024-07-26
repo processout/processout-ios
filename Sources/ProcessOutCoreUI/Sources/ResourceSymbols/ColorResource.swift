@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-// swiftlint:disable strict_fileprivate identifier_name
+// swiftlint:disable strict_fileprivate
 
 /// A color resource.
 /// - NOTE: This type wraps natively generated `ColorResource` to make resources publicly accessible.
-@_spi(PO) public struct POColorResource {
+@_spi(PO) public struct POColorResource: Sendable {
 
     fileprivate init(_ colorResource: ColorResource) {
         self.colorResource = colorResource
@@ -32,23 +32,14 @@ extension POColorResource {
     /// The "Surface" asset catalog resource namespace.
     public enum Surface {
 
-        /// The "Surface/Background" asset catalog color resource.
-        public static let background = POColorResource(.Surface.background)
-
-        /// The "Surface/Error" asset catalog color resource.
-        public static let error = POColorResource(.Surface.error)
-
-        /// The "Surface/Level1" asset catalog color resource.
-        public static let level1 = POColorResource(.Surface.level1)
-
-        /// The "Surface/Neutral" asset catalog color resource.
-        public static let neutral = POColorResource(.Surface.neutral)
+        /// The "Surface/Default" asset catalog color resource.
+        public static let `default` = POColorResource(.Surface.default)
 
         /// The "Surface/Success" asset catalog color resource.
         public static let success = POColorResource(.Surface.success)
 
-        /// The "Surface/Warning" asset catalog color resource.
-        public static let warning = POColorResource(.Surface.warning)
+        /// The "Surface/Error" asset catalog color resource.
+        public static let error = POColorResource(.Surface.error)
     }
 
     /// The "Text" asset catalog resource namespace.
@@ -63,23 +54,14 @@ extension POColorResource {
         /// The "Text/Muted" asset catalog color resource.
         public static let muted = POColorResource(.Text.muted)
 
-        /// The "Text/OnColor" asset catalog color resource.
-        public static let on = POColorResource(.Text.on)
+        /// The "Text/Inverse" asset catalog color resource.
+        public static let inverse = POColorResource(.Text.inverse)
 
         /// The "Text/Primary" asset catalog color resource.
         public static let primary = POColorResource(.Text.primary)
 
-        /// The "Text/Secondary" asset catalog color resource.
-        public static let secondary = POColorResource(.Text.secondary)
-
         /// The "Text/Success" asset catalog color resource.
         public static let success = POColorResource(.Text.success)
-
-        /// The "Text/Tertiary" asset catalog color resource.
-        public static let tertiary = POColorResource(.Text.tertiary)
-
-        /// The "Text/Warning" asset catalog color resource.
-        public static let warning = POColorResource(.Text.warning)
     }
 }
 
@@ -91,4 +73,4 @@ extension SwiftUI.Color {
     }
 }
 
-// swiftlint:enable strict_fileprivate identifier_name
+// swiftlint:enable strict_fileprivate

@@ -11,18 +11,23 @@ class BaseInteractor<State>: Interactor {
         self.state = state
     }
 
-    /// Interactor's state.
     var state: State {
-        didSet { didChange?() }
+        willSet {
+            willChange?(newValue)
+        }
+        didSet {
+            didChange?()
+        }
     }
 
-    /// A closure that is invoked after the object has changed.
-    var didChange: (() -> Void)? {
-        didSet { didChange?() }
-    }
+    var didChange: (() -> Void)?
+    var willChange: ((State) -> Void)?
 
-    @MainActor
     func start() {
+        // Does nothing
+    }
+
+    func cancel() {
         // Does nothing
     }
 }

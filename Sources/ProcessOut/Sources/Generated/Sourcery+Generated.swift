@@ -1,21 +1,88 @@
-// Generated using Sourcery 2.1.7 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 2.2.5 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 import Foundation
 import UIKit
 
-// swiftlint:disable all
+// MARK: - AutoCodingKeys
+
+extension POAssignCustomerTokenRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case source
+        case preferredScheme
+        case verify
+        case invoiceId
+        case enableThreeDS2 = "enable_three_d_s_2"
+        case thirdPartySdkVersion
+        case metadata
+    }
+}
+
+extension PODynamicCheckoutPaymentMethod.AlternativePayment {
+
+    enum CodingKeys: String, CodingKey {
+        case display
+        case flow
+        case configuration = "apm"
+    }
+}
+
+extension PODynamicCheckoutPaymentMethod.ApplePay {
+
+    enum CodingKeys: String, CodingKey {
+        case flow
+        case configuration = "applepay"
+    }
+}
+
+extension PODynamicCheckoutPaymentMethod.Card {
+
+    enum CodingKeys: String, CodingKey {
+        case display
+        case configuration = "card"
+    }
+}
+
+extension PODynamicCheckoutPaymentMethod.NativeAlternativePayment {
+
+    enum CodingKeys: String, CodingKey {
+        case display
+        case configuration = "apm"
+    }
+}
+
+extension POInvoiceAuthorizationRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case source
+        case incremental
+        case enableThreeDS2 = "enable_three_d_s_2"
+        case preferredScheme
+        case thirdPartySdkVersion
+        case invoiceDetailIds
+        case overrideMacBlocking
+        case initialSchemeTransactionId
+        case autoCaptureAt
+        case captureAmount
+        case authorizeOnly
+        case allowFallbackToSale
+        case metadata
+    }
+}
+
+// MARK: - AutoCompletion
 
 extension POCardsService {
 
-    /// Allows to retrieve card issuer information based on iin.
+    /// Allows to retrieve card issuer information based on IIN.
     /// 
     /// - Parameters:
     ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
     @discardableResult
     public func issuerInformation(
         iin: String,
-        completion: @escaping (Result<POCardIssuerInformation, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POCardIssuerInformation, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await issuerInformation(iin: iin)
@@ -29,7 +96,7 @@ extension POCardsService {
     @discardableResult
     public func tokenize(
         request: POCardTokenizationRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await tokenize(request: request)
@@ -40,7 +107,7 @@ extension POCardsService {
     @discardableResult
     public func updateCard(
         request: POCardUpdateRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await updateCard(request: request)
@@ -51,7 +118,7 @@ extension POCardsService {
     @discardableResult
     public func tokenize(
         request: POApplePayCardTokenizationRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await tokenize(request: request)
@@ -61,12 +128,12 @@ extension POCardsService {
 
 extension POCustomerTokensService {
 
-    /// Assigns new source to existing customer token and optionaly verifies it.
+    /// Assigns new source to existing customer token and optionally verifies it.
     @discardableResult
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
         threeDSService: PO3DSService,
-        completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POCustomerToken, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await assignCustomerToken(request: request, threeDSService: threeDSService)
@@ -78,7 +145,7 @@ extension POCustomerTokensService {
     @discardableResult
     public func createCustomerToken(
         request: POCreateCustomerTokenRequest,
-        completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POCustomerToken, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await createCustomerToken(request: request)
@@ -92,7 +159,7 @@ extension POGatewayConfigurationsRepository {
     @discardableResult
     public func all(
         request: POAllGatewayConfigurationsRequest,
-        completion: @escaping (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await all(request: request)
@@ -103,7 +170,7 @@ extension POGatewayConfigurationsRepository {
     @discardableResult
     public func find(
         request: POFindGatewayConfigurationRequest,
-        completion: @escaping (Result<POGatewayConfiguration, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POGatewayConfiguration, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await find(request: request)
@@ -113,7 +180,7 @@ extension POGatewayConfigurationsRepository {
     /// Returns available gateway configurations.
     @discardableResult
     public func all(
-        completion: @escaping (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await all()
@@ -127,33 +194,59 @@ extension POImagesRepository {
     @discardableResult
     public func images(
         at urls: [URL],
-        completion: @escaping ([URL: UIImage]) -> Void
+        scale: CGFloat,
+        completion: @escaping @Sendable ([URL: UIImage]) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            await images(at: urls, scale: scale)
+        }
+    }
+
+    /// Attempts to download images at given URLs.
+    @discardableResult
+    public func images(
+        at urls: [URL],
+        completion: @escaping @Sendable ([URL: UIImage]) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             await images(at: urls)
         }
     }
 
-    /// Downloads image at given URL and calls completion.
+    /// Downloads image at given URL.
     @discardableResult
     public func image(
         at url: URL?,
-        completion: @escaping (UIImage?) -> Void
+        scale: CGFloat = 1,
+        completion: @escaping @Sendable (UIImage?) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            await image(at: url)
+            await image(at: url, scale: scale)
         }
     }
 
-    /// Downloads two images at given URLs and calls completion.
+    /// Downloads two images at given URLs.
     @discardableResult
     public func images(
         at url1: URL?,
         _ url2: URL?,
-        completion: @escaping ((UIImage?, UIImage?)) -> Void
+        scale: CGFloat = 1,
+        completion: @escaping @Sendable ((UIImage?, UIImage?)) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            await images(at: url1, url2)
+            await images(at: url1, url2, scale: scale)
+        }
+    }
+
+    /// Downloads image for given resource.
+    @MainActor
+    @discardableResult
+    public func image(
+        resource: POImageRemoteResource,
+        completion: @escaping @Sendable (UIImage?) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            await image(resource: resource)
         }
     }
 }
@@ -164,7 +257,7 @@ extension POInvoicesService {
     @discardableResult
     public func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<PONativeAlternativePaymentMethodTransactionDetails, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await nativeAlternativePaymentMethodTransactionDetails(request: request)
@@ -178,10 +271,21 @@ extension POInvoicesService {
     @discardableResult
     public func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<PONativeAlternativePaymentMethodResponse, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await initiatePayment(request: request)
+        }
+    }
+
+    /// Invoice details.
+    @discardableResult
+    public func invoice(
+        request: POInvoiceRequest,
+        completion: @escaping @Sendable (Result<POInvoice, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await invoice(request: request)
         }
     }
 
@@ -190,7 +294,7 @@ extension POInvoicesService {
     public func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
         threeDSService: PO3DSService,
-        completion: @escaping (Result<Void, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<Void, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await authorizeInvoice(request: request, threeDSService: threeDSService)
@@ -201,7 +305,7 @@ extension POInvoicesService {
     @discardableResult
     public func captureNativeAlternativePayment(
         request: PONativeAlternativePaymentCaptureRequest,
-        completion: @escaping (Result<Void, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<Void, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await captureNativeAlternativePayment(request: request)
@@ -213,7 +317,7 @@ extension POInvoicesService {
     @discardableResult
     public func createInvoice(
         request: POInvoiceCreationRequest,
-        completion: @escaping (Result<POInvoice, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POInvoice, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await createInvoice(request: request)
@@ -221,13 +325,10 @@ extension POInvoicesService {
     }
 }
 
-extension POService {
-}
-
 /// Invokes given completion with a result of async operation.
-private func invoke<T>(
-    completion: @escaping (Result<T, POFailure>) -> Void,
-    after operation: @escaping () async throws -> T
+private func invoke<T: Sendable>(
+    completion: @escaping @Sendable (Result<T, POFailure>) -> Void,
+    after operation: @escaping @Sendable () async throws -> T
 ) -> POCancellable {
     Task { @MainActor in
         do {
@@ -243,7 +344,10 @@ private func invoke<T>(
 }
 
 /// Invokes given completion with a result of async operation.
-private func invoke<T>(completion: @escaping (T) -> Void, after operation: @escaping () async -> T) -> Task<Void, Never> {
+private func invoke<T: Sendable>(
+    completion: @escaping @Sendable (T) -> Void,
+    after operation: @escaping @Sendable () async -> T
+) -> Task<Void, Never> {
     Task { @MainActor in
         completion(await operation())
     }

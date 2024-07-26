@@ -10,8 +10,8 @@ import Foundation
 /// Builds http connector suitable for communications with ProcessOut API.
 final class ProcessOutHttpConnectorBuilder {
 
-    /// Connector configuration.
-    var configuration: HttpConnectorRequestMapperConfiguration?
+    /// Connector configuration provider.
+    var configuration: (@Sendable () -> HttpConnectorRequestMapperConfiguration)?
 
     /// Retry strategy to use for failing requests.
     var retryStrategy: RetryStrategy? = .exponential(maximumRetries: 3, interval: 0.1, rate: 3)
@@ -89,7 +89,7 @@ final class ProcessOutHttpConnectorBuilder {
 
 extension ProcessOutHttpConnectorBuilder {
 
-    func with(configuration: HttpConnectorRequestMapperConfiguration) -> Self {
+    func with(configuration: @escaping @Sendable () -> HttpConnectorRequestMapperConfiguration) -> Self {
         self.configuration = configuration
         return self
     }

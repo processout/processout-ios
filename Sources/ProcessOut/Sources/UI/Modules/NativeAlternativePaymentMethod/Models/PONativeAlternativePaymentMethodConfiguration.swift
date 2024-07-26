@@ -19,7 +19,7 @@ public struct PONativeAlternativePaymentMethodConfiguration {
         /// - Parameters:
         ///   - title: Action title. Pass `nil` title to use default value.
         ///   - disabledFor: By default user can interact with action immediately after it becomes visible, it is
-        ///   possible to make it initialy disabled for given amount of time.
+        ///   possible to make it initially disabled for given amount of time.
         case cancel(title: String? = nil, disabledFor: TimeInterval = 0)
     }
 
@@ -49,7 +49,7 @@ public struct PONativeAlternativePaymentMethodConfiguration {
     public let waitsPaymentConfirmation: Bool
 
     /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
-    /// Maximum value is 180 seconds.
+    /// Default timeout is 3 minutes while maximum value is 15 minutes.
     public let paymentConfirmationTimeout: TimeInterval
 
     /// Action that could be optionally presented to user during payment confirmation stage. To remove action

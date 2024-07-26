@@ -12,8 +12,8 @@ import SwiftUI
 @available(iOS 14, *)
 public struct POCardUpdateView: View {
 
-    init(viewModel: some CardUpdateViewModel) {
-        self._viewModel = .init(wrappedValue: .init(erasing: viewModel))
+    init(viewModel: @autoclosure @escaping () -> some CardUpdateViewModel) {
+        self._viewModel = .init(wrappedValue: .init(erasing: viewModel()))
     }
 
     // MARK: - View
@@ -21,7 +21,7 @@ public struct POCardUpdateView: View {
     public var body: some View {
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: POSpacing.medium) {
+                VStack(alignment: .leading, spacing: POSpacing.large) {
                     if let title = viewModel.title {
                         Text(title)
                             .textStyle(style.title)
@@ -37,13 +37,16 @@ public struct POCardUpdateView: View {
                     .backport.geometryGroup()
                 }
                 .animation(.default, value: bodyAnimationValue)
-                .padding(.vertical, POSpacing.medium)
+                .padding(.vertical, POSpacing.large)
             }
             .clipped()
             POActionsContainerView(actions: viewModel.actions)
                 .actionsContainerStyle(style.actionsContainer)
         }
-        .background(style.backgroundColor.ignoresSafeArea())
+        .backport.background {
+            style.backgroundColor.ignoresSafeArea()
+        }
+        .onAppear(perform: viewModel.start)
     }
 
     // MARK: - Private Properties

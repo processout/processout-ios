@@ -15,11 +15,11 @@ func withTimeout<T: Sendable>(
     error timeoutError: @autoclosure () -> Error,
     perform operation: @escaping @Sendable () async throws -> T
 ) async throws -> T {
-    @POUnfairlyLocked var isTimedOut = false
+    let isTimedOut = POUnfairlyLocked(wrappedValue: false)
     let task = Task(operation: operation)
     let timeoutTask = Task {
-        try await Task.sleep(nanoseconds: UInt64(timeout) * NSEC_PER_SEC)
-        $isTimedOut.withLock { value in
+        try await Task.sleep(seconds: timeout)
+        isTimedOut.withLock { value in
             value = true
         }
         guard !Task.isCancelled else {
@@ -33,7 +33,7 @@ func withTimeout<T: Sendable>(
             timeoutTask.cancel()
             return value
         } catch {
-            if task.isCancelled, isTimedOut {
+            if task.isCancelled, isTimedOut.wrappedValue {
                 throw timeoutError()
             }
             timeoutTask.cancel()
@@ -49,7 +49,7 @@ func withTimeout<T: Sendable>(
 
 func retry<T: Sendable>(
     operation: @escaping @Sendable () async throws -> T,
-    while condition: @escaping (Result<T, Error>) -> Bool,
+    while condition: @escaping @Sendable (Result<T, Error>) -> Bool,
     timeout: TimeInterval,
     timeoutError: @autoclosure () -> Error,
     retryStrategy: RetryStrategy? = nil
@@ -69,7 +69,7 @@ func retry<T: Sendable>(
 private func retry<T: Sendable>(
     operation: @escaping @Sendable () async throws -> T,
     after result: Result<T, Error>,
-    while condition: @escaping (Result<T, Error>) -> Bool,
+    while condition: @escaping @Sendable (Result<T, Error>) -> Bool,
     retryStrategy: RetryStrategy?,
     attempt: Int
 ) async throws -> T {
@@ -78,7 +78,7 @@ private func retry<T: Sendable>(
     }
     do {
         let delay = retryStrategy.interval(for: attempt)
-        try await Task.sleep(nanoseconds: UInt64(delay) * NSEC_PER_SEC)
+        try await Task.sleep(seconds: delay)
     } catch {
         // Ignored
     }

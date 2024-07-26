@@ -8,6 +8,7 @@
 import Combine
 @_spi(PO) import ProcessOutCoreUI
 
+@MainActor
 protocol CardUpdateViewModel: ObservableObject {
 
     /// Screen title.
@@ -21,4 +22,7 @@ protocol CardUpdateViewModel: ObservableObject {
 
     /// Currently focused item identifier.
     var focusedItemId: AnyHashable? { get set }
+
+    /// Starts view model.
+    func start()
 }

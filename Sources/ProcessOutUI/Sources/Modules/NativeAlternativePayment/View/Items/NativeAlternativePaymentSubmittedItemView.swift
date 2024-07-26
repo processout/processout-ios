@@ -12,9 +12,10 @@ import SwiftUI
 struct NativeAlternativePaymentSubmittedItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem.Submitted
+    let horizontalPadding: CGFloat
 
     var body: some View {
-        VStack(spacing: POSpacing.medium) {
+        VStack(spacing: POSpacing.large) {
             if let title = item.title {
                 Text(title)
                     .textStyle(POTextStyle(color: descriptionStyle.color, typography: style.title.typography))
@@ -26,11 +27,13 @@ struct NativeAlternativePaymentSubmittedItemView: View {
                     .scaledToFit()
                     .frame(height: min(Constants.maximumLogoImageHeight, image.size.height))
             }
+            if !item.isProgressViewHidden {
+                ProgressView()
+                    .poProgressViewStyle(style.progressView)
+            }
             POMarkdown(item.message)
                 .textStyle(descriptionStyle)
                 .multilineTextAlignment(isMessageCompact ? .center : .leading)
-            Spacer()
-                .frame(height: POSpacing.large)
             if let image = item.image {
                 Image(uiImage: image)
                     .resizable()
@@ -40,7 +43,7 @@ struct NativeAlternativePaymentSubmittedItemView: View {
             }
         }
         .padding(.top, isMessageCompact ? Constants.topInset : POSpacing.large)
-        .padding(.horizontal, POSpacing.large)
+        .padding(.horizontal, horizontalPadding)
     }
 
     // MARK: - Private Nested Types

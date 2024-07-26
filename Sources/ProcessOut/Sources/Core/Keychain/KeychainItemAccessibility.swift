@@ -7,13 +7,13 @@
 
 import Security
 
-struct KeychainItemAccessibility: RawRepresentable {
+struct KeychainItemAccessibility: RawRepresentable, Sendable {
 
-    let rawValue: CFString
+    let rawValue: String
 
     /// The data in the keychain item cannot be accessed after a restart until
     /// the device has been unlocked once by the user.
     static let accessibleAfterFirstUnlockThisDeviceOnly = KeychainItemAccessibility(
-        rawValue: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        rawValue: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly as String
     )
 }

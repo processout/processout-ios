@@ -13,6 +13,7 @@ import SwiftUI
 /// For more information about styling specific components, see
 /// [the dedicated documentation.](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutcoreui)
 @available(iOS 14, *)
+@MainActor
 public struct POCardTokenizationStyle {
 
     /// Title style.
@@ -64,18 +65,14 @@ public struct POCardTokenizationStyle {
 extension POCardTokenizationStyle {
 
     /// Default card tokenization style.
-    public static var `default`: POCardTokenizationStyle {
-        POCardTokenizationStyle(
-            title: POTextStyle(color: Color(poResource: .Text.primary), typography: .Medium.title),
-            sectionTitle: POTextStyle(
-                color: Color(poResource: .Text.secondary), typography: .Fixed.labelHeading
-            ),
-            input: .medium,
-            radioButton: .radio,
-            errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .Fixed.label),
-            backgroundColor: Color(poResource: .Surface.level1),
-            actionsContainer: .default,
-            separatorColor: Color(poResource: .Border.subtle)
-        )
-    }
+    public static let `default` = POCardTokenizationStyle(
+        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
+        sectionTitle: POTextStyle(color: Color(poResource: .Text.primary), typography: .label1),
+        input: .medium,
+        radioButton: .radio,
+        errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
+        backgroundColor: Color(poResource: .Surface.default),
+        actionsContainer: .default,
+        separatorColor: Color(poResource: .Border.subtle)
+    )
 }

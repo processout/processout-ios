@@ -6,13 +6,15 @@
 //
 
 /// Holds information about card issuing institution that issued the card to the card holder.
-public struct POCardIssuerInformation: Decodable {
+public struct POCardIssuerInformation: Decodable, Sendable {
 
     /// Scheme of the card.
-    public let scheme: String
+    @POTypedRepresentation<String, POCardScheme>
+    public private(set) var scheme: String
 
     /// Co-scheme of the card, such as Carte Bancaire.
-    public let coScheme: String?
+    @POTypedRepresentation<String?, POCardScheme>
+    public private(set) var coScheme: String?
 
     /// Card type.
     public let type: String?
@@ -27,15 +29,15 @@ public struct POCardIssuerInformation: Decodable {
     public let category: String?
 
     @_spi(PO) public init(
-        scheme: String,
-        coScheme: String? = nil,
+        scheme: POCardScheme,
+        coScheme: POCardScheme? = nil,
         type: String? = nil,
         bankName: String? = nil,
         brand: String? = nil,
         category: String? = nil
     ) {
-        self.scheme = scheme
-        self.coScheme = coScheme
+        self._scheme = .init(wrappedValue: scheme.rawValue)
+        self._coScheme = .init(wrappedValue: coScheme?.rawValue)
         self.type = type
         self.bankName = bankName
         self.brand = brand

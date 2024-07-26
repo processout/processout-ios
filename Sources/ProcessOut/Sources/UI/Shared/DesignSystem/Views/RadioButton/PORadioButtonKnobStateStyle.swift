@@ -8,6 +8,7 @@
 import UIKit
 
 /// Describes radio button knob style in a particular state.
+@MainActor
 public struct PORadioButtonKnobStateStyle {
 
     /// Background color.

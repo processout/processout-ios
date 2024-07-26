@@ -9,11 +9,13 @@
 "features.title" = "Available Features";
 "features.native-alternative-payment.title" = "Native Alternative Payment";
 "features.alternative-payment.title" = "Alternative Payment";
+"features.apple-pay.title" = "Apple Pay";
 "features.card-payment.title" = "Card payment";
 "features.card-payment.checkout.title" = "Card payment [Checkout 3DS SDK]";
 "features.card-payment.error" = "Card tokenization did fail with error: '%@'.";
 "features.card-payment.error-generic" = "Unable to tokenize card.";
 "features.card-payment.success" = "Card %@ was successfully tokenized.";
+"features.dynamic-checkout.title" = "Dynamic Checkout (Beta)";
 "features.continue" = "Continue";
 
 "alternative-payment-methods.title" = "Alternative Payment Methods";

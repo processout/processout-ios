@@ -9,6 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 /// Native alternative payment method screen background style.
+@MainActor
 public struct PONativeAlternativePaymentBackgroundStyle {
 
     /// Regular background color.
@@ -28,6 +29,6 @@ extension PONativeAlternativePaymentBackgroundStyle {
 
     /// Default native APM background style.
     public static let `default` = PONativeAlternativePaymentBackgroundStyle(
-        regular: Color(poResource: .Surface.level1), success: Color(poResource: .Surface.success)
+        regular: Color(poResource: .Surface.default), success: Color(poResource: .Surface.success)
     )
 }

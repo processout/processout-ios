@@ -8,6 +8,7 @@
 import UIKit
 
 /// Defines button style in all possible states.
+@MainActor
 public struct POButtonStyle {
 
     /// Style for normal state.

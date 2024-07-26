@@ -7,15 +7,15 @@
 
 import Foundation
 
-public struct POGatewayConfiguration: Decodable {
+public struct POGatewayConfiguration: Decodable, Sendable {
 
-    public struct NativeAlternativePaymentMethodConfig: Decodable {
+    public struct NativeAlternativePaymentMethodConfig: Decodable, Sendable {
 
         /// Configuration parameters.
         public let parameters: [PONativeAlternativePaymentMethodParameter]
     }
 
-    public struct Gateway: Decodable {
+    public struct Gateway: Decodable, Sendable {
 
         /// Name is the name of the payment gateway.
         public let name: String

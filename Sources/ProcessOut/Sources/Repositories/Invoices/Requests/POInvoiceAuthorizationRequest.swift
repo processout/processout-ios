@@ -7,11 +7,10 @@
 
 import Foundation
 
-public struct POInvoiceAuthorizationRequest: Encodable {
+public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: AutoCodingKeys
 
     /// Invoice identifier to to perform authorization for.
-    @POImmutableExcludedCodable
-    public var invoiceId: String
+    public let invoiceId: String // sourcery:coding: skip
 
     /// Payment source to use for authorization.
     public let source: String
@@ -19,11 +18,16 @@ public struct POInvoiceAuthorizationRequest: Encodable {
     /// Boolean value indicating if authorization is incremental. Default value is `false`.
     public let incremental: Bool
 
-    /// Boolean value indicating whether 3DS2 is enabled. Default value is `true`.
-    public let enableThreeDS2: Bool
+    /// Boolean value used as flag that when set to `true` indicates that a request is coming directly
+    /// from the frontend.  It is used to understand if we can instantly step-up to 3DS or not.
+    ///
+    /// Value is hardcoded to `true`.
+    @available(*, deprecated, message: "Property is an implementation detail and shouldn't be used.")
+    public let enableThreeDS2 = true // sourcery:coding: key="enable_three_d_s_2"
 
     /// Card scheme or co-scheme that should get priority if it is available.
-    public let preferredScheme: String?
+    @POTypedRepresentation<String?, POCardScheme>
+    public private(set) var preferredScheme: String?
 
     /// Can be used for a 3DS2 request to indicate which third party SDK is used for the call.
     public let thirdPartySdkVersion: String?
@@ -63,7 +67,7 @@ public struct POInvoiceAuthorizationRequest: Encodable {
         invoiceId: String,
         source: String,
         incremental: Bool = false,
-        enableThreeDS2: Bool = true,
+        enableThreeDS2 _: Bool = true,
         preferredScheme: String? = nil,
         thirdPartySdkVersion: String? = nil,
         invoiceDetailIds: [String]? = nil,
@@ -75,11 +79,10 @@ public struct POInvoiceAuthorizationRequest: Encodable {
         allowFallbackToSale: Bool = false,
         metadata: [String: String]? = nil
     ) {
-        self._invoiceId = .init(value: invoiceId)
+        self.invoiceId = invoiceId
         self.source = source
         self.incremental = incremental
-        self.enableThreeDS2 = enableThreeDS2
-        self.preferredScheme = preferredScheme
+        self._preferredScheme = .init(wrappedValue: preferredScheme)
         self.thirdPartySdkVersion = thirdPartySdkVersion
         self.invoiceDetailIds = invoiceDetailIds
         self.overrideMacBlocking = overrideMacBlocking

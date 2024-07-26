@@ -7,10 +7,11 @@
 
 import Foundation
 
-@_spi(PO) public enum POSpacing {
+@_spi(PO)
+public enum POSpacing {
 
     /// Extra small spacing.
-    static let extraSmall: CGFloat = 4
+    public static let extraSmall: CGFloat = 4
 
     /// Small spacing. Can be used as a spacing between adjacent
     /// items in the same section.
@@ -20,5 +21,5 @@ import Foundation
     public static let medium: CGFloat = 16
 
     /// Large spacing.
-    public static let large: CGFloat = 24
+    public static let large: CGFloat = 20
 }

@@ -7,10 +7,12 @@
 
 import SwiftUI
 
+@MainActor
 final class FocusCoordinator: ObservableObject {
 
     /// Holds boolean value indicating whether tracked control is currently being edited.
-    @Published private(set) var isEditing = false
+    @Published
+    private(set) var isEditing = false
 
     func track(control: UIControl) {
         guard self.control == nil else {
@@ -49,19 +51,5 @@ final class FocusCoordinator: ObservableObject {
 
     @objc private func editingDidEnd() {
         isEditing = false
-    }
-}
-
-extension EnvironmentValues {
-
-    var focusCoordinator: FocusCoordinator? {
-        get { self[Key.self] }
-        set { self[Key.self] = newValue }
-    }
-
-    // MARK: - Private Properties
-
-    private struct Key: EnvironmentKey {
-        static let defaultValue: FocusCoordinator? = nil
     }
 }

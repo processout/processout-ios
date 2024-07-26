@@ -22,7 +22,7 @@ ProcessOut.configure(configuration: configuration)
 
 ### Errors
 
-All errors that could happen as a result of interaction with the SDK are representd by ``POFailure`` type.
+All errors that could happen as a result of interaction with the SDK are represented by ``POFailure`` type.
 
 - ``POFailure``
 
@@ -65,6 +65,8 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``POCard``
 - ``POCardUpdateRequest``
 - ``POCardIssuerInformation``
+- ``POCardCvcCheck``
+- ``POCardScheme``
 
 ### Customer Tokens
 
@@ -83,6 +85,8 @@ All errors that could happen as a result of interaction with the SDK are represe
 ### Invoices
 
 - ``POInvoicesService``
+- ``POInvoiceRequest``
+- ``POInvoice``
 - ``POInvoiceAuthorizationRequest``
 - ``PONativeAlternativePaymentCaptureRequest``
 - ``PONativeAlternativePaymentMethodParameter``
@@ -92,6 +96,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``PONativeAlternativePaymentMethodTransactionDetailsRequest``
 - ``PONativeAlternativePaymentMethodParameterValues``
 - ``PONativeAlternativePaymentMethodState``
+<!--- ``PODynamicCheckoutPaymentMethod``-->
 
 ### Appearance
 
@@ -112,6 +117,11 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POActivityIndicatorView``
 - ``POActionsContainerStyle``
 
+### Images Utils
+
+- ``POImageRemoteResource``
+- ``POStringCodableColor``
+
 ### Utils
 
 - ``POPaginationOptions``
@@ -122,6 +132,9 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POFallbackDecodable``
 - ``POFallbackValueProvider``
 - ``POEmptyStringProvider``
+- ``POTypedRepresentation``
+- ``POStringDecodableMerchantCapability``
+- ``POBillingAddressCollectionMode``
 - ``PORepository``
 - ``POService``
 - ``POAutoAsync``

@@ -8,6 +8,7 @@
 import SwiftUI
 
 /// Actions container style.
+@MainActor
 public struct POActionsContainerStyle {
 
     /// Style for primary button.
@@ -45,12 +46,10 @@ extension POActionsContainerStyle {
 
     /// Default actions container style.
     @available(iOS 14, *)
-    public static var `default`: POActionsContainerStyle {
-        POActionsContainerStyle(
-            primary: .primary,
-            secondary: .secondary,
-            separatorColor: Color(.Border.subtle),
-            backgroundColor: Color(.Surface.level1)
-        )
-    }
+    public static let `default` = POActionsContainerStyle(
+        primary: .primary,
+        secondary: .secondary,
+        separatorColor: Color(.Border.subtle),
+        backgroundColor: Color(.Surface.default)
+    )
 }

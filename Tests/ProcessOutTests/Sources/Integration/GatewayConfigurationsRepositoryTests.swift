@@ -9,12 +9,12 @@ import Foundation
 import XCTest
 @testable import ProcessOut
 
-@MainActor final class GatewayConfigurationsRepositoryTests: XCTestCase {
+final class GatewayConfigurationsRepositoryTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        let configuration = ProcessOutConfiguration.production(projectId: Constants.projectId)
-        sut = ProcessOut(configuration: configuration).gatewayConfigurations
+        ProcessOut.configure(configuration: .production(projectId: Constants.projectId), force: true)
+        sut = ProcessOut.shared.gatewayConfigurations
     }
 
     // MARK: - Tests

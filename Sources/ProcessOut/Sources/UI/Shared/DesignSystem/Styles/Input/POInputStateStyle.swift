@@ -8,6 +8,7 @@
 import UIKit
 
 /// Defines input's styling information in a specific state.
+@MainActor
 public struct POInputStateStyle {
 
     /// Text style.

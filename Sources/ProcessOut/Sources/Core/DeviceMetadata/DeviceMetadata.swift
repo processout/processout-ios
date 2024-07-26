@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct DeviceMetadata: Encodable {
+struct DeviceMetadata: Encodable, Sendable {
 
     /// Current device identifier.
     @POImmutableExcludedCodable
@@ -21,13 +21,17 @@ struct DeviceMetadata: Encodable {
     @POImmutableExcludedCodable
     var systemVersion: String
 
+    /// Device model.
+    @POImmutableExcludedCodable
+    var model: String?
+
     /// Default app language.
     let appLanguage: String
 
     /// Width of the screen in pixels.
     let appScreenWidth: Int
 
-    /// Height of the screen in pixles.
+    /// Height of the screen in pixels.
     let appScreenHeight: Int
 
     /// Time zone offset in minutes.

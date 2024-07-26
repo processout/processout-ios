@@ -17,7 +17,7 @@ enum CardUpdateViewModelItem {
         /// Item identifier.
         let id: AnyHashable
 
-        /// Availale options.
+        /// Available options.
         let options: [PickerOption]
 
         /// Currently selected option id.
@@ -69,3 +69,6 @@ extension CardUpdateViewModelItem: Identifiable {
         static let progressId = UUID().uuidString
     }
 }
+
+@available(*, unavailable)
+extension CardUpdateViewModelItem: Sendable { }

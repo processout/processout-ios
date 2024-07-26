@@ -24,27 +24,36 @@ public struct PORadioButtonStyle: ButtonStyle {
     /// Style to use when radio button is in error state.
     public let error: PORadioButtonStateStyle
 
+    /// Style to use when radio button is disabled.
+    public let disabled: PORadioButtonStateStyle
+
     /// Creates style instance.
     public init(
         normal: PORadioButtonStateStyle,
         selected: PORadioButtonStateStyle,
         highlighted: PORadioButtonStateStyle,
-        error: PORadioButtonStateStyle
+        error: PORadioButtonStateStyle,
+        disabled: PORadioButtonStateStyle? = nil
     ) {
         self.normal = normal
         self.selected = selected
         self.highlighted = highlighted
         self.error = error
+        self.disabled = disabled ?? normal
     }
 
     // MARK: - ButtonStyle
 
     public func makeBody(configuration: Configuration) -> some View {
-        ContentView { isSelected, isInvalid in
-            let style = currentStyle(isSelected: isSelected, isInvalid: isInvalid, isPressed: configuration.isPressed)
+        ContentView { isSelected, isInvalid, isEnabled in
+            let style = resolveStyle(
+                isSelected: isSelected, isInvalid: isInvalid, isPressed: configuration.isPressed, isEnabled: isEnabled
+            )
             Label(
                 title: {
-                    configuration.label.textStyle(style.value, addPadding: false)
+                    configuration.label
+                        .textStyle(style.value, addPadding: false)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 },
                 icon: {
                     ZStack {
@@ -59,24 +68,26 @@ public struct PORadioButtonStyle: ButtonStyle {
                     .frame(width: Constants.knobSize, height: Constants.knobSize)
                 }
             )
-            .padding(.vertical, Constants.minVerticalPadding)
-            .frame(maxWidth: .infinity, minHeight: Constants.minHeight, alignment: .leading)
             .animation(.default, value: isSelected)
-            .contentShape(.rect)
+            .animation(.default, value: isEnabled)
         }
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let minVerticalPadding = POSpacing.extraSmall
-        static let minHeight: CGFloat = 44
-        static let knobSize: CGFloat = 18
+        static let knobSize: CGFloat = 22
     }
 
     // MARK: - Private Methods
 
-    private func currentStyle(isSelected: Bool, isInvalid: Bool, isPressed: Bool) -> PORadioButtonStateStyle {
+    private func resolveStyle(
+        isSelected: Bool, isInvalid: Bool, isPressed: Bool, isEnabled: Bool
+    ) -> PORadioButtonStateStyle {
+        if !isEnabled {
+            return disabled
+        }
         if isSelected {
             return selected
         }
@@ -94,14 +105,20 @@ public struct PORadioButtonStyle: ButtonStyle {
 private struct ContentView<Content: View>: View {
 
     @ViewBuilder
-    let content: (_ isSelected: Bool, _ isInvalid: Bool) -> Content
+    let content: (_ isSelected: Bool, _ isInvalid: Bool, _ isEnabled: Bool) -> Content
 
     var body: some View {
-        content(isSelected, isInvalid)
+        content(isSelected, isInvalid, isEnabled)
     }
 
     // MARK: - Private Properties
 
-    @Environment(\.isRadioButtonSelected) private var isSelected
-    @Environment(\.isControlInvalid) private var isInvalid
+    @Environment(\.isRadioButtonSelected)
+    private var isSelected
+
+    @Environment(\.isControlInvalid)
+    private var isInvalid
+
+    @Environment(\.isEnabled)
+    private var isEnabled
 }

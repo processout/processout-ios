@@ -14,7 +14,9 @@ import ProcessOut
 /// - Important: The PO3DSRedirectController class performs the same role as the SFSafariViewController
 /// class initialized with 3DSRedirect, but it does not depend on the UIKit framework. This means that
 /// the controller can be used in places where a view controller cannot (for example, in SwiftUI applications).
-public final class PO3DSRedirectController {
+@available(*, deprecated, message: "Use POWebAuthenticationSession instead.")
+@MainActor
+public final class PO3DSRedirectController: Sendable {
 
     /// - Parameters:
     ///   - redirect: redirect to handle.
@@ -67,6 +69,8 @@ public final class PO3DSRedirectController {
 
     /// Dismisses the Redirect UI.
     public func dismiss(completion: (() -> Void)? = nil) {
+        // todo(andrii-vysotskyi): automatically dismiss controller so behavior
+        // matches `POAlternativePaymentMethodController`.
         if let safariViewController, safariViewController.presentingViewController != nil {
             self.safariViewController = nil
             safariViewController.dismiss(animated: true, completion: completion)
@@ -76,7 +80,7 @@ public final class PO3DSRedirectController {
     }
 
     /// Completion to invoke when redirect handling ends.
-    public var completion: ((Result<String, POFailure>) -> Void)?
+    public var completion: (@Sendable (Result<String, POFailure>) -> Void)?
 
     /// The preferred color to tint the background of the navigation bar and toolbar.
     public var preferredBarTintColor: UIColor?
@@ -87,7 +91,7 @@ public final class PO3DSRedirectController {
     // MARK: - Private Nested Types
 
     private enum AssociatedKeys {
-        static var redirectController: UInt8 = 0
+        nonisolated(unsafe) static var redirectController: UInt8 = 0
     }
 
     // MARK: - Private Properties

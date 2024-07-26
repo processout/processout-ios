@@ -8,7 +8,9 @@
 import Foundation
 
 // todo(andrii-vysotskyi): migrate interactor and dependencies to UI module when ready
-@_spi(PO) public protocol PONativeAlternativePaymentMethodInteractor: AnyObject {
+@_spi(PO)
+@MainActor
+public protocol PONativeAlternativePaymentMethodInteractor: AnyObject {
 
     typealias State = PONativeAlternativePaymentMethodInteractorState
 

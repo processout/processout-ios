@@ -5,8 +5,10 @@
 //  Created by Andrii Vysotskyi on 27.03.2023.
 //
 
+// todo(andrii-vysotskyi): remove when updating to 5.0.0
+
 /// Available card schemes.
-public enum PO3DS2ConfigurationCardScheme: RawRepresentable, Decodable, Hashable {
+public enum PO3DS2ConfigurationCardScheme: RawRepresentable, Decodable, Hashable, Sendable {
 
     /// Known card schemes.
     case visa, mastercard, europay, carteBancaire, jcb, diners, discover, unionpay, americanExpress

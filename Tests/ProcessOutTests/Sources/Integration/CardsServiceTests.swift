@@ -9,12 +9,12 @@ import Foundation
 import XCTest
 @testable import ProcessOut
 
-@MainActor final class CardsServiceTests: XCTestCase {
+final class CardsServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        let configuration = ProcessOutConfiguration.production(projectId: Constants.projectId)
-        sut = ProcessOut(configuration: configuration).cards
+        ProcessOut.configure(configuration: .production(projectId: Constants.projectId), force: true)
+        sut = ProcessOut.shared.cards
     }
 
     // MARK: - Tests
@@ -27,7 +27,7 @@ import XCTest
         XCTAssertEqual(information.bankName, "UNITED CITIZENS BANK OF SOUTHERN KENTUCKY")
         XCTAssertEqual(information.brand, "visa business")
         XCTAssertEqual(information.category, "commercial")
-        XCTAssertEqual(information.scheme, "visa")
+        XCTAssertEqual(information.$scheme.typed, .visa)
         XCTAssertEqual(information.type, "debit")
     }
 
@@ -99,7 +99,7 @@ import XCTest
         )
 
         // Then
-        XCTAssertEqual(updatedCard.preferredScheme, "test")
+        XCTAssertEqual(updatedCard.$preferredScheme.typed, "test")
     }
 
     func test_tokenize_whenPreferredSchemeIsSet() async throws {

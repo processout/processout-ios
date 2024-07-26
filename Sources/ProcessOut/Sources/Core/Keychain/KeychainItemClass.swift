@@ -7,10 +7,10 @@
 
 import Security
 
-struct KeychainItemClass: RawRepresentable {
+struct KeychainItemClass: RawRepresentable, Sendable {
 
-    let rawValue: CFString
+    let rawValue: String
 
     /// Generic password item.
-    static let genericPassword = KeychainItemClass(rawValue: kSecClassGenericPassword)
+    static let genericPassword = KeychainItemClass(rawValue: kSecClassGenericPassword as String)
 }

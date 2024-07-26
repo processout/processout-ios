@@ -74,8 +74,10 @@ final class TextFieldContainerView: UIView {
         ]
         NSLayoutConstraint.activate(constraints)
         placeholderObservation = textField.observe(\.placeholder, options: .old) { [weak self] textField, value in
-            if textField.placeholder != value.oldValue {
-                self?.configureWithCurrentState(animated: false)
+            MainActor.assumeIsolated {
+                if textField.placeholder != value.oldValue {
+                    self?.configureWithCurrentState(animated: false)
+                }
             }
         }
     }

@@ -8,6 +8,7 @@
 import UIKit
 
 /// Text style.
+@MainActor
 public struct POTextStyle {
 
     /// Text foreground color.

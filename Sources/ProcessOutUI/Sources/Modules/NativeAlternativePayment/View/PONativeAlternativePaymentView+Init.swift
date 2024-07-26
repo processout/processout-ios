@@ -11,31 +11,33 @@
 extension PONativeAlternativePaymentView {
 
     /// Creates native APM view.
+    ///
     /// - Parameters:
     ///   - completion: Completion to invoke when flow is completed.
+    ///
+    /// - NOTE: Use caution when using this view, because SwiftUI only initializes
+    /// its state once during the lifetime of the view — even if you call the initializer
+    /// more than once — which might result in unexpected behavior.
     public init(
         configuration: PONativeAlternativePaymentConfiguration,
         delegate: PONativeAlternativePaymentDelegate? = nil,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
-        var logger = ProcessOut.shared.logger
-        logger[attributeKey: "InvoiceId"] = configuration.invoiceId
-        let interactorConfiguration = PONativeAlternativePaymentMethodInteractorConfiguration(
-            gatewayConfigurationId: configuration.gatewayConfigurationId,
-            invoiceId: configuration.invoiceId,
-            waitsPaymentConfirmation: configuration.waitsPaymentConfirmation,
-            paymentConfirmationTimeout: configuration.paymentConfirmationTimeout
-        )
-        let interactor = PODefaultNativeAlternativePaymentMethodInteractor(
-            invoicesService: ProcessOut.shared.invoices,
-            imagesRepository: ProcessOut.shared.images,
-            configuration: interactorConfiguration,
-            logger: logger,
-            delegate: delegate
-        )
-        let viewModel = DefaultNativeAlternativePaymentViewModel(
-            interactor: interactor, configuration: configuration, completion: completion
-        )
-        self = .init(viewModel: viewModel)
+        let viewModel = {
+            var logger: POLogger = ProcessOut.shared.logger
+            logger[attributeKey: .invoiceId] = configuration.invoiceId
+            logger[attributeKey: .gatewayConfigurationId] = configuration.gatewayConfigurationId
+            let interactor = NativeAlternativePaymentDefaultInteractor(
+                configuration: configuration,
+                invoicesService: ProcessOut.shared.invoices,
+                imagesRepository: ProcessOut.shared.images,
+                logger: logger,
+                completion: completion
+            )
+            interactor.delegate = delegate
+            let viewModel = DefaultNativeAlternativePaymentViewModel(interactor: interactor)
+            return AnyViewModel(erasing: viewModel)
+        }
+        self = .init(viewModel: viewModel())
     }
 }

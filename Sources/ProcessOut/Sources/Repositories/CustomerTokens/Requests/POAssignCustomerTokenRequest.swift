@@ -8,22 +8,21 @@
 import Foundation
 
 /// Request to use to assign new source to existing customer token and potentially verify it.
-public struct POAssignCustomerTokenRequest: Encodable {
+public struct POAssignCustomerTokenRequest: Encodable, Sendable { // sourcery: AutoCodingKeys
 
     /// Id of the customer who token belongs to.
-    @POImmutableExcludedCodable
-    public var customerId: String
+    public let customerId: String // sourcery:coding: skip
 
     /// Tokens that belong to the customer.
-    @POImmutableExcludedCodable
-    public var tokenId: String
+    public let tokenId: String // sourcery:coding: skip
 
     /// Payment source to associate with token. The source can be a card, an APM or a gateway request. For the source
     /// to be valid, you must not have used it for any previous payment or to create any other customer tokens.
     public let source: String
 
     /// Card scheme or co-scheme that should get priority if it is available.
-    public let preferredScheme: String?
+    @POTypedRepresentation<String?, POCardScheme>
+    public private(set) var preferredScheme: String?
 
     /// Boolean value that indicates whether token should be verified. Make sure to also pass valid
     /// ``POAssignCustomerTokenRequest/invoiceId`` if you want verification to happen. Default value
@@ -33,13 +32,17 @@ public struct POAssignCustomerTokenRequest: Encodable {
     /// Invoice identifier that will be used for token verification.
     public let invoiceId: String?
 
-    /// Boolean value indicating whether 3DS2 is enabled. Default value is `true`.
-    public let enableThreeDS2: Bool
+    /// Boolean value used as flag that when set to `true` indicates that a request is coming directly
+    /// from the frontend.  It is used to understand if we can instantly step-up to 3DS or not.
+    ///
+    /// Value is hardcoded to `true`.
+    @available(*, deprecated, message: "Property is an implementation detail and shouldn't be used.")
+    public let enableThreeDS2 = true // sourcery:coding: key="enable_three_d_s_2"
 
     /// Can be used for a 3DS2 request to indicate which third party SDK is used for the call.
     public let thirdPartySdkVersion: String?
 
-    /// Additional matadata.
+    /// Additional metadata.
     public let metadata: [String: String]?
 
     /// Creates request instance.
@@ -50,17 +53,16 @@ public struct POAssignCustomerTokenRequest: Encodable {
         preferredScheme: String? = nil,
         verify: Bool = false,
         invoiceId: String? = nil,
-        enableThreeDS2: Bool = true,
+        enableThreeDS2 _: Bool = true,
         thirdPartySdkVersion: String? = nil,
         metadata: [String: String]? = nil
     ) {
-        self._customerId = .init(value: customerId)
-        self._tokenId = .init(value: tokenId)
+        self.customerId = customerId
+        self.tokenId = tokenId
         self.source = source
-        self.preferredScheme = preferredScheme
+        self._preferredScheme = .init(wrappedValue: preferredScheme)
         self.verify = verify
         self.invoiceId = invoiceId
-        self.enableThreeDS2 = enableThreeDS2
         self.thirdPartySdkVersion = thirdPartySdkVersion
         self.metadata = metadata
     }

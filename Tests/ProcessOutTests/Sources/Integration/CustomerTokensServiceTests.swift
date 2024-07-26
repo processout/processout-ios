@@ -6,18 +6,18 @@
 //
 
 import XCTest
-@_spi(PO) @testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 
-@MainActor final class CustomerTokensServiceTests: XCTestCase {
+final class CustomerTokensServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
         let configuration = ProcessOutConfiguration.production(
             projectId: Constants.projectId, privateKey: Constants.projectPrivateKey
         )
-        let processOut = ProcessOut(configuration: configuration)
-        sut = processOut.customerTokens
-        cardsService = processOut.cards
+        ProcessOut.configure(configuration: configuration, force: true)
+        sut = ProcessOut.shared.customerTokens
+        cardsService = ProcessOut.shared.cards
     }
 
     // MARK: - Tests

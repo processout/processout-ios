@@ -29,8 +29,8 @@ public struct POMenuPickerStyle: POPickerStyle {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let minHeight: CGFloat = 44
-        static let padding = EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)
+        static let minHeight: CGFloat = 48
+        static let padding = EdgeInsets(horizontal: POSpacing.medium, vertical: POSpacing.extraSmall)
     }
 
     // MARK: - Private Properties

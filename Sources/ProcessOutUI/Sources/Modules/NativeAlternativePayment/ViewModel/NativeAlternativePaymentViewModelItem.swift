@@ -9,7 +9,7 @@ import SwiftUI
 
 enum NativeAlternativePaymentViewModelItem {
 
-    struct Title: Identifiable {
+    struct Title: Identifiable, Hashable {
 
         /// Item identifier.
         let id: AnyHashable
@@ -23,7 +23,7 @@ enum NativeAlternativePaymentViewModelItem {
         /// Item identifier.
         let id: AnyHashable
 
-        /// Availale options.
+        /// Available options.
         let options: [PickerOption]
 
         /// Currently selected option id.
@@ -60,12 +60,9 @@ enum NativeAlternativePaymentViewModelItem {
 
         /// Boolean value indicating whether value is valid.
         let isInvalid: Bool
-
-        /// Boolean value indicating whether input is currently enabled.
-        let isEnabled: Bool
     }
 
-    struct Submitted: Identifiable {
+    struct Submitted: Identifiable, Hashable {
 
         /// Item identifier.
         let id: AnyHashable
@@ -84,6 +81,9 @@ enum NativeAlternativePaymentViewModelItem {
 
         /// Boolean value that indicates whether payment is already captured.
         let isCaptured: Bool
+
+        /// Defines whether progress view should be hidden or not.
+        let isProgressViewHidden: Bool
     }
 
     case progress, title(Title), input(Input), codeInput(CodeInput), picker(Picker), submitted(Submitted)
@@ -112,5 +112,25 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
 
     private enum Constants {
         static let progressId = UUID().uuidString
+    }
+}
+
+extension NativeAlternativePaymentViewModelSection: AnimationIdentityProvider {
+
+    var animationIdentity: AnyHashable {
+        [id, items.map(animationIdentity), error]
+    }
+
+    // MARK: - Private Methods
+
+    private func animationIdentity(of item: NativeAlternativePaymentViewModelItem) -> AnyHashable {
+        switch item {
+        case .title(let item):
+            return item
+        case .submitted(let item):
+            return item
+        default:
+            return item.id
+        }
     }
 }

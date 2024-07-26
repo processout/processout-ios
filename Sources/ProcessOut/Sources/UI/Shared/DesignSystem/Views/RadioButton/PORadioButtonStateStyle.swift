@@ -8,6 +8,7 @@
 import UIKit
 
 /// Describes radio button style in a particular state, for example when selected.
+@MainActor
 public struct PORadioButtonStateStyle {
 
     /// Styling of the radio button knob not including value.

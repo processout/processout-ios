@@ -38,14 +38,17 @@ func scene(_ scene: UIScene, openURLContexts urlContexts: Set<UIOpenURLContext>)
 }
 ```
 
-We also provide ``PO3DSRedirectController`` that can handle 3DS Redirects and does not depend on the UIKit framework.
+We also provide ``POWebAuthenticationSession`` that can handle 3DS Redirects and does not depend on the UIKit framework.
 This means that the controller can be used in places where a view controller cannot (for example, in SwiftUI
 applications).
 
 ```swift
-let controller = PO3DSRedirectController(redirect: redirect, returnUrl: Constants.returnUrl)
-controller.completion = { [weak controller] result in
-   controller?.dismiss { completion(result) }
+let session = POWebAuthenticationSession(
+    redirect: redirect, returnUrl: Constants.returnUrl, completion: completion
+)
+if await session.start() {
+    return
 }
-controller.present()
+let failure = POFailure(message: "Unable to process redirect", code: .generic(.mobile))
+completion(.failure(failure))
 ```

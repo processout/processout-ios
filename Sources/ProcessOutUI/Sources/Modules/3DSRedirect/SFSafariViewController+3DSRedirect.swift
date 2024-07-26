@@ -24,19 +24,27 @@ extension SFSafariViewController {
         redirect: PO3DSRedirect,
         returnUrl: URL,
         safariConfiguration: SFSafariViewController.Configuration = .init(),
-        completion: @escaping (Result<String, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<String, POFailure>) -> Void
     ) {
         self.init(url: redirect.url, configuration: safariConfiguration)
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
-        let delegate = ThreeDSRedirectSafariViewModelDelegate(completion: completion)
-        let configuration = DefaultSafariViewModelConfiguration(
-            returnUrl: returnUrl, timeout: redirect.timeout
-        )
         let viewModel = DefaultSafariViewModel(
-            configuration: configuration, eventEmitter: api.eventEmitter, logger: api.logger, delegate: delegate
+            callback: .customScheme(returnUrl.scheme ?? ""),
+            timeout: redirect.timeout,
+            eventEmitter: api.eventEmitter,
+            logger: api.logger,
+            completion: { result in
+                completion(result.map(Self.token))
+            }
         )
-        self.delegate = viewModel
         setViewModel(viewModel)
         viewModel.start()
+    }
+
+    // MARK: - Private Methods
+
+    private static nonisolated func token(with url: URL) -> String {
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        return components?.queryItems?.first { $0.name == "token" }?.value ?? ""
     }
 }

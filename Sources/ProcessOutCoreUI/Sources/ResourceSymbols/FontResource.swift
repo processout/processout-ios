@@ -10,10 +10,10 @@
 import UIKit
 
 /// A font resource.
-struct FontResource {
+struct FontResource: Sendable {
 
     /// Font resource name.
-    fileprivate let name: String
+    fileprivate let weight: UIFont.Weight
 
     /// Font family.
     fileprivate let family: String
@@ -27,10 +27,10 @@ extension FontResource {
     enum WorkSans {
 
         /// The "WorkSans/Regular" font resource.
-        static let regular = FontResource(name: "WorkSans-Regular", family: "Work Sans", resource: "WorkSans.ttf")
+        static let regular = FontResource(weight: .regular, family: "Work Sans", resource: "WorkSans.ttf")
 
         /// The "WorkSans/Medium" font resource.
-        static let medium = FontResource(name: "WorkSansRoman-Medium", family: "Work Sans", resource: "WorkSans.ttf")
+        static let medium = FontResource(weight: .medium, family: "Work Sans", resource: "WorkSans.ttf")
     }
 
     static func register() {
@@ -54,10 +54,14 @@ extension UIKit.UIFont {
 
     /// Initialize a `UIFont` with an font resource and size.
     convenience init(_ resource: FontResource, size: CGFloat) {
-        if !UIFont.fontNames(forFamilyName: resource.family).contains(resource.name) {
+        if UIFont.fontNames(forFamilyName: resource.family).isEmpty {
             FontResource.register(resource: resource.resource)
         }
-        self.init(name: resource.name, size: size)! // swiftlint:disable:this force_unwrapping
+        let attributes: [UIFontDescriptor.AttributeName: Any] = [
+            .family: resource.family, .traits: [UIFontDescriptor.TraitKey.weight: resource.weight]
+        ]
+        let descriptor = UIFontDescriptor(fontAttributes: attributes)
+        self.init(descriptor: descriptor, size: size)
     }
 }
 

@@ -16,6 +16,7 @@ extension SFSafariViewController {
 
     // MARK: - Private Nested Types
 
+    @MainActor
     private enum Keys {
         static var viewModel: UInt8 = 0
     }

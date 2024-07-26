@@ -12,7 +12,7 @@ import Foundation
 /// Property wrapper that allows to encode and decode `Decimal` to/from string representation. Value is coded
 /// in en_US locale.
 @propertyWrapper
-public struct POImmutableStringCodableDecimal: Codable {
+public struct POImmutableStringCodableDecimal: Codable, Sendable {
 
     public let wrappedValue: Decimal
 
@@ -49,7 +49,7 @@ public struct POImmutableStringCodableDecimal: Codable {
 
 extension KeyedEncodingContainer {
 
-    mutating func encode(
+    public mutating func encode(
         _ value: POImmutableStringCodableDecimal, forKey key: KeyedEncodingContainer<K>.Key
     ) throws {
         try value.encode(to: superEncoder(forKey: key))
@@ -58,7 +58,7 @@ extension KeyedEncodingContainer {
 
 extension KeyedDecodingContainer {
 
-    func decode(
+    public func decode(
         _ type: POImmutableStringCodableDecimal.Type, forKey key: KeyedDecodingContainer<K>.Key
     ) throws -> POImmutableStringCodableDecimal {
         try type.init(from: try superDecoder(forKey: key))

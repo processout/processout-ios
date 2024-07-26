@@ -9,6 +9,10 @@ import Foundation
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
+// TODOs:
+// - Support scanning card details with camera
+// - Allow selecting card co-scheme when authorizing invoice or assigning token
+
 struct CardTokenizationViewModelState {
 
     struct Section: Identifiable {
@@ -84,10 +88,17 @@ struct CardTokenizationViewModelState {
     var focusedInputId: AnyHashable?
 }
 
-extension CardTokenizationViewModelState {
+extension CardTokenizationViewModelState: AnimationIdentityProvider {
 
     static var idle: Self {
         Self(title: nil, sections: [], actions: [], focusedInputId: nil)
+    }
+
+    var animationIdentity: AnyHashable {
+        let sectionsIdentity = sections.map { section in
+            [section.id, section.items.map(\.id)]
+        }
+        return [sectionsIdentity, AnyHashable(actions.map(\.id))]
     }
 }
 
@@ -106,3 +117,6 @@ extension CardTokenizationViewModelState.Item: Identifiable {
         }
     }
 }
+
+@available(*, unavailable)
+extension CardTokenizationViewModelState: Sendable { }

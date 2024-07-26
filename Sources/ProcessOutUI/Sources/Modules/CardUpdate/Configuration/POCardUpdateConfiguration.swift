@@ -7,7 +7,7 @@
 
 /// A configuration object that defines how a card update module behaves.
 /// Use `nil` as a value for a nullable property to indicate that default value should be used.
-public struct POCardUpdateConfiguration {
+public struct POCardUpdateConfiguration: Sendable {
 
     /// Card id that needs to be updated.
     public let cardId: String
@@ -25,7 +25,7 @@ public struct POCardUpdateConfiguration {
     /// Primary action text, such as "Cancel". Use empty string to hide button.
     public let cancelActionTitle: String?
 
-    /// Boolean flag determines whether user will be aksed to select scheme if co-scheme is available.
+    /// Boolean flag determines whether user will be asked to select scheme if co-scheme is available.
     /// Until feature is fully ready this is hardcoded to `false`.
     let isSchemeSelectionAllowed: Bool
 
