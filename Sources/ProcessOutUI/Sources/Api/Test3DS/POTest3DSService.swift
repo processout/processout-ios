@@ -21,7 +21,7 @@ public final class POTest3DSService: PO3DSService {
 
     public func authenticationRequest(
         configuration: PO3DS2Configuration,
-        completion: @escaping (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
     ) {
         let request = PO3DS2AuthenticationRequest(
             deviceData: "",
@@ -33,26 +33,28 @@ public final class POTest3DSService: PO3DSService {
         completion(.success(request))
     }
 
-    public func handle(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
-        guard let presentingViewController = PresentingViewControllerProvider.find() else {
-            completion(.success(false))
-            return
+    public func handle(challenge: PO3DS2Challenge, completion: @escaping @Sendable (Result<Bool, POFailure>) -> Void) {
+        MainActor.assumeIsolated {
+            guard let presentingViewController = PresentingViewControllerProvider.find() else {
+                completion(.success(false))
+                return
+            }
+            let alertController = UIAlertController(
+                title: String(resource: .Test3DS.title), message: "", preferredStyle: .alert
+            )
+            let acceptAction = UIAlertAction(title: String(resource: .Test3DS.accept), style: .default) { _ in
+                completion(.success(true))
+            }
+            alertController.addAction(acceptAction)
+            let rejectAction = UIAlertAction(title: String(resource: .Test3DS.reject), style: .default) { _ in
+                completion(.success(false))
+            }
+            alertController.addAction(rejectAction)
+            presentingViewController.present(alertController, animated: true)
         }
-        let alertController = UIAlertController(
-            title: String(resource: .Test3DS.title), message: "", preferredStyle: .alert
-        )
-        let acceptAction = UIAlertAction(title: String(resource: .Test3DS.accept), style: .default) { _ in
-            completion(.success(true))
-        }
-        alertController.addAction(acceptAction)
-        let rejectAction = UIAlertAction(title: String(resource: .Test3DS.reject), style: .default) { _ in
-            completion(.success(false))
-        }
-        alertController.addAction(rejectAction)
-        presentingViewController.present(alertController, animated: true)
     }
 
-    public func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
+    public func handle(redirect: PO3DSRedirect, completion: @escaping @Sendable (Result<String, POFailure>) -> Void) {
         Task { @MainActor in
             let session = POWebAuthenticationSession(redirect: redirect, returnUrl: returnUrl, completion: completion)
             if await session.start() {

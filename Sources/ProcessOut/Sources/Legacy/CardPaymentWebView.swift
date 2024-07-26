@@ -8,6 +8,7 @@
 import Foundation
 
 @available(*, deprecated)
+@preconcurrency
 final class CardPaymentWebView: ProcessOutWebView {
     
     override func onRedirect(url: URL) {

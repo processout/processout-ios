@@ -19,7 +19,7 @@ extension POWebAuthenticationSession {
     public convenience init(
         redirect: PO3DSRedirect,
         returnUrl: URL,
-        completion: @escaping (Result<String, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<String, POFailure>) -> Void
     ) {
         let completionBox: Completion = { result in
             completion(result.map(Self.token(with:)))
@@ -30,7 +30,7 @@ extension POWebAuthenticationSession {
 
     // MARK: - Private Methods
 
-    private static func token(with url: URL) -> String {
+    private static nonisolated func token(with url: URL) -> String {
         let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
         return components?.queryItems?.first { $0.name == "token" }?.value ?? ""
     }

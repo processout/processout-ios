@@ -26,7 +26,8 @@ extension EnvironmentValues {
 
     // MARK: - Private Nested Types
 
-    private struct Key: EnvironmentKey {
+    @MainActor
+    private struct Key: @preconcurrency EnvironmentKey {
         static let defaultValue = POCardTokenizationStyle.default
     }
 }

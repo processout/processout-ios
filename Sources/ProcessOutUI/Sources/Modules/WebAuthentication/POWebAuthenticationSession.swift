@@ -10,17 +10,17 @@ import AuthenticationServices
 @_spi(PO) import ProcessOut
 
 /// A session that an app uses to authenticate a payment.
-public final class POWebAuthenticationSession {
+@MainActor
+public final class POWebAuthenticationSession: Sendable {
 
     /// A completion handler for the web authentication session.
-    typealias Completion = (Result<URL, POFailure>) -> Void
+    typealias Completion = @Sendable (Result<URL, POFailure>) -> Void
 
     /// Only call this method once for a given POWebAuthenticationSession instance after initialization.
     /// Calling the start() method on a canceled session results in a failure.
     ///
     /// After you call start(), the session instance stores a strong reference to itself. To avoid deallocation during
     /// the authentication process, the session keeps the reference until after it calls the completion handler.
-    @MainActor
     public func start() async -> Bool {
         guard state == nil else {
             preconditionFailure("Session start must be attempted only once.")
@@ -41,7 +41,6 @@ public final class POWebAuthenticationSession {
     ///
     /// If the session has already presented a view with the authentication webpage, calling this method dismisses
     /// that view. Calling cancel() on an already canceled/completed session has no effect.
-    @MainActor
     public func cancel() async {
         guard case .started(let viewController) = state else {
             return
@@ -71,7 +70,7 @@ public final class POWebAuthenticationSession {
     // MARK: - Private Nested Types
 
     private enum AssociatedKeys {
-        static var controller: UInt8 = 0
+        nonisolated(unsafe) static var controller: UInt8 = 0
     }
 
     private enum State {
@@ -105,7 +104,7 @@ public final class POWebAuthenticationSession {
         return viewController
     }
 
-    private func complete(with result: Result<URL, POFailure>) {
+    private nonisolated func complete(with result: Result<URL, POFailure>) {
         Task { @MainActor in
             await self.cancel()
             state = .completed

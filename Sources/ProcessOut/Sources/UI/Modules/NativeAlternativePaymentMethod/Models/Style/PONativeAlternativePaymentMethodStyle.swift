@@ -9,6 +9,7 @@ import UIKit
 
 /// Defines style for native alternative payment method module.
 @available(*, deprecated, message: "Use ProcessOutUI.PONativeAlternativePaymentStyle instead.")
+@MainActor
 public struct PONativeAlternativePaymentMethodStyle {
 
     /// Title style.
@@ -81,6 +82,7 @@ public struct PONativeAlternativePaymentMethodStyle {
 
     // MARK: - Private Nested Types
 
+    @MainActor
     private enum Constants {
         static let title = POTextStyle(color: UIColor(resource: .Text.primary), typography: .Medium.title)
         static let sectionTitle = POTextStyle(

@@ -16,6 +16,7 @@ public protocol PONativeAlternativePaymentMethodDelegate: AnyObject {
     /// all parameters.
     /// - NOTE: completion must be called on `main` thread.
     func nativeAlternativePaymentMethodDefaultValues(
-        for parameters: [PONativeAlternativePaymentMethodParameter], completion: @escaping ([String: String]) -> Void
+        for parameters: [PONativeAlternativePaymentMethodParameter],
+        completion: @escaping @Sendable ([String: String]) -> Void
     )
 }

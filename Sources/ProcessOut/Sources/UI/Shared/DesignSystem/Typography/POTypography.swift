@@ -8,6 +8,7 @@
 import UIKit
 
 /// Holds typesetting information that could be applied to displayed text.
+@MainActor
 public struct POTypography {
 
     /// Font associated with given typography.
@@ -50,6 +51,7 @@ public struct POTypography {
 
 extension POTypography {
 
+    @MainActor
     enum Fixed {
 
         /// Use for captions, status labels and tags.
@@ -70,6 +72,7 @@ extension POTypography {
         static let labelHeading = POTypography(font: FontFamily.WorkSans.medium.font(size: 14), lineHeight: 18)
     }
 
+    @MainActor
     enum Medium {
 
         /// Use for page titles.

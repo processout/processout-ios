@@ -8,6 +8,7 @@
 import Foundation
 import ProcessOut
 
+@MainActor
 protocol DynamicCheckoutAlternativePaymentSession {
 
     /// Starts alternative payment.

@@ -8,7 +8,7 @@
 import ProcessOut
 
 /// Describes events that could happen during card tokenization lifecycle.
-public enum POCardTokenizationEvent {
+public enum POCardTokenizationEvent: Sendable {
 
     /// Initial event that is sent prior any other event.
     case willStart

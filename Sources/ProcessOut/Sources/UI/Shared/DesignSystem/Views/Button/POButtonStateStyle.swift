@@ -8,6 +8,7 @@
 import UIKit
 
 /// Defines button's styling information in a specific state.
+@MainActor
 public struct POButtonStateStyle {
 
     /// Text typography.

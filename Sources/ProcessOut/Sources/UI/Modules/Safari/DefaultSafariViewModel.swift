@@ -9,7 +9,8 @@ import Foundation
 import SafariServices
 
 @available(*, deprecated)
-final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
+@MainActor
+final class DefaultSafariViewModel: NSObject, @preconcurrency SFSafariViewControllerDelegate {
 
     init(
         configuration: DefaultSafariViewModelConfiguration,
@@ -30,7 +31,9 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
         }
         if let timeout = configuration.timeout {
             timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
-                self?.setCompletedState(with: POFailure(code: .timeout(.mobile)))
+                MainActor.assumeIsolated {
+                    self?.setCompletedState(with: POFailure(code: .timeout(.mobile)))
+                }
             }
         }
         deepLinkObserver = eventEmitter.on(PODeepLinkReceivedEvent.self) { [weak self] event in

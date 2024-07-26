@@ -209,7 +209,9 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 withTimeInterval: Constants.captureSuccessCompletionDelay,
                 repeats: false,
                 block: { [weak self] _ in
-                    self?.completion?(.success(()))
+                    MainActor.assumeIsolated {
+                        self?.completion?(.success(()))
+                    }
                 }
             )
             let submittedItem = State.SubmittedItem(
@@ -389,8 +391,10 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
         }
         self[keyPath: isDisabled] = true
         let timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
-            self?[keyPath: isDisabled] = false
-            self?.configureWithInteractorState()
+            MainActor.assumeIsolated {
+                self?[keyPath: isDisabled] = false
+                self?.configureWithInteractorState()
+            }
         }
         cancelActionTimers[timerKey] = timer
     }

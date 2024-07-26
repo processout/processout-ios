@@ -10,6 +10,7 @@ import SwiftUI
 
 /// Defines style for native alternative payment module.
 @available(iOS 14, *)
+@MainActor
 public struct PONativeAlternativePaymentStyle {
 
     /// Title style.

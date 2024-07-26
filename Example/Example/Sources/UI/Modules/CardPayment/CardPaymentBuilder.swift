@@ -8,7 +8,7 @@
 import UIKit
 import ProcessOut
 import ProcessOutUI
-import ProcessOutCheckout3DS
+// import ProcessOutCheckout3DS
 
 final class CardPaymentBuilder {
 
@@ -23,10 +23,11 @@ final class CardPaymentBuilder {
         case .test:
             threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
         case .checkout:
-            threeDSService = POCheckout3DSServiceBuilder()
-                .with(delegate: CardPaymentCheckout3DSServiceDelegate())
-                .with(environment: .sandbox)
-                .build()
+//            threeDSService = POCheckout3DSServiceBuilder()
+//                .with(delegate: CardPaymentCheckout3DSServiceDelegate())
+//                .with(environment: .sandbox)
+//                .build()
+            threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
         }
         let delegate = CardPaymentDelegate(
             invoicesService: ProcessOut.shared.invoices, threeDSService: threeDSService

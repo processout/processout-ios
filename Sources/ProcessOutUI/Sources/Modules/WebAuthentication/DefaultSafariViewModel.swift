@@ -9,14 +9,15 @@ import Foundation
 import SafariServices
 @_spi(PO) import ProcessOut
 
-final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
+@MainActor
+final class DefaultSafariViewModel: NSObject, Sendable, @preconcurrency SFSafariViewControllerDelegate {
 
     init(
         callback: POWebAuthenticationSessionCallback,
         timeout: TimeInterval? = nil,
         eventEmitter: POEventEmitter,
         logger: POLogger,
-        completion: @escaping (Result<URL, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<URL, POFailure>) -> Void
     ) {
         self.callback = callback
         self.timeout = timeout
@@ -32,7 +33,9 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
         }
         if let timeout {
             timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
-                self?.setCompletedState(with: POFailure(code: .timeout(.mobile)))
+                MainActor.assumeIsolated {
+                    self?.setCompletedState(with: POFailure(code: .timeout(.mobile)))
+                }
             }
         }
         deepLinkObserver = eventEmitter.on(PODeepLinkReceivedEvent.self) { [weak self] event in
@@ -59,7 +62,7 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
         }
     }
 
-    func safariViewController(_ controller: SFSafariViewController, initialLoadDidRedirectTo url: URL) {
+    nonisolated func safariViewController(_ controller: SFSafariViewController, initialLoadDidRedirectTo url: URL) {
         logger.debug("Safari did redirect to url: \(url)")
     }
 

@@ -21,7 +21,7 @@ extension PODynamicCheckoutView {
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         let viewModel = {
-            let logger = ProcessOut.shared.logger
+            let logger: POLogger = ProcessOut.shared.logger
             let interactor = DynamicCheckoutDefaultInteractor(
                 configuration: configuration,
                 delegate: delegate,

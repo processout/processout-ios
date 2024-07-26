@@ -6,7 +6,7 @@
 //
 
 /// Short card information necessary for CVC update.
-public struct POCardUpdateInformation {
+public struct POCardUpdateInformation: Sendable {
 
     /// Masked card number displayed to user as is if set.
     public let maskedNumber: String?

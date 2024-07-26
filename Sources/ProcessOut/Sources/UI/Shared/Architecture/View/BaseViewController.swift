@@ -66,7 +66,9 @@ class BaseViewController<Model>: UIViewController where Model: ViewModel {
         // There may be UI glitches if view is updated when being tracked by user. So
         // as a workaround, configuration is postponed to a point when tracking ends.
         guard RunLoop.current.currentMode != .tracking else {
-            RunLoop.current.perform(viewModelDidChange)
+            RunLoop.current.perform {
+                MainActor.assumeIsolated(self.viewModelDidChange)
+            }
             return
         }
         // View is configured without animation if it is not yet part of the hierarchy to avoid visual issues.
@@ -113,7 +115,9 @@ class BaseViewController<Model>: UIViewController where Model: ViewModel {
         // is extracted from notification and update is scheduled for next run loop iteration. Collection layout
         // update is needed here in a first place because layout depends on inset, which transitively depends on
         // keyboard visibility.
-        RunLoop.current.perform(animator.startAnimation)
+        RunLoop.current.perform {
+            MainActor.assumeIsolated(animator.startAnimation)
+        }
     }
 }
 

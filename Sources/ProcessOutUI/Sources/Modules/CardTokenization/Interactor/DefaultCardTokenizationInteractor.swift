@@ -121,7 +121,7 @@ final class DefaultCardTokenizationInteractor:
             preferredScheme: startedState.preferredScheme,
             metadata: configuration.metadata
         )
-        Task { @MainActor in
+        Task {
             do {
                 let card = try await cardsService.tokenize(request: request)
                 logger.debug("Did tokenize card: \(String(describing: card))")
@@ -255,20 +255,20 @@ final class DefaultCardTokenizationInteractor:
             return
         }
         logger.debug("Will fetch issuer information", attributes: ["IIN": iin])
-        issuerInformationCancellable = cardsService.issuerInformation(iin: iin) { [logger, weak self] result in
-            guard let self, case .started(var startedState) = self.state else {
-                return
-            }
-            switch result {
-            case .failure(let failure) where failure.code == .cancelled:
-                break
-            case .failure(let failure):
-                // Inability to select co-scheme is considered minor issue and we still want
-                // users to be able to continue tokenization. So errors are silently ignored.
-                logger.info("Did fail to fetch issuer information: \(failure)", attributes: ["IIN": iin])
-            case .success(let issuerInformation):
+        issuerInformationCancellable = Task {
+            do {
+                let issuerInformation = try await cardsService.issuerInformation(iin: iin)
+                guard case .started(var startedState) = self.state else {
+                    return
+                }
                 update(startedState: &startedState, issuerInformation: issuerInformation, resolvePreferredScheme: true)
                 self.setStateUnchecked(.started(startedState))
+            } catch let failure as POFailure where failure.code == .cancelled {
+                // Ignored
+            } catch {
+                // Inability to select co-scheme is considered minor issue and we still want
+                // users to be able to continue tokenization. So errors are silently ignored.
+                logger.info("Did fail to fetch issuer information: \(error)", attributes: ["IIN": iin])
             }
         }
     }

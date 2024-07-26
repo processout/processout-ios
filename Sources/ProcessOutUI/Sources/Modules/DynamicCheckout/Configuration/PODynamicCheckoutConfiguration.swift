@@ -9,9 +9,9 @@ import PassKit
 
 /// Dynamic checkout configuration.
 @_spi(PO)
-public struct PODynamicCheckoutConfiguration {
+public struct PODynamicCheckoutConfiguration: Sendable {
 
-    public struct PaymentSuccess {
+    public struct PaymentSuccess: Sendable {
 
         /// Custom success message to display user when payment completes.
         public let message: String?
@@ -26,7 +26,7 @@ public struct PODynamicCheckoutConfiguration {
         }
     }
 
-    public struct CancelButton {
+    public struct CancelButton: Sendable {
 
         /// Cancel button title.
         public let title: String?

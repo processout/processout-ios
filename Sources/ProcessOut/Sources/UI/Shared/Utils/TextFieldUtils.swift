@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+@MainActor
 enum TextFieldUtils {
 
     static func changeText(

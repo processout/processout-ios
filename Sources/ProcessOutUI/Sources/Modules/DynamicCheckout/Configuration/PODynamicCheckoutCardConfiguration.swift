@@ -9,10 +9,10 @@ import ProcessOut
 
 /// Card specific dynamic checkout configuration.
 @_spi(PO)
-public struct PODynamicCheckoutCardConfiguration {
+public struct PODynamicCheckoutCardConfiguration: Sendable {
 
     /// Billing address collection configuration.
-    public struct BillingAddress {
+    public struct BillingAddress: Sendable {
 
         /// Default address information.
         public let defaultAddress: POContact?

@@ -7,6 +7,7 @@
 
 import PassKit
 
+@MainActor
 protocol DynamicCheckoutPassKitPaymentSession {
 
     /// Boolean value indicating whether PassKit payments are supported.

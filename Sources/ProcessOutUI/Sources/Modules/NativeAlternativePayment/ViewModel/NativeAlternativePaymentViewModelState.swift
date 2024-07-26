@@ -35,5 +35,7 @@ extension NativeAlternativePaymentViewModelState: AnimationIdentityProvider {
 extension NativeAlternativePaymentViewModelState {
 
     /// Idle state.
-    static let idle = Self(sections: [], actions: [], isCaptured: false, focusedItemId: nil, confirmationDialog: nil)
+    static var idle: Self {
+        Self(sections: [], actions: [], isCaptured: false, focusedItemId: nil, confirmationDialog: nil)
+    }
 }

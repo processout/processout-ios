@@ -148,7 +148,6 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Starting State
 
-    @MainActor
     private func continueStartUnchecked() async {
         do {
             let request = POInvoiceRequest(id: configuration.invoiceId)
@@ -337,7 +336,7 @@ final class DynamicCheckoutDefaultInteractor:
             isCancellable: false
         )
         state = .paymentProcessing(paymentProcessingState)
-        Task { @MainActor in
+        Task {
             do {
                 try await passKitPaymentSession.start(invoiceId: startedState.invoice.id, request: request)
                 setSuccessState()
@@ -415,7 +414,7 @@ final class DynamicCheckoutDefaultInteractor:
             isCancellable: false
         )
         state = .paymentProcessing(paymentProcessingState)
-        Task { @MainActor in
+        Task {
             do {
                 _ = try await alternativePaymentSession.start(url: method.configuration.redirectUrl)
                 setSuccessState()
@@ -617,7 +616,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         state = .success
         send(event: .didCompletePayment)
-        Task { @MainActor in
+        Task {
             try? await Task.sleep(seconds: configuration.paymentSuccess?.duration ?? 0)
             completion(.success(()))
         }
@@ -721,7 +720,8 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
     }
 
     func nativeAlternativePaymentMethodDefaultValues(
-        for parameters: [PONativeAlternativePaymentMethodParameter], completion: @escaping ([String: String]) -> Void
+        for parameters: [PONativeAlternativePaymentMethodParameter],
+        completion: @escaping @Sendable ([String: String]) -> Void
     ) {
         Task { @MainActor in
             let values = await delegate?.dynamicCheckout(alternativePaymentDefaultsFor: parameters) ?? [:]

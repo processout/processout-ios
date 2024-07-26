@@ -17,6 +17,6 @@ extension SFSafariViewController {
     // MARK: - Private Nested Types
 
     private enum Keys {
-        static var viewModel: UInt8 = 0
+        nonisolated(unsafe) static var viewModel: UInt8 = 0
     }
 }

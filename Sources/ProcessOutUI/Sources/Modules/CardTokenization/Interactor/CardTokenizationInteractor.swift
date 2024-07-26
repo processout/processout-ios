@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 18.07.2023.
 //
 
+@MainActor
 protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState> {
 
     /// Delegate.
@@ -21,7 +22,4 @@ protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState>
 
     /// Starts card tokenization.
     func tokenize()
-
-    /// Cancells tokenization if possible.
-    func cancel()
 }

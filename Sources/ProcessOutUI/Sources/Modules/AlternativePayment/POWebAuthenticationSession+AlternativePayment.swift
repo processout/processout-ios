@@ -19,7 +19,7 @@ extension POWebAuthenticationSession {
     public convenience init(
         request: POAlternativePaymentMethodRequest,
         returnUrl: URL,
-        completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
     ) {
         let url = ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodUrl(request: request)
         self.init(alternativePaymentMethodUrl: url, returnUrl: returnUrl, completion: completion)
@@ -35,17 +35,17 @@ extension POWebAuthenticationSession {
     public convenience init(
         alternativePaymentMethodUrl url: URL,
         returnUrl: URL,
-        completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
     ) {
         let completionBox: Completion = { result in
-            completion(result.flatMap(Self.response(with:)))
+            completion(result.flatMap(Self.response))
         }
         self.init(url: url, callback: .customScheme(returnUrl.scheme ?? ""), completion: completionBox)
     }
 
     // MARK: - Private Methods
 
-    private static func response(with url: URL) -> Result<POAlternativePaymentMethodResponse, POFailure> {
+    private static nonisolated func response(with url: URL) -> Result<POAlternativePaymentMethodResponse, POFailure> {
         let result = Result {
             try ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodResponse(url: url)
         }

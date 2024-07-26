@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 struct KeyboardNotification {
 
     /// Keyboard’s frame at the end of its animation.
