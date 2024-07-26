@@ -405,10 +405,10 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Events
 
-    private func send(event: PONativeAlternativePaymentMethodEvent) {
+    private func send(event: PONativeAlternativePaymentEvent) {
         assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
-        delegate?.nativeAlternativePaymentMethodDidEmitEvent(event)
+        delegate?.nativeAlternativePaymentDidEmitEvent(event)
     }
 
     private func didUpdate(parameter: NativeAlternativePaymentInteractorState.Parameter, to value: String) {
@@ -442,7 +442,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             let formatter: Foundation.Formatter?
             switch specification.type {
             case .phone:
-                formatter = POPhoneNumberFormatter()
+                formatter = PhoneNumberFormatter()
             default:
                 formatter = nil
             }
@@ -456,7 +456,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         // Server doesn't support localized error messages, so local generic error
         // description is used instead in case particular field is invalid.
         // todo(andrii-vysotskyi): remove when backend is updated
-        let resource: POStringResource
+        let resource: StringResource
         switch parameterType {
         case .numeric:
             resource = .NativeAlternativePayment.Error.invalidNumber
@@ -498,7 +498,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         let defaultValues = await withCheckedContinuation { continuation in
             if let delegate {
-                delegate.nativeAlternativePaymentMethodDefaultValues(
+                delegate.nativeAlternativePaymentDefaultValues(
                     for: parameters.map(\.specification),
                     completion: { continuation.resume(returning: $0) }
                 )
@@ -544,7 +544,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         parameters.forEach { parameter in
             var normalizedValue = parameter.value
             if case .phone = parameter.specification.type, let value = normalizedValue {
-                normalizedValue = POPhoneNumberFormatter().normalized(number: value)
+                normalizedValue = PhoneNumberFormatter().normalized(number: value)
             }
             if let normalizedValue, normalizedValue != parameter.value {
                 logger.debug("Will use updated value '\(normalizedValue)' for key '\(parameter.specification.key)'")

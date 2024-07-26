@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-@_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 /// Dynamic checkout root view.

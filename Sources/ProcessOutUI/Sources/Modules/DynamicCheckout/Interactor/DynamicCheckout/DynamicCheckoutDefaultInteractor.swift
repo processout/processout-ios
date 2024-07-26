@@ -741,7 +741,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
 @available(iOS 14.0, *)
 extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
 
-    func nativeAlternativePaymentMethodDidEmitEvent(_ event: PONativeAlternativePaymentMethodEvent) {
+    func nativeAlternativePaymentDidEmitEvent(_ event: PONativeAlternativePaymentEvent) {
         switch event {
         case .didSubmitParameters:
             invalidateInvoiceIfPossible()
@@ -751,7 +751,7 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
         delegate?.dynamicCheckout(didEmitAlternativePaymentEvent: event)
     }
 
-    func nativeAlternativePaymentMethodDefaultValues(
+    func nativeAlternativePaymentDefaultValues(
         for parameters: [PONativeAlternativePaymentMethodParameter],
         completion: @escaping @Sendable ([String: String]) -> Void
     ) {
