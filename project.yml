@@ -61,12 +61,6 @@ targets:
       - path: Scripts/Lint.sh
         name: Swiftlint
         basedOnDependencyAnalysis: false
-      - path: Scripts/SwiftGen.sh
-        name: SwiftGen
-        outputFiles:
-          - $(TARGET_ROOT)/Sources/Generated/Files+Generated.swift
-          - $(TARGET_ROOT)/Sources/Generated/Fonts+Generated.swift
-        basedOnDependencyAnalysis: false
       - path: Scripts/Sourcery.sh
         name: Sourcery
         basedOnDependencyAnalysis: false
