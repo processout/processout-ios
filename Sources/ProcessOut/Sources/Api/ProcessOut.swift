@@ -260,7 +260,6 @@ extension ProcessOut {
                 shared.logger.debug("ProcessOut can be configured only once, ignored")
             }
         } else {
-            Self.prewarm()
             _shared.withLock { instance in
                 instance = ProcessOut(configuration: configuration)
             }
@@ -271,14 +270,6 @@ extension ProcessOut {
     // MARK: - Private Properties
 
     private static let _shared = POUnfairlyLocked<ProcessOut?>(wrappedValue: nil)
-
-    // MARK: - Private Methods
-
-    @MainActor
-    private static func prewarm() {
-        FontFamily.registerAllCustomFonts()
-        PODefaultPhoneNumberMetadataProvider.shared.prewarm()
-    }
 }
 
 // swiftlint:enable implicitly_unwrapped_optional force_unwrapping
