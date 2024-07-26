@@ -42,7 +42,7 @@ final class DefaultInvoicesService: POInvoicesService {
             let newSource = try await self.threeDSService.handle(action: customerAction, delegate: threeDSService)
             newRequest = request.replacing(source: newSource)
         } catch {
-            logger.error("Did fail to authorize invoice: \(error)", attributes: [.invoiceId: request.invoiceId])
+            logger.warn("Did fail to authorize invoice: \(error)", attributes: [.invoiceId: request.invoiceId])
             throw error
         }
         try await authorizeInvoice(request: newRequest, threeDSService: threeDSService)
