@@ -10,16 +10,16 @@ import Foundation
 
 final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
 
-    public static let shared = DefaultPhoneNumberMetadataProvider()
+    static let shared = DefaultPhoneNumberMetadataProvider()
 
     /// - NOTE: Method is asynchronous.
-    public func prewarm() {
+    func prewarm() {
         loadMetadata(sync: false)
     }
 
     // MARK: - PhoneNumberMetadataProvider
 
-    public func metadata(for countryCode: String) -> PhoneNumberMetadata? {
+    func metadata(for countryCode: String) -> PhoneNumberMetadata? {
         let transformedCountryCode = countryCode.applyingTransform(.toLatin, reverse: false) ?? countryCode
         if let metadata = metadata.wrappedValue {
             return metadata[transformedCountryCode]
@@ -47,6 +47,7 @@ final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
             let groupedMetadata: [String: PhoneNumberMetadata]
             do {
                 let data = try Data(
+                    // swiftlint:disable:next force_unwrapping
                     contentsOf: BundleLocator.bundle.url(forResource: "PhoneNumberMetadata", withExtension: "json")!
                 )
                 let metadata = try JSONDecoder().decode([PhoneNumberMetadata].self, from: data)
