@@ -23,7 +23,7 @@ final class DefaultTelemetryService: POService, LoggerDestination {
     // MARK: - LoggerDestination
 
     func log(event: LogEvent) {
-        guard event.level.rawValue >= LogLevel.error.rawValue else {
+        guard event.level.rawValue >= LogLevel.warn.rawValue else {
             return
         }
         var attributes = [
