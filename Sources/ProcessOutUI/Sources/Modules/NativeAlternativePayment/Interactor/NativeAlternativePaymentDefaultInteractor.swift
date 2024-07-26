@@ -405,10 +405,10 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Events
 
-    private func send(event: PONativeAlternativePaymentMethodEvent) {
+    private func send(event: PONativeAlternativePaymentEvent) {
         assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
-        delegate?.nativeAlternativePaymentMethodDidEmitEvent(event)
+        delegate?.nativeAlternativePaymentDidEmitEvent(event)
     }
 
     private func didUpdate(parameter: NativeAlternativePaymentInteractorState.Parameter, to value: String) {
@@ -498,7 +498,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         let defaultValues = await withCheckedContinuation { continuation in
             if let delegate {
-                delegate.nativeAlternativePaymentMethodDefaultValues(
+                delegate.nativeAlternativePaymentDefaultValues(
                     for: parameters.map(\.specification),
                     completion: { continuation.resume(returning: $0) }
                 )
