@@ -139,7 +139,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
 
     // MARK: - Customer Tokens
 
-    public struct CustomerToken {
+    public struct CustomerToken: Sendable {
 
         /// Payment method ID.
         @_spi(PO)
@@ -157,7 +157,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public let configuration: CustomerTokenConfiguration
     }
 
-    public struct CustomerTokenConfiguration: Decodable {
+    public struct CustomerTokenConfiguration: Decodable, Sendable {
 
         /// Customer token ID.
         public let customerTokenId: String
