@@ -23,7 +23,7 @@ struct DynamicCheckoutExpressPaymentView: View {
                 },
                 icon: {
                     POAsyncImage(resource: item.iconImageResource) {
-                        Color(item.brandColor).frame(width: 24, height: 24)
+                        Color.clear.frame(width: 24, height: 24)
                     }
                 }
             )

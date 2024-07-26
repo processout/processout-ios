@@ -12,7 +12,7 @@ import Foundation
 final class CardSchemeProvider: Sendable {
 
     struct Issuer: Sendable {
-        let scheme: String
+        let scheme: POCardScheme
         let numbers: IssuerNumbers
         let length: Int
     }
@@ -22,7 +22,7 @@ final class CardSchemeProvider: Sendable {
     }
 
     /// Returns locally generated scheme.
-    func scheme(cardNumber number: String) -> String? {
+    func scheme(cardNumber number: String) -> POCardScheme? {
         let normalizedNumber = number
             .removingCharacters(in: .decimalDigits.inverted)
             .prefix(Constants.maximumIinLength)
@@ -75,9 +75,9 @@ extension CardSchemeProvider {
     // Based on https://www.bincodes.com/bin-list
     // Information is sorted by length to properly handle overlapping numbers (like 622126 and 62).
     private static let defaultIssuers: [Issuer] = [
-        .init(scheme: "discover", numbers: .range(622126...622925), length: 6),
+        .init(scheme: .discover, numbers: .range(622126...622925), length: 6),
         .init(
-            scheme: "elo",
+            scheme: .elo,
             numbers: .set([
                 401178, 401179, 431274, 438935, 451416, 457393, 457631, 457632, 504175, 506699, 506770, 506771,
                 506772, 506773, 506774, 506775, 506776, 506777, 506778, 627780, 636297, 636368, 650031, 650032,
@@ -94,7 +94,7 @@ extension CardSchemeProvider {
             length: 6
         ),
         .init(
-            scheme: "elo",
+            scheme: .elo,
             numbers: .set([
                 50670, 50671, 50672, 50673, 50674, 50675, 50676, 65004, 65041, 65042, 65043, 65049, 65050, 65051,
                 65052, 65055, 65056, 65057, 65058, 65070, 65091, 65092, 65093, 65094, 65095, 65096, 65166, 65167,
@@ -102,20 +102,20 @@ extension CardSchemeProvider {
             ]),
             length: 5
         ),
-        .init(scheme: "discover", numbers: .exact(6011), length: 4),
-        .init(scheme: "jcb", numbers: .range(3528...3589), length: 4),
-        .init(scheme: "elo", numbers: .exact(509), length: 3),
-        .init(scheme: "discover", numbers: .range(644...649), length: 3),
-        .init(scheme: "diners club carte blanche", numbers: .range(300...305), length: 3),
-        .init(scheme: "diners club international", numbers: .exact(309), length: 3),
-        .init(scheme: "mastercard", numbers: .range(51...55), length: 2),
-        .init(scheme: "discover", numbers: .exact(65), length: 2),
-        .init(scheme: "china union pay", numbers: .exact(62), length: 2),
-        .init(scheme: "american express", numbers: .set([34, 37]), length: 2),
-        .init(scheme: "maestro", numbers: .set([50, 56, 57, 58, 59]), length: 2),
-        .init(scheme: "diners club international", numbers: .set([36, 38, 39]), length: 2),
-        .init(scheme: "diners club united states & canada", numbers: .range(54...55), length: 2),
-        .init(scheme: "visa", numbers: .exact(4), length: 1),
-        .init(scheme: "maestro", numbers: .exact(6), length: 1)
+        .init(scheme: .discover, numbers: .exact(6011), length: 4),
+        .init(scheme: .jcb, numbers: .range(3528...3589), length: 4),
+        .init(scheme: .elo, numbers: .exact(509), length: 3),
+        .init(scheme: .discover, numbers: .range(644...649), length: 3),
+        .init(scheme: .dinersClubCarteBlanche, numbers: .range(300...305), length: 3),
+        .init(scheme: .dinersClubInternational, numbers: .exact(309), length: 3),
+        .init(scheme: .mastercard, numbers: .range(51...55), length: 2),
+        .init(scheme: .discover, numbers: .exact(65), length: 2),
+        .init(scheme: .unionPay, numbers: .exact(62), length: 2),
+        .init(scheme: .amex, numbers: .set([34, 37]), length: 2),
+        .init(scheme: .maestro, numbers: .set([50, 56, 57, 58, 59]), length: 2),
+        .init(scheme: .dinersClubInternational, numbers: .set([36, 38, 39]), length: 2),
+        .init(scheme: .dinersClubUnitedStatesAndCanada, numbers: .range(54...55), length: 2),
+        .init(scheme: .visa, numbers: .exact(4), length: 1),
+        .init(scheme: .maestro, numbers: .exact(6), length: 1)
     ]
 }

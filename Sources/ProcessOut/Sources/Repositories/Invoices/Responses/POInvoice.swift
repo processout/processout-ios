@@ -25,4 +25,8 @@ public struct POInvoice: Decodable, Sendable {
     /// Dynamic checkout details resolved for specific invoice.
     @_spi(PO)
     public let paymentMethods: [PODynamicCheckoutPaymentMethod]?
+
+    /// Client secret.
+    @_spi(PO)
+    public let clientSecret: String?
 }

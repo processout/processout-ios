@@ -44,8 +44,12 @@ final class HttpInvoicesRepository: InvoicesRepository {
         struct Response: Decodable {
             let invoice: POInvoice
         }
+        let headers = [
+            "X-Processout-Client-Secret": request.clientSecret
+        ]
         let httpRequest = HttpConnectorRequest<Response>.get(
-            path: "/invoices/\(request.id)"
+            path: "/invoices/\(request.invoiceId)",
+            headers: headers.compactMapValues { $0 }
         )
         return try await connector.execute(request: httpRequest).invoice
     }
@@ -76,7 +80,9 @@ final class HttpInvoicesRepository: InvoicesRepository {
         let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/invoices", body: request, includesDeviceMetadata: true, requiresPrivateKey: true
         )
-        return try await connector.execute(request: httpRequest).invoice
+        let response = try await connector.execute(request: httpRequest) as HttpConnectorResponse
+        let clientSecret = response.headers["x-processout-client-secret"]
+        return response.value.invoice.replacing(clientSecret: clientSecret)
     }
 
     // MARK: - Private Nested Types
@@ -92,4 +98,19 @@ final class HttpInvoicesRepository: InvoicesRepository {
     // MARK: - Private Properties
 
     private let connector: HttpConnector
+}
+
+private extension POInvoice { // swiftlint:disable:this no_extension_access_modifier
+
+    func replacing(clientSecret newClientSecret: String?) -> Self {
+        let updatedInvoice = POInvoice(
+            id: id,
+            amount: .init(value: amount),
+            currency: currency,
+            returnUrl: returnUrl,
+            paymentMethods: paymentMethods,
+            clientSecret: newClientSecret
+        )
+        return updatedInvoice
+    }
 }

@@ -15,12 +15,12 @@ enum LogLevel: Int, Comparable, Sendable {
     /// for troubleshooting errors.
     case info
 
+    /// Potentially harmful situations that do not necessarily require immediate attention but could
+    /// indicate potential issues or unexpected behavior that might lead to more severe.
+    case warn
+
     /// The error log level. Use this log level to report process-level errors.
     case error
-
-    /// The fault log level. Use this level only to capture system-level or multi-process information when reporting
-    /// system errors.
-    case fault
 
     // MARK: - Comparable
 

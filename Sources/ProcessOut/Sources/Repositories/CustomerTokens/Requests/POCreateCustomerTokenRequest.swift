@@ -17,8 +17,12 @@ public struct POCreateCustomerTokenRequest: Encodable, Sendable {
     /// Flag if you wish to verify the customer token by making zero value transaction. Applicable for cards only.
     public let verify: Bool
 
-    public init(customerId: String, verify: Bool = false) {
+    /// Return URL to assign to verification invoice.
+    public let invoiceReturnUrl: URL?
+
+    public init(customerId: String, verify: Bool = false, invoiceReturnUrl: URL? = nil) {
         self._customerId = .init(value: customerId)
         self.verify = verify
+        self.invoiceReturnUrl = invoiceReturnUrl
     }
 }

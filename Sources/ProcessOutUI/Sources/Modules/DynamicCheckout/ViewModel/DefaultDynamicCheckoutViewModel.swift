@@ -180,6 +180,8 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             return createPassKitPaymentItem(paymentMethodId: id)
         case .alternativePayment(let method):
             display = method.display
+        case .customerToken(let method):
+            display = method.display
         case .nativeAlternativePayment, .card, .unknown:
             return nil
         }
@@ -213,6 +215,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         case .card(let method):
             display = method.display
             isExternal = false
+        case .customerToken(let method):
+            display = method.display
+            isExternal = method.configuration.redirectUrl != nil
         case .applePay, .unknown:
             return nil
         }

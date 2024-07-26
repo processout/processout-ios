@@ -19,24 +19,19 @@ final class DefaultConfigurationMapper: ConfigurationMapper {
         let configParameters = ThreeDS2ServiceConfiguration.ConfigParameters(
             directoryServerData: directoryServerData,
             messageVersion: configuration.messageVersion,
-            scheme: configuration.scheme.map(self.convert) ?? ""
+            scheme: configuration.$scheme.typed().map(self.convert) ?? ""
         )
         return configParameters
     }
 
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let visa = "visa"
-        static let mastercard = "mastercard"
-    }
-
     // MARK: - Private Methods
 
-    private func convert(scheme: PO3DS2ConfigurationCardScheme) -> String {
-        let schemes: [PO3DS2ConfigurationCardScheme: String] = [
-            .visa: Constants.visa, .mastercard: Constants.mastercard
-        ]
-        return schemes[scheme] ?? ""
+    private func convert(scheme: POCardScheme) -> String {
+        // todo(andrii-vysotskyi): fail mapping if scheme is unsupported
+        let supportedSchemes: Set<POCardScheme> = [.visa, .mastercard]
+        guard supportedSchemes.contains(scheme) else {
+            return ""
+        }
+        return scheme.rawValue
     }
 }

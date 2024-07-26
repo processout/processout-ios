@@ -14,7 +14,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
         self.retryStrategy = retryStrategy
     }
 
-    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> Value {
+    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value> {
         try await retry(
             operation: { [connector] in
                 try await connector.execute(request: request)

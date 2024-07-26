@@ -398,7 +398,7 @@ import UIKit
     // MARK: - Failure State
 
     private func setFailureStateUnchecked(failure: POFailure) {
-        logger.error("Did fail to process native payment: \(failure)")
+        logger.warn("Did fail to process native payment: \(failure)")
         state = .failure(failure)
         send(event: .didFail(failure: failure))
     }

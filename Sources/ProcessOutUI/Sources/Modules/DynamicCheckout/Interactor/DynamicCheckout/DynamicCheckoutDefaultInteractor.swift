@@ -150,8 +150,7 @@ final class DynamicCheckoutDefaultInteractor:
 
     private func continueStartUnchecked() async {
         do {
-            let request = POInvoiceRequest(id: configuration.invoiceId)
-            let invoice = try await invoicesService.invoice(request: request)
+            let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
             setStartedStateUnchecked(invoice: invoice)
         } catch {
             setFailureStateUnchecked(error: error)
@@ -210,28 +209,40 @@ final class DynamicCheckoutDefaultInteractor:
         // swiftlint:disable:next identifier_name
         var _paymentMethods: [String: PODynamicCheckoutPaymentMethod] = [:]
         for paymentMethod in paymentMethods {
-            switch paymentMethod {
-            case .applePay where includedApplePayPaymentMethodIds.contains(paymentMethod.id):
+            // swiftlint:disable:next line_length
+            guard let isExpress = isExpress(paymentMethod: paymentMethod, includedApplePayPaymentMethodIds: includedApplePayPaymentMethodIds) else {
+                continue
+            }
+            if isExpress {
                 expressIds.append(paymentMethod.id)
-            case .alternativePayment(let method):
-                if method.flow == .express {
-                    expressIds.append(paymentMethod.id)
-                } else {
-                    regularIds.append(paymentMethod.id)
-                }
-            case .nativeAlternativePayment:
+            } else {
                 regularIds.append(paymentMethod.id)
-            case .card:
-                regularIds.append(paymentMethod.id)
-            case .unknown(let rawType):
-                logger.debug("Unknown payment method is ignored: \(rawType)")
-                continue
-            default:
-                continue
             }
             _paymentMethods[paymentMethod.id] = paymentMethod
         }
         return _paymentMethods
+    }
+
+    private func isExpress(
+        paymentMethod: PODynamicCheckoutPaymentMethod,
+        includedApplePayPaymentMethodIds: Set<String>
+    ) -> Bool? {
+        switch paymentMethod {
+        case .applePay:
+            if includedApplePayPaymentMethodIds.contains(paymentMethod.id) {
+                return true
+            }
+            return nil
+        case .alternativePayment(let method):
+            return method.flow == .express
+        case .nativeAlternativePayment, .card:
+            return false
+        case .customerToken(let method):
+            return method.flow == .express
+        case .unknown(let rawType):
+            logger.debug("Unknown payment method is ignored: \(rawType)")
+            return nil
+        }
     }
 
     private func pkPaymentRequests(invoice: POInvoice) -> [String: PKPaymentRequest] {
@@ -315,7 +326,9 @@ final class DynamicCheckoutDefaultInteractor:
             startAlternativePayment(method: method, startedState: newStartedState)
         case .nativeAlternativePayment(let method):
             startNativeAlternativePayment(method: method, startedState: newStartedState)
-        default:
+        case .customerToken(let method):
+            startCustomerTokenPayment(method: method, startedState: newStartedState)
+        case .unknown:
             preconditionFailure("Attempted to start unknown payment method")
         }
     }
@@ -333,7 +346,8 @@ final class DynamicCheckoutDefaultInteractor:
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: nil,
             submission: .submitting,
-            isCancellable: false
+            isCancellable: false,
+            shouldInvalidateInvoice: true
         )
         state = .paymentProcessing(paymentProcessingState)
         Task {
@@ -411,7 +425,8 @@ final class DynamicCheckoutDefaultInteractor:
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: nil,
             submission: .submitting,
-            isCancellable: false
+            isCancellable: false,
+            shouldInvalidateInvoice: true
         )
         state = .paymentProcessing(paymentProcessingState)
         Task {
@@ -419,7 +434,7 @@ final class DynamicCheckoutDefaultInteractor:
                 _ = try await alternativePaymentSession.start(url: method.configuration.redirectUrl)
                 setSuccessState()
             } catch {
-                self.recoverPaymentProcessing(error: error)
+                recoverPaymentProcessing(error: error)
             }
         }
     }
@@ -490,6 +505,35 @@ final class DynamicCheckoutDefaultInteractor:
         }
     }
 
+    // MARK: - Token Payment
+
+    private func startCustomerTokenPayment(
+        method: PODynamicCheckoutPaymentMethod.CustomerToken, startedState: State.Started
+    ) {
+        let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
+            snapshot: startedState,
+            paymentMethodId: method.id,
+            cardTokenizationInteractor: nil,
+            nativeAlternativePaymentInteractor: nil,
+            submission: .submitting,
+            isCancellable: false,
+            shouldInvalidateInvoice: true
+        )
+        state = .paymentProcessing(paymentProcessingState)
+        Task { @MainActor in
+            do {
+                if let redirectUrl = method.configuration.redirectUrl {
+                    _ = try await alternativePaymentSession.start(url: redirectUrl)
+                } else {
+                    try await authorizeInvoice(source: method.configuration.customerTokenId, startedState: startedState)
+                }
+                setSuccessState()
+            } catch {
+                recoverPaymentProcessing(error: error)
+            }
+        }
+    }
+
     // MARK: - Failure Recovery
 
     private func recoverPaymentProcessing(error: Error) {
@@ -536,18 +580,19 @@ final class DynamicCheckoutDefaultInteractor:
             shouldStartPendingPaymentMethod: currentState.shouldStartPendingPaymentMethod
         )
         state = .recovering(recoveringState)
-        let newInvoice: POInvoice
         if shouldCreateNewInvoice(toRecoverFrom: failure, in: currentState) {
-            if let invoice = await delegate?.dynamicCheckout(newInvoiceFor: currentState.snapshot.invoice) {
-                newInvoice = invoice
-            } else {
-                setFailureStateUnchecked(error: failure)
-                return
+            do {
+                guard let request = await delegate?.dynamicCheckout(newInvoiceFor: currentState.snapshot.invoice) else {
+                    throw failure
+                }
+                let newInvoice = try await invoicesService.invoice(request: request)
+                finishPaymentFailureRecovery(with: newInvoice)
+            } catch {
+                setFailureStateUnchecked(error: error)
             }
         } else {
-            newInvoice = currentState.snapshot.invoice
+            finishPaymentFailureRecovery(with: currentState.snapshot.invoice)
         }
-        finishPaymentFailureRecovery(with: newInvoice)
     }
 
     private func finishPaymentFailureRecovery(with newInvoice: POInvoice) {
@@ -601,7 +646,7 @@ final class DynamicCheckoutDefaultInteractor:
             logger.debug("Unexpected error type: \(error)")
             failure = POFailure(code: .generic(.mobile), underlyingError: error)
         }
-        logger.error("Did fail to process dynamic checkout payment: '\(error)'")
+        logger.warn("Did fail to process dynamic checkout payment: '\(error)'")
         state = .failure(failure)
         send(event: .didFail(failure: failure))
         completion(.failure(failure))
@@ -640,26 +685,6 @@ final class DynamicCheckoutDefaultInteractor:
         return paymentMethod
     }
 
-    private func paymentMethodIds(of kind: PaymentMethodKind, state: State.Started) -> Set<String> {
-        var methodIds: Set<String> = []
-        state.paymentMethods.forEach { id, paymentMethod in
-            switch paymentMethod {
-            case .applePay where kind == .applePay:
-                break
-            case .alternativePayment where kind == .alternativePayment:
-                break
-            case .nativeAlternativePayment where kind == .nativeAlternativePayment:
-                break
-            case .card where kind == .card:
-                break
-            default:
-                return
-            }
-            methodIds.insert(id)
-        }
-        return methodIds
-    }
-
     private func paymentMethod(withId methodId: String, state: State.Started) -> PODynamicCheckoutPaymentMethod {
         guard let paymentMethod = state.paymentMethods[methodId] else {
             preconditionFailure("Unknown payment method ID.")
@@ -672,6 +697,18 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.shouldInvalidateInvoice = true
             state = .paymentProcessing(currentState)
         }
+    }
+
+    @MainActor
+    private func authorizeInvoice(source: String, startedState: State.Started) async throws {
+        guard let delegate else {
+            throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
+        }
+        var request = POInvoiceAuthorizationRequest(
+            invoiceId: startedState.invoice.id, source: source
+        )
+        let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request)
+        try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
     }
 }
 
@@ -689,12 +726,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
             assertionFailure("Unable to process card in unsupported state.")
             throw POFailure(code: .internal(.mobile))
         }
-        guard let delegate else {
-            throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
-        }
-        var request = POInvoiceAuthorizationRequest(invoiceId: currentState.snapshot.invoice.id, source: card.id)
-        let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request)
-        try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
+        try await authorizeInvoice(source: card.id, startedState: currentState.snapshot)
     }
 
     func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {

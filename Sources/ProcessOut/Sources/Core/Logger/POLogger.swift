@@ -58,6 +58,17 @@ public struct POLogger: Sendable {
         log(level: .info, message, attributes: attributes, dso: dso, file: file, line: line)
     }
 
+    /// Logs a message at the `warn` level.
+    @_spi(PO) public func warn(
+        _ message: @autoclosure () -> POLogMessage,
+        attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
+        dso: UnsafeRawPointer? = #dsohandle,
+        file: String = #fileID,
+        line: Int = #line
+    ) {
+        log(level: .warn, message, attributes: attributes, dso: dso, file: file, line: line)
+    }
+
     /// Logs a message at the `error` level.
     @_spi(PO) public func error(
         _ message: @autoclosure () -> POLogMessage,
@@ -67,17 +78,6 @@ public struct POLogger: Sendable {
         line: Int = #line
     ) {
         log(level: .error, message, attributes: attributes, dso: dso, file: file, line: line)
-    }
-
-    /// Logs a message at the `fault` level.
-    @_spi(PO) public func fault(
-        _ message: @autoclosure () -> POLogMessage,
-        attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
-        dso: UnsafeRawPointer? = #dsohandle,
-        file: String = #fileID,
-        line: Int = #line
-    ) {
-        log(level: .fault, message, attributes: attributes, dso: dso, file: file, line: line)
     }
 
     // MARK: - Private Properties

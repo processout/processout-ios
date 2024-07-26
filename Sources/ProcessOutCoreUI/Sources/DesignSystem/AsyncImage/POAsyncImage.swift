@@ -30,6 +30,11 @@ public struct POAsyncImage<Content: View>: View {
         ZStack {
             content(phase)
         }
+        .backport.onChange(of: id) {
+            withTransaction(transaction) {
+                phase = .empty
+            }
+        }
         .backport.task(id: id, priority: .userInitiated, resolveImage)
     }
 
@@ -52,11 +57,8 @@ public struct POAsyncImage<Content: View>: View {
     @Sendable
     @MainActor
     private func resolveImage() async {
-        guard !Task.isCancelled else {
+        guard !Task.isCancelled, case .empty = phase else {
             return
-        }
-        withTransaction(transaction) {
-            phase = .empty
         }
         let newPhase: POAsyncImagePhase
         do {

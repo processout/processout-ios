@@ -83,11 +83,14 @@ final class DefaultCardTokenizationInteractor:
         delegate?.cardTokenizationDidEmitEvent(.parametersChanged)
     }
 
-    func setPreferredScheme(_ scheme: String) {
+    func setPreferredScheme(_ scheme: POCardScheme) {
         guard case .started(var startedState) = state else {
             return
         }
-        let supportedSchemes = [startedState.issuerInformation?.scheme, startedState.issuerInformation?.coScheme]
+        let supportedSchemes = [
+            startedState.issuerInformation?.$scheme.typed,
+            startedState.issuerInformation?.$coScheme.typed
+        ]
         logger.debug("Will change card scheme to \(scheme)")
         guard supportedSchemes.contains(scheme) else {
             logger.info(
@@ -118,7 +121,7 @@ final class DefaultCardTokenizationInteractor:
             cvc: startedState.cvc.value,
             name: startedState.cardholderName.value,
             contact: convertToContact(addressParameters: startedState.address),
-            preferredScheme: startedState.preferredScheme,
+            preferredScheme: startedState.preferredScheme?.rawValue,
             metadata: configuration.metadata
         )
         Task {
@@ -281,12 +284,13 @@ final class DefaultCardTokenizationInteractor:
         if !resolvePreferredScheme {
             startedState.preferredScheme = nil
         } else if let issuerInformation, let delegate = delegate {
-            startedState.preferredScheme = delegate.preferredScheme(issuerInformation: issuerInformation)
+            let rawScheme = delegate.preferredScheme(issuerInformation: issuerInformation)
+            startedState.preferredScheme = rawScheme.map(POCardScheme.init)
         } else {
-            startedState.preferredScheme = issuerInformation?.scheme
+            startedState.preferredScheme = issuerInformation?.$scheme.typed
         }
         let securityCodeFormatter = CardSecurityCodeFormatter()
-        securityCodeFormatter.scheme = issuerInformation?.scheme
+        securityCodeFormatter.scheme = issuerInformation?.$scheme.typed
         startedState.cvc.value = securityCodeFormatter.string(from: startedState.cvc.value)
         startedState.cvc.formatter = securityCodeFormatter
     }
