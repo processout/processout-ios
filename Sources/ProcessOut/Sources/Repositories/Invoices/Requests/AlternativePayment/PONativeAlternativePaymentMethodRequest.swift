@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 17.10.2022.
 //
 
-public struct PONativeAlternativePaymentMethodRequest {
+public struct PONativeAlternativePaymentMethodRequest: Sendable {
 
     /// Invoice id.
     public let invoiceId: String

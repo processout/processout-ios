@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 public protocol POMessageViewStyle {
 
     /// A view that represents the body of a message.

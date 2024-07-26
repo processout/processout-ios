@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 12.10.2022.
 //
 
-public struct POAllGatewayConfigurationsResponse: Decodable {
+public struct POAllGatewayConfigurationsResponse: Decodable, Sendable {
 
     /// Boolean flag indicating whether there are more items to fetch.
     public let hasMore: Bool

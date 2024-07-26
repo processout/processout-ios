@@ -21,6 +21,7 @@ extension UIImageView {
 
     // MARK: - Private Nested Types
 
+    @MainActor
     private enum AssociatedKeys {
         static var widthConstraint: UInt8 = 0
     }

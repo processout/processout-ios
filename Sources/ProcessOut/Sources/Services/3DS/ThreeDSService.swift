@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
-protocol ThreeDSService {
+protocol ThreeDSService: Sendable {
 
     typealias Delegate = PO3DSService
 

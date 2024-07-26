@@ -7,9 +7,7 @@
 
 @_implementationOnly import cmark
 
-final class MarkdownListItem: MarkdownBaseNode {
-
-    // MARK: - MarkdownBaseNode
+final class MarkdownListItem: MarkdownBaseNode, @unchecked Sendable {
 
     override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_ITEM

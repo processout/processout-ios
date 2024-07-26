@@ -7,7 +7,8 @@
 
 import Foundation
 
-@_spi(PO) public final class POPhoneNumberFormatter: Formatter {
+@_spi(PO)
+public final class POPhoneNumberFormatter: Formatter {
 
     public init(metadataProvider: POPhoneNumberMetadataProvider = PODefaultPhoneNumberMetadataProvider.shared) {
         regexProvider = RegexProvider.shared

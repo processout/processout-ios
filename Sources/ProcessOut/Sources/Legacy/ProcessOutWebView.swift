@@ -9,6 +9,7 @@ import Foundation
 import WebKit
 
 @available(*, deprecated, message: "Use PO3DSRedirectViewControllerBuilder or POAlternativePaymentMethodViewControllerBuilder instead.")
+@preconcurrency
 public class ProcessOutWebView: WKWebView, WKNavigationDelegate, WKUIDelegate {
 
     private let REDIRECT_URL_PATTERN = "https:\\/\\/checkout\\.processout\\.(ninja|com)\\/helpers\\/mobile-processout-webview-landing.*"

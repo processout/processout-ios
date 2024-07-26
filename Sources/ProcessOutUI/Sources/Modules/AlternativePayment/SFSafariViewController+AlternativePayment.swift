@@ -24,11 +24,15 @@ extension SFSafariViewController {
         request: POAlternativePaymentMethodRequest,
         returnUrl: URL,
         safariConfiguration: SFSafariViewController.Configuration = Configuration(),
-        completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
     ) {
         let url = ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodUrl(request: request)
-        self.init(url: url, configuration: safariConfiguration)
-        commonInit(returnUrl: returnUrl, completion: completion)
+        self.init(
+            alternativePaymentMethodUrl: url,
+            returnUrl: returnUrl,
+            safariConfiguration: safariConfiguration,
+            completion: completion
+        )
     }
 
     /// Creates view controller that is capable of handling Alternative Payment.
@@ -46,33 +50,24 @@ extension SFSafariViewController {
         alternativePaymentMethodUrl url: URL,
         returnUrl: URL,
         safariConfiguration: SFSafariViewController.Configuration = Configuration(),
-        completion: @escaping (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
     ) {
         self.init(url: url, configuration: safariConfiguration)
-        commonInit(returnUrl: returnUrl, completion: completion)
-    }
-
-    // MARK: - Private Nested Types
-
-    private typealias Completion = (Result<POAlternativePaymentMethodResponse, POFailure>) -> Void
-
-    // MARK: - Private Methods
-
-    private func commonInit(returnUrl: URL, completion: @escaping Completion) {
-        let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
         let viewModel = DefaultSafariViewModel(
             callback: .customScheme(returnUrl.scheme ?? ""),
-            eventEmitter: api.eventEmitter,
-            logger: api.logger,
+            eventEmitter: ProcessOut.shared.eventEmitter,
+            logger: ProcessOut.shared.logger,
             completion: { result in
-                completion(result.flatMap(Self.response(with:)))
+                completion(result.flatMap(Self.response))
             }
         )
         self.setViewModel(viewModel)
         viewModel.start()
     }
 
-    private static func response(with url: URL) -> Result<POAlternativePaymentMethodResponse, POFailure> {
+    // MARK: - Private Methods
+
+    private nonisolated static func response(with url: URL) -> Result<POAlternativePaymentMethodResponse, POFailure> {
         let result = Result {
             try ProcessOut.shared.alternativePaymentMethods.alternativePaymentMethodResponse(url: url)
         }

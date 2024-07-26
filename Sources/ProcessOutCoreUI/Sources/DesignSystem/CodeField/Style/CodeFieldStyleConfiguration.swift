@@ -34,3 +34,6 @@ struct CodeFieldStyleConfiguration {
 
     private let _setIndex: (_ index: Index) -> Void
 }
+
+@available(*, unavailable)
+extension CodeFieldStyleConfiguration: Sendable { }

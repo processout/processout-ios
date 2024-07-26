@@ -16,7 +16,7 @@ final class HttpCardsRepository: CardsRepository {
     // MARK: - CardsRepository
 
     func issuerInformation(iin: String) async throws -> POCardIssuerInformation {
-        struct Response: Decodable {
+        struct Response: Decodable, Sendable {
             let cardInformation: POCardIssuerInformation
         }
         let httpRequest = HttpConnectorRequest<Response>.get(path: "/iins/" + iin)

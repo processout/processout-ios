@@ -8,9 +8,10 @@
 import ProcessOut
 
 /// Card tokenization module delegate definition.
-public protocol POCardTokenizationDelegate: AnyObject {
+public protocol POCardTokenizationDelegate: AnyObject, Sendable {
 
     /// Invoked when module emits event.
+    @MainActor
     func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent)
 
     /// Allows delegate to additionally process tokenized card before ending module's lifecycle. For example
@@ -22,15 +23,18 @@ public protocol POCardTokenizationDelegate: AnyObject {
 
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
+    @MainActor
     func preferredScheme(issuerInformation: POCardIssuerInformation) -> String?
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
+    @MainActor
     func shouldContinueTokenization(after failure: POFailure) -> Bool
 }
 
 extension POCardTokenizationDelegate {
 
+    @MainActor
     public func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent) {
         // Ignored
     }
@@ -39,10 +43,12 @@ extension POCardTokenizationDelegate {
         // Ignored
     }
 
+    @MainActor
     public func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
         issuerInformation.scheme
     }
 
+    @MainActor
     public func shouldContinueTokenization(after failure: POFailure) -> Bool {
         true
     }

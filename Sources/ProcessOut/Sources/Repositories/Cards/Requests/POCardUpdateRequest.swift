@@ -6,7 +6,7 @@
 //
 
 /// Updated card details.
-public struct POCardUpdateRequest: Encodable {
+public struct POCardUpdateRequest: Encodable, Sendable {
 
     /// Card id.
     @POImmutableExcludedCodable

@@ -7,10 +7,10 @@
 
 import Foundation
 
-public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable {
+public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable, Sendable {
 
     /// Payment gateway information.
-    public struct Gateway {
+    public struct Gateway: Sendable {
 
         /// Name of the payment gateway that can be displayed.
         public let displayName: String
@@ -27,7 +27,7 @@ public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable {
     }
 
     /// Invoice details.
-    public struct Invoice: Decodable {
+    public struct Invoice: Decodable, Sendable {
 
         /// Invoice amount.
         @POImmutableStringCodableDecimal

@@ -9,7 +9,7 @@ import PassKit
 
 /// PassKit button style.
 @available(iOS 14.0, *)
-public struct POPassKitPaymentButtonStyle {
+public struct POPassKitPaymentButtonStyle: Sendable {
 
     /// Native style value.
     public let style: PKPaymentButtonStyle

@@ -102,3 +102,5 @@ extension KeyedDecodingContainer {
         try type.init(from: try superDecoder(forKey: key))
     }
 }
+
+extension POTypedRepresentation: Sendable where Wrapped: Sendable { }

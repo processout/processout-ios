@@ -8,7 +8,7 @@
 import Foundation
 
 /// Cardholder information.
-public struct POContact: Encodable {
+public struct POContact: Encodable, Sendable {
 
     /// First line of cardholder’s address.
     public let address1: String?

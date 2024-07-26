@@ -24,7 +24,7 @@ extension SFSafariViewController {
         redirect: PO3DSRedirect,
         returnUrl: URL,
         safariConfiguration: SFSafariViewController.Configuration = .init(),
-        completion: @escaping (Result<String, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<String, POFailure>) -> Void
     ) {
         self.init(url: redirect.url, configuration: safariConfiguration)
         let api: ProcessOut = ProcessOut.shared // swiftlint:disable:this redundant_type_annotation
@@ -34,7 +34,7 @@ extension SFSafariViewController {
             eventEmitter: api.eventEmitter,
             logger: api.logger,
             completion: { result in
-                completion(result.map(Self.token(with:)))
+                completion(result.map(Self.token))
             }
         )
         setViewModel(viewModel)
@@ -43,7 +43,7 @@ extension SFSafariViewController {
 
     // MARK: - Private Methods
 
-    private static func token(with url: URL) -> String {
+    private static nonisolated func token(with url: URL) -> String {
         let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
         return components?.queryItems?.first { $0.name == "token" }?.value ?? ""
     }

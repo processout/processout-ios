@@ -8,7 +8,7 @@
 import Foundation
 
 @_spi(PO)
-public struct POCreateCustomerTokenRequest: Encodable {
+public struct POCreateCustomerTokenRequest: Encodable, Sendable {
 
     /// Customer id to associate created token with.
     @POImmutableExcludedCodable

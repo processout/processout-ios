@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 protocol CollectionViewDelegateCenterLayout: AnyObject, UICollectionViewDelegateFlowLayout {
 
     /// Should return index of the section that should be centered.

@@ -9,6 +9,7 @@ import UIKit
 
 /// Native alternative payment method screen background style.
 @available(*, deprecated, message: "Use ProcessOutUI.PONativeAlternativePaymentBackgroundStyle instead.")
+@MainActor
 public struct PONativeAlternativePaymentMethodBackgroundStyle {
 
     /// Regular background color.

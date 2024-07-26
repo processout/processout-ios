@@ -8,7 +8,7 @@
 import Foundation
 
 @_spi(PO)
-public struct POInvoiceCreationRequest: Encodable {
+public struct POInvoiceCreationRequest: Encodable, Sendable {
 
     /// Name of the invoice (often an internal ID code from the merchant’s systems). Maximum 80 characters long.
     public let name: String

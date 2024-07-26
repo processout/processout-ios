@@ -77,7 +77,6 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         delegate?.cardUpdateDidEmitEvent(.parametersChanged)
     }
 
-    @MainActor
     func submit() {
         guard case .started(let startedState) = state else {
             return
@@ -124,7 +123,6 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     // MARK: - Started State
 
-    @MainActor
     private func setStartedStateUnchecked(cardInfo: POCardUpdateInformation?) {
         cardSecurityCodeFormatter.scheme = cardInfo?.$scheme.typed
         let startedState = State.Started(
@@ -144,7 +142,6 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     // MARK: - Scheme Update
 
-    @MainActor
     private func updateSchemeIfNeeded(cardInfo: POCardUpdateInformation?) async {
         guard cardInfo?.scheme == nil || cardInfo?.coScheme == nil else {
             logger.debug("Needed schemes information is already set, ignored")
@@ -202,10 +199,10 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
     private func recoverUpdate(from error: Error) {
         if let failure = error as? POFailure {
             recoverUpdate(from: failure)
-            return
+        } else {
+            let failure = POFailure(code: .generic(.mobile), underlyingError: error)
+            recoverUpdate(from: failure)
         }
-        let failure = POFailure(code: .generic(.mobile), underlyingError: error)
-        recoverUpdate(from: failure)
     }
 
     private func recoverUpdate(from failure: POFailure) {

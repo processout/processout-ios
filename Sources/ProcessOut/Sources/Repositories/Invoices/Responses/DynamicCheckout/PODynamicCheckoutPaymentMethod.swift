@@ -11,11 +11,11 @@ import PassKit
 
 /// Dynamic checkout payment method description.
 @_spi(PO)
-public enum PODynamicCheckoutPaymentMethod {
+public enum PODynamicCheckoutPaymentMethod: Sendable {
 
     // MARK: - Apple Pay
 
-    public struct ApplePay: Decodable { // sourcery: AutoCodingKeys
+    public struct ApplePay: Decodable, Sendable { // sourcery: AutoCodingKeys
 
         /// Payment method ID.
         @_spi(PO)
@@ -30,7 +30,7 @@ public enum PODynamicCheckoutPaymentMethod {
         public let configuration: ApplePayConfiguration // sourcery:coding: key="applepay"
     }
 
-    public struct ApplePayConfiguration: Decodable {
+    public struct ApplePayConfiguration: Decodable, Sendable {
 
         /// Merchant ID.
         public let merchantId: String
@@ -48,7 +48,7 @@ public enum PODynamicCheckoutPaymentMethod {
 
     // MARK: - Native APM
 
-    public struct NativeAlternativePayment: Decodable { // sourcery: AutoCodingKeys
+    public struct NativeAlternativePayment: Decodable, Sendable { // sourcery: AutoCodingKeys
 
         /// Payment method ID.
         @_spi(PO)
@@ -63,7 +63,7 @@ public enum PODynamicCheckoutPaymentMethod {
         public let configuration: NativeAlternativePaymentConfiguration // sourcery:coding: key="apm"
     }
 
-    public struct NativeAlternativePaymentConfiguration: Decodable {
+    public struct NativeAlternativePaymentConfiguration: Decodable, Sendable {
 
         /// Gateway configuration ID.
         public let gatewayConfigurationId: String
@@ -71,7 +71,7 @@ public enum PODynamicCheckoutPaymentMethod {
 
     // MARK: - APM
 
-    public struct AlternativePayment: Decodable { // sourcery: AutoCodingKeys
+    public struct AlternativePayment: Decodable, Sendable { // sourcery: AutoCodingKeys
 
         /// Payment method ID.
         @_spi(PO)
@@ -89,7 +89,7 @@ public enum PODynamicCheckoutPaymentMethod {
         public let configuration: AlternativePaymentConfiguration // sourcery:coding: key="apm"
     }
 
-    public struct AlternativePaymentConfiguration: Decodable {
+    public struct AlternativePaymentConfiguration: Decodable, Sendable {
 
         /// Gateway configuration ID.
         public let gatewayConfigurationId: String
@@ -100,7 +100,7 @@ public enum PODynamicCheckoutPaymentMethod {
 
     // MARK: - Card
 
-    public struct Card: Decodable { // sourcery: AutoCodingKeys
+    public struct Card: Decodable, Sendable { // sourcery: AutoCodingKeys
 
         /// Payment method ID.
         @_spi(PO)
@@ -113,7 +113,7 @@ public enum PODynamicCheckoutPaymentMethod {
         public let configuration: CardConfiguration // sourcery:coding: key="card"
     }
 
-    public struct CardConfiguration: Decodable {
+    public struct CardConfiguration: Decodable, Sendable {
 
         /// Defines whether user will be asked to select scheme if co-scheme is available.
         let allowSchemeSelection: Bool
@@ -128,7 +128,7 @@ public enum PODynamicCheckoutPaymentMethod {
         public let billingAddress: BillingAddressConfiguration
     }
 
-    public struct BillingAddressConfiguration: Decodable {
+    public struct BillingAddressConfiguration: Decodable, Sendable {
 
         /// List of ISO country codes that is supported for the billing address. When nil, all countries are supported.
         public let restrictToCountryCodes: Set<String>?
@@ -139,7 +139,7 @@ public enum PODynamicCheckoutPaymentMethod {
 
     // MARK: - Customer Tokens
 
-    public struct CustomerToken {
+    public struct CustomerToken: Sendable {
 
         /// Payment method ID.
         @_spi(PO)
@@ -157,7 +157,7 @@ public enum PODynamicCheckoutPaymentMethod {
         public let configuration: CustomerTokenConfiguration
     }
 
-    public struct CustomerTokenConfiguration: Decodable {
+    public struct CustomerTokenConfiguration: Decodable, Sendable {
 
         /// Customer token ID.
         public let customerTokenId: String
@@ -168,7 +168,7 @@ public enum PODynamicCheckoutPaymentMethod {
 
     // MARK: - Unknown
 
-    public struct Unknown {
+    public struct Unknown: Sendable {
 
         /// Transient ID assigned to method during decoding.
         @_spi(PO)
@@ -180,7 +180,7 @@ public enum PODynamicCheckoutPaymentMethod {
 
     // MARK: - Common
 
-    public struct Display: Decodable {
+    public struct Display: Decodable, @unchecked Sendable {
 
         /// Display name.
         public let name: String
@@ -192,7 +192,7 @@ public enum PODynamicCheckoutPaymentMethod {
         public private(set) var brandColor: UIColor
     }
 
-    public enum Flow: String, Decodable {
+    public enum Flow: String, Decodable, Sendable {
         case express
     }
 

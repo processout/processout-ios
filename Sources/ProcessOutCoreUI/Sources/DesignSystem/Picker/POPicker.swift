@@ -23,7 +23,7 @@ public struct POPicker<Data: RandomAccessCollection, Id: Hashable>: View {
         let configuration = POPickerStyleConfiguration(
             elements: data.map(createConfigurationElement), isInvalid: isInvalid
         )
-        style.makeBody(configuration: configuration)
+        AnyView(style.makeBody(configuration: configuration))
     }
 
     // MARK: - Private Properties

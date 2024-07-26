@@ -5,7 +5,8 @@
 //  Created by Andrii Vysotskyi on 16.03.2023.
 //
 
-@_spi(PO) public struct POPhoneNumberMetadata: Decodable {
+@_spi(PO)
+public struct POPhoneNumberMetadata: Decodable, Sendable {
 
     /// Country code.
     public let countryCode: String

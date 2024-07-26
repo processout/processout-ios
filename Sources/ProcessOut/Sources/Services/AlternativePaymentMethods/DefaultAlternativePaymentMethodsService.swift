@@ -9,7 +9,7 @@ import Foundation
 
 final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethodsService {
 
-    init(configuration: @escaping () -> AlternativePaymentMethodsServiceConfiguration, logger: POLogger) {
+    init(configuration: @escaping @Sendable () -> AlternativePaymentMethodsServiceConfiguration, logger: POLogger) {
         self.configuration = configuration
         self.logger = logger
     }
@@ -63,7 +63,7 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
 
     // MARK: - Private
 
-    private let configuration: () -> AlternativePaymentMethodsServiceConfiguration
+    private let configuration: @Sendable () -> AlternativePaymentMethodsServiceConfiguration
     private let logger: POLogger
 
     // MARK: - Private Methods

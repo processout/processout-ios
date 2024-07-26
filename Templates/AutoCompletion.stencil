@@ -18,7 +18,7 @@ extension {{ type.name }} {
         {% for parameter in method.parameters %}
         {{ parameter.asSource }},
         {% endfor %}
-        completion: @escaping ({% if method.throws %}Result<{{ method.returnTypeName.asSource }}, POFailure>{% else %}{{ method.returnTypeName.asSource }}{% endif %}) -> Void
+        completion: @escaping @Sendable ({% if method.throws %}Result<{{ method.returnTypeName.asSource }}, POFailure>{% else %}{{ method.returnTypeName.asSource }}{% endif %}) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             {% if method.throws %}try {% endif %}await {{ method.callName }}({% for parameter in method.parameters %}{% if parameter.argumentLabel %}{{ parameter.argumentLabel }}: {% endif %}{{ parameter.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
@@ -29,9 +29,9 @@ extension {{ type.name }} {
 {% if forloop.last %}
 
 /// Invokes given completion with a result of async operation.
-private func invoke<T>(
-    completion: @escaping (Result<T, POFailure>) -> Void,
-    after operation: @escaping () async throws -> T
+private func invoke<T: Sendable>(
+    completion: @escaping @Sendable (Result<T, POFailure>) -> Void,
+    after operation: @escaping @Sendable () async throws -> T
 ) -> POCancellable {
     Task { @MainActor in
         do {
@@ -47,7 +47,10 @@ private func invoke<T>(
 }
 
 /// Invokes given completion with a result of async operation.
-private func invoke<T>(completion: @escaping (T) -> Void, after operation: @escaping () async -> T) -> Task<Void, Never> {
+private func invoke<T: Sendable>(
+    completion: @escaping @Sendable (T) -> Void,
+    after operation: @escaping @Sendable () async -> T
+) -> Task<Void, Never> {
     Task { @MainActor in
         completion(await operation())
     }

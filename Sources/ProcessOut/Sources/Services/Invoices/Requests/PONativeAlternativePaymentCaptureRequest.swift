@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PONativeAlternativePaymentCaptureRequest {
+public struct PONativeAlternativePaymentCaptureRequest: Sendable {
 
     /// Invoice identifier.
     public let invoiceId: String

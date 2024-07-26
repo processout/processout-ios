@@ -7,6 +7,7 @@
 
 import ProcessOut
 
+@MainActor
 protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState> {
 
     /// Delegate.
@@ -23,7 +24,4 @@ protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState>
 
     /// Starts card tokenization.
     func tokenize()
-
-    /// Cancells tokenization if possible.
-    func cancel()
 }

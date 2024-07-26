@@ -8,6 +8,7 @@
 import UIKit
 
 /// Describes radio button style in different states.
+@MainActor
 public struct PORadioButtonStyle {
 
     /// Style to use when radio button is in default state ie enabled and not selected.

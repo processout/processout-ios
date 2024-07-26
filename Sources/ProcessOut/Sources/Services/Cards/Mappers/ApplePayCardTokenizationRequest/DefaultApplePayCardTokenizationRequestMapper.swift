@@ -19,6 +19,7 @@ final class DefaultApplePayCardTokenizationRequestMapper: ApplePayCardTokenizati
     // MARK: - ApplePayCardTokenizationRequestMapper
 
     /// - Throws: `POFailure` instance in case of error.
+    @MainActor
     func tokenizationRequest(
         from request: POApplePayCardTokenizationRequest
     ) throws -> ApplePayCardTokenizationRequest {

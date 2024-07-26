@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 16.12.2022.
 //
 
-struct NativeAlternativePaymentCaptureRequest: Encodable {
+struct NativeAlternativePaymentCaptureRequest: Encodable, Sendable {
 
     /// Invoice identifier.
     @POImmutableExcludedCodable

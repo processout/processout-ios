@@ -8,6 +8,7 @@
 import UIKit
 
 /// Possible activity indicator styles.
+@MainActor
 public enum POActivityIndicatorStyle {
 
     /// Custom activity indicator.

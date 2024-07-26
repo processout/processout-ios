@@ -8,7 +8,7 @@
 import UIKit
 
 /// Holds typesetting information that could be applied to displayed text.
-public struct POTypography {
+public struct POTypography: Sendable {
 
     /// Font assosiated with given typography.
     public let font: UIFont

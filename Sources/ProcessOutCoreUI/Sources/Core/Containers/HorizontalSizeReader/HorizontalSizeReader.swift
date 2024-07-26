@@ -33,7 +33,7 @@ struct HorizontalSizeReader<Content: View>: View {
 
 private struct WidthPreferenceKey: PreferenceKey, Equatable {
 
-    static var defaultValue: CGFloat = 0
+    static let defaultValue: CGFloat = 0
 
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         // An empty reduce implementation takes the first value

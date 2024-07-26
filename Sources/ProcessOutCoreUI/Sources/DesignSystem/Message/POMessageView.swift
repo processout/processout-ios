@@ -19,7 +19,7 @@ public struct POMessageView: View {
 
     public var body: some View {
         let configuration = POMessageViewStyleConfiguration(label: Text(message.text), severity: message.severity)
-        style.makeBody(configuration: configuration)
+        AnyView(style.makeBody(configuration: configuration))
     }
 
     // MARK: - Private Properties

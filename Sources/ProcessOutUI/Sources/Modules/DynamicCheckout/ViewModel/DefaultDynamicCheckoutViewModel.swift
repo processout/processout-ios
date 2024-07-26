@@ -28,6 +28,10 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         interactor.start()
     }
 
+    func stop() {
+        interactor.cancel()
+    }
+
     // MARK: - Private Nested Types
 
     private enum ButtonId {

@@ -10,6 +10,7 @@ import SafariServices
 
 /// Builder that can be used to create view controller that is capable of handling 3DS web redirects.
 @available(*, deprecated, message: "Use ProcessOutUI.SFSafariViewController(redirect:returnUrl:safariConfiguration:completion:) instead") // swiftlint:disable:this line_length
+@MainActor
 public final class PO3DSRedirectViewControllerBuilder {
 
     /// Creates builder instance with given redirect information.

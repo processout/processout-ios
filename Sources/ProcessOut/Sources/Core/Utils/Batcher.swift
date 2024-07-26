@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class Batcher<Task> {
+final class Batcher<Task>: Sendable {
 
-    typealias Executor = (Array<Task>) async -> Bool
+    typealias Executor = @Sendable (Array<Task>) async -> Bool
 
     init(executionInterval: TimeInterval = 10, executor: @escaping Executor) {
         self.executionInterval = executionInterval
@@ -38,14 +38,14 @@ final class Batcher<Task> {
     private let executionInterval: TimeInterval
     private let lock: UnfairLock
 
-    private var pendingTasks: [Task]
-    private var executionTimer: Timer?
+    private nonisolated(unsafe) var pendingTasks: [Task]
+    private nonisolated(unsafe) var executionTimer: Timer?
 
     // MARK: - Private Methods
 
     /// - NOTE: method mutates self but is not thread safe.
     private func scheduleExecutionUnsafe() {
-        let timer = Timer(timeInterval: executionInterval, repeats: false) { [weak self] _ in
+        nonisolated(unsafe) let timer = Timer(timeInterval: executionInterval, repeats: false) { [weak self] _ in
             guard let self = self else {
                 return
             }

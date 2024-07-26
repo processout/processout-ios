@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Text style.
-public struct POTextStyle {
+public struct POTextStyle: Sendable {
 
     /// Text foreground color.
     public let color: Color

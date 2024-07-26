@@ -8,6 +8,7 @@
 import Foundation
 
 @available(*, deprecated)
+@preconcurrency
 final class ProcessOutRequestManager {
     
     let apiUrl: String

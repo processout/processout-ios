@@ -6,6 +6,7 @@
 //
 
 @available(*, deprecated)
+@MainActor
 protocol ViewModel<State>: AnyObject {
 
     associatedtype State

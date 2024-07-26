@@ -8,7 +8,7 @@
 import os
 
 /// An `os_unfair_lock` wrapper.
-final class UnfairLock {
+final class UnfairLock: Sendable {
 
     init() {
         unfairLock = .allocate(capacity: 1)
@@ -30,5 +30,5 @@ final class UnfairLock {
 
     // MARK: - Private Properties
 
-    private let unfairLock: os_unfair_lock_t
+    private nonisolated(unsafe) let unfairLock: os_unfair_lock_t
 }

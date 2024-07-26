@@ -18,10 +18,6 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         observeChanges(interactor: interactor)
     }
 
-    deinit {
-        interactor.cancel()
-    }
-
     // MARK: - NativeAlternativePaymentViewModel
 
     @AnimatablePublished
@@ -29,6 +25,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     func start() {
         interactor.start()
+    }
+
+    func stop() {
+        interactor.cancel()
     }
 
     // MARK: - Private Nested Types

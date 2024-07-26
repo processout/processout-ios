@@ -30,3 +30,5 @@ extension KeyedEncodingContainer {
         _ value: POImmutableExcludedCodable<T>, forKey key: KeyedEncodingContainer<K>.Key
     ) throws { /* Ignored */ }
 }
+
+extension POImmutableExcludedCodable: Sendable where Value: Sendable { }

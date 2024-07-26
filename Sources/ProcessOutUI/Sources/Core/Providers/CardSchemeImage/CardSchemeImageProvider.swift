@@ -8,7 +8,7 @@
 import SwiftUI
 import ProcessOut
 
-final class CardSchemeImageProvider {
+final class CardSchemeImageProvider: Sendable {
 
     static let shared = CardSchemeImageProvider()
 

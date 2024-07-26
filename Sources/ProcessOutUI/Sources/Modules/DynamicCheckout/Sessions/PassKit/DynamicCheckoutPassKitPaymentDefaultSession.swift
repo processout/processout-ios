@@ -9,7 +9,6 @@ import Foundation
 import PassKit
 import ProcessOut
 
-@MainActor
 final class DynamicCheckoutPassKitPaymentDefaultSession: DynamicCheckoutPassKitPaymentSession {
 
     init(delegate: PODynamicCheckoutDelegate?, invoicesService: POInvoicesService) {

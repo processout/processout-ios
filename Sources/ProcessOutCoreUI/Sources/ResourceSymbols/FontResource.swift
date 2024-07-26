@@ -10,7 +10,7 @@
 import UIKit
 
 /// A font resource.
-struct FontResource {
+struct FontResource: Sendable {
 
     /// Font resource name.
     fileprivate let weight: UIFont.Weight

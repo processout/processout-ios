@@ -15,7 +15,8 @@ import ProcessOut
 /// class initialized with 3DSRedirect, but it does not depend on the UIKit framework. This means that
 /// the controller can be used in places where a view controller cannot (for example, in SwiftUI applications).
 @available(*, deprecated, message: "Use POWebAuthenticationSession instead.")
-public final class PO3DSRedirectController {
+@MainActor
+public final class PO3DSRedirectController: Sendable {
 
     /// - Parameters:
     ///   - redirect: redirect to handle.
@@ -79,7 +80,7 @@ public final class PO3DSRedirectController {
     }
 
     /// Completion to invoke when redirect handling ends.
-    public var completion: ((Result<String, POFailure>) -> Void)?
+    public var completion: (@Sendable (Result<String, POFailure>) -> Void)?
 
     /// The preferred color to tint the background of the navigation bar and toolbar.
     public var preferredBarTintColor: UIColor?
@@ -90,7 +91,7 @@ public final class PO3DSRedirectController {
     // MARK: - Private Nested Types
 
     private enum AssociatedKeys {
-        static var redirectController: UInt8 = 0
+        nonisolated(unsafe) static var redirectController: UInt8 = 0
     }
 
     // MARK: - Private Properties

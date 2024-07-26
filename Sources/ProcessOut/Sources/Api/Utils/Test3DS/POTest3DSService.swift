@@ -19,13 +19,14 @@ public final class POTest3DSService: PO3DSService {
     }
 
     /// View controller to use for presentations.
+    @MainActor
     public unowned var viewController: UIViewController! // swiftlint:disable:this implicitly_unwrapped_optional
 
     // MARK: - PO3DSService
 
     public func authenticationRequest(
         configuration: PO3DS2Configuration,
-        completion: @escaping (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
+        completion: @escaping @Sendable (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
     ) {
         let request = PO3DS2AuthenticationRequest(
             deviceData: "",
@@ -37,32 +38,36 @@ public final class POTest3DSService: PO3DSService {
         completion(.success(request))
     }
 
-    public func handle(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
-        let alertController = UIAlertController(
-            title: String(resource: .Test3DS.title), message: "", preferredStyle: .alert
-        )
-        let acceptAction = UIAlertAction(title: String(resource: .Test3DS.accept), style: .default) { _ in
-            completion(.success(true))
+    public func handle(challenge: PO3DS2Challenge, completion: @escaping @Sendable (Result<Bool, POFailure>) -> Void) {
+        MainActor.assumeIsolated {
+            let alertController = UIAlertController(
+                title: String(resource: .Test3DS.title), message: "", preferredStyle: .alert
+            )
+            let acceptAction = UIAlertAction(title: String(resource: .Test3DS.accept), style: .default) { _ in
+                completion(.success(true))
+            }
+            alertController.addAction(acceptAction)
+            let rejectAction = UIAlertAction(title: String(resource: .Test3DS.reject), style: .default) { _ in
+                completion(.success(false))
+            }
+            alertController.addAction(rejectAction)
+            viewController.present(alertController, animated: true)
         }
-        alertController.addAction(acceptAction)
-        let rejectAction = UIAlertAction(title: String(resource: .Test3DS.reject), style: .default) { _ in
-            completion(.success(false))
-        }
-        alertController.addAction(rejectAction)
-        viewController.present(alertController, animated: true)
     }
 
-    public func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        let viewController = PO3DSRedirectViewControllerBuilder()
-            .with(redirect: redirect)
-            .with(returnUrl: returnUrl)
-            .with { [weak self] result in
-                self?.viewController.presentedViewController?.dismiss(animated: true) {
-                    completion(result)
+    public func handle(redirect: PO3DSRedirect, completion: @escaping @Sendable (Result<String, POFailure>) -> Void) {
+        MainActor.assumeIsolated {
+            let viewController = PO3DSRedirectViewControllerBuilder()
+                .with(redirect: redirect)
+                .with(returnUrl: returnUrl)
+                .with { [weak self] result in
+                    self?.viewController.presentedViewController?.dismiss(animated: true) {
+                        completion(result)
+                    }
                 }
-            }
-            .build()
-        self.viewController.present(viewController, animated: true)
+                .build()
+            self.viewController.present(viewController, animated: true)
+        }
     }
 
     // MARK: - Private Properties

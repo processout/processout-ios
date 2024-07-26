@@ -8,7 +8,7 @@
 import Foundation
 
 /// An object used to evaluate navigation events in an authentication session.
-public struct POWebAuthenticationSessionCallback: @unchecked Sendable {
+public struct POWebAuthenticationSessionCallback: Sendable {
 
     /// Creates a callback object that matches against URLs with the given custom scheme.
     /// - Parameter customScheme: The custom scheme that the app expects in the callback URL.
@@ -17,5 +17,5 @@ public struct POWebAuthenticationSessionCallback: @unchecked Sendable {
     }
 
     /// Check whether a given main-frame navigation URL matches the callback expected by the client app.
-    let matchesURL: (_ url: URL) -> Bool
+    let matchesURL: @Sendable (_ url: URL) -> Bool
 }

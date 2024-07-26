@@ -7,13 +7,13 @@
 
 import Foundation
 
-public struct POPaginationOptions {
+public struct POPaginationOptions: Sendable {
 
-    public enum Order: String {
+    public enum Order: String, Sendable {
         case ascending = "asc", descending = "desc"
     }
 
-    public enum Position {
+    public enum Position: Sendable {
         case after(String), before(String)
     }
 

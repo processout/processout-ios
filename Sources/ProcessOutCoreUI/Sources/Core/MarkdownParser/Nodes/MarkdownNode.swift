@@ -7,7 +7,7 @@
 
 @_implementationOnly import cmark
 
-class MarkdownBaseNode {
+class MarkdownBaseNode: @unchecked Sendable {
 
     typealias CmarkNode = UnsafeMutablePointer<cmark_node>
 
@@ -19,11 +19,20 @@ class MarkdownBaseNode {
         if validatesType {
             assert(cmarkNode.pointee.type == Self.cmarkNodeType.rawValue)
         }
-        self.cmarkNode = cmarkNode
+        self.children = Self.children(of: cmarkNode)
     }
 
     /// Returns node children.
-    private(set) lazy var children: [MarkdownBaseNode] = {
+    let children: [MarkdownBaseNode]
+
+    /// Accepts given visitor.
+    func accept<V: MarkdownVisitor>(visitor: V) -> V.Result { // swiftlint:disable:this unavailable_function
+        fatalError("Must be implemented by subclass.")
+    }
+
+    // MARK: - Private Methods
+
+    private static func children(of cmarkNode: CmarkNode) -> [MarkdownBaseNode] {
         var cmarkChild = cmarkNode.pointee.first_child
         var children: [MarkdownBaseNode] = []
         while let cmarkNode = cmarkChild {
@@ -32,12 +41,5 @@ class MarkdownBaseNode {
             cmarkChild = cmarkNode.pointee.next
         }
         return children
-    }()
-
-    let cmarkNode: CmarkNode
-
-    /// Accepts given visitor.
-    func accept<V: MarkdownVisitor>(visitor: V) -> V.Result { // swiftlint:disable:this unavailable_function
-        fatalError("Must be implemented by subclass.")
     }
 }

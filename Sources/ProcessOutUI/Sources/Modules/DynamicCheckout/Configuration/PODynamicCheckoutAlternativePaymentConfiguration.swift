@@ -9,9 +9,9 @@ import Foundation
 
 /// Alternative payment specific dynamic checkout configuration.
 @_spi(PO)
-public struct PODynamicCheckoutAlternativePaymentConfiguration {
+public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
 
-    public struct PaymentConfirmation {
+    public struct PaymentConfirmation: Sendable {
 
         /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
         /// Default timeout is 3 minutes while maximum value is 15 minutes.
@@ -36,7 +36,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
         }
     }
 
-    public struct CancelButton {
+    public struct CancelButton: Sendable {
 
         /// Cancel button title. Use `nil` for default title.
         public let title: String?

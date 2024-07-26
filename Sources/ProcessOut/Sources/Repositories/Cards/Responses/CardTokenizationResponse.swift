@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct CardTokenizationResponse: Decodable {
+struct CardTokenizationResponse: Decodable, Sendable {
     let card: POCard
 }

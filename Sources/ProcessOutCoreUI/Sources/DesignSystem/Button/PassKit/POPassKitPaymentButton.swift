@@ -67,6 +67,7 @@ private struct ButtonRepresentable: UIViewRepresentable {
     }
 }
 
+@MainActor
 private final class ButtonCoordinator {
 
     init(action: @escaping () -> Void) {
