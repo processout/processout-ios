@@ -97,7 +97,7 @@ final class DefaultTelemetryService: POService, LoggerDestination {
 
     private func string(from level: LogLevel) -> String {
         let strings: [LogLevel: String] = [
-            .debug: "debug", .info: "info", .error: "error", .fault: "error"
+            .debug: "debug", .info: "info", .warn: "warn", .error: "error"
         ]
         return strings[level]! // swiftlint:disable:this force_unwrapping
     }
