@@ -1,5 +1,5 @@
 //
-//  POCardNumberFormatter.swift
+//  CardNumberFormatter.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 18.07.2023.
@@ -7,9 +7,9 @@
 
 import Foundation
 
-@_spi(PO) public final class POCardNumberFormatter: Formatter {
+final class CardNumberFormatter: Formatter {
 
-    public func string(from partialNumber: String) -> String {
+    func string(from partialNumber: String) -> String {
         let normalizedNumber = normalized(number: partialNumber).prefix(Constants.maxLength)
         for format in formats {
             if let formattedNumber = attemptToFormat(cardNumber: normalizedNumber, format: format) {
@@ -19,20 +19,20 @@ import Foundation
         return attemptToFormat(cardNumber: normalizedNumber, pattern: Constants.defaultPattern) ?? partialNumber
     }
 
-    public func normalized(number: String) -> String {
+    func normalized(number: String) -> String {
         number.removingCharacters(in: Constants.significantCharacters.inverted)
     }
 
     // MARK: - Formatter
 
-    override public func string(for obj: Any?) -> String? {
+    override func string(for obj: Any?) -> String? {
         guard let cardNumber = obj as? String else {
             return nil
         }
         return string(from: cardNumber)
     }
 
-    override public func isPartialStringValid(
+    override func isPartialStringValid(
         _ partialStringPtr: AutoreleasingUnsafeMutablePointer<NSString>, // swiftlint:disable:this legacy_objc_type
         proposedSelectedRange proposedSelRangePtr: NSRangePointer?,
         originalString origString: String,
@@ -41,7 +41,7 @@ import Foundation
     ) -> Bool {
         let partialString = partialStringPtr.pointee as String
         let formatted = string(from: partialString)
-        let adjustedOffset = POFormattingUtils.adjustedCursorOffset(
+        let adjustedOffset = FormattingUtils.adjustedCursorOffset(
             in: formatted,
             source: partialString,
             // swiftlint:disable:next line_length

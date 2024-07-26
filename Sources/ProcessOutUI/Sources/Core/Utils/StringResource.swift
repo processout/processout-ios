@@ -1,5 +1,5 @@
 //
-//  POStringResource.swift
+//  StringResource.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 23.01.2024.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-@_spi(PO) public struct POStringResource: Sendable {
+struct StringResource: Sendable {
 
     /// The key to use to look up a localized string.
     let key: String
@@ -24,7 +24,7 @@ import Foundation
 extension String {
 
     /// Creates string with given resource and replacements.
-    @_spi(PO) public init(resource: POStringResource, replacements: CVarArg...) {
+    init(resource: StringResource, replacements: CVarArg...) {
         let format = Self.localized(resource.key, bundle: resource.bundle)
         self = String(format: format, locale: .current, arguments: replacements)
     }

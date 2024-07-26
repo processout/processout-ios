@@ -6,7 +6,7 @@
 //
 
 import UIKit
-@_spi(PO) import ProcessOut
+import ProcessOut
 
 /// Service that emulates the normal 3DS authentication flow but does not actually make any calls to a real Access
 /// Control Server (ACS). Should be used only for testing purposes in sandbox environment.

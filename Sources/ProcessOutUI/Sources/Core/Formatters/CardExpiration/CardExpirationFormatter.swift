@@ -1,16 +1,15 @@
 //
-//  POCardExpirationFormatter.swift
+//  CardExpirationFormatter.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 21.07.2023.
 //
 
 import Foundation
-@_spi(PO) import ProcessOut
 
-@_spi(PO) public final class POCardExpirationFormatter: Formatter {
+final class CardExpirationFormatter: Formatter {
 
-    override public init() {
+    override init() {
         regexProvider = RegexProvider.shared
         super.init()
     }
@@ -21,7 +20,7 @@ import Foundation
     }
 
     /// Returns formatted version of given expiration string.
-    public func string(from string: String) -> String {
+    func string(from string: String) -> String {
         let expiration = self.expiration(from: string)
         guard !expiration.month.isEmpty else {
             return ""
@@ -29,7 +28,7 @@ import Foundation
         return formatted(month: expiration.month, year: expiration.year)
     }
 
-    public func expirationMonth(from string: String) -> Int? {
+    func expirationMonth(from string: String) -> Int? {
         let monthDescription = expiration(from: string).month
         guard let month = Int(monthDescription), month > 0, month <= 12 else {
             return nil
@@ -37,21 +36,21 @@ import Foundation
         return month
     }
 
-    public func expirationYear(from string: String) -> Int? {
+    func expirationYear(from string: String) -> Int? {
         let yearDescription = expiration(from: string).year
         return Int(yearDescription)
     }
 
     // MARK: - Formatter
 
-    override public func string(for obj: Any?) -> String? {
+    override func string(for obj: Any?) -> String? {
         guard let expiration = obj as? String else {
             return nil
         }
         return string(from: expiration)
     }
 
-    override public func isPartialStringValid(
+    override func isPartialStringValid(
         _ partialStringPtr: AutoreleasingUnsafeMutablePointer<NSString>, // swiftlint:disable:this legacy_objc_type
         proposedSelectedRange proposedSelRangePtr: NSRangePointer?,
         originalString origString: String,
@@ -60,7 +59,7 @@ import Foundation
     ) -> Bool {
         let partialString = partialStringPtr.pointee as String
         let formatted = string(from: partialString)
-        let adjustedOffset = POFormattingUtils.adjustedCursorOffset(
+        let adjustedOffset = FormattingUtils.adjustedCursorOffset(
             in: formatted,
             source: partialString,
             // swiftlint:disable:next line_length

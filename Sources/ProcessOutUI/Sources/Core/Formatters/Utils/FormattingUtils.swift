@@ -1,5 +1,5 @@
 //
-//  POFormattingUtils.swift
+//  FormattingUtils.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 12.05.2023.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-@_spi(PO) public enum POFormattingUtils {
+public enum FormattingUtils {
 
     /// Returns index in formatted string that matches index in `string`.
     ///

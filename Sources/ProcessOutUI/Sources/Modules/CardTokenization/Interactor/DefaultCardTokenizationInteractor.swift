@@ -160,8 +160,8 @@ final class DefaultCardTokenizationInteractor:
     private let logger: POLogger
     private let completion: Completion
 
-    private lazy var cardNumberFormatter = POCardNumberFormatter()
-    private lazy var cardExpirationFormatter = POCardExpirationFormatter()
+    private lazy var cardNumberFormatter = CardNumberFormatter()
+    private lazy var cardExpirationFormatter = CardExpirationFormatter()
 
     private var issuerInformationCancellable: POCancellable?
 
@@ -198,7 +198,7 @@ final class DefaultCardTokenizationInteractor:
 
     private func errorMessage(for failure: POFailure, invalidParameterIds: inout [State.ParameterId]) -> String? {
         // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
-        let errorMessage: POStringResource
+        let errorMessage: StringResource
         switch failure.code {
         case .generic(.requestInvalidCard), .generic(.cardInvalid):
             invalidParameterIds.append(contentsOf: [\.number, \.expiration, \.cvc, \.cardholderName])

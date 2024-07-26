@@ -5,32 +5,30 @@
 //  Created by Andrii Vysotskyi on 17.10.2023.
 //
 
-@_spi(PO) import ProcessOut
-
 // swiftlint:disable nesting
 
-extension POStringResource {
+extension StringResource {
 
     enum CardTokenization {
 
         /// Card tokenization title.
-        static let title = POStringResource("card-tokenization.title", comment: "")
+        static let title = StringResource("card-tokenization.title", comment: "")
 
         enum CardDetails {
 
             /// Card number placeholder.
-            static let number = POStringResource("card-tokenization.card-details.number.placeholder", comment: "")
+            static let number = StringResource("card-tokenization.card-details.number.placeholder", comment: "")
 
             /// Card expiration placeholder.
-            static let expiration = POStringResource(
+            static let expiration = StringResource(
                 "card-tokenization.card-details.expiration.placeholder", comment: ""
             )
 
             /// Card CVC placeholder.
-            static let cvc = POStringResource("card-tokenization.card-details.cvc.placeholder", comment: "")
+            static let cvc = StringResource("card-tokenization.card-details.cvc.placeholder", comment: "")
 
             /// Cardholder name placeholder.
-            static let cardholder = POStringResource(
+            static let cardholder = StringResource(
                 "card-tokenization.card-details.cardholder.placeholder", comment: ""
             )
         }
@@ -38,49 +36,49 @@ extension POStringResource {
         enum PreferredScheme {
 
             /// Preferred scheme section title.
-            static let title = POStringResource("card-tokenization.preferred-scheme.title", comment: "")
+            static let title = StringResource("card-tokenization.preferred-scheme.title", comment: "")
         }
 
         enum BillingAddress {
 
             /// Billing address section title.
-            static let title = POStringResource("card-tokenization.billing-address.title", comment: "")
+            static let title = StringResource("card-tokenization.billing-address.title", comment: "")
 
             /// Billing address street.
-            static let street = POStringResource("card-tokenization.billing-address.street", comment: "")
+            static let street = StringResource("card-tokenization.billing-address.street", comment: "")
         }
 
         enum Error {
 
             /// Generic card error.
-            static let card = POStringResource("card-tokenization.error.card", comment: "")
+            static let card = StringResource("card-tokenization.error.card", comment: "")
 
             /// Invalid card number.
-            static let cardNumber = POStringResource("card-tokenization.error.card-number", comment: "")
+            static let cardNumber = StringResource("card-tokenization.error.card-number", comment: "")
 
             /// Invalid card expiration.
-            static let cardExpiration = POStringResource("card-tokenization.error.card-expiration", comment: "")
+            static let cardExpiration = StringResource("card-tokenization.error.card-expiration", comment: "")
 
             /// Invalid card track data.
-            static let trackData = POStringResource("card-tokenization.error.track-data", comment: "")
+            static let trackData = StringResource("card-tokenization.error.track-data", comment: "")
 
             /// Invalid CVC.
-            static let cvc = POStringResource("card-tokenization.error.cvc", comment: "")
+            static let cvc = StringResource("card-tokenization.error.cvc", comment: "")
 
             /// Invalid cardholder name.
-            static let cardholderName = POStringResource("card-tokenization.error.cardholder-name", comment: "")
+            static let cardholderName = StringResource("card-tokenization.error.cardholder-name", comment: "")
 
             /// Generic error description.
-            static let generic = POStringResource("card-tokenization.error.generic", comment: "")
+            static let generic = StringResource("card-tokenization.error.generic", comment: "")
         }
 
         enum Button {
 
             /// Submit button title.
-            static let submit = POStringResource("card-tokenization.submit-button.title", comment: "")
+            static let submit = StringResource("card-tokenization.submit-button.title", comment: "")
 
             /// Cancel button title.
-            static let cancel = POStringResource("card-tokenization.cancel-button.title", comment: "")
+            static let cancel = StringResource("card-tokenization.cancel-button.title", comment: "")
         }
     }
 }

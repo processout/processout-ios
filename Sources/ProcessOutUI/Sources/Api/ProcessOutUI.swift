@@ -18,6 +18,6 @@ public enum ProcessOutUI {
     public static func configure() {
         POTypography.registerFonts()
         AddressSpecificationProvider.shared.prewarm()
-        PODefaultPhoneNumberMetadataProvider.shared.prewarm()
+        DefaultPhoneNumberMetadataProvider.shared.prewarm()
     }
 }

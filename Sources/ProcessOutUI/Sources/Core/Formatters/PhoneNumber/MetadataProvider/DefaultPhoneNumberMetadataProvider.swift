@@ -1,5 +1,5 @@
 //
-//  PODefaultPhoneNumberMetadataProvider.swift
+//  DefaultPhoneNumberMetadataProvider.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 16.03.2023.
@@ -8,10 +8,9 @@
 import Foundation
 @_spi(PO) import ProcessOut
 
-@_spi(PO)
-public final class PODefaultPhoneNumberMetadataProvider: POPhoneNumberMetadataProvider {
+final class DefaultPhoneNumberMetadataProvider: PhoneNumberMetadataProvider {
 
-    public static let shared = PODefaultPhoneNumberMetadataProvider()
+    public static let shared = DefaultPhoneNumberMetadataProvider()
 
     /// - NOTE: Method is asynchronous.
     public func prewarm() {
@@ -20,7 +19,7 @@ public final class PODefaultPhoneNumberMetadataProvider: POPhoneNumberMetadataPr
 
     // MARK: - PhoneNumberMetadataProvider
 
-    public func metadata(for countryCode: String) -> POPhoneNumberMetadata? {
+    public func metadata(for countryCode: String) -> PhoneNumberMetadata? {
         let transformedCountryCode = countryCode.applyingTransform(.toLatin, reverse: false) ?? countryCode
         if let metadata = metadata.wrappedValue {
             return metadata[transformedCountryCode]
@@ -32,7 +31,7 @@ public final class PODefaultPhoneNumberMetadataProvider: POPhoneNumberMetadataPr
     // MARK: - Private Properties
 
     private let dispatchQueue: DispatchQueue
-    private let metadata = POUnfairlyLocked<[String: POPhoneNumberMetadata]?>(wrappedValue: nil)
+    private let metadata = POUnfairlyLocked<[String: PhoneNumberMetadata]?>(wrappedValue: nil)
 
     // MARK: - Private Methods
 
@@ -45,15 +44,15 @@ public final class PODefaultPhoneNumberMetadataProvider: POPhoneNumberMetadataPr
             guard let self, self.metadata.wrappedValue == nil else {
                 return
             }
-            let groupedMetadata: [String: POPhoneNumberMetadata]
+            let groupedMetadata: [String: PhoneNumberMetadata]
             do {
                 let data = try Data(
                     contentsOf: BundleLocator.bundle.url(forResource: "PhoneNumberMetadata", withExtension: "json")!
                 )
-                let metadata = try JSONDecoder().decode([POPhoneNumberMetadata].self, from: data)
+                let metadata = try JSONDecoder().decode([PhoneNumberMetadata].self, from: data)
                 groupedMetadata = Dictionary(grouping: metadata, by: \.countryCode).compactMapValues { values in
                     let countryCode = values.first!.countryCode // swiftlint:disable:this force_unwrapping
-                    return POPhoneNumberMetadata(countryCode: countryCode, formats: values.flatMap(\.formats))
+                    return PhoneNumberMetadata(countryCode: countryCode, formats: values.flatMap(\.formats))
                 }
             } catch {
                 assertionFailure("Failed to load metadata: \(error)")
