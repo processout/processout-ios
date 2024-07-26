@@ -12,7 +12,7 @@ extension POBackport where Wrapped: Any {
     @MainActor
     final class SubmitAction: Sendable {
 
-        typealias Action = () -> Void
+        typealias Action = () -> Void // swiftlint:disable:this nesting
 
         nonisolated init() {
             actions = []
