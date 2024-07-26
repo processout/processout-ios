@@ -53,13 +53,17 @@ import UIKit
             invoiceId: configuration.invoiceId, gatewayConfigurationId: configuration.gatewayConfigurationId
         )
         invoicesService.nativeAlternativePaymentMethodTransactionDetails(request: request) { [weak self] result in
-            switch result {
-            case let .success(details):
-                self?.defaultValues(for: details.parameters) { values in
-                    self?.setStartedStateUnchecked(details: details, defaultValues: values)
+            MainActor.assumeIsolated {
+                switch result {
+                case let .success(details):
+                    self?.defaultValues(for: details.parameters) { values in
+                        MainActor.assumeIsolated {
+                            self?.setStartedStateUnchecked(details: details, defaultValues: values)
+                        }
+                    }
+                case .failure(let failure):
+                    self?.setFailureStateUnchecked(failure: failure)
                 }
-            case .failure(let failure):
-                self?.setFailureStateUnchecked(failure: failure)
             }
         }
     }
@@ -113,11 +117,13 @@ import UIKit
             )
             state = .submitting(snapshot: startedState)
             invoicesService.initiatePayment(request: request) { [weak self] result in
-                switch result {
-                case let .success(response):
-                    self?.completeSubmissionUnchecked(with: response, startedState: startedState)
-                case let .failure(failure):
-                    self?.restoreStartedStateAfterSubmissionFailureIfPossible(failure, replaceErrorMessages: true)
+                MainActor.assumeIsolated {
+                    switch result {
+                    case let .success(response):
+                        self?.completeSubmissionUnchecked(with: response, startedState: startedState)
+                    case let .failure(failure):
+                        self?.restoreStartedStateAfterSubmissionFailureIfPossible(failure, replaceErrorMessages: true)
+                    }
                 }
             }
         } catch let error as POFailure {
@@ -204,7 +210,9 @@ import UIKit
         switch response.nativeApm.state {
         case .customerInput:
             defaultValues(for: response.nativeApm.parameterDefinitions) { [weak self] values in
-                self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm, defaultValues: values)
+                MainActor.assumeIsolated {
+                    self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm, defaultValues: values)
+                }
             }
         case .pendingCapture:
             send(event: .didSubmitParameters(additionalParametersExpected: false))
@@ -236,35 +244,39 @@ import UIKit
         let logoUrl = logoUrl(gateway: gateway, parameterValues: parameterValues)
         send(event: .willWaitForCaptureConfirmation(additionalActionExpected: actionMessage != nil))
         imagesRepository.images(at: logoUrl, gateway.customerActionImageUrl) { [weak self] logo, actionImage in
-            guard let self else {
-                return
-            }
-            let request = PONativeAlternativePaymentCaptureRequest(
-                invoiceId: self.configuration.invoiceId,
-                gatewayConfigurationId: self.configuration.gatewayConfigurationId,
-                timeout: self.configuration.paymentConfirmationTimeout
-            )
-            self.captureCancellable = self.invoicesService.captureNativeAlternativePayment(
-                request: request,
-                completion: { [weak self] result in
-                    switch result {
-                    case .success:
-                        self?.setCapturedStateUnchecked(gateway: gateway, parameterValues: parameterValues)
-                    case .failure(let failure):
-                        self?.setFailureStateUnchecked(failure: failure)
-                    }
+            MainActor.assumeIsolated {
+                guard let self else {
+                    return
                 }
-            )
-            let awaitingCaptureState = State.AwaitingCapture(
-                paymentProviderName: parameterValues?.providerName,
-                logoImage: logo,
-                actionMessage: actionMessage,
-                actionImage: actionImage,
-                isDelayed: false
-            )
-            self.state = .awaitingCapture(awaitingCaptureState)
-            self.logger.debug("Waiting for invoice capture confirmation")
-            self.schedulePaymentConfirmationDelay()
+                let request = PONativeAlternativePaymentCaptureRequest(
+                    invoiceId: self.configuration.invoiceId,
+                    gatewayConfigurationId: self.configuration.gatewayConfigurationId,
+                    timeout: self.configuration.paymentConfirmationTimeout
+                )
+                self.captureCancellable = self.invoicesService.captureNativeAlternativePayment(
+                    request: request,
+                    completion: { [weak self] result in
+                        MainActor.assumeIsolated {
+                            switch result {
+                            case .success:
+                                self?.setCapturedStateUnchecked(gateway: gateway, parameterValues: parameterValues)
+                            case .failure(let failure):
+                                self?.setFailureStateUnchecked(failure: failure)
+                            }
+                        }
+                    }
+                )
+                let awaitingCaptureState = State.AwaitingCapture(
+                    paymentProviderName: parameterValues?.providerName,
+                    logoImage: logo,
+                    actionMessage: actionMessage,
+                    actionImage: actionImage,
+                    isDelayed: false
+                )
+                self.state = .awaitingCapture(awaitingCaptureState)
+                self.logger.debug("Waiting for invoice capture confirmation")
+                self.schedulePaymentConfirmationDelay()
+            }
         }
     }
 
@@ -303,11 +315,13 @@ import UIKit
         default:
             let logoUrl = logoUrl(gateway: gateway, parameterValues: parameterValues)
             imagesRepository.image(at: logoUrl) { [weak self] logoImage in
-                let capturedState = State.Captured(
-                    paymentProviderName: parameterValues?.providerName, logoImage: logoImage
-                )
-                self?.state = .captured(capturedState)
-                self?.send(event: .didCompletePayment)
+                MainActor.assumeIsolated {
+                    let capturedState = State.Captured(
+                        paymentProviderName: parameterValues?.providerName, logoImage: logoImage
+                    )
+                    self?.state = .captured(capturedState)
+                    self?.send(event: .didCompletePayment)
+                }
             }
         }
     }
@@ -402,7 +416,7 @@ import UIKit
 
     private func defaultValues(
         for parameters: [PONativeAlternativePaymentMethodParameter]?,
-        completion: @escaping ([String: State.ParameterValue]) -> Void
+        completion: @escaping @Sendable ([String: State.ParameterValue]) -> Void
     ) {
         guard let parameters, !parameters.isEmpty else {
             completion([:])
@@ -410,27 +424,28 @@ import UIKit
         }
         if let delegate {
             delegate.nativeAlternativePaymentMethodDefaultValues(for: parameters) { [self] values in
-                assert(Thread.isMainThread, "Completion must be called on main thread.")
-                var defaultValues: [String: State.ParameterValue] = [:]
-                parameters.forEach { parameter in
-                    let defaultValue: String
-                    if let value = values[parameter.key] {
-                        switch parameter.type {
-                        case .email, .numeric, .phone, .text:
-                            defaultValue = self.formatted(value: value, type: parameter.type)
-                        case .singleSelect:
-                            precondition(
-                                parameter.availableValues?.map(\.value).contains(value) == true,
-                                "Unknown `singleSelect` parameter value."
-                            )
-                            defaultValue = value
+                MainActor.assumeIsolated {
+                    var defaultValues: [String: State.ParameterValue] = [:]
+                    parameters.forEach { parameter in
+                        let defaultValue: String
+                        if let value = values[parameter.key] {
+                            switch parameter.type {
+                            case .email, .numeric, .phone, .text:
+                                defaultValue = self.formatted(value: value, type: parameter.type)
+                            case .singleSelect:
+                                precondition(
+                                    parameter.availableValues?.map(\.value).contains(value) == true,
+                                    "Unknown `singleSelect` parameter value."
+                                )
+                                defaultValue = value
+                            }
+                        } else {
+                            defaultValue = self.defaultValue(for: parameter)
                         }
-                    } else {
-                        defaultValue = self.defaultValue(for: parameter)
+                        defaultValues[parameter.key] = .init(value: defaultValue, recentErrorMessage: nil)
                     }
-                    defaultValues[parameter.key] = .init(value: defaultValue, recentErrorMessage: nil)
+                    completion(defaultValues)
                 }
-                completion(defaultValues)
             }
         } else {
             var defaultValues: [String: State.ParameterValue] = [:]

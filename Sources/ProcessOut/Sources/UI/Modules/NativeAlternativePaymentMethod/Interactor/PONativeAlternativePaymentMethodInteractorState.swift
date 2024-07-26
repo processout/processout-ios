@@ -7,9 +7,10 @@
 
 import UIKit
 
-@_spi(PO) public enum PONativeAlternativePaymentMethodInteractorState {
+@_spi(PO)
+public enum PONativeAlternativePaymentMethodInteractorState {
 
-    public struct ParameterValue {
+    public struct ParameterValue: Sendable {
 
         /// Actual parameter value.
         public let value: String?
@@ -91,3 +92,6 @@ import UIKit
     /// Payment is completed.
     case captured(Captured)
 }
+
+@available(*, unavailable)
+extension PONativeAlternativePaymentMethodInteractorState: Sendable { }
