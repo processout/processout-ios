@@ -124,6 +124,10 @@ public enum PODynamicCheckoutPaymentMethod {
         /// Indicates whether should collect cardholder name.
         public let requireCardholderName: Bool
 
+        /// Indicates whether the UI should display a control (such as a checkbox) that allows
+        /// the user to choose whether to save their card details for future payments.
+        public let savingAllowed: Bool
+
         /// Card billing address collection configuration.
         public let billingAddress: BillingAddressConfiguration
     }
