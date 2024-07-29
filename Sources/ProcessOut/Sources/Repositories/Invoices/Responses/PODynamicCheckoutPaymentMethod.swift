@@ -10,6 +10,8 @@ import UIKit
 import PassKit
 
 /// Dynamic checkout payment method description.
+///
+/// - Warning: New cases may be added in future minor releases.
 @_spi(PO)
 public enum PODynamicCheckoutPaymentMethod {
 
@@ -116,13 +118,13 @@ public enum PODynamicCheckoutPaymentMethod {
     public struct CardConfiguration: Decodable {
 
         /// Defines whether user will be asked to select scheme if co-scheme is available.
-        let allowSchemeSelection: Bool
+        let schemeSelectionAllowed: Bool
 
         /// Indicates whether should collect card CVC.
-        public let requireCvc: Bool
+        public let cvcRequired: Bool
 
         /// Indicates whether should collect cardholder name.
-        public let requireCardholderName: Bool
+        public let cardholderNameRequired: Bool
 
         /// Card billing address collection configuration.
         public let billingAddress: BillingAddressConfiguration
