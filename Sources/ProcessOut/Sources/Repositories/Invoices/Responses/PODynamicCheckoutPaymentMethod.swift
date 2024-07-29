@@ -10,7 +10,6 @@ import UIKit
 import PassKit
 
 /// Dynamic checkout payment method description.
-@_spi(PO)
 public enum PODynamicCheckoutPaymentMethod {
 
     // MARK: - Apple Pay

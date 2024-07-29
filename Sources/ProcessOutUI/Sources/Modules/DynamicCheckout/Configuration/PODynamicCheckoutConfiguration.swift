@@ -9,7 +9,6 @@ import PassKit
 import ProcessOut
 
 /// Dynamic checkout configuration.
-@_spi(PO)
 public struct PODynamicCheckoutConfiguration {
 
     public struct PaymentSuccess {
