@@ -18,20 +18,16 @@ struct CheckboxView: View {
     // MARK: - View
 
     var body: some View {
-        if #available(iOS 17, *) {
-            CheckmarkShape()
-                .trim(from: 0, to: isSelected ? 1.0 : 0)
-                .stroke(
-                    style.color,
-                    style: StrokeStyle(lineWidth: style.width, lineCap: .round, lineJoin: .round)
-                )
-                .frame(width: Constants.checkmarkSize, height: Constants.checkmarkSize)
-                .frame(width: Constants.size, height: Constants.size)
-                .background(style.backgroundColor)
-                .border(style: style.border)
-        } else {
-            EmptyView()
-        }
+        CheckmarkShape()
+            .trim(from: 0, to: isSelected ? 1.0 : 0)
+            .stroke(
+                style.color,
+                style: StrokeStyle(lineWidth: style.width, lineCap: .round, lineJoin: .round)
+            )
+            .frame(width: Constants.checkmarkSize, height: Constants.checkmarkSize)
+            .frame(width: Constants.size, height: Constants.size)
+            .background(style.backgroundColor)
+            .border(style: style.border)
     }
 
     // MARK: - Private Nested Types
