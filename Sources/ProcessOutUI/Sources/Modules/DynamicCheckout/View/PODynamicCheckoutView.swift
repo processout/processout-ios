@@ -27,6 +27,11 @@ public struct PODynamicCheckoutView: View {
                     DynamicCheckoutContentView(sections: viewModel.state.sections)
                         .frame(minHeight: geometry.size.height, alignment: .top)
                 }
+                .modify { content in
+                    if #available(iOS 16.0, *) {
+                        content.scrollDismissesKeyboard(.interactively)
+                    }
+                }
                 .clipped()
             }
             POActionsContainerView(actions: viewModel.state.actions)
