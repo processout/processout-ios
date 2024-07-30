@@ -21,9 +21,9 @@ protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState>
     /// Changes preferred scheme to use when tokenizing card.
     func setPreferredScheme(_ scheme: POCardScheme)
 
+    /// Changes card saving selection.
+    func setShouldSaveCard(_ shouldSave: Bool)
+
     /// Starts card tokenization.
     func tokenize()
-
-    /// Cancells tokenization if possible.
-    func cancel()
 }
