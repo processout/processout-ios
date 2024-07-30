@@ -9,7 +9,7 @@ import UIKit
 
 extension UIFont {
 
-    func addingFeatures(_ settings: FontFeaturesSettings) -> UIFont {
+    func addingFeatures(_ settings: POFontFeaturesSettings) -> UIFont {
         let settings = [
             settings.numberSpacing
         ]

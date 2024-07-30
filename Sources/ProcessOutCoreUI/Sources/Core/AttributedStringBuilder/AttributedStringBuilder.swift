@@ -36,7 +36,7 @@ struct AttributedStringBuilder {
     var fontSymbolicTraits: UIFontDescriptor.SymbolicTraits = []
 
     /// Font feature settings.
-    var fontFeatures = FontFeaturesSettings()
+    var fontFeatures = POFontFeaturesSettings()
 
     /// The text tab objects that represent the paragraph’s tab stops.
     var tabStops: [NSTextTab] = []

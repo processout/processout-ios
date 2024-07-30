@@ -7,24 +7,28 @@
 
 import CoreText
 
-struct FontNumberSpacing: RawRepresentable {
+@_spi(PO)
+public struct POFontNumberSpacing {
 
     let rawValue: Int
-
-    /// Uniform width numbers, useful for displaying in columns.
-    static let monospaced = Self(rawValue: kMonospacedNumbersSelector)
-
-    /// Numbers whose widths vary.
-    static let proportional = Self(rawValue: kProportionalNumbersSelector)
-
-    /// Thin numerals.
-    static let thirdWidth = Self(rawValue: kThirdWidthNumbersSelector)
-
-    /// Very thin numerals.
-    static let quarterWidth = Self(rawValue: kQuarterWidthNumbersSelector)
 }
 
-extension FontNumberSpacing: FontFeatureSetting {
+extension POFontNumberSpacing {
+
+    /// Uniform width numbers, useful for displaying in columns.
+    public static let monospaced = Self(rawValue: kMonospacedNumbersSelector)
+
+    /// Numbers whose widths vary.
+    public static let proportional = Self(rawValue: kProportionalNumbersSelector)
+
+    /// Thin numerals.
+    public static let thirdWidth = Self(rawValue: kThirdWidthNumbersSelector)
+
+    /// Very thin numerals.
+    public static let quarterWidth = Self(rawValue: kQuarterWidthNumbersSelector)
+}
+
+extension POFontNumberSpacing: FontFeatureSetting {
 
     var featureType: Int {
         kNumberSpacingType
