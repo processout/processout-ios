@@ -37,12 +37,14 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         static let cardInformation = "card-info"
         static let preferredScheme = "preferred-scheme"
         static let billingAddress = "billing-address"
+        static let futurePayments = "future-payments"
     }
 
     private enum ItemId {
         static let error = "error"
         static let trackData = "track-data"
         static let scheme = "card-scheme"
+        static let cardSave = "card-save"
     }
 
     // MARK: - Private Properties
@@ -90,7 +92,8 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         let sections = [
             State.Section(id: SectionId.cardInformation, title: nil, items: cardInformationItems),
             preferredSchemeSection(startedState: startedState),
-            billingAddressSection(startedState: startedState)
+            billingAddressSection(startedState: startedState),
+            futurePaymentsSection(startedState: startedState)
         ]
         let startedState = State(
             title: title(),
@@ -108,7 +111,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         return title.isEmpty ? nil : title
     }
 
-    // MARK: - Card Defailts
+    // MARK: - Card Details
 
     private func cardInformationInputItems(
         startedState: InteractorState.Started
@@ -239,6 +242,30 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             items.append(createItem(parameter: startedState.address.postalCode, placeholder: placeholder))
         }
         return items.compactMap { $0 }
+    }
+
+    // MARK: - Future Payments
+
+    private func futurePaymentsSection(
+        startedState: InteractorState.Started
+    ) -> CardTokenizationViewModelState.Section? {
+        guard interactor.configuration.isSavingAllowed else {
+            return nil
+        }
+        let toggleItem = CardTokenizationViewModelState.ToggleItem(
+            id: ItemId.cardSave,
+            title: "Save this card for future payments",
+            isSelected: .init(
+                get: { startedState.shouldSaveCard },
+                set: { [weak self] newValue in
+                    self?.interactor.setShouldSaveCard(newValue)
+                }
+            )
+        )
+        let section = CardTokenizationViewModelState.Section(
+            id: SectionId.futurePayments, title: nil, items: [.toggle(toggleItem)]
+        )
+        return section
     }
 
     // MARK: - Input & Picker Items
