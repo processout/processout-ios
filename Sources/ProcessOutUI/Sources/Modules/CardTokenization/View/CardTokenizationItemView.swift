@@ -30,6 +30,9 @@ struct CardTokenizationItemView: View {
                 view.pickerStyle(style)
             }
             .pickerStyle(POMenuPickerStyle(inputStyle: style.input))
+        case .toggle(let toggleItem):
+            Toggle(toggleItem.title, isOn: toggleItem.$isSelected)
+                .poToggleStyle(style.toggle)
         case .error(let errorItem):
             Text(errorItem.description)
                 .textStyle(style.errorDescription)

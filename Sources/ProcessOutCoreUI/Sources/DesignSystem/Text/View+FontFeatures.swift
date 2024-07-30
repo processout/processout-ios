@@ -9,14 +9,14 @@ import SwiftUI
 
 extension View {
 
-    /// - WARNING: this method allows to modify text style that is applied later on
+    /// - WARNING: This method allows to modify text style that is applied later on
     /// with ````SwiftUI/View/textStyle(_:addPadding:)`` modifier.
     @_spi(PO)
     public func fontFeatures(_ settings: POFontFeaturesSettings) -> some View {
         environment(\.fontFeatures, settings)
     }
 
-    /// - WARNING: this method allows to modify text style that is applied later on
+    /// - WARNING: This method allows to modify text style that is applied later on
     /// with ````SwiftUI/View/textStyle(_:addPadding:)`` modifier.
     @_spi(PO)
     public func fontNumberSpacing(_ fontNumberSpacing: POFontNumberSpacing) -> some View {
