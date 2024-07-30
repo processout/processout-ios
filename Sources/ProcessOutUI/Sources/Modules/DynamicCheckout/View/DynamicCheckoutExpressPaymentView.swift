@@ -29,6 +29,7 @@ struct DynamicCheckoutExpressPaymentView: View {
             )
         }
         .buttonStyle(POAnyButtonStyle(erasing: style.expressPaymentButtonStyle))
+        .fontNumberSpacing(.monospaced)
     }
 
     // MARK: - Private Properties
