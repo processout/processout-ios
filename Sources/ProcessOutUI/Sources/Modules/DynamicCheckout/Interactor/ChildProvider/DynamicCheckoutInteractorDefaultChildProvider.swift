@@ -84,6 +84,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             primaryActionTitle: "",
             cancelActionTitle: "",
             billingAddress: billingAddressConfiguration,
+            isSavingAllowed: configuration.savingAllowed,
             metadata: self.configuration.card.metadata
         )
         return cardConfiguration
