@@ -34,7 +34,7 @@ struct CheckboxButtonStyle: ButtonStyle {
             .brightness(
                 brightnessAdjustment(isPressed: configuration.isPressed, colorScheme: colorScheme)
             )
-            .contentShape(.rect)
+            .contentShape(.standardHittableRect)
             .animation(.default, value: isSelected)
             .animation(.default, value: isEnabled)
         }
