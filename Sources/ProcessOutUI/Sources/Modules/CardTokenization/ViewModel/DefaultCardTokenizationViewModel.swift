@@ -254,7 +254,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         }
         let toggleItem = CardTokenizationViewModelState.ToggleItem(
             id: ItemId.cardSave,
-            title: "Save this card for future payments",
+            title: String(resource: .CardTokenization.saveCardMessage),
             isSelected: .init(
                 get: { startedState.shouldSaveCard },
                 set: { [weak self] newValue in
