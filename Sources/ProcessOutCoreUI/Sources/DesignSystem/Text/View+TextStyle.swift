@@ -44,7 +44,9 @@ private struct ContentModifier: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        let font = style.typography.font.withSize(style.typography.font.pointSize * multiplier)
+        let font = style.typography.font
+            .addingFeatures(fontFeatures)
+            .withSize(style.typography.font.pointSize * multiplier)
         let lineSpacing = (style.typography.lineHeight / style.typography.font.lineHeight - 1) * font.lineHeight
         return content
             .font(Font(font))
@@ -61,4 +63,7 @@ private struct ContentModifier: ViewModifier {
 
     @POBackport.ScaledMetric
     private var multiplier: CGFloat
+
+    @Environment(\.fontFeatures)
+    private var fontFeatures
 }
