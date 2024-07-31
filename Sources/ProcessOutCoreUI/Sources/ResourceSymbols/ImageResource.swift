@@ -35,7 +35,7 @@ extension Image {
 
     /// Initialize an `Image` with an image resource.
     @_spi(PO)
-    public init(poResource resource: POImageResource) {
+    public init(_ resource: POImageResource) {
         self.init(resource.name, bundle: resource.bundle)
     }
 }

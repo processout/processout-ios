@@ -26,6 +26,6 @@ extension EnvironmentValues {
     // MARK: - Private Nested Types
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = UIColor(resource: .Button.Primary.Background.default)
+        static let defaultValue = UIColor(.Button.Primary.Background.default)
     }
 }
