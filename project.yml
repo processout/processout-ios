@@ -9,6 +9,7 @@ settings:
   LOCALIZED_STRING_MACRO_NAMES: "$(inherited) POStringResource"
   LOCALIZATION_PREFERS_STRING_CATALOGS: true
   SWIFT_STRICT_CONCURRENCY: complete
+  ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS: false
 options:
   transitivelyLinkDependencies: true
 packages:

@@ -40,6 +40,7 @@ extension POCardTokenizationStyle {
         sectionTitle = style.inputTitle
         input = style.input
         radioButton = style.radioButton
+        toggle = style.toggle
         errorDescription = style.errorText
         backgroundColor = style.backgroundColor
         actionsContainer = style.actionsContainer

@@ -50,14 +50,14 @@ extension POInputStyle {
     // MARK: - Private Methods
 
     private static func `default`(typography: POTypography) -> POInputStyle {
-        let stateStyle = { (borderColorResource: ColorResource) in
+        let stateStyle = { (borderColorResource: POColorResource) in
             POInputStateStyle(
-                text: .init(color: Color(.Text.primary), typography: typography),
-                placeholder: .init(color: Color(.Text.muted), typography: typography),
-                backgroundColor: Color(.Surface.default),
-                border: .regular(color: Color(borderColorResource)),
+                text: .init(color: Color(poResource: .Text.primary), typography: typography),
+                placeholder: .init(color: Color(poResource: .Text.muted), typography: typography),
+                backgroundColor: Color(poResource: .Surface.default),
+                border: .regular(color: Color(poResource: borderColorResource)),
                 shadow: .clear,
-                tintColor: Color(.Text.primary)
+                tintColor: Color(poResource: .Text.primary)
             )
         }
         let style = POInputStyle(

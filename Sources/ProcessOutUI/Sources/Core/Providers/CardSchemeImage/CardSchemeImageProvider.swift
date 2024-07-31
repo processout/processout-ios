@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ProcessOut
+@_spi(PO) import ProcessOutCoreUI
 
 final class CardSchemeImageProvider: Sendable {
 
@@ -16,12 +17,12 @@ final class CardSchemeImageProvider: Sendable {
         guard let resource = resources[scheme] else {
             return nil
         }
-        return Image(resource)
+        return Image(poResource: resource)
     }
 
     // MARK: - Private Properties
 
-    private let resources: [POCardScheme: ImageResource] = [
+    private let resources: [POCardScheme: POImageResource] = [
         .amex: .Schemes.amex,
         .carteBancaire: .Schemes.carteBancaire,
         .dinaCard: .Schemes.dinacard,

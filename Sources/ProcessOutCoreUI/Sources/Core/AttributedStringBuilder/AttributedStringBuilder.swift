@@ -35,6 +35,9 @@ struct AttributedStringBuilder {
     /// Allows to alter font with the specified symbolic traits.
     var fontSymbolicTraits: UIFontDescriptor.SymbolicTraits = []
 
+    /// Font feature settings.
+    var fontFeatures = POFontFeaturesSettings()
+
     /// The text tab objects that represent the paragraph’s tab stops.
     var tabStops: [NSTextTab] = []
 
@@ -59,11 +62,11 @@ struct AttributedStringBuilder {
         guard let typography else {
             preconditionFailure("Typography must be set.")
         }
-        let font = font(typography: typography, symbolicTraits: fontSymbolicTraits, maximumFontSize: maximumFontSize)
+        let font = font(typography: typography)
         var attributes: [NSAttributedString.Key: Any] = [:]
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
         attributes[.font] = font
-        attributes[.baselineOffset] = baselineOffset(font: font, lineHeightMultiple: lineHeightMultiple)
+        attributes[.baselineOffset] = Self.baselineOffset(font: font, lineHeightMultiple: lineHeightMultiple)
         attributes[.foregroundColor] = color
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.maximumLineHeight = font.lineHeight * lineHeightMultiple
@@ -80,7 +83,7 @@ struct AttributedStringBuilder {
 
     // MARK: - Private Methods
 
-    private func baselineOffset(font: UIFont, lineHeightMultiple: CGFloat) -> CGFloat {
+    private static func baselineOffset(font: UIFont, lineHeightMultiple: CGFloat) -> CGFloat {
         let offset = (font.lineHeight * lineHeightMultiple - font.capHeight) / 2 + font.descender
         if #available(iOS 16, *) {
             return offset
@@ -90,9 +93,7 @@ struct AttributedStringBuilder {
         return offset < 0 ? offset : offset / 2
     }
 
-    private func font(
-        typography: POTypography, symbolicTraits: UIFontDescriptor.SymbolicTraits, maximumFontSize: CGFloat?
-    ) -> UIFont {
+    private func font(typography: POTypography) -> UIFont {
         var font = typography.font
         if let textStyle = typography.textStyle {
             let uiSizeCategory = sizeCategory ?? UITraitCollection.current.preferredContentSizeCategory
@@ -104,10 +105,10 @@ struct AttributedStringBuilder {
         if let maximumFontSize, font.pointSize > maximumFontSize {
             font = font.withSize(maximumFontSize)
         }
-        if !symbolicTraits.isEmpty, let descriptor = font.fontDescriptor.withSymbolicTraits(symbolicTraits) {
+        if !fontSymbolicTraits.isEmpty, let descriptor = font.fontDescriptor.withSymbolicTraits(fontSymbolicTraits) {
             font = UIFont(descriptor: descriptor, size: 0)
         }
-        return font
+        return font.addingFeatures(fontFeatures)
     }
 }
 

@@ -28,6 +28,9 @@ public struct POCardTokenizationStyle {
     /// Radio button style.
     public let radioButton: any ButtonStyle
 
+    /// Toggle style.
+    public let toggle: any ToggleStyle
+
     /// Error description text style.
     public let errorDescription: POTextStyle
 
@@ -45,6 +48,7 @@ public struct POCardTokenizationStyle {
         sectionTitle: POTextStyle,
         input: POInputStyle,
         radioButton: some ButtonStyle,
+        toggle: some ToggleStyle = .poCheckbox,
         errorDescription: POTextStyle,
         backgroundColor: Color,
         actionsContainer: POActionsContainerStyle,
@@ -54,6 +58,7 @@ public struct POCardTokenizationStyle {
         self.sectionTitle = sectionTitle
         self.input = input
         self.radioButton = radioButton
+        self.toggle = toggle
         self.errorDescription = errorDescription
         self.backgroundColor = backgroundColor
         self.actionsContainer = actionsContainer

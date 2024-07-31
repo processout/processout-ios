@@ -79,11 +79,12 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         )
         let cardConfiguration = POCardTokenizationConfiguration(
             title: "",
-            isCardholderNameInputVisible: configuration.requireCardholderName,
-            shouldCollectCvc: configuration.requireCvc,
+            isCardholderNameInputVisible: configuration.cardholderNameRequired,
+            shouldCollectCvc: configuration.cvcRequired,
             primaryActionTitle: "",
             cancelActionTitle: "",
             billingAddress: billingAddressConfiguration,
+            isSavingAllowed: configuration.savingAllowed,
             metadata: self.configuration.card.metadata
         )
         return cardConfiguration

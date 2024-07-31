@@ -80,6 +80,9 @@ extension StringResource {
             /// Cancel button title.
             static let cancel = StringResource("card-tokenization.cancel-button.title", comment: "")
         }
+
+        /// Save card message.
+        static let saveCardMessage = StringResource("card-tokenization.save-card-message", comment: "")
     }
 }
 

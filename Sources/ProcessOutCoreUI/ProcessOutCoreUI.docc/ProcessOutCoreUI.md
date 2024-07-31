@@ -31,6 +31,12 @@
 - ``SwiftUI/EnvironmentValues/isRadioButtonSelected``
 - ``PORadioButtonStyle/radio``
 
+### Checkbox
+
+- ``POCheckboxToggleStyle``
+- ``POCheckboxToggleStateStyle``
+- ``SwiftUI/ToggleStyle/poCheckbox``
+
 ### Actions Container
 
 - ``POActionsContainerStyle``
