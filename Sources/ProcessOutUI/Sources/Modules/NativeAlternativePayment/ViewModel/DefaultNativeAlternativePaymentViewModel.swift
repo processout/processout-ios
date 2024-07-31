@@ -238,7 +238,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             title: state.logoImage == nil ? state.paymentProviderName : nil,
             logoImage: state.logoImage,
             message: configuration.successMessage ?? String(resource: .NativeAlternativePayment.Success.message),
-            image: UIImage(resource: .success).withRenderingMode(.alwaysTemplate),
+            image: UIImage(.success).withRenderingMode(.alwaysTemplate),
             isCaptured: true,
             isProgressViewHidden: true
         )

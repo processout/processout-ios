@@ -66,14 +66,14 @@ extension POCardTokenizationStyle {
     /// Default card tokenization style.
     public static var `default`: POCardTokenizationStyle {
         POCardTokenizationStyle(
-            title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
-            sectionTitle: POTextStyle(color: Color(poResource: .Text.primary), typography: .label1),
+            title: POTextStyle(color: Color(.Text.primary), typography: .title),
+            sectionTitle: POTextStyle(color: Color(.Text.primary), typography: .label1),
             input: .medium,
             radioButton: .radio,
-            errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
-            backgroundColor: Color(poResource: .Surface.default),
+            errorDescription: POTextStyle(color: Color(.Text.error), typography: .label2),
+            backgroundColor: Color(.Surface.default),
             actionsContainer: .default,
-            separatorColor: Color(poResource: .Border.subtle)
+            separatorColor: Color(.Border.subtle)
         )
     }
 }

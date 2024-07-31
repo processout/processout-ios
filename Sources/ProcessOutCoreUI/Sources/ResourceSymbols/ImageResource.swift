@@ -18,6 +18,11 @@ public struct POImageResource: Hashable, Sendable {
         self.bundle = BundleLocator.bundle
     }
 
+    public init(name: String, bundle: Bundle) {
+        self.name = name
+        self.bundle = bundle
+    }
+
     /// An asset catalog image resource name.
     fileprivate let name: String
 
@@ -37,6 +42,16 @@ extension Image {
     @_spi(PO)
     public init(_ resource: POImageResource) {
         self.init(resource.name, bundle: resource.bundle)
+    }
+}
+
+extension UIImage {
+
+    /// Initialize an `Image` with an image resource.
+    @_spi(PO)
+    public convenience init(_ resource: POImageResource) {
+        // swiftlint:disable:next force_unwrapping
+        self.init(named: resource.name, in: resource.bundle, compatibleWith: nil)!
     }
 }
 
