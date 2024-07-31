@@ -11,7 +11,7 @@ import SwiftUI
 
 /// A color resource.
 @_spi(PO)
-public struct POColorResource {
+public struct POColorResource: Hashable, Sendable {
 
     init(name: String) {
         self.name = name
@@ -19,10 +19,10 @@ public struct POColorResource {
     }
 
     /// Resource name.
-    let name: String
+    fileprivate let name: String
 
     /// Resource bundle.
-    let bundle: Bundle
+    fileprivate let bundle: Bundle
 }
 
 extension POColorResource {
