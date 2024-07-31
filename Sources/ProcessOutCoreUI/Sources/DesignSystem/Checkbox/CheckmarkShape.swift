@@ -12,7 +12,7 @@ import SwiftUI
 struct CheckmarkShape: Shape {
 
     func path(in rect: CGRect) -> Path {
-        // todo(andrii-vysotskyi): ensure view correctly adapts to non-square paths
+        // todo(andrii-vysotskyi): ensure view correctly adapts to non-square rects
         let size = min(rect.width, rect.height)
         var path = Path()
         path.move   (to: CGPoint(x: 0.1565 * size, y: 0.5625 * size))
