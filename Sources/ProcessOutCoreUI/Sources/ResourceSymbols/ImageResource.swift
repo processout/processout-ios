@@ -9,7 +9,7 @@ import SwiftUI
 
 // swiftlint:disable strict_fileprivate
 
-/// A color resource.
+/// An image resource.
 @_spi(PO)
 public struct POImageResource: Hashable, Sendable {
 
