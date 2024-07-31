@@ -82,21 +82,21 @@ public struct PONativeAlternativePaymentMethodStyle {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let title = POTextStyle(color: UIColor(resource: .Text.primary), typography: .Medium.title)
+        static let title = POTextStyle(color: UIColor(poResource: .Text.primary), typography: .Medium.title)
         static let sectionTitle = POTextStyle(
-            color: UIColor(resource: .Text.secondary), typography: .Fixed.labelHeading
+            color: UIColor(poResource: .Text.secondary), typography: .Fixed.labelHeading
         )
         static let input = POInputStyle.default()
         static let codeInput = POInputStyle.default(typography: .Medium.title)
         static let radioButton = PORadioButtonStyle.default
-        static let errorDescription = POTextStyle(color: UIColor(resource: .Text.error), typography: .Fixed.label)
+        static let errorDescription = POTextStyle(color: UIColor(poResource: .Text.error), typography: .Fixed.label)
         static let actions = POActionsContainerStyle()
         static let activityIndicator = POActivityIndicatorStyle.system(
-            .large, color: UIColor(resource: .Text.secondary)
+            .large, color: UIColor(poResource: .Text.secondary)
         )
-        static let message = POTextStyle(color: UIColor(resource: .Text.primary), typography: .Fixed.body)
-        static let successMessage = POTextStyle(color: UIColor(resource: .Text.success), typography: .Fixed.body)
+        static let message = POTextStyle(color: UIColor(poResource: .Text.primary), typography: .Fixed.body)
+        static let successMessage = POTextStyle(color: UIColor(poResource: .Text.success), typography: .Fixed.body)
         static let background = PONativeAlternativePaymentMethodBackgroundStyle()
-        static let separatorColor = UIColor(resource: .Border.subtle)
+        static let separatorColor = UIColor(poResource: .Border.subtle)
     }
 }

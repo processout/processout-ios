@@ -13,6 +13,10 @@ extension ButtonStyle where Self == POBrandButtonStyle {
     /// Simple style that changes its appearance based on brand color ``SwiftUI/EnvironmentValues/poButtonBrandColor``.
     @_disfavoredOverload
     public static var brand: POBrandButtonStyle {
-        .init(title: .init(color: Color(.Text.primary), typography: .button), border: .clear, shadow: .clear)
+        POBrandButtonStyle(
+            title: .init(color: Color(poResource: .Text.primary), typography: .button),
+            border: .clear,
+            shadow: .clear
+        )
     }
 }

@@ -145,7 +145,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
             placeholder: String(resource: .CardUpdate.CardDetails.cvc),
             isInvalid: !state.areParametersValid,
             isEnabled: true,
-            icon: Image(.Card.back),
+            icon: Image(poResource: .Card.back),
             formatter: state.formatter,
             keyboard: .asciiCapableNumberPad,
             contentType: nil,
