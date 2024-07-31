@@ -103,6 +103,17 @@ final class DefaultCardTokenizationInteractor:
         delegate?.cardTokenizationDidEmitEvent(.parametersChanged)
     }
 
+    func setShouldSaveCard(_ shouldSaveCard: Bool) {
+        guard case .started(var startedState) = state else {
+            return
+        }
+        logger.debug("Will change card saving selection to \(shouldSaveCard)")
+        startedState.shouldSaveCard = shouldSaveCard
+        setStateUnchecked(.started(startedState))
+        delegate?.cardTokenizationDidEmitEvent(.parametersChanged)
+        // todo(andrii-vysotskyi): actually save card if requested.
+    }
+
     func tokenize() {
         guard case .started(let startedState) = state else {
             return

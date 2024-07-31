@@ -76,6 +76,7 @@ private struct TextViewRepresentable: UIViewRepresentable {
                 builder.color = UIColor(style.color)
                 builder.lineBreakMode = .byWordWrapping
                 builder.alignment = NSTextAlignment(multilineTextAlignment)
+                builder.fontFeatures = fontFeatures
                 builder.text = .markdown(string)
             }
             .build()
@@ -84,9 +85,17 @@ private struct TextViewRepresentable: UIViewRepresentable {
 
     // MARK: - Private Properties
 
-    @Environment(\.sizeCategory) private var sizeCategory
-    @Environment(\.multilineTextAlignment) private var multilineTextAlignment
-    @Environment(\.textStyle) private var style: POTextStyle
+    @Environment(\.sizeCategory)
+    private var sizeCategory
+
+    @Environment(\.multilineTextAlignment)
+    private var multilineTextAlignment
+
+    @Environment(\.textStyle)
+    private var style
+
+    @Environment(\.fontFeatures)
+    private var fontFeatures
 }
 
 private final class TextView: UITextView {

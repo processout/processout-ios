@@ -21,6 +21,7 @@ extension PODynamicCheckoutStyle {
         input: .medium,
         codeInput: .large,
         radioButton: PORadioButtonStyle.radio,
+        toggle: .poCheckbox,
         bodyText: POTextStyle(color: Color(poResource: .Text.primary), typography: .body1),
         errorText: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
         message: .toast,

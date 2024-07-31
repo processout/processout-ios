@@ -1259,6 +1259,16 @@
         }
       }
     },
+    "card-tokenization.save-card-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save this card for future payments"
+          }
+        }
+      }
+    },
     "card-tokenization.submit-button.title" : {
       "localizations" : {
         "ar" : {

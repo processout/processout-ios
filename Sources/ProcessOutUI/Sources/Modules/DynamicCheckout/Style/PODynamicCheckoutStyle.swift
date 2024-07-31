@@ -75,6 +75,9 @@ public struct PODynamicCheckoutStyle {
     /// Radio button style.
     public let radioButton: any ButtonStyle
 
+    /// Toggle style.
+    public let toggle: any ToggleStyle
+
     /// Main content text style. For example in context of native alternative payment method
     /// this is used to style instruction user needs to follow in order to capture payment.
     public let bodyText: POTextStyle
@@ -104,6 +107,7 @@ public struct PODynamicCheckoutStyle {
         input: POInputStyle,
         codeInput: POInputStyle,
         radioButton: some ButtonStyle,
+        toggle: some ToggleStyle,
         bodyText: POTextStyle,
         errorText: POTextStyle,
         message: some POMessageViewStyle,
@@ -119,6 +123,7 @@ public struct PODynamicCheckoutStyle {
         self.input = input
         self.codeInput = codeInput
         self.radioButton = radioButton
+        self.toggle = toggle
         self.bodyText = bodyText
         self.errorText = errorText
         self.message = message

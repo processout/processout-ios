@@ -89,6 +89,9 @@ enum CardTokenizationInteractorState {
         /// Billing address parameters.
         var address: AddressParameters
 
+        /// Indicates whether card should be saved for future payments.
+        var shouldSaveCard: Bool = false
+
         /// The most recent error message.
         var recentErrorMessage: String?
     }

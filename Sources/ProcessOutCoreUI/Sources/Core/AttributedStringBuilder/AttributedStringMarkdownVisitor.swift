@@ -50,7 +50,12 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
                     String(repeating: Constants.tab, count: level * 2 + 1) +
                     textList.marker(forItemNumber: textList.startingItemNumber + offset) +
                     Constants.tab
-                let attributedMarker = builder.with { $0.text = .plain(marker) }.build()
+                let attributedMarker = builder
+                    .with { builder in
+                        builder.fontFeatures.numberSpacing = .monospaced
+                        builder.text = .plain(marker)
+                    }
+                    .build()
                 return [attributedMarker, attributedItem].joined()
             }
             .joined(separator: itemsSeparator)

@@ -82,6 +82,9 @@ extension POStringResource {
             /// Cancel button title.
             static let cancel = POStringResource("card-tokenization.cancel-button.title", comment: "")
         }
+
+        /// Save card message.
+        static let saveCardMessage = POStringResource("card-tokenization.save-card-message", comment: "")
     }
 }
 
