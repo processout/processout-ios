@@ -40,7 +40,7 @@ extension Image {
 
     /// Initialize an `Image` with an image resource.
     @_spi(PO)
-    public init(_ resource: POImageResource) {
+    public init(poResource resource: POImageResource) {
         self.init(resource.name, bundle: resource.bundle)
     }
 }
@@ -49,7 +49,7 @@ extension UIImage {
 
     /// Initialize an `Image` with an image resource.
     @_spi(PO)
-    public convenience init(_ resource: POImageResource) {
+    public convenience init(poResource resource: POImageResource) {
         // swiftlint:disable:next force_unwrapping
         self.init(named: resource.name, in: resource.bundle, compatibleWith: nil)!
     }

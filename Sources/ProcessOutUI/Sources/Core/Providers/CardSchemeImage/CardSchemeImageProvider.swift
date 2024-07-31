@@ -17,7 +17,7 @@ final class CardSchemeImageProvider {
         guard let resource = resources[scheme] else {
             return nil
         }
-        return Image(resource)
+        return Image(poResource: resource)
     }
 
     // MARK: - Private Properties

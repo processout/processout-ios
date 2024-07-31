@@ -158,7 +158,7 @@ extension SwiftUI.Color {
 
     /// Initialize a `Color` with a color resource.
     @_spi(PO)
-    public init(_ resource: POColorResource) {
+    public init(poResource resource: POColorResource) {
         self.init(resource.name, bundle: resource.bundle)
     }
 }
@@ -167,7 +167,7 @@ extension UIColor {
 
     /// Initialize an `Image` with an image resource.
     @_spi(PO)
-    public convenience init(_ resource: POColorResource) {
+    public convenience init(poResource resource: POColorResource) {
         // swiftlint:disable:next force_unwrapping
         self.init(named: resource.name, in: resource.bundle, compatibleWith: nil)!
     }

@@ -17,8 +17,8 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             normal: .init(
                 knob: .init(
                     backgroundColor: .clear,
-                    border: .regular(color: Color(.Input.Border.default)),
-                    innerCircleColor: Color(.Input.Border.default).opacity(0),
+                    border: .regular(color: Color(poResource: .Input.Border.default)),
+                    innerCircleColor: Color(poResource: .Input.Border.default).opacity(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
@@ -26,8 +26,8 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             selected: .init(
                 knob: .init(
                     backgroundColor: .clear,
-                    border: .regular(color: Color(.Button.Primary.Background.default)),
-                    innerCircleColor: Color(.Button.Primary.Background.default),
+                    border: .regular(color: Color(poResource: .Button.Primary.Background.default)),
+                    innerCircleColor: Color(poResource: .Button.Primary.Background.default),
                     innerCircleRadius: 5
                 ),
                 value: valueStyle
@@ -35,8 +35,8 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             highlighted: .init(
                 knob: .init(
                     backgroundColor: .clear,
-                    border: .regular(color: Color(.Input.Border.hover)),
-                    innerCircleColor: Color(.Input.Border.hover).opacity(0),
+                    border: .regular(color: Color(poResource: .Input.Border.hover)),
+                    innerCircleColor: Color(poResource: .Input.Border.hover).opacity(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
@@ -44,8 +44,8 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             error: .init(
                 knob: .init(
                     backgroundColor: .clear,
-                    border: .regular(color: Color(.Text.error)),
-                    innerCircleColor: Color(.Text.error).opacity(0),
+                    border: .regular(color: Color(poResource: .Text.error)),
+                    innerCircleColor: Color(poResource: .Text.error).opacity(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
@@ -53,8 +53,8 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             disabled: .init(
                 knob: .init(
                     backgroundColor: .clear,
-                    border: .regular(color: Color(.Input.Border.disabled)),
-                    innerCircleColor: Color(.Input.Border.disabled).opacity(0),
+                    border: .regular(color: Color(poResource: .Input.Border.disabled)),
+                    innerCircleColor: Color(poResource: .Input.Border.disabled).opacity(0),
                     innerCircleRadius: 0
                 ),
                 value: valueStyle
@@ -65,6 +65,6 @@ extension ButtonStyle where Self == PORadioButtonStyle {
     // MARK: - Private Properties
 
     private static var valueStyle: POTextStyle {
-        POTextStyle(color: Color(.Text.primary), typography: .button)
+        POTextStyle(color: Color(poResource: .Text.primary), typography: .button)
     }
 }

@@ -134,7 +134,7 @@ extension POColorResource {
 extension UIColor {
 
     /// Initialize an `Image` with an image resource.
-    convenience init(resource: POColorResource) {
+    convenience init(poResource resource: POColorResource) {
         // swiftlint:disable:next force_unwrapping
         self.init(named: resource.name, in: resource.bundle, compatibleWith: nil)!
     }

@@ -28,6 +28,6 @@ extension PONativeAlternativePaymentBackgroundStyle {
 
     /// Default native APM background style.
     public static let `default` = PONativeAlternativePaymentBackgroundStyle(
-        regular: Color(.Surface.default), success: Color(.Surface.success)
+        regular: Color(poResource: .Surface.default), success: Color(poResource: .Surface.success)
     )
 }

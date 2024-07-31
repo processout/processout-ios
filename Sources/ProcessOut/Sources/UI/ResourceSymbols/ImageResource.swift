@@ -37,7 +37,7 @@ extension POImageResource {
 extension UIImage {
 
     /// Initialize an `Image` with an image resource.
-    convenience init(resource: POImageResource) {
+    convenience init(poResource resource: POImageResource) {
         // swiftlint:disable:next force_unwrapping
         self.init(named: resource.name, in: resource.bundle, compatibleWith: nil)!
     }

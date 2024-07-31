@@ -85,17 +85,17 @@ extension PONativeAlternativePaymentStyle {
 
     /// Default native alternative payment style.
     public static let `default` = PONativeAlternativePaymentStyle(
-        title: POTextStyle(color: Color(.Text.primary), typography: .title),
-        sectionTitle: POTextStyle(color: Color(.Text.primary), typography: .label1),
+        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
+        sectionTitle: POTextStyle(color: Color(poResource: .Text.primary), typography: .label1),
         input: .medium,
         codeInput: .large,
         radioButton: .radio,
-        errorDescription: POTextStyle(color: Color(.Text.error), typography: .label2),
+        errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
         actionsContainer: .default,
         progressView: .circular,
-        message: POTextStyle(color: Color(.Text.primary), typography: .body1),
-        successMessage: POTextStyle(color: Color(.Text.success), typography: .body1),
+        message: POTextStyle(color: Color(poResource: .Text.primary), typography: .body1),
+        successMessage: POTextStyle(color: Color(poResource: .Text.success), typography: .body1),
         background: .default,
-        separatorColor: Color(.Border.subtle)
+        separatorColor: Color(poResource: .Border.subtle)
     )
 }

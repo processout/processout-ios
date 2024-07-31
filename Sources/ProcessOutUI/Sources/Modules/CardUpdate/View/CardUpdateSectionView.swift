@@ -20,7 +20,7 @@ struct CardUpdateSectionView: View {
         VStack(alignment: .leading, spacing: POSpacing.small) {
             if let title = section.title {
                 // todo(andrii-vysotskyi): use injected style when scheme selection is public
-                let textStyle = POTextStyle(color: Color(.Text.primary), typography: .label1)
+                let textStyle = POTextStyle(color: Color(poResource: .Text.primary), typography: .label1)
                 Text(title).textStyle(textStyle)
             }
             ForEach(section.items) { element in

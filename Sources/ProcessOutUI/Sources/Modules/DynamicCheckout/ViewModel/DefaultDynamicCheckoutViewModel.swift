@@ -507,7 +507,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         let item = DynamicCheckoutViewModelItem.Success(
             id: ItemId.success,
             message: message,
-            image: UIImage(.success).withRenderingMode(.alwaysTemplate)
+            image: UIImage(poResource: .success).withRenderingMode(.alwaysTemplate)
         )
         let section = DynamicCheckoutViewModelState.Section(
             id: SectionId.default, items: [.success(item)], isTight: false, areBezelsVisible: false
