@@ -40,47 +40,47 @@ extension POButtonStyle {
     /// Default style for primary button.
     public static let primary = POButtonStyle(
         normal: .init(
-            title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
+            title: .init(color: UIColor(poResource: .Text.on), typography: .Fixed.button),
             border: .clear(radius: 8),
             shadow: .clear,
-            backgroundColor: UIColor(resource: .Action.Primary.default)
+            backgroundColor: UIColor(poResource: .Action.Primary.default)
         ),
         highlighted: .init(
-            title: .init(color: UIColor(resource: .Text.on), typography: .Fixed.button),
+            title: .init(color: UIColor(poResource: .Text.on), typography: .Fixed.button),
             border: .clear(radius: 8),
             shadow: .clear,
-            backgroundColor: UIColor(resource: .Action.Primary.pressed)
+            backgroundColor: UIColor(poResource: .Action.Primary.pressed)
         ),
         disabled: .init(
-            title: .init(color: UIColor(resource: .Text.disabled), typography: .Fixed.button),
+            title: .init(color: UIColor(poResource: .Text.disabled), typography: .Fixed.button),
             border: .clear(radius: 8),
             shadow: .clear,
-            backgroundColor: UIColor(resource: .Action.Primary.disabled)
+            backgroundColor: UIColor(poResource: .Action.Primary.disabled)
         ),
-        activityIndicator: activityIndicatorStyle(color: UIColor(resource: .Text.on))
+        activityIndicator: activityIndicatorStyle(color: UIColor(poResource: .Text.on))
     )
 
     /// Default style for secondary button.
     public static let secondary = POButtonStyle(
         normal: .init(
-            title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
-            border: .regular(radius: 8, color: UIColor(resource: .Border.default)),
+            title: .init(color: UIColor(poResource: .Text.secondary), typography: .Fixed.button),
+            border: .regular(radius: 8, color: UIColor(poResource: .Border.default)),
             shadow: .clear,
-            backgroundColor: UIColor(resource: .Action.Secondary.default)
+            backgroundColor: UIColor(poResource: .Action.Secondary.default)
         ),
         highlighted: .init(
-            title: .init(color: UIColor(resource: .Text.secondary), typography: .Fixed.button),
-            border: .regular(radius: 8, color: UIColor(resource: .Border.default)),
+            title: .init(color: UIColor(poResource: .Text.secondary), typography: .Fixed.button),
+            border: .regular(radius: 8, color: UIColor(poResource: .Border.default)),
             shadow: .clear,
-            backgroundColor: UIColor(resource: .Action.Secondary.pressed)
+            backgroundColor: UIColor(poResource: .Action.Secondary.pressed)
         ),
         disabled: .init(
-            title: .init(color: UIColor(resource: .Text.disabled), typography: .Fixed.button),
-            border: .regular(radius: 8, color: UIColor(resource: .Action.Border.disabled)),
+            title: .init(color: UIColor(poResource: .Text.disabled), typography: .Fixed.button),
+            border: .regular(radius: 8, color: UIColor(poResource: .Action.Border.disabled)),
             shadow: .clear,
             backgroundColor: .clear
         ),
-        activityIndicator: activityIndicatorStyle(color: UIColor(resource: .Text.secondary))
+        activityIndicator: activityIndicatorStyle(color: UIColor(poResource: .Text.secondary))
     )
 
     // MARK: - Private Methods

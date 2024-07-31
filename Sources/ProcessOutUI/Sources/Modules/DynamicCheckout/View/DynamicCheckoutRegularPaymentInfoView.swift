@@ -71,7 +71,7 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
                     .textStyle(style.regularPaymentMethod.informationText)
             },
             icon: {
-                Image(.info)
+                Image(poResource: .info)
                     .renderingMode(.template)
                     .foregroundColor(style.regularPaymentMethod.informationText.color)
             }

@@ -36,7 +36,7 @@ public struct POActionsContainerStyle {
         self.primary = primary ?? .primary
         self.secondary = secondary ?? .secondary
         self.axis = axis ?? .vertical
-        self.separatorColor = separatorColor ?? UIColor(resource: .Border.subtle)
-        self.backgroundColor = backgroundColor ?? UIColor(resource: .Surface.level1)
+        self.separatorColor = separatorColor ?? UIColor(poResource: .Border.subtle)
+        self.backgroundColor = backgroundColor ?? UIColor(poResource: .Surface.level1)
     }
 }

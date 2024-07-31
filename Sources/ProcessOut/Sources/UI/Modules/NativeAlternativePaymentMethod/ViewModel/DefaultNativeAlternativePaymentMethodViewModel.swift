@@ -216,7 +216,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
                 title: capturedState.logoImage == nil ? capturedState.paymentProviderName : nil,
                 logoImage: capturedState.logoImage,
                 message: String(resource: .NativeAlternativePayment.Success.message),
-                image: UIImage(resource: .success),
+                image: UIImage(poResource: .success),
                 isCaptured: true
             )
             let startedState = State.Started(

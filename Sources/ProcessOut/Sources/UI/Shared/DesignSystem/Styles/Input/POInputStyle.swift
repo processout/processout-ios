@@ -32,20 +32,20 @@ extension POInputStyle {
     public static func `default`(typography: POTypography? = nil) -> POInputStyle {
         POInputStyle(
             normal: POInputStateStyle(
-                text: .init(color: UIColor(resource: .Text.primary), typography: typography ?? .Fixed.label),
-                placeholder: .init(color: UIColor(resource: .Text.muted), typography: typography ?? .Fixed.label),
-                backgroundColor: UIColor(resource: .Surface.background),
-                border: .regular(radius: 8, color: UIColor(resource: .Border.default)),
+                text: .init(color: UIColor(poResource: .Text.primary), typography: typography ?? .Fixed.label),
+                placeholder: .init(color: UIColor(poResource: .Text.muted), typography: typography ?? .Fixed.label),
+                backgroundColor: UIColor(poResource: .Surface.background),
+                border: .regular(radius: 8, color: UIColor(poResource: .Border.default)),
                 shadow: .clear,
-                tintColor: UIColor(resource: .Text.primary)
+                tintColor: UIColor(poResource: .Text.primary)
             ),
             error: POInputStateStyle(
-                text: .init(color: UIColor(resource: .Text.primary), typography: typography ?? .Fixed.label),
-                placeholder: .init(color: UIColor(resource: .Text.muted), typography: typography ?? .Fixed.label),
-                backgroundColor: UIColor(resource: .Surface.background),
-                border: .regular(radius: 8, color: UIColor(resource: .Text.error)),
+                text: .init(color: UIColor(poResource: .Text.primary), typography: typography ?? .Fixed.label),
+                placeholder: .init(color: UIColor(poResource: .Text.muted), typography: typography ?? .Fixed.label),
+                backgroundColor: UIColor(poResource: .Surface.background),
+                border: .regular(radius: 8, color: UIColor(poResource: .Text.error)),
                 shadow: .clear,
-                tintColor: UIColor(resource: .Text.error)
+                tintColor: UIColor(poResource: .Text.error)
             )
         )
     }
