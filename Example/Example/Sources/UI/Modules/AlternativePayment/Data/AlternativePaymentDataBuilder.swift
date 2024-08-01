@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 final class AlternativePaymentDataBuilder {
 
     init(completion: @escaping ([String: String]) -> Void) {

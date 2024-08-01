@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 protocol AlternativePaymentDataViewModelType: ViewModelType<AlternativePaymentDataViewModelState> {
 
     /// Submits items and continues payment.

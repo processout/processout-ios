@@ -8,6 +8,7 @@
 import UIKit
 import ProcessOut
 
+@MainActor
 final class FeaturesBuilder {
 
     func build() -> UIViewController {
