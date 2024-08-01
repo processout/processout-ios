@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class Batcher<Task>: Sendable {
+final class Batcher<Task: Sendable>: Sendable {
 
     typealias Executor = @Sendable @isolated(any) (Array<Task>) async -> Bool
 
