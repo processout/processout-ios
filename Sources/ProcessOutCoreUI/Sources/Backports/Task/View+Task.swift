@@ -16,7 +16,7 @@ extension POBackport where Wrapped: View {
     public func task<T>(
         id value: T,
         priority: TaskPriority = .userInitiated,
-        @_inheritActorContext _ action: @escaping @Sendable () async -> Void
+        _ action: @escaping @Sendable @isolated(any) () async -> Void
     ) -> some View where T: Equatable {
         if #available(iOS 15, *) {
             wrapped.task(id: value, priority: priority, action)
@@ -29,7 +29,7 @@ extension POBackport where Wrapped: View {
     @available(iOS 14, *)
     @ViewBuilder
     public func task(
-        priority: TaskPriority = .userInitiated, @_inheritActorContext _ action: @escaping @Sendable () async -> Void
+        priority: TaskPriority = .userInitiated, _ action: @escaping @Sendable @isolated(any) () async -> Void
     ) -> some View {
         task(id: 0, priority: priority, action)
     }
@@ -40,7 +40,7 @@ private struct TaskModifier<Id: Equatable>: ViewModifier {
 
     let id: Id
     let priority: TaskPriority
-    let action: @Sendable () async -> Void
+    let action: @Sendable @isolated(any) () async -> Void
 
     // MARK: - ViewModifier
 

@@ -16,7 +16,7 @@ public struct POAsyncImage<Content: View>: View {
     ///   and returns the view to display for the specified phase.
     public init(
         id: AnyHashable,
-        image: @Sendable @escaping () async throws -> Image?,
+        image: @Sendable @escaping @isolated(any) () async throws -> Image?,
         transaction: Transaction,
         @ViewBuilder content: @escaping (POAsyncImagePhase) -> Content
     ) {
@@ -41,7 +41,7 @@ public struct POAsyncImage<Content: View>: View {
     // MARK: - Private Properties
 
     private let id: AnyHashable
-    private let image: @Sendable () async throws -> Image?
+    private let image: @Sendable @isolated(any) () async throws -> Image?
     private let transaction: Transaction
     private let content: (POAsyncImagePhase) -> Content
 
