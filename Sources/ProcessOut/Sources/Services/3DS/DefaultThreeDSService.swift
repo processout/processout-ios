@@ -7,28 +7,39 @@
 
 import Foundation
 
+@MainActor
 final class DefaultThreeDSService: ThreeDSService {
 
-    init(decoder: JSONDecoder, encoder: JSONEncoder, jsonWritingOptions: JSONSerialization.WritingOptions = []) {
+    nonisolated init(
+        decoder: JSONDecoder,
+        encoder: JSONEncoder,
+        jsonWritingOptions: JSONSerialization.WritingOptions = [],
+        webSession: WebAuthenticationSession
+    ) {
         self.decoder = decoder
         self.encoder = encoder
         self.jsonWritingOptions = jsonWritingOptions
+        self.webSession = webSession
     }
 
     // MARK: - ThreeDSService
 
     func handle(action: ThreeDSCustomerAction, delegate: Delegate) async throws -> String {
-        // todo(andrii-vysotskyi): when async delegate methods are publicly available ensure
-        // that thrown errors are mapped to POFailure if needed.
-        switch action.type {
-        case .fingerprintMobile:
-            return try await fingerprint(encodedConfiguration: action.value, delegate: delegate)
-        case .challengeMobile:
-            return try await challenge(encodedChallenge: action.value, delegate: delegate)
-        case .fingerprint:
-            return try await fingerprint(url: action.value, delegate: delegate)
-        case .redirect, .url:
-            return try await redirect(url: action.value, delegate: delegate)
+        do {
+            switch action.type {
+            case .fingerprintMobile:
+                return try await fingerprint(encodedConfiguration: action.value, delegate: delegate)
+            case .challengeMobile:
+                return try await challenge(encodedChallenge: action.value, delegate: delegate)
+            case .fingerprint:
+                return try await fingerprint(url: action.value)
+            case .redirect, .url:
+                return try await redirect(url: action.value)
+            }
+        } catch let error as POFailure {
+            throw error
+        } catch {
+            throw POFailure(code: .generic(.mobile), underlyingError: error)
         }
     }
 
@@ -53,8 +64,9 @@ final class DefaultThreeDSService: ThreeDSService {
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
     private let jsonWritingOptions: JSONSerialization.WritingOptions
+    private let webSession: WebAuthenticationSession
 
-    // MARK: - Private Methods
+    // MARK: - Native 3DS
 
     private func fingerprint(encodedConfiguration: String, delegate: Delegate) async throws -> String {
         let configuration = try decode(PO3DS2Configuration.self, from: encodedConfiguration)
@@ -72,14 +84,15 @@ final class DefaultThreeDSService: ThreeDSService {
         return Constants.tokenPrefix + encodedResponse
     }
 
-    private func fingerprint(url: String, delegate: Delegate) async throws -> String {
+    // MARK: - Web Based 3DS
+
+    private func fingerprint(url: String) async throws -> String {
         guard let url = URL(string: url) else {
             let message = "Unable to create URL from string: \(url)."
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
-        let context = PO3DSRedirect(url: url, timeout: Constants.webFingerprintTimeout)
         do {
-            return try await delegate.handle(redirect: context)
+            return try await handle(url: url, timeout: Constants.webFingerprintTimeout)
         } catch let failure as POFailure where failure.code == .timeout(.mobile) {
             // Fingerprinting timeout is treated differently from other errors.
             let response = AuthenticationResponse(url: url, body: Constants.fingerprintTimeoutResponseBody)
@@ -87,13 +100,24 @@ final class DefaultThreeDSService: ThreeDSService {
         }
     }
 
-    private func redirect(url: String, delegate: Delegate) async throws -> String {
+    private func redirect(url: String) async throws -> String {
         guard let url = URL(string: url) else {
             let message = "Unable to create URL from string: \(url)."
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
-        let context = PO3DSRedirect(url: url, timeout: nil)
-        return try await delegate.handle(redirect: context)
+        return try await handle(url: url, timeout: .greatestFiniteMagnitude)
+    }
+
+    private func handle(url: URL, timeout: TimeInterval) async throws -> String {
+        let url = try await withTimeout(
+            timeout,
+            error: POFailure(code: .timeout(.mobile)),
+            perform: {
+                try await self.webSession.authenticate(using: url)
+            }
+        )
+        let queryItems = URLComponents(string: url.absoluteString)?.queryItems
+        return queryItems?.first { $0.name == "token" }?.value ?? ""
     }
 
     // MARK: - Coding
@@ -137,8 +161,6 @@ final class DefaultThreeDSService: ThreeDSService {
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: error)
         }
     }
-
-    // MARK: - Utils
 
     /// Encodes given response and creates token with it.
     private func encode(authenticationResponse: AuthenticationResponse) throws -> String {

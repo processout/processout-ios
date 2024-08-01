@@ -154,12 +154,13 @@ public final class ProcessOut: @unchecked Sendable {
     }
 
     private static func create3DSService() -> DefaultThreeDSService {
+        let webSession = WebAuthenticationSession()
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .useDefaultKeys
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        return DefaultThreeDSService(decoder: decoder, encoder: encoder)
+        return DefaultThreeDSService(decoder: decoder, encoder: encoder, webSession: webSession)
     }
 
     private func createConnector(
