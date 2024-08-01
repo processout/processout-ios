@@ -29,23 +29,22 @@ public actor POCheckout3DSService: PO3DSService, Sendable {
     public func authenticationRequest(configuration: PO3DS2Configuration) async throws -> PO3DS2AuthenticationRequest {
         invalidate()
         do {
-            await delegate?.willCreateAuthenticationRequest(configuration: configuration)
             let service = try Standalone3DSService.initialize(
                 with: await serviceConfiguration(with: configuration), environment: environment
             )
             self.service = service
-            guard await delegate?.shouldContinue(with: service.getWarnings()) ?? true else {
+            guard await delegate?.checkout3DSService(self, shouldContinueWith: service.getWarnings()) ?? true else {
                 throw POFailure(code: .cancelled)
             }
             let authenticationRequest = authenticationRequest(
                 with: try await service.createTransaction().getAuthenticationRequestParameters()
             )
-            await delegate?.didCreateAuthenticationRequest(result: .success(authenticationRequest))
+            await delegate?.checkout3DSService(self, didCreateFingerprintWith: .success(authenticationRequest))
             return authenticationRequest
         } catch {
             invalidate()
             let failure = failure(with: error)
-            await delegate?.didCreateAuthenticationRequest(result: .failure(failure))
+            await delegate?.checkout3DSService(self, didCreateFingerprintWith: .failure(failure))
             throw failure
         }
     }
@@ -55,18 +54,18 @@ public actor POCheckout3DSService: PO3DSService, Sendable {
             invalidate()
         }
         do {
-            await delegate?.willHandle(challenge: challenge)
+            await delegate?.checkout3DSService(self, willPerform: challenge)
             guard let transaction = service?.createTransaction() else {
                 throw POFailure(code: .generic(.mobile))
             }
-            let authenticationStatus = try await isSuccess(
-                authenticationResult: transaction.doChallenge(challengeParameters: challengeParameters(with: challenge))
+            let authenticationResult = try await transaction.doChallenge(
+                challengeParameters: challengeParameters(with: challenge)
             )
-            await delegate?.didHandle3DS2Challenge(result: .success(authenticationStatus))
-            return authenticationStatus
+            await delegate?.checkout3DSService(self, didPerformChallengeWith: .success(authenticationResult))
+            return isSuccess(authenticationResult: authenticationResult)
         } catch {
             let failure = failure(with: error)
-            await delegate?.didHandle3DS2Challenge(result: .failure(failure))
+            await delegate?.checkout3DSService(self, didPerformChallengeWith: .failure(failure))
             throw failure
         }
     }
@@ -90,10 +89,9 @@ public actor POCheckout3DSService: PO3DSService, Sendable {
 
     private func serviceConfiguration(with configuration: PO3DS2Configuration) async -> ThreeDS2ServiceConfiguration {
         let configParameters = configurationMapper.convert(configuration: configuration)
-        guard let delegate else {
-            return ThreeDS2ServiceConfiguration(configParameters: configParameters)
-        }
-        return await delegate.configuration(with: configParameters)
+        var serviceConfiguration = ThreeDS2ServiceConfiguration(configParameters: configParameters)
+        await delegate?.checkout3DSService(self, willCreateFingerprintWith: &serviceConfiguration)
+        return serviceConfiguration
     }
 
     private func authenticationRequest(with request: AuthenticationRequestParameters) -> PO3DS2AuthenticationRequest {
