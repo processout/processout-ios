@@ -3,6 +3,7 @@
 import PackageDescription
 
 let swiftSettings: [SwiftSetting] = [
+    .enableExperimentalFeature("IsolatedAny"),
     .enableUpcomingFeature("StrictConcurrency")
 ]
 
@@ -27,7 +28,6 @@ let package = Package(
             dependencies: [
                 .target(name: "cmark")
             ],
-            exclude: ["swiftgen.yml"],
             resources: [
                 .process("Resources")
             ],

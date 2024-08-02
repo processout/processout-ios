@@ -40,7 +40,9 @@ class ViewController<ViewModel: ViewModelType>: UIViewController {
         // as a workaround, configuration is postponed to a point when tracking ends.
         if RunLoop.current.currentMode == .tracking {
             RunLoop.current.perform {
-                self.configure(with: self.viewModel.state)
+                MainActor.assumeIsolated {
+                    self.configure(with: self.viewModel.state)
+                }
             }
         } else {
             configure(with: viewModel.state)

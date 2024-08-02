@@ -8,6 +8,7 @@
 import UIKit
 import ProcessOut
 
+@MainActor
 final class AlternativePaymentMethodsBuilder {
 
     init(filter: POAllGatewayConfigurationsRequest.Filter) {

@@ -16,7 +16,7 @@ public struct POAsyncImage<Content: View>: View {
     ///   and returns the view to display for the specified phase.
     public init(
         id: AnyHashable,
-        image: @Sendable @escaping () async throws -> Image?,
+        image: @Sendable @escaping @isolated(any) () async throws -> Image?,
         transaction: Transaction,
         @ViewBuilder content: @escaping (POAsyncImagePhase) -> Content
     ) {
@@ -35,7 +35,7 @@ public struct POAsyncImage<Content: View>: View {
                 phase = .empty
             }
         }
-        .backport.task(id: id, priority: .userInitiated, resolveImage)
+        .backport.task(id: id, priority: .userInitiated) { await resolveImage() }
     }
 
     // MARK: - Private Properties
@@ -54,7 +54,6 @@ public struct POAsyncImage<Content: View>: View {
     // MARK: - Private Methods
 
     /// Implementation resolves image and updates phase.
-    @Sendable
     @MainActor
     private func resolveImage() async {
         guard !Task.isCancelled, case .empty = phase else {

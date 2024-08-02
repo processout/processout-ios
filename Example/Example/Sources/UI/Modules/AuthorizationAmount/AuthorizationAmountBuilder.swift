@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 final class AuthorizationAmountBuilder {
 
     init(completion: @escaping (_ amount: Decimal, _ currencyCode: String) -> Void) {

@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class Batcher<Task>: Sendable {
+final class Batcher<Task: Sendable>: Sendable {
 
-    typealias Executor = @Sendable (Array<Task>) async -> Bool
+    typealias Executor = @Sendable @isolated(any) (Array<Task>) async -> Bool
 
     init(executionInterval: TimeInterval = 10, executor: @escaping Executor) {
         self.executionInterval = executionInterval

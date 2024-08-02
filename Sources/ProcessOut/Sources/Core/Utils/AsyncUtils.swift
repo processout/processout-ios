@@ -12,8 +12,8 @@ import Foundation
 /// - Warning: operation should support cancellation, otherwise calling this method has no effect.
 func withTimeout<T: Sendable>(
     _ timeout: TimeInterval,
-    error timeoutError: @autoclosure () -> Error,
-    perform operation: @escaping @Sendable () async throws -> T
+    error timeoutError: @autoclosure @Sendable () -> Error,
+    perform operation: @escaping @Sendable @isolated(any) () async throws -> T
 ) async throws -> T {
     let isTimedOut = POUnfairlyLocked(wrappedValue: false)
     let task = Task(operation: operation)
@@ -48,10 +48,10 @@ func withTimeout<T: Sendable>(
 // MARK: - Retry
 
 func retry<T: Sendable>(
-    operation: @escaping @Sendable () async throws -> T,
+    operation: @escaping @Sendable @isolated(any) () async throws -> T,
     while condition: @escaping @Sendable (Result<T, Error>) -> Bool,
     timeout: TimeInterval,
-    timeoutError: @autoclosure () -> Error,
+    timeoutError: @autoclosure @Sendable () -> Error,
     retryStrategy: RetryStrategy? = nil
 ) async throws -> T {
     let operationBox = { @Sendable in
@@ -67,7 +67,7 @@ func retry<T: Sendable>(
 }
 
 private func retry<T: Sendable>(
-    operation: @escaping @Sendable () async throws -> T,
+    operation: @escaping @Sendable @isolated(any) () async throws -> T,
     after result: Result<T, Error>,
     while condition: @escaping @Sendable (Result<T, Error>) -> Bool,
     retryStrategy: RetryStrategy?,
@@ -91,11 +91,13 @@ private func retry<T: Sendable>(
     )
 }
 
-extension Result where Failure == Error {
+extension Result where Failure == Error, Success: Sendable {
 
     /// Creates a new result by evaluating a throwing closure, capturing the
     /// returned value as a success, or any thrown error as a failure.
-    fileprivate init(catching body: () async throws -> Success) async { // swiftlint:disable:this strict_fileprivate
+    fileprivate init( // swiftlint:disable:this strict_fileprivate
+        catching body: @isolated(any) () async throws -> Success
+    ) async {
         do {
             let success = try await body()
             self = .success(success)

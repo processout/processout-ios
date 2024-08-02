@@ -9,60 +9,78 @@ import ProcessOut
 import Checkout3DS
 
 /// Checkout 3DS service delegate.
-public protocol POCheckout3DSServiceDelegate: AnyObject {
-
-    /// Notifies delegate that service is about to fingerprint device.
-    func willCreateAuthenticationRequest(configuration: PO3DS2Configuration)
-
-    /// Asks implementation to create `ThreeDS2ServiceConfiguration` using `configParameters`. This method
-    /// could be used to customize underlying 3DS SDK appearance and behavior.
-    func configuration(
-        with parameters: Checkout3DS.ThreeDS2ServiceConfiguration.ConfigParameters
-    ) -> Checkout3DS.ThreeDS2ServiceConfiguration
+public protocol POCheckout3DSServiceDelegate: AnyObject, Sendable {
 
     /// Asks delegate whether service should continue with given warnings. Default implementation
-    /// ignores warnings and completes with `true`.
-    func shouldContinue(with warnings: Set<Checkout3DS.Warning>, completion: @escaping (Bool) -> Void)
+    /// ignores warnings and returns `true`.
+    func checkout3DSService(_ service: POCheckout3DSService, shouldContinueWith warnings: Set<Warning>) async -> Bool
 
-    /// Notifies delegate that service did complete device fingerprinting.
-    func didCreateAuthenticationRequest(result: Result<PO3DS2AuthenticationRequest, POFailure>)
+    /// Notifies delegate that service is about to fingerprint device.
+    ///
+    /// Your implementation could change given `configuration` in case you want to
+    /// customize underlying 3DS SDK appearance and behavior. Please note that
+    /// `configParameters` should remain unchanged.
+    @MainActor
+    func checkout3DSService(
+        _ service: POCheckout3DSService,
+        willCreateAuthenticationRequestParametersWith configuration: inout ThreeDS2ServiceConfiguration
+    )
 
-    /// Notifies delegate that implementation is about to handle 3DS2 challenge.
-    func willHandle(challenge: PO3DS2Challenge)
+    /// Notifies delegate that service failed to produce device fingerprint.
+    @MainActor
+    func checkout3DSService(
+        _ service: POCheckout3DSService,
+        didCreateAuthenticationRequestParameters result: Result<PO3DS2AuthenticationRequestParameters, POFailure>
+    )
 
-    /// Notifies delegate that service did end handling 3DS2 challenge with given result.
-    func didHandle3DS2Challenge(result: Result<Bool, POFailure>)
+    /// Notifies delegate that implementation is about to proceed with 3DS2 challenge.
+    @MainActor
+    func checkout3DSService(
+        _ service: POCheckout3DSService, willPerformChallengeWith parameters: PO3DS2ChallengeParameters
+    )
 
-    /// Asks delegate to handle 3DS redirect. See documentation of `PO3DSService/handle(redirect:completion:)`
-    /// for more details.
-    func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void)
+    /// Notifies delegate that service did fail to handle 3DS2 challenge.
+    @MainActor
+    func checkout3DSService(
+        _ service: POCheckout3DSService, didPerformChallenge result: Result<PO3DS2ChallengeResult, POFailure>
+    )
 }
 
 extension POCheckout3DSServiceDelegate {
 
-    public func willCreateAuthenticationRequest(configuration: PO3DS2Configuration) {
+    public func checkout3DSService(
+        _ service: POCheckout3DSService, shouldContinueWith warnings: Set<Warning>
+    ) async -> Bool {
+        true
+    }
+
+    @MainActor
+    public func checkout3DSService(
+        _ service: POCheckout3DSService,
+        willCreateAuthenticationRequestParametersWith configuration: inout ThreeDS2ServiceConfiguration
+    ) {
         // Ignored
     }
 
-    public func configuration(
-        with parameters: Checkout3DS.ThreeDS2ServiceConfiguration.ConfigParameters
-    ) -> Checkout3DS.ThreeDS2ServiceConfiguration {
-        ThreeDS2ServiceConfiguration(configParameters: parameters)
-    }
-
-    public func didCreateAuthenticationRequest(result: Result<PO3DS2AuthenticationRequest, POFailure>) {
+    @MainActor
+    public func checkout3DSService(
+        _ service: POCheckout3DSService,
+        didCreateAuthenticationRequestParameters result: Result<PO3DS2AuthenticationRequestParameters, POFailure>
+    ) {
         // Ignored
     }
 
-    public func willHandle(challenge: PO3DS2Challenge) {
+    @MainActor
+    public func checkout3DSService(
+        _ service: POCheckout3DSService, willPerformChallengeWith parameters: PO3DS2ChallengeParameters
+    ) {
         // Ignored
     }
 
-    public func didHandle3DS2Challenge(result: Result<Bool, POFailure>) {
+    @MainActor
+    public func checkout3DSService(
+        _ service: POCheckout3DSService, didPerformChallenge result: Result<PO3DS2ChallengeResult, POFailure>
+    ) {
         // Ignored
-    }
-
-    public func shouldContinue(with warnings: Set<Checkout3DS.Warning>, completion: @escaping (Bool) -> Void) {
-        completion(true)
     }
 }

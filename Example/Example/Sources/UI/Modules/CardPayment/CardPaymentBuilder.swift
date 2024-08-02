@@ -10,6 +10,7 @@ import ProcessOut
 import ProcessOutUI
 import ProcessOutCheckout3DS
 
+@MainActor
 final class CardPaymentBuilder {
 
     init(threeDSService: CardPayment3DSService = .test, completion: @escaping (Result<POCard, POFailure>) -> Void) {
@@ -21,12 +22,9 @@ final class CardPaymentBuilder {
         let threeDSService: PO3DSService
         switch self.threeDSService {
         case .test:
-            threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
+            threeDSService = POTest3DSService()
         case .checkout:
-            threeDSService = POCheckout3DSServiceBuilder()
-                .with(delegate: CardPaymentCheckout3DSServiceDelegate())
-                .with(environment: .sandbox)
-                .build()
+            threeDSService = POCheckout3DSService(environment: .sandbox)
         }
         let delegate = CardPaymentDelegate(
             invoicesService: ProcessOut.shared.invoices, threeDSService: threeDSService
