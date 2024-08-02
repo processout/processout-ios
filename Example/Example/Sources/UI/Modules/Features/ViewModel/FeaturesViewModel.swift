@@ -148,7 +148,7 @@ extension FeaturesViewModel: PODynamicCheckoutDelegate {
     func dynamicCheckout(
         willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest
     ) async -> any PO3DSService {
-        POTest3DSService(returnUrl: Constants.returnUrl)
+        POTest3DSService()
     }
 
     func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {
