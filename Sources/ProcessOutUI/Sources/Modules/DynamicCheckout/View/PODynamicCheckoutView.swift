@@ -30,6 +30,8 @@ public struct PODynamicCheckoutView: View {
                 .modify { content in
                     if #available(iOS 16.0, *) {
                         content.scrollDismissesKeyboard(.interactively)
+                    } else {
+                        content
                     }
                 }
                 .clipped()
