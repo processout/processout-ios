@@ -26,7 +26,9 @@ public actor POCheckout3DSService: PO3DSService, Sendable {
 
     // MARK: - PO3DSService
 
-    public func authenticationRequest(configuration: PO3DS2Configuration) async throws -> PO3DS2AuthenticationRequest {
+    public func authenticationRequestParameters(
+        configuration: PO3DS2Configuration
+    ) async throws -> PO3DS2AuthenticationRequestParameters {
         invalidate()
         do {
             let service = try Standalone3DSService.initialize(
@@ -49,23 +51,26 @@ public actor POCheckout3DSService: PO3DSService, Sendable {
         }
     }
 
-    public func handle(challenge: PO3DS2Challenge) async throws -> Bool {
+    public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
         defer {
             invalidate()
         }
         do {
-            await delegate?.checkout3DSService(self, willPerform: challenge)
+            await delegate?.checkout3DSService(self, willPerformChallengeWith: parameters)
             guard let transaction = service?.createTransaction() else {
                 throw POFailure(code: .generic(.mobile))
             }
             let authenticationResult = try await transaction.doChallenge(
-                challengeParameters: challengeParameters(with: challenge)
+                challengeParameters: challengeParameters(with: parameters)
             )
-            await delegate?.checkout3DSService(self, didPerformChallengeWith: .success(authenticationResult))
-            return isSuccess(authenticationResult: authenticationResult)
+            let challengeResult = PO3DS2ChallengeResult(
+                transactionStatus: authenticationResult.transactionStatus ?? "N"
+            )
+            await delegate?.checkout3DSService(self, didPerformChallenge: .success(challengeResult))
+            return challengeResult
         } catch {
             let failure = failure(with: error)
-            await delegate?.checkout3DSService(self, didPerformChallengeWith: .failure(failure))
+            await delegate?.checkout3DSService(self, didPerformChallenge: .failure(failure))
             throw failure
         }
     }
@@ -90,12 +95,14 @@ public actor POCheckout3DSService: PO3DSService, Sendable {
     private func serviceConfiguration(with configuration: PO3DS2Configuration) async -> ThreeDS2ServiceConfiguration {
         let configParameters = configurationMapper.convert(configuration: configuration)
         var serviceConfiguration = ThreeDS2ServiceConfiguration(configParameters: configParameters)
-        await delegate?.checkout3DSService(self, willCreateFingerprintWith: &serviceConfiguration)
+        await delegate?.checkout3DSService(self, willCreateAuthenticationRequestParametersWith: &serviceConfiguration)
         return serviceConfiguration
     }
 
-    private func authenticationRequest(with request: AuthenticationRequestParameters) -> PO3DS2AuthenticationRequest {
-        PO3DS2AuthenticationRequest(
+    private func authenticationRequest(
+        with request: AuthenticationRequestParameters
+    ) -> PO3DS2AuthenticationRequestParameters {
+        PO3DS2AuthenticationRequestParameters(
             deviceData: request.deviceData,
             sdkAppId: request.sdkAppID,
             sdkEphemeralPublicKey: request.sdkEphemeralPublicKey,
@@ -104,12 +111,12 @@ public actor POCheckout3DSService: PO3DSService, Sendable {
         )
     }
 
-    private func challengeParameters(with challenge: PO3DS2Challenge) -> ChallengeParameters {
+    private func challengeParameters(with parameters: PO3DS2ChallengeParameters) -> ChallengeParameters {
         ChallengeParameters(
-            threeDSServerTransactionID: challenge.threeDSServerTransactionId,
-            acsTransactionID: challenge.acsTransactionId,
-            acsRefNumber: challenge.acsReferenceNumber,
-            acsSignedContent: challenge.acsSignedContent
+            threeDSServerTransactionID: parameters.threeDSServerTransactionId,
+            acsTransactionID: parameters.acsTransactionId,
+            acsRefNumber: parameters.acsReferenceNumber,
+            acsSignedContent: parameters.acsSignedContent
         )
     }
 
@@ -121,9 +128,5 @@ public actor POCheckout3DSService: PO3DSService, Sendable {
             return errorMapper.convert(error: error)
         }
         return POFailure(code: .generic(.mobile), underlyingError: error)
-    }
-
-    private func isSuccess(authenticationResult: AuthenticationResult) -> Bool {
-        authenticationResult.transactionStatus?.uppercased() == "Y"
     }
 }

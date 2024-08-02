@@ -11,6 +11,10 @@ import Checkout3DS
 /// Checkout 3DS service delegate.
 public protocol POCheckout3DSServiceDelegate: AnyObject, Sendable {
 
+    /// Asks delegate whether service should continue with given warnings. Default implementation
+    /// ignores warnings and returns `true`.
+    func checkout3DSService(_ service: POCheckout3DSService, shouldContinueWith warnings: Set<Warning>) async -> Bool
+
     /// Notifies delegate that service is about to fingerprint device.
     ///
     /// Your implementation could change given `configuration` in case you want to
@@ -19,29 +23,26 @@ public protocol POCheckout3DSServiceDelegate: AnyObject, Sendable {
     @MainActor
     func checkout3DSService(
         _ service: POCheckout3DSService,
-        willCreateFingerprintWith configuration: inout ThreeDS2ServiceConfiguration
+        willCreateAuthenticationRequestParametersWith configuration: inout ThreeDS2ServiceConfiguration
     )
-
-    /// Asks delegate whether service should continue with given warnings. Default implementation
-    /// ignores warnings and returns `true`.
-    func checkout3DSService(_ service: POCheckout3DSService, shouldContinueWith warnings: Set<Warning>) async -> Bool
 
     /// Notifies delegate that service failed to produce device fingerprint.
     @MainActor
     func checkout3DSService(
         _ service: POCheckout3DSService,
-        didCreateFingerprintWith result: Result<PO3DS2AuthenticationRequest, POFailure>
+        didCreateAuthenticationRequestParameters result: Result<PO3DS2AuthenticationRequestParameters, POFailure>
     )
 
     /// Notifies delegate that implementation is about to proceed with 3DS2 challenge.
     @MainActor
-    func checkout3DSService(_ service: POCheckout3DSService, willPerform challenge: PO3DS2Challenge)
+    func checkout3DSService(
+        _ service: POCheckout3DSService, willPerformChallengeWith parameters: PO3DS2ChallengeParameters
+    )
 
     /// Notifies delegate that service did fail to handle 3DS2 challenge.
     @MainActor
     func checkout3DSService(
-        _ service: POCheckout3DSService,
-        didPerformChallengeWith result: Result<AuthenticationResult, POFailure>
+        _ service: POCheckout3DSService, didPerformChallenge result: Result<PO3DS2ChallengeResult, POFailure>
     )
 }
 
