@@ -27,7 +27,7 @@ public struct POCard: Decodable, Hashable, @unchecked Sendable {
     public let preferredScheme: POCardScheme?
 
     /// Card type.
-    public private(set) var type: String?
+    public let type: String?
 
     /// Name of the card’s issuing bank.
     public let bankName: String?
@@ -46,7 +46,7 @@ public struct POCard: Decodable, Hashable, @unchecked Sendable {
 
     /// Hash value that remains the same for this card even if it is tokenized several times.
     /// - NOTE: fingerprint is empty string for Apple and Google Pay cards.
-    public private(set) var fingerprint: String?
+    public let fingerprint: String?
 
     /// Month of the expiration date.
     public let expMonth: Int

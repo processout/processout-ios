@@ -30,14 +30,17 @@ final class HttpInvoicesRepository: InvoicesRepository {
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
     ) async throws -> PONativeAlternativePaymentMethodResponse {
+        struct Response: Decodable {
+            let nativeApm: PONativeAlternativePaymentMethodResponse
+        }
         let requestBox = NativeAlternativePaymentRequestBox(
             gatewayConfigurationId: request.gatewayConfigurationId,
             nativeApm: .init(parameterValues: request.parameters)
         )
-        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentMethodResponse>.post(
+        let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/invoices/\(request.invoiceId)/native-payment", body: requestBox
         )
-        return try await connector.execute(request: httpRequest)
+        return try await connector.execute(request: httpRequest).nativeApm
     }
 
     func invoice(request: POInvoiceRequest) async throws -> POInvoice {
@@ -66,11 +69,17 @@ final class HttpInvoicesRepository: InvoicesRepository {
 
     func captureNativeAlternativePayment(
         request: NativeAlternativePaymentCaptureRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse {
-        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentMethodResponse>.post(
+    ) async throws -> PONativeAlternativePaymentMethodState {
+        struct Response: Decodable {
+            struct NativeApm: Decodable {
+                let state: PONativeAlternativePaymentMethodState
+            }
+            let nativeApm: NativeApm
+        }
+        let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/invoices/\(request.invoiceId)/capture", body: request
         )
-        return try await connector.execute(request: httpRequest)
+        return try await connector.execute(request: httpRequest).nativeApm.state
     }
 
     func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
