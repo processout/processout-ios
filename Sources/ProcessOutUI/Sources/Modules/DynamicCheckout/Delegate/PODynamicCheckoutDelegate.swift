@@ -43,7 +43,7 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
     @MainActor
-    func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String?
+    func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> POCardScheme?
 
     // MARK: - Alternative Payment
 
@@ -88,7 +88,7 @@ extension PODynamicCheckoutDelegate {
     }
 
     @MainActor
-    public func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String? {
+    public func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> POCardScheme? {
         issuerInformation.scheme
     }
 

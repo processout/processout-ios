@@ -729,7 +729,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         try await authorizeInvoice(source: card.id, startedState: currentState.snapshot)
     }
 
-    func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
+    func preferredScheme(issuerInformation: POCardIssuerInformation) -> POCardScheme? {
         delegate?.dynamicCheckout(preferredSchemeFor: issuerInformation)
     }
 

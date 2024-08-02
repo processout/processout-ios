@@ -61,58 +61,6 @@ public struct PONativeAlternativePaymentConfiguration {
     /// Payment confirmation configuration.
     public let paymentConfirmation: PONativeAlternativePaymentConfirmationConfiguration
 
-    /// Boolean value that specifies whether module should wait for payment confirmation from PSP or will
-    /// complete right after all user's input is submitted. Default value is `true`.
-    @available(*, deprecated, renamed: "paymentConfirmation.waitsConfirmation")
-    public var waitsPaymentConfirmation: Bool {
-        paymentConfirmation.waitsConfirmation
-    }
-
-    /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
-    /// Default timeout is 3 minutes while maximum value is 15 minutes.
-    @available(*, deprecated, renamed: "paymentConfirmation.timeout")
-    public var paymentConfirmationTimeout: TimeInterval {
-        paymentConfirmation.timeout
-    }
-
-    /// Action that could be optionally presented to user during payment confirmation stage. To remove action
-    /// use `nil`, this is default behaviour.
-    @available(*, deprecated, renamed: "paymentConfirmation.secondaryAction")
-    public var paymentConfirmationSecondaryAction: SecondaryAction? {
-        paymentConfirmation.secondaryAction
-    }
-
-    /// Creates configuration instance.
-    @available(*, deprecated)
-    public init(
-        invoiceId: String,
-        gatewayConfigurationId: String,
-        title: String? = nil,
-        successMessage: String? = nil,
-        primaryActionTitle: String? = nil,
-        secondaryAction: SecondaryAction? = nil,
-        inlineSingleSelectValuesLimit: Int = 5,
-        skipSuccessScreen: Bool = false,
-        waitsPaymentConfirmation: Bool = true,
-        paymentConfirmationTimeout: TimeInterval = 180,
-        paymentConfirmationSecondaryAction: SecondaryAction? = nil
-    ) {
-        self.invoiceId = invoiceId
-        self.gatewayConfigurationId = gatewayConfigurationId
-        self.title = title
-        self.shouldHorizontallyCenterCodeInput = true
-        self.successMessage = successMessage
-        self.primaryActionTitle = primaryActionTitle
-        self.secondaryAction = secondaryAction
-        self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
-        self.skipSuccessScreen = skipSuccessScreen
-        self.paymentConfirmation = .init(
-            waitsConfirmation: waitsPaymentConfirmation,
-            timeout: paymentConfirmationTimeout,
-            secondaryAction: paymentConfirmationSecondaryAction
-        )
-    }
-
     /// Creates configuration instance.
     public init(
         invoiceId: String,

@@ -31,22 +31,6 @@ public struct POAlternativePaymentMethodRequest: Sendable {
     /// Additional Data that will be supplied to the APM.
     public let additionalData: [String: String]?
 
-    @_disfavoredOverload
-    @available(*, deprecated, message: "Use other init that creates either tokenization or payment request explicitly.")
-    public init(
-        invoiceId: String,
-        gatewayConfigurationId: String,
-        additionalData: [String: String]? = nil,
-        customerId: String? = nil,
-        tokenId: String? = nil
-    ) {
-        self.invoiceId = invoiceId
-        self.gatewayConfigurationId = gatewayConfigurationId
-        self.additionalData = additionalData
-        self.customerId = customerId
-        self.tokenId = tokenId
-    }
-
     /// Creates a request that can be used to tokenize APM.
     public init(
         customerId: String,

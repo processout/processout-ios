@@ -5,9 +5,6 @@
 //  Created by Andrii Vysotskyi on 03.11.2022.
 //
 
-@available(*, deprecated, renamed: "PO3DSService")
-public typealias PO3DSServiceType = PO3DSService
-
 /// This interface provides methods to process 3-D Secure transactions.
 public protocol PO3DSService: AnyObject, Sendable {
 

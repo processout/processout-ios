@@ -10,9 +10,6 @@
 import Foundation
 import UIKit
 
-@available(*, deprecated, renamed: "ProcessOut")
-public typealias ProcessOutApi = ProcessOut
-
 /// Provides access to shared api instance and a way to configure it.
 /// - NOTE: Instance methods and properties of this class could be access from any thread.
 public final class ProcessOut: @unchecked Sendable {

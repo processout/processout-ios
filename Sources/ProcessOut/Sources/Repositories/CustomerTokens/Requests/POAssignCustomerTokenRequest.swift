@@ -21,8 +21,7 @@ public struct POAssignCustomerTokenRequest: Encodable, Sendable { // sourcery: A
     public let source: String
 
     /// Card scheme or co-scheme that should get priority if it is available.
-    @POTypedRepresentation<String?, POCardScheme>
-    public private(set) var preferredScheme: String?
+    public let preferredScheme: POCardScheme?
 
     /// Boolean value that indicates whether token should be verified. Make sure to also pass valid
     /// ``POAssignCustomerTokenRequest/invoiceId`` if you want verification to happen. Default value
@@ -50,7 +49,7 @@ public struct POAssignCustomerTokenRequest: Encodable, Sendable { // sourcery: A
         customerId: String,
         tokenId: String,
         source: String,
-        preferredScheme: String? = nil,
+        preferredScheme: POCardScheme? = nil,
         verify: Bool = false,
         invoiceId: String? = nil,
         enableThreeDS2 _: Bool = true,
@@ -60,7 +59,7 @@ public struct POAssignCustomerTokenRequest: Encodable, Sendable { // sourcery: A
         self.customerId = customerId
         self.tokenId = tokenId
         self.source = source
-        self._preferredScheme = .init(wrappedValue: preferredScheme)
+        self.preferredScheme = preferredScheme
         self.verify = verify
         self.invoiceId = invoiceId
         self.thirdPartySdkVersion = thirdPartySdkVersion

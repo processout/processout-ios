@@ -5,9 +5,6 @@
 //  Created by Andrii Vysotskyi on 17.03.2023.
 //
 
-@available(*, deprecated, renamed: "POCardsService")
-public typealias POCardsServiceType = POCardsService
-
 /// Provides set of methods to tokenize and manipulate cards.
 public protocol POCardsService: POService { // sourcery: AutoCompletion
 

@@ -26,8 +26,7 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
     public let enableThreeDS2 = true // sourcery:coding: key="enable_three_d_s_2"
 
     /// Card scheme or co-scheme that should get priority if it is available.
-    @POTypedRepresentation<String?, POCardScheme>
-    public private(set) var preferredScheme: String?
+    public let preferredScheme: POCardScheme?
 
     /// Can be used for a 3DS2 request to indicate which third party SDK is used for the call.
     public let thirdPartySdkVersion: String?
@@ -68,7 +67,7 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
         source: String,
         incremental: Bool = false,
         enableThreeDS2 _: Bool = true,
-        preferredScheme: String? = nil,
+        preferredScheme: POCardScheme? = nil,
         thirdPartySdkVersion: String? = nil,
         invoiceDetailIds: [String]? = nil,
         overrideMacBlocking: Bool = false,
@@ -82,7 +81,7 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
         self.invoiceId = invoiceId
         self.source = source
         self.incremental = incremental
-        self._preferredScheme = .init(wrappedValue: preferredScheme)
+        self.preferredScheme = preferredScheme
         self.thirdPartySdkVersion = thirdPartySdkVersion
         self.invoiceDetailIds = invoiceDetailIds
         self.overrideMacBlocking = overrideMacBlocking

@@ -37,10 +37,6 @@ public struct POGatewayConfiguration: Decodable, Sendable {
 
         /// Boolean flag that indicates whether gateway supports refunds.
         public let canRefund: Bool
-
-        /// Native alternative payment method configuration.
-        @available(*, deprecated, message: "Use POInvoicesService/nativeAlternativePaymentMethodTransactionDetails(request:) instead.") // swiftlint:disable:this line_length
-        public let nativeApmConfig: NativeAlternativePaymentMethodConfig?
     }
 
     /// String value that uniquely identifies the configuration.

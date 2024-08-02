@@ -88,8 +88,8 @@ final class DefaultCardTokenizationInteractor:
             return
         }
         let supportedSchemes = [
-            startedState.issuerInformation?.$scheme.typed,
-            startedState.issuerInformation?.$coScheme.typed
+            startedState.issuerInformation?.scheme,
+            startedState.issuerInformation?.coScheme
         ]
         logger.debug("Will change card scheme to \(scheme)")
         guard supportedSchemes.contains(scheme) else {
@@ -132,7 +132,7 @@ final class DefaultCardTokenizationInteractor:
             cvc: startedState.cvc.value,
             name: startedState.cardholderName.value,
             contact: convertToContact(addressParameters: startedState.address),
-            preferredScheme: startedState.preferredScheme?.rawValue,
+            preferredScheme: startedState.preferredScheme,
             metadata: configuration.metadata
         )
         Task {
@@ -295,13 +295,12 @@ final class DefaultCardTokenizationInteractor:
         if !resolvePreferredScheme {
             startedState.preferredScheme = nil
         } else if let issuerInformation, let delegate = delegate {
-            let rawScheme = delegate.preferredScheme(issuerInformation: issuerInformation)
-            startedState.preferredScheme = rawScheme.map(POCardScheme.init)
+            startedState.preferredScheme = delegate.preferredScheme(issuerInformation: issuerInformation)
         } else {
-            startedState.preferredScheme = issuerInformation?.$scheme.typed
+            startedState.preferredScheme = issuerInformation?.scheme
         }
         let securityCodeFormatter = CardSecurityCodeFormatter()
-        securityCodeFormatter.scheme = issuerInformation?.$scheme.typed
+        securityCodeFormatter.scheme = issuerInformation?.scheme
         startedState.cvc.value = securityCodeFormatter.string(from: startedState.cvc.value)
         startedState.cvc.formatter = securityCodeFormatter
     }
