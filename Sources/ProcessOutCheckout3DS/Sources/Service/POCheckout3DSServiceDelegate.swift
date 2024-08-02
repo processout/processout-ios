@@ -48,14 +48,6 @@ public protocol POCheckout3DSServiceDelegate: AnyObject, Sendable {
 
 extension POCheckout3DSServiceDelegate {
 
-    @MainActor
-    public func checkout3DSService(
-        _ service: POCheckout3DSService,
-        willCreateFingerprintWith configuration: inout ThreeDS2ServiceConfiguration
-    ) {
-        // Ignored
-    }
-
     public func checkout3DSService(
         _ service: POCheckout3DSService, shouldContinueWith warnings: Set<Warning>
     ) async -> Bool {
@@ -65,20 +57,29 @@ extension POCheckout3DSServiceDelegate {
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService,
-        didCreateFingerprintWith result: Result<PO3DS2AuthenticationRequest, POFailure>
+        willCreateAuthenticationRequestParametersWith configuration: inout ThreeDS2ServiceConfiguration
     ) {
-        // Ignored
-    }
-
-    @MainActor
-    public func checkout3DSService(_ service: POCheckout3DSService, willPerform challenge: PO3DS2Challenge) {
         // Ignored
     }
 
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService,
-        didPerformChallengeWith result: Result<AuthenticationResult, POFailure>
+        didCreateAuthenticationRequestParameters result: Result<PO3DS2AuthenticationRequestParameters, POFailure>
+    ) {
+        // Ignored
+    }
+
+    @MainActor
+    public func checkout3DSService(
+        _ service: POCheckout3DSService, willPerformChallengeWith parameters: PO3DS2ChallengeParameters
+    ) {
+        // Ignored
+    }
+
+    @MainActor
+    public func checkout3DSService(
+        _ service: POCheckout3DSService, didPerformChallenge result: Result<PO3DS2ChallengeResult, POFailure>
     ) {
         // Ignored
     }
