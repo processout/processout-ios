@@ -42,7 +42,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
 
         /// Merchant capabilities.
         @POStringDecodableMerchantCapability
-        public var merchantCapabilities: PKMerchantCapability
+        public private(set) var merchantCapabilities: PKMerchantCapability
 
         /// The payment methods that are supported.
         public let supportedNetworks: Set<POCardScheme>

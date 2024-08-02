@@ -40,8 +40,8 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
 
     /// Amount of money to capture when partial captures are available. Note that this only applies if you are
     /// also using the `autoCaptureAt` option.
-    @POImmutableStringCodableOptionalDecimal
-    public var captureAmount: Decimal?
+    @POStringCodableOptionalDecimal
+    public private(set) var captureAmount: Decimal?
 
     /// Set to true if you want to authorize payment without capturing. Note that you must capture the payment on
     /// the server if you use this option. Default value is `true`.

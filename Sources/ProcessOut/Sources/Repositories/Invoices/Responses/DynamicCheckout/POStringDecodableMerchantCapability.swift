@@ -11,7 +11,7 @@ import PassKit
 @propertyWrapper
 public struct POStringDecodableMerchantCapability: Decodable, Sendable {
 
-    public let wrappedValue: PKMerchantCapability
+    public var wrappedValue: PKMerchantCapability
 
     // MARK: - Decodable
 
