@@ -40,7 +40,7 @@ private struct TaskModifier<Id: Equatable>: ViewModifier {
 
     let id: Id
     let priority: TaskPriority
-    let action: @Sendable @isolated(any) () async -> Void
+    let action: @Sendable () async -> Void
 
     // MARK: - ViewModifier
 

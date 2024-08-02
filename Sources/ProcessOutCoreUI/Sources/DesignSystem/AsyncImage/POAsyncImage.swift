@@ -35,13 +35,13 @@ public struct POAsyncImage<Content: View>: View {
                 phase = .empty
             }
         }
-        .backport.task(id: id, priority: .userInitiated, resolveImage)
+        .backport.task(id: id, priority: .userInitiated) { await resolveImage() }
     }
 
     // MARK: - Private Properties
 
     private let id: AnyHashable
-    private let image: @Sendable @isolated(any) () async throws -> Image?
+    private let image: @Sendable () async throws -> Image?
     private let transaction: Transaction
     private let content: (POAsyncImagePhase) -> Content
 
@@ -54,7 +54,6 @@ public struct POAsyncImage<Content: View>: View {
     // MARK: - Private Methods
 
     /// Implementation resolves image and updates phase.
-    @Sendable
     @MainActor
     private func resolveImage() async {
         guard !Task.isCancelled, case .empty = phase else {
