@@ -22,10 +22,12 @@ final class WebAuthenticationSession: NSObject, Sendable, ASWebAuthenticationPre
         let sessionProxy = WebAuthenticationSessionProxy()
         return try await withTaskCancellationHandler(
             operation: {
-                if Task.isCancelled {
-                    throw POFailure(message: "Authentication session was cancelled.", code: .cancelled)
-                }
-                return try await withCheckedThrowingContinuation { continuation in
+                try await withCheckedThrowingContinuation { continuation in
+                    guard !Task.isCancelled else {
+                        let failure = POFailure(message: "Authentication session was cancelled.", code: .cancelled)
+                        continuation.resume(throwing: failure)
+                        return
+                    }
                     let session = ASWebAuthenticationSession(
                         url: url,
                         callbackURLScheme: callbackScheme,
