@@ -48,8 +48,6 @@ final class DefaultThreeDSService: ThreeDSService {
     private enum Constants {
         static let deviceChannel = "app"
         static let tokenPrefix = "gway_req_"
-        static let challengeSuccessEncodedResponse = "eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiWVwiIH0ifQ=="
-        static let challengeFailureEncodedResponse = "eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiTlwiIH0ifQ=="
         static let fingerprintTimeoutResponseBody = #"{ "threeDS2FingerprintTimeout": true }"#
         static let webFingerprintTimeout: TimeInterval = 10
     }
@@ -70,18 +68,23 @@ final class DefaultThreeDSService: ThreeDSService {
 
     private func fingerprint(encodedConfiguration: String, delegate: Delegate) async throws -> String {
         let configuration = try decode(PO3DS2Configuration.self, from: encodedConfiguration)
-        let request = try await delegate.authenticationRequest(configuration: configuration)
-        let response = AuthenticationResponse(url: nil, body: try self.encode(request: request))
+        let requestParameters = try await delegate.authenticationRequestParameters(configuration: configuration)
+        let response = AuthenticationResponse(url: nil, body: try self.encode(requestParameters: requestParameters))
         return try encode(authenticationResponse: response)
     }
 
     private func challenge(encodedChallenge: String, delegate: Delegate) async throws -> String {
-        let challenge = try decode(PO3DS2Challenge.self, from: encodedChallenge)
-        let success = try await delegate.handle(challenge: challenge)
-        let encodedResponse = success
-            ? Constants.challengeSuccessEncodedResponse
-            : Constants.challengeFailureEncodedResponse
-        return Constants.tokenPrefix + encodedResponse
+        let parameters = try decode(PO3DS2ChallengeParameters.self, from: encodedChallenge)
+        let result = try await delegate.performChallenge(with: parameters)
+        let encodedChallengeResult: String
+        do {
+            encodedChallengeResult = try String(decoding: encoder.encode(result), as: UTF8.self)
+        } catch {
+            let message = "Did fail to encode CRES result."
+            throw POFailure(message: message, code: .internal(.mobile), underlyingError: error)
+        }
+        let response = AuthenticationResponse(url: nil, body: encodedChallengeResult)
+        return try Constants.tokenPrefix + encode(authenticationResponse: response)
     }
 
     // MARK: - Web Based 3DS
@@ -92,7 +95,15 @@ final class DefaultThreeDSService: ThreeDSService {
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
         do {
-            return try await handle(url: url, timeout: Constants.webFingerprintTimeout)
+            let returnUrl = try await withTimeout(
+                Constants.webFingerprintTimeout,
+                error: POFailure(code: .timeout(.mobile)),
+                perform: {
+                    try await self.webSession.authenticate(using: url)
+                }
+            )
+            let queryItems = URLComponents(string: returnUrl.absoluteString)?.queryItems
+            return queryItems?.first { $0.name == "token" }?.value ?? ""
         } catch let failure as POFailure where failure.code == .timeout(.mobile) {
             // Fingerprinting timeout is treated differently from other errors.
             let response = AuthenticationResponse(url: url, body: Constants.fingerprintTimeoutResponseBody)
@@ -105,18 +116,8 @@ final class DefaultThreeDSService: ThreeDSService {
             let message = "Unable to create URL from string: \(url)."
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
-        return try await handle(url: url, timeout: .greatestFiniteMagnitude)
-    }
-
-    private func handle(url: URL, timeout: TimeInterval) async throws -> String {
-        let url = try await withTimeout(
-            timeout,
-            error: POFailure(code: .timeout(.mobile)),
-            perform: {
-                try await self.webSession.authenticate(using: url)
-            }
-        )
-        let queryItems = URLComponents(string: url.absoluteString)?.queryItems
+        let returnUrl = try await self.webSession.authenticate(using: url)
+        let queryItems = URLComponents(string: returnUrl.absoluteString)?.queryItems
         return queryItems?.first { $0.name == "token" }?.value ?? ""
     }
 
@@ -137,20 +138,20 @@ final class DefaultThreeDSService: ThreeDSService {
         }
     }
 
-    private func encode(request: PO3DS2AuthenticationRequest) throws -> String {
+    private func encode(requestParameters parameters: PO3DS2AuthenticationRequestParameters) throws -> String {
         do {
             // Using JSONSerialization helps avoid creating boilerplate objects for JSON Web Key for coding.
             // Implementation doesn't validate JWK correctness and simply re-encodes given value.
             let sdkEphemeralPublicKey = try JSONSerialization.jsonObject(
-                with: Data(request.sdkEphemeralPublicKey.utf8)
+                with: Data(parameters.sdkEphemeralPublicKey.utf8)
             )
             let requestParameters = [
                 "deviceChannel": Constants.deviceChannel,
-                "sdkAppID": request.sdkAppId,
+                "sdkAppID": parameters.sdkAppId,
                 "sdkEphemPubKey": sdkEphemeralPublicKey,
-                "sdkReferenceNumber": request.sdkReferenceNumber,
-                "sdkTransID": request.sdkTransactionId,
-                "sdkEncData": request.deviceData
+                "sdkReferenceNumber": parameters.sdkReferenceNumber,
+                "sdkTransID": parameters.sdkTransactionId,
+                "sdkEncData": parameters.deviceData
             ]
             let requestParametersData = try JSONSerialization.data(
                 withJSONObject: requestParameters, options: jsonWritingOptions
@@ -167,7 +168,7 @@ final class DefaultThreeDSService: ThreeDSService {
         do {
             return try Constants.tokenPrefix + encoder.encode(authenticationResponse).base64EncodedString()
         } catch {
-            let message = "Did fail to encode AREQ parameters."
+            let message = "Did fail to encode authentication result."
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: error)
         }
     }

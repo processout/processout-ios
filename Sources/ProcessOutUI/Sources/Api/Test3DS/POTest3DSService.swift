@@ -12,32 +12,37 @@ import ProcessOut
 /// Control Server (ACS). Should be used only for testing purposes in sandbox environment.
 public final class POTest3DSService: PO3DSService {
 
-    public func authenticationRequest(configuration: PO3DS2Configuration) async throws -> PO3DS2AuthenticationRequest {
-        let request = PO3DS2AuthenticationRequest(
+    public init() {
+        // Ignored
+    }
+
+    public func authenticationRequestParameters(
+        configuration: PO3DS2Configuration
+    ) async throws -> PO3DS2AuthenticationRequestParameters {
+        PO3DS2AuthenticationRequestParameters(
             deviceData: "",
             sdkAppId: "",
             sdkEphemeralPublicKey: "{}",
             sdkReferenceNumber: "",
             sdkTransactionId: ""
         )
-        return request
     }
 
     @MainActor
-    public func handle(challenge: PO3DS2Challenge) async throws -> Bool {
+    public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
         guard let presentingViewController = PresentingViewControllerProvider.find() else {
-            return false
+            throw POFailure(code: .generic(.mobile))
         }
         return await withCheckedContinuation { continuation in
             let alertController = UIAlertController(
                 title: String(resource: .Test3DS.title), message: "", preferredStyle: .alert
             )
             let acceptAction = UIAlertAction(title: String(resource: .Test3DS.accept), style: .default) { _ in
-                continuation.resume(returning: true)
+                continuation.resume(returning: PO3DS2ChallengeResult(transactionStatus: "Y"))
             }
             alertController.addAction(acceptAction)
             let rejectAction = UIAlertAction(title: String(resource: .Test3DS.reject), style: .default) { _ in
-                continuation.resume(returning: false)
+                continuation.resume(returning: PO3DS2ChallengeResult(transactionStatus: "N"))
             }
             alertController.addAction(rejectAction)
             presentingViewController.present(alertController, animated: true)

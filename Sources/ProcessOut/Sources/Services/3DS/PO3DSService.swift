@@ -12,10 +12,10 @@ public typealias PO3DSServiceType = PO3DSService
 public protocol PO3DSService: AnyObject, Sendable {
 
     /// Asks implementation to create request that will be passed to 3DS Server to create the AReq.
-    func authenticationRequest(configuration: PO3DS2Configuration) async throws -> PO3DS2AuthenticationRequest
+    func authenticationRequestParameters(
+        configuration: PO3DS2Configuration
+    ) async throws -> PO3DS2AuthenticationRequestParameters
 
-    /// Implementation must handle given 3DS2 challenge and call completion with result. Use `true` if challenge
-    /// was handled successfully, if transaction was denied, pass `false`. In all other cases, call completion
-    /// with failure indicating what went wrong.
-    func handle(challenge: PO3DS2Challenge) async throws -> Bool
+    /// Implementation must handle given 3DS2 challenge.
+    func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult
 }
