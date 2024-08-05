@@ -14,10 +14,6 @@ struct NativeAlternativePaymentSubmittedItemView: View {
     let item: NativeAlternativePaymentViewModelItem.Submitted
     let horizontalPadding: CGFloat
 
-    /// Boolean value indicating whether implementation should prefer compact layout.
-    /// Default value is `false`.
-    let preferCompactLayout: Bool
-
     var body: some View {
         VStack(spacing: POSpacing.large) {
             if let title = item.title {
@@ -39,7 +35,7 @@ struct NativeAlternativePaymentSubmittedItemView: View {
                 .textStyle(descriptionStyle)
                 .multilineTextAlignment(item.isMessageCompact ? .center : .leading)
             if let image = item.image {
-                let maximumHeight = preferCompactLayout
+                let maximumHeight = sizeClass == .compact
                     ? Constants.compactDecorationHeight : Constants.regularDecorationHeight
                 Image(uiImage: image)
                     .resizable()
@@ -65,6 +61,9 @@ struct NativeAlternativePaymentSubmittedItemView: View {
     @Environment(\.nativeAlternativePaymentStyle)
     private var style
 
+    @Environment(\.nativeAlternativePaymentSizeClass)
+    private var sizeClass
+
     // MARK: - Private Methods
 
     private var descriptionStyle: POTextStyle {
@@ -74,7 +73,7 @@ struct NativeAlternativePaymentSubmittedItemView: View {
     private var topPadding: CGFloat {
         if !item.isMessageCompact {
             return 0
-        } else if preferCompactLayout {
+        } else if sizeClass == .compact {
             return POSpacing.large
         }
         return 68

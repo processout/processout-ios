@@ -18,13 +18,9 @@ struct DynamicCheckoutAlternativePaymentView: View {
     // MARK: - View
 
     var body: some View {
-        NativeAlternativePaymentContentView(
-            viewModel: viewModel,
-            insets: 0,
-            shouldCenterParameters: false,
-            preferCompactLayout: true
-        )
-        .nativeAlternativePaymentStyle(.init(dynamicCheckoutStyle: style))
+        NativeAlternativePaymentContentView(viewModel: viewModel, insets: 0, shouldCenterParameters: false)
+            .nativeAlternativePaymentSizeClass(.compact)
+            .nativeAlternativePaymentStyle(.init(dynamicCheckoutStyle: style))
     }
 
     // MARK: - Private Properties
