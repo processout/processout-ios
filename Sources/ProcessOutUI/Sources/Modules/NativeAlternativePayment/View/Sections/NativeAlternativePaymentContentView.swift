@@ -14,11 +14,13 @@ struct NativeAlternativePaymentContentView: View {
     init(
         viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>,
         insets: CGFloat,
-        shouldCenterParameters: Bool = true
+        shouldCenterParameters: Bool = true,
+        preferCompactLayout: Bool = false
     ) {
         self.viewModel = viewModel
         self.insets = insets
         self.shouldCenterParameters = shouldCenterParameters
+        self.preferCompactLayout = preferCompactLayout
     }
 
     // MARK: - View
@@ -31,6 +33,7 @@ struct NativeAlternativePaymentContentView: View {
                     NativeAlternativePaymentSectionView(
                         section: section,
                         horizontalPadding: insets,
+                        preferCompactLayout: preferCompactLayout,
                         focusedItemId: $viewModel.state.focusedItemId
                     )
                 }
@@ -40,6 +43,7 @@ struct NativeAlternativePaymentContentView: View {
                             NativeAlternativePaymentSectionView(
                                 section: section,
                                 horizontalPadding: insets,
+                                preferCompactLayout: preferCompactLayout,
                                 focusedItemId: $viewModel.state.focusedItemId
                             )
                         }
@@ -61,6 +65,7 @@ struct NativeAlternativePaymentContentView: View {
 
     private let insets: CGFloat
     private let shouldCenterParameters: Bool
+    private let preferCompactLayout: Bool
 
     @ObservedObject
     private var viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>

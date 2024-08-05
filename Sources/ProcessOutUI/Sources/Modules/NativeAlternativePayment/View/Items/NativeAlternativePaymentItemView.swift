@@ -13,6 +13,7 @@ struct NativeAlternativePaymentItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem
     let horizontalPadding: CGFloat
+    let preferCompactLayout: Bool
 
     @Binding
     private(set) var focusedItemId: AnyHashable?
@@ -46,7 +47,9 @@ struct NativeAlternativePaymentItemView: View {
                 .poProgressViewStyle(style.progressView)
                 .padding(.horizontal, horizontalPadding)
         case .submitted(let item):
-            NativeAlternativePaymentSubmittedItemView(item: item, horizontalPadding: horizontalPadding)
+            NativeAlternativePaymentSubmittedItemView(
+                item: item, horizontalPadding: horizontalPadding, preferCompactLayout: preferCompactLayout
+            )
         }
     }
 

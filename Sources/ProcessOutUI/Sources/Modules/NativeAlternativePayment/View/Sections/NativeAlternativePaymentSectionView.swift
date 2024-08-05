@@ -13,6 +13,7 @@ struct NativeAlternativePaymentSectionView: View {
 
     let section: NativeAlternativePaymentViewModelSection
     let horizontalPadding: CGFloat
+    let preferCompactLayout: Bool
 
     @Binding
     private(set) var focusedItemId: AnyHashable?
@@ -27,7 +28,10 @@ struct NativeAlternativePaymentSectionView: View {
             }
             ForEach(section.items) { element in
                 NativeAlternativePaymentItemView(
-                    item: element, horizontalPadding: horizontalPadding, focusedItemId: $focusedItemId
+                    item: element,
+                    horizontalPadding: horizontalPadding,
+                    preferCompactLayout: preferCompactLayout,
+                    focusedItemId: $focusedItemId
                 )
             }
             if let error = section.error {
