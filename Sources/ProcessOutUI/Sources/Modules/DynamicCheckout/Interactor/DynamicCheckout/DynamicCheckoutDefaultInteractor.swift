@@ -303,7 +303,7 @@ final class DynamicCheckoutDefaultInteractor:
         case .recovering:
             logger.debug("Ignoring attempt to cancel payment during error recovery.")
         default:
-            assertionFailure("Attempted to cancel payment from unsupported state.")
+            logger.debug("Ignoring attempt to cancel payment from unsupported state.")
         }
     }
 
