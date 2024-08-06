@@ -37,25 +37,11 @@ public final class ProcessOut: @unchecked Sendable {
     /// Returns customer tokens service.
     public private(set) var customerTokens: POCustomerTokensService!
 
-    /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. Only deep
-    /// links are supported.
-    ///
-    /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
-    @discardableResult
-    public func processDeepLink(url: URL) -> Bool {
-        logger.debug("Will process deep link: \(url)")
-        return eventEmitter.emit(event: PODeepLinkReceivedEvent(url: url))
-    }
-
     // MARK: - SPI
 
     /// Logger with application category.
     @_spi(PO)
     public private(set) var logger: POLogger!
-
-    /// Event emitter to use for events exchange.
-    @_spi(PO)
-    public private(set) var eventEmitter: POEventEmitter!
 
     /// Images repository.
     @_spi(PO)
@@ -114,7 +100,6 @@ public final class ProcessOut: @unchecked Sendable {
         customerTokens = Self.createCustomerTokensService(
             httpConnector: httpConnector, threeDSService: threeDSService, logger: logger
         )
-        eventEmitter = LocalEventEmitter(logger: logger)
     }
 
     // MARK: -
