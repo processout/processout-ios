@@ -150,16 +150,19 @@ public final class ProcessOut: @unchecked Sendable {
             let configuration = self.configuration
             return .init(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
         }
-        return DefaultAlternativePaymentMethodsService(configuration: serviceConfiguration, logger: logger)
+        let webSession = WebAuthenticationSession()
+        return DefaultAlternativePaymentMethodsService(
+            configuration: serviceConfiguration, webSession: webSession, logger: logger
+        )
     }
 
     private static func create3DSService() -> DefaultThreeDSService {
-        let webSession = WebAuthenticationSession()
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .useDefaultKeys
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
+        let webSession = WebAuthenticationSession()
         return DefaultThreeDSService(decoder: decoder, encoder: encoder, webSession: webSession)
     }
 
