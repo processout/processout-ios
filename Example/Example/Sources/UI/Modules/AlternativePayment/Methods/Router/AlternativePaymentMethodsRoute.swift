@@ -26,7 +26,7 @@ enum AlternativePaymentMethodsRoute: RouteType {
     case nativeAlternativePayment(NativeAlternativePayment)
 
     /// Alternative payment.
-    case alternativePayment(request: POAlternativePaymentMethodRequest)
+    case alternativePayment(request: POAlternativePaymentAuthorizationRequest)
 
     /// Asks user for authorisation amount and currency.
     case authorizationtAmount(completion: (Decimal, String) -> Void)

@@ -130,7 +130,7 @@ final class AlternativePaymentMethodsViewModel:
                 route = .nativeAlternativePayment(paymentRoute)
             } else {
                 route = AlternativePaymentMethodsRoute.additionalData { [weak self] additionalData in
-                    let request = POAlternativePaymentMethodRequest(
+                    let request = POAlternativePaymentAuthorizationRequest(
                         invoiceId: invoice.id,
                         gatewayConfigurationId: gatewayConfiguration.id,
                         additionalData: additionalData
