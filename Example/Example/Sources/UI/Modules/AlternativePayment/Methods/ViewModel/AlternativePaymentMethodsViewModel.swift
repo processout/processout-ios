@@ -135,7 +135,7 @@ final class AlternativePaymentMethodsViewModel:
                         gatewayConfigurationId: gatewayConfiguration.id,
                         additionalData: additionalData
                     )
-                    self?.router.trigger(route: .alternativePayment(request: request))
+                    self?.interactor.authorize(request: request)
                 }
             }
             self?.router.trigger(route: route)
