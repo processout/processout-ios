@@ -38,7 +38,7 @@ final class AlternativePaymentMethodsRouter: RouterType {
             self.viewController?.present(viewController, animated: true)
         case let .alternativePayment(request):
             Task {
-                try await ProcessOut.shared.alternativePaymentMethods.authorize(request: request)
+                try await ProcessOut.shared.alternativePayments.authorize(request: request)
             }
         case let .authorizationtAmount(completion):
             let viewController = AuthorizationAmountBuilder(completion: completion).build()

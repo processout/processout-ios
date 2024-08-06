@@ -21,7 +21,7 @@ final class DynamicCheckoutDefaultInteractor:
         passKitPaymentSession: DynamicCheckoutPassKitPaymentSession,
         childProvider: DynamicCheckoutInteractorChildProvider,
         invoicesService: POInvoicesService,
-        alternativePaymentsService: POAlternativePaymentMethodsService,
+        alternativePaymentsService: POAlternativePaymentsService,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
@@ -138,7 +138,7 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Private Properties
 
     private let passKitPaymentSession: DynamicCheckoutPassKitPaymentSession
-    private let alternativePaymentsService: POAlternativePaymentMethodsService
+    private let alternativePaymentsService: POAlternativePaymentsService
     private let childProvider: DynamicCheckoutInteractorChildProvider
     private let invoicesService: POInvoicesService
     private let completion: (Result<Void, POFailure>) -> Void

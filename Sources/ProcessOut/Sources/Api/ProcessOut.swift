@@ -28,8 +28,8 @@ public final class ProcessOut: @unchecked Sendable {
     /// Invoices service.
     public private(set) var invoices: POInvoicesService!
 
-    /// Alternative payment methods service.
-    public private(set) var alternativePaymentMethods: POAlternativePaymentMethodsService!
+    /// Alternative payments service.
+    public private(set) var alternativePayments: POAlternativePaymentsService!
 
     /// Cards service.
     public private(set) var cards: POCardsService!
@@ -93,7 +93,7 @@ public final class ProcessOut: @unchecked Sendable {
         invoices = Self.createInvoicesService(
             httpConnector: httpConnector, threeDSService: threeDSService, logger: logger
         )
-        alternativePaymentMethods = createAlternativePaymentsService()
+        alternativePayments = createAlternativePaymentsService()
         cards = Self.createCardsService(
             httpConnector: httpConnector, logger: logger
         )
@@ -130,13 +130,13 @@ public final class ProcessOut: @unchecked Sendable {
         return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService, logger: logger)
     }
 
-    private func createAlternativePaymentsService() -> POAlternativePaymentMethodsService {
-        let serviceConfiguration = { @Sendable [unowned self] () -> AlternativePaymentMethodsServiceConfiguration in
+    private func createAlternativePaymentsService() -> POAlternativePaymentsService {
+        let serviceConfiguration = { @Sendable [unowned self] () -> AlternativePaymentsServiceConfiguration in
             let configuration = self.configuration
             return .init(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
         }
         let webSession = WebAuthenticationSession()
-        return DefaultAlternativePaymentMethodsService(
+        return DefaultAlternativePaymentsService(
             configuration: serviceConfiguration, webSession: webSession, logger: logger
         )
     }

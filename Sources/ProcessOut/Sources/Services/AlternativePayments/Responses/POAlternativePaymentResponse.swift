@@ -1,5 +1,5 @@
 //
-//  POAlternativePaymentMethodResponse.swift
+//  POAlternativePaymentResponse.swift
 //  ProcessOut
 //
 //  Created by Simeon Kostadinov on 27/10/2022.

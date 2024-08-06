@@ -36,7 +36,7 @@ extension PODynamicCheckoutView {
                     logger: logger
                 ),
                 invoicesService: ProcessOut.shared.invoices,
-                alternativePaymentsService: ProcessOut.shared.alternativePaymentMethods,
+                alternativePaymentsService: ProcessOut.shared.alternativePayments,
                 logger: logger,
                 completion: completion
             )

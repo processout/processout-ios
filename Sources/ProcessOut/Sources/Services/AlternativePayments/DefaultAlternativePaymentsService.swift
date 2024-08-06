@@ -1,5 +1,5 @@
 //
-//  DefaultAlternativePaymentMethodsService.swift
+//  DefaultAlternativePaymentsService.swift
 //  ProcessOut
 //
 //  Created by Simeon Kostadinov on 27/10/2022.
@@ -7,10 +7,10 @@
 
 import Foundation
 
-final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethodsService {
+final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
 
     init(
-        configuration: @escaping @Sendable () -> AlternativePaymentMethodsServiceConfiguration,
+        configuration: @escaping @Sendable () -> AlternativePaymentsServiceConfiguration,
         webSession: WebAuthenticationSession,
         logger: POLogger
     ) {
@@ -19,7 +19,7 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
         self.logger = logger
     }
 
-    // MARK: - POAlternativePaymentMethodsService
+    // MARK: - POAlternativePaymentsService
 
     func tokenize(request: POAlternativePaymentTokenizationRequest) async throws -> POAlternativePaymentResponse {
         let pathComponents = [request.customerId, request.tokenId, "redirect", request.gatewayConfigurationId]
@@ -43,7 +43,7 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
 
     // MARK: - Private
 
-    private let configuration: @Sendable () -> AlternativePaymentMethodsServiceConfiguration
+    private let configuration: @Sendable () -> AlternativePaymentsServiceConfiguration
     private let logger: POLogger
     private let webSession: WebAuthenticationSession
 
