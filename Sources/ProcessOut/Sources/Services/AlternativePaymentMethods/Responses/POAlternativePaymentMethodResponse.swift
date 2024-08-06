@@ -7,22 +7,13 @@
 
 import Foundation
 
-/// Result of alternative payment.
-public struct POAlternativePaymentMethodResponse: Sendable {
+/// Generic alternative payment response.
+public struct POAlternativePaymentResponse: Sendable {
 
-    public enum APMReturnType: Sendable {
-        case authorization, createToken
-    }
-
-    /// Gateway token starting with prefix gway_req_ that can be used to perform a sale call.
+    /// Represents a gateway token.
+    ///
+    /// - Authorization: The token can be used to capture the payment on your server.
+    /// - Tokenization: The token is a gateway request token, which can only be used to
+    /// generate the eventual customer token. It should not be used as a payment source.
     public let gatewayToken: String
-
-    /// Customer  ID that may be used for creating APM recurring token.
-    public let customerId: String?
-
-    /// Customer token ID that may be used for creating APM recurring token.
-    public let tokenId: String?
-
-    /// returnType informs if this was an APM token creation or a payment creation response.
-    public let returnType: APMReturnType
 }

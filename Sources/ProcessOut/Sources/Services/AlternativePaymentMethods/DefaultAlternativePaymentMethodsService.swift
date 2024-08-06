@@ -9,39 +9,66 @@ import Foundation
 
 final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethodsService {
 
-    init(configuration: @escaping @Sendable () -> AlternativePaymentMethodsServiceConfiguration, logger: POLogger) {
+    init(
+        configuration: @escaping @Sendable () -> AlternativePaymentMethodsServiceConfiguration,
+        webSession: WebAuthenticationSession,
+        logger: POLogger
+    ) {
         self.configuration = configuration
+        self.webSession = webSession
         self.logger = logger
     }
 
     // MARK: - POAlternativePaymentMethodsService
 
-    func alternativePaymentMethodUrl(request: POAlternativePaymentMethodRequest) -> URL {
-        let configuration = self.configuration()
-        guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
-            preconditionFailure("Failed to create components from base url.")
-        }
-        var pathComponents: [String]
-        if let customerId = request.customerId, let tokenId = request.tokenId {
-            pathComponents = [configuration.projectId, customerId, tokenId, "redirect", request.gatewayConfigurationId]
-        } else {
-            precondition(!request.invoiceId.isEmpty, "Invoice ID must be set.")
-            pathComponents = [configuration.projectId, request.invoiceId, "redirect", request.gatewayConfigurationId]
-            if let tokenId = request.tokenId {
-                pathComponents += ["tokenized", tokenId]
-            }
-        }
-        components.path = "/" + pathComponents.joined(separator: "/")
-        components.queryItems = request.additionalData?.map { data in
-            URLQueryItem(name: "additional_data[" + data.key + "]", value: data.value)
-        }
-        guard let url = components.url else {
-            preconditionFailure("Failed to create APM redirection URL.")
-        }
-        return url
+    func tokenize(request: POAlternativePaymentTokenizationRequest) async throws -> POAlternativePaymentResponse {
+        let pathComponents = [request.customerId, request.tokenId, "redirect", request.gatewayConfigurationId]
+        let redirectUrl = try url(with: pathComponents, additionalData: request.additionalData)
+        return try await authenticate(using: redirectUrl)
     }
 
-    func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse {
+    func authorize(request: POAlternativePaymentAuthorizationRequest) async throws -> POAlternativePaymentResponse {
+        var pathComponents = [request.invoiceId, "redirect", request.gatewayConfigurationId]
+        if let tokenId = request.tokenId {
+            pathComponents += ["tokenized", tokenId]
+        }
+        let redirectUrl = try url(with: pathComponents, additionalData: request.additionalData)
+        return try await authenticate(using: redirectUrl)
+    }
+
+    func authenticate(using url: URL) async throws -> POAlternativePaymentResponse {
+        let returnUrl = try await webSession.authenticate(using: url)
+        return try response(from: returnUrl)
+    }
+
+    // MARK: - Private
+
+    private let configuration: @Sendable () -> AlternativePaymentMethodsServiceConfiguration
+    private let logger: POLogger
+    private let webSession: WebAuthenticationSession
+
+    // MARK: - Request
+
+    /// - NOTE: Method prepends project ID to path components automatically.
+    private func url(with additionalPathComponents: [String], additionalData: [String: String]?) throws -> URL {
+        let configuration = self.configuration()
+        guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
+            preconditionFailure("Invalid base URL.")
+        }
+        let pathComponents = [configuration.projectId] + additionalPathComponents
+        components.path = "/" + pathComponents.joined(separator: "/")
+        components.queryItems = additionalData?.map { data in
+            URLQueryItem(name: "additional_data[" + data.key + "]", value: data.value)
+        }
+        if let url = components.url {
+            return url
+        }
+        throw POFailure(message: "Unable to create redirect URL.", code: .generic(.mobile))
+    }
+
+    // MARK: - Response
+
+    private func response(from url: URL) throws -> POAlternativePaymentResponse {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             let message = "Invalid or malformed Alternative Payment Method URL response provided."
             throw POFailure(message: message, code: .generic(.mobile), underlyingError: nil)
@@ -54,19 +81,8 @@ final class DefaultAlternativePaymentMethodsService: POAlternativePaymentMethods
         if gatewayToken.isEmpty {
             logger.debug("Gateway 'token' is not set in \(url), this may be an error.")
         }
-        let tokenId = queryItems.queryItemValue(name: "token_id")
-        if let customerId = queryItems.queryItemValue(name: "customer_id"), let tokenId {
-            return .init(gatewayToken: gatewayToken, customerId: customerId, tokenId: tokenId, returnType: .createToken)
-        }
-        return .init(gatewayToken: gatewayToken, customerId: nil, tokenId: tokenId, returnType: .authorization)
+        return .init(gatewayToken: gatewayToken)
     }
-
-    // MARK: - Private
-
-    private let configuration: @Sendable () -> AlternativePaymentMethodsServiceConfiguration
-    private let logger: POLogger
-
-    // MARK: - Private Methods
 
     private func createFailureCode(rawValue: String) -> POFailure.Code {
         if let code = POFailure.AuthenticationCode(rawValue: rawValue) {
