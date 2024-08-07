@@ -132,7 +132,7 @@ public final class ProcessOut: @unchecked Sendable {
             let configuration = self.configuration
             return .init(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
         }
-        let webSession = WebAuthenticationSession()
+        let webSession = DefaultWebAuthenticationSession()
         return DefaultAlternativePaymentsService(
             configuration: serviceConfiguration, webSession: webSession, logger: logger
         )
@@ -144,7 +144,7 @@ public final class ProcessOut: @unchecked Sendable {
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        let webSession = WebAuthenticationSession()
+        let webSession = DefaultWebAuthenticationSession()
         return DefaultThreeDSService(decoder: decoder, encoder: encoder, webSession: webSession)
     }
 
