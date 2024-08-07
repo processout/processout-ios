@@ -6,8 +6,9 @@
 //
 
 import Foundation
+@_spi(PO) import ProcessOut
 
-final class MockUrlProtocol: URLProtocol {
+final class MockUrlProtocol: URLProtocol, @unchecked Sendable {
 
     /// Method doesn't validate whether handler for given method/path is already registered.
     static func register(
@@ -16,15 +17,11 @@ final class MockUrlProtocol: URLProtocol {
         handler: @escaping (URLRequest) async throws -> (URLResponse, Data)
     ) {
         let route = MockUrlProtocolRoute(method: method, path: path, handler: handler)
-        lock.withLock {
-            routes.append(route)
-        }
+        routes.withLock { $0.append(route) }
     }
 
     static func removeRegistrations() {
-        lock.withLock {
-            routes = []
-        }
+        routes.withLock { $0 = [] }
     }
 
     /// Implementation raises an assertion failure is given request can't be handled.
@@ -32,10 +29,7 @@ final class MockUrlProtocol: URLProtocol {
         guard let urlAbsoluteString = request.url?.absoluteString else {
             fatalError("Invalid request")
         }
-        var availableRoutes: [MockUrlProtocolRoute] = []
-        lock.withLock {
-            availableRoutes = routes
-        }
+        let availableRoutes = routes.wrappedValue
         for route in availableRoutes {
             if let method = route.method, method != request.httpMethod {
                 continue
@@ -55,8 +49,7 @@ final class MockUrlProtocol: URLProtocol {
 
     // MARK: - Private Properties
 
-    private static var routes: [MockUrlProtocolRoute] = []
-    private static var lock = NSLock()
+    private static let routes = POUnfairlyLocked<[MockUrlProtocolRoute]>(wrappedValue: [])
 
     // MARK: - URLProtocol
 
@@ -69,18 +62,19 @@ final class MockUrlProtocol: URLProtocol {
     }
 
     override func startLoading() {
-        currentTask = Task { [weak self] in
+        let task = Task { [weak self] in
             await self?.startLoadingAsync()
         }
+        currentTask.withLock { $0 = task }
     }
 
     override func stopLoading() {
-        currentTask?.cancel()
+        currentTask.withLock { $0?.cancel() }
     }
 
     // MARK: - Private Properties
 
-    private var currentTask: Task<Void, Never>?
+    private let currentTask = POUnfairlyLocked<Task<Void?, Never>?>(wrappedValue: nil)
 
     // MARK: - Private Methods
 

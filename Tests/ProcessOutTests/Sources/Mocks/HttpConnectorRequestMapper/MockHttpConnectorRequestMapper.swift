@@ -6,15 +6,32 @@
 //
 
 import Foundation
-@testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 
-final class MockHttpConnectorRequestMapper: HttpConnectorRequestMapper {
+final class MockHttpConnectorRequestMapper: HttpConnectorRequestMapper, Sendable {
 
-    var urlRequestFromCallsCount = 0
-    var urlRequestFromClosure: (() throws -> URLRequest)!
+    var urlRequestFromCallsCount: Int {
+        lock.withLock { _urlRequestFromCallsCount }
+    }
+
+    var urlRequestFromClosure: (() throws -> URLRequest)! {
+        get { lock.withLock { _urlRequestFromClosure } }
+        set { lock.withLock { _urlRequestFromClosure = newValue } }
+    }
+
+    // MARK: - HttpConnectorRequestMapper
 
     func urlRequest(from request: HttpConnectorRequest<some Decodable>) throws -> URLRequest {
-        urlRequestFromCallsCount += 1
-        return try urlRequestFromClosure()
+        try lock.withLock {
+            _urlRequestFromCallsCount += 1
+            return try _urlRequestFromClosure()
+        }
     }
+
+    // MARK: - Private Properties
+
+    private let lock = POUnfairlyLocked()
+
+    private nonisolated(unsafe) var _urlRequestFromCallsCount = 0
+    private nonisolated(unsafe) var _urlRequestFromClosure: (() throws -> URLRequest)!
 }
