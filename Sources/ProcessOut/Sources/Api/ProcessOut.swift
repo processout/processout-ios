@@ -28,8 +28,8 @@ public final class ProcessOut: @unchecked Sendable {
     /// Invoices service.
     public private(set) var invoices: POInvoicesService!
 
-    /// Alternative payment methods service.
-    public private(set) var alternativePaymentMethods: POAlternativePaymentMethodsService!
+    /// Alternative payments service.
+    public private(set) var alternativePayments: POAlternativePaymentsService!
 
     /// Cards service.
     public private(set) var cards: POCardsService!
@@ -37,25 +37,11 @@ public final class ProcessOut: @unchecked Sendable {
     /// Returns customer tokens service.
     public private(set) var customerTokens: POCustomerTokensService!
 
-    /// Call this method in your app or scene delegate whenever your implementation receives incoming URL. Only deep
-    /// links are supported.
-    ///
-    /// - Returns: `true` if the URL is expected and will be handled by SDK. `false` otherwise.
-    @discardableResult
-    public func processDeepLink(url: URL) -> Bool {
-        logger.debug("Will process deep link: \(url)")
-        return eventEmitter.emit(event: PODeepLinkReceivedEvent(url: url))
-    }
-
     // MARK: - SPI
 
     /// Logger with application category.
     @_spi(PO)
     public private(set) var logger: POLogger!
-
-    /// Event emitter to use for events exchange.
-    @_spi(PO)
-    public private(set) var eventEmitter: POEventEmitter!
 
     /// Images repository.
     @_spi(PO)
@@ -107,14 +93,13 @@ public final class ProcessOut: @unchecked Sendable {
         invoices = Self.createInvoicesService(
             httpConnector: httpConnector, threeDSService: threeDSService, logger: logger
         )
-        alternativePaymentMethods = createAlternativePaymentsService()
+        alternativePayments = createAlternativePaymentsService()
         cards = Self.createCardsService(
             httpConnector: httpConnector, logger: logger
         )
         customerTokens = Self.createCustomerTokensService(
             httpConnector: httpConnector, threeDSService: threeDSService, logger: logger
         )
-        eventEmitter = LocalEventEmitter(logger: logger)
     }
 
     // MARK: -
@@ -145,21 +130,24 @@ public final class ProcessOut: @unchecked Sendable {
         return DefaultCustomerTokensService(repository: repository, threeDSService: threeDSService, logger: logger)
     }
 
-    private func createAlternativePaymentsService() -> POAlternativePaymentMethodsService {
-        let serviceConfiguration = { @Sendable [unowned self] () -> AlternativePaymentMethodsServiceConfiguration in
+    private func createAlternativePaymentsService() -> POAlternativePaymentsService {
+        let serviceConfiguration = { @Sendable [unowned self] () -> AlternativePaymentsServiceConfiguration in
             let configuration = self.configuration
             return .init(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
         }
-        return DefaultAlternativePaymentMethodsService(configuration: serviceConfiguration, logger: logger)
+        let webSession = WebAuthenticationSession()
+        return DefaultAlternativePaymentsService(
+            configuration: serviceConfiguration, webSession: webSession, logger: logger
+        )
     }
 
     private static func create3DSService() -> DefaultThreeDSService {
-        let webSession = WebAuthenticationSession()
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .useDefaultKeys
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
+        let webSession = WebAuthenticationSession()
         return DefaultThreeDSService(decoder: decoder, encoder: encoder, webSession: webSession)
     }
 

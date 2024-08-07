@@ -19,18 +19,18 @@ final class DynamicCheckoutDefaultInteractor:
         configuration: PODynamicCheckoutConfiguration,
         delegate: PODynamicCheckoutDelegate?,
         passKitPaymentSession: DynamicCheckoutPassKitPaymentSession,
-        alternativePaymentSession: DynamicCheckoutAlternativePaymentSession,
         childProvider: DynamicCheckoutInteractorChildProvider,
         invoicesService: POInvoicesService,
+        alternativePaymentsService: POAlternativePaymentsService,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         self.configuration = configuration
         self.delegate = delegate
         self.passKitPaymentSession = passKitPaymentSession
-        self.alternativePaymentSession = alternativePaymentSession
         self.childProvider = childProvider
         self.invoicesService = invoicesService
+        self.alternativePaymentsService = alternativePaymentsService
         self.logger = logger
         self.completion = completion
         super.init(state: .idle)
@@ -138,7 +138,7 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Private Properties
 
     private let passKitPaymentSession: DynamicCheckoutPassKitPaymentSession
-    private let alternativePaymentSession: DynamicCheckoutAlternativePaymentSession
+    private let alternativePaymentsService: POAlternativePaymentsService
     private let childProvider: DynamicCheckoutInteractorChildProvider
     private let invoicesService: POInvoicesService
     private let completion: (Result<Void, POFailure>) -> Void
@@ -431,7 +431,7 @@ final class DynamicCheckoutDefaultInteractor:
         state = .paymentProcessing(paymentProcessingState)
         Task {
             do {
-                _ = try await alternativePaymentSession.start(url: method.configuration.redirectUrl)
+                _ = try await alternativePaymentsService.authenticate(using: method.configuration.redirectUrl)
                 setSuccessState()
             } catch {
                 recoverPaymentProcessing(error: error)
@@ -523,7 +523,7 @@ final class DynamicCheckoutDefaultInteractor:
         Task { @MainActor in
             do {
                 if let redirectUrl = method.configuration.redirectUrl {
-                    _ = try await alternativePaymentSession.start(url: redirectUrl)
+                    _ = try await alternativePaymentsService.authenticate(using: redirectUrl)
                 } else {
                     try await authorizeInvoice(source: method.configuration.customerTokenId, startedState: startedState)
                 }

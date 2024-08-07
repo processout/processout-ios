@@ -14,10 +14,12 @@ final class AlternativePaymentMethodsInteractor:
     init(
         gatewayConfigurationsRepository: POGatewayConfigurationsRepository,
         invoicesService: POInvoicesService,
+        alternativePaymentsService: POAlternativePaymentsService,
         filter: POAllGatewayConfigurationsRequest.Filter?
     ) {
         self.gatewayConfigurationsRepository = gatewayConfigurationsRepository
         self.invoicesService = invoicesService
+        self.alternativePaymentsService = alternativePaymentsService
         self.filter = filter
         super.init(state: .idle)
     }
@@ -111,6 +113,12 @@ final class AlternativePaymentMethodsInteractor:
         }
     }
 
+    func authorize(request: POAlternativePaymentAuthorizationRequest) {
+        Task {
+            try await alternativePaymentsService.authorize(request: request)
+        }
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {
@@ -121,6 +129,7 @@ final class AlternativePaymentMethodsInteractor:
 
     private let gatewayConfigurationsRepository: POGatewayConfigurationsRepository
     private let invoicesService: POInvoicesService
+    private let alternativePaymentsService: POAlternativePaymentsService
     private let filter: POAllGatewayConfigurationsRequest.Filter?
 
     // MARK: - State Management

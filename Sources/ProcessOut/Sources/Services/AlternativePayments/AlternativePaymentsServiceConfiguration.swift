@@ -1,5 +1,5 @@
 //
-//  AlternativePaymentMethodsServiceConfiguration.swift
+//  AlternativePaymentsServiceConfiguration.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 13.02.2024.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AlternativePaymentMethodsServiceConfiguration: Sendable {
+struct AlternativePaymentsServiceConfiguration: Sendable {
 
     /// Project ID.
     let projectId: String

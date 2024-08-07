@@ -28,9 +28,6 @@ extension PODynamicCheckoutView {
                 passKitPaymentSession: DynamicCheckoutPassKitPaymentDefaultSession(
                     delegate: delegate, invoicesService: ProcessOut.shared.invoices
                 ),
-                alternativePaymentSession: DynamicCheckoutAlternativePaymentDefaultSession(
-                    configuration: configuration.alternativePayment
-                ),
                 childProvider: DynamicCheckoutInteractorDefaultChildProvider(
                     configuration: configuration,
                     cardsService: ProcessOut.shared.cards,
@@ -39,6 +36,7 @@ extension PODynamicCheckoutView {
                     logger: logger
                 ),
                 invoicesService: ProcessOut.shared.invoices,
+                alternativePaymentsService: ProcessOut.shared.alternativePayments,
                 logger: logger,
                 completion: completion
             )
