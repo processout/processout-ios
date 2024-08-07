@@ -23,6 +23,7 @@ targets:
     deploymentTarget: "13.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.core-ui
+      OTHER_SWIFT_FLAGS: "-enable-experimental-feature IsolatedAny"
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutCoreUI
     preBuildScripts:
       - path: Scripts/Lint.sh
@@ -56,7 +57,7 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-ios
       MARKETING_VERSION: ${CURRENT_VERSION}
       CURRENT_PROJECT_VERSION: 1
-      OTHER_SWIFT_FLAGS: "-Xfrontend -module-interface-preserve-types-as-written"
+      OTHER_SWIFT_FLAGS: "-Xfrontend -module-interface-preserve-types-as-written -enable-experimental-feature IsolatedAny"
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOut
     preBuildScripts:
       - path: Scripts/Lint.sh
