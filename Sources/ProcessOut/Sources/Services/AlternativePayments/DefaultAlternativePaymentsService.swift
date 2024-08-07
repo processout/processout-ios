@@ -22,18 +22,24 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
     // MARK: - POAlternativePaymentsService
 
     func tokenize(request: POAlternativePaymentTokenizationRequest) async throws -> POAlternativePaymentResponse {
-        let pathComponents = [request.customerId, request.tokenId, "redirect", request.gatewayConfigurationId]
-        let redirectUrl = try url(with: pathComponents, additionalData: request.additionalData)
-        return try await authenticate(using: redirectUrl)
+        try await authenticate(using: url(for: request))
     }
 
     func authorize(request: POAlternativePaymentAuthorizationRequest) async throws -> POAlternativePaymentResponse {
+        try await authenticate(using: url(for: request))
+    }
+
+    func url(for request: POAlternativePaymentTokenizationRequest) throws -> URL {
+        let pathComponents = [request.customerId, request.tokenId, "redirect", request.gatewayConfigurationId]
+        return try url(with: pathComponents, additionalData: request.additionalData)
+    }
+
+    func url(for request: POAlternativePaymentAuthorizationRequest) throws -> URL {
         var pathComponents = [request.invoiceId, "redirect", request.gatewayConfigurationId]
         if let tokenId = request.tokenId {
             pathComponents += ["tokenized", tokenId]
         }
-        let redirectUrl = try url(with: pathComponents, additionalData: request.additionalData)
-        return try await authenticate(using: redirectUrl)
+        return try url(with: pathComponents, additionalData: request.additionalData)
     }
 
     func authenticate(using url: URL) async throws -> POAlternativePaymentResponse {
