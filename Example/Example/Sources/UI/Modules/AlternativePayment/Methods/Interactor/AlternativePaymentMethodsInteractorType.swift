@@ -16,6 +16,9 @@ protocol AlternativePaymentMethodsInteractorType: InteractorType<AlternativePaym
     /// Creates invoice and calls success closure if operation completes with success.
     func createInvoice(amount: Decimal, currencyCode: String, success: @escaping (_ invoice: POInvoice) -> Void)
 
+    /// Authorizes alternative payment using given request.
+    func authorize(request: POAlternativePaymentAuthorizationRequest)
+
     /// Loads more data if possible.
     func loadMore()
 }

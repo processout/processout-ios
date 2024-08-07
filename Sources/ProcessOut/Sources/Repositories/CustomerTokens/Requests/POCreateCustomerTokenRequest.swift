@@ -19,9 +19,13 @@ public struct POCreateCustomerTokenRequest: Encodable, Sendable { // sourcery: A
     /// Return URL to assign to verification invoice.
     public let invoiceReturnUrl: URL?
 
-    public init(customerId: String, verify: Bool = false, invoiceReturnUrl: URL? = nil) {
+    /// Return URL.
+    public let returnUrl: URL?
+
+    public init(customerId: String, verify: Bool = false, returnUrl: URL? = nil) {
         self.customerId = customerId
         self.verify = verify
-        self.invoiceReturnUrl = invoiceReturnUrl
+        self.invoiceReturnUrl = returnUrl
+        self.returnUrl = returnUrl
     }
 }

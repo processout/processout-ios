@@ -19,6 +19,7 @@ final class AlternativePaymentMethodsBuilder {
         let interactor = AlternativePaymentMethodsInteractor(
             gatewayConfigurationsRepository: ProcessOut.shared.gatewayConfigurations,
             invoicesService: ProcessOut.shared.invoices,
+            alternativePaymentsService: ProcessOut.shared.alternativePayments,
             filter: filter
         )
         let router = AlternativePaymentMethodsRouter()
