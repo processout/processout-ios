@@ -29,7 +29,7 @@ protocol InvoicesRepository: PORepository {
     /// Captures native alternative payment.
     func captureNativeAlternativePayment(
         request: NativeAlternativePaymentCaptureRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse
+    ) async throws -> PONativeAlternativePaymentMethodState
 
     /// Creates invoice with given parameters.
     func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice

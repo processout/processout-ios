@@ -22,28 +22,25 @@ public struct POCardUpdateInformation: Sendable {
     public let iin: String?
 
     /// Scheme of the card.
-    @POTypedRepresentation<String?, POCardScheme>
-    public private(set) var scheme: String?
+    public let scheme: POCardScheme?
 
     /// Co-scheme of the card, such as Carte Bancaire.
-    @POTypedRepresentation<String?, POCardScheme>
-    public private(set) var coScheme: String?
+    public let coScheme: POCardScheme?
 
     /// Preferred scheme previously selected by customer if any.
-    @POTypedRepresentation<String?, POCardScheme>
-    public private(set) var preferredScheme: String?
+    public let preferredScheme: POCardScheme?
 
     public init(
         maskedNumber: String? = nil,
         iin: String? = nil,
-        scheme: String? = nil,
-        coScheme: String? = nil,
-        preferredScheme: String? = nil
+        scheme: POCardScheme? = nil,
+        coScheme: POCardScheme? = nil,
+        preferredScheme: POCardScheme? = nil
     ) {
         self.maskedNumber = maskedNumber
         self.iin = iin
-        self._scheme = .init(wrappedValue: scheme)
-        self._coScheme = .init(wrappedValue: coScheme)
-        self._preferredScheme = .init(wrappedValue: preferredScheme)
+        self.scheme = scheme
+        self.coScheme = coScheme
+        self.preferredScheme = preferredScheme
     }
 }

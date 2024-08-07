@@ -5,9 +5,6 @@
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
-@available(*, deprecated, renamed: "POCustomerTokensService")
-public typealias POCustomerTokensServiceType = POCustomerTokensService
-
 /// Provides an ability to interact with customer tokens.
 ///
 /// You can only use a card or APM token once but you can make payments as many times as necessary with a customer

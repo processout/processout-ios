@@ -6,6 +6,24 @@ import UIKit
 
 // MARK: - AutoCodingKeys
 
+extension DeviceMetadata {
+
+    enum CodingKeys: String, CodingKey {
+        case appLanguage
+        case appScreenWidth
+        case appScreenHeight
+        case appTimeZoneOffset
+        case channel
+    }
+}
+
+extension NativeAlternativePaymentCaptureRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case source
+    }
+}
+
 extension POAssignCustomerTokenRequest {
 
     enum CodingKeys: String, CodingKey {
@@ -13,9 +31,25 @@ extension POAssignCustomerTokenRequest {
         case preferredScheme
         case verify
         case invoiceId
-        case enableThreeDS2 = "enable_three_d_s_2"
         case thirdPartySdkVersion
         case metadata
+        case enableThreeDS2 = "enable_three_d_s_2"
+    }
+}
+
+extension POCardUpdateRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case cvc
+        case preferredScheme
+    }
+}
+
+extension POCreateCustomerTokenRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case verify
+        case invoiceReturnUrl
     }
 }
 
@@ -57,7 +91,6 @@ extension POInvoiceAuthorizationRequest {
     enum CodingKeys: String, CodingKey {
         case source
         case incremental
-        case enableThreeDS2 = "enable_three_d_s_2"
         case preferredScheme
         case thirdPartySdkVersion
         case invoiceDetailIds
@@ -68,6 +101,7 @@ extension POInvoiceAuthorizationRequest {
         case authorizeOnly
         case allowFallbackToSale
         case metadata
+        case enableThreeDS2 = "enable_three_d_s_2"
     }
 }
 

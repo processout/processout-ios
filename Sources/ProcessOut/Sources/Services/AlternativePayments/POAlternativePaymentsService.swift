@@ -7,9 +7,6 @@
 
 import Foundation
 
-@available(*, deprecated, renamed: "POAlternativePaymentsService")
-public typealias POAlternativePaymentMethodsServiceType = POAlternativePaymentsService
-
 /// Service that provides set of methods to work with alternative payments.
 public protocol POAlternativePaymentsService: POService {
 

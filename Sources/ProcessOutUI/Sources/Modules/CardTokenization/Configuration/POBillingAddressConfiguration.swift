@@ -10,9 +10,6 @@ import ProcessOut
 /// Billing address collection configuration.
 public struct POBillingAddressConfiguration: Sendable {
 
-    @available(*, deprecated, message: "Use POBillingAddressCollectionMode directly.")
-    public typealias CollectionMode = POBillingAddressCollectionMode
-
     /// Billing address collection mode.
     public let mode: POBillingAddressCollectionMode
 

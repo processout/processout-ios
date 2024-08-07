@@ -1,5 +1,5 @@
 //
-//  POImmutableStringCodableOptionalDecimal.swift
+//  POStringCodableOptionalDecimal.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 18.10.2022.
@@ -12,9 +12,9 @@ import Foundation
 /// Property wrapper that allows to encode and decode optional `Decimal` to/from string representation. Value is coded
 /// in en_US locale.
 @propertyWrapper
-public struct POImmutableStringCodableOptionalDecimal: Codable, Sendable {
+public struct POStringCodableOptionalDecimal: Codable, Sendable {
 
-    public let wrappedValue: Decimal?
+    public var wrappedValue: Decimal?
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -54,7 +54,7 @@ public struct POImmutableStringCodableOptionalDecimal: Codable, Sendable {
 extension KeyedEncodingContainer {
 
     public mutating func encode(
-        _ value: POImmutableStringCodableOptionalDecimal, forKey key: KeyedEncodingContainer<K>.Key
+        _ value: POStringCodableOptionalDecimal, forKey key: KeyedEncodingContainer<K>.Key
     ) throws {
         try value.encode(to: superEncoder(forKey: key))
     }
@@ -63,8 +63,8 @@ extension KeyedEncodingContainer {
 extension KeyedDecodingContainer {
 
     public func decode(
-        _ type: POImmutableStringCodableOptionalDecimal.Type, forKey key: KeyedDecodingContainer<K>.Key
-    ) throws -> POImmutableStringCodableOptionalDecimal {
+        _ type: POStringCodableOptionalDecimal.Type, forKey key: KeyedDecodingContainer<K>.Key
+    ) throws -> POStringCodableOptionalDecimal {
         try type.init(from: try superDecoder(forKey: key))
     }
 }

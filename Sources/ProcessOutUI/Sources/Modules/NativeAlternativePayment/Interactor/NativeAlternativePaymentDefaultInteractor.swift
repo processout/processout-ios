@@ -178,19 +178,19 @@ final class NativeAlternativePaymentDefaultInteractor:
             restoreStartedStateAfterSubmissionFailureIfPossible(error, replaceErrorMessages: true)
             return
         }
-        switch response.nativeApm.state {
+        switch response.state {
         case .pendingCapture:
             send(event: .didSubmitParameters(additionalParametersExpected: false))
             await setAwaitingCaptureStateUnchecked(
-                gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
+                gateway: startedState.gateway, parameterValues: response.parameterValues
             )
         case .captured:
             send(event: .didSubmitParameters(additionalParametersExpected: false))
             await setCapturedStateUnchecked(
-                gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
+                gateway: startedState.gateway, parameterValues: response.parameterValues
             )
         case .customerInput:
-            await restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
+            await restoreStartedStateAfterSubmission(nativeApm: response)
         case .failed:
             fallthrough // swiftlint:disable:this fallthrough
         @unknown default:
@@ -327,9 +327,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         logger.debug("One or more parameters are not valid: \(invalidFields), waiting for parameters to update")
     }
 
-    private func restoreStartedStateAfterSubmission(
-        nativeApm: PONativeAlternativePaymentMethodResponse.NativeApm
-    ) async {
+    private func restoreStartedStateAfterSubmission(nativeApm: PONativeAlternativePaymentMethodResponse) async {
         guard case var .submitting(startedState) = state else {
             return
         }

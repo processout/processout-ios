@@ -30,8 +30,8 @@ public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable, Sen
     public struct Invoice: Decodable, Sendable {
 
         /// Invoice amount.
-        @POImmutableStringCodableDecimal
-        public var amount: Decimal
+        @POStringCodableDecimal
+        public private(set) var amount: Decimal
 
         /// Invoice currency code.
         public let currencyCode: String

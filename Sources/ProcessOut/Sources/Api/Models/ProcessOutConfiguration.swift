@@ -7,9 +7,6 @@
 
 import Foundation
 
-@available(*, deprecated, renamed: "ProcessOutConfiguration")
-public typealias ProcessOutApiConfiguration = ProcessOutConfiguration
-
 /// Defines configuration parameters that are used to create API singleton. In order to create instance
 /// of this structure one should use ``ProcessOutConfiguration/production(projectId:appVersion:isDebug:)``
 /// method.
@@ -35,13 +32,6 @@ public struct ProcessOutConfiguration: Sendable {
     /// Application name.
     public let application: Application?
 
-    /// Host application version. Providing this value helps ProcessOut to troubleshoot potential
-    /// issues.
-    @available(*, deprecated, renamed: "application.version")
-    public var appVersion: String? {
-        application?.version
-    }
-
     /// Session ID is a constant value
     @_spi(PO)
     public let sessionId = UUID().uuidString
@@ -60,38 +50,33 @@ public struct ProcessOutConfiguration: Sendable {
     @_spi(PO)
     public let privateKey: String?
 
+    /// Creates configuration.
+    public init(
+        projectId: String,
+        application: Application? = nil,
+        isDebug: Bool = false,
+        isTelemetryEnabled: Bool = true
+    ) {
+        self.projectId = projectId
+        self.application = application
+        self.isDebug = isDebug
+        self.isTelemetryEnabled = isTelemetryEnabled
+        self.privateKey = nil
+    }
+
+    /// Creates debug configuration.
+    @_spi(PO)
+    public init(projectId: String, privateKey: String) {
+        self.projectId = projectId
+        self.application = nil
+        self.isDebug = true
+        self.isTelemetryEnabled = false
+        self.privateKey = privateKey
+    }
+
     /// Api base URL.
     let apiBaseUrl = URL(string: "https://api.processout.com")! // swiftlint:disable:this force_unwrapping
 
     /// Checkout base URL.
     let checkoutBaseUrl = URL(string: "https://checkout.processout.com")! // swiftlint:disable:this force_unwrapping
-}
-
-extension ProcessOutConfiguration {
-
-    /// Creates production configuration.
-    ///
-    /// - Parameters:
-    ///   - appVersion: when application parameter is set, it takes precedence over this parameter.
-    public static func production(
-        projectId: String,
-        application: Application? = nil,
-        appVersion: String? = nil,
-        isDebug: Bool = false,
-        isTelemetryEnabled: Bool = true
-    ) -> Self {
-        .init(
-            projectId: projectId,
-            application: application ?? .init(name: nil, version: appVersion),
-            isDebug: isDebug,
-            isTelemetryEnabled: isTelemetryEnabled,
-            privateKey: nil
-        )
-    }
-
-    /// Creates debug production configuration with optional private key.
-    @_spi(PO)
-    public static func production(projectId: String, privateKey: String? = nil) -> Self {
-        .init(projectId: projectId, application: nil, isDebug: true, isTelemetryEnabled: false, privateKey: privateKey)
-    }
 }
