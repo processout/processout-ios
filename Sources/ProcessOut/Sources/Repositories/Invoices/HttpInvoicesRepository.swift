@@ -30,10 +30,17 @@ final class HttpInvoicesRepository: InvoicesRepository {
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
     ) async throws -> PONativeAlternativePaymentMethodResponse {
+        struct Request: Encodable {
+            struct NativeApm: Encodable { // swiftlint:disable:this nesting
+                let parameterValues: [String: String]
+            }
+            let gatewayConfigurationId: String
+            let nativeApm: NativeApm
+        }
         struct Response: Decodable {
             let nativeApm: PONativeAlternativePaymentMethodResponse
         }
-        let requestBox = NativeAlternativePaymentRequestBox(
+        let requestBox = Request(
             gatewayConfigurationId: request.gatewayConfigurationId,
             nativeApm: .init(parameterValues: request.parameters)
         )
@@ -71,7 +78,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
         request: NativeAlternativePaymentCaptureRequest
     ) async throws -> PONativeAlternativePaymentMethodState {
         struct Response: Decodable {
-            struct NativeApm: Decodable {
+            struct NativeApm: Decodable { // swiftlint:disable:this nesting
                 let state: PONativeAlternativePaymentMethodState
             }
             let nativeApm: NativeApm
@@ -92,16 +99,6 @@ final class HttpInvoicesRepository: InvoicesRepository {
         let response = try await connector.execute(request: httpRequest) as HttpConnectorResponse
         let clientSecret = response.headers["x-processout-client-secret"]
         return response.value.invoice.replacing(clientSecret: clientSecret)
-    }
-
-    // MARK: - Private Nested Types
-
-    private struct NativeAlternativePaymentRequestBox: Encodable {
-        struct NativeApm: Encodable { // swiftlint:disable:this nesting
-            let parameterValues: [String: String]
-        }
-        let gatewayConfigurationId: String
-        let nativeApm: NativeApm
     }
 
     // MARK: - Private Properties
