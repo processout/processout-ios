@@ -115,7 +115,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             waitsConfirmation: true,
             timeout: configuration.timeout,
             showProgressIndicatorAfter: configuration.showProgressIndicatorAfter,
-            shouldHideGatewayDetails: true,
+            hideGatewayDetails: true,
             secondaryAction: configuration.cancelButton.map { configuration in
                 .cancel(title: "", disabledFor: configuration.disabledFor, confirmation: nil)
             }

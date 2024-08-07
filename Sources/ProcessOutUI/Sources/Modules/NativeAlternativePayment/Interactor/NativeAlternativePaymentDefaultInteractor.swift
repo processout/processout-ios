@@ -484,7 +484,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         if parameterValues?.providerName != nil {
             return parameterValues?.providerLogoUrl
         }
-        guard !configuration.paymentConfirmation.shouldHideGatewayDetails else {
+        guard !configuration.paymentConfirmation.hideGatewayDetails else {
             return nil
         }
         return gateway.logoUrl
