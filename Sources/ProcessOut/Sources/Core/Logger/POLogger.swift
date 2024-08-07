@@ -16,7 +16,7 @@ public struct POLogger: Sendable {
         self.category = category
         self.minimumLevel = minimumLevel
         self.attributes = [:]
-        lock = NSLock()
+        lock = POUnfairlyLocked()
     }
 
     init(destinations: [LoggerDestination] = [], category: String) {
@@ -84,7 +84,7 @@ public struct POLogger: Sendable {
 
     private let destinations: [LoggerDestination]
     private let minimumLevel: @Sendable () -> LogLevel
-    private let lock: NSLock
+    private let lock: POUnfairlyLocked<Void>
     private var attributes: [POLogAttributeKey: String]
 
     // MARK: - Private Methods
