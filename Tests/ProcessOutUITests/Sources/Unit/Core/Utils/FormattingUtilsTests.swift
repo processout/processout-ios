@@ -6,13 +6,13 @@
 //
 
 import XCTest
-@testable @_spi(PO) import ProcessOut
+@testable import ProcessOutUI
 
 final class FormattingUtilsTests: XCTestCase {
 
     func test_adjustedCursorOffset_whenNotGreedy_doesNotIncludeSignificants() {
         // When
-        let offset = POFormattingUtils.adjustedCursorOffset(
+        let offset = FormattingUtils.adjustedCursorOffset(
             in: "1 2", source: "12", sourceCursorOffset: 1, significantCharacters: .decimalDigits, greedy: false
         )
 
@@ -22,7 +22,7 @@ final class FormattingUtilsTests: XCTestCase {
 
     func test_adjustedCursorOffset_whenGreedy_includesNonSignificants() {
         // When
-        let offset = POFormattingUtils.adjustedCursorOffset(
+        let offset = FormattingUtils.adjustedCursorOffset(
             in: "1 2", source: "12", sourceCursorOffset: 1, significantCharacters: .decimalDigits
         )
 
@@ -32,7 +32,7 @@ final class FormattingUtilsTests: XCTestCase {
 
     func test_adjustedCursorOffset_whenCursorPrefixChanges_returnValidOffset() {
         // When
-        let offset = POFormattingUtils.adjustedCursorOffset(
+        let offset = FormattingUtils.adjustedCursorOffset(
             in: "+12", source: "12", sourceCursorOffset: 1, significantCharacters: .decimalDigits
         )
 
@@ -42,7 +42,7 @@ final class FormattingUtilsTests: XCTestCase {
 
     func test_adjustedCursorOffset_whenCursorSuffixChanges_returnEndOfTarget() {
         // When
-        let offset = POFormattingUtils.adjustedCursorOffset(
+        let offset = FormattingUtils.adjustedCursorOffset(
             in: "2", source: "1", sourceCursorOffset: 0, significantCharacters: .decimalDigits
         )
 
@@ -52,7 +52,7 @@ final class FormattingUtilsTests: XCTestCase {
 
     func test_adjustedCursorOffset_whenNewCharacterIsAddedToCursorSuffix_returnEndOfTarget() {
         // When
-        let offset = POFormattingUtils.adjustedCursorOffset(
+        let offset = FormattingUtils.adjustedCursorOffset(
             in: "123", source: "12", sourceCursorOffset: 1, significantCharacters: .decimalDigits
         )
 
@@ -62,7 +62,7 @@ final class FormattingUtilsTests: XCTestCase {
 
     func test_adjustedCursorOffset_whenSourceIsSameAsTarget_returnsSameOffset() {
         // When
-        let offset = POFormattingUtils.adjustedCursorOffset(
+        let offset = FormattingUtils.adjustedCursorOffset(
             in: "1", source: "1", sourceCursorOffset: 0, significantCharacters: .decimalDigits
         )
 
@@ -72,7 +72,7 @@ final class FormattingUtilsTests: XCTestCase {
 
     func test_adjustedCursorOffset_whenSourceIsEmpty_returnEndOfTarget() {
         // When
-        let offset = POFormattingUtils.adjustedCursorOffset(
+        let offset = FormattingUtils.adjustedCursorOffset(
             in: "1", source: "", sourceCursorOffset: 0, significantCharacters: .decimalDigits
         )
 
@@ -82,7 +82,7 @@ final class FormattingUtilsTests: XCTestCase {
 
     func test_adjustedCursorOffset_whenTargetIsEmpty_returnStartOfTarget() {
         // When
-        let offset = POFormattingUtils.adjustedCursorOffset(
+        let offset = FormattingUtils.adjustedCursorOffset(
             in: "", source: "0", sourceCursorOffset: 1, significantCharacters: .decimalDigits
         )
 
