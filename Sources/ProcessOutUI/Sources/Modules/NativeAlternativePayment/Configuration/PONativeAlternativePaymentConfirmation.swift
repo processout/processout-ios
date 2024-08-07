@@ -21,6 +21,11 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
     /// A delay before showing progress indicator during payment confirmation.
     public let showProgressIndicatorAfter: TimeInterval?
 
+    /// Boolean value indicating whether gateway information (such as name/logo) should stay hidden
+    /// during payment confirmation even if more specific payment provider details are not available.
+    /// Default value is `false`.
+    public let hideGatewayDetails: Bool
+
     /// Action that could be optionally presented to user during payment confirmation stage. To remove action
     /// use `nil`, this is default behaviour.
     public let secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction?
@@ -30,11 +35,13 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
         waitsConfirmation: Bool = true,
         timeout: TimeInterval = 180,
         showProgressIndicatorAfter: TimeInterval? = nil,
+        hideGatewayDetails: Bool = false,
         secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction? = nil
     ) {
         self.waitsConfirmation = waitsConfirmation
         self.timeout = timeout
         self.showProgressIndicatorAfter = showProgressIndicatorAfter
+        self.hideGatewayDetails = hideGatewayDetails
         self.secondaryAction = secondaryAction
     }
 }

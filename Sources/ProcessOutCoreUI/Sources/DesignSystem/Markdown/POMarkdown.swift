@@ -125,7 +125,7 @@ extension NSAttributedString {
     fileprivate func sizeThatFits(width: CGFloat) -> CGSize {
         let proposedSize = CGSize(width: width, height: .greatestFiniteMagnitude)
         let boundingRect = boundingRect(
-            with: proposedSize, options: [.usesLineFragmentOrigin], context: nil
+            with: proposedSize, options: boundingRectOptions, context: nil
         )
         return CGSize(width: max(ceil(boundingRect.width), width), height: ceil(boundingRect.height))
     }
@@ -134,8 +134,18 @@ extension NSAttributedString {
     fileprivate func sizeThatFits(height: CGFloat) -> CGSize {
         let proposedSize = CGSize(width: .greatestFiniteMagnitude, height: height)
         let boundingRect = boundingRect(
-            with: proposedSize, options: [.usesLineFragmentOrigin], context: nil
+            with: proposedSize, options: boundingRectOptions, context: nil
         )
         return CGSize(width: ceil(boundingRect.width), height: max(ceil(boundingRect.height), height))
+    }
+
+    // MARK: -
+
+    private var boundingRectOptions: NSStringDrawingOptions {
+        var options: NSStringDrawingOptions = [.usesLineFragmentOrigin]
+        if #available(iOS 16, *) {
+            options.insert(.usesFontLeading)
+        }
+        return options
     }
 }

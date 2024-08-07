@@ -93,14 +93,6 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
     private func alternativePaymentConfiguration(
         invoiceId: String, gatewayConfigurationId: String
     ) -> PONativeAlternativePaymentConfiguration {
-        let confirmationConfiguration = PONativeAlternativePaymentConfirmationConfiguration(
-            waitsConfirmation: true,
-            timeout: configuration.alternativePayment.paymentConfirmation.timeout,
-            showProgressIndicatorAfter: configuration.alternativePayment.paymentConfirmation.showProgressIndicatorAfter,
-            secondaryAction: configuration.alternativePayment.paymentConfirmation.cancelButton.map { configuration in
-                .cancel(title: "", disabledFor: configuration.disabledFor, confirmation: nil)
-            }
-        )
         let alternativePaymentConfiguration = PONativeAlternativePaymentConfiguration(
             invoiceId: invoiceId,
             gatewayConfigurationId: gatewayConfigurationId,
@@ -111,8 +103,23 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             secondaryAction: nil,
             inlineSingleSelectValuesLimit: configuration.alternativePayment.inlineSingleSelectValuesLimit,
             skipSuccessScreen: true,
-            paymentConfirmation: confirmationConfiguration
+            paymentConfirmation: alternativePaymentConfirmationConfiguration
         )
         return alternativePaymentConfiguration
+    }
+
+    // swiftlint:disable:next identifier_name
+    private var alternativePaymentConfirmationConfiguration: PONativeAlternativePaymentConfirmationConfiguration {
+        let configuration = self.configuration.alternativePayment.paymentConfirmation
+        let confirmationConfiguration = PONativeAlternativePaymentConfirmationConfiguration(
+            waitsConfirmation: true,
+            timeout: configuration.timeout,
+            showProgressIndicatorAfter: configuration.showProgressIndicatorAfter,
+            hideGatewayDetails: true,
+            secondaryAction: configuration.cancelButton.map { configuration in
+                .cancel(title: "", disabledFor: configuration.disabledFor, confirmation: nil)
+            }
+        )
+        return confirmationConfiguration
     }
 }

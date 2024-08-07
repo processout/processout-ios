@@ -152,13 +152,15 @@ final class DynamicCheckoutDefaultInteractor:
     private func continueStartUnchecked() async {
         do {
             let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
-            setStartedStateUnchecked(invoice: invoice)
+            setStartedStateUnchecked(invoice: invoice, sendEvents: true)
         } catch {
             setFailureStateUnchecked(error: error)
         }
     }
 
-    private func setStartedStateUnchecked(invoice: POInvoice, errorDescription: String? = nil) {
+    private func setStartedStateUnchecked(
+        invoice: POInvoice, errorDescription: String? = nil, sendEvents: Bool
+    ) {
         let pkPaymentRequests = pkPaymentRequests(invoice: invoice)
         var expressMethodIds: [String] = [], regularMethodIds: [String] = []
         let paymentMethods = partitioned(
@@ -177,9 +179,11 @@ final class DynamicCheckoutDefaultInteractor:
             recentErrorDescription: errorDescription
         )
         state = .started(startedState)
-        send(event: .didStart)
-        logger[attributeKey: .invoiceId] = invoice.id
-        logger.debug("Did start dynamic checkout flow")
+        if sendEvents {
+            send(event: .didStart)
+            logger[attributeKey: .invoiceId] = invoice.id
+            logger.debug("Did start dynamic checkout flow")
+        }
         initiateDefaultPaymentIfNeeded()
     }
 
@@ -299,7 +303,7 @@ final class DynamicCheckoutDefaultInteractor:
         case .recovering:
             logger.debug("Ignoring attempt to cancel payment during error recovery.")
         default:
-            assertionFailure("Attempted to cancel payment from unsupported state.")
+            logger.debug("Ignoring attempt to cancel payment from unsupported state.")
         }
     }
 
@@ -602,7 +606,7 @@ final class DynamicCheckoutDefaultInteractor:
             return
         }
         setStartedStateUnchecked(
-            invoice: newInvoice, errorDescription: failureDescription(currentState.failure)
+            invoice: newInvoice, errorDescription: failureDescription(currentState.failure), sendEvents: false
         )
         guard let pendingPaymentMethodId = currentState.pendingPaymentMethodId else {
             return
