@@ -1,5 +1,5 @@
 //
-//  ImmutableStringCodableOptionalDecimalTests.swift
+//  StringCodableOptionalDecimalTests.swift
 //  ProcessOutTests
 //
 //  Created by Andrii Vysotskyi on 18.10.2022.
@@ -22,7 +22,7 @@ final class ImmutableStringCodableOptionalDecimalTests: XCTestCase {
         let data = Data(#""1""#.utf8)
 
         // When
-        let decimal = try decoder.decode(POImmutableStringCodableOptionalDecimal.self, from: data)
+        let decimal = try decoder.decode(POStringCodableOptionalDecimal.self, from: data)
 
         // Then
         XCTAssertEqual(decimal.wrappedValue?.description, "1")
@@ -33,7 +33,7 @@ final class ImmutableStringCodableOptionalDecimalTests: XCTestCase {
         let data = Data(#""1234.25""#.utf8)
 
         // When
-        let decimal = try decoder.decode(POImmutableStringCodableOptionalDecimal.self, from: data)
+        let decimal = try decoder.decode(POStringCodableOptionalDecimal.self, from: data)
 
         // Then
         XCTAssertEqual(decimal.wrappedValue?.description, "1234.25")
@@ -55,7 +55,7 @@ final class ImmutableStringCodableOptionalDecimalTests: XCTestCase {
         let data = Data("1".utf8)
 
         // Then
-        XCTAssertThrowsError(try decoder.decode(POImmutableStringCodableOptionalDecimal.self, from: data))
+        XCTAssertThrowsError(try decoder.decode(POStringCodableOptionalDecimal.self, from: data))
     }
 
     func test_init_whenInputHasComma_fails() throws {
@@ -63,12 +63,12 @@ final class ImmutableStringCodableOptionalDecimalTests: XCTestCase {
         let data = Data(#""1,2""#.utf8)
 
         // Then
-        XCTAssertThrowsError(try decoder.decode(POImmutableStringCodableOptionalDecimal.self, from: data))
+        XCTAssertThrowsError(try decoder.decode(POStringCodableOptionalDecimal.self, from: data))
     }
 
     func test_encode_returnsStringData() throws {
         // Given
-        let decimal = POImmutableStringCodableOptionalDecimal(value: Decimal(1234))
+        let decimal = POStringCodableOptionalDecimal(value: Decimal(1234))
 
         // When
         let data = try encoder.encode(decimal)
@@ -80,7 +80,7 @@ final class ImmutableStringCodableOptionalDecimalTests: XCTestCase {
 
     func test_encode_whenInContainer_encodesString() throws {
         // Given
-        let value = Container(number: POImmutableStringCodableOptionalDecimal(value: Decimal(1234)))
+        let value = Container(number: POStringCodableOptionalDecimal(value: Decimal(1234)))
 
         // When
         let data = try encoder.encode(value)
@@ -97,6 +97,6 @@ final class ImmutableStringCodableOptionalDecimalTests: XCTestCase {
 
 private struct Container: Codable {
 
-    @POImmutableStringCodableOptionalDecimal
+    @POStringCodableOptionalDecimal
     var number: Decimal?
 }
