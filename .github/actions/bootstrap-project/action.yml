@@ -16,7 +16,7 @@ runs:
         echo "$CONSTANTS" > Example/Example/Resources/Constants.yml
       shell: bash
     - name: Select Xcode Version
-      # Migrate to public release once available
+      # todo(andrii-vysotskyi): Migrate to public release once available
       run: sudo xcode-select -s '/Applications/Xcode_16_beta_4.app/Contents/Developer'
       shell: bash
     - name: Bootstrap Project
