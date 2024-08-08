@@ -36,14 +36,11 @@ final class AsyncUtilsTests: XCTestCase {
 
         // When
         let error = await assertThrowsError(
-            try await withTimeout(timeout, error: Failure.timeout, perform: operation)
+            try await withTimeout(timeout, error: Failure.timeout, perform: operation), errorType: Failure.self
         )
 
         // Then
-        if let failure = error as? Failure, failure == .timeout {
-            return
-        }
-        XCTFail("Expected timeout failure.")
+        XCTAssertEqual(error, .timeout, "Expected timeout failure.")
     }
 
     func test_withTimeout_whenNonCancellableOperationTimesOut_ignoresTimeout() async throws {
@@ -133,14 +130,12 @@ final class AsyncUtilsTests: XCTestCase {
                 while: { _ in false },
                 timeout: 1,
                 timeoutError: Failure.timeout
-            )
+            ),
+            errorType: Failure.self
         )
 
         // Then
-        if let failure = error as? Failure, failure == .timeout {
-            return
-        }
-        XCTFail("Expected timeout failure.")
+        XCTAssertEqual(error, .timeout, "Expected timeout failure.")
     }
 
     func test_retry_checksRetryCondition_whenRetryStrategyIsSet() async throws {
@@ -286,7 +281,7 @@ final class AsyncUtilsTests: XCTestCase {
 
     // MARK: - Private Nested Types
 
-    private enum Failure: Error {
+    private enum Failure: Error, Equatable {
         case timeout, generic, cancel
     }
 }
