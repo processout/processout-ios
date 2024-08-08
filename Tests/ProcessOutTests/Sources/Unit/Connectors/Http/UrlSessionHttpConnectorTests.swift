@@ -40,11 +40,11 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
 
         // When
         let error = await assertThrowsError(
-            try await sut.execute(request: defaultRequest)
+            try await sut.execute(request: defaultRequest), errorType: HttpConnectorFailure.self
         )
 
         // Then
-        if let failure = error as? HttpConnectorFailure, case .encoding(let encodingError) = failure {
+        if case .encoding(let encodingError) = error {
             XCTAssertEqual(encodingError as NSError, codingError)
             return
         }
@@ -215,8 +215,8 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         requestMapper.urlRequestFromClosure = defaultUrlRequest
 
         // When
-        let task = Task {
-            _ = try await sut.execute(request: defaultRequest)
+        let task = Task { [sut, defaultRequest] in
+            _ = try await sut!.execute(request: defaultRequest)
         }
         DispatchQueue.main.async {
             task.cancel()
@@ -243,7 +243,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
 
     // MARK: - Private Methods
 
-    private var defaultRequest: HttpConnectorRequest<some Decodable> {
+    private var defaultRequest: HttpConnectorRequest<some Decodable & Sendable> {
         HttpConnectorRequest<VoidCodable>.get(path: "")
     }
 
