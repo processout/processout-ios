@@ -18,9 +18,7 @@ final class DefaultWebAuthenticationSession:
     // MARK: - WebAuthenticationSession
 
     func authenticate(
-        using url: URL,
-        callbackScheme: String? = nil,
-        additionalHeaderFields: [String: String]? = nil
+        using url: URL, callbackScheme: String?, additionalHeaderFields: [String: String]?
     ) async throws -> URL {
         let sessionProxy = WebAuthenticationSessionProxy()
         return try await withTaskCancellationHandler(
