@@ -2,11 +2,6 @@
 
 import PackageDescription
 
-let swiftSettings: [SwiftSetting] = [
-    .enableExperimentalFeature("IsolatedAny"),
-    .enableUpcomingFeature("StrictConcurrency")
-]
-
 let package = Package(
     name: "ProcessOut",
     defaultLocalization: "en",
@@ -25,13 +20,9 @@ let package = Package(
     targets: [
         .target(
             name: "ProcessOut",
-            dependencies: [
-                .target(name: "cmark")
-            ],
             resources: [
                 .process("Resources")
-            ],
-            swiftSettings: swiftSettings
+            ]
         ),
         .target(
             name: "ProcessOutCheckout3DS",
@@ -50,8 +41,7 @@ let package = Package(
             ],
             resources: [
                 .process("Resources")
-            ],
-            swiftSettings: swiftSettings
+            ]
         ),
         .target(
             name: "ProcessOutCoreUI",
@@ -60,8 +50,7 @@ let package = Package(
             ],
             resources: [
                 .process("Resources")
-            ],
-            swiftSettings: swiftSettings
+            ]
         ),
         .binaryTarget(name: "cmark", path: "Vendor/cmark.xcframework")
     ]

@@ -10,7 +10,6 @@ settings:
   LOCALIZATION_PREFERS_STRING_CATALOGS: true
   SWIFT_STRICT_CONCURRENCY: complete
   ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS: false
-  OTHER_SWIFT_FLAGS: "-enable-experimental-feature IsolatedAny -enable-upcoming-feature StrictConcurrency"
 options:
   transitivelyLinkDependencies: true
 packages:
@@ -21,7 +20,7 @@ targets:
   ProcessOutCoreUI:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.core-ui
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutCoreUI
@@ -36,7 +35,7 @@ targets:
   ProcessOutUI:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.ui
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutUI
@@ -52,7 +51,7 @@ targets:
   ProcessOut:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-ios
       MARKETING_VERSION: ${CURRENT_VERSION}
@@ -70,8 +69,6 @@ targets:
       - path: Sources/ProcessOut
         excludes:
           - swiftgen.yml
-    dependencies:
-      - framework: Vendor/cmark.xcframework
   ProcessOutTests:
     type: bundle.unit-test
     platform: iOS
@@ -111,7 +108,7 @@ targets:
   ProcessOutCheckout3DS:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.checkout-3ds-ios
       EXCLUDED_ARCHS: x86_64 # Checkout3DS doesn't support x86_64 so are we
