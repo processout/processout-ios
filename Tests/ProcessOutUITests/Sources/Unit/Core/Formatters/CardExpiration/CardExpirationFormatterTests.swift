@@ -1,18 +1,18 @@
 //
 //  CardExpirationFormatterTests.swift
-//  ProcessOut
+//  ProcessOutUITests
 //
 //  Created by Andrii Vysotskyi on 21.07.2023.
 //
 
 import XCTest
-@testable @_spi(PO) import ProcessOut
+@testable import ProcessOutUI
 
 final class CardExpirationFormatterTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        sut = POCardExpirationFormatter()
+        sut = CardExpirationFormatter()
     }
 
     func test_string() {
@@ -105,5 +105,5 @@ final class CardExpirationFormatterTests: XCTestCase {
 
     // MARK: - Private Properties
 
-    private var sut: POCardExpirationFormatter!
+    private var sut: CardExpirationFormatter!
 }

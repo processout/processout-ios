@@ -20,7 +20,7 @@ targets:
   ProcessOutCoreUI:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.core-ui
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutCoreUI
@@ -35,7 +35,7 @@ targets:
   ProcessOutUI:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.ui
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutUI
@@ -51,12 +51,12 @@ targets:
   ProcessOut:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-ios
       MARKETING_VERSION: ${CURRENT_VERSION}
       CURRENT_PROJECT_VERSION: 1
-      OTHER_SWIFT_FLAGS: "-Xfrontend -module-interface-preserve-types-as-written"
+      OTHER_SWIFT_FLAGS: "$(inherited) -Xfrontend -module-interface-preserve-types-as-written"
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOut
     preBuildScripts:
       - path: Scripts/Lint.sh
@@ -69,8 +69,6 @@ targets:
       - path: Sources/ProcessOut
         excludes:
           - swiftgen.yml
-    dependencies:
-      - framework: Vendor/cmark.xcframework
   ProcessOutTests:
     type: bundle.unit-test
     platform: iOS
@@ -110,7 +108,7 @@ targets:
   ProcessOutCheckout3DS:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.checkout-3ds-ios
       EXCLUDED_ARCHS: x86_64 # Checkout3DS doesn't support x86_64 so are we

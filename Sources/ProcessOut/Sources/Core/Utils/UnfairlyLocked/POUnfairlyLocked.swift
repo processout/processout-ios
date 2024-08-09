@@ -20,18 +20,24 @@ public final class POUnfairlyLocked<Value>: @unchecked Sendable {
         lock.withLock { value }
     }
 
-    public var projectedValue: POUnfairlyLocked<Value> {
-        self
-    }
-
-    public func withLock<R>(_ body: (inout Value) -> R) -> R {
-        lock.withLock {
-            body(&value)
-        }
+    public func withLock<R>(_ body: (inout Value) throws -> R) rethrows -> R {
+        try lock.withLock { try body(&value) }
     }
 
     // MARK: - Private Properties
 
     private let lock = UnfairLock()
     private var value: Value
+}
+
+extension POUnfairlyLocked where Value == Void {
+
+    /// Convenience to create lock when value type is `Void`.
+    public convenience init() where Value == Void {
+        self.init(wrappedValue: ())
+    }
+
+    public func withLock<R>(_ body: () throws -> R) rethrows -> R {
+        try withLock { _ in try body() }
+    }
 }

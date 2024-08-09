@@ -11,9 +11,10 @@ import XCTest
 
 final class GatewayConfigurationsRepositoryTests: XCTestCase {
 
+    @MainActor
     override func setUp() {
         super.setUp()
-        ProcessOut.configure(configuration: .production(projectId: Constants.projectId), force: true)
+        ProcessOut.configure(configuration: .init(projectId: Constants.projectId), force: true)
         sut = ProcessOut.shared.gatewayConfigurations
     }
 

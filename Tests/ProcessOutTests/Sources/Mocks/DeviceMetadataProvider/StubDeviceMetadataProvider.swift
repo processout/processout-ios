@@ -11,10 +11,10 @@ struct StubDeviceMetadataProvider: DeviceMetadataProvider {
 
     var deviceMetadata: DeviceMetadata {
         DeviceMetadata(
-            id: .init(value: ""),
-            installationId: .init(value: nil),
-            systemVersion: .init(value: "4"),
-            model: .init(value: "model"),
+            id: "",
+            installationId: nil,
+            systemVersion: "4",
+            model: "model",
             appLanguage: "en",
             appScreenWidth: 1,
             appScreenHeight: 2,

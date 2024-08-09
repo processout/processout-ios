@@ -72,7 +72,7 @@ struct NativeAlternativePaymentContentView: View {
             return (top: sections, center: [])
         }
         let index = sections.firstIndex { section in
-            section.items.contains(where: shouldCenter)
+            section.items.contains { shouldCenter(item: $0) }
         }
         guard let index else {
             return (top: sections, center: [])

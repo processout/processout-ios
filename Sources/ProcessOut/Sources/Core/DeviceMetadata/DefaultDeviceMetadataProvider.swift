@@ -54,7 +54,7 @@ actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
         let description = withUnsafePointer(to: &systemInfo.machine) { pointer in
             let capacity = Int(_SYS_NAMELEN)
             return pointer.withMemoryRebound(to: CChar.self, capacity: capacity) { charPointer in
-                String(validatingUTF8: charPointer)
+                String(validatingCString: charPointer)
             }
         }
         return description

@@ -1,18 +1,18 @@
 //
 //  CardNumberFormatterTests.swift
-//  ProcessOut
+//  ProcessOutUITests
 //
 //  Created by Andrii Vysotskyi on 19.07.2023.
 //
 
 import XCTest
-@testable @_spi(PO) import ProcessOut
+@testable import ProcessOutUI
 
 final class CardNumberFormatterTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        sut = POCardNumberFormatter()
+        sut = CardNumberFormatter()
     }
 
     func test_normalized_retainsDigits() {
@@ -57,5 +57,5 @@ final class CardNumberFormatterTests: XCTestCase {
 
     // MARK: - Private Properties
 
-    private var sut: POCardNumberFormatter!
+    private var sut: CardNumberFormatter!
 }

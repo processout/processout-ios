@@ -84,7 +84,7 @@ final class DefaultThreeDSService: ThreeDSService {
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: error)
         }
         let response = AuthenticationResponse(url: nil, body: encodedChallengeResult)
-        return try Constants.tokenPrefix + encode(authenticationResponse: response)
+        return try encode(authenticationResponse: response)
     }
 
     // MARK: - Web Based 3DS

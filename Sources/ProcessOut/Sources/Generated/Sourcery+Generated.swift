@@ -50,6 +50,7 @@ extension POCreateCustomerTokenRequest {
     enum CodingKeys: String, CodingKey {
         case verify
         case invoiceReturnUrl
+        case returnUrl
     }
 }
 
