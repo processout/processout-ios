@@ -13,6 +13,7 @@ public struct POInvoice: Decodable, Sendable {
     /// String value that uniquely identifies this invoice.
     public let id: String
 
+    /// Invoice amount.
     @POStringCodableDecimal
     public private(set) var amount: Decimal
 
