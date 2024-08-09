@@ -10,8 +10,9 @@ import Foundation
 enum Strings {
 
     static var preferredLocalization: String {
-        // todo(andrii-vysotskyi): it should be possible to inject supported localizations
-        // instead of only relying on languages that are supported by current bundle.
+        // Supported languages are same for all products. There is "dummy" key defined in
+        // ProcessOut's Localizable.xcstrings that is translated to all supported languages
+        // to ensure that resolved value is consistent between targets.
         let bundle: Bundle
         if Bundle.main.preferredLocalizations.first == BundleLocator.bundle.preferredLocalizations.first {
             bundle = BundleLocator.bundle
