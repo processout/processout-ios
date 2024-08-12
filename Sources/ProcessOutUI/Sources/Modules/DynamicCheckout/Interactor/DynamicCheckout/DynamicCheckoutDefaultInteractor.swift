@@ -161,6 +161,14 @@ final class DynamicCheckoutDefaultInteractor:
     private func setStartedStateUnchecked(
         invoice: POInvoice, errorDescription: String? = nil, sendEvents: Bool
     ) {
+        guard invoice.paymentMethods?.isEmpty == false else {
+            let failure = POFailure(
+                message: "Unable to start dynamic checkout without payment methods.",
+                code: .generic(.mobile)
+            )
+            setFailureStateUnchecked(error: failure)
+            return
+        }
         let pkPaymentRequests = pkPaymentRequests(invoice: invoice)
         var expressMethodIds: [String] = [], regularMethodIds: [String] = []
         let paymentMethods = partitioned(
