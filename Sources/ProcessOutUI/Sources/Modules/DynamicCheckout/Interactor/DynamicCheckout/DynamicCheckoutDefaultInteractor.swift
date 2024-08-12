@@ -587,7 +587,11 @@ final class DynamicCheckoutDefaultInteractor:
         state = .recovering(recoveringState)
         if shouldCreateNewInvoice(toRecoverFrom: failure, in: currentState) {
             do {
-                guard let request = await delegate?.dynamicCheckout(newInvoiceFor: currentState.snapshot.invoice) else {
+                let reason: PODynamicCheckoutInvoiceInvalidationReason = failure.code == .cancelled
+                    ? .paymentMethodChanged
+                    : .failure(failure)
+                // swiftlint:disable:next line_length
+                guard let request = await delegate?.dynamicCheckout(newInvoiceFor: currentState.snapshot.invoice, invalidationReason: reason) else {
                     throw failure
                 }
                 let newInvoice = try await invoicesService.invoice(request: request)
