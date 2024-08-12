@@ -169,6 +169,9 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
         // we are additionally increasing calculated width.
         let marker = textList.marker(forItemNumber: textList.startingItemNumber + itemsCount - 1)
         let indentation = builder
+            .with { builder in
+                builder.fontFeatures.numberSpacing = .monospaced
+            }
             .build(string: marker)
             .size()
             .width + Constants.listMarkerWidthIncrement
