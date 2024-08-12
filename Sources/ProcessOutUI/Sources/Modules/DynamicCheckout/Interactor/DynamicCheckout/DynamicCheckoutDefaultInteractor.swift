@@ -609,16 +609,23 @@ final class DynamicCheckoutDefaultInteractor:
             assertionFailure("Unexpected state")
             return
         }
-        setStartedStateUnchecked(
-            invoice: newInvoice, errorDescription: failureDescription(currentState.failure), sendEvents: false
-        )
-        guard let pendingPaymentMethodId = currentState.pendingPaymentMethodId else {
+        let isPendingPaymentMethodAvailable = newInvoice.paymentMethods?
+            .contains { $0.id == currentState.pendingPaymentMethodId } ?? false
+        let errorDescription: String?
+        if currentState.pendingPaymentMethodId != nil, !isPendingPaymentMethodAvailable {
+            errorDescription = String(resource: .DynamicCheckout.Error.methodUnavailable)
+        } else {
+            errorDescription = failureDescription(currentState.failure)
+        }
+        setStartedStateUnchecked(invoice: newInvoice, errorDescription: errorDescription, sendEvents: false)
+        guard let methodId = currentState.pendingPaymentMethodId, isPendingPaymentMethodAvailable else {
+            logger.debug("Ignoring pending method selection because it is not available or not set.")
             return
         }
         if currentState.shouldStartPendingPaymentMethod {
-            startPayment(methodId: pendingPaymentMethodId)
+            startPayment(methodId: methodId)
         } else {
-            select(methodId: pendingPaymentMethodId)
+            select(methodId: methodId)
         }
         // todo(andrii-vysotskyi): decide whether input should be preserved for card tokenization
     }

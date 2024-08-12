@@ -38,6 +38,9 @@ extension POStringResource {
 
             /// Indicates that implementation is unable to process payment.
             static let generic = POStringResource("dynamic-checkout.error.generic", comment: "")
+
+            /// Indicates that selected payment method is no longer available.
+            static let methodUnavailable = POStringResource("dynamic-checkout.error.method-unavailable", comment: "")
         }
 
         enum Warning {
