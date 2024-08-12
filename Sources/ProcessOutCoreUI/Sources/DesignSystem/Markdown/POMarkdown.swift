@@ -69,17 +69,15 @@ private struct TextViewRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ textView: TextView, context: Context) {
-        textView.attributedText = AttributedStringBuilder()
-            .with { builder in
-                builder.typography = style.typography
-                builder.sizeCategory = UIContentSizeCategory(sizeCategory)
-                builder.color = UIColor(style.color)
-                builder.lineBreakMode = .byWordWrapping
-                builder.alignment = NSTextAlignment(multilineTextAlignment)
-                builder.fontFeatures = fontFeatures
-                builder.text = .markdown(string)
-            }
-            .build()
+        let builder = AttributedStringBuilder(
+            typography: style.typography,
+            fontFeatures: fontFeatures,
+            sizeCategory: .init(sizeCategory),
+            color: style.color,
+            alignment: .init(multilineTextAlignment),
+            lineBreakMode: .byWordWrapping
+        )
+        textView.attributedText = builder.build(markdown: string)
         textView.preferredWidth = preferredWidth
     }
 

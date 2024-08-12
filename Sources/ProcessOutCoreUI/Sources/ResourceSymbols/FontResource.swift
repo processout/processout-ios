@@ -34,8 +34,37 @@ extension FontResource {
     }
 
     static func register() {
-        register(resource: "WorkSans.ttf")
-        register(resource: "WorkSans-Italic.ttf")
+        let registeredFontNames = Set(
+            UIFont.fontNames(forFamilyName: "Work Sans")
+        )
+        let expectedRomanFontNames: Set<String> = [
+            "WorkSans-Regular",
+            "WorkSansRoman-Thin",
+            "WorkSansRoman-ExtraLight",
+            "WorkSansRoman-Light",
+            "WorkSansRoman-Medium",
+            "WorkSansRoman-SemiBold",
+            "WorkSansRoman-Bold",
+            "WorkSansRoman-ExtraBold",
+            "WorkSansRoman-Black"
+        ]
+        if !registeredFontNames.isSuperset(of: expectedRomanFontNames) {
+            register(resource: "WorkSans.ttf")
+        }
+        let expectedItalicFontNames: Set<String> = [
+            "WorkSans-Italic",
+            "WorkSansItalic-Thin",
+            "WorkSansItalic-ExtraLight",
+            "WorkSansItalic-Light",
+            "WorkSansItalic-Medium",
+            "WorkSansItalic-SemiBold",
+            "WorkSansItalic-Bold",
+            "WorkSansItalic-ExtraBold",
+            "WorkSansItalic-Black"
+        ]
+        if !registeredFontNames.isSuperset(of: expectedItalicFontNames) {
+            register(resource: "WorkSans-Italic.ttf")
+        }
     }
 
     // MARK: - Private
