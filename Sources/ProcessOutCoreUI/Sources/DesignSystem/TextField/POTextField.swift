@@ -153,12 +153,12 @@ private struct TextFieldRepresentable: UIViewRepresentable {
         if textField.text != text {
             textField.text = text
         }
-        let textAttributes = AttributedStringBuilder()
-            .with { builder in
-                builder.typography = style.text.typography
-                builder.sizeCategory = .init(sizeCategory)
-                builder.color = UIColor(style.text.color)
-            }
+        let builder = AttributedStringBuilder(
+            typography: style.text.typography,
+            sizeCategory: .init(sizeCategory),
+            color: style.text.color
+        )
+        let textAttributes = builder
             .buildAttributes()
             .filter { Constants.includedTextAttributes.contains($0.key) }
         textField.defaultTextAttributes = textAttributes

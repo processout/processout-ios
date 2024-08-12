@@ -5,32 +5,12 @@
 //  Created by Andrii Vysotskyi on 21.11.2022.
 //
 
-import UIKit
+import SwiftUI
 
 struct AttributedStringBuilder {
 
-    enum Text {
-        case plain(String), markdown(String)
-    }
-
-    /// The text alignment of the paragraph.
-    var alignment: NSTextAlignment = .natural
-
-    /// The mode for breaking lines in the paragraph.
-    var lineBreakMode: NSLineBreakMode = .byTruncatingTail
-
-    /// The color of the text.
-    var color: UIColor?
-
     /// The typography of the text.
-    var typography: POTypography?
-
-    /// Allows to override current trait collection's size category with custom value.
-    var sizeCategory: UIContentSizeCategory?
-
-    /// The maximum point size allowed for the font. Use this value to constrain the font to
-    /// the specified size when your interface cannot accommodate text that is any larger.
-    var maximumFontSize: CGFloat?
+    var typography: POTypography
 
     /// Allows to alter font with the specified symbolic traits.
     var fontSymbolicTraits: UIFontDescriptor.SymbolicTraits = []
@@ -38,30 +18,38 @@ struct AttributedStringBuilder {
     /// Font feature settings.
     var fontFeatures = POFontFeaturesSettings()
 
+    /// Allows to override current trait collection's size category with custom value.
+    var sizeCategory: UIContentSizeCategory
+
+    /// The color of the text.
+    var color: Color
+
+    /// The text alignment of the paragraph.
+    var alignment: NSTextAlignment = .natural
+
+    /// The mode for breaking lines in the paragraph.
+    var lineBreakMode: NSLineBreakMode = .byTruncatingTail
+
     /// The text tab objects that represent the paragraph’s tab stops.
     var tabStops: [NSTextTab] = []
 
     /// The indentation of the paragraph’s lines other than the first.
     var headIndent: CGFloat = 0
 
-    /// Contents of the future attributed string. Defaults to empty string.
-    var text: Text = .plain("")
+    // MARK: -
 
-    func build() -> NSAttributedString {
-        switch text {
-        case .markdown(let markdown):
-            let visitor = AttributedStringMarkdownVisitor(builder: self)
-            let document = MarkdownParser.parse(string: markdown)
-            return document.accept(visitor: visitor)
-        case .plain(let string):
-            return NSAttributedString(string: string, attributes: buildAttributes())
-        }
+    func build(markdown: String) -> NSAttributedString {
+        let visitor = AttributedStringMarkdownVisitor(builder: self)
+        let document = MarkdownParser.parse(string: markdown)
+        return document.accept(visitor: visitor)
+    }
+
+    func build(string: String) -> NSAttributedString {
+        let attributes = buildAttributes()
+        return NSAttributedString(string: string, attributes: attributes)
     }
 
     func buildAttributes() -> [NSAttributedString.Key: Any] {
-        guard let typography else {
-            preconditionFailure("Typography must be set.")
-        }
         let font = font(typography: typography)
         var attributes: [NSAttributedString.Key: Any] = [:]
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
@@ -96,14 +84,10 @@ struct AttributedStringBuilder {
     private func font(typography: POTypography) -> UIFont {
         var font = typography.font
         if let textStyle = typography.textStyle {
-            let uiSizeCategory = sizeCategory ?? UITraitCollection.current.preferredContentSizeCategory
             let traits = UITraitCollection(
-                traitsFrom: [.current, .init(preferredContentSizeCategory: uiSizeCategory)]
+                traitsFrom: [.current, .init(preferredContentSizeCategory: sizeCategory)]
             )
             font = UIFontMetrics(forTextStyle: textStyle).scaledFont(for: typography.font, compatibleWith: traits)
-        }
-        if let maximumFontSize, font.pointSize > maximumFontSize {
-            font = font.withSize(maximumFontSize)
         }
         if !fontSymbolicTraits.isEmpty, let descriptor = font.fontDescriptor.withSymbolicTraits(fontSymbolicTraits) {
             font = UIFont(descriptor: descriptor, size: 0)
