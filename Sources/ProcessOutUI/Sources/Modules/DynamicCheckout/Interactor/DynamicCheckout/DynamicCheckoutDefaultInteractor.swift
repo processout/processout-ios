@@ -162,10 +162,7 @@ final class DynamicCheckoutDefaultInteractor:
         invoice: POInvoice, errorDescription: String? = nil, sendEvents: Bool
     ) {
         guard invoice.paymentMethods?.isEmpty == false else {
-            let failure = POFailure(
-                message: "Unable to start dynamic checkout without payment methods.",
-                code: .generic(.mobile)
-            )
+            let failure = POFailure(message: "Payment methods are not available.", code: .generic(.mobile))
             setFailureStateUnchecked(error: failure)
             return
         }
