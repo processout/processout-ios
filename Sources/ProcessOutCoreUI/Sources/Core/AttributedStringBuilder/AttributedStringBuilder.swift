@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 14.0, *)
 struct AttributedStringBuilder {
 
     /// The typography of the text.
@@ -55,7 +56,7 @@ struct AttributedStringBuilder {
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
         attributes[.font] = font
         attributes[.baselineOffset] = Self.baselineOffset(font: font, lineHeightMultiple: lineHeightMultiple)
-        attributes[.foregroundColor] = color
+        attributes[.foregroundColor] = UIColor(color)
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.maximumLineHeight = font.lineHeight * lineHeightMultiple
         paragraphStyle.minimumLineHeight = font.lineHeight * lineHeightMultiple
@@ -96,6 +97,7 @@ struct AttributedStringBuilder {
     }
 }
 
+@available(iOS 14.0, *)
 extension AttributedStringBuilder {
 
     func with(updates: (inout AttributedStringBuilder) -> Void) -> AttributedStringBuilder {
