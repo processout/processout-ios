@@ -50,7 +50,9 @@ struct AttributedStringBuilder {
         return NSAttributedString(string: string, attributes: attributes)
     }
 
-    func buildAttributes() -> [NSAttributedString.Key: Any] {
+    // MARK: - Private Methods
+
+    private func buildAttributes() -> [NSAttributedString.Key: Any] {
         let font = font(typography: typography)
         var attributes: [NSAttributedString.Key: Any] = [:]
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
@@ -70,18 +72,6 @@ struct AttributedStringBuilder {
         return attributes
     }
 
-    // MARK: - Private Methods
-
-    private static func baselineOffset(font: UIFont, lineHeightMultiple: CGFloat) -> CGFloat {
-        let offset = (font.lineHeight * lineHeightMultiple - font.capHeight) / 2 + font.descender
-        if #available(iOS 16, *) {
-            return offset
-        }
-        // Workaround for bug in UIKit. In order to shift baseline to the top, offset should be divided
-        // by two on iOS < 16.
-        return offset < 0 ? offset : offset / 2
-    }
-
     private func font(typography: POTypography) -> UIFont {
         var font = typography.font
         if let textStyle = typography.textStyle {
@@ -94,6 +84,16 @@ struct AttributedStringBuilder {
             font = UIFont(descriptor: descriptor, size: 0)
         }
         return font.addingFeatures(fontFeatures)
+    }
+
+    private static func baselineOffset(font: UIFont, lineHeightMultiple: CGFloat) -> CGFloat {
+        let offset = (font.lineHeight * lineHeightMultiple - font.capHeight) / 2 + font.descender
+        if #available(iOS 16, *) {
+            return offset
+        }
+        // Workaround for bug in UIKit. In order to shift baseline to the top, offset should be divided
+        // by two on iOS < 16.
+        return offset < 0 ? offset : offset / 2
     }
 }
 
