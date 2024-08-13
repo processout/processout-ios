@@ -10,7 +10,7 @@ import SwiftUI
 extension POBackport where Wrapped: Any {
 
     @MainActor
-    final class SubmitAction: Sendable {
+    struct SubmitAction: Sendable {
 
         typealias Action = () -> Void // swiftlint:disable:this nesting
 
@@ -22,7 +22,7 @@ extension POBackport where Wrapped: Any {
             actions.forEach { $0() }
         }
 
-        func append(action: @escaping Action) {
+        mutating func append(action: @escaping Action) {
             actions.append(action)
         }
 
