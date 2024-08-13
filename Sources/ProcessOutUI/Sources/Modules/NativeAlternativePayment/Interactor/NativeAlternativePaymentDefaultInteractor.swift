@@ -403,8 +403,8 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Events
 
+    @MainActor
     private func send(event: PONativeAlternativePaymentEvent) {
-        assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
         delegate?.nativeAlternativePaymentDidEmitEvent(event)
     }
