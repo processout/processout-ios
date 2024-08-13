@@ -5,8 +5,9 @@
 //  Created by Andrii Vysotskyi on 13.08.2024.
 //
 
+/// Transaction status.
 @_spi(PO)
-public struct POTransactionStatus: RawRepresentable, Sendable {
+public struct POTransactionStatus: RawRepresentable, Sendable, Hashable {
 
     /// Raw status.
     public let rawValue: String
@@ -25,9 +26,6 @@ extension POTransactionStatus: Decodable {
 }
 
 extension POTransactionStatus {
-
-    /// Free transaction.
-    public static let free = POTransactionStatus(rawValue: "free")
 
     /// Waiting transaction.
     public static let waiting = POTransactionStatus(rawValue: "waiting")
