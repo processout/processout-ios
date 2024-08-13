@@ -29,4 +29,8 @@ public struct POInvoice: Decodable {
     /// Client secret.
     @_spi(PO)
     public let clientSecret: String?
+
+    /// Transaction details.
+    @_spi(PO)
+    public let transaction: POTransaction?
 }
