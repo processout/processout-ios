@@ -55,7 +55,7 @@ extension DynamicCheckoutPassKitPaymentDefaultSession: POPassKitPaymentAuthoriza
 
     func paymentAuthorizationControllerDidFinish(_ controller: POPassKitPaymentAuthorizationController) {
         guard let didFinishContinuation else {
-            preconditionFailure("Continue must be set.")
+            preconditionFailure("Continuation must be set.")
         }
         didFinishContinuation.resume()
     }
