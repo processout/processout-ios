@@ -513,7 +513,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 switch parameter.specification.type {
                 case .singleSelect:
                     let availableValues = parameter.specification.availableValues?.map(\.value) ?? []
-                    precondition(availableValues.contains(value), "Unknown `singleSelect` parameter value.")
+                    assert(availableValues.contains(value), "Unknown `singleSelect` parameter value.")
                     defaultValue = value
                 default:
                     defaultValue = parameter.formatter?.string(for: value) ?? value
