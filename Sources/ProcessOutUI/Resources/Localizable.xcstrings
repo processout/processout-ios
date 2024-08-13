@@ -1643,6 +1643,40 @@
         }
       }
     },
+    "dynamic-checkout.error.method-unavailable" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "طريقة الدفع المطلوبة غير متاحة، يرجى تجربة طريقة دفع أخرى."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The requested payment method is not available, please try another payment method."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mode de paiement demandé n'est pas disponible, veuillez essayer un autre mode de paiement."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wybrana metoda płatności nie jest obsługiwana. Proszę wybierz inną metodę."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O método de pagamento escolhido não está disponível, por favor tente outro método de pagamento."
+          }
+        }
+      }
+    },
     "dynamic-checkout.pay-button" : {
       "localizations" : {
         "ar" : {

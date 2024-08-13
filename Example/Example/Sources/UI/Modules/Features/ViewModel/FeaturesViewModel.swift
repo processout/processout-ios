@@ -157,7 +157,9 @@ extension FeaturesViewModel: PODynamicCheckoutDelegate {
         ]
     }
 
-    func dynamicCheckout(newInvoiceFor invoice: POInvoice) async -> POInvoiceRequest? {
+    func dynamicCheckout(
+        newInvoiceFor invoice: POInvoice, invalidationReason: PODynamicCheckoutInvoiceInvalidationReason
+    ) async -> POInvoiceRequest? {
         let request = POInvoiceCreationRequest(
             name: "Example",
             amount: invoice.amount.description,

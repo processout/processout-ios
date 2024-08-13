@@ -74,6 +74,7 @@
 <!--- ``PODynamicCheckoutAlternativePaymentConfiguration``-->
 <!--- ``PODynamicCheckoutDelegate``-->
 <!--- ``PODynamicCheckoutEvent``-->
+<!--- ``PODynamicCheckoutInvoiceInvalidationReason``-->
 
 ### Web Authentication
 
