@@ -33,16 +33,18 @@ struct NativeAlternativePaymentSubmittedItemView: View {
             }
             POMarkdown(item.message)
                 .textStyle(descriptionStyle)
-                .multilineTextAlignment(isMessageCompact ? .center : .leading)
+                .multilineTextAlignment(item.isMessageCompact ? .center : .leading)
             if let image = item.image {
+                let maximumHeight = sizeClass == .compact
+                    ? Constants.compactDecorationHeight : Constants.regularDecorationHeight
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .frame(height: min(Constants.maximumDecorationImageHeight, image.size.height))
+                    .frame(height: min(maximumHeight, image.size.height))
                     .foregroundColor(descriptionStyle.color)
             }
         }
-        .padding(.top, isMessageCompact ? Constants.topInset : POSpacing.large)
+        .padding(.top, topPadding)
         .padding(.horizontal, horizontalPadding)
     }
 
@@ -50,9 +52,8 @@ struct NativeAlternativePaymentSubmittedItemView: View {
 
     private enum Constants {
         static let maximumLogoImageHeight: CGFloat = 32
-        static let maximumDecorationImageHeight: CGFloat = 260
-        static let topInset: CGFloat = 68
-        static let maximumCompactMessageLength = 150
+        static let regularDecorationHeight: CGFloat = 280
+        static let compactDecorationHeight: CGFloat = 140
     }
 
     // MARK: - Private Properties
@@ -60,13 +61,21 @@ struct NativeAlternativePaymentSubmittedItemView: View {
     @Environment(\.nativeAlternativePaymentStyle)
     private var style
 
+    @Environment(\.nativeAlternativePaymentSizeClass)
+    private var sizeClass
+
     // MARK: - Private Methods
 
     private var descriptionStyle: POTextStyle {
         item.isCaptured ? style.successMessage : style.message
     }
 
-    private var isMessageCompact: Bool {
-        item.message.count <= Constants.maximumCompactMessageLength
+    private var topPadding: CGFloat {
+        if !item.isMessageCompact {
+            return 0
+        } else if sizeClass == .compact {
+            return POSpacing.large
+        }
+        return 68
     }
 }

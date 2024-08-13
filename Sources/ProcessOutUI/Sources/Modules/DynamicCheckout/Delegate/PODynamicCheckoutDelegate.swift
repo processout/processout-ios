@@ -32,7 +32,9 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
 
     /// Your implementation could return a request that will be used to fetch new invoice to replace existing one
     /// to be able to recover from normally unrecoverable payment failure.
-    func dynamicCheckout(newInvoiceFor invoice: POInvoice) async -> POInvoiceRequest?
+    func dynamicCheckout(
+        newInvoiceFor invoice: POInvoice, invalidationReason: PODynamicCheckoutInvoiceInvalidationReason
+    ) async -> POInvoiceRequest?
 
     // MARK: - Card Payment
 
@@ -78,7 +80,9 @@ extension PODynamicCheckoutDelegate {
         true
     }
 
-    public func dynamicCheckout(newInvoiceFor invoice: POInvoice) async -> POInvoiceRequest? {
+    public func dynamicCheckout(
+        newInvoiceFor invoice: POInvoice, invalidationReason: PODynamicCheckoutInvoiceInvalidationReason
+    ) async -> POInvoiceRequest? {
         nil
     }
 

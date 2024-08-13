@@ -53,9 +53,8 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
                 let attributedMarker = builder
                     .with { builder in
                         builder.fontFeatures.numberSpacing = .monospaced
-                        builder.text = .plain(marker)
                     }
-                    .build()
+                    .build(string: marker)
                 return [attributedMarker, attributedItem].joined()
             }
             .joined(separator: itemsSeparator)
@@ -79,7 +78,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     }
 
     func visit(text: MarkdownText) -> NSAttributedString {
-        builder.with { $0.text = .plain(text.value) }.build()
+        builder.build(string: text.value)
     }
 
     /// - NOTE: Softbreak is rendered with line break.
@@ -106,7 +105,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
             .trimmingCharacters(in: .newlines)
         var builder = builder
         builder.fontSymbolicTraits.formUnion(.traitMonoSpace)
-        return builder.with { $0.text = .plain(code) }.build()
+        return builder.build(string: code)
     }
 
     func visit(thematicBreak: MarkdownThematicBreak) -> NSAttributedString {
@@ -116,7 +115,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
     func visit(codeSpan: MarkdownCodeSpan) -> NSAttributedString {
         var builder = builder
         builder.fontSymbolicTraits.formUnion(.traitMonoSpace)
-        return builder.with { $0.text = .plain(codeSpan.code) }.build()
+        return builder.build(string: codeSpan.code)
     }
 
     func visit(link: MarkdownLink) -> NSAttributedString {
@@ -170,8 +169,10 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
         // we are additionally increasing calculated width.
         let marker = textList.marker(forItemNumber: textList.startingItemNumber + itemsCount - 1)
         let indentation = builder
-            .with { $0.text = .plain(marker) }
-            .build()
+            .with { builder in
+                builder.fontFeatures.numberSpacing = .monospaced
+            }
+            .build(string: marker)
             .size()
             .width + Constants.listMarkerWidthIncrement
         let parentIndentation = builder.tabStops.last?.location ?? 0

@@ -69,17 +69,15 @@ private struct TextViewRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ textView: TextView, context: Context) {
-        textView.attributedText = AttributedStringBuilder()
-            .with { builder in
-                builder.typography = style.typography
-                builder.sizeCategory = UIContentSizeCategory(sizeCategory)
-                builder.color = UIColor(style.color)
-                builder.lineBreakMode = .byWordWrapping
-                builder.alignment = NSTextAlignment(multilineTextAlignment)
-                builder.fontFeatures = fontFeatures
-                builder.text = .markdown(string)
-            }
-            .build()
+        let builder = AttributedStringBuilder(
+            typography: style.typography,
+            fontFeatures: fontFeatures,
+            sizeCategory: .init(sizeCategory),
+            color: style.color,
+            alignment: .init(multilineTextAlignment),
+            lineBreakMode: .byWordWrapping
+        )
+        textView.attributedText = builder.build(markdown: string)
         textView.preferredWidth = preferredWidth
     }
 
@@ -125,7 +123,7 @@ extension NSAttributedString {
     fileprivate func sizeThatFits(width: CGFloat) -> CGSize {
         let proposedSize = CGSize(width: width, height: .greatestFiniteMagnitude)
         let boundingRect = boundingRect(
-            with: proposedSize, options: [.usesLineFragmentOrigin], context: nil
+            with: proposedSize, options: boundingRectOptions, context: nil
         )
         return CGSize(width: max(ceil(boundingRect.width), width), height: ceil(boundingRect.height))
     }
@@ -134,8 +132,18 @@ extension NSAttributedString {
     fileprivate func sizeThatFits(height: CGFloat) -> CGSize {
         let proposedSize = CGSize(width: .greatestFiniteMagnitude, height: height)
         let boundingRect = boundingRect(
-            with: proposedSize, options: [.usesLineFragmentOrigin], context: nil
+            with: proposedSize, options: boundingRectOptions, context: nil
         )
         return CGSize(width: ceil(boundingRect.width), height: max(ceil(boundingRect.height), height))
+    }
+
+    // MARK: -
+
+    private var boundingRectOptions: NSStringDrawingOptions {
+        var options: NSStringDrawingOptions = [.usesLineFragmentOrigin]
+        if #available(iOS 16, *) {
+            options.insert(.usesFontLeading)
+        }
+        return options
     }
 }

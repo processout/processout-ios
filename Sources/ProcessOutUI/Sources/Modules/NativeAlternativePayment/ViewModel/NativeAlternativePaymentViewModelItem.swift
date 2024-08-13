@@ -76,6 +76,9 @@ enum NativeAlternativePaymentViewModelItem {
         /// Message markdown.
         let message: String
 
+        /// Boolean value indicating whether layout should be vertically compact.
+        let isMessageCompact: Bool
+
         /// Image illustrating action.
         let image: UIImage?
 

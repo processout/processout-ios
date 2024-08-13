@@ -151,13 +151,20 @@ final class DynamicCheckoutDefaultInteractor:
     private func continueStartUnchecked() async {
         do {
             let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
-            setStartedStateUnchecked(invoice: invoice)
+            setStartedStateUnchecked(invoice: invoice, sendEvents: true)
         } catch {
             setFailureStateUnchecked(error: error)
         }
     }
 
-    private func setStartedStateUnchecked(invoice: POInvoice, errorDescription: String? = nil) {
+    private func setStartedStateUnchecked(
+        invoice: POInvoice, errorDescription: String? = nil, sendEvents: Bool
+    ) {
+        guard invoice.paymentMethods?.isEmpty == false else {
+            let failure = POFailure(message: "Payment methods are not available.", code: .generic(.mobile))
+            setFailureStateUnchecked(error: failure)
+            return
+        }
         let pkPaymentRequests = pkPaymentRequests(invoice: invoice)
         var expressMethodIds: [String] = [], regularMethodIds: [String] = []
         let paymentMethods = partitioned(
@@ -176,9 +183,11 @@ final class DynamicCheckoutDefaultInteractor:
             recentErrorDescription: errorDescription
         )
         state = .started(startedState)
-        send(event: .didStart)
-        logger[attributeKey: .invoiceId] = invoice.id
-        logger.debug("Did start dynamic checkout flow")
+        if sendEvents {
+            send(event: .didStart)
+            logger[attributeKey: .invoiceId] = invoice.id
+            logger.debug("Did start dynamic checkout flow")
+        }
         initiateDefaultPaymentIfNeeded()
     }
 
@@ -582,7 +591,12 @@ final class DynamicCheckoutDefaultInteractor:
         state = .recovering(recoveringState)
         if shouldCreateNewInvoice(toRecoverFrom: failure, in: currentState) {
             do {
-                guard let request = await delegate?.dynamicCheckout(newInvoiceFor: currentState.snapshot.invoice) else {
+                let reason: PODynamicCheckoutInvoiceInvalidationReason = failure.code == .cancelled
+                    ? .paymentMethodChanged
+                    : .failure(failure)
+                guard let request = await delegate?.dynamicCheckout(
+                    newInvoiceFor: currentState.snapshot.invoice, invalidationReason: reason
+                ) else {
                     throw failure
                 }
                 let newInvoice = try await invoicesService.invoice(request: request)
@@ -600,16 +614,23 @@ final class DynamicCheckoutDefaultInteractor:
             assertionFailure("Unexpected state")
             return
         }
-        setStartedStateUnchecked(
-            invoice: newInvoice, errorDescription: failureDescription(currentState.failure)
-        )
-        guard let pendingPaymentMethodId = currentState.pendingPaymentMethodId else {
+        let isPendingPaymentMethodAvailable = newInvoice.paymentMethods?
+            .contains { $0.id == currentState.pendingPaymentMethodId } ?? false
+        let errorDescription: String?
+        if currentState.pendingPaymentMethodId != nil, !isPendingPaymentMethodAvailable {
+            errorDescription = String(resource: .DynamicCheckout.Error.methodUnavailable)
+        } else {
+            errorDescription = failureDescription(currentState.failure)
+        }
+        setStartedStateUnchecked(invoice: newInvoice, errorDescription: errorDescription, sendEvents: false)
+        guard let methodId = currentState.pendingPaymentMethodId, isPendingPaymentMethodAvailable else {
+            logger.debug("Ignoring pending method selection because it is not available or not set.")
             return
         }
         if currentState.shouldStartPendingPaymentMethod {
-            startPayment(methodId: pendingPaymentMethodId)
+            startPayment(methodId: methodId)
         } else {
-            select(methodId: pendingPaymentMethodId)
+            select(methodId: methodId)
         }
         // todo(andrii-vysotskyi): decide whether input should be preserved for card tokenization
     }

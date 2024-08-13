@@ -36,6 +36,9 @@ extension StringResource {
 
             /// Indicates that implementation is unable to process payment.
             static let generic = StringResource("dynamic-checkout.error.generic", comment: "")
+
+            /// Indicates that selected payment method is no longer available.
+            static let methodUnavailable = StringResource("dynamic-checkout.error.method-unavailable", comment: "")
         }
 
         enum Warning {

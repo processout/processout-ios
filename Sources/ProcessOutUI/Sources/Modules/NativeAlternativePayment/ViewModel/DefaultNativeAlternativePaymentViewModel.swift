@@ -37,6 +37,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private enum Constants {
         static let maximumCodeLength = 6
+        static let maximumCompactMessageLength = 150
     }
 
     // MARK: - Private Properties
@@ -196,6 +197,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 title: state.logoImage == nil ? state.paymentProviderName : nil,
                 logoImage: state.logoImage,
                 message: expectedActionMessage,
+                isMessageCompact: expectedActionMessage.count <= Constants.maximumCompactMessageLength,
                 image: state.actionImage,
                 isCaptured: false,
                 isProgressViewHidden: !state.isDelayed
@@ -238,6 +240,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             title: state.logoImage == nil ? state.paymentProviderName : nil,
             logoImage: state.logoImage,
             message: configuration.successMessage ?? String(resource: .NativeAlternativePayment.Success.message),
+            isMessageCompact: true,
             image: UIImage(poResource: .success).withRenderingMode(.alwaysTemplate),
             isCaptured: true,
             isProgressViewHidden: true
