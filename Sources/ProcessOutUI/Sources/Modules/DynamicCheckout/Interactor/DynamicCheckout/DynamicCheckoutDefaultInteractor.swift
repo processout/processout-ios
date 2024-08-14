@@ -707,8 +707,8 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Events
 
+    @MainActor
     private func send(event: PODynamicCheckoutEvent) {
-        assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
         delegate?.dynamicCheckout(didEmitEvent: event)
     }
