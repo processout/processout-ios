@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 14.0, *)
 struct AttributedStringBuilder {
 
     /// The typography of the text.
@@ -49,13 +50,15 @@ struct AttributedStringBuilder {
         return NSAttributedString(string: string, attributes: attributes)
     }
 
-    func buildAttributes() -> [NSAttributedString.Key: Any] {
+    // MARK: - Private Methods
+
+    private func buildAttributes() -> [NSAttributedString.Key: Any] {
         let font = font(typography: typography)
         var attributes: [NSAttributedString.Key: Any] = [:]
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
         attributes[.font] = font
         attributes[.baselineOffset] = Self.baselineOffset(font: font, lineHeightMultiple: lineHeightMultiple)
-        attributes[.foregroundColor] = color
+        attributes[.foregroundColor] = UIColor(color)
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.maximumLineHeight = font.lineHeight * lineHeightMultiple
         paragraphStyle.minimumLineHeight = font.lineHeight * lineHeightMultiple
@@ -67,18 +70,6 @@ struct AttributedStringBuilder {
         paragraphStyle.headIndent = headIndent
         attributes[.paragraphStyle] = paragraphStyle
         return attributes
-    }
-
-    // MARK: - Private Methods
-
-    private static func baselineOffset(font: UIFont, lineHeightMultiple: CGFloat) -> CGFloat {
-        let offset = (font.lineHeight * lineHeightMultiple - font.capHeight) / 2 + font.descender
-        if #available(iOS 16, *) {
-            return offset
-        }
-        // Workaround for bug in UIKit. In order to shift baseline to the top, offset should be divided
-        // by two on iOS < 16.
-        return offset < 0 ? offset : offset / 2
     }
 
     private func font(typography: POTypography) -> UIFont {
@@ -94,8 +85,19 @@ struct AttributedStringBuilder {
         }
         return font.addingFeatures(fontFeatures)
     }
+
+    private static func baselineOffset(font: UIFont, lineHeightMultiple: CGFloat) -> CGFloat {
+        let offset = (font.lineHeight * lineHeightMultiple - font.capHeight) / 2 + font.descender
+        if #available(iOS 16, *) {
+            return offset
+        }
+        // Workaround for bug in UIKit. In order to shift baseline to the top, offset should be divided
+        // by two on iOS < 16.
+        return offset < 0 ? offset : offset / 2
+    }
 }
 
+@available(iOS 14.0, *)
 extension AttributedStringBuilder {
 
     func with(updates: (inout AttributedStringBuilder) -> Void) -> AttributedStringBuilder {
