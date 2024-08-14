@@ -153,7 +153,12 @@ extension DynamicCheckoutViewModelItem: Identifiable, AnimationIdentityProvider 
     var animationIdentity: AnyHashable {
         switch self {
         case .regularPayment(let item):
-            return [item.id, AnyHashable(item.content == nil), item.submitButton?.id]
+            return [
+                item.id,
+                AnyHashable(item.content == nil),
+                item.info.additionalInformation == nil,
+                item.submitButton?.id
+            ]
         default:
             return self.id
         }
