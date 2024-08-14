@@ -151,7 +151,15 @@ final class DynamicCheckoutDefaultInteractor:
     private func continueStartUnchecked() async {
         do {
             let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
-            setStartedStateUnchecked(invoice: invoice, sendEvents: true)
+            switch invoice.transaction?.status {
+            case .waiting:
+                setStartedStateUnchecked(invoice: invoice, sendEvents: true)
+            case .authorized, .completed:
+                setSuccessState()
+            default:
+                let message = "Unsupported invoice state, please create new invoice and restart checkout."
+                throw POFailure(message: message, code: .generic(.mobile))
+            }
         } catch {
             setFailureStateUnchecked(error: error)
         }
@@ -614,6 +622,12 @@ final class DynamicCheckoutDefaultInteractor:
             assertionFailure("Unexpected state")
             return
         }
+        guard newInvoice.transaction?.status == .waiting else {
+            // Another recovery is not attempted to prevent potential recursion
+            let failure = POFailure(message: "Unsupported invoice state.", code: .generic(.mobile))
+            setFailureStateUnchecked(error: failure)
+            return
+        }
         let isPendingPaymentMethodAvailable = newInvoice.paymentMethods?
             .contains { $0.id == currentState.pendingPaymentMethodId } ?? false
         let errorDescription: String?
@@ -676,8 +690,11 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Success State
 
     private func setSuccessState() {
-        guard case .paymentProcessing = state else {
-            assertionFailure("Success state can be set only after payment processing start.")
+        switch state {
+        case .paymentProcessing, .starting:
+            break
+        default:
+            assertionFailure("Success state can be set while starting or payment processing.")
             return
         }
         state = .success

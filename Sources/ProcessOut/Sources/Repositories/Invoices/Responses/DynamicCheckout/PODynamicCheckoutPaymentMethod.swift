@@ -296,7 +296,6 @@ extension PODynamicCheckoutPaymentMethod {
         case .customerToken(let method):
             return method.id
         case .unknown(let method):
-            assertionFailure("It is considered an error to request an ID for unknown payment method.")
             return method.id
         }
     }

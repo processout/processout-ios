@@ -78,11 +78,17 @@ private enum Constants {
 @available(iOS 14, *)
 private struct TextFieldRepresentable: UIViewRepresentable {
 
-    @Binding
-    var text: String
+    init(text: Binding<String>, formatter: Formatter?, style: POInputStateStyle) {
+        self._text = text
+        self.formatter = formatter
+        self.style = style
+        _multiplier = .init(wrappedValue: 1, relativeTo: style.text.typography.textStyle)
+    }
 
     let formatter: Formatter?
-    let style: POInputStateStyle
+
+    @Binding
+    var text: String
 
     // MARK: - UIViewRepresentable
 
@@ -124,13 +130,14 @@ private struct TextFieldRepresentable: UIViewRepresentable {
 
     private enum Constants {
         static let animationDuration: TimeInterval = 0.25
-        static let includedTextAttributes: Set<NSAttributedString.Key> = [.foregroundColor, .font]
     }
 
     // MARK: - Private Properties
 
-    @Environment(\.sizeCategory)
-    private var sizeCategory
+    private let style: POInputStateStyle
+
+    @POBackport.ScaledMetric
+    private var multiplier: CGFloat
 
     @Environment(\.poKeyboardType)
     private var keyboardType
@@ -153,15 +160,8 @@ private struct TextFieldRepresentable: UIViewRepresentable {
         if textField.text != text {
             textField.text = text
         }
-        let builder = AttributedStringBuilder(
-            typography: style.text.typography,
-            sizeCategory: .init(sizeCategory),
-            color: style.text.color
-        )
-        let textAttributes = builder
-            .buildAttributes()
-            .filter { Constants.includedTextAttributes.contains($0.key) }
-        textField.defaultTextAttributes = textAttributes
+        textField.font = style.text.typography.font.withSize(style.text.typography.font.pointSize * multiplier)
+        textField.textColor = UIColor(style.text.color)
     }
 }
 

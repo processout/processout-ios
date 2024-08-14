@@ -59,6 +59,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
         ]
         let httpRequest = HttpConnectorRequest<Response>.get(
             path: "/invoices/\(request.invoiceId)",
+            query: ["expand": "transaction"],
             headers: headers.compactMapValues { $0 }
         )
         return try await connector.execute(request: httpRequest).invoice
@@ -115,7 +116,8 @@ private extension POInvoice { // swiftlint:disable:this no_extension_access_modi
             currency: currency,
             returnUrl: returnUrl,
             paymentMethods: paymentMethods,
-            clientSecret: newClientSecret
+            clientSecret: newClientSecret,
+            transaction: transaction
         )
         return updatedInvoice
     }

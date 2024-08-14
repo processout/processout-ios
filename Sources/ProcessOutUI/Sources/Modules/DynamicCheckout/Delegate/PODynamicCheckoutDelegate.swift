@@ -32,6 +32,8 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
 
     /// Your implementation could return a request that will be used to fetch new invoice to replace existing one
     /// to be able to recover from normally unrecoverable payment failure.
+    ///
+    /// - NOTE: Please make sure to invalidate old invoice if you decide to create new.
     func dynamicCheckout(
         newInvoiceFor invoice: POInvoice, invalidationReason: PODynamicCheckoutInvoiceInvalidationReason
     ) async -> POInvoiceRequest?
