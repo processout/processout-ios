@@ -15,6 +15,10 @@ public struct PO3DS2ChallengeResult: Encodable, Sendable {
         self.transactionStatus = transactionStatus
     }
 
+    public init(transactionStatus: Bool) {
+        self.transactionStatus = transactionStatus ? "Y" : "N"
+    }
+
     // MARK: - Private Nested Types
 
     private enum CodingKeys: String, CodingKey {

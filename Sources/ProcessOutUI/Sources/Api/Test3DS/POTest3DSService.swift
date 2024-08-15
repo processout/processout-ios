@@ -38,11 +38,11 @@ public final class POTest3DSService: PO3DSService {
                 title: String(resource: .Test3DS.title), message: "", preferredStyle: .alert
             )
             let acceptAction = UIAlertAction(title: String(resource: .Test3DS.accept), style: .default) { _ in
-                continuation.resume(returning: PO3DS2ChallengeResult(transactionStatus: "Y"))
+                continuation.resume(returning: PO3DS2ChallengeResult(transactionStatus: true))
             }
             alertController.addAction(acceptAction)
             let rejectAction = UIAlertAction(title: String(resource: .Test3DS.reject), style: .default) { _ in
-                continuation.resume(returning: PO3DS2ChallengeResult(transactionStatus: "N"))
+                continuation.resume(returning: PO3DS2ChallengeResult(transactionStatus: false))
             }
             alertController.addAction(rejectAction)
             presentingViewController.present(alertController, animated: true)
