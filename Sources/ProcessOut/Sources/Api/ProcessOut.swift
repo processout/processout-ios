@@ -232,12 +232,12 @@ extension ProcessOut {
 
     /// Configures ``ProcessOut/shared`` instance.
     /// - Parameters:
+    ///   - configuration: configuration.
     ///   - force: When set to `false` (the default) only the first invocation takes effect, all
     /// subsequent calls to this method are ignored. Pass `true` to allow existing shared instance
     /// reconfiguration (if any).
     @MainActor
     public static func configure(configuration: ProcessOutConfiguration, force: Bool = false) {
-        MainActor.preconditionIsolated("Shared instance must be configured from main thread.")
         if isConfigured {
             if force {
                 shared._configuration.withLock { $0 = configuration }
