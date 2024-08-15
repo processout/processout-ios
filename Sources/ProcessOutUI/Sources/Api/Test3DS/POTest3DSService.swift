@@ -12,7 +12,7 @@ import ProcessOut
 /// Control Server (ACS). Should be used only for testing purposes in sandbox environment.
 public final class POTest3DSService: PO3DSService {
 
-    public init() {
+    public nonisolated init() {
         // Ignored
     }
 
