@@ -1,5 +1,114 @@
 # Migration Guides
 
+## Migrating from versions < 5.0.0
+
+- `ProcessOutConfiguration` is no longer created using the `func production(...)` static method. Instead, a regular
+initializer should be used. See the example below:
+
+```swift
+let configuration = ProcessOutConfiguration(
+   projectId: "test-proj_XZY",
+   application: .init(name: "Example", version: "1.0.0"),
+   isDebug: true,
+   isTelemetryEnabled: true
+)
+```
+
+  * It is no longer possible to pass the version directly when creating a ProcessOutConfiguration. Instead, set the
+application object with the version. 
+
+- The `ProcessOut.shared` instance must be configured exclusively on the main actor's thread. However, once configured,
+it is safe to use from any thread.
+
+- It is no longer necessary to notify the framework of inbound deep links using the
+`ProcessOut.shared.processDeepLink(url: url)` method. This method can be safely removed, as the framework now handles
+deep link processing internally.
+
+- Previously deprecated declaration were removed:
+
+  * `POTest3DSService` has been replaced by a new `POTest3DSService` defined in the ProcessOutUI module.
+
+  * Legacy API bindings have been removed. Instead, you should use the services and repositories available in
+``ProcessOut/ProcessOut/shared`` to interact with the API.
+
+  * `PO3DSRedirectViewControllerBuilder` has been removed, as 3DS redirects are now handled internally by the SDK.
+
+  * `PONativeAlternativePaymentMethodViewControllerBuilder` has been removed. Instead, import the `ProcessOutUI` module
+and instantiate `PONativeAlternativePaymentView` (or view controller) directly. For additional details, please refer to
+the [documentation](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutui/nativealternativepayment).
+
+  * Deprecated protocol aliases with the `Type` suffix have been removed. Please use their counterparts without the
+suffix. For example, refer to `POGatewayConfigurationsRepository` instead of `POGatewayConfigurationsRepositoryType`.
+
+- The card properties `scheme`, `coScheme`, `preferredScheme`, and `cvcCheck`, previously represented as strings,
+are now represented by typed values: `POCardScheme` and `POCardCvcCheck`. If you need to access the raw string
+representation, use the `rawValue` property. This affects:
+
+  * ``POCardTokenizationRequest``
+  * ``POCardUpdateRequest``
+  * ``POCard``
+  * ``POCardIssuerInformation``
+  * ``POAssignCustomerTokenRequest``
+  * ``POInvoiceAuthorizationRequest``
+  * `POCardTokenizationDelegate`
+  * `POCardUpdateInformation`
+  
+- The ``PO3DS2Configuration/scheme`` is no longer represented by `PO3DS2ConfigurationCardScheme`. It is now
+represented by ``POCardScheme``, consistent with other card-related requests and objects.
+
+- Requests that previously exposed the `enableThreeDS2` property no longer do so. This property is now considered an
+implementation detail and should always be set to `true` for API requests made from mobile. This affects:
+  
+  * ``POAssignCustomerTokenRequest``
+  * ``POInvoiceAuthorizationRequest``
+
+- ``PO3DSService`` has been migrated to structured concurrency. To adapt your existing implementation, you could wrap it
+using `withCheckedThrowingContinuation`. See the example below:
+
+```swift
+func authenticationRequestParameters(
+   configuration: PO3DS2Configuration
+) async throws -> PO3DS2AuthenticationRequestParameters {
+   try await withCheckedThrowingContinuation { completion in
+      <existing code>
+   }
+}
+```
+
+Additionally:
+
+  * The method `func authenticationRequest(configuration:completion:)` has been renamed to
+``PO3DSService/authenticationRequestParameters(configuration:)``.
+
+  * The method `func handle(challenge:completion:)` has been renamed to ``PO3DSService/performChallenge(with:)``.
+In old implementation you were supposed to return boolean value indicating whether it was performed successfully or not.
+Now you should return ``PO3DS2ChallengeResult`` that could be created with string value or boolean depending on your 3DS
+provider.
+
+  * The method `func handle(challenge:completion:)` has been renamed to ``PO3DSService/performChallenge(with:)``. In the
+previous implementation, you were required to return a boolean value indicating whether the challenge was performed
+successfully. In the new implementation, you should return a ``PO3DS2ChallengeResult``, which can be created using either
+a string value or a boolean, depending on your 3DS provider.
+
+- `POTest3DSService` is no longer part of the `ProcessOut` module. It can now be found in the `ProcessOutUI` module.
+
+- `POAlternativePaymentMethodsService` has been renamed to ``POAlternativePaymentsService`` and can now be accessed
+using the ``ProcessOut/ProcessOut/alternativePayments`` method.
+
+  * `POAlternativePaymentTokenizationRequest` has been removed. Instead, use the dedicated `POAlternativePaymentTokenizationRequest`
+for tokenizing alternative payment methods (APMs) or `POAlternativePaymentAuthorizationRequest` for authorizing them.
+
+  * `POAlternativePaymentMethodResponse` has been replaced with ``POAlternativePaymentResponse``.
+
+  * `POAlternativePaymentsService` provides functionality to create a URL for tokenization or authorization. However,
+the recommended approach is to use the ``POAlternativePaymentsService/authenticate(using:)`` and/or
+``POAlternativePaymentsService/tokenize(request:)`` methods that handle the entire request process, including URL
+preparation and the actual redirect.
+
+  * It is no longer possible to process alternative payments using view controllers created by
+`POAlternativePaymentMethodViewControllerBuilder` or by the `SFSafariViewController`-based handler defined in the
+`ProcessOutUI` module. Instead, use one of the methods in `POAlternativePaymentsService` to handle the payment/tokenization.
+
 ## Migrating from versions < 4.11.0
 
 - UI available in `ProcessOut` package is deprecated. `ProcessOutUI` package should be imported instead. Please see
