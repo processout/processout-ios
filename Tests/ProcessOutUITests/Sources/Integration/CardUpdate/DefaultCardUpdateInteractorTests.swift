@@ -11,10 +11,9 @@ import XCTest
 
 final class DefaultCardUpdateInteractorTests: XCTestCase {
 
-    @MainActor
-    override func setUp() {
-        super.setUp()
-        ProcessOut.configure(configuration: .init(projectId: Constants.projectId), force: true)
+    override func setUp() async throws {
+        try await super.setUp()
+        await ProcessOut.configure(configuration: .init(projectId: Constants.projectId), force: true)
         cardsService = ProcessOut.shared.cards
     }
 
