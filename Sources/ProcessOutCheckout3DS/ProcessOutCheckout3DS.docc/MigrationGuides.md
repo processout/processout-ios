@@ -20,7 +20,9 @@ service.
 
   - Method `func willHandle(challenge:)` was replaced with ``POCheckout3DSServiceDelegate/checkout3DSService(_:willPerformChallengeWith:)``.
 
-  - Method `func didHandle3DS2Challenge(result:)` was replaced with ``POCheckout3DSServiceDelegate/checkout3DSService(_:didPerformChallenge:)``.  
+  - Method `func didHandle3DS2Challenge(result:)` was replaced with ``POCheckout3DSServiceDelegate/checkout3DSService(_:didPerformChallenge:)``.
+
+- `POCheckout3DSService` now holds a weak reference to its delegate.
 
 ## Migrating from versions < 4.0.0
 
