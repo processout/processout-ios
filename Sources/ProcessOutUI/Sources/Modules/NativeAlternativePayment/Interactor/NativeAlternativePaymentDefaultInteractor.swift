@@ -406,7 +406,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     @MainActor
     private func send(event: PONativeAlternativePaymentEvent) {
         logger.debug("Did send event: '\(event)'")
-        delegate?.nativeAlternativePaymentDidEmitEvent(event)
+        delegate?.nativeAlternativePayment(didEmitEvent: event)
     }
 
     private func didUpdate(parameter: NativeAlternativePaymentInteractorState.Parameter, to value: String) {
@@ -497,16 +497,9 @@ final class NativeAlternativePaymentDefaultInteractor:
         guard !parameters.isEmpty else {
             return
         }
-        let defaultValues = await withCheckedContinuation { continuation in
-            if let delegate {
-                delegate.nativeAlternativePaymentDefaultValues(
-                    for: parameters.map(\.specification),
-                    completion: { continuation.resume(returning: $0) }
-                )
-            } else {
-                continuation.resume(returning: [:])
-            }
-        }
+        let defaultValues = await delegate?.nativeAlternativePayment(
+            defaultsFor: parameters.map(\.specification)
+        ) ?? [:]
         for (offset, parameter) in parameters.enumerated() {
             let defaultValue: String?
             if let value = defaultValues[parameter.specification.key] {
