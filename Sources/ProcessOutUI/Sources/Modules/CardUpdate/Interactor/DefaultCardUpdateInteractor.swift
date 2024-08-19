@@ -31,13 +31,13 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             return
         }
         logger.debug("Will start card update")
-        delegate?.cardUpdateDidEmitEvent(.willStart)
+        delegate?.cardUpdate(didEmitEvent: .willStart)
         if let cardInfo = configuration.cardInformation {
             setStartedStateUnchecked(cardInfo: cardInfo)
         } else {
             state = .starting
             Task {
-                let cardInfo = await delegate?.cardInformation(cardId: configuration.cardId)
+                let cardInfo = await delegate?.cardUpdate(informationFor: configuration.cardId)
                 setStartedStateUnchecked(cardInfo: cardInfo)
             }
         }
@@ -57,7 +57,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         startedState.recentErrorMessage = nil
         startedState.cvc = formatted
         state = .started(startedState)
-        delegate?.cardUpdateDidEmitEvent(.parametersChanged)
+        delegate?.cardUpdate(didEmitEvent: .parametersChanged)
     }
 
     func setPreferredScheme(_ scheme: POCardScheme) {
@@ -74,7 +74,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         }
         startedState.preferredScheme = scheme
         state = .started(startedState)
-        delegate?.cardUpdateDidEmitEvent(.parametersChanged)
+        delegate?.cardUpdate(didEmitEvent: .parametersChanged)
     }
 
     func submit() {
@@ -86,7 +86,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             return
         }
         logger.debug("Will submit card information")
-        delegate?.cardUpdateDidEmitEvent(.willUpdateCard)
+        delegate?.cardUpdate(didEmitEvent: .willUpdateCard)
         state = .updating(snapshot: startedState)
         Task {
             do {
@@ -131,7 +131,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             formatter: cardSecurityCodeFormatter
         )
         self.state = .started(startedState)
-        delegate?.cardUpdateDidEmitEvent(.didStart)
+        delegate?.cardUpdate(didEmitEvent: .didStart)
         logger.debug("Did start card update")
         Task {
             await updateSchemeIfNeeded(cardInfo: cardInfo)
@@ -208,8 +208,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             assertionFailure("Unsupported state")
             return
         }
-        let shouldContinue = delegate?.shouldContinueUpdate(after: failure) ?? true
-        guard shouldContinue else {
+        guard delegate?.cardUpdate(shouldContinueAfter: failure) ?? true else {
             setFailureStateUnchecked(failure: failure)
             return
         }
@@ -248,7 +247,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         }
         logger.info("Did update card")
         state = .completed
-        delegate?.cardUpdateDidEmitEvent(.didComplete)
+        delegate?.cardUpdate(didEmitEvent: .didComplete)
         completion(.success(card))
     }
 

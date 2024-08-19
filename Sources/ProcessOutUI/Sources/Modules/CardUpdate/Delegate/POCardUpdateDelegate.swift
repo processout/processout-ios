@@ -11,31 +11,31 @@ import ProcessOut
 public protocol POCardUpdateDelegate: AnyObject, Sendable {
 
     /// Asks delegate to resolve card information based on card id.
-    func cardInformation(cardId: String) async -> POCardUpdateInformation?
+    func cardUpdate(informationFor cardId: String) async -> POCardUpdateInformation?
 
     /// Invoked when module emits event.
     @MainActor
-    func cardUpdateDidEmitEvent(_ event: POCardUpdateEvent)
+    func cardUpdate(didEmitEvent event: POCardUpdateEvent)
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
     @MainActor
-    func shouldContinueUpdate(after failure: POFailure) -> Bool
+    func cardUpdate(shouldContinueAfter failure: POFailure) -> Bool
 }
 
 extension POCardUpdateDelegate {
 
-    public func cardInformation(cardId: String) async -> POCardUpdateInformation? {
+    public func cardUpdate(informationFor cardId: String) async -> POCardUpdateInformation? {
         nil
     }
 
     @MainActor
-    public func cardUpdateDidEmitEvent(_ event: POCardUpdateEvent) {
+    public func cardUpdate(didEmitEvent event: POCardUpdateEvent) {
         // Ignored
     }
 
     @MainActor
-    public func shouldContinueUpdate(after failure: POFailure) -> Bool {
+    public func cardUpdate(shouldContinueAfter failure: POFailure) -> Bool {
         true
     }
 }

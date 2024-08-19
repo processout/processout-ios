@@ -35,21 +35,21 @@ public protocol POCardTokenizationDelegate: AnyObject, Sendable {
 extension POCardTokenizationDelegate {
 
     @MainActor
-    func cardTokenization(didEmitEvent event: POCardTokenizationEvent) {
+    public func cardTokenization(didEmitEvent event: POCardTokenizationEvent) {
         // Ignored
     }
 
-    func cardTokenization(didTokenizeCard card: POCard) async throws {
+    public func cardTokenization(didTokenizeCard card: POCard) async throws {
         // Ignored
     }
 
     @MainActor
-    func cardTokenization(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> POCardScheme? {
+    public func cardTokenization(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> POCardScheme? {
         issuerInformation.scheme
     }
 
     @MainActor
-    func cardTokenization(shouldContinueAfter failure: POFailure) -> Bool {
+    public func cardTokenization(shouldContinueAfter failure: POFailure) -> Bool {
         true
     }
 }

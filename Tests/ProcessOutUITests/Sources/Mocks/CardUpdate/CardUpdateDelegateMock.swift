@@ -25,17 +25,17 @@ final class CardUpdateDelegateMock: POCardUpdateDelegate, Sendable {
         set { lock.withLock { _shouldContinueUpdateFromClosure = newValue } }
     }
 
-    // MARK: - PO3DSService
+    // MARK: - POCardUpdateDelegate
 
-    func cardUpdateDidEmitEvent(_ event: POCardUpdateEvent) {
+    func cardUpdate(didEmitEvent event: POCardUpdateEvent) {
         cardUpdateDidEmitEventFromClosure?(event)
     }
 
-    func cardInformation(cardId: String) async -> POCardUpdateInformation? {
+    func cardUpdate(informationFor cardId: String) async -> POCardUpdateInformation? {
         cardInformationFromClosure?(cardId)
     }
 
-    func shouldContinueUpdate(after failure: POFailure) -> Bool {
+    func cardUpdate(shouldContinueAfter failure: POFailure) -> Bool {
         shouldContinueUpdateFromClosure?(failure) ?? false
     }
 
