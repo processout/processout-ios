@@ -52,6 +52,18 @@ longer part of `PONativeAlternativePaymentConfiguration`. Instead these can now 
 ``PONativeAlternativePaymentDelegate/nativeAlternativePayment(defaultsFor:)``. Additionally this method no longer
 accepts a completion argument and now relies on structured concurrency.
 
+- `PONativeAlternativePaymentConfirmation` has been renamed to
+``PONativeAlternativePaymentConfiguration/PaymentConfirmation``.
+
+- `PONativeAlternativePaymentConfiguration/SecondaryAction` has been renamed to
+``PONativeAlternativePaymentConfiguration/CancelButton``.
+
+- The `secondaryAction` property in ``PONativeAlternativePaymentConfiguration`` and
+``PONativeAlternativePaymentConfiguration/PaymentConfirmation`` has been renamed to `cancelButton`.
+
+- `PONativeAlternativePaymentConfiguration/primaryActionTitle` has been renamed to
+``PONativeAlternativePaymentConfiguration/primaryButtonTitle``.
+
 ### Card Tokenization
 
 - The method names in ``POCardTokenizationDelegate`` have been updated:

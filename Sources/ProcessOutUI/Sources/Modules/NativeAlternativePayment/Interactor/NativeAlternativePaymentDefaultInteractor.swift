@@ -142,7 +142,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 amount: details.invoice.amount,
                 currencyCode: details.invoice.currencyCode,
                 parameters: await createParameters(specifications: details.parameters),
-                isCancellable: disableDuration(of: configuration.secondaryAction).isZero
+                isCancellable: (configuration.cancelButton?.disabledFor ?? 0).isZero
             )
             setStateUnchecked(.started(startedState))
             send(event: .didStart)
@@ -220,7 +220,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             logoImage: logoImage,
             actionMessage: actionMessage,
             actionImage: actionImage,
-            isCancellable: disableDuration(of: configuration.paymentConfirmation.secondaryAction).isZero,
+            isCancellable: (configuration.paymentConfirmation.cancelButton?.disabledFor ?? 0).isZero,
             isDelayed: false
         )
         setStateUnchecked(.awaitingCapture(awaitingCaptureState))
@@ -365,7 +365,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Cancellation Availability
 
     private func enableCancellationAfterDelay() {
-        let disabledFor = disableDuration(of: configuration.secondaryAction)
+        let disabledFor = configuration.cancelButton?.disabledFor ?? 0
         guard disabledFor > 0 else {
             logger.debug("Cancel action is not set or initially enabled.")
             return
@@ -386,7 +386,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     private func enableCaptureCancellationAfterDelay() {
-        let disabledFor = disableDuration(of: configuration.paymentConfirmation.secondaryAction)
+        let disabledFor = configuration.paymentConfirmation.cancelButton?.disabledFor ?? 0
         guard disabledFor > 0 else {
             logger.debug("Confirmation cancel action is not set or initially enabled.")
             return
@@ -479,13 +479,6 @@ final class NativeAlternativePaymentDefaultInteractor:
             return nil
         }
         return gateway.logoUrl
-    }
-
-    private func disableDuration(of action: PONativeAlternativePaymentConfiguration.SecondaryAction?) -> TimeInterval {
-        guard case .cancel(_, let disabledFor, _) = action else {
-            return 0
-        }
-        return disabledFor
     }
 
     // MARK: - Default Values
