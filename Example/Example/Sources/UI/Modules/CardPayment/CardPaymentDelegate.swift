@@ -16,7 +16,9 @@ final class CardPaymentDelegate: POCardTokenizationDelegate {
         self.threeDSService = threeDSService
     }
 
-    func processTokenizedCard(card: POCard) async throws {
+    // MARK: - POCardTokenizationDelegate
+
+    func cardTokenization(didTokenizeCard card: POCard) async throws {
         let invoiceCreationRequest = POInvoiceCreationRequest(
             name: UUID().uuidString,
             amount: "20",
