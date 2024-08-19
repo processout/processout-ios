@@ -34,7 +34,7 @@ let configuration = POCardUpdateConfiguration(cardId: "ID", cardInformation: car
 ```
 
 During lifecycle view also gives a chance to its delegate to resolve card information dynamically. It calls
-``POCardUpdateDelegate/cardInformation(cardId:)-7wujo`` to retrieve needed info. Please note that the method
+``POCardUpdateDelegate/cardUpdate(informationFor:)`` to retrieve needed info. Please note that the method
 is asynchronous.
 
 See ``POCardUpdateConfiguration`` reference for other available configurations.
@@ -43,12 +43,12 @@ See ``POCardUpdateConfiguration`` reference for other available configurations.
 
 In order to tweak view’s styling, you should create an instance of ``POCardUpdateStyle`` structure and pass it
 to view. The way you set style depends on whether you are using SwiftUI or UIKit bindings. For view controller
-pass style instance via init, for SwiftUI view you can use ``SwiftUI/View/cardUpdateStyle(_:)`` modifier.
+pass style instance via init, for SwiftUI view you can use ``SwiftUICore/View/cardUpdateStyle(_:)`` modifier.
 
 ### Errors Recovery
 
 By default, implementation allow user to recover from all errors (not including cancellation). If you wish to
-change this behavior, you can implement delegate’s ``POCardUpdateDelegate/shouldContinueUpdate(after:)-3ax8v``
+change this behavior, you can implement delegate’s ``POCardUpdateDelegate/cardUpdate(shouldContinueAfter:)``
 method. Where based on a given failure, you should decide if user should be allowed to continue or flow should
 be ended.
 
@@ -67,7 +67,7 @@ func shouldContinueUpdate(after failure: POFailure) -> Bool {
 ### Lifecycle Events
 
 During lifecycle view emits multiple events that allow to understand user behavior, in order to observe them
-implement delegate's ``POCardUpdateDelegate/cardUpdateDidEmitEvent(_:)-5mhya`` method.
+implement delegate's ``POCardUpdateDelegate/cardUpdate(didEmitEvent:)`` method.
 
 ### Localization
 
