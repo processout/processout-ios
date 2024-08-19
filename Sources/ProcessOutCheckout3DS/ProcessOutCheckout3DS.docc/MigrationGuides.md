@@ -8,19 +8,19 @@ service. Delegate could be passed during initialization or injected later.
 - Delegate was migrated to structured concurrency, additionally naming was updated:
 
   - Method `func configuration(with:)` where delegate was asked to provide service configuration is no longer available.
-It was replaced with ``POCheckout3DSServiceDelegate/checkout3DSService(_:willCreateAuthenticationRequestParametersWith:)-9zbj9``.
+It was replaced with ``POCheckout3DSServiceDelegate/checkout3DSService(_:willCreateAuthenticationRequestParametersWith:)``.
 Passed `configuration` is an inout argument that you could modify to alter styling and behaviour of underlying 3DS
 service.
 
   - Method `func shouldContinue(with warnings:completion:)` became
-``POCheckout3DSServiceDelegate/checkout3DSService(_:shouldContinueWith:)-4hwuf``.
+``POCheckout3DSServiceDelegate/checkout3DSService(_:shouldContinueWith:)``.
 
   - Method `func didCreateAuthenticationRequest(result:)` was replaced with
-``POCheckout3DSServiceDelegate/checkout3DSService(_:didCreateAuthenticationRequestParameters:)-4upet``.
+``POCheckout3DSServiceDelegate/checkout3DSService(_:didCreateAuthenticationRequestParameters:)``.
 
-  - Method `func willHandle(challenge:)` was replaced with ``POCheckout3DSServiceDelegate/checkout3DSService(_:willPerformChallengeWith:)-insg``.
+  - Method `func willHandle(challenge:)` was replaced with ``POCheckout3DSServiceDelegate/checkout3DSService(_:willPerformChallengeWith:)``.
 
-  - Method `func didHandle3DS2Challenge(result:)` was replaced with ``POCheckout3DSServiceDelegate/checkout3DSService(_:didPerformChallenge:)-4t9c0``.  
+  - Method `func didHandle3DS2Challenge(result:)` was replaced with ``POCheckout3DSServiceDelegate/checkout3DSService(_:didPerformChallenge:)``.  
 
 ## Migrating from versions < 4.0.0
 

@@ -13,7 +13,7 @@ public struct POCardUpdateConfiguration: Sendable {
     public let cardId: String
 
     /// Allows to provide card information that will be visible in UI. It is also possible to inject
-    /// it dynamically using ``POCardUpdateDelegate/cardUpdate(informationFor:)-7mbl8``.
+    /// it dynamically using ``POCardUpdateDelegate/cardUpdate(informationFor:)``.
     public let cardInformation: POCardUpdateInformation?
 
     /// Custom title. Use empty string to hide title.
