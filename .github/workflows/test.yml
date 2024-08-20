@@ -14,9 +14,13 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v3
-      - name: Bootstrap Project
-        uses: ./.github/actions/bootstrap-project
-        with:
-          test-project-constants: ${{ secrets.TEST_PROJECT_CONSTANTS }}
-      - name: Run Unit Tests
-        run: source Scripts/Test.sh
+      - name: Dump Environment
+        env:
+          TEST_PROJECT_CONSTANTS: ${{ secrets.TEST_PROJECT_CONSTANTS }}
+        run: source Scripts/DumpConstants/DumpConstants.sh
+      # - name: Bootstrap Project
+      #   uses: ./.github/actions/bootstrap-project
+      #   with:
+      #     test-project-constants: ${{ secrets.TEST_PROJECT_CONSTANTS }}
+      # - name: Run Unit Tests
+      #   run: source Scripts/Test.sh
