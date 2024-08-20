@@ -56,6 +56,7 @@ extension POInvoiceAuthorizationRequest {
 
     enum CodingKeys: String, CodingKey {
         case source
+        case saveSource
         case incremental
         case enableThreeDS2 = "enable_three_d_s_2"
         case preferredScheme
@@ -67,6 +68,7 @@ extension POInvoiceAuthorizationRequest {
         case captureAmount
         case authorizeOnly
         case allowFallbackToSale
+        case clientSecret
         case metadata
     }
 }
