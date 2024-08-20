@@ -140,6 +140,7 @@ final class DefaultCardTokenizationInteractor:
                 let card = try await cardsService.tokenize(request: request)
                 logger.debug("Did tokenize card: \(String(describing: card))")
                 delegate?.cardTokenizationDidEmitEvent(.didTokenize(card: card))
+                try await delegate?.cardTokenization(didTokenizeCard: card, shouldSaveCard: startedState.shouldSaveCard)
                 try await delegate?.processTokenizedCard(card: card)
                 setTokenizedState(card: card)
             } catch let error as POFailure {
