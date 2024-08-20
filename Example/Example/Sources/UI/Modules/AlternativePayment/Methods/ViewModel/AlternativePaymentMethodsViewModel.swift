@@ -66,7 +66,7 @@ final class AlternativePaymentMethodsViewModel:
             state = convertToState(startedState: snapshot, areOperationsExecuting: true)
         case .failure(let failure):
             let failureItem = State.FailureItem(
-                description: failure.message ?? Strings.AlternativePaymentMethods.Failure.unknown
+                description: failure.message ?? String(localized: .AlternativePayments.genericError)
             )
             let state = State.Started(items: [.failure(failureItem)], areOperationsExecuting: false)
             self.state = .started(state)
@@ -77,22 +77,27 @@ final class AlternativePaymentMethodsViewModel:
         startedState: AlternativePaymentMethodsInteractorState.Started, areOperationsExecuting: Bool
     ) -> State {
         let state = State.Started(
-            items: startedState.gatewayConfigurations.map(convertToItem), areOperationsExecuting: areOperationsExecuting
+            items: startedState.gatewayConfigurations.compactMap(convertToItem),
+            areOperationsExecuting: areOperationsExecuting
         )
         return .started(state)
     }
 
     private func convertToState(loadingMoreState: AlternativePaymentMethodsInteractorState.LoadingMore) -> State {
         let state = State.Started(
-            items: loadingMoreState.gatewayConfigurations.map(convertToItem), areOperationsExecuting: true
+            items: loadingMoreState.gatewayConfigurations.compactMap(convertToItem),
+            areOperationsExecuting: true
         )
         return .started(state)
     }
 
-    private func convertToItem(gatewayConfiguration: POGatewayConfiguration) -> State.Item {
+    private func convertToItem(gatewayConfiguration: POGatewayConfiguration) -> State.Item? {
+        guard let gatewayName = gatewayConfiguration.gateway?.displayName else {
+            return nil
+        }
         let item = State.ConfigurationItem(
             id: AnyHashable(gatewayConfiguration.id),
-            name: gatewayConfiguration.gateway?.displayName ?? Strings.AlternativePaymentMethods.Gateway.unknown,
+            name: gatewayName,
             select: { [weak self] in
                 let route = AlternativePaymentMethodsRoute.authorizationtAmount { amount, currencyCode in
                     self?.startNativeAlternativePayment(
@@ -149,9 +154,11 @@ final class AlternativePaymentMethodsViewModel:
         }
         let message: String
         if let failureMessage = failure.message, !failureMessage.isEmpty {
-            message = Strings.AlternativePaymentMethods.Result.failureMessage(failureMessage)
+            var options = String.LocalizationOptions()
+            options.replacements = [failureMessage]
+            message = String(localized: .AlternativePayments.error, options: options)
         } else {
-            message = Strings.AlternativePaymentMethods.Result.defaultFailureMessage
+            message = String(localized: .AlternativePayments.genericError)
         }
         router.trigger(route: .alert(message: message))
     }

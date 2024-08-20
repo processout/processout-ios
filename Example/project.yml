@@ -4,12 +4,14 @@ name: Example
 # Options
 options:
   deploymentTarget:
-    iOS: 14.0
+    iOS: 17.0
 
 # Project Settings
 settings:
   MARKETING_VERSION: 1.0.0
   CURRENT_PROJECT_VERSION: 1
+  LOCALIZATION_PREFERS_STRING_CATALOGS: true
+  SWIFT_EMIT_LOC_STRINGS: true
 
 # SPM Packages
 packages:

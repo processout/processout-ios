@@ -15,18 +15,18 @@ final class AlternativePaymentDataEntryBuilder {
 
     func build() -> UIViewController {
         let viewController = UIAlertController(
-            title: nil, message: Strings.AlternativePaymentDataEntry.message, preferredStyle: .alert
+            title: nil, message: String(localized: .AlternativePaymentDataEntry.message), preferredStyle: .alert
         )
         viewController.addTextField { textField in
-            textField.placeholder = Strings.AlternativePaymentDataEntry.Key.placeholder
+            textField.placeholder = String(localized: .AlternativePaymentDataEntry.key)
             textField.keyboardType = .asciiCapable
         }
         viewController.addTextField { textField in
-            textField.placeholder = Strings.AlternativePaymentDataEntry.Value.placeholder
+            textField.placeholder = String(localized: .AlternativePaymentDataEntry.value)
             textField.keyboardType = .asciiCapable
         }
         let submitAction = UIAlertAction(
-            title: Strings.AlternativePaymentDataEntry.confirm,
+            title: String(localized: .AlternativePaymentDataEntry.confirm),
             style: .default,
             handler: { [weak viewController, completion] _ in
                 let textFields = viewController?.textFields ?? []
