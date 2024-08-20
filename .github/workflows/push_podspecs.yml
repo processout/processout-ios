@@ -7,7 +7,7 @@ jobs:
   push-podspecs:
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Bootstrap Project
         uses: ./.github/actions/bootstrap-project
       - name: Push Specs

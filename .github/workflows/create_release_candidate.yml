@@ -15,7 +15,7 @@ jobs:
   update-version:
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Update Version
         run: |
           source Scripts/UpdateVersion.sh --${{ inputs.release_type }}
