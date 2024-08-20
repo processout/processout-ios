@@ -9,5 +9,3 @@
 Packages
 *.xcodeproj
 xcuserdata/
-Example/Sources/Generated
-Example/Resources/Constants.yml

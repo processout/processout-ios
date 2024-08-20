@@ -9,8 +9,6 @@
 Packages
 *.xcodeproj
 xcuserdata/
-Tests/*/Sources/Generated/*.swift
-Tests/*/Resources/Constants.yml
 
 ## Misc
 .env
