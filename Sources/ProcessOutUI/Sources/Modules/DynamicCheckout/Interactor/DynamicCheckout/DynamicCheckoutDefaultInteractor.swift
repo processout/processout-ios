@@ -197,10 +197,10 @@ final class DynamicCheckoutDefaultInteractor:
             recentErrorDescription: errorDescription
         )
         state = .started(startedState)
+        logger[attributeKey: .invoiceId] = invoice.id
+        logger.debug("Did start dynamic checkout flow")
         if sendEvents {
             send(event: .didStart)
-            logger[attributeKey: .invoiceId] = invoice.id
-            logger.debug("Did start dynamic checkout flow")
         }
         initiateDefaultPaymentIfNeeded()
     }
