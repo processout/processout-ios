@@ -111,7 +111,7 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
 
     private func startPassKitPayment() {
         let request = PKPaymentRequest()
-        request.merchantIdentifier = Constants.merchantId as? String ?? ""
+        request.merchantIdentifier = Constants.merchantId ?? ""
         request.merchantCapabilities = [.threeDSecure]
         request.paymentSummaryItems = [
             .init(label: "Test", amount: 1)

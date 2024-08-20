@@ -28,16 +28,8 @@ targets:
       - path: Scripts/Lint.sh
         name: Swiftlint
         basedOnDependencyAnalysis: false
-      - path: Scripts/SwiftGen/SwiftGen.sh
-        name: SwiftGen
-        inputFileLists:
-          - $(PROJECT_DIR)/Scripts/SwiftGen/Input.xcfilelist
-        outputFileLists:
-          - $(PROJECT_DIR)/Scripts/SwiftGen/Output.xcfilelist
     sources:
       - path: Example
-      - path: Example/Sources/Generated/Constants+Generated.swift
-        optional: true
       - path: Example/Sources/Generated/Strings+Generated.swift
         optional: true
     platform: iOS
