@@ -30,6 +30,9 @@ enum DynamicCheckoutInteractorState {
         /// Current invoice.
         var invoice: POInvoice
 
+        /// Client secret.
+        var clientSecret: String?
+
         /// Most recent error description if any.
         var recentErrorDescription: String?
     }
