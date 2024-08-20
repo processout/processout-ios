@@ -30,10 +30,7 @@ targets:
       - path: Scripts/Lint.sh
         name: Swiftlint
         basedOnDependencyAnalysis: false
-    sources:
-      - path: Example
-      - path: Example/Sources/Generated/Strings+Generated.swift
-        optional: true
+    sources: Example
     platform: iOS
     settings:
       TARGETED_DEVICE_FAMILY: 1
