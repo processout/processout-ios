@@ -8,6 +8,8 @@
 import ProcessOut
 import Checkout3DS
 
+/// Adapter wraps Checkout's `Standalone3DSService` service so it could be used with `ProcessOut` APIs
+/// where instance of `PO3DSService` is expected.
 public actor POCheckout3DSService: PO3DSService, Sendable {
 
     public init(delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production) {

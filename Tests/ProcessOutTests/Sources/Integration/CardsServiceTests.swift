@@ -11,10 +11,9 @@ import XCTest
 
 final class CardsServiceTests: XCTestCase {
 
-    @MainActor
-    override func setUp() {
-        super.setUp()
-        ProcessOut.configure(configuration: .init(projectId: Constants.projectId), force: true)
+    override func setUp() async throws {
+        try await super.setUp()
+        await ProcessOut.configure(configuration: .init(projectId: Constants.projectId), force: true)
         sut = ProcessOut.shared.cards
     }
 

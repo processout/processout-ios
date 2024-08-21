@@ -753,12 +753,12 @@ final class DynamicCheckoutDefaultInteractor:
 @available(iOS 14.0, *)
 extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
 
-    func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent) {
+    func cardTokenization(didEmitEvent event: POCardTokenizationEvent) {
         delegate?.dynamicCheckout(didEmitCardTokenizationEvent: event)
     }
 
     @MainActor
-    func processTokenizedCard(card: POCard) async throws {
+    func cardTokenization(didTokenizeCard card: POCard) async throws {
         invalidateInvoiceIfPossible()
         guard case .paymentProcessing(let currentState) = state else {
             assertionFailure("Unable to process card in unsupported state.")
@@ -767,11 +767,11 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         try await authorizeInvoice(source: card.id, startedState: currentState.snapshot)
     }
 
-    func preferredScheme(issuerInformation: POCardIssuerInformation) -> POCardScheme? {
+    func cardTokenization(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> POCardScheme? {
         delegate?.dynamicCheckout(preferredSchemeFor: issuerInformation)
     }
 
-    func shouldContinueTokenization(after failure: POFailure) -> Bool {
+    func cardTokenization(shouldContinueAfter failure: POFailure) -> Bool {
         canRecoverCardTokenization(from: failure)
     }
 }
@@ -779,7 +779,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
 @available(iOS 14.0, *)
 extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
 
-    func nativeAlternativePaymentDidEmitEvent(_ event: PONativeAlternativePaymentEvent) {
+    func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentEvent) {
         switch event {
         case .didSubmitParameters:
             invalidateInvoiceIfPossible()
@@ -789,14 +789,10 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
         delegate?.dynamicCheckout(didEmitAlternativePaymentEvent: event)
     }
 
-    func nativeAlternativePaymentDefaultValues(
-        for parameters: [PONativeAlternativePaymentMethodParameter],
-        completion: @escaping @Sendable ([String: String]) -> Void
-    ) {
-        Task { @MainActor in
-            let values = await delegate?.dynamicCheckout(alternativePaymentDefaultsFor: parameters) ?? [:]
-            completion(values)
-        }
+    func nativeAlternativePayment(
+        defaultsFor parameters: [PONativeAlternativePaymentMethodParameter]
+    ) async -> [String: String] {
+        await delegate?.dynamicCheckout(alternativePaymentDefaultsFor: parameters) ?? [:]
     }
 }
 

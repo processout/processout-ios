@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum FormattingUtils {
+enum FormattingUtils {
 
     /// Returns index in formatted string that matches index in `string`.
     ///
@@ -17,7 +17,7 @@ public enum FormattingUtils {
     /// Alternative solution would be to compare all substrings starting from end of `target` with suffix
     /// after cursor in `source` and finding substring with least possible difference (using for example Levenshtein
     /// distance). Downside of it would be almost cubic complexity.
-    public static func adjustedCursorOffset(
+    static func adjustedCursorOffset(
         in target: String,
         source: String,
         sourceCursorOffset: Int,

@@ -50,7 +50,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
 
         public init(
             title: String? = nil,
-            disabledFor: TimeInterval,
+            disabledFor: TimeInterval = 0,
             confirmation: POConfirmationDialogConfiguration? = nil
         ) {
             self.title = title

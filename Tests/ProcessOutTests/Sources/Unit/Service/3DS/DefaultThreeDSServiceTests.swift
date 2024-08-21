@@ -162,7 +162,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             // Then
             XCTAssertEqual(challenge, expectedChallenge)
             isDelegateCalled = true
-            return .init(transactionStatus: "Y")
+            return .init(transactionStatus: true)
         }
 
         // When
@@ -190,7 +190,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
     func test_handle_whenDelegateDoChallengeCompletesWithTrue_succeeds() async throws {
         // Given
         delegate.performChallengeFromClosure = { _ in
-            .init(transactionStatus: "Y")
+            .init(transactionStatus: true)
         }
 
         // When
@@ -203,7 +203,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
     func test_handle_whenDelegateDoChallengeCompletesWithFalse_succeeds() async throws {
         // Given
         delegate.performChallengeFromClosure = { _ in
-            .init(transactionStatus: "N")
+            .init(transactionStatus: false)
         }
 
         // When

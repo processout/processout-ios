@@ -16,7 +16,7 @@
 
 - ``POButtonStyle``
 - ``POButtonStateStyle``
-- ``SwiftUI/EnvironmentValues/isButtonLoading``
+- ``SwiftUICore/EnvironmentValues/isButtonLoading``
 - ``POButtonStyle/primary``
 - ``POButtonStyle/secondary``
 - ``POBrandButtonStyle``
@@ -28,7 +28,7 @@
 - ``PORadioButtonStyle``
 - ``PORadioButtonStateStyle``
 - ``PORadioButtonKnobStateStyle``
-- ``SwiftUI/EnvironmentValues/isRadioButtonSelected``
+- ``SwiftUICore/EnvironmentValues/isRadioButtonSelected``
 - ``PORadioButtonStyle/radio``
 
 ### Checkbox
