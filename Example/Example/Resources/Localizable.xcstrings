@@ -216,7 +216,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Something went wrong: %s."
+            "value" : "Something went wrong: %@."
           }
         }
       }
