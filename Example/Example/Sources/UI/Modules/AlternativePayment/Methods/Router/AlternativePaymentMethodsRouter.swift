@@ -50,7 +50,7 @@ final class AlternativePaymentMethodsRouter: RouterType {
         case let .alert(message):
             let viewController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
             viewController.addAction(
-                UIAlertAction(title: Strings.AlternativePaymentMethods.Result.continue, style: .default)
+                UIAlertAction(title: String(localized: .AlternativePayments.continue), style: .default)
             )
             self.viewController?.present(viewController, animated: true)
         }

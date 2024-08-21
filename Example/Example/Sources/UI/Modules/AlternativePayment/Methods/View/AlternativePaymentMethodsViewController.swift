@@ -13,7 +13,7 @@ final class AlternativePaymentMethodsViewController<ViewModel: AlternativePaymen
     override func viewDidLoad() {
         super.viewDidLoad()
         configureCollectionView()
-        navigationItem.title = Strings.AlternativePaymentMethods.title
+        navigationItem.title = String(localized: .AlternativePayments.title)
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: activityIndicatorView)
     }

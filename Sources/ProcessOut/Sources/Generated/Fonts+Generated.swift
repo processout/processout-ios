@@ -1,5 +1,6 @@
 // swiftlint:disable all
 // Generated using SwiftGen — https://github.com/SwiftGen/SwiftGen
+// todo(andrii-vysotskyi): remove before releasing 5.0.0
 
 #if os(macOS)
   import AppKit.NSFont

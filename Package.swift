@@ -23,7 +23,6 @@ let package = Package(
             dependencies: [
                 .target(name: "cmark")
             ],
-            exclude: ["swiftgen.yml"],
             resources: [
                 .process("Resources")
             ]

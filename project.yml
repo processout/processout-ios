@@ -61,19 +61,11 @@ targets:
       - path: Scripts/Lint.sh
         name: Swiftlint
         basedOnDependencyAnalysis: false
-      - path: Scripts/SwiftGen.sh
-        name: SwiftGen
-        outputFiles:
-          - $(TARGET_ROOT)/Sources/Generated/Files+Generated.swift
-          - $(TARGET_ROOT)/Sources/Generated/Fonts+Generated.swift
-        basedOnDependencyAnalysis: false
       - path: Scripts/Sourcery.sh
         name: Sourcery
         basedOnDependencyAnalysis: false
     sources:
       - path: Sources/ProcessOut
-        excludes:
-          - swiftgen.yml
     dependencies:
       - framework: Vendor/cmark.xcframework
   ProcessOutTests:
@@ -82,36 +74,18 @@ targets:
     deploymentTarget: "16.0"
     settings:
       TARGET_ROOT: $(PROJECT_DIR)/Tests/ProcessOutTests
-    preBuildScripts:
-      - path: Scripts/SwiftGen.sh
-        name: SwiftGen
-        outputFiles:
-          - $(TARGET_ROOT)/Sources/Generated/Constants+Generated.swift
-        basedOnDependencyAnalysis: false
     dependencies:
       - target: ProcessOut
-    sources:
-      - path: Tests/ProcessOutTests
-      - path: Tests/ProcessOutTests/Sources/Generated/Constants+Generated.swift
-        optional: true
+    sources: Tests/ProcessOutTests
   ProcessOutUITests:
     type: bundle.unit-test
     platform: iOS
     deploymentTarget: "14.0"
     settings:
       TARGET_ROOT: $(PROJECT_DIR)/Tests/ProcessOutUITests
-    preBuildScripts:
-      - path: Scripts/SwiftGen.sh
-        name: SwiftGen
-        outputFiles:
-          - $(TARGET_ROOT)/Sources/Generated/Constants+Generated.swift
-        basedOnDependencyAnalysis: false
     dependencies:
       - target: ProcessOutUI
-    sources:
-      - path: Tests/ProcessOutUITests
-      - path: Tests/ProcessOutUITests/Sources/Generated/Constants+Generated.swift
-        optional: true
+    sources: Tests/ProcessOutUITests
   ProcessOutCheckout3DS:
     type: framework
     platform: iOS
@@ -136,8 +110,7 @@ targets:
       TARGET_ROOT: $(PROJECT_DIR)/Tests/ProcessOutCheckout3DSTests
     dependencies:
       - target: ProcessOutCheckout3DS
-    sources:
-      - path: Tests/ProcessOutCheckout3DSTests
+    sources: Tests/ProcessOutCheckout3DSTests
 schemes:
   ProcessOut:
     build:

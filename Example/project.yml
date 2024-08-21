@@ -4,12 +4,14 @@ name: Example
 # Options
 options:
   deploymentTarget:
-    iOS: 14.0
+    iOS: 17.0
 
 # Project Settings
 settings:
   MARKETING_VERSION: 1.0.0
   CURRENT_PROJECT_VERSION: 1
+  LOCALIZATION_PREFERS_STRING_CATALOGS: true
+  SWIFT_EMIT_LOC_STRINGS: true
 
 # SPM Packages
 packages:
@@ -28,18 +30,7 @@ targets:
       - path: Scripts/Lint.sh
         name: Swiftlint
         basedOnDependencyAnalysis: false
-      - path: Scripts/SwiftGen/SwiftGen.sh
-        name: SwiftGen
-        inputFileLists:
-          - $(PROJECT_DIR)/Scripts/SwiftGen/Input.xcfilelist
-        outputFileLists:
-          - $(PROJECT_DIR)/Scripts/SwiftGen/Output.xcfilelist
-    sources:
-      - path: Example
-      - path: Example/Sources/Generated/Constants+Generated.swift
-        optional: true
-      - path: Example/Sources/Generated/Strings+Generated.swift
-        optional: true
+    sources: Example
     platform: iOS
     settings:
       TARGETED_DEVICE_FAMILY: 1

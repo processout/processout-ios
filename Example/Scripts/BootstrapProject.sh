@@ -5,9 +5,6 @@ set -euo pipefail
 # Installs brew dependencies
 brew bundle -q
 
-# SwiftGen is broken with Brew so installed with Mint instead
-mint install SwiftGen/SwiftGen
-
 # Generates project
 xcodegen generate
 

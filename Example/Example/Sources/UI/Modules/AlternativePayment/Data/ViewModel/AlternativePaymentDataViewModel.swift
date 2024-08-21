@@ -51,7 +51,7 @@ final class AlternativePaymentDataViewModel:
     private let completion: ([String: String]) -> Void
 
     private lazy var emptyItem: State.Item = {
-        State.Item(title: Strings.AlternativePaymentData.emptyMessage, subtitle: nil, remove: nil)
+        State.Item(title: String(localized: .AlternativePaymentData.emptyMessage), subtitle: nil, remove: nil)
     }()
 
     private var additionalData: [String: String] {
