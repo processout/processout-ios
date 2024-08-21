@@ -13,7 +13,7 @@ final class FeaturesViewController<ViewModel: FeaturesViewModelType>:
     override func viewDidLoad() {
         super.viewDidLoad()
         configureCollectionView()
-        navigationItem.title = Strings.Features.title
+        navigationItem.title = String(localized: .Features.title)
     }
 
     override func loadView() {

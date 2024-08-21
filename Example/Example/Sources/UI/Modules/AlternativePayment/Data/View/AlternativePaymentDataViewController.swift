@@ -54,7 +54,7 @@ final class AlternativePaymentDataViewController<ViewModel: AlternativePaymentDa
             if let remove = item.remove {
                 let action = UIContextualAction(
                     style: .destructive,
-                    title: Strings.AlternativePaymentData.remove,
+                    title: String(localized: .AlternativePaymentData.remove),
                     handler: { _, _, completion in
                         remove()
                         completion(true)
@@ -103,7 +103,7 @@ final class AlternativePaymentDataViewController<ViewModel: AlternativePaymentDa
     }
 
     private func configureNavigationItem() {
-        navigationItem.title = Strings.AlternativePaymentData.title
+        navigationItem.title = String(localized: .AlternativePaymentData.title)
         navigationItem.largeTitleDisplayMode = .never
         let submitButtonItem = UIBarButtonItem(
             systemItem: .done,

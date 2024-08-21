@@ -16,22 +16,22 @@ final class AuthorizationAmountBuilder {
 
     func build() -> UIViewController {
         let viewController = UIAlertController(
-            title: nil, message: Strings.AuthorizationAmount.message, preferredStyle: .alert
+            title: nil, message: String(localized: .AuthorizationAmount.message), preferredStyle: .alert
         )
         viewController.addTextField { textField in
-            textField.placeholder = Strings.AuthorizationAmount.Amount.placeholder
+            textField.placeholder = String(localized: .AuthorizationAmount.amount)
             textField.keyboardType = .decimalPad
             textField.autocorrectionType = .no
             textField.accessibilityIdentifier = "authorization-amount.amount"
         }
         viewController.addTextField { textField in
-            textField.placeholder = Strings.AuthorizationAmount.Currency.placeholder
+            textField.placeholder = String(localized: .AuthorizationAmount.currency)
             textField.keyboardType = .alphabet
             textField.autocorrectionType = .no
             textField.accessibilityIdentifier = "authorization-amount.currency"
         }
         let submitAction = UIAlertAction(
-            title: Strings.AuthorizationAmount.confirm,
+            title: String(localized: .AuthorizationAmount.confirm),
             style: .default,
             handler: { [weak viewController, completion] _ in
                 let textFields = viewController?.textFields ?? []

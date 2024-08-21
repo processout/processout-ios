@@ -40,7 +40,7 @@ final class FeaturesRouter: RouterType {
         case .alert(let message):
             let viewController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
             viewController.addAction(
-                UIAlertAction(title: Strings.Features.continue, style: .default)
+                UIAlertAction(title: String(localized: .Features.continue), style: .default)
             )
             self.viewController?.present(viewController, animated: true)
         }

@@ -11,9 +11,8 @@ runs:
     - name: Write Constants
       run: |
         CONSTANTS=$'${{ inputs.test-project-constants }}'
-        echo "$CONSTANTS" > Tests/ProcessOutTests/Resources/Constants.yml
-        echo "$CONSTANTS" > Tests/ProcessOutUITests/Resources/Constants.yml
-        echo "$CONSTANTS" > Example/Example/Resources/Constants.yml
+        echo "$CONSTANTS" > Tests/ProcessOutTests/Sources/Core/Constants.swift
+        echo "$CONSTANTS" > Tests/ProcessOutUITests/Sources/Core/Constants.swift
       shell: bash
     - name: Select Xcode Version
       # todo(andrii-vysotskyi): Migrate to public release once available

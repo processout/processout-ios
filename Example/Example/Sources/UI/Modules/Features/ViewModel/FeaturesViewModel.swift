@@ -24,35 +24,35 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
         }
         let features: [State.Feature] = [
             .init(
-                name: Strings.Features.NativeAlternativePayment.title,
+                name: String(localized: .Features.nativeAlternativePayment),
                 accessibilityId: "features.native-alternative-payment",
                 select: { [weak self] in
                     self?.router.trigger(route: .gatewayConfigurations(filter: .nativeAlternativePaymentMethods))
                 }
             ),
             .init(
-                name: Strings.Features.AlternativePayment.title,
+                name: String(localized: .Features.alternativePayment),
                 accessibilityId: "features.alternative-payment",
                 select: { [weak self] in
                     self?.router.trigger(route: .gatewayConfigurations(filter: .alternativePaymentMethods))
                 }
             ),
             .init(
-                name: Strings.Features.CardPayment.title,
+                name: String(localized: .Features.cardPayment),
                 accessibilityId: "features.card-payment",
                 select: { [weak self] in
                     self?.startCardTokenization(threeDSService: .test)
                 }
             ),
             .init(
-                name: Strings.Features.CardPayment.Checkout.title,
+                name: String(localized: .Features.checkoutCardPayment),
                 accessibilityId: "features.card-payment",
                 select: { [weak self] in
                     self?.startCardTokenization(threeDSService: .checkout)
                 }
             ),
             .init(
-                name: Strings.Features.DynamicCheckout.title,
+                name: String(localized: .Features.dynamicCheckout),
                 accessibilityId: "features.dynamic-checkout",
                 select: { [weak self] in
                     self?.startDynamicCheckout()
@@ -74,13 +74,15 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
         let route = FeaturesRoute.cardTokenization(threeDSService: threeDSService) { [weak self] result in
             let message: String
             switch result {
-            case .success(let card):
-                message = Strings.Features.CardPayment.success(card.id)
+            case .success:
+                message = String(localized: .Features.successMessage)
             case .failure(let failure):
                 if let errorMessage = failure.message {
-                    message = Strings.Features.CardPayment.error(errorMessage)
+                    var options = String.LocalizationOptions()
+                    options.replacements = [errorMessage]
+                    message = String(localized: .Features.error, options: options)
                 } else {
-                    message = Strings.Features.CardPayment.errorGeneric
+                    message = String(localized: .Features.genericError)
                 }
             }
             self?.router.trigger(route: .alert(message: message))
@@ -110,7 +112,7 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
 
     private func startPassKitPayment() {
         let request = PKPaymentRequest()
-        request.merchantIdentifier = Constants.merchantId as? String ?? ""
+        request.merchantIdentifier = Constants.merchantId ?? ""
         request.merchantCapabilities = [.threeDSecure]
         request.paymentSummaryItems = [
             .init(label: "Test", amount: 1)
@@ -132,7 +134,7 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
             return nil
         }
         let feature = State.Feature(
-            name: Strings.Features.ApplePay.title,
+            name: String(localized: .Features.applePay),
             accessibilityId: "features.apple-pay",
             select: { [weak self] in
                 self?.startPassKitPayment()
