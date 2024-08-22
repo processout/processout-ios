@@ -17,12 +17,16 @@ public struct POCreateCustomerTokenRequest: Encodable {
     /// Flag if you wish to verify the customer token by making zero value transaction. Applicable for cards only.
     public let verify: Bool
 
-    /// Return URL to assign to verification invoice.
+    /// For APMs, this is the URL to return to the app after payment is accepted.
+    public let returnUrl: URL?
+
+    /// This is the URL to be set on the invoice that is created for card verification.
     public let invoiceReturnUrl: URL?
 
-    public init(customerId: String, verify: Bool = false, invoiceReturnUrl: URL? = nil) {
+    public init(customerId: String, verify: Bool = false, returnUrl: URL? = nil) {
         self._customerId = .init(value: customerId)
         self.verify = verify
-        self.invoiceReturnUrl = invoiceReturnUrl
+        self.returnUrl = returnUrl
+        self.invoiceReturnUrl = returnUrl
     }
 }

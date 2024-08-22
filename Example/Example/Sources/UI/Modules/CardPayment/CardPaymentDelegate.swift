@@ -16,7 +16,7 @@ final class CardPaymentDelegate: POCardTokenizationDelegate {
         self.threeDSService = threeDSService
     }
 
-    func processTokenizedCard(card: POCard) async throws {
+    func cardTokenization(didTokenizeCard card: POCard, shouldSaveCard save: Bool) async throws {
         let invoiceCreationRequest = POInvoiceCreationRequest(
             name: UUID().uuidString,
             amount: "20",
@@ -25,7 +25,10 @@ final class CardPaymentDelegate: POCardTokenizationDelegate {
         )
         let invoice = try await invoicesService.createInvoice(request: invoiceCreationRequest)
         let invoiceAuthorizationRequest = POInvoiceAuthorizationRequest(
-            invoiceId: invoice.id, source: card.id
+            invoiceId: invoice.id,
+            source: card.id,
+            saveSource: save,
+            clientSecret: invoice.clientSecret
         )
         try await invoicesService.authorizeInvoice(request: invoiceAuthorizationRequest, threeDSService: threeDSService)
     }

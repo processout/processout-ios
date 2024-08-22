@@ -15,6 +15,10 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
     /// Payment source to use for authorization.
     public let source: String
 
+    /// If you want us to save the payment source by creating a customer token during the authorization.
+    /// Only supported with card payment source.
+    public let saveSource: Bool
+
     /// Boolean value indicating if authorization is incremental. Default value is `false`.
     public let incremental: Bool
 
@@ -60,12 +64,16 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
     /// value is `false`.
     public let allowFallbackToSale: Bool
 
+    /// A secret key associated with the client making the request.
+    public let clientSecret: String?
+
     /// Operation metadata.
     public let metadata: [String: String]?
 
     public init(
         invoiceId: String,
         source: String,
+        saveSource: Bool = false,
         incremental: Bool = false,
         enableThreeDS2 _: Bool = true,
         preferredScheme: String? = nil,
@@ -77,10 +85,12 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
         captureAmount: Decimal? = nil,
         authorizeOnly: Bool = true,
         allowFallbackToSale: Bool = false,
+        clientSecret: String? = nil,
         metadata: [String: String]? = nil
     ) {
         self.invoiceId = invoiceId
         self.source = source
+        self.saveSource = saveSource
         self.incremental = incremental
         self._preferredScheme = .init(wrappedValue: preferredScheme)
         self.thirdPartySdkVersion = thirdPartySdkVersion
@@ -91,6 +101,7 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
         self._captureAmount = .init(value: captureAmount)
         self.authorizeOnly = authorizeOnly
         self.allowFallbackToSale = allowFallbackToSale
+        self.clientSecret = clientSecret
         self.metadata = metadata
     }
 }
