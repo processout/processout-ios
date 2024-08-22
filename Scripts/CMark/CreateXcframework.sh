@@ -2,6 +2,13 @@
 
 set -euo pipefail
 
+function cleanup {
+  rm -rf $WORK_DIR
+}
+
+# Configure cleanup
+trap cleanup EXIT
+
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 OUTPUT_DIR="$SCRIPT_DIR/../../Vendor"
 WORK_DIR=$(mktemp -d)
@@ -50,9 +57,3 @@ xcodebuild -create-xcframework \
 
 # Write metadata
 echo $CURRENT_VERSION > "$OUTPUT_DIR/cmark.xcframework.version"
-
-function cleanup {
-  rm -rf $WORK_DIR
-}
-
-trap cleanup EXIT
