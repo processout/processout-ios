@@ -6,10 +6,15 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
+      - name: Select Xcode Version
+        uses: ./.github/actions/select-xcode
+      - name: Bootstrap Project
+        working-directory: ./Example
+        run: ./Scripts/BootstrapProject.sh
       - name: Export
         working-directory: ./Example
         env:
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
-        run: source Scripts/Export/Export.sh
+        run: ./Scripts/Export/Export.sh
