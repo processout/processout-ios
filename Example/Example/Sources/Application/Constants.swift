@@ -19,7 +19,7 @@ enum Constants {
     static var customerId = ""
 
     /// ApplePay merchant ID.
-    static let merchantId: String?
+    static let merchantId: String? = nil
 
     /// Return URL.
     static let returnUrl = URL(string: "processout-example://return")! // swiftlint:disable:this force_unwrapping
