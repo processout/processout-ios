@@ -46,14 +46,17 @@ struct ConfigurationView: View {
             .navigationTitle(
                 String(localized: .Configuration.title)
             )
-            .navigationDestination(isPresented: $viewModel.state.areFeaturesPresented) {
-                FeaturesView()
-            }
+        }
+        .onReceive(viewModel.dismiss) {
+            dismiss()
         }
         .onAppear(perform: viewModel.start)
     }
 
     // MARK: - Private Properties
+
+    @Environment(\.dismiss)
+    private var dismiss
 
     @State
     private var viewModel = ConfigurationViewModel()

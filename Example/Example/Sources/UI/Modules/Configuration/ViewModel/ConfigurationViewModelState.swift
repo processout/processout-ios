@@ -31,9 +31,6 @@ struct ConfigurationViewModelState {
 
     /// Customer ID.
     var customerId: String
-
-    /// Indicates whether features are presented.
-    var areFeaturesPresented: Bool
 }
 
 extension ConfigurationViewModelState {
@@ -47,7 +44,6 @@ extension ConfigurationViewModelState {
             .init(id: .stage, name: String(localized: .Configuration.stageEnvironment))
         ],
         selectedEnvironment: .production,
-        customerId: "",
-        areFeaturesPresented: false
+        customerId: ""
     )
 }

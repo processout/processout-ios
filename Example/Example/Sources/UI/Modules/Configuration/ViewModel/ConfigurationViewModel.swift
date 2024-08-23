@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 @_spi(PO) import ProcessOut
 
 @Observable
@@ -13,20 +14,32 @@ final class ConfigurationViewModel {
 
     init() {
         state = .idle
+        dismissSubject = PassthroughSubject<Void, Never>()
     }
 
     // MARK: -
 
-    var state: ConfigurationViewModelState! // swiftlint:disable:this implicitly_unwrapped_optional
+    /// Publisher that emits value when view model requires dismissal.
+    var dismiss: AnyPublisher<Void, Never> {
+        dismissSubject.eraseToAnyPublisher()
+    }
+
+    /// View model's state.
+    var state: ConfigurationViewModelState
 
     func start() {
         updateStateWithExistingProcessOutConfiguration()
     }
 
     func submit() {
+        configureProjectConstants()
         configureProcessOut()
-        state.areFeaturesPresented = true
+        dismissSubject.send(())
     }
+
+    // MARK: - Private Properties
+
+    private let dismissSubject: PassthroughSubject<Void, Never>
 
     // MARK: - Private Methods
 
@@ -42,12 +55,16 @@ final class ConfigurationViewModel {
     }
 
     private func configureProcessOut() {
-        // todo(andrii-vysotskyi): set customer ID
         let configuration = ProcessOutConfiguration(
             projectId: state.projectId,
             privateKey: state.projectKey,
             environment: state.selectedEnvironment
         )
         ProcessOut.configure(configuration: configuration, force: true)
+    }
+
+    private func configureProjectConstants() {
+        // todo(andrii-vysotskyi): update customer
+        // Constants.customerId = state.customerId
     }
 }

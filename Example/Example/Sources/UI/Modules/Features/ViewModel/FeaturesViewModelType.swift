@@ -5,7 +5,11 @@
 //  Created by Andrii Vysotskyi on 28.10.2022.
 //
 
-protocol FeaturesViewModelType: ViewModelType<FeaturesViewModelState> { }
+protocol FeaturesViewModelType: ViewModelType<FeaturesViewModelState> {
+
+    /// Informs view model that shake motion has ended.
+    func motionShakeEnded()
+}
 
 enum FeaturesViewModelState {
 

@@ -21,4 +21,7 @@ enum FeaturesRoute: RouteType {
 
     /// Alert with given message.
     case alert(message: String)
+
+    /// Configuration route.
+    case configuration
 }

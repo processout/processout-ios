@@ -18,6 +18,8 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
         super.init(state: .idle)
     }
 
+    // MARK: - FeaturesViewModelType
+
     override func start() {
         guard case .idle = state else {
             return
@@ -61,6 +63,10 @@ final class FeaturesViewModel: BaseViewModel<FeaturesViewModelState>, FeaturesVi
             createPassKitPaymentFeature()
         ].compactMap { $0 }
         state = .started(State.Started(features: features))
+    }
+
+    func motionShakeEnded() {
+        router.trigger(route: .configuration)
     }
 
     // MARK: - Private Properties
