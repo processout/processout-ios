@@ -1,5 +1,11 @@
 name: Upload to TestFlighs
 on:
+  # todo(andrii-vysotskyi): remove PR trigger after testing
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - 'master'
   workflow_dispatch:
 jobs:
   export:
