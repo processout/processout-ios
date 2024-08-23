@@ -79,11 +79,11 @@ public final class ProcessOutLegacyApi {
     }
 
     private static var ApiUrl: String {
-        ProcessOut.shared.configuration.apiBaseUrl.absoluteString
+        ProcessOut.shared.configuration.environment.apiBaseUrl.absoluteString
     }
 
     internal static var CheckoutUrl: String {
-        ProcessOut.shared.configuration.checkoutBaseUrl.absoluteString
+        ProcessOut.shared.configuration.environment.checkoutBaseUrl.absoluteString
     }
 
     internal static var ProjectId: String {

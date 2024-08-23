@@ -35,7 +35,7 @@ public final class ProcessOut {
     public private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
         let serviceConfiguration: () -> AlternativePaymentMethodsServiceConfiguration = { [unowned self] in
             let configuration = self.configuration
-            return .init(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
+            return .init(projectId: configuration.projectId, baseUrl: configuration.environment.checkoutBaseUrl)
         }
         return DefaultAlternativePaymentMethodsService(configuration: serviceConfiguration, logger: serviceLogger)
     }()
@@ -155,7 +155,7 @@ public final class ProcessOut {
         let connectorConfiguration = { [unowned self] in
             let configuration = self.configuration
             return HttpConnectorRequestMapperConfiguration(
-                baseUrl: configuration.apiBaseUrl,
+                baseUrl: configuration.environment.apiBaseUrl,
                 projectId: configuration.projectId,
                 privateKey: configuration.privateKey,
                 sessionId: configuration.sessionId,
