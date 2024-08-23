@@ -15,11 +15,11 @@ struct ConfigurationView: View {
             Form {
                 Section(header: Text(.Configuration.project)) {
                     TextField(
-                        String(localized: .Configuration.projectId),
+                        String(localized: .Configuration.id),
                         text: $viewModel.state.projectId
                     )
                     TextField(
-                        String(localized: .Configuration.projectKey),
+                        String(localized: .Configuration.privateKey),
                         text: $viewModel.state.projectKey
                     )
                     Picker(selection: $viewModel.state.selectedEnvironment) {
@@ -32,7 +32,7 @@ struct ConfigurationView: View {
                 }
                 Section(header: Text(.Configuration.customer)) {
                     TextField(
-                        String(localized: .Configuration.customerId),
+                        String(localized: .Configuration.id),
                         text: $viewModel.state.customerId
                     )
                 }

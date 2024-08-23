@@ -14,14 +14,14 @@ extension LocalizedStringResource {
         /// Screen title.
         static let title = LocalizedStringResource("configuration.title")
 
+        /// Generic ID.
+        static let id = LocalizedStringResource("configuration.id")
+
         /// Project.
         static let project = LocalizedStringResource("configuration.project")
 
-        /// Project ID.
-        static let projectId = LocalizedStringResource("configuration.project-id")
-
         /// Project key.
-        static let projectKey = LocalizedStringResource("configuration.project-key")
+        static let privateKey = LocalizedStringResource("configuration.private-key")
 
         /// Environment.
         static let environment = LocalizedStringResource("configuration.environment")
@@ -34,9 +34,6 @@ extension LocalizedStringResource {
 
         /// Customer.
         static let customer = LocalizedStringResource("configuration.customer")
-
-        /// Customer ID.
-        static let customerId = LocalizedStringResource("configuration.customer-id")
 
         /// Submit button title.
         static let submit = LocalizedStringResource("configuration.submit")
