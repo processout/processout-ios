@@ -91,11 +91,12 @@ public struct ProcessOutConfiguration {
     }
 
     /// Creates debug configuration.
+    @_disfavoredOverload
     @_spi(PO)
     public init(
         projectId: String,
         privateKey: String? = nil,
-        environment: ProcessOutConfiguration.Environment
+        environment: ProcessOutConfiguration.Environment = .production
     ) {
         self.projectId = projectId
         self.privateKey = privateKey
