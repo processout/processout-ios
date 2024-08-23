@@ -49,6 +49,10 @@ public struct ProcessOutConfiguration {
     @_spi(PO)
     public let privateKey: String?
 
+    /// Project environment.
+    @_spi(PO)
+    public let environment: Environment
+
     /// Application name.
     public let application: Application?
 
@@ -79,11 +83,11 @@ public struct ProcessOutConfiguration {
         isTelemetryEnabled: Bool = true
     ) {
         self.projectId = projectId
+        self.environment = .production
         self.application = application
         self.isDebug = isDebug
         self.isTelemetryEnabled = isTelemetryEnabled
         self.privateKey = nil
-        self.environment = .production
     }
 
     /// Creates debug configuration.
@@ -100,11 +104,6 @@ public struct ProcessOutConfiguration {
         self.isTelemetryEnabled = true
         self.environment = environment
     }
-
-    // MARK: - Internal Properties
-
-    /// Project environment.
-    let environment: Environment
 }
 
 extension ProcessOutConfiguration {
