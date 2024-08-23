@@ -33,15 +33,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Private Methods
 
     private func configureProcessOut() {
-        // Please note that implementation is using factory method (part of private interface) that creates
-        // configuration with private key. It is only done for demonstration/testing purposes to avoid setting
-        // up test server and shouldn't be shipped with production code.
-        let configuration = ProcessOutConfiguration(
-            projectId: Constants.projectId,
-            privateKey: Constants.projectPrivateKey,
-            environment: .stage
-        )
-        ProcessOut.configure(configuration: configuration)
+        ProcessOut.configure(configuration: Constants.projectConfiguration)
         ProcessOutUI.configure()
     }
 }

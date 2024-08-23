@@ -32,7 +32,6 @@ final class ConfigurationViewModel {
     }
 
     func submit() {
-        configureProjectConstants()
         configureProcessOut()
         dismissSubject.send(())
     }
@@ -44,10 +43,7 @@ final class ConfigurationViewModel {
     // MARK: - Private Methods
 
     private func updateStateWithExistingProcessOutConfiguration() {
-        guard ProcessOut.isConfigured else {
-            return
-        }
-        let configuration = ProcessOut.shared.configuration
+        let configuration = Constants.projectConfiguration
         state.projectId = configuration.projectId
         state.projectKey = configuration.privateKey ?? ""
         state.selectedEnvironment = configuration.environment
@@ -60,10 +56,8 @@ final class ConfigurationViewModel {
             privateKey: state.projectKey,
             environment: state.selectedEnvironment
         )
-        ProcessOut.configure(configuration: configuration, force: true)
-    }
-
-    private func configureProjectConstants() {
+        Constants.projectConfiguration = configuration
         Constants.customerId = state.customerId
+        ProcessOut.configure(configuration: configuration, force: true)
     }
 }
