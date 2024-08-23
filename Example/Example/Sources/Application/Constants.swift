@@ -10,16 +10,16 @@ import Foundation
 enum Constants {
 
     /// Project ID.
-    static let projectId = ""
+    static var projectId = ""
 
     /// Project private key.
-    static let projectPrivateKey = ""
+    static var projectPrivateKey = ""
 
     /// Customer ID.
-    static let customerId = ""
+    static var customerId = ""
 
     /// ApplePay merchant ID.
-    static let merchantId: String? = nil
+    static let merchantId: String?
 
     /// Return URL.
     static let returnUrl = URL(string: "processout-example://return")! // swiftlint:disable:this force_unwrapping

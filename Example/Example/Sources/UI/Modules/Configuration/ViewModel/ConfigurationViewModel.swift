@@ -64,7 +64,6 @@ final class ConfigurationViewModel {
     }
 
     private func configureProjectConstants() {
-        // todo(andrii-vysotskyi): update customer
-        // Constants.customerId = state.customerId
+        Constants.customerId = state.customerId
     }
 }
