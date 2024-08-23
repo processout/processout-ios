@@ -19,7 +19,7 @@ WORK_DIR=$(mktemp -d)
 
 # Write AppStore Connect API key
 APP_STORE_CONNECT_API_KEY_PATH="$WORK_DIR/AuthKey.p8"
-echo -n $APP_STORE_CONNECT_API_KEY_CONTENT > $APP_STORE_CONNECT_API_KEY_PATH
+echo -n $APP_STORE_CONNECT_API_KEY_CONTENT | base64 -d > $APP_STORE_CONNECT_API_KEY_PATH
 
 # Create archive
 xcodebuild archive \
