@@ -6,14 +6,12 @@
 //
 
 import Foundation
+import ProcessOut
 
 enum Constants {
 
-    /// Project ID.
-    static var projectId = ""
-
-    /// Project private key.
-    static var projectPrivateKey = ""
+    /// Project configuration.
+    static var projectConfiguration = ProcessOutConfiguration(projectId: "")
 
     /// Customer ID.
     static var customerId = ""
