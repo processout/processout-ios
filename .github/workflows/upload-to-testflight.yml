@@ -1,0 +1,15 @@
+name: Upload to TestFlighs
+on:
+  workflow_dispatch:
+jobs:
+  export:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Export
+        working-directory: ./Example
+        env:
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+        run: source Scripts/Export/Export.sh
