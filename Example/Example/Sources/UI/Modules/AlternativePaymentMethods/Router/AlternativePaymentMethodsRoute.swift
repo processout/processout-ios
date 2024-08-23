@@ -31,9 +31,6 @@ enum AlternativePaymentMethodsRoute: RouteType {
     /// Asks user for authorisation amount and currency.
     case authorizationtAmount(completion: (Decimal, String) -> Void)
 
-    /// Asks user for additional data.
-    case additionalData(completion: ([String: String]) -> Void)
-
     /// Alert that shows given message.
     case alert(message: String)
 }

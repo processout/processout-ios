@@ -44,9 +44,6 @@ final class AlternativePaymentMethodsRouter: RouterType {
         case let .authorizationtAmount(completion):
             let viewController = AuthorizationAmountBuilder(completion: completion).build()
             self.viewController?.present(viewController, animated: true)
-        case let .additionalData(completion):
-            let viewController = AlternativePaymentDataBuilder(completion: completion).build()
-            self.viewController?.navigationController?.pushViewController(viewController, animated: true)
         case let .alert(message):
             let viewController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
             viewController.addAction(
