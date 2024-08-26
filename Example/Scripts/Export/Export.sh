@@ -2,17 +2,18 @@
 
 set -euo pipefail
 
+# Configure cleanup
 function cleanup {
   rm -rf $WORK_DIR
 }
 
-# Configure cleanup
 trap cleanup EXIT
 
 # Clean
 xcodebuild clean
 
-# Create working directory
+# Constants
+DEVELOPMENT_TEAM_ID="3Y9WMX63ZJ"
 WORK_DIR=$(mktemp -d)
 
 # todo(andrii-vysotskyi): inject default credentials
@@ -31,13 +32,18 @@ xcodebuild archive \
   -authenticationKeyID $APP_STORE_CONNECT_API_KEY_ID \
   -authenticationKeyPath $APP_STORE_CONNECT_API_KEY_PATH \
   -allowProvisioningUpdates \
-  "DEVELOPMENT_TEAM=3Y9WMX63ZJ"
-
-# Copy export options plist
-cp ./Scripts/Export/ExportOptions.plist $WORK_DIR
+  "DEVELOPMENT_TEAM=$DEVELOPMENT_TEAM_ID"
 
 # Navigate to working directory
 cd $WORK_DIR
+
+# Create export options plist
+/usr/libexec/PlistBuddy "ExportOptions.plist" \
+  -c "Add :method string 'app-store-connect'" \
+  -c "Add :destination string 'upload'" \
+  -c "Add :testFlightInternalTestingOnly bool true" \
+  -c "Add :manageAppVersionAndBuildNumber bool true" \
+  -c "Add :teamID string '$DEVELOPMENT_TEAM_ID'"
 
 # Export archive
 xcodebuild \
