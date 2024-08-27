@@ -757,6 +757,7 @@ final class DynamicCheckoutDefaultInteractor:
             invoiceId: startedState.invoice.id,
             source: source,
             saveSource: saveSource,
+            allowFallbackToSale: true,
             clientSecret: startedState.clientSecret
         )
         let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request)
