@@ -799,7 +799,7 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
 
     func nativeAlternativePaymentMethodDidEmitEvent(_ event: PONativeAlternativePaymentMethodEvent) {
         switch event {
-        case .didSubmitParameters:
+        case .willSubmitParameters:
             invalidateInvoiceIfPossible()
         default:
             break
