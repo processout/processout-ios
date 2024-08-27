@@ -81,6 +81,16 @@
         }
       }
     },
+    "configuration-scanner.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan Configuration"
+          }
+        }
+      }
+    },
     "configuration.customer" : {
       "localizations" : {
         "en" : {
