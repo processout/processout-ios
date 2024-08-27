@@ -538,7 +538,12 @@ final class DynamicCheckoutDefaultInteractor:
         Task { @MainActor in
             do {
                 if let redirectUrl = method.configuration.redirectUrl {
-                    _ = try await alternativePaymentSession.start(url: redirectUrl)
+                    let response = try await alternativePaymentSession.start(url: redirectUrl)
+                    try await authorizeInvoice(
+                        source: response.gatewayToken,
+                        saveSource: false,
+                        startedState: startedState
+                    )
                 } else {
                     try await authorizeInvoice(
                         source: method.configuration.customerTokenId,
