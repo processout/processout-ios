@@ -46,6 +46,30 @@ struct ConfigurationView: View {
             .navigationTitle(
                 String(localized: .Configuration.title)
             )
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button(
+                        action: {
+                            isScannerPresented = true
+                        },
+                        label: {
+                            Image(systemName: "qrcode.viewfinder")
+                        }
+                    )
+                }
+            }
+            .sheet(isPresented: $isScannerPresented) {
+                VStack {
+                    ConfigurationScannerView { code in
+                        viewModel.didScanConfiguration(code)
+                    }
+                    Spacer()
+                }
+                .presentationCornerRadius(16)
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.fraction(0.5)])
+            }
         }
         .onReceive(viewModel.dismiss) {
             dismiss()
@@ -60,6 +84,9 @@ struct ConfigurationView: View {
 
     @State
     private var viewModel = ConfigurationViewModel()
+
+    @State
+    private var isScannerPresented = false
 }
 
 #Preview {

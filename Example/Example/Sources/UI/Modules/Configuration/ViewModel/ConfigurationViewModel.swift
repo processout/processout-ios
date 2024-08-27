@@ -32,8 +32,26 @@ final class ConfigurationViewModel {
     }
 
     func submit() {
-        configureProcessOut()
+        configureProcessOutWithCurrentState()
         dismissSubject.send(())
+    }
+
+    func didScanConfiguration(_ rawValue: String) {
+        // todo(andrii-vysotskyi): decide if suggested format is acceptable
+        struct Configuration: Decodable {
+            let projectId, projectKey, customerId: String
+        }
+        let decoder = JSONDecoder()
+        do {
+            let data = Data(rawValue.utf8)
+            let configuration = try decoder.decode(Configuration.self, from: data)
+            state.projectId = configuration.projectId
+            state.projectKey = configuration.projectKey
+            state.customerId = configuration.customerId
+            configureProcessOutWithCurrentState()
+        } catch {
+            // Errors are ignored
+        }
     }
 
     // MARK: - Private Properties
@@ -50,7 +68,7 @@ final class ConfigurationViewModel {
         state.customerId = Constants.customerId
     }
 
-    private func configureProcessOut() {
+    private func configureProcessOutWithCurrentState() {
         let configuration = ProcessOutConfiguration(
             projectId: state.projectId,
             privateKey: state.projectKey,
