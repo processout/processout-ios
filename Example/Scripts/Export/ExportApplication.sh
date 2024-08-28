@@ -2,25 +2,31 @@
 
 set -euo pipefail
 
-# Configure cleanup
 function cleanup {
   rm -rf $WORK_DIR
 }
 
+# Configure cleanup
 trap cleanup EXIT
 
-# Clean
-xcodebuild clean
-
-# Constants
-DEVELOPMENT_TEAM_ID="3Y9WMX63ZJ"
+# Create temp directory
 WORK_DIR=$(mktemp -d)
 
-# todo(andrii-vysotskyi): inject default credentials
+# Clean project
+xcodebuild clean
 
 # Write AppStore Connect API key
 APP_STORE_CONNECT_API_KEY_PATH="$WORK_DIR/AuthKey.p8"
-echo -n $APP_STORE_CONNECT_API_KEY_CONTENT | base64 -d > $APP_STORE_CONNECT_API_KEY_PATH
+echo -n $APP_STORE_CONNECT_API_KEY_CONTENT | base64 -d -o $APP_STORE_CONNECT_API_KEY_PATH
+
+# Credentials
+AUTHENTICATION_ARGS=(
+  -authenticationKeyIssuerID $APP_STORE_CONNECT_API_KEY_ISSUER_ID
+  -authenticationKeyID $APP_STORE_CONNECT_API_KEY_ID
+  -authenticationKeyPath $APP_STORE_CONNECT_API_KEY_PATH
+  -allowProvisioningUpdates
+)
+DEVELOPMENT_TEAM_ID="3Y9WMX63ZJ"
 
 # Create archive
 xcodebuild archive \
@@ -28,10 +34,7 @@ xcodebuild archive \
   -sdk iphoneos \
   -destination generic/platform=iOS \
   -archivePath $WORK_DIR/Example.xcarchive \
-  -authenticationKeyIssuerID $APP_STORE_CONNECT_API_KEY_ISSUER_ID \
-  -authenticationKeyID $APP_STORE_CONNECT_API_KEY_ID \
-  -authenticationKeyPath $APP_STORE_CONNECT_API_KEY_PATH \
-  -allowProvisioningUpdates \
+  "${AUTHENTICATION_ARGS[@]}" \
   "DEVELOPMENT_TEAM=$DEVELOPMENT_TEAM_ID"
 
 # Navigate to working directory
@@ -51,7 +54,4 @@ xcodebuild \
   -archivePath "Example.xcarchive" \
   -exportOptionsPlist "ExportOptions.plist" \
   -exportPath "./" \
-  -authenticationKeyIssuerID $APP_STORE_CONNECT_API_KEY_ISSUER_ID \
-  -authenticationKeyID $APP_STORE_CONNECT_API_KEY_ID \
-  -authenticationKeyPath $APP_STORE_CONNECT_API_KEY_PATH \
-  -allowProvisioningUpdates
+  "${AUTHENTICATION_ARGS[@]}"
