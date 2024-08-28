@@ -60,5 +60,7 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires camera access to scan codes for project configuration.</string>
 </dict>
 </plist>
