@@ -2,13 +2,6 @@
 
 set -euo pipefail
 
-function cleanup {
-  rm -rf $WORK_DIR
-}
-
-# Configure cleanup
-trap cleanup EXIT
-
 # Create temp directory
 WORK_DIR=$(mktemp -d)
 
