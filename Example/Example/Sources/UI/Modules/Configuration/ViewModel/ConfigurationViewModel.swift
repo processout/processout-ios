@@ -42,6 +42,7 @@ final class ConfigurationViewModel {
             let projectId, projectKey, customerId: String
         }
         let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
         do {
             let data = Data(rawValue.utf8)
             let configuration = try decoder.decode(Configuration.self, from: data)
