@@ -1,4 +1,4 @@
-name: Upload Example to TestFlighs
+name: Upload Example to TestFlight
 on:
   # todo(andrii-vysotskyi): remove PR trigger after testing
   pull_request:

@@ -25,9 +25,6 @@ security import $DEVELOPMENT_CERTIFICATE_PATH \
     -f pkcs12 \
     -A
 
-# Enable codesigning from a non user interactive shell
-# security set-key-partition-list -S "apple-tool:,apple:" -s -k $KEYCHAIN_PASSWORD $KEYCHAIN_PATH
-
 # Append temp keychain to the user domain
 EXISTING_USER_KEYCHAIN_PATHS=$(security list-keychain -d user | awk -F'"' '{print $2}' ORS=' ')
 security list-keychains -d user -s $KEYCHAIN_PATH $EXISTING_USER_KEYCHAIN_PATHS
