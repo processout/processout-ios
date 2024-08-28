@@ -18,11 +18,10 @@ Project demonstrates multiple flows that ProcessOut framework is capable of.
 ```swift
 enum Constants {
 
-    /// Project ID.
-    static var projectId = "test-proj_K3Ur9LQzcKtm4zttWJ7oAKHgqdiwboAw"
-
-    /// Project private key.
-    static var projectPrivateKey = "key_test_RE14RLcNikkP5ZXMn84BFYApwotD05Kc"
+    /// Project configuration.
+    static var projectConfiguration = ProcessOutConfiguration(
+        projectId: "test-proj_K3Ur9LQzcKtm4zttWJ7oAKHgqdiwboAw"
+    )
 
     /// Customer ID.
     static var customerId = "cust_dCFEWBwqWrBFYAtkRIpILCynNqfhLQWX"
