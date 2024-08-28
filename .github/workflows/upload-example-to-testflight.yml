@@ -1,4 +1,4 @@
-name: Upload to TestFlighs
+name: Upload Example to TestFlighs
 on:
   # todo(andrii-vysotskyi): remove PR trigger after testing
   pull_request:
@@ -17,10 +17,16 @@ jobs:
       - name: Bootstrap Project
         working-directory: ./Example
         run: ./Scripts/BootstrapProject.sh
-      - name: Export
+      - name: Import Certificates
+        working-directory: ./Example
+        env:
+          APPLE_DEVELOPMENT_CERTIFICATE_CONTENT: ${{ secrets.APPLE_DEVELOPMENT_CERTIFICATE_CONTENT }}
+          APPLE_DEVELOPMENT_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_DEVELOPMENT_CERTIFICATE_PASSWORD }}
+        run: ./Scripts/Distribution/ImportCerificates.sh
+      - name: Export Application
         working-directory: ./Example
         env:
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
-        run: ./Scripts/Export/Export.sh
+        run: ./Scripts/Distribution/ExportApplication.sh
