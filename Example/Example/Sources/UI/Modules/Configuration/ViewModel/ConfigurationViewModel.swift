@@ -37,7 +37,6 @@ final class ConfigurationViewModel {
     }
 
     func didScanConfiguration(_ rawValue: String) {
-        // todo(andrii-vysotskyi): decide if suggested format is acceptable
         struct Configuration: Decodable {
             let projectId, projectKey, customerId: String
         }
