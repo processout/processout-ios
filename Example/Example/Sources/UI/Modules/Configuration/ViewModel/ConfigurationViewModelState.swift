@@ -31,6 +31,9 @@ struct ConfigurationViewModelState {
 
     /// Customer ID.
     var customerId: String
+
+    /// ApplePay Merchant ID.
+    var merchantId: String
 }
 
 extension ConfigurationViewModelState {
@@ -44,6 +47,7 @@ extension ConfigurationViewModelState {
             .init(id: .stage, name: String(localized: .Configuration.stageEnvironment))
         ],
         selectedEnvironment: .production,
-        customerId: ""
+        customerId: "",
+        merchantId: ""
     )
 }

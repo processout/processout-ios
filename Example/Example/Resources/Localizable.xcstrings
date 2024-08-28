@@ -91,6 +91,16 @@
         }
       }
     },
+    "configuration.apple-pay" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Pay"
+          }
+        }
+      }
+    },
     "configuration.customer" : {
       "localizations" : {
         "en" : {
@@ -117,6 +127,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ID"
+          }
+        }
+      }
+    },
+    "configuration.merchant-id" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merchant ID"
           }
         }
       }

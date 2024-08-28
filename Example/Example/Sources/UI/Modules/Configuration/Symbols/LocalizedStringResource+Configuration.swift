@@ -35,6 +35,12 @@ extension LocalizedStringResource {
         /// Customer.
         static let customer = LocalizedStringResource("configuration.customer")
 
+        /// ApplePay.
+        static let applePay = LocalizedStringResource("configuration.apple-pay")
+
+        /// ApplePay merchant ID..
+        static let merchantId = LocalizedStringResource("configuration.merchant-id")
+
         /// Submit button title.
         static let submit = LocalizedStringResource("configuration.submit")
     }

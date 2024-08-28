@@ -36,6 +36,12 @@ struct ConfigurationView: View {
                         text: $viewModel.state.customerId
                     )
                 }
+                Section(header: Text(.Configuration.applePay)) {
+                    TextField(
+                        String(localized: .Configuration.merchantId),
+                        text: $viewModel.state.merchantId
+                    )
+                }
                 Button(String(localized: .Configuration.submit)) {
                     viewModel.submit()
                 }
