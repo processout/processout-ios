@@ -12,7 +12,7 @@ final class CustomerTokensServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        let configuration = ProcessOutConfiguration.production(
+        let configuration = ProcessOutConfiguration(
             projectId: Constants.projectId, privateKey: Constants.projectPrivateKey
         )
         ProcessOut.configure(configuration: configuration, force: true)

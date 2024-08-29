@@ -2,6 +2,13 @@
 
 set -euo pipefail
 
+function cleanup {
+  rm -rf $WORK_DIR
+}
+
+# Configure cleanup
+trap cleanup EXIT
+
 # Constants
 export WORK_DIR=$(mktemp -d)
 export BASE_LANGUAGE=en
@@ -48,9 +55,3 @@ mkdir -p $WORK_DIR/export
 
 # Import available localizations
 find $IMPORT_DIR -name '*.xliff' -exec /bin/bash -c 'import_localization "$0"' {} \;
-
-function cleanup {
-  rm -rf $WORK_DIR
-}
-
-trap cleanup EXIT

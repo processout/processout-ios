@@ -29,6 +29,13 @@ final class FeaturesViewController<ViewModel: FeaturesViewModelType>:
         }
     }
 
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        if motion == .motionShake {
+            viewModel.motionShakeEnded()
+        }
+        super.motionEnded(motion, with: event)
+    }
+
     // MARK: - UICollectionViewDelegate
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

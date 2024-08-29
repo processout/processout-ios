@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 29.10.2022.
 //
 
-import UIKit
+import SwiftUI
 import ProcessOut
 @_spi(PO) import ProcessOutUI
 
@@ -42,6 +42,9 @@ final class FeaturesRouter: RouterType {
             viewController.addAction(
                 UIAlertAction(title: String(localized: .Features.continue), style: .default)
             )
+            self.viewController?.present(viewController, animated: true)
+        case .configuration:
+            let viewController = UIHostingController(rootView: ConfigurationView())
             self.viewController?.present(viewController, animated: true)
         }
         return true

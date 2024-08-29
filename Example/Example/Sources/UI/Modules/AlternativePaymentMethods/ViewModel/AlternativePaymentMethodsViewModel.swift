@@ -134,14 +134,10 @@ final class AlternativePaymentMethodsViewModel:
                 )
                 route = .nativeAlternativePayment(paymentRoute)
             } else {
-                route = AlternativePaymentMethodsRoute.additionalData { [weak self] additionalData in
-                    let request = POAlternativePaymentMethodRequest(
-                        invoiceId: invoice.id,
-                        gatewayConfigurationId: gatewayConfiguration.id,
-                        additionalData: additionalData
-                    )
-                    self?.router.trigger(route: .alternativePayment(request: request))
-                }
+                let request = POAlternativePaymentMethodRequest(
+                    invoiceId: invoice.id, gatewayConfigurationId: gatewayConfiguration.id
+                )
+                route = .alternativePayment(request: request)
             }
             self?.router.trigger(route: route)
         }
