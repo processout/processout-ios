@@ -446,7 +446,12 @@ final class DynamicCheckoutDefaultInteractor:
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
             do {
-                _ = try await alternativePaymentSession.start(url: method.configuration.redirectUrl)
+                let response = try await alternativePaymentSession.start(url: method.configuration.redirectUrl)
+                try await authorizeInvoice(
+                    source: response.gatewayToken,
+                    saveSource: false,
+                    startedState: startedState
+                )
                 setSuccessState()
             } catch {
                 recoverPaymentProcessing(error: error)
@@ -537,15 +542,11 @@ final class DynamicCheckoutDefaultInteractor:
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
             do {
+                var source = method.configuration.customerTokenId
                 if let redirectUrl = method.configuration.redirectUrl {
-                    _ = try await alternativePaymentSession.start(url: redirectUrl)
-                } else {
-                    try await authorizeInvoice(
-                        source: method.configuration.customerTokenId,
-                        saveSource: false,
-                        startedState: startedState
-                    )
+                    source = try await alternativePaymentSession.start(url: redirectUrl).gatewayToken
                 }
+                try await authorizeInvoice(source: source, saveSource: false, startedState: startedState)
                 setSuccessState()
             } catch {
                 recoverPaymentProcessing(error: error)
@@ -756,6 +757,7 @@ final class DynamicCheckoutDefaultInteractor:
             invoiceId: startedState.invoice.id,
             source: source,
             saveSource: saveSource,
+            allowFallbackToSale: true,
             clientSecret: startedState.clientSecret
         )
         let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request)
@@ -797,7 +799,7 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
 
     func nativeAlternativePaymentMethodDidEmitEvent(_ event: PONativeAlternativePaymentMethodEvent) {
         switch event {
-        case .didSubmitParameters:
+        case .willSubmitParameters:
             invalidateInvoiceIfPossible()
         default:
             break
