@@ -15,9 +15,12 @@ final class FeaturesRouter: RouterType {
 
     func trigger(route: FeaturesRoute) -> Bool {
         switch route {
-        case .gatewayConfigurations(let filter):
-            let viewController = AlternativePaymentMethodsBuilder(filter: filter).build()
-            self.viewController?.navigationController?.pushViewController(viewController, animated: true)
+        case .gatewayConfigurations:
+            // todo(andrii-vysotskyi): pass filter
+            MainActor.assumeIsolated {
+                let viewController = UIHostingController(rootView: AlternativePaymentsView())
+                self.viewController?.navigationController?.pushViewController(viewController, animated: true)
+            }
         case let .cardTokenization(threeDSService, completion):
             let builder = CardPaymentBuilder(threeDSService: threeDSService) { [weak self] result in
                 self?.viewController?.navigationController?.dismiss(animated: true) {

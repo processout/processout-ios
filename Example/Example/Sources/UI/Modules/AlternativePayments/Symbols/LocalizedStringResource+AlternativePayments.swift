@@ -14,6 +14,9 @@ extension LocalizedStringResource {
         /// Title.
         static let title = LocalizedStringResource("alternative-payments.title")
 
+        /// Gateway configurations.
+        static let gatewayConfigurations = LocalizedStringResource("alternative-payments.gateway-configurations")
+
         /// Error message.
         static let error = LocalizedStringResource("alternative-payments.error-\(placeholder: .object)")
 

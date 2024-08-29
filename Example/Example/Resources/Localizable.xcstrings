@@ -21,6 +21,16 @@
         }
       }
     },
+    "alternative-payments.gateway-configurations" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gateway Configurations"
+          }
+        }
+      }
+    },
     "alternative-payments.generic-error" : {
       "localizations" : {
         "en" : {
