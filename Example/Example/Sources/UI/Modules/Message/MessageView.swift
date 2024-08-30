@@ -26,6 +26,7 @@ struct MessageView: View {
         return HStack {
             Image(systemName: imageName)
             Text(viewModel.text)
+                .textSelection(.enabled)
         }
         .foregroundStyle(foregroundColor)
     }

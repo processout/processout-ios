@@ -51,14 +51,13 @@ final class CardPaymentViewModel {
             delegate: self,
             completion: { [weak self] result in
                 switch result {
-                case .success:
+                case .success(let card):
                     self?.state.message = .init(
-                        text: String(localized: .CardPayment.successMessage), severity: .success
+                        text: String(localized: .CardPayment.successMessage, replacements: card.id),
+                        severity: .success
                     )
-                case .failure(let failure) where failure.code != .cancelled:
-                    self?.state.message = .init(text: String(localized: .CardPayment.errorMessage), severity: .error)
-                default:
-                    break
+                case .failure:
+                    break // Ignored
                 }
                 self?.state.cardTokenization = nil
             }
