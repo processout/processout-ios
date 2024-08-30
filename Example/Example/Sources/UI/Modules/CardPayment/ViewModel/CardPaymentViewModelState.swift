@@ -32,6 +32,19 @@ struct CardPaymentViewModelState {
         var currencyCode: PickerData<Locale.Currency, String>
     }
 
+    struct Message {
+
+        /// Message text.
+        let text: String
+
+        /// Message severity.
+        let severity: MessageSeverity
+    }
+
+    enum MessageSeverity {
+        case success, error
+    }
+
     struct CardTokenization: Identifiable {
 
         let id: String
@@ -54,4 +67,7 @@ struct CardPaymentViewModelState {
 
     /// Card tokenization.
     var cardTokenization: CardTokenization?
+
+    /// Message.
+    var message: Message?
 }

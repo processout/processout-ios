@@ -24,6 +24,7 @@ final class CardPaymentViewModel {
     var state: CardPaymentViewModelState! // swiftlint:disable:this implicitly_unwrapped_optional
 
     func pay() {
+        state.message = nil
         setCardTokenizationItem()
     }
 
@@ -52,8 +53,17 @@ final class CardPaymentViewModel {
             id: UUID().uuidString,
             configuration: configuration,
             delegate: self,
-            completion: { [weak self] _ in
-                // todo(andrii-vysotskyi): present success/error message
+            completion: { [weak self] result in
+                switch result {
+                case .success:
+                    self?.state.message = .init(
+                        text: String(localized: .CardPayment.successMessage), severity: .success
+                    )
+                case .failure(let failure) where failure.code != .cancelled:
+                    self?.state.message = .init(text: String(localized: .CardPayment.errorMessage), severity: .error)
+                default:
+                    break
+                }
                 self?.state.cardTokenization = nil
             }
         )

@@ -36,6 +36,12 @@ extension LocalizedStringResource {
 
         /// Continue button.
         static let pay = LocalizedStringResource("card-payment.pay")
+
+        /// Success message.
+        static let successMessage = LocalizedStringResource("card-payment.success-message")
+
+        /// Error message.
+        static let errorMessage = LocalizedStringResource("card-payment.error-message")
     }
 }
 
