@@ -29,7 +29,7 @@ extension LocalizedStringResource {
         /// ApplePay.
         static let applePay = LocalizedStringResource("features.apple-pay")
 
-        /// App settings.
-        static let applicationSettings = LocalizedStringResource("features.application-settings")
+        /// App configuration.
+        static let applicationConfiguration = LocalizedStringResource("features.application-configuration")
     }
 }

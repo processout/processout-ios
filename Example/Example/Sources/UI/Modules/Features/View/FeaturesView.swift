@@ -1,5 +1,5 @@
 //
-//  FeaturesViewController.swift
+//  FeaturesView.swift
 //  Example
 //
 //  Created by Andrii Vysotskyi on 28.10.2022.
@@ -29,7 +29,7 @@ struct FeaturesView: View {
                 }
             }
             Section {
-                NavigationLink(String(localized: .Features.applicationSettings)) {
+                NavigationLink(String(localized: .Features.applicationConfiguration)) {
                     ConfigurationView()
                 }
             }
