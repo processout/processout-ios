@@ -18,7 +18,7 @@ extension LocalizedStringResource {
         static let pay = LocalizedStringResource("dynamic-checkout.pay")
 
         /// Success message.
-        static let successMessage = LocalizedStringResource("dynamic-checkout.success-message")
+        static let successMessage = LocalizedStringResource("dynamic-checkout.success-message-\(placeholder: .object)")
 
         /// Error message.
         static let errorMessage = LocalizedStringResource("dynamic-checkout.error-message")

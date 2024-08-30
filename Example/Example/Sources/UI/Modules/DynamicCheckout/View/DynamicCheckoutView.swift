@@ -22,7 +22,9 @@ struct DynamicCheckoutView: View {
         }
         .sheet(item: $viewModel.state.dynamicCheckout) { item in
             PODynamicCheckoutView(
-                configuration: item.configuration, delegate: item.delegate, completion: item.completion
+                configuration: item.configuration,
+                delegate: item.delegate,
+                completion: item.completion
             )
         }
         .onSubmit {
@@ -33,9 +35,6 @@ struct DynamicCheckoutView: View {
     }
 
     // MARK: - Private Properties
-
-    @Environment(\.dismiss)
-    private var dismiss
 
     @State
     private var viewModel = DynamicCheckoutViewModel()

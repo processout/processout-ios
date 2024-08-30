@@ -62,11 +62,13 @@ final class DynamicCheckoutViewModel {
                 switch result {
                 case .success:
                     self?.state.message = .init(
-                        text: String(localized: .DynamicCheckout.successMessage), severity: .success
+                        text: String(localized: .DynamicCheckout.successMessage, replacements: invoice.id),
+                        severity: .success
                     )
                 case .failure(let failure) where failure.code != .cancelled:
                     self?.state.message = .init(
-                        text: String(localized: .DynamicCheckout.errorMessage), severity: .error
+                        text: failure.message ?? String(localized: .DynamicCheckout.errorMessage),
+                        severity: .error
                     )
                 default:
                     break
@@ -89,8 +91,7 @@ extension DynamicCheckoutViewModel: PODynamicCheckoutDelegate {
     func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {
         let item = PKPaymentSummaryItem(
             label: "Test",
-            amount: state.invoice.amount as NSDecimalNumber, // swiftlint:disable:this legacy_objc_type
-            type: .final
+            amount: state.invoice.amount as NSDecimalNumber // swiftlint:disable:this legacy_objc_type
         )
         request.paymentSummaryItems = [item]
     }
