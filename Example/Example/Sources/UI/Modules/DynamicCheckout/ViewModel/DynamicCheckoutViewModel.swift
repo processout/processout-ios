@@ -88,7 +88,7 @@ extension DynamicCheckoutViewModel: PODynamicCheckoutDelegate {
 
     func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {
         let item = PKPaymentSummaryItem(
-            label: state.invoice.name,
+            label: "Test",
             amount: NSDecimalNumber(string: state.invoice.amount), // swiftlint:disable:this legacy_objc_type
             type: .final
         )
