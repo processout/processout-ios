@@ -29,9 +29,6 @@ struct ApplePayView: View {
 
     // MARK: - Private Properties
 
-    @Environment(\.dismiss)
-    private var dismiss
-
     @State
     private var viewModel = ApplePayViewModel()
 }

@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-@_spi(PO) import ProcessOut
 
 struct ConfigurationView: View {
 
