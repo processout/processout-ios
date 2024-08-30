@@ -75,10 +75,18 @@ extension ApplePayViewModel: POPassKitPaymentAuthorizationControllerDelegate {
             )
             let threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
             try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
+            setSuccessMessage(invoice: invoice, card: card)
         } catch {
             return .init(status: .failure, errors: [error])
         }
         return .init(status: .success, errors: nil)
+    }
+
+    // MARK: - Private Methods
+
+    private func setSuccessMessage(invoice: POInvoice, card: POCard) {
+        let text = String(localized: .ApplePay.successMessage, replacements: invoice.id, card.id)
+        state.message = .init(text: text, severity: .success)
     }
 }
 

@@ -14,10 +14,12 @@ extension LocalizedStringResource {
         /// Title.
         static let title = LocalizedStringResource("apple-pay.title")
 
-        /// Continue button.
+        /// Pay button.
         static let pay = LocalizedStringResource("apple-pay.pay")
 
         /// Success message.
-        static let successMessage = LocalizedStringResource("apple-pay.success-message")
+        static let successMessage = LocalizedStringResource(
+            "apple-pay.success-message-\(placeholder: .object)-\(placeholder: .object)"
+        )
     }
 }

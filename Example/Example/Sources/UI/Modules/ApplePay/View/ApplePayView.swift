@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-@_spi(PO) import ProcessOutUI
+import PassKit
 
 struct ApplePayView: View {
 

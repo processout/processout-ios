@@ -9,6 +9,7 @@ import Foundation
 
 extension String {
 
+    @_disfavoredOverload
     init(localized resource: LocalizedStringResource, replacements: any CVarArg...) {
         var options = String.LocalizationOptions()
         options.replacements = replacements
