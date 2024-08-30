@@ -9,7 +9,6 @@ import UIKit
 @_spi(PO) import ProcessOut
 import ProcessOutUI
 
-@main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(
@@ -27,7 +26,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         configurationForConnecting connectingSceneSession: UISceneSession,
         options: UIScene.ConnectionOptions
     ) -> UISceneConfiguration {
-        UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+        let sceneConfiguration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        sceneConfiguration.delegateClass = SceneDelegate.self
+        return sceneConfiguration
     }
 
     // MARK: - Private Methods
