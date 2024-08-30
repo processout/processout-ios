@@ -41,6 +41,7 @@ struct CardPaymentView: View {
         .sheet(item: $viewModel.state.cardTokenization) { item in
             // swiftlint:disable:next line_length
             POCardTokenizationView(configuration: item.configuration, delegate: item.delegate, completion: item.completion)
+                .presentationDetents([.fraction(0.75), .large])
         }
         .onSubmit {
             viewModel.pay()
