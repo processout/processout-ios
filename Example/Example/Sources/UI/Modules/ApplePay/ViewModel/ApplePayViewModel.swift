@@ -37,10 +37,8 @@ final class ApplePayViewModel {
         request.merchantIdentifier = Constants.merchantId ?? ""
         request.merchantCapabilities = [.threeDSecure]
         request.paymentSummaryItems = [
-            .init(
-                label: "Test",
-                amount: NSDecimalNumber(string: state.invoice.amount) // swiftlint:disable:this legacy_objc_type
-            )
+            // swiftlint:disable:next legacy_objc_type
+            .init(label: "Test", amount: state.invoice.amount as NSDecimalNumber)
         ]
         request.currencyCode = state.invoice.currencyCode.selection
         request.countryCode = "US"
@@ -67,7 +65,7 @@ extension ApplePayViewModel: POPassKitPaymentAuthorizationControllerDelegate {
     ) async -> PKPaymentAuthorizationResult {
         let invoiceCreationRequest = POInvoiceCreationRequest(
             name: state.invoice.name,
-            amount: state.invoice.amount,
+            amount: state.invoice.amount.description,
             currency: state.invoice.currencyCode.selection
         )
         do {

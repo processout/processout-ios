@@ -38,7 +38,7 @@ final class DynamicCheckoutViewModel {
     private func startDynamicCheckout() async {
         let invoiceCreationRequest = POInvoiceCreationRequest(
             name: state.invoice.name,
-            amount: state.invoice.amount,
+            amount: state.invoice.amount.description,
             currency: state.invoice.currencyCode.selection,
             returnUrl: Constants.returnUrl,
             customerId: Constants.customerId
@@ -89,7 +89,7 @@ extension DynamicCheckoutViewModel: PODynamicCheckoutDelegate {
     func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {
         let item = PKPaymentSummaryItem(
             label: "Test",
-            amount: NSDecimalNumber(string: state.invoice.amount), // swiftlint:disable:this legacy_objc_type
+            amount: state.invoice.amount as NSDecimalNumber, // swiftlint:disable:this legacy_objc_type
             type: .final
         )
         request.paymentSummaryItems = [item]

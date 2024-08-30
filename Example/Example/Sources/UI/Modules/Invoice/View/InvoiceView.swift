@@ -21,8 +21,9 @@ struct InvoiceView: View {
                 String(localized: .Invoice.name), text: $viewModel.name
             )
             TextField(
-                String(localized: .Invoice.amount), text: $viewModel.amount
+                String(localized: .Invoice.amount), value: $viewModel.amount, format: .number
             )
+            .keyboardType(.decimalPad)
             Picker(data: $viewModel.currencyCode) { code in
                 Text(Locale.current.localizedString(forCurrencyCode: code.identifier) ?? code.identifier)
             } label: {

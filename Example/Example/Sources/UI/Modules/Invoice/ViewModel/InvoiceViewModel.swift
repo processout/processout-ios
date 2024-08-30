@@ -13,7 +13,7 @@ struct InvoiceViewModel {
     var name: String
 
     /// Invoice amount.
-    var amount: String
+    var amount: Decimal
 
     /// Currency code.
     var currencyCode: PickerData<Locale.Currency, String>
@@ -24,7 +24,7 @@ extension InvoiceViewModel {
     /// Convenience init to create default view model.
     init() {
         self.name = UUID().uuidString
-        self.amount = ""
+        self.amount = 100
         currencyCode = .init(sources: Locale.Currency.isoCurrencies, id: \.identifier, selection: "USD")
     }
 }

@@ -71,7 +71,7 @@ extension CardPaymentViewModel: POCardTokenizationDelegate {
     func cardTokenization(didTokenizeCard card: POCard, shouldSaveCard save: Bool) async throws {
         let invoiceCreationRequest = POInvoiceCreationRequest(
             name: state.invoice.name,
-            amount: state.invoice.amount,
+            amount: state.invoice.amount.description,
             currency: state.invoice.currencyCode.selection,
             returnUrl: Constants.returnUrl
         )
