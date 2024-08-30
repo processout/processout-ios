@@ -20,31 +20,6 @@ struct CardPaymentViewModelState {
         case checkout
     }
 
-    struct Invoice {
-
-        /// Invoice name.
-        var name: String = ""
-
-        /// Invoice amount.
-        var amount: String = ""
-
-        /// Currency code.
-        var currencyCode: PickerData<Locale.Currency, String>
-    }
-
-    struct Message {
-
-        /// Message text.
-        let text: String
-
-        /// Message severity.
-        let severity: MessageSeverity
-    }
-
-    enum MessageSeverity {
-        case success, error
-    }
-
     struct CardTokenization: Identifiable {
 
         let id: String
@@ -60,7 +35,7 @@ struct CardPaymentViewModelState {
     }
 
     /// Invoice details.
-    var invoice: Invoice
+    var invoice = InvoiceViewModel()
 
     /// 3DS service.
     var authenticationService: PickerData<AuthenticationService, AuthenticationService>
@@ -69,5 +44,5 @@ struct CardPaymentViewModelState {
     var cardTokenization: CardTokenization?
 
     /// Message.
-    var message: Message?
+    var message: MessageViewModel?
 }

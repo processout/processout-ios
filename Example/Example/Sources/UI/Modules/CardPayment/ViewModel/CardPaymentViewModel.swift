@@ -36,10 +36,6 @@ final class CardPaymentViewModel {
 
     private func commonInit() {
         state = .init(
-            invoice: .init(
-                name: UUID().uuidString,
-                currencyCode: .init(sources: Locale.Currency.isoCurrencies, id: \.identifier, selection: "USD")
-            ),
             authenticationService: .init(
                 sources: [.test, .checkout], id: \.self, selection: .test
             ),
