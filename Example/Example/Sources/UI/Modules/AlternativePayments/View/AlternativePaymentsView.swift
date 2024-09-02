@@ -6,59 +6,59 @@
 //
 
 import SwiftUI
+import ProcessOutUI
 
 @MainActor
 struct AlternativePaymentsView: View {
 
-    // MARK: - View
-
     var body: some View {
-        List(selection: $selectedItemId) {
-            ForEach(viewModel.state.sections) { section in
-                Section {
-                    ForEach(section.items) { item in
-                        switch item {
-                        case .configuration(let item):
-                            HStack {
-                                Text(item.name)
-                                    .contentShape(.rect)
-                                    .onTapGesture(perform: item.select)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                            }
-                        case .error(let item):
-                            Label {
-                                Text(item.errorMessage)
-                            } icon: {
-                                Image(systemName: "exclamationmark.octagon").foregroundColor(.red)
-                            }
-                        }
-                    }
-                } header: {
-                    if let title = section.title {
-                        Text(title)
+        Form {
+            if let viewModel = viewModel.state.message {
+                MessageView(viewModel: viewModel)
+            }
+            InvoiceView(viewModel: $viewModel.state.invoice)
+            Section {
+                if let filters = viewModel.state.filter {
+                    Picker(data: filters) { filter in
+                        Text(filter.name)
+                    } label: {
+                        Text(.AlternativePayments.Filter.title)
                     }
                 }
+                if let gatewayConfigurations = Binding($viewModel.state.gatewayConfiguration) {
+                    Picker(data: gatewayConfigurations) { configuration in
+                        Text(configuration.name)
+                    } label: {
+                        Text(.AlternativePayments.gatewayConfiguration)
+                    }
+                }
+                Toggle(
+                    String(localized: .AlternativePayments.nativePreference),
+                    isOn: $viewModel.state.preferNative
+                )
+            } header: {
+                Text(.AlternativePayments.gateway)
+            }
+            Button(String(localized: .AlternativePayments.pay)) {
+                viewModel.pay()
             }
         }
-        .animation(.default, value: viewModel.state.sections.flatMap(\.id))
-        .listStyle(.insetGrouped)
-        .onChange(of: selectedItemId) {
-            selectedItemId = nil
+        .onSubmit {
+            viewModel.pay()
         }
         .refreshable {
             await viewModel.restart()
         }
         .onAppear(perform: viewModel.start)
+        .sheet(item: $viewModel.state.nativePayment) { item in
+            PONativeAlternativePaymentView(configuration: item.configuration, completion: item.completion)
+        }
         .navigationTitle(String(localized: .AlternativePayments.title))
         .navigationBarTitleDisplayMode(.inline)
     }
 
     // MARK: - Private Properties
 
-    @State
-    private var selectedItemId: String?
-
-    @State
+    @StateObject
     private var viewModel = AlternativePaymentsViewModel()
 }
