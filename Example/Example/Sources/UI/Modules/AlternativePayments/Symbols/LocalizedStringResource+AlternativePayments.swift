@@ -43,6 +43,11 @@ extension LocalizedStringResource {
         /// Generic error message.
         static let errorMessage = LocalizedStringResource("alternative-payments.error-message")
 
+        /// Success message.
+        static let successMessage = LocalizedStringResource(
+            "alternative-payments.success-message-\(placeholder: .object)-\(placeholder: .object)"
+        )
+
         /// Pay button.
         static let pay = LocalizedStringResource("alternative-payments.pay")
     }

@@ -2,7 +2,14 @@
   "sourceLanguage" : "en",
   "strings" : {
     "alternative-payments.error-message" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alternative payment could not be processed. Please try again."
+          }
+        }
+      }
     },
     "alternative-payments.filter" : {
       "localizations" : {
@@ -80,6 +87,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pay"
+          }
+        }
+      }
+    },
+    "alternative-payments.success-message-%@-%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The invoice '%1$@' has been successfully authorized using the alternative payment method '%2$@'."
           }
         }
       }

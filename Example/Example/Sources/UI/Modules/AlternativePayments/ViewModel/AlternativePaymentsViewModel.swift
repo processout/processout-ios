@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import SwiftUI
 import ProcessOut
 import ProcessOutUI
 
@@ -31,15 +32,17 @@ final class AlternativePaymentsViewModel: ObservableObject {
     }
 
     func restart() async {
+        state.nativePayment = nil
         state.message = nil
         await interactor.restart()
     }
 
     func pay() {
+        state.nativePayment = nil
+        state.message = nil
         Task {
             await startPayment()
         }
-        state.message = nil
     }
 
     // MARK: - Private Properties
@@ -47,7 +50,7 @@ final class AlternativePaymentsViewModel: ObservableObject {
     private let interactor: AlternativePaymentsInteractor
     private var cancellables: Set<AnyCancellable>
 
-    // MARK: - Private Methods
+    // MARK: - Interactor Observation
 
     private func observeInteractorStateChanges() {
         let cancellable = interactor.$state.sink { [weak self] state in
@@ -57,11 +60,123 @@ final class AlternativePaymentsViewModel: ObservableObject {
     }
 
     private func update(with interactorState: AlternativePaymentsInteractorState) {
-        // TBD
+        switch interactorState {
+        case .idle:
+            state.filter = nil
+            state.gatewayConfiguration = nil
+        case .starting(let interactorState):
+            updateStateFilters(with: interactorState.filter)
+            state.gatewayConfiguration = nil
+        case .started(let interactorState):
+            updateStateFilters(with: interactorState.filter)
+            updateStateGatewayConfigurations(with: interactorState.gatewayConfigurations)
+        case .failure(let failure):
+            state.gatewayConfiguration = nil
+            state.filter = nil
+            updateStateMessage(with: failure)
+        }
     }
 
+    private func updateStateFilters(with selectedFilter: POAllGatewayConfigurationsRequest.Filter) {
+        // todo(andrii-vysotskyi): support tokenization flow
+        let sources: [AlternativePaymentsViewModelState.Filter] = [
+            .init(id: .alternativePaymentMethods, name: String(localized: .AlternativePayments.Filter.all)),
+            // .init(
+            //    id: .alternativePaymentMethodsWithTokenization,
+            //    name: String(localized: .AlternativePayments.Filter.tokenizable)
+            // ),
+            .init(id: .nativeAlternativePaymentMethods, name: String(localized: .AlternativePayments.Filter.native))
+        ]
+        let binding = Binding(
+            get: {
+                PickerData(sources: sources, id: \.id, selection: selectedFilter)
+            },
+            set: { [weak self] newValue in
+                Task { @MainActor in
+                    await self?.interactor.setFilter(newValue.selection)
+                }
+            }
+        )
+        state.filter = binding
+    }
+
+    private func updateStateGatewayConfigurations(with gatewayConfigurations: [POGatewayConfiguration]) {
+        if gatewayConfigurations.isEmpty {
+            state.gatewayConfiguration = nil
+        } else {
+            let sources = gatewayConfigurations.map { configuration in
+                AlternativePaymentsViewModelState.GatewayConfiguration(
+                    id: configuration.id, name: configuration.gateway?.name ?? ""
+                )
+            }
+            // swiftlint:disable:next force_unwrapping
+            let selection = state.gatewayConfiguration?.selection ?? gatewayConfigurations.first!.id
+            state.gatewayConfiguration = .init(sources: sources, id: \.id, selection: selection)
+        }
+    }
+
+    private func updateStateMessage(with error: Error) {
+        if let failure = error as? POFailure, failure.code == .cancelled {
+            return
+        }
+        let errorMessage: String
+        if let failure = error as? POFailure, let message = failure.message {
+            errorMessage = message
+        } else {
+            errorMessage = String(localized: .AlternativePayments.errorMessage)
+        }
+        state.message = .init(text: errorMessage, severity: .error)
+    }
+
+    // MARK: -
+
     private func startPayment() async {
-       // TBD
+        guard let gatewayConfigurationId = state.gatewayConfiguration?.selection else {
+            state.message = .init(text: "Please select a Gateway Configuration to proceed.", severity: .error)
+            return
+        }
+        do {
+            let invoice = try await interactor.createInvoice(
+                name: state.invoice.name,
+                amount: state.invoice.amount,
+                currencyCode: state.invoice.currencyCode.selection
+            )
+            if state.preferNative {
+                try await authorizeNatively(invoice: invoice, gatewayConfigurationId: gatewayConfigurationId)
+            } else {
+                try await interactor.authorize(invoice: invoice, gatewayConfigurationId: gatewayConfigurationId)
+            }
+            let successMessage = String(
+                localized: .AlternativePayments.successMessage,
+                replacements: invoice.id, gatewayConfigurationId
+            )
+            state.message = .init(text: successMessage, severity: .success)
+        } catch {
+            updateStateMessage(with: error)
+        }
+    }
+
+    private func authorizeNatively(invoice: POInvoice, gatewayConfigurationId: String) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            let configuration = PONativeAlternativePaymentConfiguration(
+                invoiceId: invoice.id,
+                gatewayConfigurationId: gatewayConfigurationId,
+                secondaryAction: .cancel(),
+                paymentConfirmation: .init(
+                    showProgressIndicatorAfter: 5,
+                    secondaryAction: .cancel(disabledFor: 10)
+                )
+            )
+            let nativePaymentItem = AlternativePaymentsViewModelState.NativePayment(
+                id: UUID().uuidString,
+                configuration: configuration,
+                completion: { [weak self] result in
+                    self?.state.nativePayment = nil
+                    continuation.resume(with: result)
+                }
+            )
+            state.nativePayment = nativePaymentItem
+        }
     }
 }
 
