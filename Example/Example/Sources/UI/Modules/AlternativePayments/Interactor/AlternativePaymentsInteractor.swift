@@ -7,11 +7,15 @@
 
 import Foundation
 @_spi(PO) import ProcessOut
+import ProcessOutUI
 
 @MainActor
 final class AlternativePaymentsInteractor {
 
-    init(gatewayConfigurationsRepository: POGatewayConfigurationsRepository, invoicesService: POInvoicesService) {
+    init(
+        gatewayConfigurationsRepository: POGatewayConfigurationsRepository,
+        invoicesService: POInvoicesService
+    ) {
         self.gatewayConfigurationsRepository = gatewayConfigurationsRepository
         self.invoicesService = invoicesService
         state = .idle
@@ -25,37 +29,58 @@ final class AlternativePaymentsInteractor {
     func start() async {
         switch state {
         case .idle, .failure:
-            break
+            await setFilter(.alternativePaymentMethods)
         default:
-            return
-        }
-        state = .starting
-        do {
-            try await setStartedStateUnchecked()
-        } catch {
-            state = .failure(error)
+            break
         }
     }
 
     func restart() async {
         switch state {
-        case .failure:
+        case .idle, .failure:
             await start()
-        case .started(let currentState):
-            state = .restarting(snapshot: currentState)
-            do {
-                try await setStartedStateUnchecked()
-            } catch {
-                state = .started(currentState) // Error is ignored
-            }
-        default:
-            break // Ignored
+        case .starting(let currentState):
+            _ = await currentState.task.result
+        case .started(let started):
+            await setFilter(started.filter)
         }
     }
 
-    func createInvoice(amount: Decimal, currencyCode: String) async throws -> POInvoice {
+    func setFilter(_ filter: POAllGatewayConfigurationsRequest.Filter) async {
+        switch state {
+        case .idle, .started, .failure:
+            break
+        case .starting(let currentState):
+            currentState.task.cancel()
+        }
+        let startingStateId = UUID().uuidString
+        let task = Task { @MainActor [gatewayConfigurationsRepository] in
+            do {
+                let request = POAllGatewayConfigurationsRequest(
+                    filter: filter, paginationOptions: .init(limit: Constants.pageSize)
+                )
+                let response = try await gatewayConfigurationsRepository.all(request: request)
+                let startedState = AlternativePaymentsInteractorState.Started(
+                    gatewayConfigurations: response.gatewayConfigurations, filter: filter
+                )
+                state = .started(startedState)
+            } catch {
+                guard case .starting(let currentState) = state, currentState.id == startingStateId else {
+                    return
+                }
+                state = .failure(error)
+            }
+        }
+        let startingState = AlternativePaymentsInteractorState.Starting(
+            id: startingStateId, filter: filter, task: task
+        )
+        state = .starting(startingState)
+        _ = await task.result
+    }
+
+    func createInvoice(name: String, amount: Decimal, currencyCode: String) async throws -> POInvoice {
         let request = POInvoiceCreationRequest(
-            name: UUID().uuidString,
+            name: name,
             amount: amount.description,
             currency: currencyCode,
             returnUrl: Example.Constants.returnUrl,
@@ -64,27 +89,39 @@ final class AlternativePaymentsInteractor {
         return try await invoicesService.createInvoice(request: request)
     }
 
+    func authorize(invoice: POInvoice, gatewayConfigurationId: String) async throws {
+        let request = POAlternativePaymentMethodRequest(
+            invoiceId: invoice.id, gatewayConfigurationId: gatewayConfigurationId
+        )
+        let result: POAlternativePaymentMethodResponse = try await withCheckedThrowingContinuation { continuation in
+            let session = POWebAuthenticationSession(
+                request: request,
+                returnUrl: Example.Constants.returnUrl,
+                completion: { result in
+                    continuation.resume(with: result)
+                }
+            )
+            Task { @MainActor in
+                if await session.start() {
+                    return
+                }
+                let failure = POFailure(message: "Unable to start alternative payment.", code: .generic(.mobile))
+                continuation.resume(throwing: failure)
+            }
+        }
+        let authRequest = POInvoiceAuthorizationRequest(invoiceId: invoice.id, source: result.gatewayToken)
+        let threeDSService = POTest3DSService(returnUrl: Example.Constants.returnUrl)
+        try await invoicesService.authorizeInvoice(request: authRequest, threeDSService: threeDSService)
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let pageSize = 100
+        static let pageSize = 50
     }
 
     // MARK: - Private Properties
 
     private let gatewayConfigurationsRepository: POGatewayConfigurationsRepository
     private let invoicesService: POInvoicesService
-
-    // MARK: - Private Methods
-
-    private func setStartedStateUnchecked() async throws {
-        let request = POAllGatewayConfigurationsRequest(
-            filter: nil, paginationOptions: .init(limit: Constants.pageSize)
-        )
-        let response = try await gatewayConfigurationsRepository.all(request: request)
-        let startedState = AlternativePaymentsInteractorState.Started(
-            gatewayConfigurations: response.gatewayConfigurations, filter: nil
-        )
-        state = .started(startedState)
-    }
 }
