@@ -11,8 +11,7 @@ import SwiftUI
 import ProcessOutUI
 import ProcessOutCheckout3DS
 
-@Observable
-final class CardPaymentViewModel {
+final class CardPaymentViewModel: ObservableObject {
 
     init(invoicesService: POInvoicesService) {
         self.invoicesService = invoicesService
@@ -21,6 +20,7 @@ final class CardPaymentViewModel {
 
     // MARK: -
 
+    @Published
     var state: CardPaymentViewModelState! // swiftlint:disable:this implicitly_unwrapped_optional
 
     func pay() {

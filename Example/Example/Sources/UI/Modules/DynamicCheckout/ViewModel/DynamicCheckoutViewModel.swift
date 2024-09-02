@@ -10,8 +10,7 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutUI
 
-@Observable
-final class DynamicCheckoutViewModel {
+final class DynamicCheckoutViewModel: ObservableObject {
 
     init(invoicesService: POInvoicesService) {
         self.invoicesService = invoicesService
@@ -19,6 +18,7 @@ final class DynamicCheckoutViewModel {
 
     // MARK: -
 
+    @Published
     var state = DynamicCheckoutViewModelState()
 
     func pay() {

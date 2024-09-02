@@ -87,7 +87,7 @@ struct ConfigurationView: View {
     @Environment(\.dismiss)
     private var dismiss
 
-    @State
+    @StateObject
     private var viewModel = ConfigurationViewModel()
 
     @State

@@ -41,7 +41,7 @@ struct CardPaymentView: View {
 
     // MARK: - Private Properties
 
-    @State
+    @StateObject
     private var viewModel = CardPaymentViewModel()
 }
 

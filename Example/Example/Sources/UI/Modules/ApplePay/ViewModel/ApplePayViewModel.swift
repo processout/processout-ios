@@ -10,8 +10,7 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutUI
 
-@Observable
-final class ApplePayViewModel {
+final class ApplePayViewModel: ObservableObject {
 
     init(invoicesService: POInvoicesService) {
         self.invoicesService = invoicesService
@@ -19,6 +18,7 @@ final class ApplePayViewModel {
 
     // MARK: -
 
+    @Published
     var state = ApplePayViewModelState()
 
     func pay() {

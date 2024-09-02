@@ -29,7 +29,7 @@ struct ApplePayView: View {
 
     // MARK: - Private Properties
 
-    @State
+    @StateObject
     private var viewModel = ApplePayViewModel()
 }
 
