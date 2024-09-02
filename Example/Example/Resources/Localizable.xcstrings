@@ -1,42 +1,85 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "alternative-payments.continue" : {
+    "alternative-payments.error-message" : {
+
+    },
+    "alternative-payments.filter" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Continue"
+            "value" : "Filter"
           }
         }
       }
     },
-    "alternative-payments.error-%@" : {
+    "alternative-payments.filter.all" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Something went wrong: %@."
+            "value" : "All"
           }
         }
       }
     },
-    "alternative-payments.gateway-configurations" : {
+    "alternative-payments.filter.native" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gateway Configurations"
+            "value" : "Native"
           }
         }
       }
     },
-    "alternative-payments.generic-error" : {
+    "alternative-payments.filter.tokenizable" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Something went wrong."
+            "value" : "Tokenizable"
+          }
+        }
+      }
+    },
+    "alternative-payments.gateway" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gateway"
+          }
+        }
+      }
+    },
+    "alternative-payments.gateway-configuration" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuration"
+          }
+        }
+      }
+    },
+    "alternative-payments.native-preference" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prefer Native Flow"
+          }
+        }
+      }
+    },
+    "alternative-payments.pay" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay"
           }
         }
       }
@@ -46,47 +89,77 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alternative Payments"
+            "value" : "Alternative Payment"
           }
         }
       }
     },
-    "authorization-amount.amount" : {
+    "apple-pay.pay" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Amount"
+            "value" : "Pay with Apple"
           }
         }
       }
     },
-    "authorization-amount.confirm" : {
+    "apple-pay.success-message-%@-%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Confirm"
+            "value" : "The invoice '%1$@' has been successfully authorized using the Apple Pay card token '%2$@'."
           }
         }
       }
     },
-    "authorization-amount.currency" : {
+    "apple-pay.title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Currency Code"
+            "value" : "Apple Pay"
           }
         }
       }
     },
-    "authorization-amount.message" : {
+    "card-payment.3ds-service" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Please select amount and currency."
+            "value" : "3DS Service"
+          }
+        }
+      }
+    },
+    "card-payment.pay" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay with Card"
+          }
+        }
+      }
+    },
+    "card-payment.success-message-%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The invoice has been successfully authorized using card '%1$@'."
+          }
+        }
+      }
+    },
+    "card-payment.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Card Payment"
           }
         }
       }
@@ -211,6 +284,46 @@
         }
       }
     },
+    "dynamic-checkout.error-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to process payment using dynamic checkout. Please try again."
+          }
+        }
+      }
+    },
+    "dynamic-checkout.pay" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay"
+          }
+        }
+      }
+    },
+    "dynamic-checkout.success-message-%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The invoice '%@' has been successfully authorized."
+          }
+        }
+      }
+    },
+    "dynamic-checkout.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dynamic Checkout"
+          }
+        }
+      }
+    },
     "features.alternative-payment" : {
       "localizations" : {
         "en" : {
@@ -231,32 +344,32 @@
         }
       }
     },
+    "features.application-configuration" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Application Configuration"
+          }
+        }
+      }
+    },
+    "features.available-features" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available Features"
+          }
+        }
+      }
+    },
     "features.card-payment" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Card payment"
-          }
-        }
-      }
-    },
-    "features.checkout-card-payment" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Card payment [Checkout 3DS SDK]"
-          }
-        }
-      }
-    },
-    "features.continue" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue"
+            "value" : "Card Payment"
           }
         }
       }
@@ -271,52 +384,52 @@
         }
       }
     },
-    "features.error-%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Something went wrong: %@."
-          }
-        }
-      }
-    },
-    "features.generic-error" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Something went wrong."
-          }
-        }
-      }
-    },
-    "features.native-alternative-payment" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Native Alternative Payment"
-          }
-        }
-      }
-    },
-    "features.success-message" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your request was completed successfully."
-          }
-        }
-      }
-    },
     "features.title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Available Features"
+            "value" : "Example"
+          }
+        }
+      }
+    },
+    "invoice.amount" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amount"
+          }
+        }
+      }
+    },
+    "invoice.currency-code" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Currency Code"
+          }
+        }
+      }
+    },
+    "invoice.name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "invoice.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invoice"
           }
         }
       }
