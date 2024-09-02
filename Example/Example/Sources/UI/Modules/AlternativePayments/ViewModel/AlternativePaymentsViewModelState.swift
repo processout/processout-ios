@@ -6,63 +6,56 @@
 //
 
 import Foundation
+import SwiftUI
+import ProcessOut
+import ProcessOutUI
 
 struct AlternativePaymentsViewModelState {
 
-    struct Section: Identifiable {
-
-        /// Section ID.
-        let id: String
-
-        /// Section title.
-        let title: String?
-
-        /// Section items.
-        let items: [Item]
-    }
-
-    enum Item {
-
-        /// Items
-        case configuration(ConfigurationItem), error(ErrorItem)
-    }
-
-    struct ConfigurationItem: Identifiable {
+    struct GatewayConfiguration: Identifiable {
 
         /// Item identifier.
         let id: String
 
         /// Configuration name.
         let name: String
-
-        /// Invoked when this configuration item is selected.
-        let select: () -> Void
     }
 
-    struct ErrorItem {
+    struct Filter: Identifiable {
 
-        /// Error message.
-        let errorMessage: String
+        /// Filter ID.
+        let id: POAllGatewayConfigurationsRequest.Filter
+
+        /// Filter name.
+        let name: String
     }
 
-    /// Available sections.
-    var sections: [Section]
-}
+    struct NativePayment: Identifiable {
 
-extension AlternativePaymentsViewModelState.Item: Identifiable {
+        let id: String
 
-    var id: String {
-        switch self {
-        case .configuration(let item):
-            item.id
-        case .error(let item):
-            item.errorMessage
-        }
+        /// Configuration.
+        let configuration: PONativeAlternativePaymentConfiguration
+
+        /// Completion.
+        let completion: (Result<Void, POFailure>) -> Void
     }
-}
 
-extension AlternativePaymentsViewModelState {
+    /// Invoice details.
+    var invoice = InvoiceViewModel()
 
-    /// Idle state.
-    static let idle = AlternativePaymentsViewModelState(sections: [])
+    /// Gateway configuration.
+    var filter: Binding<PickerData<Filter, POAllGatewayConfigurationsRequest.Filter>>?
+
+    /// Gateway configuration.
+    var gatewayConfiguration: PickerData<GatewayConfiguration, String>?
+
+    /// Boolean value indicating whether native flow should be preferred if available.
+    var preferNative = false
+
+    /// Currently presented native alternative payment.
+    var nativePayment: NativePayment?
+
+    /// Message.
+    var message: MessageViewModel?
 }
