@@ -43,8 +43,11 @@ final class DynamicCheckoutViewModel {
             returnUrl: Constants.returnUrl,
             customerId: Constants.customerId
         )
-        if let invoice = try? await self.invoicesService.createInvoice(request: invoiceCreationRequest) {
+        do {
+            let invoice = try await self.invoicesService.createInvoice(request: invoiceCreationRequest)
             continueDynamicCheckout(invoice: invoice)
+        } catch {
+            setMessage(with: error)
         }
     }
 
@@ -65,18 +68,24 @@ final class DynamicCheckoutViewModel {
                         text: String(localized: .DynamicCheckout.successMessage, replacements: invoice.id),
                         severity: .success
                     )
-                case .failure(let failure) where failure.code != .cancelled:
-                    self?.state.message = .init(
-                        text: failure.message ?? String(localized: .DynamicCheckout.errorMessage),
-                        severity: .error
-                    )
-                default:
-                    break
+                case .failure(let failure):
+                    self?.setMessage(with: failure)
                 }
                 self?.state.dynamicCheckout = nil
             }
         )
         self.state.dynamicCheckout = item
+    }
+
+    private func setMessage(with error: Error) {
+        var errorMessage: String?
+        if let failure = error as? POFailure {
+            guard failure.code != .cancelled else {
+                return
+            }
+            errorMessage = failure.message
+        }
+        state.message = .init(text: errorMessage ?? String(localized: .DynamicCheckout.errorMessage), severity: .error)
     }
 }
 
