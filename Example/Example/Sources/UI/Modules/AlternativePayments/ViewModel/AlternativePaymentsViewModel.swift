@@ -148,7 +148,8 @@ final class AlternativePaymentsViewModel: ObservableObject {
             }
             let successMessage = String(
                 localized: .AlternativePayments.successMessage,
-                replacements: invoice.id, gatewayConfigurationId
+                replacements: invoice.id,
+                gatewayConfigurationId
             )
             state.message = .init(text: successMessage, severity: .success)
         } catch {
