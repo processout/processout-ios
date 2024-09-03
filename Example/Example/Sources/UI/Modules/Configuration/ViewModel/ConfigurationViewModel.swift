@@ -9,8 +9,7 @@ import SwiftUI
 import Combine
 @_spi(PO) import ProcessOut
 
-@Observable
-final class ConfigurationViewModel {
+final class ConfigurationViewModel: ObservableObject {
 
     init() {
         state = .idle
@@ -25,6 +24,7 @@ final class ConfigurationViewModel {
     }
 
     /// View model's state.
+    @Published
     var state: ConfigurationViewModelState
 
     func start() {

@@ -28,7 +28,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     var state: NativeAlternativePaymentViewModelState = .idle
 
     func start() {
-        interactor.start()
+        $state.performWithoutAnimation(interactor.start)
     }
 
     // MARK: - Private Nested Types
