@@ -58,9 +58,6 @@ private final class AuthorizationSessionCoordinator<ProcessedPayment>
         super.init()
     }
 
-    /// Payment information if any.
-    var payment: PKPayment?
-
     /// Processed payment information if any.
     var processedPayment: ProcessedPayment?
 
