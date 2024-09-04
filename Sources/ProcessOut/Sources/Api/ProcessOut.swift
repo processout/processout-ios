@@ -52,6 +52,7 @@ public final class ProcessOut {
         )
         let service = DefaultCardsService(
             repository: HttpCardsRepository(connector: httpConnector),
+            applePayAuthorizationSession: DefaultApplePayAuthorizationSession(),
             applePayCardTokenizationRequestMapper: requestMapper
         )
         return service

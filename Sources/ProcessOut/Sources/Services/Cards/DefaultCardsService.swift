@@ -6,14 +6,17 @@
 //
 
 import Foundation
+import PassKit
 
 final class DefaultCardsService: POCardsService {
 
     init(
         repository: CardsRepository,
+        applePayAuthorizationSession: ApplePayAuthorizationSession,
         applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
     ) {
         self.repository = repository
+        self.applePayAuthorizationSession = applePayAuthorizationSession
         self.applePayCardTokenizationRequestMapper = applePayCardTokenizationRequestMapper
     }
 
@@ -31,13 +34,29 @@ final class DefaultCardsService: POCardsService {
         try await repository.updateCard(request: request)
     }
 
-    func tokenize(request: POApplePayCardTokenizationRequest) async throws -> POCard {
+    func tokenize(request: POApplePayPaymentTokenizationRequest) async throws -> POCard {
         let request = try applePayCardTokenizationRequestMapper.tokenizationRequest(from: request)
         return try await repository.tokenize(request: request)
+    }
+
+    func tokenize(request: POApplePayTokenizationRequest) async throws -> POCard {
+        let tokenizePayment = { (payment: PKPayment) async throws -> POCard in
+            let paymentTokenizationRequest = POApplePayPaymentTokenizationRequest(
+                payment: payment,
+                merchantIdentifier: request.paymentRequest.merchantIdentifier,
+                contact: request.contact,
+                metadata: request.metadata
+            )
+            return try await self.tokenize(request: paymentTokenizationRequest)
+        }
+        return try await applePayAuthorizationSession.authorize(
+            request: request.paymentRequest, didAuthorizePayment: tokenizePayment, delegate: nil
+        )
     }
 
     // MARK: - Private Properties
 
     private let repository: CardsRepository
+    private let applePayAuthorizationSession: ApplePayAuthorizationSession
     private let applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
 }

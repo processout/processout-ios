@@ -8,8 +8,11 @@
 import Foundation
 import PassKit
 
-/// Apple pay card details.
-public struct POApplePayCardTokenizationRequest {
+@available(*, deprecated, renamed: "POApplePayPaymentTokenizationRequest")
+public typealias POApplePayCardTokenizationRequest = POApplePayPaymentTokenizationRequest
+
+/// Apple Pay payment details.
+public struct POApplePayPaymentTokenizationRequest {
 
     /// Payment information.
     public let payment: PKPayment

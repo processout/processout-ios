@@ -26,6 +26,9 @@ public protocol POCardsService: POService { // sourcery: AutoCompletion
     /// Updates card information.
     func updateCard(request: POCardUpdateRequest) async throws -> POCard
 
-    /// Tokenize a card via ApplePay. You can use the card for a single payment by creating a card token with it.
-    func tokenize(request: POApplePayCardTokenizationRequest) async throws -> POCard
+    /// Tokenize previously authorized payment.
+    func tokenize(request: POApplePayPaymentTokenizationRequest) async throws -> POCard
+
+    /// Authorize given payment request and tokenize it.
+    func tokenize(request: POApplePayTokenizationRequest) async throws -> POCard
 }
