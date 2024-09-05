@@ -48,16 +48,16 @@ final class ApplePayAuthorizationSessionCoordinator: NSObject, PKPaymentAuthoriz
         return result ?? .init(status: .success, errors: nil)
     }
 
-    @MainActor
     func paymentAuthorizationControllerWillAuthorizePayment(_ controller: PKPaymentAuthorizationController) {
-        // todo(andrii-vysotskyi): forward to delegate
+        delegate?.applePayAuthorizationSessionWillAuthorizePayment()
     }
 
     @available(iOS 14.0, *)
     func paymentAuthorizationControllerDidRequestMerchantSessionUpdate(
         controller: PKPaymentAuthorizationController
     ) async -> PKPaymentRequestMerchantSessionUpdate {
-        .init() // todo(andrii-vysotskyi): forward to delegate
+        let update = await delegate?.applePayAuthorizationSessionDidRequestMerchantSessionUpdate()
+        return update ?? .init(status: .success, merchantSession: nil)
     }
 
     @available(iOS 15.0, *)
@@ -65,39 +65,33 @@ final class ApplePayAuthorizationSessionCoordinator: NSObject, PKPaymentAuthoriz
         _ controller: PKPaymentAuthorizationController,
         didChangeCouponCode couponCode: String
     ) async -> PKPaymentRequestCouponCodeUpdate {
-        .init() // todo(andrii-vysotskyi): forward to delegate
+        await delegate?.applePayAuthorizationSession(didChangeCouponCode: couponCode) ?? .init()
     }
 
     func paymentAuthorizationController(
         _ controller: PKPaymentAuthorizationController,
         didSelectShippingMethod shippingMethod: PKShippingMethod
     ) async -> PKPaymentRequestShippingMethodUpdate {
-        .init() // todo(andrii-vysotskyi): forward to delegate
+        await delegate?.applePayAuthorizationSession(didSelectShippingMethod: shippingMethod) ?? .init()
     }
 
     func paymentAuthorizationController(
         _ controller: PKPaymentAuthorizationController,
         didSelectShippingContact contact: PKContact
     ) async -> PKPaymentRequestShippingContactUpdate {
-        .init() // todo(andrii-vysotskyi): forward to delegate
+        await delegate?.applePayAuthorizationSession(didSelectShippingContact: contact) ?? .init()
     }
 
     func paymentAuthorizationController(
         _ controller: PKPaymentAuthorizationController,
         didSelectPaymentMethod paymentMethod: PKPaymentMethod
     ) async -> PKPaymentRequestPaymentMethodUpdate {
-        .init() // todo(andrii-vysotskyi): forward to delegate
-    }
-
-    @available(iOS 14.0, *)
-    nonisolated func presentationWindow(for controller: PKPaymentAuthorizationController) -> UIWindow? {
-        nil
+        await delegate?.applePayAuthorizationSession(didSelectPaymentMethod: paymentMethod) ?? .init()
     }
 
     // MARK: - Private Properties
 
     private let delegate: ApplePayAuthorizationSessionDelegate?
-
     private var continuation: CheckedContinuation<Void, Never>?
     private var didFinish: Bool
 }

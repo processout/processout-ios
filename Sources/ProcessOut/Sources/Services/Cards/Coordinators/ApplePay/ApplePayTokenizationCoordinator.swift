@@ -49,6 +49,46 @@ final class ApplePayTokenizationCoordinator: ApplePayAuthorizationSessionDelegat
         }
     }
 
+    func applePayAuthorizationSessionWillAuthorizePayment() {
+        delegate?.applePayTokenizationWillAuthorizePayment()
+    }
+
+    @available(iOS 14.0, *)
+    func applePayAuthorizationSessionDidRequestMerchantSessionUpdate() async -> PKPaymentRequestMerchantSessionUpdate? {
+        await delegate?.applePayTokenizationDidRequestMerchantSessionUpdate()
+    }
+
+    @available(iOS 15.0, *)
+    func applePayAuthorizationSession(
+        didChangeCouponCode couponCode: String
+    ) async -> PKPaymentRequestCouponCodeUpdate? {
+        let update = await delegate?.applePayTokenization(didChangeCouponCode: couponCode)
+        update?.errors = update?.errors.flatMap(errorMapper.map)
+        return update
+    }
+
+    func applePayAuthorizationSession(
+        didSelectShippingMethod shippingMethod: PKShippingMethod
+    ) async -> PKPaymentRequestShippingMethodUpdate? {
+        await delegate?.applePayTokenization(didSelectShippingMethod: shippingMethod)
+    }
+
+    func applePayAuthorizationSession(
+        didSelectShippingContact contact: PKContact
+    ) async -> PKPaymentRequestShippingContactUpdate? {
+        let update = await delegate?.applePayTokenization(didSelectShippingContact: contact)
+        update?.errors = update?.errors.flatMap(errorMapper.map)
+        return update
+    }
+
+    func applePayAuthorizationSession(
+        didSelectPaymentMethod paymentMethod: PKPaymentMethod
+    ) async -> PKPaymentRequestPaymentMethodUpdate? {
+        let update = await delegate?.applePayTokenization(didSelectPaymentMethod: paymentMethod)
+        update?.errors = update?.errors.flatMap(errorMapper.map)
+        return update
+    }
+
     // MARK: - Private Properties
 
     private let cardsService: POCardsService
