@@ -26,7 +26,9 @@ extension PODynamicCheckoutView {
                 configuration: configuration,
                 delegate: delegate,
                 passKitPaymentSession: DynamicCheckoutPassKitPaymentDefaultSession(
-                    delegate: delegate, invoicesService: ProcessOut.shared.invoices
+                    invoicesService: ProcessOut.shared.invoices,
+                    cardsService: ProcessOut.shared.cards,
+                    delegate: delegate
                 ),
                 alternativePaymentSession: DynamicCheckoutAlternativePaymentDefaultSession(
                     configuration: configuration.alternativePayment

@@ -12,9 +12,10 @@ import ProcessOut
 @MainActor
 final class DynamicCheckoutPassKitPaymentDefaultSession: DynamicCheckoutPassKitPaymentSession {
 
-    init(delegate: PODynamicCheckoutDelegate?, invoicesService: POInvoicesService) {
-        self.delegate = delegate
+    init(invoicesService: POInvoicesService, cardsService: POCardsService, delegate: PODynamicCheckoutDelegate?) {
         self.invoicesService = invoicesService
+        self.cardsService = cardsService
+        self.delegate = delegate
     }
 
     nonisolated var isSupported: Bool {
@@ -31,13 +32,14 @@ final class DynamicCheckoutPassKitPaymentDefaultSession: DynamicCheckoutPassKitP
             let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &authorizationRequest)
             try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
         }
-        // todo(andrii-vysotskyii): use injected card service
-        _ = try await ProcessOut.shared.cards.tokenize(request: tokenizationRequest, delegate: coordinator)
+        _ = try await cardsService.tokenize(request: tokenizationRequest, delegate: coordinator)
     }
 
     // MARK: - Private Properties
 
     private let invoicesService: POInvoicesService
+    private let cardsService: POCardsService
+
     private weak var delegate: PODynamicCheckoutDelegate?
 }
 
