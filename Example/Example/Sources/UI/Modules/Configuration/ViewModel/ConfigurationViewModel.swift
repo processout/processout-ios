@@ -9,6 +9,7 @@ import SwiftUI
 import Combine
 @_spi(PO) import ProcessOut
 
+@MainActor
 final class ConfigurationViewModel: ObservableObject {
 
     init() {

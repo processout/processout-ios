@@ -10,6 +10,7 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutUI
 
+@MainActor
 final class DynamicCheckoutViewModel: ObservableObject {
 
     init(invoicesService: POInvoicesService) {
