@@ -131,6 +131,18 @@ extension POCardsService {
     @discardableResult
     public func tokenize(
         request: POApplePayTokenizationRequest,
+        delegate: POApplePayTokenizationDelegate?,
+        completion: @escaping (Result<POCard, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await tokenize(request: request, delegate: delegate)
+        }
+    }
+
+    /// Authorize given payment request and tokenize it.
+    @discardableResult
+    public func tokenize(
+        request: POApplePayTokenizationRequest,
         completion: @escaping (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
