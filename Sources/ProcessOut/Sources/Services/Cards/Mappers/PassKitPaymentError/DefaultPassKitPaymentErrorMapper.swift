@@ -6,7 +6,6 @@
 //
 
 import PassKit
-@_spi(PO) import ProcessOut
 
 final class DefaultPassKitPaymentErrorMapper: PassKitPaymentErrorMapper {
 
