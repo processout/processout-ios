@@ -39,19 +39,17 @@ final class DefaultCardsService: POCardsService {
         return try await repository.tokenize(request: request)
     }
 
-    func tokenize(request: POApplePayTokenizationRequest) async throws -> POCard {
-        let tokenizePayment = { (payment: PKPayment) async throws -> POCard in
-            let paymentTokenizationRequest = POApplePayPaymentTokenizationRequest(
-                payment: payment,
-                merchantIdentifier: request.paymentRequest.merchantIdentifier,
-                contact: request.contact,
-                metadata: request.metadata
-            )
-            return try await self.tokenize(request: paymentTokenizationRequest)
-        }
-        return try await applePayAuthorizationSession.authorize(
-            request: request.paymentRequest, didAuthorizePayment: tokenizePayment, delegate: nil
+    func tokenize(
+        request: POApplePayTokenizationRequest, delegate: POApplePayTokenizationDelegate?
+    ) async throws -> POCard {
+        let coordinator = ApplePayTokenizationCoordinator(
+            cardsService: self, request: request, delegate: delegate
         )
+        _ = try await applePayAuthorizationSession.authorize(request: request.paymentRequest, delegate: coordinator)
+        guard let card = coordinator.card else {
+            throw POFailure(message: "Tokenization was cancelled.", code: .cancelled)
+        }
+        return card
     }
 
     // MARK: - Private Properties

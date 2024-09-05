@@ -30,5 +30,15 @@ public protocol POCardsService: POService { // sourcery: AutoCompletion
     func tokenize(request: POApplePayPaymentTokenizationRequest) async throws -> POCard
 
     /// Authorize given payment request and tokenize it.
-    func tokenize(request: POApplePayTokenizationRequest) async throws -> POCard
+    func tokenize(
+        request: POApplePayTokenizationRequest, delegate: POApplePayTokenizationDelegate?
+    ) async throws -> POCard
+}
+
+extension POCardsService {
+
+    /// Authorize given payment request and tokenize it.
+    public func tokenize(request: POApplePayTokenizationRequest) async throws -> POCard {
+        try await tokenize(request: request, delegate: nil)
+    }
 }
