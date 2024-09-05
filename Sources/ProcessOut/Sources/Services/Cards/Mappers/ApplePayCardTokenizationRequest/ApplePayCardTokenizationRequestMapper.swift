@@ -8,5 +8,7 @@
 protocol ApplePayCardTokenizationRequestMapper {
 
     /// Creates tokenization request with given ``POApplePayCardTokenizationRequest`` instance.
-    func tokenizationRequest(from request: POApplePayCardTokenizationRequest) throws -> ApplePayCardTokenizationRequest
+    func tokenizationRequest(
+        from request: POApplePayPaymentTokenizationRequest
+    ) throws -> ApplePayCardTokenizationRequest
 }

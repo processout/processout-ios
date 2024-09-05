@@ -20,8 +20,8 @@ public struct POApplePayTokenizationRequest {
     /// Additional matadata.
     public let metadata: [String: String]?
 
-    public init(request: PKPaymentRequest, contact: POContact? = nil, metadata: [String: String]? = nil) {
-        self.paymentRequest = request
+    public init(paymentRequest: PKPaymentRequest, contact: POContact? = nil, metadata: [String: String]? = nil) {
+        self.paymentRequest = paymentRequest
         self.contact = contact
         self.metadata = metadata
     }

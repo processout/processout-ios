@@ -107,7 +107,7 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
     public func paymentAuthorizationController(
         _: PKPaymentAuthorizationController, didAuthorizePayment payment: PKPayment
     ) async -> PKPaymentAuthorizationResult {
-        let request = POApplePayCardTokenizationRequest(
+        let request = POApplePayPaymentTokenizationRequest(
             payment: payment,
             merchantIdentifier: paymentRequest.merchantIdentifier,
             metadata: nil // todo(andrii-vysotskyi): decide if metadata injection should be allowed
