@@ -8,9 +8,9 @@
 import Foundation
 import PassKit
 
-protocol POApplePayAuthorizationSessionDelegate: AnyObject {
+protocol ApplePayAuthorizationSessionDelegate: AnyObject {
 
-    /// Sent to the delegate after the user has acted on the payment request and it was tokenized by ProcessOut.
+    /// Sent to the delegate after the user has acted on the payment request.
     @MainActor
     func applePayAuthorizationSession(didAuthorizePayment payment: PKPayment) async -> PKPaymentAuthorizationResult
 }
