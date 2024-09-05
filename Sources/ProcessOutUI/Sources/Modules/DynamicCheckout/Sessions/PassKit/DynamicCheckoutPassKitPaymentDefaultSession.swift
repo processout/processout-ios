@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 17.03.2024.
 //
 
+// todo(andrii-vysotskyi): use cards service instead of relying on session
+
 import Foundation
 import PassKit
 import ProcessOut
