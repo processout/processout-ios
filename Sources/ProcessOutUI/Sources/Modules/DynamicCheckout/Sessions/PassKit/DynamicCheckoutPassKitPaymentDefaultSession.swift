@@ -15,68 +15,48 @@ final class DynamicCheckoutPassKitPaymentDefaultSession: DynamicCheckoutPassKitP
     init(delegate: PODynamicCheckoutDelegate?, invoicesService: POInvoicesService) {
         self.delegate = delegate
         self.invoicesService = invoicesService
-        didAuthorizeInvoice = false
     }
 
     nonisolated var isSupported: Bool {
-        POPassKitPaymentAuthorizationController.canMakePayments()
+        PKPaymentAuthorizationController.canMakePayments()
     }
 
     func start(invoiceId: String, request: PKPaymentRequest) async throws {
-        await delegate?.dynamicCheckout(willAuthorizeInvoiceWith: request)
-        guard let controller = POPassKitPaymentAuthorizationController(paymentRequest: request) else {
-            assertionFailure("ApplePay payment shouldn't be attempted when unavailable.")
-            throw POFailure(code: .generic(.mobile))
+        guard let delegate else {
+            throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
         }
-        self.invoiceId = invoiceId
-        controller.delegate = self
-        _ = await controller.present()
-        await withCheckedContinuation { continuation in
-            self.didFinishContinuation = continuation
+        let tokenizationRequest = POApplePayTokenizationRequest(paymentRequest: request)
+        let coordinator = TokenizationCoordinator { [invoicesService] card in
+            var authorizationRequest = POInvoiceAuthorizationRequest(invoiceId: invoiceId, source: card.id)
+            let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &authorizationRequest)
+            try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
         }
-        await controller.dismiss()
-        if didAuthorizeInvoice {
-            return
-        }
-        throw POFailure(code: .cancelled)
+        // todo(andrii-vysotskyii): use injected card service
+        _ = try await ProcessOut.shared.cards.tokenize(request: tokenizationRequest, delegate: coordinator)
     }
 
     // MARK: - Private Properties
 
     private let invoicesService: POInvoicesService
-
-    private var didFinishContinuation: CheckedContinuation<Void, Never>?
-    private var didAuthorizeInvoice: Bool
-    private var invoiceId: String?
-
     private weak var delegate: PODynamicCheckoutDelegate?
 }
 
-extension DynamicCheckoutPassKitPaymentDefaultSession: POPassKitPaymentAuthorizationControllerDelegate {
+private final class TokenizationCoordinator: POApplePayTokenizationDelegate {
 
-    func paymentAuthorizationControllerDidFinish(_ controller: POPassKitPaymentAuthorizationController) {
-        guard let didFinishContinuation else {
-            preconditionFailure("Continue must be set.")
-        }
-        didFinishContinuation.resume()
+    init(didTokenizeCard: @escaping (POCard) async throws -> Void) {
+        self.didTokenizeCard = didTokenizeCard
     }
 
-    func paymentAuthorizationController(
-        _ controller: POPassKitPaymentAuthorizationController,
-        didTokenizePayment payment: PKPayment,
-        card: POCard
+    /// Closure that is called when invoice is authorized.
+    let didTokenizeCard: (POCard) async throws -> Void
+
+    // MARK: -
+
+    func applePayTokenization(
+        didTokenizePayment payment: PKPayment, card: POCard
     ) async -> PKPaymentAuthorizationResult {
-        guard let invoiceId else {
-            preconditionFailure("Invoice ID must be set.")
-        }
-        var authorizationRequest = POInvoiceAuthorizationRequest(invoiceId: invoiceId, source: card.id)
         do {
-            guard let delegate else {
-                throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
-            }
-            let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &authorizationRequest)
-            try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
-            didAuthorizeInvoice = true
+            try await didTokenizeCard(card)
         } catch {
             return .init(status: .failure, errors: [error])
         }

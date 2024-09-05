@@ -9,6 +9,7 @@ import PassKit
 import ProcessOut
 
 /// Methods that let you respond to user interactions with payment authorization controller.
+@available(*, deprecated, message: "Tokenize payments using cards service accessible via ProcessOut.shared.cards")
 public protocol POPassKitPaymentAuthorizationControllerDelegate: AnyObject {
 
     /// Sent to the delegate when payment authorization is finished.  This may occur when
@@ -85,6 +86,7 @@ public protocol POPassKitPaymentAuthorizationControllerDelegate: AnyObject {
     func presentationWindow(for controller: POPassKitPaymentAuthorizationController) -> UIWindow?
 }
 
+@available(*, deprecated)
 extension POPassKitPaymentAuthorizationControllerDelegate {
 
     public func paymentAuthorizationController(

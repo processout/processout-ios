@@ -9,6 +9,7 @@ import PassKit
 @_spi(PO) import ProcessOut
 
 /// An object that presents a sheet that prompts the user to authorize a payment request
+@available(*, deprecated, message: "Tokenize payments using cards service accessible via ProcessOut.shared.cards")
 public final class POPassKitPaymentAuthorizationController: NSObject {
 
     /// Determine whether this device can process payment requests.
@@ -98,6 +99,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     private var didPresentApplePay: Bool
 }
 
+@available(*, deprecated)
 extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControllerDelegate {
 
     public func paymentAuthorizationControllerDidFinish(_: PKPaymentAuthorizationController) {
