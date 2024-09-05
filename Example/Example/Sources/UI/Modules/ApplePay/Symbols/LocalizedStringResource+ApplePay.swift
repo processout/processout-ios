@@ -21,5 +21,8 @@ extension LocalizedStringResource {
         static let successMessage = LocalizedStringResource(
             "apple-pay.success-message-\(placeholder: .object)-\(placeholder: .object)"
         )
+
+        /// Error message.
+        static let errorMessage = LocalizedStringResource("apple-pay.error-message")
     }
 }
