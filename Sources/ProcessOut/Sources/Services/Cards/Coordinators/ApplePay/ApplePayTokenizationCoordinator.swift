@@ -11,7 +11,7 @@ final class ApplePayTokenizationCoordinator: ApplePayAuthorizationSessionDelegat
 
     init(
         cardsService: POCardsService,
-        errorMapper: PassKitPaymentErrorMapper,
+        errorMapper: POPassKitPaymentErrorMapper,
         request: POApplePayTokenizationRequest,
         delegate: POApplePayTokenizationDelegate?
     ) {
@@ -52,7 +52,7 @@ final class ApplePayTokenizationCoordinator: ApplePayAuthorizationSessionDelegat
     // MARK: - Private Properties
 
     private let cardsService: POCardsService
-    private let errorMapper: PassKitPaymentErrorMapper
+    private let errorMapper: POPassKitPaymentErrorMapper
     private let request: POApplePayTokenizationRequest
     private let delegate: POApplePayTokenizationDelegate?
 }

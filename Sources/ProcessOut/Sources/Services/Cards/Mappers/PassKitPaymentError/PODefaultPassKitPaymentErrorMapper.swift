@@ -1,20 +1,24 @@
 //
-//  DefaultPassKitPaymentErrorMapper.swift
+//  PODefaultPassKitPaymentErrorMapper.swift
 //  ProcessOutUI
 //
 //  Created by Andrii Vysotskyi on 19.12.2023.
 //
 
+// todo(andrii-vysotskyi): remove public access level when POPassKitPaymentAuthorizationController is removed
+
 import PassKit
-@_spi(PO) import ProcessOut
 
-final class DefaultPassKitPaymentErrorMapper: PassKitPaymentErrorMapper {
+@_spi(PO)
+public final class PODefaultPassKitPaymentErrorMapper: POPassKitPaymentErrorMapper {
 
-    init(logger: POLogger) {
+    public init(logger: POLogger) {
         self.logger = logger
     }
 
-    func map(poError error: Error) -> [Error] {
+    // MARK: - POPassKitPaymentErrorMapper
+
+    public func map(poError error: Error) -> [Error] {
         if let failure = error as? POFailure, let pkError = map(failure: failure) {
             return [pkError]
         }

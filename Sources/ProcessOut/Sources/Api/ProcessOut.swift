@@ -51,7 +51,7 @@ public final class ProcessOut {
             repository: HttpCardsRepository(connector: httpConnector),
             applePayAuthorizationSession: DefaultApplePayAuthorizationSession(),
             applePayCardTokenizationRequestMapper: requestMapper,
-            applePayErrorMapper: DefaultPassKitPaymentErrorMapper(logger: serviceLogger)
+            applePayErrorMapper: PODefaultPassKitPaymentErrorMapper(logger: serviceLogger)
         )
         return service
     }()

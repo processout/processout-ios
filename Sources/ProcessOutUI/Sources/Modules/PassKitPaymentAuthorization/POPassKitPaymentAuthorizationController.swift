@@ -37,7 +37,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
         _didPresentApplePay = .init(wrappedValue: false)
         self.paymentRequest = paymentRequest
         controller = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
-        errorMapper = DefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger)
+        errorMapper = PODefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger)
         cardsService = ProcessOut.shared.cards
         super.init()
         controller.delegate = self
@@ -92,7 +92,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     private let paymentRequest: PKPaymentRequest
     private let controller: PKPaymentAuthorizationController
 
-    private let errorMapper: PassKitPaymentErrorMapper
+    private let errorMapper: POPassKitPaymentErrorMapper
     private let cardsService: POCardsService
 
     @POUnfairlyLocked

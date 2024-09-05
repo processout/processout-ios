@@ -14,7 +14,7 @@ final class DefaultCardsService: POCardsService {
         repository: CardsRepository,
         applePayAuthorizationSession: ApplePayAuthorizationSession,
         applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper,
-        applePayErrorMapper: PassKitPaymentErrorMapper
+        applePayErrorMapper: POPassKitPaymentErrorMapper
     ) {
         self.repository = repository
         self.applePayAuthorizationSession = applePayAuthorizationSession
@@ -61,5 +61,5 @@ final class DefaultCardsService: POCardsService {
     private let repository: CardsRepository
     private let applePayAuthorizationSession: ApplePayAuthorizationSession
     private let applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
-    private let applePayErrorMapper: PassKitPaymentErrorMapper
+    private let applePayErrorMapper: POPassKitPaymentErrorMapper
 }
