@@ -13,11 +13,13 @@ final class DefaultCardsService: POCardsService {
     init(
         repository: CardsRepository,
         applePayAuthorizationSession: ApplePayAuthorizationSession,
-        applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
+        applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper,
+        applePayErrorMapper: PassKitPaymentErrorMapper
     ) {
         self.repository = repository
         self.applePayAuthorizationSession = applePayAuthorizationSession
         self.applePayCardTokenizationRequestMapper = applePayCardTokenizationRequestMapper
+        self.applePayErrorMapper = applePayErrorMapper
     }
 
     // MARK: - POCardsService
@@ -43,9 +45,11 @@ final class DefaultCardsService: POCardsService {
         request: POApplePayTokenizationRequest, delegate: POApplePayTokenizationDelegate?
     ) async throws -> POCard {
         let coordinator = ApplePayTokenizationCoordinator(
-            cardsService: self, request: request, delegate: delegate
+            cardsService: self, errorMapper: applePayErrorMapper, request: request, delegate: delegate
         )
-        _ = try await applePayAuthorizationSession.authorize(request: request.paymentRequest, delegate: coordinator)
+        _ = try await applePayAuthorizationSession.authorize(
+            request: request.paymentRequest, delegate: coordinator
+        )
         guard let card = coordinator.card else {
             throw POFailure(message: "Tokenization was cancelled.", code: .cancelled)
         }
@@ -57,4 +61,5 @@ final class DefaultCardsService: POCardsService {
     private let repository: CardsRepository
     private let applePayAuthorizationSession: ApplePayAuthorizationSession
     private let applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
+    private let applePayErrorMapper: PassKitPaymentErrorMapper
 }

@@ -11,10 +11,12 @@ final class ApplePayTokenizationCoordinator: ApplePayAuthorizationSessionDelegat
 
     init(
         cardsService: POCardsService,
+        errorMapper: PassKitPaymentErrorMapper,
         request: POApplePayTokenizationRequest,
         delegate: POApplePayTokenizationDelegate?
     ) {
         self.cardsService = cardsService
+        self.errorMapper = errorMapper
         self.request = request
         self.delegate = delegate
     }
@@ -43,14 +45,15 @@ final class ApplePayTokenizationCoordinator: ApplePayAuthorizationSessionDelegat
             }
             return result ?? .init(status: .success, errors: nil)
         } catch {
-            // todo(andrii-vysotskyi): map errors
-            return .init(status: .failure, errors: nil)
+            let errors = errorMapper.map(poError: error)
+            return PKPaymentAuthorizationResult(status: .failure, errors: errors)
         }
     }
 
     // MARK: - Private Properties
 
     private let cardsService: POCardsService
+    private let errorMapper: PassKitPaymentErrorMapper
     private let request: POApplePayTokenizationRequest
     private let delegate: POApplePayTokenizationDelegate?
 }

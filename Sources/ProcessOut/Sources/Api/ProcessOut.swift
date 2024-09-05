@@ -42,18 +42,16 @@ public final class ProcessOut {
 
     /// Returns cards repository.
     public private(set) lazy var cards: POCardsService = {
-        let contactMapper = DefaultPassKitContactMapper(
-            logger: serviceLogger
-        )
         let requestMapper = DefaultApplePayCardTokenizationRequestMapper(
-            contactMapper: contactMapper,
+            contactMapper: DefaultPassKitContactMapper(logger: serviceLogger),
             decoder: JSONDecoder(),
             logger: serviceLogger
         )
         let service = DefaultCardsService(
             repository: HttpCardsRepository(connector: httpConnector),
             applePayAuthorizationSession: DefaultApplePayAuthorizationSession(),
-            applePayCardTokenizationRequestMapper: requestMapper
+            applePayCardTokenizationRequestMapper: requestMapper,
+            applePayErrorMapper: DefaultPassKitPaymentErrorMapper(logger: serviceLogger)
         )
         return service
     }()
