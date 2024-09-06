@@ -20,7 +20,6 @@ final class MarkdownNodeFactory {
         }
         // HTML and images are intentionally not supported.
         guard let nodeClass = Self.supportedNodes[nodeType] else {
-            assertionFailure("Unknown node type: \(nodeType)")
             return MarkdownUnknown(cmarkNode: cmarkNode)
         }
         return nodeClass.init(cmarkNode: cmarkNode)
