@@ -20,7 +20,7 @@ final class ApplePayTokenizationCoordinator: POApplePayTokenizationDelegate {
     // MARK: -
 
     func applePayTokenization(
-        didTokenizePayment payment: PKPayment, card: POCard
+        didAuthorizePayment payment: PKPayment, card: POCard
     ) async -> PKPaymentAuthorizationResult {
         do {
             try await didTokenizeCard(card)

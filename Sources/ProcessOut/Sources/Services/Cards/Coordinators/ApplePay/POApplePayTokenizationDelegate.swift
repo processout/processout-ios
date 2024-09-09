@@ -12,7 +12,7 @@ public protocol POApplePayTokenizationDelegate: AnyObject {
     /// Sent to the delegate after the user has acted on the payment request and it was tokenized by ProcessOut.
     @MainActor
     func applePayTokenization(
-        didTokenizePayment payment: PKPayment, card: POCard
+        didAuthorizePayment payment: PKPayment, card: POCard
     ) async -> PKPaymentAuthorizationResult
 
     /// Sent to the delegate before the payment is authorized, but
@@ -45,8 +45,8 @@ public protocol POApplePayTokenizationDelegate: AnyObject {
         didSelectShippingContact contact: PKContact
     ) async -> PKPaymentRequestShippingContactUpdate?
 
-    /// Sent when the user has selected a new payment card.  Use this delegate callback if you need to
-    /// update the summary items in response to the card type changing (for example, applying credit card surcharges)
+    /// Sent when the user has selected a new payment card. Use this delegate callback if you need to
+    /// update the summary items in response to the card type changing (for example, applying credit card surcharges).
     @MainActor
     func applePayTokenization(
         didSelectPaymentMethod paymentMethod: PKPaymentMethod
@@ -55,10 +55,9 @@ public protocol POApplePayTokenizationDelegate: AnyObject {
 
 extension POApplePayTokenizationDelegate {
 
-    /// Sent to the delegate after the user has acted on the payment request and it was tokenized by ProcessOut.
     @MainActor
     public func applePayTokenization(
-        didTokenizePayment payment: PKPayment, card: POCard
+        didAuthorizePayment payment: PKPayment, card: POCard
     ) async -> PKPaymentAuthorizationResult {
         .init(status: .success, errors: nil)
     }

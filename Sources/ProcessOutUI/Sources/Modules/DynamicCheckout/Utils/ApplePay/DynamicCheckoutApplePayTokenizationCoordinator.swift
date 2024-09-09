@@ -5,8 +5,6 @@
 //  Created by Andrii Vysotskyi on 17.03.2024.
 //
 
-// todo(andrii-vysotskyi): use cards service instead of relying on session
-
 import Foundation
 import PassKit
 import ProcessOut
@@ -23,7 +21,7 @@ final class DynamicCheckoutApplePayTokenizationCoordinator: POApplePayTokenizati
     // MARK: -
 
     func applePayTokenization(
-        didTokenizePayment payment: PKPayment, card: POCard
+        didAuthorizePayment payment: PKPayment, card: POCard
     ) async -> PKPaymentAuthorizationResult {
         do {
             try await didTokenizeCard(card)

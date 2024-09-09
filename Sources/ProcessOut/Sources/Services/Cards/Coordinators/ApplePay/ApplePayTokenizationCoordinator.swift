@@ -37,7 +37,7 @@ final class ApplePayTokenizationCoordinator: ApplePayAuthorizationSessionDelegat
         do {
             let card = try await cardsService.tokenize(request: paymentTokenizationRequest)
             // swiftlint:disable:next line_length
-            let result = await delegate?.applePayTokenization(didTokenizePayment: payment, card: card) ?? .init(status: .success, errors: nil)
+            let result = await delegate?.applePayTokenization(didAuthorizePayment: payment, card: card) ?? .init(status: .success, errors: nil)
             if case .success = result.status {
                 self.card = card
             }
