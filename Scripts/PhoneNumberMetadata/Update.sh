@@ -15,7 +15,7 @@ function cleanup {
 trap cleanup EXIT
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
-OUTPUT_DIR="$SCRIPT_DIR/../Sources/ProcessOut/Resources/PhoneNumberMetadata"
+OUTPUT_DIR="$SCRIPT_DIR/../../Sources/ProcessOut/Resources/PhoneNumberMetadata"
 WORK_DIR=$(mktemp -d)
 
 # Validates arguments acount
@@ -30,7 +30,7 @@ git clone --depth 1 --branch $1 https://github.com/google/libphonenumber libphon
 mkdir -p $OUTPUT_DIR
 
 # Convert XML metadata to JSON
-"$SCRIPT_DIR/ConvertPhoneNumberMetadata.swift" "libphonenumber/resources/PhoneNumberMetadata.xml" "$OUTPUT_DIR/PhoneNumberMetadata.json"
+"$SCRIPT_DIR/ConvertToJson.swift" "libphonenumber/resources/PhoneNumberMetadata.xml" "$OUTPUT_DIR/PhoneNumberMetadata.json"
 
 # Write metadata
 echo $1 > "$OUTPUT_DIR/PhoneNumberMetadata.version"
