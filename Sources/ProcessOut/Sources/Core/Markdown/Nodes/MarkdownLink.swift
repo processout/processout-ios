@@ -5,15 +5,12 @@
 //  Created by Andrii Vysotskyi on 15.06.2023.
 //
 
-@_implementationOnly import cmark
+import cmark_gfm
 
 final class MarkdownLink: MarkdownBaseNode {
 
     private(set) lazy var url: String? = {
-        if let url = cmarkNode.pointee.as.link.url {
-            return String(cString: url)
-        }
-        return nil
+        String(cString: cmarkNode.pointee.as.link.url.data)
     }()
 
     // MARK: - MarkdownBaseNode

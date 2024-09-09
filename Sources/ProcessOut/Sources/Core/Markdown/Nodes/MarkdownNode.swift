@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 12.06.2023.
 //
 
-@_implementationOnly import cmark
+import cmark_gfm
 
 class MarkdownBaseNode {
 
