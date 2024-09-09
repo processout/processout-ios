@@ -1,30 +1,28 @@
-name: cmark
+name: cmark-gfm
 settings:
   GENERATE_INFOPLIST_FILE: YES
   CODE_SIGNING_ALLOWED: NO
 targets:
-  cmark:
+  cmark-gfm:
     type: framework
     platform: iOS
     deploymentTarget: "12.0"
     settings:
       SKIP_INSTALL: NO
       BUILD_LIBRARY_FOR_DISTRIBUTION: YES
-      PRODUCT_BUNDLE_IDENTIFIER: com.processout.cmark-ios
+      PRODUCT_BUNDLE_IDENTIFIER: com.swiftlang.cmark
       MARKETING_VERSION: ${CURRENT_VERSION}
       CURRENT_PROJECT_VERSION: 1
-      MODULEMAP_FILE: src/module.modulemap
+      MODULEMAP_FILE: src/include/module.modulemap
     sources:
       - path: src
         excludes:
-          - "main.c"
-          - "man.c"
           - "*.inc"
           - "*.re"
           - "*.in"
           - "*.txt"
 schemes:
-  cmark:
+  cmark-gfm:
     build:
       targets:
-        cmark: all
+        cmark-gfm: all
