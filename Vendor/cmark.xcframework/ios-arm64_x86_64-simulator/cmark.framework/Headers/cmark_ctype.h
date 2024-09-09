@@ -13,6 +13,8 @@ int cmark_isspace(char c);
 
 int cmark_ispunct(char c);
 
+int cmark_isalnum(char c);
+
 int cmark_isdigit(char c);
 
 int cmark_isalpha(char c);
