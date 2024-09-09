@@ -1,4 +1,5 @@
 {
+  "originHash" : "8f250d3cf19fc47446f324890a784ded5493b6143de5d0aef317488859119617",
   "pins" : [
     {
       "identity" : "checkout-3ds-sdk-ios",
@@ -28,5 +29,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

@@ -41,14 +41,14 @@ cp "$SCRIPT_DIR/project.yml" .
 xcodegen generate
 
 # Create frameworks for needed platforms
-xcodebuild archive -scheme cmark-gfm -destination "generic/platform=iOS" -archivePath ./cmark-gfm-iOS
-xcodebuild archive -scheme cmark-gfm -destination "generic/platform=iOS Simulator" -archivePath ./cmark-gfm-Sim
+xcodebuild archive -scheme cmark_gfm -destination "generic/platform=iOS" -archivePath ./cmark_gfm-iOS
+xcodebuild archive -scheme cmark_gfm -destination "generic/platform=iOS Simulator" -archivePath ./cmark_gfm-Sim
 
 # Generate XCFramework
 xcodebuild -create-xcframework \
-    -framework ./cmark-gfm-iOS.xcarchive/Products/Library/Frameworks/cmark-gfm.framework \
-    -framework ./cmark-gfm-Sim.xcarchive/Products/Library/Frameworks/cmark-gfm.framework \
-    -output "$OUTPUT_DIR/cmark-gfm.xcframework"
+    -framework ./cmark_gfm-iOS.xcarchive/Products/Library/Frameworks/cmark_gfm.framework \
+    -framework ./cmark_gfm-Sim.xcarchive/Products/Library/Frameworks/cmark_gfm.framework \
+    -output "$OUTPUT_DIR/cmark_gfm.xcframework"
 
 # Write metadata
-echo $CURRENT_VERSION > "$OUTPUT_DIR/cmark-gfm.xcframework.version"
+echo $CURRENT_VERSION > "$OUTPUT_DIR/cmark_gfm.xcframework.version"

@@ -1,9 +1,9 @@
-name: cmark-gfm
+name: cmark_gfm
 settings:
   GENERATE_INFOPLIST_FILE: YES
   CODE_SIGNING_ALLOWED: NO
 targets:
-  cmark-gfm:
+  cmark_gfm:
     type: framework
     platform: iOS
     deploymentTarget: "12.0"
@@ -22,7 +22,7 @@ targets:
           - "*.in"
           - "*.txt"
 schemes:
-  cmark-gfm:
+  cmark_gfm:
     build:
       targets:
-        cmark-gfm: all
+        cmark_gfm: all

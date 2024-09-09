@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.source                = { :git => 'https://github.com/processout/processout-ios.git', :tag => s.version.to_s }
   s.frameworks            = 'Foundation', 'UIKit'
   s.ios.deployment_target = '13.0'
-  s.vendored_frameworks   = "Vendor/cmark-gfm.xcframework"
+  s.vendored_frameworks   = "Vendor/cmark_gfm.xcframework"
   s.ios.resources         = 'Sources/ProcessOut/Resources/**/*'
   s.source_files          = 'Sources/ProcessOut/**/*.swift'
   s.pod_target_xcconfig   = { 'OTHER_SWIFT_FLAGS' => '-Xfrontend -module-interface-preserve-types-as-written' }

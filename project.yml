@@ -28,7 +28,7 @@ targets:
     sources:
       - path: Sources/ProcessOutCoreUI
     dependencies:
-      - framework: Vendor/cmark-gfm.xcframework
+      - framework: Vendor/cmark_gfm.xcframework
   ProcessOutUI:
     type: framework
     platform: iOS
@@ -65,7 +65,7 @@ targets:
     sources:
       - path: Sources/ProcessOut
     dependencies:
-      - framework: Vendor/cmark-gfm.xcframework
+      - framework: Vendor/cmark_gfm.xcframework
   ProcessOutTests:
     type: bundle.unit-test
     platform: iOS
