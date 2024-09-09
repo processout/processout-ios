@@ -2,6 +2,11 @@
 
 set -euo pipefail
 
+function fail {
+  echo "$@" 1>&2
+  exit 1
+}
+
 function cleanup {
   rm -rf $WORK_DIR
 }
@@ -14,7 +19,7 @@ OUTPUT_DIR="$SCRIPT_DIR/../Sources/ProcessOut/Resources/PhoneNumberMetadata"
 WORK_DIR=$(mktemp -d)
 
 # Validates arguments acount
-test $# -eq 1
+test $# -eq 1 || fail "Expected tag or branch reference."
 
 # Go to temporary directory
 cd $WORK_DIR

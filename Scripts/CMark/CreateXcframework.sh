@@ -2,6 +2,11 @@
 
 set -euo pipefail
 
+function fail {
+  echo "$@" 1>&2
+  exit 1
+}
+
 function cleanup {
   rm -rf $WORK_DIR
 }
@@ -14,7 +19,7 @@ OUTPUT_DIR="$SCRIPT_DIR/../../Vendor"
 WORK_DIR=$(mktemp -d)
 
 # Script expects revision as a first and only argument
-test $# -eq 1
+test $# -eq 1 || fail "Expected tag or branch reference."
 
 # Exports version as environment variable
 export CURRENT_VERSION=$1
