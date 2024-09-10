@@ -9,6 +9,6 @@ protocol ApplePayCardTokenizationRequestMapper: Sendable {
 
     /// Creates tokenization request with given ``POApplePayCardTokenizationRequest`` instance.
     func tokenizationRequest(
-        from request: POApplePayCardTokenizationRequest
+        from request: POApplePayPaymentTokenizationRequest
     ) async throws -> ApplePayCardTokenizationRequest
 }

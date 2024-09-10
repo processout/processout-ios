@@ -6,15 +6,20 @@
 //
 
 import Foundation
+import PassKit
 
 final class DefaultCardsService: POCardsService {
 
     init(
         repository: CardsRepository,
-        applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
+        applePayAuthorizationSession: ApplePayAuthorizationSession,
+        applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper,
+        applePayErrorMapper: POPassKitPaymentErrorMapper
     ) {
         self.repository = repository
+        self.applePayAuthorizationSession = applePayAuthorizationSession
         self.applePayCardTokenizationRequestMapper = applePayCardTokenizationRequestMapper
+        self.applePayErrorMapper = applePayErrorMapper
     }
 
     // MARK: - POCardsService
@@ -31,13 +36,31 @@ final class DefaultCardsService: POCardsService {
         try await repository.updateCard(request: request)
     }
 
-    func tokenize(request: POApplePayCardTokenizationRequest) async throws -> POCard {
+    func tokenize(request: POApplePayPaymentTokenizationRequest) async throws -> POCard {
         let request = try await applePayCardTokenizationRequestMapper.tokenizationRequest(from: request)
         return try await repository.tokenize(request: request)
+    }
+
+    @MainActor
+    func tokenize(
+        request: POApplePayTokenizationRequest, delegate: POApplePayTokenizationDelegate?
+    ) async throws -> POCard {
+        let coordinator = ApplePayTokenizationCoordinator(
+            cardsService: self, errorMapper: applePayErrorMapper, request: request, delegate: delegate
+        )
+        _ = try await applePayAuthorizationSession.authorize(
+            request: request.paymentRequest, delegate: coordinator
+        )
+        guard let card = coordinator.card else {
+            throw POFailure(message: "Tokenization was cancelled.", code: .cancelled)
+        }
+        return card
     }
 
     // MARK: - Private Properties
 
     private let repository: CardsRepository
+    private let applePayAuthorizationSession: ApplePayAuthorizationSession
     private let applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
+    private let applePayErrorMapper: POPassKitPaymentErrorMapper
 }

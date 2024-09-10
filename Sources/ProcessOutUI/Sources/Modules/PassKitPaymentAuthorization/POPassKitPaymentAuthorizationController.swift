@@ -9,6 +9,7 @@ import PassKit
 @_spi(PO) import ProcessOut
 
 /// An object that presents a sheet that prompts the user to authorize a payment request
+@available(*, deprecated, message: "Tokenize payments using cards service accessible via ProcessOut.shared.cards")
 @MainActor
 public final class POPassKitPaymentAuthorizationController: NSObject {
 
@@ -37,7 +38,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
         didPresentApplePay = false
         self.paymentRequest = paymentRequest
         controller = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
-        errorMapper = DefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger)
+        errorMapper = PODefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger)
         cardsService = ProcessOut.shared.cards
         super.init()
         controller.delegate = self
@@ -92,11 +93,12 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     private let paymentRequest: PKPaymentRequest
     private let controller: PKPaymentAuthorizationController
 
-    private let errorMapper: PassKitPaymentErrorMapper
+    private let errorMapper: POPassKitPaymentErrorMapper
     private let cardsService: POCardsService
     private var didPresentApplePay: Bool
 }
 
+@available(*, deprecated)
 extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControllerDelegate {
 
     public func paymentAuthorizationControllerDidFinish(_: PKPaymentAuthorizationController) {
@@ -106,7 +108,7 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
     public func paymentAuthorizationController(
         _: PKPaymentAuthorizationController, didAuthorizePayment payment: PKPayment
     ) async -> PKPaymentAuthorizationResult {
-        let request = POApplePayCardTokenizationRequest(
+        let request = POApplePayPaymentTokenizationRequest(
             payment: payment,
             merchantIdentifier: paymentRequest.merchantIdentifier,
             metadata: nil // todo(andrii-vysotskyi): decide if metadata injection should be allowed

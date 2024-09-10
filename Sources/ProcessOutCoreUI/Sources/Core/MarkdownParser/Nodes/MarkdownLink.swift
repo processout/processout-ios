@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 15.06.2023.
 //
 
-@_implementationOnly import cmark
+import cmark_gfm
 
 final class MarkdownLink: MarkdownBaseNode, @unchecked Sendable {
 
@@ -14,11 +14,7 @@ final class MarkdownLink: MarkdownBaseNode, @unchecked Sendable {
     // MARK: - MarkdownBaseNode
 
     required init(cmarkNode: MarkdownBaseNode.CmarkNode, validatesType: Bool = true) {
-        if let url = cmarkNode.pointee.as.link.url {
-            self.url = String(cString: url)
-        } else {
-            url = nil
-        }
+        self.url = String(cString: cmarkNode.pointee.as.link.url.data)
         super.init(cmarkNode: cmarkNode, validatesType: validatesType)
     }
 

@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 12.06.2023.
 //
 
-@_implementationOnly import cmark
+import cmark_gfm
 
 final class MarkdownList: MarkdownBaseNode, @unchecked Sendable {
 
@@ -40,11 +40,11 @@ final class MarkdownList: MarkdownBaseNode, @unchecked Sendable {
 
     private static func listType(cmarkNode: CmarkNode) -> ListType {
         let listNode = cmarkNode.pointee.as.list
-        switch UInt32(listNode.list_type) {
-        case CMARK_BULLET_LIST.rawValue:
+        switch listNode.list_type {
+        case CMARK_BULLET_LIST:
             let marker = Character(Unicode.Scalar(listNode.bullet_char))
             return .bullet(marker: marker)
-        case CMARK_ORDERED_LIST.rawValue:
+        case CMARK_ORDERED_LIST:
             let delimiter: Character
             switch cmark_node_get_list_delim(cmarkNode) {
             case CMARK_PERIOD_DELIM:

@@ -108,7 +108,9 @@ public final class ProcessOut: @unchecked Sendable {
         )
         let service = DefaultCardsService(
             repository: HttpCardsRepository(connector: httpConnector),
-            applePayCardTokenizationRequestMapper: requestMapper
+            applePayAuthorizationSession: DefaultApplePayAuthorizationSession(),
+            applePayCardTokenizationRequestMapper: requestMapper,
+            applePayErrorMapper: PODefaultPassKitPaymentErrorMapper(logger: logger)
         )
         return service
     }

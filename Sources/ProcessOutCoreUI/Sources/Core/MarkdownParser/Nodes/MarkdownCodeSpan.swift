@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 15.06.2023.
 //
 
-@_implementationOnly import cmark
+import cmark_gfm
 
 final class MarkdownCodeSpan: MarkdownBaseNode, @unchecked Sendable {
 

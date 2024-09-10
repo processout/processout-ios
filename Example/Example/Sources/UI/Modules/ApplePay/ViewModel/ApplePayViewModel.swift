@@ -13,8 +13,9 @@ import SwiftUI
 @MainActor
 final class ApplePayViewModel: ObservableObject {
 
-    init(invoicesService: POInvoicesService) {
+    init(invoicesService: POInvoicesService, cardsService: POCardsService) {
         self.invoicesService = invoicesService
+        self.cardsService = cardsService
     }
 
     // MARK: -
@@ -24,16 +25,19 @@ final class ApplePayViewModel: ObservableObject {
 
     func pay() {
         state.message = nil
-        startPassKitPayment()
+        Task {
+            await startPassKitPayment()
+        }
     }
 
     // MARK: - Private Properties
 
     private let invoicesService: POInvoicesService
+    private let cardsService: POCardsService
 
     // MARK: - Private Methods
 
-    func startPassKitPayment() {
+    func startPassKitPayment() async {
         let request = PKPaymentRequest()
         request.merchantIdentifier = Constants.merchantId ?? ""
         request.merchantCapabilities = [.threeDSecure]
@@ -44,46 +48,34 @@ final class ApplePayViewModel: ObservableObject {
         request.currencyCode = state.invoice.currencyCode.selection
         request.countryCode = "US"
         request.supportedNetworks = [.visa, .masterCard, .amex]
-        guard let controller = POPassKitPaymentAuthorizationController(paymentRequest: request) else {
-            assertionFailure("Unable to start PassKit payment authorization.")
-            return
-        }
-        controller.delegate = self
-        controller.present()
-    }
-}
-
-extension ApplePayViewModel: POPassKitPaymentAuthorizationControllerDelegate {
-
-    func paymentAuthorizationControllerDidFinish(_ controller: POPassKitPaymentAuthorizationController) {
-        controller.dismiss()
+        await createInvoiceAndAuthorize(request: request)
     }
 
-    func paymentAuthorizationController(
-        _ controller: POPassKitPaymentAuthorizationController,
-        didTokenizePayment payment: PKPayment,
-        card: POCard
-    ) async -> PKPaymentAuthorizationResult {
-        let invoiceCreationRequest = POInvoiceCreationRequest(
-            name: state.invoice.name,
-            amount: state.invoice.amount.description,
-            currency: state.invoice.currencyCode.selection
-        )
+    private func createInvoiceAndAuthorize(request: PKPaymentRequest) async {
         do {
-            let invoice = try await invoicesService.createInvoice(request: invoiceCreationRequest)
-            let authorizationRequest = POInvoiceAuthorizationRequest(
-                invoiceId: invoice.id, source: card.id
+            var invoice: POInvoice! // swiftlint:disable:this implicitly_unwrapped_optional
+            let invoiceCreationRequest = POInvoiceCreationRequest(
+                name: state.invoice.name,
+                amount: state.invoice.amount.description,
+                currency: state.invoice.currencyCode.selection
             )
-            let threeDSService = POTest3DSService()
-            try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
+            let coordinator = ApplePayTokenizationCoordinator { [invoicesService] card in
+                invoice = try await invoicesService.createInvoice(request: invoiceCreationRequest)
+                let authorizationRequest = POInvoiceAuthorizationRequest(
+                    invoiceId: invoice.id, source: card.id
+                )
+                let threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
+                try await invoicesService.authorizeInvoice(
+                    request: authorizationRequest, threeDSService: threeDSService
+                )
+            }
+            let tokenizationRequest = POApplePayTokenizationRequest(paymentRequest: request)
+            let card = try await cardsService.tokenize(request: tokenizationRequest, delegate: coordinator)
             setSuccessMessage(invoice: invoice, card: card)
         } catch {
-            return .init(status: .failure, errors: [error])
+            state.message = .init(text: String(localized: .ApplePay.errorMessage), severity: .error)
         }
-        return .init(status: .success, errors: nil)
     }
-
-    // MARK: - Private Methods
 
     private func setSuccessMessage(invoice: POInvoice, card: POCard) {
         let text = String(localized: .ApplePay.successMessage, replacements: invoice.id, card.id)
@@ -95,6 +87,6 @@ extension ApplePayViewModel {
 
     /// Convenience initializer that resolves its dependencies automatically.
     convenience init() {
-        self.init(invoicesService: ProcessOut.shared.invoices)
+        self.init(invoicesService: ProcessOut.shared.invoices, cardsService: ProcessOut.shared.cards)
     }
 }

@@ -111,6 +111,16 @@
         }
       }
     },
+    "apple-pay.error-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Pay payment failed. Please check your information or try again later."
+          }
+        }
+      }
+    },
     "apple-pay.pay" : {
       "localizations" : {
         "en" : {
