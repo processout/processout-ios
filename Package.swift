@@ -16,12 +16,13 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", exact: "3.2.4"),
+        .package(url: "https://github.com/swiftlang/swift-cmark", branch: "gfm")
     ],
     targets: [
         .target(
             name: "ProcessOut",
             dependencies: [
-                .target(name: "cmark")
+                .product(name: "cmark-gfm", package: "swift-cmark")
             ],
             resources: [
                 .process("Resources")
@@ -49,13 +50,12 @@ let package = Package(
         .target(
             name: "ProcessOutCoreUI",
             dependencies: [
-                .target(name: "cmark")
+                .product(name: "cmark-gfm", package: "swift-cmark")
             ],
             resources: [
                 .process("Resources")
             ]
-        ),
-        .binaryTarget(name: "cmark", path: "Vendor/cmark.xcframework")
+        )
     ],
     swiftLanguageVersions: [.v5]
 )
