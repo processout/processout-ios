@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@_implementationOnly import cmark
+import cmark_gfm
 
 enum MarkdownParser {
 

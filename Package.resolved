@@ -17,6 +17,15 @@
         "revision" : "a914d754b4ffb1843730e8e1f8e7e60c4bf81cf9",
         "version" : "1.2.4"
       }
+    },
+    {
+      "identity" : "swift-cmark",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-cmark",
+      "state" : {
+        "branch" : "gfm",
+        "revision" : "fc07ab5da47975c5ef5f336acadfc02e8f706d30"
+      }
     }
   ],
   "version" : 2

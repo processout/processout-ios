@@ -5,16 +5,13 @@
 //  Created by Andrii Vysotskyi on 15.06.2023.
 //
 
-@_implementationOnly import cmark
+import cmark_gfm
 
 final class MarkdownCodeBlock: MarkdownBaseNode {
 
     /// Returns the info string from a fenced code block.
     private(set) lazy var info: String? = {
-        guard let info = cmarkNode.pointee.as.code.info else {
-            return nil
-        }
-        return String(cString: info)
+        String(cString: cmarkNode.pointee.as.code.info.data)
     }()
 
     private(set) lazy var code: String = {
