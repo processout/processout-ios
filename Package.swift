@@ -56,5 +56,6 @@ let package = Package(
             ]
         ),
         .binaryTarget(name: "cmark", path: "Vendor/cmark.xcframework")
-    ]
+    ],
+    swiftLanguageVersions: [.v5]
 )
