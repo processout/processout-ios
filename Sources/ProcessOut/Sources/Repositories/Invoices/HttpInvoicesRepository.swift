@@ -69,8 +69,14 @@ final class HttpInvoicesRepository: InvoicesRepository {
         struct Response: Decodable {
             let customerAction: ThreeDSCustomerAction?
         }
+        let headers = [
+            "X-Processout-Client-Secret": request.clientSecret
+        ]
         let httpRequest = HttpConnectorRequest<Response>.post(
-            path: "/invoices/\(request.invoiceId)/authorize", body: request, includesDeviceMetadata: true
+            path: "/invoices/\(request.invoiceId)/authorize",
+            body: request,
+            headers: headers.compactMapValues { $0 },
+            includesDeviceMetadata: true
         )
         return try await connector.execute(request: httpRequest).customerAction
     }

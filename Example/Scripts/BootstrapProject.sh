@@ -7,8 +7,3 @@ brew bundle -q
 
 # Generates project
 xcodegen generate
-
-# Creates hardlink to Package.resolved
-SWIFTPM_DIR='Example.xcodeproj/project.xcworkspace/xcshareddata/swiftpm'
-mkdir -p $SWIFTPM_DIR
-ln -f Package.resolved $SWIFTPM_DIR/Package.resolved

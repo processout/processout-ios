@@ -15,9 +15,6 @@ settings:
 
 # SPM Packages
 packages:
-  SnapKit:
-    url: https://github.com/SnapKit/SnapKit
-    from: 5.6.0
   ProcessOutUI:
     path: ../
   ProcessOutCheckout3DS:
@@ -34,9 +31,8 @@ targets:
     platform: iOS
     settings:
       TARGETED_DEVICE_FAMILY: 1
-      PRODUCT_BUNDLE_IDENTIFIER: com.processout.example
+      PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-example
     dependencies:
-      - package: SnapKit
       - package: ProcessOutUI
       - package: ProcessOutCheckout3DS
   ExampleUiTests:
@@ -45,7 +41,7 @@ targets:
     platform: iOS
     settings:
       GENERATE_INFOPLIST_FILE: 1
-      PRODUCT_BUNDLE_IDENTIFIER: com.processout.example-ui-tests
+      PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-example-ui-tests
     dependencies:
       - target: Example
 

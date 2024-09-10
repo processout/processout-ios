@@ -1,0 +1,29 @@
+name: Upload Example to TestFlight
+on:
+  push:
+    branches:
+      - 'master'
+  workflow_dispatch:
+jobs:
+  export:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode Version
+        uses: ./.github/actions/select-xcode
+      - name: Bootstrap Project
+        working-directory: ./Example
+        run: ./Scripts/BootstrapProject.sh
+      - name: Import Certificates
+        working-directory: ./Example
+        env:
+          APPLE_DEVELOPMENT_CERTIFICATE_CONTENT: ${{ secrets.APPLE_DEVELOPMENT_CERTIFICATE_CONTENT }}
+          APPLE_DEVELOPMENT_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_DEVELOPMENT_CERTIFICATE_PASSWORD }}
+        run: ./Scripts/Distribution/ImportCerificates.sh
+      - name: Export Application
+        working-directory: ./Example
+        env:
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+        run: ./Scripts/Distribution/ExportApplication.sh

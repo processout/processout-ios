@@ -25,7 +25,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     var state: DynamicCheckoutViewModelState = .idle
 
     func start() {
-        interactor.start()
+        $state.performWithoutAnimation(interactor.start)
     }
 
     func stop() {

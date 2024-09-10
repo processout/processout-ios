@@ -8,4 +8,5 @@
 .swiftpm
 Packages
 *.xcodeproj
+!*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 xcuserdata/

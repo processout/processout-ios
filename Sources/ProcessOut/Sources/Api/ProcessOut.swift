@@ -130,7 +130,7 @@ public final class ProcessOut: @unchecked Sendable {
     private func createAlternativePaymentsService() -> POAlternativePaymentsService {
         let serviceConfiguration = { @Sendable [unowned self] () -> AlternativePaymentsServiceConfiguration in
             let configuration = self.configuration
-            return .init(projectId: configuration.projectId, baseUrl: configuration.checkoutBaseUrl)
+            return .init(projectId: configuration.projectId, baseUrl: configuration.environment.checkoutBaseUrl)
         }
         let webSession = DefaultWebAuthenticationSession()
         return DefaultAlternativePaymentsService(
@@ -154,7 +154,7 @@ public final class ProcessOut: @unchecked Sendable {
         let connectorConfiguration = { @Sendable [unowned self] in
             let configuration = self.configuration
             return HttpConnectorRequestMapperConfiguration(
-                baseUrl: configuration.apiBaseUrl,
+                baseUrl: configuration.environment.apiBaseUrl,
                 projectId: configuration.projectId,
                 privateKey: configuration.privateKey,
                 sessionId: configuration.sessionId,

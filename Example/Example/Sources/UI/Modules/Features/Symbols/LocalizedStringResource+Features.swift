@@ -14,34 +14,22 @@ extension LocalizedStringResource {
         /// Title.
         static let title = LocalizedStringResource("features.title")
 
-        /// Native alternative payment.
-        static let nativeAlternativePayment = LocalizedStringResource("features.native-alternative-payment")
+        /// Available features.
+        static let availableFeatures = LocalizedStringResource("features.available-features")
 
         /// Alternative payment.
         static let alternativePayment = LocalizedStringResource("features.alternative-payment")
 
-        /// ApplePay.
-        static let applePay = LocalizedStringResource("features.apple-pay")
-
         /// Card payment.
         static let cardPayment = LocalizedStringResource("features.card-payment")
-
-        /// CKO based card payment.
-        static let checkoutCardPayment = LocalizedStringResource("features.checkout-card-payment")
 
         /// Dynamic checkout.
         static let dynamicCheckout = LocalizedStringResource("features.dynamic-checkout")
 
-        /// Error.
-        static let error = LocalizedStringResource("features.error-\(placeholder: .object)")
+        /// ApplePay.
+        static let applePay = LocalizedStringResource("features.apple-pay")
 
-        /// Generic error.
-        static let genericError = LocalizedStringResource("features.generic-error")
-
-        /// Success message.
-        static let successMessage = LocalizedStringResource("features.success-message")
-
-        /// Continue button.
-        static let `continue` = LocalizedStringResource("features.continue")
+        /// App configuration.
+        static let applicationConfiguration = LocalizedStringResource("features.application-configuration")
     }
 }

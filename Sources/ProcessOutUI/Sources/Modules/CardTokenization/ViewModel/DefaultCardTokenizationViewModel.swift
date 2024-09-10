@@ -25,7 +25,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     var state: CardTokenizationViewModelState
 
     func start() {
-        interactor.start()
+        $state.performWithoutAnimation(interactor.start)
     }
 
     func stop() {

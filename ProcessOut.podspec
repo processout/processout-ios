@@ -1,7 +1,12 @@
 Pod::Spec.new do |s|
   s.name                  = 'ProcessOut'
+<<<<<<< HEAD
   s.version               = '4.19.0'
   s.swift_versions        = ['6.0']
+=======
+  s.version               = '4.20.0'
+  s.swift_versions        = ['5.9']
+>>>>>>> origin/master
   s.license               = { :type => 'MIT', :file => 'LICENSE' }
   s.homepage              = 'https://github.com/processout/processout-ios'
   s.author                = 'ProcessOut'

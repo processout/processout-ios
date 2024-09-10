@@ -49,8 +49,8 @@ extension POCreateCustomerTokenRequest {
 
     enum CodingKeys: String, CodingKey {
         case verify
-        case invoiceReturnUrl
         case returnUrl
+        case invoiceReturnUrl
     }
 }
 
@@ -91,6 +91,7 @@ extension POInvoiceAuthorizationRequest {
 
     enum CodingKeys: String, CodingKey {
         case source
+        case saveSource
         case incremental
         case preferredScheme
         case thirdPartySdkVersion
@@ -101,6 +102,7 @@ extension POInvoiceAuthorizationRequest {
         case captureAmount
         case authorizeOnly
         case allowFallbackToSale
+        case clientSecret
         case metadata
         case enableThreeDS2 = "enable_three_d_s_2"
     }

@@ -15,9 +15,7 @@ runs:
         echo "$CONSTANTS" > Tests/ProcessOutUITests/Sources/Core/Constants.swift
       shell: bash
     - name: Select Xcode Version
-      # todo(andrii-vysotskyi): Migrate to public release once available
-      run: sudo xcode-select -s '/Applications/Xcode_16_beta_5.app/Contents/Developer'
-      shell: bash
+      uses: ./.github/actions/select-xcode
     - name: Bootstrap Project
       run: ./Scripts/BootstrapProject.sh
       shell: bash

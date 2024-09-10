@@ -12,7 +12,7 @@ import Foundation
 /// method.
 public struct ProcessOutConfiguration: Sendable {
 
-    public struct Application: Sendable {
+    public struct Application: Hashable, Sendable {
 
         /// Application name.
         public let name: String?
@@ -26,8 +26,29 @@ public struct ProcessOutConfiguration: Sendable {
         }
     }
 
+    /// Environment.
+    @_spi(PO)
+    public struct Environment: Hashable, Sendable {
+
+        /// Api base URL.
+        let apiBaseUrl: URL
+
+        /// Checkout base URL.
+        let checkoutBaseUrl: URL
+    }
+
     /// Project id.
     public let projectId: String
+
+    /// Project's private key.
+    /// - Warning: this is only intended to be used for testing purposes storing your private key
+    /// inside application is extremely dangerous and is highly discouraged.
+    @_spi(PO)
+    public let privateKey: String?
+
+    /// Project environment.
+    @_spi(PO)
+    public let environment: Environment
 
     /// Application name.
     public let application: Application?
@@ -44,12 +65,6 @@ public struct ProcessOutConfiguration: Sendable {
     /// Boolean value indicating whether remote telemetry is enabled.
     public let isTelemetryEnabled: Bool
 
-    /// Project's private key.
-    /// - Warning: this is only intended to be used for testing purposes storing your private key
-    /// inside application is extremely dangerous and is highly discouraged.
-    @_spi(PO)
-    public let privateKey: String?
-
     /// Creates configuration.
     public init(
         projectId: String,
@@ -58,6 +73,7 @@ public struct ProcessOutConfiguration: Sendable {
         isTelemetryEnabled: Bool = true
     ) {
         self.projectId = projectId
+        self.environment = .production
         self.application = application
         self.isDebug = isDebug
         self.isTelemetryEnabled = isTelemetryEnabled
@@ -65,18 +81,60 @@ public struct ProcessOutConfiguration: Sendable {
     }
 
     /// Creates debug configuration.
+    @_disfavoredOverload
     @_spi(PO)
-    public init(projectId: String, privateKey: String) {
+    public init(
+        projectId: String,
+        privateKey: String? = nil,
+        environment: ProcessOutConfiguration.Environment = .production
+    ) {
         self.projectId = projectId
+        self.privateKey = privateKey
         self.application = nil
         self.isDebug = true
-        self.isTelemetryEnabled = false
-        self.privateKey = privateKey
+        self.isTelemetryEnabled = true
+        self.environment = environment
     }
-
-    /// Api base URL.
-    let apiBaseUrl = URL(string: "https://api.processout.com")! // swiftlint:disable:this force_unwrapping
-
-    /// Checkout base URL.
-    let checkoutBaseUrl = URL(string: "https://checkout.processout.com")! // swiftlint:disable:this force_unwrapping
 }
+
+extension ProcessOutConfiguration {
+
+    /// Creates production configuration.
+    ///
+    /// - Parameters:
+    ///   - appVersion: when application parameter is set, it takes precedence over this parameter.
+    @available(*, deprecated, message: "Use initialiser directly.")
+    public static func production(
+        projectId: String,
+        application: Application? = nil,
+        appVersion: String? = nil,
+        isDebug: Bool = false,
+        isTelemetryEnabled: Bool = true
+    ) -> Self {
+        ProcessOutConfiguration(
+            projectId: projectId,
+            application: application ?? .init(name: nil, version: appVersion),
+            isDebug: isDebug,
+            isTelemetryEnabled: isTelemetryEnabled
+        )
+    }
+}
+
+// swiftlint:disable force_unwrapping
+
+extension ProcessOutConfiguration.Environment {
+
+    /// Production environment.
+    public static let production = Self(
+        apiBaseUrl: URL(string: "https://api.processout.com")!,
+        checkoutBaseUrl: URL(string: "https://checkout.processout.com")!
+    )
+
+    /// Staging environment.
+    public static let stage = Self(
+        apiBaseUrl: URL(string: "https://api.processout.ninja")!,
+        checkoutBaseUrl: URL(string: "https://checkout.processout.ninja")!
+    )
+}
+
+// swiftlint:enable force_unwrapping

@@ -90,5 +90,6 @@ opt_in_rules:
 
 disabled_rules:
   - todo
+  - optional_data_string_conversion
 
 reporter: "xcode"

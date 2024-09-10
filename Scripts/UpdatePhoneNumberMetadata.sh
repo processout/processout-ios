@@ -2,6 +2,13 @@
 
 set -euo pipefail
 
+function cleanup {
+  rm -rf $WORK_DIR
+}
+
+# Configure cleanup
+trap cleanup EXIT
+
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 OUTPUT_DIR="$SCRIPT_DIR/../Sources/ProcessOut/Resources/PhoneNumberMetadata"
 WORK_DIR=$(mktemp -d)
@@ -22,9 +29,3 @@ mkdir -p $OUTPUT_DIR
 
 # Write metadata
 echo $1 > "$OUTPUT_DIR/PhoneNumberMetadata.version"
-
-function cleanup {
-  rm -rf $WORK_DIR
-}
-
-trap cleanup EXIT

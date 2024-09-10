@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
+// todo(andrii-vysotskyi): potentially make threeDSService optional to allow easier APMs authorization
+
 public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 
     /// Requests information needed to continue existing payment or start new one.
