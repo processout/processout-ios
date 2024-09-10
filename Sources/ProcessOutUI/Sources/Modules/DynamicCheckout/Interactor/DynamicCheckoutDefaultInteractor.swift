@@ -18,19 +18,19 @@ final class DynamicCheckoutDefaultInteractor:
     init(
         configuration: PODynamicCheckoutConfiguration,
         delegate: PODynamicCheckoutDelegate?,
-        passKitPaymentSession: DynamicCheckoutPassKitPaymentSession,
         alternativePaymentSession: DynamicCheckoutAlternativePaymentSession,
         childProvider: DynamicCheckoutInteractorChildProvider,
         invoicesService: POInvoicesService,
+        cardsService: POCardsService,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         self.configuration = configuration
         self.delegate = delegate
-        self.passKitPaymentSession = passKitPaymentSession
         self.alternativePaymentSession = alternativePaymentSession
         self.childProvider = childProvider
         self.invoicesService = invoicesService
+        self.cardsService = cardsService
         self.logger = logger
         self.completion = completion
         super.init(state: .idle)
@@ -137,10 +137,10 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Private Properties
 
-    private let passKitPaymentSession: DynamicCheckoutPassKitPaymentSession
     private let alternativePaymentSession: DynamicCheckoutAlternativePaymentSession
     private let childProvider: DynamicCheckoutInteractorChildProvider
     private let invoicesService: POInvoicesService
+    private let cardsService: POCardsService
     private let completion: (Result<Void, POFailure>) -> Void
 
     private var logger: POLogger
@@ -269,7 +269,7 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     private func pkPaymentRequests(invoice: POInvoice) -> [String: PKPaymentRequest] {
-        guard passKitPaymentSession.isSupported else {
+        guard PKPaymentAuthorizationController.canMakePayments() else {
             logger.debug("PassKit is not supported, won't attempt to resolve request.")
             return [:]
         }
@@ -375,7 +375,20 @@ final class DynamicCheckoutDefaultInteractor:
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
             do {
-                try await passKitPaymentSession.start(invoiceId: startedState.invoice.id, request: request)
+                guard let delegate else {
+                    throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
+                }
+                let tokenizationRequest = POApplePayTokenizationRequest(paymentRequest: request)
+                let coordinator = DynamicCheckoutApplePayTokenizationCoordinator { [invoicesService] card in
+                    var authorizationRequest = POInvoiceAuthorizationRequest(
+                        invoiceId: startedState.invoice.id, source: card.id
+                    )
+                    let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &authorizationRequest)
+                    try await invoicesService.authorizeInvoice(
+                        request: authorizationRequest, threeDSService: threeDSService
+                    )
+                }
+                _ = try await cardsService.tokenize(request: tokenizationRequest, delegate: coordinator)
                 setSuccessState()
             } catch {
                 recoverPaymentProcessing(error: error)

@@ -116,10 +116,33 @@ extension POCardsService {
         }
     }
 
-    /// Tokenize a card via ApplePay. You can use the card for a single payment by creating a card token with it.
+    /// Tokenize previously authorized payment.
     @discardableResult
     public func tokenize(
-        request: POApplePayCardTokenizationRequest,
+        request: POApplePayPaymentTokenizationRequest,
+        completion: @escaping (Result<POCard, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await tokenize(request: request)
+        }
+    }
+
+    /// Authorize given payment request and tokenize it.
+    @discardableResult
+    public func tokenize(
+        request: POApplePayTokenizationRequest,
+        delegate: POApplePayTokenizationDelegate?,
+        completion: @escaping (Result<POCard, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await tokenize(request: request, delegate: delegate)
+        }
+    }
+
+    /// Authorize given payment request and tokenize it.
+    @discardableResult
+    public func tokenize(
+        request: POApplePayTokenizationRequest,
         completion: @escaping (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {

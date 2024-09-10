@@ -11,6 +11,7 @@ import SwiftUI
 import ProcessOutUI
 import ProcessOutCheckout3DS
 
+@MainActor
 final class CardPaymentViewModel: ObservableObject {
 
     init(invoicesService: POInvoicesService) {

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PassKit
 import ProcessOutUI
 
 struct FeaturesView: View {
@@ -34,13 +35,21 @@ struct FeaturesView: View {
                 }
             }
         }
+        .onAppear {
+            updateApplePayAvailability()
+        }
         .listStyle(.insetGrouped)
         .navigationTitle(String(localized: .Features.title))
     }
 
     // MARK: - Private Methods
 
-    private var isApplePayAvailable: Bool {
-        POPassKitPaymentAuthorizationController.canMakePayments() && Constants.merchantId != nil
+    @State
+    private var isApplePayAvailable = false
+
+    // MARK: - Private Methods
+
+    private func updateApplePayAvailability() {
+        isApplePayAvailable = PKPaymentAuthorizationController.canMakePayments() && Constants.merchantId != nil
     }
 }

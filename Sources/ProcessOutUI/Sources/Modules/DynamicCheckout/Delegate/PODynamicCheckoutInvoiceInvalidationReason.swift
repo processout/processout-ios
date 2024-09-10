@@ -8,6 +8,7 @@
 import ProcessOut
 
 /// Invoice invalidation reason.
+@_spi(PO)
 public enum PODynamicCheckoutInvoiceInvalidationReason: Sendable {
 
     /// User requested different payment method selection that requires new invoice.

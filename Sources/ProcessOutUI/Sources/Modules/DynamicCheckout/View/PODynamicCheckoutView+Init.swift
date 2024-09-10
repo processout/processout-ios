@@ -25,9 +25,6 @@ extension PODynamicCheckoutView {
             let interactor = DynamicCheckoutDefaultInteractor(
                 configuration: configuration,
                 delegate: delegate,
-                passKitPaymentSession: DynamicCheckoutPassKitPaymentDefaultSession(
-                    delegate: delegate, invoicesService: ProcessOut.shared.invoices
-                ),
                 alternativePaymentSession: DynamicCheckoutAlternativePaymentDefaultSession(
                     configuration: configuration.alternativePayment
                 ),
@@ -39,6 +36,7 @@ extension PODynamicCheckoutView {
                     logger: logger
                 ),
                 invoicesService: ProcessOut.shared.invoices,
+                cardsService: ProcessOut.shared.cards,
                 logger: logger,
                 completion: completion
             )
