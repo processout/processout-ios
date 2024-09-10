@@ -5,5 +5,5 @@ runs:
   steps:
     - name: Select Xcode Version
       # todo(andrii-vysotskyi): Migrate to public release once available
-      run: sudo xcode-select -s '/Applications/Xcode_16_beta_5.app/Contents/Developer'
+      run: sudo xcode-select -s '/Applications/Xcode_16_beta_6.app/Contents/Developer'
       shell: bash
