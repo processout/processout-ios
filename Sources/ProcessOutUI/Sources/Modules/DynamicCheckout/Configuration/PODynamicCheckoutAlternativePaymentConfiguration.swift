@@ -59,9 +59,6 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
         }
     }
 
-    /// Return URL to expect when handling OOB or web based payments.
-    public let returnUrl: URL?
-
     /// For parameters where user should select single option from multiple values defines
     /// maximum number of options that framework will display inline (e.g. using radio buttons).
     ///
@@ -72,12 +69,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
     public let paymentConfirmation: PaymentConfirmation
 
     /// Creates configuration.
-    public init(
-        returnUrl: URL? = nil,
-        inlineSingleSelectValuesLimit: Int = 5,
-        paymentConfirmation: PaymentConfirmation = .init()
-    ) {
-        self.returnUrl = returnUrl
+    public init(inlineSingleSelectValuesLimit: Int = 5, paymentConfirmation: PaymentConfirmation = .init()) {
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.paymentConfirmation = paymentConfirmation
     }
