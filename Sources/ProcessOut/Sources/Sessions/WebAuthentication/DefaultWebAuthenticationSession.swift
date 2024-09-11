@@ -60,11 +60,13 @@ final class DefaultWebAuthenticationSession:
 
     // MARK: - ASWebAuthenticationPresentationContextProviding
 
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        let application = UIApplication.shared
-        let scene = application.connectedScenes.first { $0 is UIWindowScene } as? UIWindowScene
-        let window = scene?.windows.first(where: \.isKeyWindow)
-        return window ?? ASPresentationAnchor()
+    nonisolated func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        MainActor.assumeIsolated {
+            let application = UIApplication.shared
+            let scene = application.connectedScenes.first { $0 is UIWindowScene } as? UIWindowScene
+            let window = scene?.windows.first(where: \.isKeyWindow)
+            return window ?? ASPresentationAnchor()
+        }
     }
 
     // MARK: - Private Methods
