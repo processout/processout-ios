@@ -187,7 +187,8 @@ extension AlternativePaymentsViewModel {
     convenience init() {
         let interactor = AlternativePaymentsInteractor(
             gatewayConfigurationsRepository: ProcessOut.shared.gatewayConfigurations,
-            invoicesService: ProcessOut.shared.invoices
+            invoicesService: ProcessOut.shared.invoices,
+            alternativePaymentsService: ProcessOut.shared.alternativePayments
         )
         self.init(interactor: interactor)
     }
