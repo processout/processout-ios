@@ -5,13 +5,10 @@
 ### Framework 
 
 - ``ProcessOutUI``
+- <doc:MigrationGuides>
 
-### 3DS
+### 3D Secure
 
-- <doc:3DS>
-- ``SafariServices/SFSafariViewController/init(redirect:returnUrl:safariConfiguration:completion:)``
-- ``POWebAuthenticationSession/init(redirect:returnUrl:completion:)``
-- ``PO3DSRedirectController``
 - ``POTest3DSService``
 
 ### Card Tokenization
@@ -19,7 +16,7 @@
 - ``POCardTokenizationView``
 - ``POCardTokenizationViewController``
 - ``POCardTokenizationStyle``
-- ``SwiftUI/View/cardTokenizationStyle(_:)``
+- ``SwiftUICore/View/cardTokenizationStyle(_:)``
 - ``POCardTokenizationConfiguration``
 - ``POBillingAddressConfiguration``
 - ``POCardTokenizationDelegate``
@@ -36,18 +33,11 @@
 - ``POCardUpdateView``
 - ``POCardUpdateViewController``
 - ``POCardUpdateStyle``
-- ``SwiftUI/View/cardUpdateStyle(_:)``
+- ``SwiftUICore/View/cardUpdateStyle(_:)``
 - ``POCardUpdateConfiguration``
 - ``POCardUpdateDelegate``
 - ``POCardUpdateInformation``
 - ``POCardUpdateEvent``
-
-### Alternative Payment Method
-
-- ``SafariServices/SFSafariViewController/init(request:returnUrl:safariConfiguration:completion:)``
-- ``SafariServices/SFSafariViewController/init(alternativePaymentMethodUrl:returnUrl:safariConfiguration:completion:)``
-- ``POWebAuthenticationSession/init(alternativePaymentMethodUrl:returnUrl:completion:)``
-- ``POWebAuthenticationSession/init(request:returnUrl:completion:)``
 
 ### Native Alternative Payment Method
 
@@ -56,7 +46,7 @@
 - ``PONativeAlternativePaymentViewController``
 - ``PONativeAlternativePaymentStyle``
 - ``PONativeAlternativePaymentBackgroundStyle``
-- ``SwiftUI/View/nativeAlternativePaymentStyle(_:)``
+- ``SwiftUICore/View/nativeAlternativePaymentStyle(_:)``
 - ``PONativeAlternativePaymentConfiguration``
 - ``PONativeAlternativePaymentConfirmationConfiguration``
 - ``PONativeAlternativePaymentDelegate``
@@ -67,7 +57,7 @@
 <!--- ``PODynamicCheckoutView``-->
 <!--- ``PODynamicCheckoutViewController``-->
 <!--- ``PODynamicCheckoutStyle``-->
-<!--- ``SwiftUI/View/dynamicCheckoutStyle(_:)``-->
+<!--- ``SwiftUICore/View/dynamicCheckoutStyle(_:)``-->
 <!--- ``PODynamicCheckoutConfiguration``-->
 <!--- ``PODynamicCheckoutCardConfiguration``-->
 <!--- ``PODynamicCheckoutCardBillingAddressConfiguration``-->
@@ -75,11 +65,6 @@
 <!--- ``PODynamicCheckoutDelegate``-->
 <!--- ``PODynamicCheckoutEvent``-->
 <!--- ``PODynamicCheckoutInvoiceInvalidationReason``-->
-
-### Web Authentication
-
-- ``POWebAuthenticationSession``
-- ``POWebAuthenticationSessionCallback``
 
 ### Utils
 

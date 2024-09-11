@@ -18,10 +18,6 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         observeChanges(interactor: interactor)
     }
 
-    deinit {
-        interactor.cancel()
-    }
-
     // MARK: - NativeAlternativePaymentViewModel
 
     @AnimatablePublished
@@ -29,6 +25,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     func start() {
         $state.performWithoutAnimation(interactor.start)
+    }
+
+    func stop() {
+        interactor.cancel()
     }
 
     // MARK: - Private Nested Types
@@ -135,7 +135,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     ) -> [POActionsContainerActionViewModel] {
         let actions = [
             submitAction(state: state, isLoading: isSubmitting),
-            cancelAction(configuration: configuration.secondaryAction, isEnabled: !isSubmitting && state.isCancellable)
+            cancelAction(configuration: configuration.cancelButton, isEnabled: !isSubmitting && state.isCancellable)
         ]
         return actions.compactMap { $0 }
     }
@@ -215,7 +215,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func createActions(state: InteractorState.AwaitingCapture) -> [POActionsContainerActionViewModel] {
         let actions = [
             cancelAction(
-                configuration: configuration.paymentConfirmation.secondaryAction, isEnabled: state.isCancellable
+                configuration: configuration.paymentConfirmation.cancelButton, isEnabled: state.isCancellable
             )
         ]
         return actions.compactMap { $0 }
@@ -365,7 +365,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func submitAction(state: InteractorState.Started, isLoading: Bool) -> POActionsContainerActionViewModel? {
         let title: String
-        if let customTitle = configuration.primaryActionTitle {
+        if let customTitle = configuration.primaryButtonTitle {
             title = customTitle
         } else {
             priceFormatter.currencyCode = state.currencyCode
@@ -393,19 +393,19 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func cancelAction(
-        configuration: PONativeAlternativePaymentConfiguration.SecondaryAction?, isEnabled: Bool
+        configuration: PONativeAlternativePaymentConfiguration.CancelButton?, isEnabled: Bool
     ) -> POActionsContainerActionViewModel? {
-        guard case let .cancel(title, _, confirmation) = configuration else {
+        guard let configuration else {
             return nil
         }
         let action = POActionsContainerActionViewModel(
             id: "native-alternative-payment.secondary-button",
-            title: title ?? String(resource: .NativeAlternativePayment.Button.cancel),
+            title: configuration.title ?? String(resource: .NativeAlternativePayment.Button.cancel),
             isEnabled: isEnabled,
             isLoading: false,
             isPrimary: false,
             action: { [weak self] in
-                self?.cancelPayment(confirmationConfiguration: confirmation)
+                self?.cancelPayment(confirmationConfiguration: configuration.confirmation)
             }
         )
         return action

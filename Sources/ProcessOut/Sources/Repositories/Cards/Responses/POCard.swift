@@ -9,7 +9,7 @@ import Foundation
 
 /// A card object represents a credit or debit card. It contains many useful pieces of information about the card but
 /// it does not contain the full card number and CVC (which are kept securely in the ProcessOut Vault).
-public struct POCard: Decodable, Hashable {
+public struct POCard: Decodable, Hashable, Sendable {
 
     /// Value that uniquely identifies the card.
     public let id: String
@@ -18,20 +18,16 @@ public struct POCard: Decodable, Hashable {
     public let projectId: String
 
     /// Scheme of the card.
-    @POTypedRepresentation<String, POCardScheme>
-    public private(set) var scheme: String
+    public let scheme: POCardScheme
 
     /// Co-scheme of the card, such as Carte Bancaire.
-    @POTypedRepresentation<String?, POCardScheme>
-    public private(set) var coScheme: String?
+    public let coScheme: POCardScheme?
 
     /// Preferred scheme defined by the Customer.
-    @POTypedRepresentation<String?, POCardScheme>
-    public private(set) var preferredScheme: String?
+    public let preferredScheme: POCardScheme?
 
     /// Card type.
-    @POFallbackDecodable<POEmptyStringProvider>
-    public private(set) var type: String
+    public let type: String?
 
     /// Name of the card’s issuing bank.
     public let bankName: String?
@@ -50,8 +46,7 @@ public struct POCard: Decodable, Hashable {
 
     /// Hash value that remains the same for this card even if it is tokenized several times.
     /// - NOTE: fingerprint is empty string for Apple and Google Pay cards.
-    @POFallbackDecodable<POEmptyStringProvider>
-    public private(set) var fingerprint: String
+    public let fingerprint: String?
 
     /// Month of the expiration date.
     public let expMonth: Int
@@ -60,8 +55,7 @@ public struct POCard: Decodable, Hashable {
     public let expYear: Int
 
     /// CVC check status.
-    @POTypedRepresentation<String, POCardCvcCheck>
-    public var cvcCheck: String
+    public var cvcCheck: POCardCvcCheck
 
     /// AVS check status.
     public let avsCheck: String

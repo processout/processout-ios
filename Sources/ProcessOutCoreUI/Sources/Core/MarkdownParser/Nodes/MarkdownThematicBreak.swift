@@ -7,7 +7,7 @@
 
 import cmark_gfm
 
-final class MarkdownThematicBreak: MarkdownBaseNode {
+final class MarkdownThematicBreak: MarkdownBaseNode, @unchecked Sendable {
 
     override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_THEMATIC_BREAK

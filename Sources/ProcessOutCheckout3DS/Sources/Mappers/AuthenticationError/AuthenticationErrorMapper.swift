@@ -8,8 +8,8 @@
 import ProcessOut
 import Checkout3DS
 
-protocol AuthenticationErrorMapper {
+protocol AuthenticationErrorMapper: Sendable {
 
     /// Converts given authentication error to ProcessOut error.
-    func convert(error: Checkout3DS.AuthenticationError) -> POFailure
+    func convert(error: AuthenticationError) -> POFailure
 }

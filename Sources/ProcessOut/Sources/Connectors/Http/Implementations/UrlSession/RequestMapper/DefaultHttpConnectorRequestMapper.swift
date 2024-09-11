@@ -10,7 +10,7 @@ import Foundation
 final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     init(
-        configuration: @escaping () -> HttpConnectorRequestMapperConfiguration,
+        configuration: @escaping @Sendable () -> HttpConnectorRequestMapperConfiguration,
         encoder: JSONEncoder,
         deviceMetadataProvider: DeviceMetadataProvider,
         logger: POLogger
@@ -51,7 +51,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     // MARK: - Private Properties
 
-    private let configuration: () -> HttpConnectorRequestMapperConfiguration
+    private let configuration: @Sendable () -> HttpConnectorRequestMapperConfiguration
     private let encoder: JSONEncoder
     private let deviceMetadataProvider: DeviceMetadataProvider
     private let logger: POLogger

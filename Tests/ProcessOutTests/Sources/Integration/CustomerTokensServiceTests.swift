@@ -10,12 +10,12 @@ import XCTest
 
 final class CustomerTokensServiceTests: XCTestCase {
 
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         let configuration = ProcessOutConfiguration(
             projectId: Constants.projectId, privateKey: Constants.projectPrivateKey
         )
-        ProcessOut.configure(configuration: configuration, force: true)
+        await ProcessOut.configure(configuration: configuration, force: true)
         sut = ProcessOut.shared.customerTokens
         cardsService = ProcessOut.shared.cards
     }
@@ -60,19 +60,18 @@ final class CustomerTokensServiceTests: XCTestCase {
             customerId: Constants.customerId,
             tokenId: try await createToken(verify: true).id,
             source: card.id,
-            verify: true,
-            enableThreeDS2: true
+            verify: true
         )
         let threeDSService = Mock3DSService()
-        threeDSService.authenticationRequestFromClosure = { _, completion in
-            completion(.failure(.init(code: .cancelled)))
+        threeDSService.authenticationRequestParametersFromClosure = { _ in
+            throw POFailure(code: .cancelled)
         }
 
         // When
         _ = try? await sut.assignCustomerToken(request: request, threeDSService: threeDSService)
 
         // Then
-        XCTAssertEqual(threeDSService.authenticationRequestCallsCount, 1)
+        XCTAssertEqual(threeDSService.authenticationRequestParametersCallsCount, 1)
     }
 
     // MARK: - Private Properties

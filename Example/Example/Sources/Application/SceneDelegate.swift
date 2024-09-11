@@ -11,10 +11,4 @@ import ProcessOut
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-
-    func scene(_ scene: UIScene, openURLContexts urlContexts: Set<UIOpenURLContext>) {
-        if let url = urlContexts.first?.url {
-            ProcessOut.shared.processDeepLink(url: url)
-        }
-    }
 }

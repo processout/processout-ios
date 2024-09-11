@@ -136,3 +136,6 @@ extension CardTokenizationInteractorState.Started {
         return parameters.allSatisfy(\.isValid) && address.areParametersValid
     }
 }
+
+@available(*, unavailable)
+extension CardTokenizationInteractorState: Sendable { }

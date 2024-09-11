@@ -7,7 +7,7 @@
 
 import cmark_gfm
 
-final class MarkdownBlockQuote: MarkdownBaseNode {
+final class MarkdownBlockQuote: MarkdownBaseNode, @unchecked Sendable {
 
     override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_BLOCK_QUOTE

@@ -7,7 +7,7 @@
 
 import PassKit
 
-public protocol POApplePayTokenizationDelegate: AnyObject {
+public protocol POApplePayTokenizationDelegate: AnyObject, Sendable {
 
     /// Sent to the delegate after the user has acted on the payment request and it was tokenized by ProcessOut.
     @MainActor

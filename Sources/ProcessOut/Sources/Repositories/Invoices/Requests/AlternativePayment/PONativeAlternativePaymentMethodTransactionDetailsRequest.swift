@@ -5,9 +5,7 @@
 //  Created by Andrii Vysotskyi on 01.12.2022.
 //
 
-import Foundation
-
-public struct PONativeAlternativePaymentMethodTransactionDetailsRequest { // swiftlint:disable:this type_name
+public struct PONativeAlternativePaymentMethodTransactionDetailsRequest: Sendable { // swiftlint:disable:this type_name
 
     /// Invoice identifier.
     public let invoiceId: String

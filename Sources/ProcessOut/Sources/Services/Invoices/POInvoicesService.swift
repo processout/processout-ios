@@ -7,9 +7,6 @@
 
 // todo(andrii-vysotskyi): potentially make threeDSService optional to allow easier APMs authorization
 
-@available(*, deprecated, renamed: "POInvoicesService")
-public typealias POInvoicesServiceType = POInvoicesService
-
 public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 
     /// Requests information needed to continue existing payment or start new one.

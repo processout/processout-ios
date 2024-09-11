@@ -21,13 +21,10 @@ extension PODynamicCheckoutView {
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         let viewModel = {
-            let logger = ProcessOut.shared.logger
+            let logger: POLogger = ProcessOut.shared.logger
             let interactor = DynamicCheckoutDefaultInteractor(
                 configuration: configuration,
                 delegate: delegate,
-                alternativePaymentSession: DynamicCheckoutAlternativePaymentDefaultSession(
-                    configuration: configuration.alternativePayment
-                ),
                 childProvider: DynamicCheckoutInteractorDefaultChildProvider(
                     configuration: configuration,
                     cardsService: ProcessOut.shared.cards,
@@ -36,6 +33,7 @@ extension PODynamicCheckoutView {
                     logger: logger
                 ),
                 invoicesService: ProcessOut.shared.invoices,
+                alternativePaymentsService: ProcessOut.shared.alternativePayments,
                 cardsService: ProcessOut.shared.cards,
                 logger: logger,
                 completion: completion

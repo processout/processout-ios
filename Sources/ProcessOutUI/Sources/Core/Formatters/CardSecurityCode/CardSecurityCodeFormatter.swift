@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@_spi(PO) import ProcessOut
+import ProcessOut
 
 final class CardSecurityCodeFormatter: Formatter {
 
@@ -44,7 +44,7 @@ final class CardSecurityCodeFormatter: Formatter {
     ) -> Bool {
         let partialString = partialStringPtr.pointee as String
         let formatted = string(from: partialString)
-        let adjustedOffset = POFormattingUtils.adjustedCursorOffset(
+        let adjustedOffset = FormattingUtils.adjustedCursorOffset(
             in: formatted,
             source: partialString,
             // swiftlint:disable:next line_length

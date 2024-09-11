@@ -8,10 +8,11 @@
 import ProcessOut
 
 /// Card tokenization module delegate definition.
-public protocol POCardTokenizationDelegate: AnyObject {
+public protocol POCardTokenizationDelegate: AnyObject, Sendable {
 
     /// Invoked when module emits event.
-    func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent)
+    @MainActor
+    func cardTokenization(didEmitEvent event: POCardTokenizationEvent)
 
     /// Allows delegate to additionally process tokenized card before ending module's lifecycle. For example
     /// it is possible to authorize an invoice or assign customer token. Default implementation does nothing.
@@ -32,16 +33,19 @@ public protocol POCardTokenizationDelegate: AnyObject {
 
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
-    func preferredScheme(issuerInformation: POCardIssuerInformation) -> String?
+    @MainActor
+    func cardTokenization(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> POCardScheme?
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
-    func shouldContinueTokenization(after failure: POFailure) -> Bool
+    @MainActor
+    func cardTokenization(shouldContinueAfter failure: POFailure) -> Bool
 }
 
 extension POCardTokenizationDelegate {
 
-    public func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent) {
+    @MainActor
+    public func cardTokenization(didEmitEvent event: POCardTokenizationEvent) {
         // Ignored
     }
 
@@ -54,11 +58,13 @@ extension POCardTokenizationDelegate {
         // Ignored
     }
 
-    public func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
+    @MainActor
+    public func cardTokenization(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> POCardScheme? {
         issuerInformation.scheme
     }
 
-    public func shouldContinueTokenization(after failure: POFailure) -> Bool {
+    @MainActor
+    public func cardTokenization(shouldContinueAfter failure: POFailure) -> Bool {
         true
     }
 }

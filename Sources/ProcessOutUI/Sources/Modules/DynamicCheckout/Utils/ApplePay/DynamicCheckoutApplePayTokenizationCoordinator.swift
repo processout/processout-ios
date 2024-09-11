@@ -9,14 +9,15 @@ import Foundation
 import PassKit
 import ProcessOut
 
+@MainActor
 final class DynamicCheckoutApplePayTokenizationCoordinator: POApplePayTokenizationDelegate {
 
-    init(didTokenizeCard: @escaping (POCard) async throws -> Void) {
+    nonisolated init(didTokenizeCard: @escaping (POCard) async throws -> Void) {
         self.didTokenizeCard = didTokenizeCard
     }
 
     /// Closure that is called when invoice is authorized.
-    let didTokenizeCard: (POCard) async throws -> Void
+    nonisolated(unsafe) private(set) var didTokenizeCard: (POCard) async throws -> Void
 
     // MARK: -
 

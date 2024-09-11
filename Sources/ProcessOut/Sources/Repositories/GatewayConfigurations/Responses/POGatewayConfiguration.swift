@@ -7,15 +7,15 @@
 
 import Foundation
 
-public struct POGatewayConfiguration: Decodable {
+public struct POGatewayConfiguration: Decodable, Sendable {
 
-    public struct NativeAlternativePaymentMethodConfig: Decodable {
+    public struct NativeAlternativePaymentMethodConfig: Decodable, Sendable {
 
         /// Configuration parameters.
         public let parameters: [PONativeAlternativePaymentMethodParameter]
     }
 
-    public struct Gateway: Decodable {
+    public struct Gateway: Decodable, Sendable {
 
         /// Name is the name of the payment gateway.
         public let name: String
@@ -37,10 +37,6 @@ public struct POGatewayConfiguration: Decodable {
 
         /// Boolean flag that indicates whether gateway supports refunds.
         public let canRefund: Bool
-
-        /// Native alternative payment method configuration.
-        @available(*, deprecated, message: "Use POInvoicesService/nativeAlternativePaymentMethodTransactionDetails(request:) instead.") // swiftlint:disable:this line_length
-        public let nativeApmConfig: NativeAlternativePaymentMethodConfig?
     }
 
     /// String value that uniquely identifies the configuration.

@@ -23,13 +23,17 @@ final class AnyViewModel<State>: ViewModel {
 
     // MARK: - CardTokenizationViewModel
 
+    var state: State {
+        get { base.state }
+        set { base.state = newValue }
+    }
+
     func start() {
         base.start()
     }
 
-    var state: State {
-        get { base.state }
-        set { base.state = newValue }
+    func stop() {
+        base.stop()
     }
 
     // MARK: - Private Properties
@@ -46,13 +50,17 @@ private class ViewModelBox<T>: AnyViewModelBase<T.State> where T: ViewModel {
 
     let base: T
 
+    override var state: T.State {
+        get { base.state }
+        set { base.state = newValue }
+    }
+
     override func start() {
         base.start()
     }
 
-    override var state: T.State {
-        get { base.state }
-        set { base.state = newValue }
+    override func stop() {
+        base.stop()
     }
 }
 
@@ -60,13 +68,17 @@ private class ViewModelBox<T>: AnyViewModelBase<T.State> where T: ViewModel {
 
 private class AnyViewModelBase<State>: ViewModel {
 
+    var state: State {
+        get { fatalError("Not implemented") }
+        set { fatalError("Not implemented") }
+    }
+
     func start() {
         fatalError("Not implemented")
     }
 
-    var state: State {
-        get { fatalError("Not implemented") }
-        set { fatalError("Not implemented") }
+    func stop() {
+        fatalError("Not implemented")
     }
 }
 

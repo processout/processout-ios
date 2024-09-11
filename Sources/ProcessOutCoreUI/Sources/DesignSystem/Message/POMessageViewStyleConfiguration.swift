@@ -21,3 +21,6 @@ public struct POMessageViewStyleConfiguration {
         self.severity = severity
     }
 }
+
+@available(*, unavailable)
+extension POMessageViewStyleConfiguration: Sendable { }

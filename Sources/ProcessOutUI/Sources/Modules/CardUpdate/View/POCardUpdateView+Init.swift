@@ -21,7 +21,7 @@ extension POCardUpdateView {
         completion: @escaping (Result<POCard, POFailure>) -> Void
     ) {
         let viewModel = {
-            var logger = ProcessOut.shared.logger
+            var logger: POLogger = ProcessOut.shared.logger
             logger[attributeKey: .cardId] = configuration.cardId
             let interactor = DefaultCardUpdateInteractor(
                 cardsService: ProcessOut.shared.cards,

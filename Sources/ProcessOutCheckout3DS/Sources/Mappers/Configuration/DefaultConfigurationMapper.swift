@@ -8,7 +8,7 @@
 import ProcessOut
 import Checkout3DS
 
-final class DefaultConfigurationMapper: ConfigurationMapper {
+struct DefaultConfigurationMapper: ConfigurationMapper {
 
     func convert(configuration: PO3DS2Configuration) -> ThreeDS2ServiceConfiguration.ConfigParameters {
         let directoryServerData = ThreeDS2ServiceConfiguration.DirectoryServerData(
@@ -19,7 +19,7 @@ final class DefaultConfigurationMapper: ConfigurationMapper {
         let configParameters = ThreeDS2ServiceConfiguration.ConfigParameters(
             directoryServerData: directoryServerData,
             messageVersion: configuration.messageVersion,
-            scheme: configuration.$scheme.typed().map(self.convert) ?? ""
+            scheme: configuration.scheme.map(self.convert) ?? ""
         )
         return configParameters
     }

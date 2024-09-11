@@ -52,3 +52,6 @@ enum CardUpdateInteractorState: Equatable {
     /// Card update has finished. This is a sink state.
     case completed
 }
+
+@available(*, unavailable)
+extension CardUpdateInteractorState: Sendable { }

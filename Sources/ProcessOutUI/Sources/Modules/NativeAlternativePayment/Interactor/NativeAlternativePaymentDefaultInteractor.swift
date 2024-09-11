@@ -121,7 +121,6 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Starting State
 
-    @MainActor
     private func continueStartUnchecked() async {
         let details: PONativeAlternativePaymentMethodTransactionDetails
         do {
@@ -143,7 +142,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 amount: details.invoice.amount,
                 currencyCode: details.invoice.currencyCode,
                 parameters: await createParameters(specifications: details.parameters),
-                isCancellable: disableDuration(of: configuration.secondaryAction).isZero
+                isCancellable: (configuration.cancelButton?.disabledFor ?? 0).isZero
             )
             setStateUnchecked(.started(startedState))
             send(event: .didStart)
@@ -164,7 +163,6 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Submission State
 
-    @MainActor
     private func continueSubmissionUnchecked(
         startedState: NativeAlternativePaymentInteractorState.Started, values: [String: String]
     ) async {
@@ -180,19 +178,19 @@ final class NativeAlternativePaymentDefaultInteractor:
             restoreStartedStateAfterSubmissionFailureIfPossible(error, replaceErrorMessages: true)
             return
         }
-        switch response.nativeApm.state {
+        switch response.state {
         case .pendingCapture:
             send(event: .didSubmitParameters(additionalParametersExpected: false))
             await setAwaitingCaptureStateUnchecked(
-                gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
+                gateway: startedState.gateway, parameterValues: response.parameterValues
             )
         case .captured:
             send(event: .didSubmitParameters(additionalParametersExpected: false))
             await setCapturedStateUnchecked(
-                gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
+                gateway: startedState.gateway, parameterValues: response.parameterValues
             )
         case .customerInput:
-            await restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
+            await restoreStartedStateAfterSubmission(nativeApm: response)
         case .failed:
             fallthrough // swiftlint:disable:this fallthrough
         @unknown default:
@@ -203,7 +201,6 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Awaiting Capture State
 
-    @MainActor
     private func setAwaitingCaptureStateUnchecked(
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway,
         parameterValues: PONativeAlternativePaymentMethodParameterValues?
@@ -223,7 +220,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             logoImage: logoImage,
             actionMessage: actionMessage,
             actionImage: actionImage,
-            isCancellable: disableDuration(of: configuration.paymentConfirmation.secondaryAction).isZero,
+            isCancellable: (configuration.paymentConfirmation.cancelButton?.disabledFor ?? 0).isZero,
             isDelayed: false
         )
         setStateUnchecked(.awaitingCapture(awaitingCaptureState))
@@ -250,7 +247,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         guard let timeInterval = configuration.paymentConfirmation.showProgressIndicatorAfter else {
             return
         }
-        Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
+        Task { [weak self] in
+            try? await Task.sleep(seconds: timeInterval)
             guard let self, case .awaitingCapture(var awaitingCaptureState) = self.state else {
                 return
             }
@@ -261,7 +259,6 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Captured State
 
-    @MainActor
     private func setCapturedStateUnchecked(
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway,
         parameterValues: PONativeAlternativePaymentMethodParameterValues?
@@ -330,10 +327,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         logger.debug("One or more parameters are not valid: \(invalidFields), waiting for parameters to update")
     }
 
-    @MainActor
-    private func restoreStartedStateAfterSubmission(
-        nativeApm: PONativeAlternativePaymentMethodResponse.NativeApm
-    ) async {
+    private func restoreStartedStateAfterSubmission(nativeApm: PONativeAlternativePaymentMethodResponse) async {
         guard case var .submitting(startedState) = state else {
             return
         }
@@ -370,9 +364,8 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Cancellation Availability
 
-    @MainActor
     private func enableCancellationAfterDelay() {
-        let disabledFor = disableDuration(of: configuration.secondaryAction)
+        let disabledFor = configuration.cancelButton?.disabledFor ?? 0
         guard disabledFor > 0 else {
             logger.debug("Cancel action is not set or initially enabled.")
             return
@@ -392,9 +385,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
     }
 
-    @MainActor
     private func enableCaptureCancellationAfterDelay() {
-        let disabledFor = disableDuration(of: configuration.paymentConfirmation.secondaryAction)
+        let disabledFor = configuration.paymentConfirmation.cancelButton?.disabledFor ?? 0
         guard disabledFor > 0 else {
             logger.debug("Confirmation cancel action is not set or initially enabled.")
             return
@@ -411,10 +403,10 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Events
 
-    private func send(event: PONativeAlternativePaymentMethodEvent) {
-        assert(Thread.isMainThread, "Method should be called on main thread.")
+    @MainActor
+    private func send(event: PONativeAlternativePaymentEvent) {
         logger.debug("Did send event: '\(event)'")
-        delegate?.nativeAlternativePaymentMethodDidEmitEvent(event)
+        delegate?.nativeAlternativePayment(didEmitEvent: event)
     }
 
     private func didUpdate(parameter: NativeAlternativePaymentInteractorState.Parameter, to value: String) {
@@ -441,7 +433,6 @@ final class NativeAlternativePaymentDefaultInteractor:
         self.state = state
     }
 
-    @MainActor
     private func createParameters(
         specifications: [PONativeAlternativePaymentMethodParameter]
     ) async -> [NativeAlternativePaymentInteractorState.Parameter] {
@@ -449,7 +440,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             let formatter: Foundation.Formatter?
             switch specification.type {
             case .phone:
-                formatter = POPhoneNumberFormatter()
+                formatter = PhoneNumberFormatter()
             default:
                 formatter = nil
             }
@@ -463,7 +454,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         // Server doesn't support localized error messages, so local generic error
         // description is used instead in case particular field is invalid.
         // todo(andrii-vysotskyi): remove when backend is updated
-        let resource: POStringResource
+        let resource: StringResource
         switch parameterType {
         case .numeric:
             resource = .NativeAlternativePayment.Error.invalidNumber
@@ -490,39 +481,25 @@ final class NativeAlternativePaymentDefaultInteractor:
         return gateway.logoUrl
     }
 
-    private func disableDuration(of action: PONativeAlternativePaymentConfiguration.SecondaryAction?) -> TimeInterval {
-        guard case .cancel(_, let disabledFor, _) = action else {
-            return 0
-        }
-        return disabledFor
-    }
-
     // MARK: - Default Values
 
     /// Updates parameters with default values.
-    @MainActor
     private func setDefaultValues(
         parameters: inout [NativeAlternativePaymentInteractorState.Parameter]
     ) async {
         guard !parameters.isEmpty else {
             return
         }
-        let defaultValues = await withCheckedContinuation { continuation in
-            if let delegate {
-                delegate.nativeAlternativePaymentMethodDefaultValues(
-                    for: parameters.map(\.specification), completion: continuation.resume
-                )
-            } else {
-                continuation.resume(returning: [:])
-            }
-        }
+        let defaultValues = await delegate?.nativeAlternativePayment(
+            defaultsFor: parameters.map(\.specification)
+        ) ?? [:]
         for (offset, parameter) in parameters.enumerated() {
             let defaultValue: String?
             if let value = defaultValues[parameter.specification.key] {
                 switch parameter.specification.type {
                 case .singleSelect:
                     let availableValues = parameter.specification.availableValues?.map(\.value) ?? []
-                    precondition(availableValues.contains(value), "Unknown `singleSelect` parameter value.")
+                    assert(availableValues.contains(value), "Unknown `singleSelect` parameter value.")
                     defaultValue = value
                 default:
                     defaultValue = parameter.formatter?.string(for: value) ?? value
@@ -554,7 +531,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         parameters.forEach { parameter in
             var normalizedValue = parameter.value
             if case .phone = parameter.specification.type, let value = normalizedValue {
-                normalizedValue = POPhoneNumberFormatter().normalized(number: value)
+                normalizedValue = PhoneNumberFormatter().normalized(number: value)
             }
             if let normalizedValue, normalizedValue != parameter.value {
                 logger.debug("Will use updated value '\(normalizedValue)' for key '\(parameter.specification.key)'")

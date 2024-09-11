@@ -45,7 +45,9 @@ extension DynamicCheckoutViewModelState: AnimationIdentityProvider {
         [sections.map(\.animationIdentity), actions.map(\.id)]
     }
 
-    static let idle = DynamicCheckoutViewModelState(sections: [], actions: [], isCompleted: false)
+    static var idle: Self {
+        Self(sections: [], actions: [], isCompleted: false)
+    }
 }
 
 extension DynamicCheckoutViewModelState.Section: AnimationIdentityProvider {
@@ -54,3 +56,6 @@ extension DynamicCheckoutViewModelState.Section: AnimationIdentityProvider {
         [id, items.map(\.animationIdentity), AnyHashable(isTight), AnyHashable(areBezelsVisible)]
     }
 }
+
+@available(*, unavailable)
+extension DynamicCheckoutViewModelState: Sendable { }

@@ -9,7 +9,7 @@ import SwiftUI
 import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-final class CardSchemeImageProvider {
+final class CardSchemeImageProvider: Sendable {
 
     static let shared = CardSchemeImageProvider()
 

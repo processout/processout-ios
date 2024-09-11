@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct ApplePayCardTokenizationRequest: Encodable {
+struct ApplePayCardTokenizationRequest: Encodable, Sendable {
 
-    struct PaymentMethod {
+    struct PaymentMethod: Sendable {
 
         /// Card display name.
         let displayName: String?
@@ -22,7 +22,7 @@ struct ApplePayCardTokenizationRequest: Encodable {
     }
 
     /// Based on [payment token structure.](https://developer.apple.com/documentation/passkit/apple_pay/payment_token_format_reference#3949537)
-    struct PaymentData: Codable {
+    struct PaymentData: Codable, Sendable {
 
         /// Encrypted payment data.
         let data: String
@@ -37,7 +37,7 @@ struct ApplePayCardTokenizationRequest: Encodable {
         let version: String
     }
 
-    struct ApplePayToken {
+    struct ApplePayToken: Sendable {
 
         /// Payment data.
         let paymentData: PaymentData
@@ -49,7 +49,7 @@ struct ApplePayCardTokenizationRequest: Encodable {
         let transactionIdentifier: String
     }
 
-    struct ApplePay: Encodable {
+    struct ApplePay: Encodable, Sendable {
 
         /// Token details.
         let token: ApplePayToken

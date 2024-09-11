@@ -14,8 +14,10 @@
 public enum ProcessOutUI {
 
     /// Configures UI package and preloads needed resources.
+    @MainActor
     public static func configure() {
         POTypography.registerFonts()
         AddressSpecificationProvider.shared.prewarm()
+        DefaultPhoneNumberMetadataProvider.shared.prewarm()
     }
 }

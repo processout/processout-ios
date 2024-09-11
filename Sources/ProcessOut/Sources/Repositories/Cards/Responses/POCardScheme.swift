@@ -20,6 +20,7 @@ public struct POCardScheme: Hashable, RawRepresentable, ExpressibleByStringLiter
     public let rawValue: String
 }
 
+// Defined values are a subset of values defined in https://github.com/processout/norms/blob/master/card_schemes.go
 extension POCardScheme {
 
     /// Visa is the largest global card network in the world by transaction value, ubiquitous worldwide.
@@ -61,6 +62,9 @@ extension POCardScheme {
     /// The Dankort is the national debit card of Denmark.
     public static let dankort: POCardScheme = "dankort"
 
+    /// A Mir payment card.
+    public static let mir: POCardScheme = "nspk mir"
+
     /// Verve is Africa's most successful card brand.
     public static let verve: POCardScheme = "verve"
 
@@ -71,19 +75,10 @@ extension POCardScheme {
     public static let cielo: POCardScheme = "cielo"
 
     /// Domestic debit and credit card brand of Brazil.
-    public static let elo: POCardScheme = "elp"
+    public static let elo: POCardScheme = "elo"
 
     /// Domestic debit and credit card brand of Brazil.
     public static let hipercard: POCardScheme = "hipercard"
-
-    /// Domestic debit and credit card brand of Brazil.
-    public static let ourocard: POCardScheme = "ourocard"
-
-    /// Domestic debit and credit card brand of Brazil.
-    public static let aura: POCardScheme = "aura"
-
-    /// Domestic debit and credit card brand of Brazil.
-    public static let comprocard: POCardScheme = "comprocard"
 
     /// Cabal is a local credit and debit card payment method based in Argentina.
     public static let cabal: POCardScheme = "cabal"
@@ -91,9 +86,6 @@ extension POCardScheme {
     /// The New York Currency Exchange (NYCE) is an interbank network connecting the ATMs of various
     /// financial institutions in the United States and Canada.
     public static let nyce: POCardScheme = "nyce"
-
-    /// Mastercard Cirrus is a worldwide interbank network that provides cash to Mastercard cardholders.
-    public static let cirrus: POCardScheme = "cirrus"
 
     /// TROY (acronym of Türkiye’nin Ödeme Yöntemi) is a Turkish card scheme
     public static let troy: POCardScheme = "troy"
@@ -103,8 +95,23 @@ extension POCardScheme {
     /// such as the German Girocard.
     public static let vPay: POCardScheme = "vpay"
 
+    /// A private label credit card is a type of credit card that is branded for a specific retailer or brand.
+    public static let privateLabel: POCardScheme = "private label"
+
+    /// Mastercard Cirrus is a worldwide interbank network that provides cash to Mastercard cardholders.
+    public static let cirrus: POCardScheme = "cirrus"
+
+    /// Domestic debit and credit card brand of Brazil.
+    public static let ourocard: POCardScheme = "ourocard"
+
     /// Carnet is a leading brand of Mexican acceptance, with more than 50 years of experience.
     public static let carnet: POCardScheme = "carnet"
+
+    /// A private label credit card that is branded for Atos.
+    public static let atosPrivateLabel: POCardScheme = "atos private label"
+
+    /// Domestic debit and credit card brand of Brazil.
+    public static let aura: POCardScheme = "aura"
 
     /// GE Capital is the financial services division of General Electric.
     public static let geCapital: POCardScheme = "ge capital"
@@ -121,65 +128,67 @@ extension POCardScheme {
     /// DinaCard is a national payment card of the Republic of Serbia.
     public static let dinaCard: POCardScheme = "dinacard"
 
+    /// Domestic debit and credit card brand of Brazil.
+    public static let comprocard: POCardScheme = "comprocard"
+
     /// Mada is the national payment scheme of Saudi Arabia
     public static let mada: POCardScheme = "mada"
 
     /// Bancontact is the most popular online payment method in Belgium.
     public static let bancontact: POCardScheme = "bancontact"
 
+    /// A Girocard payment method.
+    public static let girocard: POCardScheme = "girocard"
+
+    /// The Interac payment method.
+    public static let interac: POCardScheme = "interac"
+
+    /// A Meeza payment card.
+    public static let meeza: POCardScheme = "meeza"
+
+    /// A Nanaco payment card.
+    public static let nanaco: POCardScheme = "nanaco"
+
+    /// A Bancomat payment card.
+    public static let pagoBancomat: POCardScheme = "pagobancomat"
+
+    /// A PostFinance AG payment card.
+    public static let postFinance: POCardScheme = "postfinance"
+
+    /// A QUICPay payment card.
+    public static let quicPay: POCardScheme = "quicpay"
+
+    /// A Suica payment card.
+    public static let suica: POCardScheme = "suica"
+
+    /// The TMoney card.
+    public static let tmoney: POCardScheme = "tmoney"
+
+    /// A WAON payment card.
+    public static let waon: POCardScheme = "waon"
+}
+
+extension POCardScheme {
+
     /// Giropay is an Internet payment System in Germany
     public static let giropay: POCardScheme = "giropay"
-
-    /// A private label credit card is a type of credit card that is branded for a specific retailer or brand.
-    public static let privateLabel: POCardScheme = "private label"
-
-    /// A private label credit card that is branded for Atos.
-    public static let atosPrivateLabel: POCardScheme = "atos private label"
 
     /// An Electron debit card.
     public static let electron: POCardScheme = "electron"
 
     /// An iD payment card.
     public static let idCredit: POCardScheme = "idCredit"
-
-    /// The Interac payment method.
-    public static let interac: POCardScheme = "interac"
-
-    /// A QUICPay payment card.
-    public static let quicPay: POCardScheme = "quicPay"
-
-    /// A Suica payment card.
-    public static let suica: POCardScheme = "suica"
-
-    /// A Girocard payment method.
-    public static let girocard: POCardScheme = "girocard"
-
-    /// A Meeza payment card.
-    public static let meeza: POCardScheme = "meeza"
-
-    /// A Bancomat payment card.
-    public static let pagoBancomat: POCardScheme = "pagoBancomat"
-
-    /// The TMoney card.
-    public static let tmoney: POCardScheme = "tmoney"
-
-    /// A PostFinance AG payment card.
-    public static let postFinance: POCardScheme = "postFinance"
-
-    /// A Nanaco payment card.
-    public static let nanaco: POCardScheme = "nanaco"
-
-    /// A WAON payment card.
-    public static let waon: POCardScheme = "waon"
-
-    /// A Mir payment card.
-    public static let mir: POCardScheme = "nspk mir"
 }
 
-extension POCardScheme: Decodable {
+extension POCardScheme: Codable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(String.self)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
     }
 }

@@ -7,7 +7,7 @@
 
 import cmark_gfm
 
-final class MarkdownSoftbreak: MarkdownBaseNode {
+final class MarkdownSoftbreak: MarkdownBaseNode, @unchecked Sendable {
 
     override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_SOFTBREAK

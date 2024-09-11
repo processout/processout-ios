@@ -7,13 +7,13 @@
 
 /// A configuration object that defines how a card update module behaves.
 /// Use `nil` as a value for a nullable property to indicate that default value should be used.
-public struct POCardUpdateConfiguration {
+public struct POCardUpdateConfiguration: Sendable {
 
     /// Card id that needs to be updated.
     public let cardId: String
 
     /// Allows to provide card information that will be visible in UI. It is also possible to inject
-    /// it dynamically using ``POCardUpdateDelegate/cardInformation(cardId:)``.
+    /// it dynamically using ``POCardUpdateDelegate/cardUpdate(informationFor:)``.
     public let cardInformation: POCardUpdateInformation?
 
     /// Custom title. Use empty string to hide title.

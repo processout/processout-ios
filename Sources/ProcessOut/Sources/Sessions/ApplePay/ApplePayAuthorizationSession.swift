@@ -7,6 +7,7 @@
 
 import PassKit
 
+@MainActor
 protocol ApplePayAuthorizationSession: Sendable {
 
     /// Begins an Apple Pay payment authorization.

@@ -7,13 +7,16 @@
 
 import cmark_gfm
 
-final class MarkdownLink: MarkdownBaseNode {
+final class MarkdownLink: MarkdownBaseNode, @unchecked Sendable {
 
-    private(set) lazy var url: String? = {
-        String(cString: cmarkNode.pointee.as.link.url.data)
-    }()
+    let url: String?
 
     // MARK: - MarkdownBaseNode
+
+    required init(cmarkNode: MarkdownBaseNode.CmarkNode, validatesType: Bool = true) {
+        self.url = String(cString: cmarkNode.pointee.as.link.url.data)
+        super.init(cmarkNode: cmarkNode, validatesType: validatesType)
+    }
 
     override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_LINK

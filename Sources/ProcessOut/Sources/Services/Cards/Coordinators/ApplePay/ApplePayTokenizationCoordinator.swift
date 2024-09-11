@@ -7,6 +7,7 @@
 
 import PassKit
 
+@MainActor
 final class ApplePayTokenizationCoordinator: ApplePayAuthorizationSessionDelegate {
 
     init(

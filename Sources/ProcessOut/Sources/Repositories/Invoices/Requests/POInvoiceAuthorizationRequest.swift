@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCodingKeys
+public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: AutoCodingKeys
 
     /// Invoice identifier to to perform authorization for.
     public let invoiceId: String // sourcery:coding: skip
@@ -22,16 +22,8 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
     /// Boolean value indicating if authorization is incremental. Default value is `false`.
     public let incremental: Bool
 
-    /// Boolean value used as flag that when set to `true` indicates that a request is coming directly
-    /// from the frontend.  It is used to understand if we can instantly step-up to 3DS or not.
-    ///
-    /// Value is hardcoded to `true`.
-    @available(*, deprecated, message: "Property is an implementation detail and shouldn't be used.")
-    public let enableThreeDS2 = true // sourcery:coding: key="enable_three_d_s_2"
-
     /// Card scheme or co-scheme that should get priority if it is available.
-    @POTypedRepresentation<String?, POCardScheme>
-    public private(set) var preferredScheme: String?
+    public let preferredScheme: POCardScheme?
 
     /// Can be used for a 3DS2 request to indicate which third party SDK is used for the call.
     public let thirdPartySdkVersion: String?
@@ -52,8 +44,8 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
 
     /// Amount of money to capture when partial captures are available. Note that this only applies if you are
     /// also using the `autoCaptureAt` option.
-    @POImmutableStringCodableOptionalDecimal
-    public var captureAmount: Decimal?
+    @POStringCodableOptionalDecimal
+    public private(set) var captureAmount: Decimal?
 
     /// Set to true if you want to authorize payment without capturing. Note that you must capture the payment on
     /// the server if you use this option. Default value is `true`.
@@ -70,13 +62,18 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
     /// Operation metadata.
     public let metadata: [String: String]?
 
+    /// Boolean value used as flag that when set to `true` indicates that a request is coming directly
+    /// from the frontend.  It is used to understand if we can instantly step-up to 3DS or not.
+    ///
+    /// Value is hardcoded to `true`.
+    let enableThreeDS2 = true // sourcery:coding: key="enable_three_d_s_2"
+
     public init(
         invoiceId: String,
         source: String,
         saveSource: Bool = false,
         incremental: Bool = false,
-        enableThreeDS2 _: Bool = true,
-        preferredScheme: String? = nil,
+        preferredScheme: POCardScheme? = nil,
         thirdPartySdkVersion: String? = nil,
         invoiceDetailIds: [String]? = nil,
         overrideMacBlocking: Bool = false,
@@ -92,7 +89,7 @@ public struct POInvoiceAuthorizationRequest: Encodable { // sourcery: AutoCoding
         self.source = source
         self.saveSource = saveSource
         self.incremental = incremental
-        self._preferredScheme = .init(wrappedValue: preferredScheme)
+        self.preferredScheme = preferredScheme
         self.thirdPartySdkVersion = thirdPartySdkVersion
         self.invoiceDetailIds = invoiceDetailIds
         self.overrideMacBlocking = overrideMacBlocking

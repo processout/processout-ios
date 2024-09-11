@@ -12,8 +12,7 @@ final class SystemLoggerDestination: LoggerDestination {
 
     init(subsystem: String) {
         self.subsystem = subsystem
-        lock = NSLock()
-        logs = [:]
+        logs = POUnfairlyLocked(wrappedValue: [:])
     }
 
     func log(event: LogEvent) {
@@ -30,8 +29,7 @@ final class SystemLoggerDestination: LoggerDestination {
     // MARK: - Private Properties
 
     private let subsystem: String
-    private let lock: NSLock
-    private var logs: [String: OSLog]
+    private let logs: POUnfairlyLocked<[String: OSLog]>
 
     // MARK: - Private Methods
 
@@ -49,7 +47,7 @@ final class SystemLoggerDestination: LoggerDestination {
     }
 
     private func osLog(category: String) -> OSLog {
-        let log = lock.withLock {
+        let log = logs.withLock { logs in
             if let log = logs[category] {
                 return log
             }

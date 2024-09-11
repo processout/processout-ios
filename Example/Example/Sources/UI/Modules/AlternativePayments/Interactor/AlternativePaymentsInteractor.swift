@@ -14,10 +14,12 @@ final class AlternativePaymentsInteractor {
 
     init(
         gatewayConfigurationsRepository: POGatewayConfigurationsRepository,
-        invoicesService: POInvoicesService
+        invoicesService: POInvoicesService,
+        alternativePaymentsService: POAlternativePaymentsService
     ) {
         self.gatewayConfigurationsRepository = gatewayConfigurationsRepository
         self.invoicesService = invoicesService
+        self.alternativePaymentsService = alternativePaymentsService
         state = .idle
     }
 
@@ -90,28 +92,13 @@ final class AlternativePaymentsInteractor {
     }
 
     func authorize(invoice: POInvoice, gatewayConfigurationId: String) async throws {
-        let request = POAlternativePaymentMethodRequest(
+        let request = POAlternativePaymentAuthorizationRequest(
             invoiceId: invoice.id, gatewayConfigurationId: gatewayConfigurationId
         )
-        let result: POAlternativePaymentMethodResponse = try await withCheckedThrowingContinuation { continuation in
-            let session = POWebAuthenticationSession(
-                request: request,
-                returnUrl: Example.Constants.returnUrl,
-                completion: { result in
-                    continuation.resume(with: result)
-                }
-            )
-            Task { @MainActor in
-                if await session.start() {
-                    return
-                }
-                let failure = POFailure(message: "Unable to start alternative payment.", code: .generic(.mobile))
-                continuation.resume(throwing: failure)
-            }
-        }
-        let authRequest = POInvoiceAuthorizationRequest(invoiceId: invoice.id, source: result.gatewayToken)
-        let threeDSService = POTest3DSService(returnUrl: Example.Constants.returnUrl)
-        try await invoicesService.authorizeInvoice(request: authRequest, threeDSService: threeDSService)
+        let response = try await alternativePaymentsService.authorize(request: request)
+        let authorizationRequest = POInvoiceAuthorizationRequest(invoiceId: invoice.id, source: response.gatewayToken)
+        let threeDSService = POTest3DSService()
+        try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
     }
 
     // MARK: - Private Nested Types
@@ -124,4 +111,5 @@ final class AlternativePaymentsInteractor {
 
     private let gatewayConfigurationsRepository: POGatewayConfigurationsRepository
     private let invoicesService: POInvoicesService
+    private let alternativePaymentsService: POAlternativePaymentsService
 }

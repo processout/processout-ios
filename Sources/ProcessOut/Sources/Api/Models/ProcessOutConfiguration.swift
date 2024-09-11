@@ -7,15 +7,12 @@
 
 import Foundation
 
-@available(*, deprecated, renamed: "ProcessOutConfiguration")
-public typealias ProcessOutApiConfiguration = ProcessOutConfiguration
-
 /// Defines configuration parameters that are used to create API singleton. In order to create instance
-/// of this structure one should use ``ProcessOutConfiguration/production(projectId:appVersion:isDebug:)``
+/// of this structure one should use ``ProcessOutConfiguration/init(projectId:application:isDebug:isTelemetryEnabled:)``
 /// method.
-public struct ProcessOutConfiguration {
+public struct ProcessOutConfiguration: Sendable {
 
-    public struct Application: Hashable {
+    public struct Application: Hashable, Sendable {
 
         /// Application name.
         public let name: String?
@@ -31,7 +28,7 @@ public struct ProcessOutConfiguration {
 
     /// Environment.
     @_spi(PO)
-    public struct Environment: Hashable {
+    public struct Environment: Hashable, Sendable {
 
         /// Api base URL.
         let apiBaseUrl: URL
@@ -55,13 +52,6 @@ public struct ProcessOutConfiguration {
 
     /// Application name.
     public let application: Application?
-
-    /// Host application version. Providing this value helps ProcessOut to troubleshoot potential
-    /// issues.
-    @available(*, deprecated, renamed: "application.version")
-    public var appVersion: String? {
-        application?.version
-    }
 
     /// Session ID is a constant value
     @_spi(PO)

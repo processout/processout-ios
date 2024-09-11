@@ -32,10 +32,14 @@ extension POBackport where Wrapped: View {
 @available(iOS 14, *)
 private struct FocusModifier<Value: Hashable>: ViewModifier {
 
-    init(binding: Binding<Value?>, value: Value) {
-        self._binding = binding
-        self.value = value
-    }
+    /// The state binding to register.
+    @Binding
+    private(set) var binding: Value?
+
+    /// The value to match against when determining whether the binding should change.
+    let value: Value
+
+    // MARK: - ViewModifier
 
     func body(content: Content) -> some View {
         content
@@ -62,13 +66,6 @@ private struct FocusModifier<Value: Hashable>: ViewModifier {
     }
 
     // MARK: - Private Properties
-
-    /// The value to match against when determining whether the binding should change.
-    private let value: Value
-
-    /// The state binding to register.
-    @Binding
-    private var binding: Value?
 
     /// Indicates whether
     @State

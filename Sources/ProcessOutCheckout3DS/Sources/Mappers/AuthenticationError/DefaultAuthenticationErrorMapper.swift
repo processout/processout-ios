@@ -8,7 +8,7 @@
 import ProcessOut
 import Checkout3DS
 
-final class DefaultAuthenticationErrorMapper: AuthenticationErrorMapper {
+struct DefaultAuthenticationErrorMapper: AuthenticationErrorMapper {
 
     func convert(error: AuthenticationError) -> POFailure {
         let code: POFailure.Code

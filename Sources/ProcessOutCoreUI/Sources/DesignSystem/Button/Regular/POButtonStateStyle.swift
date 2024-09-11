@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Defines button's styling information in a specific state.
-public struct POButtonStateStyle {
+public struct POButtonStateStyle: Sendable {
 
     /// Title typography.
     public let title: POTextStyle

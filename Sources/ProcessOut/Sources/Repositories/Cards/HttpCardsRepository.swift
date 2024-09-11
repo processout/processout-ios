@@ -24,21 +24,30 @@ final class HttpCardsRepository: CardsRepository {
     }
 
     func tokenize(request: POCardTokenizationRequest) async throws -> POCard {
-        let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
+        struct Response: Decodable {
+            let card: POCard
+        }
+        let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/cards", body: request, includesDeviceMetadata: true
         )
         return try await connector.execute(request: httpRequest).card
     }
 
     func updateCard(request: POCardUpdateRequest) async throws -> POCard {
-        let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.put(
+        struct Response: Decodable {
+            let card: POCard
+        }
+        let httpRequest = HttpConnectorRequest<Response>.put(
             path: "/cards/" + request.cardId, body: request, includesDeviceMetadata: true
         )
         return try await connector.execute(request: httpRequest).card
     }
 
     func tokenize(request: ApplePayCardTokenizationRequest) async throws -> POCard {
-        let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
+        struct Response: Decodable {
+            let card: POCard
+        }
+        let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/cards", body: request, includesDeviceMetadata: true
         )
         return try await connector.execute(request: httpRequest).card

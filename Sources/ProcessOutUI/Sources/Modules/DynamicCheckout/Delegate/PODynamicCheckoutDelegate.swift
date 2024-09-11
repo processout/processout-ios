@@ -10,10 +10,11 @@ import ProcessOut
 
 /// Dynamic checkout module delegate.
 @_spi(PO)
-public protocol PODynamicCheckoutDelegate: AnyObject {
+public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
 
     /// Invoked when module emits dynamic checkout event.
     /// - NOTE: default implementation does nothing.
+    @MainActor
     func dynamicCheckout(didEmitEvent event: PODynamicCheckoutEvent)
 
     /// Called when dynamic checkout is about to authorize invoice with given request.
@@ -26,6 +27,7 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
+    @MainActor
     func dynamicCheckout(shouldContinueAfter failure: POFailure) -> Bool
 
     /// Your implementation could return a request that will be used to fetch new invoice to replace existing one
@@ -39,15 +41,18 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
     // MARK: - Card Payment
 
     /// Invoked when module emits event.
+    @MainActor
     func dynamicCheckout(didEmitCardTokenizationEvent event: POCardTokenizationEvent)
 
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
-    func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String?
+    @MainActor
+    func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> POCardScheme?
 
     // MARK: - Alternative Payment
 
     /// Invoked when module emits alternative payment event.
+    @MainActor
     func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEvent)
 
     /// Method provides an ability to supply default values for given parameters.
@@ -61,15 +66,18 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
     // MARK: - Pass Kit
 
     /// Gives implementation an opportunity to modify payment request before it is used to authorize invoice.
+    @MainActor
     func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async
 }
 
 extension PODynamicCheckoutDelegate {
 
+    @MainActor
     public func dynamicCheckout(didEmitEvent event: PODynamicCheckoutEvent) {
         // Ignored
     }
 
+    @MainActor
     public func dynamicCheckout(shouldContinueAfter failure: POFailure) -> Bool {
         true
     }
@@ -80,14 +88,17 @@ extension PODynamicCheckoutDelegate {
         nil
     }
 
+    @MainActor
     public func dynamicCheckout(didEmitCardTokenizationEvent event: POCardTokenizationEvent) {
         // Ignored
     }
 
-    public func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String? {
+    @MainActor
+    public func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> POCardScheme? {
         issuerInformation.scheme
     }
 
+    @MainActor
     public func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEvent) {
         // Ignored
     }

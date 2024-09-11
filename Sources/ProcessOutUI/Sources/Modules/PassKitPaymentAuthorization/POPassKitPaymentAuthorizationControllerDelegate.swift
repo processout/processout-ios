@@ -89,6 +89,7 @@ public protocol POPassKitPaymentAuthorizationControllerDelegate: AnyObject {
 @available(*, deprecated)
 extension POPassKitPaymentAuthorizationControllerDelegate {
 
+    @MainActor
     public func paymentAuthorizationController(
         _ controller: POPassKitPaymentAuthorizationController,
         didFailToTokenizePayment payment: PKPayment,
@@ -97,6 +98,7 @@ extension POPassKitPaymentAuthorizationControllerDelegate {
         nil
     }
 
+    @MainActor
     public func paymentAuthorizationControllerWillAuthorizePayment(
         _ controller: POPassKitPaymentAuthorizationController
     ) {
@@ -104,6 +106,7 @@ extension POPassKitPaymentAuthorizationControllerDelegate {
     }
 
     @available(iOS 14.0, *)
+    @MainActor
     public func paymentAuthorizationControllerDidRequestMerchantSessionUpdate(
         controller: POPassKitPaymentAuthorizationController
     ) async -> PKPaymentRequestMerchantSessionUpdate? {
@@ -111,6 +114,7 @@ extension POPassKitPaymentAuthorizationControllerDelegate {
     }
 
     @available(iOS 15.0, *)
+    @MainActor
     public func paymentAuthorizationController(
         _ controller: POPassKitPaymentAuthorizationController,
         didChangeCouponCode couponCode: String
@@ -118,6 +122,7 @@ extension POPassKitPaymentAuthorizationControllerDelegate {
         nil
     }
 
+    @MainActor
     public func paymentAuthorizationController(
         _ controller: POPassKitPaymentAuthorizationController,
         didSelectShippingMethod shippingMethod: PKShippingMethod
@@ -125,6 +130,7 @@ extension POPassKitPaymentAuthorizationControllerDelegate {
         nil
     }
 
+    @MainActor
     public func paymentAuthorizationController(
         _ controller: POPassKitPaymentAuthorizationController,
         didSelectShippingContact contact: PKContact
@@ -132,6 +138,7 @@ extension POPassKitPaymentAuthorizationControllerDelegate {
         nil
     }
 
+    @MainActor
     public func paymentAuthorizationController(
         _ controller: POPassKitPaymentAuthorizationController,
         didSelectPaymentMethod paymentMethod: PKPaymentMethod

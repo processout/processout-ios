@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-@_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 /// Dynamic checkout root view.
@@ -48,6 +47,7 @@ public struct PODynamicCheckoutView: View {
         }
         .backport.geometryGroup()
         .onAppear(perform: viewModel.start)
+        .onDisappear(perform: viewModel.stop)
         .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
     }
 

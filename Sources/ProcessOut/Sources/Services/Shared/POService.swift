@@ -6,11 +6,8 @@
 //
 
 /// Common protocol that all services conform to.
-public protocol POService {
+public protocol POService: Sendable {
 
     /// Service's failure type.
     typealias Failure = POFailure
 }
-
-@available(*, deprecated, renamed: "POService")
-public typealias POServiceType = POService

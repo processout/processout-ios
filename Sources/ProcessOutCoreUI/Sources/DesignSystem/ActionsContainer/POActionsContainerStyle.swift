@@ -8,6 +8,7 @@
 import SwiftUI
 
 /// Actions container style.
+@MainActor
 public struct POActionsContainerStyle {
 
     /// Style for primary button.

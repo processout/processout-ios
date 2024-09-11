@@ -28,6 +28,10 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         $state.performWithoutAnimation(interactor.start)
     }
 
+    func stop() {
+        interactor.cancel()
+    }
+
     // MARK: - Private Nested Types
 
     private typealias InteractorState = CardTokenizationInteractorState
@@ -154,7 +158,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func cardNumberIcon(startedState: InteractorState.Started) -> Image? {
         let scheme = startedState.issuerInformation?.coScheme != nil
             ? startedState.preferredScheme
-            : startedState.issuerInformation?.$scheme.typed
+            : startedState.issuerInformation?.scheme
         return scheme.flatMap(CardSchemeImageProvider.shared.image)
     }
 
@@ -171,14 +175,14 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         let pickerItem = State.PickerItem(
             id: ItemId.scheme,
             options: [
-                .init(id: issuerInformation.scheme, title: issuerInformation.scheme.capitalized),
-                .init(id: coScheme, title: coScheme.capitalized)
+                .init(id: issuerInformation.scheme.rawValue, title: issuerInformation.scheme.rawValue.capitalized),
+                .init(id: coScheme.rawValue, title: coScheme.rawValue.capitalized)
             ],
             selectedOptionId: .init(
                 get: { startedState.preferredScheme?.rawValue },
                 set: { [weak self] newValue in
                     let newScheme = newValue.map(POCardScheme.init)
-                    self?.interactor.setPreferredScheme(newScheme ?? issuerInformation.$scheme.typed)
+                    self?.interactor.setPreferredScheme(newScheme ?? issuerInformation.scheme)
                 }
             ),
             preferrsInline: true

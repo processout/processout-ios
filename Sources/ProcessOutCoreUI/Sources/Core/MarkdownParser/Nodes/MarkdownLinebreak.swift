@@ -7,7 +7,7 @@
 
 import cmark_gfm
 
-final class MarkdownLinebreak: MarkdownBaseNode {
+final class MarkdownLinebreak: MarkdownBaseNode, @unchecked Sendable {
 
     override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_LINEBREAK

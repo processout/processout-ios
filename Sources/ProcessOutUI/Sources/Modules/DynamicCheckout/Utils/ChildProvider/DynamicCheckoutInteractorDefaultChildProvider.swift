@@ -99,8 +99,8 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             title: "",
             shouldHorizontallyCenterCodeInput: false,
             successMessage: "",
-            primaryActionTitle: "",
-            secondaryAction: nil,
+            primaryButtonTitle: "",
+            cancelButton: nil,
             inlineSingleSelectValuesLimit: configuration.alternativePayment.inlineSingleSelectValuesLimit,
             skipSuccessScreen: true,
             paymentConfirmation: alternativePaymentConfirmationConfiguration
@@ -108,16 +108,16 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         return alternativePaymentConfiguration
     }
 
-    // swiftlint:disable:next identifier_name
-    private var alternativePaymentConfirmationConfiguration: PONativeAlternativePaymentConfirmationConfiguration {
+    // swiftlint:disable:next identifier_name line_length
+    private var alternativePaymentConfirmationConfiguration: PONativeAlternativePaymentConfiguration.PaymentConfirmation {
         let configuration = self.configuration.alternativePayment.paymentConfirmation
-        let confirmationConfiguration = PONativeAlternativePaymentConfirmationConfiguration(
+        let confirmationConfiguration = PONativeAlternativePaymentConfiguration.PaymentConfirmation(
             waitsConfirmation: true,
             timeout: configuration.timeout,
             showProgressIndicatorAfter: configuration.showProgressIndicatorAfter,
             hideGatewayDetails: true,
-            secondaryAction: configuration.cancelButton.map { configuration in
-                .cancel(title: "", disabledFor: configuration.disabledFor, confirmation: nil)
+            cancelButton: configuration.cancelButton.map { configuration in
+                .init(title: "", disabledFor: configuration.disabledFor, confirmation: nil)
             }
         )
         return confirmationConfiguration

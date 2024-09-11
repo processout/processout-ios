@@ -37,10 +37,11 @@ final class DefaultCardsService: POCardsService {
     }
 
     func tokenize(request: POApplePayPaymentTokenizationRequest) async throws -> POCard {
-        let request = try applePayCardTokenizationRequestMapper.tokenizationRequest(from: request)
+        let request = try await applePayCardTokenizationRequestMapper.tokenizationRequest(from: request)
         return try await repository.tokenize(request: request)
     }
 
+    @MainActor
     func tokenize(
         request: POApplePayTokenizationRequest, delegate: POApplePayTokenizationDelegate?
     ) async throws -> POCard {

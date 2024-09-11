@@ -7,10 +7,10 @@
 
 import Foundation
 
-public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable {
+public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable, Sendable {
 
     /// Payment gateway information.
-    public struct Gateway {
+    public struct Gateway: Sendable {
 
         /// Name of the payment gateway that can be displayed.
         public let displayName: String
@@ -27,11 +27,11 @@ public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable {
     }
 
     /// Invoice details.
-    public struct Invoice: Decodable {
+    public struct Invoice: Decodable, Sendable {
 
         /// Invoice amount.
-        @POImmutableStringCodableDecimal
-        public var amount: Decimal
+        @POStringCodableDecimal
+        public private(set) var amount: Decimal
 
         /// Invoice currency code.
         public let currencyCode: String
@@ -63,12 +63,28 @@ extension PONativeAlternativePaymentMethodTransactionDetails.Gateway: Decodable 
         // Escapes plain text action message and stores as a markdown.
         customerActionMessage = try container
             .decodeIfPresent(String.self, forKey: .customerActionMessage)
-            .map(MarkdownParser.escaped)
+            .map(Self.escaped(plainText:))
     }
 
     // MARK: - Private Nested Types
 
     private enum CodingKeys: String, CodingKey {
         case displayName, logoUrl, customerActionImageUrl, customerActionMessage
+    }
+
+    // MARK: - Private Methods
+
+    /// Escapes given plain text so it can be represented as is, in markdown.
+    private static func escaped(plainText: String) -> String {
+        let specialCharacters = CharacterSet(charactersIn: "\\`*_{}[]()#+-.!")
+        var markdown = String()
+        markdown.reserveCapacity(plainText.count)
+        for character in plainText {
+            if character.unicodeScalars.allSatisfy(specialCharacters.contains) {
+                markdown += "\\"
+            }
+            markdown += String(character)
+        }
+        return markdown
     }
 }

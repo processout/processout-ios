@@ -12,22 +12,23 @@ extension View {
     /// Sets the style for picker views within this view.
     @_spi(PO)
     @available(iOS 14, *)
-    public func pickerStyle<Style: POPickerStyle>(_ style: Style) -> some View {
-        environment(\.pickerStyle, AnyPickerStyle(erasing: style))
+    public func pickerStyle(_ style: any POPickerStyle) -> some View {
+        environment(\.pickerStyle, style)
     }
 }
 
 @available(iOS 14, *)
 extension EnvironmentValues {
 
-    var pickerStyle: AnyPickerStyle {
+    var pickerStyle: any POPickerStyle {
         get { self[Key.self] }
         set { self[Key.self] = newValue }
     }
 
     // MARK: - Private Properties
 
-    private struct Key: EnvironmentKey {
-        static let defaultValue = AnyPickerStyle(erasing: .radioGroup)
+    @MainActor
+    private struct Key: @preconcurrency EnvironmentKey {
+        static let defaultValue: any POPickerStyle = .radioGroup
     }
 }

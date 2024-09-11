@@ -6,7 +6,7 @@
 //
 
 /// Describes events that could happen during card update lifecycle.
-public enum POCardUpdateEvent {
+public enum POCardUpdateEvent: Sendable {
 
     /// Initial event that is sent prior any other event.
     case willStart

@@ -6,7 +6,7 @@
 //
 
 /// Represents the configuration parameters that are required by the 3DS SDK for initialization.
-public struct PO3DS2Configuration: Decodable, Hashable {
+public struct PO3DS2Configuration: Decodable, Hashable, Sendable {
 
     /// The identifier of the directory server to use during the transaction creation phase.
     public let directoryServerId: String
@@ -21,8 +21,7 @@ public struct PO3DS2Configuration: Decodable, Hashable {
     public let directoryServerTransactionId: String
 
     /// Card scheme from the card used to initiate the payment.
-    @POTypedRepresentation<PO3DS2ConfigurationCardScheme?, POCardScheme>
-    public private(set) var scheme: PO3DS2ConfigurationCardScheme?
+    public let scheme: POCardScheme?
 
     /// 3DS protocol version identifier.
     public let messageVersion: String

@@ -131,3 +131,6 @@ extension CardTokenizationViewModelState.Item: Identifiable {
         }
     }
 }
+
+@available(*, unavailable)
+extension CardTokenizationViewModelState: Sendable { }

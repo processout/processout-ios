@@ -18,18 +18,18 @@ final class DynamicCheckoutDefaultInteractor:
     init(
         configuration: PODynamicCheckoutConfiguration,
         delegate: PODynamicCheckoutDelegate?,
-        alternativePaymentSession: DynamicCheckoutAlternativePaymentSession,
         childProvider: DynamicCheckoutInteractorChildProvider,
         invoicesService: POInvoicesService,
+        alternativePaymentsService: POAlternativePaymentsService,
         cardsService: POCardsService,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         self.configuration = configuration
         self.delegate = delegate
-        self.alternativePaymentSession = alternativePaymentSession
         self.childProvider = childProvider
         self.invoicesService = invoicesService
+        self.alternativePaymentsService = alternativePaymentsService
         self.cardsService = cardsService
         self.logger = logger
         self.completion = completion
@@ -137,9 +137,9 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Private Properties
 
-    private let alternativePaymentSession: DynamicCheckoutAlternativePaymentSession
     private let childProvider: DynamicCheckoutInteractorChildProvider
     private let invoicesService: POInvoicesService
+    private let alternativePaymentsService: POAlternativePaymentsService
     private let cardsService: POCardsService
     private let completion: (Result<Void, POFailure>) -> Void
 
@@ -148,7 +148,6 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Starting State
 
-    @MainActor
     private func continueStartUnchecked() async {
         do {
             let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
@@ -373,7 +372,7 @@ final class DynamicCheckoutDefaultInteractor:
             shouldInvalidateInvoice: true
         )
         state = .paymentProcessing(paymentProcessingState)
-        Task { @MainActor in
+        Task {
             do {
                 guard let delegate else {
                     throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
@@ -457,9 +456,11 @@ final class DynamicCheckoutDefaultInteractor:
             shouldInvalidateInvoice: true
         )
         state = .paymentProcessing(paymentProcessingState)
-        Task { @MainActor in
+        Task {
             do {
-                let response = try await alternativePaymentSession.start(url: method.configuration.redirectUrl)
+                let response = try await alternativePaymentsService.authenticate(
+                    using: method.configuration.redirectUrl
+                )
                 try await authorizeInvoice(
                     source: response.gatewayToken,
                     saveSource: false,
@@ -557,7 +558,7 @@ final class DynamicCheckoutDefaultInteractor:
             do {
                 var source = method.configuration.customerTokenId
                 if let redirectUrl = method.configuration.redirectUrl {
-                    source = try await alternativePaymentSession.start(url: redirectUrl).gatewayToken
+                    source = try await alternativePaymentsService.authenticate(using: redirectUrl).gatewayToken
                 }
                 try await authorizeInvoice(source: source, saveSource: false, startedState: startedState)
                 setSuccessState()
@@ -723,7 +724,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         state = .success
         send(event: .didCompletePayment)
-        Task { @MainActor in
+        Task {
             try? await Task.sleep(seconds: configuration.paymentSuccess?.duration ?? 0)
             completion(.success(()))
         }
@@ -731,8 +732,8 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Events
 
+    @MainActor
     private func send(event: PODynamicCheckoutEvent) {
-        assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
         delegate?.dynamicCheckout(didEmitEvent: event)
     }
@@ -781,7 +782,7 @@ final class DynamicCheckoutDefaultInteractor:
 @available(iOS 14.0, *)
 extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
 
-    func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent) {
+    func cardTokenization(didEmitEvent event: POCardTokenizationEvent) {
         delegate?.dynamicCheckout(didEmitCardTokenizationEvent: event)
     }
 
@@ -795,11 +796,11 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         try await authorizeInvoice(source: card.id, saveSource: save, startedState: currentState.snapshot)
     }
 
-    func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
+    func cardTokenization(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> POCardScheme? {
         delegate?.dynamicCheckout(preferredSchemeFor: issuerInformation)
     }
 
-    func shouldContinueTokenization(after failure: POFailure) -> Bool {
+    func cardTokenization(shouldContinueAfter failure: POFailure) -> Bool {
         guard case .paymentProcessing(let currentState) = state else {
             return false
         }
@@ -810,7 +811,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
 @available(iOS 14.0, *)
 extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
 
-    func nativeAlternativePaymentMethodDidEmitEvent(_ event: PONativeAlternativePaymentMethodEvent) {
+    func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentEvent) {
         switch event {
         case .willSubmitParameters:
             invalidateInvoiceIfPossible()
@@ -820,13 +821,10 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
         delegate?.dynamicCheckout(didEmitAlternativePaymentEvent: event)
     }
 
-    func nativeAlternativePaymentMethodDefaultValues(
-        for parameters: [PONativeAlternativePaymentMethodParameter], completion: @escaping ([String: String]) -> Void
-    ) {
-        Task { @MainActor in
-            let values = await delegate?.dynamicCheckout(alternativePaymentDefaultsFor: parameters) ?? [:]
-            completion(values)
-        }
+    func nativeAlternativePayment(
+        defaultsFor parameters: [PONativeAlternativePaymentMethodParameter]
+    ) async -> [String: String] {
+        await delegate?.dynamicCheckout(alternativePaymentDefaultsFor: parameters) ?? [:]
     }
 }
 

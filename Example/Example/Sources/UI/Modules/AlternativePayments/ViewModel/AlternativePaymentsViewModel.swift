@@ -162,10 +162,9 @@ final class AlternativePaymentsViewModel: ObservableObject {
             let configuration = PONativeAlternativePaymentConfiguration(
                 invoiceId: invoice.id,
                 gatewayConfigurationId: gatewayConfigurationId,
-                secondaryAction: .cancel(),
+                cancelButton: .init(),
                 paymentConfirmation: .init(
-                    showProgressIndicatorAfter: 5,
-                    secondaryAction: .cancel(disabledFor: 10)
+                    showProgressIndicatorAfter: 5, cancelButton: .init()
                 )
             )
             let nativePaymentItem = AlternativePaymentsViewModelState.NativePayment(
@@ -187,7 +186,8 @@ extension AlternativePaymentsViewModel {
     convenience init() {
         let interactor = AlternativePaymentsInteractor(
             gatewayConfigurationsRepository: ProcessOut.shared.gatewayConfigurations,
-            invoicesService: ProcessOut.shared.invoices
+            invoicesService: ProcessOut.shared.invoices,
+            alternativePaymentsService: ProcessOut.shared.alternativePayments
         )
         self.init(interactor: interactor)
     }

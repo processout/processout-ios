@@ -14,7 +14,9 @@ extension POBackport where Wrapped: View {
     @available(iOS 14, *)
     @ViewBuilder
     public func task<T>(
-        id value: T, priority: TaskPriority = .userInitiated, _ action: @escaping @Sendable () async -> Void
+        id value: T,
+        priority: TaskPriority = .userInitiated,
+        _ action: @escaping @Sendable @isolated(any) () async -> Void
     ) -> some View where T: Equatable {
         if #available(iOS 15, *) {
             wrapped.task(id: value, priority: priority, action)
@@ -23,11 +25,11 @@ extension POBackport where Wrapped: View {
         }
     }
 
-    @ViewBuilder
     @available(iOS, deprecated: 15)
     @available(iOS 14, *)
+    @ViewBuilder
     public func task(
-        priority: TaskPriority = .userInitiated, _ action: @escaping @Sendable () async -> Void
+        priority: TaskPriority = .userInitiated, _ action: @escaping @Sendable @isolated(any) () async -> Void
     ) -> some View {
         task(id: 0, priority: priority, action)
     }

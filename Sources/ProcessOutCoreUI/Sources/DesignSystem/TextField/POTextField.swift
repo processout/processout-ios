@@ -123,7 +123,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
     // MARK: -
 
     func willReturn() {
-        submitAction?()
+        submitAction()
     }
 
     // MARK: - Private Nested Types

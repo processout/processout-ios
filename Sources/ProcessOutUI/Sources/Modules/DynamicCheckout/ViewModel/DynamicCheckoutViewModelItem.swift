@@ -170,3 +170,6 @@ extension DynamicCheckoutViewModelItem: Identifiable, AnimationIdentityProvider 
         static let progressId = UUID().uuidString
     }
 }
+
+@available(*, unavailable)
+extension DynamicCheckoutViewModelItem: Sendable { }

@@ -10,20 +10,21 @@ import PassKit
 
 /// An object that presents a sheet that prompts the user to authorize a payment request
 @available(*, deprecated, message: "Tokenize payments using cards service accessible via ProcessOut.shared.cards")
+@MainActor
 public final class POPassKitPaymentAuthorizationController: NSObject {
 
     /// Determine whether this device can process payment requests.
-    public static func canMakePayments() -> Bool {
+    public nonisolated static func canMakePayments() -> Bool {
         PKPaymentAuthorizationController.canMakePayments()
     }
 
     /// Determine whether this device can process payment requests using specific payment network brands.
-    public static func canMakePayments(usingNetworks supportedNetworks: [PKPaymentNetwork]) -> Bool {
+    public nonisolated static func canMakePayments(usingNetworks supportedNetworks: [PKPaymentNetwork]) -> Bool {
         PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks)
     }
 
     /// Determine whether this device can process payments using the specified networks and capabilities bitmask.
-    public static func canMakePayments(
+    public nonisolated static func canMakePayments(
         usingNetworks supportedNetworks: [PKPaymentNetwork], capabilities: PKMerchantCapability
     ) -> Bool {
         PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks, capabilities: capabilities)
@@ -31,10 +32,10 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
 
     /// Initialize the controller with a payment request.
     public init?(paymentRequest: PKPaymentRequest) {
-        if PKPaymentAuthorizationViewController(paymentRequest: paymentRequest) == nil {
+        guard Self.canMakePayments() else {
             return nil
         }
-        _didPresentApplePay = .init(wrappedValue: false)
+        didPresentApplePay = false
         self.paymentRequest = paymentRequest
         controller = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
         errorMapper = PODefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger)
@@ -50,7 +51,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
             completion?(false)
             return
         }
-        $didPresentApplePay.withLock { $0 = true }
+        didPresentApplePay = true
         // Bound lifecycle of self to underlying PKPaymentAuthorizationController
         objc_setAssociatedObject(controller, &AssociatedObjectKeys.controller, self, .OBJC_ASSOCIATION_RETAIN)
         controller.present(completion: completion)
@@ -59,7 +60,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     /// Presents the payment sheet modally over your app.
     public func present() async -> Bool {
         await withUnsafeContinuation { continuation in
-            present(completion: continuation.resume)
+            present { continuation.resume(returning: $0) }
         }
     }
 
@@ -84,7 +85,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     // MARK: - Private Nested Types
 
     private enum AssociatedObjectKeys {
-        static var controller: UInt8 = 0
+        nonisolated(unsafe) static var controller: UInt8 = 0
     }
 
     // MARK: - Private Properties
@@ -94,8 +95,6 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
 
     private let errorMapper: POPassKitPaymentErrorMapper
     private let cardsService: POCardsService
-
-    @POUnfairlyLocked
     private var didPresentApplePay: Bool
 }
 
@@ -175,7 +174,9 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
         return update ?? PKPaymentRequestPaymentMethodUpdate()
     }
 
-    public func presentationWindow(for _: PKPaymentAuthorizationController) -> UIWindow? {
-        delegate?.presentationWindow(for: self)
+    public nonisolated func presentationWindow(for _: PKPaymentAuthorizationController) -> UIWindow? {
+        MainActor.assumeIsolated {
+            delegate?.presentationWindow(for: self)
+        }
     }
 }

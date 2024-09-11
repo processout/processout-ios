@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class UrlRequestFormatter {
+final class UrlRequestFormatter: Sendable {
 
     init(prettyPrintedBody: Bool = true) {
         self.prettyPrintedBody = prettyPrintedBody

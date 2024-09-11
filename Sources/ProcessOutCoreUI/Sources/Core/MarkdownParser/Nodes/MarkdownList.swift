@@ -7,7 +7,7 @@
 
 import cmark_gfm
 
-final class MarkdownList: MarkdownBaseNode {
+final class MarkdownList: MarkdownBaseNode, @unchecked Sendable {
 
     enum ListType {
 
@@ -18,7 +18,27 @@ final class MarkdownList: MarkdownBaseNode {
         case bullet(marker: Character)
     }
 
-    private(set) lazy var type: ListType = {
+    /// List type.
+    let type: ListType
+
+    // MARK: - MarkdownBaseNode
+
+    required init(cmarkNode: MarkdownBaseNode.CmarkNode, validatesType: Bool = true) {
+        type = Self.listType(cmarkNode: cmarkNode)
+        super.init(cmarkNode: cmarkNode, validatesType: validatesType)
+    }
+
+    override static var cmarkNodeType: cmark_node_type {
+        CMARK_NODE_LIST
+    }
+
+    override func accept<V: MarkdownVisitor>(visitor: V) -> V.Result {
+        visitor.visit(list: self)
+    }
+
+    // MARK: - Private Methods
+
+    private static func listType(cmarkNode: CmarkNode) -> ListType {
         let listNode = cmarkNode.pointee.as.list
         switch listNode.list_type {
         case CMARK_BULLET_LIST:
@@ -40,19 +60,5 @@ final class MarkdownList: MarkdownBaseNode {
         default:
             preconditionFailure("Unsupported list type: \(listNode.list_type)")
         }
-    }()
-
-    private(set) lazy var isTight: Bool = {
-        cmarkNode.pointee.as.list.tight
-    }()
-
-    // MARK: - MarkdownBaseNode
-
-    override static var cmarkNodeType: cmark_node_type {
-        CMARK_NODE_LIST
-    }
-
-    override func accept<V: MarkdownVisitor>(visitor: V) -> V.Result {
-        visitor.visit(list: self)
     }
 }

@@ -7,22 +7,21 @@
 
 import cmark_gfm
 
-final class MarkdownCodeBlock: MarkdownBaseNode {
+final class MarkdownCodeBlock: MarkdownBaseNode, @unchecked Sendable {
 
-    /// Returns the info string from a fenced code block.
-    private(set) lazy var info: String? = {
-        String(cString: cmarkNode.pointee.as.code.info.data)
-    }()
-
-    private(set) lazy var code: String = {
-        guard let literal = cmark_node_get_literal(cmarkNode) else {
-            assertionFailure("Unable to get text node value")
-            return ""
-        }
-        return String(cString: literal)
-    }()
+    /// Actual code value.
+    let code: String
 
     // MARK: - MarkdownBaseNode
+
+    required init(cmarkNode: MarkdownBaseNode.CmarkNode, validatesType: Bool = true) {
+        if let literal = cmark_node_get_literal(cmarkNode) {
+            self.code = String(cString: literal)
+        } else {
+            self.code = ""
+        }
+        super.init(cmarkNode: cmarkNode, validatesType: validatesType)
+    }
 
     override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_CODE_BLOCK

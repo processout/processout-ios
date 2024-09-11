@@ -55,7 +55,7 @@ final class DynamicCheckoutViewModel: ObservableObject {
     private func continueDynamicCheckout(invoice: POInvoice) {
         let configuration = PODynamicCheckoutConfiguration(
             invoiceRequest: .init(invoiceId: invoice.id, clientSecret: invoice.clientSecret),
-            alternativePayment: .init(returnUrl: Constants.returnUrl),
+            alternativePayment: .init(),
             cancelButton: .init(confirmation: .init())
         )
         let item = DynamicCheckoutViewModelState.DynamicCheckout(
@@ -95,7 +95,7 @@ extension DynamicCheckoutViewModel: PODynamicCheckoutDelegate {
     func dynamicCheckout(
         willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest
     ) async -> any PO3DSService {
-        POTest3DSService(returnUrl: Constants.returnUrl)
+        POTest3DSService()
     }
 
     func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {

@@ -86,30 +86,11 @@ extension CardPaymentViewModel: POCardTokenizationDelegate {
         let threeDSService: PO3DSService
         switch state.authenticationService.selection {
         case .test:
-            threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
+            threeDSService = POTest3DSService()
         case .checkout:
-            threeDSService = POCheckout3DSServiceBuilder()
-                .with(delegate: self)
-                .with(environment: .sandbox)
-                .build()
+            threeDSService = POCheckout3DSService(environment: .sandbox)
         }
         try await invoicesService.authorizeInvoice(request: invoiceAuthorizationRequest, threeDSService: threeDSService)
-    }
-}
-
-extension CardPaymentViewModel: POCheckout3DSServiceDelegate {
-
-    func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        Task { @MainActor in
-            let session = POWebAuthenticationSession(
-                redirect: redirect, returnUrl: Constants.returnUrl, completion: completion
-            )
-            if await session.start() {
-                return
-            }
-            let failure = POFailure(message: "Unable to process redirect", code: .generic(.mobile))
-            completion(.failure(failure))
-        }
     }
 }
 

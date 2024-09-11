@@ -9,7 +9,8 @@ import SwiftUI
 
 extension View {
 
-    @_spi(PO) public func radioButtonSelected(_ isSelected: Bool) -> some View {
+    @_spi(PO)
+    public func radioButtonSelected(_ isSelected: Bool) -> some View {
         environment(\.isRadioButtonSelected, isSelected)
     }
 }

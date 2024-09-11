@@ -9,9 +9,9 @@ import Foundation
 
 /// Alternative payment specific dynamic checkout configuration.
 @_spi(PO)
-public struct PODynamicCheckoutAlternativePaymentConfiguration {
+public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
 
-    public struct PaymentConfirmation {
+    public struct PaymentConfirmation: Sendable {
 
         /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
         /// Default timeout is 3 minutes while maximum value is 15 minutes.
@@ -36,7 +36,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
         }
     }
 
-    public struct CancelButton {
+    public struct CancelButton: Sendable {
 
         /// Cancel button title. Use `nil` for default title.
         public let title: String?
@@ -50,7 +50,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
 
         public init(
             title: String? = nil,
-            disabledFor: TimeInterval,
+            disabledFor: TimeInterval = 0,
             confirmation: POConfirmationDialogConfiguration? = nil
         ) {
             self.title = title
@@ -58,9 +58,6 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
             self.confirmation = confirmation
         }
     }
-
-    /// Return URL to expect when handling OOB or web based payments.
-    public let returnUrl: URL?
 
     /// For parameters where user should select single option from multiple values defines
     /// maximum number of options that framework will display inline (e.g. using radio buttons).
@@ -72,12 +69,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
     public let paymentConfirmation: PaymentConfirmation
 
     /// Creates configuration.
-    public init(
-        returnUrl: URL? = nil,
-        inlineSingleSelectValuesLimit: Int = 5,
-        paymentConfirmation: PaymentConfirmation = .init()
-    ) {
-        self.returnUrl = returnUrl
+    public init(inlineSingleSelectValuesLimit: Int = 5, paymentConfirmation: PaymentConfirmation = .init()) {
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.paymentConfirmation = paymentConfirmation
     }

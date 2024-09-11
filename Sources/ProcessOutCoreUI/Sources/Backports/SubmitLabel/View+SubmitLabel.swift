@@ -10,7 +10,7 @@ import SwiftUI
 extension POBackport where Wrapped == Any {
 
     /// A semantic label describing the label of submission within a view hierarchy.
-    public struct SubmitLabel: Equatable {
+    public struct SubmitLabel: Equatable, Sendable {
 
         let returnKeyType: UIReturnKeyType
 

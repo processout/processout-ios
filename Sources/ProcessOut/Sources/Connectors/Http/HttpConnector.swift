@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 10.10.2022.
 //
 
-protocol HttpConnector: AnyObject {
+protocol HttpConnector: AnyObject, Sendable {
 
     typealias Failure = HttpConnectorFailure
 

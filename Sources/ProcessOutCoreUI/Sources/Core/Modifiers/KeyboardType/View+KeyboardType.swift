@@ -11,7 +11,8 @@ extension View {
 
     /// Sets the keyboard type for this view. In addition to calling the native counterpart,
     /// the implementation also exposes given type as an environment so works with `POTextField`.
-    @_spi(PO) public func poKeyboardType(_ type: UIKeyboardType) -> some View {
+    @_spi(PO)
+    public func poKeyboardType(_ type: UIKeyboardType) -> some View {
         environment(\.poKeyboardType, type).keyboardType(type)
     }
 }

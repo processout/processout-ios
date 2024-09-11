@@ -69,3 +69,6 @@ extension CardUpdateViewModelItem: Identifiable {
         static let progressId = UUID().uuidString
     }
 }
+
+@available(*, unavailable)
+extension CardUpdateViewModelItem: Sendable { }

@@ -24,7 +24,7 @@ extension PONativeAlternativePaymentView {
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         let viewModel = {
-            var logger = ProcessOut.shared.logger
+            var logger: POLogger = ProcessOut.shared.logger
             logger[attributeKey: .invoiceId] = configuration.invoiceId
             logger[attributeKey: .gatewayConfigurationId] = configuration.gatewayConfigurationId
             let interactor = NativeAlternativePaymentDefaultInteractor(

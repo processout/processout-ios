@@ -9,8 +9,8 @@ import SwiftUI
 
 extension View {
 
-    @_spi(PO)
     @available(iOS 14, *)
+    @_spi(PO)
     public func poConfirmationDialog(item: Binding<POConfirmationDialog?>) -> some View {
         modifier(ContentModifier(confirmationDialog: item))
     }

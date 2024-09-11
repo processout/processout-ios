@@ -5,9 +5,8 @@
 //  Created by Andrii Vysotskyi on 03.09.2024.
 //
 
-import PassKit
+@preconcurrency import PassKit
 
-@MainActor
 final class DefaultApplePayAuthorizationSession: ApplePayAuthorizationSession {
 
     nonisolated init() {
@@ -31,7 +30,9 @@ final class DefaultApplePayAuthorizationSession: ApplePayAuthorizationSession {
                 coordinator.setContinuation(continuation: continuation)
             }
         } onCancel: {
-            controller.dismiss()
+            Task { @MainActor in
+                await controller.dismiss()
+            }
         }
         await controller.dismiss()
         guard let payment = coordinator.payment else {

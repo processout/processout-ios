@@ -7,9 +7,7 @@
 
 import cmark_gfm
 
-final class MarkdownEmphasis: MarkdownBaseNode {
-
-    // MARK: - MarkdownBaseNode
+final class MarkdownEmphasis: MarkdownBaseNode, @unchecked Sendable {
 
     override static var cmarkNodeType: cmark_node_type {
         CMARK_NODE_EMPH

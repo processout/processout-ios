@@ -10,5 +10,5 @@
 extension POLogger {
 
     /// Stub logger.
-    static var stub = POLogger(category: "")
+    static let stub = POLogger(category: "")
 }

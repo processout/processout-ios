@@ -8,6 +8,7 @@
 import PassKit
 
 /// Apple Pay tokenization request.
+@MainActor
 public struct POApplePayTokenizationRequest {
 
     /// The payment request to be authorized and tokenized.

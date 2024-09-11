@@ -12,6 +12,7 @@ import PassKit
 public typealias POApplePayCardTokenizationRequest = POApplePayPaymentTokenizationRequest
 
 /// Apple Pay payment details.
+@MainActor
 public struct POApplePayPaymentTokenizationRequest {
 
     /// Payment information.

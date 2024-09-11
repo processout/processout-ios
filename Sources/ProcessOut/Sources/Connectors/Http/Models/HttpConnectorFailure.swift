@@ -5,9 +5,9 @@
 //  Created by Andrii Vysotskyi on 10.10.2022.
 //
 
-enum HttpConnectorFailure: Error {
+enum HttpConnectorFailure: Error, Sendable {
 
-    struct InvalidField: Decodable {
+    struct InvalidField: Decodable, Sendable {
 
         /// Field name.
         let name: String
@@ -16,7 +16,7 @@ enum HttpConnectorFailure: Error {
         let message: String
     }
 
-    struct Server: Decodable {
+    struct Server: Decodable, Sendable {
 
         /// Error type.
         let errorType: String

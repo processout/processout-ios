@@ -8,30 +8,34 @@
 import ProcessOut
 
 /// Card update module delegate definition.
-public protocol POCardUpdateDelegate: AnyObject {
-
-    /// Invoked when module emits event.
-    func cardUpdateDidEmitEvent(_ event: POCardUpdateEvent)
+public protocol POCardUpdateDelegate: AnyObject, Sendable {
 
     /// Asks delegate to resolve card information based on card id.
-    func cardInformation(cardId: String) async -> POCardUpdateInformation?
+    func cardUpdate(informationFor cardId: String) async -> POCardUpdateInformation?
+
+    /// Invoked when module emits event.
+    @MainActor
+    func cardUpdate(didEmitEvent event: POCardUpdateEvent)
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
-    func shouldContinueUpdate(after failure: POFailure) -> Bool
+    @MainActor
+    func cardUpdate(shouldContinueAfter failure: POFailure) -> Bool
 }
 
 extension POCardUpdateDelegate {
 
-    public func cardUpdateDidEmitEvent(_ event: POCardUpdateEvent) {
-        // Ignored
-    }
-
-    public func cardInformation(cardId: String) async -> POCardUpdateInformation? {
+    public func cardUpdate(informationFor cardId: String) async -> POCardUpdateInformation? {
         nil
     }
 
-    public func shouldContinueUpdate(after failure: POFailure) -> Bool {
+    @MainActor
+    public func cardUpdate(didEmitEvent event: POCardUpdateEvent) {
+        // Ignored
+    }
+
+    @MainActor
+    public func cardUpdate(shouldContinueAfter failure: POFailure) -> Bool {
         true
     }
 }
