@@ -56,7 +56,7 @@ final class ApplePayViewModel: ObservableObject {
             var invoice: POInvoice! // swiftlint:disable:this implicitly_unwrapped_optional
             let invoiceCreationRequest = POInvoiceCreationRequest(
                 name: state.invoice.name,
-                amount: state.invoice.amount.description,
+                amount: state.invoice.amount,
                 currency: state.invoice.currencyCode.selection
             )
             let coordinator = ApplePayTokenizationCoordinator { [invoicesService] card in
