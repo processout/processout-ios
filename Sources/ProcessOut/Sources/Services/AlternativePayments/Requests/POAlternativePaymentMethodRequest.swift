@@ -14,6 +14,7 @@ import Foundation
 ///
 /// - NOTE: Make sure to supply proper `additionalData` specific for particular payment
 /// method.
+@available(*, deprecated, message: "Use POAlternativePaymentAuthorizationRequest or POAlternativePaymentTokenizationRequest instead.") // swiftlint:disable:this line_length
 public struct POAlternativePaymentMethodRequest {
 
     /// Invoice identifier to to perform APM payment for.

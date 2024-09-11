@@ -7,6 +7,12 @@
 
 import Foundation
 
+@available(*, deprecated, renamed: "POAlternativePaymentsService")
+public typealias POAlternativePaymentMethodsServiceType = POAlternativePaymentsService
+
+@available(*, deprecated, renamed: "POAlternativePaymentsService")
+public typealias POAlternativePaymentMethodsService = POAlternativePaymentsService
+
 /// Service that provides set of methods to work with alternative payments.
 public protocol POAlternativePaymentsService: POService {
 
@@ -24,4 +30,17 @@ public protocol POAlternativePaymentsService: POService {
 
     /// Authenticates alternative payment using given raw URL.
     func authenticate(using url: URL) async throws -> POAlternativePaymentResponse
+
+    /// Creates the redirection URL for APM Payments and APM token creation.
+    ///
+    /// - Parameter request: request containing information needed to build the URL.
+    @available(*, deprecated, message: "Use tokenize(request:) or authorize(request:) instead to process payment.")
+    func alternativePaymentMethodUrl(request: POAlternativePaymentMethodRequest) -> URL
+
+    /// Convert given APMs response URL into response object.
+    ///
+    /// - Parameter url: url response that our checkout service sends back when the customer gets redirected.
+    /// - Returns: response parsed from given url.
+    @available(*, deprecated, message: "Use tokenize(request:) or authorize(request:) instead to process payment.")
+    func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse
 }

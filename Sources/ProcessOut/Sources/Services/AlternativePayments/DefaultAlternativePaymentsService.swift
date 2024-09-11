@@ -47,6 +47,51 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
         return try response(from: returnUrl)
     }
 
+    @available(*, deprecated)
+    func alternativePaymentMethodUrl(request: POAlternativePaymentMethodRequest) -> URL {
+        do {
+            if let customerId = request.customerId, let tokenId = request.tokenId {
+                let tokenizationRequest = POAlternativePaymentTokenizationRequest(
+                    customerId: customerId,
+                    tokenId: tokenId,
+                    gatewayConfigurationId: request.gatewayConfigurationId,
+                    additionalData: request.additionalData
+                )
+                return try url(for: tokenizationRequest)
+            }
+            let authorizationRequest = POAlternativePaymentAuthorizationRequest(
+                invoiceId: request.invoiceId,
+                gatewayConfigurationId: request.gatewayConfigurationId,
+                tokenId: request.tokenId,
+                additionalData: request.additionalData
+            )
+            return try url(for: authorizationRequest)
+        } catch {
+            preconditionFailure("Failed to create APM redirection URL.")
+        }
+    }
+
+    @available(*, deprecated)
+    func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+            let message = "Invalid or malformed Alternative Payment Method URL response provided."
+            throw POFailure(message: message, code: .generic(.mobile), underlyingError: nil)
+        }
+        let queryItems = components.queryItems ?? []
+        if let errorCode = queryItems.queryItemValue(name: "error_code") {
+            throw POFailure(code: createFailureCode(rawValue: errorCode))
+        }
+        let gatewayToken = queryItems.queryItemValue(name: "token") ?? ""
+        if gatewayToken.isEmpty {
+            logger.debug("Gateway 'token' is not set in \(url), this may be an error.")
+        }
+        let tokenId = queryItems.queryItemValue(name: "token_id")
+        if let customerId = queryItems.queryItemValue(name: "customer_id"), let tokenId {
+            return .init(gatewayToken: gatewayToken, customerId: customerId, tokenId: tokenId, returnType: .createToken)
+        }
+        return .init(gatewayToken: gatewayToken, customerId: nil, tokenId: tokenId, returnType: .authorization)
+    }
+
     // MARK: - Private
 
     private let configuration: @Sendable () -> AlternativePaymentsServiceConfiguration
