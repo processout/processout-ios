@@ -99,6 +99,7 @@ private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_e
         let updatedRequest = POInvoiceAuthorizationRequest(
             invoiceId: invoiceId,
             source: newSource,
+            saveSource: saveSource,
             incremental: incremental,
             preferredScheme: preferredScheme,
             thirdPartySdkVersion: thirdPartySdkVersion,
@@ -106,7 +107,11 @@ private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_e
             overrideMacBlocking: overrideMacBlocking,
             initialSchemeTransactionId: initialSchemeTransactionId,
             autoCaptureAt: autoCaptureAt,
-            captureAmount: captureAmount
+            captureAmount: captureAmount,
+            authorizeOnly: authorizeOnly,
+            allowFallbackToSale: allowFallbackToSale,
+            clientSecret: clientSecret,
+            metadata: metadata
         )
         return updatedRequest
     }
