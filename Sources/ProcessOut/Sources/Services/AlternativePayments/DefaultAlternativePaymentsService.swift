@@ -43,8 +43,15 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
     }
 
     func authenticate(using url: URL) async throws -> POAlternativePaymentResponse {
-        let returnUrl = try await webSession.authenticate(using: url)
-        return try response(from: returnUrl)
+        do {
+            let returnUrl = try await webSession.authenticate(using: url)
+            let response = try response(from: returnUrl)
+            logger.debug("Did authenticate alternative payment: \(response.gatewayToken)")
+            return response
+        } catch {
+            logger.debug("Did fail to authenticate alternative payment: \(error)")
+            throw error
+        }
     }
 
     @available(*, deprecated)
