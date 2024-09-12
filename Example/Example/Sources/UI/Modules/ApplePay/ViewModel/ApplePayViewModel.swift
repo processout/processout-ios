@@ -45,7 +45,7 @@ final class ApplePayViewModel: ObservableObject {
             // swiftlint:disable:next legacy_objc_type
             .init(label: "Test", amount: state.invoice.amount as NSDecimalNumber)
         ]
-        request.currencyCode = state.invoice.currencyCode.selection
+        request.currencyCode = state.invoice.currencyCode
         request.countryCode = "US"
         request.supportedNetworks = [.visa, .masterCard, .amex]
         await createInvoiceAndAuthorize(request: request)
@@ -57,7 +57,7 @@ final class ApplePayViewModel: ObservableObject {
             let invoiceCreationRequest = POInvoiceCreationRequest(
                 name: state.invoice.name,
                 amount: state.invoice.amount,
-                currency: state.invoice.currencyCode.selection
+                currency: state.invoice.currencyCode
             )
             let coordinator = ApplePayTokenizationCoordinator { [invoicesService] card in
                 invoice = try await invoicesService.createInvoice(request: invoiceCreationRequest)

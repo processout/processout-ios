@@ -16,7 +16,7 @@ struct InvoiceViewModel {
     var amount: Decimal
 
     /// Currency code.
-    var currencyCode: PickerData<Locale.Currency, String>
+    var currencyCode: String
 }
 
 extension InvoiceViewModel {
@@ -25,6 +25,6 @@ extension InvoiceViewModel {
     init() {
         self.name = UUID().uuidString
         self.amount = 100
-        currencyCode = .init(sources: Locale.Currency.isoCurrencies, id: \.identifier, selection: "USD")
+        currencyCode = "USD"
     }
 }
