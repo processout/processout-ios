@@ -33,6 +33,7 @@ final class DefaultWebAuthenticationSession:
                         url: url,
                         callbackURLScheme: callbackScheme,
                         completionHandler: { url, error in
+                            // completionHandler is invoked before session is dismissed
                             sessionProxy.invalidate()
                             if let error {
                                 continuation.resume(throwing: Self.converted(error: error))
@@ -49,7 +50,11 @@ final class DefaultWebAuthenticationSession:
                         session.additionalHeaderFields = additionalHeaderFields
                     }
                     sessionProxy.setSession(session, continuation: continuation)
-                    session.start()
+                    if !session.start() {
+                        // swiftlint:disable:next line_length
+                        let failure = POFailure(message: "Unable to start authentication session.", code: .generic(.mobile))
+                        continuation.resume(throwing: failure)
+                    }
                 }
             },
             onCancel: {
