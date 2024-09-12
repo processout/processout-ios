@@ -13,21 +13,22 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        let configuration = AlternativePaymentMethodsServiceConfiguration(
+        let configuration = AlternativePaymentsServiceConfiguration(
             projectId: "proj_test", baseUrl: URL(string: "https://example.com")!
         )
-        sut = DefaultAlternativePaymentMethodsService(configuration: { configuration }, logger: .stub)
+        let webSession = MockWebAuthenticationSession()
+        sut = .init(configuration: { configuration }, webSession: webSession, logger: .stub)
     }
 
     func test_alternativePaymentMethodUrl_authorizationWithAdditionalData_succeeds() throws {
-        let request = POAlternativePaymentMethodRequest(
+        let request = POAlternativePaymentAuthorizationRequest(
             invoiceId: "iv_test",
             gatewayConfigurationId: "gway_conf_test",
             additionalData: ["field1": "test", "field2": "test2"]
         )
 
         // When
-        let url = sut.alternativePaymentMethodUrl(request: request)
+        let url = try sut.url(for: request)
 
         // Then
         let expectedUrls = [
@@ -41,14 +42,14 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
     }
 
     func test_alternativePaymentMethodUrl_tokenization_succeeds() throws {
-        let request = POAlternativePaymentMethodRequest(
+        let request = POAlternativePaymentTokenizationRequest(
             customerId: "cust_test",
             tokenId: "tok_test",
             gatewayConfigurationId: "gway_conf_test"
         )
 
         // When
-        let url = sut.alternativePaymentMethodUrl(request: request)
+        let url = try sut.url(for: request)
 
         // Then
         let expectedUrl = "https://example.com/proj_test/cust_test/tok_test/redirect/gway_conf_test"
@@ -56,36 +57,39 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
     }
 
     func test_alternativePaymentMethodUrl_authorizationWithToken_succeeds() throws {
-        let request = POAlternativePaymentMethodRequest(
+        let request = POAlternativePaymentAuthorizationRequest(
             invoiceId: "iv_test", gatewayConfigurationId: "gway_conf_test", tokenId: "tok_test"
         )
 
         // When
-        let url = sut.alternativePaymentMethodUrl(request: request)
+        let url = try sut.url(for: request)
 
         // Then
         let expectedUrl = "https://example.com/proj_test/iv_test/redirect/gway_conf_test/tokenized/tok_test"
         XCTAssertEqual(url.absoluteString, expectedUrl)
     }
 
+    @available(*, deprecated)
     func test_alternativePaymentMethodResponse_withOnlyGatewayToken_succeeds() throws {
-        let result: POAlternativePaymentMethodResponse? = try sut.alternativePaymentMethodResponse(
+        let result = try sut.alternativePaymentMethodResponse(
             url: URL(string: "https://processout.return?token=gway_req_test")!
         )
 
-        XCTAssertEqual(result?.gatewayToken, "gway_req_test")
+        XCTAssertEqual(result.gatewayToken, "gway_req_test")
     }
 
+    @available(*, deprecated)
     func test_alternativePaymentMethodResponse_withCustomerToken_succeeds() throws {
-        let result: POAlternativePaymentMethodResponse? = try sut.alternativePaymentMethodResponse(
+        let result = try sut.alternativePaymentMethodResponse(
             url: URL(string: "https://processout.return?token=gway_req_test&token_id=tok_test&customer_id=cust_test")!
         )
 
-        XCTAssertEqual(result?.gatewayToken, "gway_req_test")
-        XCTAssertEqual(result?.tokenId, "tok_test")
-        XCTAssertEqual(result?.customerId, "cust_test")
+        XCTAssertEqual(result.gatewayToken, "gway_req_test")
+        XCTAssertEqual(result.tokenId, "tok_test")
+        XCTAssertEqual(result.customerId, "cust_test")
     }
 
+    @available(*, deprecated)
     func test_alternativePaymentMethodResponse_whenTokenIsNotSet_succeeds() throws {
         // When
         let url = URL(string: "test://return")!
@@ -95,5 +99,5 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
         XCTAssertTrue(result.gatewayToken.isEmpty)
     }
 
-    private var sut: DefaultAlternativePaymentMethodsService!
+    private var sut: DefaultAlternativePaymentsService!
 }

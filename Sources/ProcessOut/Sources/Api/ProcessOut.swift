@@ -32,13 +32,22 @@ public final class ProcessOut {
     }()
 
     /// Returns alternative payment methods service.
-    public private(set) lazy var alternativePaymentMethods: POAlternativePaymentMethodsService = {
-        let serviceConfiguration: () -> AlternativePaymentMethodsServiceConfiguration = { [unowned self] in
+    public private(set) lazy var alternativePayments: POAlternativePaymentsService = {
+        let serviceConfiguration = { @Sendable [unowned self] () -> AlternativePaymentsServiceConfiguration in
             let configuration = self.configuration
             return .init(projectId: configuration.projectId, baseUrl: configuration.environment.checkoutBaseUrl)
         }
-        return DefaultAlternativePaymentMethodsService(configuration: serviceConfiguration, logger: serviceLogger)
+        let webSession = DefaultWebAuthenticationSession()
+        return DefaultAlternativePaymentsService(
+            configuration: serviceConfiguration, webSession: webSession, logger: serviceLogger
+        )
     }()
+
+    /// Returns alternative payment methods service.
+    @available(*, deprecated, renamed: "alternativePayments")
+    public var alternativePaymentMethods: POAlternativePaymentsService {
+        alternativePayments
+    }
 
     /// Returns cards repository.
     public private(set) lazy var cards: POCardsService = {

@@ -18,19 +18,19 @@ final class DynamicCheckoutDefaultInteractor:
     init(
         configuration: PODynamicCheckoutConfiguration,
         delegate: PODynamicCheckoutDelegate?,
-        alternativePaymentSession: DynamicCheckoutAlternativePaymentSession,
         childProvider: DynamicCheckoutInteractorChildProvider,
         invoicesService: POInvoicesService,
         cardsService: POCardsService,
+        alternativePaymentsService: POAlternativePaymentsService,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         self.configuration = configuration
         self.delegate = delegate
-        self.alternativePaymentSession = alternativePaymentSession
         self.childProvider = childProvider
         self.invoicesService = invoicesService
         self.cardsService = cardsService
+        self.alternativePaymentsService = alternativePaymentsService
         self.logger = logger
         self.completion = completion
         super.init(state: .idle)
@@ -137,10 +137,10 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Private Properties
 
-    private let alternativePaymentSession: DynamicCheckoutAlternativePaymentSession
     private let childProvider: DynamicCheckoutInteractorChildProvider
     private let invoicesService: POInvoicesService
     private let cardsService: POCardsService
+    private let alternativePaymentsService: POAlternativePaymentsService
     private let completion: (Result<Void, POFailure>) -> Void
 
     private var logger: POLogger
@@ -459,7 +459,9 @@ final class DynamicCheckoutDefaultInteractor:
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
             do {
-                let response = try await alternativePaymentSession.start(url: method.configuration.redirectUrl)
+                let response = try await alternativePaymentsService.authenticate(
+                    using: method.configuration.redirectUrl
+                )
                 try await authorizeInvoice(
                     source: response.gatewayToken,
                     saveSource: false,
@@ -557,7 +559,7 @@ final class DynamicCheckoutDefaultInteractor:
             do {
                 var source = method.configuration.customerTokenId
                 if let redirectUrl = method.configuration.redirectUrl {
-                    source = try await alternativePaymentSession.start(url: redirectUrl).gatewayToken
+                    source = try await alternativePaymentsService.authenticate(using: redirectUrl).gatewayToken
                 }
                 try await authorizeInvoice(source: source, saveSource: false, startedState: startedState)
                 setSuccessState()

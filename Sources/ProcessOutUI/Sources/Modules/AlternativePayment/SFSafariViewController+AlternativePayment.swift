@@ -9,6 +9,7 @@ import Foundation
 import SafariServices
 @_spi(PO) import ProcessOut
 
+@available(*, deprecated, message: "Use ProcessOut.shared.alternativePayment directly to process payments.")
 extension SFSafariViewController {
 
     /// Creates view controller that is capable of handling Alternative Payment.

@@ -8,6 +8,7 @@
 import Foundation
 import ProcessOut
 
+@available(*, deprecated, message: "Use ProcessOut.shared.alternativePayment directly to process payments.")
 extension POWebAuthenticationSession {
 
     /// Creates session that is capable of handling alternative payment.

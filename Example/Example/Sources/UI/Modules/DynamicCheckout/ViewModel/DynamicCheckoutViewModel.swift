@@ -39,7 +39,7 @@ final class DynamicCheckoutViewModel: ObservableObject {
     private func startDynamicCheckout() async {
         let invoiceCreationRequest = POInvoiceCreationRequest(
             name: state.invoice.name,
-            amount: state.invoice.amount.description,
+            amount: state.invoice.amount,
             currency: state.invoice.currencyCode.selection,
             returnUrl: Constants.returnUrl,
             customerId: Constants.customerId
@@ -55,7 +55,6 @@ final class DynamicCheckoutViewModel: ObservableObject {
     private func continueDynamicCheckout(invoice: POInvoice) {
         let configuration = PODynamicCheckoutConfiguration(
             invoiceRequest: .init(invoiceId: invoice.id, clientSecret: invoice.clientSecret),
-            alternativePayment: .init(returnUrl: Constants.returnUrl),
             cancelButton: .init(confirmation: .init())
         )
         let item = DynamicCheckoutViewModelState.DynamicCheckout(
@@ -111,7 +110,7 @@ extension DynamicCheckoutViewModel: PODynamicCheckoutDelegate {
     ) async -> POInvoiceRequest? {
         let request = POInvoiceCreationRequest(
             name: UUID().uuidString,
-            amount: invoice.amount.description,
+            amount: invoice.amount,
             currency: invoice.currency,
             returnUrl: invoice.returnUrl,
             customerId: Constants.customerId
