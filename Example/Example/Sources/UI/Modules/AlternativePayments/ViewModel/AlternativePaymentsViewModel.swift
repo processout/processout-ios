@@ -78,13 +78,12 @@ final class AlternativePaymentsViewModel: ObservableObject {
     }
 
     private func updateStateFilters(with selectedFilter: POAllGatewayConfigurationsRequest.Filter) {
-        // todo(andrii-vysotskyi): support tokenization flow
         let sources: [AlternativePaymentsViewModelState.Filter] = [
             .init(id: .alternativePaymentMethods, name: String(localized: .AlternativePayments.Filter.all)),
-            // .init(
-            //    id: .alternativePaymentMethodsWithTokenization,
-            //    name: String(localized: .AlternativePayments.Filter.tokenizable)
-            // ),
+            .init(
+                id: .alternativePaymentMethodsWithTokenization,
+                name: String(localized: .AlternativePayments.Filter.tokenizable)
+            ),
             .init(id: .nativeAlternativePaymentMethods, name: String(localized: .AlternativePayments.Filter.native))
         ]
         let binding = Binding(
@@ -132,24 +131,26 @@ final class AlternativePaymentsViewModel: ObservableObject {
 
     private func startPayment() async {
         guard let gatewayConfigurationId = state.gatewayConfiguration?.selection else {
-            state.message = .init(text: "Please select a Gateway Configuration to proceed.", severity: .error)
             return
         }
         do {
             let invoice = try await interactor.createInvoice(
                 name: state.invoice.name,
                 amount: state.invoice.amount,
-                currencyCode: state.invoice.currencyCode.selection
+                currencyCode: state.invoice.currencyCode
             )
+            var authorizationSource = gatewayConfigurationId
             if state.preferNative {
                 try await authorizeNatively(invoice: invoice, gatewayConfigurationId: gatewayConfigurationId)
+            } else if state.shouldTokenize {
+                let token = try await interactor.tokenize(gatewayConfigurationId: gatewayConfigurationId)
+                try await interactor.authorize(invoice: invoice, customerToken: token)
+                authorizationSource = token.id
             } else {
                 try await interactor.authorize(invoice: invoice, gatewayConfigurationId: gatewayConfigurationId)
             }
             let successMessage = String(
-                localized: .AlternativePayments.successMessage,
-                replacements: invoice.id,
-                gatewayConfigurationId
+                localized: .AlternativePayments.successMessage, replacements: invoice.id, authorizationSource
             )
             state.message = .init(text: successMessage, severity: .success)
         } catch {
@@ -188,7 +189,8 @@ extension AlternativePaymentsViewModel {
         let interactor = AlternativePaymentsInteractor(
             gatewayConfigurationsRepository: ProcessOut.shared.gatewayConfigurations,
             invoicesService: ProcessOut.shared.invoices,
-            alternativePaymentsService: ProcessOut.shared.alternativePayments
+            alternativePaymentsService: ProcessOut.shared.alternativePayments,
+            tokensService: ProcessOut.shared.customerTokens
         )
         self.init(interactor: interactor)
     }

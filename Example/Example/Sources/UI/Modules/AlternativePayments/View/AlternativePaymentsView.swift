@@ -36,6 +36,10 @@ struct AlternativePaymentsView: View {
                     String(localized: .AlternativePayments.nativePreference),
                     isOn: $viewModel.state.preferNative
                 )
+                Toggle(
+                    String(localized: .AlternativePayments.tokenizationPreference),
+                    isOn: $viewModel.state.shouldTokenize
+                )
             } header: {
                 Text(.AlternativePayments.gateway)
             }

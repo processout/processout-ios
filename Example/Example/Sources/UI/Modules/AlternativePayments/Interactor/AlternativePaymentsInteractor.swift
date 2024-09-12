@@ -15,11 +15,13 @@ final class AlternativePaymentsInteractor {
     init(
         gatewayConfigurationsRepository: POGatewayConfigurationsRepository,
         invoicesService: POInvoicesService,
-        alternativePaymentsService: POAlternativePaymentsService
+        alternativePaymentsService: POAlternativePaymentsService,
+        tokensService: POCustomerTokensService
     ) {
         self.gatewayConfigurationsRepository = gatewayConfigurationsRepository
         self.invoicesService = invoicesService
         self.alternativePaymentsService = alternativePaymentsService
+        self.tokensService = tokensService
         state = .idle
     }
 
@@ -106,6 +108,35 @@ final class AlternativePaymentsInteractor {
         try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
     }
 
+    func tokenize(gatewayConfigurationId: String) async throws -> POCustomerToken {
+        let tokenCreationRequest = POCreateCustomerTokenRequest(
+            customerId: Example.Constants.customerId,
+            verify: true,
+            returnUrl: Example.Constants.returnUrl
+        )
+        let token = try await tokensService.createCustomerToken(request: tokenCreationRequest)
+        let tokenizationRequest = POAlternativePaymentTokenizationRequest(
+            customerId: Example.Constants.customerId,
+            tokenId: token.id,
+            gatewayConfigurationId: gatewayConfigurationId
+        )
+        let tokenAssignRequest = POAssignCustomerTokenRequest(
+            customerId: Example.Constants.customerId,
+            tokenId: token.id,
+            source: try await alternativePaymentsService.tokenize(request: tokenizationRequest).gatewayToken
+        )
+        let threeDSService = POTest3DSService(returnUrl: Example.Constants.returnUrl)
+        return try await tokensService.assignCustomerToken(request: tokenAssignRequest, threeDSService: threeDSService)
+    }
+
+    func authorize(invoice: POInvoice, customerToken: POCustomerToken) async throws {
+        let authorizationRequest = POInvoiceAuthorizationRequest(
+            invoiceId: invoice.id, source: customerToken.id
+        )
+        let threeDSService = POTest3DSService(returnUrl: Example.Constants.returnUrl)
+        try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {
@@ -117,4 +148,5 @@ final class AlternativePaymentsInteractor {
     private let gatewayConfigurationsRepository: POGatewayConfigurationsRepository
     private let invoicesService: POInvoicesService
     private let alternativePaymentsService: POAlternativePaymentsService
+    private let tokensService: POCustomerTokensService
 }
