@@ -17,19 +17,31 @@ public typealias POAlternativePaymentMethodsService = POAlternativePaymentsServi
 public protocol POAlternativePaymentsService: POService {
 
     /// Attempts to tokenize APM using given request.
+    ///
+    /// - NOTE: The underlying implementation uses `ASWebAuthenticationSession`, which triggers its
+    /// completion handler before dismissing the view controller. To avoid presentation issues, if you plan to perform
+    /// any UI-related tasks immediately after this method completes, consider adding a delay.
     func tokenize(request: POAlternativePaymentTokenizationRequest) async throws -> POAlternativePaymentResponse
 
     /// Authorizes invoice using given request.
+    ///
+    /// - NOTE: The underlying implementation uses `ASWebAuthenticationSession`, which triggers its
+    /// completion handler before dismissing the view controller. To avoid presentation issues, if you plan to perform
+    /// any UI-related tasks immediately after this method completes, consider adding a delay.
     func authorize(request: POAlternativePaymentAuthorizationRequest) async throws -> POAlternativePaymentResponse
+
+    /// Authenticates alternative payment using given raw URL.
+    ///
+    /// - NOTE: The underlying implementation uses `ASWebAuthenticationSession`, which triggers its
+    /// completion handler before dismissing the view controller. To avoid presentation issues, if you plan to perform
+    /// any UI-related tasks immediately after this method completes, consider adding a delay.
+    func authenticate(using url: URL) async throws -> POAlternativePaymentResponse
 
     /// Creates redirect URL for given tokenization request.
     func url(for request: POAlternativePaymentTokenizationRequest) throws -> URL
 
     /// Creates redirect URL for given authorization request.
     func url(for request: POAlternativePaymentAuthorizationRequest) throws -> URL
-
-    /// Authenticates alternative payment using given raw URL.
-    func authenticate(using url: URL) async throws -> POAlternativePaymentResponse
 
     /// Creates the redirection URL for APM Payments and APM token creation.
     ///
