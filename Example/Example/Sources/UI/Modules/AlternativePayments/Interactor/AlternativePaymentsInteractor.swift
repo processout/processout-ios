@@ -102,7 +102,9 @@ final class AlternativePaymentsInteractor {
         )
         let response = try await alternativePaymentsService.authorize(request: request)
         let authorizationRequest = POInvoiceAuthorizationRequest(
-            invoiceId: invoice.id, source: response.gatewayToken
+            invoiceId: invoice.id,
+            source: response.gatewayToken,
+            allowFallbackToSale: true
         )
         let threeDSService = POTest3DSService(returnUrl: Example.Constants.returnUrl)
         try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
@@ -130,11 +132,13 @@ final class AlternativePaymentsInteractor {
     }
 
     func authorize(invoice: POInvoice, customerToken: POCustomerToken) async throws {
-        let authorizationRequest = POInvoiceAuthorizationRequest(
-            invoiceId: invoice.id, source: customerToken.id
+        let invoiceAuthorizationRequest = POInvoiceAuthorizationRequest(
+            invoiceId: invoice.id,
+            source: customerToken.id,
+            allowFallbackToSale: true
         )
         let threeDSService = POTest3DSService(returnUrl: Example.Constants.returnUrl)
-        try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
+        try await invoicesService.authorizeInvoice(request: invoiceAuthorizationRequest, threeDSService: threeDSService)
     }
 
     // MARK: - Private Nested Types

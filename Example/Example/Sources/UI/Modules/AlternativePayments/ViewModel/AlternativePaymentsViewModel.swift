@@ -140,12 +140,12 @@ final class AlternativePaymentsViewModel: ObservableObject {
                 currencyCode: state.invoice.currencyCode
             )
             var authorizationSource = gatewayConfigurationId
-            if state.preferNative {
-                try await authorizeNatively(invoice: invoice, gatewayConfigurationId: gatewayConfigurationId)
-            } else if state.shouldTokenize {
+            if state.shouldTokenize {
                 let token = try await interactor.tokenize(gatewayConfigurationId: gatewayConfigurationId)
                 try await interactor.authorize(invoice: invoice, customerToken: token)
                 authorizationSource = token.id
+            } else if state.preferNative {
+                try await authorizeNatively(invoice: invoice, gatewayConfigurationId: gatewayConfigurationId)
             } else {
                 try await interactor.authorize(invoice: invoice, gatewayConfigurationId: gatewayConfigurationId)
             }
