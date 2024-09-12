@@ -15,12 +15,12 @@ final class UnfairLock {
         unfairLock.initialize(to: os_unfair_lock())
     }
 
-    func withLock<R>(_ body: () -> R) -> R {
+    func withLock<R>(_ body: () throws -> R) rethrows -> R {
         defer {
             os_unfair_lock_unlock(unfairLock)
         }
         os_unfair_lock_lock(unfairLock)
-        return body()
+        return try body()
     }
 
     deinit {
