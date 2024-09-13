@@ -18,7 +18,7 @@ public struct POAlternativePaymentAuthorizationRequest: Sendable {
     public let gatewayConfigurationId: String
 
     /// When value is set invoice is being authorized with previously tokenized APM.
-    public let tokenId: String?
+    public let customerTokenId: String?
 
     /// Additional Data that will be supplied to the APM.
     public let additionalData: [String: String]?
@@ -27,12 +27,12 @@ public struct POAlternativePaymentAuthorizationRequest: Sendable {
     public init(
         invoiceId: String,
         gatewayConfigurationId: String,
-        tokenId: String? = nil,
+        customerTokenId: String? = nil,
         additionalData: [String: String]? = nil
     ) {
         self.invoiceId = invoiceId
         self.gatewayConfigurationId = gatewayConfigurationId
-        self.tokenId = tokenId
+        self.customerTokenId = customerTokenId
         self.additionalData = additionalData
     }
 }

@@ -119,7 +119,7 @@ final class AlternativePaymentsInteractor {
         let token = try await tokensService.createCustomerToken(request: tokenCreationRequest)
         let tokenizationRequest = POAlternativePaymentTokenizationRequest(
             customerId: Example.Constants.customerId,
-            tokenId: token.id,
+            customerTokenId: token.id,
             gatewayConfigurationId: gatewayConfigurationId
         )
         let tokenAssignRequest = POAssignCustomerTokenRequest(

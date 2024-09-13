@@ -30,13 +30,13 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
     }
 
     func url(for request: POAlternativePaymentTokenizationRequest) throws -> URL {
-        let pathComponents = [request.customerId, request.tokenId, "redirect", request.gatewayConfigurationId]
+        let pathComponents = [request.customerId, request.customerTokenId, "redirect", request.gatewayConfigurationId]
         return try url(with: pathComponents, additionalData: request.additionalData)
     }
 
     func url(for request: POAlternativePaymentAuthorizationRequest) throws -> URL {
         var pathComponents = [request.invoiceId, "redirect", request.gatewayConfigurationId]
-        if let tokenId = request.tokenId {
+        if let tokenId = request.customerTokenId {
             pathComponents += ["tokenized", tokenId]
         }
         return try url(with: pathComponents, additionalData: request.additionalData)
@@ -60,7 +60,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
             if let customerId = request.customerId, let tokenId = request.tokenId {
                 let tokenizationRequest = POAlternativePaymentTokenizationRequest(
                     customerId: customerId,
-                    tokenId: tokenId,
+                    customerTokenId: tokenId,
                     gatewayConfigurationId: request.gatewayConfigurationId,
                     additionalData: request.additionalData
                 )
@@ -69,7 +69,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
             let authorizationRequest = POAlternativePaymentAuthorizationRequest(
                 invoiceId: request.invoiceId,
                 gatewayConfigurationId: request.gatewayConfigurationId,
-                tokenId: request.tokenId,
+                customerTokenId: request.tokenId,
                 additionalData: request.additionalData
             )
             return try url(for: authorizationRequest)
