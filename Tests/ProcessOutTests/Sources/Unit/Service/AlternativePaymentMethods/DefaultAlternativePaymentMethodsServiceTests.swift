@@ -44,7 +44,7 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
     func test_alternativePaymentMethodUrl_tokenization_succeeds() throws {
         let request = POAlternativePaymentTokenizationRequest(
             customerId: "cust_test",
-            tokenId: "tok_test",
+            customerTokenId: "tok_test",
             gatewayConfigurationId: "gway_conf_test"
         )
 
@@ -58,7 +58,7 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
 
     func test_alternativePaymentMethodUrl_authorizationWithToken_succeeds() throws {
         let request = POAlternativePaymentAuthorizationRequest(
-            invoiceId: "iv_test", gatewayConfigurationId: "gway_conf_test", tokenId: "tok_test"
+            invoiceId: "iv_test", gatewayConfigurationId: "gway_conf_test", customerTokenId: "tok_test"
         )
 
         // When
