@@ -24,10 +24,7 @@ struct ConfigurationViewModelState {
     var projectKey: String
 
     /// Available environments.
-    var environments: [Environment]
-
-    /// Selected environment.
-    var selectedEnvironment: ProcessOutConfiguration.Environment
+    var environments: PickerData<Environment, ProcessOutConfiguration.Environment>
 
     /// Customer ID.
     var customerId: String
@@ -42,12 +39,15 @@ extension ConfigurationViewModelState {
     static let idle = ConfigurationViewModelState(
         projectId: "",
         projectKey: "",
-        environments: [
-            .init(id: .production, name: String(localized: .Configuration.productionEnvironment)),
-            .init(id: .stage, name: String(localized: .Configuration.stageEnvironment))
-        ],
-        selectedEnvironment: .production,
+        environments: .init(sources: environmentSources, id: \.id, selection: .production),
         customerId: "",
         merchantId: ""
     )
+
+    // MARK: - Private
+
+    private static let environmentSources: [Environment] = [
+        .init(id: .production, name: String(localized: .Configuration.productionEnvironment)),
+        .init(id: .stage, name: String(localized: .Configuration.stageEnvironment))
+    ]
 }

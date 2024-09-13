@@ -21,10 +21,8 @@ struct ConfigurationView: View {
                         String(localized: .Configuration.privateKey),
                         text: $viewModel.state.projectKey
                     )
-                    Picker(selection: $viewModel.state.selectedEnvironment) {
-                        ForEach(viewModel.state.environments) { environment in
-                            Text(environment.name)
-                        }
+                    Picker(data: $viewModel.state.environments) { environment in
+                        Text(environment.name)
                     } label: {
                         Text(.Configuration.environment)
                     }
