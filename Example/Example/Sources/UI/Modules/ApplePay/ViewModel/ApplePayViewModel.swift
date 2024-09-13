@@ -55,7 +55,7 @@ final class ApplePayViewModel: ObservableObject {
         do {
             var invoice: POInvoice! // swiftlint:disable:this implicitly_unwrapped_optional
             let invoiceCreationRequest = POInvoiceCreationRequest(
-                name: state.invoice.name,
+                name: UUID().uuidString,
                 amount: state.invoice.amount,
                 currency: state.invoice.currencyCode
             )

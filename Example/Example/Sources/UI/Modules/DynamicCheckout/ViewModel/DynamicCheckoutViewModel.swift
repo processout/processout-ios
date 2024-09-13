@@ -38,7 +38,7 @@ final class DynamicCheckoutViewModel: ObservableObject {
     @MainActor
     private func startDynamicCheckout() async {
         let invoiceCreationRequest = POInvoiceCreationRequest(
-            name: state.invoice.name,
+            name: UUID().uuidString,
             amount: state.invoice.amount,
             currency: state.invoice.currencyCode,
             returnUrl: Constants.returnUrl,
