@@ -50,6 +50,8 @@ final class ConfigurationViewModel: ObservableObject {
             state.projectKey = configuration.projectKey ?? ""
             state.customerId = configuration.customerId ?? ""
             state.merchantId = configuration.merchantId ?? ""
+            // Scanning configuration from QR is useful during development so environment is set to stage.
+            state.environments.selection = .stage
             configureProcessOutWithCurrentState()
         } catch {
             // Errors are ignored
@@ -66,7 +68,7 @@ final class ConfigurationViewModel: ObservableObject {
         let configuration = Constants.projectConfiguration
         state.projectId = configuration.projectId
         state.projectKey = configuration.privateKey ?? ""
-        state.selectedEnvironment = configuration.environment
+        state.environments.selection = configuration.environment
         state.customerId = Constants.customerId
         state.merchantId = Constants.merchantId ?? ""
     }
@@ -75,7 +77,7 @@ final class ConfigurationViewModel: ObservableObject {
         let configuration = ProcessOutConfiguration(
             projectId: state.projectId,
             privateKey: state.projectKey,
-            environment: state.selectedEnvironment
+            environment: state.environments.selection
         )
         Constants.projectConfiguration = configuration
         Constants.customerId = state.customerId

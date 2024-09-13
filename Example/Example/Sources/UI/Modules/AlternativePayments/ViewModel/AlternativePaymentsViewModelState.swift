@@ -53,6 +53,9 @@ struct AlternativePaymentsViewModelState {
     /// Boolean value indicating whether native flow should be preferred if available.
     var preferNative = false
 
+    /// Boolean value indicating whether payment method should be tokenized before authorizing invoice.
+    var shouldTokenize = false
+
     /// Currently presented native alternative payment.
     var nativePayment: NativePayment?
 

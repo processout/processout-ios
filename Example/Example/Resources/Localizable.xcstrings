@@ -111,6 +111,16 @@
         }
       }
     },
+    "alternative-payments.tokenization-preference" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Should Tokenize"
+          }
+        }
+      }
+    },
     "apple-pay.error-message" : {
       "localizations" : {
         "en" : {

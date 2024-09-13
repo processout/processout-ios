@@ -40,7 +40,7 @@ final class DynamicCheckoutViewModel: ObservableObject {
         let invoiceCreationRequest = POInvoiceCreationRequest(
             name: state.invoice.name,
             amount: state.invoice.amount,
-            currency: state.invoice.currencyCode.selection,
+            currency: state.invoice.currencyCode,
             returnUrl: Constants.returnUrl,
             customerId: Constants.customerId
         )

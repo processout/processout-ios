@@ -24,11 +24,10 @@ struct InvoiceView: View {
                 String(localized: .Invoice.amount), value: $viewModel.amount, format: .number
             )
             .keyboardType(.decimalPad)
-            Picker(data: $viewModel.currencyCode) { code in
-                Text(code.identifier)
-            } label: {
-                Text(.Invoice.currency)
-            }
+            TextField(
+                String(localized: .Invoice.currency), text: $viewModel.currencyCode
+            )
+            .keyboardType(.asciiCapable)
         } header: {
             Text(.Invoice.title)
         }

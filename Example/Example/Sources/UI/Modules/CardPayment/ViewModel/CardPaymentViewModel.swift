@@ -73,7 +73,7 @@ extension CardPaymentViewModel: POCardTokenizationDelegate {
         let invoiceCreationRequest = POInvoiceCreationRequest(
             name: state.invoice.name,
             amount: state.invoice.amount,
-            currency: state.invoice.currencyCode.selection,
+            currency: state.invoice.currencyCode,
             returnUrl: Constants.returnUrl
         )
         let invoice = try await invoicesService.createInvoice(request: invoiceCreationRequest)
