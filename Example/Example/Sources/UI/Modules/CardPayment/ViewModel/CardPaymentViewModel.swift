@@ -76,7 +76,7 @@ final class CardPaymentViewModel: ObservableObject {
             )
             return try await invoicesService.createInvoice(request: request)
         } else {
-            let request = POInvoiceRequest(invoiceId: state.invoice.id)
+            let request = POInvoiceRequest(invoiceId: state.invoice.id, attachPrivateKey: true)
             return try await invoicesService.invoice(request: request)
         }
     }

@@ -50,7 +50,8 @@ final class HttpInvoicesRepository: InvoicesRepository {
         let httpRequest = HttpConnectorRequest<Response>.get(
             path: "/invoices/\(request.invoiceId)",
             query: ["expand": "transaction"],
-            headers: headers.compactMapValues { $0 }
+            headers: headers.compactMapValues { $0 },
+            requiresPrivateKey: request.attachPrivateKey
         )
         return try await connector.execute(request: httpRequest).invoice
     }

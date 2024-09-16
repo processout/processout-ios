@@ -83,7 +83,7 @@ final class AlternativePaymentsInteractor {
     }
 
     func invoice(id: String) async throws -> POInvoice {
-        let request = POInvoiceRequest(invoiceId: id)
+        let request = POInvoiceRequest(invoiceId: id, attachPrivateKey: true)
         return try await invoicesService.invoice(request: request)
     }
 
