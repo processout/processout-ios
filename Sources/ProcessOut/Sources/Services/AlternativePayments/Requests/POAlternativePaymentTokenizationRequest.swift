@@ -15,7 +15,7 @@ public struct POAlternativePaymentTokenizationRequest: Sendable {
     public let customerId: String
 
     /// Customer token ID that may be used for creating APM recurring token.
-    public let tokenId: String
+    public let customerTokenId: String
 
     /// Gateway Configuration ID of the APM the payment will be made on.
     public let gatewayConfigurationId: String
@@ -26,12 +26,12 @@ public struct POAlternativePaymentTokenizationRequest: Sendable {
     /// Creates tokenization request.
     public init(
         customerId: String,
-        tokenId: String,
+        customerTokenId: String,
         gatewayConfigurationId: String,
         additionalData: [String: String]? = nil
     ) {
         self.customerId = customerId
-        self.tokenId = tokenId
+        self.customerTokenId = customerTokenId
         self.gatewayConfigurationId = gatewayConfigurationId
         self.additionalData = additionalData
     }
