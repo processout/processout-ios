@@ -37,15 +37,8 @@ final class DynamicCheckoutViewModel: ObservableObject {
 
     @MainActor
     private func startDynamicCheckout() async {
-        let invoiceCreationRequest = POInvoiceCreationRequest(
-            name: state.invoice.name,
-            amount: state.invoice.amount,
-            currency: state.invoice.currencyCode,
-            returnUrl: Constants.returnUrl,
-            customerId: Constants.customerId
-        )
         do {
-            let invoice = try await self.invoicesService.createInvoice(request: invoiceCreationRequest)
+            let invoice = try await createInvoice()
             continueDynamicCheckout(invoice: invoice)
         } catch {
             setMessage(with: error)
@@ -86,6 +79,21 @@ final class DynamicCheckoutViewModel: ObservableObject {
             errorMessage = failure.message
         }
         state.message = .init(text: errorMessage ?? String(localized: .DynamicCheckout.errorMessage), severity: .error)
+    }
+
+    private func createInvoice() async throws -> POInvoice {
+        if state.invoice.id.isEmpty {
+            let request = POInvoiceCreationRequest(
+                name: UUID().uuidString,
+                amount: state.invoice.amount,
+                currency: state.invoice.currencyCode,
+                returnUrl: Constants.returnUrl
+            )
+            return try await invoicesService.createInvoice(request: request)
+        } else {
+            let request = POInvoiceRequest(invoiceId: state.invoice.id)
+            return try await invoicesService.invoice(request: request)
+        }
     }
 }
 

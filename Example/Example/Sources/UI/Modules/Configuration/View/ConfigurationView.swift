@@ -63,15 +63,9 @@ struct ConfigurationView: View {
                 }
             }
             .sheet(isPresented: $isScannerPresented) {
-                VStack {
-                    ConfigurationScannerView { code in
-                        viewModel.didScanConfiguration(code)
-                    }
-                    Spacer()
+                ConfigurationScannerView { code in
+                    viewModel.didScanConfiguration(code)
                 }
-                .presentationCornerRadius(16)
-                .presentationDragIndicator(.visible)
-                .presentationDetents([.fraction(0.5)])
             }
         }
         .onReceive(viewModel.dismiss) {

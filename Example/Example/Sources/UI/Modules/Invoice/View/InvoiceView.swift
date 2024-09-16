@@ -17,9 +17,25 @@ struct InvoiceView: View {
 
     var body: some View {
         Section {
-            TextField(
-                String(localized: .Invoice.name), text: $viewModel.name
-            )
+            HStack {
+                TextField(
+                    String(localized: .Invoice.id), text: $viewModel.id
+                )
+                .keyboardType(.asciiCapable)
+                Button(
+                    action: {
+                        isScannerPresented = true
+                    },
+                    label: {
+                        Image(systemName: "qrcode.viewfinder")
+                    }
+                )
+            }
+            .sheet(isPresented: $isScannerPresented) {
+                ConfigurationScannerView { invoiceId in
+                    viewModel.id = invoiceId
+                }
+            }
             TextField(
                 String(localized: .Invoice.amount), value: $viewModel.amount, format: .number
             )
@@ -37,4 +53,7 @@ struct InvoiceView: View {
 
     @Binding
     private var viewModel: InvoiceViewModel
+
+    @State
+    private var isScannerPresented = false
 }
