@@ -53,14 +53,8 @@ final class ApplePayViewModel: ObservableObject {
 
     private func createInvoiceAndAuthorize(request: PKPaymentRequest) async {
         do {
-            var invoice: POInvoice! // swiftlint:disable:this implicitly_unwrapped_optional
-            let invoiceCreationRequest = POInvoiceCreationRequest(
-                name: state.invoice.name,
-                amount: state.invoice.amount,
-                currency: state.invoice.currencyCode
-            )
+            let invoice = try await createInvoice()
             let coordinator = ApplePayTokenizationCoordinator { [invoicesService] card in
-                invoice = try await invoicesService.createInvoice(request: invoiceCreationRequest)
                 let authorizationRequest = POInvoiceAuthorizationRequest(
                     invoiceId: invoice.id, source: card.id
                 )
@@ -74,6 +68,21 @@ final class ApplePayViewModel: ObservableObject {
             setSuccessMessage(invoice: invoice, card: card)
         } catch {
             state.message = .init(text: String(localized: .ApplePay.errorMessage), severity: .error)
+        }
+    }
+
+    private func createInvoice() async throws -> POInvoice {
+        if state.invoice.id.isEmpty {
+            let request = POInvoiceCreationRequest(
+                name: UUID().uuidString,
+                amount: state.invoice.amount,
+                currency: state.invoice.currencyCode,
+                returnUrl: Constants.returnUrl
+            )
+            return try await invoicesService.createInvoice(request: request)
+        } else {
+            let request = POInvoiceRequest(invoiceId: state.invoice.id)
+            return try await invoicesService.invoice(request: request)
         }
     }
 

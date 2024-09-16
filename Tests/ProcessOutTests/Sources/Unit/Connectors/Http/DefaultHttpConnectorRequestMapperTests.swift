@@ -139,7 +139,7 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
 
         // Then
         let authorization = urlRequest.value(forHTTPHeaderField: "Authorization")
-        XCTAssertEqual(authorization, "Basic PElEPjo=")
+        XCTAssertEqual(authorization, "Basic PElEPjo8S0VZPg==")
     }
 
     func test_urlRequest_whenPrivateKeyIsRequired_addsAuthorization() async throws {

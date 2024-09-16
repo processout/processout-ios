@@ -11,6 +11,9 @@ extension LocalizedStringResource {
 
     enum Invoice {
 
+        /// Invoice ID.
+        static let id = LocalizedStringResource("invoice.id")
+
         /// Title.
         static let title = LocalizedStringResource("invoice.title")
 

@@ -451,6 +451,16 @@
         }
       }
     },
+    "invoice.id" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID (optional)"
+          }
+        }
+      }
+    },
     "invoice.name" : {
       "localizations" : {
         "en" : {

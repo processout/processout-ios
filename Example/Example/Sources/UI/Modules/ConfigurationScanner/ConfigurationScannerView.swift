@@ -39,9 +39,13 @@ struct ConfigurationScannerView: View {
                 .background(Color(UIColor.secondarySystemBackground))
                 .cornerRadius(8)
                 .fixedSize(horizontal: false, vertical: true)
+            Spacer()
         }
         .frame(maxWidth: .infinity)
         .padding(32)
+        .presentationCornerRadius(16)
+        .presentationDragIndicator(.visible)
+        .presentationDetents([.fraction(0.5)])
     }
 
     // MARK: - Private Properties

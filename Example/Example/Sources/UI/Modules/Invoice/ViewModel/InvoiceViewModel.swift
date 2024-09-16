@@ -9,8 +9,8 @@ import Foundation
 
 struct InvoiceViewModel {
 
-    /// Invoice name.
-    var name: String
+    /// Invoice ID.
+    var id: String
 
     /// Invoice amount.
     var amount: Decimal
@@ -23,8 +23,8 @@ extension InvoiceViewModel {
 
     /// Convenience init to create default view model.
     init() {
-        self.name = UUID().uuidString
-        self.amount = 100
+        id = ""
+        amount = 100
         currencyCode = "USD"
     }
 }

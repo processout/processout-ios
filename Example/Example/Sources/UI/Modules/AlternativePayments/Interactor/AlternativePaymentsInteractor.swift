@@ -82,9 +82,14 @@ final class AlternativePaymentsInteractor {
         _ = await task.result
     }
 
-    func createInvoice(name: String, amount: Decimal, currencyCode: String) async throws -> POInvoice {
+    func invoice(id: String) async throws -> POInvoice {
+        let request = POInvoiceRequest(invoiceId: id)
+        return try await invoicesService.invoice(request: request)
+    }
+
+    func createInvoice(amount: Decimal, currencyCode: String) async throws -> POInvoice {
         let request = POInvoiceCreationRequest(
-            name: name,
+            name: UUID().uuidString,
             amount: amount,
             currency: currencyCode,
             returnUrl: Example.Constants.returnUrl,

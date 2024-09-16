@@ -134,11 +134,13 @@ final class AlternativePaymentsViewModel: ObservableObject {
             return
         }
         do {
-            let invoice = try await interactor.createInvoice(
-                name: state.invoice.name,
-                amount: state.invoice.amount,
-                currencyCode: state.invoice.currencyCode
-            )
+            let invoice = if state.invoice.id.isEmpty {
+                try await interactor.createInvoice(
+                    amount: state.invoice.amount, currencyCode: state.invoice.currencyCode
+                )
+            } else {
+                try await interactor.invoice(id: state.invoice.id)
+            }
             var authorizationSource = gatewayConfigurationId
             if state.shouldTokenize {
                 let token = try await interactor.tokenize(gatewayConfigurationId: gatewayConfigurationId)
