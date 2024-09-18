@@ -108,11 +108,6 @@ final class Checkout3DSService: PO3DS2Service {
         }
     }
 
-    func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        // Redirection is simply forwarded to delegate without additional validations.
-        delegate.handle(redirect: redirect, completion: completion)
-    }
-
     // MARK: - Private Nested Types
 
     private typealias State = Checkout3DSServiceState

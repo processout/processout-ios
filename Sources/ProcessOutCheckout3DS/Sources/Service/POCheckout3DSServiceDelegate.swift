@@ -35,6 +35,7 @@ public protocol POCheckout3DSServiceDelegate: AnyObject {
 
     /// Asks delegate to handle 3DS redirect. See documentation of `PO3DSService/handle(redirect:completion:)`
     /// for more details.
+    @available(*, deprecated, message: "Redirects are handled internally.")
     func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void)
 }
 
@@ -64,5 +65,10 @@ extension POCheckout3DSServiceDelegate {
 
     public func shouldContinue(with warnings: Set<Checkout3DS.Warning>, completion: @escaping (Bool) -> Void) {
         completion(true)
+    }
+
+    @available(*, deprecated, message: "Redirects are handled internally.")
+    public func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
+        preconditionFailure("Should never be called.")
     }
 }
