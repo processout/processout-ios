@@ -34,7 +34,7 @@ extension PO3DSService {
     /// Asks implementation to create request that will be passed to 3DS Server to create the AReq.
     func authenticationRequest(configuration: PO3DS2Configuration) async throws -> PO3DS2AuthenticationRequest {
         try await withUnsafeThrowingContinuation { continuation in
-            authenticationRequest(configuration: configuration, completion: continuation.resume)
+            authenticationRequest(configuration: configuration) { continuation.resume(with: $0) }
         }
     }
 
@@ -43,7 +43,7 @@ extension PO3DSService {
     /// with failure indicating what went wrong.
     func handle(challenge: PO3DS2Challenge) async throws -> Bool {
         try await withUnsafeThrowingContinuation { continuation in
-            handle(challenge: challenge, completion: continuation.resume)
+            handle(challenge: challenge) { continuation.resume(with: $0) }
         }
     }
 
@@ -52,7 +52,7 @@ extension PO3DSService {
     /// ``POFailure/code-swift.property`` set to ``POFailure/TimeoutCode/mobile``.
     func handle(redirect: PO3DSRedirect) async throws -> String {
         try await withUnsafeThrowingContinuation { continuation in
-            handle(redirect: redirect, completion: continuation.resume)
+            handle(redirect: redirect) { continuation.resume(with: $0) }
         }
     }
 }
