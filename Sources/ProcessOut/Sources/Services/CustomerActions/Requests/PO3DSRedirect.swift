@@ -8,6 +8,7 @@
 import Foundation
 
 /// Holds information about 3DS redirect.
+@available(*, deprecated, message: "Redirects are handled internally.")
 public struct PO3DSRedirect: Hashable {
 
     /// Redirect url.

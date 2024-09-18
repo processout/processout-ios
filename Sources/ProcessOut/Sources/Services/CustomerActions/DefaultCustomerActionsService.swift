@@ -7,28 +7,39 @@
 
 import Foundation
 
+@MainActor
 final class DefaultCustomerActionsService: CustomerActionsService {
 
-    init(decoder: JSONDecoder, encoder: JSONEncoder, jsonWritingOptions: JSONSerialization.WritingOptions = []) {
+    nonisolated init(
+        decoder: JSONDecoder,
+        encoder: JSONEncoder,
+        jsonWritingOptions: JSONSerialization.WritingOptions = [],
+        webSession: WebAuthenticationSession
+    ) {
         self.decoder = decoder
         self.encoder = encoder
         self.jsonWritingOptions = jsonWritingOptions
+        self.webSession = webSession
     }
 
     // MARK: - CustomerActionsService
 
     func handle(action: _CustomerAction, threeDSService: PO3DSService) async throws -> String {
-        // todo(andrii-vysotskyi): when async delegate methods are publicly available ensure
-        // that thrown errors are mapped to POFailure if needed.
-        switch action.type {
-        case .fingerprintMobile:
-            return try await fingerprint(encodedConfiguration: action.value, threeDSService: threeDSService)
-        case .challengeMobile:
-            return try await challenge(encodedChallenge: action.value, threeDSService: threeDSService)
-        case .fingerprint:
-            return try await fingerprint(url: action.value, threeDSService: threeDSService)
-        case .redirect, .url:
-            return try await redirect(url: action.value, threeDSService: threeDSService)
+        do {
+            switch action.type {
+            case .fingerprintMobile:
+                return try await fingerprint(encodedConfiguration: action.value, threeDSService: threeDSService)
+            case .challengeMobile:
+                return try await challenge(encodedChallenge: action.value, threeDSService: threeDSService)
+            case .fingerprint:
+                return try await fingerprint(url: action.value)
+            case .redirect, .url:
+                return try await redirect(url: action.value)
+            }
+        } catch let error as POFailure {
+            throw error
+        } catch {
+            throw POFailure(code: .generic(.mobile), underlyingError: error)
         }
     }
 
@@ -37,8 +48,6 @@ final class DefaultCustomerActionsService: CustomerActionsService {
     private enum Constants {
         static let deviceChannel = "app"
         static let tokenPrefix = "gway_req_"
-        static let challengeSuccessEncodedResponse = "eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiWVwiIH0ifQ=="
-        static let challengeFailureEncodedResponse = "eyJib2R5IjoieyBcInRyYW5zU3RhdHVzXCI6IFwiTlwiIH0ifQ=="
         static let fingerprintTimeoutResponseBody = #"{ "threeDS2FingerprintTimeout": true }"#
         static let webFingerprintTimeout: TimeInterval = 10
     }
@@ -53,33 +62,48 @@ final class DefaultCustomerActionsService: CustomerActionsService {
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
     private let jsonWritingOptions: JSONSerialization.WritingOptions
+    private let webSession: WebAuthenticationSession
 
-    // MARK: - Private Methods
+    // MARK: - Native 3DS
 
     private func fingerprint(encodedConfiguration: String, threeDSService: PO3DSService) async throws -> String {
         let configuration = try decode(PO3DS2Configuration.self, from: encodedConfiguration)
-        let request = try await threeDSService.authenticationRequest(configuration: configuration)
-        let response = AuthenticationResponse(url: nil, body: try self.encode(request: request))
+        let requestParameters = try await threeDSService.authenticationRequest(configuration: configuration)
+        let response = AuthenticationResponse(url: nil, body: try self.encode(requestParameters: requestParameters))
         return try encode(authenticationResponse: response)
     }
 
     private func challenge(encodedChallenge: String, threeDSService: PO3DSService) async throws -> String {
-        let challenge = try decode(PO3DS2Challenge.self, from: encodedChallenge)
-        let success = try await threeDSService.handle(challenge: challenge)
-        let encodedResponse = success
-            ? Constants.challengeSuccessEncodedResponse
-            : Constants.challengeFailureEncodedResponse
-        return Constants.tokenPrefix + encodedResponse
+        let parameters = try decode(PO3DS2ChallengeParameters.self, from: encodedChallenge)
+        let result = try await threeDSService.handle(challenge: parameters)
+        let encodedChallengeResult: String
+        do {
+            encodedChallengeResult = try String(decoding: encoder.encode(result), as: UTF8.self)
+        } catch {
+            let message = "Did fail to encode CRES result."
+            throw POFailure(message: message, code: .internal(.mobile), underlyingError: error)
+        }
+        let response = AuthenticationResponse(url: nil, body: encodedChallengeResult)
+        return try encode(authenticationResponse: response)
     }
 
-    private func fingerprint(url: String, threeDSService: PO3DSService) async throws -> String {
+    // MARK: - Redirects
+
+    private func fingerprint(url: String) async throws -> String {
         guard let url = URL(string: url) else {
             let message = "Unable to create URL from string: \(url)."
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
-        let context = PO3DSRedirect(url: url, timeout: Constants.webFingerprintTimeout)
         do {
-            return try await threeDSService.handle(redirect: context)
+            let returnUrl = try await withTimeout(
+                Constants.webFingerprintTimeout,
+                error: POFailure(code: .timeout(.mobile)),
+                perform: {
+                    try await self.webSession.authenticate(using: url)
+                }
+            )
+            let queryItems = URLComponents(string: returnUrl.absoluteString)?.queryItems
+            return queryItems?.first { $0.name == "token" }?.value ?? ""
         } catch let failure as POFailure where failure.code == .timeout(.mobile) {
             // Fingerprinting timeout is treated differently from other errors.
             let response = AuthenticationResponse(url: url, body: Constants.fingerprintTimeoutResponseBody)
@@ -87,13 +111,14 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         }
     }
 
-    private func redirect(url: String, threeDSService: PO3DSService) async throws -> String {
+    private func redirect(url: String) async throws -> String {
         guard let url = URL(string: url) else {
             let message = "Unable to create URL from string: \(url)."
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
-        let context = PO3DSRedirect(url: url, timeout: nil)
-        return try await threeDSService.handle(redirect: context)
+        let returnUrl = try await self.webSession.authenticate(using: url)
+        let queryItems = URLComponents(string: returnUrl.absoluteString)?.queryItems
+        return queryItems?.first { $0.name == "token" }?.value ?? ""
     }
 
     // MARK: - Coding
@@ -113,20 +138,20 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         }
     }
 
-    private func encode(request: PO3DS2AuthenticationRequest) throws -> String {
+    private func encode(requestParameters parameters: PO3DS2AuthenticationRequestParameters) throws -> String {
         do {
             // Using JSONSerialization helps avoid creating boilerplate objects for JSON Web Key for coding.
             // Implementation doesn't validate JWK correctness and simply re-encodes given value.
             let sdkEphemeralPublicKey = try JSONSerialization.jsonObject(
-                with: Data(request.sdkEphemeralPublicKey.utf8)
+                with: Data(parameters.sdkEphemeralPublicKey.utf8)
             )
             let requestParameters = [
                 "deviceChannel": Constants.deviceChannel,
-                "sdkAppID": request.sdkAppId,
+                "sdkAppID": parameters.sdkAppId,
                 "sdkEphemPubKey": sdkEphemeralPublicKey,
-                "sdkReferenceNumber": request.sdkReferenceNumber,
-                "sdkTransID": request.sdkTransactionId,
-                "sdkEncData": request.deviceData
+                "sdkReferenceNumber": parameters.sdkReferenceNumber,
+                "sdkTransID": parameters.sdkTransactionId,
+                "sdkEncData": parameters.deviceData
             ]
             let requestParametersData = try JSONSerialization.data(
                 withJSONObject: requestParameters, options: jsonWritingOptions
@@ -138,14 +163,12 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         }
     }
 
-    // MARK: - Utils
-
     /// Encodes given response and creates token with it.
     private func encode(authenticationResponse: AuthenticationResponse) throws -> String {
         do {
             return try Constants.tokenPrefix + encoder.encode(authenticationResponse).base64EncodedString()
         } catch {
-            let message = "Did fail to encode AREQ parameters."
+            let message = "Did fail to encode authentication result."
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: error)
         }
     }

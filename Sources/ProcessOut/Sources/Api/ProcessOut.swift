@@ -39,7 +39,6 @@ public final class ProcessOut {
             let configuration = self.configuration
             return .init(projectId: configuration.projectId, baseUrl: configuration.environment.checkoutBaseUrl)
         }
-        let webSession = DefaultWebAuthenticationSession()
         return DefaultAlternativePaymentsService(
             configuration: serviceConfiguration, webSession: webSession, logger: serviceLogger
         )
@@ -152,8 +151,10 @@ public final class ProcessOut {
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        return DefaultCustomerActionsService(decoder: decoder, encoder: encoder)
+        return DefaultCustomerActionsService(decoder: decoder, encoder: encoder, webSession: webSession)
     }()
+
+    private let webSession = DefaultWebAuthenticationSession()
 
     // MARK: - Private Methods
 
