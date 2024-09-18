@@ -95,15 +95,10 @@ final class DefaultCustomerActionsService: CustomerActionsService {
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
         do {
-            let returnUrl = try await withTimeout(
-                Constants.webFingerprintTimeout,
-                error: POFailure(code: .timeout(.mobile)),
-                perform: {
-                    try await self.webSession.authenticate(using: url)
-                }
-            )
-            let queryItems = URLComponents(string: returnUrl.absoluteString)?.queryItems
-            return queryItems?.first { $0.name == "token" }?.value ?? ""
+            let timeoutError = POFailure(code: .timeout(.mobile))
+            return try await withTimeout(Constants.webFingerprintTimeout, error: timeoutError) {
+                try await self.redirect(url: url.absoluteString)
+            }
         } catch let failure as POFailure where failure.code == .timeout(.mobile) {
             // Fingerprinting timeout is treated differently from other errors.
             let response = AuthenticationResponse(url: url, body: Constants.fingerprintTimeoutResponseBody)
