@@ -21,19 +21,19 @@ public final class POTest3DSService: PO3DSService {
 
     public func authenticationRequest(
         configuration: PO3DS2Configuration,
-        completion: @escaping (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
+        completion: @escaping (Result<PO3DS2AuthenticationRequestParameters, POFailure>) -> Void
     ) {
-        let request = PO3DS2AuthenticationRequest(
+        let parameters = PO3DS2AuthenticationRequestParameters(
             deviceData: "",
             sdkAppId: "",
             sdkEphemeralPublicKey: "{}",
             sdkReferenceNumber: "",
             sdkTransactionId: ""
         )
-        completion(.success(request))
+        completion(.success(parameters))
     }
 
-    public func handle(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
+    public func handle(challenge: PO3DS2ChallengeParameters, completion: @escaping (Result<Bool, POFailure>) -> Void) {
         guard let presentingViewController = PresentingViewControllerProvider.find() else {
             completion(.success(false))
             return
@@ -50,17 +50,6 @@ public final class POTest3DSService: PO3DSService {
         }
         alertController.addAction(rejectAction)
         presentingViewController.present(alertController, animated: true)
-    }
-
-    public func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        Task { @MainActor in
-            let session = POWebAuthenticationSession(redirect: redirect, returnUrl: returnUrl, completion: completion)
-            if await session.start() {
-                return
-            }
-            let failure = POFailure(message: "Unable to process redirect", code: .generic(.mobile))
-            completion(.failure(failure))
-        }
     }
 
     // MARK: - Private Properties

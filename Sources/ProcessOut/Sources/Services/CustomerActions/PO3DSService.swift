@@ -29,10 +29,10 @@ public protocol PO3DSService: AnyObject {
     func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void)
 }
 
-@MainActor
 extension PO3DSService {
 
     /// Asks implementation to create request that will be passed to 3DS Server to create the AReq.
+    @MainActor
     func authenticationRequest(
         configuration: PO3DS2Configuration
     ) async throws -> PO3DS2AuthenticationRequestParameters {
@@ -44,6 +44,7 @@ extension PO3DSService {
     /// Implementation must handle given 3DS2 challenge and call completion with result. Use `true` if challenge
     /// was handled successfully, if transaction was denied, pass `false`. In all other cases, call completion
     /// with failure indicating what went wrong.
+    @MainActor
     func handle(challenge: PO3DS2ChallengeParameters) async throws -> Bool {
         try await withUnsafeThrowingContinuation { continuation in
             handle(challenge: challenge) { continuation.resume(with: $0) }
@@ -51,7 +52,7 @@ extension PO3DSService {
     }
 
     @available(*, deprecated, message: "Redirects are handled internally.")
-    func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
+    public func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
         let failure = POFailure(message: "Unexpected method invocation.", code: .generic(.mobile))
         completion(.failure(failure))
     }

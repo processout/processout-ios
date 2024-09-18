@@ -8,6 +8,7 @@
 import SafariServices
 @_spi(PO) import ProcessOut
 
+@available(*, deprecated, message: "Redirects are handled internally.")
 extension SFSafariViewController {
 
     /// Creates view controller that can handle 3DS Redirects.
