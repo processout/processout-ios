@@ -111,7 +111,7 @@ final class AlternativePaymentsInteractor {
             source: response.gatewayToken,
             allowFallbackToSale: true
         )
-        let threeDSService = POTest3DSService(returnUrl: Example.Constants.returnUrl)
+        let threeDSService = POTest3DSService()
         try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
     }
 
@@ -132,7 +132,7 @@ final class AlternativePaymentsInteractor {
             tokenId: token.id,
             source: try await alternativePaymentsService.tokenize(request: tokenizationRequest).gatewayToken
         )
-        let threeDSService = POTest3DSService(returnUrl: Example.Constants.returnUrl)
+        let threeDSService = POTest3DSService()
         return try await tokensService.assignCustomerToken(request: tokenAssignRequest, threeDSService: threeDSService)
     }
 
@@ -142,7 +142,7 @@ final class AlternativePaymentsInteractor {
             source: customerToken.id,
             allowFallbackToSale: true
         )
-        let threeDSService = POTest3DSService(returnUrl: Example.Constants.returnUrl)
+        let threeDSService = POTest3DSService()
         try await invoicesService.authorizeInvoice(request: invoiceAuthorizationRequest, threeDSService: threeDSService)
     }
 
