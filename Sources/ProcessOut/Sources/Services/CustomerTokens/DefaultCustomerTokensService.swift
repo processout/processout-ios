@@ -16,7 +16,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
     // MARK: - POCustomerTokensService
 
     func assignCustomerToken(
-        request: POAssignCustomerTokenRequest, threeDSService: PO3DSService
+        request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
     ) async throws -> POCustomerToken {
         let response = try await repository.assignCustomerToken(request: request)
         if let customerAction = response.customerAction {

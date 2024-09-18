@@ -14,8 +14,13 @@ public final class POTest3DSService: PO3DSService {
 
     /// Creates service instance.
     @_disfavoredOverload
-    public init(returnUrl: URL) {
-        self.returnUrl = returnUrl
+    @available(*, deprecated, message: "Use init that doesn't require arguments.")
+    public nonisolated init(returnUrl: URL) {
+        // Ignored
+    }
+
+    nonisolated init() {
+        // Ignored
     }
 
     /// View controller to use for presentations.
@@ -51,21 +56,4 @@ public final class POTest3DSService: PO3DSService {
         alertController.addAction(rejectAction)
         viewController.present(alertController, animated: true)
     }
-
-    public func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        let viewController = PO3DSRedirectViewControllerBuilder()
-            .with(redirect: redirect)
-            .with(returnUrl: returnUrl)
-            .with { [weak self] result in
-                self?.viewController.presentedViewController?.dismiss(animated: true) {
-                    completion(result)
-                }
-            }
-            .build()
-        self.viewController.present(viewController, animated: true)
-    }
-
-    // MARK: - Private Properties
-
-    private let returnUrl: URL
 }

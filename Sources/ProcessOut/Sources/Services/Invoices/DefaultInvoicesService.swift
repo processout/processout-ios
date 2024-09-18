@@ -33,7 +33,7 @@ final class DefaultInvoicesService: POInvoicesService {
         try await repository.invoice(request: request)
     }
 
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DSService) async throws {
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
         guard let customerAction = try await repository.authorizeInvoice(request: request) else {
             return
         }

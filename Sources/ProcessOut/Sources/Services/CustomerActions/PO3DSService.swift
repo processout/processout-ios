@@ -9,7 +9,8 @@
 public typealias PO3DSServiceType = PO3DSService
 
 /// This interface provides methods to process 3-D Secure transactions.
-public protocol PO3DSService: AnyObject {
+@available(*, deprecated, message: "Implement PO3DS2Service service directly instead.")
+public protocol PO3DSService: PO3DS2Service {
 
     /// Asks implementation to create request that will be passed to 3DS Server to create the AReq.
     func authenticationRequest(
@@ -29,11 +30,11 @@ public protocol PO3DSService: AnyObject {
     func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void)
 }
 
+@available(*, deprecated, message: "Implement PO3DS2Service service directly instead.")
 extension PO3DSService {
 
-    /// Asks implementation to create request that will be passed to 3DS Server to create the AReq.
     @MainActor
-    func authenticationRequest(
+    public func authenticationRequestParameters(
         configuration: PO3DS2Configuration
     ) async throws -> PO3DS2AuthenticationRequestParameters {
         try await withUnsafeThrowingContinuation { continuation in
@@ -41,14 +42,12 @@ extension PO3DSService {
         }
     }
 
-    /// Implementation must handle given 3DS2 challenge and call completion with result. Use `true` if challenge
-    /// was handled successfully, if transaction was denied, pass `false`. In all other cases, call completion
-    /// with failure indicating what went wrong.
     @MainActor
-    func handle(challenge: PO3DS2ChallengeParameters) async throws -> Bool {
-        try await withUnsafeThrowingContinuation { continuation in
-            handle(challenge: challenge) { continuation.resume(with: $0) }
+    public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
+        let status = try await withUnsafeThrowingContinuation { continuation in
+            handle(challenge: parameters) { continuation.resume(with: $0) }
         }
+        return PO3DS2ChallengeResult(transactionStatus: status)
     }
 
     @available(*, deprecated, message: "Redirects are handled internally.")

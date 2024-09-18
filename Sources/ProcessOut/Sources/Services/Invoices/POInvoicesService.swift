@@ -29,7 +29,7 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
     func invoice(request: POInvoiceRequest) async throws -> POInvoice
 
     /// Performs invoice authorization with given request.
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DSService) async throws
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws
 
     /// Captures native alternative payament.
     func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws

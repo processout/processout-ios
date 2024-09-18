@@ -24,7 +24,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     // MARK: - CustomerActionsService
 
-    func handle(action: _CustomerAction, threeDSService: PO3DSService) async throws -> String {
+    func handle(action: _CustomerAction, threeDSService: PO3DS2Service) async throws -> String {
         do {
             switch action.type {
             case .fingerprintMobile:
@@ -66,16 +66,16 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     // MARK: - Native 3DS
 
-    private func fingerprint(encodedConfiguration: String, threeDSService: PO3DSService) async throws -> String {
+    private func fingerprint(encodedConfiguration: String, threeDSService: PO3DS2Service) async throws -> String {
         let configuration = try decode(PO3DS2Configuration.self, from: encodedConfiguration)
-        let requestParameters = try await threeDSService.authenticationRequest(configuration: configuration)
+        let requestParameters = try await threeDSService.authenticationRequestParameters(configuration: configuration)
         let response = AuthenticationResponse(url: nil, body: try self.encode(requestParameters: requestParameters))
         return try encode(authenticationResponse: response)
     }
 
-    private func challenge(encodedChallenge: String, threeDSService: PO3DSService) async throws -> String {
+    private func challenge(encodedChallenge: String, threeDSService: PO3DS2Service) async throws -> String {
         let parameters = try decode(PO3DS2ChallengeParameters.self, from: encodedChallenge)
-        let result = try await threeDSService.handle(challenge: parameters)
+        let result = try await threeDSService.performChallenge(with: parameters)
         let encodedChallengeResult: String
         do {
             encodedChallengeResult = try String(decoding: encoder.encode(result), as: UTF8.self)
