@@ -9,9 +9,9 @@ import Foundation
 
 final class DefaultInvoicesService: POInvoicesService {
 
-    init(repository: InvoicesRepository, threeDSService: ThreeDSService, logger: POLogger) {
+    init(repository: InvoicesRepository, customerActionsService: CustomerActionsService, logger: POLogger) {
         self.repository = repository
-        self.threeDSService = threeDSService
+        self.customerActionsService = customerActionsService
         self.logger = logger
     }
 
@@ -39,7 +39,9 @@ final class DefaultInvoicesService: POInvoicesService {
         }
         let newRequest: POInvoiceAuthorizationRequest
         do {
-            let newSource = try await self.threeDSService.handle(action: customerAction, delegate: threeDSService)
+            let newSource = try await customerActionsService.handle(
+                action: customerAction, threeDSService: threeDSService
+            )
             newRequest = request.replacing(source: newSource)
         } catch {
             logger.warn("Did fail to authorize invoice: \(error)", attributes: [.invoiceId: request.invoiceId])
@@ -89,7 +91,7 @@ final class DefaultInvoicesService: POInvoicesService {
     // MARK: - Private Properties
 
     private let repository: InvoicesRepository
-    private let threeDSService: ThreeDSService
+    private let customerActionsService: CustomerActionsService
     private let logger: POLogger
 }
 

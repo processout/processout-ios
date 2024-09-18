@@ -1,5 +1,5 @@
 //
-//  DefaultThreeDSService.swift
+//  DefaultCustomerActionsService.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 03.11.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class DefaultThreeDSService: ThreeDSService {
+final class DefaultCustomerActionsService: CustomerActionsService {
 
     init(decoder: JSONDecoder, encoder: JSONEncoder, jsonWritingOptions: JSONSerialization.WritingOptions = []) {
         self.decoder = decoder
@@ -15,20 +15,20 @@ final class DefaultThreeDSService: ThreeDSService {
         self.jsonWritingOptions = jsonWritingOptions
     }
 
-    // MARK: - ThreeDSService
+    // MARK: - CustomerActionsService
 
-    func handle(action: ThreeDSCustomerAction, delegate: Delegate) async throws -> String {
+    func handle(action: _CustomerAction, threeDSService: PO3DSService) async throws -> String {
         // todo(andrii-vysotskyi): when async delegate methods are publicly available ensure
         // that thrown errors are mapped to POFailure if needed.
         switch action.type {
         case .fingerprintMobile:
-            return try await fingerprint(encodedConfiguration: action.value, delegate: delegate)
+            return try await fingerprint(encodedConfiguration: action.value, threeDSService: threeDSService)
         case .challengeMobile:
-            return try await challenge(encodedChallenge: action.value, delegate: delegate)
+            return try await challenge(encodedChallenge: action.value, threeDSService: threeDSService)
         case .fingerprint:
-            return try await fingerprint(url: action.value, delegate: delegate)
+            return try await fingerprint(url: action.value, threeDSService: threeDSService)
         case .redirect, .url:
-            return try await redirect(url: action.value, delegate: delegate)
+            return try await redirect(url: action.value, threeDSService: threeDSService)
         }
     }
 
@@ -56,30 +56,30 @@ final class DefaultThreeDSService: ThreeDSService {
 
     // MARK: - Private Methods
 
-    private func fingerprint(encodedConfiguration: String, delegate: Delegate) async throws -> String {
+    private func fingerprint(encodedConfiguration: String, threeDSService: PO3DSService) async throws -> String {
         let configuration = try decode(PO3DS2Configuration.self, from: encodedConfiguration)
-        let request = try await delegate.authenticationRequest(configuration: configuration)
+        let request = try await threeDSService.authenticationRequest(configuration: configuration)
         let response = AuthenticationResponse(url: nil, body: try self.encode(request: request))
         return try encode(authenticationResponse: response)
     }
 
-    private func challenge(encodedChallenge: String, delegate: Delegate) async throws -> String {
+    private func challenge(encodedChallenge: String, threeDSService: PO3DSService) async throws -> String {
         let challenge = try decode(PO3DS2Challenge.self, from: encodedChallenge)
-        let success = try await delegate.handle(challenge: challenge)
+        let success = try await threeDSService.handle(challenge: challenge)
         let encodedResponse = success
             ? Constants.challengeSuccessEncodedResponse
             : Constants.challengeFailureEncodedResponse
         return Constants.tokenPrefix + encodedResponse
     }
 
-    private func fingerprint(url: String, delegate: Delegate) async throws -> String {
+    private func fingerprint(url: String, threeDSService: PO3DSService) async throws -> String {
         guard let url = URL(string: url) else {
             let message = "Unable to create URL from string: \(url)."
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
         let context = PO3DSRedirect(url: url, timeout: Constants.webFingerprintTimeout)
         do {
-            return try await delegate.handle(redirect: context)
+            return try await threeDSService.handle(redirect: context)
         } catch let failure as POFailure where failure.code == .timeout(.mobile) {
             // Fingerprinting timeout is treated differently from other errors.
             let response = AuthenticationResponse(url: url, body: Constants.fingerprintTimeoutResponseBody)
@@ -87,13 +87,13 @@ final class DefaultThreeDSService: ThreeDSService {
         }
     }
 
-    private func redirect(url: String, delegate: Delegate) async throws -> String {
+    private func redirect(url: String, threeDSService: PO3DSService) async throws -> String {
         guard let url = URL(string: url) else {
             let message = "Unable to create URL from string: \(url)."
             throw POFailure(message: message, code: .internal(.mobile), underlyingError: nil)
         }
         let context = PO3DSRedirect(url: url, timeout: nil)
-        return try await delegate.handle(redirect: context)
+        return try await threeDSService.handle(redirect: context)
     }
 
     // MARK: - Coding

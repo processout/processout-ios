@@ -8,7 +8,7 @@
 struct AssignCustomerTokenResponse: Decodable {
 
     /// Optional customer action.
-    let customerAction: ThreeDSCustomerAction?
+    let customerAction: _CustomerAction?
 
     /// Token information.
     let token: POCustomerToken?

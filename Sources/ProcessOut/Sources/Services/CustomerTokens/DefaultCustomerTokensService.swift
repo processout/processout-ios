@@ -7,9 +7,9 @@
 
 final class DefaultCustomerTokensService: POCustomerTokensService {
 
-    init(repository: CustomerTokensRepository, threeDSService: ThreeDSService, logger: POLogger) {
+    init(repository: CustomerTokensRepository, customerActionsService: CustomerActionsService, logger: POLogger) {
         self.repository = repository
-        self.threeDSService = threeDSService
+        self.customerActionsService = customerActionsService
         self.logger = logger
     }
 
@@ -22,7 +22,9 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
         if let customerAction = response.customerAction {
             let newRequest: POAssignCustomerTokenRequest
             do {
-                let newSource = try await self.threeDSService.handle(action: customerAction, delegate: threeDSService)
+                let newSource = try await customerActionsService.handle(
+                    action: customerAction, threeDSService: threeDSService
+                )
                 newRequest = request.replacing(source: newSource)
             } catch {
                 var attributes: [POLogAttributeKey: String] = [
@@ -47,7 +49,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
     // MARK: - Private Properties
 
     private let repository: CustomerTokensRepository
-    private let threeDSService: ThreeDSService
+    private let customerActionsService: CustomerActionsService
     private let logger: POLogger
 }
 

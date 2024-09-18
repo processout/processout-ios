@@ -1,5 +1,5 @@
 //
-//  ThreeDSCustomerAction.swift
+//  CustomerAction.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 18.10.2022.
@@ -7,7 +7,8 @@
 
 import Foundation
 
-struct ThreeDSCustomerAction: Decodable {
+// todo(andrii-vysotskyi): remove underscore when legacy codebase is removed.
+struct _CustomerAction: Decodable { // swiftlint:disable:this type_name
 
     enum ActionType: String, Decodable {
 
