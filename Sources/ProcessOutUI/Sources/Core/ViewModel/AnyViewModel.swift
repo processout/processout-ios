@@ -27,6 +27,10 @@ final class AnyViewModel<State>: ViewModel {
         base.start()
     }
 
+    func stop() {
+        base.stop()
+    }
+
     var state: State {
         get { base.state }
         set { base.state = newValue }
@@ -50,6 +54,10 @@ private class ViewModelBox<T>: AnyViewModelBase<T.State> where T: ViewModel {
         base.start()
     }
 
+    override func stop() {
+        base.stop()
+    }
+
     override var state: T.State {
         get { base.state }
         set { base.state = newValue }
@@ -61,6 +69,10 @@ private class ViewModelBox<T>: AnyViewModelBase<T.State> where T: ViewModel {
 private class AnyViewModelBase<State>: ViewModel {
 
     func start() {
+        fatalError("Not implemented")
+    }
+
+    func stop() {
         fatalError("Not implemented")
     }
 

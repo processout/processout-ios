@@ -37,6 +37,7 @@ public struct PONativeAlternativePaymentView: View {
                 .animation(.default, value: viewModel.state.isCaptured)
         }
         .onAppear(perform: viewModel.start)
+        .onDisappear(perform: viewModel.stop)
         .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
     }
 
