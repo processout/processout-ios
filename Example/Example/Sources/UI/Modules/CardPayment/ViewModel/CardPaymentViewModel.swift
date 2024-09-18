@@ -9,7 +9,6 @@ import Combine
 import SwiftUI
 @_spi(PO) import ProcessOut
 import ProcessOutUI
-import ProcessOutCheckout3DS
 
 @MainActor
 final class CardPaymentViewModel: ObservableObject {
@@ -38,7 +37,7 @@ final class CardPaymentViewModel: ObservableObject {
     private func commonInit() {
         state = .init(
             authenticationService: .init(
-                sources: [.test, .checkout], id: \.self, selection: .test
+                sources: [.test], id: \.self, selection: .test
             ),
             cardTokenization: nil
         )
@@ -92,21 +91,11 @@ extension CardPaymentViewModel: POCardTokenizationDelegate {
             saveSource: save,
             clientSecret: invoice.clientSecret
         )
-        let threeDSService: PO3DS2Service
-        switch state.authenticationService.selection {
-        case .test:
-            threeDSService = POTest3DSService()
-        case .checkout:
-            threeDSService = POCheckout3DSServiceBuilder()
-                .with(delegate: self)
-                .with(environment: .sandbox)
-                .build()
-        }
+        // todo(andrii-vysotskyi): allow selecting Checkout 3DS service when build issue is resolved.
+        let threeDSService = POTest3DSService()
         try await invoicesService.authorizeInvoice(request: invoiceAuthorizationRequest, threeDSService: threeDSService)
     }
 }
-
-extension CardPaymentViewModel: POCheckout3DSServiceDelegate { }
 
 extension CardPaymentViewModel {
 
