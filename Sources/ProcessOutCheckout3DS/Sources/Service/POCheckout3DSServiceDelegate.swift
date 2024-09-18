@@ -68,7 +68,9 @@ extension POCheckout3DSServiceDelegate {
     }
 
     @available(*, deprecated, message: "Redirects are handled internally.")
-    public func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
+    public func handle( // swiftlint:disable:this unavailable_function
+        redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void
+    ) {
         preconditionFailure("Should never be called.")
     }
 }
