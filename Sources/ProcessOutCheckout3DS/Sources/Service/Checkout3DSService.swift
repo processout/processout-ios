@@ -8,7 +8,7 @@
 import ProcessOut
 import Checkout3DS
 
-final class Checkout3DSService: PO3DS2Service {
+final class Checkout3DSService: PO3DSService {
 
     init(
         errorMapper: AuthenticationErrorMapper,
