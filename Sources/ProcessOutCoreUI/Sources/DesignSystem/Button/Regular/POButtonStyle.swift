@@ -43,20 +43,21 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
                 isEnabled: isEnabled, isLoading: isLoading, isPressed: configuration.isPressed
             )
             ZStack {
-                ProgressView()
-                    .progressViewStyle(progressStyle)
-                    .opacity(isLoading ? 1 : 0)
-                configuration.label
-                    .textStyle(currentStyle.title)
-                    .lineLimit(1)
-                    .opacity(isLoading ? 0 : 1)
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(progressStyle)
+                } else {
+                    configuration.label
+                        .textStyle(currentStyle.title)
+                        .lineLimit(1)
+                }
             }
             .padding(Constants.padding)
             .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
             .background(currentStyle.backgroundColor)
             .border(style: currentStyle.border)
             .shadow(style: currentStyle.shadow)
-            .contentShape(.rect)
+            .contentShape(.standardHittableRect)
             .animation(.default, value: isLoading)
             .animation(.default, value: isEnabled)
             .allowsHitTesting(isEnabled && !isLoading)
