@@ -33,6 +33,11 @@ extension POStringResource {
             /// Pay %@
             static let submitAmount = POStringResource("native-alternative-payment.submit-button.title", comment: "")
 
+            /// Capture confirmation.
+            static let confirmCapture = POStringResource(
+                "native-alternative-payment.confirm-capture-button.title", comment: ""
+            )
+
             /// Cancel button title.
             static let cancel = POStringResource("native-alternative-payment.cancel-button.title", comment: "")
         }

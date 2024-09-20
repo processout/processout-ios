@@ -1813,6 +1813,9 @@
         }
       }
     },
+    "native-alternative-payment.confirm-capture-button.title" : {
+
+    },
     "native-alternative-payment.email.placeholder" : {
       "localizations" : {
         "ar" : {

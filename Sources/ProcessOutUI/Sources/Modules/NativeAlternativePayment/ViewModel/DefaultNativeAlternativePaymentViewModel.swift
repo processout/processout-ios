@@ -191,19 +191,20 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func createSections(state: InteractorState.AwaitingCapture) -> [NativeAlternativePaymentViewModelSection] {
         let item: NativeAlternativePaymentViewModelItem
-        if let expectedActionMessage = state.actionMessage {
+        if let customerAction = state.customerAction {
             let submittedItem = NativeAlternativePaymentViewModelItem.Submitted(
                 id: "awaiting-capture",
-                title: state.logoImage == nil ? state.paymentProviderName : nil,
-                logoImage: state.logoImage,
-                message: expectedActionMessage,
-                isMessageCompact: expectedActionMessage.count <= Constants.maximumCompactMessageLength,
-                image: state.actionImage,
+                title: state.paymentProvider.image == nil ? state.paymentProvider.name : nil,
+                logoImage: state.paymentProvider.image,
+                message: customerAction.message,
+                isMessageCompact: customerAction.message.count <= Constants.maximumCompactMessageLength,
+                image: customerAction.image,
                 isCaptured: false,
                 isProgressViewHidden: !state.isDelayed
             )
             item = .submitted(submittedItem)
         } else {
+            // todo(andrii-vysotskyi): set additional text saying that payment is being processed.
             item = .progress
         }
         let section = NativeAlternativePaymentViewModelSection(
@@ -214,11 +215,34 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func createActions(state: InteractorState.AwaitingCapture) -> [POActionsContainerActionViewModel] {
         let actions = [
+            createConfirmPaymentCaptureAction(state: state),
             cancelAction(
-                configuration: configuration.paymentConfirmation.secondaryAction, isEnabled: state.isCancellable
+                configuration: configuration.paymentConfirmation.secondaryAction,
+                isEnabled: state.isCancellable
             )
         ]
         return actions.compactMap { $0 }
+    }
+
+    private func createConfirmPaymentCaptureAction(
+        state: InteractorState.AwaitingCapture
+    ) -> POActionsContainerActionViewModel? {
+        guard state.shouldConfirmCapture else {
+            return nil
+        }
+        let buttonTitle = interactor.configuration.paymentConfirmation.confirmButton?.title
+            ?? String(resource: .NativeAlternativePayment.Button.confirmCapture)
+        let action = POActionsContainerActionViewModel(
+            id: "native-alternative-payment.primary-button",
+            title: buttonTitle,
+            isEnabled: true,
+            isLoading: false,
+            isPrimary: true,
+            action: { [weak self] in
+                self?.interactor.confirmCapture()
+            }
+        )
+        return action
     }
 
     // MARK: - Captured State
@@ -237,8 +261,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func createSections(state: InteractorState.Captured) -> [NativeAlternativePaymentViewModelSection] {
         let item = NativeAlternativePaymentViewModelItem.Submitted(
             id: "captured",
-            title: state.logoImage == nil ? state.paymentProviderName : nil,
-            logoImage: state.logoImage,
+            title: state.paymentProvider.image == nil ? state.paymentProvider.name : nil,
+            logoImage: state.paymentProvider.image,
             message: configuration.successMessage ?? String(resource: .NativeAlternativePayment.Success.message),
             isMessageCompact: true,
             image: UIImage(poResource: .success).withRenderingMode(.alwaysTemplate),
@@ -368,9 +392,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         if let customTitle = configuration.primaryActionTitle {
             title = customTitle
         } else {
-            priceFormatter.currencyCode = state.currencyCode
+            priceFormatter.currencyCode = state.invoice.currencyCode
             // swiftlint:disable:next legacy_objc_type
-            if let formattedAmount = priceFormatter.string(from: state.amount as NSDecimalNumber) {
+            if let formattedAmount = priceFormatter.string(from: state.invoice.amount as NSDecimalNumber) {
                 title = String(resource: .NativeAlternativePayment.Button.submitAmount, replacements: formattedAmount)
             } else {
                 title = String(resource: .NativeAlternativePayment.Button.submit)
