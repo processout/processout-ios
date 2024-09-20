@@ -91,13 +91,17 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     override func cancel() {
-        // todo(andrii-vysotskyi): fix cancellation handling
+        // todo(andrii-vysotskyi): allow cancellation in all states except sink
         logger.debug("Will attempt to cancel payment.")
         switch state {
         case .started(let state) where state.isCancellable:
             setFailureStateUnchecked(error: POFailure(code: .cancelled))
         case .awaitingCapture(let state) where state.isCancellable:
-            state.cancellable?.cancel()
+            if let cancellable = state.cancellable {
+                cancellable.cancel()
+            } else {
+                setFailureStateUnchecked(error: POFailure(code: .cancelled))
+            }
         default:
             logger.debug("Ignored cancellation attempt from unsupported state: \(state)")
         }
