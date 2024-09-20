@@ -6,10 +6,54 @@
 //
 
 import Foundation
-import SwiftUI
+import Combine
+import UIKit
 import ProcessOut
 
 enum NativeAlternativePaymentInteractorState {
+
+    struct Started {
+
+        /// Name of the payment gateway that can be displayed.
+        let gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
+
+        /// Invoice details.
+        let invoice: PONativeAlternativePaymentMethodTransactionDetails.Invoice
+
+        /// Parameters that are expected from user.
+        var parameters: [Parameter]
+
+        /// Boolean value indicating whether "soft" cancelation is supported in the current state.
+        var isCancellable: Bool
+    }
+
+    struct AwaitingCapture {
+
+        /// Payment provider details.
+        let paymentProvider: PaymentProvider
+
+        /// Additional action details.
+        let customerAction: CaptureCustomerAction?
+
+        /// Boolean value indicating whether "soft" cancelation is supported in the current state.
+        var isCancellable: Bool
+
+        /// Capture cancellable.
+        /// - NOTE: For internal use by interactor only.
+        var cancellable: AnyCancellable?
+
+        /// Boolean value indicating whether capture takes longer than anticipated.
+        var isDelayed: Bool
+
+        /// Boolean value indicating whether payment should be manually confirmed by user to start capture.
+        var shouldConfirmCapture: Bool
+    }
+
+    struct Captured {
+
+        /// Payment provider details.
+        let paymentProvider: PaymentProvider
+    }
 
     struct Parameter {
 
@@ -26,52 +70,22 @@ enum NativeAlternativePaymentInteractorState {
         var recentErrorMessage: String?
     }
 
-    struct Started {
-
-        /// Name of the payment gateway that can be displayed.
-        let gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
-
-        /// Invoice amount.
-        let amount: Decimal
-
-        /// Invoice currency code.
-        let currencyCode: String
-
-        /// Parameters that are expected from user.
-        var parameters: [Parameter]
-
-        /// Boolean value indicating whether cancel is supported in the current state.
-        var isCancellable: Bool
-    }
-
-    struct AwaitingCapture {
+    struct PaymentProvider {
 
         /// Payment provider name.
-        let paymentProviderName: String?
+        let name: String?
 
         /// Payment provider or gateway logo image.
-        let logoImage: UIImage?
+        let image: UIImage?
+    }
+
+    struct CaptureCustomerAction {
 
         /// Messaged describing additional actions that are needed from user in order to capture payment.
-        let actionMessage: String?
+        let message: String
 
         /// Action image.
-        let actionImage: UIImage?
-
-        /// Boolean value indicating whether cancel is supported in the current state.
-        var isCancellable: Bool
-
-        /// Boolean value indicating whether capture takes longer than anticipated.
-        var isDelayed: Bool
-    }
-
-    struct Captured {
-
-        /// Payment provider name.
-        let paymentProviderName: String?
-
-        /// Payment provider or gateway logo image.
-        let logoImage: UIImage?
+        let image: UIImage?
     }
 
     /// Initial interactor state.
