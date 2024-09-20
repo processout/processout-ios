@@ -168,6 +168,7 @@ final class AlternativePaymentsViewModel: ObservableObject {
                 secondaryAction: .cancel(),
                 paymentConfirmation: .init(
                     showProgressIndicatorAfter: 5,
+                    confirmButton: .init(),
                     secondaryAction: .cancel(disabledFor: 10)
                 )
             )
