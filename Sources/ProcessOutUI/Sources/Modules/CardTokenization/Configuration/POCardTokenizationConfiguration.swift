@@ -32,7 +32,6 @@ public struct POCardTokenizationConfiguration {
 
     /// Indicates whether the UI should display a control that allows the user
     /// to choose whether to save their card details for future payments.
-    @_spi(PO)
     public let isSavingAllowed: Bool
 
     /// Metadata related to the card.
@@ -49,28 +48,7 @@ public struct POCardTokenizationConfiguration {
         primaryActionTitle: String? = nil,
         cancelActionTitle: String? = nil,
         billingAddress: POBillingAddressConfiguration = .init(),
-        metadata: [String: String]? = nil
-    ) {
-        self.title = title
-        self.isCardholderNameInputVisible = isCardholderNameInputVisible
-        self.shouldCollectCvc = shouldCollectCvc
-        self.primaryActionTitle = primaryActionTitle
-        self.cancelActionTitle = cancelActionTitle
-        self.billingAddress = billingAddress
-        self.isSavingAllowed = false
-        self.metadata = metadata
-        isSchemeSelectionAllowed = false
-    }
-
-    @_spi(PO)
-    public init(
-        title: String? = nil,
-        isCardholderNameInputVisible: Bool = true,
-        shouldCollectCvc: Bool = true,
-        primaryActionTitle: String? = nil,
-        cancelActionTitle: String? = nil,
-        billingAddress: POBillingAddressConfiguration = .init(),
-        isSavingAllowed: Bool,
+        isSavingAllowed: Bool = false,
         metadata: [String: String]? = nil
     ) {
         self.title = title
