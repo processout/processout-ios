@@ -86,13 +86,22 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
     }
 
+    func confirmCapture() {
+        confirmCapture(force: false)
+    }
+
     override func cancel() {
+        // todo(andrii-vysotskyi): allow cancellation in all states except sink
         logger.debug("Will attempt to cancel payment.")
         switch state {
         case .started(let state) where state.isCancellable:
             setFailureStateUnchecked(error: POFailure(code: .cancelled))
         case .awaitingCapture(let state) where state.isCancellable:
-            captureCancellable?.cancel()
+            if let cancellable = state.cancellable {
+                cancellable.cancel()
+            } else {
+                setFailureStateUnchecked(error: POFailure(code: .cancelled))
+            }
         default:
             logger.debug("Ignored cancellation attempt from unsupported state: \(state)")
         }
@@ -117,8 +126,6 @@ final class NativeAlternativePaymentDefaultInteractor:
     private let logger: POLogger
     private let completion: (Result<Void, POFailure>) -> Void
 
-    private var captureCancellable: AnyCancellable?
-
     // MARK: - Starting State
 
     @MainActor
@@ -140,8 +147,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
             let startedState = State.Started(
                 gateway: details.gateway,
-                amount: details.invoice.amount,
-                currencyCode: details.invoice.currencyCode,
+                invoice: details.invoice,
                 parameters: await createParameters(specifications: details.parameters),
                 isCancellable: disableDuration(of: configuration.secondaryAction).isZero
             )
@@ -213,36 +219,58 @@ final class NativeAlternativePaymentDefaultInteractor:
             setSubmittedUnchecked()
             return
         }
-        let actionMessage = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
-        send(event: .willWaitForCaptureConfirmation(additionalActionExpected: actionMessage != nil))
+        let customerActionMessage = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
+        let additionalActionExpected = customerActionMessage != nil
+        send(event: .willWaitForCaptureConfirmation(additionalActionExpected: additionalActionExpected))
         let (logoImage, actionImage) = await imagesRepository.images(
             at: logoUrl(gateway: gateway, parameterValues: parameterValues), gateway.customerActionImageUrl
         )
+        let shouldConfirmCapture = additionalActionExpected && configuration.paymentConfirmation.confirmButton != nil
         let awaitingCaptureState = State.AwaitingCapture(
-            paymentProviderName: parameterValues?.providerName,
-            logoImage: logoImage,
-            actionMessage: actionMessage,
-            actionImage: actionImage,
+            paymentProvider: .init(name: parameterValues?.providerName, image: logoImage),
+            customerAction: customerActionMessage.map { message in
+                .init(message: message, image: actionImage)
+            },
             isCancellable: disableDuration(of: configuration.paymentConfirmation.secondaryAction).isZero,
-            isDelayed: false
+            isDelayed: false,
+            shouldConfirmCapture: shouldConfirmCapture
         )
         setStateUnchecked(.awaitingCapture(awaitingCaptureState))
-        logger.info("Waiting for invoice capture confirmation")
+        if !shouldConfirmCapture {
+            confirmCapture(force: true)
+        }
+        enableCaptureCancellationAfterDelay()
+    }
+
+    private func confirmCapture(force: Bool) {
+        guard case .awaitingCapture(var currentState) = state else {
+            logger.debug("Ignoring attempt to confirm capture from unsupported state: \(state).")
+            return
+        }
+        guard (currentState.shouldConfirmCapture || force) && currentState.cancellable == nil else {
+            logger.debug("Payment is already being captured, ignored.")
+            return
+        }
+        if !force {
+            delegate?.nativeAlternativePaymentMethodDidEmitEvent(.didConfirmPayment)
+        }
         let request = PONativeAlternativePaymentCaptureRequest(
             invoiceId: configuration.invoiceId,
             gatewayConfigurationId: configuration.gatewayConfigurationId,
             timeout: configuration.paymentConfirmation.timeout
         )
-        let task = Task {
+        let task = Task { @MainActor in
             do {
                 try await invoicesService.captureNativeAlternativePayment(request: request)
-                await setCapturedStateUnchecked(gateway: gateway, parameterValues: parameterValues)
+                await setCapturedStateUnchecked(paymentProvider: currentState.paymentProvider)
             } catch {
                 setFailureStateUnchecked(error: error)
             }
         }
-        captureCancellable = AnyCancellable(task.cancel)
-        enableCaptureCancellationAfterDelay()
+        currentState.cancellable = AnyCancellable(task.cancel)
+        currentState.shouldConfirmCapture = false
+        self.state = .awaitingCapture(currentState)
+        logger.info("Waiting for invoice capture confirmation")
         schedulePaymentConfirmationDelay()
     }
 
@@ -266,23 +294,24 @@ final class NativeAlternativePaymentDefaultInteractor:
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway,
         parameterValues: PONativeAlternativePaymentMethodParameterValues?
     ) async {
+        let logoImage = await imagesRepository.image(
+            at: logoUrl(gateway: gateway, parameterValues: parameterValues)
+        )
+        let paymentProvider = State.PaymentProvider(name: parameterValues?.providerName, image: logoImage)
+        await setCapturedStateUnchecked(paymentProvider: paymentProvider)
+    }
+
+    @MainActor
+    private func setCapturedStateUnchecked(
+        paymentProvider: NativeAlternativePaymentInteractorState.PaymentProvider
+    ) async {
         logger.info("Did receive invoice capture confirmation")
         guard configuration.paymentConfirmation.waitsConfirmation else {
             logger.info("Should't wait for confirmation, so setting submitted state instead of captured.")
             setSubmittedUnchecked()
             return
         }
-        let capturedState: State.Captured
-        if case .awaitingCapture(let awaitingCaptureState) = state {
-            capturedState = State.Captured(
-                paymentProviderName: awaitingCaptureState.paymentProviderName, logoImage: awaitingCaptureState.logoImage
-            )
-        } else {
-            let logoImage = await imagesRepository.image(
-                at: logoUrl(gateway: gateway, parameterValues: parameterValues)
-            )
-            capturedState = State.Captured(paymentProviderName: parameterValues?.providerName, logoImage: logoImage)
-        }
+        let capturedState = State.Captured(paymentProvider: paymentProvider)
         setStateUnchecked(.captured(capturedState))
         send(event: .didCompletePayment)
         if !configuration.skipSuccessScreen {
@@ -370,14 +399,13 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Cancellation Availability
 
-    @MainActor
     private func enableCancellationAfterDelay() {
         let disabledFor = disableDuration(of: configuration.secondaryAction)
         guard disabledFor > 0 else {
             logger.debug("Cancel action is not set or initially enabled.")
             return
         }
-        Task {
+        Task { @MainActor in
             try? await Task.sleep(seconds: disabledFor)
             switch state {
             case .started(var state):
@@ -392,14 +420,13 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
     }
 
-    @MainActor
     private func enableCaptureCancellationAfterDelay() {
         let disabledFor = disableDuration(of: configuration.paymentConfirmation.secondaryAction)
         guard disabledFor > 0 else {
             logger.debug("Confirmation cancel action is not set or initially enabled.")
             return
         }
-        Task {
+        Task { @MainActor in
             try? await Task.sleep(seconds: disabledFor)
             guard case .awaitingCapture(var awaitingState) = state else {
                 return

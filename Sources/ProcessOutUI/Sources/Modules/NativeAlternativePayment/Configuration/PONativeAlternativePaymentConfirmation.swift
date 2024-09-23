@@ -10,6 +10,18 @@ import Foundation
 /// Configuration specific to native APM payment confirmation.
 public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint:disable:this type_name
 
+    /// Confirmation button configuration.
+    public struct ConfirmButton {
+
+        /// Button title.
+        public let title: String?
+
+        /// Creates button instance.
+        public init(title: String? = nil) {
+            self.title = title
+        }
+    }
+
     /// Boolean value that specifies whether module should wait for payment confirmation from PSP or will
     /// complete right after all user's input is submitted. Default value is `true`.
     public let waitsConfirmation: Bool
@@ -26,6 +38,13 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
     /// Default value is `false`.
     public let hideGatewayDetails: Bool
 
+    /// Payment confirmation button configuration.
+    ///
+    /// Displays a confirmation button when the user needs to perform an external customer action (e.g.,
+    /// completing a step with a third-party service) before proceeding with payment capture. The user
+    /// must press this button to continue.
+    public let confirmButton: ConfirmButton?
+
     /// Action that could be optionally presented to user during payment confirmation stage. To remove action
     /// use `nil`, this is default behaviour.
     public let secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction?
@@ -36,12 +55,14 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
         timeout: TimeInterval = 180,
         showProgressIndicatorAfter: TimeInterval? = nil,
         hideGatewayDetails: Bool = false,
+        confirmButton: ConfirmButton? = nil,
         secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction? = nil
     ) {
         self.waitsConfirmation = waitsConfirmation
         self.timeout = timeout
         self.showProgressIndicatorAfter = showProgressIndicatorAfter
         self.hideGatewayDetails = hideGatewayDetails
+        self.confirmButton = confirmButton
         self.secondaryAction = secondaryAction
     }
 }

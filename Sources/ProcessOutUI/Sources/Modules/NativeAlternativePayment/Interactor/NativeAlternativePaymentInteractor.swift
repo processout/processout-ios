@@ -19,6 +19,11 @@ protocol NativeAlternativePaymentInteractor: Interactor<NativeAlternativePayment
     /// Submits parameters.
     func submit()
 
+    /// Confirms that capture preconditions are satisfied and implementation could proceed with capture.
+    ///
+    /// - NOTE: Implementation does nothing if manual confirmation is not needed.
+    func confirmCapture()
+
     /// Notifies interactor that user requested cancel confirmation.
     func didRequestCancelConfirmation()
 }
