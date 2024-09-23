@@ -75,6 +75,11 @@ public enum PONativeAlternativePaymentMethodEvent {
     /// to make capture happen.
     case willWaitForCaptureConfirmation(additionalActionExpected: Bool)
 
+    /// This event is triggered during the capture stage when the user confirms that they have completed
+    /// any required external action (if applicable). Once the event is triggered, the implementation
+    /// proceeds with the actual capture process.
+    case didConfirmPayment
+
     /// Event is sent after payment was confirmed to be captured. This is a final event.
     case didCompletePayment
 

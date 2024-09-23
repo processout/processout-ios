@@ -251,6 +251,9 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.debug("Payment is already being captured, ignored.")
             return
         }
+        if !force {
+            delegate?.nativeAlternativePaymentMethodDidEmitEvent(.didConfirmPayment)
+        }
         let request = PONativeAlternativePaymentCaptureRequest(
             invoiceId: configuration.invoiceId,
             gatewayConfigurationId: configuration.gatewayConfigurationId,
