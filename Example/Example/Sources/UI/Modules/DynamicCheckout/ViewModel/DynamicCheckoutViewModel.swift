@@ -87,7 +87,8 @@ final class DynamicCheckoutViewModel: ObservableObject {
                 name: UUID().uuidString,
                 amount: state.invoice.amount,
                 currency: state.invoice.currencyCode,
-                returnUrl: Constants.returnUrl
+                returnUrl: Constants.returnUrl,
+                customerId: Constants.customerId
             )
             return try await invoicesService.createInvoice(request: request)
         } else {
