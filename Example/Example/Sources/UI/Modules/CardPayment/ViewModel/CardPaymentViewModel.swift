@@ -45,7 +45,9 @@ final class CardPaymentViewModel: ObservableObject {
     }
 
     private func setCardTokenizationItem() {
-        let configuration = POCardTokenizationConfiguration(isCardholderNameInputVisible: false)
+        let configuration = POCardTokenizationConfiguration(
+            isCardholderNameInputVisible: false, isSavingAllowed: true
+        )
         let cardTokenizationItem = CardPaymentViewModelState.CardTokenization(
             id: UUID().uuidString,
             configuration: configuration,
