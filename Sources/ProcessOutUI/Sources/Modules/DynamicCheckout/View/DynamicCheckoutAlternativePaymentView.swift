@@ -18,9 +18,17 @@ struct DynamicCheckoutAlternativePaymentView: View {
     // MARK: - View
 
     var body: some View {
-        NativeAlternativePaymentContentView(viewModel: viewModel, insets: 0)
-            .nativeAlternativePaymentSizeClass(.compact)
-            .nativeAlternativePaymentStyle(.init(dynamicCheckoutStyle: style))
+        VStack(spacing: POSpacing.large) {
+            NativeAlternativePaymentContentView(viewModel: viewModel, insets: 0)
+                .nativeAlternativePaymentSizeClass(.compact)
+                .nativeAlternativePaymentStyle(.init(dynamicCheckoutStyle: style))
+            ForEach(viewModel.state.actions.filter(\.isPrimary)) { button in
+                Button(button.title, action: button.action)
+                    .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.primary))
+                    .disabled(!button.isEnabled)
+                    .buttonLoading(button.isLoading)
+            }
+        }
     }
 
     // MARK: - Private Properties

@@ -17,9 +17,6 @@ protocol DynamicCheckoutInteractor: Interactor<DynamicCheckoutInteractorState> {
     /// Please note that only selected payment method can be started.
     func startPayment(methodId: String)
 
-    /// Submits current payment method's data.
-    func submit()
-
     /// Notifies interactor that user requested cancel confirmation.
     func didRequestCancelConfirmation()
 }

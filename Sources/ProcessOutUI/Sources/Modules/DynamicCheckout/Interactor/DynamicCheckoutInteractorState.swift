@@ -60,9 +60,6 @@ enum DynamicCheckoutInteractorState {
         /// Native APM interactor.
         let nativeAlternativePaymentInteractor: (any NativeAlternativePaymentInteractor)?
 
-        /// Submission state.
-        var submission: PaymentSubmission
-
         /// Defines whether payment is cancellable.
         var isCancellable: Bool
 
@@ -89,18 +86,6 @@ enum DynamicCheckoutInteractorState {
         /// Boolean value indicating whether invoice should be invalidated when interactor transitions back
         /// to started from this state.
         var shouldInvalidateInvoice = false
-    }
-
-    enum PaymentSubmission {
-
-        /// Submission is currently unavailable.
-        case temporarilyUnavailable
-
-        /// Submission is currently possible.
-        case possible
-
-        /// Payment is already being processed.
-        case submitting
     }
 
     struct Recovering {

@@ -103,20 +103,6 @@ final class DynamicCheckoutDefaultInteractor:
         }
     }
 
-    func submit() {
-        guard case .paymentProcessing(let currentState) = state else {
-            return
-        }
-        switch currentPaymentMethod(state: currentState) {
-        case .card:
-            currentState.cardTokenizationInteractor?.tokenize()
-        case .nativeAlternativePayment:
-            currentState.nativeAlternativePaymentInteractor?.submit()
-        default:
-            assertionFailure("Active payment method doesn't support forced submission")
-        }
-    }
-
     override func cancel() {
         cancel(force: true)
     }
@@ -368,7 +354,6 @@ final class DynamicCheckoutDefaultInteractor:
             paymentMethodId: methodId,
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: nil,
-            submission: .submitting,
             isCancellable: false,
             shouldInvalidateInvoice: true
         )
@@ -411,7 +396,6 @@ final class DynamicCheckoutDefaultInteractor:
             paymentMethodId: method.id,
             cardTokenizationInteractor: interactor,
             nativeAlternativePaymentInteractor: nil,
-            submission: .possible,
             isCancellable: true
         )
         state = .paymentProcessing(paymentProcessingState)
@@ -428,11 +412,9 @@ final class DynamicCheckoutDefaultInteractor:
         case .idle:
             break // Ignored
         case .started(let startedState):
-            currentState.submission = startedState.areParametersValid ? .possible : .temporarilyUnavailable
             currentState.isCancellable = currentState.snapshot.isCancellable
             self.state = .paymentProcessing(currentState)
         case .tokenizing:
-            currentState.submission = .submitting
             currentState.isCancellable = false
             self.state = .paymentProcessing(currentState)
         case .tokenized:
@@ -452,7 +434,6 @@ final class DynamicCheckoutDefaultInteractor:
             paymentMethodId: method.id,
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: nil,
-            submission: .submitting,
             isCancellable: false,
             shouldInvalidateInvoice: true
         )
@@ -492,7 +473,6 @@ final class DynamicCheckoutDefaultInteractor:
             paymentMethodId: method.id,
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: interactor,
-            submission: .submitting,
             isCancellable: false,
             isReady: false
         )
@@ -510,25 +490,21 @@ final class DynamicCheckoutDefaultInteractor:
         case .idle:
             break // Ignored
         case .starting:
-            currentState.submission = .submitting
             currentState.isCancellable = false
             currentState.isReady = false
             currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)
         case .started(let startedState):
-            currentState.submission = startedState.areParametersValid ? .possible : .temporarilyUnavailable
             currentState.isCancellable = startedState.isCancellable
             currentState.isReady = true
             currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)
         case .submitting(let submittingState):
-            currentState.submission = .submitting
             currentState.isCancellable = submittingState.isCancellable
             currentState.isReady = true
             currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)
         case .awaitingCapture(let awaitingCaptureState):
-            currentState.submission = .submitting
             currentState.isCancellable = awaitingCaptureState.isCancellable
             currentState.isReady = true
             currentState.isAwaitingNativeAlternativePaymentCapture = true
@@ -550,7 +526,6 @@ final class DynamicCheckoutDefaultInteractor:
             paymentMethodId: method.id,
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: nil,
-            submission: .submitting,
             isCancellable: false,
             shouldInvalidateInvoice: true
         )

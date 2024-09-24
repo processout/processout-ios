@@ -329,7 +329,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 info: info,
                 content: createRegularPaymentContent(state: state, methodId: methodId),
                 contentId: state.snapshot.invoice.id,
-                submitButton: createSubmitAction(methodId: methodId, state: state)
+                submitButton: nil
             )
             return .regularPayment(payment)
         }
@@ -375,37 +375,6 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         default:
             return nil
         }
-    }
-
-    private func createSubmitAction(
-        methodId: String, state: DynamicCheckoutInteractorState.PaymentProcessing
-    ) -> POActionsContainerActionViewModel? {
-        guard shouldResolveContent(for: methodId, state: state) else {
-            return nil
-        }
-        let isEnabled, isLoading: Bool
-        switch state.submission {
-        case .temporarilyUnavailable:
-            isEnabled = false
-            isLoading = false
-        case .possible:
-            isEnabled = true
-            isLoading = false
-        case .submitting:
-            isEnabled = true
-            isLoading = true
-        }
-        let viewModel = POActionsContainerActionViewModel(
-            id: ButtonId.submit,
-            title: interactor.configuration.submitButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
-            isEnabled: isEnabled,
-            isLoading: isLoading,
-            isPrimary: true,
-            action: { [weak self] in
-                self?.interactor.submit()
-            }
-        )
-        return viewModel
     }
 
     private func createCancelAction(
