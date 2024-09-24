@@ -355,7 +355,7 @@ final class DynamicCheckoutDefaultInteractor:
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: nil,
             isCancellable: false,
-            shouldInvalidateInvoice: true
+            shouldInvalidateInvoice: false
         )
         state = .paymentProcessing(paymentProcessingState)
         Task { @MainActor in
@@ -363,17 +363,17 @@ final class DynamicCheckoutDefaultInteractor:
                 guard let delegate else {
                     throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
                 }
-                let tokenizationRequest = POApplePayTokenizationRequest(paymentRequest: request)
-                let coordinator = DynamicCheckoutApplePayTokenizationCoordinator { [invoicesService] card in
-                    var authorizationRequest = POInvoiceAuthorizationRequest(
-                        invoiceId: startedState.invoice.id, source: card.id
-                    )
-                    let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &authorizationRequest)
-                    try await invoicesService.authorizeInvoice(
-                        request: authorizationRequest, threeDSService: threeDSService
-                    )
-                }
-                _ = try await cardsService.tokenize(request: tokenizationRequest, delegate: coordinator)
+                let card = try await cardsService.tokenize(
+                    request: POApplePayTokenizationRequest(paymentRequest: request)
+                )
+                invalidateInvoiceIfPossible()
+                var authorizationRequest = POInvoiceAuthorizationRequest(
+                    invoiceId: startedState.invoice.id, source: card.id
+                )
+                let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &authorizationRequest)
+                try await invoicesService.authorizeInvoice(
+                    request: authorizationRequest, threeDSService: threeDSService
+                )
                 setSuccessState()
             } catch {
                 recoverPaymentProcessing(error: error)
