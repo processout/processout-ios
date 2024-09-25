@@ -16,4 +16,14 @@ protocol ViewModel<State>: ObservableObject {
 
     /// Starts view model.
     func start()
+
+    /// Cancels view model.
+    func stop()
+}
+
+extension ViewModel {
+
+    func stop() {
+        // Ignored
+    }
 }
