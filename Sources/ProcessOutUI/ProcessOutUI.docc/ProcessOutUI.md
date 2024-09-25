@@ -9,10 +9,10 @@
 ### 3DS
 
 - <doc:3DS>
+- ``POTest3DSService``
 - ``SafariServices/SFSafariViewController/init(redirect:returnUrl:safariConfiguration:completion:)``
 - ``POWebAuthenticationSession/init(redirect:returnUrl:completion:)``
 - ``PO3DSRedirectController``
-- ``POTest3DSService``
 
 ### Card Tokenization
 
@@ -24,11 +24,6 @@
 - ``POBillingAddressConfiguration``
 - ``POCardTokenizationDelegate``
 - ``POCardTokenizationEvent``
-
-### Apple Pay
-
-- ``POPassKitPaymentAuthorizationController``
-- ``POPassKitPaymentAuthorizationControllerDelegate``
 
 ### Card Update
 
@@ -76,11 +71,16 @@
 <!--- ``PODynamicCheckoutEvent``-->
 <!--- ``PODynamicCheckoutInvoiceInvalidationReason``-->
 
+### Utils
+
+- ``POConfirmationDialogConfiguration``
+
+### Apple Pay
+
+- ``POPassKitPaymentAuthorizationController``
+- ``POPassKitPaymentAuthorizationControllerDelegate``
+
 ### Web Authentication
 
 - ``POWebAuthenticationSession``
 - ``POWebAuthenticationSessionCallback``
-
-### Utils
-
-- ``POConfirmationDialogConfiguration``
