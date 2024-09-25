@@ -81,7 +81,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             title: "",
             isCardholderNameInputVisible: configuration.cardholderNameRequired,
             shouldCollectCvc: configuration.cvcRequired,
-            primaryActionTitle: "",
+            primaryActionTitle: self.configuration.submitButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
             cancelActionTitle: "",
             billingAddress: billingAddressConfiguration,
             isSavingAllowed: configuration.savingAllowed,
@@ -99,7 +99,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             title: "",
             shouldHorizontallyCenterCodeInput: false,
             successMessage: "",
-            primaryActionTitle: "",
+            primaryActionTitle: self.configuration.submitButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
             secondaryAction: nil,
             inlineSingleSelectValuesLimit: configuration.alternativePayment.inlineSingleSelectValuesLimit,
             skipSuccessScreen: true,
@@ -116,6 +116,9 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             timeout: configuration.timeout,
             showProgressIndicatorAfter: configuration.showProgressIndicatorAfter,
             hideGatewayDetails: true,
+            confirmButton: configuration.confirmButton.map { button in
+                .init(title: button.title)
+            },
             secondaryAction: configuration.cancelButton.map { configuration in
                 .cancel(title: "", disabledFor: configuration.disabledFor, confirmation: nil)
             }
