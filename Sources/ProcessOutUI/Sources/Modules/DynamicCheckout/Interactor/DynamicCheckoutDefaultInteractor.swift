@@ -363,6 +363,7 @@ final class DynamicCheckoutDefaultInteractor:
                 guard let delegate else {
                     throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
                 }
+                await delegate.dynamicCheckout(willAuthorizeInvoiceWith: request)
                 let card = try await cardsService.tokenize(
                     request: POApplePayTokenizationRequest(paymentRequest: request)
                 )
