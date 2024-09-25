@@ -31,7 +31,6 @@ public struct POCardTokenizationView: View {
             style.backgroundColor.ignoresSafeArea()
         }
         .onAppear(perform: viewModel.start)
-        .onDisappear(perform: viewModel.stop)
     }
 
     // MARK: - Private Properties

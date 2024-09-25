@@ -5,7 +5,6 @@
 //  Created by Andrii Vysotskyi on 05.03.2024.
 //
 
-@MainActor
 protocol DynamicCheckoutInteractor: Interactor<DynamicCheckoutInteractorState> {
 
     /// Configuration.

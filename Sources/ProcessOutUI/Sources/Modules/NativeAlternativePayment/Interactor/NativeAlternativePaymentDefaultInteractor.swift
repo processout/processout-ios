@@ -278,8 +278,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         guard let timeInterval = configuration.paymentConfirmation.showProgressIndicatorAfter else {
             return
         }
-        Task { [weak self] in
-            try? await Task.sleep(seconds: timeInterval)
+        Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
             guard let self, case .awaitingCapture(var awaitingCaptureState) = self.state else {
                 return
             }

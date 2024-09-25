@@ -7,7 +7,6 @@
 
 import ProcessOut
 
-@MainActor
 protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState> {
 
     /// Delegate.

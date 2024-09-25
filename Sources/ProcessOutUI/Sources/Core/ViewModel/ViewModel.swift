@@ -7,7 +7,6 @@
 
 import Combine
 
-@MainActor
 protocol ViewModel<State>: ObservableObject {
 
     associatedtype State
@@ -17,7 +16,4 @@ protocol ViewModel<State>: ObservableObject {
 
     /// Starts view model.
     func start()
-
-    /// Stops view model.
-    func stop()
 }

@@ -23,6 +23,7 @@ class BaseInteractor<State>: Interactor {
     var didChange: (() -> Void)?
     var willChange: ((State) -> Void)?
 
+    @MainActor
     func start() {
         // Does nothing
     }

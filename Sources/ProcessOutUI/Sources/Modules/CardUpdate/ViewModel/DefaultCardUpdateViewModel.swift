@@ -39,10 +39,6 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         interactor.start()
     }
 
-    func stop() {
-        interactor.cancel()
-    }
-
     // MARK: - Private Nested Types
 
     private typealias InteractorState = CardUpdateInteractorState

@@ -8,7 +8,6 @@
 import Combine
 @_spi(PO) import ProcessOutCoreUI
 
-@MainActor
 protocol CardUpdateViewModel: ObservableObject {
 
     /// Screen title.
@@ -25,7 +24,4 @@ protocol CardUpdateViewModel: ObservableObject {
 
     /// Starts view model.
     func start()
-
-    /// Stops view model.
-    func stop()
 }

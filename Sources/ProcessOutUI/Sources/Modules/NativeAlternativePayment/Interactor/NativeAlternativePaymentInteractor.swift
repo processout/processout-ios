@@ -5,7 +5,6 @@
 //  Created by Andrii Vysotskyi on 29.02.2024.
 //
 
-@MainActor
 protocol NativeAlternativePaymentInteractor: Interactor<NativeAlternativePaymentInteractorState> {
 
     /// Configuration.

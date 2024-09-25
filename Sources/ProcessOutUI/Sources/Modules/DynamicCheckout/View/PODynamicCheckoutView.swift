@@ -48,7 +48,6 @@ public struct PODynamicCheckoutView: View {
         }
         .backport.geometryGroup()
         .onAppear(perform: viewModel.start)
-        .onDisappear(perform: viewModel.stop)
         .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
     }
 
