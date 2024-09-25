@@ -10,6 +10,7 @@ import UIKit
 extension UIView {
 
     /// Applies given border style to view's layer.
+    @available(*, deprecated)
     func apply(style: POBorderStyle) {
         layer.cornerRadius = style.radius
         layer.borderWidth = style.width
@@ -17,6 +18,7 @@ extension UIView {
     }
 
     /// Applies given shadow style to view's layer.
+    @available(*, deprecated)
     func apply(style: POShadowStyle, shadowOpacity: CGFloat = 1) {
         layer.shadowColor = style.color.cgColor
         layer.shadowOpacity = Float(shadowOpacity)

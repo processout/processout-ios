@@ -364,7 +364,7 @@ public final class ProcessOutLegacyApi {
     /// Initiate a payment authorization from a previously generated invoice and card token
     ///
     /// - Parameters:
-    ///   - AuthorizationRequest: contains all the necessary fields to initiate an authorisation request.
+    ///   - request: contains all the necessary fields to initiate an authorisation request.
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeCardPayment(AuthorizationRequest request: AuthorizationRequest, handler: ThreeDSHandler, with: UIViewController) {
@@ -443,7 +443,7 @@ public final class ProcessOutLegacyApi {
     /// Initiate an incremental payment authorization from a previously generated invoice and card token
     ///
     /// - Parameters:
-    ///   - AuthorizationRequest: contains all the necessary fields to initiate an authorisation request.
+    ///   - request: contains all the necessary fields to initiate an authorisation request.
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeIncrementalAuthorizationPayment(AuthorizationRequest request: AuthorizationRequest, handler: ThreeDSHandler, with: UIViewController) {

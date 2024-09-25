@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+@available(*, deprecated)
 final class AttributedStringMarkdownVisitor: MarkdownVisitor {
 
     init(builder: AttributedStringBuilder, level: Int = 0) {

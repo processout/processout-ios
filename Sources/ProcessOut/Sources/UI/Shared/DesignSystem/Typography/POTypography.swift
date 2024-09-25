@@ -49,6 +49,7 @@ public struct POTypography {
     }
 }
 
+@available(*, deprecated)
 extension POTypography {
 
     enum Fixed {

@@ -27,6 +27,7 @@ public struct POInputStyle {
     }
 }
 
+@available(*, deprecated)
 extension POInputStyle {
 
     /// Allows to create default input style with given typography.

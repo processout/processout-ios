@@ -27,6 +27,7 @@ public struct POBorderStyle {
     }
 }
 
+@available(*, deprecated)
 extension POBorderStyle {
 
     /// Clear border of specified radius.

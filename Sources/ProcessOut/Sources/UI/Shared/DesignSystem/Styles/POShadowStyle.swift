@@ -27,6 +27,7 @@ public struct POShadowStyle {
     }
 }
 
+@available(*, deprecated)
 extension POShadowStyle {
 
     /// Value represents no shadow.

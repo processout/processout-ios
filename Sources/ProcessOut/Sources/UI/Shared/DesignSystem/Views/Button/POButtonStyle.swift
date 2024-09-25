@@ -36,6 +36,7 @@ public struct POButtonStyle {
     }
 }
 
+@available(*, deprecated)
 extension POButtonStyle {
 
     /// Default style for primary button.

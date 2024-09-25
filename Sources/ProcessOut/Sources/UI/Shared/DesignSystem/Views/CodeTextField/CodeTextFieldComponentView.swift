@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 final class CodeTextFieldComponentView: UIView {
 
     struct ViewModel {

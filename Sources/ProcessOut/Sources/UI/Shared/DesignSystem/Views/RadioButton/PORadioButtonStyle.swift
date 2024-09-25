@@ -38,6 +38,7 @@ public struct PORadioButtonStyle {
     }
 }
 
+@available(*, deprecated)
 extension PORadioButtonStyle {
 
     static let `default` = PORadioButtonStyle(
