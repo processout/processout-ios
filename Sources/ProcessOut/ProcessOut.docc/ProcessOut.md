@@ -17,6 +17,8 @@ ProcessOut.configure(configuration: configuration)
 
 - ``ProcessOut/ProcessOut``
 - ``ProcessOutConfiguration``
+- ``ProcessOutApi``
+- ``ProcessOutApiConfiguration``
 - <doc:Localizations>
 - <doc:MigrationGuides>
 
@@ -29,9 +31,14 @@ All errors that could happen as a result of interaction with the SDK are represe
 ### 3DS
 
 - <doc:3DS>
-- ``PO3DSService``
+- ``PO3DS2Service``
 - ``PO3DS2Configuration``
 - ``PO3DS2ConfigurationCardScheme``
+- ``PO3DS2AuthenticationRequestParameters``
+- ``PO3DS2ChallengeParameters``
+- ``PO3DS2ChallengeResult``
+- ``PO3DSServiceType``
+- ``PO3DSService``
 - ``PO3DS2AuthenticationRequest``
 - ``PO3DS2Challenge``
 - ``PO3DSRedirect``
@@ -49,12 +56,17 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``PONativeAlternativePaymentMethodEvent``
 - ``PONativeAlternativePaymentMethodDelegate``
 
-### Alternative Payment Method
+### Alternative Payments
 
-- ``POAlternativePaymentMethodViewControllerBuilder``
+- ``POAlternativePaymentsService``
+- ``POAlternativePaymentAuthorizationRequest``
+- ``POAlternativePaymentTokenizationRequest``
+- ``POAlternativePaymentResponse``
 - ``POAlternativePaymentMethodsService``
+- ``POAlternativePaymentMethodsServiceType``
 - ``POAlternativePaymentMethodRequest``
 - ``POAlternativePaymentMethodResponse``
+- ``POAlternativePaymentMethodViewControllerBuilder``
 
 ### Cards
 
@@ -70,12 +82,14 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``POCardIssuerInformation``
 - ``POCardCvcCheck``
 - ``POCardScheme``
+- ``POCardsServiceType``
 
 ### Customer Tokens
 
 - ``POCustomerTokensService``
 - ``POAssignCustomerTokenRequest``
 - ``POCustomerToken``
+- ``POCustomerTokensServiceType``
 
 ### Gateway Configurations
 
@@ -84,6 +98,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``POAllGatewayConfigurationsRequest``
 - ``POFindGatewayConfigurationRequest``
 - ``POGatewayConfiguration``
+- ``POGatewayConfigurationsRepositoryType``
 
 ### Invoices
 
@@ -99,6 +114,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``PONativeAlternativePaymentMethodTransactionDetailsRequest``
 - ``PONativeAlternativePaymentMethodParameterValues``
 - ``PONativeAlternativePaymentMethodState``
+- ``POInvoicesServiceType``
 <!--- ``PODynamicCheckoutPaymentMethod``-->
 
 ### Appearance
@@ -119,6 +135,8 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POActivityIndicatorStyle``
 - ``POActivityIndicatorView``
 - ``POActionsContainerStyle``
+- ``POTextFieldStyle``
+- ``POActivityIndicatorViewType``
 
 ### Images Utils
 
@@ -140,6 +158,9 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POBillingAddressCollectionMode``
 - ``PORepository``
 - ``POService``
+- ``POCancellableType``
+- ``PORepositoryType``
+- ``POServiceType``
 - ``POAutoAsync``
 - ``POAutoCompletion``
 

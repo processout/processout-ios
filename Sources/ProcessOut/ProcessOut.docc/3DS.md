@@ -19,10 +19,17 @@ package.
 
 ### 3DS Redirect
 
-Method ``PO3DSService/handle(redirect:completion:)`` is a part of 3DS service that is responsible for handling web
-based redirects. 
+In order to handle redirects your application should support deep links. When application receives incoming URL you
+should notify ProcessOut SDK so it has a chance to handle it. 
 
-We provide an extension of `SFSafariViewController` (defined in `ProcessOutUI` package) that can be used to create an
-instance, capable of handling redirects. 
+For example if you are using scene delegate it may look like following:
 
-For additional details on 3DS UI see dedicated [documentation.](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutui/3ds)
+```swift
+func scene(_ scene: UIScene, openURLContexts urlContexts: Set<UIOpenURLContext>) {
+    guard let url = urlContexts.first?.url else {
+    return
+}
+let isHandled = ProcessOut.shared.processDeepLink(url: url)
+print(isHandled)
+}
+```
