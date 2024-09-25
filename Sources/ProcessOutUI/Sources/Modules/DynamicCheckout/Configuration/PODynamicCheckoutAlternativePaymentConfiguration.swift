@@ -13,12 +13,31 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
 
     public struct PaymentConfirmation {
 
+        /// Confirmation button configuration.
+        public struct ConfirmButton { // swiftlint:disable:this nesting
+
+            /// Button title.
+            public let title: String?
+
+            /// Creates button instance.
+            public init(title: String? = nil) {
+                self.title = title
+            }
+        }
+
         /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
         /// Default timeout is 3 minutes while maximum value is 15 minutes.
         public let timeout: TimeInterval
 
         /// A delay before showing progress indicator during payment confirmation.
         public let showProgressIndicatorAfter: TimeInterval?
+
+        /// Payment confirmation button configuration.
+        ///
+        /// Displays a confirmation button when the user needs to perform an external customer action (e.g.,
+        /// completing a step with a third-party service) before proceeding with payment capture. The user
+        /// must press this button to continue.
+        public let confirmButton: ConfirmButton?
 
         /// Action that could be optionally presented to user during payment confirmation stage. To remove action
         /// use `nil`, this is default behaviour.
@@ -28,10 +47,12 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
         public init(
             timeout: TimeInterval = 180,
             showProgressIndicatorAfter: TimeInterval? = nil,
+            confirmButton: ConfirmButton? = nil,
             cancelButton: CancelButton? = nil
         ) {
             self.timeout = timeout
             self.showProgressIndicatorAfter = showProgressIndicatorAfter
+            self.confirmButton = confirmButton
             self.cancelButton = cancelButton
         }
     }
