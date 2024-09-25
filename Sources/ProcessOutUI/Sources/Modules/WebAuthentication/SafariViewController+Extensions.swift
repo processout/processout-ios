@@ -7,6 +7,7 @@
 
 import SafariServices
 
+@available(*, deprecated, message: "Web authentications are handled internally.")
 extension SFSafariViewController {
 
     func setViewModel(_ viewModel: DefaultSafariViewModel) {
