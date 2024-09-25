@@ -45,7 +45,7 @@ final class CustomerTokensServiceTests: XCTestCase {
         )
 
         // When
-        let updatedToken = try await sut.assignCustomerToken(request: request, threeDSService: Mock3DSService())
+        let updatedToken = try await sut.assignCustomerToken(request: request, threeDSService: Mock3DS2Service())
 
         // Then
         XCTAssertEqual(updatedToken.cardId, card.id)
@@ -63,16 +63,16 @@ final class CustomerTokensServiceTests: XCTestCase {
             verify: true,
             enableThreeDS2: true
         )
-        let threeDSService = Mock3DSService()
-        threeDSService.authenticationRequestFromClosure = { _, completion in
-            completion(.failure(.init(code: .cancelled)))
+        let threeDSService = Mock3DS2Service()
+        threeDSService.authenticationRequestParametersFromClosure = { _ in
+            throw POFailure(code: .cancelled)
         }
 
         // When
         _ = try? await sut.assignCustomerToken(request: request, threeDSService: threeDSService)
 
         // Then
-        XCTAssertEqual(threeDSService.authenticationRequestCallsCount, 1)
+        XCTAssertEqual(threeDSService.authenticationRequestParametersCallsCount, 1)
     }
 
     // MARK: - Private Properties

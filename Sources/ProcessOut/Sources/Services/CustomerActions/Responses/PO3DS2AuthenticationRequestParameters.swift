@@ -1,12 +1,15 @@
 //
-//  PO3DS2AuthenticationRequest.swift
+//  PO3DS2AuthenticationRequestParameters.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 03.11.2022.
 //
 
+@available(*, deprecated, renamed: "PO3DS2AuthenticationRequestParameters")
+public typealias PO3DS2AuthenticationRequest = PO3DS2AuthenticationRequestParameters
+
 /// Holds transaction data that the 3DS Server requires to create the AReq.
-public struct PO3DS2AuthenticationRequest: Hashable {
+public struct PO3DS2AuthenticationRequestParameters: Hashable {
 
     /// Encrypted device data as a JWE string.
     public let deviceData: String

@@ -12,16 +12,19 @@ import XCTest
 ///   - expression: An expression that can throw an error.
 ///   - message: An optional description of a failure.
 @discardableResult
-func assertThrowsError<T>(
+func assertThrowsError<T, E: Error>(
     _ expression: @autoclosure () async throws -> T,
     _ message: @autoclosure () -> String = "",
+    errorType: E.Type = Error.self,
     file: StaticString = #filePath,
     line: UInt = #line
-) async -> Error? {
+) async -> E? {
     do {
         _ = try await expression()
-    } catch {
+    } catch let error as E {
         return error
+    } catch {
+        XCTFail("Unexpected error type")
     }
     XCTFail(message(), file: file, line: line)
     return nil

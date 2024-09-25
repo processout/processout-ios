@@ -157,7 +157,7 @@ extension POCustomerTokensService {
     @discardableResult
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
-        threeDSService: PO3DSService,
+        threeDSService: PO3DS2Service,
         completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
@@ -318,7 +318,7 @@ extension POInvoicesService {
     @discardableResult
     public func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
-        threeDSService: PO3DSService,
+        threeDSService: PO3DS2Service,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {

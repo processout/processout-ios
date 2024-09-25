@@ -10,60 +10,50 @@ import UIKit
 
 /// Service that emulates the normal 3DS authentication flow but does not actually make any calls to a real Access
 /// Control Server (ACS). Should be used only for testing purposes in sandbox environment.
-public final class POTest3DSService: PO3DSService {
+public final class POTest3DSService: PO3DS2Service {
 
     /// Creates service instance.
+    @available(*, deprecated, message: "Use init that doesn't accept parameters.")
     public init(returnUrl: URL) {
-        self.returnUrl = returnUrl
+        // Ignored
     }
 
-    // MARK: - PO3DSService
+    public init() {
+        // Ignored
+    }
 
-    public func authenticationRequest(
-        configuration: PO3DS2Configuration,
-        completion: @escaping (Result<PO3DS2AuthenticationRequest, POFailure>) -> Void
-    ) {
-        let request = PO3DS2AuthenticationRequest(
+    // MARK: - PO3DS2Service
+
+    public func authenticationRequestParameters(
+        configuration: PO3DS2Configuration
+    ) async throws -> PO3DS2AuthenticationRequestParameters {
+        PO3DS2AuthenticationRequestParameters(
             deviceData: "",
             sdkAppId: "",
             sdkEphemeralPublicKey: "{}",
             sdkReferenceNumber: "",
             sdkTransactionId: ""
         )
-        completion(.success(request))
     }
 
-    public func handle(challenge: PO3DS2Challenge, completion: @escaping (Result<Bool, POFailure>) -> Void) {
+    @MainActor
+    public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
         guard let presentingViewController = PresentingViewControllerProvider.find() else {
-            completion(.success(false))
-            return
+            throw POFailure(code: .generic(.mobile))
         }
-        let alertController = UIAlertController(
-            title: String(resource: .Test3DS.title), message: "", preferredStyle: .alert
-        )
-        let acceptAction = UIAlertAction(title: String(resource: .Test3DS.accept), style: .default) { _ in
-            completion(.success(true))
-        }
-        alertController.addAction(acceptAction)
-        let rejectAction = UIAlertAction(title: String(resource: .Test3DS.reject), style: .default) { _ in
-            completion(.success(false))
-        }
-        alertController.addAction(rejectAction)
-        presentingViewController.present(alertController, animated: true)
-    }
-
-    public func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        Task { @MainActor in
-            let session = POWebAuthenticationSession(redirect: redirect, returnUrl: returnUrl, completion: completion)
-            if await session.start() {
-                return
+        return await withCheckedContinuation { continuation in
+            let alertController = UIAlertController(
+                title: String(resource: .Test3DS.title), message: "", preferredStyle: .alert
+            )
+            let acceptAction = UIAlertAction(title: String(resource: .Test3DS.accept), style: .default) { _ in
+                continuation.resume(returning: PO3DS2ChallengeResult(transactionStatus: true))
             }
-            let failure = POFailure(message: "Unable to process redirect", code: .generic(.mobile))
-            completion(.failure(failure))
+            alertController.addAction(acceptAction)
+            let rejectAction = UIAlertAction(title: String(resource: .Test3DS.reject), style: .default) { _ in
+                continuation.resume(returning: PO3DS2ChallengeResult(transactionStatus: false))
+            }
+            alertController.addAction(rejectAction)
+            presentingViewController.present(alertController, animated: true)
         }
     }
-
-    // MARK: - Private Properties
-
-    private let returnUrl: URL
 }

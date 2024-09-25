@@ -24,7 +24,7 @@ protocol InvoicesRepository: PORepository {
     func invoice(request: POInvoiceRequest) async throws -> POInvoice
 
     /// Performs invoice authorization with given request.
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> ThreeDSCustomerAction?
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> _CustomerAction?
 
     /// Captures native alternative payment.
     func captureNativeAlternativePayment(

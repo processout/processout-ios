@@ -28,7 +28,9 @@ public final class ProcessOut {
     /// Returns invoices service.
     public private(set) lazy var invoices: POInvoicesService = {
         let repository = HttpInvoicesRepository(connector: httpConnector)
-        return DefaultInvoicesService(repository: repository, threeDSService: threeDSService, logger: serviceLogger)
+        return DefaultInvoicesService(
+            repository: repository, customerActionsService: customerActionsService, logger: serviceLogger
+        )
     }()
 
     /// Returns alternative payment methods service.
@@ -37,7 +39,6 @@ public final class ProcessOut {
             let configuration = self.configuration
             return .init(projectId: configuration.projectId, baseUrl: configuration.environment.checkoutBaseUrl)
         }
-        let webSession = DefaultWebAuthenticationSession()
         return DefaultAlternativePaymentsService(
             configuration: serviceConfiguration, webSession: webSession, logger: serviceLogger
         )
@@ -69,7 +70,7 @@ public final class ProcessOut {
     public private(set) lazy var customerTokens: POCustomerTokensService = {
         let repository = HttpCustomerTokensRepository(connector: httpConnector)
         return DefaultCustomerTokensService(
-            repository: repository, threeDSService: threeDSService, logger: serviceLogger
+            repository: repository, customerActionsService: customerActionsService, logger: serviceLogger
         )
     }()
 
@@ -144,14 +145,16 @@ public final class ProcessOut {
         )
     }()
 
-    private lazy var threeDSService: ThreeDSService = {
+    private lazy var customerActionsService: CustomerActionsService = {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .useDefaultKeys
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        return DefaultThreeDSService(decoder: decoder, encoder: encoder)
+        return DefaultCustomerActionsService(decoder: decoder, encoder: encoder, webSession: webSession)
     }()
+
+    private let webSession = DefaultWebAuthenticationSession()
 
     // MARK: - Private Methods
 

@@ -95,7 +95,8 @@ extension CardPaymentViewModel: POCardTokenizationDelegate {
             saveSource: save,
             clientSecret: invoice.clientSecret
         )
-        let threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
+        // todo(andrii-vysotskyi): allow using Checkout3DS when compatibility with Swift 6 is restored
+        let threeDSService = POTest3DSService()
         try await invoicesService.authorizeInvoice(request: invoiceAuthorizationRequest, threeDSService: threeDSService)
     }
 }

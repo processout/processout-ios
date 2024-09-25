@@ -8,6 +8,7 @@
 import Foundation
 import ProcessOut
 
+@available(*, deprecated, message: "Redirects are handled internally.")
 extension POWebAuthenticationSession {
 
     /// Creates POWebAuthenticationSession that is able to handle 3DS redirects.

@@ -22,7 +22,7 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
     /// sure that invoice id and source stay the same.
     func dynamicCheckout(
         willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest
-    ) async -> PO3DSService
+    ) async -> PO3DS2Service
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.

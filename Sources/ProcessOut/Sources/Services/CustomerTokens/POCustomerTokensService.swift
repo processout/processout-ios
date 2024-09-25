@@ -17,7 +17,7 @@ public protocol POCustomerTokensService: POService { // sourcery: AutoCompletion
 
     /// Assigns new source to existing customer token and optionally verifies it.
     func assignCustomerToken(
-        request: POAssignCustomerTokenRequest, threeDSService: PO3DSService
+        request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
     ) async throws -> POCustomerToken
 
     /// Creates customer token using given request.

@@ -56,9 +56,9 @@ final class HttpInvoicesRepository: InvoicesRepository {
         return try await connector.execute(request: httpRequest).invoice
     }
 
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> ThreeDSCustomerAction? {
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> _CustomerAction? {
         struct Response: Decodable {
-            let customerAction: ThreeDSCustomerAction?
+            let customerAction: _CustomerAction?
         }
         let headers = [
             "X-Processout-Client-Secret": request.clientSecret

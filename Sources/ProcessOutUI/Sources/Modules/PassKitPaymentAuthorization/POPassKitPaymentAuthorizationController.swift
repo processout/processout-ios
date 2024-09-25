@@ -59,7 +59,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
     /// Presents the payment sheet modally over your app.
     public func present() async -> Bool {
         await withUnsafeContinuation { continuation in
-            present(completion: continuation.resume)
+            present { continuation.resume(returning: $0) }
         }
     }
 

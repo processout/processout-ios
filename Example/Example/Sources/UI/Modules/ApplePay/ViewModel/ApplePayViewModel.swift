@@ -58,7 +58,7 @@ final class ApplePayViewModel: ObservableObject {
                 let authorizationRequest = POInvoiceAuthorizationRequest(
                     invoiceId: invoice.id, source: card.id
                 )
-                let threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
+                let threeDSService = POTest3DSService()
                 try await invoicesService.authorizeInvoice(
                     request: authorizationRequest, threeDSService: threeDSService
                 )
