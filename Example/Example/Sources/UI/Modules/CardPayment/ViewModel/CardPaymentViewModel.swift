@@ -9,7 +9,6 @@ import Combine
 import SwiftUI
 @_spi(PO) import ProcessOut
 import ProcessOutUI
-import ProcessOutCheckout3DS
 
 @MainActor
 final class CardPaymentViewModel: ObservableObject {
@@ -36,16 +35,19 @@ final class CardPaymentViewModel: ObservableObject {
     // MARK: - Private Methods
 
     private func commonInit() {
+        // todo(andrii-vysotskyi): allow using Checkout3DS when compatibility with Swift 6 is restored
         state = .init(
             authenticationService: .init(
-                sources: [.test, .checkout], id: \.self, selection: .test
+                sources: [.test], id: \.self, selection: .test
             ),
             cardTokenization: nil
         )
     }
 
     private func setCardTokenizationItem() {
-        let configuration = POCardTokenizationConfiguration(isCardholderNameInputVisible: false)
+        let configuration = POCardTokenizationConfiguration(
+            isCardholderNameInputVisible: false, isSavingAllowed: true
+        )
         let cardTokenizationItem = CardPaymentViewModelState.CardTokenization(
             id: UUID().uuidString,
             configuration: configuration,
@@ -72,7 +74,8 @@ final class CardPaymentViewModel: ObservableObject {
                 name: UUID().uuidString,
                 amount: state.invoice.amount,
                 currency: state.invoice.currencyCode,
-                returnUrl: Constants.returnUrl
+                returnUrl: Constants.returnUrl,
+                customerId: Constants.customerId
             )
             return try await invoicesService.createInvoice(request: request)
         } else {
@@ -92,33 +95,8 @@ extension CardPaymentViewModel: POCardTokenizationDelegate {
             saveSource: save,
             clientSecret: invoice.clientSecret
         )
-        let threeDSService: PO3DSService
-        switch state.authenticationService.selection {
-        case .test:
-            threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
-        case .checkout:
-            threeDSService = POCheckout3DSServiceBuilder()
-                .with(delegate: self)
-                .with(environment: .sandbox)
-                .build()
-        }
+        let threeDSService = POTest3DSService(returnUrl: Constants.returnUrl)
         try await invoicesService.authorizeInvoice(request: invoiceAuthorizationRequest, threeDSService: threeDSService)
-    }
-}
-
-extension CardPaymentViewModel: POCheckout3DSServiceDelegate {
-
-    func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void) {
-        Task { @MainActor in
-            let session = POWebAuthenticationSession(
-                redirect: redirect, returnUrl: Constants.returnUrl, completion: completion
-            )
-            if await session.start() {
-                return
-            }
-            let failure = POFailure(message: "Unable to process redirect", code: .generic(.mobile))
-            completion(.failure(failure))
-        }
     }
 }
 
