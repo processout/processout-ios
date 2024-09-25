@@ -8,6 +8,7 @@
 import UIKit
 
 /// Describes radio button knob style in a particular state.
+@available(*, deprecated, message: "Use ProcessOutUI module.")
 public struct PORadioButtonKnobStateStyle {
 
     /// Background color.

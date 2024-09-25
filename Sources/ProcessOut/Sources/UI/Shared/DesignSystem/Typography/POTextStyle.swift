@@ -8,6 +8,7 @@
 import UIKit
 
 /// Text style.
+@available(*, deprecated, message: "Use ProcessOutUI module.")
 public struct POTextStyle {
 
     /// Text foreground color.

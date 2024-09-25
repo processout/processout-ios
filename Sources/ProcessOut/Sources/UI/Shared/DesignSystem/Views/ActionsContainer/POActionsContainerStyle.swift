@@ -8,6 +8,7 @@
 import UIKit
 
 /// Actions container style.
+@available(*, deprecated, message: "Use ProcessOutUI module.")
 public struct POActionsContainerStyle {
 
     /// Style for primary button.

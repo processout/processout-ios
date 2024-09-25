@@ -8,6 +8,7 @@
 import UIKit
 
 /// Describes radio button style in different states.
+@available(*, deprecated, message: "Use ProcessOutUI module.")
 public struct PORadioButtonStyle {
 
     /// Style to use when radio button is in default state ie enabled and not selected.

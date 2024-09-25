@@ -12,6 +12,7 @@ public typealias POActivityIndicatorViewType = POActivityIndicatorView
 
 /// Protocol that activity indicator should conform to in order to be used with
 /// ``POActivityIndicatorStyle`` custom style.
+@available(*, deprecated, message: "Use ProcessOutUI module.")
 public protocol POActivityIndicatorView: UIView {
 
     /// Changes animation state.

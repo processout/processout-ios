@@ -8,6 +8,7 @@
 import UIKit
 
 /// Defines button style in all possible states.
+@available(*, deprecated, message: "Use ProcessOutUI module.")
 public struct POButtonStyle {
 
     /// Style for normal state.
