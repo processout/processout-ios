@@ -43,7 +43,7 @@ See ``POCardUpdateConfiguration`` reference for other available configurations.
 
 In order to tweak view’s styling, you should create an instance of ``POCardUpdateStyle`` structure and pass it
 to view. The way you set style depends on whether you are using SwiftUI or UIKit bindings. For view controller
-pass style instance via init, for SwiftUI view you can use ``SwiftUI/View/cardUpdateStyle(_:)`` modifier.
+pass style instance via init, for SwiftUI view you can use ``SwiftUICore/View/cardUpdateStyle(_:)`` modifier.
 
 ### Errors Recovery
 

@@ -19,7 +19,7 @@
 - ``POCardTokenizationView``
 - ``POCardTokenizationViewController``
 - ``POCardTokenizationStyle``
-- ``SwiftUI/View/cardTokenizationStyle(_:)``
+- ``SwiftUICore/View/cardTokenizationStyle(_:)``
 - ``POCardTokenizationConfiguration``
 - ``POBillingAddressConfiguration``
 - ``POCardTokenizationDelegate``
@@ -31,7 +31,7 @@
 - ``POCardUpdateView``
 - ``POCardUpdateViewController``
 - ``POCardUpdateStyle``
-- ``SwiftUI/View/cardUpdateStyle(_:)``
+- ``SwiftUICore/View/cardUpdateStyle(_:)``
 - ``POCardUpdateConfiguration``
 - ``POCardUpdateDelegate``
 - ``POCardUpdateInformation``
@@ -51,7 +51,7 @@
 - ``PONativeAlternativePaymentViewController``
 - ``PONativeAlternativePaymentStyle``
 - ``PONativeAlternativePaymentBackgroundStyle``
-- ``SwiftUI/View/nativeAlternativePaymentStyle(_:)``
+- ``SwiftUICore/View/nativeAlternativePaymentStyle(_:)``
 - ``PONativeAlternativePaymentConfiguration``
 - ``PONativeAlternativePaymentConfirmationConfiguration``
 - ``PONativeAlternativePaymentDelegate``
