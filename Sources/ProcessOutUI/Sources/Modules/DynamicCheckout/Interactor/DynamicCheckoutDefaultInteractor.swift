@@ -412,7 +412,7 @@ final class DynamicCheckoutDefaultInteractor:
         switch state {
         case .idle:
             break // Ignored
-        case .started(let startedState):
+        case .started:
             currentState.isCancellable = currentState.snapshot.isCancellable
             self.state = .paymentProcessing(currentState)
         case .tokenizing:
