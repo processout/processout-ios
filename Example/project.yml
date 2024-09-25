@@ -17,8 +17,6 @@ settings:
 packages:
   ProcessOutUI:
     path: ../
-  # ProcessOutCheckout3DS:
-  #   path: ../
 
 targets:
   Example:
@@ -34,7 +32,6 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-example
     dependencies:
       - package: ProcessOutUI
-      # - package: ProcessOutCheckout3DS
   ExampleUiTests:
     type: bundle.ui-testing
     sources: ExampleUiTests

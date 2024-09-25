@@ -35,6 +35,7 @@ final class CardPaymentViewModel: ObservableObject {
     // MARK: - Private Methods
 
     private func commonInit() {
+        // todo(andrii-vysotskyi): allow using Checkout3DS when compatibility with Swift 6 is restored
         state = .init(
             authenticationService: .init(
                 sources: [.test], id: \.self, selection: .test
@@ -44,7 +45,9 @@ final class CardPaymentViewModel: ObservableObject {
     }
 
     private func setCardTokenizationItem() {
-        let configuration = POCardTokenizationConfiguration(isCardholderNameInputVisible: false)
+        let configuration = POCardTokenizationConfiguration(
+            isCardholderNameInputVisible: false, isSavingAllowed: true
+        )
         let cardTokenizationItem = CardPaymentViewModelState.CardTokenization(
             id: UUID().uuidString,
             configuration: configuration,
@@ -71,7 +74,8 @@ final class CardPaymentViewModel: ObservableObject {
                 name: UUID().uuidString,
                 amount: state.invoice.amount,
                 currency: state.invoice.currencyCode,
-                returnUrl: Constants.returnUrl
+                returnUrl: Constants.returnUrl,
+                customerId: Constants.customerId
             )
             return try await invoicesService.createInvoice(request: request)
         } else {
@@ -91,7 +95,7 @@ extension CardPaymentViewModel: POCardTokenizationDelegate {
             saveSource: save,
             clientSecret: invoice.clientSecret
         )
-        // todo(andrii-vysotskyi): allow selecting Checkout 3DS service when build issue is resolved.
+        // todo(andrii-vysotskyi): allow using Checkout3DS when compatibility with Swift 6 is restored
         let threeDSService = POTest3DSService()
         try await invoicesService.authorizeInvoice(request: invoiceAuthorizationRequest, threeDSService: threeDSService)
     }

@@ -5,8 +5,11 @@ set -euo pipefail
 PROJECT='ProcessOut.xcodeproj'
 DESTINATION=$(./Scripts/TestDestination.swift)
 
+# todo(andrii-vysotskyi): re-enable Checkout3DS wrapper testing
+# ProcessOutCheckout3DS is not compatible with Xcode 16
+
 # Run Tests
-for PRODUCT in "ProcessOut" "ProcessOutUI" "ProcessOutCheckout3DS"; do
+for PRODUCT in "ProcessOut" "ProcessOutUI"; do
     xcodebuild clean test \
         -destination "$DESTINATION" \
         -project $PROJECT \
