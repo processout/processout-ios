@@ -142,13 +142,8 @@ final class DefaultCardTokenizationInteractor:
     }
 
     override func cancel() {
-        switch state {
-        case .idle, .started:
-            break
-        case .tokenizing(let currentState):
+        if case .tokenizing(let currentState) = state {
             currentState.cancellable.cancel()
-        case .tokenized, .failure:
-            logger.debug("Unable to cancel in sink state, ignored.")
         }
         setFailureState(failure: POFailure(code: .cancelled))
     }
