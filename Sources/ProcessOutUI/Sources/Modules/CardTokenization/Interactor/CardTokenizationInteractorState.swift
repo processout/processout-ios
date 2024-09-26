@@ -6,65 +6,10 @@
 //
 
 import Foundation
+import Combine
 import ProcessOut
 
 enum CardTokenizationInteractorState {
-
-    typealias ParameterId = WritableKeyPath<Started, Parameter>
-
-    struct Parameter {
-
-        /// Parameter identifier
-        let id: ParameterId
-
-        /// Actual parameter value.
-        var value: String = ""
-
-        /// Indicates whether parameter is valid.
-        var isValid = true
-
-        /// Boolean flag indicating whether parameter should be collected.
-        var shouldCollect = true // todo(andrii-vysotskyi): consider migrating to optional parameters
-
-        /// Available parameter values.
-        var availableValues: [ParameterValue] = []
-
-        /// Formatter that can be used to format this parameter.
-        var formatter: Formatter?
-    }
-
-    struct ParameterValue: Decodable, Hashable {
-
-        /// Display name of value.
-        let displayName: String
-
-        /// Actual parameter value.
-        let value: String
-    }
-
-    struct AddressParameters {
-
-        /// Billing address country.
-        var country: Parameter
-
-        /// Billing address street line 1.
-        var street1: Parameter
-
-        /// Billing address street line 2.
-        var street2: Parameter
-
-        /// Billing address city.
-        var city: Parameter
-
-        /// Billing address state.
-        var state: Parameter
-
-        /// Billing address postal code.
-        var postalCode: Parameter
-
-        /// Address country specification.
-        var specification: AddressSpecification
-    }
 
     struct Started {
 
@@ -96,14 +41,70 @@ enum CardTokenizationInteractorState {
         var recentErrorMessage: String?
     }
 
-    struct Tokenized {
+    struct Tokenizing {
 
-        /// Tokenized card.
-        let card: POCard
+        /// Started state snapshot.
+        let snapshot: Started
 
-        /// Full card number.
-        let cardNumber: String
+        /// Tokenization cancellable.
+        let cancellable: AnyCancellable
     }
+
+    struct AddressParameters {
+
+        /// Billing address country.
+        var country: Parameter
+
+        /// Billing address street line 1.
+        var street1: Parameter
+
+        /// Billing address street line 2.
+        var street2: Parameter
+
+        /// Billing address city.
+        var city: Parameter
+
+        /// Billing address state.
+        var state: Parameter
+
+        /// Billing address postal code.
+        var postalCode: Parameter
+
+        /// Address country specification.
+        var specification: AddressSpecification
+    }
+
+    struct Parameter {
+
+        /// Parameter identifier
+        let id: ParameterId
+
+        /// Actual parameter value.
+        var value: String = ""
+
+        /// Indicates whether parameter is valid.
+        var isValid = true
+
+        /// Boolean flag indicating whether parameter should be collected.
+        var shouldCollect = true // todo(andrii-vysotskyi): consider migrating to optional parameters
+
+        /// Available parameter values.
+        var availableValues: [ParameterValue] = []
+
+        /// Formatter that can be used to format this parameter.
+        var formatter: Formatter?
+    }
+
+    struct ParameterValue: Decodable, Hashable {
+
+        /// Display name of value.
+        let displayName: String
+
+        /// Actual parameter value.
+        let value: String
+    }
+
+    typealias ParameterId = WritableKeyPath<Started, Parameter>
 
     case idle
 
@@ -111,13 +112,28 @@ enum CardTokenizationInteractorState {
     case started(Started)
 
     /// Card information is currently being tokenized.
-    case tokenizing(snapshot: Started)
+    case tokenizing(Tokenizing)
 
     /// Card was successfully tokenized. This is a sink state.
-    case tokenized(Tokenized)
+    case tokenized
 
     /// Card tokenization did end with unrecoverable failure. This is a sink state.
     case failure(POFailure)
+}
+
+extension CardTokenizationInteractorState {
+
+    /// Boolean variable that indicates whether the current state is a sink state.
+    ///
+    /// A sink state is a special kind of state where, once entered, no other state transitions are possible.
+    var isSink: Bool {
+        switch self {
+        case .tokenized, .failure:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 extension CardTokenizationInteractorState.AddressParameters {
