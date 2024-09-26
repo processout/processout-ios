@@ -14,7 +14,7 @@ public protocol POCardsService: POService { // sourcery: AutoCompletion
     /// Allows to retrieve card issuer information based on IIN.
     ///
     /// - Parameters:
-    ///   - iin: Card issuer identification number. Corresponds to the first 6 or 8 digits of the main card number.
+    ///   - iin: Card issuer identification number. Length should be at least 6 otherwise error is thrown.
     func issuerInformation(iin: String) async throws -> POCardIssuerInformation
 
     /// Tokenizes a card. You can use the card for a single payment by creating a card token with it. If you want

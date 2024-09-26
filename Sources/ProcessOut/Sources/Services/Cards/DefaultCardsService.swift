@@ -24,8 +24,10 @@ final class DefaultCardsService: POCardsService {
 
     // MARK: - POCardsService
 
-    func issuerInformation(iin: String) async throws -> POCardIssuerInformation {
-        try await repository.issuerInformation(iin: iin)
+    func issuerInformation(iin cardNumber: String) async throws -> POCardIssuerInformation {
+        // todo(andrii-vysotskyi): indicate in method arguments that method accepts full card number
+        let iin = try issuerIdentificationNumber(of: cardNumber)
+        return try await repository.issuerInformation(iin: iin)
     }
 
     func tokenize(request: POCardTokenizationRequest) async throws -> POCard {
@@ -62,4 +64,18 @@ final class DefaultCardsService: POCardsService {
     private let applePayAuthorizationSession: ApplePayAuthorizationSession
     private let applePayCardTokenizationRequestMapper: ApplePayCardTokenizationRequestMapper
     private let applePayErrorMapper: POPassKitPaymentErrorMapper
+
+    // MARK: - Private Methods
+
+    private func issuerIdentificationNumber(of cardNumber: String) throws -> String {
+        let iinLength: Int, filteredNumber = cardNumber.filter(\.isNumber)
+        if filteredNumber.count >= 8 {
+            iinLength = 8
+        } else if filteredNumber.count >= 6 {
+            iinLength = 6
+        } else {
+            throw POFailure(message: "IIN must have at least 6 digits.", code: .generic(.mobile))
+        }
+        return String(filteredNumber.prefix(iinLength))
+    }
 }
