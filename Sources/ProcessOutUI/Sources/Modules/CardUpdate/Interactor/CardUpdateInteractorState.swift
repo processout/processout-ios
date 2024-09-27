@@ -8,12 +8,18 @@
 import Foundation
 import ProcessOut
 
-enum CardUpdateInteractorState: Equatable {
+enum CardUpdateInteractorState {
+
+    struct Starting {
+
+        /// Start task.
+        let task: Task<Void, Never>
+    }
 
     struct Started: Equatable {
 
         /// Masked card number.
-        var cardNumber: String?
+        let cardNumber: String?
 
         /// Scheme of the card.
         var scheme: POCardScheme?
@@ -28,7 +34,7 @@ enum CardUpdateInteractorState: Equatable {
         var cvc: String = ""
 
         /// Formatter that should be used to format CVC.
-        var formatter: Formatter?
+        let formatter: Formatter
 
         /// Indicates whether parameters are valid.
         /// - NOTE: CVC is the only parameter that could be invalid at a moment.
@@ -38,17 +44,39 @@ enum CardUpdateInteractorState: Equatable {
         var recentErrorMessage: String?
     }
 
+    struct Updating {
+
+        /// Started state snapshot.
+        let snapshot: Started
+
+        /// Update task.
+        let task: Task<Void, Never>
+    }
+
     case idle
 
     /// Interactor is currently starting.
-    case starting
+    case starting(Starting)
 
     /// Interactor has started and is ready.
     case started(Started)
 
     /// Card information is currently being updated.
-    case updating(snapshot: Started)
+    case updating(Updating)
 
     /// Card update has finished. This is a sink state.
     case completed
+}
+
+extension CardUpdateInteractorState {
+
+    /// Boolean variable that indicates whether the current state is a sink state.
+    ///
+    /// A sink state is a special kind of state where, once entered, no other state transitions are possible.
+    var isSink: Bool {
+        if case .completed = self {
+            return true
+        }
+        return false
+    }
 }
