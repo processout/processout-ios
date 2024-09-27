@@ -39,6 +39,10 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         interactor.start()
     }
 
+    func stop() {
+        interactor.cancel()
+    }
+
     // MARK: - Private Nested Types
 
     private typealias InteractorState = CardUpdateInteractorState
@@ -84,13 +88,13 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
             ]
             updateActionsWithStartingState()
             focusedItemId = nil
-        case .started(let state):
-            updateSections(with: state)
-            updateActions(with: state)
+        case .started(let currentState):
+            updateSections(with: currentState)
+            updateActions(with: currentState)
             focusedItemId = ItemId.cvc
-        case .updating(let state):
-            updateSections(with: state)
-            updateActions(with: state, isSubmitting: true)
+        case .updating(let currentState):
+            updateSections(with: currentState.snapshot)
+            updateActions(with: currentState.snapshot, isSubmitting: true)
             focusedItemId = nil
         }
     }

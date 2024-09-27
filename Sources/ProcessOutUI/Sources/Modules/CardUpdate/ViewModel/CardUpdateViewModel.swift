@@ -24,4 +24,7 @@ protocol CardUpdateViewModel: ObservableObject {
 
     /// Starts view model.
     func start()
+
+    /// Stops view model.
+    func stop()
 }
