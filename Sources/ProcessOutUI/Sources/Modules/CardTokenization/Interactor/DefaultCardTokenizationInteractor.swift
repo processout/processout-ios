@@ -137,13 +137,13 @@ final class DefaultCardTokenizationInteractor:
                 attemptRecoverTokenizationFailure(failure: failure)
             }
         }
-        let tokenizingState = State.Tokenizing(snapshot: currentState, cancellable: AnyCancellable(task.cancel))
+        let tokenizingState = State.Tokenizing(snapshot: currentState, task: task)
         state = .tokenizing(tokenizingState)
     }
 
     override func cancel() {
         if case .tokenizing(let currentState) = state {
-            currentState.cancellable.cancel()
+            currentState.task.cancel()
         }
         setFailureState(failure: POFailure(code: .cancelled))
     }
@@ -267,7 +267,7 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - Card Issuer Information
 
     private func scheduleIssuerInformationUpdates() {
-        var issuerInformationUpdateCancellable: AnyCancellable?
+        var issuerInformationUpdateTask: Task<Void, Never>?
         cardNumberSubject
             .map { number in
                 String(number.filter(\.isNumber).prefix(Constants.iinLength))
@@ -275,13 +275,13 @@ final class DefaultCardTokenizationInteractor:
             .removeDuplicates()
             .debounce(for: .seconds(0.3), scheduler: RunLoop.main)
             .sink { [weak self] iin in
-                issuerInformationUpdateCancellable?.cancel()
-                issuerInformationUpdateCancellable = self?.updateIssuerInformation(iin: iin)
+                issuerInformationUpdateTask?.cancel()
+                issuerInformationUpdateTask = self?.updateIssuerInformation(iin: iin)
             }
             .store(in: &cancellables)
     }
 
-    private func updateIssuerInformation(iin: String) -> AnyCancellable? {
+    private func updateIssuerInformation(iin: String) -> Task<Void, Never>? {
         if let scheme = CardSchemeProvider.shared.scheme(cardNumber: iin) {
             let information = POCardIssuerInformation(scheme: scheme)
             update(issuerInformation: information, resolvePreferredScheme: false)
@@ -298,7 +298,7 @@ final class DefaultCardTokenizationInteractor:
                 self?.update(issuerInformation: information, resolvePreferredScheme: true)
             }
         }
-        return AnyCancellable(task.cancel)
+        return task
     }
 
     /// Updates started state with given issuer information, which includes scheme and possibly CVC.

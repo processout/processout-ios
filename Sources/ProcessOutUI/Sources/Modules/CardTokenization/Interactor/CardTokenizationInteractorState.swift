@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 import ProcessOut
 
 enum CardTokenizationInteractorState {
@@ -46,8 +45,8 @@ enum CardTokenizationInteractorState {
         /// Started state snapshot.
         let snapshot: Started
 
-        /// Tokenization cancellable.
-        let cancellable: AnyCancellable
+        /// Tokenization task.
+        let task: Task<Void, Never>
     }
 
     struct AddressParameters {
