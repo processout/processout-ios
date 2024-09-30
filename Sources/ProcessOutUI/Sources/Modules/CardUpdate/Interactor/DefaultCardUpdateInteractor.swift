@@ -149,6 +149,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     // MARK: - Scheme Update
 
+    @MainActor
     private func issuerInformation(cardInfo: POCardUpdateInformation?) async -> POCardIssuerInformation? {
         if let scheme = cardInfo?.$scheme.typed {
             logger.debug("Needed schemes information is already set, won't resolve.")
