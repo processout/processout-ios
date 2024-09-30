@@ -20,7 +20,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
     // MARK: - Start
 
     @MainActor
-    func test_start_whenCardInfoIsNotSet_setsStartingState() {
+    func test_start_whenCardInfoIsNotSet_setsStartingState() async {
         // Given
         let delegate = CardUpdateDelegateMock()
         let configuration = POCardUpdateConfiguration(cardId: "")
@@ -35,21 +35,23 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
             return nil
         }
         sut.start()
+        try? await Task.sleep(for: .seconds(1))
 
         // Then
-        wait(for: [expectation])
+        await fulfillment(of: [expectation])
     }
 
     // MARK: - Scheme Resolve
 
     @MainActor
-    func test_start_whenCardSchemeIsSetInConfiguration_setsStartedStateWithIt() {
+    func test_start_whenCardSchemeIsSetInConfiguration_setsStartedStateWithIt() async {
         // Given
         let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
         let sut = createSut(configuration: configuration)
 
         // When
         sut.start()
+        try? await Task.sleep(for: .seconds(1))
 
         // Then
         guard case .started(let startedState) = sut.state else {
@@ -60,7 +62,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
     }
 
     @MainActor
-    func test_start_whenPreferredCardSchemeIsAvailable_setsStartedStateWithIt() {
+    func test_start_whenPreferredCardSchemeIsAvailable_setsStartedStateWithIt() async {
         // Given
         let configuration = POCardUpdateConfiguration(
             cardId: "", cardInformation: .init(scheme: "visa", preferredScheme: "carte bancaire")
@@ -69,6 +71,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
 
         // When
         sut.start()
+        try? await Task.sleep(for: .seconds(1))
 
         // Then
         guard case .started(let startedState) = sut.state else {
@@ -80,7 +83,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
     }
 
     @MainActor
-    func test_start_whenCardSchemeIsNotSetAndIinIsSet_attemptsToResolve() {
+    func test_start_whenCardSchemeIsNotSetAndIinIsSet_attemptsToResolve() async {
         // Given
         let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(iin: "424242"))
         let sut = createSut(configuration: configuration)
@@ -95,11 +98,11 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
                 expectation.fulfill()
             }
         }
-        wait(for: [expectation])
+        await fulfillment(of: [expectation])
     }
 
     @MainActor
-    func test_start_whenCardSchemeIsNotSetAndMaskedNumberIsSet_attemptsToResolve() {
+    func test_start_whenCardSchemeIsNotSetAndMaskedNumberIsSet_attemptsToResolve() async {
         // Given
         let configuration = POCardUpdateConfiguration(
             cardId: "", cardInformation: .init(maskedNumber: "4242 42** **42")
@@ -116,17 +119,18 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
                 expectation.fulfill()
             }
         }
-        wait(for: [expectation])
+        await fulfillment(of: [expectation])
     }
 
     // MARK: - Cancel
 
     @MainActor
-    func test_cancel_whenStarted() {
+    func test_cancel_whenStarted() async {
         // Given
         let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
         let sut = createSut(configuration: configuration)
         sut.start()
+        try? await Task.sleep(for: .seconds(1))
 
         // When
         sut.cancel()
@@ -156,11 +160,12 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
     }
 
     @MainActor
-    func test_updateCvc_whenStarted_updatesState() {
+    func test_updateCvc_whenStarted_updatesState() async {
         // Given
         let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
         let sut = createSut(configuration: configuration)
         sut.start()
+        try? await Task.sleep(for: .seconds(1))
 
         // When
         sut.update(cvc: "1 23 45")
@@ -175,11 +180,12 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
     // MARK: - Submit
 
     @MainActor
-    func test_submit_whenCvcIsNotSet_causesError() {
+    func test_submit_whenCvcIsNotSet_causesError() async {
         // Given
         let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
         let sut = createSut(configuration: configuration)
         sut.start()
+        try? await Task.sleep(for: .seconds(1))
 
         // When
         sut.submit()
@@ -191,20 +197,21 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
                 expectation.fulfill()
             }
         }
-        wait(for: [expectation])
+        await fulfillment(of: [expectation])
     }
 
     @MainActor
-    func test_submit_whenValidCvcIsSet_completes() {
+    func test_submit_whenValidCvcIsSet_completes() async {
         // Given
         let configuration = POCardUpdateConfiguration(
             cardId: "card_ZbHkl2Uh3Udafx2cbb2uN4pP2evwHPyf", cardInformation: .init(scheme: "visa")
         )
         let sut = createSut(configuration: configuration)
         sut.start()
-        sut.update(cvc: "123")
+        try? await Task.sleep(for: .seconds(1))
 
         // When
+        sut.update(cvc: "123")
         sut.submit()
 
         // Then
@@ -214,7 +221,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
                 expectation.fulfill()
             }
         }
-        wait(for: [expectation])
+        await fulfillment(of: [expectation])
     }
 
     // MARK: - Private Properties
