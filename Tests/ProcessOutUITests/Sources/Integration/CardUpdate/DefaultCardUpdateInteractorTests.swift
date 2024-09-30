@@ -29,7 +29,7 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
         // When
         let expectation = XCTestExpectation()
         delegate.cardInformationFromClosure = { [unowned sut] _ in
-            if sut.state == .starting {
+            if case .starting = sut.state {
                 expectation.fulfill()
             }
             return nil
@@ -132,7 +132,9 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
         sut.cancel()
 
         // Then
-        XCTAssertEqual(sut.state, .completed)
+        if case .completed = sut.state { } else {
+            XCTFail("Expected completed state.")
+        }
     }
 
     // MARK: - Update CVC
@@ -143,13 +145,14 @@ final class DefaultCardUpdateInteractorTests: XCTestCase {
         let configuration = POCardUpdateConfiguration(cardId: "")
         let sut = createSut(configuration: configuration)
         sut.start()
-        let oldState = sut.state
 
         // When
         sut.update(cvc: "123")
 
         // Then
-        XCTAssertEqual(sut.state, oldState)
+        if case .starting = sut.state { } else {
+            XCTFail("Expected starting state.")
+        }
     }
 
     @MainActor
