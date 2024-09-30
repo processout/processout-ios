@@ -501,7 +501,7 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)
         case .submitting(let submittingState):
-            currentState.isCancellable = submittingState.isCancellable
+            currentState.isCancellable = submittingState.snapshot.isCancellable
             currentState.isReady = true
             currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)

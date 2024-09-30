@@ -12,19 +12,31 @@ import ProcessOut
 
 enum NativeAlternativePaymentInteractorState {
 
+    struct Starting {
+
+        /// Start task.
+        let task: Task<Void, Never>
+    }
+
     struct Started {
 
-        /// Name of the payment gateway that can be displayed.
-        let gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
-
-        /// Invoice details.
-        let invoice: PONativeAlternativePaymentMethodTransactionDetails.Invoice
+        /// Transaction details.
+        let transactionDetails: PONativeAlternativePaymentMethodTransactionDetails
 
         /// Parameters that are expected from user.
         var parameters: [Parameter]
 
-        /// Boolean value indicating whether "soft" cancelation is supported in the current state.
+        /// Boolean value indicating whether user should be able to manually cancel payment in current state.
         var isCancellable: Bool
+    }
+
+    struct Submitting {
+
+        /// Started state snapshot.
+        let snapshot: Started
+
+        /// Submission task.
+        let task: Task<Void, Never>
     }
 
     struct AwaitingCapture {
@@ -35,12 +47,12 @@ enum NativeAlternativePaymentInteractorState {
         /// Additional action details.
         let customerAction: CaptureCustomerAction?
 
-        /// Boolean value indicating whether "soft" cancelation is supported in the current state.
+        /// Boolean value indicating whether user should be able to manually cancel payment in current state.
         var isCancellable: Bool
 
-        /// Capture cancellable.
+        /// Capture task if any.
         /// - NOTE: For internal use by interactor only.
-        var cancellable: AnyCancellable?
+        var task: Task<Void, Never>?
 
         /// Boolean value indicating whether capture takes longer than anticipated.
         var isDelayed: Bool
@@ -92,7 +104,7 @@ enum NativeAlternativePaymentInteractorState {
     case idle
 
     /// Interactor is loading initial content portion.
-    case starting
+    case starting(Starting)
 
     /// Interactor is started and awaits for parameters values.
     case started(Started)
@@ -101,7 +113,7 @@ enum NativeAlternativePaymentInteractorState {
     case failure(POFailure)
 
     /// Parameter values are being submitted.
-    case submitting(snapshot: Started)
+    case submitting(Submitting)
 
     /// Parameter values were submitted.
     /// - NOTE: This is a sink state and it's only set if user opted out from awaiting capture.
@@ -119,5 +131,20 @@ extension NativeAlternativePaymentInteractorState.Started {
     /// Boolean value that allows to determine whether all parameters are valid.
     var areParametersValid: Bool {
         parameters.allSatisfy { $0.recentErrorMessage == nil }
+    }
+}
+
+extension NativeAlternativePaymentInteractorState {
+
+    /// Boolean variable that indicates whether the current state is a sink state.
+    ///
+    /// A sink state is a special kind of state where, once entered, no other state transitions are possible.
+    var isSink: Bool {
+        switch self {
+        case .submitted, .captured, .failure:
+            return true
+        default:
+            return false
+        }
     }
 }
