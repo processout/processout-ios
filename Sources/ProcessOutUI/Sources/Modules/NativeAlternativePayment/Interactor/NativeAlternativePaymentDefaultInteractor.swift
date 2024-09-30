@@ -407,7 +407,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func setFailureState(error: Error) {
         guard !state.isSink else {
-            logger.debug("Already in a sink state, ignoring attempt to set failure state.")
+            logger.debug("Already in a sink state, ignoring attempt to set failure state with: \(error).")
             return
         }
         logger.warn("Did fail to process native payment: \(error)")

@@ -241,7 +241,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     private func setFailureState(failure: POFailure) {
         if state.isSink {
-            logger.debug("Already in a sink state, ignoring attempt to set failure state.")
+            logger.debug("Already in a sink state, ignoring attempt to set failure state with: \(failure).")
         } else {
             state = .completed
             logger.info("Did fail to update card \(failure)")

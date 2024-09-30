@@ -241,7 +241,7 @@ final class DefaultCardTokenizationInteractor:
 
     private func setFailureState(failure: POFailure) {
         if state.isSink {
-            logger.debug("Already in a sink state, ignoring attempt to set failure state.")
+            logger.debug("Already in a sink state, ignoring attempt to set failure state with: \(failure).")
         } else {
             state = .failure(failure)
             logger.info("Did fail to tokenize/process card \(failure)")
