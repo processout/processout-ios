@@ -186,7 +186,6 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Starting State
 
-    @MainActor
     private func setStartedState(transactionDetails: PONativeAlternativePaymentMethodTransactionDetails) async {
         let parameters = await createParameters(specifications: transactionDetails.parameters)
         guard case .starting = state else {
@@ -231,7 +230,6 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Awaiting Capture State
 
-    @MainActor
     private func setAwaitingCaptureState(
         with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
@@ -326,7 +324,6 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Captured State
 
-    @MainActor
     private func setCapturedState(paymentProvider: NativeAlternativePaymentInteractorState.PaymentProvider) async {
         guard !state.isSink else {
             logger.debug("Already in a sink state, ignoring attempt to set captured state.")
@@ -389,7 +386,6 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Submission Completion
 
-    @MainActor
     private func restoreStartedStateAfterSubmission(
         nativeApm: PONativeAlternativePaymentMethodResponse.NativeApm
     ) async {
@@ -469,7 +465,6 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Utils
 
-    @MainActor
     private func createParameters(
         specifications: [PONativeAlternativePaymentMethodParameter]
     ) async -> [NativeAlternativePaymentInteractorState.Parameter] {
@@ -534,7 +529,6 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Default Values
 
     /// Updates parameters with default values.
-    @MainActor
     private func setDefaultValues(
         parameters: inout [NativeAlternativePaymentInteractorState.Parameter]
     ) async {
