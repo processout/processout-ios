@@ -27,6 +27,7 @@ extension PONativeAlternativePaymentMethodDelegate {
     ///
     /// - Returns: Dictionary where key is a parameter key, and value is desired default.
     @_spi(PO)
+    @MainActor
     public func nativeAlternativePayment(
         defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]
     ) async -> [String: String] {
