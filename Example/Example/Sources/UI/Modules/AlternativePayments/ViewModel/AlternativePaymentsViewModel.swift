@@ -165,7 +165,9 @@ final class AlternativePaymentsViewModel: ObservableObject {
             let configuration = PONativeAlternativePaymentConfiguration(
                 invoiceId: invoice.id,
                 gatewayConfigurationId: gatewayConfigurationId,
-                secondaryAction: .cancel(),
+                secondaryAction: .cancel(
+                    confirmation: .init()
+                ),
                 paymentConfirmation: .init(
                     showProgressIndicatorAfter: 5,
                     confirmButton: .init(),
