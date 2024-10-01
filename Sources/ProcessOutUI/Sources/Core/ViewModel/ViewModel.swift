@@ -7,6 +7,7 @@
 
 import Combine
 
+@MainActor
 protocol ViewModel<State>: ObservableObject {
 
     associatedtype State

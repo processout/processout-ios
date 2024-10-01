@@ -7,6 +7,7 @@
 
 import ProcessOut
 
+@MainActor
 protocol CardUpdateInteractor: Interactor<CardUpdateInteractorState> {
 
     /// Updates CVC value.

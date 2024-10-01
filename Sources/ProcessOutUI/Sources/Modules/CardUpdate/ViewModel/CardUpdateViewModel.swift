@@ -8,6 +8,7 @@
 import Combine
 @_spi(PO) import ProcessOutCoreUI
 
+@MainActor
 protocol CardUpdateViewModel: ObservableObject {
 
     /// Screen title.
