@@ -60,7 +60,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                     let paymentProvider = await paymentProvider(
                         with: transactionDetails.parameterValues, gateway: transactionDetails.gateway
                     )
-                    await setCapturedState(paymentProvider: paymentProvider)
+                    setCapturedState(paymentProvider: paymentProvider)
                 case .failed:
                     fallthrough // swiftlint:disable:this fallthrough
                 @unknown default:
@@ -132,7 +132,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                         with: response.nativeApm.parameterValues,
                         gateway: currentState.transactionDetails.gateway
                     )
-                    await setCapturedState(paymentProvider: paymentProvider)
+                    setCapturedState(paymentProvider: paymentProvider)
                 case .customerInput:
                     await restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
                 case .failed:
@@ -159,6 +159,10 @@ final class NativeAlternativePaymentDefaultInteractor:
             currentState.task.cancel()
         case .awaitingCapture(let currentState):
             currentState.task?.cancel()
+        case .captured(let currentState):
+            // Intent here is not to cancel invocation of completion but to fast-forward
+            // it by cancelling any ongoing delay operation if any.
+            currentState.completionTask.cancel()
         default:
             break
         }
@@ -234,8 +238,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
     ) async {
-        let paymentProvider = await paymentProvider(with: parameterValues, gateway: gateway)
         if configuration.paymentConfirmation.waitsConfirmation {
+            let paymentProvider = await paymentProvider(with: parameterValues, gateway: gateway)
             let customerAction = await customerAction(with: parameterValues, gateway: gateway)
             switch state {
             case .starting, .submitting:
@@ -260,7 +264,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             enableCaptureCancellationAfterDelay()
         } else {
             logger.info("Payment capture wasn't requested, will attempt to set captured state directly.")
-            await setCapturedState(paymentProvider: paymentProvider)
+            setSubmittedState()
         }
     }
 
@@ -285,7 +289,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         newState.task = Task { @MainActor in
             do {
                 try await invoicesService.captureNativeAlternativePayment(request: request)
-                await setCapturedState(paymentProvider: currentState.paymentProvider)
+                setCapturedState(paymentProvider: currentState.paymentProvider)
             } catch {
                 setFailureState(error: error)
             }
@@ -324,21 +328,29 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Captured State
 
-    private func setCapturedState(paymentProvider: NativeAlternativePaymentInteractorState.PaymentProvider) async {
+    private func setCapturedState(paymentProvider: NativeAlternativePaymentInteractorState.PaymentProvider) {
         guard !state.isSink else {
             logger.debug("Already in a sink state, ignoring attempt to set captured state.")
             return
         }
-        if configuration.paymentConfirmation.waitsConfirmation {
-            state = .captured(.init(paymentProvider: paymentProvider))
-            send(event: .didCompletePayment)
+        let task = Task {
             if !configuration.skipSuccessScreen {
+                // Sleep errors are ignored. The goal is that if this task is cancelled we should still
+                // invoke completion.
                 try? await Task.sleep(seconds: Constants.captureCompletionDelay)
             }
-        } else {
-            logger.info("Shouldn't wait for confirmation, setting submitted state instead.")
-            state = .submitted
+            completion(.success(()))
         }
+        state = .captured(.init(paymentProvider: paymentProvider, completionTask: task))
+        send(event: .didCompletePayment)
+    }
+
+    private func setSubmittedState() {
+        guard !state.isSink else {
+            logger.debug("Already in a sink state, ignoring attempt to set submitted state.")
+            return
+        }
+        state = .submitted
         completion(.success(()))
     }
 

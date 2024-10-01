@@ -65,6 +65,9 @@ enum NativeAlternativePaymentInteractorState {
 
         /// Payment provider details.
         let paymentProvider: PaymentProvider
+
+        /// Task that handles completion invocation.
+        let completionTask: Task<Void, Never>
     }
 
     struct Parameter {
