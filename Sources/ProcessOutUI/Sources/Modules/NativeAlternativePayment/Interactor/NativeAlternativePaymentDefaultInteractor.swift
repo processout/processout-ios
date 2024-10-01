@@ -263,7 +263,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
             enableCaptureCancellationAfterDelay()
         } else {
-            logger.info("Payment capture wasn't requested, will attempt to set captured state directly.")
+            logger.info("Payment capture wasn't requested, will attempt to set submitted state directly.")
             setSubmittedState()
         }
     }
