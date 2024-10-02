@@ -8,7 +8,7 @@
 @MainActor
 protocol Interactor<State>: AnyObject {
 
-    associatedtype State
+    associatedtype State: InteractorState
 
     /// Interactor's state.
     var state: State { get }

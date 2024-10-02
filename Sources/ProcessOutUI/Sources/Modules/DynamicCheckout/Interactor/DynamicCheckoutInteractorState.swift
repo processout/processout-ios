@@ -10,6 +10,12 @@ import PassKit
 
 enum DynamicCheckoutInteractorState {
 
+    struct Starting {
+
+        /// Start task.
+        let task: Task<Void, Never>
+    }
+
     struct Started {
 
         /// Express payment methods.
@@ -130,4 +136,16 @@ enum DynamicCheckoutInteractorState {
 
     /// Payment was successfully processed. This is a sink state.
     case success
+}
+
+extension DynamicCheckoutInteractorState: InteractorState {
+
+    var isSink: Bool {
+        switch self {
+        case .failure, .success:
+            return true
+        default:
+            return false
+        }
+    }
 }
