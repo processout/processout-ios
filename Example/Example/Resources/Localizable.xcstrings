@@ -51,6 +51,16 @@
         }
       }
     },
+    "alternative-payments.flow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flow"
+          }
+        }
+      }
+    },
     "alternative-payments.gateway" : {
       "localizations" : {
         "en" : {
@@ -107,16 +117,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alternative Payment"
-          }
-        }
-      }
-    },
-    "alternative-payments.tokenization-preference" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Should Tokenize"
           }
         }
       }

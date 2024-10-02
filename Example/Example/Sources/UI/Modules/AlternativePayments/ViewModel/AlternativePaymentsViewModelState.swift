@@ -12,6 +12,18 @@ import ProcessOutUI
 
 struct AlternativePaymentsViewModelState {
 
+    enum Flow: String, Hashable {
+
+        /// One time payment.
+        case payment
+
+        /// Payment method should be tokenized.
+        case tokenization
+
+        /// Combined payment and tokenization.
+        case combined
+    }
+
     struct GatewayConfiguration: Identifiable {
 
         /// Item identifier.
@@ -53,8 +65,8 @@ struct AlternativePaymentsViewModelState {
     /// Boolean value indicating whether native flow should be preferred if available.
     var preferNative = false
 
-    /// Boolean value indicating whether payment method should be tokenized before authorizing invoice.
-    var shouldTokenize = false
+    /// Payment flow.
+    var flow: PickerData<Flow, Flow>! // swiftlint:disable:this implicitly_unwrapped_optional
 
     /// Currently presented native alternative payment.
     var nativePayment: NativePayment?

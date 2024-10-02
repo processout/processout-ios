@@ -18,6 +18,7 @@ final class AlternativePaymentsViewModel: ObservableObject {
         self.interactor = interactor
         cancellables = []
         observeInteractorStateChanges()
+        updateStateFlows()
     }
 
     // MARK: - AlternativePaymentsViewModel
@@ -127,6 +128,13 @@ final class AlternativePaymentsViewModel: ObservableObject {
         state.message = .init(text: errorMessage, severity: .error)
     }
 
+    private func updateStateFlows() {
+        let flows: [AlternativePaymentsViewModelState.Flow] = [
+            .payment, .tokenization, .combined
+        ]
+        state.flow = .init(sources: flows, id: \.self, selection: .payment)
+    }
+
     // MARK: -
 
     private func startPayment() async {
@@ -142,14 +150,21 @@ final class AlternativePaymentsViewModel: ObservableObject {
                 try await interactor.invoice(id: state.invoice.id)
             }
             var authorizationSource = gatewayConfigurationId
-            if state.shouldTokenize {
+            switch state.flow.selection {
+            case .payment where state.preferNative:
+                try await authorizeNatively(invoice: invoice, gatewayConfigurationId: gatewayConfigurationId)
+            case .payment:
+                try await interactor.authorize(
+                    invoice: invoice, gatewayConfigurationId: gatewayConfigurationId, saveSource: false
+                )
+            case .tokenization:
                 let token = try await interactor.tokenize(gatewayConfigurationId: gatewayConfigurationId)
                 try await interactor.authorize(invoice: invoice, customerToken: token)
                 authorizationSource = token.id
-            } else if state.preferNative {
-                try await authorizeNatively(invoice: invoice, gatewayConfigurationId: gatewayConfigurationId)
-            } else {
-                try await interactor.authorize(invoice: invoice, gatewayConfigurationId: gatewayConfigurationId)
+            case .combined:
+                try await interactor.authorize(
+                    invoice: invoice, gatewayConfigurationId: gatewayConfigurationId, saveSource: true
+                )
             }
             let successMessage = String(
                 localized: .AlternativePayments.successMessage, replacements: invoice.id, authorizationSource
