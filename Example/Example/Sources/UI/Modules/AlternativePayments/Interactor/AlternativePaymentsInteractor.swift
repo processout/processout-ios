@@ -101,7 +101,7 @@ final class AlternativePaymentsInteractor {
         return try await invoicesService.createInvoice(request: request)
     }
 
-    func authorize(invoice: POInvoice, gatewayConfigurationId: String) async throws {
+    func authorize(invoice: POInvoice, gatewayConfigurationId: String, saveSource: Bool) async throws {
         let request = POAlternativePaymentAuthorizationRequest(
             invoiceId: invoice.id, gatewayConfigurationId: gatewayConfigurationId
         )
@@ -109,7 +109,9 @@ final class AlternativePaymentsInteractor {
         let authorizationRequest = POInvoiceAuthorizationRequest(
             invoiceId: invoice.id,
             source: response.gatewayToken,
-            allowFallbackToSale: true
+            saveSource: saveSource,
+            allowFallbackToSale: true,
+            clientSecret: invoice.clientSecret
         )
         let threeDSService = POTest3DSService()
         try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)

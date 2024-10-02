@@ -40,8 +40,8 @@ extension LocalizedStringResource {
         /// Native payment preference.
         static let nativePreference = LocalizedStringResource("alternative-payments.native-preference")
 
-        /// Tokenization preference.
-        static let tokenizationPreference = LocalizedStringResource("alternative-payments.tokenization-preference")
+        /// Payment flow.
+        static let flow = LocalizedStringResource("alternative-payments.flow")
 
         /// Generic error message.
         static let errorMessage = LocalizedStringResource("alternative-payments.error-message")

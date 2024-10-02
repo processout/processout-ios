@@ -32,13 +32,14 @@ struct AlternativePaymentsView: View {
                         Text(.AlternativePayments.gatewayConfiguration)
                     }
                 }
+                Picker(data: $viewModel.state.flow) { flow in
+                    Text(flow.rawValue.capitalized)
+                } label: {
+                    Text(.AlternativePayments.flow)
+                }
                 Toggle(
                     String(localized: .AlternativePayments.nativePreference),
                     isOn: $viewModel.state.preferNative
-                )
-                Toggle(
-                    String(localized: .AlternativePayments.tokenizationPreference),
-                    isOn: $viewModel.state.shouldTokenize
                 )
             } header: {
                 Text(.AlternativePayments.gateway)
