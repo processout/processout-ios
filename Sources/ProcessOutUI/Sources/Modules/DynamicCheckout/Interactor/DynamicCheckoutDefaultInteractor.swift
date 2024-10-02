@@ -45,10 +45,27 @@ final class DynamicCheckoutDefaultInteractor:
             return
         }
         send(event: .willStart)
-        state = .starting
-        Task {
-            await continueStartUnchecked()
+        let task = Task { @MainActor in
+            do {
+                let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
+                switch invoice.transaction?.status {
+                case .waiting:
+                    setStartedStateUnchecked(
+                        invoice: invoice,
+                        clientSecret: configuration.invoiceRequest.clientSecret,
+                        sendEvents: true
+                    )
+                case .authorized, .completed:
+                    setSuccessState()
+                default:
+                    let message = "Unsupported invoice state, please create new invoice and restart checkout."
+                    throw POFailure(message: message, code: .generic(.mobile))
+                }
+            } catch {
+                setFailureState(error: error)
+            }
         }
+        state = .starting(.init(task: task))
     }
 
     func select(methodId: String) {
@@ -134,33 +151,12 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Starting State
 
-    private func continueStartUnchecked() async {
-        do {
-            let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
-            switch invoice.transaction?.status {
-            case .waiting:
-                setStartedStateUnchecked(
-                    invoice: invoice,
-                    clientSecret: configuration.invoiceRequest.clientSecret,
-                    sendEvents: true
-                )
-            case .authorized, .completed:
-                setSuccessState()
-            default:
-                let message = "Unsupported invoice state, please create new invoice and restart checkout."
-                throw POFailure(message: message, code: .generic(.mobile))
-            }
-        } catch {
-            setFailureStateUnchecked(error: error)
-        }
-    }
-
     private func setStartedStateUnchecked(
         invoice: POInvoice, clientSecret: String?, errorDescription: String? = nil, sendEvents: Bool
     ) {
         guard invoice.paymentMethods?.isEmpty == false else {
             let failure = POFailure(message: "Payment methods are not available.", code: .generic(.mobile))
-            setFailureStateUnchecked(error: failure)
+            setFailureState(error: failure)
             return
         }
         let pkPaymentRequests = pkPaymentRequests(invoice: invoice)
@@ -302,7 +298,7 @@ final class DynamicCheckoutDefaultInteractor:
             }
             interactor.cancel()
         case .started, .selected:
-            setFailureStateUnchecked(error: POFailure(code: .cancelled))
+            setFailureState(error: POFailure(code: .cancelled))
         case .recovering:
             logger.debug("Ignoring attempt to cancel payment during error recovery.")
         default:
@@ -554,7 +550,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         guard let failure = error as? POFailure else {
             logger.debug("Won't recover unknown failure")
-            setFailureStateUnchecked(error: error)
+            setFailureState(error: error)
             return
         }
         if shouldRecover(after: failure, in: currentState) {
@@ -562,7 +558,7 @@ final class DynamicCheckoutDefaultInteractor:
                 await continuePaymentProcessingRecovery(after: failure)
             }
         } else {
-            setFailureStateUnchecked(error: failure)
+            setFailureState(error: failure)
         }
     }
 
@@ -602,7 +598,7 @@ final class DynamicCheckoutDefaultInteractor:
                 let newInvoice = try await invoicesService.invoice(request: request)
                 finishPaymentFailureRecovery(with: newInvoice, clientSecret: request.clientSecret)
             } catch {
-                setFailureStateUnchecked(error: error)
+                setFailureState(error: error)
             }
         } else {
             finishPaymentFailureRecovery(
@@ -620,7 +616,7 @@ final class DynamicCheckoutDefaultInteractor:
         guard newInvoice.transaction?.status == .waiting else {
             // Another recovery is not attempted to prevent potential recursion
             let failure = POFailure(message: "Unsupported invoice state.", code: .generic(.mobile))
-            setFailureStateUnchecked(error: failure)
+            setFailureState(error: failure)
             return
         }
         let isPendingPaymentMethodAvailable = newInvoice.paymentMethods?
@@ -673,7 +669,12 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Failure State
 
-    private func setFailureStateUnchecked(error: Error) {
+    private func setFailureState(error: Error) {
+        guard !state.isSink else {
+            logger.debug("Already in a sink state, ignoring attempt to set failure state with: \(error).")
+            return
+        }
+        logger.warn("Did fail to process dynamic checkout payment: '\(error)'")
         let failure: POFailure
         if let error = error as? POFailure {
             failure = error
@@ -681,7 +682,6 @@ final class DynamicCheckoutDefaultInteractor:
             logger.debug("Unexpected error type: \(error)")
             failure = POFailure(code: .generic(.mobile), underlyingError: error)
         }
-        logger.warn("Did fail to process dynamic checkout payment: '\(error)'")
         state = .failure(failure)
         send(event: .didFail(failure: failure))
         completion(.failure(failure))

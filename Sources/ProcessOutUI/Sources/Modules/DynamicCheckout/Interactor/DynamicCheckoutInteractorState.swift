@@ -117,7 +117,7 @@ enum DynamicCheckoutInteractorState {
     case idle
 
     /// Starting state.
-    case starting
+    case starting(Starting)
 
     /// Started state.
     case started(Started)
