@@ -11,7 +11,7 @@ import Foundation
 public typealias ProcessOutApiConfiguration = ProcessOutConfiguration
 
 /// Defines configuration parameters that are used to create API singleton. In order to create instance
-/// of this structure one should use ``ProcessOutConfiguration/production(projectId:appVersion:isDebug:)``
+/// of this structure one should use ``ProcessOutConfiguration/init(projectId:application:isDebug:isTelemetryEnabled:)``
 /// method.
 public struct ProcessOutConfiguration {
 

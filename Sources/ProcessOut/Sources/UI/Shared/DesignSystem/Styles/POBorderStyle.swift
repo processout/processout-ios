@@ -8,6 +8,7 @@
 import UIKit
 
 /// Style that defines border appearance. Border is always a solid line.
+@available(*, deprecated, message: "Use ProcessOutUI module.")
 public struct POBorderStyle {
 
     /// Corner radius.
@@ -26,6 +27,7 @@ public struct POBorderStyle {
     }
 }
 
+@available(*, deprecated)
 extension POBorderStyle {
 
     /// Clear border of specified radius.

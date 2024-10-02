@@ -40,7 +40,7 @@ and alter run-time behaviors.
 
 In order to tweak view’s styling, you should create an instance of ``PONativeAlternativePaymentStyle`` structure
 and pass it to view. The way you set style depends on whether you are using SwiftUI or UIKit bindings. For view
-controller pass style instance via init, for SwiftUI view you should use ``SwiftUI/View/nativeAlternativePaymentStyle(_:)``
+controller pass style instance via init, for SwiftUI view you should use ``SwiftUICore/View/nativeAlternativePaymentStyle(_:)``
 modifier.
 
 Let's say you want to change pay button's appearance:

@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 struct AttributedStringBuilder {
 
     enum Text {
@@ -118,6 +119,7 @@ struct AttributedStringBuilder {
     }
 }
 
+@available(*, deprecated)
 extension AttributedStringBuilder {
 
     func with(updates: (inout AttributedStringBuilder) -> Void) -> AttributedStringBuilder {

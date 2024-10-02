@@ -8,6 +8,7 @@
 import UIKit
 
 /// Defines input's styling information in a specific state.
+@available(*, deprecated, message: "Use ProcessOutUI module.")
 public struct POInputStateStyle {
 
     /// Text style.

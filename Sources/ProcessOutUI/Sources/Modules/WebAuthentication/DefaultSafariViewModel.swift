@@ -9,6 +9,7 @@ import Foundation
 import SafariServices
 @_spi(PO) import ProcessOut
 
+@available(*, deprecated, message: "Web authentications are handled internally.")
 final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
 
     init(

@@ -11,6 +11,7 @@ import UIKit
 public typealias POTextFieldStyle = POInputStyle
 
 /// Defines input control style in both normal and error states.
+@available(*, deprecated, message: "Use ProcessOutUI module.")
 public struct POInputStyle {
 
     /// Style for normal state.
@@ -26,6 +27,7 @@ public struct POInputStyle {
     }
 }
 
+@available(*, deprecated)
 extension POInputStyle {
 
     /// Allows to create default input style with given typography.

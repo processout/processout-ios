@@ -8,6 +8,7 @@
 import Foundation
 
 /// An object used to evaluate navigation events in an authentication session.
+@available(*, deprecated, message: "Web authentications are handled internally.")
 public struct POWebAuthenticationSessionCallback: @unchecked Sendable {
 
     /// Creates a callback object that matches against URLs with the given custom scheme.

@@ -8,6 +8,7 @@
 import UIKit
 
 /// Style that defines shadow appearance.
+@available(*, deprecated, message: "Use ProcessOutUI module.")
 public struct POShadowStyle {
 
     /// The color of the shadow.
@@ -26,6 +27,7 @@ public struct POShadowStyle {
     }
 }
 
+@available(*, deprecated)
 extension POShadowStyle {
 
     /// Value represents no shadow.

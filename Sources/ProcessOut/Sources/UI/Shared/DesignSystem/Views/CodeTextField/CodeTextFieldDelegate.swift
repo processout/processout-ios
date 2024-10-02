@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 protocol CodeTextFieldDelegate: AnyObject {
 
     /// Asks the delegate whether to begin editing in the specified text field.

@@ -364,7 +364,7 @@ public final class ProcessOutLegacyApi {
     /// Initiate a payment authorization from a previously generated invoice and card token
     ///
     /// - Parameters:
-    ///   - AuthorizationRequest: contains all the necessary fields to initiate an authorisation request.
+    ///   - request: contains all the necessary fields to initiate an authorisation request.
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeCardPayment(AuthorizationRequest request: AuthorizationRequest, handler: ThreeDSHandler, with: UIViewController) {
@@ -443,7 +443,7 @@ public final class ProcessOutLegacyApi {
     /// Initiate an incremental payment authorization from a previously generated invoice and card token
     ///
     /// - Parameters:
-    ///   - AuthorizationRequest: contains all the necessary fields to initiate an authorisation request.
+    ///   - request: contains all the necessary fields to initiate an authorisation request.
     ///   - handler: Custom 3DS2 handler (please refer to our documentation for this)
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeIncrementalAuthorizationPayment(AuthorizationRequest request: AuthorizationRequest, handler: ThreeDSHandler, with: UIViewController) {
@@ -502,7 +502,6 @@ public final class ProcessOutLegacyApi {
     /// Create a customer token from a card ID
     ///
     /// - Parameters:
-    ///   - cardId: Card ID used for the customer token
     ///   - customerId: Customer ID created in backend
     ///   - tokenId: Token ID created in backend
     ///   - handler: 3DS2 handler
@@ -560,7 +559,6 @@ public final class ProcessOutLegacyApi {
     /// Create a customer token from a card ID
     ///
     /// - Parameters:
-    ///   - cardId: Card ID used for the customer token
     ///   - customerId: Customer ID created in backend
     ///   - tokenId: Token ID created in backend
     ///   - thirdPartySDKVersion: Version of the 3rd party SDK being used for the calls. Can be blank if unused
@@ -620,7 +618,7 @@ public final class ProcessOutLegacyApi {
     /// Create a customer token from a card ID
     ///
     /// - Parameters:
-    ///   - TokenRequest: contains all the fields necessary for the token request
+    ///   - request: contains all the fields necessary for the token request
     ///   - handler: 3DS2 handler
     ///   - with: UIViewController to display webviews and perform fingerprinting
     public static func makeCardToken(TokenRequest request: TokenRequest, handler: ThreeDSHandler, with: UIViewController) {

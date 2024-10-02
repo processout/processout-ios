@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 extension UIActivityIndicatorView: POActivityIndicatorView {
 
     public func setAnimating(_ isAnimating: Bool) {

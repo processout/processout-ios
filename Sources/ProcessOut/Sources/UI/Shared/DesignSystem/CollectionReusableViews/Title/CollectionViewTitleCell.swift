@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 final class CollectionViewTitleCell: UICollectionViewCell {
 
     override init(frame: CGRect) {

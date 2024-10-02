@@ -10,6 +10,7 @@ import AuthenticationServices
 @_spi(PO) import ProcessOut
 
 /// A session that an app uses to authenticate a payment.
+@available(*, deprecated, message: "Web authentications are handled internally.")
 public final class POWebAuthenticationSession {
 
     /// A completion handler for the web authentication session.

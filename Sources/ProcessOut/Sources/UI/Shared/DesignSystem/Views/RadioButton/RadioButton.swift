@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 
 // todo(andrii-vysotskyi): respond to `isSelected` changes.
+@available(*, deprecated)
 final class RadioButton: UIControl {
 
     init() {

@@ -8,6 +8,7 @@
 import UIKit
 
 /// Holds typesetting information that could be applied to displayed text.
+@available(*, deprecated, message: "Use ProcessOutUI module.")
 public struct POTypography {
 
     /// Font associated with given typography.
@@ -48,6 +49,7 @@ public struct POTypography {
     }
 }
 
+@available(*, deprecated)
 extension POTypography {
 
     enum Fixed {

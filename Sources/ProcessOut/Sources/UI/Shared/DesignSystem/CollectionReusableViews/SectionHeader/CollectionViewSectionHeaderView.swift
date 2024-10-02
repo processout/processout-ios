@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(*, deprecated)
 final class CollectionViewSectionHeaderView: UICollectionReusableView {
 
     override init(frame: CGRect) {

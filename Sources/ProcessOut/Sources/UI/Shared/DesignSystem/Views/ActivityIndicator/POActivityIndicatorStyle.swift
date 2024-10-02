@@ -8,6 +8,7 @@
 import UIKit
 
 /// Possible activity indicator styles.
+@available(*, deprecated, message: "Use ProcessOutUI module.")
 public enum POActivityIndicatorStyle {
 
     /// Custom activity indicator.

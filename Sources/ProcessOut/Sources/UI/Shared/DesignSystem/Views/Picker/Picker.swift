@@ -8,6 +8,7 @@
 import UIKit
 
 // todo(andrii-vysotskyi): add placeholder
+@available(*, deprecated)
 final class Picker: UIControl {
 
     init() {
