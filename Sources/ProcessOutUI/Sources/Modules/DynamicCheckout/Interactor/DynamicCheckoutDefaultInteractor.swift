@@ -276,8 +276,10 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Cancel
 
     /// - Parameter force: When set to `true` implementation won't attempt to restore started state.
-    private func cancel(force: Bool) {
+    private func cancel(force: Bool) { // swiftlint:disable:this cyclomatic_complexity
         switch state {
+        case .starting(let currentState):
+            currentState.task.cancel()
         case .paymentProcessing(var currentState):
             if force {
                 currentState.isForcelyCancelled = true
@@ -301,9 +303,12 @@ final class DynamicCheckoutDefaultInteractor:
             setFailureState(error: POFailure(code: .cancelled))
         case .recovering:
             logger.debug("Ignoring attempt to cancel payment during error recovery.")
+        case .success(let currentState):
+            currentState.completionTask.cancel() // Fast-forward completion invocation.
         default:
             logger.debug("Ignoring attempt to cancel payment from unsupported state.")
         }
+        // todo(andrii-vysotskyi): set cancel state immediately
     }
 
     // MARK: - Selected State
@@ -690,25 +695,21 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Success State
 
     private func setSuccessState() {
-        switch state {
-        case .paymentProcessing, .starting:
-            break
-        default:
-            assertionFailure("Success state can be set while starting or payment processing.")
+        guard !state.isSink else {
+            logger.debug("Already in a sink state, ignoring attempt to set success state.")
             return
         }
-        state = .success
-        send(event: .didCompletePayment)
-        Task { @MainActor in
+        let task = Task { @MainActor in
             try? await Task.sleep(seconds: configuration.paymentSuccess?.duration ?? 0)
             completion(.success(()))
         }
+        state = .success(.init(completionTask: task))
+        send(event: .didCompletePayment)
     }
 
     // MARK: - Events
 
     private func send(event: PODynamicCheckoutEvent) {
-        assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
         delegate?.dynamicCheckout(didEmitEvent: event)
     }

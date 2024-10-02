@@ -113,6 +113,12 @@ enum DynamicCheckoutInteractorState {
         var shouldStartPendingPaymentMethod = false
     }
 
+    struct Success {
+
+        /// Task that handles completion invocation.
+        let completionTask: Task<Void, Never>
+    }
+
     /// Idle state.
     case idle
 
@@ -135,7 +141,7 @@ enum DynamicCheckoutInteractorState {
     case failure(POFailure)
 
     /// Payment was successfully processed. This is a sink state.
-    case success
+    case success(Success)
 }
 
 extension DynamicCheckoutInteractorState: InteractorState {
