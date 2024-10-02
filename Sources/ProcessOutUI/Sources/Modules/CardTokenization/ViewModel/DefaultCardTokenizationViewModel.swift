@@ -28,6 +28,10 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         $state.performWithoutAnimation(interactor.start)
     }
 
+    func stop() {
+        interactor.cancel()
+    }
+
     // MARK: - Private Nested Types
 
     private typealias InteractorState = CardTokenizationInteractorState
@@ -68,11 +72,11 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         switch interactor.state {
         case .idle:
             state = .idle
-        case .started(let startedState):
-            let newState = convertToState(startedState: startedState, isSubmitting: false)
+        case .started(let currentState):
+            let newState = convertToState(startedState: currentState, isSubmitting: false)
             self.state = newState
-        case .tokenizing(let startedState):
-            let newState = convertToState(startedState: startedState, isSubmitting: true)
+        case .tokenizing(let currentState):
+            let newState = convertToState(startedState: currentState.snapshot, isSubmitting: true)
             self.state = newState
         default:
             break

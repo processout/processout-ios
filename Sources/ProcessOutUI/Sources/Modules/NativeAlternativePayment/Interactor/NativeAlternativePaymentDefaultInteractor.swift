@@ -39,51 +39,112 @@ final class NativeAlternativePaymentDefaultInteractor:
         guard case .idle = state else {
             return
         }
-        logger.info("Starting native alternative payment")
+        logger.info("Starting native alternative payment.")
         send(event: .willStart)
-        setStateUnchecked(.starting)
-        Task {
-            await continueStartUnchecked()
+        let task = Task { @MainActor in
+            do {
+                let request = PONativeAlternativePaymentMethodTransactionDetailsRequest(
+                    invoiceId: configuration.invoiceId,
+                    gatewayConfigurationId: configuration.gatewayConfigurationId
+                )
+                let transactionDetails = try await invoicesService
+                    .nativeAlternativePaymentMethodTransactionDetails(request: request)
+                switch transactionDetails.state {
+                case .customerInput, nil:
+                    await setStartedState(transactionDetails: transactionDetails)
+                case .pendingCapture:
+                    await setAwaitingCaptureState(
+                        with: transactionDetails.parameterValues, gateway: transactionDetails.gateway
+                    )
+                case .captured:
+                    let paymentProvider = await paymentProvider(
+                        with: transactionDetails.parameterValues, gateway: transactionDetails.gateway
+                    )
+                    setCapturedState(paymentProvider: paymentProvider)
+                case .failed:
+                    fallthrough // swiftlint:disable:this fallthrough
+                @unknown default:
+                    throw POFailure(code: .generic(.mobile))
+                }
+            } catch {
+                setFailureState(error: error)
+            }
         }
+        state = .starting(.init(task: task))
     }
 
     func updateValue(_ value: String?, for key: String) {
-        guard case var .started(startedState) = state else {
-            logger.debug("Unable to update value in unsupported state: \(state)")
+        guard case var .started(newState) = state else {
+            logger.debug("Unable to update value in unsupported state: \(state).")
             return
         }
-        // swiftlint:disable:next line_length
-        guard let element = startedState.parameters.enumerated().first(where: { $0.element.specification.key == key }) else {
-            logger.info("No value to update for key \(key)")
+        let parameter = newState.parameters
+            .enumerated()
+            .first(where: { $0.element.specification.key == key })
+        guard let parameter else {
+            logger.info("No value to update for key \(key).")
             return
         }
-        var parameter = element.1
-        let formattedValue = parameter.formatter?.string(for: value ?? "") ?? value
-        guard parameter.value != formattedValue else {
-            logger.debug("Ignored the same value for key: \(key)")
+        let formattedValue = parameter.element.formatter?.string(for: value ?? "") ?? value
+        guard parameter.element.value != formattedValue else {
+            logger.debug("Ignored the same value for key: \(key).")
             return
         }
-        parameter.value = formattedValue
-        parameter.recentErrorMessage = nil
-        startedState.parameters[element.0] = parameter
-        setStateUnchecked(.started(startedState))
-        didUpdate(parameter: parameter, to: formattedValue ?? "")
+        var updatedParameter = parameter.element
+        updatedParameter.value = formattedValue
+        updatedParameter.recentErrorMessage = nil
+        newState.parameters[parameter.offset] = updatedParameter
+        state = .started(newState)
+        didUpdate(parameter: parameter.element, to: formattedValue ?? "")
     }
 
     func submit() {
-        guard case let .started(startedState) = state, startedState.areParametersValid else {
+        guard case let .started(currentState) = state else {
+            logger.debug("Ignoring attempt to submit parameters in unsupported state: \(state).")
             return
         }
-        willSubmit(parameters: startedState.parameters)
-        do {
-            let values = try validatedValues(for: startedState.parameters)
-            setStateUnchecked(.submitting(snapshot: startedState))
-            Task {
-                await continueSubmissionUnchecked(startedState: startedState, values: values)
-            }
-        } catch {
-            restoreStartedStateAfterSubmissionFailureIfPossible(error, replaceErrorMessages: false)
+        guard currentState.areParametersValid else {
+            logger.debug("Ignoring attempt to submit invalid parameters.")
+            return
         }
+        willSubmit(parameters: currentState.parameters)
+        let task = Task { @MainActor in
+            var replaceErrorMessages = false
+            do {
+                let values = try validatedValues(for: currentState.parameters)
+                replaceErrorMessages = true
+                let request = PONativeAlternativePaymentMethodRequest(
+                    invoiceId: configuration.invoiceId,
+                    gatewayConfigurationId: configuration.gatewayConfigurationId,
+                    parameters: values
+                )
+                let response = try await invoicesService.initiatePayment(request: request)
+                switch response.nativeApm.state {
+                case .pendingCapture:
+                    send(event: .didSubmitParameters(additionalParametersExpected: false))
+                    await setAwaitingCaptureState(
+                        with: response.nativeApm.parameterValues,
+                        gateway: currentState.transactionDetails.gateway
+                    )
+                case .captured:
+                    send(event: .didSubmitParameters(additionalParametersExpected: false))
+                    let paymentProvider = await paymentProvider(
+                        with: response.nativeApm.parameterValues,
+                        gateway: currentState.transactionDetails.gateway
+                    )
+                    setCapturedState(paymentProvider: paymentProvider)
+                case .customerInput:
+                    await restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
+                case .failed:
+                    fallthrough // swiftlint:disable:this fallthrough
+                @unknown default:
+                    throw POFailure(code: .generic(.mobile))
+                }
+            } catch {
+                attemptRecoverSubmissionError(error, replaceErrorMessages: replaceErrorMessages)
+            }
+        }
+        state = .submitting(.init(snapshot: currentState, task: task))
     }
 
     func confirmCapture() {
@@ -91,20 +152,21 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     override func cancel() {
-        // todo(andrii-vysotskyi): allow cancellation in all states except sink
-        logger.debug("Will attempt to cancel payment.")
         switch state {
-        case .started(let state) where state.isCancellable:
-            setFailureStateUnchecked(error: POFailure(code: .cancelled))
-        case .awaitingCapture(let state) where state.isCancellable:
-            if let cancellable = state.cancellable {
-                cancellable.cancel()
-            } else {
-                setFailureStateUnchecked(error: POFailure(code: .cancelled))
-            }
+        case .starting(let currentState):
+            currentState.task.cancel()
+        case .submitting(let currentState):
+            currentState.task.cancel()
+        case .awaitingCapture(let currentState):
+            currentState.task?.cancel()
+        case .captured(let currentState):
+            // Intent here is not to cancel invocation of completion but to fast-forward
+            // it by cancelling any ongoing delay operation if any.
+            currentState.completionTask.cancel()
         default:
-            logger.debug("Ignored cancellation attempt from unsupported state: \(state)")
+            break
         }
+        setFailureState(error: POFailure(code: .cancelled))
     }
 
     func didRequestCancelConfirmation() {
@@ -128,276 +190,25 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Starting State
 
-    @MainActor
-    private func continueStartUnchecked() async {
-        let details: PONativeAlternativePaymentMethodTransactionDetails
-        do {
-            let request = PONativeAlternativePaymentMethodTransactionDetailsRequest(
-                invoiceId: configuration.invoiceId, gatewayConfigurationId: configuration.gatewayConfigurationId
-            )
-            details = try await invoicesService.nativeAlternativePaymentMethodTransactionDetails(request: request)
-        } catch {
-            setFailureStateUnchecked(error: error)
+    private func setStartedState(transactionDetails: PONativeAlternativePaymentMethodTransactionDetails) async {
+        let parameters = await createParameters(specifications: transactionDetails.parameters)
+        guard case .starting = state else {
+            logger.debug("Ignoring attempt to set started state in unsupported state: \(state).")
             return
         }
-        switch details.state {
-        case .customerInput, nil:
-            if details.parameters.isEmpty {
-                logger.debug("Will set started state with empty inputs, this may be unexpected")
-            }
-            let startedState = State.Started(
-                gateway: details.gateway,
-                invoice: details.invoice,
-                parameters: await createParameters(specifications: details.parameters),
-                isCancellable: disableDuration(of: configuration.secondaryAction).isZero
-            )
-            setStateUnchecked(.started(startedState))
-            send(event: .didStart)
-            logger.info("Did start payment, waiting for parameters")
-            enableCancellationAfterDelay()
-        case .pendingCapture:
-            logger.debug("No more parameters to submit, waiting for capture")
-            await setAwaitingCaptureStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
-        case .captured:
-            await setCapturedStateUnchecked(gateway: details.gateway, parameterValues: details.parameterValues)
-        case .failed:
-            fallthrough // swiftlint:disable:this fallthrough
-        @unknown default:
-            let failure = POFailure(code: .generic(.mobile))
-            setFailureStateUnchecked(error: failure)
+        if transactionDetails.parameters.isEmpty {
+            logger.debug("Will set started state with empty inputs, this may be unexpected.")
         }
-    }
-
-    // MARK: - Submission State
-
-    @MainActor
-    private func continueSubmissionUnchecked(
-        startedState: NativeAlternativePaymentInteractorState.Started, values: [String: String]
-    ) async {
-        let request = PONativeAlternativePaymentMethodRequest(
-            invoiceId: configuration.invoiceId,
-            gatewayConfigurationId: configuration.gatewayConfigurationId,
-            parameters: values
+        let startedState = State.Started(
+            transactionDetails: transactionDetails,
+            parameters: parameters,
+            isCancellable: disableDuration(of: configuration.secondaryAction).isZero
         )
-        let response: PONativeAlternativePaymentMethodResponse
-        do {
-            response = try await invoicesService.initiatePayment(request: request)
-        } catch {
-            restoreStartedStateAfterSubmissionFailureIfPossible(error, replaceErrorMessages: true)
-            return
-        }
-        switch response.nativeApm.state {
-        case .pendingCapture:
-            send(event: .didSubmitParameters(additionalParametersExpected: false))
-            await setAwaitingCaptureStateUnchecked(
-                gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
-            )
-        case .captured:
-            send(event: .didSubmitParameters(additionalParametersExpected: false))
-            await setCapturedStateUnchecked(
-                gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
-            )
-        case .customerInput:
-            await restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
-        case .failed:
-            fallthrough // swiftlint:disable:this fallthrough
-        @unknown default:
-            let failure = POFailure(code: .generic(.mobile))
-            setFailureStateUnchecked(error: failure)
-        }
+        state = .started(startedState)
+        send(event: .didStart)
+        logger.info("Did start payment, waiting for parameters.")
+        enableCancellationAfterDelay()
     }
-
-    // MARK: - Awaiting Capture State
-
-    @MainActor
-    private func setAwaitingCaptureStateUnchecked(
-        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway,
-        parameterValues: PONativeAlternativePaymentMethodParameterValues?
-    ) async {
-        guard configuration.paymentConfirmation.waitsConfirmation else {
-            logger.info("Won't await payment capture because waitsPaymentConfirmation is set to false")
-            setSubmittedUnchecked()
-            return
-        }
-        let customerActionMessage = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
-        let additionalActionExpected = customerActionMessage != nil
-        send(event: .willWaitForCaptureConfirmation(additionalActionExpected: additionalActionExpected))
-        let (logoImage, actionImage) = await imagesRepository.images(
-            at: logoUrl(gateway: gateway, parameterValues: parameterValues), gateway.customerActionImageUrl
-        )
-        let shouldConfirmCapture = additionalActionExpected && configuration.paymentConfirmation.confirmButton != nil
-        let awaitingCaptureState = State.AwaitingCapture(
-            paymentProvider: .init(name: parameterValues?.providerName, image: logoImage),
-            customerAction: customerActionMessage.map { message in
-                .init(message: message, image: actionImage)
-            },
-            isCancellable: disableDuration(of: configuration.paymentConfirmation.secondaryAction).isZero,
-            isDelayed: false,
-            shouldConfirmCapture: shouldConfirmCapture
-        )
-        setStateUnchecked(.awaitingCapture(awaitingCaptureState))
-        if !shouldConfirmCapture {
-            confirmCapture(force: true)
-        }
-        enableCaptureCancellationAfterDelay()
-    }
-
-    private func confirmCapture(force: Bool) {
-        guard case .awaitingCapture(var currentState) = state else {
-            logger.debug("Ignoring attempt to confirm capture from unsupported state: \(state).")
-            return
-        }
-        guard (currentState.shouldConfirmCapture || force) && currentState.cancellable == nil else {
-            logger.debug("Payment is already being captured, ignored.")
-            return
-        }
-        if !force {
-            delegate?.nativeAlternativePaymentMethodDidEmitEvent(.didConfirmPayment)
-        }
-        let request = PONativeAlternativePaymentCaptureRequest(
-            invoiceId: configuration.invoiceId,
-            gatewayConfigurationId: configuration.gatewayConfigurationId,
-            timeout: configuration.paymentConfirmation.timeout
-        )
-        let task = Task { @MainActor in
-            do {
-                try await invoicesService.captureNativeAlternativePayment(request: request)
-                await setCapturedStateUnchecked(paymentProvider: currentState.paymentProvider)
-            } catch {
-                setFailureStateUnchecked(error: error)
-            }
-        }
-        currentState.cancellable = AnyCancellable(task.cancel)
-        currentState.shouldConfirmCapture = false
-        self.state = .awaitingCapture(currentState)
-        logger.info("Waiting for invoice capture confirmation")
-        schedulePaymentConfirmationDelay()
-    }
-
-    private func schedulePaymentConfirmationDelay() {
-        guard let timeInterval = configuration.paymentConfirmation.showProgressIndicatorAfter else {
-            return
-        }
-        Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
-            guard let self, case .awaitingCapture(var awaitingCaptureState) = self.state else {
-                return
-            }
-            awaitingCaptureState.isDelayed = true
-            setStateUnchecked(.awaitingCapture(awaitingCaptureState))
-        }
-    }
-
-    // MARK: - Captured State
-
-    @MainActor
-    private func setCapturedStateUnchecked(
-        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway,
-        parameterValues: PONativeAlternativePaymentMethodParameterValues?
-    ) async {
-        let logoImage = await imagesRepository.image(
-            at: logoUrl(gateway: gateway, parameterValues: parameterValues)
-        )
-        let paymentProvider = State.PaymentProvider(name: parameterValues?.providerName, image: logoImage)
-        await setCapturedStateUnchecked(paymentProvider: paymentProvider)
-    }
-
-    @MainActor
-    private func setCapturedStateUnchecked(
-        paymentProvider: NativeAlternativePaymentInteractorState.PaymentProvider
-    ) async {
-        logger.info("Did receive invoice capture confirmation")
-        guard configuration.paymentConfirmation.waitsConfirmation else {
-            logger.info("Should't wait for confirmation, so setting submitted state instead of captured.")
-            setSubmittedUnchecked()
-            return
-        }
-        let capturedState = State.Captured(paymentProvider: paymentProvider)
-        setStateUnchecked(.captured(capturedState))
-        send(event: .didCompletePayment)
-        if !configuration.skipSuccessScreen {
-            try? await Task.sleep(seconds: Constants.captureCompletionDelay)
-        }
-        completion(.success(()))
-    }
-
-    // MARK: - Started State Restoration
-
-    private func restoreStartedStateAfterSubmissionFailureIfPossible(_ error: Error, replaceErrorMessages: Bool) {
-        logger.info("Did fail to submit parameters: \(error)")
-        guard let failure = error as? POFailure else {
-            setFailureStateUnchecked(error: error)
-            return
-        }
-        var startedState: State.Started
-        switch state {
-        case let .submitting(state), let .started(state):
-            startedState = state
-        default:
-            return
-        }
-        let invalidFields = failure.invalidFields.map { invalidFields in
-            Dictionary(grouping: invalidFields, by: \.name).compactMapValues(\.first)
-        }
-        guard let invalidFields = invalidFields, !invalidFields.isEmpty else {
-            logger.debug("Submission error is not recoverable, aborting")
-            setFailureStateUnchecked(error: failure)
-            return
-        }
-        for (offset, parameter) in startedState.parameters.enumerated() {
-            let errorMessage: String?
-            if !replaceErrorMessages {
-                errorMessage = invalidFields[parameter.specification.key]?.message
-            } else if invalidFields[parameter.specification.key] != nil {
-                errorMessage = self.errorMessage(parameterType: parameter.specification.type)
-            } else {
-                errorMessage = nil
-            }
-            startedState.parameters[offset].recentErrorMessage = errorMessage
-        }
-        setStateUnchecked(.started(startedState))
-        send(event: .didFailToSubmitParameters(failure: failure))
-        logger.debug("One or more parameters are not valid: \(invalidFields), waiting for parameters to update")
-    }
-
-    @MainActor
-    private func restoreStartedStateAfterSubmission(
-        nativeApm: PONativeAlternativePaymentMethodResponse.NativeApm
-    ) async {
-        guard case var .submitting(startedState) = state else {
-            return
-        }
-        startedState.parameters = await createParameters(
-            specifications: nativeApm.parameterDefinitions ?? []
-        )
-        setStateUnchecked(.started(startedState))
-        send(event: .didSubmitParameters(additionalParametersExpected: true))
-        logger.debug("More parameters are expected, waiting for parameters to update")
-    }
-
-    // MARK: - Submitted State
-
-    private func setSubmittedUnchecked() {
-        setStateUnchecked(.submitted)
-        completion(.success(()))
-    }
-
-    // MARK: - Failure State
-
-    private func setFailureStateUnchecked(error: Error) {
-        logger.warn("Did fail to process native payment: \(error)")
-        let failure: POFailure
-        if let error = error as? POFailure {
-            failure = error
-        } else {
-            logger.debug("Unexpected error type: \(error)")
-            failure = POFailure(code: .generic(.mobile), underlyingError: error)
-        }
-        setStateUnchecked(.failure(failure))
-        send(event: .didFail(failure: failure))
-        completion(.failure(failure))
-    }
-
-    // MARK: - Cancellation Availability
 
     private func enableCancellationAfterDelay() {
         let disabledFor = disableDuration(of: configuration.secondaryAction)
@@ -408,17 +219,219 @@ final class NativeAlternativePaymentDefaultInteractor:
         Task { @MainActor in
             try? await Task.sleep(seconds: disabledFor)
             switch state {
-            case .started(var state):
-                state.isCancellable = true
-                setStateUnchecked(.started(state))
-            case .submitting(var state):
-                state.isCancellable = true
-                setStateUnchecked(.submitting(snapshot: state))
+            case .started(var currentState):
+                currentState.isCancellable = true
+                state = .started(currentState)
+            case .submitting(let currentState):
+                var updatedSnapshot = currentState.snapshot
+                updatedSnapshot.isCancellable = true
+                state = .submitting(.init(snapshot: updatedSnapshot, task: currentState.task))
             default:
                 break
             }
         }
     }
+
+    // MARK: - Awaiting Capture State
+
+    private func setAwaitingCaptureState(
+        with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
+        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
+    ) async {
+        if configuration.paymentConfirmation.waitsConfirmation {
+            let paymentProvider = await paymentProvider(with: parameterValues, gateway: gateway)
+            let customerAction = await customerAction(with: parameterValues, gateway: gateway)
+            switch state {
+            case .starting, .submitting:
+                break
+            default:
+                logger.debug("Ignoring attempt to wait for capture from unsupported state.")
+                return
+            }
+            send(event: .willWaitForCaptureConfirmation(additionalActionExpected: customerAction != nil))
+            let shouldConfirmCapture = customerAction != nil && configuration.paymentConfirmation.confirmButton != nil
+            let awaitingCaptureState = State.AwaitingCapture(
+                paymentProvider: paymentProvider,
+                customerAction: customerAction,
+                isCancellable: disableDuration(of: configuration.paymentConfirmation.secondaryAction).isZero,
+                isDelayed: false,
+                shouldConfirmCapture: shouldConfirmCapture
+            )
+            state = .awaitingCapture(awaitingCaptureState)
+            if !shouldConfirmCapture {
+                confirmCapture(force: true)
+            }
+            enableCaptureCancellationAfterDelay()
+        } else {
+            logger.info("Payment capture wasn't requested, will attempt to set submitted state directly.")
+            setSubmittedState()
+        }
+    }
+
+    private func confirmCapture(force: Bool) {
+        guard case .awaitingCapture(let currentState) = state else {
+            logger.debug("Ignoring attempt to confirm capture from unsupported state: \(state).")
+            return
+        }
+        guard currentState.shouldConfirmCapture || force else {
+            logger.debug("Payment is already being captured, ignored.")
+            return
+        }
+        if currentState.shouldConfirmCapture {
+            delegate?.nativeAlternativePaymentMethodDidEmitEvent(.didConfirmPayment)
+        }
+        let request = PONativeAlternativePaymentCaptureRequest(
+            invoiceId: configuration.invoiceId,
+            gatewayConfigurationId: configuration.gatewayConfigurationId,
+            timeout: configuration.paymentConfirmation.timeout
+        )
+        var newState = currentState
+        newState.task = Task { @MainActor in
+            do {
+                try await invoicesService.captureNativeAlternativePayment(request: request)
+                setCapturedState(paymentProvider: currentState.paymentProvider)
+            } catch {
+                setFailureState(error: error)
+            }
+        }
+        newState.shouldConfirmCapture = false
+        state = .awaitingCapture(newState)
+        logger.info("Waiting for invoice capture confirmation.")
+        schedulePaymentConfirmationDelay()
+    }
+
+    private func schedulePaymentConfirmationDelay() {
+        guard let timeInterval = configuration.paymentConfirmation.showProgressIndicatorAfter else {
+            return
+        }
+        Task { @MainActor in
+            try? await Task.sleep(seconds: timeInterval)
+            guard case .awaitingCapture(var newState) = state else {
+                return
+            }
+            newState.isDelayed = true
+            state = .awaitingCapture(newState)
+        }
+    }
+
+    private func customerAction(
+        with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
+        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
+    ) async -> NativeAlternativePaymentInteractorState.CaptureCustomerAction? {
+        let message = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
+        guard let message else {
+            return nil
+        }
+        let image = await imagesRepository.image(at: gateway.customerActionImageUrl)
+        return .init(message: message, image: image)
+    }
+
+    // MARK: - Captured State
+
+    private func setCapturedState(paymentProvider: NativeAlternativePaymentInteractorState.PaymentProvider) {
+        guard !state.isSink else {
+            logger.debug("Already in a sink state, ignoring attempt to set captured state.")
+            return
+        }
+        let task = Task {
+            if !configuration.skipSuccessScreen {
+                // Sleep errors are ignored. The goal is that if this task is cancelled we should still
+                // invoke completion.
+                try? await Task.sleep(seconds: Constants.captureCompletionDelay)
+            }
+            completion(.success(()))
+        }
+        state = .captured(.init(paymentProvider: paymentProvider, completionTask: task))
+        send(event: .didCompletePayment)
+    }
+
+    private func setSubmittedState() {
+        guard !state.isSink else {
+            logger.debug("Already in a sink state, ignoring attempt to set submitted state.")
+            return
+        }
+        state = .submitted
+        completion(.success(()))
+    }
+
+    // MARK: - Submission Recovery
+
+    private func attemptRecoverSubmissionError(_ error: Error, replaceErrorMessages: Bool) {
+        logger.info("Did fail to submit parameters: \(error)")
+        guard let failure = error as? POFailure else {
+            setFailureState(error: error)
+            return
+        }
+        var newState: State.Started
+        switch state {
+        case let .started(state):
+            newState = state
+        case let .submitting(state):
+            newState = state.snapshot
+        default:
+            logger.debug("Ignoring attempt to recover submission error from unsupported state: \(state).")
+            return
+        }
+        let invalidFields = failure.invalidFields.map { invalidFields in
+            Dictionary(grouping: invalidFields, by: \.name).compactMapValues(\.first)
+        }
+        guard let invalidFields = invalidFields, !invalidFields.isEmpty else {
+            logger.debug("Submission error is not recoverable, aborting.")
+            setFailureState(error: failure)
+            return
+        }
+        for (offset, parameter) in newState.parameters.enumerated() {
+            let errorMessage: String?
+            if !replaceErrorMessages {
+                errorMessage = invalidFields[parameter.specification.key]?.message
+            } else if invalidFields[parameter.specification.key] != nil {
+                errorMessage = self.errorMessage(parameterType: parameter.specification.type)
+            } else {
+                errorMessage = nil
+            }
+            newState.parameters[offset].recentErrorMessage = errorMessage
+        }
+        state = .started(newState)
+        send(event: .didFailToSubmitParameters(failure: failure))
+        logger.debug("One or more parameters are not valid: \(invalidFields), waiting for parameters to update.")
+    }
+
+    // MARK: - Submission Completion
+
+    private func restoreStartedStateAfterSubmission(
+        nativeApm: PONativeAlternativePaymentMethodResponse.NativeApm
+    ) async {
+        guard case let .submitting(currentState) = state else {
+            return
+        }
+        var newState = currentState.snapshot
+        newState.parameters = await createParameters(specifications: nativeApm.parameterDefinitions ?? [])
+        state = .started(newState)
+        send(event: .didSubmitParameters(additionalParametersExpected: true))
+        logger.debug("More parameters are expected, waiting for parameters to update.")
+    }
+
+    // MARK: - Failure State
+
+    private func setFailureState(error: Error) {
+        guard !state.isSink else {
+            logger.debug("Already in a sink state, ignoring attempt to set failure state with: \(error).")
+            return
+        }
+        logger.warn("Did fail to process native payment: \(error)")
+        let failure: POFailure
+        if let error = error as? POFailure {
+            failure = error
+        } else {
+            logger.debug("Unexpected error type: \(error)")
+            failure = POFailure(code: .generic(.mobile), underlyingError: error)
+        }
+        state = .failure(failure)
+        send(event: .didFail(failure: failure))
+        completion(.failure(failure))
+    }
+
+    // MARK: - Cancellation Availability
 
     private func enableCaptureCancellationAfterDelay() {
         let disabledFor = disableDuration(of: configuration.paymentConfirmation.secondaryAction)
@@ -428,11 +441,11 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         Task { @MainActor in
             try? await Task.sleep(seconds: disabledFor)
-            guard case .awaitingCapture(var awaitingState) = state else {
+            guard case .awaitingCapture(var newState) = state else {
                 return
             }
-            awaitingState.isCancellable = true
-            setStateUnchecked(.awaitingCapture(awaitingState))
+            newState.isCancellable = true
+            state = .awaitingCapture(newState)
         }
     }
 
@@ -445,7 +458,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     private func didUpdate(parameter: NativeAlternativePaymentInteractorState.Parameter, to value: String) {
-        logger.debug("Did update parameter value '\(value)' for '\(parameter.specification.key)' key")
+        logger.debug("Did update parameter value '\(value)' for '\(parameter.specification.key)' key.")
         let parametersChangedEvent = PONativeAlternativePaymentEvent.ParametersChanged(
             parameter: parameter.specification, value: value
         )
@@ -464,11 +477,6 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Utils
 
-    private func setStateUnchecked(_ state: NativeAlternativePaymentInteractorState) {
-        self.state = state
-    }
-
-    @MainActor
     private func createParameters(
         specifications: [PONativeAlternativePaymentMethodParameter]
     ) async -> [NativeAlternativePaymentInteractorState.Parameter] {
@@ -504,17 +512,23 @@ final class NativeAlternativePaymentDefaultInteractor:
         return String(resource: resource)
     }
 
-    private func logoUrl(
-        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway,
-        parameterValues: PONativeAlternativePaymentMethodParameterValues?
-    ) -> URL? {
-        if parameterValues?.providerName != nil {
-            return parameterValues?.providerLogoUrl
+    private func paymentProvider(
+        with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
+        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
+    ) async -> NativeAlternativePaymentInteractorState.PaymentProvider {
+        if let parameterValues {
+            if let url = parameterValues.providerLogoUrl, let image = await imagesRepository.image(at: url) {
+                return .init(name: nil, image: image)
+            }
+            if let name = parameterValues.providerName {
+                return .init(name: name, image: nil)
+            }
         }
         guard !configuration.paymentConfirmation.hideGatewayDetails else {
-            return nil
+            return .init(name: nil, image: nil)
         }
-        return gateway.logoUrl
+        let gatewayLogoImage = await imagesRepository.image(at: gateway.logoUrl)
+        return .init(name: nil, image: gatewayLogoImage)
     }
 
     private func disableDuration(of action: PONativeAlternativePaymentConfiguration.SecondaryAction?) -> TimeInterval {
@@ -527,22 +541,15 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Default Values
 
     /// Updates parameters with default values.
-    @MainActor
     private func setDefaultValues(
         parameters: inout [NativeAlternativePaymentInteractorState.Parameter]
     ) async {
         guard !parameters.isEmpty else {
             return
         }
-        let defaultValues = await withCheckedContinuation { continuation in
-            if let delegate {
-                delegate.nativeAlternativePaymentMethodDefaultValues(
-                    for: parameters.map(\.specification), completion: { continuation.resume(returning: $0) }
-                )
-            } else {
-                continuation.resume(returning: [:])
-            }
-        }
+        let defaultValues = await delegate?.nativeAlternativePayment(
+            defaultValuesFor: parameters.map(\.specification)
+        ) ?? [:]
         for (offset, parameter) in parameters.enumerated() {
             let defaultValue: String?
             if let value = defaultValues[parameter.specification.key] {
@@ -584,7 +591,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 normalizedValue = POPhoneNumberFormatter().normalized(number: value)
             }
             if let normalizedValue, normalizedValue != parameter.value {
-                logger.debug("Will use updated value '\(normalizedValue)' for key '\(parameter.specification.key)'")
+                logger.debug("Will use updated value '\(normalizedValue)' for key '\(parameter.specification.key)'.")
             }
             if let invalidField = validate(value: normalizedValue ?? "", specification: parameter.specification) {
                 invalidFields.append(invalidField)

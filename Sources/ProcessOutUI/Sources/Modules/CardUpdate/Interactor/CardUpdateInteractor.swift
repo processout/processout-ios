@@ -7,6 +7,7 @@
 
 import ProcessOut
 
+@MainActor
 protocol CardUpdateInteractor: Interactor<CardUpdateInteractorState> {
 
     /// Updates CVC value.
@@ -18,6 +19,6 @@ protocol CardUpdateInteractor: Interactor<CardUpdateInteractorState> {
     /// Attempts to update card with new CVC.
     func submit()
 
-    /// Cancells update if possible.
+    /// Cancels update if possible.
     func cancel()
 }

@@ -134,7 +134,6 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Starting State
 
-    @MainActor
     private func continueStartUnchecked() async {
         do {
             let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
@@ -501,7 +500,7 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)
         case .submitting(let submittingState):
-            currentState.isCancellable = submittingState.isCancellable
+            currentState.isCancellable = submittingState.snapshot.isCancellable
             currentState.isReady = true
             currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)
@@ -577,7 +576,6 @@ final class DynamicCheckoutDefaultInteractor:
         return delegate.dynamicCheckout(shouldContinueAfter: failure)
     }
 
-    @MainActor
     private func continuePaymentProcessingRecovery(after failure: POFailure) async {
         guard case .paymentProcessing(let currentState) = state else {
             assertionFailure("Error could be recovered only when processing payment.")
@@ -739,7 +737,6 @@ final class DynamicCheckoutDefaultInteractor:
         }
     }
 
-    @MainActor
     private func authorizeInvoice(source: String, saveSource: Bool, startedState: State.Started) async throws {
         guard let delegate else {
             throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
@@ -763,7 +760,6 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         delegate?.dynamicCheckout(didEmitCardTokenizationEvent: event)
     }
 
-    @MainActor
     func cardTokenization(didTokenizeCard card: POCard, shouldSaveCard save: Bool) async throws {
         invalidateInvoiceIfPossible()
         guard case .paymentProcessing(let currentState) = state else {

@@ -32,15 +32,17 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         }
         logger.debug("Will start card update")
         delegate?.cardUpdateDidEmitEvent(.willStart)
-        if let cardInfo = configuration.cardInformation {
-            setStartedStateUnchecked(cardInfo: cardInfo)
-        } else {
-            state = .starting
-            Task {
-                let cardInfo = await delegate?.cardInformation(cardId: configuration.cardId)
-                setStartedStateUnchecked(cardInfo: cardInfo)
+        let task = Task { @MainActor in
+            logger.debug("Did start card update")
+            var cardInfo = configuration.cardInformation
+            if cardInfo == nil {
+                cardInfo = await delegate?.cardInformation(cardId: configuration.cardId)
             }
+            let issuerInformation = await self.issuerInformation(cardInfo: cardInfo)
+            setStartedState(cardInfo: cardInfo, issuerInformation: issuerInformation)
         }
+        let startingState = State.Starting(task: task)
+        state = .starting(startingState)
     }
 
     func update(cvc: String) {
@@ -48,7 +50,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             return
         }
         logger.debug("Will change CVC to '\(cvc)'")
-        let formatted = cardSecurityCodeFormatter.string(from: cvc)
+        let formatted = startedState.formatter.string(for: cvc) ?? ""
         guard startedState.cvc != formatted else {
             logger.debug("Ignoring same CVC value \(formatted)")
             return
@@ -67,9 +69,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         let supportedSchemes = [startedState.scheme, startedState.coScheme].compactMap { $0 }
         logger.debug("Will change card scheme to \(scheme)")
         guard supportedSchemes.contains(scheme) else {
-            logger.info(
-                "Aborting attempt to select unknown '\(scheme)' scheme, supported schemes are: \(supportedSchemes)"
-            )
+            logger.info("Unable to select unknown '\(scheme)' scheme, supported values: \(supportedSchemes)")
             return
         }
         startedState.preferredScheme = scheme
@@ -77,109 +77,93 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         delegate?.cardUpdateDidEmitEvent(.parametersChanged)
     }
 
-    @MainActor
     func submit() {
-        guard case .started(let startedState) = state else {
+        guard case .started(let currentState) = state else {
+            logger.debug("Ignoring submission attempt from unsupported state: \(state).")
             return
         }
-        guard startedState.areParametersValid else {
+        guard currentState.areParametersValid else {
             logger.debug("Ignoring attempt to submit invalid parameters.")
             return
         }
-        logger.debug("Will submit card information")
+        logger.debug("Will submit card information.")
         delegate?.cardUpdateDidEmitEvent(.willUpdateCard)
-        state = .updating(snapshot: startedState)
-        Task {
+        let task = Task { @MainActor in
             do {
                 let request = POCardUpdateRequest(
                     cardId: configuration.cardId,
-                    cvc: startedState.cvc,
-                    preferredScheme: startedState.preferredScheme?.rawValue
+                    cvc: currentState.cvc,
+                    preferredScheme: currentState.preferredScheme?.rawValue
                 )
                 setCompletedState(card: try await cardsService.updateCard(request: request))
             } catch {
-                recoverUpdate(from: error)
+                attemptRecoverUpdateError(error)
             }
         }
+        state = .updating(State.Updating(snapshot: currentState, task: task))
     }
 
     override func cancel() {
-        guard case .started = state else {
-            return
+        switch state {
+        case .starting(let currentState):
+            currentState.task.cancel()
+        case .updating(let currentState):
+            currentState.task.cancel()
+        default:
+            break // Ignored
         }
-        let failure = POFailure(code: .cancelled)
-        setFailureStateUnchecked(failure: failure)
+        setFailureState(failure: POFailure(code: .cancelled))
     }
 
     // MARK: - Private Properties
-
-    private weak var delegate: POCardUpdateDelegate?
 
     private let cardsService: POCardsService
     private let logger: POLogger
     private let configuration: POCardUpdateConfiguration
     private let completion: (Result<POCard, POFailure>) -> Void
 
-    private lazy var cardSecurityCodeFormatter = CardSecurityCodeFormatter()
+    private weak var delegate: POCardUpdateDelegate?
 
     // MARK: - Started State
 
-    @MainActor
-    private func setStartedStateUnchecked(cardInfo: POCardUpdateInformation?) {
-        cardSecurityCodeFormatter.scheme = cardInfo?.$scheme.typed
+    private func setStartedState(cardInfo: POCardUpdateInformation?, issuerInformation: POCardIssuerInformation?) {
+        switch state {
+        case .idle, .starting:
+            break
+        default:
+            logger.debug("Ignoring attempt to set started state from unsupported state: \(state)")
+            return
+        }
+        let formatter = CardSecurityCodeFormatter()
+        formatter.scheme = issuerInformation?.$scheme.typed
         let startedState = State.Started(
             cardNumber: cardInfo?.maskedNumber,
-            scheme: cardInfo?.$scheme.typed,
-            coScheme: cardInfo?.$coScheme.typed,
-            preferredScheme: preferredScheme(cardInfo: cardInfo),
-            formatter: cardSecurityCodeFormatter
+            scheme: issuerInformation?.$scheme.typed,
+            coScheme: issuerInformation?.$coScheme.typed,
+            preferredScheme: preferredScheme(cardInfo: cardInfo, issuerInformation: issuerInformation),
+            formatter: formatter
         )
         self.state = .started(startedState)
         delegate?.cardUpdateDidEmitEvent(.didStart)
-        logger.debug("Did start card update")
-        Task {
-            await updateSchemeIfNeeded(cardInfo: cardInfo)
-        }
     }
 
     // MARK: - Scheme Update
 
-    @MainActor
-    private func updateSchemeIfNeeded(cardInfo: POCardUpdateInformation?) async {
-        guard cardInfo?.scheme == nil || cardInfo?.coScheme == nil else {
-            logger.debug("Needed schemes information is already set, ignored")
-            return
+    private func issuerInformation(cardInfo: POCardUpdateInformation?) async -> POCardIssuerInformation? {
+        if let scheme = cardInfo?.$scheme.typed {
+            logger.debug("Needed schemes information is already set, won't resolve.")
+            return POCardIssuerInformation(scheme: scheme, coScheme: cardInfo?.$coScheme.typed)
         }
         guard let iin = cardInfo?.iin ?? cardInfo?.maskedNumber.flatMap(issuerIdentificationNumber) else {
             logger.info("Unable to resolve scheme, IIN is not available")
-            return
+            return nil
         }
         do {
-            let issuerInformation = try await cardsService.issuerInformation(iin: iin)
-            logger.info("Did resolve issuer info: \(issuerInformation)")
-            switch state {
-            case .started(var startedState):
-                update(state: &startedState, with: issuerInformation)
-                state = .started(startedState)
-            case .updating(var startedState):
-                update(state: &startedState, with: issuerInformation)
-                state = .updating(snapshot: startedState)
-            default:
-                logger.debug("Unsupported state, resolved scheme info is ignored")
-                return
-            }
+            return try await cardsService.issuerInformation(iin: iin)
         } catch {
-            logger.info("Did fail to resolve scheme: \(error)")
+            logger.info("Did fail to resolve issuer information: \(error)")
         }
-    }
-
-    /// - NOTE: Method updates interactor's CSC formatter as well.
-    private func update(state: inout State.Started, with issuerInformation: POCardIssuerInformation) {
-        cardSecurityCodeFormatter.scheme = issuerInformation.$scheme.typed
-        state.scheme = issuerInformation.$scheme.typed
-        state.coScheme = issuerInformation.$coScheme.typed
-        state.preferredScheme = state.preferredScheme ?? preferredScheme(issuerInformation: issuerInformation)
-        state.cvc = cardSecurityCodeFormatter.string(from: state.cvc)
+        return nil
     }
 
     private func issuerIdentificationNumber(maskedNumber: String) -> String? {
@@ -197,68 +181,6 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         return nil
     }
 
-    // MARK: - Failure Recovery
-
-    private func recoverUpdate(from error: Error) {
-        if let failure = error as? POFailure {
-            recoverUpdate(from: failure)
-            return
-        }
-        let failure = POFailure(code: .generic(.mobile), underlyingError: error)
-        recoverUpdate(from: failure)
-    }
-
-    private func recoverUpdate(from failure: POFailure) {
-        guard case .updating(var startedState) = state else {
-            assertionFailure("Unsupported state")
-            return
-        }
-        let shouldContinue = delegate?.shouldContinueUpdate(after: failure) ?? true
-        guard shouldContinue else {
-            setFailureStateUnchecked(failure: failure)
-            return
-        }
-        var errorMessage: POStringResource
-        switch failure.code {
-        case .generic(.requestInvalidCard),
-             .generic(.cardInvalid),
-             .generic(.cardBadTrackData),
-             .generic(.cardMissingCvc),
-             .generic(.cardInvalidCvc),
-             .generic(.cardFailedCvc),
-             .generic(.cardFailedCvcAndAvs):
-            startedState.areParametersValid = false
-            errorMessage = .CardUpdate.Error.cvc
-        default:
-            startedState.areParametersValid = true
-            errorMessage = .CardUpdate.Error.generic
-        }
-        // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
-        startedState.recentErrorMessage = String(resource: errorMessage)
-        state = .started(startedState)
-        logger.debug("Did recover started state after failure: \(failure)")
-    }
-
-    private func setFailureStateUnchecked(failure: POFailure) {
-        logger.info("Did fail to update card \(failure)")
-        state = .completed
-        completion(.failure(failure))
-    }
-
-    // MARK: - Completed State
-
-    private func setCompletedState(card: POCard) {
-        guard case .updating = state else {
-            return
-        }
-        logger.info("Did update card")
-        state = .completed
-        delegate?.cardUpdateDidEmitEvent(.didComplete)
-        completion(.success(card))
-    }
-
-    // MARK: - Preferred Scheme
-
     private func preferredScheme(
         cardInfo: POCardUpdateInformation? = nil,
         issuerInformation: POCardIssuerInformation? = nil
@@ -269,6 +191,73 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         guard configuration.isSchemeSelectionAllowed else {
             return nil
         }
-        return cardInfo?.$scheme.typed ?? issuerInformation?.$scheme.typed
+        return issuerInformation?.$scheme.typed
+    }
+
+    // MARK: - Failure Recovery
+
+    private func attemptRecoverUpdateError(_ error: Error) {
+        guard case .updating(let currentState) = state else {
+            logger.debug("Unable to recover update error from unsupported state: \(state).")
+            return
+        }
+        let failure = (error as? POFailure) ?? .init(code: .generic(.mobile), underlyingError: error)
+        if case .cancelled = failure.code {
+            setFailureState(failure: failure)
+        } else if delegate?.shouldContinueUpdate(after: failure) != false {
+            var newState = currentState.snapshot
+            newState.recentErrorMessage = errorMessage(for: failure, areParametersValid: &newState.areParametersValid)
+            state = .started(newState)
+            logger.debug("Did recover started state after failure: \(failure).")
+        } else {
+            setFailureState(failure: failure)
+        }
+    }
+
+    private func errorMessage(for failure: POFailure, areParametersValid: inout Bool) -> String? {
+        // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
+        var errorMessage: POStringResource
+        switch failure.code {
+        case .generic(.requestInvalidCard),
+             .generic(.cardInvalid),
+             .generic(.cardBadTrackData),
+             .generic(.cardMissingCvc),
+             .generic(.cardInvalidCvc),
+             .generic(.cardFailedCvc),
+             .generic(.cardFailedCvcAndAvs):
+            areParametersValid = false
+            errorMessage = .CardUpdate.Error.cvc
+        case .cancelled:
+            return nil
+        default:
+            areParametersValid = true
+            errorMessage = .CardUpdate.Error.generic
+        }
+        return String(resource: errorMessage)
+    }
+
+    // MARK: - Failure State
+
+    private func setFailureState(failure: POFailure) {
+        if state.isSink {
+            logger.debug("Already in a sink state, ignoring attempt to set failure state with: \(failure).")
+        } else {
+            state = .completed
+            logger.info("Did fail to update card \(failure)")
+            completion(.failure(failure))
+        }
+    }
+
+    // MARK: - Completed State
+
+    private func setCompletedState(card: POCard) {
+        if state.isSink {
+            logger.debug("Unable to complete with card: \(card), already in a sink state.")
+        } else {
+            logger.info("Did update card")
+            state = .completed
+            delegate?.cardUpdateDidEmitEvent(.didComplete)
+            completion(.success(card))
+        }
     }
 }

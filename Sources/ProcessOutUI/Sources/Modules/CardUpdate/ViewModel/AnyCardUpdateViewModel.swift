@@ -42,6 +42,10 @@ final class AnyCardUpdateViewModel: CardUpdateViewModel {
         base.start()
     }
 
+    func stop() {
+        base.stop()
+    }
+
     // MARK: - Private Properties
 
     private var cancellable: AnyCancellable?

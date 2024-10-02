@@ -44,7 +44,7 @@ internal enum FontFamily {
   }
   internal static let allCustomFonts: [FontConvertible] = [WorkSans.all].flatMap { $0 }
   internal static func registerAllCustomFonts() {
-    allCustomFonts.forEach { $0.register() }
+    allCustomFonts.forEach { $0.registerIfNeeded() }
   }
 }
 // swiftlint:enable identifier_name line_length type_body_length

@@ -18,10 +18,6 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         observeChanges(interactor: interactor)
     }
 
-    deinit {
-        interactor.cancel()
-    }
-
     // MARK: - NativeAlternativePaymentViewModel
 
     @AnimatablePublished
@@ -29,6 +25,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     func start() {
         $state.performWithoutAnimation(interactor.start)
+    }
+
+    func stop() {
+        interactor.cancel()
     }
 
     // MARK: - Private Nested Types
@@ -72,7 +72,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         case .started(let state):
             update(with: state)
         case .submitting(let state):
-            update(withSubmittingState: state)
+            update(withSubmittingState: state.snapshot)
         case .awaitingCapture(let state):
             update(with: state)
         case .captured(let state) where !configuration.skipSuccessScreen:
@@ -141,8 +141,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createTitleSection(state: InteractorState.Started) -> NativeAlternativePaymentViewModelSection? {
-        let title = configuration.title
-        ?? String(resource: .NativeAlternativePayment.title, replacements: state.gateway.displayName)
+        let gatewayDisplayName = state.transactionDetails.gateway.displayName
+        // swiftlint:disable:next line_length
+        let title = configuration.title ?? String(resource: .NativeAlternativePayment.title, replacements: gatewayDisplayName)
         guard !title.isEmpty else {
             return nil
         }
@@ -392,9 +393,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         if let customTitle = configuration.primaryActionTitle {
             title = customTitle
         } else {
-            priceFormatter.currencyCode = state.invoice.currencyCode
-            // swiftlint:disable:next legacy_objc_type
-            if let formattedAmount = priceFormatter.string(from: state.invoice.amount as NSDecimalNumber) {
+            priceFormatter.currencyCode = state.transactionDetails.invoice.currencyCode
+            // swiftlint:disable:next legacy_objc_type line_length
+            if let formattedAmount = priceFormatter.string(from: state.transactionDetails.invoice.amount as NSDecimalNumber) {
                 title = String(resource: .NativeAlternativePayment.Button.submitAmount, replacements: formattedAmount)
             } else {
                 title = String(resource: .NativeAlternativePayment.Button.submit)
