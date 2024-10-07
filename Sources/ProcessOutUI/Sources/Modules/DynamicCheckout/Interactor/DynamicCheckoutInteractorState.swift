@@ -82,9 +82,6 @@ enum DynamicCheckoutInteractorState {
         /// Defines whether payment is cancellable.
         var isCancellable: Bool
 
-        /// For payment methods that need preloading this is initially set to `false`. Default value is `true`.
-        var isReady = true
-
         /// Boolean flag indicating whether interactor is currently processing native APM and it is
         /// in `awaitingCapture` state
         ///

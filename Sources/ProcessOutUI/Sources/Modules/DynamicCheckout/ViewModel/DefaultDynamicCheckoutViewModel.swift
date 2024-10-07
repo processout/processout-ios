@@ -398,16 +398,25 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func shouldResolveContent(
         for methodId: String, state: DynamicCheckoutInteractorState.PaymentProcessing
     ) -> Bool {
-        state.paymentMethodId == methodId && state.isReady
+        guard state.paymentMethodId == methodId else {
+            return false
+        }
+        if let interactor = state.nativeAlternativePaymentInteractor, case .starting = interactor.state {
+            return false
+        }
+        return true
     }
 
     private func status(
         of methodId: String, state: DynamicCheckoutInteractorState.PaymentProcessing
     ) -> (isSelected: Bool, isLoading: Bool) {
-        if methodId == state.paymentMethodId {
-            return (true, !state.isReady)
+        guard methodId == state.paymentMethodId else {
+            return (false, false)
         }
-        return (false, false)
+        if let interactor = state.nativeAlternativePaymentInteractor, case .starting = interactor.state {
+            return (true, true)
+        }
+        return (true, false)
     }
 
     // MARK: - Restarting State
