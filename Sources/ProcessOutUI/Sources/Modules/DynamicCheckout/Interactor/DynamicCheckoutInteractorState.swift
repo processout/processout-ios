@@ -16,6 +16,25 @@ enum DynamicCheckoutInteractorState {
         let task: Task<Void, Never>
     }
 
+    struct Restarting {
+
+        /// Payment processing state.
+        let snapshot: PaymentProcessing
+
+        /// Restart task.
+        let task: Task<Void, Never>
+
+        /// Failure that caused restart if any.
+        let failure: POFailure?
+
+        /// Payment method that should be selected in case of processing failure.
+        var pendingPaymentMethodId: String?
+
+        /// When processing fails and this property is set to `true`, pending payment method (if present) is
+        /// started after selection.
+        var shouldStartPendingPaymentMethod = false
+    }
+
     struct Started {
 
         /// Express payment methods.
@@ -23,9 +42,6 @@ enum DynamicCheckoutInteractorState {
 
         /// Express payment methods.
         let expressPaymentMethodIds: [String]
-
-        /// Payment methods.
-        let regularPaymentMethodIds: [String]
 
         /// Pass Kit payment request.
         let pkPaymentRequests: [String: PKPaymentRequest]
@@ -66,11 +82,11 @@ enum DynamicCheckoutInteractorState {
         /// Native APM interactor.
         let nativeAlternativePaymentInteractor: (any NativeAlternativePaymentInteractor)?
 
+        /// Payment processing task if any.
+        let task: Task<Void, Never>?
+
         /// Defines whether payment is cancellable.
         var isCancellable: Bool
-
-        /// Indicates whether cancellation was forced (if at all).
-        var isForcelyCancelled = false
 
         /// For payment methods that need preloading this is initially set to `false`. Default value is `true`.
         var isReady = true
@@ -82,35 +98,9 @@ enum DynamicCheckoutInteractorState {
         /// currently possible because state update is perform on `willChange`.
         var isAwaitingNativeAlternativePaymentCapture = false // swiftlint:disable:this identifier_name
 
-        /// Payment method that should be selected in case of processing failure.
-        var pendingPaymentMethodId: String?
-
-        /// When processing fails and this property is set to `true`, pending payment method (if present) is
-        /// started after selection.
-        var shouldStartPendingPaymentMethod = false
-
         /// Boolean value indicating whether invoice should be invalidated when interactor transitions back
         /// to started from this state.
         var shouldInvalidateInvoice = false
-    }
-
-    struct Recovering {
-
-        /// Failure that caused recovery process to happen.
-        let failure: POFailure
-
-        /// Started state snapshot.
-        let snapshot: Started
-
-        /// Failed payment method ID.
-        let failedPaymentMethodId: String
-
-        /// Payment method that should be selected in case of processing failure.
-        var pendingPaymentMethodId: String?
-
-        /// When processing fails and this property is set to `true`, pending payment method (if present) is
-        /// started after selection.
-        var shouldStartPendingPaymentMethod = false
     }
 
     struct Success {
@@ -125,6 +115,9 @@ enum DynamicCheckoutInteractorState {
     /// Starting state.
     case starting(Starting)
 
+    /// Restarting state.
+    case restarting(Restarting)
+
     /// Started state.
     case started(Started)
 
@@ -133,9 +126,6 @@ enum DynamicCheckoutInteractorState {
 
     /// Payment is being processed.
     case paymentProcessing(PaymentProcessing)
-
-    /// Payment recovering state.
-    case recovering(Recovering)
 
     /// Failure state. This is a sink state.
     case failure(POFailure)

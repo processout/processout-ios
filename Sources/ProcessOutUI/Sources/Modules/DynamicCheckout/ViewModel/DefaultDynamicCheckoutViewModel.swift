@@ -71,7 +71,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             updateWithSelectedState(state)
         case .paymentProcessing(let state):
             updateWithPaymentProcessingState(state)
-        case .recovering(let state):
+        case .restarting(let state):
             updateWithRecoveringState(state)
         case .success:
             updateWithSuccessState()
@@ -108,15 +108,18 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             createErrorSection(state: state),
             createExpressMethodsSection(state: state)
         ]
-        let regularItems = state.regularPaymentMethodIds.compactMap { methodId -> DynamicCheckoutViewModelItem? in
-            let isSelected = selectedMethodId == methodId
-            // swiftlint:disable:next line_length
-            guard let info = createPaymentInfo(id: methodId, isSelected: isSelected, isLoading: false, state: state) else {
+        let regularItems = state.paymentMethods.values.compactMap { paymentMethod -> DynamicCheckoutViewModelItem? in
+            guard !state.expressPaymentMethodIds.contains(paymentMethod.id) else {
                 return nil
             }
-            let submitButton = createSubmitAction(methodId: methodId, selectedMethodId: selectedMethodId)
+            let isSelected = selectedMethodId == paymentMethod.id
+            // swiftlint:disable:next line_length
+            guard let info = createPaymentInfo(id: paymentMethod.id, isSelected: isSelected, isLoading: false, state: state) else {
+                return nil
+            }
+            let submitButton = createSubmitAction(methodId: paymentMethod.id, selectedMethodId: selectedMethodId)
             let payment = DynamicCheckoutViewModelItem.RegularPayment(
-                id: methodId, info: info, content: nil, contentId: "", submitButton: submitButton
+                id: paymentMethod.id, info: info, content: nil, contentId: "", submitButton: submitButton
             )
             return .regularPayment(payment)
         }
@@ -318,16 +321,19 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             createExpressMethodsSection(state: state.snapshot)
         ]
         // swiftlint:disable:next line_length
-        let regularItems = state.snapshot.regularPaymentMethodIds.compactMap { methodId -> DynamicCheckoutViewModelItem? in
-            let (isSelected, isLoading) = status(of: methodId, state: state)
+        let regularItems = state.snapshot.paymentMethods.values.compactMap { paymentMethod -> DynamicCheckoutViewModelItem? in
+            guard !state.snapshot.expressPaymentMethodIds.contains(paymentMethod.id) else {
+                return nil
+            }
+            let (isSelected, isLoading) = status(of: paymentMethod.id, state: state)
             // swiftlint:disable:next line_length
-            guard let info = createPaymentInfo(id: methodId, isSelected: isSelected, isLoading: isLoading, state: state.snapshot) else {
+            guard let info = createPaymentInfo(id: paymentMethod.id, isSelected: isSelected, isLoading: isLoading, state: state.snapshot) else {
                 return nil
             }
             let payment = DynamicCheckoutViewModelItem.RegularPayment(
-                id: methodId,
+                id: paymentMethod.id,
                 info: info,
-                content: createRegularPaymentContent(state: state, methodId: methodId),
+                content: createRegularPaymentContent(state: state, methodId: paymentMethod.id),
                 contentId: state.snapshot.invoice.id,
                 submitButton: nil
             )
@@ -400,25 +406,21 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func shouldResolveContent(
         for methodId: String, state: DynamicCheckoutInteractorState.PaymentProcessing
     ) -> Bool {
-        state.paymentMethodId == methodId && state.isReady && state.pendingPaymentMethodId == nil
+        state.paymentMethodId == methodId && state.isReady
     }
 
     private func status(
         of methodId: String, state: DynamicCheckoutInteractorState.PaymentProcessing
     ) -> (isSelected: Bool, isLoading: Bool) {
-        if let pendingPaymentMethodId = state.pendingPaymentMethodId {
-            if methodId == pendingPaymentMethodId {
-                return (true, true)
-            }
-        } else if methodId == state.paymentMethodId {
+        if methodId == state.paymentMethodId {
             return (true, !state.isReady)
         }
         return (false, false)
     }
 
-    // MARK: - Recovering State
+    // MARK: - Restarting State
 
-    private func updateWithRecoveringState(_ state: DynamicCheckoutInteractorState.Recovering) {
+    private func updateWithRecoveringState(_ state: DynamicCheckoutInteractorState.Restarting) {
         let newActions = [
             createCancelAction(state)
         ]
@@ -431,21 +433,24 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     }
 
     private func createSectionsWithRecoveringState(
-        _ state: DynamicCheckoutInteractorState.Recovering
+        _ state: DynamicCheckoutInteractorState.Restarting
     ) -> [DynamicCheckoutViewModelState.Section] {
         var sections = [
-            createErrorSection(state: state.snapshot),
-            createExpressMethodsSection(state: state.snapshot)
+            createErrorSection(state: state.snapshot.snapshot),
+            createExpressMethodsSection(state: state.snapshot.snapshot)
         ]
         // swiftlint:disable:next line_length
-        let regularItems = state.snapshot.regularPaymentMethodIds.compactMap { methodId -> DynamicCheckoutViewModelItem? in
-            let isSelected = methodId == (state.pendingPaymentMethodId ?? state.failedPaymentMethodId)
+        let regularItems = state.snapshot.snapshot.paymentMethods.values.compactMap { paymentMethod -> DynamicCheckoutViewModelItem? in
+            guard !state.snapshot.snapshot.expressPaymentMethodIds.contains(paymentMethod.id) else {
+                return nil
+            }
+            let isSelected = paymentMethod.id == (state.pendingPaymentMethodId ?? state.snapshot.paymentMethodId)
             // swiftlint:disable:next line_length
-            guard let info = createPaymentInfo(id: methodId, isSelected: isSelected, isLoading: isSelected, state: state.snapshot) else {
+            guard let info = createPaymentInfo(id: paymentMethod.id, isSelected: isSelected, isLoading: isSelected, state: state.snapshot.snapshot) else {
                 return nil
             }
             let payment = DynamicCheckoutViewModelItem.RegularPayment(
-                id: methodId, info: info, content: nil, contentId: "", submitButton: nil
+                id: paymentMethod.id, info: info, content: nil, contentId: "", submitButton: nil
             )
             return .regularPayment(payment)
         }
@@ -457,7 +462,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     }
 
     private func createCancelAction(
-        _ state: DynamicCheckoutInteractorState.Recovering
+        _ state: DynamicCheckoutInteractorState.Restarting
     ) -> POActionsContainerActionViewModel? {
         guard state.snapshot.isCancellable else {
             return nil
