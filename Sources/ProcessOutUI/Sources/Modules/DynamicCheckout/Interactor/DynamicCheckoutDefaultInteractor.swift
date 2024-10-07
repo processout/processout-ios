@@ -118,6 +118,7 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.nativeAlternativePaymentInteractor?.delegate = nil
             currentState.nativeAlternativePaymentInteractor?.willChange = nil
             currentState.nativeAlternativePaymentInteractor?.cancel()
+            currentState.task?.cancel()
         case .success(let currentState):
             currentState.completionTask.cancel() // Fast-forward completion invocation.
         default:
