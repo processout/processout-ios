@@ -207,7 +207,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         } else {
             failure = POFailure(code: .generic(.mobile), underlyingError: error)
         }
-        if failure.code == .cancelled || delegate?.shouldContinueUpdate(after: failure) != false {
+        if delegate?.shouldContinueUpdate(after: failure) != false {
             var newState = currentState.snapshot
             newState.recentErrorMessage = errorMessage(for: failure, areParametersValid: &newState.areParametersValid)
             state = .started(newState)

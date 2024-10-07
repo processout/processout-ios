@@ -185,7 +185,7 @@ final class DefaultCardTokenizationInteractor:
             logger.debug("Unable to recover tokenization failure from unsupported state: \(state)")
             return
         }
-        if failure.code == .cancelled || delegate?.shouldContinueTokenization(after: failure) != false {
+        if delegate?.shouldContinueTokenization(after: failure) != false {
             var newState = currentState.snapshot
             var invalidParameterIds: [State.ParameterId] = []
             newState.recentErrorMessage = errorMessage(for: failure, invalidParameterIds: &invalidParameterIds)

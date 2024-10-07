@@ -231,7 +231,7 @@ final class DynamicCheckoutDefaultInteractor:
             setFailureState(error: error)
             return
         }
-        if failure.code == .cancelled || delegate?.dynamicCheckout(shouldContinueAfter: failure) != false {
+        if delegate?.dynamicCheckout(shouldContinueAfter: failure) != false {
             let task = Task {
                 await continueRestart(reason: .failure(failure))
             }
