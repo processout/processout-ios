@@ -333,7 +333,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.debug("Already in a sink state, ignoring attempt to set captured state.")
             return
         }
-        let task = Task {
+        let task = Task { @MainActor in
             if !configuration.skipSuccessScreen {
                 // Sleep errors are ignored. The goal is that if this task is cancelled we should still
                 // invoke completion.
