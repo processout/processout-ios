@@ -112,13 +112,7 @@ final class DynamicCheckoutDefaultInteractor:
         case .restarting(let currentState):
             currentState.task.cancel()
         case .paymentProcessing(let currentState):
-            currentState.cardTokenizationInteractor?.delegate = nil
-            currentState.cardTokenizationInteractor?.willChange = nil
-            currentState.cardTokenizationInteractor?.cancel()
-            currentState.nativeAlternativePaymentInteractor?.delegate = nil
-            currentState.nativeAlternativePaymentInteractor?.willChange = nil
-            currentState.nativeAlternativePaymentInteractor?.cancel()
-            currentState.task?.cancel()
+            cancelCurrentPayment(in: currentState)
         case .success(let currentState):
             currentState.completionTask.cancel() // Fast-forward completion invocation.
         default:
@@ -216,12 +210,12 @@ final class DynamicCheckoutDefaultInteractor:
             logger.debug("Requested payment method is already being processed, ignored.")
             return
         }
-        let task = Task { @MainActor in
-            await continueRestart(reason: .paymentMethodChanged)
-        }
+        cancelCurrentPayment(in: currentState)
         let newState = State.Restarting(
             snapshot: currentState,
-            task: task,
+            task: Task { @MainActor in
+                await continueRestart(reason: .paymentMethodChanged)
+            },
             failure: nil,
             pendingPaymentMethodId: methodId,
             shouldStartPendingPaymentMethod: shouldStart
@@ -324,6 +318,16 @@ final class DynamicCheckoutDefaultInteractor:
         default:
             return String(resource: .DynamicCheckout.Error.generic)
         }
+    }
+
+    private func cancelCurrentPayment(in state: State.PaymentProcessing) {
+        state.cardTokenizationInteractor?.delegate = nil
+        state.cardTokenizationInteractor?.willChange = nil
+        state.cardTokenizationInteractor?.cancel()
+        state.nativeAlternativePaymentInteractor?.delegate = nil
+        state.nativeAlternativePaymentInteractor?.willChange = nil
+        state.nativeAlternativePaymentInteractor?.cancel()
+        state.task?.cancel()
     }
 
     // MARK: - Selected State
