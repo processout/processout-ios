@@ -383,7 +383,8 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let title: String?
         let confirmation: POConfirmationDialogConfiguration?
-        if state.isAwaitingNativeAlternativePaymentCapture {
+        // swiftlint:disable:next line_length
+        if let alternativePaymentInteractor = state.nativeAlternativePaymentInteractor, case .awaitingCapture = alternativePaymentInteractor.state {
             let configuration = interactor.configuration.alternativePayment.paymentConfirmation.cancelButton
             title = configuration?.title
             confirmation = configuration?.confirmation

@@ -499,7 +499,7 @@ final class DynamicCheckoutDefaultInteractor:
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: interactor,
             task: nil,
-            isCancellable: false
+            isCancellable: true
         )
         state = .paymentProcessing(paymentProcessingState)
         interactor.start()
@@ -515,20 +515,16 @@ final class DynamicCheckoutDefaultInteractor:
         case .idle:
             break // Ignored
         case .starting:
-            currentState.isCancellable = false
-            currentState.isAwaitingNativeAlternativePaymentCapture = false
+            currentState.isCancellable = true
             self.state = .paymentProcessing(currentState)
         case .started(let startedState):
             currentState.isCancellable = startedState.isCancellable
-            currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)
         case .submitting(let submittingState):
             currentState.isCancellable = submittingState.snapshot.isCancellable
-            currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)
         case .awaitingCapture(let awaitingCaptureState):
             currentState.isCancellable = awaitingCaptureState.isCancellable
-            currentState.isAwaitingNativeAlternativePaymentCapture = true
             self.state = .paymentProcessing(currentState)
         case .submitted, .captured:
             setSuccessState()

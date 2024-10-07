@@ -82,13 +82,6 @@ enum DynamicCheckoutInteractorState {
         /// Defines whether payment is cancellable.
         var isCancellable: Bool
 
-        /// Boolean flag indicating whether interactor is currently processing native APM and it is
-        /// in `awaitingCapture` state
-        ///
-        /// Normally consumer of state should be able to inspect interactor state directly, but since it is not
-        /// currently possible because state update is perform on `willChange`.
-        var isAwaitingNativeAlternativePaymentCapture = false // swiftlint:disable:this identifier_name
-
         /// Boolean value indicating whether invoice should be invalidated when interactor transitions back
         /// to started from this state.
         var shouldInvalidateInvoice = false
