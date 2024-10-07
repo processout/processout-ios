@@ -160,23 +160,21 @@ final class DynamicCheckoutDefaultInteractor:
             logger.debug("Unable to set started state from unsupported state: \(state).")
             return
         }
-        guard let paymentMethods = invoice.paymentMethods, !paymentMethods.isEmpty else {
+        if let paymentMethods = invoice.paymentMethods?.filter(isSupported), !paymentMethods.isEmpty {
+            let startedState = DynamicCheckoutInteractorState.Started(
+                paymentMethods: paymentMethods,
+                isCancellable: configuration.cancelButton?.title.map { !$0.isEmpty } ?? true,
+                invoice: invoice,
+                clientSecret: clientSecret,
+                recentErrorDescription: errorDescription
+            )
+            state = .started(startedState)
+            logger[attributeKey: .invoiceId] = invoice.id
+            logger.debug("Did start dynamic checkout flow.")
+        } else {
             let failure = POFailure(message: "Payment methods are not available.", code: .generic(.mobile))
             setFailureState(error: failure)
-            return
         }
-        let pkPaymentRequests = pkPaymentRequests(invoice: invoice)
-        let startedState = DynamicCheckoutInteractorState.Started(
-            paymentMethods: paymentMethods,
-            pkPaymentRequests: pkPaymentRequests,
-            isCancellable: configuration.cancelButton?.title.map { !$0.isEmpty } ?? true,
-            invoice: invoice,
-            clientSecret: clientSecret,
-            recentErrorDescription: errorDescription
-        )
-        state = .started(startedState)
-        logger[attributeKey: .invoiceId] = invoice.id
-        logger.debug("Did start dynamic checkout flow.")
     }
 
     private func initiateDefaultPaymentIfNeeded() {
@@ -197,28 +195,13 @@ final class DynamicCheckoutDefaultInteractor:
         }
     }
 
-    private func pkPaymentRequests(invoice: POInvoice) -> [String: PKPaymentRequest] {
-        guard PKPaymentAuthorizationController.canMakePayments() else {
-            logger.debug("PassKit is not supported, won't attempt to resolve request.")
-            return [:]
+    private func isSupported(paymentMethod: PODynamicCheckoutPaymentMethod) -> Bool {
+        switch paymentMethod {
+        case .applePay:
+            return PKPaymentAuthorizationController.canMakePayments()
+        default:
+            return true
         }
-        let availableNetworks = Set(PKPaymentRequest.availableNetworks())
-        var requests: [String: PKPaymentRequest] = [:]
-        invoice.paymentMethods?.forEach { method in
-            guard case .applePay(let method) = method else {
-                return
-            }
-            let request = PKPaymentRequest()
-            request.merchantIdentifier = method.configuration.merchantId
-            request.countryCode = method.configuration.countryCode
-            request.merchantCapabilities = method.configuration.merchantCapabilities
-            request.supportedNetworks = method.configuration.supportedNetworks
-                .compactMap(PKPaymentNetwork.init(poScheme:))
-                .filter(availableNetworks.contains)
-            request.currencyCode = invoice.currency
-            requests[method.id] = request
-        }
-        return requests
     }
 
     // MARK: - Restarting State
@@ -357,8 +340,8 @@ final class DynamicCheckoutDefaultInteractor:
         var newStartedState = startedState
         newStartedState.recentErrorDescription = nil
         switch startedState.paymentMethods.first(where: { $0.id == methodId }) {
-        case .applePay:
-            startPassKitPayment(methodId: methodId, startedState: newStartedState)
+        case .applePay(let method):
+            startPassKitPayment(method: method, startedState: newStartedState)
         case .card(let method):
             startCardPayment(method: method, startedState: newStartedState)
         case .alternativePayment(let method):
@@ -374,16 +357,13 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Pass Kit Payment
 
-    private func startPassKitPayment(methodId: String, startedState: State.Started) {
-        guard let request = startedState.pkPaymentRequests[methodId] else {
-            assertionFailure("Attempted to initiate PassKit payment without request.")
-            return
-        }
+    private func startPassKitPayment(method: PODynamicCheckoutPaymentMethod.ApplePay, startedState: State.Started) {
         let task = Task { @MainActor in
             do {
                 guard let delegate else {
                     throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
                 }
+                let request = pkPaymentRequest(for: method, invoice: startedState.invoice)
                 await delegate.dynamicCheckout(willAuthorizeInvoiceWith: request)
                 let card = try await cardsService.tokenize(
                     request: POApplePayTokenizationRequest(paymentRequest: request)
@@ -403,7 +383,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
-            paymentMethodId: methodId,
+            paymentMethodId: method.id,
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: nil,
             task: task,
@@ -411,6 +391,21 @@ final class DynamicCheckoutDefaultInteractor:
             shouldInvalidateInvoice: false
         )
         state = .paymentProcessing(paymentProcessingState)
+    }
+
+    private func pkPaymentRequest(
+        for paymentMethod: PODynamicCheckoutPaymentMethod.ApplePay, invoice: POInvoice
+    ) -> PKPaymentRequest {
+        let availableNetworks = Set(PKPaymentRequest.availableNetworks())
+        let request = PKPaymentRequest()
+        request.merchantIdentifier = paymentMethod.configuration.merchantId
+        request.countryCode = paymentMethod.configuration.countryCode
+        request.merchantCapabilities = paymentMethod.configuration.merchantCapabilities
+        request.supportedNetworks = paymentMethod.configuration.supportedNetworks
+            .compactMap(PKPaymentNetwork.init(poScheme:))
+            .filter(availableNetworks.contains)
+        request.currencyCode = invoice.currency
+        return request
     }
 
     // MARK: - Card Payment
