@@ -166,15 +166,8 @@ final class DynamicCheckoutDefaultInteractor:
             return
         }
         let pkPaymentRequests = pkPaymentRequests(invoice: invoice)
-        var expressMethodIds: [String] = []
-        let partitionedPaymentMethods = partitioned(
-            paymentMethods: paymentMethods,
-            expressIds: &expressMethodIds,
-            includedApplePayPaymentMethodIds: Set(pkPaymentRequests.keys)
-        )
         let startedState = DynamicCheckoutInteractorState.Started(
-            paymentMethods: partitionedPaymentMethods,
-            expressPaymentMethodIds: expressMethodIds,
+            paymentMethods: paymentMethods,
             pkPaymentRequests: pkPaymentRequests,
             isCancellable: configuration.cancelButton?.title.map { !$0.isEmpty } ?? true,
             invoice: invoice,
@@ -193,7 +186,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         guard configuration.allowsSkippingPaymentList,
               startedState.paymentMethods.count == 1,
-              let paymentMethod = startedState.paymentMethods.values.first else {
+              let paymentMethod = startedState.paymentMethods.first else {
             return
         }
         switch paymentMethod {
@@ -201,48 +194,6 @@ final class DynamicCheckoutDefaultInteractor:
             startPayment(methodId: paymentMethod.id)
         default:
             return
-        }
-    }
-
-    private func partitioned(
-        paymentMethods: [PODynamicCheckoutPaymentMethod],
-        expressIds: inout [String],
-        includedApplePayPaymentMethodIds: Set<String>
-    ) -> [String: PODynamicCheckoutPaymentMethod] {
-        // swiftlint:disable:next identifier_name
-        var _paymentMethods: [String: PODynamicCheckoutPaymentMethod] = [:]
-        for paymentMethod in paymentMethods {
-            // swiftlint:disable:next line_length
-            guard let isExpress = isExpress(paymentMethod: paymentMethod, includedApplePayPaymentMethodIds: includedApplePayPaymentMethodIds) else {
-                continue
-            }
-            if isExpress {
-                expressIds.append(paymentMethod.id)
-            }
-            _paymentMethods[paymentMethod.id] = paymentMethod
-        }
-        return _paymentMethods
-    }
-
-    private func isExpress(
-        paymentMethod: PODynamicCheckoutPaymentMethod,
-        includedApplePayPaymentMethodIds: Set<String>
-    ) -> Bool? {
-        switch paymentMethod {
-        case .applePay:
-            if includedApplePayPaymentMethodIds.contains(paymentMethod.id) {
-                return true
-            }
-            return nil
-        case .alternativePayment(let method):
-            return method.flow == .express
-        case .nativeAlternativePayment, .card:
-            return false
-        case .customerToken(let method):
-            return method.flow == .express
-        case .unknown(let rawType):
-            logger.debug("Unknown payment method is ignored: \(rawType)")
-            return nil
         }
     }
 
@@ -405,7 +356,7 @@ final class DynamicCheckoutDefaultInteractor:
     private func continuePaymentProcessingUnchecked(methodId: String, startedState: State.Started) {
         var newStartedState = startedState
         newStartedState.recentErrorDescription = nil
-        switch startedState.paymentMethods[methodId] {
+        switch startedState.paymentMethods.first(where: { $0.id == methodId }) {
         case .applePay:
             startPassKitPayment(methodId: methodId, startedState: newStartedState)
         case .card(let method):
@@ -675,7 +626,7 @@ final class DynamicCheckoutDefaultInteractor:
 
     private func currentPaymentMethod(state: State.PaymentProcessing) -> PODynamicCheckoutPaymentMethod {
         let id = state.paymentMethodId
-        guard let paymentMethod = state.snapshot.paymentMethods[id] else {
+        guard let paymentMethod = state.snapshot.paymentMethods.first(where: { $0.id == id }) else {
             preconditionFailure("Non existing payment method ID.")
         }
         return paymentMethod

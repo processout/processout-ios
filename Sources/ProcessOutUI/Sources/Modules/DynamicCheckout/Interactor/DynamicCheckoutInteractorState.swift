@@ -38,10 +38,7 @@ enum DynamicCheckoutInteractorState {
     struct Started {
 
         /// Express payment methods.
-        let paymentMethods: [String: PODynamicCheckoutPaymentMethod]
-
-        /// Express payment methods.
-        let expressPaymentMethodIds: [String]
+        let paymentMethods: [PODynamicCheckoutPaymentMethod]
 
         /// Pass Kit payment request.
         let pkPaymentRequests: [String: PKPaymentRequest]
