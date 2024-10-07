@@ -128,12 +128,6 @@ final class DynamicCheckoutDefaultInteractor:
         }
     }
 
-    // MARK: - Private Nested Types
-
-    private enum PaymentMethodKind: Hashable {
-        case nativeAlternativePayment, alternativePayment, card, applePay
-    }
-
     // MARK: - Private Properties
 
     private let childProvider: DynamicCheckoutInteractorChildProvider
