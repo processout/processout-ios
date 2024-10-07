@@ -383,8 +383,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let title: String?
         let confirmation: POConfirmationDialogConfiguration?
-        // swiftlint:disable:next line_length
-        if let alternativePaymentInteractor = state.nativeAlternativePaymentInteractor, case .awaitingCapture = alternativePaymentInteractor.state {
+        if state.isAwaitingNativeAlternativePaymentCapture {
             let configuration = interactor.configuration.alternativePayment.paymentConfirmation.cancelButton
             title = configuration?.title
             confirmation = configuration?.confirmation
@@ -399,25 +398,16 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func shouldResolveContent(
         for methodId: String, state: DynamicCheckoutInteractorState.PaymentProcessing
     ) -> Bool {
-        guard state.paymentMethodId == methodId else {
-            return false
-        }
-        if let interactor = state.nativeAlternativePaymentInteractor, case .starting = interactor.state {
-            return false
-        }
-        return true
+        state.paymentMethodId == methodId && state.isReady
     }
 
     private func status(
         of methodId: String, state: DynamicCheckoutInteractorState.PaymentProcessing
     ) -> (isSelected: Bool, isLoading: Bool) {
-        guard methodId == state.paymentMethodId else {
-            return (false, false)
+        if methodId == state.paymentMethodId {
+            return (true, !state.isReady)
         }
-        if let interactor = state.nativeAlternativePaymentInteractor, case .starting = interactor.state {
-            return (true, true)
-        }
-        return (true, false)
+        return (false, false)
     }
 
     // MARK: - Restarting State
