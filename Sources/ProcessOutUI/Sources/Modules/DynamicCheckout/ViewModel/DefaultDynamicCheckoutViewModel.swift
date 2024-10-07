@@ -72,7 +72,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         case .paymentProcessing(let state):
             updateWithPaymentProcessingState(state)
         case .restarting(let state):
-            updateWithRecoveringState(state)
+            updateWithRestartingState(state)
         case .success:
             updateWithSuccessState()
         }
@@ -412,19 +412,19 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
 
     // MARK: - Restarting State
 
-    private func updateWithRecoveringState(_ state: DynamicCheckoutInteractorState.Restarting) {
+    private func updateWithRestartingState(_ state: DynamicCheckoutInteractorState.Restarting) {
         let newActions = [
             createCancelAction(state)
         ]
         let newState = DynamicCheckoutViewModelState(
-            sections: createSectionsWithRecoveringState(state),
+            sections: createSectionsWithRestartingState(state),
             actions: newActions.compactMap { $0 },
             isCompleted: false
         )
         self.state = newState
     }
 
-    private func createSectionsWithRecoveringState(
+    private func createSectionsWithRestartingState(
         _ state: DynamicCheckoutInteractorState.Restarting
     ) -> [DynamicCheckoutViewModelState.Section] {
         var sections = [
@@ -457,11 +457,11 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func createCancelAction(
         _ state: DynamicCheckoutInteractorState.Restarting
     ) -> POActionsContainerActionViewModel? {
-        guard state.snapshot.isCancellable else {
+        guard state.snapshot.isCancellable || state.snapshot.snapshot.isCancellable else {
             return nil
         }
         let title = interactor.configuration.cancelButton?.title
-        return createCancelAction(title: title, isEnabled: false, confirmation: nil)
+        return createCancelAction(title: title, isEnabled: true, confirmation: nil)
     }
 
     // MARK: - Success
@@ -486,7 +486,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
 
     private func createCancelAction(
         title: String?, isEnabled: Bool, confirmation: POConfirmationDialogConfiguration?
-    ) -> POActionsContainerActionViewModel? {
+    ) -> POActionsContainerActionViewModel {
         let viewModel = POActionsContainerActionViewModel(
             id: ButtonId.cancel,
             title: title ?? String(resource: .DynamicCheckout.Button.cancel),

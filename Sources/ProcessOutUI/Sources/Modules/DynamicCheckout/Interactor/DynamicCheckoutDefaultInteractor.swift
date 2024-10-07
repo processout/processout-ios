@@ -279,7 +279,7 @@ final class DynamicCheckoutDefaultInteractor:
             return
         }
         guard newInvoice.transaction?.status == .waiting else {
-            // Another recovery is not attempted to prevent potential recursion
+            // Another restart is not attempted to prevent potential recursion
             let failure = POFailure(message: "Unsupported invoice state.", code: .generic(.mobile))
             setFailureState(error: failure)
             return
