@@ -201,10 +201,13 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             logger.debug("Unable to recover update error from unsupported state: \(state).")
             return
         }
-        let failure = (error as? POFailure) ?? .init(code: .generic(.mobile), underlyingError: error)
-        if case .cancelled = failure.code {
-            setFailureState(failure: failure)
-        } else if delegate?.shouldContinueUpdate(after: failure) != false {
+        let failure: POFailure
+        if let error = error as? POFailure {
+            failure = error
+        } else {
+            failure = POFailure(code: .generic(.mobile), underlyingError: error)
+        }
+        if failure.code == .cancelled || delegate?.shouldContinueUpdate(after: failure) != false {
             var newState = currentState.snapshot
             newState.recentErrorMessage = errorMessage(for: failure, areParametersValid: &newState.areParametersValid)
             state = .started(newState)
