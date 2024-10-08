@@ -137,11 +137,8 @@ extension NativeAlternativePaymentInteractorState.Started {
     }
 }
 
-extension NativeAlternativePaymentInteractorState {
+extension NativeAlternativePaymentInteractorState: InteractorState {
 
-    /// Boolean variable that indicates whether the current state is a sink state.
-    ///
-    /// A sink state is a special kind of state where, once entered, no other state transitions are possible.
     var isSink: Bool {
         switch self {
         case .submitted, .captured, .failure:
