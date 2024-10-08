@@ -70,10 +70,10 @@ final class DynamicCheckoutDefaultInteractor:
         switch state {
         case .started(let currentState):
             send(event: .willSelectPaymentMethod)
-            continueSelectionUnchecked(methodId: methodId, startedState: currentState)
+            setSelectedStateUnchecked(methodId: methodId, startedState: currentState)
         case .selected(let currentState) where currentState.paymentMethodId != methodId:
             send(event: .willSelectPaymentMethod)
-            continueSelectionUnchecked(methodId: methodId, startedState: currentState.snapshot)
+            setSelectedStateUnchecked(methodId: methodId, startedState: currentState.snapshot)
         case .selected:
             logger.debug("Method \(methodId) is already selected, ignored.")
         case .restarting(var newState):
@@ -328,7 +328,7 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Selected State
 
-    private func continueSelectionUnchecked(methodId: String, startedState: State.Started) {
+    private func setSelectedStateUnchecked(methodId: String, startedState: State.Started) {
         var newStartedState = startedState
         newStartedState.recentErrorDescription = nil
         let newState = State.Selected(snapshot: newStartedState, paymentMethodId: methodId)
