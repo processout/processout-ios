@@ -188,8 +188,10 @@ final class DynamicCheckoutDefaultInteractor:
         switch paymentMethod {
         case .applePay:
             return PKPaymentAuthorizationController.canMakePayments()
-        default:
+        case .alternativePayment, .nativeAlternativePayment, .card, .customerToken:
             return true
+        default:
+            return false
         }
     }
 
