@@ -64,7 +64,9 @@ OUTPUT_DIR="$SCRIPT_DIR/../../Vendor"
 # Generate XCFramework
 xcodebuild -create-xcframework \
     -framework ./cmark_gfm-iOS.xcarchive/Products/Library/Frameworks/cmark_gfm.framework \
+    -debug-symbols "$WORK_DIR/cmark_gfm-iOS.xcarchive/dSYMs/cmark_gfm.framework.dSYM" \
     -framework ./cmark_gfm-Sim.xcarchive/Products/Library/Frameworks/cmark_gfm.framework \
+    -debug-symbols "$WORK_DIR/cmark_gfm-Sim.xcarchive/dSYMs/cmark_gfm.framework.dSYM" \
     -output "$OUTPUT_DIR/cmark_gfm.xcframework"
 
 # Sign XCFramework
