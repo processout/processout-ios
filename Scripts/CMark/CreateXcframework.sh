@@ -21,11 +21,14 @@ WORK_DIR=$(mktemp -d)
 # Script expects revision as a first and only argument
 test $# -eq 1 || fail "Expected tag or branch reference."
 
+# Exports revision as environment variable
+export CURRENT_REVISION=$1
+
 # Go to temporary directory
 cd $WORK_DIR
 
 # Clone library
-git clone --depth 1 --branch $1 https://github.com/swiftlang/swift-cmark .
+git clone --depth 1 --branch $CURRENT_REVISION https://github.com/swiftlang/swift-cmark .
 
 # Ensure modulemap represents darwin-style framework
 MODULEMAP_PATH="src/include/module.modulemap"
@@ -61,12 +64,10 @@ OUTPUT_DIR="$SCRIPT_DIR/../../Vendor"
 # Generate XCFramework
 xcodebuild -create-xcframework \
     -framework ./cmark_gfm-iOS.xcarchive/Products/Library/Frameworks/cmark_gfm.framework \
+    -debug-symbols "$WORK_DIR/cmark_gfm-iOS.xcarchive/dSYMs/cmark_gfm.framework.dSYM" \
     -framework ./cmark_gfm-Sim.xcarchive/Products/Library/Frameworks/cmark_gfm.framework \
+    -debug-symbols "$WORK_DIR/cmark_gfm-Sim.xcarchive/dSYMs/cmark_gfm.framework.dSYM" \
     -output "$OUTPUT_DIR/cmark_gfm.xcframework"
 
 # Sign XCFramework
 /usr/bin/codesign "${CODESIGN_ARGS[@]}" "$OUTPUT_DIR/cmark_gfm.xcframework"
-
-# Write metadata
-CURRENT_REVISION=$(git rev-parse --short HEAD)
-echo $CURRENT_REVISION > "$OUTPUT_DIR/cmark_gfm.xcframework.version"
