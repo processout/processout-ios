@@ -110,7 +110,19 @@
 		</data>
 		<key>ios-arm64/cmark_gfm.framework/cmark_gfm</key>
 		<data>
-		JgrMJqVg4TM7vJ5oz7OZMgstL0A=
+		v5ZnPqwx42L6UmORAF8ep731iDE=
+		</data>
+		<key>ios-arm64/dSYMs/cmark_gfm.framework.dSYM/Contents/Info.plist</key>
+		<data>
+		Y4Z8vmvB5YCVwiwre2EmdtFs8j8=
+		</data>
+		<key>ios-arm64/dSYMs/cmark_gfm.framework.dSYM/Contents/Resources/DWARF/cmark_gfm</key>
+		<data>
+		5LBrlfM3puignK8RtJXxPO2jhbQ=
+		</data>
+		<key>ios-arm64/dSYMs/cmark_gfm.framework.dSYM/Contents/Resources/Relocations/aarch64/cmark_gfm.yml</key>
+		<data>
+		DPRB9B4oSGz9/F+6ff2oJrZWxK8=
 		</data>
 		<key>ios-arm64_x86_64-simulator/cmark_gfm.framework/Headers/buffer.h</key>
 		<data>
@@ -218,7 +230,23 @@
 		</data>
 		<key>ios-arm64_x86_64-simulator/cmark_gfm.framework/cmark_gfm</key>
 		<data>
-		IcUlRKmiICYHUSrC0ySQcdBTSHk=
+		MyQhxgu90zQ7OG+ADpY69kYUwOc=
+		</data>
+		<key>ios-arm64_x86_64-simulator/dSYMs/cmark_gfm.framework.dSYM/Contents/Info.plist</key>
+		<data>
+		Y4Z8vmvB5YCVwiwre2EmdtFs8j8=
+		</data>
+		<key>ios-arm64_x86_64-simulator/dSYMs/cmark_gfm.framework.dSYM/Contents/Resources/DWARF/cmark_gfm</key>
+		<data>
+		rAu3SlPHOlzRpF66FZW1noVSKYw=
+		</data>
+		<key>ios-arm64_x86_64-simulator/dSYMs/cmark_gfm.framework.dSYM/Contents/Resources/Relocations/aarch64/cmark_gfm.yml</key>
+		<data>
+		oKoWrsLht9aoY7LoPjRRpP/C5Zg=
+		</data>
+		<key>ios-arm64_x86_64-simulator/dSYMs/cmark_gfm.framework.dSYM/Contents/Resources/Relocations/x86_64/cmark_gfm.yml</key>
+		<data>
+		FPotjFZ38e+nNUJ6ga+GqtZ7g08=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -513,11 +541,44 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			JgrMJqVg4TM7vJ5oz7OZMgstL0A=
+			v5ZnPqwx42L6UmORAF8ep731iDE=
 			</data>
 			<key>hash2</key>
 			<data>
-			W1djE2rHEdxdhyxZHMUGBOE75YAAUNQc4vTYmVJXwJ8=
+			t2+s2ZQQ2v21dqagZOwyXE+XvtaUzjJDDRiG372xnNU=
+			</data>
+		</dict>
+		<key>ios-arm64/dSYMs/cmark_gfm.framework.dSYM/Contents/Info.plist</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			Y4Z8vmvB5YCVwiwre2EmdtFs8j8=
+			</data>
+			<key>hash2</key>
+			<data>
+			8zEhTMxvcWt6Hyt6ZY53zX7xJzOA+uuDOZ4kbstqqYg=
+			</data>
+		</dict>
+		<key>ios-arm64/dSYMs/cmark_gfm.framework.dSYM/Contents/Resources/DWARF/cmark_gfm</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			5LBrlfM3puignK8RtJXxPO2jhbQ=
+			</data>
+			<key>hash2</key>
+			<data>
+			svjRtk+bhsFsvcQV8Rx8xmCvuDXfcbEsi40fHabeZ+Q=
+			</data>
+		</dict>
+		<key>ios-arm64/dSYMs/cmark_gfm.framework.dSYM/Contents/Resources/Relocations/aarch64/cmark_gfm.yml</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			DPRB9B4oSGz9/F+6ff2oJrZWxK8=
+			</data>
+			<key>hash2</key>
+			<data>
+			jY1t5+CoPLeE70suxvVZ0T8fkJw3pDHlH/M9egiQPg0=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/cmark_gfm.framework/Headers/buffer.h</key>
@@ -810,11 +871,55 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			IcUlRKmiICYHUSrC0ySQcdBTSHk=
+			MyQhxgu90zQ7OG+ADpY69kYUwOc=
 			</data>
 			<key>hash2</key>
 			<data>
-			vAuwjZTFc43wAGL6wm604idXEKfEwWbs+IoHcTm2zNk=
+			9dLgG/FQBhInPP4+XEIOh56NnooXnmmApZzTvnAc35o=
+			</data>
+		</dict>
+		<key>ios-arm64_x86_64-simulator/dSYMs/cmark_gfm.framework.dSYM/Contents/Info.plist</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			Y4Z8vmvB5YCVwiwre2EmdtFs8j8=
+			</data>
+			<key>hash2</key>
+			<data>
+			8zEhTMxvcWt6Hyt6ZY53zX7xJzOA+uuDOZ4kbstqqYg=
+			</data>
+		</dict>
+		<key>ios-arm64_x86_64-simulator/dSYMs/cmark_gfm.framework.dSYM/Contents/Resources/DWARF/cmark_gfm</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			rAu3SlPHOlzRpF66FZW1noVSKYw=
+			</data>
+			<key>hash2</key>
+			<data>
+			Mn3uPe/nsSnYHoMMKghF/GqWAlajjL/c3sB2ViCrJxA=
+			</data>
+		</dict>
+		<key>ios-arm64_x86_64-simulator/dSYMs/cmark_gfm.framework.dSYM/Contents/Resources/Relocations/aarch64/cmark_gfm.yml</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			oKoWrsLht9aoY7LoPjRRpP/C5Zg=
+			</data>
+			<key>hash2</key>
+			<data>
+			qEKi5DZ5rXk5kw9Fe0ioX5NlFoAzM3WTWgfUfgbb4l4=
+			</data>
+		</dict>
+		<key>ios-arm64_x86_64-simulator/dSYMs/cmark_gfm.framework.dSYM/Contents/Resources/Relocations/x86_64/cmark_gfm.yml</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			FPotjFZ38e+nNUJ6ga+GqtZ7g08=
+			</data>
+			<key>hash2</key>
+			<data>
+			zGsOsoMhc5mpQwP9CYyvMZUEC1ux5AwebcvdRm6GEfo=
 			</data>
 		</dict>
 	</dict>
