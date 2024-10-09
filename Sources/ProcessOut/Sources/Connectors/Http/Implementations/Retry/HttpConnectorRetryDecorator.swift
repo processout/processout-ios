@@ -23,10 +23,10 @@ final class HttpConnectorRetryDecorator: HttpConnector {
                 guard case .failure(let failure as Failure) = result else {
                     return false
                 }
-                switch failure {
+                switch failure.code {
                 case .networkUnreachable, .timeout:
                     return true
-                case .server(_, let statusCode), .decoding(_, let statusCode):
+                case .server(_, let statusCode), .decoding(let statusCode):
                     let clientErrors: Set = [408, 409, 425, 429]
                     let serverErrors = (500...599)
                     return clientErrors.contains(statusCode) || serverErrors.contains(statusCode)
@@ -35,7 +35,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
                 }
             },
             timeout: 3600, // 1 hour
-            timeoutError: HttpConnectorFailure.timeout,
+            timeoutError: HttpConnectorFailure(code: .timeout, underlyingError: nil),
             retryStrategy: retryStrategy
         )
     }
