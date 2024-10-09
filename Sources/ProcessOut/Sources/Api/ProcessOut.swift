@@ -127,7 +127,7 @@ public final class ProcessOut {
     }()
 
     private lazy var remoteLoggerDestination: LoggerDestination = {
-        let configuration: () -> TelemetryServiceConfiguration = { [unowned self] in
+        let configuration = { @Sendable [unowned self] () -> TelemetryServiceConfiguration in
             let configuration = self.configuration
             return TelemetryServiceConfiguration(
                 isTelemetryEnabled: configuration.isTelemetryEnabled,
@@ -151,7 +151,9 @@ public final class ProcessOut {
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
         encoder.keyEncodingStrategy = .useDefaultKeys
-        return DefaultCustomerActionsService(decoder: decoder, encoder: encoder, webSession: webSession)
+        return DefaultCustomerActionsService(
+            decoder: decoder, encoder: encoder, webSession: webSession, logger: serviceLogger
+        )
     }()
 
     private let webSession = DefaultWebAuthenticationSession()
@@ -192,7 +194,7 @@ public final class ProcessOut {
         if includeRemoteDestination {
             destinations.append(remoteLoggerDestination)
         }
-        let minimumLevel: () -> LogLevel = { [unowned self] in
+        let minimumLevel = { @Sendable [unowned self] () -> LogLevel in
             configuration.isDebug ? .debug : .info
         }
         return POLogger(destinations: destinations, category: category, minimumLevel: minimumLevel)

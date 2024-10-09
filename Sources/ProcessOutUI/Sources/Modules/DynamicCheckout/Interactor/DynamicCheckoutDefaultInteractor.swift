@@ -118,7 +118,7 @@ final class DynamicCheckoutDefaultInteractor:
         default:
             break // No ongoing operation to cancel
         }
-        setFailureState(error: POFailure(code: .cancelled))
+        setFailureState(error: POFailure(message: "Dynamic checkout has been canceled.", code: .cancelled))
     }
 
     func didRequestCancelConfirmation() {
@@ -261,7 +261,7 @@ final class DynamicCheckoutDefaultInteractor:
                 guard let invoiceRequest = await delegate?.dynamicCheckout(
                     newInvoiceFor: currentState.snapshot.snapshot.invoice, invalidationReason: reason
                 ) else {
-                    throw POFailure(message: "Unable to change payment method.", code: .generic(.mobile))
+                    throw POFailure(message: "Unable to restart dynamic checkout.", code: .generic(.mobile))
                 }
                 invoice = try await invoicesService.invoice(request: invoiceRequest)
                 clientSecret = invoiceRequest.clientSecret
@@ -280,9 +280,11 @@ final class DynamicCheckoutDefaultInteractor:
             logger.debug("Unexpected state to finish restart: \(state).")
             return
         }
-        guard newInvoice.transaction?.status == .waiting else {
+        guard let transaction = newInvoice.transaction, transaction.status == .waiting else {
             // Another restart is not attempted to prevent potential recursion
-            let failure = POFailure(message: "Unsupported invoice state.", code: .generic(.mobile))
+            let failure = POFailure(
+                message: "Unsupported invoice state: \(transaction.status).", code: .generic(.mobile)
+            )
             setFailureState(error: failure)
             return
         }
@@ -588,7 +590,7 @@ final class DynamicCheckoutDefaultInteractor:
         if let error = error as? POFailure {
             failure = error
         } else {
-            logger.debug("Unexpected error type: \(error)")
+            logger.error("Unexpected error type: \(error)")
             failure = POFailure(code: .generic(.mobile), underlyingError: error)
         }
         state = .failure(failure)
@@ -661,8 +663,8 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
     func cardTokenization(didTokenizeCard card: POCard, shouldSaveCard save: Bool) async throws {
         invalidateInvoiceIfPossible()
         guard case .paymentProcessing(let currentState) = state else {
-            assertionFailure("Unable to process card in unsupported state.")
-            throw POFailure(code: .internal(.mobile))
+            logger.error("Unable to process card in unsupported state: \(state).")
+            throw POFailure(message: "Something went wrong." code: .internal(.mobile))
         }
         try await authorizeInvoice(source: card.id, saveSource: save, startedState: currentState.snapshot)
     }

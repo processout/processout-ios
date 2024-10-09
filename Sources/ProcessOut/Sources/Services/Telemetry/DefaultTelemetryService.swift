@@ -7,10 +7,10 @@
 
 import Foundation
 
-final class DefaultTelemetryService: POService, LoggerDestination {
+final class DefaultTelemetryService: POService, LoggerDestination, @unchecked Sendable {
 
     init(
-        configuration: @escaping () -> TelemetryServiceConfiguration,
+        configuration: @escaping @Sendable () -> TelemetryServiceConfiguration,
         repository: TelemetryRepository,
         deviceMetadataProvider: DeviceMetadataProvider
     ) {
@@ -58,7 +58,7 @@ final class DefaultTelemetryService: POService, LoggerDestination {
 
     private let repository: TelemetryRepository
     private let deviceMetadataProvider: DeviceMetadataProvider
-    private let configuration: () -> TelemetryServiceConfiguration
+    private let configuration: @Sendable () -> TelemetryServiceConfiguration
 
     private var batcher: Batcher<Telemetry.Event>! // swiftlint:disable:this implicitly_unwrapped_optional
 
