@@ -154,7 +154,9 @@ public final class ProcessOut {
         return DefaultCustomerActionsService(decoder: decoder, encoder: encoder, webSession: webSession)
     }()
 
-    private let webSession = DefaultWebAuthenticationSession()
+    private let webSession = ThrottledWebAuthenticationSessionDecorator(
+        session: DefaultWebAuthenticationSession()
+    )
 
     // MARK: - Private Methods
 
