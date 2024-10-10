@@ -8,7 +8,7 @@
 import Foundation
 
 @_spi(PO)
-public struct POLogAttributeKey: RawRepresentable, ExpressibleByStringLiteral, Hashable {
+public struct POLogAttributeKey: RawRepresentable, ExpressibleByStringLiteral, Hashable, Sendable {
 
     public init(rawValue: String) {
         self.rawValue = rawValue

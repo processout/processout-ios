@@ -62,9 +62,13 @@ final class NativeAlternativePaymentDefaultInteractor:
                     )
                     setCapturedState(paymentProvider: paymentProvider)
                 case .failed:
-                    fallthrough // swiftlint:disable:this fallthrough
+                    throw POFailure(
+                        message: "A payment attempt was made previously and is currently in a failed state.",
+                        code: .generic(.mobile)
+                    )
                 @unknown default:
-                    throw POFailure(code: .generic(.mobile))
+                    logger.error("Unexpected alternative payment state: \(transactionDetails.state).")
+                    throw POFailure(message: "Something went wrong.", code: .internal(.mobile))
                 }
             } catch {
                 setFailureState(error: error)
@@ -136,9 +140,12 @@ final class NativeAlternativePaymentDefaultInteractor:
                 case .customerInput:
                     await restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
                 case .failed:
-                    fallthrough // swiftlint:disable:this fallthrough
+                    throw POFailure(message: "The submitted parameters are not valid.", code: .generic(.mobile))
                 @unknown default:
-                    throw POFailure(code: .generic(.mobile))
+                    throw POFailure(
+                        message: "Unexpected alternative payment state: \(response.nativeApm.state).",
+                        code: .internal(.mobile)
+                    )
                 }
             } catch {
                 attemptRecoverSubmissionError(error, replaceErrorMessages: replaceErrorMessages)
@@ -166,7 +173,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         default:
             break
         }
-        setFailureState(error: POFailure(code: .cancelled))
+        setFailureState(error: POFailure(message: "Alternative payment has been canceled.", code: .cancelled))
     }
 
     func didRequestCancelConfirmation() {
@@ -423,8 +430,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         if let error = error as? POFailure {
             failure = error
         } else {
-            logger.debug("Unexpected error type: \(error)")
-            failure = POFailure(code: .generic(.mobile), underlyingError: error)
+            logger.error("Unexpected error type: \(error)")
+            failure = POFailure(message: "Something went wrong.", code: .generic(.mobile), underlyingError: error)
         }
         state = .failure(failure)
         send(event: .didFail(failure: failure))
@@ -602,7 +609,9 @@ final class NativeAlternativePaymentDefaultInteractor:
         if invalidFields.isEmpty {
             return validatedValues
         }
-        throw POFailure(code: .validation(.general), invalidFields: invalidFields)
+        throw POFailure(
+            message: "Submitted parameters are not valid.", code: .validation(.general), invalidFields: invalidFields
+        )
     }
 
     private func validate(

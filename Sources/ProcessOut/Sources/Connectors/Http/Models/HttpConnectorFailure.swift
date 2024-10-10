@@ -5,15 +5,30 @@
 //  Created by Andrii Vysotskyi on 10.10.2022.
 //
 
-enum HttpConnectorFailure: Error {
+struct HttpConnectorFailure: Error {
 
-    struct InvalidField: Decodable {
+    enum Code {
 
-        /// Field name.
-        let name: String
+        /// Unable to encode data.
+        case encoding
 
-        /// Message describing an error.
-        let message: String
+        /// Unable to decode data.
+        case decoding(statusCode: Int)
+
+        /// No network connection.
+        case networkUnreachable
+
+        /// Request didn't finish in time.
+        case timeout
+
+        /// Server error.
+        case server(Server, statusCode: Int)
+
+        /// Cancellation error.
+        case cancelled
+
+        /// Internal error.
+        case `internal`
     }
 
     struct Server: Decodable {
@@ -28,24 +43,18 @@ enum HttpConnectorFailure: Error {
         let invalidFields: [InvalidField]?
     }
 
-    /// Unable to encode data.
-    case encoding(Error)
+    struct InvalidField: Decodable {
 
-    /// Unable to decode data.
-    case decoding(Error, statusCode: Int)
+        /// Field name.
+        let name: String
 
-    /// No network connection.
-    case networkUnreachable
+        /// Message describing an error.
+        let message: String
+    }
 
-    /// Request didn't finish in time.
-    case timeout
+    /// Failure code.
+    let code: Code
 
-    /// Server error.
-    case server(Server, statusCode: Int)
-
-    /// Cancellation error.
-    case cancelled
-
-    /// Internal error.
-    case `internal`
+    /// Underlying error.
+    let underlyingError: Error?
 }

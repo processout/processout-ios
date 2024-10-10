@@ -112,7 +112,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         default:
             break // Ignored
         }
-        setFailureState(failure: POFailure(code: .cancelled))
+        setFailureState(failure: POFailure(message: "Card update has been canceled.", code: .cancelled))
     }
 
     // MARK: - Private Properties
@@ -205,7 +205,8 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         if let error = error as? POFailure {
             failure = error
         } else {
-            failure = POFailure(code: .generic(.mobile), underlyingError: error)
+            logger.error("Unexpected error type: \(error).")
+            failure = POFailure(message: "Something went wrong.", code: .generic(.mobile), underlyingError: error)
         }
         if delegate?.shouldContinueUpdate(after: failure) != false {
             var newState = currentState.snapshot

@@ -35,7 +35,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         // Given
         let codingError = NSError(domain: "", code: 1234)
         requestMapper.urlRequestFromClosure = {
-            throw HttpConnectorFailure.encoding(codingError)
+            throw HttpConnectorFailure(code: .encoding, underlyingError: codingError)
         }
 
         // When
@@ -44,8 +44,8 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         )
 
         // Then
-        if let failure = error as? HttpConnectorFailure, case .encoding(let encodingError) = failure {
-            XCTAssertEqual(encodingError as NSError, codingError)
+        if let failure = error as? HttpConnectorFailure, case .encoding = failure.code {
+            XCTAssertEqual(failure.underlyingError as NSError?, codingError)
             return
         }
         XCTFail("Unexpected result")
@@ -66,7 +66,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         )
 
         // Then
-        if let failure = error as? HttpConnectorFailure, case .networkUnreachable = failure {
+        if let failure = error as? HttpConnectorFailure, case .networkUnreachable = failure.code {
             return
         }
         XCTFail("Unexpected result")
@@ -85,7 +85,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         )
 
         // Then
-        if let failure = error as? HttpConnectorFailure, case .internal = failure {
+        if let failure = error as? HttpConnectorFailure, case .internal = failure.code {
             return
         }
         XCTFail("Expected internal failure")
@@ -107,7 +107,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         )
 
         // Then
-        if case let failure = error as? HttpConnectorFailure, case .decoding = failure {
+        if let failure = error as? HttpConnectorFailure, case .decoding = failure.code {
             return
         }
         XCTFail("Unexpected result")
@@ -130,7 +130,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         )
 
         // Then
-        if case let failure = error as? HttpConnectorFailure, case .decoding = failure {
+        if let failure = error as? HttpConnectorFailure, case .decoding = failure.code {
             return
         }
         XCTFail("Unexpected result")
@@ -153,7 +153,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         )
 
         // Then
-        if case let failure = error as? HttpConnectorFailure, case .decoding = failure {
+        if let failure = error as? HttpConnectorFailure, case .decoding = failure.code {
             return
         }
         XCTFail("Unexpected result")
@@ -176,7 +176,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
         )
 
         // Then
-        if let failure = error as? HttpConnectorFailure, case let .server(serverError, statusCode) = failure {
+        if let failure = error as? HttpConnectorFailure, case let .server(serverError, statusCode) = failure.code {
             XCTAssertEqual(serverError.errorType, "card.invalid-number")
             XCTAssertEqual(statusCode, 404)
         } else {
@@ -224,7 +224,7 @@ final class UrlSessionHttpConnectorTests: XCTestCase {
 
         // Then
         let error = await assertThrowsError(try await task.value)
-        if case let failure = error as? HttpConnectorFailure, case .cancelled = failure {
+        if let failure = error as? HttpConnectorFailure, case .cancelled = failure.code {
             return
         }
         XCTFail("Unexpected result")

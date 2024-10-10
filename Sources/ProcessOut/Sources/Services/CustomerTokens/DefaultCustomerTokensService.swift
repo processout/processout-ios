@@ -39,7 +39,8 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
         if let token = response.token {
             return token
         }
-        throw POFailure(code: .internal(.mobile)) // Either token or action should be set
+        logger.error("Unexpected response, either token or action should be set.")
+        throw POFailure(message: "Unable to assign customer token.", code: .internal(.mobile))
     }
 
     func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {

@@ -40,7 +40,7 @@ private func invoke<T>(
         } catch let failure as POFailure {
             completion(.failure(failure))
         } catch {
-            let failure = POFailure(code: .internal(.mobile), underlyingError: error)
+            let failure = POFailure(message: "Something went wrong.", code: .internal(.mobile), underlyingError: error)
             completion(.failure(failure))
         }
     }

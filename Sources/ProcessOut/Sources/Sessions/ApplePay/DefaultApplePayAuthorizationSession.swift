@@ -24,7 +24,7 @@ final class DefaultApplePayAuthorizationSession: ApplePayAuthorizationSession {
         let coordinator = ApplePayAuthorizationSessionCoordinator(delegate: delegate)
         controller.delegate = coordinator
         guard await controller.present() else {
-            throw POFailure(message: "Unable to present authorization controller.", code: .generic(.mobile))
+            throw POFailure(message: "Unable to present payment authorization controller.", code: .generic(.mobile))
         }
         await withTaskCancellationHandler {
             await withCheckedContinuation { continuation in
@@ -35,7 +35,7 @@ final class DefaultApplePayAuthorizationSession: ApplePayAuthorizationSession {
         }
         await controller.dismiss()
         guard let payment = coordinator.payment else {
-            throw POFailure(message: "Authorization was cancelled.", code: .cancelled)
+            throw POFailure(message: "Payment authorization was cancelled.", code: .cancelled)
         }
         return payment
     }

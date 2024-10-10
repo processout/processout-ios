@@ -81,7 +81,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
     @available(*, deprecated)
     func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
-            let message = "Invalid or malformed Alternative Payment Method URL response provided."
+            let message = "Invalid or malformed alternative payment method URL response provided."
             throw POFailure(message: message, code: .generic(.mobile), underlyingError: nil)
         }
         let queryItems = components.queryItems ?? []
@@ -128,7 +128,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
 
     private func response(from url: URL) throws -> POAlternativePaymentResponse {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
-            let message = "Invalid or malformed Alternative Payment Method URL response provided."
+            let message = "Invalid or malformed alternative payment method URL response provided."
             throw POFailure(message: message, code: .generic(.mobile), underlyingError: nil)
         }
         let queryItems = components.queryItems ?? []

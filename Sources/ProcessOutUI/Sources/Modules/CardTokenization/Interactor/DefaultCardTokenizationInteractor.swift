@@ -130,11 +130,8 @@ final class DefaultCardTokenizationInteractor:
                 try await delegate?.cardTokenization(didTokenizeCard: card, shouldSaveCard: currentState.shouldSaveCard)
                 try await delegate?.processTokenizedCard(card: card)
                 setTokenizedState(card: card)
-            } catch let error as POFailure {
-                attemptRecoverTokenizationFailure(failure: error)
             } catch {
-                let failure = POFailure(code: .generic(.mobile), underlyingError: error)
-                attemptRecoverTokenizationFailure(failure: failure)
+                attemptRecoverTokenizationError(error)
             }
         }
         let tokenizingState = State.Tokenizing(snapshot: currentState, task: task)
@@ -145,7 +142,7 @@ final class DefaultCardTokenizationInteractor:
         if case .tokenizing(let currentState) = state {
             currentState.task.cancel()
         }
-        setFailureState(failure: POFailure(code: .cancelled))
+        setFailureState(failure: POFailure(message: "Card tokenization has been canceled.", code: .cancelled))
     }
 
     // MARK: - Private Nested Types
@@ -180,10 +177,17 @@ final class DefaultCardTokenizationInteractor:
 
     // MARK: - Failure Restoration
 
-    private func attemptRecoverTokenizationFailure(failure: POFailure) {
+    private func attemptRecoverTokenizationError(_ error: Error) {
         guard case .tokenizing(let currentState) = state else {
             logger.debug("Unable to recover tokenization failure from unsupported state: \(state)")
             return
+        }
+        let failure: POFailure
+        if let error = error as? POFailure {
+            failure = error
+        } else {
+            logger.error("Unexpected error type: \(error).")
+            failure = POFailure(message: "Something went wrong.", code: .generic(.mobile), underlyingError: error)
         }
         if delegate?.shouldContinueTokenization(after: failure) != false {
             var newState = currentState.snapshot
