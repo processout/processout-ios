@@ -282,9 +282,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         guard let transaction = newInvoice.transaction, transaction.status == .waiting else {
             // Another restart is not attempted to prevent potential recursion
-            let failure = POFailure(
-                message: "Unsupported invoice state: \(transaction.status).", code: .generic(.mobile)
-            )
+            let failure = POFailure(message: "Unsupported invoice state.", code: .generic(.mobile))
             setFailureState(error: failure)
             return
         }
@@ -664,7 +662,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         invalidateInvoiceIfPossible()
         guard case .paymentProcessing(let currentState) = state else {
             logger.error("Unable to process card in unsupported state: \(state).")
-            throw POFailure(message: "Something went wrong." code: .internal(.mobile))
+            throw POFailure(message: "Something went wrong.", code: .internal(.mobile))
         }
         try await authorizeInvoice(source: card.id, saveSource: save, startedState: currentState.snapshot)
     }
