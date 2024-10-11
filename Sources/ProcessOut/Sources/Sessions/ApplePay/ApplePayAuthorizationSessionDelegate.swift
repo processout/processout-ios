@@ -8,7 +8,7 @@
 import Foundation
 import PassKit
 
-protocol ApplePayAuthorizationSessionDelegate: AnyObject {
+protocol ApplePayAuthorizationSessionDelegate: AnyObject, Sendable {
 
     /// Sent to the delegate after the user has acted on the payment request.
     @MainActor
