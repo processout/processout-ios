@@ -156,7 +156,9 @@ public final class ProcessOut {
         )
     }()
 
-    private let webSession = DefaultWebAuthenticationSession()
+    private let webSession = ThrottledWebAuthenticationSessionDecorator(
+        session: DefaultWebAuthenticationSession()
+    )
 
     // MARK: - Private Methods
 

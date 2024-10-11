@@ -1,5 +1,4 @@
 {
-  "originHash" : "8f250d3cf19fc47446f324890a784ded5493b6143de5d0aef317488859119617",
   "pins" : [
     {
       "identity" : "checkout-3ds-sdk-ios",
@@ -24,10 +23,10 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiftlang/swift-cmark",
       "state" : {
-        "branch" : "gfm",
-        "revision" : "fc07ab5da47975c5ef5f336acadfc02e8f706d30"
+        "revision" : "3ccff77b2dc5b96b77db3da0d68d28068593fa53",
+        "version" : "0.5.0"
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }

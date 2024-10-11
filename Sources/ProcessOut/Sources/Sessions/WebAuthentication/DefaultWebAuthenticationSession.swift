@@ -33,8 +33,6 @@ final class DefaultWebAuthenticationSession:
                         url: url,
                         callbackURLScheme: callbackScheme,
                         completionHandler: { url, error in
-                            // `completionHandler` is invoked before session is dismissed, see
-                            // https://github.com/aws-amplify/amplify-swift/issues/959 for similar issue.
                             sessionProxy.invalidate()
                             if let error {
                                 continuation.resume(throwing: Self.converted(error: error))
