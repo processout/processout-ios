@@ -7,11 +7,13 @@
 
 import Foundation
 
-struct HttpConnectorRequest<Value: Decodable> {
+struct HttpConnectorRequest<Value: Decodable & Sendable>: Sendable {
 
     enum Method: String {
         case get, put, post
     }
+
+    typealias Body = Sendable & Encodable
 
     /// Request identifier.
     let id: String
@@ -23,10 +25,10 @@ struct HttpConnectorRequest<Value: Decodable> {
     let path: String
 
     /// Query items.
-    let query: [String: CustomStringConvertible]
+    let query: [String: String]
 
     /// Parameters.
-    let body: Encodable?
+    let body: Body?
 
     /// Custom headers.
     let headers: [String: String]
@@ -54,7 +56,7 @@ extension HttpConnectorRequest {
             id: UUID().uuidString,
             method: .get,
             path: path,
-            query: query,
+            query: query.mapValues(\.description),
             body: nil,
             headers: headers,
             includesDeviceMetadata: false,
@@ -64,7 +66,7 @@ extension HttpConnectorRequest {
 
     static func post(
         path: String,
-        body: Encodable? = nil,
+        body: Body? = nil,
         headers: [String: String] = [:],
         includesDeviceMetadata: Bool = false,
         requiresPrivateKey: Bool = false
@@ -83,7 +85,7 @@ extension HttpConnectorRequest {
 
     static func put(
         path: String,
-        body: Encodable? = nil,
+        body: Body? = nil,
         headers: [String: String] = [:],
         includesDeviceMetadata: Bool = false,
         requiresPrivateKey: Bool = false
