@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-@_spi(PO) public protocol POImagesRepository { // sourcery: AutoCompletion
+@_spi(PO) public protocol POImagesRepository: PORepository { // sourcery: AutoCompletion
 
     /// Attempts to download images at given URLs.
     func images(at urls: [URL], scale: CGFloat) async -> [URL: UIImage]

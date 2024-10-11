@@ -8,9 +8,9 @@
 import Foundation
 
 // todo(andrii-vysotskyi): remove underscore when legacy codebase is removed.
-struct _CustomerAction: Decodable { // swiftlint:disable:this type_name
+struct _CustomerAction: Decodable, Sendable { // swiftlint:disable:this type_name
 
-    enum ActionType: String, Decodable {
+    enum ActionType: String, Decodable, Sendable {
 
         /// Device fingerprint is required.
         case fingerprintMobile = "fingerprint-mobile"

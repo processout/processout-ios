@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct Telemetry: Encodable {
+struct Telemetry: Encodable, Sendable {
 
-    struct ApplicationMetadata: Encodable {
+    struct ApplicationMetadata: Encodable, Sendable {
 
         /// Host application name.
         let name: String?
@@ -18,7 +18,7 @@ struct Telemetry: Encodable {
         let version: String?
     }
 
-    struct DeviceMetadata: Encodable {
+    struct DeviceMetadata: Encodable, Sendable {
 
         /// Device system language.
         let language: String
@@ -30,7 +30,7 @@ struct Telemetry: Encodable {
         let timeZone: Int
     }
 
-    struct Metadata: Encodable {
+    struct Metadata: Encodable, Sendable {
 
         /// App metadata.
         let application: ApplicationMetadata
@@ -39,7 +39,7 @@ struct Telemetry: Encodable {
         let device: DeviceMetadata
     }
 
-    struct Event: Encodable {
+    struct Event: Encodable, Sendable {
 
         /// Event timestamp.
         let timestamp: Date

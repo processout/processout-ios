@@ -12,7 +12,7 @@ import Foundation
 /// Information about an error that occurred.
 public struct POFailure: Error {
 
-    public struct InvalidField: Decodable {
+    public struct InvalidField: Decodable, Sendable {
 
         /// Field name.
         public let name: String
@@ -26,17 +26,17 @@ public struct POFailure: Error {
         }
     }
 
-    public enum InternalCode: String {
+    public enum InternalCode: String, Sendable {
         case gateway = "gateway-internal-error"
         case mobile = "processout-mobile.internal"
     }
 
-    public enum TimeoutCode: String {
+    public enum TimeoutCode: String, Sendable {
         case gateway = "gateway.timeout"
         case mobile = "processout-mobile.timeout"
     }
 
-    public enum ValidationCode: String {
+    public enum ValidationCode: String, Sendable {
         case general                   = "request.validation.error"
         case gateway                   = "gateway.validation-error"
         case invalidAddress            = "request.validation.invalid-address"
@@ -88,7 +88,7 @@ public struct POFailure: Error {
         case missingType               = "request.validation.missing-type"
     }
 
-    public enum NotFoundCode: String {
+    public enum NotFoundCode: String, Sendable {
         case activity                  = "resource.activity.not-found"
         case addon                     = "resource.addon.not-found"
         case alert                     = "resource.alert.not-found"
@@ -127,12 +127,12 @@ public struct POFailure: Error {
         case webhookEndpoint           = "resource.webhook-endpoint.not-found"
     }
 
-    public enum AuthenticationCode: String {
+    public enum AuthenticationCode: String, Sendable {
         case invalid          = "request.authentication.invalid"
         case invalidProjectId = "request.authentication.invalid-project-id"
     }
 
-    public enum GenericCode: String {
+    public enum GenericCode: String, Sendable {
 
         /// The card limits were reached (ex: amounts, transactions volume) and the customer should contact its bank.
         case cardExceededLimits = "card.exceeded-limits"
@@ -362,7 +362,7 @@ public struct POFailure: Error {
         case serviceNotSupported                 = "service.not-supported"
     }
 
-    public enum Code: Hashable {
+    public enum Code: Hashable, Sendable {
 
         /// No network connection.
         case networkUnreachable

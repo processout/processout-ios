@@ -8,7 +8,7 @@
 import Foundation
 
 /// Invoice details.
-public struct POInvoice: Decodable {
+public struct POInvoice: Decodable, Sendable {
 
     /// String value that uniquely identifies this invoice.
     public let id: String

@@ -6,11 +6,10 @@
 //
 
 /// Updated card details.
-public struct POCardUpdateRequest: Encodable {
+public struct POCardUpdateRequest: Encodable, Sendable {  // sourcery: AutoCodingKeys
 
     /// Card id.
-    @POImmutableExcludedCodable
-    public var cardId: String
+    public let cardId: String // sourcery:coding: skip
 
     /// New cvc.
     /// Pass `nil` to keep existing value.
@@ -23,7 +22,7 @@ public struct POCardUpdateRequest: Encodable {
 
     /// Creates request instance.
     public init(cardId: String, cvc: String? = nil, preferredScheme: String? = nil) {
-        self._cardId = .init(value: cardId)
+        self.cardId = cardId
         self.cvc = cvc
         self._preferredScheme = .init(wrappedValue: preferredScheme)
     }

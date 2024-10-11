@@ -8,10 +8,10 @@
 import Foundation
 
 @_spi(PO)
-public struct POInvoiceCreationRequest: Encodable {
+public struct POInvoiceCreationRequest: Encodable, Sendable {
 
     /// Invoice detail item.
-    public struct Detail: Encodable {
+    public struct Detail: Encodable, Sendable {
 
         /// Name.
         public let name: String
