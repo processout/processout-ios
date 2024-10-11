@@ -17,7 +17,11 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         encoder.outputFormatting = .sortedKeys
         webSession = MockWebAuthenticationSession()
         sut = DefaultCustomerActionsService(
-            decoder: JSONDecoder(), encoder: encoder, jsonWritingOptions: [.sortedKeys], webSession: webSession
+            decoder: JSONDecoder(),
+            encoder: encoder,
+            jsonWritingOptions: [.sortedKeys],
+            webSession: webSession,
+            logger: .stub
         )
         threeDSService = Mock3DS2Service()
     }

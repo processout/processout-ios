@@ -39,7 +39,7 @@ public final class POTest3DSService: PO3DS2Service {
     @MainActor
     public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
         guard let presentingViewController = PresentingViewControllerProvider.find() else {
-            throw POFailure(code: .generic(.mobile))
+            throw POFailure(message: "Unable to present 3DS challenge.", code: .generic(.mobile))
         }
         return await withCheckedContinuation { continuation in
             let alertController = UIAlertController(

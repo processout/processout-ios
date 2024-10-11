@@ -52,7 +52,7 @@ final class ProcessOutHttpConnectorBuilder {
             connector = HttpConnectorRetryDecorator(connector: connector, retryStrategy: retryStrategy)
         }
         return HttpConnectorErrorDecorator(
-            connector: connector, failureMapper: DefaultHttpConnectorFailureMapper(logger: logger)
+            connector: connector, failureMapper: DefaultHttpConnectorFailureMapper(logger: logger), logger: logger
         )
     }
 

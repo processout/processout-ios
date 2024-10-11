@@ -41,7 +41,7 @@ final class UrlSessionHttpConnector: HttpConnector {
             throw convertToFailure(urlError: error)
         } catch {
             logger.error("Request did fail with unknown error '\(error)'.")
-            throw Failure.internal
+            throw Failure(code: .internal, underlyingError: error)
         }
         return try decodeResponse(Value.self, from: data, response: response, logger: logger)
     }
@@ -61,8 +61,8 @@ final class UrlSessionHttpConnector: HttpConnector {
         _ valueType: Value.Type, from data: Data, response: URLResponse, logger: POLogger
     ) throws -> HttpConnectorResponse<Value> {
         guard let response = response as? HTTPURLResponse else {
-            logger.error("Unexpected url response type")
-            throw Failure.internal
+            logger.error("Unexpected url response type.")
+            throw Failure(code: .internal, underlyingError: nil)
         }
         let responseDescription = urlResponseFormatter.string(from: response, data: data)
         logger.debug("Received response: \(responseDescription)")
@@ -72,27 +72,27 @@ final class UrlSessionHttpConnector: HttpConnector {
                 let headers = response.allHeaderFields as? [String: String] ?? [:]
                 return HttpConnectorResponse(value: value, headers: headers)
             }
-            let failure = Failure.server(
-                try decoder.decode(HttpConnectorFailure.Server.self, from: data), statusCode: response.statusCode
-            )
-            throw failure
+            let serverCode = try decoder.decode(HttpConnectorFailure.Server.self, from: data)
+            throw Failure(code: .server(serverCode, statusCode: response.statusCode), underlyingError: nil)
         } catch let error as DecodingError {
             logger.error("Did fail to decode response: '\(error)'")
-            throw Failure.decoding(error, statusCode: response.statusCode)
+            throw Failure(code: .decoding(statusCode: response.statusCode), underlyingError: error)
         }
     }
 
     private func convertToFailure(urlError error: Error) -> Failure {
+        let code: Failure.Code
         switch error {
         case URLError.cancelled:
-            return .cancelled
+            code = .cancelled
         case URLError.notConnectedToInternet, URLError.networkConnectionLost:
-            return .networkUnreachable
+            code = .networkUnreachable
         case URLError.timedOut:
-            return .timeout
+            code = .timeout
         default:
-            return .internal
+            code = .internal
         }
+        return Failure(code: code, underlyingError: error)
     }
 }
 
