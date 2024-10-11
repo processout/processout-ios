@@ -10,10 +10,10 @@ final class AsyncSemaphoreSuspension {
     func resume() {
         switch state {
         case .suspendedUnlessCancelled(let unsafeContinuation):
-            state = nil
+            state = .resumed
             unsafeContinuation.resume()
         case .suspended(let unsafeContinuation):
-            state = nil
+            state = .resumed
             unsafeContinuation.resume()
         case .cancelled:
             assertionFailure("Cannot resume a canceled suspension.")
