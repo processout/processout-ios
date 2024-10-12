@@ -9,15 +9,8 @@
 
 final class DefaultApplePayAuthorizationSession: ApplePayAuthorizationSession {
 
-    nonisolated init() {
-        // Ignored
-    }
-
-    // MARK: - ApplePayAuthorizationSession
-
     func authorize(
-        request: PKPaymentRequest,
-        delegate: ApplePayAuthorizationSessionDelegate?
+        request: PKPaymentRequest, delegate: ApplePayAuthorizationSessionDelegate?
     ) async throws -> PKPayment {
         let controller = PKPaymentAuthorizationController(paymentRequest: request)
         let coordinator = ApplePayAuthorizationSessionCoordinator(delegate: delegate)

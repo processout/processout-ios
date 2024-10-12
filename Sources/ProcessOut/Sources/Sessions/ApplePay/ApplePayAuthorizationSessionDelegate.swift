@@ -5,7 +5,6 @@
 //  Created by Andrii Vysotskyi on 03.09.2024.
 //
 
-import Foundation
 import PassKit
 
 protocol ApplePayAuthorizationSessionDelegate: AnyObject, Sendable {

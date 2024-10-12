@@ -8,11 +8,10 @@
 import PassKit
 
 @MainActor
-final class ApplePayAuthorizationSessionCoordinator: NSObject, PKPaymentAuthorizationControllerDelegate {
+final class ApplePayAuthorizationSessionCoordinator: NSObject, PKPaymentAuthorizationControllerDelegate, Sendable {
 
     nonisolated init(delegate: ApplePayAuthorizationSessionDelegate?) {
         self.delegate = delegate
-        didFinish = false
         super.init()
     }
 
@@ -20,19 +19,28 @@ final class ApplePayAuthorizationSessionCoordinator: NSObject, PKPaymentAuthoriz
     var payment: PKPayment?
 
     func setContinuation(continuation: CheckedContinuation<Void, Never>) {
-        if didFinish {
+        switch state {
+        case .processing:
+            preconditionFailure("Continuation is already set.")
+        case .finished:
             continuation.resume()
-        } else {
-            self.continuation = continuation
+        case nil:
+            state = .processing(continuation)
         }
     }
 
     // MARK: - PKPaymentAuthorizationControllerDelegate
 
     func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
-        didFinish = true
-        continuation?.resume()
-        continuation = nil
+        switch state {
+        case .processing(let checkedContinuation):
+            self.state = .finished
+            checkedContinuation.resume()
+        case .finished:
+            break
+        case nil:
+            state = .finished
+        }
     }
 
     func paymentAuthorizationController(
@@ -89,9 +97,14 @@ final class ApplePayAuthorizationSessionCoordinator: NSObject, PKPaymentAuthoriz
         await delegate?.applePayAuthorizationSession(didSelectPaymentMethod: paymentMethod) ?? .init()
     }
 
+    // MARK: - Private Nested Types
+
+    private enum State {
+        case processing(CheckedContinuation<Void, Never>), finished
+    }
+
     // MARK: - Private Properties
 
     private let delegate: ApplePayAuthorizationSessionDelegate?
-    private var continuation: CheckedContinuation<Void, Never>?
-    private var didFinish: Bool
+    private var state: State?
 }
