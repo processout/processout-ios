@@ -7,7 +7,8 @@
 
 import UIKit
 
-@_spi(PO) public enum PONativeAlternativePaymentMethodInteractorState {
+@_spi(PO)
+public enum PONativeAlternativePaymentMethodInteractorState {
 
     public struct ParameterValue {
 

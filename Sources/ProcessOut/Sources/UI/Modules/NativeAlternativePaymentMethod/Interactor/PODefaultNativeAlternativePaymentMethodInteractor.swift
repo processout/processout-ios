@@ -10,8 +10,8 @@
 import Foundation
 import UIKit
 
-@_spi(PO) public final class PODefaultNativeAlternativePaymentMethodInteractor:
-    PONativeAlternativePaymentMethodInteractor {
+@_spi(PO)
+public final class PODefaultNativeAlternativePaymentMethodInteractor: PONativeAlternativePaymentMethodInteractor {
 
     public init(
         invoicesService: POInvoicesService,
