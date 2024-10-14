@@ -10,7 +10,7 @@ import PassKit
 @MainActor
 final class ApplePayAuthorizationSessionCoordinator: NSObject, PKPaymentAuthorizationControllerDelegate, Sendable {
 
-    nonisolated init(delegate: ApplePayAuthorizationSessionDelegate?) {
+    init(delegate: ApplePayAuthorizationSessionDelegate?) {
         self.delegate = delegate
         super.init()
     }
