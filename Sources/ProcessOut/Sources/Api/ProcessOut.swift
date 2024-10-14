@@ -167,7 +167,7 @@ public final class ProcessOut {
     }
 
     private func createConnector(includeLoggerRemoteDestination: Bool) -> HttpConnector {
-        let connectorConfiguration = { [unowned self] in
+        let connectorConfiguration = { @Sendable [unowned self] in
             let configuration = self.configuration
             return HttpConnectorRequestMapperConfiguration(
                 baseUrl: configuration.environment.apiBaseUrl,
