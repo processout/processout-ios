@@ -17,28 +17,7 @@ public final class FingerPrintWebViewSchemeHandler: NSObject, WKURLSchemeHandler
     }
     
     public func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
-        DispatchQueue.global().async {
-            if let url = urlSchemeTask.request.url {
-                var invoice = ""
-                var token = ""
-                if let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: true)?.queryItems {
-                    for queryParams in queryItems {
-                        if queryParams.name == "invoice_id", let value = queryParams.value {
-                            invoice = value
-                        } else if queryParams.name == "token", let value = queryParams.value {
-                            token = value
-                        }
-                    }
-                }
-                
-                if invoice == "" || token == "" {
-                    self.completion!(nil, nil, ProcessOutException.InternalError)
-                    return
-                }
-                
-                self.completion!(invoice, token, nil)
-            }
-        }
+        // No longer supported
     }
 
     public func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {

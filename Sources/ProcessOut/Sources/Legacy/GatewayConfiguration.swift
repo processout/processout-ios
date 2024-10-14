@@ -44,18 +44,3 @@ public class GatewayConfiguration: Decodable {
         self.gateway = gateway
     }
 }
-
-@available(*, deprecated)
-class GatewayConfigurationResult: ApiResponse {
-    var gatewayConfigurations: [GatewayConfiguration]?
-    
-    enum CodingKeys: String, CodingKey {
-        case gatewayConfigurations = "gateway_configurations"
-    }
-    
-    required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.gatewayConfigurations = try container.decode([GatewayConfiguration].self, forKey: .gatewayConfigurations)
-        try super.init(from: decoder)
-    }
-}
