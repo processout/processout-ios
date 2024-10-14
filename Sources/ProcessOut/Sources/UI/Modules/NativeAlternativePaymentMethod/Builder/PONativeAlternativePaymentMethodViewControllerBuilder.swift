@@ -77,7 +77,7 @@ public final class PONativeAlternativePaymentMethodViewControllerBuilder { // sw
         var logger = api.logger
         logger[attributeKey: .invoiceId] = invoiceId
         logger[attributeKey: .gatewayConfigurationId] = gatewayConfigurationId
-        let interactor = PODefaultNativeAlternativePaymentMethodInteractor(
+        let interactor = DefaultNativeAlternativePaymentMethodInteractor(
             invoicesService: api.invoices,
             imagesRepository: api.images,
             configuration: .init(
