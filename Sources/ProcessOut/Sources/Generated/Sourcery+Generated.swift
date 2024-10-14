@@ -6,6 +6,24 @@ import UIKit
 
 // MARK: - AutoCodingKeys
 
+extension DeviceMetadata {
+
+    enum CodingKeys: String, CodingKey {
+        case appLanguage
+        case appScreenWidth
+        case appScreenHeight
+        case appTimeZoneOffset
+        case channel
+    }
+}
+
+extension NativeAlternativePaymentCaptureRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case source
+    }
+}
+
 extension POAssignCustomerTokenRequest {
 
     enum CodingKeys: String, CodingKey {
@@ -16,6 +34,23 @@ extension POAssignCustomerTokenRequest {
         case enableThreeDS2 = "enable_three_d_s_2"
         case thirdPartySdkVersion
         case metadata
+    }
+}
+
+extension POCardUpdateRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case cvc
+        case preferredScheme
+    }
+}
+
+extension POCreateCustomerTokenRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case verify
+        case returnUrl
+        case invoiceReturnUrl
     }
 }
 
@@ -117,6 +152,7 @@ extension POCardsService {
     }
 
     /// Tokenize previously authorized payment.
+    @MainActor
     @discardableResult
     public func tokenize(
         request: POApplePayPaymentTokenizationRequest,
@@ -128,6 +164,7 @@ extension POCardsService {
     }
 
     /// Authorize given payment request and tokenize it.
+    @MainActor
     @discardableResult
     public func tokenize(
         request: POApplePayTokenizationRequest,
@@ -140,6 +177,7 @@ extension POCardsService {
     }
 
     /// Authorize given payment request and tokenize it.
+    @MainActor
     @discardableResult
     public func tokenize(
         request: POApplePayTokenizationRequest,
