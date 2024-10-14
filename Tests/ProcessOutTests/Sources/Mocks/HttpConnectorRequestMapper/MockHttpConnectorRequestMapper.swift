@@ -22,7 +22,7 @@ final class MockHttpConnectorRequestMapper: HttpConnectorRequestMapper {
     func urlRequest(from request: HttpConnectorRequest<some Decodable>) throws -> URLRequest {
         try lock.withLock {
             _urlRequestFromCallsCount += 1
-            return try urlRequestFromClosure()
+            return try _urlRequestFromClosure()
         }
     }
 

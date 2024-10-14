@@ -21,7 +21,7 @@ final class MockPhoneNumberMetadataProvider: POPhoneNumberMetadataProvider {
     func metadata(for countryCode: String) -> POPhoneNumberMetadata? {
         lock.withLock {
             _metadataCallsCount += 1
-            return metadata
+            return _metadata
         }
     }
 
