@@ -10,7 +10,7 @@ import Foundation
 final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     init(
-        configuration: HttpConnectorRequestMapperConfiguration,
+        configuration: HttpConnectorConfiguration,
         encoder: JSONEncoder,
         deviceMetadataProvider: DeviceMetadataProvider,
         logger: POLogger
@@ -49,13 +49,13 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         return sessionRequest
     }
 
-    func replace(configuration: HttpConnectorRequestMapperConfiguration) {
+    func replace(configuration: HttpConnectorConfiguration) {
         self.configuration.withLock { $0 = configuration }
     }
 
     // MARK: - Private Properties
 
-    private let configuration: POUnfairlyLocked<HttpConnectorRequestMapperConfiguration>
+    private let configuration: POUnfairlyLocked<HttpConnectorConfiguration>
     private let encoder: JSONEncoder
     private let deviceMetadataProvider: DeviceMetadataProvider
     private let logger: POLogger
@@ -63,7 +63,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
     // MARK: - Request Body Encoding
 
     private func encodedRequestBody(
-        _ request: HttpConnectorRequest<some Decodable>, configuration: HttpConnectorRequestMapperConfiguration
+        _ request: HttpConnectorRequest<some Decodable>, configuration: HttpConnectorConfiguration
     ) async throws -> Data? {
         let decoratedBody: Encodable?
         if request.includesDeviceMetadata {
@@ -86,7 +86,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
     // MARK: - Request Headers
 
     private func authorization(
-        request: HttpConnectorRequest<some Decodable>, configuration: HttpConnectorRequestMapperConfiguration
+        request: HttpConnectorRequest<some Decodable>, configuration: HttpConnectorConfiguration
     ) -> String {
         var value = configuration.projectId + ":"
         if request.requiresPrivateKey {
@@ -100,7 +100,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
     }
 
     private func defaultHeaders(
-        for request: HttpConnectorRequest<some Decodable>, configuration: HttpConnectorRequestMapperConfiguration
+        for request: HttpConnectorRequest<some Decodable>, configuration: HttpConnectorConfiguration
     ) async -> [String: String] {
         let deviceMetadata = await deviceMetadataProvider.deviceMetadata
         let headers = [
@@ -120,7 +120,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
     }
 
     private func userAgent(
-        deviceMetadata: DeviceMetadata, configuration: HttpConnectorRequestMapperConfiguration
+        deviceMetadata: DeviceMetadata, configuration: HttpConnectorConfiguration
     ) -> String {
         let components = [
             "iOS",

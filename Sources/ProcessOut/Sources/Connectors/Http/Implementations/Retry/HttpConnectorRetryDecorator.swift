@@ -40,7 +40,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
         )
     }
 
-    func replace(configuration: HttpConnectorRequestMapperConfiguration) {
+    func replace(configuration: HttpConnectorConfiguration) {
         connector.replace(configuration: configuration)
     }
 

@@ -15,7 +15,7 @@ protocol HttpConnector: AnyObject, Sendable {
     func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value>
 
     /// Replaces existing connector configuration.
-    func replace(configuration: HttpConnectorRequestMapperConfiguration)
+    func replace(configuration: HttpConnectorConfiguration)
 }
 
 extension HttpConnector {

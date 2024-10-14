@@ -46,7 +46,7 @@ final class UrlSessionHttpConnector: HttpConnector {
         return try decodeResponse(Value.self, from: data, response: response, logger: logger)
     }
 
-    func replace(configuration: HttpConnectorRequestMapperConfiguration) {
+    func replace(configuration: HttpConnectorConfiguration) {
         requestMapper.replace(configuration: configuration)
     }
 

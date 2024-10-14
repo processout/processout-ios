@@ -26,7 +26,7 @@ final class MockHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         }
     }
 
-    func replace(configuration: HttpConnectorRequestMapperConfiguration) {
+    func replace(configuration: HttpConnectorConfiguration) {
         // Not implemented
     }
 

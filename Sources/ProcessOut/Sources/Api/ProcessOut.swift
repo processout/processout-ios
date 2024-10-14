@@ -252,7 +252,7 @@ public final class ProcessOut: @unchecked Sendable {
 
     private static func connectorConfiguration(
         with configuration: ProcessOutConfiguration
-    ) -> HttpConnectorRequestMapperConfiguration {
+    ) -> HttpConnectorConfiguration {
         .init(
             baseUrl: configuration.environment.apiBaseUrl,
             projectId: configuration.projectId,

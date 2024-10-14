@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct HttpConnectorRequestMapperConfiguration: Sendable {
+struct HttpConnectorConfiguration: Sendable {
 
     /// Base url to use to send requests to.
     let baseUrl: URL
