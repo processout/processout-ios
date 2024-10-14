@@ -9,22 +9,25 @@ import Foundation
 
 /// An object for writing interpolated string messages to the processout logging system.
 @_spi(PO)
-public struct POLogger: Sendable {
+public struct POLogger: @unchecked Sendable {
 
-    init(destinations: [LoggerDestination] = [], category: String, minimumLevel: @escaping @Sendable () -> LogLevel) {
+    init(destinations: [LoggerDestination] = [], category: String, minimumLevel: LogLevel = .debug) {
         self.destinations = destinations
         self.category = category
-        self.minimumLevel = minimumLevel
+        self.storage = .init(minimumLevel: minimumLevel)
         self.attributes = [:]
         lock = NSLock()
     }
 
-    init(destinations: [LoggerDestination] = [], category: String) {
-        self.init(destinations: destinations, category: category) { .debug }
+    /// Logger category.
+    let category: String
+
+    /// Replaces current minimum logging level.
+    func replace(minimumLevel: LogLevel) {
+        lock.withLock { self.storage.minimumLevel = minimumLevel }
     }
 
     /// Add, change, or remove a logging attribute.
-    @_spi(PO)
     public subscript(attributeKey attributeKey: POLogAttributeKey) -> String? {
         get {
             lock.withLock { attributes[attributeKey] }
@@ -33,8 +36,6 @@ public struct POLogger: Sendable {
             lock.withLock { attributes[attributeKey] = newValue }
         }
     }
-
-    let category: String
 
     /// Logs a message at the `debug` level.
     public func debug(
@@ -83,8 +84,8 @@ public struct POLogger: Sendable {
     // MARK: - Private Properties
 
     private let destinations: [LoggerDestination]
-    private let minimumLevel: @Sendable () -> LogLevel
     private let lock: NSLock
+    private let storage: MutableStorage
     private var attributes: [POLogAttributeKey: String]
 
     // MARK: - Private Methods
@@ -105,12 +106,18 @@ public struct POLogger: Sendable {
         file: String,
         line: Int
     ) {
-        guard level >= minimumLevel() else {
-            return
+        let attributes: [POLogAttributeKey: String]? = lock.withLock {
+            guard level >= storage.minimumLevel else {
+                return nil
+            }
+            var attributes = self.attributes
+            additionalAttributes().forEach { key, value in
+                attributes[key] = value
+            }
+            return attributes
         }
-        var attributes = lock.withLock { self.attributes }
-        additionalAttributes().forEach { key, value in
-            attributes[key] = value
+        guard let attributes else {
+            return
         }
         let entry = LogEvent(
             level: level,
@@ -125,4 +132,13 @@ public struct POLogger: Sendable {
         )
         destinations.forEach { $0.log(event: entry) }
     }
+}
+
+private final class MutableStorage {
+
+    init(minimumLevel: LogLevel) {
+        self.minimumLevel = minimumLevel
+    }
+
+    var minimumLevel: LogLevel
 }

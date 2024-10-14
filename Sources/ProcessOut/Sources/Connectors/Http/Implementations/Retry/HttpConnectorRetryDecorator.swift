@@ -40,6 +40,10 @@ final class HttpConnectorRetryDecorator: HttpConnector {
         )
     }
 
+    func replace(configuration: HttpConnectorRequestMapperConfiguration) {
+        connector.replace(configuration: configuration)
+    }
+
     // MARK: - Private Properties
 
     private let connector: HttpConnector

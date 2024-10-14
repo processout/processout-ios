@@ -46,6 +46,10 @@ final class UrlSessionHttpConnector: HttpConnector {
         return try decodeResponse(Value.self, from: data, response: response, logger: logger)
     }
 
+    func replace(configuration: HttpConnectorRequestMapperConfiguration) {
+        requestMapper.replace(configuration: configuration)
+    }
+
     // MARK: - Private Properties
 
     private let session: URLSession

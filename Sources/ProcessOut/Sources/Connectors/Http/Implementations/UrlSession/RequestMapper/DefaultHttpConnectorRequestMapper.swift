@@ -10,19 +10,19 @@ import Foundation
 final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     init(
-        configuration: @escaping @Sendable () -> HttpConnectorRequestMapperConfiguration,
+        configuration: HttpConnectorRequestMapperConfiguration,
         encoder: JSONEncoder,
         deviceMetadataProvider: DeviceMetadataProvider,
         logger: POLogger
     ) {
-        self.configuration = configuration
+        self.configuration = .init(wrappedValue: configuration)
         self.encoder = encoder
         self.deviceMetadataProvider = deviceMetadataProvider
         self.logger = logger
     }
 
     func urlRequest(from request: HttpConnectorRequest<some Decodable>) async throws -> URLRequest {
-        let configuration = self.configuration()
+        let configuration = configuration.wrappedValue
         guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
             logger.error("Unable to create a request with base URL \(configuration.baseUrl)")
             throw HttpConnectorFailure(code: .internal, underlyingError: nil)
@@ -49,9 +49,13 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         return sessionRequest
     }
 
+    func replace(configuration: HttpConnectorRequestMapperConfiguration) {
+        self.configuration.withLock { $0 = configuration }
+    }
+
     // MARK: - Private Properties
 
-    private let configuration: @Sendable () -> HttpConnectorRequestMapperConfiguration
+    private let configuration: POUnfairlyLocked<HttpConnectorRequestMapperConfiguration>
     private let encoder: JSONEncoder
     private let deviceMetadataProvider: DeviceMetadataProvider
     private let logger: POLogger

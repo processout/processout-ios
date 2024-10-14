@@ -11,4 +11,7 @@ protocol HttpConnectorRequestMapper: Sendable {
 
     /// Transforms given `HttpConnectorRequest` to `URLRequest`.
     func urlRequest(from request: HttpConnectorRequest<some Decodable>) async throws -> URLRequest
+
+    /// Replaces current configuration.
+    func replace(configuration: HttpConnectorRequestMapperConfiguration)
 }
