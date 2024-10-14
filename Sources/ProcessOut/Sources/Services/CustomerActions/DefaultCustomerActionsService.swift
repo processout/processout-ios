@@ -7,10 +7,9 @@
 
 import Foundation
 
-@MainActor
 final class DefaultCustomerActionsService: CustomerActionsService {
 
-    nonisolated init(
+    init(
         decoder: JSONDecoder,
         encoder: JSONEncoder,
         jsonWritingOptions: JSONSerialization.WritingOptions = [],

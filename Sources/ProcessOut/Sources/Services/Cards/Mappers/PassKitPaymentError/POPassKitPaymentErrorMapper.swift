@@ -8,7 +8,7 @@
 // todo(andrii-vysotskyi): remove public access level when POPassKitPaymentAuthorizationController is removed
 
 @_spi(PO)
-public protocol POPassKitPaymentErrorMapper {
+public protocol POPassKitPaymentErrorMapper: Sendable {
 
     /// Converts ProcessOut errors into the appropriate Apple Pay error, for use in
     /// `PKPaymentAuthorizationResult`.

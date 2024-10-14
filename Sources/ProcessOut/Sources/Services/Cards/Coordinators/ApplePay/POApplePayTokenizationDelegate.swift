@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 05.09.2024.
 //
 
+// todo(andrii-vysotskyi): add Sendable conformance to POApplePayTokenizationDelegate when releasing 5.0.0
+
 import PassKit
 
 public protocol POApplePayTokenizationDelegate: AnyObject {
