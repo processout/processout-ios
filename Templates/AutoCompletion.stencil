@@ -3,7 +3,7 @@
 
 extension {{ type.name }} {
     {% for method in type.methods %}
-        {% if not method.isAsync %}
+        {% if not method.isAsync and not method.throws %}
             {% continue %}
         {% endif %}
 
@@ -13,44 +13,22 @@ extension {{ type.name }} {
     {% for key, value in method.attributes %}
     {{ value.first }}
     {% endfor %}
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func {{ method.callName }}(
         {% for parameter in method.parameters %}
-        {{ parameter.asSource }},
+        {% if parameter.argumentLabel != parameter.name %}{{ parameter.argumentLabel }} {% endif %}{{ parameter.name }}: sending {{ parameter.typeName.asSource }}{% if parameter.defaultValue %} = {{ parameter.defaultValue }}{% endif %},
         {% endfor %}
-        completion: @escaping ({% if method.throws %}Result<{{ method.returnTypeName.asSource }}, POFailure>{% else %}{{ method.returnTypeName.asSource }}{% endif %}) -> Void
+        completion: sending @escaping @isolated(any) (Result<{{ method.returnTypeName.asSource }}, POFailure>) -> Void
     ) -> POCancellable {
-        invoke(completion: completion) {
-            {% if method.throws %}try {% endif %}await {{ method.callName }}({% for parameter in method.parameters %}{% if parameter.argumentLabel %}{{ parameter.argumentLabel }}: {% endif %}{{ parameter.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
+        Task { @MainActor in
+            do {
+                await completion(.success(try await {{ method.callName }}({% for parameter in method.parameters %}{% if parameter.argumentLabel %}{{ parameter.argumentLabel }}: {% endif %}{{ parameter.name }}{% if not forloop.last %}, {% endif %}{% endfor %})))
+            } catch {
+                await completion(.failure(error as! POFailure))
+            }
         }
     }
     {% endfor %}
 }
-{% if forloop.last %}
-
-/// Invokes given completion with a result of async operation.
-private func invoke<T>(
-    completion: @escaping (Result<T, POFailure>) -> Void,
-    after operation: @escaping () async throws -> T
-) -> POCancellable {
-    Task { @MainActor in
-        do {
-            let returnValue = try await operation()
-            completion(.success(returnValue))
-        } catch let failure as POFailure {
-            completion(.failure(failure))
-        } catch {
-            let failure = POFailure(message: "Something went wrong.", code: .internal(.mobile), underlyingError: error)
-            completion(.failure(failure))
-        }
-    }
-}
-
-/// Invokes given completion with a result of async operation.
-private func invoke<T>(completion: @escaping (T) -> Void, after operation: @escaping () async -> T) -> Task<Void, Never> {
-    Task { @MainActor in
-        completion(await operation())
-    }
-}
-{% endif %}
 {% endfor %}
