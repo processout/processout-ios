@@ -8,7 +8,7 @@
 import os
 
 /// An `os_unfair_lock` wrapper.
-final class UnfairLock {
+final class UnfairLock: @unchecked Sendable {
 
     init() {
         unfairLock = .allocate(capacity: 1)

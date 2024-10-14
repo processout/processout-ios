@@ -12,7 +12,7 @@ import Foundation
 /// Property wrapper that allows to encode and decode optional `Decimal` to/from string representation. Value is coded
 /// in en_US locale.
 @propertyWrapper
-public struct POImmutableStringCodableOptionalDecimal: Codable {
+public struct POImmutableStringCodableOptionalDecimal: Codable, Sendable {
 
     public let wrappedValue: Decimal?
 

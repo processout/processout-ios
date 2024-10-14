@@ -7,7 +7,8 @@
 
 import Foundation
 
-@_spi(PO) public final class POCardNumberFormatter: Formatter {
+@_spi(PO)
+public final class POCardNumberFormatter: Formatter {
 
     public func string(from partialNumber: String) -> String {
         let normalizedNumber = normalized(number: partialNumber).prefix(Constants.maxLength)

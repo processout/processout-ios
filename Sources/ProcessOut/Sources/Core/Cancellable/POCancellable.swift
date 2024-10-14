@@ -9,6 +9,7 @@
 public typealias POCancellableType = POCancellable
 
 /// A protocol indicating that an activity or action supports cancellation.
+@available(*, deprecated, message: "No longer used.")
 public protocol POCancellable {
 
     /// Cancel the activity.

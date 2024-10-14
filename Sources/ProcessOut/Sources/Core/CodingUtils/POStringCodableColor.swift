@@ -10,7 +10,7 @@ import UIKit
 
 /// Property wrapper that allows to decode UIColor from string representations.
 @propertyWrapper
-public struct POStringCodableColor: Decodable {
+public struct POStringCodableColor: Decodable, Sendable {
 
     public var wrappedValue: UIColor
 

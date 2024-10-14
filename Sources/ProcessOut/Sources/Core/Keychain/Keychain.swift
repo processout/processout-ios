@@ -8,7 +8,7 @@
 import Foundation
 import Security
 
-final class Keychain {
+final class Keychain: Sendable {
 
     init(service: String) {
         queryBuilder = KeychainQueryBuilder(service: service)

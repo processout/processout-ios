@@ -37,7 +37,7 @@ public struct POLogger: Sendable {
     let category: String
 
     /// Logs a message at the `debug` level.
-    @_spi(PO) public func debug(
+    public func debug(
         _ message: @autoclosure () -> POLogMessage,
         attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
@@ -48,7 +48,7 @@ public struct POLogger: Sendable {
     }
 
     /// Logs a message at the `info` level.
-    @_spi(PO) public func info(
+    public func info(
         _ message: @autoclosure () -> POLogMessage,
         attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
@@ -59,7 +59,7 @@ public struct POLogger: Sendable {
     }
 
     /// Logs a message at the `warn` level.
-    @_spi(PO) public func warn(
+    public func warn(
         _ message: @autoclosure () -> POLogMessage,
         attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
@@ -70,7 +70,7 @@ public struct POLogger: Sendable {
     }
 
     /// Logs a message at the `error` level.
-    @_spi(PO) public func error(
+    public func error(
         _ message: @autoclosure () -> POLogMessage,
         attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,

@@ -9,8 +9,9 @@ import UIKit
 
 extension UIImage {
 
+    @MainActor
     static func dynamic(lightImage: UIImage?, darkImage: UIImage?) -> UIImage? {
-        // When image with scale greater than 3 is registed asset created explicitly produced image
+        // When image with scale greater than 3 is registered asset created explicitly produced image
         // is malformed and doesn't contain images for light nor dark styles.
         guard let image = lightImage ?? darkImage else {
             return nil

@@ -5,7 +5,8 @@
 //  Created by Andrii Vysotskyi on 25.10.2022.
 //
 
-@_spi(PO) public struct POLogInterpolation: StringInterpolationProtocol {
+@_spi(PO)
+public struct POLogInterpolation: StringInterpolationProtocol, Sendable {
 
     /// Privacy options for specifying privacy level of the interpolated expressions
     /// in the string interpolations passed to the log APIs.

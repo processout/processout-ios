@@ -28,7 +28,8 @@ public struct POCardIssuerInformation: Decodable, Sendable {
     /// Card category.
     public let category: String?
 
-    @_spi(PO) public init(
+    @_spi(PO)
+    public init(
         scheme: POCardScheme,
         coScheme: POCardScheme? = nil,
         type: String? = nil,

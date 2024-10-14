@@ -8,7 +8,7 @@
 import Foundation
 
 /// Contract for providing a default value of a Type.
-public protocol POFallbackValueProvider<Value> {
+public protocol POFallbackValueProvider<Value>: Sendable {
 
     associatedtype Value
 

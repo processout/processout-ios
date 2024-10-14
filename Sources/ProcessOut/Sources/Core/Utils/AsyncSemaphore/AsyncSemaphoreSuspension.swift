@@ -5,71 +5,83 @@
 //  Created by Andrii Vysotskyi on 10.10.2024.
 //
 
-final class AsyncSemaphoreSuspension {
+import Foundation
+
+final class AsyncSemaphoreSuspension: Sendable {
 
     func resume() {
-        switch state {
-        case .suspendedUnlessCancelled(let unsafeContinuation):
-            state = .resumed
-            unsafeContinuation.resume()
-        case .suspended(let unsafeContinuation):
-            state = .resumed
-            unsafeContinuation.resume()
-        case .cancelled:
-            assertionFailure("Cannot resume a canceled suspension.")
-        case .resumed:
-            break
-        case nil:
-            state = .resumed
+        state.withLock { state in
+            switch state {
+            case .suspendedUnlessCancelled(let unsafeContinuation):
+                state = .resumed
+                unsafeContinuation.resume()
+            case .suspended(let unsafeContinuation):
+                state = .resumed
+                unsafeContinuation.resume()
+            case .cancelled:
+                assertionFailure("Cannot resume a canceled suspension.")
+            case .resumed:
+                break
+            case nil:
+                state = .resumed
+            }
         }
     }
 
     func cancel() {
-        switch state {
-        case .suspendedUnlessCancelled(let unsafeContinuation):
-            state = .cancelled
-            unsafeContinuation.resume(throwing: CancellationError())
-        case .suspended:
-            assertionFailure("Cancellation attempted on a continuation that does not support it.")
-        case .cancelled:
-            break
-        case .resumed:
-            assertionFailure("Cannot cancel a suspension that has already been resumed.")
-        case nil:
-            state = .cancelled
+        state.withLock { state in
+            switch state {
+            case .suspendedUnlessCancelled(let unsafeContinuation):
+                state = .cancelled
+                unsafeContinuation.resume(throwing: CancellationError())
+            case .suspended:
+                assertionFailure("Cancellation attempted on a continuation that does not support it.")
+            case .cancelled:
+                break
+            case .resumed:
+                assertionFailure("Cannot cancel a suspension that has already been resumed.")
+            case nil:
+                state = .cancelled
+            }
         }
     }
 
     @discardableResult
     func setContinuation(_ unsafeContinuation: UnsafeContinuation<Void, Error>) -> Bool {
-        switch state {
-        case .suspendedUnlessCancelled, .suspended:
-            preconditionFailure("The continuation is already established.")
-        case .cancelled:
-            unsafeContinuation.resume(throwing: CancellationError())
-        case .resumed:
-            unsafeContinuation.resume()
-        case nil:
-            state = .suspendedUnlessCancelled(unsafeContinuation)
-            return true
+        state.withLock { state in
+            switch state {
+            case .suspendedUnlessCancelled, .suspended:
+                preconditionFailure("The continuation is already established.")
+            case .cancelled:
+                unsafeContinuation.resume(throwing: CancellationError())
+            case .resumed:
+                unsafeContinuation.resume()
+            case nil:
+                state = .suspendedUnlessCancelled(unsafeContinuation)
+                return true
+            }
+            return false
         }
-        return false
     }
 
     @discardableResult
     func setContinuation(_ unsafeContinuation: UnsafeContinuation<Void, Never>) -> Bool {
-        switch state {
-        case .suspendedUnlessCancelled, .suspended:
-            preconditionFailure("The continuation is already established.")
-        case .cancelled:
-            preconditionFailure("The suspension was canceled, but provided continuation doesn't support cancellation.")
-        case .resumed:
-            unsafeContinuation.resume()
-        case nil:
-            state = .suspended(unsafeContinuation)
-            return true
+        state.withLock { state in
+            switch state {
+            case .suspendedUnlessCancelled, .suspended:
+                preconditionFailure("The continuation is already established.")
+            case .cancelled:
+                preconditionFailure(
+                    "The suspension was canceled, but provided continuation doesn't support cancellation."
+                )
+            case .resumed:
+                unsafeContinuation.resume()
+            case nil:
+                state = .suspended(unsafeContinuation)
+                return true
+            }
+            return false
         }
-        return false
     }
 
     // MARK: - Private Nested Types
@@ -91,5 +103,5 @@ final class AsyncSemaphoreSuspension {
 
     // MARK: - Private Properties
 
-    private var state: State?
+    private let state = POUnfairlyLocked<State?>(wrappedValue: nil)
 }

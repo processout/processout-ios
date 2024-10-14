@@ -8,7 +8,7 @@
 import Foundation
 import Security
 
-struct KeychainQueryBuilder {
+struct KeychainQueryBuilder: Sendable {
 
     /// Item's class.
     var itemClass: KeychainItemClass = .genericPassword

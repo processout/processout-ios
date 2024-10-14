@@ -5,7 +5,8 @@
 //  Created by Andrii Vysotskyi on 23.03.2023.
 //
 
-@_spi(PO) public protocol POPhoneNumberMetadataProvider {
+@_spi(PO)
+public protocol POPhoneNumberMetadataProvider: Sendable {
 
     /// Returns metadata for given country code if any.
     func metadata(for countryCode: String) -> POPhoneNumberMetadata?

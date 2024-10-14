@@ -28,3 +28,5 @@ extension KeyedDecodingContainer {
 }
 
 extension POFallbackDecodable: Hashable, Equatable where Provider.Value: Hashable { }
+
+extension POFallbackDecodable: Sendable where Provider.Value: Sendable { }

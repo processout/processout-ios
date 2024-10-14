@@ -7,7 +7,8 @@
 
 /// Returns an integer number raised to a given power.
 /// - NOTE: Implementation uses exponentiation by squaring algorithm.
-@_spi(PO) public func pow(_ x: Int, _ y: Int) -> Int { // swiftlint:disable:this identifier_name
+@_spi(PO)
+public func pow(_ x: Int, _ y: Int) -> Int { // swiftlint:disable:this identifier_name
     assert(y >= 0, "Negative exponent is not supported.")
     var base = x, exp = y, result = 1
     while true {

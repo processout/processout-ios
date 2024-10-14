@@ -12,6 +12,7 @@ import Foundation
 ///
 /// - NOTE: Wrapped value is immutable.
 @propertyWrapper
+@available(*, deprecated, message: "No longer in use.")
 public struct POImmutableExcludedCodable<Value>: Encodable {
 
     public let wrappedValue: Value
@@ -26,6 +27,7 @@ public struct POImmutableExcludedCodable<Value>: Encodable {
 
 extension KeyedEncodingContainer {
 
+    @available(*, deprecated, message: "No longer in use.")
     public mutating func encode<T>(
         _ value: POImmutableExcludedCodable<T>, forKey key: KeyedEncodingContainer<K>.Key
     ) throws { /* Ignored */ }

@@ -7,7 +7,8 @@
 
 import Foundation
 
-@_spi(PO) public final class POCardExpirationFormatter: Formatter {
+@_spi(PO)
+public final class POCardExpirationFormatter: Formatter {
 
     override public init() {
         regexProvider = RegexProvider.shared
