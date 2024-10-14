@@ -13,7 +13,7 @@ import UIKit
 @available(*, deprecated)
 final class DefaultNativeAlternativePaymentMethodInteractor: NativeAlternativePaymentMethodInteractor {
 
-    public init(
+    init(
         invoicesService: POInvoicesService,
         imagesRepository: POImagesRepository,
         configuration: PONativeAlternativePaymentMethodInteractorConfiguration,

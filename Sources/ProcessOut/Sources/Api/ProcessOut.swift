@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 14.10.2024.
 //
 
-// swiftlint:disable implicitly_unwrapped_optional force_unwrapping
+// swiftlint:disable force_unwrapping
 
 import Foundation
 import UIKit
@@ -333,21 +333,23 @@ extension ProcessOut {
     ///   - force: When set to `false` (the default) only the first invocation takes effect, all
     /// subsequent calls to this method are ignored. Pass `true` to allow existing shared instance
     /// reconfiguration (if any).
-    @MainActor
     public static func configure(configuration: ProcessOutConfiguration, force: Bool = false) {
-        if isConfigured {
-            if force {
-                shared.replace(configuration: configuration)
-                shared.logger.debug("Did change ProcessOut configuration")
+        // todo(andrii-vysotskyi): isolate method to main actor when releasing 5.0.0
+        MainActor.assumeIsolated {
+            if isConfigured {
+                if force {
+                    shared.replace(configuration: configuration)
+                    shared.logger.debug("Did change ProcessOut configuration")
+                } else {
+                    shared.logger.debug("ProcessOut can be configured only once, ignored")
+                }
             } else {
-                shared.logger.debug("ProcessOut can be configured only once, ignored")
+                Self.prewarm()
+                _shared.withLock { instance in
+                    instance = ProcessOut(configuration: configuration)
+                }
+                shared.logger.debug("Did complete ProcessOut configuration")
             }
-        } else {
-            Self.prewarm()
-            _shared.withLock { instance in
-                instance = ProcessOut(configuration: configuration)
-            }
-            shared.logger.debug("Did complete ProcessOut configuration")
         }
     }
 
@@ -363,4 +365,4 @@ extension ProcessOut {
     }
 }
 
-// swiftlint:enable implicitly_unwrapped_optional force_unwrapping
+// swiftlint:enable force_unwrapping
