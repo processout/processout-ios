@@ -235,7 +235,8 @@ public final class PODefaultNativeAlternativePaymentMethodInteractor: PONativeAl
         let actionMessage = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
         let logoUrl = logoUrl(gateway: gateway, parameterValues: parameterValues)
         send(event: .willWaitForCaptureConfirmation(additionalActionExpected: actionMessage != nil))
-        imagesRepository.images(at: logoUrl, gateway.customerActionImageUrl) { [weak self] logo, actionImage in
+        Task { @MainActor [weak self, imagesRepository] in
+            let (logo, actionImage) = await imagesRepository.images(at: logoUrl, gateway.customerActionImageUrl)
             guard let self else {
                 return
             }
@@ -302,7 +303,8 @@ public final class PODefaultNativeAlternativePaymentMethodInteractor: PONativeAl
             send(event: .didCompletePayment)
         default:
             let logoUrl = logoUrl(gateway: gateway, parameterValues: parameterValues)
-            imagesRepository.image(at: logoUrl) { [weak self] logoImage in
+            Task { @MainActor [weak self, imagesRepository] in
+                let logoImage = await imagesRepository.image(at: logoUrl)
                 let capturedState = State.Captured(
                     paymentProviderName: parameterValues?.providerName, logoImage: logoImage
                 )
