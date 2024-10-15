@@ -242,11 +242,12 @@ public final class ProcessOut: @unchecked Sendable {
         deviceMetadataProvider: DeviceMetadataProvider,
         logger: POLogger
     ) -> HttpConnector {
-        let connector = ProcessOutHttpConnectorBuilder()
-            .with(configuration: connectorConfiguration(with: configuration))
-            .with(logger: logger)
-            .with(deviceMetadataProvider: deviceMetadataProvider)
-            .build()
+        let connectorConfiguration = Self.connectorConfiguration(with: configuration)
+        let connector = ProcessOutHttpConnectorBuilder().build(
+            configuration: connectorConfiguration,
+            deviceMetadataProvider: deviceMetadataProvider,
+            logger: logger
+        )
         return connector
     }
 
