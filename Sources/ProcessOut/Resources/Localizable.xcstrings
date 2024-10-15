@@ -2,7 +2,6 @@
   "sourceLanguage" : "en",
   "strings" : {
     "native-alternative-payment.cancel-button.title" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -37,7 +36,6 @@
       }
     },
     "native-alternative-payment.email.placeholder" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -72,7 +70,6 @@
       }
     },
     "native-alternative-payment.error.invalid-email" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -107,7 +104,6 @@
       }
     },
     "native-alternative-payment.error.invalid-length-%d" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "variations" : {
@@ -202,7 +198,6 @@
       }
     },
     "native-alternative-payment.error.invalid-number" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -237,7 +232,6 @@
       }
     },
     "native-alternative-payment.error.invalid-phone" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -272,7 +266,6 @@
       }
     },
     "native-alternative-payment.error.invalid-value" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -307,7 +300,6 @@
       }
     },
     "native-alternative-payment.error.required-parameter" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -342,7 +334,6 @@
       }
     },
     "native-alternative-payment.phone.placeholder" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -377,7 +368,6 @@
       }
     },
     "native-alternative-payment.submit-button.default-title" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -412,7 +402,6 @@
       }
     },
     "native-alternative-payment.submit-button.title" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -447,7 +436,6 @@
       }
     },
     "native-alternative-payment.success.message" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -482,7 +470,6 @@
       }
     },
     "native-alternative-payment.title" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
