@@ -14,7 +14,7 @@ final class Batcher<Task>: Sendable {
     init(executionInterval: TimeInterval = 10, executor: @escaping Executor) {
         self.executionInterval = executionInterval
         self.executor = executor
-        lock = UnfairLock()
+        lock = .init()
         pendingTasks = []
     }
 
@@ -36,7 +36,7 @@ final class Batcher<Task>: Sendable {
 
     private let executor: Executor
     private let executionInterval: TimeInterval
-    private let lock: UnfairLock
+    private let lock: POUnfairlyLocked<Void>
 
     private nonisolated(unsafe) var pendingTasks: [Task]
     private nonisolated(unsafe) var executionTimer: Timer?

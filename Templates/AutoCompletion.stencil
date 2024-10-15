@@ -13,6 +13,7 @@ extension {{ type.name }} {
     {% for key, value in method.attributes %}
     {{ value.first }}
     {% endfor %}
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func {{ method.callName }}(
         {% for parameter in method.parameters %}
@@ -36,12 +37,12 @@ private func invoke<T>(
     Task { @MainActor in
         do {
             let returnValue = try await operation()
-            await completion(.success(returnValue))
+            completion(.success(returnValue))
         } catch let failure as POFailure {
-            await completion(.failure(failure))
+            completion(.failure(failure))
         } catch {
             let failure = POFailure(message: "Something went wrong.", code: .internal(.mobile), underlyingError: error)
-            await completion(.failure(failure))
+            completion(.failure(failure))
         }
     }
 }

@@ -34,7 +34,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
         if PKPaymentAuthorizationViewController(paymentRequest: paymentRequest) == nil {
             return nil
         }
-        _didPresentApplePay = .init(wrappedValue: false)
+        didPresentApplePay = .init(wrappedValue: false)
         self.paymentRequest = paymentRequest
         controller = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
         errorMapper = PODefaultPassKitPaymentErrorMapper(logger: ProcessOut.shared.logger)
@@ -45,12 +45,12 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
 
     /// Presents the Apple Pay UI modally over your app. You are responsible for dismissal.
     public func present(completion: ((Bool) -> Void)? = nil) {
-        guard !didPresentApplePay else {
+        guard !didPresentApplePay.wrappedValue else {
             assertionFailure("POPassKitPaymentAuthorizationController must be presented only once.")
             completion?(false)
             return
         }
-        $didPresentApplePay.withLock { $0 = true }
+        didPresentApplePay.withLock { $0 = true }
         // Bound lifecycle of self to underlying PKPaymentAuthorizationController
         objc_setAssociatedObject(controller, &AssociatedObjectKeys.controller, self, .OBJC_ASSOCIATION_RETAIN)
         controller.present(completion: completion)
@@ -94,9 +94,7 @@ public final class POPassKitPaymentAuthorizationController: NSObject {
 
     private let errorMapper: POPassKitPaymentErrorMapper
     private let cardsService: POCardsService
-
-    @POUnfairlyLocked
-    private var didPresentApplePay: Bool
+    private let didPresentApplePay: POUnfairlyLocked<Bool>
 }
 
 @available(*, deprecated)

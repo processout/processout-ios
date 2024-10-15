@@ -105,12 +105,12 @@ final class AsyncUtilsTests: XCTestCase {
 
     func test_retry_whenTimeoutIsZero_executesOperationOnce() async throws {
         // Given
-        @POUnfairlyLocked var isOperationExecuted = false
+        let isOperationExecuted = POUnfairlyLocked<Bool>(wrappedValue: false)
 
         // When
         try await retry(
             operation: {
-                $isOperationExecuted.withLock { $0 = true }
+                isOperationExecuted.withLock { $0 = true }
             },
             while: { _ in
                 false
@@ -120,7 +120,7 @@ final class AsyncUtilsTests: XCTestCase {
         )
 
         // Then
-        XCTAssertTrue(isOperationExecuted)
+        XCTAssertTrue(isOperationExecuted.wrappedValue)
     }
 
     func test_retry_whenTimesOut_throwsTimeoutError() async {
@@ -145,7 +145,7 @@ final class AsyncUtilsTests: XCTestCase {
 
     func test_retry_checksRetryCondition_whenRetryStrategyIsSet() async throws {
         // Given
-        @POUnfairlyLocked var isConditionChecked = false
+        let isConditionChecked = POUnfairlyLocked<Bool>(wrappedValue: false)
 
         // When
         _ = try await retry(
@@ -153,7 +153,7 @@ final class AsyncUtilsTests: XCTestCase {
                 ""
             },
             while: { _ in
-                $isConditionChecked.withLock { $0 = true }
+                isConditionChecked.withLock { $0 = true }
                 return false
             },
             timeout: 10,
@@ -162,17 +162,17 @@ final class AsyncUtilsTests: XCTestCase {
         )
 
         // Then
-        XCTAssertTrue(isConditionChecked)
+        XCTAssertTrue(isConditionChecked.wrappedValue)
     }
 
     func test_retry_retriesOperation_whenRetryStrategyIsSet() async throws {
         // Given
-        @POUnfairlyLocked var operationStartsCount = 0
+        let operationStartsCount = POUnfairlyLocked<Int>(wrappedValue: 0)
 
         // When
         _ = try await retry(
             operation: {
-                $operationStartsCount.withLock { $0 += 1 }
+                operationStartsCount.withLock { $0 += 1 }
             },
             while: { _ in
                 true
@@ -183,7 +183,7 @@ final class AsyncUtilsTests: XCTestCase {
         )
 
         // Then
-        XCTAssertEqual(operationStartsCount, 2)
+        XCTAssertEqual(operationStartsCount.wrappedValue, 2)
     }
 
     // swiftlint:disable:next line_length
@@ -217,13 +217,15 @@ final class AsyncUtilsTests: XCTestCase {
 
     func test_retry_whenRetryCountIsExceeded_completesWithRecentResult() async throws {
         // Given
-        @POUnfairlyLocked var recentOperationValue = ""
+        let recentOperationValue = POUnfairlyLocked<String>(wrappedValue: "")
 
         // When
         let value = try await retry(
             operation: {
-                $recentOperationValue.withLock { $0 = UUID().uuidString }
-                return recentOperationValue
+                recentOperationValue.withLock { value in
+                    value = UUID().uuidString
+                    return value
+                }
             },
             while: { _ in
                 true
@@ -234,18 +236,20 @@ final class AsyncUtilsTests: XCTestCase {
         )
 
         // Then
-        XCTAssertEqual(recentOperationValue, value)
+        XCTAssertEqual(recentOperationValue.wrappedValue, value)
     }
 
     func test_retry_whenRetryConditionResolvesFalse_completesWithRecentResult() async throws {
         // Given
-        @POUnfairlyLocked var recentOperationValue = ""
+        let recentOperationValue = POUnfairlyLocked<String>(wrappedValue: "")
 
         // When
         let value = try await retry(
             operation: {
-                $recentOperationValue.withLock { $0 = UUID().uuidString }
-                return recentOperationValue
+                recentOperationValue.withLock { value in
+                    value = UUID().uuidString
+                    return value
+                }
             },
             while: { _ in
                 false
@@ -256,7 +260,7 @@ final class AsyncUtilsTests: XCTestCase {
         )
 
         // Then
-        XCTAssertEqual(recentOperationValue, value)
+        XCTAssertEqual(recentOperationValue.wrappedValue, value)
     }
 
     func test_retry_whenCancelledImmediately_completesWithCancellationError() async throws {

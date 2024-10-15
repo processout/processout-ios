@@ -116,6 +116,7 @@ extension POCardsService {
     /// 
     /// - Parameters:
     ///   - iin: Card issuer identification number. Length should be at least 6 otherwise error is thrown.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func issuerInformation(
         iin: String,
@@ -130,6 +131,7 @@ extension POCardsService {
     /// to use the card for multiple payments then you can use the card token to create a reusable customer token.
     /// Note that once you have used the card token either for a payment or to create a customer token, the card
     /// token becomes invalid and you cannot use it for any further actions.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func tokenize(
         request: POCardTokenizationRequest,
@@ -141,6 +143,7 @@ extension POCardsService {
     }
 
     /// Updates card information.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func updateCard(
         request: POCardUpdateRequest,
@@ -153,6 +156,7 @@ extension POCardsService {
 
     /// Tokenize previously authorized payment.
     @MainActor
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func tokenize(
         request: POApplePayPaymentTokenizationRequest,
@@ -165,6 +169,7 @@ extension POCardsService {
 
     /// Authorize given payment request and tokenize it.
     @MainActor
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func tokenize(
         request: POApplePayTokenizationRequest,
@@ -178,6 +183,7 @@ extension POCardsService {
 
     /// Authorize given payment request and tokenize it.
     @MainActor
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func tokenize(
         request: POApplePayTokenizationRequest,
@@ -192,6 +198,7 @@ extension POCardsService {
 extension POCustomerTokensService {
 
     /// Assigns new source to existing customer token and optionally verifies it.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
@@ -205,6 +212,7 @@ extension POCustomerTokensService {
 
     /// Creates customer token using given request.
     @_spi(PO)
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func createCustomerToken(
         request: POCreateCustomerTokenRequest,
@@ -219,6 +227,7 @@ extension POCustomerTokensService {
 extension POGatewayConfigurationsRepository {
 
     /// Returns available gateway configurations.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func all(
         request: POAllGatewayConfigurationsRequest,
@@ -230,6 +239,7 @@ extension POGatewayConfigurationsRepository {
     }
 
     /// Searches configuration with given request.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func find(
         request: POFindGatewayConfigurationRequest,
@@ -241,6 +251,7 @@ extension POGatewayConfigurationsRepository {
     }
 
     /// Returns available gateway configurations.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func all(
         completion: @escaping @isolated(any) (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
@@ -254,6 +265,7 @@ extension POGatewayConfigurationsRepository {
 extension POInvoicesService {
 
     /// Requests information needed to continue existing payment or start new one.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
@@ -268,6 +280,7 @@ extension POInvoicesService {
     /// 
     /// Some Native APMs require further information to be collected back from the customer. You can inspect
     /// `nativeApm` in response object to understand if additional data is required.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest,
@@ -279,6 +292,7 @@ extension POInvoicesService {
     }
 
     /// Invoice details.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func invoice(
         request: POInvoiceRequest,
@@ -290,6 +304,7 @@ extension POInvoicesService {
     }
 
     /// Performs invoice authorization with given request.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
@@ -302,6 +317,7 @@ extension POInvoicesService {
     }
 
     /// Captures native alternative payament.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func captureNativeAlternativePayment(
         request: PONativeAlternativePaymentCaptureRequest,
@@ -314,6 +330,7 @@ extension POInvoicesService {
 
     /// Creates invoice with given parameters.
     @_spi(PO)
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func createInvoice(
         request: POInvoiceCreationRequest,
@@ -333,12 +350,12 @@ private func invoke<T>(
     Task { @MainActor in
         do {
             let returnValue = try await operation()
-            await completion(.success(returnValue))
+            completion(.success(returnValue))
         } catch let failure as POFailure {
-            await completion(.failure(failure))
+            completion(.failure(failure))
         } catch {
             let failure = POFailure(message: "Something went wrong.", code: .internal(.mobile), underlyingError: error)
-            await completion(.failure(failure))
+            completion(.failure(failure))
         }
     }
 }
