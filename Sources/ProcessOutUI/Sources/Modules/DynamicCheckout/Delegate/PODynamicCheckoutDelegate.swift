@@ -6,7 +6,7 @@
 //
 
 import PassKit
-import ProcessOut
+@_spi(PO) import ProcessOut
 
 /// Dynamic checkout module delegate.
 @_spi(PO)
@@ -21,7 +21,8 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
     /// Your implementation may alter request parameters and return new request but make
     /// sure that invoice id and source stay the same.
     func dynamicCheckout(
-        willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest
+        willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest,
+        using paymentMethod: PODynamicCheckoutPaymentMethod
     ) async -> PO3DS2Service
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.

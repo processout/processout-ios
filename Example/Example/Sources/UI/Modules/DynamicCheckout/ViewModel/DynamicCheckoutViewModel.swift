@@ -101,7 +101,8 @@ final class DynamicCheckoutViewModel: ObservableObject {
 extension DynamicCheckoutViewModel: PODynamicCheckoutDelegate {
 
     func dynamicCheckout(
-        willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest
+        willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest,
+        using paymentMethod: PODynamicCheckoutPaymentMethod
     ) async -> any PO3DS2Service {
         POTest3DSService()
     }
