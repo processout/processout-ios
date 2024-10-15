@@ -373,7 +373,9 @@ final class DynamicCheckoutDefaultInteractor:
                 var authorizationRequest = POInvoiceAuthorizationRequest(
                     invoiceId: startedState.invoice.id, source: card.id
                 )
-                let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &authorizationRequest)
+                let threeDSService = await delegate.dynamicCheckout(
+                    willAuthorizeInvoiceWith: &authorizationRequest, using: .applePay(method)
+                )
                 try await invoicesService.authorizeInvoice(
                     request: authorizationRequest, threeDSService: threeDSService
                 )
@@ -463,7 +465,12 @@ final class DynamicCheckoutDefaultInteractor:
                 let response = try await alternativePaymentsService.authenticate(
                     using: method.configuration.redirectUrl
                 )
-                try await authorizeInvoice(source: response.gatewayToken, saveSource: false, startedState: startedState)
+                try await authorizeInvoice(
+                    using: .alternativePayment(method),
+                    source: response.gatewayToken,
+                    saveSource: false,
+                    startedState: startedState
+                )
                 setSuccessState()
             } catch {
                 restart(toRecoverPaymentProcessingError: error)
@@ -554,7 +561,9 @@ final class DynamicCheckoutDefaultInteractor:
                 if let redirectUrl = method.configuration.redirectUrl {
                     source = try await alternativePaymentsService.authenticate(using: redirectUrl).gatewayToken
                 }
-                try await authorizeInvoice(source: source, saveSource: false, startedState: startedState)
+                try await authorizeInvoice(
+                    using: .customerToken(method), source: source, saveSource: false, startedState: startedState
+                )
                 setSuccessState()
             } catch {
                 restart(toRecoverPaymentProcessingError: error)
@@ -635,7 +644,12 @@ final class DynamicCheckoutDefaultInteractor:
         }
     }
 
-    private func authorizeInvoice(source: String, saveSource: Bool, startedState: State.Started) async throws {
+    private func authorizeInvoice(
+        using paymentMethod: PODynamicCheckoutPaymentMethod,
+        source: String,
+        saveSource: Bool,
+        startedState: State.Started
+    ) async throws {
         guard let delegate else {
             throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
         }
@@ -646,7 +660,7 @@ final class DynamicCheckoutDefaultInteractor:
             allowFallbackToSale: true,
             clientSecret: startedState.clientSecret
         )
-        let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request)
+        let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request, using: paymentMethod)
         try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
     }
 }
@@ -664,7 +678,12 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
             logger.error("Unable to process card in unsupported state: \(state).")
             throw POFailure(message: "Something went wrong.", code: .internal(.mobile))
         }
-        try await authorizeInvoice(source: card.id, saveSource: save, startedState: currentState.snapshot)
+        try await authorizeInvoice(
+            using: currentPaymentMethod(state: currentState),
+            source: card.id,
+            saveSource: save,
+            startedState: currentState.snapshot
+        )
     }
 
     func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
