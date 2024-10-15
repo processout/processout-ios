@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 final class FocusCoordinator: ObservableObject {
 
     /// Holds boolean value indicating whether tracked control is currently being edited.

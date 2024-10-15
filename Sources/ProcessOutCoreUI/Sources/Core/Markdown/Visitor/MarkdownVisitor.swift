@@ -9,9 +9,6 @@ protocol MarkdownVisitor<Result> {
 
     associatedtype Result
 
-    /// Visits unknown node.
-    func visit(node: MarkdownUnknown) -> Result
-
     /// Visits document.
     func visit(document: MarkdownDocument) -> Result
 

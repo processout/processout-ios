@@ -9,25 +9,13 @@
 
 import Foundation
 
-extension MarkdownBaseNode: CustomDebugStringConvertible {
-
-    var debugDescription: String {
-        let visitor = MarkdownDebugDescriptionPrinter()
-        return self.accept(visitor: visitor)
-    }
-}
-
-private final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
+final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
 
     init(level: Int = 0) {
         self.level = level
     }
 
     // MARK: - MarkdownVisitor
-
-    func visit(node: MarkdownUnknown) -> String {
-        description(node: node, nodeName: "Unknown")
-    }
 
     func visit(document: MarkdownDocument) -> String {
         description(node: document, nodeName: "Document")
@@ -81,11 +69,7 @@ private final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
     }
 
     func visit(codeBlock: MarkdownCodeBlock) -> String {
-        var attributes: [String: CustomStringConvertible] = [:]
-        if let info = codeBlock.info {
-            attributes["info"] = info
-        }
-        return description(node: codeBlock, nodeName: "Code Block", attributes: attributes, content: codeBlock.code)
+        return description(node: codeBlock, nodeName: "Code Block", content: codeBlock.code)
     }
 
     func visit(thematicBreak: MarkdownThematicBreak) -> String {
@@ -131,7 +115,7 @@ private final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
     }
 
     private func description(
-        node: MarkdownBaseNode,
+        node: MarkdownNode,
         nodeName: String,
         attributes: [String: CustomStringConvertible] = [:],
         content: String? = nil

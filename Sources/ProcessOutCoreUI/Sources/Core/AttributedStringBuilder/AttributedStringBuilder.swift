@@ -41,7 +41,7 @@ struct AttributedStringBuilder {
 
     func build(markdown: String) -> NSAttributedString {
         let visitor = AttributedStringMarkdownVisitor(builder: self)
-        let document = MarkdownParser.parse(string: markdown)
+        let document = MarkdownParser().parse(string: markdown)
         return document.accept(visitor: visitor)
     }
 
