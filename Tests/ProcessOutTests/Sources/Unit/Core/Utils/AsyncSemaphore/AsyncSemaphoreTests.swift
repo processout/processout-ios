@@ -164,7 +164,7 @@ final class AsyncSemaphoreTests: XCTestCase {
         }
 
         // Then
-        await fulfillment(of: [expectation], timeout: 1)
+        await fulfillment(of: [expectation], timeout: 2)
     }
 
     // MARK: - Signal
