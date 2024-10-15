@@ -13,22 +13,37 @@ extension {{ type.name }} {
     {% for key, value in method.attributes %}
     {{ value.first }}
     {% endfor %}
-    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func {{ method.callName }}(
         {% for parameter in method.parameters %}
-        {% if parameter.argumentLabel != parameter.name %}{{ parameter.argumentLabel }} {% endif %}{{ parameter.name }}: sending {{ parameter.typeName.asSource }}{% if parameter.defaultValue %} = {{ parameter.defaultValue }}{% endif %},
+        {{ parameter.asSource }},
         {% endfor %}
-        completion: sending @escaping @isolated(any) (Result<{{ method.returnTypeName.asSource }}, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<{{ method.returnTypeName.asSource }}, POFailure>) -> Void
     ) -> POCancellable {
-        Task { @MainActor in
-            do {
-                await completion(.success(try await {{ method.callName }}({% for parameter in method.parameters %}{% if parameter.argumentLabel %}{{ parameter.argumentLabel }}: {% endif %}{{ parameter.name }}{% if not forloop.last %}, {% endif %}{% endfor %})))
-            } catch {
-                await completion(.failure(error as! POFailure))
-            }
+        invoke(completion: completion) {
+            try await {{ method.callName }}({% for parameter in method.parameters %}{% if parameter.argumentLabel %}{{ parameter.argumentLabel }}: {% endif %}{{ parameter.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
         }
     }
     {% endfor %}
 }
+{% if forloop.last %}
+
+/// Invokes given completion with a result of async operation.
+private func invoke<T>(
+    completion: @escaping (Result<T, POFailure>) -> Void,
+    after operation: @escaping @isolated(any) () async throws -> T
+) -> POCancellable {
+    Task { @MainActor in
+        do {
+            let returnValue = try await operation()
+            await completion(.success(returnValue))
+        } catch let failure as POFailure {
+            await completion(.failure(failure))
+        } catch {
+            let failure = POFailure(message: "Something went wrong.", code: .internal(.mobile), underlyingError: error)
+            await completion(.failure(failure))
+        }
+    }
+}
+{% endif %}
 {% endfor %}
