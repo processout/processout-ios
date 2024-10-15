@@ -7,7 +7,7 @@
 
 import PassKit
 
-protocol PassKitContactMapper {
+protocol PassKitContactMapper: Sendable {
 
     /// Converts given `PKContact` instance to `POContact`.
     func map(contact: PKContact) -> POContact

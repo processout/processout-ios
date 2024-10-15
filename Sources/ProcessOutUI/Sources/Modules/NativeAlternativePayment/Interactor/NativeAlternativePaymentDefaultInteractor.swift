@@ -67,7 +67,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                         code: .generic(.mobile)
                     )
                 @unknown default:
-                    logger.error("Unexpected alternative payment state: \(transactionDetails.state).")
+                    logger.error("Unexpected alternative payment state: \(transactionDetails.state.debugDescription).")
                     throw POFailure(message: "Something went wrong.", code: .internal(.mobile))
                 }
             } catch {

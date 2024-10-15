@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
-protocol CustomerActionsService {
+protocol CustomerActionsService: POService {
 
     /// Implementation should attempt to handle given customer action.
     /// - Parameters:

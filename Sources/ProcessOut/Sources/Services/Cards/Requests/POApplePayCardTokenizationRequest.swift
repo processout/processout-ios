@@ -40,3 +40,6 @@ public struct POApplePayPaymentTokenizationRequest {
         self.metadata = metadata
     }
 }
+
+@available(*, unavailable)
+extension POApplePayPaymentTokenizationRequest: Sendable { }

@@ -21,10 +21,10 @@ actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
     @MainActor var deviceMetadata: DeviceMetadata {
         get async {
             let metadata = DeviceMetadata(
-                id: .init(value: await deviceId),
-                installationId: .init(value: device.identifierForVendor?.uuidString),
-                systemVersion: .init(value: device.systemVersion),
-                model: .init(value: await machineName),
+                id: await deviceId,
+                installationId: device.identifierForVendor?.uuidString,
+                systemVersion: device.systemVersion,
+                model: await machineName,
                 appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
                 appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
                 appScreenHeight: Int(screen.nativeBounds.height),
@@ -54,7 +54,7 @@ actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
         let description = withUnsafePointer(to: &systemInfo.machine) { pointer in
             let capacity = Int(_SYS_NAMELEN)
             return pointer.withMemoryRebound(to: CChar.self, capacity: capacity) { charPointer in
-                String(validatingUTF8: charPointer)
+                String(validatingCString: charPointer)
             }
         }
         return description

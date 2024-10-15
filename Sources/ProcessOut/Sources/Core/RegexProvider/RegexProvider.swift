@@ -9,7 +9,7 @@ import Foundation
 
 // swiftlint:disable legacy_objc_type
 
-final class RegexProvider {
+final class RegexProvider: @unchecked Sendable {
 
     static let shared = RegexProvider()
 

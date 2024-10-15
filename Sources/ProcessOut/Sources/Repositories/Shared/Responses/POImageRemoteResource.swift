@@ -8,9 +8,9 @@
 import Foundation
 
 /// Image resource with light/dark image variations.
-public struct POImageRemoteResource: Hashable, Decodable {
+public struct POImageRemoteResource: Hashable, Decodable, Sendable {
 
-    public struct ResourceUrl: Hashable, Decodable {
+    public struct ResourceUrl: Hashable, Decodable, Sendable {
 
         /// Raster asset URLs.
         public let raster: URL

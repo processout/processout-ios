@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class UrlResponseFormatter {
+final class UrlResponseFormatter: Sendable {
 
     init(includesHeaders: Bool, prettyPrintedBody: Bool = true) {
         self.includesHeaders = includesHeaders

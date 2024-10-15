@@ -6,7 +6,7 @@
 //
 
 /// Represents the configuration parameters that are required by the 3DS SDK for initialization.
-public struct PO3DS2Configuration: Decodable, Hashable {
+public struct PO3DS2Configuration: Decodable, Hashable, Sendable {
 
     /// The identifier of the directory server to use during the transaction creation phase.
     public let directoryServerId: String

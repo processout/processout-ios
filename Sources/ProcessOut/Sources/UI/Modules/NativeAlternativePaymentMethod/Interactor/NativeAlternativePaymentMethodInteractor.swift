@@ -1,5 +1,5 @@
 //
-//  PONativeAlternativePaymentMethodInteractor.swift
+//  NativeAlternativePaymentMethodInteractor.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 19.10.2022.
@@ -7,8 +7,8 @@
 
 import Foundation
 
-// todo(andrii-vysotskyi): migrate interactor and dependencies to UI module when ready
-@_spi(PO) public protocol PONativeAlternativePaymentMethodInteractor: AnyObject {
+@available(*, deprecated)
+protocol NativeAlternativePaymentMethodInteractor: AnyObject {
 
     typealias State = PONativeAlternativePaymentMethodInteractorState
 

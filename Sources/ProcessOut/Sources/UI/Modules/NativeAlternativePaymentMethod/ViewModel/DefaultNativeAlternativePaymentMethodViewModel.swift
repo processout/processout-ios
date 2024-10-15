@@ -15,7 +15,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
     BaseViewModel<NativeAlternativePaymentMethodViewModelState>, NativeAlternativePaymentMethodViewModel {
 
     init(
-        interactor: any PONativeAlternativePaymentMethodInteractor,
+        interactor: any NativeAlternativePaymentMethodInteractor,
         configuration: PONativeAlternativePaymentMethodConfiguration,
         completion: ((Result<Void, POFailure>) -> Void)?
     ) {
@@ -50,7 +50,7 @@ final class DefaultNativeAlternativePaymentMethodViewModel:
 
     // MARK: - NativeAlternativePaymentMethodInteractor
 
-    private let interactor: any PONativeAlternativePaymentMethodInteractor
+    private let interactor: any NativeAlternativePaymentMethodInteractor
     private let configuration: PONativeAlternativePaymentMethodConfiguration
     private let completion: ((Result<Void, POFailure>) -> Void)?
 

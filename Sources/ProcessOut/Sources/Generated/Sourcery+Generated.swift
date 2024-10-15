@@ -6,6 +6,24 @@ import UIKit
 
 // MARK: - AutoCodingKeys
 
+extension DeviceMetadata {
+
+    enum CodingKeys: String, CodingKey {
+        case appLanguage
+        case appScreenWidth
+        case appScreenHeight
+        case appTimeZoneOffset
+        case channel
+    }
+}
+
+extension NativeAlternativePaymentCaptureRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case source
+    }
+}
+
 extension POAssignCustomerTokenRequest {
 
     enum CodingKeys: String, CodingKey {
@@ -16,6 +34,23 @@ extension POAssignCustomerTokenRequest {
         case enableThreeDS2 = "enable_three_d_s_2"
         case thirdPartySdkVersion
         case metadata
+    }
+}
+
+extension POCardUpdateRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case cvc
+        case preferredScheme
+    }
+}
+
+extension POCreateCustomerTokenRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case verify
+        case returnUrl
+        case invoiceReturnUrl
     }
 }
 
@@ -81,10 +116,11 @@ extension POCardsService {
     /// 
     /// - Parameters:
     ///   - iin: Card issuer identification number. Length should be at least 6 otherwise error is thrown.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func issuerInformation(
         iin: String,
-        completion: @escaping (Result<POCardIssuerInformation, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POCardIssuerInformation, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await issuerInformation(iin: iin)
@@ -95,10 +131,11 @@ extension POCardsService {
     /// to use the card for multiple payments then you can use the card token to create a reusable customer token.
     /// Note that once you have used the card token either for a payment or to create a customer token, the card
     /// token becomes invalid and you cannot use it for any further actions.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func tokenize(
         request: POCardTokenizationRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await tokenize(request: request)
@@ -106,10 +143,11 @@ extension POCardsService {
     }
 
     /// Updates card information.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func updateCard(
         request: POCardUpdateRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await updateCard(request: request)
@@ -117,10 +155,12 @@ extension POCardsService {
     }
 
     /// Tokenize previously authorized payment.
+    @MainActor
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func tokenize(
         request: POApplePayPaymentTokenizationRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await tokenize(request: request)
@@ -128,11 +168,13 @@ extension POCardsService {
     }
 
     /// Authorize given payment request and tokenize it.
+    @MainActor
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func tokenize(
         request: POApplePayTokenizationRequest,
         delegate: POApplePayTokenizationDelegate?,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await tokenize(request: request, delegate: delegate)
@@ -140,10 +182,12 @@ extension POCardsService {
     }
 
     /// Authorize given payment request and tokenize it.
+    @MainActor
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func tokenize(
         request: POApplePayTokenizationRequest,
-        completion: @escaping (Result<POCard, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POCard, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await tokenize(request: request)
@@ -154,11 +198,12 @@ extension POCardsService {
 extension POCustomerTokensService {
 
     /// Assigns new source to existing customer token and optionally verifies it.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func assignCustomerToken(
         request: POAssignCustomerTokenRequest,
         threeDSService: PO3DS2Service,
-        completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POCustomerToken, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await assignCustomerToken(request: request, threeDSService: threeDSService)
@@ -167,10 +212,11 @@ extension POCustomerTokensService {
 
     /// Creates customer token using given request.
     @_spi(PO)
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func createCustomerToken(
         request: POCreateCustomerTokenRequest,
-        completion: @escaping (Result<POCustomerToken, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POCustomerToken, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await createCustomerToken(request: request)
@@ -181,10 +227,11 @@ extension POCustomerTokensService {
 extension POGatewayConfigurationsRepository {
 
     /// Returns available gateway configurations.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func all(
         request: POAllGatewayConfigurationsRequest,
-        completion: @escaping (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await all(request: request)
@@ -192,10 +239,11 @@ extension POGatewayConfigurationsRepository {
     }
 
     /// Searches configuration with given request.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func find(
         request: POFindGatewayConfigurationRequest,
-        completion: @escaping (Result<POGatewayConfiguration, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POGatewayConfiguration, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await find(request: request)
@@ -203,9 +251,10 @@ extension POGatewayConfigurationsRepository {
     }
 
     /// Returns available gateway configurations.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func all(
-        completion: @escaping (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POAllGatewayConfigurationsResponse, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await all()
@@ -213,76 +262,14 @@ extension POGatewayConfigurationsRepository {
     }
 }
 
-extension POImagesRepository {
-
-    /// Attempts to download images at given URLs.
-    @discardableResult
-    public func images(
-        at urls: [URL],
-        scale: CGFloat,
-        completion: @escaping ([URL: UIImage]) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            await images(at: urls, scale: scale)
-        }
-    }
-
-    /// Attempts to download images at given URLs.
-    @discardableResult
-    public func images(
-        at urls: [URL],
-        completion: @escaping ([URL: UIImage]) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            await images(at: urls)
-        }
-    }
-
-    /// Downloads image at given URL.
-    @discardableResult
-    public func image(
-        at url: URL?,
-        scale: CGFloat = 1,
-        completion: @escaping (UIImage?) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            await image(at: url, scale: scale)
-        }
-    }
-
-    /// Downloads two images at given URLs.
-    @discardableResult
-    public func images(
-        at url1: URL?,
-        _ url2: URL?,
-        scale: CGFloat = 1,
-        completion: @escaping ((UIImage?, UIImage?)) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            await images(at: url1, url2, scale: scale)
-        }
-    }
-
-    /// Downloads image for given resource.
-    @MainActor
-    @discardableResult
-    public func image(
-        resource: POImageRemoteResource,
-        completion: @escaping (UIImage?) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            await image(resource: resource)
-        }
-    }
-}
-
 extension POInvoicesService {
 
     /// Requests information needed to continue existing payment or start new one.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodTransactionDetails, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<PONativeAlternativePaymentMethodTransactionDetails, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await nativeAlternativePaymentMethodTransactionDetails(request: request)
@@ -293,10 +280,11 @@ extension POInvoicesService {
     /// 
     /// Some Native APMs require further information to be collected back from the customer. You can inspect
     /// `nativeApm` in response object to understand if additional data is required.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest,
-        completion: @escaping (Result<PONativeAlternativePaymentMethodResponse, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<PONativeAlternativePaymentMethodResponse, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await initiatePayment(request: request)
@@ -304,10 +292,11 @@ extension POInvoicesService {
     }
 
     /// Invoice details.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func invoice(
         request: POInvoiceRequest,
-        completion: @escaping (Result<POInvoice, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POInvoice, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await invoice(request: request)
@@ -315,11 +304,12 @@ extension POInvoicesService {
     }
 
     /// Performs invoice authorization with given request.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func authorizeInvoice(
         request: POInvoiceAuthorizationRequest,
         threeDSService: PO3DS2Service,
-        completion: @escaping (Result<Void, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<Void, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await authorizeInvoice(request: request, threeDSService: threeDSService)
@@ -327,10 +317,11 @@ extension POInvoicesService {
     }
 
     /// Captures native alternative payament.
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func captureNativeAlternativePayment(
         request: PONativeAlternativePaymentCaptureRequest,
-        completion: @escaping (Result<Void, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<Void, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await captureNativeAlternativePayment(request: request)
@@ -339,10 +330,11 @@ extension POInvoicesService {
 
     /// Creates invoice with given parameters.
     @_spi(PO)
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func createInvoice(
         request: POInvoiceCreationRequest,
-        completion: @escaping (Result<POInvoice, POFailure>) -> Void
+        completion: @escaping @isolated(any) (Result<POInvoice, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
             try await createInvoice(request: request)
@@ -353,7 +345,7 @@ extension POInvoicesService {
 /// Invokes given completion with a result of async operation.
 private func invoke<T>(
     completion: @escaping (Result<T, POFailure>) -> Void,
-    after operation: @escaping () async throws -> T
+    after operation: @escaping @isolated(any) () async throws -> T
 ) -> POCancellable {
     Task { @MainActor in
         do {
@@ -365,12 +357,5 @@ private func invoke<T>(
             let failure = POFailure(message: "Something went wrong.", code: .internal(.mobile), underlyingError: error)
             completion(.failure(failure))
         }
-    }
-}
-
-/// Invokes given completion with a result of async operation.
-private func invoke<T>(completion: @escaping (T) -> Void, after operation: @escaping () async -> T) -> Task<Void, Never> {
-    Task { @MainActor in
-        completion(await operation())
     }
 }

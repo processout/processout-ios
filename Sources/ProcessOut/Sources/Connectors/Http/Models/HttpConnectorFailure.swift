@@ -5,9 +5,9 @@
 //  Created by Andrii Vysotskyi on 10.10.2022.
 //
 
-struct HttpConnectorFailure: Error {
+struct HttpConnectorFailure: Error, Sendable {
 
-    enum Code {
+    enum Code: Sendable {
 
         /// Unable to encode data.
         case encoding
@@ -31,7 +31,7 @@ struct HttpConnectorFailure: Error {
         case `internal`
     }
 
-    struct Server: Decodable {
+    struct Server: Decodable, Sendable {
 
         /// Error type.
         let errorType: String
@@ -43,7 +43,7 @@ struct HttpConnectorFailure: Error {
         let invalidFields: [InvalidField]?
     }
 
-    struct InvalidField: Decodable {
+    struct InvalidField: Decodable, Sendable {
 
         /// Field name.
         let name: String

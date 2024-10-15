@@ -8,7 +8,7 @@
 import Foundation
 
 /// Card details that should be tokenized.
-public struct POCardTokenizationRequest: Encodable {
+public struct POCardTokenizationRequest: Encodable, Sendable {
 
     /// Number of the card.
     public let number: String

@@ -7,7 +7,8 @@
 
 import Foundation
 
-@_spi(PO) public protocol POEventEmitter: Sendable {
+@_spi(PO)
+public protocol POEventEmitter: Sendable {
 
     /// Emits given event.
     func emit<Event: POEventEmitterEvent>(event: Event) -> Bool

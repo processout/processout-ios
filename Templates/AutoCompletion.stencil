@@ -3,7 +3,7 @@
 
 extension {{ type.name }} {
     {% for method in type.methods %}
-        {% if not method.isAsync %}
+        {% if not method.isAsync and not method.throws %}
             {% continue %}
         {% endif %}
 
@@ -13,15 +13,16 @@ extension {{ type.name }} {
     {% for key, value in method.attributes %}
     {{ value.first }}
     {% endfor %}
+    @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func {{ method.callName }}(
         {% for parameter in method.parameters %}
         {{ parameter.asSource }},
         {% endfor %}
-        completion: @escaping ({% if method.throws %}Result<{{ method.returnTypeName.asSource }}, POFailure>{% else %}{{ method.returnTypeName.asSource }}{% endif %}) -> Void
+        completion: @escaping @isolated(any) (Result<{{ method.returnTypeName.asSource }}, POFailure>) -> Void
     ) -> POCancellable {
         invoke(completion: completion) {
-            {% if method.throws %}try {% endif %}await {{ method.callName }}({% for parameter in method.parameters %}{% if parameter.argumentLabel %}{{ parameter.argumentLabel }}: {% endif %}{{ parameter.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
+            try await {{ method.callName }}({% for parameter in method.parameters %}{% if parameter.argumentLabel %}{{ parameter.argumentLabel }}: {% endif %}{{ parameter.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
         }
     }
     {% endfor %}
@@ -31,7 +32,7 @@ extension {{ type.name }} {
 /// Invokes given completion with a result of async operation.
 private func invoke<T>(
     completion: @escaping (Result<T, POFailure>) -> Void,
-    after operation: @escaping () async throws -> T
+    after operation: @escaping @isolated(any) () async throws -> T
 ) -> POCancellable {
     Task { @MainActor in
         do {
@@ -43,13 +44,6 @@ private func invoke<T>(
             let failure = POFailure(message: "Something went wrong.", code: .internal(.mobile), underlyingError: error)
             completion(.failure(failure))
         }
-    }
-}
-
-/// Invokes given completion with a result of async operation.
-private func invoke<T>(completion: @escaping (T) -> Void, after operation: @escaping () async -> T) -> Task<Void, Never> {
-    Task { @MainActor in
-        completion(await operation())
     }
 }
 {% endif %}

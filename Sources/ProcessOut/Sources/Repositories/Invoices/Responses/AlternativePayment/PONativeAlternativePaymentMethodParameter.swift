@@ -7,9 +7,9 @@
 
 import Foundation
 
-public struct PONativeAlternativePaymentMethodParameter: Decodable {
+public struct PONativeAlternativePaymentMethodParameter: Decodable, Sendable {
 
-    public enum ParameterType: String, Decodable, Hashable {
+    public enum ParameterType: String, Decodable, Hashable, Sendable {
 
         /// For numeric only fields.
         case numeric
@@ -28,7 +28,7 @@ public struct PONativeAlternativePaymentMethodParameter: Decodable {
     }
 
     /// Describes available value.
-    public struct AvailableValue: Decodable, Hashable {
+    public struct AvailableValue: Decodable, Hashable, Sendable {
 
         /// Display name of value.
         public let displayName: String

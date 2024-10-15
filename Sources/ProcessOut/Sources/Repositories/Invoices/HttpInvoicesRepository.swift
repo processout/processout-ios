@@ -18,7 +18,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
     func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest
     ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
-        struct Response: Decodable {
+        struct Response: Decodable, Sendable {
             let nativeApm: PONativeAlternativePaymentMethodTransactionDetails
         }
         let httpRequest = HttpConnectorRequest<Response>.get(
@@ -30,7 +30,14 @@ final class HttpInvoicesRepository: InvoicesRepository {
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
     ) async throws -> PONativeAlternativePaymentMethodResponse {
-        let requestBox = NativeAlternativePaymentRequestBox(
+        struct RequestBox: Encodable, Sendable {
+            struct NativeApm: Encodable, Sendable { // swiftlint:disable:this nesting
+                let parameterValues: [String: String]
+            }
+            let gatewayConfigurationId: String
+            let nativeApm: NativeApm
+        }
+        let requestBox = RequestBox(
             gatewayConfigurationId: request.gatewayConfigurationId,
             nativeApm: .init(parameterValues: request.parameters)
         )
@@ -41,7 +48,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
     }
 
     func invoice(request: POInvoiceRequest) async throws -> POInvoice {
-        struct Response: Decodable {
+        struct Response: Decodable, Sendable {
             let invoice: POInvoice
         }
         let headers = [
@@ -57,7 +64,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
     }
 
     func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> _CustomerAction? {
-        struct Response: Decodable {
+        struct Response: Decodable, Sendable {
             let customerAction: _CustomerAction?
         }
         let headers = [
@@ -82,7 +89,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
     }
 
     func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
-        struct Response: Decodable {
+        struct Response: Decodable, Sendable {
             let invoice: POInvoice
         }
         let httpRequest = HttpConnectorRequest<Response>.post(
@@ -91,16 +98,6 @@ final class HttpInvoicesRepository: InvoicesRepository {
         let response = try await connector.execute(request: httpRequest) as HttpConnectorResponse
         let clientSecret = response.headers["x-processout-client-secret"]
         return response.value.invoice.replacing(clientSecret: clientSecret)
-    }
-
-    // MARK: - Private Nested Types
-
-    private struct NativeAlternativePaymentRequestBox: Encodable {
-        struct NativeApm: Encodable { // swiftlint:disable:this nesting
-            let parameterValues: [String: String]
-        }
-        let gatewayConfigurationId: String
-        let nativeApm: NativeApm
     }
 
     // MARK: - Private Properties

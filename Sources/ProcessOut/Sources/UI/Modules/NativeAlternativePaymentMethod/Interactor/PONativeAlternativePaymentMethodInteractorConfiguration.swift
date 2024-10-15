@@ -7,7 +7,8 @@
 
 import Foundation
 
-@_spi(PO) public struct PONativeAlternativePaymentMethodInteractorConfiguration { // swiftlint:disable:this type_name
+@_spi(PO)
+public struct PONativeAlternativePaymentMethodInteractorConfiguration { // swiftlint:disable:this type_name
 
     /// Gateway configuration id.
     public let gatewayConfigurationId: String

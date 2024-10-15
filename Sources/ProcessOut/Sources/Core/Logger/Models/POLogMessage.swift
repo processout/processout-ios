@@ -5,7 +5,8 @@
 //  Created by Andrii Vysotskyi on 25.10.2022.
 //
 
-@_spi(PO) public struct POLogMessage: ExpressibleByStringInterpolation {
+@_spi(PO)
+public struct POLogMessage: ExpressibleByStringInterpolation, Sendable {
 
     let interpolation: POLogInterpolation
 

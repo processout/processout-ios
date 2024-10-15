@@ -7,7 +7,8 @@
 
 import Foundation
 
-@_spi(PO) public enum POFormattingUtils {
+@_spi(PO)
+public enum POFormattingUtils {
 
     /// Returns index in formatted string that matches index in `string`.
     ///

@@ -13,11 +13,11 @@ final class DefaultAlternativePaymentMethodsServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        let configuration = AlternativePaymentsServiceConfiguration(
+        let configuration = POAlternativePaymentsServiceConfiguration(
             projectId: "proj_test", baseUrl: URL(string: "https://example.com")!
         )
         let webSession = MockWebAuthenticationSession()
-        sut = .init(configuration: { configuration }, webSession: webSession, logger: .stub)
+        sut = .init(configuration: configuration, webSession: webSession, logger: .stub)
     }
 
     func test_alternativePaymentMethodUrl_authorizationWithAdditionalData_succeeds() throws {

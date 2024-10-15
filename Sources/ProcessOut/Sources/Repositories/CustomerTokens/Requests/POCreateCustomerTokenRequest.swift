@@ -8,11 +8,10 @@
 import Foundation
 
 @_spi(PO)
-public struct POCreateCustomerTokenRequest: Encodable {
+public struct POCreateCustomerTokenRequest: Encodable, Sendable { // sourcery: AutoCodingKeys
 
     /// Customer id to associate created token with.
-    @POImmutableExcludedCodable
-    public var customerId: String
+    public let customerId: String // sourcery:coding: skip
 
     /// Flag if you wish to verify the customer token by making zero value transaction. Applicable for cards only.
     public let verify: Bool
@@ -24,7 +23,7 @@ public struct POCreateCustomerTokenRequest: Encodable {
     public let invoiceReturnUrl: URL?
 
     public init(customerId: String, verify: Bool = false, returnUrl: URL? = nil) {
-        self._customerId = .init(value: customerId)
+        self.customerId = customerId
         self.verify = verify
         self.returnUrl = returnUrl
         self.invoiceReturnUrl = returnUrl

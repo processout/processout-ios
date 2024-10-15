@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 10.10.2022.
 //
 
-protocol HttpConnector: AnyObject {
+protocol HttpConnector: AnyObject, Sendable {
 
     typealias Failure = HttpConnectorFailure
 
@@ -13,6 +13,9 @@ protocol HttpConnector: AnyObject {
     /// - Parameters:
     ///   - request: request to execute.
     func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value>
+
+    /// Replaces existing connector configuration.
+    func replace(configuration: HttpConnectorConfiguration)
 }
 
 extension HttpConnector {

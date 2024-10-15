@@ -6,7 +6,7 @@
 //
 
 /// Holds information about card issuing institution that issued the card to the card holder.
-public struct POCardIssuerInformation: Decodable {
+public struct POCardIssuerInformation: Decodable, Sendable {
 
     /// Scheme of the card.
     @POTypedRepresentation<String, POCardScheme>
@@ -28,7 +28,8 @@ public struct POCardIssuerInformation: Decodable {
     /// Card category.
     public let category: String?
 
-    @_spi(PO) public init(
+    @_spi(PO)
+    public init(
         scheme: POCardScheme,
         coScheme: POCardScheme? = nil,
         type: String? = nil,

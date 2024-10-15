@@ -10,11 +10,11 @@ import Foundation
 final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
 
     init(
-        configuration: @escaping @Sendable () -> AlternativePaymentsServiceConfiguration,
+        configuration: POAlternativePaymentsServiceConfiguration,
         webSession: WebAuthenticationSession,
         logger: POLogger
     ) {
-        self.configuration = configuration
+        self.configuration = .init(wrappedValue: configuration)
         self.webSession = webSession
         self.logger = logger
     }
@@ -101,7 +101,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
 
     // MARK: - Private
 
-    private let configuration: @Sendable () -> AlternativePaymentsServiceConfiguration
+    private let configuration: POUnfairlyLocked<POAlternativePaymentsServiceConfiguration>
     private let logger: POLogger
     private let webSession: WebAuthenticationSession
 
@@ -109,7 +109,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
 
     /// - NOTE: Method prepends project ID to path components automatically.
     private func url(with additionalPathComponents: [String], additionalData: [String: String]?) throws -> URL {
-        let configuration = self.configuration()
+        let configuration = configuration.wrappedValue
         guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
             preconditionFailure("Invalid base URL.")
         }
@@ -122,6 +122,10 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
             return url
         }
         throw POFailure(message: "Unable to create redirect URL.", code: .generic(.mobile))
+    }
+
+    func replace(configuration: POAlternativePaymentsServiceConfiguration) {
+        self.configuration.withLock { $0 = configuration }
     }
 
     // MARK: - Response

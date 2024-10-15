@@ -27,7 +27,7 @@ final class HttpGatewayConfigurationsRepository: POGatewayConfigurationsReposito
     }
 
     func find(request: POFindGatewayConfigurationRequest) async throws -> POGatewayConfiguration {
-        struct Response: Decodable {
+        struct Response: Decodable, Sendable {
             let gatewayConfiguration: POGatewayConfiguration
         }
         let httpRequest = HttpConnectorRequest<Response>.get(

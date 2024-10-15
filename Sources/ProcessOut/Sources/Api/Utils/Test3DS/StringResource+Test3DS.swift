@@ -7,6 +7,7 @@
 
 extension POStringResource {
 
+    @available(*, deprecated, message: "No longer in use.")
     enum Test3DS {
 
         /// 3DS challenge title.

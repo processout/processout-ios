@@ -7,7 +7,8 @@
 
 import Foundation
 
-@_spi(PO) public struct POStringResource {
+@_spi(PO)
+public struct POStringResource: Sendable {
 
     /// The key to use to look up a localized string.
     let key: String
@@ -29,7 +30,8 @@ import Foundation
 extension String {
 
     /// Creates string with given resource and replacements.
-    @_spi(PO) public init(resource: POStringResource, replacements: CVarArg...) {
+    @_spi(PO)
+    public init(resource: POStringResource, replacements: CVarArg...) {
         let format = Self.localized(resource.key, bundle: resource.bundle)
         self = String(format: format, locale: .current, arguments: replacements)
     }

@@ -7,6 +7,7 @@
 
 import PassKit
 
+@MainActor
 final class ApplePayTokenizationCoordinator: ApplePayAuthorizationSessionDelegate {
 
     init(
@@ -28,16 +29,16 @@ final class ApplePayTokenizationCoordinator: ApplePayAuthorizationSessionDelegat
     func applePayAuthorizationSession(
         didAuthorizePayment payment: PKPayment
     ) async -> PKPaymentAuthorizationResult {
-        let paymentTokenizationRequest = POApplePayPaymentTokenizationRequest(
-            payment: payment,
-            merchantIdentifier: request.paymentRequest.merchantIdentifier,
-            contact: request.contact,
-            metadata: request.metadata
-        )
         do {
-            let card = try await cardsService.tokenize(request: paymentTokenizationRequest)
-            // swiftlint:disable:next line_length
-            let result = await delegate?.applePayTokenization(didAuthorizePayment: payment, card: card) ?? .init(status: .success, errors: nil)
+            let tokenizationRequest = POApplePayPaymentTokenizationRequest(
+                payment: payment,
+                merchantIdentifier: request.paymentRequest.merchantIdentifier,
+                contact: request.contact,
+                metadata: request.metadata
+            )
+            let card = try await cardsService.tokenize(request: tokenizationRequest)
+            let result = await delegate?.applePayTokenization(didAuthorizePayment: payment, card: card)
+                ?? .init(status: .success, errors: nil)
             if case .success = result.status {
                 self.card = card
             }

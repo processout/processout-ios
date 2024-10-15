@@ -5,7 +5,8 @@
 //  Created by Andrii Vysotskyi on 16.03.2023.
 //
 
-@_spi(PO) public struct POPhoneNumberFormat: Decodable {
+@_spi(PO)
+public struct POPhoneNumberFormat: Decodable, Sendable {
 
     /// Formatting patern.
     public let pattern: String

@@ -11,6 +11,7 @@ protocol ApplePayAuthorizationSession: Sendable {
 
     /// Begins an Apple Pay payment authorization.
     /// - NOTE: delegate is retained for the duration of presentation.
+    @MainActor
     func authorize(
         request: PKPaymentRequest, delegate: ApplePayAuthorizationSessionDelegate?
     ) async throws -> PKPayment

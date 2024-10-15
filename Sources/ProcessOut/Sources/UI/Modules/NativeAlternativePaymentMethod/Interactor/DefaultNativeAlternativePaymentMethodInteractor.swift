@@ -1,5 +1,5 @@
 //
-//  PODefaultNativeAlternativePaymentMethodInteractor.swift
+//  DefaultNativeAlternativePaymentMethodInteractor.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 19.10.2022.
@@ -10,10 +10,10 @@
 import Foundation
 import UIKit
 
-@_spi(PO) public final class PODefaultNativeAlternativePaymentMethodInteractor:
-    PONativeAlternativePaymentMethodInteractor {
+@available(*, deprecated)
+final class DefaultNativeAlternativePaymentMethodInteractor: NativeAlternativePaymentMethodInteractor {
 
-    public init(
+    init(
         invoicesService: POInvoicesService,
         imagesRepository: POImagesRepository,
         configuration: PONativeAlternativePaymentMethodInteractorConfiguration,
@@ -34,15 +34,15 @@ import UIKit
 
     // MARK: - NativeAlternativePaymentMethodInteractor
 
-    public private(set) var state: State {
+    private(set) var state: State {
         didSet { didChange?() }
     }
 
-    public var didChange: (() -> Void)? {
+    var didChange: (() -> Void)? {
         didSet { didChange?() }
     }
 
-    public func start() {
+    func start() {
         guard case .idle = state else {
             return
         }
@@ -64,7 +64,7 @@ import UIKit
         }
     }
 
-    public func formatter(type: PONativeAlternativePaymentMethodParameter.ParameterType) -> Formatter? {
+    func formatter(type: PONativeAlternativePaymentMethodParameter.ParameterType) -> Formatter? {
         switch type {
         case .phone:
             return phoneNumberFormatter
@@ -73,7 +73,7 @@ import UIKit
         }
     }
 
-    public func updateValue(_ value: String?, for key: String) {
+    func updateValue(_ value: String?, for key: String) {
         guard case let .started(startedState) = state,
               let parameter = startedState.parameters.first(where: { $0.key == key }) else {
             return
@@ -95,7 +95,7 @@ import UIKit
         logger.debug("Did update parameter value '\(value ?? "nil")' for '\(key)' key")
     }
 
-    public func submit() {
+    func submit() {
         guard case let .started(startedState) = state, startedState.isSubmitAllowed else {
             return
         }
@@ -128,7 +128,7 @@ import UIKit
         }
     }
 
-    public func cancel() {
+    func cancel() {
         logger.debug("Will attempt to cancel payment.")
         switch state {
         case .started:
@@ -235,7 +235,8 @@ import UIKit
         let actionMessage = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
         let logoUrl = logoUrl(gateway: gateway, parameterValues: parameterValues)
         send(event: .willWaitForCaptureConfirmation(additionalActionExpected: actionMessage != nil))
-        imagesRepository.images(at: logoUrl, gateway.customerActionImageUrl) { [weak self] logo, actionImage in
+        Task { @MainActor [weak self, imagesRepository] in
+            let (logo, actionImage) = await imagesRepository.images(at: logoUrl, gateway.customerActionImageUrl)
             guard let self else {
                 return
             }
@@ -302,7 +303,8 @@ import UIKit
             send(event: .didCompletePayment)
         default:
             let logoUrl = logoUrl(gateway: gateway, parameterValues: parameterValues)
-            imagesRepository.image(at: logoUrl) { [weak self] logoImage in
+            Task { @MainActor [weak self, imagesRepository] in
+                let logoImage = await imagesRepository.image(at: logoUrl)
                 let capturedState = State.Captured(
                     paymentProviderName: parameterValues?.providerName, logoImage: logoImage
                 )

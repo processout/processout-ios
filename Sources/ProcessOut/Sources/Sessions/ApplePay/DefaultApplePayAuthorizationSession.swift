@@ -5,20 +5,12 @@
 //  Created by Andrii Vysotskyi on 03.09.2024.
 //
 
-import PassKit
+@preconcurrency import PassKit
 
-@MainActor
 final class DefaultApplePayAuthorizationSession: ApplePayAuthorizationSession {
 
-    nonisolated init() {
-        // Ignored
-    }
-
-    // MARK: - ApplePayAuthorizationSession
-
     func authorize(
-        request: PKPaymentRequest,
-        delegate: ApplePayAuthorizationSessionDelegate?
+        request: PKPaymentRequest, delegate: ApplePayAuthorizationSessionDelegate?
     ) async throws -> PKPayment {
         let controller = PKPaymentAuthorizationController(paymentRequest: request)
         let coordinator = ApplePayAuthorizationSessionCoordinator(delegate: delegate)
@@ -31,7 +23,9 @@ final class DefaultApplePayAuthorizationSession: ApplePayAuthorizationSession {
                 coordinator.setContinuation(continuation: continuation)
             }
         } onCancel: {
-            controller.dismiss()
+            Task { @MainActor in
+                await controller.dismiss()
+            }
         }
         await controller.dismiss()
         guard let payment = coordinator.payment else {

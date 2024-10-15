@@ -37,8 +37,7 @@ final class AddressSpecificationProvider {
 
     // MARK: - Private Properties
 
-    @POUnfairlyLocked
-    private var specifications: [String: AddressSpecification]?
+    private let specifications = POUnfairlyLocked<[String: AddressSpecification]?>(wrappedValue: nil)
 
     // MARK: - Private Methods
 
@@ -48,7 +47,7 @@ final class AddressSpecificationProvider {
 
     @discardableResult
     private func loadSpecifications() -> [String: AddressSpecification] {
-        $specifications.withLock { specifications in
+        specifications.withLock { specifications in
             if let specifications {
                 return specifications
             }

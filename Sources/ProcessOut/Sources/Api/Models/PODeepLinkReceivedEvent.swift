@@ -7,7 +7,8 @@
 
 import Foundation
 
-@_spi(PO) public struct PODeepLinkReceivedEvent: POEventEmitterEvent {
+@_spi(PO)
+public struct PODeepLinkReceivedEvent: POEventEmitterEvent {
 
     /// Url representing deep link or universal link.
     public let url: URL

@@ -9,11 +9,26 @@
 
 final class MockPhoneNumberMetadataProvider: POPhoneNumberMetadataProvider {
 
-    var metadataCallsCount = 0
-    var metadata: POPhoneNumberMetadata?
+    var metadataCallsCount: Int {
+        lock.withLock { _metadataCallsCount }
+    }
+
+    var metadata: POPhoneNumberMetadata? {
+        get { lock.withLock { _metadata } }
+        set { lock.withLock { _metadata = newValue } }
+    }
 
     func metadata(for countryCode: String) -> POPhoneNumberMetadata? {
-        metadataCallsCount += 1
-        return metadata
+        lock.withLock {
+            _metadataCallsCount += 1
+            return _metadata
+        }
     }
+
+    // MARK: - Private Properties
+
+    private let lock = POUnfairlyLocked()
+
+    private nonisolated(unsafe) var _metadataCallsCount = 0
+    private nonisolated(unsafe) var _metadata: POPhoneNumberMetadata?
 }

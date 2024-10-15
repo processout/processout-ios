@@ -7,17 +7,23 @@
 
 import Foundation
 
-final class DefaultTelemetryService: POService, LoggerDestination, @unchecked Sendable {
+final class DefaultTelemetryService: TelemetryService {
 
     init(
-        configuration: @escaping @Sendable () -> TelemetryServiceConfiguration,
+        configuration: TelemetryServiceConfiguration,
         repository: TelemetryRepository,
         deviceMetadataProvider: DeviceMetadataProvider
     ) {
-        self.configuration = configuration
+        self.configuration = .init(wrappedValue: configuration)
         self.repository = repository
         self.deviceMetadataProvider = deviceMetadataProvider
         initBatcher()
+    }
+
+    // MARK: - TelemetryService
+
+    func replace(configuration: TelemetryServiceConfiguration) {
+        self.configuration.withLock { $0 = configuration }
     }
 
     // MARK: - LoggerDestination
@@ -58,9 +64,10 @@ final class DefaultTelemetryService: POService, LoggerDestination, @unchecked Se
 
     private let repository: TelemetryRepository
     private let deviceMetadataProvider: DeviceMetadataProvider
-    private let configuration: @Sendable () -> TelemetryServiceConfiguration
+    private let configuration: POUnfairlyLocked<TelemetryServiceConfiguration>
 
-    private var batcher: Batcher<Telemetry.Event>! // swiftlint:disable:this implicitly_unwrapped_optional
+    // swiftlint:disable:next implicitly_unwrapped_optional
+    private nonisolated(unsafe) var batcher: Batcher<Telemetry.Event>!
 
     // MARK: - Private Methods
 
@@ -69,7 +76,7 @@ final class DefaultTelemetryService: POService, LoggerDestination, @unchecked Se
             guard let self else {
                 return true // Self no longer exists, return true to "drop" pending events
             }
-            let configuration = self.configuration()
+            let configuration = self.configuration.wrappedValue
             guard configuration.isTelemetryEnabled else {
                 return true // Events shouldn't be submitted, return true to "drop" pending
             }
