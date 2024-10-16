@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 09.08.2023.
 //
 
+// todo(andrii-vysotskyi): add Sendable requirement when releasing 5.0.0
+
 import ProcessOut
 
 /// Card tokenization module delegate definition.

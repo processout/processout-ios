@@ -10,7 +10,7 @@ import PassKit
 
 /// Dynamic checkout module delegate.
 @_spi(PO)
-public protocol PODynamicCheckoutDelegate: AnyObject {
+public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
 
     /// Invoked when module emits dynamic checkout event.
     /// - NOTE: default implementation does nothing.
@@ -25,7 +25,7 @@ public protocol PODynamicCheckoutDelegate: AnyObject {
     func dynamicCheckout(
         willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest,
         using paymentMethod: PODynamicCheckoutPaymentMethod
-    ) async -> sending PO3DS2Service
+    ) async -> PO3DS2Service
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
