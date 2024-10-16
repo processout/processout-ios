@@ -10,12 +10,12 @@ import ProcessOut
 
 final class ApplePayTokenizationCoordinator: POApplePayTokenizationDelegate {
 
-    init(didTokenizeCard: @escaping (POCard) async throws -> Void) {
+    init(didTokenizeCard: @escaping @Sendable (POCard) async throws -> Void) {
         self.didTokenizeCard = didTokenizeCard
     }
 
     /// Closure that is called when invoice is authorized.
-    let didTokenizeCard: (POCard) async throws -> Void
+    let didTokenizeCard: @Sendable (POCard) async throws -> Void
 
     // MARK: -
 
