@@ -5,12 +5,11 @@
 //  Created by Andrii Vysotskyi on 03.11.2023.
 //
 
-// todo(andrii-vysotskyi): add Sendable requirement when releasing 5.0.0
-
 import ProcessOut
 
 /// Card update module delegate definition.
-public protocol POCardUpdateDelegate: AnyObject {
+@preconcurrency
+public protocol POCardUpdateDelegate: AnyObject, Sendable {
 
     /// Invoked when module emits event.
     @MainActor

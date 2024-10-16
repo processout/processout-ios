@@ -5,11 +5,10 @@
 //  Created by Andrii Vysotskyi on 05.09.2024.
 //
 
-// todo(andrii-vysotskyi): add Sendable conformance to POApplePayTokenizationDelegate when releasing 5.0.0
-
 import PassKit
 
-public protocol POApplePayTokenizationDelegate: AnyObject {
+@preconcurrency
+public protocol POApplePayTokenizationDelegate: Sendable { // swiftlint:disable:this class_delegate_protocol
 
     /// Sent to the delegate after the user has acted on the payment request and it was tokenized by ProcessOut.
     @MainActor

@@ -6,7 +6,8 @@
 //
 
 /// Native alternative payment module delegate definition.
-public protocol PONativeAlternativePaymentMethodDelegate: AnyObject {
+@preconcurrency
+public protocol PONativeAlternativePaymentMethodDelegate: AnyObject, Sendable {
 
     /// Invoked when module emits event.
     @MainActor

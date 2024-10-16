@@ -5,12 +5,11 @@
 //  Created by Andrii Vysotskyi on 09.08.2023.
 //
 
-// todo(andrii-vysotskyi): add Sendable requirement when releasing 5.0.0
-
 import ProcessOut
 
 /// Card tokenization module delegate definition.
-public protocol POCardTokenizationDelegate: AnyObject {
+@preconcurrency
+public protocol POCardTokenizationDelegate: AnyObject, Sendable {
 
     /// Invoked when module emits event.
     @MainActor

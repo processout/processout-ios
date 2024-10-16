@@ -10,16 +10,17 @@ import UIKit
 /// Service that emulates the normal 3DS authentication flow but does not actually make any calls to a real Access
 /// Control Server (ACS). Should be used only for testing purposes in sandbox environment.
 @available(*, deprecated, message: "Use ProcessOutUI.POTest3DSService instead.")
+@MainActor
 public final class POTest3DSService: PO3DS2Service {
 
     /// Creates service instance.
     @_disfavoredOverload
     @available(*, deprecated, message: "Use init that doesn't require arguments.")
-    public init(returnUrl: URL) {
+    public nonisolated init(returnUrl: URL) {
         // Ignored
     }
 
-    init() {
+    nonisolated init() {
         // Ignored
     }
 
@@ -40,7 +41,6 @@ public final class POTest3DSService: PO3DS2Service {
         )
     }
 
-    @MainActor
     public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
         await withCheckedContinuation { continuation in
             let alertController = UIAlertController(
