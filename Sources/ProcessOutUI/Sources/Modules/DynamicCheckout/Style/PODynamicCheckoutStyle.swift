@@ -13,10 +13,12 @@ import SwiftUI
 ///
 /// For more information about styling specific components, see
 /// [the dedicated documentation.](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutcoreui)
-@available(iOS 14, *)
 @_spi(PO)
+@available(iOS 14, *)
+@MainActor
 public struct PODynamicCheckoutStyle {
 
+    @MainActor
     public struct RegularPaymentMethod {
 
         /// Payment method title.
@@ -35,6 +37,7 @@ public struct PODynamicCheckoutStyle {
         }
     }
 
+    @MainActor
     public struct PaymentSuccess {
 
         /// Success message style.

@@ -13,6 +13,8 @@ import SwiftUI
 /// For more information about styling specific components, see
 /// [the dedicated documentation.](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutcoreui)
 @available(iOS 14, *)
+@MainActor
+@preconcurrency
 public struct POCardTokenizationStyle {
 
     /// Title style.

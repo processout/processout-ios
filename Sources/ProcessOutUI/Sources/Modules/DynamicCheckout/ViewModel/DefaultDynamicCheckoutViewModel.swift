@@ -147,7 +147,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func createExpressMethodsSection(
         state: DynamicCheckoutInteractorState.Started
     ) -> DynamicCheckoutViewModelState.Section? {
-        let expressItems = state.paymentMethods.filter(isExpress).compactMap { paymentMethod in
+        let expressItems = state.paymentMethods.filter({ isExpress(paymentMethod: $0) }).compactMap { paymentMethod in
             createExpressPaymentItem(for: paymentMethod, state: state)
         }
         guard !expressItems.isEmpty else {

@@ -45,7 +45,9 @@ extension DynamicCheckoutViewModelState: AnimationIdentityProvider {
         [sections.map(\.animationIdentity), actions.map(\.id)]
     }
 
-    static let idle = DynamicCheckoutViewModelState(sections: [], actions: [], isCompleted: false)
+    static var idle: DynamicCheckoutViewModelState {
+        .init(sections: [], actions: [], isCompleted: false)
+    }
 }
 
 extension DynamicCheckoutViewModelState.Section: AnimationIdentityProvider {

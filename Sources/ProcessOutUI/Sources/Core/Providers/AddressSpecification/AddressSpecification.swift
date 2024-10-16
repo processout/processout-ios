@@ -5,25 +5,25 @@
 //  Created by Andrii Vysotskyi on 26.10.2023.
 //
 
-struct AddressSpecification {
+struct AddressSpecification: Sendable {
 
-    enum Unit: String, CaseIterable, Decodable {
+    enum Unit: String, CaseIterable, Decodable, Sendable {
         case street, city, state, postcode
     }
 
-    enum CityUnit: String, Decodable {
+    enum CityUnit: String, Decodable, Sendable {
         case city, district, postTown, suburb
     }
 
-    enum StateUnit: String, Decodable {
+    enum StateUnit: String, Decodable, Sendable {
         case area, county, department, doSi, emirate, island, oblast, parish, prefecture, province, state
     }
 
-    enum PostcodeUnit: String, Decodable {
+    enum PostcodeUnit: String, Decodable, Sendable {
         case postcode, eircode, pin, zip
     }
 
-    struct State: Decodable {
+    struct State: Decodable, Sendable {
         let abbreviation, name: String
     }
 

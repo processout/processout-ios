@@ -8,7 +8,7 @@
 import ProcessOut
 
 /// Billing address collection configuration.
-public struct POBillingAddressConfiguration {
+public struct POBillingAddressConfiguration: Sendable {
 
     @available(*, deprecated, message: "Use POBillingAddressCollectionMode directly.")
     public typealias CollectionMode = POBillingAddressCollectionMode

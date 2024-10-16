@@ -6,7 +6,7 @@
 //
 
 /// Confirmation dialog configuration.
-public struct POConfirmationDialogConfiguration {
+public struct POConfirmationDialogConfiguration: Sendable {
 
     /// Confirmation title. Use empty string to hide title.
     public let title: String?
