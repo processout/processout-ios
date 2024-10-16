@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Style that defines shadow appearance.
-public struct POShadowStyle {
+public struct POShadowStyle: Sendable {
 
     /// The color of the shadow.
     public let color: Color

@@ -9,7 +9,8 @@ import SwiftUI
 
 /// The `POAnyButtonStyle` type forwards body creation to an underlying style value,
 /// hiding the type of the wrapped value.
-@_spi(PO) public struct POAnyButtonStyle: ButtonStyle {
+@_spi(PO)
+public struct POAnyButtonStyle: ButtonStyle {
 
     public init(erasing style: any ButtonStyle) {
         self.style = style

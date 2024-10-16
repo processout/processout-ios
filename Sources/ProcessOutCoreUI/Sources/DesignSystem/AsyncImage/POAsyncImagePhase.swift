@@ -8,7 +8,7 @@
 import SwiftUI
 
 @_spi(PO)
-public enum POAsyncImagePhase {
+public enum POAsyncImagePhase: Sendable {
 
     /// No image is loaded.
     case empty

@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 15.10.2024.
 //
 
+import UIKit
+
 @_spi(PO)
 extension POTypography {
 

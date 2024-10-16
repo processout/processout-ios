@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-@available(iOS 14.0, *)
 @_spi(PO)
+@available(iOS 14.0, *)
 public struct POCodeField: View {
 
     public init(text: Binding<String>, length: Int) {
@@ -24,8 +24,7 @@ public struct POCodeField: View {
             focusCoordinator.beginEditing()
             textIndex = newIndex
         }
-        style
-            .makeBody(configuration: configuration)
+        AnyView(style.makeBody(configuration: configuration))
             .background(
                 CodeFieldRepresentable(
                     length: length, text: $text, textIndex: $textIndex, isMenuVisible: $isMenuVisible

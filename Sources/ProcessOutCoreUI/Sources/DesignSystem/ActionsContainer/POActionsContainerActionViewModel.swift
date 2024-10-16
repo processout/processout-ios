@@ -7,7 +7,8 @@
 
 import Foundation
 
-@_spi(PO) public struct POActionsContainerActionViewModel: Identifiable {
+@_spi(PO)
+public struct POActionsContainerActionViewModel: Identifiable {
 
     /// Creates view model with given parameters.
     public init(

@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-protocol CodeFieldStyle {
+@MainActor
+protocol CodeFieldStyle: Sendable {
 
     /// A view that represents the body of a button.
     associatedtype Body: View

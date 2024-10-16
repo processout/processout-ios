@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Style that defines border appearance. Border is always a solid line.
-public struct POBorderStyle {
+public struct POBorderStyle: Sendable {
 
     /// Corner radius.
     public let radius: CGFloat

@@ -13,21 +13,22 @@ extension View {
     @_spi(PO)
     @available(iOS 14.0, *)
     public func messageViewStyle(_ style: any POMessageViewStyle) -> some View {
-        environment(\.messageViewStyle, AnyMessageViewStyle(erasing: style))
+        environment(\.messageViewStyle, style)
     }
 }
 
 @available(iOS 14.0, *)
 extension EnvironmentValues {
 
-    var messageViewStyle: AnyMessageViewStyle {
-        get { self[Key.self] }
+    @MainActor
+    var messageViewStyle: any POMessageViewStyle {
+        get { self[Key.self] ?? .toast /* Workaround to allow use of MainActor isolated default value. */ }
         set { self[Key.self] = newValue }
     }
 
     // MARK: - Private Properties
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = AnyMessageViewStyle(erasing: .toast)
+        static let defaultValue: (any POMessageViewStyle)? = nil
     }
 }

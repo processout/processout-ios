@@ -8,7 +8,6 @@
 import SwiftUI
 
 @_spi(PO)
-@MainActor
 @available(iOS 14, *)
 public struct POAsyncImage<Content: View>: View {
 
@@ -55,8 +54,6 @@ public struct POAsyncImage<Content: View>: View {
     // MARK: - Private Methods
 
     /// Implementation resolves image and updates phase.
-    @Sendable
-    @MainActor
     private func resolveImage() async {
         guard !Task.isCancelled, case .empty = phase else {
             return

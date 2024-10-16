@@ -9,6 +9,8 @@ import SwiftUI
 
 /// Describes radio button style in different states.
 @available(iOS 14, *)
+@MainActor
+@preconcurrency
 public struct PORadioButtonStyle: ButtonStyle {
 
     /// Style to use when radio button is in default state ie enabled and not selected.

@@ -9,7 +9,8 @@ import SwiftUI
 
 extension View {
 
-    @_spi(PO) public func controlInvalid(_ isInvalid: Bool) -> some View {
+    @_spi(PO)
+    public func controlInvalid(_ isInvalid: Bool) -> some View {
         environment(\.isControlInvalid, isInvalid)
     }
 }

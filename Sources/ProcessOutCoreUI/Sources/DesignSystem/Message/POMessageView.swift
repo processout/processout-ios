@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-@available(iOS 14.0, *)
 @_spi(PO)
+@available(iOS 14.0, *)
 public struct POMessageView: View {
 
     public init(message: POMessage) {
@@ -19,7 +19,7 @@ public struct POMessageView: View {
 
     public var body: some View {
         let configuration = POMessageViewStyleConfiguration(label: Text(message.text), severity: message.severity)
-        style.makeBody(configuration: configuration)
+        AnyView(style.makeBody(configuration: configuration))
     }
 
     // MARK: - Private Properties

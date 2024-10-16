@@ -8,7 +8,7 @@
 import UIKit
 
 /// Describes radio button style in a particular state, for example when selected.
-public struct PORadioButtonStateStyle {
+public struct PORadioButtonStateStyle: Sendable {
 
     /// Styling of the radio button knob not including value.
     public let knob: PORadioButtonKnobStateStyle
