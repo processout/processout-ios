@@ -41,6 +41,7 @@ final class MarkdownParser {
 
     // MARK: - Bridging
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func node(from pNode: UnsafeMutablePointer<cmark_node>) -> MarkdownNode? {
         let nodeType = cmark_node_type(
             UInt32(pNode.pointee.type)
@@ -85,11 +86,11 @@ final class MarkdownParser {
     // MARK: - Nodes Bridging
 
     private func documentNode(from pNode: UnsafeMutablePointer<cmark_node>) -> MarkdownNode {
-        return MarkdownDocument(children: children(of: pNode))
+        MarkdownDocument(children: children(of: pNode))
     }
 
     private func blockQuoteNode(from pNode: UnsafeMutablePointer<cmark_node>) -> MarkdownNode {
-        return MarkdownBlockQuote(children: children(of: pNode))
+        MarkdownBlockQuote(children: children(of: pNode))
     }
 
     private func codeBlockNode(from pNode: UnsafeMutablePointer<cmark_node>) -> MarkdownNode? {

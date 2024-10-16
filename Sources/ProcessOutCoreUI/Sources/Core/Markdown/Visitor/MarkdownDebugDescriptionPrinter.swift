@@ -69,7 +69,7 @@ final class MarkdownDebugDescriptionPrinter: MarkdownVisitor {
     }
 
     func visit(codeBlock: MarkdownCodeBlock) -> String {
-        return description(node: codeBlock, nodeName: "Code Block", content: codeBlock.code)
+        description(node: codeBlock, nodeName: "Code Block", content: codeBlock.code)
     }
 
     func visit(thematicBreak: MarkdownThematicBreak) -> String {

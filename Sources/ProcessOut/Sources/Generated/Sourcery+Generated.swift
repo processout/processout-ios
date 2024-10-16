@@ -156,6 +156,7 @@ extension POCardsService {
 
     /// Tokenize previously authorized payment.
     @MainActor
+    @preconcurrency
     @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func tokenize(
@@ -169,6 +170,7 @@ extension POCardsService {
 
     /// Authorize given payment request and tokenize it.
     @MainActor
+    @preconcurrency
     @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func tokenize(
@@ -183,6 +185,7 @@ extension POCardsService {
 
     /// Authorize given payment request and tokenize it.
     @MainActor
+    @preconcurrency
     @available(*, deprecated, message: "Use the async method instead.")
     @discardableResult
     public func tokenize(
