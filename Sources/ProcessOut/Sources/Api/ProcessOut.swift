@@ -334,23 +334,22 @@ extension ProcessOut {
     ///   - force: When set to `false` (the default) only the first invocation takes effect, all
     /// subsequent calls to this method are ignored. Pass `true` to allow existing shared instance
     /// reconfiguration (if any).
+    @MainActor
+    @preconcurrency
     public static func configure(configuration: ProcessOutConfiguration, force: Bool = false) {
-        // todo(andrii-vysotskyi): isolate method to main actor when releasing 5.0.0
-        MainActor.assumeIsolated {
-            if isConfigured {
-                if force {
-                    shared.replace(configuration: configuration)
-                    shared.logger.debug("Did change ProcessOut configuration")
-                } else {
-                    shared.logger.debug("ProcessOut can be configured only once, ignored")
-                }
+        if isConfigured {
+            if force {
+                shared.replace(configuration: configuration)
+                shared.logger.debug("Did change ProcessOut configuration")
             } else {
-                Self.prewarm()
-                _shared.withLock { instance in
-                    instance = ProcessOut(configuration: configuration)
-                }
-                shared.logger.debug("Did complete ProcessOut configuration")
+                shared.logger.debug("ProcessOut can be configured only once, ignored")
             }
+        } else {
+            Self.prewarm()
+            _shared.withLock { instance in
+                instance = ProcessOut(configuration: configuration)
+            }
+            shared.logger.debug("Did complete ProcessOut configuration")
         }
     }
 
