@@ -8,6 +8,7 @@
 import Foundation
 import ProcessOut
 
+@MainActor
 enum Constants {
 
     /// Project configuration.
