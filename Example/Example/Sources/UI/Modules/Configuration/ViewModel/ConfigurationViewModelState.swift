@@ -36,18 +36,14 @@ struct ConfigurationViewModelState {
 extension ConfigurationViewModelState {
 
     /// Idle state.
-    static let idle = ConfigurationViewModelState(
-        projectId: "",
-        projectKey: "",
-        environments: .init(sources: environmentSources, id: \.id, selection: .production),
-        customerId: "",
-        merchantId: ""
-    )
-
-    // MARK: - Private
-
-    private static let environmentSources: [Environment] = [
-        .init(id: .production, name: String(localized: .Configuration.productionEnvironment)),
-        .init(id: .stage, name: String(localized: .Configuration.stageEnvironment))
-    ]
+    static var idle: ConfigurationViewModelState {
+        let environmentSources: [Environment] = [
+            .init(id: .production, name: String(localized: .Configuration.productionEnvironment)),
+            .init(id: .stage, name: String(localized: .Configuration.stageEnvironment))
+        ]
+        let environments: PickerData<Environment, ProcessOutConfiguration.Environment> = .init(
+            sources: environmentSources, id: \.id, selection: .production
+        )
+        return .init(projectId: "", projectKey: "", environments: environments, customerId: "", merchantId: "")
+    }
 }
