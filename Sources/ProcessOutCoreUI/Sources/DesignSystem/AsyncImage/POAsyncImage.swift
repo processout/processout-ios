@@ -35,7 +35,7 @@ public struct POAsyncImage<Content: View>: View {
                 phase = .empty
             }
         }
-        .backport.task(id: id, priority: .userInitiated, resolveImage)
+        .backport.task(id: id, priority: .userInitiated) { await resolveImage() }
     }
 
     // MARK: - Private Properties
