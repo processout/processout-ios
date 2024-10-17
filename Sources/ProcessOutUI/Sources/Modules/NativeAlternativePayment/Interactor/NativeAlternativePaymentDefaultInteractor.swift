@@ -123,28 +123,27 @@ final class NativeAlternativePaymentDefaultInteractor:
                     parameters: values
                 )
                 let response = try await invoicesService.initiatePayment(request: request)
-                switch response.nativeApm.state {
+                switch response.state {
                 case .pendingCapture:
                     send(event: .didSubmitParameters(additionalParametersExpected: false))
                     await setAwaitingCaptureState(
-                        with: response.nativeApm.parameterValues,
+                        with: response.parameterValues,
                         gateway: currentState.transactionDetails.gateway
                     )
                 case .captured:
                     send(event: .didSubmitParameters(additionalParametersExpected: false))
                     let paymentProvider = await paymentProvider(
-                        with: response.nativeApm.parameterValues,
+                        with: response.parameterValues,
                         gateway: currentState.transactionDetails.gateway
                     )
                     setCapturedState(paymentProvider: paymentProvider)
                 case .customerInput:
-                    await restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
+                    await restoreStartedStateAfterSubmission(paymentResponse: response)
                 case .failed:
                     throw POFailure(message: "The submitted parameters are not valid.", code: .generic(.mobile))
                 @unknown default:
                     throw POFailure(
-                        message: "Unexpected alternative payment state: \(response.nativeApm.state).",
-                        code: .internal(.mobile)
+                        message: "Unexpected alternative payment state: \(response.state).", code: .internal(.mobile)
                     )
                 }
             } catch {
@@ -405,14 +404,12 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Submission Completion
 
-    private func restoreStartedStateAfterSubmission(
-        nativeApm: PONativeAlternativePaymentMethodResponse.NativeApm
-    ) async {
+    private func restoreStartedStateAfterSubmission(paymentResponse: PONativeAlternativePaymentMethodResponse) async {
         guard case let .submitting(currentState) = state else {
             return
         }
         var newState = currentState.snapshot
-        newState.parameters = await createParameters(specifications: nativeApm.parameterDefinitions ?? [])
+        newState.parameters = await createParameters(specifications: paymentResponse.parameterDefinitions ?? [])
         state = .started(newState)
         send(event: .didSubmitParameters(additionalParametersExpected: true))
         logger.debug("More parameters are expected, waiting for parameters to update.")

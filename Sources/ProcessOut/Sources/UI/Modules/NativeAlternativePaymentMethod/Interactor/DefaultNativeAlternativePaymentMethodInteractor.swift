@@ -201,19 +201,19 @@ final class DefaultNativeAlternativePaymentMethodInteractor: NativeAlternativePa
     private func completeSubmissionUnchecked(
         with response: PONativeAlternativePaymentMethodResponse, startedState: State.Started
     ) {
-        switch response.nativeApm.state {
+        switch response.state {
         case .customerInput:
-            defaultValues(for: response.nativeApm.parameterDefinitions) { [weak self] values in
-                self?.restoreStartedStateAfterSubmission(nativeApm: response.nativeApm, defaultValues: values)
+            defaultValues(for: response.parameterDefinitions) { [weak self] values in
+                self?.restoreStartedStateAfterSubmission(nativeApm: response, defaultValues: values)
             }
         case .pendingCapture:
             send(event: .didSubmitParameters(additionalParametersExpected: false))
             setAwaitingCaptureStateUnchecked(
-                gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
+                gateway: startedState.gateway, parameterValues: response.parameterValues
             )
         case .captured:
             setCapturedStateUnchecked(
-                gateway: startedState.gateway, parameterValues: response.nativeApm.parameterValues
+                gateway: startedState.gateway, parameterValues: response.parameterValues
             )
         case .failed:
             let failure = POFailure(code: .generic(.mobile))
@@ -369,7 +369,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor: NativeAlternativePa
     }
 
     private func restoreStartedStateAfterSubmission(
-        nativeApm: PONativeAlternativePaymentMethodResponse.NativeApm, defaultValues: [String: State.ParameterValue]
+        nativeApm: PONativeAlternativePaymentMethodResponse, defaultValues: [String: State.ParameterValue]
     ) {
         guard case let .submitting(startedState) = state else {
             return

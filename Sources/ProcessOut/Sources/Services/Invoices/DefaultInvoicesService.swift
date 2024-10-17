@@ -62,7 +62,7 @@ final class DefaultInvoicesService: POInvoicesService {
             while: { result in
                 switch result {
                 case let .success(response):
-                    return response.nativeApm.state != .captured
+                    return response.state != .captured
                 case let .failure(failure as POFailure):
                     let retriableCodes: [POFailure.Code] = [
                         .networkUnreachable, .timeout(.mobile), .internal(.mobile)
