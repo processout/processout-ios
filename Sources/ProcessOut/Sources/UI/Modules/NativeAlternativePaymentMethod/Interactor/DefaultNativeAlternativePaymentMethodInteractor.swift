@@ -232,6 +232,14 @@ final class DefaultNativeAlternativePaymentMethodInteractor: NativeAlternativePa
             state = .submitted
             return
         }
+        if parameterValues?.customerActionBarcode != nil {
+            let failure = POFailure(
+                message: "Barcode customer actions are not supported. Please use the ProcessOutUI instead.",
+                code: .generic(.mobile)
+            )
+            setFailureStateUnchecked(failure: failure)
+            return
+        }
         let actionMessage = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
         let logoUrl = logoUrl(gateway: gateway, parameterValues: parameterValues)
         send(event: .willWaitForCaptureConfirmation(additionalActionExpected: actionMessage != nil))
