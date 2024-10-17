@@ -9,7 +9,10 @@ import SwiftUI
 
 /// A type that specifies the appearance and interaction of all pickers
 /// within a view hierarchy.
-@_spi(PO) public protocol POPickerStyle {
+@_spi(PO)
+@MainActor
+@preconcurrency
+public protocol POPickerStyle: Sendable {
 
     /// A view representing the appearance and interaction of a `POPicker`.
     associatedtype Body: View
@@ -20,7 +23,8 @@ import SwiftUI
     @ViewBuilder func makeBody(configuration: POPickerStyleConfiguration) -> Self.Body
 }
 
-@_spi(PO) public struct POPickerStyleConfiguration {
+@_spi(PO)
+public struct POPickerStyleConfiguration {
 
     /// Picker elements.
     public let elements: [POPickerStyleConfigurationElement]
@@ -29,7 +33,8 @@ import SwiftUI
     public let isInvalid: Bool
 }
 
-@_spi(PO) public struct POPickerStyleConfigurationElement: Identifiable {
+@_spi(PO)
+public struct POPickerStyleConfigurationElement: Identifiable {
 
     /// The stable identity of the element.
     public let id: AnyHashable
@@ -42,21 +47,4 @@ import SwiftUI
 
     /// Invoke to select element.
     public let select: () -> Void
-}
-
-struct AnyPickerStyle: POPickerStyle {
-
-    init<Style: POPickerStyle>(erasing style: Style) {
-        _makeBody = { configuration in
-            AnyView(style.makeBody(configuration: configuration))
-        }
-    }
-
-    func makeBody(configuration: POPickerStyleConfiguration) -> some View {
-        _makeBody(configuration)
-    }
-
-    // MARK: - Private Properties
-
-    private let _makeBody: (POPickerStyleConfiguration) -> AnyView
 }

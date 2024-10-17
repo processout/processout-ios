@@ -9,9 +9,9 @@ import Foundation
 @_spi(PO) import ProcessOut
 
 // todo(andrii-vysotskyi): support more schemes
-final class CardSchemeProvider {
+final class CardSchemeProvider: Sendable {
 
-    struct Issuer {
+    struct Issuer: Sendable {
         let scheme: POCardScheme
         let numbers: IssuerNumbers
         let length: Int

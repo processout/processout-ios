@@ -7,10 +7,9 @@
 
 import Foundation
 
-@MainActor
-final class ThrottledWebAuthenticationSessionDecorator: WebAuthenticationSession {
+actor ThrottledWebAuthenticationSessionDecorator: WebAuthenticationSession {
 
-    nonisolated init(session: WebAuthenticationSession) {
+    init(session: WebAuthenticationSession) {
         self.session = session
         semaphore = AsyncSemaphore(value: 1)
     }

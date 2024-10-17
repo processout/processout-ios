@@ -398,8 +398,10 @@ final class DefaultNativeAlternativePaymentMethodInteractor: NativeAlternativePa
     }
 
     private func send(event: PONativeAlternativePaymentMethodEvent) {
-        logger.debug("Did send event: '\(String(describing: event))'")
-        delegate?.nativeAlternativePaymentMethodDidEmitEvent(event)
+        MainActor.assumeIsolated {
+            logger.debug("Did send event: '\(String(describing: event))'")
+            delegate?.nativeAlternativePaymentMethodDidEmitEvent(event)
+        }
     }
 
     private func defaultValues(
@@ -410,34 +412,26 @@ final class DefaultNativeAlternativePaymentMethodInteractor: NativeAlternativePa
             completion([:])
             return
         }
-        if let delegate {
-            delegate.nativeAlternativePaymentMethodDefaultValues(for: parameters) { [self] values in
-                assert(Thread.isMainThread, "Completion must be called on main thread.")
-                var defaultValues: [String: State.ParameterValue] = [:]
-                parameters.forEach { parameter in
-                    let defaultValue: String
-                    if let value = values[parameter.key] {
-                        switch parameter.type {
-                        case .email, .numeric, .phone, .text:
-                            defaultValue = self.formatted(value: value, type: parameter.type)
-                        case .singleSelect:
-                            precondition(
-                                parameter.availableValues?.map(\.value).contains(value) == true,
-                                "Unknown `singleSelect` parameter value."
-                            )
-                            defaultValue = value
-                        }
-                    } else {
-                        defaultValue = self.defaultValue(for: parameter)
-                    }
-                    defaultValues[parameter.key] = .init(value: defaultValue, recentErrorMessage: nil)
-                }
-                completion(defaultValues)
-            }
-        } else {
+        Task { @MainActor in
+            let values = await delegate?.nativeAlternativePayment(defaultValuesFor: parameters) ?? [:]
             var defaultValues: [String: State.ParameterValue] = [:]
             parameters.forEach { parameter in
-                defaultValues[parameter.key] = .init(value: defaultValue(for: parameter), recentErrorMessage: nil)
+                let defaultValue: String
+                if let value = values[parameter.key] {
+                    switch parameter.type {
+                    case .email, .numeric, .phone, .text:
+                        defaultValue = self.formatted(value: value, type: parameter.type)
+                    case .singleSelect:
+                        precondition(
+                            parameter.availableValues?.map(\.value).contains(value) == true,
+                            "Unknown `singleSelect` parameter value."
+                        )
+                        defaultValue = value
+                    }
+                } else {
+                    defaultValue = self.defaultValue(for: parameter)
+                }
+                defaultValues[parameter.key] = .init(value: defaultValue, recentErrorMessage: nil)
             }
             completion(defaultValues)
         }

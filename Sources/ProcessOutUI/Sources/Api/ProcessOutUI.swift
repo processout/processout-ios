@@ -11,9 +11,11 @@
 ///
 /// This method should be called when the application starts to ensure that all resources are loaded and available
 /// for SDK to use. It also allows to avoid potential UI hangs during runtime.
-public enum ProcessOutUI {
+public enum ProcessOutUI: Sendable {
 
     /// Configures UI package and preloads needed resources.
+    @MainActor
+    @preconcurrency
     public static func configure() {
         POTypography.registerFonts()
         AddressSpecificationProvider.shared.prewarm()

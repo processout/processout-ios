@@ -8,9 +8,9 @@
 import SwiftUI
 
 /// Describes checkbox style in a particular state.
-public struct POCheckboxToggleStateStyle {
+public struct POCheckboxToggleStateStyle: Sendable {
 
-    public struct Checkmark {
+    public struct Checkmark: Sendable {
 
         /// Checkmark color.
         public let color: Color

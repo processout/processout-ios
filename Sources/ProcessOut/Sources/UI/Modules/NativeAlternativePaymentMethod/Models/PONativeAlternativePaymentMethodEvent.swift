@@ -6,9 +6,9 @@
 //
 
 /// Describes events that could happen during native alternative payment module lifecycle.
-public enum PONativeAlternativePaymentMethodEvent {
+public enum PONativeAlternativePaymentMethodEvent: Sendable {
 
-    public struct WillSubmitParameters {
+    public struct WillSubmitParameters: Sendable {
 
         /// Available parameters.
         public let parameters: [PONativeAlternativePaymentMethodParameter]
@@ -25,7 +25,7 @@ public enum PONativeAlternativePaymentMethodEvent {
         }
     }
 
-    public struct ParametersChanged {
+    public struct ParametersChanged: Sendable {
 
         /// Parameter definition that the user changed.
         public let parameter: PONativeAlternativePaymentMethodParameter

@@ -12,8 +12,8 @@ extension View {
     /// Applies given `style` to text.
     ///
     /// - NOTE: When `addPadding` is set to true this method has a cumulative effect.
-    @available(iOS 14.0, *)
     @_spi(PO)
+    @available(iOS 14.0, *)
     public func textStyle(_ style: POTextStyle, addPadding: Bool = true) -> some View {
         modifier(ContentModifier(style: style, addPadding: addPadding))
     }

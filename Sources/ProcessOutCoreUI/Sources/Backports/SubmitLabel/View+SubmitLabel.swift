@@ -10,7 +10,7 @@ import SwiftUI
 extension POBackport where Wrapped == Any {
 
     /// A semantic label describing the label of submission within a view hierarchy.
-    public struct SubmitLabel: Equatable {
+    public struct SubmitLabel: Equatable, Sendable {
 
         let returnKeyType: UIReturnKeyType
 
@@ -66,14 +66,7 @@ extension POBackport where Wrapped: View {
 
 extension EnvironmentValues {
 
-    var backportSubmitLabel: POBackport<Any>.SubmitLabel {
-        get { self[LabelKey.self] }
-        set { self[LabelKey.self] = newValue }
-    }
-
-    // MARK: - Private Properties
-
-    private struct LabelKey: EnvironmentKey {
-        static let defaultValue = POBackport.SubmitLabel.default
-    }
+    /// Submit label.
+    @Entry
+    var backportSubmitLabel = POBackport.SubmitLabel.default
 }

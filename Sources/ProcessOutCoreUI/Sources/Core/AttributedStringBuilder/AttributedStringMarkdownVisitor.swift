@@ -18,10 +18,6 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
 
     // MARK: - MarkdownVisitor
 
-    func visit(node: MarkdownUnknown) -> NSAttributedString {
-        node.children.map { $0.accept(visitor: self) }.joined()
-    }
-
     func visit(document: MarkdownDocument) -> NSAttributedString {
         let separator = NSAttributedString(string: Constants.paragraphSeparator)
         return document.children.map { $0.accept(visitor: self) }.joined(separator: separator)
@@ -135,7 +131,7 @@ final class AttributedStringMarkdownVisitor: MarkdownVisitor {
 
     private enum Constants {
         static let listMarkerWidthIncrement: CGFloat = 12
-        static let listMarkerSpacing = POSpacing.extraSmall
+        static let listMarkerSpacing: CGFloat = 4
         static let lineSeparator = "\u{2028}"
         static let paragraphSeparator = "\u{2029}"
         static let tab = "\t"

@@ -16,6 +16,7 @@ Project demonstrates multiple flows that ProcessOut framework is capable of.
 3. Set constants defined in `Example/Sources/Application/Constants.swift` file to your project credentials. E.g.:
 
 ```swift
+@MainActor
 enum Constants {
 
     /// Project configuration.

@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 @_spi(PO)
+@available(iOS 14, *)
 public struct POMenuPickerStyle: POPickerStyle {
 
     public init(inputStyle: POInputStyle) {

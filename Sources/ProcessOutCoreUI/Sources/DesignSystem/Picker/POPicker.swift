@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 @_spi(PO)
+@available(iOS 14, *)
 public struct POPicker<Data: RandomAccessCollection, Id: Hashable>: View {
 
     // swiftlint:disable:next line_length
@@ -23,7 +23,7 @@ public struct POPicker<Data: RandomAccessCollection, Id: Hashable>: View {
         let configuration = POPickerStyleConfiguration(
             elements: data.map(createConfigurationElement), isInvalid: isInvalid
         )
-        style.makeBody(configuration: configuration)
+        AnyView(style.makeBody(configuration: configuration))
     }
 
     // MARK: - Private Properties
@@ -32,10 +32,14 @@ public struct POPicker<Data: RandomAccessCollection, Id: Hashable>: View {
     private let id: KeyPath<Data.Element, Id>
     private let content: (Data.Element) -> Text
 
-    @Binding private var selection: Id?
+    @Binding
+    private var selection: Id?
 
-    @Environment(\.pickerStyle) private var style
-    @Environment(\.isControlInvalid) private var isInvalid
+    @Environment(\.pickerStyle)
+    private var style
+
+    @Environment(\.isControlInvalid)
+    private var isInvalid
 
     // MARK: - Private Methods
 

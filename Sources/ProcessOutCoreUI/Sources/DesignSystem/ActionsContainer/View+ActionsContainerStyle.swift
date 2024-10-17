@@ -9,8 +9,8 @@ import SwiftUI
 
 extension View {
 
-    @available(iOS 14, *)
     @_spi(PO)
+    @available(iOS 14, *)
     public func actionsContainerStyle(_ style: POActionsContainerStyle) -> some View {
         environment(\.actionsContainerStyle, style)
     }
@@ -19,14 +19,15 @@ extension View {
 @available(iOS 14, *)
 extension EnvironmentValues {
 
+    @MainActor
     var actionsContainerStyle: POActionsContainerStyle {
-        get { self[Key.self] }
+        get { self[Key.self] ?? .default }
         set { self[Key.self] = newValue }
     }
 
     // MARK: - Private Nested Types
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = POActionsContainerStyle.default
+        static let defaultValue: POActionsContainerStyle? = nil
     }
 }

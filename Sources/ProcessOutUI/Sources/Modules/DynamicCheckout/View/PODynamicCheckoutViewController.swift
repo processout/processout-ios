@@ -15,7 +15,7 @@ public final class PODynamicCheckoutViewController: UIHostingController<AnyView>
 
     /// Creates dynamic checkout view controller.
     public init(
-        style: PODynamicCheckoutStyle = PODynamicCheckoutStyle.default,
+        style: PODynamicCheckoutStyle = .default,
         configuration: PODynamicCheckoutConfiguration,
         delegate: PODynamicCheckoutDelegate,
         completion: @escaping (Result<Void, POFailure>) -> Void

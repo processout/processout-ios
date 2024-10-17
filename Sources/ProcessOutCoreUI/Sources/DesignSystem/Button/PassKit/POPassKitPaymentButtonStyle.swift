@@ -9,7 +9,9 @@ import PassKit
 
 /// PassKit button style.
 @available(iOS 14.0, *)
-public struct POPassKitPaymentButtonStyle {
+@MainActor
+@preconcurrency
+public struct POPassKitPaymentButtonStyle: Sendable {
 
     /// Native style value.
     public let style: PKPaymentButtonStyle
@@ -18,16 +20,14 @@ public struct POPassKitPaymentButtonStyle {
     public let cornerRadius: CGFloat
 
     /// Creates style instance.
-    public init(native: PKPaymentButtonStyle = .automatic, cornerRadius: CGFloat = defaultCornerRadius) {
+    public init(native: PKPaymentButtonStyle = .automatic) {
+        self.style = native
+        self.cornerRadius = POSpacing.extraSmall
+    }
+
+    /// Creates style instance.
+    public init(native: PKPaymentButtonStyle = .automatic, cornerRadius: CGFloat) {
         self.style = native
         self.cornerRadius = cornerRadius
     }
-}
-
-@available(iOS 14.0, *)
-extension POPassKitPaymentButtonStyle {
-
-    /// Default value of corner radius.
-    @usableFromInline
-    static let defaultCornerRadius = POSpacing.extraSmall
 }

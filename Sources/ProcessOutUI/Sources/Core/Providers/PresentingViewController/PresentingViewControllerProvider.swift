@@ -10,6 +10,8 @@ import UIKit
 enum PresentingViewControllerProvider {
 
     /// Attempts to find view controller that can modally present other view controller.
+    @MainActor
+    @preconcurrency
     static func find() -> UIViewController? {
         let rootViewController = UIApplication.shared
             .connectedScenes

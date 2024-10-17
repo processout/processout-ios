@@ -149,7 +149,8 @@ final class DynamicCheckoutDefaultInteractor:
             logger.debug("Unable to set started state from unsupported state: \(state).")
             return
         }
-        if let paymentMethods = invoice.paymentMethods?.filter(isSupported), !paymentMethods.isEmpty {
+        // swiftlint:disable:next line_length
+        if let paymentMethods = invoice.paymentMethods?.filter({ isSupported(paymentMethod: $0) }), !paymentMethods.isEmpty {
             let startedState = DynamicCheckoutInteractorState.Started(
                 paymentMethods: paymentMethods,
                 isCancellable: configuration.cancelButton?.title.map { !$0.isEmpty } ?? true,

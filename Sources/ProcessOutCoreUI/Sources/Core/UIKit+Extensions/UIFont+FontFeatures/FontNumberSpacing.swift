@@ -8,7 +8,7 @@
 import CoreText
 
 @_spi(PO)
-public struct POFontNumberSpacing {
+public struct POFontNumberSpacing: Sendable {
 
     let rawValue: Int
 }

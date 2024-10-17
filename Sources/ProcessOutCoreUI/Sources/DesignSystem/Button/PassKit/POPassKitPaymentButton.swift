@@ -8,8 +8,8 @@
 import SwiftUI
 import PassKit
 
-@available(iOS 14.0, *)
 @_spi(PO)
+@available(iOS 14.0, *)
 public struct POPassKitPaymentButton: View {
 
     public init(type: PKPaymentButtonType, action: @escaping () -> Void) {
@@ -67,6 +67,7 @@ private struct ButtonRepresentable: UIViewRepresentable {
     }
 }
 
+@MainActor
 private final class ButtonCoordinator {
 
     init(action: @escaping () -> Void) {

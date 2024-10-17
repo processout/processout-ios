@@ -9,6 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 /// Native alternative payment method screen background style.
+@MainActor
 public struct PONativeAlternativePaymentBackgroundStyle {
 
     /// Regular background color.

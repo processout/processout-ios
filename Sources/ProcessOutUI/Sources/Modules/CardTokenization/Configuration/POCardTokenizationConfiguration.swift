@@ -10,7 +10,7 @@ import ProcessOut
 
 /// A configuration object that defines a card tokenization module behaves.
 /// Use `nil` as a value for a nullable property to indicate that default value should be used.
-public struct POCardTokenizationConfiguration {
+public struct POCardTokenizationConfiguration: Sendable {
 
     /// Custom title. Use empty string to hide title.
     public let title: String?

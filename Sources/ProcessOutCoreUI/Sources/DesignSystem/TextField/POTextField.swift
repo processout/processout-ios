@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 @_spi(PO)
+@available(iOS 14, *)
 public struct POTextField<Trailing: View>: View {
 
     /// - Parameters:
@@ -123,7 +123,7 @@ private struct TextFieldRepresentable: UIViewRepresentable {
     // MARK: -
 
     func willReturn() {
-        submitAction?()
+        submitAction()
     }
 
     // MARK: - Private Nested Types

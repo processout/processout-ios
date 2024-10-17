@@ -9,12 +9,12 @@ import Foundation
 
 /// Alternative payment specific dynamic checkout configuration.
 @_spi(PO)
-public struct PODynamicCheckoutAlternativePaymentConfiguration {
+public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
 
-    public struct PaymentConfirmation {
+    public struct PaymentConfirmation: Sendable {
 
         /// Confirmation button configuration.
-        public struct ConfirmButton { // swiftlint:disable:this nesting
+        public struct ConfirmButton: Sendable { // swiftlint:disable:this nesting
 
             /// Button title.
             public let title: String?
@@ -57,7 +57,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
         }
     }
 
-    public struct CancelButton {
+    public struct CancelButton: Sendable {
 
         /// Cancel button title. Use `nil` for default title.
         public let title: String?

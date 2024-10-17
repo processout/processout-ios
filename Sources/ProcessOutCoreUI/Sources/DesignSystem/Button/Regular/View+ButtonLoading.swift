@@ -10,7 +10,8 @@ import SwiftUI
 extension View {
 
     /// Adds a condition that controls whether button with a `POButtonStyle` should show loading indicator.
-    @_spi(PO) public func buttonLoading(_ isLoading: Bool) -> some View {
+    @_spi(PO)
+    public func buttonLoading(_ isLoading: Bool) -> some View {
         environment(\.isButtonLoading, isLoading)
     }
 }

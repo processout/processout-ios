@@ -19,14 +19,15 @@ extension View {
 @available(iOS 14, *)
 extension EnvironmentValues {
 
+    @MainActor
     var cardUpdateStyle: POCardUpdateStyle {
-        get { self[Key.self] }
+        get { self[Key.self] ?? .default }
         set { self[Key.self] = newValue }
     }
 
     // MARK: - Private Nested Types
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = POCardUpdateStyle.default
+        static let defaultValue: POCardUpdateStyle? = nil
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 
 @_spi(PO)
-public struct POMessage: Identifiable {
+public struct POMessage: Identifiable, Sendable {
 
     /// Message ID.
     public let id: String
@@ -27,7 +27,7 @@ public struct POMessage: Identifiable {
 }
 
 /// Message severity.
-public enum POMessageSeverity {
+public enum POMessageSeverity: Sendable {
 
     /// An error.
     case error

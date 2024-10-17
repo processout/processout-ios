@@ -42,6 +42,7 @@ extension POBackport where Wrapped == Any {
         private let baseValue: Value
         private let textStyle: UIFont.TextStyle?
 
-        @Environment(\.sizeCategory) private var sizeCategory
+        @Environment(\.sizeCategory)
+        private var sizeCategory
     }
 }
