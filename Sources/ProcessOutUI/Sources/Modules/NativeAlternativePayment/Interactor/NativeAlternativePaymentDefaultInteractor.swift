@@ -329,7 +329,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return nil
         }
         let image = await imagesRepository.image(at: gateway.customerActionImageUrl)
-        return .init(message: message, image: image)
+        return .init(message: message, image: image, barcode: parameterValues?.customerActionBarcode)
     }
 
     // MARK: - Captured State

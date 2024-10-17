@@ -101,6 +101,9 @@ enum NativeAlternativePaymentInteractorState {
 
         /// Action image.
         let image: UIImage?
+
+        /// Barcode that customer needs to interact with to proceed with payment.
+        let barcode: POBarcode?
     }
 
     /// Initial interactor state.
