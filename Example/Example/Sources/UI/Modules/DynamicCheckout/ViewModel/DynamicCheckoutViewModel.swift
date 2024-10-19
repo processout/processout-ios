@@ -48,6 +48,9 @@ final class DynamicCheckoutViewModel: ObservableObject {
     private func continueDynamicCheckout(invoice: POInvoice) {
         let configuration = PODynamicCheckoutConfiguration(
             invoiceRequest: .init(invoiceId: invoice.id, clientSecret: invoice.clientSecret),
+            alternativePayment: .init(
+                paymentConfirmation: .init(confirmButton: .init())
+            ),
             cancelButton: .init(confirmation: .init())
         )
         let item = DynamicCheckoutViewModelState.DynamicCheckout(
