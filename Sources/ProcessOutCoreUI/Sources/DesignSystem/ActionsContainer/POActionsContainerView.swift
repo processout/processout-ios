@@ -11,7 +11,7 @@ import SwiftUI
 @available(iOS 14, *)
 public struct POActionsContainerView: View {
 
-    public init(actions: [POActionsContainerActionViewModel]) {
+    public init(actions: [POButtonViewModel]) {
         self.actions = actions
     }
 
@@ -20,10 +20,8 @@ public struct POActionsContainerView: View {
             VStack(spacing: POSpacing.small) {
                 ForEach(actions) { element in
                     Button(element.title, action: element.action)
-                        .buttonStyle(POAnyButtonStyle(erasing: element.isPrimary ? style.primary : style.secondary))
-                        .disabled(!element.isEnabled)
-                        .buttonLoading(element.isLoading)
-                        .accessibility(identifier: element.id)
+                        .buttonStyle(forPrimaryRole: style.primary, fallback: style.secondary)
+                        .buttonViewModel(element)
                 }
                 .modify(when: style.axis == .horizontal) { content in
                     // The implementation considers that benign action that people are likely to
@@ -52,7 +50,7 @@ public struct POActionsContainerView: View {
 
     // MARK: - Private Properties
 
-    private let actions: [POActionsContainerActionViewModel]
+    private let actions: [POButtonViewModel]
 
     @Environment(\.actionsContainerStyle)
     private var style

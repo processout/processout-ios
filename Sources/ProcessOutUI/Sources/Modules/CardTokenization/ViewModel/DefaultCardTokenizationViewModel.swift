@@ -348,7 +348,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
 
     private func createActions(
         startedState: InteractorState.Started, isSubmitting: Bool
-    ) -> [POActionsContainerActionViewModel] {
+    ) -> [POButtonViewModel] {
         let actions = [
             submitAction(startedState: startedState, isSubmitting: isSubmitting),
             cancelAction(isEnabled: !isSubmitting)
@@ -358,17 +358,17 @@ final class DefaultCardTokenizationViewModel: ViewModel {
 
     private func submitAction(
         startedState: InteractorState.Started, isSubmitting: Bool
-    ) -> POActionsContainerActionViewModel? {
+    ) -> POButtonViewModel? {
         let title = configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit)
         guard !title.isEmpty else {
             return nil
         }
-        let action = POActionsContainerActionViewModel(
+        let action = POButtonViewModel(
             id: "primary-button",
             title: title,
             isEnabled: startedState.areParametersValid,
             isLoading: isSubmitting,
-            isPrimary: true,
+            role: .primary,
             action: { [weak self] in
                 self?.interactor.tokenize()
             }
@@ -376,17 +376,16 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         return action
     }
 
-    private func cancelAction(isEnabled: Bool) -> POActionsContainerActionViewModel? {
+    private func cancelAction(isEnabled: Bool) -> POButtonViewModel? {
         let title = configuration.cancelActionTitle ?? String(resource: .CardTokenization.Button.cancel)
         guard !title.isEmpty else {
             return nil
         }
-        let action = POActionsContainerActionViewModel(
+        let action = POButtonViewModel(
             id: "cancel-button",
             title: title,
             isEnabled: isEnabled,
-            isLoading: false,
-            isPrimary: false,
+            role: .cancel,
             action: { [weak self] in
                 self?.interactor.cancel()
             }

@@ -13,7 +13,7 @@ struct NativeAlternativePaymentViewModelState {
     let sections: [NativeAlternativePaymentViewModelSection]
 
     /// Available actions.
-    let actions: [POActionsContainerActionViewModel]
+    let actions: [POButtonViewModel]
 
     /// Boolean value that indicates whether payment is already captured.
     let isCaptured: Bool
