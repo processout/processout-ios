@@ -33,7 +33,11 @@ private struct ContentModifier: ViewModifier {
                 isPresented = confirmationDialog != nil
                 confirmationDialogSnapshot = confirmationDialog
             }
-            .alert(isPresented: $isPresented) { confirmationAlert }
+            .overlay(
+                // When an alert defined at multiple levels in the view hierarchy, only the
+                // higher-level alert will be shown. Workaround is to present alert from an overlay.
+                Color.clear.alert(isPresented: $isPresented) { confirmationAlert }
+            )
     }
 
     // MARK: - Private Properties
