@@ -44,6 +44,9 @@
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>This app requires camera access to scan codes for project configuration.</string>
+	<string>This application requires camera access to scan codes for project configuration.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This application requires access to your photo library to save payment information.
+This application requires access to your photo library to save payment information.</string>
 </dict>
 </plist>
