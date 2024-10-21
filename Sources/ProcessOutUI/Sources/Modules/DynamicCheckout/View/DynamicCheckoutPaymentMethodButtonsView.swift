@@ -27,6 +27,7 @@ struct DynamicCheckoutPaymentMethodButtonsView: View {
                     .buttonViewModel(button)
             }
         }
+        .backport.geometryGroup()
         .modify(when: buttons.isEmpty) { _ in
             EmptyView()
         }
