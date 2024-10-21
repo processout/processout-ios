@@ -102,8 +102,8 @@ enum NativeAlternativePaymentInteractorState {
         /// Action image.
         let image: UIImage?
 
-        /// Barcode that customer needs to interact with to proceed with payment.
-        let barcode: POBarcode?
+        /// Boolean value indicating whether the image is decorative (i.e., not meant for user interaction).
+        let isImageDecorative: Bool
     }
 
     /// Initial interactor state.

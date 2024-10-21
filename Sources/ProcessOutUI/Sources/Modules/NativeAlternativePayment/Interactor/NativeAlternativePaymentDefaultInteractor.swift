@@ -324,12 +324,22 @@ final class NativeAlternativePaymentDefaultInteractor:
         with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
     ) async -> NativeAlternativePaymentInteractorState.CaptureCustomerAction? {
+        // todo(andrii-vysotskyi): decide if `null` customer action should be allowed
         let message = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
         guard let message else {
             return nil
         }
-        let image = await imagesRepository.image(at: gateway.customerActionImageUrl)
-        return .init(message: message, image: image, barcode: parameterValues?.customerActionBarcode)
+        let image: UIImage?, isImageDecorative: Bool
+        if let barcode = parameterValues?.customerActionBarcode {
+            let minimumSize = CGSize(width: 250, height: 250)
+            // todo(andrii-vysotskyi): inject provider
+            image = DefaultBarcodeImageProvider().image(for: barcode, minimumSize: minimumSize)
+            isImageDecorative = false
+        } else {
+            image = await imagesRepository.image(at: gateway.customerActionImageUrl)
+            isImageDecorative = true
+        }
+        return .init(message: message, image: image, isImageDecorative: isImageDecorative)
     }
 
     // MARK: - Captured State
