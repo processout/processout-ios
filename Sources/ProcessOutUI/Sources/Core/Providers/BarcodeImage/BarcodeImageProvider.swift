@@ -8,7 +8,7 @@
 import ProcessOut
 import UIKit
 
-protocol BarcodeImageProvider {
+protocol BarcodeImageProvider: Sendable {
 
     /// Generates an image for the given barcode if the barcode format is supported and a valid
     /// image can be produced.

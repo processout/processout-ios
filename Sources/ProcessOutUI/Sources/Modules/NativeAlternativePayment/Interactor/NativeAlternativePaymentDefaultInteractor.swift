@@ -19,12 +19,14 @@ final class NativeAlternativePaymentDefaultInteractor:
         configuration: PONativeAlternativePaymentConfiguration,
         invoicesService: POInvoicesService,
         imagesRepository: POImagesRepository,
+        barcodeImageProvider: BarcodeImageProvider,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         self.configuration = configuration
         self.invoicesService = invoicesService
         self.imagesRepository = imagesRepository
+        self.barcodeImageProvider = barcodeImageProvider
         self.logger = logger
         self.completion = completion
         super.init(state: .idle)
@@ -191,6 +193,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private let invoicesService: POInvoicesService
     private let imagesRepository: POImagesRepository
+    private let barcodeImageProvider: BarcodeImageProvider
     private let logger: POLogger
     private let completion: (Result<Void, POFailure>) -> Void
 
@@ -332,8 +335,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         let image: UIImage?, isImageDecorative: Bool
         if let barcode = parameterValues?.customerActionBarcode {
             let minimumSize = CGSize(width: 250, height: 250)
-            // todo(andrii-vysotskyi): inject provider
-            image = DefaultBarcodeImageProvider().image(for: barcode, minimumSize: minimumSize)
+            image = barcodeImageProvider.image(for: barcode, minimumSize: minimumSize)
             isImageDecorative = false
         } else {
             image = await imagesRepository.image(at: gateway.customerActionImageUrl)

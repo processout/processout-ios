@@ -5,14 +5,21 @@
 //  Created by Andrii Vysotskyi on 17.10.2024.
 //
 
-import ProcessOut
+@_spi(PO) import ProcessOut
 import CoreImage.CIFilterBuiltins
 import UIKit
 
-struct DefaultBarcodeImageProvider: BarcodeImageProvider {
+final class DefaultBarcodeImageProvider: BarcodeImageProvider {
+
+    init(logger: POLogger) {
+        self.logger = logger
+    }
+
+    // MARK: - BarcodeImageProvider
 
     func image(for barcode: POBarcode, minimumSize: CGSize) -> UIImage? {
         guard let ciImage = ciFilter(for: barcode)?.outputImage else {
+            logger.warn("Failed to generate CIImage for barcode of type \(barcode.type.rawValue).")
             return nil
         }
         let scaledCiImage = ciImage.transformed(
@@ -25,6 +32,10 @@ struct DefaultBarcodeImageProvider: BarcodeImageProvider {
         }
         return image
     }
+
+    // MARK: - Private Properties
+
+    private let logger: POLogger
 
     // MARK: - Private Methods
 

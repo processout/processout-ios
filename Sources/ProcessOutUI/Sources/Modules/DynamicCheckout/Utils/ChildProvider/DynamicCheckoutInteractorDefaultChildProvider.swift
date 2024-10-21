@@ -52,6 +52,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             ),
             invoicesService: invoicesService,
             imagesRepository: imagesRepository,
+            barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
             logger: logger,
             completion: { _ in }
         )
