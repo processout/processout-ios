@@ -38,6 +38,11 @@ extension POStringResource {
                 "native-alternative-payment.confirm-capture-button.title", comment: ""
             )
 
+            /// Save barcode button.
+            static let saveBarcode = POStringResource(
+                "native-alternative-payment.save-barcode-button.title", comment: ""
+            )
+
             /// Cancel button title.
             static let cancel = POStringResource("native-alternative-payment.cancel-button.title", comment: "")
         }
@@ -71,6 +76,18 @@ extension POStringResource {
             static let requiredParameter = POStringResource(
                 "native-alternative-payment.error.required-parameter", comment: ""
             )
+        }
+
+        enum BarcodeError {
+
+            /// Error title.
+            static let title = POStringResource("native-alternative-payment.barcode-error.title", comment: "")
+
+            /// Error message.
+            static let message = POStringResource("native-alternative-payment.barcode-error.message", comment: "")
+
+            /// Confirm button.
+            static let confirm = POStringResource("native-alternative-payment.barcode-error.confirm", comment: "")
         }
 
         enum CancelConfirmation {

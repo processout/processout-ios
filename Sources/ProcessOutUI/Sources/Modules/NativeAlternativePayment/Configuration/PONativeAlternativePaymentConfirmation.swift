@@ -10,6 +10,17 @@ import Foundation
 /// Configuration specific to native APM payment confirmation.
 public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint:disable:this type_name
 
+    /// Configuration options for barcode interaction.
+    public struct BarcodeInteraction {
+
+        /// Button title.
+        public let saveButtonTitle: String?
+
+        /// Save error confirmation dialog.
+        /// - NOTE: Secondary action is ignored.
+        public let saveErrorConfirmation: POConfirmationDialogConfiguration?
+    }
+
     /// Confirmation button configuration.
     public struct ConfirmButton {
 
@@ -38,6 +49,9 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
     /// Default value is `false`.
     public let hideGatewayDetails: Bool
 
+    /// Barcode interaction configuration.
+    public let barcodeInteraction: BarcodeInteraction?
+
     /// Payment confirmation button configuration.
     ///
     /// Displays a confirmation button when the user needs to perform an external customer action (e.g.,
@@ -55,6 +69,7 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
         timeout: TimeInterval = 180,
         showProgressIndicatorAfter: TimeInterval? = nil,
         hideGatewayDetails: Bool = false,
+        barcodeInteraction: BarcodeInteraction? = nil,
         confirmButton: ConfirmButton? = nil,
         secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction? = nil
     ) {
@@ -62,6 +77,7 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
         self.timeout = timeout
         self.showProgressIndicatorAfter = showProgressIndicatorAfter
         self.hideGatewayDetails = hideGatewayDetails
+        self.barcodeInteraction = barcodeInteraction
         self.confirmButton = confirmButton
         self.secondaryAction = secondaryAction
     }

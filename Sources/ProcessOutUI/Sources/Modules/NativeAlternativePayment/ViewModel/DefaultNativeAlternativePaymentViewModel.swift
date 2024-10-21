@@ -251,10 +251,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
               !customerAction.isImageDecorative else {
             return nil
         }
-        // todo(andrii-vysotskyi): support custom button title
+        let customTitle = interactor.configuration.paymentConfirmation.barcodeInteraction?.saveButtonTitle
         let viewModel = POButtonViewModel(
             id: "barcode-button",
-            title: "Save Barcode to Photos",
+            title: customTitle ?? String(resource: .NativeAlternativePayment.Button.saveBarcode),
             action: { [weak self] in
                 self?.saveImageToPhotoLibraryOrShowError(image)
             }
@@ -267,11 +267,14 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             guard await !saveImageToPhotoLibrary(image) else {
                 return
             }
+            let configuration = interactor.configuration.paymentConfirmation.barcodeInteraction?.saveErrorConfirmation
             let dialog = POConfirmationDialog(
-                title: "Image Save Failed",
-                // swiftlint:disable:next line_length
-                message: "We couldn't save the image. Please check your permissions or try taking a screenshot as an alternative.",
-                primaryButton: .init(title: "Got it")
+                title: configuration?.title ?? String(resource: .NativeAlternativePayment.BarcodeError.title),
+                message: configuration?.message ?? String(resource: .NativeAlternativePayment.BarcodeError.message),
+                primaryButton: .init(
+                    // swiftlint:disable:next line_length
+                    title: configuration?.confirmActionTitle ?? String(resource: .NativeAlternativePayment.BarcodeError.confirm)
+                )
             )
             self.state.confirmationDialog = dialog
         }
