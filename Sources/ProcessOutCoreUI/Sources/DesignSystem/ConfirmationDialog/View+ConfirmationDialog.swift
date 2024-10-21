@@ -48,12 +48,21 @@ private struct ContentModifier: ViewModifier {
         guard let dialog = confirmationDialogSnapshot else {
             preconditionFailure("Confirmation dialog must be set.")
         }
-        let alert = Alert(
-            title: Text(dialog.title),
-            message: dialog.message.map(Text.init),
-            primaryButton: createAlertButton(with: dialog.primaryButton),
-            secondaryButton: createAlertButton(with: dialog.secondaryButton)
-        )
+        let alert: Alert
+        if let secondaryButton = dialog.secondaryButton {
+            alert = Alert(
+                title: Text(dialog.title),
+                message: dialog.message.map(Text.init),
+                primaryButton: createAlertButton(with: dialog.primaryButton),
+                secondaryButton: createAlertButton(with: secondaryButton)
+            )
+        } else {
+            alert = Alert(
+                title: Text(dialog.title),
+                message: dialog.message.map(Text.init),
+                dismissButton: createAlertButton(with: dialog.primaryButton)
+            )
+        }
         return alert
     }
 
