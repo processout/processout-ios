@@ -120,7 +120,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             }
             let submitButton = createSubmitAction(methodId: paymentMethod.id, selectedMethodId: selectedMethodId)
             let payment = DynamicCheckoutViewModelItem.RegularPayment(
-                id: paymentMethod.id, info: info, content: nil, contentId: "", submitButton: submitButton
+                id: paymentMethod.id, info: info, content: nil, submitButton: submitButton
             )
             return .regularPayment(payment)
         }
@@ -330,7 +330,6 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 id: paymentMethod.id,
                 info: info,
                 content: createRegularPaymentContent(for: paymentMethod, state: state),
-                contentId: state.snapshot.invoice.id,
                 submitButton: nil
             )
             return .regularPayment(payment)
@@ -354,7 +353,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 assertionFailure("Interactor must be set.")
                 return nil
             }
-            let item = DynamicCheckoutViewModelItem.AlternativePayment {
+            let item = DynamicCheckoutViewModelItem.AlternativePayment(id: state.snapshot.invoice.id) {
                 // todo(andrii-vysotskyi): decide if it is okay to create view model directly here
                 let viewModel = DefaultNativeAlternativePaymentViewModel(interactor: interactor)
                 return AnyViewModel(erasing: viewModel)
@@ -365,7 +364,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 assertionFailure("Interactor must be set.")
                 return nil
             }
-            let item = DynamicCheckoutViewModelItem.Card {
+            let item = DynamicCheckoutViewModelItem.Card(id: state.snapshot.invoice.id) {
                 let viewModel = DefaultCardTokenizationViewModel(interactor: interactor)
                 return AnyViewModel(erasing: viewModel)
             }
@@ -443,7 +442,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 return nil
             }
             let payment = DynamicCheckoutViewModelItem.RegularPayment(
-                id: paymentMethod.id, info: info, content: nil, contentId: "", submitButton: nil
+                id: paymentMethod.id, info: info, content: nil, submitButton: nil
             )
             return .regularPayment(payment)
         }
