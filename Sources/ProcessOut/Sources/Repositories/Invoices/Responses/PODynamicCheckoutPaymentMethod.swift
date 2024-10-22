@@ -191,6 +191,9 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         /// Display name.
         public let name: String
 
+        /// Payment method description.
+        public let description: String?
+
         /// Payment method logo.
         public let logo: POImageRemoteResource
 

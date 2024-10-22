@@ -183,7 +183,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let item = DynamicCheckoutViewModelItem.ExpressPayment(
             id: paymentMethod.id,
-            title: display.name,
+            title: display.description ?? display.name,
             iconImageResource: display.logo,
             brandColor: display.brandColor,
             action: { [weak self] in
@@ -225,7 +225,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let item = DynamicCheckoutViewModelItem.RegularPaymentInfo(
             iconImageResource: display.logo,
-            title: display.name,
+            title: display.description ?? display.name,
             isLoading: isLoading,
             isSelected: isSelected,
             additionalInformation: additionalPaymentInformation(
