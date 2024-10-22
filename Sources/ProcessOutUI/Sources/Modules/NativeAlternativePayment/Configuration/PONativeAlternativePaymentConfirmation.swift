@@ -19,6 +19,20 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
         /// Save error confirmation dialog.
         /// - NOTE: Secondary action is ignored.
         public let saveErrorConfirmation: POConfirmationDialogConfiguration?
+
+        /// Indicates if haptic feedback is generated during barcode interaction. Feedback is only provided
+        /// when the barcode is successfully saved. Default is true.
+        public let generateHapticFeedback: Bool
+
+        public init(
+            saveButtonTitle: String? = nil,
+            saveErrorConfirmation: POConfirmationDialogConfiguration? = nil,
+            generateHapticFeedback: Bool = true
+        ) {
+            self.saveButtonTitle = saveButtonTitle
+            self.saveErrorConfirmation = saveErrorConfirmation
+            self.generateHapticFeedback = generateHapticFeedback
+        }
     }
 
     /// Confirmation button configuration.

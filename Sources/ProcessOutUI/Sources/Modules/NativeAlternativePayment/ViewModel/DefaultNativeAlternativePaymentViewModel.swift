@@ -264,19 +264,23 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func saveImageToPhotoLibraryOrShowError(_ image: UIImage) {
         Task { @MainActor in
-            guard await !saveImageToPhotoLibrary(image) else {
-                return
-            }
-            let configuration = interactor.configuration.paymentConfirmation.barcodeInteraction?.saveErrorConfirmation
-            let dialog = POConfirmationDialog(
-                title: configuration?.title ?? String(resource: .NativeAlternativePayment.BarcodeError.title),
-                message: configuration?.message ?? String(resource: .NativeAlternativePayment.BarcodeError.message),
-                primaryButton: .init(
-                    // swiftlint:disable:next line_length
-                    title: configuration?.confirmActionTitle ?? String(resource: .NativeAlternativePayment.BarcodeError.confirm)
+            let barcodeInteraction = interactor.configuration.paymentConfirmation.barcodeInteraction
+            if await saveImageToPhotoLibrary(image) {
+                if barcodeInteraction?.generateHapticFeedback != false {
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                }
+            } else {
+                let configuration = barcodeInteraction?.saveErrorConfirmation
+                let dialog = POConfirmationDialog(
+                    title: configuration?.title ?? String(resource: .NativeAlternativePayment.BarcodeError.title),
+                    message: configuration?.message ?? String(resource: .NativeAlternativePayment.BarcodeError.message),
+                    primaryButton: .init(
+                        // swiftlint:disable:next line_length
+                        title: configuration?.confirmActionTitle ?? String(resource: .NativeAlternativePayment.BarcodeError.confirm)
+                    )
                 )
-            )
-            self.state.confirmationDialog = dialog
+                self.state.confirmationDialog = dialog
+            }
         }
     }
 
