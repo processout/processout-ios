@@ -23,12 +23,9 @@ struct DynamicCheckoutRegularPaymentView: View {
                 DynamicCheckoutAlternativePaymentView(item: item)
                     .id(self.item.contentId)
             }
-            if let item = item.submitButton {
-                Button(item.title, action: item.action)
-                    .disabled(!item.isEnabled)
-                    .buttonLoading(item.isLoading)
-                    .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.primary))
-            }
+            DynamicCheckoutPaymentMethodButtonsView(
+                buttons: [item.submitButton].compactMap { $0 }
+            )
         }
         .backport.geometryGroup()
     }

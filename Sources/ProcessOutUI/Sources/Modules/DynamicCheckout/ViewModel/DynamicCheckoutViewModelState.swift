@@ -30,7 +30,7 @@ struct DynamicCheckoutViewModelState {
     let sections: [Section]
 
     /// Available actions.
-    let actions: [POActionsContainerActionViewModel]
+    let actions: [POButtonViewModel]
 
     /// Indicates whether state represents final success state.
     let isCompleted: Bool

@@ -94,7 +94,7 @@ struct CardTokenizationViewModelState {
     let sections: [Section]
 
     /// Available actions.
-    let actions: [POActionsContainerActionViewModel]
+    let actions: [POButtonViewModel]
 
     /// Currently focused input identifier.
     var focusedInputId: AnyHashable?

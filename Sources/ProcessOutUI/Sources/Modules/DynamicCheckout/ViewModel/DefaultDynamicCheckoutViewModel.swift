@@ -12,6 +12,7 @@ import SwiftUI
 
 // swiftlint:disable type_body_length file_length
 
+@available(iOS 14, *)
 final class DefaultDynamicCheckoutViewModel: ViewModel {
 
     init(interactor: some DynamicCheckoutInteractor) {
@@ -252,7 +253,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
 
     private func createCancelAction(
         _ state: DynamicCheckoutInteractorState.Started
-    ) -> POActionsContainerActionViewModel? {
+    ) -> POButtonViewModel? {
         guard state.isCancellable else {
             return nil
         }
@@ -278,16 +279,14 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         self.state = newState
     }
 
-    private func createSubmitAction(methodId: String, selectedMethodId: String?) -> POActionsContainerActionViewModel? {
+    private func createSubmitAction(methodId: String, selectedMethodId: String?) -> POButtonViewModel? {
         guard methodId == selectedMethodId else {
             return nil
         }
-        let viewModel = POActionsContainerActionViewModel(
+        let viewModel = POButtonViewModel(
             id: ButtonId.submit,
             title: interactor.configuration.submitButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
-            isEnabled: true,
-            isLoading: false,
-            isPrimary: true,
+            role: .primary,
             action: { [weak self] in
                 self?.interactor.startPayment(methodId: methodId)
             }
@@ -377,7 +376,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
 
     private func createCancelAction(
         _ state: DynamicCheckoutInteractorState.PaymentProcessing
-    ) -> POActionsContainerActionViewModel? {
+    ) -> POButtonViewModel? {
         guard state.isCancellable || state.snapshot.isCancellable else {
             return nil
         }
@@ -456,7 +455,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
 
     private func createCancelAction(
         _ state: DynamicCheckoutInteractorState.Restarting
-    ) -> POActionsContainerActionViewModel? {
+    ) -> POButtonViewModel? {
         guard state.snapshot.isCancellable || state.snapshot.snapshot.isCancellable else {
             return nil
         }
@@ -486,13 +485,12 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
 
     private func createCancelAction(
         title: String?, isEnabled: Bool, confirmation: POConfirmationDialogConfiguration?
-    ) -> POActionsContainerActionViewModel {
-        let viewModel = POActionsContainerActionViewModel(
+    ) -> POButtonViewModel {
+        let viewModel = POButtonViewModel(
             id: ButtonId.cancel,
             title: title ?? String(resource: .DynamicCheckout.Button.cancel),
             isEnabled: isEnabled,
-            isLoading: false,
-            isPrimary: false,
+            role: .cancel,
             action: { [weak self] in
                 self?.cancelCheckout(configuration: confirmation)
             }

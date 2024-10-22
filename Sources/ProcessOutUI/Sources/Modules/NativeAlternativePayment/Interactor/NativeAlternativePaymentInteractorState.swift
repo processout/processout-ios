@@ -101,6 +101,9 @@ enum NativeAlternativePaymentInteractorState {
 
         /// Action image.
         let image: UIImage?
+
+        /// Boolean value indicating whether the image is decorative (i.e., not meant for user interaction).
+        let isImageDecorative: Bool
     }
 
     /// Initial interactor state.

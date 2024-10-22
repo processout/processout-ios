@@ -29,7 +29,7 @@ final class AnyCardUpdateViewModel: CardUpdateViewModel {
         base.sections
     }
 
-    var actions: [POActionsContainerActionViewModel] {
+    var actions: [POButtonViewModel] {
         base.actions
     }
 

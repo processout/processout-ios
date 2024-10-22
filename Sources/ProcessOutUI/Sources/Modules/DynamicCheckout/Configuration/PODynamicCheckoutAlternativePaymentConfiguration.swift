@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 27.02.2024.
 //
 
+// swiftlint:disable nesting
+
 import Foundation
 
 /// Alternative payment specific dynamic checkout configuration.
@@ -14,7 +16,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
     public struct PaymentConfirmation: Sendable {
 
         /// Confirmation button configuration.
-        public struct ConfirmButton: Sendable { // swiftlint:disable:this nesting
+        public struct ConfirmButton: Sendable {
 
             /// Button title.
             public let title: String?
@@ -25,12 +27,26 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
             }
         }
 
+        /// Configuration options for barcode interaction.
+        public struct BarcodeInteraction: Sendable {
+
+            /// Button title.
+            public let saveButtonTitle: String?
+
+            /// Error confirmation dialog.
+            /// - NOTE: Secondary action is ignored.
+            public let saveErrorConfirmation: POConfirmationDialogConfiguration?
+        }
+
         /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
         /// Default timeout is 3 minutes while maximum value is 15 minutes.
         public let timeout: TimeInterval
 
         /// A delay before showing progress indicator during payment confirmation.
         public let showProgressIndicatorAfter: TimeInterval?
+
+        /// Barcode interaction configuration.
+        public let barcodeInteraction: BarcodeInteraction?
 
         /// Payment confirmation button configuration.
         ///
@@ -47,11 +63,13 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
         public init(
             timeout: TimeInterval = 180,
             showProgressIndicatorAfter: TimeInterval? = nil,
+            barcodeInteraction: BarcodeInteraction? = nil,
             confirmButton: ConfirmButton? = nil,
             cancelButton: CancelButton? = nil
         ) {
             self.timeout = timeout
             self.showProgressIndicatorAfter = showProgressIndicatorAfter
+            self.barcodeInteraction = barcodeInteraction
             self.confirmButton = confirmButton
             self.cancelButton = cancelButton
         }
@@ -95,3 +113,5 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
         self.paymentConfirmation = paymentConfirmation
     }
 }
+
+// swiftlint:enable nesting

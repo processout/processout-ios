@@ -5,12 +5,14 @@
 //  Created by Andrii Vysotskyi on 23.11.2023.
 //
 
+import Photos
 import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 // swiftlint:disable type_body_length file_length
 
+@available(iOS 14, *)
 final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     init(interactor: any NativeAlternativePaymentInteractor) {
@@ -132,7 +134,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func createActions(
         state: InteractorState.Started, isSubmitting: Bool
-    ) -> [POActionsContainerActionViewModel] {
+    ) -> [POButtonViewModel] {
         let actions = [
             submitAction(state: state, isLoading: isSubmitting),
             cancelAction(configuration: configuration.secondaryAction, isEnabled: !isSubmitting && state.isCancellable)
@@ -214,9 +216,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         return [section]
     }
 
-    private func createActions(state: InteractorState.AwaitingCapture) -> [POActionsContainerActionViewModel] {
+    private func createActions(state: InteractorState.AwaitingCapture) -> [POButtonViewModel] {
         let actions = [
             createConfirmPaymentCaptureAction(state: state),
+            createSaveImageAction(state: state),
             cancelAction(
                 configuration: configuration.paymentConfirmation.secondaryAction,
                 isEnabled: state.isCancellable
@@ -225,25 +228,60 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         return actions.compactMap { $0 }
     }
 
-    private func createConfirmPaymentCaptureAction(
-        state: InteractorState.AwaitingCapture
-    ) -> POActionsContainerActionViewModel? {
+    private func createConfirmPaymentCaptureAction(state: InteractorState.AwaitingCapture) -> POButtonViewModel? {
         guard state.shouldConfirmCapture else {
             return nil
         }
         let buttonTitle = interactor.configuration.paymentConfirmation.confirmButton?.title
             ?? String(resource: .NativeAlternativePayment.Button.confirmCapture)
-        let action = POActionsContainerActionViewModel(
-            id: "native-alternative-payment.primary-button",
+        let action = POButtonViewModel(
+            id: "primary-button",
             title: buttonTitle,
-            isEnabled: true,
-            isLoading: false,
-            isPrimary: true,
+            role: .primary,
             action: { [weak self] in
                 self?.interactor.confirmCapture()
             }
         )
         return action
+    }
+
+    private func createSaveImageAction(state: InteractorState.AwaitingCapture) -> POButtonViewModel? {
+        guard let customerAction = state.customerAction,
+              let image = customerAction.image,
+              !customerAction.isImageDecorative else {
+            return nil
+        }
+        let customTitle = interactor.configuration.paymentConfirmation.barcodeInteraction?.saveButtonTitle
+        let viewModel = POButtonViewModel(
+            id: "barcode-button",
+            title: customTitle ?? String(resource: .NativeAlternativePayment.Button.saveBarcode),
+            action: { [weak self] in
+                self?.saveImageToPhotoLibraryOrShowError(image)
+            }
+        )
+        return viewModel
+    }
+
+    private func saveImageToPhotoLibraryOrShowError(_ image: UIImage) {
+        Task { @MainActor in
+            let barcodeInteraction = interactor.configuration.paymentConfirmation.barcodeInteraction
+            if await saveImageToPhotoLibrary(image) {
+                if barcodeInteraction?.generateHapticFeedback != false {
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                }
+            } else {
+                let configuration = barcodeInteraction?.saveErrorConfirmation
+                let dialog = POConfirmationDialog(
+                    title: configuration?.title ?? String(resource: .NativeAlternativePayment.BarcodeError.title),
+                    message: configuration?.message ?? String(resource: .NativeAlternativePayment.BarcodeError.message),
+                    primaryButton: .init(
+                        // swiftlint:disable:next line_length
+                        title: configuration?.confirmActionTitle ?? String(resource: .NativeAlternativePayment.BarcodeError.confirm)
+                    )
+                )
+                self.state.confirmationDialog = dialog
+            }
+        }
     }
 
     // MARK: - Captured State
@@ -388,7 +426,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     // MARK: - Actions
 
-    private func submitAction(state: InteractorState.Started, isLoading: Bool) -> POActionsContainerActionViewModel? {
+    private func submitAction(state: InteractorState.Started, isLoading: Bool) -> POButtonViewModel? {
         let title: String
         if let customTitle = configuration.primaryActionTitle {
             title = customTitle
@@ -404,12 +442,12 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         guard !title.isEmpty else {
             return nil
         }
-        let action = POActionsContainerActionViewModel(
-            id: "native-alternative-payment.primary-button",
+        let action = POButtonViewModel(
+            id: "primary-button",
             title: title,
             isEnabled: state.areParametersValid,
             isLoading: isLoading,
-            isPrimary: true,
+            role: .primary,
             action: { [weak self] in
                 self?.interactor.submit()
             }
@@ -419,16 +457,15 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func cancelAction(
         configuration: PONativeAlternativePaymentConfiguration.SecondaryAction?, isEnabled: Bool
-    ) -> POActionsContainerActionViewModel? {
+    ) -> POButtonViewModel? {
         guard case let .cancel(title, _, confirmation) = configuration else {
             return nil
         }
-        let action = POActionsContainerActionViewModel(
+        let action = POButtonViewModel(
             id: "native-alternative-payment.secondary-button",
             title: title ?? String(resource: .NativeAlternativePayment.Button.cancel),
             isEnabled: isEnabled,
-            isLoading: false,
-            isPrimary: false,
+            role: .cancel,
             action: { [weak self] in
                 self?.cancelPayment(confirmationConfiguration: confirmation)
             }
@@ -463,6 +500,28 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         } else {
             interactor.cancel()
         }
+    }
+
+    private func saveImageToPhotoLibrary(_ image: UIImage) async -> Bool {
+        switch await PHPhotoLibrary.requestAuthorization(for: .addOnly) {
+        case .notDetermined:
+            assertionFailure("Unexpected 'notDetermined' status after requesting explicit authorization.")
+            return false
+        case .denied, .restricted:
+            return false
+        case .authorized, .limited:
+            break
+        @unknown default:
+            break // Attempt to save anyway
+        }
+        do {
+            try await PHPhotoLibrary.shared().performChanges {
+                PHAssetChangeRequest.creationRequestForAsset(from: image)
+            }
+        } catch {
+            return false
+        }
+        return true
     }
 }
 

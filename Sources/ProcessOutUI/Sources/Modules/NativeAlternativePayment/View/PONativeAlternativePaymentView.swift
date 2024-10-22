@@ -38,7 +38,6 @@ public struct PONativeAlternativePaymentView: View {
         }
         .onAppear(perform: viewModel.start)
         .onDisappear(perform: viewModel.stop)
-        .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
     }
 
     // MARK: - Private Properties

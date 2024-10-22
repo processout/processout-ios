@@ -50,6 +50,7 @@ struct NativeAlternativePaymentContentView: View {
             .frame(maxWidth: .infinity)
         }
         .backport.geometryGroup()
+        .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
     }
 
     // MARK: - Private Properties

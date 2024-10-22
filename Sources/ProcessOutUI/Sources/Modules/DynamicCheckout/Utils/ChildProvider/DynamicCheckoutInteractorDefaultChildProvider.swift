@@ -52,6 +52,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             ),
             invoicesService: invoicesService,
             imagesRepository: imagesRepository,
+            barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
             logger: logger,
             completion: { _ in }
         )
@@ -116,6 +117,12 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             timeout: configuration.timeout,
             showProgressIndicatorAfter: configuration.showProgressIndicatorAfter,
             hideGatewayDetails: true,
+            barcodeInteraction: configuration.barcodeInteraction.map { configuration in
+                .init(
+                    saveButtonTitle: configuration.saveButtonTitle,
+                    saveErrorConfirmation: configuration.saveErrorConfirmation
+                )
+            },
             confirmButton: configuration.confirmButton.map { button in
                 .init(title: button.title)
             },

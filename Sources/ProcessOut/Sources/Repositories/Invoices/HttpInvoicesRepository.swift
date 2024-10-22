@@ -30,21 +30,24 @@ final class HttpInvoicesRepository: InvoicesRepository {
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
     ) async throws -> PONativeAlternativePaymentMethodResponse {
-        struct RequestBox: Encodable, Sendable {
+        struct Request: Encodable, Sendable {
             struct NativeApm: Encodable, Sendable { // swiftlint:disable:this nesting
                 let parameterValues: [String: String]
             }
             let gatewayConfigurationId: String
             let nativeApm: NativeApm
         }
-        let requestBox = RequestBox(
+        struct Response: Decodable, Sendable {
+            let nativeApm: PONativeAlternativePaymentMethodResponse
+        }
+        let requestBox = Request(
             gatewayConfigurationId: request.gatewayConfigurationId,
             nativeApm: .init(parameterValues: request.parameters)
         )
-        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentMethodResponse>.post(
+        let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/invoices/\(request.invoiceId)/native-payment", body: requestBox
         )
-        return try await connector.execute(request: httpRequest)
+        return try await connector.execute(request: httpRequest).nativeApm
     }
 
     func invoice(request: POInvoiceRequest) async throws -> POInvoice {
@@ -82,10 +85,13 @@ final class HttpInvoicesRepository: InvoicesRepository {
     func captureNativeAlternativePayment(
         request: NativeAlternativePaymentCaptureRequest
     ) async throws -> PONativeAlternativePaymentMethodResponse {
-        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentMethodResponse>.post(
+        struct Response: Decodable, Sendable {
+            let nativeApm: PONativeAlternativePaymentMethodResponse
+        }
+        let httpRequest = HttpConnectorRequest<Response>.post(
             path: "/invoices/\(request.invoiceId)/capture", body: request
         )
-        return try await connector.execute(request: httpRequest)
+        return try await connector.execute(request: httpRequest).nativeApm
     }
 
     func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
