@@ -81,10 +81,8 @@ final class DynamicCheckoutDefaultInteractor:
     func select(methodId: String) {
         switch state {
         case .started(let currentState):
-            send(event: .willSelectPaymentMethod)
             setSelectedStateUnchecked(methodId: methodId, startedState: currentState)
-        case .selected(let currentState) where currentState.paymentMethodId != methodId:
-            send(event: .willSelectPaymentMethod)
+        case .selected(let currentState) where currentState.paymentMethod.id != methodId:
             setSelectedStateUnchecked(methodId: methodId, startedState: currentState.snapshot)
         case .selected:
             logger.debug("Method \(methodId) is already selected, ignored.")
@@ -102,13 +100,17 @@ final class DynamicCheckoutDefaultInteractor:
     func startPayment(methodId: String) {
         switch state {
         case .started(let currentState):
+            guard let paymentMethod = currentState.paymentMethods.first(where: { $0.id == methodId }) else {
+                assertionFailure("Unable to resolve requested payment method.")
+                return
+            }
             send(event: .willSelectPaymentMethod)
             continuePaymentProcessingUnchecked(
-                methodId: methodId, shouldSavePaymentMethod: nil, startedState: currentState
+                paymentMethod: paymentMethod, shouldSavePaymentMethod: nil, startedState: currentState
             )
         case .selected(let currentState):
             continuePaymentProcessingUnchecked(
-                methodId: methodId,
+                paymentMethod: currentState.paymentMethod,
                 shouldSavePaymentMethod: currentState.shouldSavePaymentMethod,
                 startedState: currentState.snapshot
             )
@@ -221,7 +223,7 @@ final class DynamicCheckoutDefaultInteractor:
             logger.debug("Can only restart interactor during payment processing, ignored.")
             return
         }
-        guard currentState.paymentMethodId != methodId else {
+        guard currentState.paymentMethod.id != methodId else {
             logger.debug("Requested payment method is already being processed, ignored.")
             return
         }
@@ -349,13 +351,15 @@ final class DynamicCheckoutDefaultInteractor:
 
     private func setSelectedStateUnchecked(methodId: String, startedState: State.Started) {
         guard let selectedPaymentMethod = startedState.paymentMethods.first(where: { $0.id == methodId }) else {
-            preconditionFailure("Unable to resolve selected payment method.")
+            assertionFailure("Unable to resolve requested payment method.")
+            return
         }
+        send(event: .willSelectPaymentMethod)
         var newStartedState = startedState
         newStartedState.recentErrorDescription = nil
         let newState = State.Selected(
             snapshot: newStartedState,
-            paymentMethodId: methodId,
+            paymentMethod: selectedPaymentMethod,
             shouldSavePaymentMethod: canSave(paymentMethod: selectedPaymentMethod) ? false : nil
         )
         state = .selected(newState)
@@ -372,11 +376,11 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Payment Processing
 
     private func continuePaymentProcessingUnchecked(
-        methodId: String, shouldSavePaymentMethod: Bool?, startedState: State.Started
+        paymentMethod: PODynamicCheckoutPaymentMethod, shouldSavePaymentMethod: Bool?, startedState: State.Started
     ) {
         var newStartedState = startedState
         newStartedState.recentErrorDescription = nil
-        switch startedState.paymentMethods.first(where: { $0.id == methodId }) {
+        switch paymentMethod {
         case .applePay(let method):
             startPassKitPayment(method: method, startedState: newStartedState)
         case .card(let method):
@@ -389,7 +393,7 @@ final class DynamicCheckoutDefaultInteractor:
             startNativeAlternativePayment(method: method, startedState: newStartedState)
         case .customerToken(let method):
             startCustomerTokenPayment(method: method, startedState: newStartedState)
-        case nil, .unknown:
+        case .unknown:
             logger.error("Attempted to start unknown payment method.")
         }
     }
@@ -424,7 +428,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
-            paymentMethodId: method.id,
+            paymentMethod: .applePay(method),
             willSavePaymentMethod: nil,
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: nil,
@@ -462,7 +466,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
-            paymentMethodId: method.id,
+            paymentMethod: .card(method),
             willSavePaymentMethod: nil,
             cardTokenizationInteractor: interactor,
             nativeAlternativePaymentInteractor: nil,
@@ -475,7 +479,7 @@ final class DynamicCheckoutDefaultInteractor:
 
     private func cardTokenization(willChangeState state: CardTokenizationInteractorState) {
         guard case .paymentProcessing(var currentState) = self.state,
-              case .card = currentPaymentMethod(state: currentState) else {
+              case .card = currentState.paymentMethod else {
             assertionFailure("No currently active card payment")
             return
         }
@@ -524,7 +528,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
-            paymentMethodId: method.id,
+            paymentMethod: .alternativePayment(method),
             willSavePaymentMethod: shouldSavePaymentMethod,
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: nil,
@@ -550,7 +554,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
-            paymentMethodId: method.id,
+            paymentMethod: .nativeAlternativePayment(method),
             willSavePaymentMethod: nil,
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: interactor,
@@ -564,7 +568,7 @@ final class DynamicCheckoutDefaultInteractor:
 
     private func nativeAlternativePayment(willChangeState state: NativeAlternativePaymentInteractorState) {
         guard case .paymentProcessing(var currentState) = self.state,
-              case .nativeAlternativePayment = currentPaymentMethod(state: currentState) else {
+              case .nativeAlternativePayment = currentState.paymentMethod else {
             assertionFailure("No currently active alternative payment")
             return
         }
@@ -619,7 +623,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         let paymentProcessingState = DynamicCheckoutInteractorState.PaymentProcessing(
             snapshot: startedState,
-            paymentMethodId: method.id,
+            paymentMethod: .customerToken(method),
             willSavePaymentMethod: nil,
             cardTokenizationInteractor: nil,
             nativeAlternativePaymentInteractor: nil,
@@ -678,14 +682,6 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Utils
 
-    private func currentPaymentMethod(state: State.PaymentProcessing) -> PODynamicCheckoutPaymentMethod {
-        let id = state.paymentMethodId
-        guard let paymentMethod = state.snapshot.paymentMethods.first(where: { $0.id == id }) else {
-            preconditionFailure("Non existing payment method ID.")
-        }
-        return paymentMethod
-    }
-
     private func invalidateInvoiceIfPossible() {
         if case .paymentProcessing(var currentState) = state {
             currentState.shouldInvalidateInvoice = true
@@ -728,7 +724,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
             throw POFailure(message: "Something went wrong.", code: .internal(.mobile))
         }
         try await authorizeInvoice(
-            using: currentPaymentMethod(state: currentState),
+            using: currentState.paymentMethod,
             source: card.id,
             saveSource: save,
             startedState: currentState.snapshot
