@@ -49,6 +49,9 @@ extension POStringResource {
             static let redirect = POStringResource("dynamic-checkout.redirect-warning", comment: "")
         }
 
+        /// Save payment method information message.
+        static let savePaymentMessage = POStringResource("dynamic-checkout.save-payment-message", comment: "")
+
         /// Success message.
         static let successMessage = POStringResource("dynamic-checkout.success-message", comment: "")
     }

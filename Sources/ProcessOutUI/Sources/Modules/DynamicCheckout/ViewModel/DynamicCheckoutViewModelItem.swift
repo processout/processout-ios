@@ -72,6 +72,9 @@ enum DynamicCheckoutViewModelItem {
         @Binding
         var isSelected: Bool
 
+        /// Defines whether method should be saved.
+        var shouldSave: Binding<Bool>?
+
         /// Payment details.
         let additionalInformation: String?
     }
