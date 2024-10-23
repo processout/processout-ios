@@ -28,7 +28,7 @@ struct DynamicCheckoutSectionView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .background(
-                    style.backgroundColor.opacity(section.areBezelsVisible ? 1 : 0)
+                    style.regularPaymentMethod.backgroundColor.opacity(section.areBezelsVisible ? 1 : 0)
                 )
                 .backport.geometryGroup()
             }
