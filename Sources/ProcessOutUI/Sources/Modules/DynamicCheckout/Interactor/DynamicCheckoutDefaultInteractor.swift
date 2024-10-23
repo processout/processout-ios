@@ -100,17 +100,13 @@ final class DynamicCheckoutDefaultInteractor:
     func startPayment(methodId: String) {
         switch state {
         case .started(let currentState):
-            guard let paymentMethod = currentState.paymentMethods.first(where: { $0.id == methodId }) else {
-                assertionFailure("Unable to resolve requested payment method.")
-                return
-            }
             send(event: .willSelectPaymentMethod)
             continuePaymentProcessingUnchecked(
-                paymentMethod: paymentMethod, shouldSavePaymentMethod: nil, startedState: currentState
+                paymentMethodId: methodId, shouldSavePaymentMethod: nil, startedState: currentState
             )
         case .selected(let currentState):
             continuePaymentProcessingUnchecked(
-                paymentMethod: currentState.paymentMethod,
+                paymentMethodId: methodId,
                 shouldSavePaymentMethod: currentState.shouldSavePaymentMethod,
                 startedState: currentState.snapshot
             )
@@ -376,8 +372,12 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Payment Processing
 
     private func continuePaymentProcessingUnchecked(
-        paymentMethod: PODynamicCheckoutPaymentMethod, shouldSavePaymentMethod: Bool?, startedState: State.Started
+        paymentMethodId: String, shouldSavePaymentMethod: Bool?, startedState: State.Started
     ) {
+        guard let paymentMethod = startedState.paymentMethods.first(where: { $0.id == paymentMethodId }) else {
+            assertionFailure("Unable to resolve requested payment method.")
+            return
+        }
         var newStartedState = startedState
         newStartedState.recentErrorDescription = nil
         switch paymentMethod {
