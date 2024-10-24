@@ -76,9 +76,6 @@ extension POImageResource {
 
         /// The "Card/Back" asset catalog image resource.
         static let back = POImageResource(name: "Card/Back")
-
-        /// The "Card/Front" asset catalog image resource.
-        static let front = POImageResource(name: "Card/Front")
     }
 
     /// The "Success" asset catalog image resource.
