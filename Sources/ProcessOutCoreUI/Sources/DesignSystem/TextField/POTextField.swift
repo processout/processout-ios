@@ -39,7 +39,7 @@ public struct POTextField<Trailing: View>: View {
                         transaction.animation = nil
                     }
             }
-            trailingView
+            trailingView.foregroundColor(text.isEmpty ? style.placeholder.color : style.text.color)
         }
         .padding(Constants.padding)
         .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
