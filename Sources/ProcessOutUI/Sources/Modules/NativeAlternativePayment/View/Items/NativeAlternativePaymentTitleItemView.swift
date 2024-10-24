@@ -19,9 +19,10 @@ struct NativeAlternativePaymentTitleItemView: View {
             Text(item.text)
                 .textStyle(style.title)
                 .padding(.horizontal, horizontalPadding)
-            Divider()
+            Rectangle()
+                .fill(style.separatorColor)
                 .frame(height: 1)
-                .overlay(style.separatorColor)
+                .frame(maxWidth: .infinity)
         }
     }
 

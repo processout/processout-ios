@@ -26,9 +26,10 @@ public struct POCardUpdateView: View {
                         Text(title)
                             .textStyle(style.title)
                             .padding(.horizontal, POSpacing.large)
-                        Divider()
+                        Rectangle()
+                            .fill(style.separatorColor)
                             .frame(height: 1)
-                            .overlay(style.separatorColor)
+                            .frame(maxWidth: .infinity)
                     }
                     ForEach(viewModel.sections) { element in
                         CardUpdateSectionView(section: element, focusedInputId: $viewModel.focusedItemId)
