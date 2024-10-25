@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "ChevronDown.pdf",
+      "filename" : "ChevronDownLight.pdf",
       "idiom" : "universal"
     },
     {
@@ -11,7 +11,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "ChevronDown 1.pdf",
+      "filename" : "ChevronDownDark.pdf",
       "idiom" : "universal"
     }
   ],
