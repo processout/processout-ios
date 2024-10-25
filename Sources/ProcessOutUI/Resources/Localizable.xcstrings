@@ -1769,6 +1769,34 @@
         }
       }
     },
+    "dynamic-checkout.save-payment-message" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حِفْظُ هذِهِ الطَّريقَةِ لِلدَّفْعِ في المُستَقبَلِ"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save this method for future payments"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer cette méthode pour les paiements futurs"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar este método para futuros pagamentos"
+          }
+        }
+      }
+    },
     "dynamic-checkout.success-message" : {
       "localizations" : {
         "ar" : {
