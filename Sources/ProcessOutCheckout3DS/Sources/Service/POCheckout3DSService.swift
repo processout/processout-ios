@@ -20,6 +20,7 @@ public actor POCheckout3DSService: PO3DS2Service {
             semaphore.signal()
         }
         invalidate()
+        await delegate?.checkout3DSService(self, willCreateAuthenticationRequestParametersWith: configuration)
         do {
             let service = try Standalone3DSService.initialize(
                 with: await serviceConfiguration(with: configuration), environment: environment
@@ -50,8 +51,8 @@ public actor POCheckout3DSService: PO3DS2Service {
             invalidate()
             semaphore.signal()
         }
+        await delegate?.checkout3DSService(self, willPerformChallengeWith: parameters)
         do {
-            await delegate?.checkout3DSService(self, willPerformChallengeWith: parameters)
             guard let transaction = service?.createTransaction() else {
                 throw POFailure(code: .generic(.mobile))
             }
@@ -106,7 +107,7 @@ public actor POCheckout3DSService: PO3DS2Service {
         service = nil
     }
 
-    private func waitForSemaphoreUnlessCancelled() async throws {
+    private func waitForSemaphoreUnlessCancelled() async throws(POFailure) {
         do {
             try await semaphore.waitUnlessCancelled()
         } catch {
@@ -116,11 +117,11 @@ public actor POCheckout3DSService: PO3DS2Service {
 
     // MARK: - Mapping
 
-    private func serviceConfiguration(with configuration: PO3DS2Configuration) async -> ThreeDS2ServiceConfiguration {
-        let configParameters = configurationMapper.convert(configuration: configuration)
-        let serviceConfiguration = await delegate?.checkout3DSService(
-            self, willCreateServiceConfigurationWith: configParameters, configuration: configuration
-        )
+    private func serviceConfiguration(
+        with configuration: PO3DS2Configuration
+    ) async throws -> ThreeDS2ServiceConfiguration {
+        let configParameters = try configurationMapper.convert(configuration: configuration)
+        let serviceConfiguration = await delegate?.checkout3DSService(self, configurationWith: configParameters)
         return serviceConfiguration ?? .init(configParameters: configParameters)
     }
 

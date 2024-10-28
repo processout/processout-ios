@@ -13,6 +13,13 @@ import Checkout3DS
 public protocol POCheckout3DSServiceDelegate: AnyObject, Sendable {
 
     /// Notifies delegate that service is about to fingerprint device.
+    @MainActor
+    func checkout3DSService(
+        _ service: POCheckout3DSService,
+        willCreateAuthenticationRequestParametersWith configuration: PO3DS2Configuration
+    )
+
+    /// Allows delegate to return customized 3DS service configuration.
     ///
     /// Your implementation could return custom `ThreeDS2ServiceConfiguration` in case you want to
     /// customize underlying 3DS SDK appearance and behavior. Please note that `configParameters`
@@ -20,8 +27,7 @@ public protocol POCheckout3DSServiceDelegate: AnyObject, Sendable {
     @MainActor
     func checkout3DSService(
         _ service: POCheckout3DSService,
-        willCreateServiceConfigurationWith parameters: ThreeDS2ServiceConfiguration.ConfigParameters,
-        configuration: PO3DS2Configuration
+        configurationWith parameters: ThreeDS2ServiceConfiguration.ConfigParameters
     ) -> ThreeDS2ServiceConfiguration?
 
     /// Asks delegate whether service should continue with given warnings. Default implementation
@@ -90,11 +96,18 @@ extension POCheckout3DSServiceDelegate {
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService,
-        willCreateServiceConfigurationWith parameters: ThreeDS2ServiceConfiguration.ConfigParameters,
-        configuration: PO3DS2Configuration
-    ) -> ThreeDS2ServiceConfiguration? {
+        willCreateAuthenticationRequestParametersWith configuration: PO3DS2Configuration
+    ) {
         willCreateAuthenticationRequest(configuration: configuration)
-        return self.configuration(with: parameters)
+    }
+
+    @available(*, deprecated)
+    @MainActor
+    public func checkout3DSService(
+        _ service: POCheckout3DSService,
+        configurationWith parameters: ThreeDS2ServiceConfiguration.ConfigParameters
+    ) -> ThreeDS2ServiceConfiguration? {
+        configuration(with: parameters)
     }
 
     @available(*, deprecated)
