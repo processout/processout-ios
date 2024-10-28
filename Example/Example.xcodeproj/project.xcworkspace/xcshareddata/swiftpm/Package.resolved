@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/checkout/checkout-3ds-sdk-ios",
       "state" : {
-        "revision" : "d3548a0ad311e5599b4e9c44bf4fc86b0c52a532",
-        "version" : "3.2.4"
+        "revision" : "17bee169a7ef971f85513a90a07af34e830ff19a",
+        "version" : "3.2.5"
       }
     },
     {
