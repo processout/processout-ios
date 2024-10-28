@@ -10,6 +10,7 @@ import ProcessOut
 import Checkout3DS
 
 /// Builder to configure and create service capable of handling 3DS challenges using Checkout3DS SDK.
+@available(*, deprecated, message: "Instantiate POCheckout3DSService directly.")
 public final class POCheckout3DSServiceBuilder {
 
     /// - NOTE: Delegate will be strongly referenced by created service.
@@ -36,17 +37,8 @@ public final class POCheckout3DSServiceBuilder {
     }
 
     /// Creates service instance.
-    public func build() -> PO3DSService {
-        guard let delegate else {
-            preconditionFailure("Delegate must be set.")
-        }
-        let service = Checkout3DSService(
-            errorMapper: DefaultAuthenticationErrorMapper(),
-            configurationMapper: DefaultConfigurationMapper(),
-            delegate: delegate,
-            environment: environment
-        )
-        return service
+    public func build() -> PO3DS2Service {
+        POCheckout3DSService(delegate: delegate, environment: environment)
     }
 
     // MARK: - Private Properties
