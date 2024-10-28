@@ -8,7 +8,18 @@
 @_spi(PO) import ProcessOut
 import Checkout3DS
 
+/// 3DS2 service implementation that is based on Checkout3DS.
 public actor POCheckout3DSService: PO3DS2Service {
+
+    /// Creates service instance.
+    public init(delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production) {
+        self.init(
+            errorMapper: DefaultAuthenticationErrorMapper(),
+            configurationMapper: DefaultConfigurationMapper(),
+            delegate: delegate,
+            environment: environment
+        )
+    }
 
     // MARK: - PO3DS2Service
 
@@ -77,9 +88,8 @@ public actor POCheckout3DSService: PO3DS2Service {
     private let configurationMapper: ConfigurationMapper
     private let semaphore: POAsyncSemaphore
     private let environment: Checkout3DS.Environment
-
+    private let delegate: POCheckout3DSServiceDelegate?
     private var service: ThreeDS2Service?
-    private weak var delegate: POCheckout3DSServiceDelegate?
 
     // MARK: -
 
@@ -154,18 +164,5 @@ public actor POCheckout3DSService: PO3DS2Service {
             return errorMapper.convert(error: error)
         }
         return POFailure(code: .generic(.mobile), underlyingError: error)
-    }
-}
-
-extension POCheckout3DSService {
-
-    /// Creates service instance.
-    public init(delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production) {
-        self.init(
-            errorMapper: DefaultAuthenticationErrorMapper(),
-            configurationMapper: DefaultConfigurationMapper(),
-            delegate: delegate,
-            environment: environment
-        )
     }
 }

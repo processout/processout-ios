@@ -57,12 +57,12 @@ public protocol POCheckout3DSServiceDelegate: AnyObject, Sendable {
     // MARK: -
 
     /// Notifies delegate that service is about to fingerprint device.
-    @available(*, deprecated, renamed: "checkout3DSService(_:willCreateConfigurationWith:)")
+    @available(*, deprecated, renamed: "checkout3DSService(_:willCreateAuthenticationRequestParametersWith:)")
     func willCreateAuthenticationRequest(configuration: PO3DS2Configuration)
 
     /// Asks implementation to create `ThreeDS2ServiceConfiguration` using `configParameters`. This method
     /// could be used to customize underlying 3DS SDK appearance and behavior.
-    @available(*, deprecated, renamed: "checkout3DSService(_:willCreateConfigurationWith:)")
+    @available(*, deprecated, renamed: "checkout3DSService(_:configurationWith:)")
     func configuration(
         with parameters: Checkout3DS.ThreeDS2ServiceConfiguration.ConfigParameters
     ) -> Checkout3DS.ThreeDS2ServiceConfiguration
