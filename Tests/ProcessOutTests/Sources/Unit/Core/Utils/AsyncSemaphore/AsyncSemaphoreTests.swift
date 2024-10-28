@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 10.10.2024.
 //
 
-@testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 import XCTest
 
 final class AsyncSemaphoreTests: XCTestCase {
@@ -14,7 +14,7 @@ final class AsyncSemaphoreTests: XCTestCase {
 
     func test_wait_whenInitialValueIsZero_suspends() async {
         // Given
-        let sut = AsyncSemaphore(value: 0)
+        let sut = POAsyncSemaphore(value: 0)
         let expectation = XCTestExpectation()
         expectation.isInverted = true
 
@@ -30,7 +30,7 @@ final class AsyncSemaphoreTests: XCTestCase {
 
     func test_wait_whenInitialValueIsGreaterThanZero_doesntSuspend() async {
         // Given
-        let sut = AsyncSemaphore(value: 1)
+        let sut = POAsyncSemaphore(value: 1)
         let expectation = XCTestExpectation()
 
         // When
@@ -45,7 +45,7 @@ final class AsyncSemaphoreTests: XCTestCase {
 
     func test_wait_whenSemaphoreIsBlocked_suspendsSecondFunc() async {
         // Given
-        let sut = AsyncSemaphore(value: 1)
+        let sut = POAsyncSemaphore(value: 1)
         let expectation1 = XCTestExpectation(), expectation2 = XCTestExpectation()
         expectation2.isInverted = true
 
@@ -65,7 +65,7 @@ final class AsyncSemaphoreTests: XCTestCase {
 
     func test_waitUnlessCancelled_whenInitialValueIsZero_suspendsAndDoesntThrow() async {
         // Given
-        let sut = AsyncSemaphore(value: 0)
+        let sut = POAsyncSemaphore(value: 0)
         let expectation = XCTestExpectation()
         expectation.isInverted = true
 
@@ -85,7 +85,7 @@ final class AsyncSemaphoreTests: XCTestCase {
 
     func test_waitUnlessCancelled_whenInitialValueIsGreaterThanZero_doesntSuspendNorThrow() async {
         // Given
-        let sut = AsyncSemaphore(value: 1)
+        let sut = POAsyncSemaphore(value: 1)
         let expectation = XCTestExpectation()
 
         // When
@@ -104,7 +104,7 @@ final class AsyncSemaphoreTests: XCTestCase {
 
     func test_waitUnlessCancelled_whenSemaphoreIsBlocked_suspendsSecondFuncAndDoesntThrow() async {
         // Given
-        let sut = AsyncSemaphore(value: 1)
+        let sut = POAsyncSemaphore(value: 1)
         let expectation1 = XCTestExpectation(), expectation2 = XCTestExpectation()
         expectation2.isInverted = true
 
@@ -126,7 +126,7 @@ final class AsyncSemaphoreTests: XCTestCase {
 
     func test_waitUnlessCancelled_whenCancelledImmediately_throwsCancellationError() async {
         // Given
-        let sut = AsyncSemaphore(value: 0)
+        let sut = POAsyncSemaphore(value: 0)
         let expectation = XCTestExpectation()
 
         // When
@@ -146,7 +146,7 @@ final class AsyncSemaphoreTests: XCTestCase {
 
     func test_waitUnlessCancelled_whenCancelledAfterDelay_throwsCancellationError() async {
         // Given
-        let sut = AsyncSemaphore(value: 0)
+        let sut = POAsyncSemaphore(value: 0)
         let expectation = XCTestExpectation()
 
         // When
@@ -171,7 +171,7 @@ final class AsyncSemaphoreTests: XCTestCase {
 
     func test_signal_whenSemaphoreIsBlocked_resumesWhenSignalled() async {
         // Given
-        let sut = AsyncSemaphore(value: 1)
+        let sut = POAsyncSemaphore(value: 1)
         let expectation = XCTestExpectation()
 
         // When
