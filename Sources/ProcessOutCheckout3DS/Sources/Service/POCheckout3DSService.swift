@@ -13,12 +13,15 @@ public actor POCheckout3DSService: PO3DS2Service {
 
     /// Creates service instance.
     public init(delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production) {
-        self.init(
-            errorMapper: DefaultAuthenticationErrorMapper(),
-            configurationMapper: DefaultConfigurationMapper(),
-            delegate: delegate,
-            environment: environment
-        )
+        self.errorMapper = DefaultAuthenticationErrorMapper()
+        self.configurationMapper = DefaultConfigurationMapper()
+        self.delegate = delegate
+        self.environment = environment
+        semaphore = .init(value: 1)
+    }
+
+    deinit {
+        service?.cleanUp()
     }
 
     // MARK: - PO3DS2Service
@@ -90,25 +93,6 @@ public actor POCheckout3DSService: PO3DS2Service {
     private let environment: Checkout3DS.Environment
     private let delegate: POCheckout3DSServiceDelegate?
     private var service: ThreeDS2Service?
-
-    // MARK: -
-
-    init(
-        errorMapper: AuthenticationErrorMapper,
-        configurationMapper: ConfigurationMapper,
-        delegate: POCheckout3DSServiceDelegate?,
-        environment: Checkout3DS.Environment
-    ) {
-        self.errorMapper = errorMapper
-        self.configurationMapper = configurationMapper
-        self.delegate = delegate
-        self.environment = environment
-        semaphore = .init(value: 1)
-    }
-
-    deinit {
-        service?.cleanUp()
-    }
 
     // MARK: - Utils
 
