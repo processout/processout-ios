@@ -98,7 +98,7 @@ extension CardPaymentViewModel: POCardTokenizationDelegate {
         case .test:
             threeDSService = POTest3DSService()
         case .checkout:
-            threeDSService = POCheckout3DSService()
+            threeDSService = POCheckout3DSService(environment: .sandbox)
         }
         try await invoicesService.authorizeInvoice(request: invoiceAuthorizationRequest, threeDSService: threeDSService)
     }
