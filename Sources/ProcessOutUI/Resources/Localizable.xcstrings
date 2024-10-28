@@ -1789,6 +1789,12 @@
             "value" : "Enregistrer cette méthode pour les paiements futurs"
           }
         },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisz tę metodę płatności na przyszłe płatności"
+          }
+        },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
