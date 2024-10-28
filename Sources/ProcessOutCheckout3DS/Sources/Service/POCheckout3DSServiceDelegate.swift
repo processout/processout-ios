@@ -54,7 +54,7 @@ public protocol POCheckout3DSServiceDelegate: AnyObject, Sendable {
         _ service: POCheckout3DSService, didPerformChallenge result: Result<PO3DS2ChallengeResult, POFailure>
     )
 
-    // MARK: -
+    // MARK: - Deprecations
 
     /// Notifies delegate that service is about to fingerprint device.
     @available(*, deprecated, renamed: "checkout3DSService(_:willCreateAuthenticationRequestParametersWith:)")
@@ -90,9 +90,9 @@ public protocol POCheckout3DSServiceDelegate: AnyObject, Sendable {
     func handle(redirect: PO3DSRedirect, completion: @escaping (Result<String, POFailure>) -> Void)
 }
 
+/// Provides default implementations to ensure backward compatibility.
 extension POCheckout3DSServiceDelegate {
 
-    @available(*, deprecated)
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService,
@@ -101,7 +101,6 @@ extension POCheckout3DSServiceDelegate {
         willCreateAuthenticationRequest(configuration: configuration)
     }
 
-    @available(*, deprecated)
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService,
@@ -110,7 +109,6 @@ extension POCheckout3DSServiceDelegate {
         configuration(with: parameters)
     }
 
-    @available(*, deprecated)
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService, shouldContinueWith warnings: Set<Warning>
@@ -120,8 +118,6 @@ extension POCheckout3DSServiceDelegate {
         }
     }
 
-    /// Notifies delegate that service failed to produce device fingerprint.
-    @available(*, deprecated)
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService,
@@ -130,8 +126,6 @@ extension POCheckout3DSServiceDelegate {
         didCreateAuthenticationRequest(result: result)
     }
 
-    /// Notifies delegate that implementation is about to perform 3DS2 challenge.
-    @available(*, deprecated)
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService, willPerformChallengeWith parameters: PO3DS2ChallengeParameters
@@ -139,8 +133,6 @@ extension POCheckout3DSServiceDelegate {
         willHandle(challenge: parameters)
     }
 
-    /// Notifies delegate that service ended processing 3DS2 challenge with either success or failure.
-    @available(*, deprecated)
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService, didPerformChallenge result: Result<PO3DS2ChallengeResult, POFailure>
