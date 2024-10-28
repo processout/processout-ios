@@ -110,7 +110,7 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
         let request = POApplePayPaymentTokenizationRequest(
             payment: payment,
             merchantIdentifier: paymentRequest.merchantIdentifier,
-            metadata: nil // todo(andrii-vysotskyi): decide if metadata injection should be allowed
+            metadata: nil
         )
         let card: POCard
         do {
@@ -124,7 +124,6 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
             let errors = errorMapper.map(poError: error)
             return PKPaymentAuthorizationResult(status: .failure, errors: errors)
         }
-        // todo(andrii-vysotskyi): decide if errors should be mapped with other results
         if let result = await delegate?.paymentAuthorizationController(self, didTokenizePayment: payment, card: card) {
             result.errors = result.errors.flatMap(errorMapper.map)
             return result

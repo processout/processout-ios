@@ -97,7 +97,6 @@ final class DefaultSafariViewModel: NSObject, SFSafariViewControllerDelegate {
             logger.info("Can't change state to completed because already in sink state.")
             return false
         }
-        // todo(andrii-vysotskyi): consider validating whether url is related to initial request if possible
         guard callback.matchesURL(url) else {
             logger.debug("Ignoring unrelated url: \(url)")
             return false

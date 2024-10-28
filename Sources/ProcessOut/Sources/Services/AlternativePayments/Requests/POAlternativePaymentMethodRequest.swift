@@ -5,8 +5,6 @@
 //  Created by Simeon Kostadinov on 27/10/2022.
 //
 
-// todo(andrii-vysotskyi): consider splitting request into separate tokenization and authorization requests
-
 import Foundation
 
 /// Request describing parameters that are used to create URL that user can be redirected to initiate
