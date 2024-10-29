@@ -58,8 +58,12 @@ enum DynamicCheckoutInteractorState {
         /// Started state snapshot.
         let snapshot: Started
 
-        /// Selected payment method ID.
-        let paymentMethodId: String
+        /// Selected payment method.
+        let paymentMethod: PODynamicCheckoutPaymentMethod
+
+        /// Indicates if the payment method should be saved for future use.
+        /// `nil` means saving is not supported.
+        var shouldSavePaymentMethod: Bool?
     }
 
     struct PaymentProcessing {
@@ -68,7 +72,10 @@ enum DynamicCheckoutInteractorState {
         let snapshot: Started
 
         /// Payment method ID that is currently being processed.
-        let paymentMethodId: String
+        let paymentMethod: PODynamicCheckoutPaymentMethod
+
+        /// Indicates if the current payment method will be saved. `nil` means the information is unavailable.
+        let willSavePaymentMethod: Bool?
 
         /// Card tokenization interactor.
         let cardTokenizationInteractor: (any CardTokenizationInteractor)?

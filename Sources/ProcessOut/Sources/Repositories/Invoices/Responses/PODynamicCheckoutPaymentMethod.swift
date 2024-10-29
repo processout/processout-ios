@@ -98,6 +98,10 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
 
         /// Redirect URL.
         public let redirectUrl: URL
+
+        /// Indicates whether the UI should display a control (such as a checkbox) that allows
+        /// the user to choose whether to save payment details for future payments.
+        public let savingAllowed: Bool
     }
 
     // MARK: - Card
@@ -190,6 +194,9 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
 
         /// Display name.
         public let name: String
+
+        /// Payment method description.
+        public let description: String?
 
         /// Payment method logo.
         public let logo: POImageRemoteResource
