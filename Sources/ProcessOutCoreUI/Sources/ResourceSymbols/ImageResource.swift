@@ -34,6 +34,9 @@ extension POImageResource {
 
     /// The "Info" asset catalog image resource.
     public static let info = POImageResource(name: "Info")
+
+    /// The "Info" asset catalog image resource.
+    public static let chevronDown = POImageResource(name: "ChevronDown")
 }
 
 extension Image {

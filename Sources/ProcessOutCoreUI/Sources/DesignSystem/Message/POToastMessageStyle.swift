@@ -24,13 +24,25 @@ public struct POToastMessageStyle: POMessageViewStyle {
 
         /// Text style.
         public let text: POTextStyle
+
+        public init(icon: Image?, border: POBorderStyle, backgroundColor: Color, text: POTextStyle) {
+            self.icon = icon
+            self.border = border
+            self.backgroundColor = backgroundColor
+            self.text = text
+        }
     }
 
     /// Style to apply to message view with **error** severity.
     public let error: Severity
 
-    public init(error: Severity = .error) {
+    public init(error: Severity) {
         self.error = error
+    }
+
+    @available(*, deprecated)
+    public init() {
+        self.error = .error
     }
 
     // MARK: - POMessageStyle
@@ -64,7 +76,7 @@ extension POMessageViewStyle where Self == POToastMessageStyle {
 
     /// Toast message style.
     public static var toast: POToastMessageStyle {
-        POToastMessageStyle()
+        POToastMessageStyle(error: .error)
     }
 }
 

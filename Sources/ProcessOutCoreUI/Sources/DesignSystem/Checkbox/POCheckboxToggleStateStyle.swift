@@ -23,6 +23,14 @@ public struct POCheckboxToggleStateStyle: Sendable {
 
         /// Border style.
         public let border: POBorderStyle
+
+        /// Creates checkmark style instance.
+        public init(color: Color, width: CGFloat, backgroundColor: Color, border: POBorderStyle) {
+            self.color = color
+            self.width = width
+            self.backgroundColor = backgroundColor
+            self.border = border
+        }
     }
 
     /// Checkmark style.

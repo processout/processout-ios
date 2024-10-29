@@ -129,7 +129,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             createItem(
                 parameter: startedState.cvc,
                 placeholder: String(resource: .CardTokenization.CardDetails.cvc),
-                icon: Image(poResource: .Card.back),
+                icon: Image(poResource: .Card.back).renderingMode(.template),
                 keyboard: .asciiCapableNumberPad
             )
         ]
