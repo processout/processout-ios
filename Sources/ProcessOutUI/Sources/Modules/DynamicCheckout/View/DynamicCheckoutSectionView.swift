@@ -19,16 +19,17 @@ struct DynamicCheckoutSectionView: View {
             ForEach(items, id: \.element.id) { offset, item in
                 VStack(spacing: 0) {
                     if section.areBezelsVisible, offset != 0 {
-                        Divider()
+                        Rectangle()
+                            .fill(style.regularPaymentMethod.border.color)
                             .frame(height: style.regularPaymentMethod.border.width)
-                            .overlay(style.regularPaymentMethod.border.color)
+                            .frame(maxWidth: .infinity)
                     }
                     DynamicCheckoutItemView(item: item)
                         .padding(section.areBezelsVisible ? POSpacing.large : 0)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .background(
-                    style.backgroundColor.opacity(section.areBezelsVisible ? 1 : 0)
+                    style.regularPaymentMethod.backgroundColor.opacity(section.areBezelsVisible ? 1 : 0)
                 )
                 .backport.geometryGroup()
             }

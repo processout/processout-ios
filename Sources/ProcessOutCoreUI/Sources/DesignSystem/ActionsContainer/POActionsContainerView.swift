@@ -37,9 +37,9 @@ public struct POActionsContainerView: View {
             }
             .padding(POSpacing.large)
             .overlay(
-                Divider()
+                Rectangle()
+                    .fill(style.separatorColor)
                     .frame(height: 1)
-                    .overlay(style.separatorColor)
                     .frame(maxHeight: .infinity, alignment: .top)
             )
             .background(

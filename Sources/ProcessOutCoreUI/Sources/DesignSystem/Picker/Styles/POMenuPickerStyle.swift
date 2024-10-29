@@ -42,12 +42,16 @@ public struct POMenuPickerStyle: POPickerStyle {
     @ViewBuilder
     private func label(configuration: POPickerStyleConfiguration) -> some View {
         let style = configuration.isInvalid ? inputStyle.error : inputStyle.normal
-        Group {
+        HStack(spacing: POSpacing.small) {
             if let element = configuration.elements.first(where: \.isSelected) {
                 element.makeBody().textStyle(style.text)
             } else {
                 Text(verbatim: "").textStyle(style.placeholder)
             }
+            Spacer()
+            Image(poResource: .chevronDown)
+                .renderingMode(.template)
+                .foregroundColor(style.text.color)
         }
         .transaction { transaction in
             transaction.animation = nil
