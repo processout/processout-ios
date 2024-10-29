@@ -198,11 +198,7 @@ public final class ProcessOut: @unchecked Sendable {
     }
 
     private static func createCustomerActionsService(logger: POLogger) -> CustomerActionsService {
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .useDefaultKeys
-        let encoder = JSONEncoder()
-        encoder.dataEncodingStrategy = .base64
-        encoder.keyEncodingStrategy = .useDefaultKeys
+        let decoder = JSONDecoder(), encoder = JSONEncoder()
         let webSession = DefaultWebAuthenticationSession()
         return DefaultCustomerActionsService(decoder: decoder, encoder: encoder, webSession: webSession, logger: logger)
     }
