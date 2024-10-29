@@ -24,8 +24,8 @@ public struct POBarcode: Decodable, Sendable {
     /// The type of the barcode.
     public let type: BarcodeType
 
-    /// The message to encode in the barcode.
-    public let message: Data
+    /// The value to encode in the barcode.
+    public let value: Data
 }
 
 extension POBarcode.BarcodeType: Decodable {
@@ -39,5 +39,5 @@ extension POBarcode.BarcodeType: Decodable {
 extension POBarcode.BarcodeType {
 
     /// Represents a QR (Quick Response) code type.
-    public static let qr = Self(rawValue: "QR") // swiftlint:disable:this identifier_name
+    public static let qr = Self(rawValue: "qr") // swiftlint:disable:this identifier_name
 }

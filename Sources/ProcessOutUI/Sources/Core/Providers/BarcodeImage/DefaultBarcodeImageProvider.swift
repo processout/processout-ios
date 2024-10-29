@@ -43,7 +43,7 @@ final class DefaultBarcodeImageProvider: BarcodeImageProvider {
         switch barcode.type {
         case .qr:
             let generator = CIFilter.qrCodeGenerator()
-            generator.message = barcode.message
+            generator.message = barcode.value
             generator.correctionLevel = "L"
             return generator
         default:
