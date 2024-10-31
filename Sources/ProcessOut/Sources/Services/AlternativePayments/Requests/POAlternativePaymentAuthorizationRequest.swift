@@ -23,7 +23,7 @@ public struct POAlternativePaymentAuthorizationRequest: Sendable {
     /// Additional Data that will be supplied to the APM.
     public let additionalData: [String: String]?
 
-    /// An object used to evaluate navigation events in an authentication session.
+    /// An object used to evaluate navigation events in a web authentication session.
     public let callback: POWebAuthenticationCallback?
 
     /// Creates authorization request.

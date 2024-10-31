@@ -5,8 +5,7 @@
 //  Created by Andrii Vysotskyi on 31.10.2024.
 //
 
-/// An object used to evaluate navigation events in an authentication session. When the session navigates
-/// to a matching URL, it will pass the URL to the session completion handler.
+/// An object used to evaluate navigation events in a web authentication session.
 public struct POWebAuthenticationCallback: Sendable {
 
     enum Value: Sendable {

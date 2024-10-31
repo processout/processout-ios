@@ -25,7 +25,9 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     // MARK: - CustomerActionsService
 
-    func handle(action: _CustomerAction, threeDSService: PO3DS2Service) async throws -> String {
+    func handle(
+        action: _CustomerAction, threeDSService: PO3DS2Service, callback: POWebAuthenticationCallback?
+    ) async throws -> String {
         do {
             switch action.type {
             case .fingerprintMobile:
@@ -33,9 +35,9 @@ final class DefaultCustomerActionsService: CustomerActionsService {
             case .challengeMobile:
                 return try await challenge(encodedChallenge: action.value, threeDSService: threeDSService)
             case .fingerprint:
-                return try await fingerprint(url: action.value)
+                return try await fingerprint(url: action.value, callback: callback)
             case .redirect, .url:
-                return try await redirect(url: action.value)
+                return try await redirect(url: action.value, callback: callback)
             }
         } catch let error as POFailure {
             throw error
@@ -91,7 +93,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     // MARK: - Redirects
 
-    private func fingerprint(url: String) async throws -> String {
+    private func fingerprint(url: String, callback: POWebAuthenticationCallback?) async throws -> String {
         guard let url = URL(string: url) else {
             logger.error("Unable to create URL from string: \(url).")
             throw POFailure(message: "Can't process customer action.", code: .internal(.mobile), underlyingError: nil)
@@ -101,7 +103,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
                 message: "Unable to complete device fingerprinting within the expected time.", code: .timeout(.mobile)
             )
             return try await withTimeout(Constants.webFingerprintTimeout, error: timeoutError) {
-                try await self.redirect(url: url.absoluteString)
+                try await self.redirect(url: url.absoluteString, callback: callback)
             }
         } catch let failure as POFailure where failure.code == .timeout(.mobile) {
             // Fingerprinting timeout is treated differently from other errors.
@@ -110,12 +112,12 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         }
     }
 
-    private func redirect(url: String) async throws -> String {
+    private func redirect(url: String, callback: POWebAuthenticationCallback?) async throws -> String {
         guard let url = URL(string: url) else {
             logger.error("Unable to create URL from string: \(url).")
             throw POFailure(message: "Can't process customer action.", code: .internal(.mobile), underlyingError: nil)
         }
-        let returnUrl = try await self.webSession.authenticate(using: url)
+        let returnUrl = try await self.webSession.authenticate(using: .init(url: url, callback: callback))
         let queryItems = URLComponents(string: returnUrl.absoluteString)?.queryItems
         return queryItems?.first { $0.name == "token" }?.value ?? ""
     }
