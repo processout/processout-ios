@@ -23,7 +23,9 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
             let newRequest: POAssignCustomerTokenRequest
             do {
                 let newSource = try await customerActionsService.handle(
-                    action: customerAction, threeDSService: threeDSService, callback: request.callback
+                    action: customerAction,
+                    threeDSService: threeDSService,
+                    webAuthenticationCallback: request.webAuthenticationCallback
                 )
                 newRequest = request.replacing(source: newSource)
             } catch {
@@ -66,7 +68,7 @@ private extension POAssignCustomerTokenRequest { // swiftlint:disable:this no_ex
             invoiceId: invoiceId,
             thirdPartySdkVersion: thirdPartySdkVersion,
             metadata: metadata,
-            callback: callback
+            webAuthenticationCallback: webAuthenticationCallback
         )
         return updatedRequest
     }

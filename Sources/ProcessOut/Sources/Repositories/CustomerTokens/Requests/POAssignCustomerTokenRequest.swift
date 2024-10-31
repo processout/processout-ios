@@ -46,7 +46,7 @@ public struct POAssignCustomerTokenRequest: Encodable, Sendable { // sourcery: A
     public let metadata: [String: String]?
 
     /// An object used to evaluate navigation events in a web authentication session.
-    public let callback: POWebAuthenticationCallback? // sourcery:coding: skip
+    public let webAuthenticationCallback: POWebAuthenticationCallback? // sourcery:coding: skip
 
     /// Creates request instance.
     public init(
@@ -59,7 +59,7 @@ public struct POAssignCustomerTokenRequest: Encodable, Sendable { // sourcery: A
         enableThreeDS2 _: Bool = true,
         thirdPartySdkVersion: String? = nil,
         metadata: [String: String]? = nil,
-        callback: POWebAuthenticationCallback? = nil
+        webAuthenticationCallback: POWebAuthenticationCallback? = nil
     ) {
         self.customerId = customerId
         self.tokenId = tokenId
@@ -69,6 +69,6 @@ public struct POAssignCustomerTokenRequest: Encodable, Sendable { // sourcery: A
         self.invoiceId = invoiceId
         self.thirdPartySdkVersion = thirdPartySdkVersion
         self.metadata = metadata
-        self.callback = callback
+        self.webAuthenticationCallback = webAuthenticationCallback
     }
 }

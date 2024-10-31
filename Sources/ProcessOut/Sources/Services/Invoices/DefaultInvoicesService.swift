@@ -40,7 +40,9 @@ final class DefaultInvoicesService: POInvoicesService {
         let newRequest: POInvoiceAuthorizationRequest
         do {
             let newSource = try await customerActionsService.handle(
-                action: customerAction, threeDSService: threeDSService, callback: request.callback
+                action: customerAction,
+                threeDSService: threeDSService,
+                webAuthenticationCallback: request.webAuthenticationCallback
             )
             newRequest = request.replacing(source: newSource)
         } catch {
@@ -116,7 +118,7 @@ private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_e
             allowFallbackToSale: allowFallbackToSale,
             clientSecret: clientSecret,
             metadata: metadata,
-            callback: callback
+            webAuthenticationCallback: webAuthenticationCallback
         )
         return updatedRequest
     }

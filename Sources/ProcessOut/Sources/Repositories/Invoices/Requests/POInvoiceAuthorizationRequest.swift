@@ -71,7 +71,7 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
     public let metadata: [String: String]?
 
     /// An object used to evaluate navigation events in a web authentication session.
-    public let callback: POWebAuthenticationCallback? // sourcery:coding: skip
+    public let webAuthenticationCallback: POWebAuthenticationCallback? // sourcery:coding: skip
 
     public init(
         invoiceId: String,
@@ -90,7 +90,7 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
         allowFallbackToSale: Bool = false,
         clientSecret: String? = nil,
         metadata: [String: String]? = nil,
-        callback: POWebAuthenticationCallback? = nil
+        webAuthenticationCallback: POWebAuthenticationCallback? = nil
     ) {
         self.invoiceId = invoiceId
         self.source = source
@@ -107,6 +107,6 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
         self.allowFallbackToSale = allowFallbackToSale
         self.clientSecret = clientSecret
         self.metadata = metadata
-        self.callback = callback
+        self.webAuthenticationCallback = webAuthenticationCallback
     }
 }

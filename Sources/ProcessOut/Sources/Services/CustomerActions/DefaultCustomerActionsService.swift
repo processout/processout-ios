@@ -26,7 +26,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
     // MARK: - CustomerActionsService
 
     func handle(
-        action: _CustomerAction, threeDSService: PO3DS2Service, callback: POWebAuthenticationCallback?
+        action: _CustomerAction, threeDSService: PO3DS2Service, webAuthenticationCallback: POWebAuthenticationCallback?
     ) async throws -> String {
         do {
             switch action.type {
@@ -35,9 +35,9 @@ final class DefaultCustomerActionsService: CustomerActionsService {
             case .challengeMobile:
                 return try await challenge(encodedChallenge: action.value, threeDSService: threeDSService)
             case .fingerprint:
-                return try await fingerprint(url: action.value, callback: callback)
+                return try await fingerprint(url: action.value, callback: webAuthenticationCallback)
             case .redirect, .url:
-                return try await redirect(url: action.value, callback: callback)
+                return try await redirect(url: action.value, callback: webAuthenticationCallback)
             }
         } catch let error as POFailure {
             throw error
