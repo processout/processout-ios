@@ -23,16 +23,21 @@ public struct POAlternativePaymentTokenizationRequest: Sendable {
     /// Additional data that will be supplied to the APM.
     public let additionalData: [String: String]?
 
+    /// An object used to evaluate navigation events in an authentication session.
+    public let callback: POWebAuthenticationCallback?
+
     /// Creates tokenization request.
     public init(
         customerId: String,
         customerTokenId: String,
         gatewayConfigurationId: String,
-        additionalData: [String: String]? = nil
+        additionalData: [String: String]? = nil,
+        callback: POWebAuthenticationCallback? = nil
     ) {
         self.customerId = customerId
         self.customerTokenId = customerTokenId
         self.gatewayConfigurationId = gatewayConfigurationId
         self.additionalData = additionalData
+        self.callback = callback
     }
 }
