@@ -248,29 +248,34 @@ final class NativeAlternativePaymentDefaultInteractor:
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
     ) async {
         if configuration.paymentConfirmation.waitsConfirmation {
-            let paymentProvider = await paymentProvider(with: parameterValues, gateway: gateway)
-            let customerAction = await customerAction(with: parameterValues, gateway: gateway)
-            switch state {
-            case .starting, .submitting:
-                break
-            default:
-                logger.debug("Ignoring attempt to wait for capture from unsupported state.")
-                return
+            do {
+                let paymentProvider = await paymentProvider(with: parameterValues, gateway: gateway)
+                let customerAction = try await customerAction(with: parameterValues, gateway: gateway)
+                switch state {
+                case .starting, .submitting:
+                    break
+                default:
+                    logger.debug("Ignoring attempt to wait for capture from unsupported state.")
+                    return
+                }
+                send(event: .willWaitForCaptureConfirmation(additionalActionExpected: customerAction != nil))
+                // swiftlint:disable:next line_length
+                let shouldConfirmCapture = customerAction != nil && configuration.paymentConfirmation.confirmButton != nil
+                let awaitingCaptureState = State.AwaitingCapture(
+                    paymentProvider: paymentProvider,
+                    customerAction: customerAction,
+                    isCancellable: disableDuration(of: configuration.paymentConfirmation.secondaryAction).isZero,
+                    isDelayed: false,
+                    shouldConfirmCapture: shouldConfirmCapture
+                )
+                state = .awaitingCapture(awaitingCaptureState)
+                if !shouldConfirmCapture {
+                    confirmCapture(force: true)
+                }
+                enableCaptureCancellationAfterDelay()
+            } catch {
+                setFailureState(error: error)
             }
-            send(event: .willWaitForCaptureConfirmation(additionalActionExpected: customerAction != nil))
-            let shouldConfirmCapture = customerAction != nil && configuration.paymentConfirmation.confirmButton != nil
-            let awaitingCaptureState = State.AwaitingCapture(
-                paymentProvider: paymentProvider,
-                customerAction: customerAction,
-                isCancellable: disableDuration(of: configuration.paymentConfirmation.secondaryAction).isZero,
-                isDelayed: false,
-                shouldConfirmCapture: shouldConfirmCapture
-            )
-            state = .awaitingCapture(awaitingCaptureState)
-            if !shouldConfirmCapture {
-                confirmCapture(force: true)
-            }
-            enableCaptureCancellationAfterDelay()
         } else {
             logger.info("Payment capture wasn't requested, will attempt to set submitted state directly.")
             setSubmittedState()
@@ -326,7 +331,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func customerAction(
         with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
-    ) async -> NativeAlternativePaymentInteractorState.CaptureCustomerAction? {
+    ) async throws -> NativeAlternativePaymentInteractorState.CaptureCustomerAction? {
         // todo(andrii-vysotskyi): decide if `null` customer action should be allowed
         let message = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
         guard let message else {
@@ -336,6 +341,9 @@ final class NativeAlternativePaymentDefaultInteractor:
         if let barcode = parameterValues?.customerActionBarcode {
             let minimumSize = CGSize(width: 250, height: 250)
             image = barcodeImageProvider.image(for: barcode, minimumSize: minimumSize)
+            if image == nil {
+                throw POFailure(message: "Unable to generate barcode image.", code: .internal(.mobile))
+            }
             isImageDecorative = false
         } else {
             image = await imagesRepository.image(at: gateway.customerActionImageUrl)
