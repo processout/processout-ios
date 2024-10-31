@@ -11,7 +11,8 @@ protocol CustomerActionsService: POService {
     /// - Parameters:
     ///   - action: customer action to handle.
     ///   - threeDSService: delegate that would perform 3DS2 handling
-    ///   - callback: An object used to evaluate navigation events in a web authentication session.
+    ///   - webAuthenticationCallback: An object used to evaluate navigation
+    ///   events in a web authentication session.
     func handle(
         action: _CustomerAction, threeDSService: PO3DS2Service, webAuthenticationCallback: POWebAuthenticationCallback?
     ) async throws -> String
