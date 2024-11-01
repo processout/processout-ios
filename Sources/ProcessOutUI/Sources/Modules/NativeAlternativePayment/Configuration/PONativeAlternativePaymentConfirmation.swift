@@ -11,6 +11,7 @@ import Foundation
 public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint:disable:this type_name
 
     /// Configuration options for barcode interaction.
+    @_spi(PO)
     public struct BarcodeInteraction {
 
         /// Button title.
@@ -64,6 +65,7 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
     public let hideGatewayDetails: Bool
 
     /// Barcode interaction configuration.
+    @_spi(PO)
     public let barcodeInteraction: BarcodeInteraction?
 
     /// Payment confirmation button configuration.
@@ -78,6 +80,25 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
     public let secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction?
 
     /// Creates configuration instance.
+    public init(
+        waitsConfirmation: Bool = true,
+        timeout: TimeInterval = 180,
+        showProgressIndicatorAfter: TimeInterval? = nil,
+        hideGatewayDetails: Bool = false,
+        confirmButton: ConfirmButton? = nil,
+        secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction? = nil
+    ) {
+        self.waitsConfirmation = waitsConfirmation
+        self.timeout = timeout
+        self.showProgressIndicatorAfter = showProgressIndicatorAfter
+        self.hideGatewayDetails = hideGatewayDetails
+        self.barcodeInteraction = .init()
+        self.confirmButton = confirmButton
+        self.secondaryAction = secondaryAction
+    }
+
+    /// Creates configuration instance.
+    @_spi(PO)
     public init(
         waitsConfirmation: Bool = true,
         timeout: TimeInterval = 180,

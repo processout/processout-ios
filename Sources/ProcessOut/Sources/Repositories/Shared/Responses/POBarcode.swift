@@ -8,6 +8,7 @@
 import Foundation
 
 /// Represents a barcode with its type and encoded data.
+@_spi(PO)
 public struct POBarcode: Decodable, Sendable {
 
     /// Represents the type of barcode (e.g., QR code, UPC, etc.).
