@@ -48,10 +48,10 @@ public struct POConfirmationDialog {
     public let primaryButton: Button
 
     /// Secondary button.
-    public let secondaryButton: Button
+    public let secondaryButton: Button?
 
     /// Creates confirmation dialog instance.
-    public init(title: String, message: String? = nil, primaryButton: Button, secondaryButton: Button) {
+    public init(title: String, message: String? = nil, primaryButton: Button, secondaryButton: Button? = nil) {
         self.title = title
         self.message = message
         self.primaryButton = primaryButton

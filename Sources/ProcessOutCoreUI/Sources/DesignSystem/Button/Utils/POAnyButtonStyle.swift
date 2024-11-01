@@ -16,7 +16,7 @@ public struct POAnyButtonStyle: ButtonStyle {
         self.style = style
     }
 
-    public func makeBody(configuration: Configuration) -> AnyView {
+    public func makeBody(configuration: Configuration) -> some View {
         AnyView(style.makeBody(configuration: configuration))
     }
 

@@ -20,7 +20,10 @@ struct AttributedStringBuilder {
     var fontFeatures = POFontFeaturesSettings()
 
     /// Allows to override current trait collection's size category with custom value.
-    var sizeCategory: UIContentSizeCategory
+    var sizeCategory: ContentSizeCategory
+
+    /// Allows to override color scheme. Has effect on iOS greater than 17.
+    var colorScheme: ColorScheme?
 
     /// The color of the text.
     var color: Color
@@ -53,12 +56,12 @@ struct AttributedStringBuilder {
     // MARK: - Private Methods
 
     private func buildAttributes() -> [NSAttributedString.Key: Any] {
-        let font = font(typography: typography)
+        let font = resolvedFont()
         var attributes: [NSAttributedString.Key: Any] = [:]
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
         attributes[.font] = font
         attributes[.baselineOffset] = Self.baselineOffset(font: font, lineHeightMultiple: lineHeightMultiple)
-        attributes[.foregroundColor] = UIColor(color)
+        attributes[.foregroundColor] = resolvedForegroundColor()
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.maximumLineHeight = font.lineHeight * lineHeightMultiple
         paragraphStyle.minimumLineHeight = font.lineHeight * lineHeightMultiple
@@ -72,11 +75,25 @@ struct AttributedStringBuilder {
         return attributes
     }
 
-    private func font(typography: POTypography) -> UIFont {
+    private func resolvedForegroundColor() -> UIColor {
+        let resolvedColor: Color
+        if let colorScheme, #available(iOS 17.0, *) {
+            // On iOS 18 (!), when Color is converted to UIColor, system is unable to resolve proper
+            // value on its own (based on colorScheme) when used with NSAttributedString.
+            var environment = EnvironmentValues()
+            environment.colorScheme = colorScheme
+            resolvedColor = Color(color.resolve(in: environment))
+        } else {
+            resolvedColor = color
+        }
+        return UIColor(resolvedColor)
+    }
+
+    private func resolvedFont() -> UIFont {
         var font = typography.font
         if let textStyle = typography.textStyle {
             let traits = UITraitCollection(
-                traitsFrom: [.current, .init(preferredContentSizeCategory: sizeCategory)]
+                traitsFrom: [.current, .init(preferredContentSizeCategory: .init(sizeCategory))]
             )
             font = UIFontMetrics(forTextStyle: textStyle).scaledFont(for: typography.font, compatibleWith: traits)
         }

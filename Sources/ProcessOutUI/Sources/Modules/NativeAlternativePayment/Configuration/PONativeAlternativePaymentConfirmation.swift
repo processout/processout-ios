@@ -10,6 +10,32 @@ import Foundation
 /// Configuration specific to native APM payment confirmation.
 public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint:disable:this type_name
 
+    /// Configuration options for barcode interaction.
+    @_spi(PO)
+    public struct BarcodeInteraction {
+
+        /// Button title.
+        public let saveButtonTitle: String?
+
+        /// Save error confirmation dialog.
+        /// - NOTE: Secondary action is ignored.
+        public let saveErrorConfirmation: POConfirmationDialogConfiguration?
+
+        /// Indicates if haptic feedback is generated during barcode interaction. Feedback is only provided
+        /// when the barcode is successfully saved. Default is true.
+        public let generateHapticFeedback: Bool
+
+        public init(
+            saveButtonTitle: String? = nil,
+            saveErrorConfirmation: POConfirmationDialogConfiguration? = nil,
+            generateHapticFeedback: Bool = true
+        ) {
+            self.saveButtonTitle = saveButtonTitle
+            self.saveErrorConfirmation = saveErrorConfirmation
+            self.generateHapticFeedback = generateHapticFeedback
+        }
+    }
+
     /// Confirmation button configuration.
     public struct ConfirmButton {
 
@@ -38,6 +64,10 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
     /// Default value is `false`.
     public let hideGatewayDetails: Bool
 
+    /// Barcode interaction configuration.
+    @_spi(PO)
+    public let barcodeInteraction: BarcodeInteraction?
+
     /// Payment confirmation button configuration.
     ///
     /// Displays a confirmation button when the user needs to perform an external customer action (e.g.,
@@ -62,6 +92,27 @@ public struct PONativeAlternativePaymentConfirmationConfiguration { // swiftlint
         self.timeout = timeout
         self.showProgressIndicatorAfter = showProgressIndicatorAfter
         self.hideGatewayDetails = hideGatewayDetails
+        self.barcodeInteraction = .init()
+        self.confirmButton = confirmButton
+        self.secondaryAction = secondaryAction
+    }
+
+    /// Creates configuration instance.
+    @_spi(PO)
+    public init(
+        waitsConfirmation: Bool = true,
+        timeout: TimeInterval = 180,
+        showProgressIndicatorAfter: TimeInterval? = nil,
+        hideGatewayDetails: Bool = false,
+        barcodeInteraction: BarcodeInteraction? = nil,
+        confirmButton: ConfirmButton? = nil,
+        secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction? = nil
+    ) {
+        self.waitsConfirmation = waitsConfirmation
+        self.timeout = timeout
+        self.showProgressIndicatorAfter = showProgressIndicatorAfter
+        self.hideGatewayDetails = hideGatewayDetails
+        self.barcodeInteraction = barcodeInteraction
         self.confirmButton = confirmButton
         self.secondaryAction = secondaryAction
     }

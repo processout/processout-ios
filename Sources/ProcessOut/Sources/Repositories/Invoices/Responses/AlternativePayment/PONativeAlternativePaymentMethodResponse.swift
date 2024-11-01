@@ -9,22 +9,28 @@ import Foundation
 
 public struct PONativeAlternativePaymentMethodResponse: Decodable, Sendable {
 
+    /// Payment's state.
+    public let state: PONativeAlternativePaymentMethodState
+
+    /// Contains details about the additional information you need to collect from your customer before creating the
+    /// payment request.
+    public let parameterDefinitions: [PONativeAlternativePaymentMethodParameter]?
+
+    /// Additional information about payment step.
+    public let parameterValues: PONativeAlternativePaymentMethodParameterValues?
+}
+
+extension PONativeAlternativePaymentMethodResponse {
+
     @available(*, deprecated, message: "Use PONativeAlternativePaymentMethodParameterValues directly.")
     public typealias NativeAlternativePaymentMethodParameterValues = PONativeAlternativePaymentMethodParameterValues
 
-    public struct NativeApm: Decodable, Sendable {
-
-        /// Payment's state.
-        public let state: PONativeAlternativePaymentMethodState
-
-        /// Contains details about the additional information you need to collect from your customer before creating the
-        /// payment request.
-        public let parameterDefinitions: [PONativeAlternativePaymentMethodParameter]?
-
-        /// Additional information about payment step.
-        public let parameterValues: PONativeAlternativePaymentMethodParameterValues?
-    }
+    @available(*, deprecated, message: "Use PONativeAlternativePaymentMethodResponse directly.")
+    public typealias NativeApm = PONativeAlternativePaymentMethodResponse
 
     /// Details for alternative payment method.
-    public let nativeApm: NativeApm
+    @available(*, deprecated, message: "Access PONativeAlternativePaymentMethodResponse properties directly.")
+    public var nativeApm: NativeApm {
+        self
+    }
 }

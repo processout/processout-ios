@@ -33,7 +33,11 @@ private struct ContentModifier: ViewModifier {
                 isPresented = confirmationDialog != nil
                 confirmationDialogSnapshot = confirmationDialog
             }
-            .alert(isPresented: $isPresented) { confirmationAlert }
+            .overlay(
+                // When an alert defined at multiple levels in the view hierarchy, only the
+                // higher-level alert will be shown. Workaround is to present alert from an overlay.
+                Color.clear.alert(isPresented: $isPresented) { confirmationAlert }
+            )
     }
 
     // MARK: - Private Properties
@@ -48,12 +52,21 @@ private struct ContentModifier: ViewModifier {
         guard let dialog = confirmationDialogSnapshot else {
             preconditionFailure("Confirmation dialog must be set.")
         }
-        let alert = Alert(
-            title: Text(dialog.title),
-            message: dialog.message.map(Text.init),
-            primaryButton: createAlertButton(with: dialog.primaryButton),
-            secondaryButton: createAlertButton(with: dialog.secondaryButton)
-        )
+        let alert: Alert
+        if let secondaryButton = dialog.secondaryButton {
+            alert = Alert(
+                title: Text(dialog.title),
+                message: dialog.message.map(Text.init),
+                primaryButton: createAlertButton(with: dialog.primaryButton),
+                secondaryButton: createAlertButton(with: secondaryButton)
+            )
+        } else {
+            alert = Alert(
+                title: Text(dialog.title),
+                message: dialog.message.map(Text.init),
+                dismissButton: createAlertButton(with: dialog.primaryButton)
+            )
+        }
         return alert
     }
 

@@ -54,7 +54,7 @@ enum DynamicCheckoutViewModelItem {
         let content: RegularPaymentContent?
 
         /// Submits payment information.
-        let submitButton: POActionsContainerActionViewModel?
+        let submitButton: POButtonViewModel?
     }
 
     struct RegularPaymentInfo {
