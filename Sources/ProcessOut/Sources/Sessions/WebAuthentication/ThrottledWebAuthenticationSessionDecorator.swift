@@ -16,9 +16,7 @@ actor ThrottledWebAuthenticationSessionDecorator: WebAuthenticationSession {
 
     // MARK: - WebAuthenticationSession
 
-    func authenticate(
-        using url: URL, callbackScheme: String?, additionalHeaderFields: [String: String]?
-    ) async throws -> URL {
+    func authenticate(using request: WebAuthenticationRequest) async throws -> URL {
         do {
             try await semaphore.waitUnlessCancelled()
         } catch {
@@ -29,9 +27,7 @@ actor ThrottledWebAuthenticationSessionDecorator: WebAuthenticationSession {
             semaphore.signal()
         }
         await delayAuthenticationIfNeeded()
-        return try await self.session.authenticate(
-            using: url, callbackScheme: callbackScheme, additionalHeaderFields: additionalHeaderFields
-        )
+        return try await self.session.authenticate(using: request)
     }
 
     // MARK: - Private Properties

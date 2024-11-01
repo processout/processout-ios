@@ -37,7 +37,10 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
             // When
             let failure = await assertThrowsError(
-                try await sut.handle(action: customerAction, threeDSService: threeDSService), errorType: POFailure.self
+                try await sut.handle(
+                    action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+                ),
+                errorType: POFailure.self
             )
 
             // Then
@@ -70,7 +73,9 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             }
 
             // When
-            _ = try? await sut.handle(action: customerAction, threeDSService: threeDSService)
+            _ = try? await sut.handle(
+                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            )
         }
         XCTAssertEqual(delegateCallsCount, customerActions.count)
     }
@@ -85,7 +90,10 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
         // When
         let failure = await assertThrowsError(
-            try await sut.handle(action: customerAction, threeDSService: threeDSService), errorType: POFailure.self
+            try await sut.handle(
+                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            ),
+            errorType: POFailure.self
         )
 
         // Then
@@ -105,7 +113,10 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
         // When
         let failure = await assertThrowsError(
-            try await sut.handle(action: customerAction, threeDSService: threeDSService), errorType: POFailure.self
+            try await sut.handle(
+                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            ),
+            errorType: POFailure.self
         )
 
         // Then
@@ -127,7 +138,9 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         }
 
         // When
-        let token = try await sut.handle(action: customerAction, threeDSService: threeDSService)
+        let token = try await sut.handle(
+            action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+        )
 
         // Then
         let expectedToken = """
@@ -146,7 +159,10 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
         // When
         let failure = await assertThrowsError(
-            try await sut.handle(action: customerAction, threeDSService: threeDSService), errorType: POFailure.self
+            try await sut.handle(
+                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            ),
+            errorType: POFailure.self
         )
 
         // Then
@@ -170,7 +186,9 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         }
 
         // When
-        _ = try await sut.handle(action: defaultChallengeMobileCustomerAction, threeDSService: threeDSService)
+        _ = try await sut.handle(
+            action: defaultChallengeMobileCustomerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+        )
         XCTAssertTrue(isDelegateCalled)
     }
 
@@ -183,7 +201,11 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
         // When
         let failure = await assertThrowsError(
-            try await sut.handle(action: defaultChallengeMobileCustomerAction, threeDSService: threeDSService),
+            try await sut.handle(
+                action: defaultChallengeMobileCustomerAction,
+                threeDSService: threeDSService,
+                webAuthenticationCallback: nil
+            ),
             errorType: POFailure.self
         )
 
@@ -198,7 +220,9 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         }
 
         // When
-        let token = try await sut.handle(action: defaultChallengeMobileCustomerAction, threeDSService: threeDSService)
+        let token = try await sut.handle(
+            action: defaultChallengeMobileCustomerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+        )
 
         // Then
         XCTAssertEqual(token, "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIllcIn0ifQ==")
@@ -211,7 +235,9 @@ final class DefaultThreeDSServiceTests: XCTestCase {
         }
 
         // When
-        let token = try await sut.handle(action: defaultChallengeMobileCustomerAction, threeDSService: threeDSService)
+        let token = try await sut.handle(
+            action: defaultChallengeMobileCustomerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+        )
 
         // Then
         XCTAssertEqual(token, "gway_req_eyJib2R5Ijoie1widHJhbnNTdGF0dXNcIjpcIk5cIn0ifQ==")
@@ -221,7 +247,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
     func test_handle_whenActionTypeIsUrlOrFingerprint_callsWebSession() async throws {
         // Given
-        webSession.authenticateFromClosure = { _, _, _ in
+        webSession.authenticateFromClosure = { _ in
             URL(string: "example.com")!
         }
         let actionTypes: [_CustomerAction.ActionType] = [.url, .fingerprint]
@@ -230,7 +256,9 @@ final class DefaultThreeDSServiceTests: XCTestCase {
             let customerAction = _CustomerAction(type: actionType, value: "example.com")
 
             // When
-            _ = try await sut.handle(action: customerAction, threeDSService: threeDSService)
+            _ = try await sut.handle(
+                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            )
         }
 
         // Then
@@ -246,7 +274,10 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
             // When
             let failure = await assertThrowsError(
-                try await sut.handle(action: action, threeDSService: threeDSService), errorType: POFailure.self
+                try await sut.handle(
+                    action: action, threeDSService: threeDSService, webAuthenticationCallback: nil
+                ),
+                errorType: POFailure.self
             )
 
             // Then
@@ -256,26 +287,28 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
     func test_handle_whenRedirectValueIsValidUrl_callsWebSession() async throws {
         // Given
-        webSession.authenticateFromClosure = { url, _, _ in
-            XCTAssertEqual(URL(string: "example.com"), url)
+        webSession.authenticateFromClosure = { request in
+            XCTAssertEqual(URL(string: "example.com"), request.url)
             return URL(string: "test://return")!
         }
         let customerAction = _CustomerAction(type: .redirect, value: "example.com")
 
         // When
-        _ = try await sut.handle(action: customerAction, threeDSService: threeDSService)
+        _ = try await sut.handle(action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil)
         XCTAssertEqual(webSession.authenticateCallsCount, 1)
     }
 
     func test_handle_whenRedirectCompletesWithNewToken_propagatesToken() async throws {
         // Given
-        webSession.authenticateFromClosure = { _, _, _ in
+        webSession.authenticateFromClosure = { _ in
             URL(string: "test://return?token=test")!
         }
         let customerAction = _CustomerAction(type: .redirect, value: "example.com")
 
         // When
-        let value = try await sut.handle(action: customerAction, threeDSService: threeDSService)
+        let value = try await sut.handle(
+            action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+        )
 
         // Then
         XCTAssertEqual(value, "test")
@@ -283,7 +316,7 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
     func test_handle_whenRedirectFails_propagatesError() async {
         // Given
-        webSession.authenticateFromClosure = { _, _, _ in
+        webSession.authenticateFromClosure = { _ in
             throw POFailure(code: .unknown(rawValue: "test-error"))
         }
 
@@ -291,7 +324,10 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
         // When
         let failure = await assertThrowsError(
-            try await sut.handle(action: customerAction, threeDSService: threeDSService), errorType: POFailure.self
+            try await sut.handle(
+                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            ),
+            errorType: POFailure.self
         )
 
         // Then
@@ -303,26 +339,28 @@ final class DefaultThreeDSServiceTests: XCTestCase {
     func test_handle_whenFingerprintValueIsValidUrl_callsWebSession() async throws {
         // Given
         let expectedRedirectUrl = URL(string: "example.com")!
-        webSession.authenticateFromClosure = { url, _, _ in
-            XCTAssertEqual(url, expectedRedirectUrl)
+        webSession.authenticateFromClosure = { request in
+            XCTAssertEqual(request.url, expectedRedirectUrl)
             return URL(string: "test://return")!
         }
         let customerAction = _CustomerAction(type: .fingerprint, value: expectedRedirectUrl.absoluteString)
 
         // When
-        _ = try await sut.handle(action: customerAction, threeDSService: threeDSService)
+        _ = try await sut.handle(action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil)
         XCTAssertEqual(webSession.authenticateCallsCount, 1)
     }
 
     func test_handle_whenFingerprintCompletesWithNewToken_propagatesToken() async throws {
         // Given
-        webSession.authenticateFromClosure = { _, _, _ in
+        webSession.authenticateFromClosure = { _ in
             URL(string: "test://return?token=test")!
         }
         let customerAction = _CustomerAction(type: .fingerprint, value: "example.com")
 
         // When
-        let value = try await sut.handle(action: customerAction, threeDSService: threeDSService)
+        let value = try await sut.handle(
+            action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+        )
 
         // Then
         XCTAssertEqual(value, "test")
@@ -330,14 +368,17 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
     func test_handle_whenFingerprintFails_propagatesError() async {
         // Given
-        webSession.authenticateFromClosure = { _, _, _ in
+        webSession.authenticateFromClosure = { _ in
             throw POFailure(code: .unknown(rawValue: "test-error"))
         }
         let customerAction = _CustomerAction(type: .fingerprint, value: "example.com")
 
         // When
         let failure = await assertThrowsError(
-            try await sut.handle(action: customerAction, threeDSService: threeDSService), errorType: POFailure.self
+            try await sut.handle(
+                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            ),
+            errorType: POFailure.self
         )
 
         // Then
@@ -346,13 +387,15 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
     func test_handle_whenFingerprintFailsWithTimeoutError_succeeds() async throws {
         // Given
-        webSession.authenticateFromClosure = { _, _, _ in
+        webSession.authenticateFromClosure = { _ in
             throw POFailure(code: .timeout(.mobile))
         }
         let customerAction = _CustomerAction(type: .fingerprint, value: "example.com")
 
         // When
-        let value = try await sut.handle(action: customerAction, threeDSService: threeDSService)
+        let value = try await sut.handle(
+            action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+        )
 
             // Then
         let expectedValue = """
@@ -363,14 +406,16 @@ final class DefaultThreeDSServiceTests: XCTestCase {
 
     func test_handle_whenFingerprintTakesTooLong_succeedsWithTimeout() async throws {
         // Given
-        webSession.authenticateFromClosure = { _, _, _ in
+        webSession.authenticateFromClosure = { _ in
             try await Task.sleep(seconds: 15)
             return URL(string: "test://return")!
         }
         let customerAction = _CustomerAction(type: .fingerprint, value: "example.com")
 
         // When
-        let value = try await sut.handle(action: customerAction, threeDSService: threeDSService)
+        let value = try await sut.handle(
+            action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+        )
 
         // Then
         let expectedValue = """
