@@ -146,6 +146,7 @@ Types that describe properties such as shadow and border. And style of higher le
 
 ### Utils
 
+- ``POWebAuthenticationCallback``
 - ``POPaginationOptions``
 - ``POCancellable``
 - ``POImmutableExcludedCodable``

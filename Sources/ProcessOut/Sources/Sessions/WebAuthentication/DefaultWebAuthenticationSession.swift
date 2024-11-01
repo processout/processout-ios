@@ -17,9 +17,7 @@ final class DefaultWebAuthenticationSession:
 
     // MARK: - WebAuthenticationSession
 
-    func authenticate(
-        using url: URL, callbackScheme: String?, additionalHeaderFields: [String: String]?
-    ) async throws -> URL {
+    func authenticate(using request: WebAuthenticationRequest) async throws -> URL {
         let sessionProxy = WebAuthenticationSessionProxy()
         return try await withTaskCancellationHandler(
             operation: {
@@ -29,25 +27,12 @@ final class DefaultWebAuthenticationSession:
                         continuation.resume(throwing: failure)
                         return
                     }
-                    let session = ASWebAuthenticationSession(
-                        url: url,
-                        callbackURLScheme: callbackScheme,
-                        completionHandler: { url, error in
-                            sessionProxy.invalidate()
-                            if let error {
-                                continuation.resume(throwing: Self.converted(error: error))
-                            } else if let url {
-                                continuation.resume(returning: url)
-                            } else {
-                                preconditionFailure("Unexpected ASWebAuthenticationSession completion result.")
-                            }
-                        }
-                    )
+                    let session = Self.createAuthenticationSession(with: request) { result in
+                        sessionProxy.invalidate()
+                        continuation.resume(with: result)
+                    }
                     session.prefersEphemeralWebBrowserSession = true
                     session.presentationContextProvider = self
-                    if #available(iOS 17.4, *) {
-                        session.additionalHeaderFields = additionalHeaderFields
-                    }
                     sessionProxy.setSession(session, continuation: continuation)
                     if !session.start() {
                         // swiftlint:disable:next line_length
@@ -74,6 +59,38 @@ final class DefaultWebAuthenticationSession:
     }
 
     // MARK: - Private Methods
+
+    private static func createAuthenticationSession(
+        with request: WebAuthenticationRequest, completion: @escaping (Result<URL, POFailure>) -> Void
+    ) -> ASWebAuthenticationSession {
+        let completionHandler = { (url: URL?, error: Error?) in
+            if let url {
+                completion(.success(url))
+            } else if let error {
+                completion(.failure(Self.converted(error: error)))
+            } else {
+                preconditionFailure("Unexpected ASWebAuthenticationSession completion result.")
+            }
+        }
+        switch request.callback?.value {
+        case .scheme(let scheme):
+            return ASWebAuthenticationSession(
+                url: request.url, callbackURLScheme: scheme, completionHandler: completionHandler
+            )
+        case let .https(host, path):
+            if #available(iOS 17.4, *) {
+                return ASWebAuthenticationSession(
+                    url: request.url, callback: .https(host: host, path: path), completionHandler: completionHandler
+                )
+            } else {
+                preconditionFailure("HTTPs callback is unavailable before iOS 17.4")
+            }
+        case nil:
+            return ASWebAuthenticationSession(
+                url: request.url, callbackURLScheme: nil, completionHandler: completionHandler
+            )
+        }
+    }
 
     private static func converted(error: Error) -> POFailure {
         guard let error = error as? ASWebAuthenticationSessionError else {

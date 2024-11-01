@@ -15,7 +15,7 @@ final class ThrottledWebAuthenticationSessionDecoratorTests: XCTestCase {
     func test_authenticate_allowsOneAuthenticationAtTime() async throws {
         // Given
         let mockSession = MockWebAuthenticationSession()
-        mockSession.authenticateFromClosure = { _, _, _ in
+        mockSession.authenticateFromClosure = { _ in
             try await Task.sleep(for: .seconds(5))
             return URL(string: "response.com")!
         }
@@ -23,10 +23,10 @@ final class ThrottledWebAuthenticationSessionDecoratorTests: XCTestCase {
 
         // When
         Task {
-            _ = try await sut.authenticate(using: URL(string: "request1.com")!)
+            _ = try await sut.authenticate(using: .init(url: URL(string: "request1.com")!, callback: nil))
         }
         Task {
-            _ = try await sut.authenticate(using: URL(string: "request2.com")!)
+            _ = try await sut.authenticate(using: .init(url: URL(string: "request2.com")!, callback: nil))
         }
         try await Task.sleep(for: .seconds(1))
 
@@ -39,7 +39,7 @@ final class ThrottledWebAuthenticationSessionDecoratorTests: XCTestCase {
 
         // Given
         let mockSession = MockWebAuthenticationSession()
-        mockSession.authenticateFromClosure = { _, _, _ in
+        mockSession.authenticateFromClosure = { _ in
             // Then
             if let lastAuthenticationStartTime {
                 let delay = Int(DispatchTime.now().uptimeNanoseconds - lastAuthenticationStartTime.uptimeNanoseconds)
@@ -52,7 +52,7 @@ final class ThrottledWebAuthenticationSessionDecoratorTests: XCTestCase {
         let sut = ThrottledWebAuthenticationSessionDecorator(session: mockSession)
 
         // When
-        _ = try await sut.authenticate(using: URL(string: "request1.com")!)
-        _ = try await sut.authenticate(using: URL(string: "request2.com")!)
+        _ = try await sut.authenticate(using: .init(url: URL(string: "request1.com")!, callback: nil))
+        _ = try await sut.authenticate(using: .init(url: URL(string: "request2.com")!, callback: nil))
     }
 }
