@@ -22,11 +22,11 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
     // MARK: - POAlternativePaymentsService
 
     func tokenize(request: POAlternativePaymentTokenizationRequest) async throws -> POAlternativePaymentResponse {
-        try await authenticate(using: url(for: request))
+        try await authenticate(using: url(for: request), callback: request.callback)
     }
 
     func authorize(request: POAlternativePaymentAuthorizationRequest) async throws -> POAlternativePaymentResponse {
-        try await authenticate(using: url(for: request))
+        try await authenticate(using: url(for: request), callback: request.callback)
     }
 
     func url(for request: POAlternativePaymentTokenizationRequest) throws -> URL {
@@ -42,9 +42,11 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
         return try url(with: pathComponents, additionalData: request.additionalData)
     }
 
-    func authenticate(using url: URL) async throws -> POAlternativePaymentResponse {
+    func authenticate(
+        using url: URL, callback: POWebAuthenticationCallback?
+    ) async throws -> POAlternativePaymentResponse {
         do {
-            let returnUrl = try await webSession.authenticate(using: url)
+            let returnUrl = try await webSession.authenticate(using: .init(url: url, callback: callback))
             let response = try response(from: returnUrl)
             logger.debug("Did authenticate alternative payment: \(response.gatewayToken)")
             return response

@@ -11,6 +11,9 @@ protocol DynamicCheckoutInteractor: Interactor<DynamicCheckoutInteractorState> {
     /// Configuration.
     var configuration: PODynamicCheckoutConfiguration { get }
 
+    /// Changes payment method saving selection.
+    func setShouldSaveSelectedPaymentMethod(_ shouldSave: Bool)
+
     /// Selects payment method with Given ID.
     func select(methodId: String)
 

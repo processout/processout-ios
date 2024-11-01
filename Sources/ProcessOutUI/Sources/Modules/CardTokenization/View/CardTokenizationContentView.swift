@@ -25,9 +25,10 @@ struct CardTokenizationContentView: View {
                     Text(title)
                         .textStyle(style.title)
                         .padding(EdgeInsets(horizontal: insets, vertical: 0))
-                    Divider()
+                    Rectangle()
+                        .fill(style.separatorColor)
                         .frame(height: 1)
-                        .overlay(style.separatorColor)
+                        .frame(maxWidth: .infinity)
                 }
                 ForEach(viewModel.state.sections) { section in
                     CardTokenizationSectionView(

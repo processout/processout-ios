@@ -53,9 +53,6 @@ enum DynamicCheckoutViewModelItem {
         /// Payment content.
         let content: RegularPaymentContent?
 
-        /// Content ID.
-        let contentId: String
-
         /// Submits payment information.
         let submitButton: POActionsContainerActionViewModel?
     }
@@ -75,6 +72,9 @@ enum DynamicCheckoutViewModelItem {
         @Binding
         var isSelected: Bool
 
+        /// Defines whether method should be saved.
+        var shouldSave: Binding<Bool>?
+
         /// Payment details.
         let additionalInformation: String?
     }
@@ -88,13 +88,19 @@ enum DynamicCheckoutViewModelItem {
         case alternativePayment(AlternativePayment)
     }
 
-    struct AlternativePayment {
+    struct AlternativePayment: Identifiable {
+
+        /// Content ID.
+        let id: String
 
         /// Creates alternative payment view model.
         let viewModel: () -> AnyViewModel<NativeAlternativePaymentViewModelState>
     }
 
-    struct Card {
+    struct Card: Identifiable {
+
+        /// Content ID.
+        let id: String
 
         /// Creates card tokenization view model.
         let viewModel: () -> AnyViewModel<CardTokenizationViewModelState>

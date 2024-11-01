@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
@@ -44,6 +45,10 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
             .animation(.default, value: item.isLoading)
             if let information = item.additionalInformation {
                 body(information: information)
+            }
+            if let binding = item.shouldSave {
+                Toggle(String(resource: .DynamicCheckout.savePaymentMessage), isOn: binding)
+                    .poToggleStyle(style.toggle)
             }
         }
         .contentShape(.rect)

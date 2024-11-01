@@ -35,7 +35,9 @@ public protocol POAlternativePaymentsService: POService {
     /// - NOTE: The underlying implementation uses `ASWebAuthenticationSession`, which triggers its
     /// completion handler before dismissing the view controller. To avoid presentation issues, if you plan to perform
     /// any UI-related tasks immediately after this method completes, consider adding a delay.
-    func authenticate(using url: URL) async throws -> POAlternativePaymentResponse
+    func authenticate(
+        using url: URL, callback: POWebAuthenticationCallback?
+    ) async throws -> POAlternativePaymentResponse
 
     /// Creates redirect URL for given tokenization request.
     func url(for request: POAlternativePaymentTokenizationRequest) throws -> URL
@@ -59,4 +61,16 @@ public protocol POAlternativePaymentsService: POService {
     /// Replaces configuration.
     @_spi(PO)
     func replace(configuration: POAlternativePaymentsServiceConfiguration)
+}
+
+extension POAlternativePaymentsService {
+
+    /// Authenticates alternative payment using given raw URL.
+    ///
+    /// - NOTE: The underlying implementation uses `ASWebAuthenticationSession`, which triggers its
+    /// completion handler before dismissing the view controller. To avoid presentation issues, if you plan to perform
+    /// any UI-related tasks immediately after this method completes, consider adding a delay.
+    public func authenticate(using url: URL) async throws -> POAlternativePaymentResponse {
+        try await authenticate(using: url, callback: nil)
+    }
 }

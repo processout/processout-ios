@@ -94,7 +94,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             createCancelAction(state)
         ]
         let newState = DynamicCheckoutViewModelState(
-            sections: createSectionsWithStartedState(state, selectedMethodId: nil),
+            sections: createSectionsWithStartedState(state, selectedMethodId: nil, shouldSaveSelectedMethod: nil),
             actions: newActions.compactMap { $0 },
             isCompleted: false
         )
@@ -102,7 +102,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     }
 
     private func createSectionsWithStartedState(
-        _ state: DynamicCheckoutInteractorState.Started, selectedMethodId: String?
+        _ state: DynamicCheckoutInteractorState.Started, selectedMethodId: String?, shouldSaveSelectedMethod: Bool?
     ) -> [DynamicCheckoutViewModelState.Section] {
         var sections = [
             createErrorSection(state: state),
@@ -114,13 +114,17 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             }
             let isSelected = selectedMethodId == paymentMethod.id
             guard let info = createPaymentInfo(
-                for: paymentMethod, isSelected: isSelected, isLoading: false, state: state
+                for: paymentMethod,
+                isSelected: isSelected,
+                isLoading: false,
+                shouldSaveSelected: shouldSaveSelectedMethod,
+                state: state
             ) else {
                 return nil
             }
             let submitButton = createSubmitAction(methodId: paymentMethod.id, selectedMethodId: selectedMethodId)
             let payment = DynamicCheckoutViewModelItem.RegularPayment(
-                id: paymentMethod.id, info: info, content: nil, contentId: "", submitButton: submitButton
+                id: paymentMethod.id, info: info, content: nil, submitButton: submitButton
             )
             return .regularPayment(payment)
         }
@@ -183,7 +187,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let item = DynamicCheckoutViewModelItem.ExpressPayment(
             id: paymentMethod.id,
-            title: display.name,
+            title: display.description ?? display.name,
             iconImageResource: display.logo,
             brandColor: display.brandColor,
             action: { [weak self] in
@@ -197,6 +201,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         for paymentMethod: PODynamicCheckoutPaymentMethod,
         isSelected selected: Bool,
         isLoading: Bool,
+        shouldSaveSelected: Bool?,
         state: DynamicCheckoutInteractorState.Started
     ) -> DynamicCheckoutViewModelItem.RegularPaymentInfo? {
         let display: PODynamicCheckoutPaymentMethod.Display, isExternal: Bool
@@ -225,14 +230,32 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let item = DynamicCheckoutViewModelItem.RegularPaymentInfo(
             iconImageResource: display.logo,
-            title: display.name,
+            title: display.description ?? display.name,
             isLoading: isLoading,
             isSelected: isSelected,
+            shouldSave: shouldSavePaymentMethod(
+                isSelected: selected, shouldSaveSelected: shouldSaveSelected
+            ),
             additionalInformation: additionalPaymentInformation(
                 methodId: paymentMethod.id, isExternal: isExternal, isSelected: selected
             )
         )
         return item
+    }
+
+    private func shouldSavePaymentMethod(isSelected: Bool, shouldSaveSelected: Bool?) -> Binding<Bool>? {
+        guard isSelected, let shouldSaveSelected else {
+            return nil
+        }
+        let binding = Binding(
+            get: {
+                shouldSaveSelected
+            },
+            set: { [weak self] newValue in
+                self?.interactor.setShouldSaveSelectedPaymentMethod(newValue)
+            }
+        )
+        return binding
     }
 
     private func didSelectPaymentItem(id: String, isExternal: Bool) {
@@ -271,7 +294,11 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             createCancelAction(state.snapshot)
         ]
         let newState = DynamicCheckoutViewModelState(
-            sections: createSectionsWithStartedState(state.snapshot, selectedMethodId: state.paymentMethodId),
+            sections: createSectionsWithStartedState(
+                state.snapshot,
+                selectedMethodId: state.paymentMethod.id,
+                shouldSaveSelectedMethod: state.shouldSavePaymentMethod
+            ),
             actions: newActions.compactMap { $0 },
             isCompleted: false
         )
@@ -322,7 +349,11 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             }
             let (isSelected, isLoading) = status(of: paymentMethod.id, state: state)
             guard let info = createPaymentInfo(
-                for: paymentMethod, isSelected: isSelected, isLoading: isLoading, state: state.snapshot
+                for: paymentMethod,
+                isSelected: isSelected,
+                isLoading: isLoading,
+                shouldSaveSelected: state.willSavePaymentMethod,
+                state: state.snapshot
             ) else {
                 return nil
             }
@@ -330,7 +361,6 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 id: paymentMethod.id,
                 info: info,
                 content: createRegularPaymentContent(for: paymentMethod, state: state),
-                contentId: state.snapshot.invoice.id,
                 submitButton: nil
             )
             return .regularPayment(payment)
@@ -354,7 +384,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 assertionFailure("Interactor must be set.")
                 return nil
             }
-            let item = DynamicCheckoutViewModelItem.AlternativePayment {
+            let item = DynamicCheckoutViewModelItem.AlternativePayment(id: state.snapshot.invoice.id) {
                 // todo(andrii-vysotskyi): decide if it is okay to create view model directly here
                 let viewModel = DefaultNativeAlternativePaymentViewModel(interactor: interactor)
                 return AnyViewModel(erasing: viewModel)
@@ -365,7 +395,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 assertionFailure("Interactor must be set.")
                 return nil
             }
-            let item = DynamicCheckoutViewModelItem.Card {
+            let item = DynamicCheckoutViewModelItem.Card(id: state.snapshot.invoice.id) {
                 let viewModel = DefaultCardTokenizationViewModel(interactor: interactor)
                 return AnyViewModel(erasing: viewModel)
             }
@@ -398,13 +428,13 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func shouldResolveContent(
         for methodId: String, state: DynamicCheckoutInteractorState.PaymentProcessing
     ) -> Bool {
-        state.paymentMethodId == methodId && state.isReady
+        state.paymentMethod.id == methodId && state.isReady
     }
 
     private func status(
         of methodId: String, state: DynamicCheckoutInteractorState.PaymentProcessing
     ) -> (isSelected: Bool, isLoading: Bool) {
-        if methodId == state.paymentMethodId {
+        if methodId == state.paymentMethod.id {
             return (true, !state.isReady)
         }
         return (false, false)
@@ -436,14 +466,18 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             guard !isExpress(paymentMethod: paymentMethod) else {
                 return nil
             }
-            let isSelected = paymentMethod.id == (state.pendingPaymentMethodId ?? state.snapshot.paymentMethodId)
+            let isSelected = paymentMethod.id == state.pendingPaymentMethodId
             guard let info = createPaymentInfo(
-                for: paymentMethod, isSelected: isSelected, isLoading: isSelected, state: state.snapshot.snapshot
+                for: paymentMethod,
+                isSelected: isSelected,
+                isLoading: isSelected,
+                shouldSaveSelected: nil,
+                state: state.snapshot.snapshot
             ) else {
                 return nil
             }
             let payment = DynamicCheckoutViewModelItem.RegularPayment(
-                id: paymentMethod.id, info: info, content: nil, contentId: "", submitButton: nil
+                id: paymentMethod.id, info: info, content: nil, submitButton: nil
             )
             return .regularPayment(payment)
         }
