@@ -10,23 +10,30 @@ import Foundation
 @_spi(PO)
 public struct POButtonViewModel: Identifiable {
 
-    /// Creates view model with given parameters.
-    public init(
-        id: String,
-        title: String,
-        isEnabled: Bool = true,
-        isLoading: Bool = false,
-        role: POButtonRole? = nil,
-        action: @escaping () -> Void
-    ) {
-        self.id = id
-        self.title = title
-        self.isEnabled = isEnabled
-        self.isLoading = isLoading
-        self.role = role
-        self.action = action
+    /// Confirmation dialog configuration.
+    public struct Confirmation: Sendable {
+
+        /// Confirmation title. Use empty string to hide title.
+        public let title: String
+
+        /// Message. Use empty string to hide message.
+        public let message: String?
+
+        /// Button that confirms action.
+        public let confirmButtonTitle: String
+
+        /// Button that aborts action.
+        public let cancelButtonTitle: String
+
+        public init(title: String, message: String?, confirmButtonTitle: String, cancelButtonTitle: String) {
+            self.title = title
+            self.message = message
+            self.confirmButtonTitle = confirmButtonTitle
+            self.cancelButtonTitle = cancelButtonTitle
+        }
     }
 
+    /// Identifier.
     public let id: String
 
     /// Action title.
@@ -41,6 +48,28 @@ public struct POButtonViewModel: Identifiable {
     /// A value that describes the purpose of a button.
     public let role: POButtonRole?
 
+    /// Confirmation dialog to present to user before invoking action.
+    public let confirmation: Confirmation?
+
     /// Action handler.
-    public let action: () -> Void
+    public let action: @MainActor () -> Void
+
+    /// Creates view model with given parameters.
+    public init(
+        id: String,
+        title: String,
+        isEnabled: Bool = true,
+        isLoading: Bool = false,
+        role: POButtonRole? = nil,
+        confirmation: Confirmation? = nil,
+        action: @escaping @MainActor () -> Void
+    ) {
+        self.id = id
+        self.title = title
+        self.isEnabled = isEnabled
+        self.isLoading = isLoading
+        self.role = role
+        self.confirmation = confirmation
+        self.action = action
+    }
 }

@@ -19,9 +19,8 @@ public struct POActionsContainerView: View {
         if !actions.isEmpty {
             VStack(spacing: POSpacing.small) {
                 ForEach(actions) { element in
-                    Button(element.title, action: element.action)
+                    Button.create(with: element)
                         .buttonStyle(forPrimaryRole: style.primary, fallback: style.secondary)
-                        .buttonViewModel(element)
                 }
                 .modify(when: style.axis == .horizontal) { content in
                     // The implementation considers that benign action that people are likely to
