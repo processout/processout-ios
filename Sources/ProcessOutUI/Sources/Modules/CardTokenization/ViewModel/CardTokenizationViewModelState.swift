@@ -47,7 +47,7 @@ struct CardTokenizationViewModelState {
         /// Item identifier.
         let id: AnyHashable
 
-        /// Availale options.
+        /// Available options.
         let options: [PickerItemOption]
 
         /// Currently selected option id.

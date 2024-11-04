@@ -184,9 +184,7 @@ final class AlternativePaymentsViewModel: ObservableObject {
                     confirmation: .init()
                 ),
                 paymentConfirmation: .init(
-                    showProgressViewAfter: 5,
-                    confirmButton: .init(),
-                    cancelButton: .init(disabledFor: 10)
+                    showProgressViewAfter: 5, confirmButton: .init(), cancelButton: .init(disabledFor: 10)
                 )
             )
             let nativePaymentItem = AlternativePaymentsViewModelState.NativePayment(
