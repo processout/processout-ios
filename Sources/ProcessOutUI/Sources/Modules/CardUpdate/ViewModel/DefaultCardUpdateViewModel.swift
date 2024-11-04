@@ -147,7 +147,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
                 }
             ),
             placeholder: String(resource: .CardUpdate.CardDetails.cvc),
-            icon: AnyView(Image(poResource: .Card.back)),
+            icon: configuration.cvc.icon ?? .init(Image(poResource: .Card.back)),
             isInvalid: !state.areParametersValid,
             isEnabled: true,
             formatter: state.formatter,
@@ -215,7 +215,8 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     private func submitAction(isEnabled: Bool, isLoading: Bool) -> POButtonViewModel {
         let action = POButtonViewModel(
             id: ActionId.submit,
-            title: configuration.primaryActionTitle ?? String(resource: .CardUpdate.Button.submit),
+            title: configuration.submitButton.title ?? String(resource: .CardUpdate.Button.submit),
+            icon: configuration.submitButton.icon,
             isEnabled: isEnabled,
             isLoading: isLoading,
             role: .primary,
@@ -227,15 +228,16 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     }
 
     private func cancelAction(isEnabled: Bool) -> POButtonViewModel? {
-        let title = configuration.cancelActionTitle ?? String(resource: .CardUpdate.Button.cancel)
-        guard !title.isEmpty else {
+        guard let buttonConfiguration = configuration.cancelButton else {
             return nil
         }
         let action = POButtonViewModel(
             id: ActionId.cancel,
-            title: title,
+            title: buttonConfiguration.title ?? String(resource: .CardUpdate.Button.cancel),
+            icon: buttonConfiguration.icon,
             isEnabled: isEnabled,
             role: .cancel,
+            confirmation: buttonConfiguration.confirmation.map { .cancel(with: $0) },
             action: { [weak self] in
                 self?.interactor.cancel()
             }
