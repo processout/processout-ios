@@ -11,37 +11,61 @@ import ProcessOut
 
 /// A configuration object that defines a card tokenization module behaves.
 /// Use `nil` as a value for a nullable property to indicate that default value should be used.
+@MainActor
+@preconcurrency
 public struct POCardTokenizationConfiguration: Sendable {
 
+    @MainActor
+    @preconcurrency
+    public struct TextField: Sendable {
+
+        /// Text providing users with guidance on what to type into the text field.
+        public let prompt: String?
+
+        /// Text field icon.
+        public let icon: AnyView?
+
+        public init(prompt: String? = nil, icon: AnyView? = nil) {
+            self.prompt = prompt
+            self.icon = icon
+        }
+    }
+
     /// Button configuration.
+    @MainActor
+    @preconcurrency
     public struct SubmitButton: Sendable {
 
         /// Button title, such as "Pay". Pass `nil` title to use default value.
         public let title: String?
 
         /// Button icon. Pass `nil` to remove icon.
-        public let icon: Image?
+        public let icon: AnyView?
 
-        public init(title: String? = nil, icon: Image? = nil) {
+        public init(title: String? = nil, icon: AnyView? = nil) {
             self.title = title
             self.icon = icon
         }
     }
 
     /// Cancel button configuration.
+    @MainActor
+    @preconcurrency
     public struct CancelButton: Sendable {
 
         /// Button title. Pass `nil` title to use default value.
         public let title: String?
 
         /// Button icon. Pass `nil` to remove icon.
-        public let icon: Image?
+        public let icon: AnyView?
 
         /// When property is set implementation asks user to confirm cancel.
         public let confirmation: POConfirmationDialogConfiguration?
 
         /// Creates cancel button configuration.
-        public init(title: String? = nil, icon: Image? = nil, confirmation: POConfirmationDialogConfiguration? = nil) {
+        public init(
+            title: String? = nil, icon: AnyView? = nil, confirmation: POConfirmationDialogConfiguration? = nil
+        ) {
             self.title = title
             self.icon = icon
             self.confirmation = confirmation
@@ -51,17 +75,21 @@ public struct POCardTokenizationConfiguration: Sendable {
     /// Custom title. Use empty string to hide title.
     public let title: String?
 
-    /// Indicates if the input for entering the cardholder name should be displayed. Defaults to `true`.
-    public let shouldCollectCardholderName: Bool
+    /// Configuration for the cardholder name text field. Set to `nil` if cardholder name collection is not required.
+    public let cardholderName: TextField?
 
-    /// Indicates whether card's CVC should be collected.
-    public let shouldCollectCvc: Bool
+    /// Configuration for the card number text field.
+    public let cardNumber: TextField
 
-    /// Submit button configuration.
-    public let submitButton: SubmitButton
+    /// Configuration for the expiration date text field.
+    public let expirationDate: TextField
 
-    /// Cancel button configuration.
-    public let cancelButton: CancelButton?
+    /// Configuration for the CVC text field. Set to `nil` if CVC collection is not required.
+    public let cvc: TextField?
+
+    /// Boolean flag determines whether user will be asked to select scheme if co-scheme is available.
+    @_spi(PO)
+    public var isSchemeSelectionAllowed: Bool = false
 
     /// Card billing address collection configuration.
     public let billingAddress: POBillingAddressConfiguration
@@ -70,26 +98,32 @@ public struct POCardTokenizationConfiguration: Sendable {
     /// to choose whether to save their card details for future payments.
     public let isSavingAllowed: Bool
 
+    /// Submit button configuration.
+    public let submitButton: SubmitButton
+
+    /// Cancel button configuration.
+    public let cancelButton: CancelButton?
+
     /// Metadata related to the card.
     public let metadata: [String: String]?
 
-    /// Boolean flag determines whether user will be asked to select scheme if co-scheme is available.
-    @_spi(PO)
-    public var isSchemeSelectionAllowed: Bool = false
-
     public init(
         title: String? = nil,
-        shouldCollectCardholderName: Bool = true,
-        shouldCollectCvc: Bool = true,
+        cardholderName: TextField? = .init(),
+        cardNumber: TextField = .init(),
+        expirationDate: TextField = .init(),
+        cvc: TextField? = .init(),
         billingAddress: POBillingAddressConfiguration = .init(),
         isSavingAllowed: Bool = false,
         submitButton: SubmitButton = .init(),
-        cancelButton: CancelButton? = nil,
-        metadata: [String: String]?
+        cancelButton: CancelButton? = .init(),
+        metadata: [String: String]? = nil
     ) {
         self.title = title
-        self.shouldCollectCardholderName = shouldCollectCardholderName
-        self.shouldCollectCvc = shouldCollectCvc
+        self.cardholderName = cardholderName
+        self.cardNumber = cardNumber
+        self.expirationDate = expirationDate
+        self.cvc = cvc
         self.submitButton = submitButton
         self.cancelButton = cancelButton
         self.billingAddress = billingAddress
@@ -100,9 +134,16 @@ public struct POCardTokenizationConfiguration: Sendable {
 
 extension POCardTokenizationConfiguration {
 
-    @available(*, deprecated, renamed: "shouldCollectCardholderName")
+    /// Indicates if the input for entering the cardholder name should be displayed. Defaults to `true`.
+    @available(*, deprecated, message: "Use cardholderName object instead.")
     public var isCardholderNameInputVisible: Bool {
-        shouldCollectCardholderName
+        cardholderName != nil
+    }
+
+    /// Indicates whether card's CVC should be collected.
+    @available(*, deprecated, message: "Use cvc object instead.")
+    public var shouldCollectCvc: Bool {
+        cvc != nil
     }
 
     /// Primary action text, such as "Submit".
@@ -130,8 +171,10 @@ extension POCardTokenizationConfiguration {
         metadata: [String: String]? = nil
     ) {
         self.title = title
-        self.shouldCollectCardholderName = isCardholderNameInputVisible
-        self.shouldCollectCvc = shouldCollectCvc
+        self.cardholderName = isCardholderNameInputVisible ? .init() : nil
+        self.cardNumber = .init()
+        self.expirationDate = .init()
+        self.cvc = shouldCollectCvc ? .init() : nil
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = cancelActionTitle?.isEmpty == true ? nil : .init(title: cancelActionTitle)
         self.billingAddress = billingAddress
