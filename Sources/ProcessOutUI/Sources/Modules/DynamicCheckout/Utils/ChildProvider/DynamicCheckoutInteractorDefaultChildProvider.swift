@@ -94,7 +94,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
     private func alternativePaymentConfiguration(
         invoiceId: String, gatewayConfigurationId: String
     ) -> PONativeAlternativePaymentConfiguration {
-        let alternativePaymentConfiguration = PONativeAlternativePaymentConfiguration(
+        var alternativePaymentConfiguration = PONativeAlternativePaymentConfiguration(
             invoiceId: invoiceId,
             gatewayConfigurationId: gatewayConfigurationId,
             title: "",
@@ -106,6 +106,12 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             skipSuccessScreen: true,
             paymentConfirmation: alternativePaymentConfirmationConfiguration
         )
+        if let barcodeInteraction = self.configuration.alternativePayment.paymentConfirmation.barcodeInteraction {
+            alternativePaymentConfiguration.barcodeInteraction = .init(
+                saveButton: .init(title: barcodeInteraction.saveButtonTitle),
+                saveErrorConfirmation: barcodeInteraction.saveErrorConfirmation
+            )
+        }
         return alternativePaymentConfiguration
     }
 
@@ -117,12 +123,6 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             timeout: configuration.timeout,
             showProgressIndicatorAfter: configuration.showProgressIndicatorAfter,
             hideGatewayDetails: true,
-            barcodeInteraction: configuration.barcodeInteraction.map { configuration in
-                .init(
-                    saveButtonTitle: configuration.saveButtonTitle,
-                    saveErrorConfirmation: configuration.saveErrorConfirmation
-                )
-            },
             confirmButton: configuration.confirmButton.map { button in
                 .init(title: button.title)
             },

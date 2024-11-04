@@ -251,10 +251,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
               !customerAction.isImageDecorative else {
             return nil
         }
-        let customTitle = interactor.configuration.paymentConfirmation.barcodeInteraction?.saveButtonTitle
+        let buttonConfiguration = interactor.configuration.barcodeInteraction?.saveButton
         let viewModel = POButtonViewModel(
             id: "barcode-button",
-            title: customTitle ?? String(resource: .NativeAlternativePayment.Button.saveBarcode),
+            title: buttonConfiguration?.title ?? String(resource: .NativeAlternativePayment.Button.saveBarcode),
             action: { [weak self] in
                 self?.saveImageToPhotoLibraryOrShowError(image)
             }
@@ -264,7 +264,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func saveImageToPhotoLibraryOrShowError(_ image: UIImage) {
         Task { @MainActor in
-            let barcodeInteraction = interactor.configuration.paymentConfirmation.barcodeInteraction
+            let barcodeInteraction = interactor.configuration.barcodeInteraction
             if await saveImageToPhotoLibrary(image) {
                 if barcodeInteraction?.generateHapticFeedback != false {
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -466,41 +466,15 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             title: title ?? String(resource: .NativeAlternativePayment.Button.cancel),
             isEnabled: isEnabled,
             role: .cancel,
+            confirmation: confirmation.map { .cancel(with: $0) },
             action: { [weak self] in
-                self?.cancelPayment(confirmationConfiguration: confirmation)
+                self?.interactor.cancel()
             }
         )
         return action
     }
 
     // MARK: - Utils
-
-    /// Depending on configuration this method either shows confirmation dialog prior to cancelling payment
-    /// or does that immediately.
-    private func cancelPayment(confirmationConfiguration: POConfirmationDialogConfiguration?) {
-        if let configuration = confirmationConfiguration {
-            interactor.didRequestCancelConfirmation()
-            state.confirmationDialog = POConfirmationDialog(
-                title: configuration.title ?? String(resource: .NativeAlternativePayment.CancelConfirmation.title),
-                message: configuration.message,
-                primaryButton: .init(
-                    // swiftlint:disable:next line_length
-                    title: configuration.confirmActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.confirm),
-                    role: .destructive,
-                    action: { [weak self] in
-                        self?.interactor.cancel()
-                    }
-                ),
-                secondaryButton: .init(
-                    // swiftlint:disable:next line_length
-                    title: configuration.cancelActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.cancel),
-                    role: .cancel
-                )
-            )
-        } else {
-            interactor.cancel()
-        }
-    }
 
     private func saveImageToPhotoLibrary(_ image: UIImage) async -> Bool {
         switch await PHPhotoLibrary.requestAuthorization(for: .addOnly) {
@@ -522,6 +496,20 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             return false
         }
         return true
+    }
+}
+
+extension POButtonViewModel.Confirmation {
+
+    static func cancel(with configuration: POConfirmationDialogConfiguration) -> Self {
+        .init(
+            title: configuration.title ?? String(resource: .NativeAlternativePayment.CancelConfirmation.title),
+            message: configuration.message,
+            confirmButtonTitle: configuration.confirmActionTitle
+                ?? String(resource: .NativeAlternativePayment.CancelConfirmation.confirm),
+            cancelButtonTitle: configuration.cancelActionTitle
+                ?? String(resource: .NativeAlternativePayment.CancelConfirmation.cancel)
+        )
     }
 }
 
