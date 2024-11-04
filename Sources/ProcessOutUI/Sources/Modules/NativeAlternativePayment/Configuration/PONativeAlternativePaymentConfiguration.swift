@@ -181,7 +181,7 @@ public struct PONativeAlternativePaymentConfiguration {
 
     /// Barcode interaction configuration.
     @_spi(PO)
-    public var barcodeInteraction: BarcodeInteraction?
+    public var barcodeInteraction: BarcodeInteraction = .init()
 
     /// Creates configuration.
     public init(

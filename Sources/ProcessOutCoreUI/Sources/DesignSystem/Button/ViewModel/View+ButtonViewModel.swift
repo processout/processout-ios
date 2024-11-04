@@ -24,7 +24,7 @@ private struct ButtonWrapper: View {
     // MARK: - View
 
     var body: some View {
-        Button(viewModel.title, action: action)
+        Button(action: action, label: { buttonLabel })
             .accessibility(identifier: viewModel.id)
             .disabled(!viewModel.isEnabled)
             .buttonLoading(viewModel.isLoading)
@@ -38,6 +38,14 @@ private struct ButtonWrapper: View {
     private var confirmationDialog: POConfirmationDialog?
 
     // MARK: - Private Methods
+
+    private var buttonLabel: Label<Text, some View> {
+        Label {
+            Text(viewModel.title)
+        } icon: {
+            viewModel.icon
+        }
+    }
 
     private func action() {
         if let confirmation = viewModel.confirmation {

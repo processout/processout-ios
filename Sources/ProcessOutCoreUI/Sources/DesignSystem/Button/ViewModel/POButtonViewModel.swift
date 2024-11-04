@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 @_spi(PO)
 public struct POButtonViewModel: Identifiable {
@@ -39,6 +40,9 @@ public struct POButtonViewModel: Identifiable {
     /// Action title.
     public let title: String
 
+    /// Icon image.
+    public let icon: Image?
+
     /// Boolean value indicating whether action is enabled.
     public let isEnabled: Bool
 
@@ -58,6 +62,7 @@ public struct POButtonViewModel: Identifiable {
     public init(
         id: String,
         title: String,
+        icon: Image? = nil,
         isEnabled: Bool = true,
         isLoading: Bool = false,
         role: POButtonRole? = nil,
@@ -66,6 +71,7 @@ public struct POButtonViewModel: Identifiable {
     ) {
         self.id = id
         self.title = title
+        self.icon = icon
         self.isEnabled = isEnabled
         self.isLoading = isLoading
         self.role = role

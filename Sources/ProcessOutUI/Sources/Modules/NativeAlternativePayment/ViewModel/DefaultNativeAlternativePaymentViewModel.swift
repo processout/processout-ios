@@ -232,11 +232,14 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         guard state.shouldConfirmCapture else {
             return nil
         }
-        let buttonTitle = interactor.configuration.paymentConfirmation.confirmButton?.title
-            ?? String(resource: .NativeAlternativePayment.Button.confirmCapture)
+        guard let buttonConfiguration = interactor.configuration.paymentConfirmation.confirmButton else {
+            assertionFailure("Unable to setup confirmation UI without confirm button configuration.")
+            return nil
+        }
         let action = POButtonViewModel(
             id: "primary-button",
-            title: buttonTitle,
+            title: buttonConfiguration.title ?? String(resource: .NativeAlternativePayment.Button.confirmCapture),
+            icon: buttonConfiguration.icon,
             role: .primary,
             action: { [weak self] in
                 self?.interactor.confirmCapture()
@@ -251,10 +254,11 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
               !customerAction.isImageDecorative else {
             return nil
         }
-        let buttonConfiguration = interactor.configuration.barcodeInteraction?.saveButton
+        let buttonConfiguration = interactor.configuration.barcodeInteraction.saveButton
         let viewModel = POButtonViewModel(
             id: "barcode-button",
-            title: buttonConfiguration?.title ?? String(resource: .NativeAlternativePayment.Button.saveBarcode),
+            title: buttonConfiguration.title ?? String(resource: .NativeAlternativePayment.Button.saveBarcode),
+            icon: buttonConfiguration.icon,
             action: { [weak self] in
                 self?.saveImageToPhotoLibraryOrShowError(image)
             }
@@ -266,17 +270,16 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         Task { @MainActor in
             let barcodeInteraction = interactor.configuration.barcodeInteraction
             if await saveImageToPhotoLibrary(image) {
-                if barcodeInteraction?.generateHapticFeedback != false {
+                if barcodeInteraction.generateHapticFeedback {
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                 }
-            } else {
-                let configuration = barcodeInteraction?.saveErrorConfirmation
+            } else if let configuration = barcodeInteraction.saveErrorConfirmation {
                 let dialog = POConfirmationDialog(
-                    title: configuration?.title ?? String(resource: .NativeAlternativePayment.BarcodeError.title),
-                    message: configuration?.message ?? String(resource: .NativeAlternativePayment.BarcodeError.message),
+                    title: configuration.title ?? String(resource: .NativeAlternativePayment.BarcodeError.title),
+                    message: configuration.message ?? String(resource: .NativeAlternativePayment.BarcodeError.message),
                     primaryButton: .init(
                         // swiftlint:disable:next line_length
-                        title: configuration?.confirmActionTitle ?? String(resource: .NativeAlternativePayment.BarcodeError.confirm)
+                        title: configuration.confirmActionTitle ?? String(resource: .NativeAlternativePayment.BarcodeError.confirm)
                     )
                 )
                 self.state.confirmationDialog = dialog
@@ -445,6 +448,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         let action = POButtonViewModel(
             id: "primary-button",
             title: title,
+            icon: configuration.submitButton.icon,
             isEnabled: state.areParametersValid,
             isLoading: isLoading,
             role: .primary,
@@ -464,6 +468,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         let action = POButtonViewModel(
             id: "native-alternative-payment.secondary-button",
             title: configuration.title ?? String(resource: .NativeAlternativePayment.Button.cancel),
+            icon: configuration.icon,
             isEnabled: isEnabled,
             role: .cancel,
             confirmation: configuration.confirmation.map { .cancel(with: $0) },
