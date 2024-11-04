@@ -26,7 +26,7 @@ struct InputViewModel: Identifiable {
     let isEnabled: Bool
 
     /// Input icon.
-    let icon: Image?
+    let icon: AnyView?
 
     /// Formatter to use to format value if any.
     let formatter: Formatter?

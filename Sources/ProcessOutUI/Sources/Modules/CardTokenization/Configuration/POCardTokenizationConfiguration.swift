@@ -15,6 +15,7 @@ import ProcessOut
 @preconcurrency
 public struct POCardTokenizationConfiguration: Sendable {
 
+    /// Text field configuration.
     @MainActor
     @preconcurrency
     public struct TextField: Sendable {
