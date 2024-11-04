@@ -10,9 +10,13 @@ import SwiftUI
 import ProcessOut
 
 /// A configuration object that defines how a native alternative payment view content.
+@preconcurrency
+@MainActor
 public struct PONativeAlternativePaymentConfiguration: Sendable {
 
     /// Payment confirmation configuration.
+    @preconcurrency
+    @MainActor
     public struct Confirmation: Sendable {
 
         /// Boolean value that specifies whether module should wait for payment confirmation from PSP or will
@@ -23,8 +27,8 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
         /// Default timeout is 3 minutes while maximum value is 15 minutes.
         public let timeout: TimeInterval
 
-        /// A delay before showing progress indicator during payment confirmation.
-        public let showProgressIndicatorAfter: TimeInterval?
+        /// A delay before showing progress view during payment confirmation.
+        public let showProgressViewAfter: TimeInterval?
 
         /// Boolean value indicating whether gateway information (such as name/logo) should stay hidden
         /// during payment confirmation even if more specific payment provider details are not available.
@@ -39,20 +43,20 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
         public let confirmButton: Button?
 
         /// Cancel button that could be optionally presented to user during payment confirmation stage. To
-        /// remove action use `nil`, this is default behaviour.
+        /// remove button use `nil`, this is default behaviour.
         public let cancelButton: CancelButton?
 
         public init(
             waitsConfirmation: Bool = true,
             timeout: TimeInterval = 180,
-            showProgressIndicatorAfter: TimeInterval? = nil,
+            showProgressViewAfter: TimeInterval? = nil,
             hideGatewayDetails: Bool = false,
             confirmButton: Button? = nil,
             cancelButton: CancelButton? = nil
         ) {
             self.waitsConfirmation = waitsConfirmation
             self.timeout = timeout
-            self.showProgressIndicatorAfter = showProgressIndicatorAfter
+            self.showProgressViewAfter = showProgressViewAfter
             self.hideGatewayDetails = hideGatewayDetails
             self.confirmButton = confirmButton
             self.cancelButton = cancelButton
@@ -60,6 +64,8 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     }
 
     /// Payment success configuration.
+    @preconcurrency
+    @MainActor
     public struct Success: Sendable {
 
         /// Custom success message to display user when payment completes.
@@ -78,6 +84,8 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
 
     /// Configuration options for barcode interaction.
     @_spi(PO)
+    @preconcurrency
+    @MainActor
     public struct BarcodeInteraction: Sendable {
 
         /// Button title.
@@ -102,28 +110,32 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     }
 
     /// Button configuration.
+    @preconcurrency
+    @MainActor
     public struct Button: Sendable {
 
-        /// Button title, such as "Pay". Pass `nil` title to use default value.
+        /// Button title, such as "Pay". Pass `nil` to use default value.
         public let title: String?
 
-        /// Button icon. Pass `nil` to remove icon.
-        public let icon: Image?
+        /// Button icon. Pass `nil` to use default value.
+        public let icon: AnyView?
 
-        public init(title: String? = nil, icon: Image? = nil) {
+        public init(title: String? = nil, icon: AnyView? = nil) {
             self.title = title
             self.icon = icon
         }
     }
 
     /// Cancel button configuration.
+    @preconcurrency
+    @MainActor
     public struct CancelButton: Sendable {
 
         /// Button title. Pass `nil` title to use default value.
         public let title: String?
 
-        /// Button icon. Pass `nil` to remove icon.
-        public let icon: Image?
+        /// Button icon. Pass `nil` to use default value.
+        public let icon: AnyView?
 
         /// By default user can interact with button immediately after it becomes visible, it is
         /// possible to make it initially disabled for given amount of time.
@@ -135,7 +147,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
         /// Creates cancel button configuration.
         public init(
             title: String? = nil,
-            icon: Image? = nil,
+            icon: AnyView? = nil,
             disabledFor: TimeInterval = 0,
             confirmation: POConfirmationDialogConfiguration? = nil
         ) {
@@ -340,6 +352,12 @@ extension PONativeAlternativePaymentConfiguration.Confirmation {
         cancelButton.map { .cancel(title: $0.title, disabledFor: $0.disabledFor, confirmation: $0.confirmation) }
     }
 
+    /// A delay before showing progress view during payment confirmation.
+    @available(*, deprecated, renamed: "showProgressViewAfter")
+    public var showProgressIndicatorAfter: TimeInterval? {
+        showProgressViewAfter
+    }
+
     /// Creates configuration instance.
     @available(*, deprecated)
     @_disfavoredOverload
@@ -353,7 +371,7 @@ extension PONativeAlternativePaymentConfiguration.Confirmation {
     ) {
         self.waitsConfirmation = waitsConfirmation
         self.timeout = timeout
-        self.showProgressIndicatorAfter = showProgressIndicatorAfter
+        self.showProgressViewAfter = showProgressIndicatorAfter
         self.hideGatewayDetails = hideGatewayDetails
         self.confirmButton = confirmButton
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }
@@ -363,8 +381,7 @@ extension PONativeAlternativePaymentConfiguration.Confirmation {
 extension PONativeAlternativePaymentConfiguration.CancelButton {
 
     @available(*, deprecated)
-    // swiftlint:disable:next strict_fileprivate
-    fileprivate init?(bridging action: PONativeAlternativePaymentConfiguration.SecondaryAction) {
+    fileprivate init?(bridging action: PONativeAlternativePaymentConfiguration.SecondaryAction) {     // swiftlint:disable:this strict_fileprivate line_length
         guard case let .cancel(title, disabledFor, confirmation) = action else {
             return nil
         }

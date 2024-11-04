@@ -313,7 +313,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     private func schedulePaymentConfirmationDelay() {
-        guard let timeInterval = configuration.paymentConfirmation.showProgressIndicatorAfter else {
+        guard let timeInterval = configuration.paymentConfirmation.showProgressViewAfter else {
             return
         }
         Task { @MainActor in

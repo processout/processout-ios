@@ -8,9 +8,10 @@
 import Foundation
 @_spi(PO) import ProcessOut
 
+@MainActor
 final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutInteractorChildProvider {
 
-    init(
+    nonisolated init(
         configuration: PODynamicCheckoutConfiguration,
         cardsService: POCardsService,
         invoicesService: POInvoicesService,

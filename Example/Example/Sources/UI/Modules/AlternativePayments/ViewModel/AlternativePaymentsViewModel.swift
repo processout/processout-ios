@@ -184,7 +184,7 @@ final class AlternativePaymentsViewModel: ObservableObject {
                     confirmation: .init()
                 ),
                 paymentConfirmation: .init(
-                    showProgressIndicatorAfter: 5,
+                    showProgressViewAfter: 5,
                     confirmButton: .init(),
                     cancelButton: .init(disabledFor: 10)
                 )
