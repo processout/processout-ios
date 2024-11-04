@@ -10,11 +10,10 @@ import SwiftUI
 import ProcessOut
 
 /// A configuration object that defines how a native alternative payment view content.
-/// Use `nil` to indicate that default value should be used.
-public struct PONativeAlternativePaymentConfiguration {
+public struct PONativeAlternativePaymentConfiguration: Sendable {
 
     /// Payment confirmation configuration.
-    public struct Confirmation {
+    public struct Confirmation: Sendable {
 
         /// Boolean value that specifies whether module should wait for payment confirmation from PSP or will
         /// complete right after all user's input is submitted. Default value is `true`.
@@ -79,7 +78,7 @@ public struct PONativeAlternativePaymentConfiguration {
 
     /// Configuration options for barcode interaction.
     @_spi(PO)
-    public struct BarcodeInteraction {
+    public struct BarcodeInteraction: Sendable {
 
         /// Button title.
         public let saveButton: Button
@@ -103,7 +102,7 @@ public struct PONativeAlternativePaymentConfiguration {
     }
 
     /// Button configuration.
-    public struct Button {
+    public struct Button: Sendable {
 
         /// Button title, such as "Pay". Pass `nil` title to use default value.
         public let title: String?
@@ -118,7 +117,7 @@ public struct PONativeAlternativePaymentConfiguration {
     }
 
     /// Cancel button configuration.
-    public struct CancelButton {
+    public struct CancelButton: Sendable {
 
         /// Button title. Pass `nil` title to use default value.
         public let title: String?
