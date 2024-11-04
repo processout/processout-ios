@@ -178,6 +178,10 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     /// Default value is `5`.
     public let inlineSingleSelectValuesLimit: Int
 
+    /// Barcode interaction configuration.
+    @_spi(PO)
+    public var barcodeInteraction: BarcodeInteraction
+
     /// Submit button configuration.
     public let submitButton: Button
 
@@ -189,10 +193,6 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
 
     /// Payment success screen configuration. In order to avoid showing success screen to user pass `nil`.
     public let success: Success?
-
-    /// Barcode interaction configuration.
-    @_spi(PO)
-    public var barcodeInteraction: BarcodeInteraction = .init()
 
     /// Creates configuration.
     public init(
@@ -215,6 +215,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
         self.cancelButton = cancelButton
         self.paymentConfirmation = paymentConfirmation
         self.success = success
+        self.barcodeInteraction = .init()
     }
 }
 
@@ -311,6 +312,7 @@ extension PONativeAlternativePaymentConfiguration {
             timeout: paymentConfirmationTimeout,
             secondaryAction: paymentConfirmationSecondaryAction
         )
+        self.barcodeInteraction = .init()
     }
 
     /// Creates configuration instance.
@@ -337,6 +339,7 @@ extension PONativeAlternativePaymentConfiguration {
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.paymentConfirmation = paymentConfirmation
+        self.barcodeInteraction = .init()
     }
 }
 
