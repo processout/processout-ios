@@ -19,7 +19,7 @@ struct CardTokenizationItemView: View {
     var body: some View {
         switch item {
         case .input(let inputItem):
-            InputView(viewModel: inputItem, focusedInputId: $focusedInputId)
+            POTextField.create(with: inputItem, focusedInputId: $focusedInputId)
                 .inputStyle(style.input)
         case .picker(let pickerItem):
             POPicker(pickerItem.options, selection: pickerItem.$selectedOptionId) { option in

@@ -362,9 +362,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                     }
                 ),
                 placeholder: placeholder(for: parameter.specification),
+                icon: nil,
                 isInvalid: parameter.recentErrorMessage != nil,
                 isEnabled: true,
-                icon: nil,
                 formatter: parameter.formatter,
                 keyboard: keyboard(parameterType: parameter.specification.type),
                 contentType: contentType(parameterType: parameter.specification.type),

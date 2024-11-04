@@ -7,10 +7,11 @@
 
 import Foundation
 import SwiftUI
+@_spi(PO) import ProcessOutCoreUI
 
 enum CardUpdateViewModelItem {
 
-    typealias Input = InputViewModel
+    typealias Input = POTextFieldViewModel
 
     struct Picker: Identifiable {
 

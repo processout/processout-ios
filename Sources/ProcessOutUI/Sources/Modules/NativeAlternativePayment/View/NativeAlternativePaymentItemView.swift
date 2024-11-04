@@ -22,7 +22,7 @@ struct NativeAlternativePaymentItemView: View {
         case .title(let item):
             NativeAlternativePaymentTitleItemView(item: item, horizontalPadding: horizontalPadding)
         case .input(let item):
-            InputView(viewModel: item, focusedInputId: $focusedItemId)
+            POTextField.create(with: item, focusedInputId: $focusedItemId)
                 .inputStyle(style.input)
                 .padding(.horizontal, horizontalPadding)
         case .codeInput(let item):

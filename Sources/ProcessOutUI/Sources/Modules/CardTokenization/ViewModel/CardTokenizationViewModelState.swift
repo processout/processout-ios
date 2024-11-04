@@ -40,7 +40,7 @@ struct CardTokenizationViewModelState {
         let items: [Item]
     }
 
-    typealias InputItem = InputViewModel
+    typealias InputItem = POTextFieldViewModel
 
     struct PickerItem: Identifiable {
 
