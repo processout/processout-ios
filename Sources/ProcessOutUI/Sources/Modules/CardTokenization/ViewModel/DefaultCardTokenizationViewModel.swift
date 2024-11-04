@@ -359,13 +359,11 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func submitAction(
         startedState: InteractorState.Started, isSubmitting: Bool
     ) -> POButtonViewModel? {
-        let title = configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit)
-        guard !title.isEmpty else {
-            return nil
-        }
+        let buttonConfiguration = configuration.submitButton
         let action = POButtonViewModel(
             id: "primary-button",
-            title: title,
+            title: buttonConfiguration.title ?? String(resource: .CardTokenization.Button.submit),
+            icon: buttonConfiguration.icon,
             isEnabled: startedState.areParametersValid,
             isLoading: isSubmitting,
             role: .primary,
@@ -377,15 +375,16 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     }
 
     private func cancelAction(isEnabled: Bool) -> POButtonViewModel? {
-        let title = configuration.cancelActionTitle ?? String(resource: .CardTokenization.Button.cancel)
-        guard !title.isEmpty else {
+        guard let buttonConfiguration = configuration.cancelButton else {
             return nil
         }
         let action = POButtonViewModel(
             id: "cancel-button",
-            title: title,
+            title: buttonConfiguration.title ?? String(resource: .CardTokenization.Button.cancel),
+            icon: buttonConfiguration.icon,
             isEnabled: isEnabled,
             role: .cancel,
+            confirmation: nil,
             action: { [weak self] in
                 self?.interactor.cancel()
             }
