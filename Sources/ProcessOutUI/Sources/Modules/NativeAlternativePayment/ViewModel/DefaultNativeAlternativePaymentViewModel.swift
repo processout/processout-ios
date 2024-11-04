@@ -77,7 +77,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             update(withSubmittingState: state.snapshot)
         case .awaitingCapture(let state):
             update(with: state)
-        case .captured(let state) where !configuration.skipSuccessScreen:
+        case .captured(let state) where configuration.success != nil:
             update(with: state)
         default:
             break // Ignored
@@ -137,7 +137,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     ) -> [POButtonViewModel] {
         let actions = [
             submitAction(state: state, isLoading: isSubmitting),
-            cancelAction(configuration: configuration.secondaryAction, isEnabled: !isSubmitting && state.isCancellable)
+            cancelAction(configuration: configuration.cancelButton, isEnabled: !isSubmitting && state.isCancellable)
         ]
         return actions.compactMap { $0 }
     }
@@ -221,7 +221,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             createConfirmPaymentCaptureAction(state: state),
             createSaveImageAction(state: state),
             cancelAction(
-                configuration: configuration.paymentConfirmation.secondaryAction,
+                configuration: configuration.paymentConfirmation.cancelButton,
                 isEnabled: state.isCancellable
             )
         ]
@@ -302,7 +302,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             id: "captured",
             title: state.paymentProvider.image == nil ? state.paymentProvider.name : nil,
             logoImage: state.paymentProvider.image,
-            message: configuration.successMessage ?? String(resource: .NativeAlternativePayment.Success.message),
+            message: configuration.success?.message ?? String(resource: .NativeAlternativePayment.Success.message),
             isMessageCompact: true,
             image: UIImage(poResource: .success).withRenderingMode(.alwaysTemplate),
             isCaptured: true,
@@ -428,7 +428,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func submitAction(state: InteractorState.Started, isLoading: Bool) -> POButtonViewModel? {
         let title: String
-        if let customTitle = configuration.primaryActionTitle {
+        if let customTitle = configuration.submitButton.title {
             title = customTitle
         } else {
             priceFormatter.currencyCode = state.transactionDetails.invoice.currencyCode
@@ -456,17 +456,17 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func cancelAction(
-        configuration: PONativeAlternativePaymentConfiguration.SecondaryAction?, isEnabled: Bool
+        configuration: PONativeAlternativePaymentConfiguration.CancelButton?, isEnabled: Bool
     ) -> POButtonViewModel? {
-        guard case let .cancel(title, _, confirmation) = configuration else {
+        guard let configuration else {
             return nil
         }
         let action = POButtonViewModel(
             id: "native-alternative-payment.secondary-button",
-            title: title ?? String(resource: .NativeAlternativePayment.Button.cancel),
+            title: configuration.title ?? String(resource: .NativeAlternativePayment.Button.cancel),
             isEnabled: isEnabled,
             role: .cancel,
-            confirmation: confirmation.map { .cancel(with: $0) },
+            confirmation: configuration.confirmation.map { .cancel(with: $0) },
             action: { [weak self] in
                 self?.interactor.cancel()
             }

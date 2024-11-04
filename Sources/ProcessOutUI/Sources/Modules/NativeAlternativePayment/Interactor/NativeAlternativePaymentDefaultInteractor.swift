@@ -184,7 +184,6 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let captureCompletionDelay: TimeInterval = 3
         static let emailRegex = #"^\S+@\S+$"#
         static let phoneRegex = #"^\+?\d{1,3}\d*$"#
     }
@@ -211,7 +210,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         let startedState = State.Started(
             transactionDetails: transactionDetails,
             parameters: parameters,
-            isCancellable: disableDuration(of: configuration.secondaryAction).isZero
+            isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
         )
         state = .started(startedState)
         send(event: .didStart)
@@ -220,8 +219,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     private func enableCancellationAfterDelay() {
-        let disabledFor = disableDuration(of: configuration.secondaryAction)
-        guard disabledFor > 0 else {
+        guard let disabledFor = configuration.cancelButton?.disabledFor, disabledFor > 0 else {
             logger.debug("Cancel action is not set or initially enabled.")
             return
         }
@@ -264,7 +262,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 let awaitingCaptureState = State.AwaitingCapture(
                     paymentProvider: paymentProvider,
                     customerAction: customerAction,
-                    isCancellable: disableDuration(of: configuration.paymentConfirmation.secondaryAction).isZero,
+                    isCancellable: configuration.paymentConfirmation.cancelButton?.disabledFor.isZero ?? true,
                     isDelayed: false,
                     shouldConfirmCapture: shouldConfirmCapture
                 )
@@ -360,10 +358,10 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         let task = Task { @MainActor in
-            if !configuration.skipSuccessScreen {
+            if let success = configuration.success {
                 // Sleep errors are ignored. The goal is that if this task is cancelled we should still
                 // invoke completion.
-                try? await Task.sleep(seconds: Constants.captureCompletionDelay)
+                try? await Task.sleep(seconds: success.duration)
             }
             completion(.success(()))
         }
@@ -458,8 +456,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Cancellation Availability
 
     private func enableCaptureCancellationAfterDelay() {
-        let disabledFor = disableDuration(of: configuration.paymentConfirmation.secondaryAction)
-        guard disabledFor > 0 else {
+        guard let disabledFor = configuration.paymentConfirmation.cancelButton?.disabledFor, disabledFor > 0 else {
             logger.debug("Confirmation cancel action is not set or initially enabled.")
             return
         }
@@ -553,13 +550,6 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         let gatewayLogoImage = await imagesRepository.image(at: gateway.logoUrl)
         return .init(name: nil, image: gatewayLogoImage)
-    }
-
-    private func disableDuration(of action: PONativeAlternativePaymentConfiguration.SecondaryAction?) -> TimeInterval {
-        guard case .cancel(_, let disabledFor, _) = action else {
-            return 0
-        }
-        return disabledFor
     }
 
     // MARK: - Default Values
