@@ -504,18 +504,4 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 }
 
-extension POButtonViewModel.Confirmation {
-
-    static func cancel(with configuration: POConfirmationDialogConfiguration) -> Self {
-        .init(
-            title: configuration.title ?? String(resource: .NativeAlternativePayment.CancelConfirmation.title),
-            message: configuration.message,
-            confirmButtonTitle: configuration.confirmActionTitle
-                ?? String(resource: .NativeAlternativePayment.CancelConfirmation.confirm),
-            cancelButtonTitle: configuration.cancelActionTitle
-                ?? String(resource: .NativeAlternativePayment.CancelConfirmation.cancel)
-        )
-    }
-}
-
 // swiftlint:enable type_body_length file_length

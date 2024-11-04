@@ -89,18 +89,6 @@ extension POStringResource {
             /// Confirm button.
             static let confirm = POStringResource("native-alternative-payment.barcode-error.confirm", comment: "")
         }
-
-        enum CancelConfirmation {
-
-            /// Success message.
-            static let title = POStringResource("cancel-confirmation.title", comment: "")
-
-            /// Confirm button title..
-            static let confirm = POStringResource("cancel-confirmation.confirm", comment: "")
-
-            /// Cancel button title.
-            static let cancel = POStringResource("cancel-confirmation.cancel", comment: "")
-        }
     }
 }
 
