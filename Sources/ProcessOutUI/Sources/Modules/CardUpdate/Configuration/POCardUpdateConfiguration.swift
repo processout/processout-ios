@@ -9,6 +9,8 @@ import SwiftUI
 
 /// A configuration object that defines how a card update module behaves.
 /// Use `nil` as a value for a nullable property to indicate that default value should be used.
+@MainActor
+@preconcurrency
 public struct POCardUpdateConfiguration: Sendable {
 
     /// Text field configuration.
@@ -36,7 +38,7 @@ public struct POCardUpdateConfiguration: Sendable {
         /// Button title, such as "Pay". Pass `nil` title to use default value.
         public let title: String?
 
-        /// Button icon. Pass `nil` to remove icon.
+        /// Button icon. Pass `nil` to use default value.
         public let icon: AnyView?
 
         public init(title: String? = nil, icon: AnyView? = nil) {
@@ -53,7 +55,7 @@ public struct POCardUpdateConfiguration: Sendable {
         /// Button title. Pass `nil` title to use default value.
         public let title: String?
 
-        /// Button icon. Pass `nil` to remove icon.
+        /// Button icon. Pass `nil` title to use default value.
         public let icon: AnyView?
 
         /// When property is set implementation asks user to confirm cancel.

@@ -18,6 +18,8 @@ import ProcessOut
 public struct POCardTokenizationConfiguration: Sendable {
 
     /// Billing address collection configuration.
+    @MainActor
+    @preconcurrency
     public struct BillingAddress: Sendable {
 
         @available(*, deprecated, message: "Use POBillingAddressCollectionMode directly.")
