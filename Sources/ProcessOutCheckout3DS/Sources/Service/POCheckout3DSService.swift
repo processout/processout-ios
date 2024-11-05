@@ -9,10 +9,11 @@
 import Checkout3DS
 
 /// 3DS2 service implementation that is based on Checkout3DS.
-public actor POCheckout3DSService: PO3DS2Service {
+@MainActor
+public final class POCheckout3DSService: PO3DS2Service {
 
     /// Creates service instance.
-    public init(delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production) {
+    public nonisolated init(delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production) {
         self.errorMapper = DefaultAuthenticationErrorMapper()
         self.configurationMapper = DefaultConfigurationMapper()
         self.delegate = delegate
@@ -34,27 +35,26 @@ public actor POCheckout3DSService: PO3DS2Service {
             semaphore.signal()
         }
         invalidate()
-        await delegate?.checkout3DSService(self, willCreateAuthenticationRequestParametersWith: configuration)
+        delegate?.checkout3DSService(self, willCreateAuthenticationRequestParametersWith: configuration)
         do {
             let service = try Standalone3DSService.initialize(
                 with: await serviceConfiguration(with: configuration), environment: environment
             )
             self.service = service
-            let warnings = service.getWarnings()
-            guard await delegate?.checkout3DSService(self, shouldContinueWith: warnings) ?? true else {
+            guard await delegate?.checkout3DSService(self, shouldContinueWith: await service.warnings) ?? true else {
                 throw POFailure(code: .cancelled)
             }
             let authenticationRequest = authenticationRequest(
                 with: try await service.createTransaction().getAuthenticationRequestParameters()
             )
-            await delegate?.checkout3DSService(
+            delegate?.checkout3DSService(
                 self, didCreateAuthenticationRequestParameters: .success(authenticationRequest)
             )
             return authenticationRequest
         } catch {
             invalidate()
             let failure = failure(with: error)
-            await delegate?.checkout3DSService(self, didCreateAuthenticationRequestParameters: .failure(failure))
+            delegate?.checkout3DSService(self, didCreateAuthenticationRequestParameters: .failure(failure))
             throw failure
         }
     }
@@ -65,7 +65,7 @@ public actor POCheckout3DSService: PO3DS2Service {
             invalidate()
             semaphore.signal()
         }
-        await delegate?.checkout3DSService(self, willPerformChallengeWith: parameters)
+        delegate?.checkout3DSService(self, willPerformChallengeWith: parameters)
         do {
             guard let transaction = service?.createTransaction() else {
                 throw POFailure(code: .generic(.mobile))
@@ -76,11 +76,11 @@ public actor POCheckout3DSService: PO3DS2Service {
             let challengeResult = PO3DS2ChallengeResult(
                 transactionStatus: authenticationResult.transactionStatus ?? "N"
             )
-            await delegate?.checkout3DSService(self, didPerformChallenge: .success(challengeResult))
+            delegate?.checkout3DSService(self, didPerformChallenge: .success(challengeResult))
             return challengeResult
         } catch {
             let failure = failure(with: error)
-            await delegate?.checkout3DSService(self, didPerformChallenge: .failure(failure))
+            delegate?.checkout3DSService(self, didPerformChallenge: .failure(failure))
             throw failure
         }
     }
@@ -90,7 +90,7 @@ public actor POCheckout3DSService: PO3DS2Service {
     private let errorMapper: AuthenticationErrorMapper
     private let configurationMapper: ConfigurationMapper
     private let semaphore: POAsyncSemaphore
-    private let environment: Checkout3DS.Environment
+    private nonisolated(unsafe) var environment: Checkout3DS.Environment
     private let delegate: POCheckout3DSServiceDelegate?
     private var service: ThreeDS2Service?
 
@@ -115,7 +115,7 @@ public actor POCheckout3DSService: PO3DS2Service {
         with configuration: PO3DS2Configuration
     ) async throws -> ThreeDS2ServiceConfiguration {
         let configParameters = try configurationMapper.convert(configuration: configuration)
-        let serviceConfiguration = await delegate?.checkout3DSService(self, configurationWith: configParameters)
+        let serviceConfiguration = delegate?.checkout3DSService(self, configurationWith: configParameters)
         return serviceConfiguration ?? .init(configParameters: configParameters)
     }
 

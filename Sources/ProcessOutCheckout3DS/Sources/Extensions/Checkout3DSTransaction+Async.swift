@@ -1,6 +1,6 @@
 //
 //  Checkout3DSTransaction+Async.swift
-//  ProcessOut
+//  ProcessOutCheckout3DS
 //
 //  Created by Andrii Vysotskyi on 25.10.2024.
 //
