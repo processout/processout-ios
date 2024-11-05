@@ -10,13 +10,13 @@ import SwiftUI
 import ProcessOut
 
 /// A configuration object that defines how a native alternative payment view content.
-@preconcurrency
 @MainActor
+@preconcurrency
 public struct PONativeAlternativePaymentConfiguration: Sendable {
 
     /// Payment confirmation configuration.
-    @preconcurrency
     @MainActor
+    @preconcurrency
     public struct Confirmation: Sendable {
 
         /// Boolean value that specifies whether module should wait for payment confirmation from PSP or will
@@ -40,7 +40,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
         /// Displays a confirmation button when the user needs to perform an external customer action (e.g.,
         /// completing a step with a third-party service) before proceeding with payment capture. The user
         /// must press this button to continue.
-        public let confirmButton: Button?
+        public let confirmButton: SubmitButton?
 
         /// Cancel button that could be optionally presented to user during payment confirmation stage. To
         /// remove button use `nil`, this is default behaviour.
@@ -51,7 +51,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
             timeout: TimeInterval = 180,
             showProgressViewAfter: TimeInterval? = nil,
             hideGatewayDetails: Bool = false,
-            confirmButton: Button? = nil,
+            confirmButton: SubmitButton? = nil,
             cancelButton: CancelButton? = nil
         ) {
             self.waitsConfirmation = waitsConfirmation
@@ -64,8 +64,8 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     }
 
     /// Payment success configuration.
-    @preconcurrency
     @MainActor
+    @preconcurrency
     public struct Success: Sendable {
 
         /// Custom success message to display user when payment completes.
@@ -84,12 +84,12 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
 
     /// Configuration options for barcode interaction.
     @_spi(PO)
-    @preconcurrency
     @MainActor
+    @preconcurrency
     public struct BarcodeInteraction: Sendable {
 
         /// Button title.
-        public let saveButton: Button
+        public let saveButton: SubmitButton
 
         /// Save error confirmation dialog.
         public let saveErrorConfirmation: POConfirmationDialogConfiguration?
@@ -99,7 +99,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
         public let generateHapticFeedback: Bool
 
         public init(
-            saveButton: Button = .init(),
+            saveButton: SubmitButton = .init(),
             saveErrorConfirmation: POConfirmationDialogConfiguration? = nil,
             generateHapticFeedback: Bool = true
         ) {
@@ -110,9 +110,9 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     }
 
     /// Button configuration.
-    @preconcurrency
     @MainActor
-    public struct Button: Sendable {
+    @preconcurrency
+    public struct SubmitButton: Sendable {
 
         /// Button title, such as "Pay". Pass `nil` to use default value.
         public let title: String?
@@ -127,8 +127,8 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     }
 
     /// Cancel button configuration.
-    @preconcurrency
     @MainActor
+    @preconcurrency
     public struct CancelButton: Sendable {
 
         /// Button title. Pass `nil` title to use default value.
@@ -183,7 +183,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     public var barcodeInteraction: BarcodeInteraction
 
     /// Submit button configuration.
-    public let submitButton: Button
+    public let submitButton: SubmitButton
 
     /// Cancel button configuration.
     public let cancelButton: CancelButton?
@@ -201,7 +201,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
         title: String? = nil,
         shouldHorizontallyCenterCodeInput: Bool = true,
         inlineSingleSelectValuesLimit: Int = 5,
-        submitButton: Button = .init(),
+        submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = nil,
         paymentConfirmation: Confirmation = .init(),
         success: Success? = .init()
@@ -346,7 +346,7 @@ extension PONativeAlternativePaymentConfiguration {
 extension PONativeAlternativePaymentConfiguration.Confirmation {
 
     @available(*, deprecated)
-    public typealias ConfirmButton = PONativeAlternativePaymentConfiguration.Button
+    public typealias ConfirmButton = PONativeAlternativePaymentConfiguration.SubmitButton
 
     /// Action that could be optionally presented to user during payment confirmation stage. To remove action
     /// use `nil`, this is default behaviour.

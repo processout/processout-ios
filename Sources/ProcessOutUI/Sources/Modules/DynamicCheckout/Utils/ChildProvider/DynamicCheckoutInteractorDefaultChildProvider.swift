@@ -140,7 +140,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
 
     private func submitButtonConfiguration(
         with configuration: PODynamicCheckoutConfiguration.SubmitButton
-    ) -> PONativeAlternativePaymentConfiguration.Button {
+    ) -> PONativeAlternativePaymentConfiguration.SubmitButton {
         .init(title: configuration.title ?? String(resource: .DynamicCheckout.Button.pay), icon: configuration.icon)
     }
 
@@ -162,7 +162,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
 
     private func submitButtonConfiguration(
         with configuration: PODynamicCheckoutAlternativePaymentConfiguration.SubmitButton
-    ) -> PONativeAlternativePaymentConfiguration.Button {
+    ) -> PONativeAlternativePaymentConfiguration.SubmitButton {
         .init(title: configuration.title, icon: configuration.icon)
     }
 
