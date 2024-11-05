@@ -104,6 +104,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         didUpdate(parameter: parameter.element, to: formattedValue ?? "")
     }
 
+    // swiftlint:disable:next function_body_length
     func submit() {
         guard case let .started(currentState) = state else {
             logger.debug("Ignoring attempt to submit parameters in unsupported state: \(state).")
@@ -114,11 +115,15 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         willSubmit(parameters: currentState.parameters)
+        let values: [String: String]
+        do {
+            values = try validatedValues(for: currentState.parameters)
+        } catch {
+            attemptRecoverSubmissionError(error, replaceErrorMessages: false)
+            return
+        }
         let task = Task { @MainActor in
-            var replaceErrorMessages = false
             do {
-                let values = try validatedValues(for: currentState.parameters)
-                replaceErrorMessages = true
                 let request = PONativeAlternativePaymentMethodRequest(
                     invoiceId: configuration.invoiceId,
                     gatewayConfigurationId: configuration.gatewayConfigurationId,
@@ -149,7 +154,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                     )
                 }
             } catch {
-                attemptRecoverSubmissionError(error, replaceErrorMessages: replaceErrorMessages)
+                attemptRecoverSubmissionError(error, replaceErrorMessages: true)
             }
         }
         state = .submitting(.init(snapshot: currentState, task: task))
