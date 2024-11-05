@@ -10,13 +10,15 @@
 
 extension POButtonViewModel.Confirmation {
 
-    static func cancel(with configuration: POConfirmationDialogConfiguration) -> Self {
-        .init(
+    static func cancel(with configuration: POConfirmationDialogConfiguration, onAppear: (() -> Void)?) -> Self {
+        let confirmation = POButtonViewModel.Confirmation(
             title: configuration.title ?? String(resource: .CancelConfirmation.title),
             message: configuration.message,
             confirmButtonTitle: configuration.confirmActionTitle ?? String(resource: .CancelConfirmation.confirm),
-            cancelButtonTitle: configuration.cancelActionTitle ?? String(resource: .CancelConfirmation.cancel)
+            cancelButtonTitle: configuration.cancelActionTitle ?? String(resource: .CancelConfirmation.cancel),
+            onAppear: onAppear
         )
+        return confirmation
     }
 }
 

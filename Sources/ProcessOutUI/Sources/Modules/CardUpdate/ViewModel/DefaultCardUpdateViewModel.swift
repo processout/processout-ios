@@ -237,7 +237,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
             icon: buttonConfiguration.icon,
             isEnabled: isEnabled,
             role: .cancel,
-            confirmation: buttonConfiguration.confirmation.map { .cancel(with: $0) },
+            confirmation: buttonConfiguration.confirmation.map { .cancel(with: $0, onAppear: nil) },
             action: { [weak self] in
                 self?.interactor.cancel()
             }

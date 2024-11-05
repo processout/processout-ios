@@ -9,10 +9,12 @@ import Foundation
 import SwiftUI
 
 @_spi(PO)
+@MainActor
 public struct POButtonViewModel: Identifiable {
 
     /// Confirmation dialog configuration.
-    public struct Confirmation: Sendable {
+    @MainActor
+    public struct Confirmation {
 
         /// Confirmation title. Use empty string to hide title.
         public let title: String
@@ -26,16 +28,26 @@ public struct POButtonViewModel: Identifiable {
         /// Button that aborts action.
         public let cancelButtonTitle: String
 
-        public init(title: String, message: String?, confirmButtonTitle: String, cancelButtonTitle: String) {
+        /// Action to invoke when confirmation appears.
+        public let onAppear: (() -> Void)?
+
+        public init(
+            title: String,
+            message: String?,
+            confirmButtonTitle: String,
+            cancelButtonTitle: String,
+            onAppear: (() -> Void)?
+        ) {
             self.title = title
             self.message = message
             self.confirmButtonTitle = confirmButtonTitle
             self.cancelButtonTitle = cancelButtonTitle
+            self.onAppear = onAppear
         }
     }
 
     /// Identifier.
-    public let id: String
+    public nonisolated let id: String
 
     /// Action title.
     public let title: String

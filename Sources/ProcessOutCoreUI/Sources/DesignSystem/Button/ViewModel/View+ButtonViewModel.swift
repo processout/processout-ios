@@ -49,6 +49,7 @@ private struct ButtonWrapper: View {
 
     private func action() {
         if let confirmation = viewModel.confirmation {
+            confirmation.onAppear?()
             confirmationDialog = .init(
                 title: confirmation.title,
                 message: confirmation.message,

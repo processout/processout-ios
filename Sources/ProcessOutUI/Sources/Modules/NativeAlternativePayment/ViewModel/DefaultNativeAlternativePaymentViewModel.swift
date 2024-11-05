@@ -471,7 +471,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             icon: configuration.icon,
             isEnabled: isEnabled,
             role: .cancel,
-            confirmation: configuration.confirmation.map { .cancel(with: $0) },
+            confirmation: configuration.confirmation.map { configuration in
+                .cancel(with: configuration) { [weak self] in self?.interactor.didRequestCancelConfirmation() }
+            },
             action: { [weak self] in
                 self?.interactor.cancel()
             }
