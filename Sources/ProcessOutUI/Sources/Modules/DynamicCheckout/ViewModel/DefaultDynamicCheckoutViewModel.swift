@@ -388,7 +388,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 assertionFailure("Interactor must be set.")
                 return nil
             }
-            let item = DynamicCheckoutViewModelItem.AlternativePayment(id: state.snapshot.invoice.id) {
+            let item = DynamicCheckoutViewModelItem.AlternativePayment(id: ObjectIdentifier(interactor)) {
                 // todo(andrii-vysotskyi): decide if it is okay to create view model directly here
                 let viewModel = DefaultNativeAlternativePaymentViewModel(interactor: interactor)
                 return AnyViewModel(erasing: viewModel)
@@ -399,7 +399,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 assertionFailure("Interactor must be set.")
                 return nil
             }
-            let item = DynamicCheckoutViewModelItem.Card(id: state.snapshot.invoice.id) {
+            let item = DynamicCheckoutViewModelItem.Card(id: ObjectIdentifier(interactor)) {
                 let viewModel = DefaultCardTokenizationViewModel(interactor: interactor)
                 return AnyViewModel(erasing: viewModel)
             }
