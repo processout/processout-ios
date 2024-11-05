@@ -35,7 +35,6 @@ public struct PODynamicCheckoutCardConfiguration: Sendable {
 
     /// Text field configuration.
     @MainActor
-    @preconcurrency
     public struct TextField: Sendable {
 
         /// Text providing users with guidance on what to type into the text field.
@@ -59,7 +58,7 @@ public struct PODynamicCheckoutCardConfiguration: Sendable {
     /// Configuration for the expiration date text field.
     public let expirationDate: TextField
 
-    /// Configuration for the CVC text field. Set to `nil` if CVC collection is not required.
+    /// Configuration for the CVC text field.
     public let cvc: TextField
 
     /// Card billing address collection configuration.

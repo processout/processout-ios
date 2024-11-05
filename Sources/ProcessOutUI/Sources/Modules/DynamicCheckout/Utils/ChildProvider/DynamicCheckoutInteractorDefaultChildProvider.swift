@@ -75,10 +75,11 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
     ) -> POCardTokenizationConfiguration {
         POCardTokenizationConfiguration(
             title: "",
-            cardholderName: textFieldConfiguration(with: configuration.card.cardholderName),
+            cardholderName: methodConfiguration.cardholderNameRequired
+                ? textFieldConfiguration(with: configuration.card.cardholderName) : nil,
             cardNumber: textFieldConfiguration(with: configuration.card.cardNumber),
             expirationDate: textFieldConfiguration(with: configuration.card.expirationDate),
-            cvc: textFieldConfiguration(with: configuration.card.cvc),
+            cvc: methodConfiguration.cvcRequired ? textFieldConfiguration(with: configuration.card.cvc) : nil,
             billingAddress: billingAddressConfiguration(with: methodConfiguration),
             isSavingAllowed: methodConfiguration.savingAllowed,
             submitButton: submitButtonConfiguration(with: configuration.submitButton),
@@ -158,12 +159,6 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             saveErrorConfirmation: interaction.saveErrorConfirmation,
             generateHapticFeedback: interaction.generateHapticFeedback
         )
-    }
-
-    private func submitButtonConfiguration(
-        with configuration: PODynamicCheckoutAlternativePaymentConfiguration.SubmitButton
-    ) -> PONativeAlternativePaymentConfiguration.SubmitButton {
-        .init(title: configuration.title, icon: configuration.icon)
     }
 
     private func alternativePaymentConfirmationConfiguration() -> PONativeAlternativePaymentConfiguration.Confirmation {

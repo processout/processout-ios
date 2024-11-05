@@ -28,7 +28,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
         /// Displays a confirmation button when the user needs to perform an external customer action (e.g.,
         /// completing a step with a third-party service) before proceeding with payment capture. The user
         /// must press this button to continue.
-        public let confirmButton: SubmitButton?
+        public let confirmButton: PODynamicCheckoutConfiguration.SubmitButton?
 
         /// Action that could be optionally presented to user during payment confirmation stage. To remove action
         /// use `nil`, this is default behaviour.
@@ -38,7 +38,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
         public init(
             timeout: TimeInterval = 180,
             showProgressViewAfter: TimeInterval? = nil,
-            confirmButton: SubmitButton? = nil,
+            confirmButton: PODynamicCheckoutConfiguration.SubmitButton? = nil,
             cancelButton: CancelButton? = nil
         ) {
             self.timeout = timeout
@@ -53,7 +53,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
     public struct BarcodeInteraction: Sendable {
 
         /// Save button configuration.
-        public let saveButton: SubmitButton
+        public let saveButton: PODynamicCheckoutConfiguration.SubmitButton
 
         /// Save error confirmation dialog.
         public let saveErrorConfirmation: POConfirmationDialogConfiguration?
@@ -63,30 +63,13 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
         public let generateHapticFeedback: Bool
 
         public init(
-            saveButton: SubmitButton? = nil,
+            saveButton: PODynamicCheckoutConfiguration.SubmitButton? = nil,
             saveErrorConfirmation: POConfirmationDialogConfiguration? = nil,
             generateHapticFeedback: Bool = true
         ) {
             self.saveButton = saveButton ?? .init()
             self.saveErrorConfirmation = saveErrorConfirmation
             self.generateHapticFeedback = generateHapticFeedback
-        }
-    }
-
-    /// Submit button configuration.
-    @MainActor
-    public struct SubmitButton: Sendable {
-
-        /// Button title.
-        public let title: String?
-
-        /// Button icon.
-        public let icon: AnyView?
-
-        /// Creates button instance.
-        public init(title: String? = nil, icon: AnyView? = nil) {
-            self.title = title
-            self.icon = icon
         }
     }
 

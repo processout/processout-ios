@@ -14,6 +14,7 @@ import ProcessOut
 @MainActor
 public struct PODynamicCheckoutConfiguration: Sendable {
 
+    /// Payment success configuration.
     @MainActor
     public struct PaymentSuccess: Sendable {
 
@@ -30,14 +31,14 @@ public struct PODynamicCheckoutConfiguration: Sendable {
         }
     }
 
-    /// Button configuration.
+    /// Submit button configuration.
     @MainActor
     public struct SubmitButton: Sendable {
 
         /// Button title, such as "Pay". Pass `nil` title to use default value.
         public let title: String?
 
-        /// Button icon. Pass `nil` to remove icon.
+        /// Button icon. Pass `nil` to use default value.
         public let icon: AnyView?
 
         public init(title: String? = nil, icon: AnyView? = nil) {
@@ -53,7 +54,7 @@ public struct PODynamicCheckoutConfiguration: Sendable {
         /// Button title. Pass `nil` title to use default value.
         public let title: String?
 
-        /// Button icon. Pass `nil` to remove icon.
+        /// Button icon. Pass `nil` to use default value.
         public let icon: AnyView?
 
         /// When property is set implementation asks user to confirm cancel.
@@ -100,18 +101,18 @@ public struct PODynamicCheckoutConfiguration: Sendable {
         card: PODynamicCheckoutCardConfiguration = .init(),
         alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .init(),
         passKitPaymentButtonType: PKPaymentButtonType = .plain,
+        allowsSkippingPaymentList: Bool = true,
         submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = .init(),
-        allowsSkippingPaymentList: Bool = true,
         paymentSuccess: PaymentSuccess? = .init()
     ) {
         self.invoiceRequest = invoiceRequest
         self.card = card
         self.alternativePayment = alternativePayment
         self.passKitPaymentButtonType = passKitPaymentButtonType
+        self.allowsSkippingPaymentList = allowsSkippingPaymentList
         self.submitButton = submitButton
         self.cancelButton = cancelButton
-        self.allowsSkippingPaymentList = allowsSkippingPaymentList
         self.paymentSuccess = paymentSuccess
     }
 }
