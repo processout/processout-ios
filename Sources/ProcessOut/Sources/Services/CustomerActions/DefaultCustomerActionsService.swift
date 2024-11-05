@@ -21,6 +21,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         self.jsonWritingOptions = jsonWritingOptions
         self.webSession = webSession
         self.logger = logger
+        semaphore = .init(value: 1)
     }
 
     // MARK: - CustomerActionsService
@@ -28,6 +29,14 @@ final class DefaultCustomerActionsService: CustomerActionsService {
     func handle(
         action: _CustomerAction, threeDSService: PO3DS2Service, webAuthenticationCallback: POWebAuthenticationCallback?
     ) async throws -> String {
+        do {
+            try await semaphore.waitUnlessCancelled()
+        } catch {
+            throw POFailure(message: "Customer action handling was cancelled.", code: .cancelled)
+        }
+        defer {
+            semaphore.signal()
+        }
         do {
             switch action.type {
             case .fingerprintMobile:
@@ -67,6 +76,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
     private let jsonWritingOptions: JSONSerialization.WritingOptions
     private let webSession: WebAuthenticationSession
     private let logger: POLogger
+    private let semaphore: POAsyncSemaphore
 
     // MARK: - Native 3DS
 
