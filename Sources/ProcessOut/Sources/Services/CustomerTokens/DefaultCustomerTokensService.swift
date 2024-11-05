@@ -18,6 +18,31 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
     ) async throws -> POCustomerToken {
+        do {
+            let customerToken = try await _assignCustomerToken(request: request, threeDSService: threeDSService)
+            await threeDSService.clean()
+            return customerToken
+        } catch {
+            await threeDSService.clean()
+            throw error
+        }
+    }
+
+    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
+        try await repository.createCustomerToken(request: request)
+    }
+
+    // MARK: - Private Properties
+
+    private let repository: CustomerTokensRepository
+    private let customerActionsService: CustomerActionsService
+    private let logger: POLogger
+
+    // MARK: - Private Methods
+
+    private func _assignCustomerToken(
+        request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
+    ) async throws -> POCustomerToken {
         let response = try await repository.assignCustomerToken(request: request)
         if let customerAction = response.customerAction {
             let newRequest: POAssignCustomerTokenRequest
@@ -44,16 +69,6 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
         logger.error("Unexpected response, either token or action should be set.")
         throw POFailure(message: "Unable to assign customer token.", code: .internal(.mobile))
     }
-
-    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
-        try await repository.createCustomerToken(request: request)
-    }
-
-    // MARK: - Private Properties
-
-    private let repository: CustomerTokensRepository
-    private let customerActionsService: CustomerActionsService
-    private let logger: POLogger
 }
 
 private extension POAssignCustomerTokenRequest { // swiftlint:disable:this no_extension_access_modifier

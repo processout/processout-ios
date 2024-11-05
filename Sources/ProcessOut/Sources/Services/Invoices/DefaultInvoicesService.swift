@@ -34,22 +34,13 @@ final class DefaultInvoicesService: POInvoicesService {
     }
 
     func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
-        guard let customerAction = try await repository.authorizeInvoice(request: request) else {
-            return
-        }
-        let newRequest: POInvoiceAuthorizationRequest
         do {
-            let newSource = try await customerActionsService.handle(
-                action: customerAction,
-                threeDSService: threeDSService,
-                webAuthenticationCallback: request.webAuthenticationCallback
-            )
-            newRequest = request.replacing(source: newSource)
+            try await _authorizeInvoice(request: request, threeDSService: threeDSService)
         } catch {
-            logger.warn("Did fail to authorize invoice: \(error)", attributes: [.invoiceId: request.invoiceId])
+            await threeDSService.clean()
             throw error
         }
-        try await authorizeInvoice(request: newRequest, threeDSService: threeDSService)
+        await threeDSService.clean()
     }
 
     func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws {
@@ -97,6 +88,27 @@ final class DefaultInvoicesService: POInvoicesService {
     private let repository: InvoicesRepository
     private let customerActionsService: CustomerActionsService
     private let logger: POLogger
+
+    // MARK: - Private Methods
+
+    private func _authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
+        guard let customerAction = try await repository.authorizeInvoice(request: request) else {
+            return
+        }
+        let newRequest: POInvoiceAuthorizationRequest
+        do {
+            let newSource = try await customerActionsService.handle(
+                action: customerAction,
+                threeDSService: threeDSService,
+                webAuthenticationCallback: request.webAuthenticationCallback
+            )
+            newRequest = request.replacing(source: newSource)
+        } catch {
+            logger.warn("Did fail to authorize invoice: \(error)", attributes: [.invoiceId: request.invoiceId])
+            throw error
+        }
+        try await authorizeInvoice(request: newRequest, threeDSService: threeDSService)
+    }
 }
 
 private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_extension_access_modifier

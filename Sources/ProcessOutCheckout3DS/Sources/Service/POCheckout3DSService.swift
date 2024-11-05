@@ -21,10 +21,6 @@ public final class POCheckout3DSService: PO3DS2Service {
         semaphore = .init(value: 1)
     }
 
-    deinit {
-        service?.cleanUp()
-    }
-
     // MARK: - PO3DS2Service
 
     public func authenticationRequestParameters(
@@ -34,7 +30,6 @@ public final class POCheckout3DSService: PO3DS2Service {
         defer {
             semaphore.signal()
         }
-        invalidate()
         delegate?.checkout3DSService(self, willCreateAuthenticationRequestParametersWith: configuration)
         do {
             let service = try Standalone3DSService.initialize(
@@ -52,7 +47,6 @@ public final class POCheckout3DSService: PO3DS2Service {
             )
             return authenticationRequest
         } catch {
-            invalidate()
             let failure = failure(with: error)
             delegate?.checkout3DSService(self, didCreateAuthenticationRequestParameters: .failure(failure))
             throw failure
@@ -62,7 +56,6 @@ public final class POCheckout3DSService: PO3DS2Service {
     public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
         try await waitForSemaphoreUnlessCancelled()
         defer {
-            invalidate()
             semaphore.signal()
         }
         delegate?.checkout3DSService(self, willPerformChallengeWith: parameters)
@@ -85,6 +78,10 @@ public final class POCheckout3DSService: PO3DS2Service {
         }
     }
 
+    public func clean() async {
+        service?.cleanUp()
+    }
+
     // MARK: - Private Properties
 
     private let errorMapper: AuthenticationErrorMapper
@@ -95,11 +92,6 @@ public final class POCheckout3DSService: PO3DS2Service {
     private var service: ThreeDS2Service?
 
     // MARK: - Utils
-
-    private func invalidate() {
-        service?.cleanUp()
-        service = nil
-    }
 
     private func waitForSemaphoreUnlessCancelled() async throws(POFailure) {
         do {
