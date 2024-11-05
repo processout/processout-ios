@@ -18,7 +18,7 @@ protocol CardUpdateViewModel: ObservableObject {
     var sections: [CardUpdateViewModelSection] { get }
 
     /// Available actions.
-    var actions: [POActionsContainerActionViewModel] { get }
+    var actions: [POButtonViewModel] { get }
 
     /// Currently focused item identifier.
     var focusedItemId: AnyHashable? { get set }

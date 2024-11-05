@@ -31,6 +31,7 @@ extension PONativeAlternativePaymentView {
                 configuration: configuration,
                 invoicesService: ProcessOut.shared.invoices,
                 imagesRepository: ProcessOut.shared.images,
+                barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
                 logger: logger,
                 completion: completion
             )

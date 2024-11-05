@@ -1837,6 +1837,36 @@
         }
       }
     },
+    "native-alternative-payment.barcode-error.confirm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Got it"
+          }
+        }
+      }
+    },
+    "native-alternative-payment.barcode-error.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We couldn't save the image. Please check your permissions or try taking a screenshot as an alternative."
+          }
+        }
+      }
+    },
+    "native-alternative-payment.barcode-error.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image Save Failed"
+          }
+        }
+      }
+    },
     "native-alternative-payment.cancel-button.title" : {
       "localizations" : {
         "ar" : {
@@ -2233,6 +2263,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Insira o seu número de telemóvel"
+          }
+        }
+      }
+    },
+    "native-alternative-payment.save-barcode-button.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save Barcode to Photos"
           }
         }
       }

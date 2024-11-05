@@ -30,7 +30,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     private(set) var sections: [CardUpdateViewModelSection]
 
     @Published
-    private(set) var actions: [POActionsContainerActionViewModel]
+    private(set) var actions: [POButtonViewModel]
 
     @Published
     var focusedItemId: AnyHashable?
@@ -212,13 +212,13 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         self.actions = actions.compactMap { $0 }
     }
 
-    private func submitAction(isEnabled: Bool, isLoading: Bool) -> POActionsContainerActionViewModel {
-        let action = POActionsContainerActionViewModel(
+    private func submitAction(isEnabled: Bool, isLoading: Bool) -> POButtonViewModel {
+        let action = POButtonViewModel(
             id: ActionId.submit,
             title: configuration.primaryActionTitle ?? String(resource: .CardUpdate.Button.submit),
             isEnabled: isEnabled,
             isLoading: isLoading,
-            isPrimary: true,
+            role: .primary,
             action: { [weak self] in
                 self?.interactor.submit()
             }
@@ -226,17 +226,16 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         return action
     }
 
-    private func cancelAction(isEnabled: Bool) -> POActionsContainerActionViewModel? {
+    private func cancelAction(isEnabled: Bool) -> POButtonViewModel? {
         let title = configuration.cancelActionTitle ?? String(resource: .CardUpdate.Button.cancel)
         guard !title.isEmpty else {
             return nil
         }
-        let action = POActionsContainerActionViewModel(
+        let action = POButtonViewModel(
             id: ActionId.cancel,
             title: title,
             isEnabled: isEnabled,
-            isLoading: false,
-            isPrimary: false,
+            role: .cancel,
             action: { [weak self] in
                 self?.interactor.cancel()
             }

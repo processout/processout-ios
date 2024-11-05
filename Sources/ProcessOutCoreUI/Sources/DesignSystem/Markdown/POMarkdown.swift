@@ -72,7 +72,8 @@ private struct TextViewRepresentable: UIViewRepresentable {
         let builder = AttributedStringBuilder(
             typography: style.typography,
             fontFeatures: fontFeatures,
-            sizeCategory: .init(sizeCategory),
+            sizeCategory: sizeCategory,
+            colorScheme: colorScheme,
             color: style.color,
             alignment: .init(multilineTextAlignment),
             lineBreakMode: .byWordWrapping
@@ -85,6 +86,9 @@ private struct TextViewRepresentable: UIViewRepresentable {
 
     @Environment(\.sizeCategory)
     private var sizeCategory
+
+    @Environment(\.colorScheme)
+    private var colorScheme
 
     @Environment(\.multilineTextAlignment)
     private var multilineTextAlignment

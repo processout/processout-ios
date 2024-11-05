@@ -19,12 +19,14 @@ final class NativeAlternativePaymentDefaultInteractor:
         configuration: PONativeAlternativePaymentConfiguration,
         invoicesService: POInvoicesService,
         imagesRepository: POImagesRepository,
+        barcodeImageProvider: BarcodeImageProvider,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         self.configuration = configuration
         self.invoicesService = invoicesService
         self.imagesRepository = imagesRepository
+        self.barcodeImageProvider = barcodeImageProvider
         self.logger = logger
         self.completion = completion
         super.init(state: .idle)
@@ -123,28 +125,27 @@ final class NativeAlternativePaymentDefaultInteractor:
                     parameters: values
                 )
                 let response = try await invoicesService.initiatePayment(request: request)
-                switch response.nativeApm.state {
+                switch response.state {
                 case .pendingCapture:
                     send(event: .didSubmitParameters(additionalParametersExpected: false))
                     await setAwaitingCaptureState(
-                        with: response.nativeApm.parameterValues,
+                        with: response.parameterValues,
                         gateway: currentState.transactionDetails.gateway
                     )
                 case .captured:
                     send(event: .didSubmitParameters(additionalParametersExpected: false))
                     let paymentProvider = await paymentProvider(
-                        with: response.nativeApm.parameterValues,
+                        with: response.parameterValues,
                         gateway: currentState.transactionDetails.gateway
                     )
                     setCapturedState(paymentProvider: paymentProvider)
                 case .customerInput:
-                    await restoreStartedStateAfterSubmission(nativeApm: response.nativeApm)
+                    await restoreStartedStateAfterSubmission(paymentResponse: response)
                 case .failed:
                     throw POFailure(message: "The submitted parameters are not valid.", code: .generic(.mobile))
                 @unknown default:
                     throw POFailure(
-                        message: "Unexpected alternative payment state: \(response.nativeApm.state).",
-                        code: .internal(.mobile)
+                        message: "Unexpected alternative payment state: \(response.state).", code: .internal(.mobile)
                     )
                 }
             } catch {
@@ -192,6 +193,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private let invoicesService: POInvoicesService
     private let imagesRepository: POImagesRepository
+    private let barcodeImageProvider: BarcodeImageProvider
     private let logger: POLogger
     private let completion: (Result<Void, POFailure>) -> Void
 
@@ -246,29 +248,34 @@ final class NativeAlternativePaymentDefaultInteractor:
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
     ) async {
         if configuration.paymentConfirmation.waitsConfirmation {
-            let paymentProvider = await paymentProvider(with: parameterValues, gateway: gateway)
-            let customerAction = await customerAction(with: parameterValues, gateway: gateway)
-            switch state {
-            case .starting, .submitting:
-                break
-            default:
-                logger.debug("Ignoring attempt to wait for capture from unsupported state.")
-                return
+            do {
+                let paymentProvider = await paymentProvider(with: parameterValues, gateway: gateway)
+                let customerAction = try await customerAction(with: parameterValues, gateway: gateway)
+                switch state {
+                case .starting, .submitting:
+                    break
+                default:
+                    logger.debug("Ignoring attempt to wait for capture from unsupported state.")
+                    return
+                }
+                send(event: .willWaitForCaptureConfirmation(additionalActionExpected: customerAction != nil))
+                // swiftlint:disable:next line_length
+                let shouldConfirmCapture = customerAction != nil && configuration.paymentConfirmation.confirmButton != nil
+                let awaitingCaptureState = State.AwaitingCapture(
+                    paymentProvider: paymentProvider,
+                    customerAction: customerAction,
+                    isCancellable: disableDuration(of: configuration.paymentConfirmation.secondaryAction).isZero,
+                    isDelayed: false,
+                    shouldConfirmCapture: shouldConfirmCapture
+                )
+                state = .awaitingCapture(awaitingCaptureState)
+                if !shouldConfirmCapture {
+                    confirmCapture(force: true)
+                }
+                enableCaptureCancellationAfterDelay()
+            } catch {
+                setFailureState(error: error)
             }
-            send(event: .willWaitForCaptureConfirmation(additionalActionExpected: customerAction != nil))
-            let shouldConfirmCapture = customerAction != nil && configuration.paymentConfirmation.confirmButton != nil
-            let awaitingCaptureState = State.AwaitingCapture(
-                paymentProvider: paymentProvider,
-                customerAction: customerAction,
-                isCancellable: disableDuration(of: configuration.paymentConfirmation.secondaryAction).isZero,
-                isDelayed: false,
-                shouldConfirmCapture: shouldConfirmCapture
-            )
-            state = .awaitingCapture(awaitingCaptureState)
-            if !shouldConfirmCapture {
-                confirmCapture(force: true)
-            }
-            enableCaptureCancellationAfterDelay()
         } else {
             logger.info("Payment capture wasn't requested, will attempt to set submitted state directly.")
             setSubmittedState()
@@ -324,13 +331,25 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func customerAction(
         with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
-    ) async -> NativeAlternativePaymentInteractorState.CaptureCustomerAction? {
+    ) async throws -> NativeAlternativePaymentInteractorState.CaptureCustomerAction? {
+        // todo(andrii-vysotskyi): decide if `null` customer action should be allowed
         let message = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
         guard let message else {
             return nil
         }
-        let image = await imagesRepository.image(at: gateway.customerActionImageUrl)
-        return .init(message: message, image: image)
+        let image: UIImage?, isImageDecorative: Bool
+        if let barcode = parameterValues?.customerActionBarcode {
+            let minimumSize = CGSize(width: 250, height: 250)
+            image = barcodeImageProvider.image(for: barcode, minimumSize: minimumSize)
+            if image == nil {
+                throw POFailure(message: "Unable to generate barcode image.", code: .internal(.mobile))
+            }
+            isImageDecorative = false
+        } else {
+            image = await imagesRepository.image(at: gateway.customerActionImageUrl)
+            isImageDecorative = true
+        }
+        return .init(message: message, image: image, isImageDecorative: isImageDecorative)
     }
 
     // MARK: - Captured State
@@ -405,14 +424,12 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Submission Completion
 
-    private func restoreStartedStateAfterSubmission(
-        nativeApm: PONativeAlternativePaymentMethodResponse.NativeApm
-    ) async {
+    private func restoreStartedStateAfterSubmission(paymentResponse: PONativeAlternativePaymentMethodResponse) async {
         guard case let .submitting(currentState) = state else {
             return
         }
         var newState = currentState.snapshot
-        newState.parameters = await createParameters(specifications: nativeApm.parameterDefinitions ?? [])
+        newState.parameters = await createParameters(specifications: paymentResponse.parameterDefinitions ?? [])
         state = .started(newState)
         send(event: .didSubmitParameters(additionalParametersExpected: true))
         logger.debug("More parameters are expected, waiting for parameters to update.")

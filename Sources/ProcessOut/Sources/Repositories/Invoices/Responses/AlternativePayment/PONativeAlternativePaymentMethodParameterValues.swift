@@ -17,6 +17,10 @@ public struct PONativeAlternativePaymentMethodParameterValues: Decodable, Sendab
     /// it will be set only when payment state is `PENDING_CAPTURE`.
     public let customerActionMessage: String?
 
+    /// A barcode that represents the customer's action, such as a QR code for payment.
+    @_spi(PO)
+    public let customerActionBarcode: POBarcode?
+
     /// Payment provider name.
     public let providerName: String?
 
