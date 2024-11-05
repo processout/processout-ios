@@ -18,7 +18,6 @@ public final class POCheckout3DSService: PO3DS2Service {
         self.configurationMapper = DefaultConfigurationMapper()
         self.delegate = delegate
         self.environment = environment
-        semaphore = .init(value: 1)
     }
 
     // MARK: - PO3DS2Service
@@ -26,10 +25,6 @@ public final class POCheckout3DSService: PO3DS2Service {
     public func authenticationRequestParameters(
         configuration: PO3DS2Configuration
     ) async throws -> PO3DS2AuthenticationRequestParameters {
-        try await waitForSemaphoreUnlessCancelled()
-        defer {
-            semaphore.signal()
-        }
         delegate?.checkout3DSService(self, willCreateAuthenticationRequestParametersWith: configuration)
         do {
             let service = try Standalone3DSService.initialize(
@@ -54,10 +49,6 @@ public final class POCheckout3DSService: PO3DS2Service {
     }
 
     public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
-        try await waitForSemaphoreUnlessCancelled()
-        defer {
-            semaphore.signal()
-        }
         delegate?.checkout3DSService(self, willPerformChallengeWith: parameters)
         do {
             guard let transaction = service?.createTransaction() else {
@@ -86,20 +77,9 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     private let errorMapper: AuthenticationErrorMapper
     private let configurationMapper: ConfigurationMapper
-    private let semaphore: POAsyncSemaphore
     private nonisolated(unsafe) var environment: Checkout3DS.Environment
     private let delegate: POCheckout3DSServiceDelegate?
     private var service: ThreeDS2Service?
-
-    // MARK: - Utils
-
-    private func waitForSemaphoreUnlessCancelled() async throws(POFailure) {
-        do {
-            try await semaphore.waitUnlessCancelled()
-        } catch {
-            throw POFailure(message: "3DS session was cancelled.", code: .cancelled)
-        }
-    }
 
     // MARK: - Mapping
 
