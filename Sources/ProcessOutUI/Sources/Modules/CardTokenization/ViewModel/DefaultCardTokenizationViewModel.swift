@@ -19,6 +19,10 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         observeChanges(interactor: interactor)
     }
 
+    deinit {
+        Task { @MainActor [interactor] in interactor.cancel() }
+    }
+
     // MARK: - CardTokenizationViewModel
 
     @AnimatablePublished
@@ -26,10 +30,6 @@ final class DefaultCardTokenizationViewModel: ViewModel {
 
     func start() {
         $state.performWithoutAnimation(interactor.start)
-    }
-
-    func stop() {
-        interactor.cancel()
     }
 
     // MARK: - Private Nested Types

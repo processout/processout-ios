@@ -20,6 +20,10 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         observeChanges(interactor: interactor)
     }
 
+    deinit {
+        Task { @MainActor [interactor] in interactor.cancel() }
+    }
+
     // MARK: - DynamicCheckoutViewModel
 
     @AnimatablePublished
