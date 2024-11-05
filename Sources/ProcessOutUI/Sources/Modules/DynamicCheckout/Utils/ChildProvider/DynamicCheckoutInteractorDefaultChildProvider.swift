@@ -89,8 +89,8 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
 
     private func billingAddressConfiguration(
         with methodConfiguration: PODynamicCheckoutPaymentMethod.CardConfiguration
-    ) -> POBillingAddressConfiguration {
-        POBillingAddressConfiguration(
+    ) -> POCardTokenizationConfiguration.BillingAddress {
+        POCardTokenizationConfiguration.BillingAddress(
             mode: methodConfiguration.billingAddress.collectionMode,
             countryCodes: methodConfiguration.billingAddress.restrictToCountryCodes,
             defaultAddress: configuration.card.billingAddress.defaultAddress,

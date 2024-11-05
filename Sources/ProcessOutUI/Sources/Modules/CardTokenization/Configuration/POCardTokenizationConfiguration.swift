@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 01.08.2023.
 //
 
+// swiftlint:disable nesting
+
 import Foundation
 import SwiftUI
 import ProcessOut
@@ -14,6 +16,41 @@ import ProcessOut
 @MainActor
 @preconcurrency
 public struct POCardTokenizationConfiguration: Sendable {
+
+    /// Billing address collection configuration.
+    public struct BillingAddress: Sendable {
+
+        @available(*, deprecated, message: "Use POBillingAddressCollectionMode directly.")
+        public typealias CollectionMode = POBillingAddressCollectionMode
+
+        /// Billing address collection mode.
+        public let mode: POBillingAddressCollectionMode
+
+        /// List of ISO country codes that is supported for the billing address. When nil, all countries are provided.
+        public let countryCodes: Set<String>?
+
+        /// Default address information.
+        public let defaultAddress: POContact?
+
+        /// Whether the values included in ``POBillingAddressConfiguration/defaultAddress`` should be attached to the
+        /// card, this includes fields that aren't displayed in the form.
+        ///
+        /// If `false` (the default), those values will only be used to prefill the corresponding fields in the form.
+        public let attachDefaultsToPaymentMethod: Bool
+
+        /// Creates billing address configuration.
+        public init(
+            mode: POBillingAddressCollectionMode = .automatic,
+            countryCodes: Set<String>? = nil,
+            defaultAddress: POContact? = nil,
+            attachDefaultsToPaymentMethod: Bool = false
+        ) {
+            self.countryCodes = countryCodes
+            self.mode = mode
+            self.defaultAddress = defaultAddress
+            self.attachDefaultsToPaymentMethod = attachDefaultsToPaymentMethod
+        }
+    }
 
     /// Text field configuration.
     @MainActor
@@ -32,7 +69,7 @@ public struct POCardTokenizationConfiguration: Sendable {
         }
     }
 
-    /// Button configuration.
+    /// Submit button configuration.
     @MainActor
     @preconcurrency
     public struct SubmitButton: Sendable {
@@ -40,7 +77,7 @@ public struct POCardTokenizationConfiguration: Sendable {
         /// Button title, such as "Pay". Pass `nil` title to use default value.
         public let title: String?
 
-        /// Button icon. Pass `nil` to remove icon.
+        /// Button icon. Pass `nil` title to use default value.
         public let icon: AnyView?
 
         public init(title: String? = nil, icon: AnyView? = nil) {
@@ -57,7 +94,7 @@ public struct POCardTokenizationConfiguration: Sendable {
         /// Button title. Pass `nil` title to use default value.
         public let title: String?
 
-        /// Button icon. Pass `nil` to remove icon.
+        /// Button icon. Pass `nil` title to use default value.
         public let icon: AnyView?
 
         /// When property is set implementation asks user to confirm cancel.
@@ -93,7 +130,7 @@ public struct POCardTokenizationConfiguration: Sendable {
     public var isSchemeSelectionAllowed: Bool = false
 
     /// Card billing address collection configuration.
-    public let billingAddress: POBillingAddressConfiguration
+    public let billingAddress: BillingAddress
 
     /// Indicates whether the UI should display a control that allows the user
     /// to choose whether to save their card details for future payments.
@@ -114,7 +151,7 @@ public struct POCardTokenizationConfiguration: Sendable {
         cardNumber: TextField = .init(),
         expirationDate: TextField = .init(),
         cvc: TextField? = .init(),
-        billingAddress: POBillingAddressConfiguration = .init(),
+        billingAddress: BillingAddress = .init(),
         isSavingAllowed: Bool = false,
         submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = .init(),
@@ -183,3 +220,5 @@ extension POCardTokenizationConfiguration {
         self.metadata = metadata
     }
 }
+
+// swiftlint:enable nesting
