@@ -107,7 +107,7 @@ final class DefaultInvoicesService: POInvoicesService {
             logger.warn("Did fail to authorize invoice: \(error)", attributes: [.invoiceId: request.invoiceId])
             throw error
         }
-        try await authorizeInvoice(request: newRequest, threeDSService: threeDSService)
+        try await _authorizeInvoice(request: newRequest, threeDSService: threeDSService)
     }
 }
 
