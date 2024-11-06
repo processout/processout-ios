@@ -19,6 +19,10 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         observeChanges(interactor: interactor)
     }
 
+    deinit {
+        Task { @MainActor [interactor] in interactor.cancel() }
+    }
+
     // MARK: - CardUpdateViewModel
 
     private(set) lazy var title: String? = {
@@ -37,10 +41,6 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
 
     func start() {
         interactor.start()
-    }
-
-    func stop() {
-        interactor.cancel()
     }
 
     // MARK: - Private Nested Types

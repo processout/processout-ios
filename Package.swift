@@ -15,7 +15,7 @@ let package = Package(
         .library(name: "ProcessOutCheckout3DS", targets: ["ProcessOutCheckout3DS"])
     ],
     dependencies: [
-        .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", exact: "3.2.4"),
+        .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", exact: "3.2.5"),
         .package(url: "https://github.com/swiftlang/swift-cmark", from: "0.5.0")
     ],
     targets: [

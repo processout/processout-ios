@@ -16,4 +16,14 @@ public protocol PO3DS2Service: Sendable {
 
     /// Implementation must handle given 3DS2 challenge.
     func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult
+
+    /// Allows the implementation to release any resources or reset its state after completing a 3DS session.
+    func clean() async
+}
+
+extension PO3DS2Service {
+
+    public func clean() async {
+        // Ignored
+    }
 }

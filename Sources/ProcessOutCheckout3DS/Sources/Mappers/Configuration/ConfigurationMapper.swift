@@ -8,8 +8,8 @@
 import ProcessOut
 import Checkout3DS
 
-protocol ConfigurationMapper {
+protocol ConfigurationMapper: Sendable {
 
     /// Converts given ProcessOut configuration to Checkout config parameters.
-    func convert(configuration: PO3DS2Configuration) -> ThreeDS2ServiceConfiguration.ConfigParameters
+    func convert(configuration: PO3DS2Configuration) throws -> ThreeDS2ServiceConfiguration.ConfigParameters
 }

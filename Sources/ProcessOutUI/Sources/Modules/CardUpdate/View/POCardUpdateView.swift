@@ -48,7 +48,6 @@ public struct POCardUpdateView: View {
             style.backgroundColor.ignoresSafeArea()
         }
         .onAppear(perform: viewModel.start)
-        .onDisappear(perform: viewModel.stop)
     }
 
     // MARK: - Private Properties
