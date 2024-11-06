@@ -19,20 +19,17 @@ struct DefaultConfigurationMapper: ConfigurationMapper {
         let configParameters = ThreeDS2ServiceConfiguration.ConfigParameters(
             directoryServerData: directoryServerData,
             messageVersion: configuration.messageVersion,
-            scheme: try configuration.$scheme.typed().map(self.convert) ?? ""
+            scheme: convert(scheme: configuration.$scheme.typed())
         )
         return configParameters
     }
 
     // MARK: - Private Methods
 
-    private func convert(scheme: POCardScheme) throws -> String {
+    private func convert(scheme: POCardScheme?) -> String {
         let supportedSchemes: Set<POCardScheme> = [.visa, .mastercard]
-        guard supportedSchemes.contains(scheme) else {
-            throw POFailure(
-                message: "Card scheme '\(scheme.rawValue)' is not supported by 3DS SDK.",
-                code: .generic(.mobile)
-            )
+        guard let scheme, supportedSchemes.contains(scheme) else {
+            return ""
         }
         return scheme.rawValue
     }
