@@ -77,7 +77,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             update(withSubmittingState: state.snapshot)
         case .awaitingCapture(let state):
             update(with: state)
-        case .captured(let state) where !configuration.skipSuccessScreen:
+        case .captured(let state) where configuration.success != nil:
             update(with: state)
         default:
             break // Ignored
@@ -137,7 +137,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     ) -> [POButtonViewModel] {
         let actions = [
             submitAction(state: state, isLoading: isSubmitting),
-            cancelAction(configuration: configuration.secondaryAction, isEnabled: !isSubmitting && state.isCancellable)
+            cancelAction(configuration: configuration.cancelButton, isEnabled: !isSubmitting && state.isCancellable)
         ]
         return actions.compactMap { $0 }
     }
@@ -221,7 +221,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             createConfirmPaymentCaptureAction(state: state),
             createSaveImageAction(state: state),
             cancelAction(
-                configuration: configuration.paymentConfirmation.secondaryAction,
+                configuration: configuration.paymentConfirmation.cancelButton,
                 isEnabled: state.isCancellable
             )
         ]
@@ -232,11 +232,14 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         guard state.shouldConfirmCapture else {
             return nil
         }
-        let buttonTitle = interactor.configuration.paymentConfirmation.confirmButton?.title
-            ?? String(resource: .NativeAlternativePayment.Button.confirmCapture)
+        guard let buttonConfiguration = interactor.configuration.paymentConfirmation.confirmButton else {
+            assertionFailure("Unable to setup confirmation UI without confirm button configuration.")
+            return nil
+        }
         let action = POButtonViewModel(
             id: "primary-button",
-            title: buttonTitle,
+            title: buttonConfiguration.title ?? String(resource: .NativeAlternativePayment.Button.confirmCapture),
+            icon: buttonConfiguration.icon,
             role: .primary,
             action: { [weak self] in
                 self?.interactor.confirmCapture()
@@ -251,10 +254,11 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
               !customerAction.isImageDecorative else {
             return nil
         }
-        let customTitle = interactor.configuration.paymentConfirmation.barcodeInteraction?.saveButtonTitle
+        let buttonConfiguration = interactor.configuration.barcodeInteraction.saveButton
         let viewModel = POButtonViewModel(
             id: "barcode-button",
-            title: customTitle ?? String(resource: .NativeAlternativePayment.Button.saveBarcode),
+            title: buttonConfiguration.title ?? String(resource: .NativeAlternativePayment.Button.saveBarcode),
+            icon: buttonConfiguration.icon,
             action: { [weak self] in
                 self?.saveImageToPhotoLibraryOrShowError(image)
             }
@@ -264,19 +268,18 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func saveImageToPhotoLibraryOrShowError(_ image: UIImage) {
         Task { @MainActor in
-            let barcodeInteraction = interactor.configuration.paymentConfirmation.barcodeInteraction
+            let barcodeInteraction = interactor.configuration.barcodeInteraction
             if await saveImageToPhotoLibrary(image) {
-                if barcodeInteraction?.generateHapticFeedback != false {
+                if barcodeInteraction.generateHapticFeedback {
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                 }
-            } else {
-                let configuration = barcodeInteraction?.saveErrorConfirmation
+            } else if let configuration = barcodeInteraction.saveErrorConfirmation {
                 let dialog = POConfirmationDialog(
-                    title: configuration?.title ?? String(resource: .NativeAlternativePayment.BarcodeError.title),
-                    message: configuration?.message ?? String(resource: .NativeAlternativePayment.BarcodeError.message),
+                    title: configuration.title ?? String(resource: .NativeAlternativePayment.BarcodeError.title),
+                    message: configuration.message ?? String(resource: .NativeAlternativePayment.BarcodeError.message),
                     primaryButton: .init(
                         // swiftlint:disable:next line_length
-                        title: configuration?.confirmActionTitle ?? String(resource: .NativeAlternativePayment.BarcodeError.confirm)
+                        title: configuration.confirmActionTitle ?? String(resource: .NativeAlternativePayment.BarcodeError.confirm)
                     )
                 )
                 self.state.confirmationDialog = dialog
@@ -302,7 +305,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             id: "captured",
             title: state.paymentProvider.image == nil ? state.paymentProvider.name : nil,
             logoImage: state.paymentProvider.image,
-            message: configuration.successMessage ?? String(resource: .NativeAlternativePayment.Success.message),
+            message: configuration.success?.message ?? String(resource: .NativeAlternativePayment.Success.message),
             isMessageCompact: true,
             image: UIImage(poResource: .success).withRenderingMode(.alwaysTemplate),
             isCaptured: true,
@@ -359,9 +362,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                     }
                 ),
                 placeholder: placeholder(for: parameter.specification),
+                icon: nil,
                 isInvalid: parameter.recentErrorMessage != nil,
                 isEnabled: true,
-                icon: nil,
                 formatter: parameter.formatter,
                 keyboard: keyboard(parameterType: parameter.specification.type),
                 contentType: contentType(parameterType: parameter.specification.type),
@@ -428,7 +431,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func submitAction(state: InteractorState.Started, isLoading: Bool) -> POButtonViewModel? {
         let title: String
-        if let customTitle = configuration.primaryActionTitle {
+        if let customTitle = configuration.submitButton.title {
             title = customTitle
         } else {
             priceFormatter.currencyCode = state.transactionDetails.invoice.currencyCode
@@ -445,6 +448,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         let action = POButtonViewModel(
             id: "primary-button",
             title: title,
+            icon: configuration.submitButton.icon,
             isEnabled: state.areParametersValid,
             isLoading: isLoading,
             role: .primary,
@@ -456,51 +460,28 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func cancelAction(
-        configuration: PONativeAlternativePaymentConfiguration.SecondaryAction?, isEnabled: Bool
+        configuration: PONativeAlternativePaymentConfiguration.CancelButton?, isEnabled: Bool
     ) -> POButtonViewModel? {
-        guard case let .cancel(title, _, confirmation) = configuration else {
+        guard let configuration else {
             return nil
         }
         let action = POButtonViewModel(
             id: "native-alternative-payment.secondary-button",
-            title: title ?? String(resource: .NativeAlternativePayment.Button.cancel),
+            title: configuration.title ?? String(resource: .NativeAlternativePayment.Button.cancel),
+            icon: configuration.icon,
             isEnabled: isEnabled,
             role: .cancel,
+            confirmation: configuration.confirmation.map { configuration in
+                .cancel(with: configuration) { [weak self] in self?.interactor.didRequestCancelConfirmation() }
+            },
             action: { [weak self] in
-                self?.cancelPayment(confirmationConfiguration: confirmation)
+                self?.interactor.cancel()
             }
         )
         return action
     }
 
     // MARK: - Utils
-
-    /// Depending on configuration this method either shows confirmation dialog prior to cancelling payment
-    /// or does that immediately.
-    private func cancelPayment(confirmationConfiguration: POConfirmationDialogConfiguration?) {
-        if let configuration = confirmationConfiguration {
-            interactor.didRequestCancelConfirmation()
-            state.confirmationDialog = POConfirmationDialog(
-                title: configuration.title ?? String(resource: .NativeAlternativePayment.CancelConfirmation.title),
-                message: configuration.message,
-                primaryButton: .init(
-                    // swiftlint:disable:next line_length
-                    title: configuration.confirmActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.confirm),
-                    role: .destructive,
-                    action: { [weak self] in
-                        self?.interactor.cancel()
-                    }
-                ),
-                secondaryButton: .init(
-                    // swiftlint:disable:next line_length
-                    title: configuration.cancelActionTitle ?? String(resource: .NativeAlternativePayment.CancelConfirmation.cancel),
-                    role: .cancel
-                )
-            )
-        } else {
-            interactor.cancel()
-        }
-    }
 
     private func saveImageToPhotoLibrary(_ image: UIImage) async -> Bool {
         switch await PHPhotoLibrary.requestAuthorization(for: .addOnly) {

@@ -19,12 +19,12 @@ struct DynamicCheckoutPaymentMethodButtonsView: View {
     var body: some View {
         let buttons = self.buttons.filter(isIncluded)
         VStack(spacing: POSpacing.small) {
-            ForEach(buttons) { button in
-                Button(button.title, action: button.action)
+            ForEach(buttons) { buttonViewModel in
+                Button.create(with: buttonViewModel)
                     .buttonStyle(
-                        forPrimaryRole: style.actionsContainer.primary, fallback: style.actionsContainer.secondary
+                        forPrimaryRole: style.actionsContainer.primary,
+                        fallback: style.actionsContainer.secondary
                     )
-                    .buttonViewModel(button)
             }
         }
         .backport.geometryGroup()

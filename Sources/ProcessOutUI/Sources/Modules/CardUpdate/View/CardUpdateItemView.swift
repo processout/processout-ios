@@ -19,7 +19,7 @@ struct CardUpdateItemView: View {
     var body: some View {
         switch item {
         case .input(let item):
-            InputView(viewModel: item, focusedInputId: $focusedInputId)
+            POTextField.create(with: item, focusedInputId: $focusedInputId)
                 .inputStyle(style.input)
         case .picker(let pickerItem):
             // todo(andrii-vysotskyi): use injected style when scheme selection is public

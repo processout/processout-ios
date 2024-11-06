@@ -5,55 +5,30 @@
 //  Created by Andrii Vysotskyi on 27.02.2024.
 //
 
-// swiftlint:disable nesting
-
 import Foundation
+import SwiftUI
 
 /// Alternative payment specific dynamic checkout configuration.
 @_spi(PO)
+@MainActor
 public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
 
+    @MainActor
     public struct PaymentConfirmation: Sendable {
-
-        /// Confirmation button configuration.
-        public struct ConfirmButton: Sendable {
-
-            /// Button title.
-            public let title: String?
-
-            /// Creates button instance.
-            public init(title: String? = nil) {
-                self.title = title
-            }
-        }
-
-        /// Configuration options for barcode interaction.
-        public struct BarcodeInteraction: Sendable {
-
-            /// Button title.
-            public let saveButtonTitle: String?
-
-            /// Error confirmation dialog.
-            /// - NOTE: Secondary action is ignored.
-            public let saveErrorConfirmation: POConfirmationDialogConfiguration?
-        }
 
         /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
         /// Default timeout is 3 minutes while maximum value is 15 minutes.
         public let timeout: TimeInterval
 
         /// A delay before showing progress indicator during payment confirmation.
-        public let showProgressIndicatorAfter: TimeInterval?
-
-        /// Barcode interaction configuration.
-        public let barcodeInteraction: BarcodeInteraction?
+        public let showProgressViewAfter: TimeInterval?
 
         /// Payment confirmation button configuration.
         ///
         /// Displays a confirmation button when the user needs to perform an external customer action (e.g.,
         /// completing a step with a third-party service) before proceeding with payment capture. The user
         /// must press this button to continue.
-        public let confirmButton: ConfirmButton?
+        public let confirmButton: PODynamicCheckoutConfiguration.SubmitButton?
 
         /// Action that could be optionally presented to user during payment confirmation stage. To remove action
         /// use `nil`, this is default behaviour.
@@ -62,23 +37,50 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
         /// Creates confirmation configuration.
         public init(
             timeout: TimeInterval = 180,
-            showProgressIndicatorAfter: TimeInterval? = nil,
-            barcodeInteraction: BarcodeInteraction? = nil,
-            confirmButton: ConfirmButton? = nil,
+            showProgressViewAfter: TimeInterval? = nil,
+            confirmButton: PODynamicCheckoutConfiguration.SubmitButton? = nil,
             cancelButton: CancelButton? = nil
         ) {
             self.timeout = timeout
-            self.showProgressIndicatorAfter = showProgressIndicatorAfter
-            self.barcodeInteraction = barcodeInteraction
+            self.showProgressViewAfter = showProgressViewAfter
             self.confirmButton = confirmButton
             self.cancelButton = cancelButton
         }
     }
 
+    /// Configuration options for barcode interaction.
+    @MainActor
+    public struct BarcodeInteraction: Sendable {
+
+        /// Save button configuration.
+        public let saveButton: PODynamicCheckoutConfiguration.SubmitButton
+
+        /// Save error confirmation dialog.
+        public let saveErrorConfirmation: POConfirmationDialogConfiguration?
+
+        /// Indicates if haptic feedback is generated during barcode interaction. Feedback is only provided
+        /// when the barcode is successfully saved. Default is true.
+        public let generateHapticFeedback: Bool
+
+        public init(
+            saveButton: PODynamicCheckoutConfiguration.SubmitButton? = nil,
+            saveErrorConfirmation: POConfirmationDialogConfiguration? = nil,
+            generateHapticFeedback: Bool = true
+        ) {
+            self.saveButton = saveButton ?? .init()
+            self.saveErrorConfirmation = saveErrorConfirmation
+            self.generateHapticFeedback = generateHapticFeedback
+        }
+    }
+
+    @MainActor
     public struct CancelButton: Sendable {
 
         /// Cancel button title. Use `nil` for default title.
         public let title: String?
+
+        /// Button icon.
+        public let icon: AnyView?
 
         /// By default user can interact with action immediately after it becomes visible, it is
         /// possible to make it initially disabled for given amount of time.
@@ -89,10 +91,12 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
 
         public init(
             title: String? = nil,
-            disabledFor: TimeInterval,
+            icon: AnyView? = nil,
+            disabledFor: TimeInterval = 0,
             confirmation: POConfirmationDialogConfiguration? = nil
         ) {
             self.title = title
+            self.icon = icon
             self.disabledFor = disabledFor
             self.confirmation = confirmation
         }
@@ -104,14 +108,20 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
     /// Default value is `5`.
     public let inlineSingleSelectValuesLimit: Int
 
+    /// Barcode interaction configuration.
+    public let barcodeInteraction: BarcodeInteraction
+
     /// Payment confirmation configuration for payment method where available.
     public let paymentConfirmation: PaymentConfirmation
 
     /// Creates configuration.
-    public init(inlineSingleSelectValuesLimit: Int = 5, paymentConfirmation: PaymentConfirmation = .init()) {
+    public init(
+        inlineSingleSelectValuesLimit: Int = 5,
+        barcodeInteraction: BarcodeInteraction = .init(),
+        paymentConfirmation: PaymentConfirmation = .init()
+    ) {
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
+        self.barcodeInteraction = barcodeInteraction
         self.paymentConfirmation = paymentConfirmation
     }
 }
-
-// swiftlint:enable nesting

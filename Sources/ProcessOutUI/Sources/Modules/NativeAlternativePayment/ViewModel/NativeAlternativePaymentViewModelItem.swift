@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOutCoreUI
 
 enum NativeAlternativePaymentViewModelItem {
 
@@ -45,7 +46,7 @@ enum NativeAlternativePaymentViewModelItem {
         let title: String
     }
 
-    typealias Input = InputViewModel
+    typealias Input = POTextFieldViewModel
 
     struct CodeInput: Identifiable {
 

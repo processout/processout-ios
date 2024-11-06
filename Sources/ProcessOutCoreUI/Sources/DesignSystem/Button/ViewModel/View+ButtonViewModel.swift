@@ -7,20 +7,59 @@
 
 import SwiftUI
 
-extension View {
+extension Button where Label == AnyView {
 
-    /// Configures a button view using provided view model.
-    ///
-    /// - Parameters:
-    ///   - viewModel: The view model containing button properties.
-    ///   - styleProvider: An object that provides the button style based on the role.
     @_spi(PO)
-    @ViewBuilder
-    public func buttonViewModel(_ viewModel: POButtonViewModel) -> some View {
-        self
+    @available(iOS 14, *)
+    public static func create(with viewModel: POButtonViewModel) -> some View {
+        ButtonWrapper(viewModel: viewModel)
+    }
+}
+
+@available(iOS 14, *)
+private struct ButtonWrapper: View {
+
+    let viewModel: POButtonViewModel
+
+    // MARK: - View
+
+    var body: some View {
+        Button(action: action, label: { buttonLabel })
+            .accessibility(identifier: viewModel.id)
             .disabled(!viewModel.isEnabled)
             .buttonLoading(viewModel.isLoading)
             .poButtonRole(viewModel.role)
-            .accessibility(identifier: viewModel.id)
+            .poConfirmationDialog(item: $confirmationDialog)
+    }
+
+    // MARK: - Private Properties
+
+    @State
+    private var confirmationDialog: POConfirmationDialog?
+
+    // MARK: - Private Methods
+
+    private var buttonLabel: Label<Text, some View> {
+        Label {
+            Text(viewModel.title)
+        } icon: {
+            viewModel.icon
+        }
+    }
+
+    private func action() {
+        if let confirmation = viewModel.confirmation {
+            confirmation.onAppear?()
+            confirmationDialog = .init(
+                title: confirmation.title,
+                message: confirmation.message,
+                primaryButton: .init(
+                    title: confirmation.confirmButtonTitle, action: viewModel.action
+                ),
+                secondaryButton: .init(title: confirmation.cancelButtonTitle, role: .cancel)
+            )
+        } else {
+            viewModel.action()
+        }
     }
 }

@@ -1,20 +1,32 @@
 //
-//  InputView.swift
-//  ProcessOutUI
+//  TextField+ViewModel.swift
+//  ProcessOut
 //
-//  Created by Andrii Vysotskyi on 13.11.2023.
+//  Created by Andrii Vysotskyi on 04.11.2024.
 //
 
 import SwiftUI
-@_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
-struct InputView: View {
+extension POTextField where Trailing == AnyView {
 
-    let viewModel: InputViewModel
+    @_spi(PO)
+    public static func create(
+        with viewModel: POTextFieldViewModel, focusedInputId: Binding<AnyHashable?>
+    ) -> some View {
+        TextFieldWrapper(viewModel: viewModel, focusedInputId: focusedInputId)
+    }
+}
+
+@available(iOS 14, *)
+private struct TextFieldWrapper: View {
+
+    let viewModel: POTextFieldViewModel
 
     @Binding
     private(set) var focusedInputId: AnyHashable?
+
+    // MARK: - View
 
     var body: some View {
         POTextField(

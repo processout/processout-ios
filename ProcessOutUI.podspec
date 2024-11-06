@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name                  = 'ProcessOutUI'
   s.version               = '4.21.1'
-  s.swift_versions        = ['5.9']
+  s.swift_versions        = ['5.10']
   s.license               = { :type => 'MIT', :file => 'LICENSE' }
   s.homepage              = 'https://github.com/processout/processout-ios'
   s.author                = 'ProcessOut'
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '14.0'
   s.ios.resources         = 'Sources/ProcessOutUI/Resources/**/*'
   s.source_files          = 'Sources/ProcessOutUI/**/*.swift'
-  s.pod_target_xcconfig   = { 'OTHER_SWIFT_FLAGS' => '-Xfrontend -module-interface-preserve-types-as-written' }
+  s.pod_target_xcconfig   = { 'OTHER_SWIFT_FLAGS' => '-Xfrontend -module-interface-preserve-types-as-written -enable-upcoming-feature IsolatedDefaultValues' }
   s.dependency            'ProcessOut', s.version.to_s
   s.dependency            'ProcessOutCoreUI', s.version.to_s
 end

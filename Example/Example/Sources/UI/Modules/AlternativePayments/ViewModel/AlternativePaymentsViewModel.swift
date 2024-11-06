@@ -180,13 +180,11 @@ final class AlternativePaymentsViewModel: ObservableObject {
             let configuration = PONativeAlternativePaymentConfiguration(
                 invoiceId: invoice.id,
                 gatewayConfigurationId: gatewayConfigurationId,
-                secondaryAction: .cancel(
+                cancelButton: .init(
                     confirmation: .init()
                 ),
                 paymentConfirmation: .init(
-                    showProgressIndicatorAfter: 5,
-                    confirmButton: .init(),
-                    secondaryAction: .cancel(disabledFor: 10)
+                    showProgressViewAfter: 5, confirmButton: .init(), cancelButton: .init(disabledFor: 10)
                 )
             )
             let nativePaymentItem = AlternativePaymentsViewModelState.NativePayment(

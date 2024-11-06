@@ -41,12 +41,8 @@ final class DefaultCardTokenizationInteractor:
         let newState = State.Started(
             number: .init(id: \.number, formatter: cardNumberFormatter),
             expiration: .init(id: \.expiration, formatter: cardExpirationFormatter),
-            cvc: .init(
-                id: \.cvc,
-                shouldCollect: configuration.shouldCollectCvc,
-                formatter: CardSecurityCodeFormatter()
-            ),
-            cardholderName: .init(id: \.cardholderName, shouldCollect: configuration.isCardholderNameInputVisible),
+            cvc: .init(id: \.cvc, shouldCollect: configuration.cvc != nil, formatter: CardSecurityCodeFormatter()),
+            cardholderName: .init(id: \.cardholderName, shouldCollect: configuration.cardholderName != nil),
             address: defaultAddressParameters
         )
         state = .started(newState)

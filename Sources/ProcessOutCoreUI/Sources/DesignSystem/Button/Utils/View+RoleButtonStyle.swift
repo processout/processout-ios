@@ -1,5 +1,5 @@
 //
-//  POButtonRoleStyleProvider.swift
+//  View+RoleButtonStyle.swift.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 19.10.2024.
@@ -20,24 +20,24 @@ extension View {
     public func buttonStyle(
         forPrimaryRole primaryStyle: any ButtonStyle, fallback fallbackStyle: any ButtonStyle
     ) -> some View {
-        modifier(ContentModifier(primaryStyle: primaryStyle, fallbackStyle: fallbackStyle))
+        self.buttonStyle(RoleButtonStyle(primaryStyle: primaryStyle, fallbackStyle: fallbackStyle))
     }
 }
 
-private struct ContentModifier: ViewModifier {
+private struct RoleButtonStyle: ButtonStyle {
 
     let primaryStyle, fallbackStyle: any ButtonStyle
 
-    // MARK: - ViewModifier
+    // MARK: - ButtonStyle
 
-    func body(content: Content) -> some View {
+    func makeBody(configuration: Configuration) -> some View {
         let resolvedStyle = switch poButtonRole {
         case .primary:
             primaryStyle
         default:
             fallbackStyle
         }
-        content.buttonStyle(POAnyButtonStyle(erasing: resolvedStyle))
+        AnyView(resolvedStyle.makeBody(configuration: configuration))
     }
 
     // MARK: - Private Properties

@@ -8,9 +8,10 @@
 import Foundation
 @_spi(PO) import ProcessOut
 
+@MainActor
 final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutInteractorChildProvider {
 
-    init(
+    nonisolated init(
         configuration: PODynamicCheckoutConfiguration,
         cardsService: POCardsService,
         invoicesService: POInvoicesService,
@@ -34,7 +35,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         let interactor = DefaultCardTokenizationInteractor(
             cardsService: cardsService,
             logger: logger,
-            configuration: cardTokenizationConfiguration(configuration: configuration),
+            configuration: cardTokenizationConfiguration(with: configuration),
             completion: { _ in }
         )
         return interactor
@@ -67,69 +68,122 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
     private let imagesRepository: POImagesRepository
     private let logger: POLogger
 
-    // MARK: - Private Methods
+    // MARK: - Card Tokenization Configuration
 
     private func cardTokenizationConfiguration(
-        configuration: PODynamicCheckoutPaymentMethod.CardConfiguration
+        with methodConfiguration: PODynamicCheckoutPaymentMethod.CardConfiguration
     ) -> POCardTokenizationConfiguration {
-        let billingAddressConfiguration = POBillingAddressConfiguration(
-            mode: configuration.billingAddress.collectionMode,
-            countryCodes: configuration.billingAddress.restrictToCountryCodes,
-            defaultAddress: self.configuration.card.billingAddress.defaultAddress,
-            attachDefaultsToPaymentMethod: self.configuration.card.billingAddress.attachDefaultsToPaymentMethod
-        )
-        let cardConfiguration = POCardTokenizationConfiguration(
+        POCardTokenizationConfiguration(
             title: "",
-            isCardholderNameInputVisible: configuration.cardholderNameRequired,
-            shouldCollectCvc: configuration.cvcRequired,
-            primaryActionTitle: self.configuration.submitButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
-            cancelActionTitle: "",
-            billingAddress: billingAddressConfiguration,
-            isSavingAllowed: configuration.savingAllowed,
-            metadata: self.configuration.card.metadata
+            cardholderName: methodConfiguration.cardholderNameRequired
+                ? textFieldConfiguration(with: configuration.card.cardholderName) : nil,
+            cardNumber: textFieldConfiguration(with: configuration.card.cardNumber),
+            expirationDate: textFieldConfiguration(with: configuration.card.expirationDate),
+            cvc: methodConfiguration.cvcRequired ? textFieldConfiguration(with: configuration.card.cvc) : nil,
+            billingAddress: billingAddressConfiguration(with: methodConfiguration),
+            isSavingAllowed: methodConfiguration.savingAllowed,
+            submitButton: submitButtonConfiguration(with: configuration.submitButton),
+            cancelButton: configuration.cancelButton.map { cancelButtonConfiguration(with: $0) },
+            metadata: configuration.card.metadata
         )
-        return cardConfiguration
     }
+
+    private func billingAddressConfiguration(
+        with methodConfiguration: PODynamicCheckoutPaymentMethod.CardConfiguration
+    ) -> POCardTokenizationConfiguration.BillingAddress {
+        POCardTokenizationConfiguration.BillingAddress(
+            mode: methodConfiguration.billingAddress.collectionMode,
+            countryCodes: methodConfiguration.billingAddress.restrictToCountryCodes,
+            defaultAddress: configuration.card.billingAddress.defaultAddress,
+            attachDefaultsToPaymentMethod: configuration.card.billingAddress.attachDefaultsToPaymentMethod
+        )
+    }
+
+    private func textFieldConfiguration(
+        with configuration: PODynamicCheckoutCardConfiguration.TextField
+    ) -> POCardTokenizationConfiguration.TextField {
+        .init(prompt: configuration.prompt, icon: configuration.icon)
+    }
+
+    private func submitButtonConfiguration(
+        with configuration: PODynamicCheckoutConfiguration.SubmitButton
+    ) -> POCardTokenizationConfiguration.SubmitButton {
+        .init(title: configuration.title ?? String(resource: .DynamicCheckout.Button.pay), icon: configuration.icon)
+    }
+
+    private func cancelButtonConfiguration(
+        with configuration: PODynamicCheckoutConfiguration.CancelButton
+    ) -> POCardTokenizationConfiguration.CancelButton {
+        .init(title: configuration.title, icon: configuration.icon, confirmation: configuration.confirmation)
+    }
+
+    // MARK: - Alternative Payment Configuration
 
     private func alternativePaymentConfiguration(
         invoiceId: String, gatewayConfigurationId: String
     ) -> PONativeAlternativePaymentConfiguration {
-        let alternativePaymentConfiguration = PONativeAlternativePaymentConfiguration(
+        var configuration = PONativeAlternativePaymentConfiguration(
             invoiceId: invoiceId,
             gatewayConfigurationId: gatewayConfigurationId,
             title: "",
             shouldHorizontallyCenterCodeInput: false,
-            successMessage: "",
-            primaryActionTitle: self.configuration.submitButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
-            secondaryAction: nil,
             inlineSingleSelectValuesLimit: configuration.alternativePayment.inlineSingleSelectValuesLimit,
-            skipSuccessScreen: true,
-            paymentConfirmation: alternativePaymentConfirmationConfiguration
+            submitButton: submitButtonConfiguration(with: configuration.submitButton),
+            cancelButton: configuration.cancelButton.map { cancelButtonConfiguration(with: $0) },
+            paymentConfirmation: alternativePaymentConfirmationConfiguration(),
+            success: nil
         )
-        return alternativePaymentConfiguration
+        configuration.barcodeInteraction = barcodeInteraction(
+            with: self.configuration.alternativePayment.barcodeInteraction
+        )
+        return configuration
     }
 
-    // swiftlint:disable:next identifier_name
-    private var alternativePaymentConfirmationConfiguration: PONativeAlternativePaymentConfirmationConfiguration {
-        let configuration = self.configuration.alternativePayment.paymentConfirmation
-        let confirmationConfiguration = PONativeAlternativePaymentConfirmationConfiguration(
+    private func submitButtonConfiguration(
+        with configuration: PODynamicCheckoutConfiguration.SubmitButton
+    ) -> PONativeAlternativePaymentConfiguration.SubmitButton {
+        .init(title: configuration.title ?? String(resource: .DynamicCheckout.Button.pay), icon: configuration.icon)
+    }
+
+    private func cancelButtonConfiguration(
+        with configuration: PODynamicCheckoutConfiguration.CancelButton
+    ) -> PONativeAlternativePaymentConfiguration.CancelButton {
+        .init(title: configuration.title, icon: configuration.icon, confirmation: configuration.confirmation)
+    }
+
+    private func barcodeInteraction(
+        with interaction: PODynamicCheckoutAlternativePaymentConfiguration.BarcodeInteraction
+    ) -> PONativeAlternativePaymentConfiguration.BarcodeInteraction {
+        PONativeAlternativePaymentConfiguration.BarcodeInteraction(
+            saveButton: submitButtonConfiguration(with: interaction.saveButton),
+            saveErrorConfirmation: interaction.saveErrorConfirmation,
+            generateHapticFeedback: interaction.generateHapticFeedback
+        )
+    }
+
+    private func alternativePaymentConfirmationConfiguration() -> PONativeAlternativePaymentConfiguration.Confirmation {
+        PONativeAlternativePaymentConfiguration.Confirmation(
             waitsConfirmation: true,
-            timeout: configuration.timeout,
-            showProgressIndicatorAfter: configuration.showProgressIndicatorAfter,
+            timeout: configuration.alternativePayment.paymentConfirmation.timeout,
+            showProgressViewAfter: configuration.alternativePayment.paymentConfirmation.showProgressViewAfter,
             hideGatewayDetails: true,
-            barcodeInteraction: configuration.barcodeInteraction.map { configuration in
-                .init(
-                    saveButtonTitle: configuration.saveButtonTitle,
-                    saveErrorConfirmation: configuration.saveErrorConfirmation
-                )
+            confirmButton: configuration.alternativePayment.paymentConfirmation.confirmButton.map { configuration in
+                submitButtonConfiguration(with: configuration)
             },
-            confirmButton: configuration.confirmButton.map { button in
-                .init(title: button.title)
-            },
-            secondaryAction: configuration.cancelButton.map { configuration in
-                .cancel(title: "", disabledFor: configuration.disabledFor, confirmation: nil)
+            cancelButton: configuration.alternativePayment.paymentConfirmation.cancelButton.map { configuration in
+                cancelButtonConfiguration(with: configuration)
             }
         )
-        return confirmationConfiguration
+    }
+
+    private func cancelButtonConfiguration(
+        with configuration: PODynamicCheckoutAlternativePaymentConfiguration.CancelButton
+    ) -> PONativeAlternativePaymentConfiguration.CancelButton {
+        PONativeAlternativePaymentConfiguration.CancelButton(
+            title: configuration.title,
+            icon: configuration.icon,
+            disabledFor: configuration.disabledFor,
+            confirmation: configuration.confirmation
+        )
     }
 }

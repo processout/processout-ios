@@ -284,10 +284,14 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         guard state.isCancellable else {
             return nil
         }
+        guard let configuration = interactor.configuration.cancelButton else {
+            return nil
+        }
         let cancelAction = createCancelAction(
-            title: interactor.configuration.cancelButton?.title,
+            title: configuration.title,
+            icon: configuration.icon,
             isEnabled: true,
-            confirmation: interactor.configuration.cancelButton?.confirmation
+            confirmation: configuration.confirmation
         )
         return cancelAction
     }
@@ -316,7 +320,8 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let viewModel = POButtonViewModel(
             id: ButtonId.submit,
-            title: interactor.configuration.submitButtonTitle ?? String(resource: .DynamicCheckout.Button.pay),
+            title: interactor.configuration.submitButton.title ?? String(resource: .DynamicCheckout.Button.pay),
+            icon: interactor.configuration.submitButton.icon,
             role: .primary,
             action: { [weak self] in
                 self?.interactor.startPayment(methodId: methodId)
@@ -387,7 +392,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 assertionFailure("Interactor must be set.")
                 return nil
             }
-            let item = DynamicCheckoutViewModelItem.AlternativePayment(id: state.snapshot.invoice.id) {
+            let item = DynamicCheckoutViewModelItem.AlternativePayment(id: ObjectIdentifier(interactor)) {
                 // todo(andrii-vysotskyi): decide if it is okay to create view model directly here
                 let viewModel = DefaultNativeAlternativePaymentViewModel(interactor: interactor)
                 return AnyViewModel(erasing: viewModel)
@@ -398,7 +403,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 assertionFailure("Interactor must be set.")
                 return nil
             }
-            let item = DynamicCheckoutViewModelItem.Card(id: state.snapshot.invoice.id) {
+            let item = DynamicCheckoutViewModelItem.Card(id: ObjectIdentifier(interactor)) {
                 let viewModel = DefaultCardTokenizationViewModel(interactor: interactor)
                 return AnyViewModel(erasing: viewModel)
             }
@@ -414,18 +419,19 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         guard state.isCancellable || state.snapshot.isCancellable else {
             return nil
         }
-        let title: String?
-        let confirmation: POConfirmationDialogConfiguration?
+        let title: String?, icon: AnyView?, confirmation: POConfirmationDialogConfiguration?
         if state.isAwaitingNativeAlternativePaymentCapture {
             let configuration = interactor.configuration.alternativePayment.paymentConfirmation.cancelButton
             title = configuration?.title
+            icon = configuration?.icon
             confirmation = configuration?.confirmation
         } else {
             let configuration = interactor.configuration.cancelButton
             title = configuration?.title
+            icon = configuration?.icon
             confirmation = configuration?.confirmation
         }
-        return createCancelAction(title: title, isEnabled: state.isCancellable, confirmation: confirmation)
+        return createCancelAction(title: title, icon: icon, isEnabled: state.isCancellable, confirmation: confirmation)
     }
 
     private func shouldResolveContent(
@@ -497,8 +503,15 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         guard state.snapshot.isCancellable || state.snapshot.snapshot.isCancellable else {
             return nil
         }
-        let title = interactor.configuration.cancelButton?.title
-        return createCancelAction(title: title, isEnabled: true, confirmation: nil)
+        guard let configuration = interactor.configuration.cancelButton else {
+            return nil
+        }
+        return createCancelAction(
+            title: configuration.title,
+            icon: configuration.icon,
+            isEnabled: true,
+            confirmation: configuration.confirmation
+        )
     }
 
     // MARK: - Success
@@ -522,44 +535,22 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     // MARK: - Utils
 
     private func createCancelAction(
-        title: String?, isEnabled: Bool, confirmation: POConfirmationDialogConfiguration?
+        title: String?, icon: AnyView?, isEnabled: Bool, confirmation: POConfirmationDialogConfiguration?
     ) -> POButtonViewModel {
         let viewModel = POButtonViewModel(
             id: ButtonId.cancel,
             title: title ?? String(resource: .DynamicCheckout.Button.cancel),
+            icon: icon,
             isEnabled: isEnabled,
             role: .cancel,
+            confirmation: confirmation.map { configuration in
+                .cancel(with: configuration) { [weak self] in self?.interactor.didRequestCancelConfirmation() }
+            },
             action: { [weak self] in
-                self?.cancelCheckout(configuration: confirmation)
+                self?.interactor.cancel()
             }
         )
         return viewModel
-    }
-
-    private func cancelCheckout(configuration: POConfirmationDialogConfiguration?) {
-        if let configuration = configuration {
-            interactor.didRequestCancelConfirmation()
-            let confirmationDialog = POConfirmationDialog(
-                title: configuration.title ?? String(resource: .DynamicCheckout.CancelConfirmation.title),
-                message: configuration.message,
-                primaryButton: .init(
-                    // swiftlint:disable:next line_length
-                    title: configuration.confirmActionTitle ?? String(resource: .DynamicCheckout.CancelConfirmation.confirm),
-                    role: .destructive,
-                    action: { [weak self] in
-                        self?.interactor.cancel()
-                    }
-                ),
-                secondaryButton: .init(
-                    // swiftlint:disable:next line_length
-                    title: configuration.cancelActionTitle ?? String(resource: .DynamicCheckout.CancelConfirmation.cancel),
-                    role: .cancel
-                )
-            )
-            state.confirmationDialog = confirmationDialog
-        } else {
-            interactor.cancel()
-        }
     }
 
     // MARK: - Utils

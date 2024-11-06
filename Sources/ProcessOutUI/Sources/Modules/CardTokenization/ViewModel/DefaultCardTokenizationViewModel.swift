@@ -123,20 +123,22 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         let trackItems = [
             createItem(
                 parameter: startedState.expiration,
-                placeholder: String(resource: .CardTokenization.CardDetails.expiration),
+                // swiftlint:disable:next line_length
+                placeholder: configuration.expirationDate.prompt ?? String(resource: .CardTokenization.CardDetails.expiration),
+                icon: configuration.expirationDate.icon,
                 keyboard: .asciiCapableNumberPad
             ),
             createItem(
                 parameter: startedState.cvc,
-                placeholder: String(resource: .CardTokenization.CardDetails.cvc),
-                icon: Image(poResource: .Card.back).renderingMode(.template),
+                placeholder: configuration.cvc?.prompt ?? String(resource: .CardTokenization.CardDetails.cvc),
+                icon: configuration.cvc?.icon ?? AnyView(Image(poResource: .Card.back).renderingMode(.template)),
                 keyboard: .asciiCapableNumberPad
             )
         ]
         let items = [
             createItem(
                 parameter: startedState.number,
-                placeholder: String(resource: .CardTokenization.CardDetails.number),
+                placeholder: configuration.cardNumber.prompt ?? String(resource: .CardTokenization.CardDetails.number),
                 icon: cardNumberIcon(startedState: startedState),
                 keyboard: .asciiCapableNumberPad,
                 contentType: .creditCardNumber
@@ -146,7 +148,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             ),
             createItem(
                 parameter: startedState.cardholderName,
-                placeholder: String(resource: .CardTokenization.CardDetails.cardholder),
+                // swiftlint:disable:next line_length
+                placeholder: configuration.cardholderName?.prompt ?? String(resource: .CardTokenization.CardDetails.cardholder),
+                icon: configuration.cardholderName?.icon,
                 keyboard: .asciiCapable,
                 contentType: .name,
                 submitLabel: .done
@@ -155,11 +159,15 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         return items.compactMap { $0 }
     }
 
-    private func cardNumberIcon(startedState: InteractorState.Started) -> Image? {
+    private func cardNumberIcon(startedState: InteractorState.Started) -> AnyView? {
+        // Scheme icon takes precedence over inject icon.
         let scheme = startedState.issuerInformation?.coScheme != nil
             ? startedState.preferredScheme
             : startedState.issuerInformation?.$scheme.typed
-        return scheme.flatMap(CardSchemeImageProvider.shared.image)
+        if let image = scheme.flatMap(CardSchemeImageProvider.shared.image) {
+            return AnyView(image)
+        }
+        return configuration.cardNumber.icon
     }
 
     // MARK: - Preferred Scheme
@@ -277,7 +285,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func createItem(
         parameter: InteractorState.Parameter,
         placeholder: String,
-        icon: Image? = nil,
+        icon: AnyView? = nil,
         keyboard: UIKeyboardType = .default,
         contentType: UITextContentType? = nil,
         submitLabel: POBackport<Any>.SubmitLabel = .default
@@ -301,7 +309,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func createInputItem(
         parameter: InteractorState.Parameter,
         placeholder: String,
-        icon: Image? = nil,
+        icon: AnyView? = nil,
         keyboard: UIKeyboardType = .default,
         contentType: UITextContentType? = nil,
         submitLabel: POBackport<Any>.SubmitLabel
@@ -314,9 +322,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             id: parameter.id,
             value: value,
             placeholder: placeholder,
+            icon: icon,
             isInvalid: !parameter.isValid,
             isEnabled: true,
-            icon: icon,
             formatter: parameter.formatter,
             keyboard: keyboard,
             contentType: contentType,
@@ -359,13 +367,11 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func submitAction(
         startedState: InteractorState.Started, isSubmitting: Bool
     ) -> POButtonViewModel? {
-        let title = configuration.primaryActionTitle ?? String(resource: .CardTokenization.Button.submit)
-        guard !title.isEmpty else {
-            return nil
-        }
+        let buttonConfiguration = configuration.submitButton
         let action = POButtonViewModel(
             id: "primary-button",
-            title: title,
+            title: buttonConfiguration.title ?? String(resource: .CardTokenization.Button.submit),
+            icon: buttonConfiguration.icon,
             isEnabled: startedState.areParametersValid,
             isLoading: isSubmitting,
             role: .primary,
@@ -377,15 +383,16 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     }
 
     private func cancelAction(isEnabled: Bool) -> POButtonViewModel? {
-        let title = configuration.cancelActionTitle ?? String(resource: .CardTokenization.Button.cancel)
-        guard !title.isEmpty else {
+        guard let buttonConfiguration = configuration.cancelButton else {
             return nil
         }
         let action = POButtonViewModel(
             id: "cancel-button",
-            title: title,
+            title: buttonConfiguration.title ?? String(resource: .CardTokenization.Button.cancel),
+            icon: buttonConfiguration.icon,
             isEnabled: isEnabled,
             role: .cancel,
+            confirmation: buttonConfiguration.confirmation.map { .cancel(with: $0, onAppear: nil) },
             action: { [weak self] in
                 self?.interactor.cancel()
             }

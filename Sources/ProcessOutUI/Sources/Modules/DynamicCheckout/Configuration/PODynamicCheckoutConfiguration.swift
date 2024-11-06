@@ -6,12 +6,16 @@
 //
 
 import PassKit
+import SwiftUI
 import ProcessOut
 
 /// Dynamic checkout configuration.
 @_spi(PO)
+@MainActor
 public struct PODynamicCheckoutConfiguration: Sendable {
 
+    /// Payment success configuration.
+    @MainActor
     public struct PaymentSuccess: Sendable {
 
         /// Custom success message to display user when payment completes.
@@ -27,16 +31,41 @@ public struct PODynamicCheckoutConfiguration: Sendable {
         }
     }
 
+    /// Submit button configuration.
+    @MainActor
+    public struct SubmitButton: Sendable {
+
+        /// Button title, such as "Pay". Pass `nil` title to use default value.
+        public let title: String?
+
+        /// Button icon. Pass `nil` to use default value.
+        public let icon: AnyView?
+
+        public init(title: String? = nil, icon: AnyView? = nil) {
+            self.title = title
+            self.icon = icon
+        }
+    }
+
+    /// Cancel button configuration.
+    @MainActor
     public struct CancelButton: Sendable {
 
-        /// Cancel button title.
+        /// Button title. Pass `nil` title to use default value.
         public let title: String?
+
+        /// Button icon. Pass `nil` to use default value.
+        public let icon: AnyView?
 
         /// When property is set implementation asks user to confirm cancel.
         public let confirmation: POConfirmationDialogConfiguration?
 
-        public init(title: String? = nil, confirmation: POConfirmationDialogConfiguration? = nil) {
+        /// Creates cancel button configuration.
+        public init(
+            title: String? = nil, icon: AnyView? = nil, confirmation: POConfirmationDialogConfiguration? = nil
+        ) {
             self.title = title
+            self.icon = icon
             self.confirmation = confirmation
         }
     }
@@ -53,15 +82,15 @@ public struct PODynamicCheckoutConfiguration: Sendable {
     /// PassKit payment button type.
     public let passKitPaymentButtonType: PKPaymentButtonType
 
-    /// Primary button text, such as "Submit".
-    public let submitButtonTitle: String?
-
-    /// Cancel button. To remove button use `nil`.
-    public let cancelButton: CancelButton?
-
     /// Determines whether to enable skipping payment list step when there is only
     /// one non-instant payment method. Default value: `true`.
     public let allowsSkippingPaymentList: Bool
+
+    /// Submit button.
+    public let submitButton: SubmitButton
+
+    /// Cancel button. To remove button use `nil`.
+    public let cancelButton: CancelButton?
 
     /// Capture success screen configuration. In order to avoid showing success screen to user pass `nil`.
     public let paymentSuccess: PaymentSuccess?
@@ -72,18 +101,18 @@ public struct PODynamicCheckoutConfiguration: Sendable {
         card: PODynamicCheckoutCardConfiguration = .init(),
         alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .init(),
         passKitPaymentButtonType: PKPaymentButtonType = .plain,
-        submitButtonTitle: String? = nil,
-        cancelButton: CancelButton? = nil,
         allowsSkippingPaymentList: Bool = true,
+        submitButton: SubmitButton = .init(),
+        cancelButton: CancelButton? = .init(),
         paymentSuccess: PaymentSuccess? = .init()
     ) {
         self.invoiceRequest = invoiceRequest
         self.card = card
         self.alternativePayment = alternativePayment
         self.passKitPaymentButtonType = passKitPaymentButtonType
-        self.submitButtonTitle = submitButtonTitle
-        self.cancelButton = cancelButton
         self.allowsSkippingPaymentList = allowsSkippingPaymentList
+        self.submitButton = submitButton
+        self.cancelButton = cancelButton
         self.paymentSuccess = paymentSuccess
     }
 }

@@ -91,7 +91,7 @@ enum DynamicCheckoutViewModelItem {
     struct AlternativePayment: Identifiable {
 
         /// Content ID.
-        let id: String
+        let id: AnyHashable
 
         /// Creates alternative payment view model.
         let viewModel: () -> AnyViewModel<NativeAlternativePaymentViewModelState>
@@ -100,7 +100,7 @@ enum DynamicCheckoutViewModelItem {
     struct Card: Identifiable {
 
         /// Content ID.
-        let id: String
+        let id: AnyHashable
 
         /// Creates card tokenization view model.
         let viewModel: () -> AnyViewModel<CardTokenizationViewModelState>
