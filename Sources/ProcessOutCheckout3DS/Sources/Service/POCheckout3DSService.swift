@@ -71,6 +71,7 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     public func clean() async {
         service?.cleanUp()
+        service = nil
     }
 
     // MARK: - Private Properties
