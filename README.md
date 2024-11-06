@@ -24,11 +24,6 @@ Get started with our ProcessOut [documentation](https://docs.processout.com/) or
 > is based on SwiftUI, so styling is not compatible with ProcessOut (that is based on UIKit). Also
 > beware that UI in ProcessOut will be removed in `5.0.0`.
 
-> [!WARNING]
->
-> Checkout3DS is currently incompatible with Xcode 16, which also affects ProcessOutCheckout3DS. If you
-> depend on this functionality, please use version 4.20.0 with Xcode 15 until the issue is resolved.
-
 ## Contributing
 
 We welcome contributions of any kind including new features, bug fixes, and general improvements.
