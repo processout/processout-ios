@@ -76,7 +76,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
     private let jsonWritingOptions: JSONSerialization.WritingOptions
     private let webSession: WebAuthenticationSession
     private let logger: POLogger
-    private let semaphore: POAsyncSemaphore
+    private let semaphore: AsyncSemaphore
 
     // MARK: - Native 3DS
 

@@ -1,5 +1,5 @@
 //
-//  POAsyncSemaphore.swift
+//  AsyncSemaphore.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 10.10.2024.
@@ -7,13 +7,12 @@
 
 import Foundation
 
-@_spi(PO)
-public actor POAsyncSemaphore {
+actor AsyncSemaphore {
 
     // MARK: - Creating a Semaphore
 
     /// Creates a semaphore.
-    public init(value: UInt) {
+    init(value: UInt) {
         initialValue = Int(value)
         self.value = Int(value)
     }
@@ -31,7 +30,7 @@ public actor POAsyncSemaphore {
     ///
     /// If the count is negative, the current task is suspended without blocking
     /// the thread. Otherwise, no suspension occurs.
-    public func wait() async {
+    func wait() async {
         value -= 1
         guard value < 0 else {
             return
@@ -50,7 +49,7 @@ public actor POAsyncSemaphore {
     /// the thread. Otherwise, no suspension occurs.
     ///
     /// If canceled before signalling, this function throws `CancellationError`.
-    public func waitUnlessCancelled() async throws {
+    func waitUnlessCancelled() async throws {
         try Task.checkCancellation()
         value -= 1
         guard value < 0 else {
@@ -74,7 +73,7 @@ public actor POAsyncSemaphore {
     ///
     /// Increases the semaphore's count, potentially unblocking a suspended task
     /// if the count transitions from negative to non-negative.
-    public nonisolated func signal() {
+    nonisolated func signal() {
         Task {
             await signalSemaphore()
         }

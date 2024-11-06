@@ -11,7 +11,7 @@ actor ThrottledWebAuthenticationSessionDecorator: WebAuthenticationSession {
 
     init(session: WebAuthenticationSession) {
         self.session = session
-        semaphore = POAsyncSemaphore(value: 1)
+        semaphore = AsyncSemaphore(value: 1)
     }
 
     // MARK: - WebAuthenticationSession
@@ -33,7 +33,7 @@ actor ThrottledWebAuthenticationSessionDecorator: WebAuthenticationSession {
     // MARK: - Private Properties
 
     private let session: WebAuthenticationSession
-    private let semaphore: POAsyncSemaphore
+    private let semaphore: AsyncSemaphore
 
     private var lastAuthenticationTime: DispatchTime?
 
