@@ -61,7 +61,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
                 logger.warn("Did fail to assign customer token: \(error)", attributes: attributes)
                 throw error
             }
-            return try await assignCustomerToken(request: newRequest, threeDSService: threeDSService)
+            return try await _assignCustomerToken(request: newRequest, threeDSService: threeDSService)
         }
         if let token = response.token {
             return token
