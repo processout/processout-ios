@@ -43,9 +43,9 @@ public struct PODynamicCheckoutCardConfiguration: Sendable {
         /// Text field icon.
         public let icon: AnyView?
 
-        public init(prompt: String? = nil, icon: AnyView? = nil) {
+        public init<Icon: View>(prompt: String? = nil, icon: Icon? = AnyView?.none) {
             self.prompt = prompt
-            self.icon = icon
+            self.icon = icon.map(AnyView.init(erasing:))
         }
     }
 

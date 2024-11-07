@@ -120,9 +120,9 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
         /// Button icon. Pass `nil` to use default value.
         public let icon: AnyView?
 
-        public init(title: String? = nil, icon: AnyView? = nil) {
+        public init<Icon: View>(title: String? = nil, icon: Icon? = AnyView?.none) {
             self.title = title
-            self.icon = icon
+            self.icon = icon.map(AnyView.init(erasing:))
         }
     }
 
@@ -145,14 +145,14 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
         public let confirmation: POConfirmationDialogConfiguration?
 
         /// Creates cancel button configuration.
-        public init(
+        public init<Icon: View>(
             title: String? = nil,
-            icon: AnyView? = nil,
+            icon: Icon? = AnyView?.none,
             disabledFor: TimeInterval = 0,
             confirmation: POConfirmationDialogConfiguration? = nil
         ) {
             self.title = title
-            self.icon = icon
+            self.icon = icon.map(AnyView.init(erasing:))
             self.disabledFor = disabledFor
             self.confirmation = confirmation
         }
@@ -388,6 +388,6 @@ extension PONativeAlternativePaymentConfiguration.CancelButton {
         guard case let .cancel(title, disabledFor, confirmation) = action else {
             return nil
         }
-        self = .init(title: title, icon: nil, disabledFor: disabledFor, confirmation: confirmation)
+        self = .init(title: title, disabledFor: disabledFor, confirmation: confirmation)
     }
 }

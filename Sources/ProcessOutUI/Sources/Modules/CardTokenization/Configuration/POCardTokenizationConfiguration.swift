@@ -65,9 +65,9 @@ public struct POCardTokenizationConfiguration: Sendable {
         /// Text field icon.
         public let icon: AnyView?
 
-        public init(prompt: String? = nil, icon: AnyView? = nil) {
+        public init<Icon: View>(prompt: String? = nil, icon: Icon? = AnyView?.none) {
             self.prompt = prompt
-            self.icon = icon
+            self.icon = icon.map(AnyView.init(erasing:))
         }
     }
 
@@ -82,9 +82,9 @@ public struct POCardTokenizationConfiguration: Sendable {
         /// Button icon. Pass `nil` title to use default value.
         public let icon: AnyView?
 
-        public init(title: String? = nil, icon: AnyView? = nil) {
+        public init<Icon: View>(title: String? = nil, icon: Icon? = AnyView?.none) {
             self.title = title
-            self.icon = icon
+            self.icon = icon.map(AnyView.init(erasing:))
         }
     }
 
@@ -103,11 +103,13 @@ public struct POCardTokenizationConfiguration: Sendable {
         public let confirmation: POConfirmationDialogConfiguration?
 
         /// Creates cancel button configuration.
-        public init(
-            title: String? = nil, icon: AnyView? = nil, confirmation: POConfirmationDialogConfiguration? = nil
+        public init<Icon: View>(
+            title: String? = nil,
+            icon: Icon? = AnyView?.none,
+            confirmation: POConfirmationDialogConfiguration? = nil
         ) {
             self.title = title
-            self.icon = icon
+            self.icon = icon.map(AnyView.init(erasing:))
             self.confirmation = confirmation
         }
     }
