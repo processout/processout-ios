@@ -16,6 +16,7 @@ public final class POCheckout3DSService: PO3DS2Service {
     public nonisolated init(delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production) {
         self.errorMapper = DefaultAuthenticationErrorMapper()
         self.configurationMapper = DefaultConfigurationMapper()
+        self.eventEmitter = ProcessOut.shared.eventEmitter
         self.delegate = delegate
         self.environment = environment
     }
@@ -54,6 +55,7 @@ public final class POCheckout3DSService: PO3DS2Service {
             guard let transaction = service?.createTransaction() else {
                 throw POFailure(code: .generic(.mobile))
             }
+            observeDeepLinks()
             let authenticationResult = try await transaction.doChallenge(
                 challengeParameters: challengeParameters(with: parameters)
             )
@@ -70,6 +72,7 @@ public final class POCheckout3DSService: PO3DS2Service {
     }
 
     public func clean() async {
+        deepLinkObservation = nil
         service?.cleanUp()
         service = nil
     }
@@ -78,9 +81,13 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     private let errorMapper: AuthenticationErrorMapper
     private let configurationMapper: ConfigurationMapper
-    private nonisolated(unsafe) var environment: Checkout3DS.Environment
+    private let eventEmitter: POEventEmitter
+
+    private let environment: Checkout3DS.Environment
     private let delegate: POCheckout3DSServiceDelegate?
+
     private var service: ThreeDS2Service?
+    private var deepLinkObservation: AnyObject?
 
     // MARK: - Mapping
 
@@ -121,5 +128,11 @@ public final class POCheckout3DSService: PO3DS2Service {
             return errorMapper.convert(error: error)
         }
         return POFailure(code: .generic(.mobile), underlyingError: error)
+    }
+
+    private func observeDeepLinks() {
+        deepLinkObservation = eventEmitter.on(PODeepLinkReceivedEvent.self) { event in
+            Checkout3DSService.handleAppURL(url: event.url)
+        }
     }
 }
