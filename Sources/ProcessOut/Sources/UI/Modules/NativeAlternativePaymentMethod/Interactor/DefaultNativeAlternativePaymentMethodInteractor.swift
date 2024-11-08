@@ -408,7 +408,7 @@ final class DefaultNativeAlternativePaymentMethodInteractor: NativeAlternativePa
     private func send(event: PONativeAlternativePaymentMethodEvent) {
         MainActor.assumeIsolated {
             logger.debug("Did send event: '\(String(describing: event))'")
-            delegate?.nativeAlternativePaymentMethodDidEmitEvent(event)
+            delegate?.nativeAlternativePayment(didEmitEvent: event)
         }
     }
 
