@@ -29,7 +29,7 @@ final class ProcessOutHttpConnectorBuilder {
                     decoder: decoder,
                     logger: logger
                 ),
-                retryStrategy: .exponential(maximumRetries: 3, interval: 0.1, rate: 3)
+                retryStrategy: .init(function: .exponential(interval: 0.1, rate: 3), maximumRetries: 3)
             ),
             failureMapper: DefaultHttpConnectorFailureMapper(logger: logger),
             logger: logger

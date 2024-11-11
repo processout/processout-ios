@@ -69,7 +69,7 @@ final class DefaultInvoicesService: POInvoicesService {
             timeoutError: POFailure(
                 message: "Unable to capture alternative payment within the expected time.", code: .timeout(.mobile)
             ),
-            retryStrategy: .exponential(maximumRetries: .max, interval: 0.15, rate: 1.45, minimum: 3, maximum: 90)
+            retryStrategy: .init(function: .exponential(interval: 0.15, rate: 1.45), minimum: 3, maximum: 90)
         )
     }
 

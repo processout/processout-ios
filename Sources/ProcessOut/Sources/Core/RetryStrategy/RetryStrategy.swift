@@ -9,34 +9,52 @@ import Foundation
 
 struct RetryStrategy: Sendable {
 
-    /// Returns time interval to void for given retry.
-    func interval(for retry: Int) -> TimeInterval {
-        intervalFunction(retry)
+    struct Function {
+
+        func callAsFunction(retry: Int) -> TimeInterval {
+            function(retry)
+        }
+
+        /// Actual function.
+        let function: @Sendable (_ retry: Int) -> TimeInterval
     }
+
+    /// Returns time interval for given retry or `nil` if no retry should occur.
+    func interval(for retry: Int) -> TimeInterval {
+        let delay = min(function(retry: retry), maximum) / 2
+        let jitter = TimeInterval.random(in: 0...delay) // Equal Jitter
+        return max(delay + jitter, minimum)
+    }
+
+    /// Function to use to calculate delay for given attempt number.
+    let function: Function
 
     /// Maximum number of retries.
     let maximumRetries: Int
 
-    /// Function to use to calculate delay for given attempt number.
-    let intervalFunction: @Sendable (_ retry: Int) -> TimeInterval
-}
+    /// Minimum delay value.
+    let minimum: TimeInterval
 
-extension RetryStrategy {
+    /// Maximum delay value.
+    let maximum: TimeInterval
 
-    static func linear(maximumRetries: Int, interval: TimeInterval) -> Self {
-        .init(maximumRetries: maximumRetries) { _ in interval }
-    }
-
-    static func exponential(
-        maximumRetries: Int,
-        interval: TimeInterval,
-        rate: Double,
+    /// Creates retry strategy.
+    init(
+        function: Function,
+        maximumRetries: Int = .max,
         minimum: TimeInterval = 0,
         maximum: TimeInterval = .greatestFiniteMagnitude
-    ) -> Self {
-        RetryStrategy(maximumRetries: maximumRetries) { retry in
-            let delay = interval * pow(rate, Double(retry))
-            return max(min(delay, maximum), minimum)
-        }
+    ) {
+        self.function = function
+        self.maximumRetries = maximumRetries
+        self.minimum = minimum
+        self.maximum = maximum
+    }
+}
+
+extension RetryStrategy.Function {
+
+    static func exponential(interval: TimeInterval, rate: Double) -> Self {
+        .init { interval * pow(rate, Double($0)) }
     }
 }
