@@ -9,7 +9,7 @@ import Foundation
 
 struct RetryStrategy: Sendable {
 
-    struct Function {
+    struct Function: Sendable {
 
         func callAsFunction(retry: Int) -> TimeInterval {
             function(retry)
