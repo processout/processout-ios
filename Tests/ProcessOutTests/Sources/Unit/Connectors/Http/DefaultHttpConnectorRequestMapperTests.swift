@@ -164,23 +164,41 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         let urlRequest = try await sut.urlRequest(from: request)
 
         // Then
-        let expectedHeaders = ["Idempotency-Key", "User-Agent", "Accept-Language", "Content-Type", "Authorization"]
+        let expectedHeaders = ["User-Agent", "Accept-Language", "Content-Type", "Authorization"]
         for header in expectedHeaders {
             XCTAssertNotNil(urlRequest.value(forHTTPHeaderField: header))
         }
     }
 
-    func test_urlRequest_addsValidIdempotencyKeyHeader() async throws {
+    func test_urlRequest_whenRequestMethodIsPost_addsIdempotencyKeyHeader() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
-        let request = HttpConnectorRequest<VoidCodable>.get(path: "")
+        let request = HttpConnectorRequest<VoidCodable>.post(path: "")
 
         // When
         let urlRequest = try await sut.urlRequest(from: request)
 
         // Then
         let idempotencyKey = urlRequest.value(forHTTPHeaderField: "Idempotency-Key")
-        XCTAssertEqual(idempotencyKey, request.id)
+        XCTAssertEqual(idempotencyKey, request.idempotencyKey)
+    }
+
+    func test_urlRequest_whenRequestMethodIsGetOrPut_doesntAddIdempotencyKeyHeader() async throws {
+        // Given
+        let sut = createMapper(configuration: defaultConfiguration)
+        let requests = [
+            HttpConnectorRequest<VoidCodable>.get(path: ""),
+            HttpConnectorRequest<VoidCodable>.put(path: "")
+        ]
+
+        // When
+        for request in requests {
+            let urlRequest = try await sut.urlRequest(from: request)
+
+            // Then
+            let idempotencyKey = urlRequest.value(forHTTPHeaderField: "Idempotency-Key")
+            XCTAssertNil(idempotencyKey)
+        }
     }
 
     func test_urlRequest_addsJsonContentTypeHeader() async throws {

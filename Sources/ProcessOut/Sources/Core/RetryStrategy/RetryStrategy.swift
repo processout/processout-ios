@@ -53,6 +53,10 @@ struct RetryStrategy: Sendable {
 
 extension RetryStrategy.Function {
 
+    static func linear(interval: TimeInterval) -> Self {
+        .init { _ in interval }
+    }
+
     static func exponential(interval: TimeInterval, rate: Double) -> Self {
         .init { interval * pow(rate, Double($0)) }
     }
