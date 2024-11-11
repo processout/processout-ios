@@ -21,9 +21,8 @@ struct RetryStrategy: Sendable {
 
     /// Returns time interval for given retry or `nil` if no retry should occur.
     func interval(for retry: Int) -> TimeInterval {
-        let delay = min(function(retry: retry), maximum) / 2
-        let jitter = TimeInterval.random(in: 0...delay) // Equal Jitter
-        return max(delay + jitter, minimum)
+        let delay = min(function(retry: retry), maximum)
+        return max(delay * TimeInterval.random(in: 0.5 ... 1), minimum) // Apple equal jitter
     }
 
     /// Function to use to calculate delay for given attempt number.
@@ -42,7 +41,7 @@ struct RetryStrategy: Sendable {
     init(
         function: Function,
         maximumRetries: Int = .max,
-        minimum: TimeInterval = 0,
+        minimum: TimeInterval = 0.1,
         maximum: TimeInterval = .greatestFiniteMagnitude
     ) {
         self.function = function
