@@ -89,14 +89,14 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
         /// When property is set implementation asks user to confirm cancel.
         public let confirmation: POConfirmationDialogConfiguration?
 
-        public init(
+        public init<Icon: View>(
             title: String? = nil,
-            icon: AnyView? = nil,
+            icon: Icon? = AnyView?.none,
             disabledFor: TimeInterval = 0,
             confirmation: POConfirmationDialogConfiguration? = nil
         ) {
             self.title = title
-            self.icon = icon
+            self.icon = icon.map(AnyView.init(erasing:))
             self.disabledFor = disabledFor
             self.confirmation = confirmation
         }

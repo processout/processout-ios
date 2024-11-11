@@ -295,7 +295,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         if currentState.shouldConfirmCapture {
-            delegate?.nativeAlternativePaymentMethodDidEmitEvent(.didConfirmPayment)
+            delegate?.nativeAlternativePayment(didEmitEvent: .didConfirmPayment)
         }
         let request = PONativeAlternativePaymentCaptureRequest(
             invoiceId: configuration.invoiceId,
@@ -480,7 +480,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func send(event: PONativeAlternativePaymentMethodEvent) {
         assert(Thread.isMainThread, "Method should be called on main thread.")
         logger.debug("Did send event: '\(event)'")
-        delegate?.nativeAlternativePaymentMethodDidEmitEvent(event)
+        delegate?.nativeAlternativePayment(didEmitEvent: event)
     }
 
     private func didUpdate(parameter: NativeAlternativePaymentInteractorState.Parameter, to value: String) {
