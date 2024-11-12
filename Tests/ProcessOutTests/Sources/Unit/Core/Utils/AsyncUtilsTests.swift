@@ -158,7 +158,7 @@ final class AsyncUtilsTests: XCTestCase {
             },
             timeout: 10,
             timeoutError: Failure.timeout,
-            retryStrategy: .linear(maximumRetries: 1, interval: 0)
+            retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1, minimum: 0)
         )
 
         // Then
@@ -179,7 +179,7 @@ final class AsyncUtilsTests: XCTestCase {
             },
             timeout: 10,
             timeoutError: Failure.timeout,
-            retryStrategy: .linear(maximumRetries: 1, interval: 0)
+            retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1, minimum: 0)
         )
 
         // Then
@@ -200,7 +200,7 @@ final class AsyncUtilsTests: XCTestCase {
                 },
                 timeout: 10,
                 timeoutError: Failure.timeout,
-                retryStrategy: .linear(maximumRetries: 1, interval: 5)
+                retryStrategy: .init(function: .linear(interval: 5), maximumRetries: 1)
             )
         }
 
@@ -232,7 +232,7 @@ final class AsyncUtilsTests: XCTestCase {
             },
             timeout: 10,
             timeoutError: Failure.timeout,
-            retryStrategy: .linear(maximumRetries: 1, interval: 0)
+            retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1, minimum: 0)
         )
 
         // Then
@@ -256,7 +256,7 @@ final class AsyncUtilsTests: XCTestCase {
             },
             timeout: 10,
             timeoutError: Failure.timeout,
-            retryStrategy: .linear(maximumRetries: 1, interval: 0)
+            retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1, minimum: 0)
         )
 
         // Then

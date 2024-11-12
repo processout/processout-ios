@@ -100,7 +100,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
 
         public init(
             saveButton: SubmitButton = .init(),
-            saveErrorConfirmation: POConfirmationDialogConfiguration? = nil,
+            saveErrorConfirmation: POConfirmationDialogConfiguration? = .init(),
             generateHapticFeedback: Bool = true
         ) {
             self.saveButton = saveButton

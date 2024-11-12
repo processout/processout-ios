@@ -15,9 +15,10 @@ final class HttpConnectorRetryDecorator: HttpConnector {
     }
 
     func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value> {
-        try await retry(
+        let updatedRequest = addingIdempotencyKey(request: request)
+        return try await retry(
             operation: { [connector] in
-                try await connector.execute(request: request)
+                try await connector.execute(request: updatedRequest)
             },
             while: { result in
                 guard case .failure(let failure as Failure) = result else {
@@ -48,4 +49,27 @@ final class HttpConnectorRetryDecorator: HttpConnector {
 
     private let connector: HttpConnector
     private let retryStrategy: RetryStrategy
+
+    // MARK: - Private Methods
+
+    private func addingIdempotencyKey<Value>(request: HttpConnectorRequest<Value>) -> HttpConnectorRequest<Value> {
+        var updatedHeaders = request.headers
+        switch request.method {
+        case .get, .put:
+            return request
+        case .post:
+            updatedHeaders["Idempotency-Key"] = UUID().uuidString
+        }
+        let request = HttpConnectorRequest(
+            id: request.id,
+            method: request.method,
+            path: request.path,
+            query: request.query,
+            body: request.body,
+            headers: updatedHeaders,
+            includesDeviceMetadata: request.includesDeviceMetadata,
+            requiresPrivateKey: request.requiresPrivateKey
+        )
+        return request
+    }
 }

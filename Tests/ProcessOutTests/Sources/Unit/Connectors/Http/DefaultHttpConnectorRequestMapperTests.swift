@@ -1,6 +1,6 @@
 //
 //  DefaultHttpConnectorRequestMapperTests.swift
-//  ProcessOut
+//  ProcessOutTests
 //
 //  Created by Andrii Vysotskyi on 03.04.2023.
 //
@@ -164,23 +164,10 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         let urlRequest = try await sut.urlRequest(from: request)
 
         // Then
-        let expectedHeaders = ["Idempotency-Key", "User-Agent", "Accept-Language", "Content-Type", "Authorization"]
+        let expectedHeaders = ["User-Agent", "Accept-Language", "Content-Type", "Authorization"]
         for header in expectedHeaders {
             XCTAssertNotNil(urlRequest.value(forHTTPHeaderField: header))
         }
-    }
-
-    func test_urlRequest_addsValidIdempotencyKeyHeader() async throws {
-        // Given
-        let sut = createMapper(configuration: defaultConfiguration)
-        let request = HttpConnectorRequest<VoidCodable>.get(path: "")
-
-        // When
-        let urlRequest = try await sut.urlRequest(from: request)
-
-        // Then
-        let idempotencyKey = urlRequest.value(forHTTPHeaderField: "Idempotency-Key")
-        XCTAssertEqual(idempotencyKey, request.id)
     }
 
     func test_urlRequest_addsJsonContentTypeHeader() async throws {
