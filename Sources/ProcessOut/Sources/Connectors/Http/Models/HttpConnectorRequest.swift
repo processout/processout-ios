@@ -30,9 +30,6 @@ struct HttpConnectorRequest<Value: Decodable & Sendable>: Sendable {
     /// Parameters.
     let body: Body?
 
-    /// Unique key that the server uses to recognize subsequent retries of the same request.
-    let idempotencyKey: String?
-
     /// Custom headers.
     let headers: [String: String]
 
@@ -61,7 +58,6 @@ extension HttpConnectorRequest {
             path: path,
             query: query.mapValues(\.description),
             body: nil,
-            idempotencyKey: nil,
             headers: headers,
             includesDeviceMetadata: false,
             requiresPrivateKey: requiresPrivateKey
@@ -81,7 +77,6 @@ extension HttpConnectorRequest {
             path: path,
             query: [:],
             body: body,
-            idempotencyKey: UUID().uuidString,
             headers: headers,
             includesDeviceMetadata: includesDeviceMetadata,
             requiresPrivateKey: requiresPrivateKey
@@ -101,7 +96,6 @@ extension HttpConnectorRequest {
             path: path,
             query: [:],
             body: body,
-            idempotencyKey: nil,
             headers: headers,
             includesDeviceMetadata: includesDeviceMetadata,
             requiresPrivateKey: requiresPrivateKey
