@@ -12,12 +12,15 @@ import ProcessOut
 enum Constants {
 
     /// Project configuration.
+    @UserDefaultsStorage("Constants.projectConfiguration")
     static var projectConfiguration = ProcessOutConfiguration(projectId: "")
 
     /// Customer ID.
+    @UserDefaultsStorage("Constants.customerId")
     static var customerId = ""
 
     /// ApplePay merchant ID.
+    @UserDefaultsStorage("Constants.merchantId")
     static var merchantId: String?
 
     /// Return URL.
