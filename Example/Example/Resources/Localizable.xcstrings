@@ -161,6 +161,9 @@
         }
       }
     },
+    "Card scanner" : {
+
+    },
     "card-payment.3ds-service" : {
       "localizations" : {
         "en" : {
