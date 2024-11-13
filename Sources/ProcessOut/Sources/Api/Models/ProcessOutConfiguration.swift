@@ -63,10 +63,6 @@ public struct ProcessOutConfiguration: Sendable, Codable { // sourcery: AutoCodi
         application?.version
     }
 
-    /// Session ID is a constant value
-    @_spi(PO)
-    public let sessionId = UUID().uuidString // sourcery:coding: skip
-
     /// Boolean value that indicates whether SDK should operate in debug mode. At this moment it
     /// only affects logging level.
     /// - NOTE: Debug logs may contain sensitive data.
