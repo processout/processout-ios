@@ -111,7 +111,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     ) -> [DynamicCheckoutViewModelState.Section] {
         var sections = [
             createErrorSection(state: state),
-            createExpressMethodsSection(state: state)
+            createExpressMethodsSection(state: state, processedPaymentMethodId: nil)
         ]
         let regularItems = state.paymentMethods.compactMap { paymentMethod -> DynamicCheckoutViewModelItem? in
             guard !isExpress(paymentMethod: paymentMethod) else {
@@ -156,10 +156,10 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     }
 
     private func createExpressMethodsSection(
-        state: DynamicCheckoutInteractorState.Started
+        state: DynamicCheckoutInteractorState.Started, processedPaymentMethodId: String?
     ) -> DynamicCheckoutViewModelState.Section? {
-        let expressItems = state.paymentMethods.filter({ isExpress(paymentMethod: $0) }).compactMap { paymentMethod in
-            createExpressPaymentItem(for: paymentMethod, state: state)
+        let expressItems = state.paymentMethods.compactMap { paymentMethod in
+            createExpressPaymentItem(for: paymentMethod, processedPaymentMethodId: processedPaymentMethodId)
         }
         guard !expressItems.isEmpty else {
             return nil
@@ -179,8 +179,11 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     }
 
     private func createExpressPaymentItem(
-        for paymentMethod: PODynamicCheckoutPaymentMethod, state: DynamicCheckoutInteractorState.Started
+        for paymentMethod: PODynamicCheckoutPaymentMethod, processedPaymentMethodId: String?
     ) -> DynamicCheckoutViewModelItem? {
+        guard isExpress(paymentMethod: paymentMethod) else {
+            return nil
+        }
         if case .applePay = paymentMethod {
             return createPassKitPaymentItem(paymentMethodId: paymentMethod.id)
         }
@@ -192,6 +195,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             title: display.description ?? display.name,
             iconImageResource: display.logo,
             brandColor: display.brandColor,
+            isLoading: paymentMethod.id == processedPaymentMethodId,
             action: { [weak self] in
                 self?.interactor.startPayment(methodId: paymentMethod.id)
             }
@@ -332,7 +336,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     ) -> [DynamicCheckoutViewModelState.Section] {
         var sections = [
             createErrorSection(state: state.snapshot),
-            createExpressMethodsSection(state: state.snapshot)
+            createExpressMethodsSection(state: state.snapshot, processedPaymentMethodId: state.paymentMethod.id)
         ]
         let regularItems = state.snapshot.paymentMethods.compactMap { paymentMethod -> DynamicCheckoutViewModelItem? in
             guard !isExpress(paymentMethod: paymentMethod) else {
@@ -469,7 +473,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     ) -> [DynamicCheckoutViewModelState.Section] {
         var sections = [
             createErrorSection(state: state.snapshot.snapshot),
-            createExpressMethodsSection(state: state.snapshot.snapshot)
+            createExpressMethodsSection(
+                state: state.snapshot.snapshot, processedPaymentMethodId: state.pendingPaymentMethodId
+            )
         ]
         // swiftlint:disable:next line_length
         let regularItems = state.snapshot.snapshot.paymentMethods.compactMap { paymentMethod -> DynamicCheckoutViewModelItem? in
