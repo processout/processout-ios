@@ -13,7 +13,7 @@ public typealias ProcessOutApiConfiguration = ProcessOutConfiguration
 /// Defines configuration parameters that are used to create API singleton. In order to create instance
 /// of this structure one should use ``ProcessOutConfiguration/init(projectId:application:isDebug:isTelemetryEnabled:)``
 /// method.
-public struct ProcessOutConfiguration: Sendable, Codable {
+public struct ProcessOutConfiguration: Sendable, Codable { // sourcery: AutoCodingKeys
 
     public struct Application: Hashable, Sendable, Codable {
 
@@ -59,13 +59,13 @@ public struct ProcessOutConfiguration: Sendable, Codable {
     /// Host application version. Providing this value helps ProcessOut to troubleshoot potential
     /// issues.
     @available(*, deprecated, renamed: "application.version")
-    public var appVersion: String? {
+    public var appVersion: String? { // sourcery:coding: skip
         application?.version
     }
 
     /// Session ID is a constant value
     @_spi(PO)
-    public let sessionId = UUID().uuidString
+    public let sessionId = UUID().uuidString // sourcery:coding: skip
 
     /// Boolean value that indicates whether SDK should operate in debug mode. At this moment it
     /// only affects logging level.

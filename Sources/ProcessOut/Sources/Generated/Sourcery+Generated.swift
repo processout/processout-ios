@@ -107,6 +107,18 @@ extension POInvoiceAuthorizationRequest {
     }
 }
 
+extension ProcessOutConfiguration {
+
+    enum CodingKeys: String, CodingKey {
+        case projectId
+        case privateKey
+        case environment
+        case application
+        case isDebug
+        case isTelemetryEnabled
+    }
+}
+
 // MARK: - AutoCompletion
 
 extension POCardsService {
