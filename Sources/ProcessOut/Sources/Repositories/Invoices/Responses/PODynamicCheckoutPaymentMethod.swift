@@ -306,4 +306,21 @@ extension PODynamicCheckoutPaymentMethod {
             return method.id
         }
     }
+
+    /// Display information.
+    @_spi(PO)
+    public var display: Display? {
+        switch self {
+        case .alternativePayment(let paymentMethod):
+            return paymentMethod.display
+        case .nativeAlternativePayment(let paymentMethod):
+            return paymentMethod.display
+        case .card(let paymentMethod):
+            return paymentMethod.display
+        case .customerToken(let paymentMethod):
+            return paymentMethod.display
+        case .applePay, .unknown:
+            return nil
+        }
+    }
 }
