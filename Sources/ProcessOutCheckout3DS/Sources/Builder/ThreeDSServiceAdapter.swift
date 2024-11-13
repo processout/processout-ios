@@ -31,6 +31,10 @@ final class ThreeDSServiceAdapter: PO3DSService {
         }
     }
 
+    func clean() async {
+        await service.clean()
+    }
+
     // MARK: - Private Properties
 
     private let service: PO3DS2Service
