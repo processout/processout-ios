@@ -93,6 +93,7 @@ public final class ProcessOut: @unchecked Sendable {
     // MARK: - Private Methods
 
     @MainActor
+    // swiftlint:disable:next function_body_length
     private init(configuration: ProcessOutConfiguration) {
         self._configuration = .init(wrappedValue: configuration)
         let deviceMetadataProvider = Self.createDeviceMetadataProvider()
@@ -125,13 +126,18 @@ public final class ProcessOut: @unchecked Sendable {
             deviceMetadataProvider: deviceMetadataProvider,
             logger: connectorLogger
         )
-        let customerActionsService = Self.createCustomerActionsService(logger: serviceLogger)
+        let webAuthenticationSession = ThrottledWebAuthenticationSessionDecorator(
+            session: DefaultWebAuthenticationSession()
+        )
+        let customerActionsService = Self.createCustomerActionsService(
+            webAuthenticationSession: webAuthenticationSession, logger: serviceLogger
+        )
         gatewayConfigurations = HttpGatewayConfigurationsRepository(connector: httpConnector)
         invoices = Self.createInvoicesService(
             httpConnector: httpConnector, customerActionsService: customerActionsService, logger: serviceLogger
         )
         alternativePayments = Self.createAlternativePaymentsService(
-            configuration: configuration, logger: serviceLogger
+            configuration: configuration, webAuthenticationSession: webAuthenticationSession, logger: serviceLogger
         )
         cards = Self.createCardsService(
             httpConnector: httpConnector, logger: serviceLogger
@@ -159,10 +165,11 @@ public final class ProcessOut: @unchecked Sendable {
     }
 
     private static func createAlternativePaymentsService(
-        configuration: ProcessOutConfiguration, logger: POLogger
+        configuration: ProcessOutConfiguration,
+        webAuthenticationSession webSession: WebAuthenticationSession,
+        logger: POLogger
     ) -> POAlternativePaymentsService {
         let serviceConfiguration = Self.alternativePaymentsConfiguration(with: configuration)
-        let webSession = DefaultWebAuthenticationSession()
         return DefaultAlternativePaymentsService(
             configuration: serviceConfiguration, webSession: webSession, logger: logger
         )
@@ -197,9 +204,11 @@ public final class ProcessOut: @unchecked Sendable {
         )
     }
 
-    private static func createCustomerActionsService(logger: POLogger) -> CustomerActionsService {
+    private static func createCustomerActionsService(
+        webAuthenticationSession webSession: WebAuthenticationSession,
+        logger: POLogger
+    ) -> CustomerActionsService {
         let decoder = JSONDecoder(), encoder = JSONEncoder()
-        let webSession = DefaultWebAuthenticationSession()
         return DefaultCustomerActionsService(decoder: decoder, encoder: encoder, webSession: webSession, logger: logger)
     }
 
