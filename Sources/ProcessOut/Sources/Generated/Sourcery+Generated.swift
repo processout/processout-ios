@@ -103,7 +103,6 @@ extension POInvoiceAuthorizationRequest {
         case captureAmount
         case authorizeOnly
         case allowFallbackToSale
-        case clientSecret
         case metadata
     }
 }

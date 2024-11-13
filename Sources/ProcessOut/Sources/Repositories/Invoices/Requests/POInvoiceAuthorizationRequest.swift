@@ -65,7 +65,7 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
     public let allowFallbackToSale: Bool
 
     /// A secret key associated with the client making the request.
-    public let clientSecret: String?
+    public let clientSecret: String? // sourcery:coding: skip
 
     /// Operation metadata.
     public let metadata: [String: String]?
