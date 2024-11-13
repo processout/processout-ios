@@ -17,6 +17,7 @@ func supportedDeviceId(attempt: Int = 0) throws -> String? {
         .filter { $0.version.starts(with: "18") && $0.platform == "iOS" }
         .compactMap { devices[$0.identifier] }
         .flatMap { $0 }
+        .filter { $0.name.starts(with: "iPhone") && $0.isAvailable }
     // Grab last device to get the most recent iOS version
     if let device = supportedDevices.last {
         return device.udid
@@ -42,7 +43,8 @@ func runtimes() throws -> [Runtime] {
 }
 
 struct Device: Decodable {
-    let udid: String
+    let udid, name: String
+    let isAvailable: Bool
 }
 
 /// Key is Runtime ID.
