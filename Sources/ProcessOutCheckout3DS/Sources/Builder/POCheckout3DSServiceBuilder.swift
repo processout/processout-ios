@@ -37,8 +37,8 @@ public final class POCheckout3DSServiceBuilder {
     }
 
     /// Creates service instance.
-    public func build() -> PO3DS2Service {
-        POCheckout3DSService(delegate: delegate, environment: environment)
+    public func build() -> PO3DSService {
+        ThreeDSServiceAdapter(service: POCheckout3DSService(delegate: delegate, environment: environment))
     }
 
     // MARK: - Private Properties
