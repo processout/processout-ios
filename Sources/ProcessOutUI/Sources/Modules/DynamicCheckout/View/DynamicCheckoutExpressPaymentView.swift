@@ -31,6 +31,7 @@ struct DynamicCheckoutExpressPaymentView: View {
         .buttonStyle(POAnyButtonStyle(erasing: style.expressPaymentButtonStyle))
         .disabled(item.isLoading)
         .buttonLoading(item.isLoading)
+        .buttonBrandColor(item.brandColor)
         .fontNumberSpacing(.monospaced)
     }
 
