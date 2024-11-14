@@ -23,37 +23,53 @@ public struct POBrandButtonStyle: ButtonStyle {
     /// Shadow style.
     public let shadow: POShadowStyle
 
+    /// Progress view style. Only used with normal state.
+    public let progressStyle: any ProgressViewStyle
+
     /// Creates style instance.
-    public init(title: POTextStyle, border: POBorderStyle, shadow: POShadowStyle) {
+    public init(
+        title: POTextStyle,
+        border: POBorderStyle,
+        shadow: POShadowStyle,
+        progressStyle: some ProgressViewStyle = .circular
+    ) {
         self.title = title
         self.border = border
         self.shadow = shadow
+        self.progressStyle = progressStyle
     }
 
     // MARK: - ButtonStyle
 
     public func makeBody(configuration: Configuration) -> some View {
         // todo(andrii-vysotskyi): add overlay or accept configuration for disabled state if needed
-        ContentView { isEnabled, brandColor in
+        ContentView { isEnabled, isLoading, brandColor in
             let isBrandColorLight = UIColor(brandColor).isLight() != false
-            configuration.label
-                .textStyle(title)
-                .lineLimit(1)
-                .padding(Constants.padding)
-                .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
-                .backport.background {
-                    let adjustment = brightnessAdjustment(
-                        isPressed: configuration.isPressed, isBrandColorLight: isBrandColorLight
-                    )
-                    brandColor.brightness(adjustment)
+            ZStack {
+                if isLoading {
+                    ProgressView()
+                        .poProgressViewStyle(progressStyle)
+                } else {
+                    configuration.label
+                        .textStyle(title)
+                        .lineLimit(1)
                 }
-                .border(style: border)
-                .shadow(style: shadow)
-                .colorScheme(isBrandColorLight ? .light : .dark)
-                .contentShape(.rect)
-                .animation(.default, value: isEnabled)
-                .animation(.default, value: AnyHashable(brandColor))
-                .allowsHitTesting(isEnabled)
+            }
+            .padding(Constants.padding)
+            .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
+            .backport.background {
+                let adjustment = brightnessAdjustment(
+                    isPressed: configuration.isPressed, isBrandColorLight: isBrandColorLight
+                )
+                brandColor.brightness(adjustment)
+            }
+            .border(style: border)
+            .shadow(style: shadow)
+            .colorScheme(isBrandColorLight ? .light : .dark)
+            .contentShape(.rect)
+            .animation(.default, value: isEnabled)
+            .animation(.default, value: AnyHashable(brandColor))
+            .allowsHitTesting(isEnabled)
         }
         .backport.geometryGroup()
     }
@@ -81,16 +97,19 @@ public struct POBrandButtonStyle: ButtonStyle {
 private struct ContentView<Content: View>: View {
 
     @ViewBuilder
-    let content: (_ isEnabled: Bool, _ brandColor: Color) -> Content
+    let content: (_ isEnabled: Bool, _ isLoading: Bool, _ brandColor: Color) -> Content
 
     var body: some View {
-        content(isEnabled, brandColor)
+        content(isEnabled, isLoading, brandColor)
     }
 
     // MARK: - Private Properties
 
     @Environment(\.isEnabled)
     private var isEnabled
+
+    @Environment(\.isButtonLoading)
+    private var isLoading
 
     @Environment(\.poButtonBrandColor)
     private var uiBrandColor

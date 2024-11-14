@@ -20,11 +20,13 @@ Project demonstrates multiple flows that ProcessOut framework is capable of.
 enum Constants {
 
     /// Project configuration.
+    @UserDefaultsStorage("Constants.projectConfiguration")
     static var projectConfiguration = ProcessOutConfiguration(
         projectId: "test-proj_K3Ur9LQzcKtm4zttWJ7oAKHgqdiwboAw"
     )
 
     /// Customer ID.
+    @UserDefaultsStorage("Constants.customerId")
     static var customerId = "cust_dCFEWBwqWrBFYAtkRIpILCynNqfhLQWX"
 
     ...

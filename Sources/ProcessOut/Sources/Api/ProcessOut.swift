@@ -65,7 +65,7 @@ public final class ProcessOut: @unchecked Sendable {
     func replace(configuration newConfiguration: ProcessOutConfiguration) {
         _configuration.withLock { configuration in
             replaceLoggersConfiguration(with: newConfiguration)
-            replaceConnectorsConfiguration(with: newConfiguration)
+            replaceConnectorsConfiguration(with: newConfiguration, sessionId: UUID().uuidString)
             replaceServicesConfiguration(with: newConfiguration)
             configuration = newConfiguration
         }
@@ -93,6 +93,7 @@ public final class ProcessOut: @unchecked Sendable {
     // MARK: - Private Methods
 
     @MainActor
+    // swiftlint:disable:next function_body_length
     private init(configuration: ProcessOutConfiguration) {
         self._configuration = .init(wrappedValue: configuration)
         let deviceMetadataProvider = Self.createDeviceMetadataProvider()
@@ -100,8 +101,10 @@ public final class ProcessOut: @unchecked Sendable {
         telemetryConnectorLogger = Self.createLogger(
             for: Constants.connectorLoggerCategory, configuration: configuration
         )
+        let sessionId = UUID().uuidString
         telemetryHttpConnector = Self.createConnector(
             configuration: configuration,
+            sessionId: sessionId,
             deviceMetadataProvider: deviceMetadataProvider,
             logger: telemetryConnectorLogger
         )
@@ -122,16 +125,22 @@ public final class ProcessOut: @unchecked Sendable {
         )
         httpConnector = Self.createConnector(
             configuration: configuration,
+            sessionId: sessionId,
             deviceMetadataProvider: deviceMetadataProvider,
             logger: connectorLogger
         )
-        let customerActionsService = Self.createCustomerActionsService(logger: serviceLogger)
+        let webAuthenticationSession = ThrottledWebAuthenticationSessionDecorator(
+            session: DefaultWebAuthenticationSession()
+        )
+        let customerActionsService = Self.createCustomerActionsService(
+            webAuthenticationSession: webAuthenticationSession, logger: serviceLogger
+        )
         gatewayConfigurations = HttpGatewayConfigurationsRepository(connector: httpConnector)
         invoices = Self.createInvoicesService(
             httpConnector: httpConnector, customerActionsService: customerActionsService, logger: serviceLogger
         )
         alternativePayments = Self.createAlternativePaymentsService(
-            configuration: configuration, logger: serviceLogger
+            configuration: configuration, webAuthenticationSession: webAuthenticationSession, logger: serviceLogger
         )
         cards = Self.createCardsService(
             httpConnector: httpConnector, logger: serviceLogger
@@ -159,10 +168,11 @@ public final class ProcessOut: @unchecked Sendable {
     }
 
     private static func createAlternativePaymentsService(
-        configuration: ProcessOutConfiguration, logger: POLogger
+        configuration: ProcessOutConfiguration,
+        webAuthenticationSession webSession: WebAuthenticationSession,
+        logger: POLogger
     ) -> POAlternativePaymentsService {
         let serviceConfiguration = Self.alternativePaymentsConfiguration(with: configuration)
-        let webSession = DefaultWebAuthenticationSession()
         return DefaultAlternativePaymentsService(
             configuration: serviceConfiguration, webSession: webSession, logger: logger
         )
@@ -197,9 +207,11 @@ public final class ProcessOut: @unchecked Sendable {
         )
     }
 
-    private static func createCustomerActionsService(logger: POLogger) -> CustomerActionsService {
+    private static func createCustomerActionsService(
+        webAuthenticationSession webSession: WebAuthenticationSession,
+        logger: POLogger
+    ) -> CustomerActionsService {
         let decoder = JSONDecoder(), encoder = JSONEncoder()
-        let webSession = DefaultWebAuthenticationSession()
         return DefaultCustomerActionsService(decoder: decoder, encoder: encoder, webSession: webSession, logger: logger)
     }
 
@@ -235,10 +247,11 @@ public final class ProcessOut: @unchecked Sendable {
 
     private static func createConnector(
         configuration: ProcessOutConfiguration,
+        sessionId: String,
         deviceMetadataProvider: DeviceMetadataProvider,
         logger: POLogger
     ) -> HttpConnector {
-        let connectorConfiguration = Self.connectorConfiguration(with: configuration)
+        let connectorConfiguration = Self.connectorConfiguration(with: configuration, sessionId: sessionId)
         let connector = ProcessOutHttpConnectorBuilder().build(
             configuration: connectorConfiguration,
             deviceMetadataProvider: deviceMetadataProvider,
@@ -248,13 +261,13 @@ public final class ProcessOut: @unchecked Sendable {
     }
 
     private static func connectorConfiguration(
-        with configuration: ProcessOutConfiguration
+        with configuration: ProcessOutConfiguration, sessionId: String
     ) -> HttpConnectorConfiguration {
         .init(
             baseUrl: configuration.environment.apiBaseUrl,
             projectId: configuration.projectId,
             privateKey: configuration.privateKey,
-            sessionId: configuration.sessionId,
+            sessionId: sessionId,
             version: ProcessOut.version
         )
     }
@@ -285,7 +298,7 @@ public final class ProcessOut: @unchecked Sendable {
         telemetryService.replace(configuration: Self.telemetryConfiguration(with: configuration))
     }
 
-    private func replaceConnectorsConfiguration(with configuration: ProcessOutConfiguration) {
+    private func replaceLoggersConfiguration(with configuration: ProcessOutConfiguration) {
         let logLevel = Self.minimumLogLevel(with: configuration)
         telemetryConnectorLogger.replace(minimumLevel: logLevel)
         connectorLogger.replace(minimumLevel: logLevel)
@@ -293,8 +306,8 @@ public final class ProcessOut: @unchecked Sendable {
         logger.replace(minimumLevel: logLevel)
     }
 
-    private func replaceLoggersConfiguration(with configuration: ProcessOutConfiguration) {
-        let connectorConfiguration = Self.connectorConfiguration(with: configuration)
+    private func replaceConnectorsConfiguration(with configuration: ProcessOutConfiguration, sessionId: String) {
+        let connectorConfiguration = Self.connectorConfiguration(with: configuration, sessionId: sessionId)
         httpConnector.replace(configuration: connectorConfiguration)
         telemetryHttpConnector.replace(configuration: connectorConfiguration)
     }

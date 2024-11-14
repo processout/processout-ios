@@ -111,7 +111,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     ) -> [DynamicCheckoutViewModelState.Section] {
         var sections = [
             createErrorSection(state: state),
-            createExpressMethodsSection(state: state)
+            createExpressMethodsSection(state: state, processedPaymentMethodId: nil)
         ]
         let regularItems = state.paymentMethods.compactMap { paymentMethod -> DynamicCheckoutViewModelItem? in
             guard !isExpress(paymentMethod: paymentMethod) else {
@@ -127,9 +127,11 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             ) else {
                 return nil
             }
-            let submitButton = createSubmitAction(methodId: paymentMethod.id, selectedMethodId: selectedMethodId)
             let payment = DynamicCheckoutViewModelItem.RegularPayment(
-                id: paymentMethod.id, info: info, content: nil, submitButton: submitButton
+                id: paymentMethod.id,
+                info: info,
+                content: nil,
+                submitButton: createSubmitAction(for: paymentMethod.id, selectedMethodId: selectedMethodId)
             )
             return .regularPayment(payment)
         }
@@ -154,10 +156,10 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     }
 
     private func createExpressMethodsSection(
-        state: DynamicCheckoutInteractorState.Started
+        state: DynamicCheckoutInteractorState.Started, processedPaymentMethodId: String?
     ) -> DynamicCheckoutViewModelState.Section? {
-        let expressItems = state.paymentMethods.filter({ isExpress(paymentMethod: $0) }).compactMap { paymentMethod in
-            createExpressPaymentItem(for: paymentMethod, state: state)
+        let expressItems = state.paymentMethods.compactMap { paymentMethod in
+            createExpressPaymentItem(for: paymentMethod, processedPaymentMethodId: processedPaymentMethodId)
         }
         guard !expressItems.isEmpty else {
             return nil
@@ -177,17 +179,15 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     }
 
     private func createExpressPaymentItem(
-        for paymentMethod: PODynamicCheckoutPaymentMethod, state: DynamicCheckoutInteractorState.Started
+        for paymentMethod: PODynamicCheckoutPaymentMethod, processedPaymentMethodId: String?
     ) -> DynamicCheckoutViewModelItem? {
-        let display: PODynamicCheckoutPaymentMethod.Display
-        switch paymentMethod {
-        case .applePay:
+        guard isExpress(paymentMethod: paymentMethod) else {
+            return nil
+        }
+        if case .applePay = paymentMethod {
             return createPassKitPaymentItem(paymentMethodId: paymentMethod.id)
-        case .alternativePayment(let paymentMethod):
-            display = paymentMethod.display
-        case .customerToken(let paymentMethod):
-            display = paymentMethod.display
-        case .nativeAlternativePayment, .card, .unknown:
+        }
+        guard let display = paymentMethod.display else {
             return nil
         }
         let item = DynamicCheckoutViewModelItem.ExpressPayment(
@@ -195,6 +195,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             title: display.description ?? display.name,
             iconImageResource: display.logo,
             brandColor: display.brandColor,
+            isLoading: paymentMethod.id == processedPaymentMethodId,
             action: { [weak self] in
                 self?.interactor.startPayment(methodId: paymentMethod.id)
             }
@@ -209,21 +210,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         shouldSaveSelected: Bool?,
         state: DynamicCheckoutInteractorState.Started
     ) -> DynamicCheckoutViewModelItem.RegularPaymentInfo? {
-        let display: PODynamicCheckoutPaymentMethod.Display, isExternal: Bool
-        switch paymentMethod {
-        case .alternativePayment(let paymentMethod):
-            display = paymentMethod.display
-            isExternal = true
-        case .nativeAlternativePayment(let paymentMethod):
-            display = paymentMethod.display
-            isExternal = false
-        case .card(let paymentMethod):
-            display = paymentMethod.display
-            isExternal = false
-        case .customerToken(let paymentMethod):
-            display = paymentMethod.display
-            isExternal = paymentMethod.configuration.redirectUrl != nil
-        case .applePay, .unknown:
+        guard let isExternal = isExternal(paymentMethod: paymentMethod), let display = paymentMethod.display else {
             return nil
         }
         let isSelected = Binding<Bool> {
@@ -314,8 +301,8 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         self.state = newState
     }
 
-    private func createSubmitAction(methodId: String, selectedMethodId: String?) -> POButtonViewModel? {
-        guard methodId == selectedMethodId else {
+    private func createSubmitAction(for methodId: String, selectedMethodId: String?) -> POButtonViewModel? {
+        guard let selectedMethodId, methodId == selectedMethodId else {
             return nil
         }
         let viewModel = POButtonViewModel(
@@ -324,7 +311,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             icon: interactor.configuration.submitButton.icon,
             role: .primary,
             action: { [weak self] in
-                self?.interactor.startPayment(methodId: methodId)
+                self?.interactor.startPayment(methodId: selectedMethodId)
             }
         )
         return viewModel
@@ -349,7 +336,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     ) -> [DynamicCheckoutViewModelState.Section] {
         var sections = [
             createErrorSection(state: state.snapshot),
-            createExpressMethodsSection(state: state.snapshot)
+            createExpressMethodsSection(state: state.snapshot, processedPaymentMethodId: state.paymentMethod.id)
         ]
         let regularItems = state.snapshot.paymentMethods.compactMap { paymentMethod -> DynamicCheckoutViewModelItem? in
             guard !isExpress(paymentMethod: paymentMethod) else {
@@ -369,7 +356,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 id: paymentMethod.id,
                 info: info,
                 content: createRegularPaymentContent(for: paymentMethod, state: state),
-                submitButton: nil
+                submitButton: createSubmitAction(for: paymentMethod.id, in: state)
             )
             return .regularPayment(payment)
         }
@@ -411,6 +398,24 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         default:
             return nil
         }
+    }
+
+    private func createSubmitAction(
+        for methodId: String, in state: DynamicCheckoutInteractorState.PaymentProcessing
+    ) -> POButtonViewModel? {
+        guard shouldResolveContent(for: methodId, state: state),
+              isExternal(paymentMethod: state.paymentMethod) == true else {
+            return nil
+        }
+        let viewModel = POButtonViewModel(
+            id: ButtonId.submit,
+            title: interactor.configuration.submitButton.title ?? String(resource: .DynamicCheckout.Button.pay),
+            icon: interactor.configuration.submitButton.icon,
+            isLoading: true,
+            role: .primary,
+            action: { /* Ignored */ }
+        )
+        return viewModel
     }
 
     private func createCancelAction(
@@ -468,7 +473,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     ) -> [DynamicCheckoutViewModelState.Section] {
         var sections = [
             createErrorSection(state: state.snapshot.snapshot),
-            createExpressMethodsSection(state: state.snapshot.snapshot)
+            createExpressMethodsSection(
+                state: state.snapshot.snapshot, processedPaymentMethodId: state.pendingPaymentMethodId
+            )
         ]
         // swiftlint:disable:next line_length
         let regularItems = state.snapshot.snapshot.paymentMethods.compactMap { paymentMethod -> DynamicCheckoutViewModelItem? in
@@ -567,6 +574,21 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             return method.flow == .express
         case .unknown:
             preconditionFailure("Unexpected payment method.")
+        }
+    }
+
+    private func isExternal(paymentMethod: PODynamicCheckoutPaymentMethod) -> Bool? {
+        switch paymentMethod {
+        case .alternativePayment:
+            return true
+        case .nativeAlternativePayment:
+            return false
+        case .card:
+            return false
+        case .customerToken(let paymentMethod):
+            return paymentMethod.configuration.redirectUrl != nil
+        case .applePay, .unknown:
+            return nil
         }
     }
 }

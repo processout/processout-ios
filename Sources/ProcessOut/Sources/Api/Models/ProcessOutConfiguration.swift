@@ -13,9 +13,9 @@ public typealias ProcessOutApiConfiguration = ProcessOutConfiguration
 /// Defines configuration parameters that are used to create API singleton. In order to create instance
 /// of this structure one should use ``ProcessOutConfiguration/init(projectId:application:isDebug:isTelemetryEnabled:)``
 /// method.
-public struct ProcessOutConfiguration: Sendable {
+public struct ProcessOutConfiguration: Sendable, Codable {
 
-    public struct Application: Hashable, Sendable {
+    public struct Application: Hashable, Sendable, Codable {
 
         /// Application name.
         public let name: String?
@@ -31,7 +31,7 @@ public struct ProcessOutConfiguration: Sendable {
 
     /// Environment.
     @_spi(PO)
-    public struct Environment: Hashable, Sendable {
+    public struct Environment: Hashable, Sendable, Codable {
 
         /// Api base URL.
         let apiBaseUrl: URL
@@ -63,10 +63,6 @@ public struct ProcessOutConfiguration: Sendable {
         application?.version
     }
 
-    /// Session ID is a constant value
-    @_spi(PO)
-    public let sessionId = UUID().uuidString
-
     /// Boolean value that indicates whether SDK should operate in debug mode. At this moment it
     /// only affects logging level.
     /// - NOTE: Debug logs may contain sensitive data.
@@ -96,14 +92,17 @@ public struct ProcessOutConfiguration: Sendable {
     public init(
         projectId: String,
         privateKey: String? = nil,
-        environment: ProcessOutConfiguration.Environment = .production
+        environment: ProcessOutConfiguration.Environment = .production,
+        application: Application? = nil,
+        isDebug: Bool = true,
+        isTelemetryEnabled: Bool = true
     ) {
         self.projectId = projectId
         self.privateKey = privateKey
-        self.application = nil
-        self.isDebug = true
-        self.isTelemetryEnabled = true
         self.environment = environment
+        self.application = application
+        self.isDebug = isDebug
+        self.isTelemetryEnabled = isTelemetryEnabled
     }
 }
 

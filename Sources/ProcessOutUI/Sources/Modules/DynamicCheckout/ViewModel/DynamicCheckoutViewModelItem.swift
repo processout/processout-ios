@@ -38,6 +38,9 @@ enum DynamicCheckoutViewModelItem {
         /// Brand color.
         let brandColor: UIColor
 
+        /// Indicates whether button is loading.
+        let isLoading: Bool
+
         /// Action handler.
         let action: () -> Void
     }
