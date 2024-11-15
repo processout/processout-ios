@@ -63,7 +63,9 @@ final class HttpInvoicesRepository: InvoicesRepository {
             headers: headers.compactMapValues { $0 },
             requiresPrivateKey: request.attachPrivateKey
         )
-        return try await connector.execute(request: httpRequest).invoice
+        let response = try await connector.execute(request: httpRequest) as HttpConnectorResponse
+        let clientSecret = response.headers["x-processout-client-secret"]
+        return response.value.invoice.replacing(clientSecret: clientSecret)
     }
 
     func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> _CustomerAction? {
