@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class Batcher<Task>: Sendable {
+final class Batcher<Task>: @unchecked Sendable {
 
     typealias Executor = @Sendable (Array<Task>) async -> Bool
 
@@ -38,8 +38,8 @@ final class Batcher<Task>: Sendable {
     private let executionInterval: TimeInterval
     private let lock: POUnfairlyLocked<Void>
 
-    private nonisolated(unsafe) var pendingTasks: [Task]
-    private nonisolated(unsafe) var executionTimer: Timer?
+    private var pendingTasks: [Task]
+    private var executionTimer: Timer?
 
     // MARK: - Private Methods
 
