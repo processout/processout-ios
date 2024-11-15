@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct LogEvent: Sendable {
+struct LogEvent: @unchecked Sendable {
 
     /// Logging level.
     let level: LogLevel
@@ -22,7 +22,7 @@ struct LogEvent: Sendable {
     let timestamp: Date
 
     /// DSO handle.
-    nonisolated(unsafe) let dso: UnsafeRawPointer?
+    let dso: UnsafeRawPointer?
 
     /// File name.
     let file: String

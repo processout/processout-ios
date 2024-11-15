@@ -8,7 +8,7 @@
 import Foundation
 import os
 
-final class SystemLoggerDestination: LoggerDestination {
+final class SystemLoggerDestination: LoggerDestination, @unchecked Sendable {
 
     init(subsystem: String) {
         self.subsystem = subsystem
@@ -31,7 +31,7 @@ final class SystemLoggerDestination: LoggerDestination {
 
     private let subsystem: String
     private let lock: NSLock
-    private nonisolated(unsafe) var logs: [String: OSLog]
+    private var logs: [String: OSLog]
 
     // MARK: - Private Methods
 
