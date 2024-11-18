@@ -15,7 +15,7 @@ public final class POCardTokenizationViewController: UIHostingController<AnyView
     /// Creates card tokenization view controller.
     public init(
         style: POCardTokenizationStyle = .default,
-        configuration: POCardTokenizationConfiguration = .init(),
+        configuration: POCardTokenizationConfiguration = .default,
         delegate: POCardTokenizationDelegate? = nil,
         completion: @escaping (Result<POCard, POFailure>) -> Void
     ) {
