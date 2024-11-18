@@ -9,6 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
+@MainActor
 struct NativeAlternativePaymentContentView: View {
 
     init(viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>, insets: CGFloat) {

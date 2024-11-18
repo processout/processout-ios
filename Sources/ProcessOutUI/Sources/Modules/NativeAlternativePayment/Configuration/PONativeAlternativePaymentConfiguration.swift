@@ -381,13 +381,17 @@ extension PONativeAlternativePaymentConfiguration.Confirmation {
     }
 }
 
+// swiftlint:disable strict_fileprivate
+
 extension PONativeAlternativePaymentConfiguration.CancelButton {
 
     @available(*, deprecated)
-    fileprivate init?(bridging action: PONativeAlternativePaymentConfiguration.SecondaryAction) {     // swiftlint:disable:this strict_fileprivate line_length
+    fileprivate init?(bridging action: PONativeAlternativePaymentConfiguration.SecondaryAction) {
         guard case let .cancel(title, disabledFor, confirmation) = action else {
             return nil
         }
         self = .init(title: title, disabledFor: disabledFor, confirmation: confirmation)
     }
 }
+
+// swiftlint:enable strict_fileprivate
