@@ -34,6 +34,7 @@ extension POBackport where Wrapped: View {
 }
 
 @available(iOS 14, *)
+@MainActor
 private struct TaskModifier<Id: Equatable>: ViewModifier {
 
     let id: Id

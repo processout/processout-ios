@@ -26,6 +26,7 @@ extension View {
 
     /// Wraps a SwiftUI `View` that can be extended to provide backport functionality.
     @_spi(PO)
+    @MainActor
     public var backport: POBackport<Self> {
         .init(self)
     }
