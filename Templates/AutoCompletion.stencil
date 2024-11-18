@@ -14,7 +14,10 @@ extension {{ type.name }} {
     {% endfor %}
     @available(*, deprecated, message: "Use the async method instead.")
     {% for key, value in method.attributes %}
-    {% if key|!hasPrefix:"preconcurrency" %}{{ value.first }}{% endif %}
+    {% if key == "preconcurrency" %}
+        {% break %}
+    {% endif %}
+    {{ value.first }}
     {% endfor %}
     @preconcurrency
     @discardableResult
