@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct HorizontalSizeReader<Content: View>: View {
 
     @ViewBuilder

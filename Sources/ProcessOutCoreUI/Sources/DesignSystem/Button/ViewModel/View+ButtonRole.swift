@@ -22,6 +22,12 @@ extension EnvironmentValues {
 
     /// The role of the button in the current environment.
     @_spi(PO)
-    @Entry
-    public var poButtonRole: POButtonRole?
+    public var poButtonRole: POButtonRole? {
+        get { self[Key.self] }
+        set { self[Key.self] = newValue }
+    }
+
+    private struct Key: EnvironmentKey {
+        static let defaultValue: POButtonRole? = nil
+    }
 }

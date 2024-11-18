@@ -60,7 +60,7 @@ final class ApplePayAuthorizationSessionCoordinator: NSObject, PKPaymentAuthoriz
         delegate?.applePayAuthorizationSessionWillAuthorizePayment()
     }
 
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     func paymentAuthorizationControllerDidRequestMerchantSessionUpdate(
         controller: PKPaymentAuthorizationController
     ) async -> PKPaymentRequestMerchantSessionUpdate {
@@ -68,7 +68,7 @@ final class ApplePayAuthorizationSessionCoordinator: NSObject, PKPaymentAuthoriz
         return update ?? .init(status: .success, merchantSession: nil)
     }
 
-    @available(iOS 15.0, *)
+    @available(iOS 15, *)
     func paymentAuthorizationController(
         _ controller: PKPaymentAuthorizationController,
         didChangeCouponCode couponCode: String

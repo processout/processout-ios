@@ -8,7 +8,7 @@
 import PassKit
 import ProcessOut
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 extension PKPaymentNetwork {
 
     init?(poScheme: POCardScheme) {

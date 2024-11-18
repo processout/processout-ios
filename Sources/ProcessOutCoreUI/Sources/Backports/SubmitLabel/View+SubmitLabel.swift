@@ -67,6 +67,12 @@ extension POBackport where Wrapped: View {
 extension EnvironmentValues {
 
     /// Submit label.
-    @Entry
-    var backportSubmitLabel = POBackport.SubmitLabel.default
+    var backportSubmitLabel: POBackport<Any>.SubmitLabel {
+        get { self[Key.self] }
+        set { self[Key.self] = newValue }
+    }
+
+    private struct Key: EnvironmentKey {
+        static let defaultValue = POBackport.SubmitLabel.default
+    }
 }

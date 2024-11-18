@@ -14,6 +14,7 @@ extension View {
     }
 }
 
+@MainActor
 private struct BlinkViewModifier: ViewModifier {
 
     let animation: Animation

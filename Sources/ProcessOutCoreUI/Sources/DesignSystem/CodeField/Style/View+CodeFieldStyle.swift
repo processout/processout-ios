@@ -10,13 +10,13 @@ import SwiftUI
 extension View {
 
     /// Sets the style for picker views within this view.
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     func codeFieldStyle(_ style: some CodeFieldStyle) -> some View {
         environment(\.codeFieldStyle, style)
     }
 }
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 extension EnvironmentValues {
 
     @MainActor

@@ -104,6 +104,8 @@ public struct PORadioButtonStyle: ButtonStyle {
 }
 
 // Environments are not propagated directly to ButtonStyle in any iOS before 14.
+@MainActor
+@preconcurrency
 private struct ContentView<Content: View>: View {
 
     @ViewBuilder

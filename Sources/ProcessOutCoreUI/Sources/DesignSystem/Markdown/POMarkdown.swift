@@ -9,6 +9,7 @@ import SwiftUI
 
 @available(iOS 14, *)
 @_spi(PO)
+@MainActor
 public struct POMarkdown: View {
 
     public init(_ string: String) {
@@ -31,6 +32,7 @@ public struct POMarkdown: View {
 }
 
 @available(iOS 14, *)
+@MainActor
 private struct TextViewRepresentable: UIViewRepresentable {
 
     /// The text that the view displays.
@@ -60,7 +62,7 @@ private struct TextViewRepresentable: UIViewRepresentable {
         return textView
     }
 
-    @available(iOS 16.0, *)
+    @available(iOS 16, *)
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: TextView, context: Context) -> CGSize? {
         if let width = proposal.width {
             return uiView.attributedText.sizeThatFits(width: width)

@@ -22,12 +22,12 @@ public protocol POApplePayTokenizationDelegate: Sendable { // swiftlint:disable:
     func applePayTokenizationWillAuthorizePayment()
 
     /// Requests an object that validates the identity of a merchant for a payment request.
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     @MainActor
     func applePayTokenizationDidRequestMerchantSessionUpdate() async -> PKPaymentRequestMerchantSessionUpdate?
 
     /// Tells the delegate that the user entered or updated a coupon code.
-    @available(iOS 15.0, *)
+    @available(iOS 15, *)
     @MainActor
     func applePayTokenization(didChangeCouponCode couponCode: String) async -> PKPaymentRequestCouponCodeUpdate?
 
@@ -68,13 +68,13 @@ extension POApplePayTokenizationDelegate {
         // Ignored
     }
 
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     @MainActor
     public func applePayTokenizationDidRequestMerchantSessionUpdate() async -> PKPaymentRequestMerchantSessionUpdate? {
         nil
     }
 
-    @available(iOS 15.0, *)
+    @available(iOS 15, *)
     @MainActor
     public func applePayTokenization(
         didChangeCouponCode couponCode: String

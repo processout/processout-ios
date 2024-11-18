@@ -43,18 +43,18 @@ final class ThreeDSServiceAdapter: PO3DSService {
 
     private func invoke<T>(
         completion: @escaping (Result<T, POFailure>) -> Void,
-        after operation: @escaping @isolated(any) () async throws -> T
+        withResultOf operation: @escaping @Sendable () async throws -> T
     ) {
-        Task { @MainActor in
+        let operationBox = { @MainActor @Sendable in
             do {
-                let returnValue = try await operation()
-                completion(.success(returnValue))
+                completion(.success(try await operation()))
             } catch let failure as POFailure {
                 completion(.failure(failure))
             } catch {
-                let failure = POFailure(message: "Something went wrong.", code: .internal(.mobile), underlyingError: error) // swiftlint:disable:this line_length
-                completion(.failure(failure))
+                let message = "Something went wrong."
+                completion(.failure(POFailure(message: message, code: .internal(.mobile), underlyingError: error)))
             }
         }
+        Task(operation: operationBox)
     }
 }

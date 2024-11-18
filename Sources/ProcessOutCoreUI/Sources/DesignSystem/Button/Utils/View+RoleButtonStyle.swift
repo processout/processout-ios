@@ -17,6 +17,7 @@ extension View {
     ///   - primaryStyle: The style for the primary role.
     ///   - fallbackStyle: The style used when the role is not primary.
     @_spi(PO)
+    @MainActor
     public func buttonStyle(
         forPrimaryRole primaryStyle: any ButtonStyle, fallback fallbackStyle: any ButtonStyle
     ) -> some View {
@@ -24,6 +25,7 @@ extension View {
     }
 }
 
+@MainActor
 private struct RoleButtonStyle: ButtonStyle {
 
     let primaryStyle, fallbackStyle: any ButtonStyle

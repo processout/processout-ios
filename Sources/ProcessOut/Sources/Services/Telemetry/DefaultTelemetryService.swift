@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class DefaultTelemetryService: TelemetryService {
+final class DefaultTelemetryService: TelemetryService, @unchecked Sendable {
 
     init(
         configuration: TelemetryServiceConfiguration,
@@ -67,7 +67,7 @@ final class DefaultTelemetryService: TelemetryService {
     private let configuration: POUnfairlyLocked<TelemetryServiceConfiguration>
 
     // swiftlint:disable:next implicitly_unwrapped_optional
-    private nonisolated(unsafe) var batcher: Batcher<Telemetry.Event>!
+    private var batcher: Batcher<Telemetry.Event>!
 
     // MARK: - Private Methods
 

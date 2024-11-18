@@ -11,11 +11,13 @@ import SwiftUI
 
 extension View {
 
+    @MainActor
     func onSizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
         modifier(SizeModifier(action: action))
     }
 }
 
+@MainActor
 private struct SizeModifier: ViewModifier {
 
     let action: (CGSize) -> Void

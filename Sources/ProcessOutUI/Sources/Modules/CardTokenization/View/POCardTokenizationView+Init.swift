@@ -19,7 +19,7 @@ extension POCardTokenizationView {
     /// its state once during the lifetime of the view — even if you call the initializer
     /// more than once — which might result in unexpected behavior.
     public init(
-        configuration: POCardTokenizationConfiguration = .init(),
+        configuration: POCardTokenizationConfiguration = .default,
         delegate: POCardTokenizationDelegate? = nil,
         completion: @escaping (Result<POCard, POFailure>) -> Void
     ) {

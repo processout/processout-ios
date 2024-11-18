@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 extension ToggleStyle where Self == POCheckboxToggleStyle {
 
     /// Checkbox toggle.

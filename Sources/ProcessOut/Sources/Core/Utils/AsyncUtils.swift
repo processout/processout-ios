@@ -7,13 +7,15 @@
 
 import Foundation
 
+// todo(andrii-vysotskyi): annotate operations with @isolated(any) after removing support for Xcode 15.4 CLT.
+
 // MARK: - Timeout
 
 /// - Warning: operation should support cancellation, otherwise calling this method has no effect.
 func withTimeout<T: Sendable>(
     _ timeout: TimeInterval,
     error timeoutError: Error,
-    perform operation: @escaping @Sendable @isolated(any) () async throws -> T
+    @_inheritActorContext perform operation: @escaping @Sendable () async throws -> T
 ) async throws -> T {
     let isTimedOut = POUnfairlyLocked(wrappedValue: false)
     let task = Task(operation: operation)
@@ -48,7 +50,7 @@ func withTimeout<T: Sendable>(
 // MARK: - Retry
 
 func retry<T: Sendable>(
-    operation: @escaping @Sendable @isolated(any) () async throws -> T,
+    @_inheritActorContext operation: @escaping @Sendable () async throws -> T,
     while condition: @escaping @Sendable (Result<T, Error>) -> Bool,
     timeout: TimeInterval,
     timeoutError: Error,
@@ -67,7 +69,7 @@ func retry<T: Sendable>(
 }
 
 private func retry<T: Sendable>(
-    operation: @escaping @Sendable @isolated(any) () async throws -> T,
+    @_inheritActorContext operation: @escaping @Sendable () async throws -> T,
     after result: Result<T, Error>,
     while condition: @escaping (Result<T, Error>) -> Bool,
     retryStrategy: RetryStrategy?,
@@ -94,9 +96,7 @@ private func retry<T: Sendable>(
 extension Result where Failure == Error, Success: Sendable {
 
     // swiftlint:disable:next strict_fileprivate
-    fileprivate init(
-        catching body: @isolated(any) () async throws -> Success
-    ) async {
+    fileprivate init(catching body: () async throws -> Success) async {
         do {
             let success = try await body()
             self = .success(success)

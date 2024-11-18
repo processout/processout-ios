@@ -12,6 +12,7 @@ extension POMarkdown {
 
     /// Applies given `style` to text.
     @_spi(PO)
+    @MainActor
     public func textStyle(_ style: POTextStyle) -> some View {
         textStyle(style, addPadding: false)
     }

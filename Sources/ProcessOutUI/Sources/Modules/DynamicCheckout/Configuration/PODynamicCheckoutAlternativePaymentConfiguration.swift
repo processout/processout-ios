@@ -125,3 +125,13 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
         self.paymentConfirmation = paymentConfirmation
     }
 }
+
+extension PODynamicCheckoutAlternativePaymentConfiguration {
+
+    /// Default configuration.
+    @MainActor
+    @inlinable
+    static var `default`: PODynamicCheckoutAlternativePaymentConfiguration {
+        PODynamicCheckoutAlternativePaymentConfiguration()
+    }
+}

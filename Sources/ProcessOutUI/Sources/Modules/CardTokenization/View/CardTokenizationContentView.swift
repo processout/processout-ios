@@ -8,7 +8,8 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
+@MainActor
 struct CardTokenizationContentView: View {
 
     init(viewModel: AnyViewModel<CardTokenizationViewModelState>, insets: CGFloat) {
