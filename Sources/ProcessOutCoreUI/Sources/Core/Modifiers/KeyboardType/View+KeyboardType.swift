@@ -20,6 +20,12 @@ extension View {
 extension EnvironmentValues {
 
     /// Keyboard type.
-    @Entry
-    var poKeyboardType = UIKeyboardType.default
+    var poKeyboardType: UIKeyboardType {
+        get { self[Key.self] }
+        set { self[Key.self] = newValue }
+    }
+
+    private struct Key: EnvironmentKey {
+        static let defaultValue = UIKeyboardType.default
+    }
 }

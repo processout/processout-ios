@@ -10,6 +10,7 @@ import SwiftUI
 extension View {
 
     /// Adds an action to perform after this view appears.
+    @MainActor
     func onDidAppear(perform action: @escaping () -> Void) -> some View {
         background(ViewControllerRepresentable(onDidAppear: action))
     }
@@ -35,6 +36,7 @@ private final class ViewController: UIViewController {
     }
 }
 
+@MainActor
 private struct ViewControllerRepresentable: UIViewControllerRepresentable {
 
     let onDidAppear: () -> Void
