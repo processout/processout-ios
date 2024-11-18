@@ -9,7 +9,7 @@ import SwiftUI
 import PassKit
 
 @_spi(PO)
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 @MainActor
 public struct POPassKitPaymentButton: View {
 
@@ -43,7 +43,7 @@ public struct POPassKitPaymentButton: View {
     private var style
 }
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 @MainActor
 private struct ButtonRepresentable: UIViewRepresentable {
 

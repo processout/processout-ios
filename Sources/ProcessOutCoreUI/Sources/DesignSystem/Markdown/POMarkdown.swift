@@ -62,7 +62,7 @@ private struct TextViewRepresentable: UIViewRepresentable {
         return textView
     }
 
-    @available(iOS 16.0, *)
+    @available(iOS 16, *)
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: TextView, context: Context) -> CGSize? {
         if let width = proposal.width {
             return uiView.attributedText.sizeThatFits(width: width)

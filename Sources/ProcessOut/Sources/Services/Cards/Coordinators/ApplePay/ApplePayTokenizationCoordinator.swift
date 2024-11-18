@@ -54,12 +54,12 @@ final class ApplePayTokenizationCoordinator: ApplePayAuthorizationSessionDelegat
         delegate?.applePayTokenizationWillAuthorizePayment()
     }
 
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     func applePayAuthorizationSessionDidRequestMerchantSessionUpdate() async -> PKPaymentRequestMerchantSessionUpdate? {
         await delegate?.applePayTokenizationDidRequestMerchantSessionUpdate()
     }
 
-    @available(iOS 15.0, *)
+    @available(iOS 15, *)
     func applePayAuthorizationSession(
         didChangeCouponCode couponCode: String
     ) async -> PKPaymentRequestCouponCodeUpdate? {

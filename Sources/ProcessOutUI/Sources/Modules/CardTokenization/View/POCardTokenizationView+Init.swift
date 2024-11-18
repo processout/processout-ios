@@ -18,7 +18,6 @@ extension POCardTokenizationView {
     /// - NOTE: Use caution when using this view, because SwiftUI only initializes
     /// its state once during the lifetime of the view — even if you call the initializer
     /// more than once — which might result in unexpected behavior.
-    @MainActor
     public init(
         configuration: POCardTokenizationConfiguration = .default,
         delegate: POCardTokenizationDelegate? = nil,

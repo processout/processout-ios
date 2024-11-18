@@ -21,7 +21,7 @@ struct CheckmarkShape: Shape {
         return path
     }
 
-    @available(iOS 17.0, *)
+    @available(iOS 17, *)
     var layoutDirectionBehavior: LayoutDirectionBehavior {
         .fixed
     }

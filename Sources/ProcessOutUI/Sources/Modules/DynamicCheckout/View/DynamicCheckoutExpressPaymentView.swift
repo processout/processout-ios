@@ -8,7 +8,7 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 @MainActor
 struct DynamicCheckoutExpressPaymentView: View {
 

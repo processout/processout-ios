@@ -43,14 +43,14 @@ public protocol POPassKitPaymentAuthorizationControllerDelegate: AnyObject {
     func paymentAuthorizationControllerWillAuthorizePayment(_ controller: POPassKitPaymentAuthorizationController)
 
     /// Requests an object that validates the identity of a merchant for a payment request.
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     @MainActor
     func paymentAuthorizationControllerDidRequestMerchantSessionUpdate(
         controller: POPassKitPaymentAuthorizationController
     ) async -> PKPaymentRequestMerchantSessionUpdate?
 
     /// Tells the delegate that the user entered or updated a coupon code.
-    @available(iOS 15.0, *)
+    @available(iOS 15, *)
     @MainActor
     func paymentAuthorizationController(
         _ controller: POPassKitPaymentAuthorizationController,
@@ -103,14 +103,14 @@ extension POPassKitPaymentAuthorizationControllerDelegate {
         // Ignored
     }
 
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     public func paymentAuthorizationControllerDidRequestMerchantSessionUpdate(
         controller: POPassKitPaymentAuthorizationController
     ) async -> PKPaymentRequestMerchantSessionUpdate? {
         nil
     }
 
-    @available(iOS 15.0, *)
+    @available(iOS 15, *)
     public func paymentAuthorizationController(
         _ controller: POPassKitPaymentAuthorizationController,
         didChangeCouponCode couponCode: String
