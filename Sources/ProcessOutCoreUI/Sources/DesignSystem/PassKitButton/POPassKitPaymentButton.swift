@@ -10,6 +10,7 @@ import PassKit
 
 @_spi(PO)
 @available(iOS 14.0, *)
+@MainActor
 public struct POPassKitPaymentButton: View {
 
     public init(type: PKPaymentButtonType, action: @escaping () -> Void) {
@@ -43,6 +44,7 @@ public struct POPassKitPaymentButton: View {
 }
 
 @available(iOS 14.0, *)
+@MainActor
 private struct ButtonRepresentable: UIViewRepresentable {
 
     let buttonType: PKPaymentButtonType

@@ -8,6 +8,7 @@
 import SwiftUI
 
 @available(iOS 14.0, *)
+@MainActor
 struct DefaultCodeFieldStyleCharacterView: View {
 
     enum CaretPosition: Equatable {

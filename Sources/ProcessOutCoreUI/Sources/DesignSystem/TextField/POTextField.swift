@@ -9,6 +9,7 @@ import SwiftUI
 
 @_spi(PO)
 @available(iOS 14, *)
+@MainActor
 public struct POTextField<Trailing: View>: View {
 
     /// - Parameters:
@@ -76,6 +77,7 @@ private enum Constants {
 }
 
 @available(iOS 14, *)
+@MainActor
 private struct TextFieldRepresentable: UIViewRepresentable {
 
     init(text: Binding<String>, formatter: Formatter?, style: POInputStateStyle) {

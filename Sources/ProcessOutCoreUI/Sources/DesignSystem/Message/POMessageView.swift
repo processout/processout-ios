@@ -9,6 +9,7 @@ import SwiftUI
 
 @_spi(PO)
 @available(iOS 14.0, *)
+@MainActor
 public struct POMessageView: View {
 
     public init(message: POMessage) {

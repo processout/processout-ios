@@ -8,6 +8,7 @@
 import SwiftUI
 
 @available(iOS 14.0, *)
+@MainActor
 struct CheckboxButtonStyle: ButtonStyle {
 
     /// Defines whether checkbox is selected.
@@ -67,6 +68,7 @@ struct CheckboxButtonStyle: ButtonStyle {
 }
 
 // Environments are not propagated directly to ButtonStyle in any iOS before 14.
+@MainActor
 private struct ContentView<Content: View>: View {
 
     @ViewBuilder

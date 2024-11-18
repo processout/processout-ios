@@ -9,6 +9,8 @@ import SwiftUI
 
 /// A toggle style that displays a checkbox followed by its label.
 @available(iOS 14.0, *)
+@MainActor
+@preconcurrency
 public struct POCheckboxToggleStyle: ToggleStyle {
 
     /// Style to use when checkbox is not selected.

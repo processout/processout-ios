@@ -14,6 +14,7 @@ extension View {
     /// - NOTE: When `addPadding` is set to true this method has a cumulative effect.
     @_spi(PO)
     @available(iOS 14.0, *)
+    @MainActor
     public func textStyle(_ style: POTextStyle, addPadding: Bool = true) -> some View {
         modifier(ContentModifier(style: style, addPadding: addPadding))
     }
@@ -35,6 +36,7 @@ extension EnvironmentValues {
 }
 
 @available(iOS 14.0, *)
+@MainActor
 private struct ContentModifier: ViewModifier {
 
     init(style: POTextStyle, addPadding: Bool) {

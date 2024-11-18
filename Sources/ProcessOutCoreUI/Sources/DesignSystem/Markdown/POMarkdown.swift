@@ -9,6 +9,7 @@ import SwiftUI
 
 @available(iOS 14, *)
 @_spi(PO)
+@MainActor
 public struct POMarkdown: View {
 
     public init(_ string: String) {
@@ -31,6 +32,7 @@ public struct POMarkdown: View {
 }
 
 @available(iOS 14, *)
+@MainActor
 private struct TextViewRepresentable: UIViewRepresentable {
 
     /// The text that the view displays.

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct CodeFieldRepresentable: UIViewRepresentable {
 
     let length: Int

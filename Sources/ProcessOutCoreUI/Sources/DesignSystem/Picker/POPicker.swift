@@ -9,6 +9,7 @@ import SwiftUI
 
 @_spi(PO)
 @available(iOS 14, *)
+@MainActor
 public struct POPicker<Data: RandomAccessCollection, Id: Hashable>: View {
 
     // swiftlint:disable:next line_length

@@ -17,6 +17,7 @@ extension View {
 }
 
 @available(iOS 14, *)
+@MainActor
 private struct ContentModifier: ViewModifier {
 
     @Binding
