@@ -9,6 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14.0, *)
+@MainActor
 struct DynamicCheckoutCardView: View {
 
     init(item: DynamicCheckoutViewModelItem.Card) {
