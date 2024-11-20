@@ -749,6 +749,9 @@
         }
       }
     },
+    "card-scanner.title" : {
+
+    },
     "card-tokenization.billing-address.street" : {
       "localizations" : {
         "ar" : {
