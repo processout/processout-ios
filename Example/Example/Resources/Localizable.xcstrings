@@ -161,9 +161,6 @@
         }
       }
     },
-    "Card scanner" : {
-
-    },
     "card-payment.3ds-service" : {
       "localizations" : {
         "en" : {
@@ -413,6 +410,9 @@
           }
         }
       }
+    },
+    "features.card-scanner" : {
+
     },
     "features.dynamic-checkout" : {
       "localizations" : {
