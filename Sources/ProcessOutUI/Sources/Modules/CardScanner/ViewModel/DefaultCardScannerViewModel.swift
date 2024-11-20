@@ -23,6 +23,7 @@ final class DefaultCardScannerViewModel: ViewModel {
     }
 
     deinit {
+        // todo(andrii-vysotskyi): set cancelled state if needed.
         Task { [cameraSession] in await cameraSession.stop() }
     }
 
@@ -42,7 +43,7 @@ final class DefaultCardScannerViewModel: ViewModel {
             if await cameraSession.start(), await cardRecognitionSession.setCameraSession(cameraSession) {
                 state.preview.captureSession = await cameraSession.captureSession
             } else {
-                completion(.failure(.init(message: "Unable to start scanning.", code: .generic(.mobile))))
+                setCompletedState(with: .failure(.init(message: "Unable to start scanning.", code: .generic(.mobile))))
             }
         }
     }
@@ -67,19 +68,27 @@ final class DefaultCardScannerViewModel: ViewModel {
     private func commonInit() {
         state = .init(
             title: String(resource: .CardScanner.title),
-            preview: .init(captureSession: nil, aspectRatio: Constants.previewAspectRatio)
+            preview: .init(captureSession: nil, aspectRatio: Constants.previewAspectRatio),
+            didComplete: false
         )
+    }
+
+    private func setCompletedState(with result: Result<POScannedCard, POFailure>) {
+        guard !state.didComplete else {
+            return // Ignore attempt to complete
+        }
+        state.didComplete = true
+        completion(result)
     }
 }
 
 extension DefaultCardScannerViewModel: CardRecognitionSessionDelegate {
 
     func cardRecognitionSession(_ session: CardRecognitionSession, didRecognize card: POScannedCard) {
-        // todo(andrii-vysotskyi): ensure completion is called only once.
         Task {
             await session.setDelegate(nil)
             await session.stop()
         }
-        completion(.success(card))
+        setCompletedState(with: .success(card))
     }
 }

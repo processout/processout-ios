@@ -23,11 +23,14 @@ struct CardScannerViewModelState {
 
     /// Preview.
     var preview: Preview
+
+    /// Boolean flag indicating wh
+    var didComplete: Bool
 }
 
 extension CardScannerViewModelState: AnimationIdentityProvider {
 
     var animationIdentity: AnyHashable {
-        title
+        [title, AnyHashable(preview.aspectRatio)]
     }
 }
