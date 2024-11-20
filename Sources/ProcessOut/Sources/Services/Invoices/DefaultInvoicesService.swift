@@ -74,7 +74,8 @@ final class DefaultInvoicesService: POInvoicesService {
     }
 
     func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
-        try await repository.createInvoice(request: request)
+        try await Task.sleep(seconds: 5)
+        return try await repository.createInvoice(request: request)
     }
 
     // MARK: - Private Nested Types
