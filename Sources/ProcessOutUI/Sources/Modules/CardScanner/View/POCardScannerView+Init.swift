@@ -15,19 +15,21 @@ extension POCardScannerView {
     /// - NOTE: Use caution when using this view, because SwiftUI only initializes
     /// its state once during the lifetime of the view — even if you call the initializer
     /// more than once — which might result in unexpected behavior.
-    public init() {
+    public init(completion: @escaping (Result<POScannedCard, POFailure>) -> Void) {
         let viewModel = {
-            DefaultCardScannerViewModel(
+            let cardRecognitionSession = CardRecognitionSession(
+                numberDetector: CardNumberDetector(
+                    regexProvider: .shared, formatter: .init()
+                ),
+                expirationDetector: CardExpirationDetector(
+                    regexProvider: .shared, formatter: .init()
+                ),
+                logger: ProcessOut.shared.logger
+            )
+            return DefaultCardScannerViewModel(
                 cameraSession: .init(),
-                cardRecognitionSession: .init(
-                    numberDetector: CardNumberDetector(
-                        regexProvider: .shared, formatter: .init()
-                    ),
-                    expirationDetector: CardExpirationDetector(
-                        regexProvider: .shared, formatter: .init()
-                    ),
-                    logger: ProcessOut.shared.logger
-                )
+                cardRecognitionSession: cardRecognitionSession,
+                completion: completion
             )
         }
         self = .init(viewModel: viewModel())

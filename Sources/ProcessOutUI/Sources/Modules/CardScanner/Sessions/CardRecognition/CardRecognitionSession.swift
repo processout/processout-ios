@@ -116,6 +116,7 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
             return
         }
         if let card = scannedCard(in: textRequest.results) {
+            logger.debug("Did recognize card details: \(card).")
             await delegate?.cardRecognitionSession(self, didRecognize: card)
         }
     }

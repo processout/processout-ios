@@ -11,9 +11,14 @@ import UIKit
 
 final class DefaultCardScannerViewModel: ViewModel {
 
-    init(cameraSession: CameraSession, cardRecognitionSession: CardRecognitionSession) {
+    init(
+        cameraSession: CameraSession,
+        cardRecognitionSession: CardRecognitionSession,
+        completion: @escaping (Result<POScannedCard, POFailure>) -> Void
+    ) {
         self.cameraSession = cameraSession
         self.cardRecognitionSession = cardRecognitionSession
+        self.completion = completion
         commonInit()
     }
 
@@ -29,13 +34,16 @@ final class DefaultCardScannerViewModel: ViewModel {
     }
 
     func start() {
-        // todo(andrii-vysotskyi): abort on error
         Task { @MainActor in
-            await cardRecognitionSession.setRegionOfInterestAspectRatio(Constants.previewAspectRatio)
+            await cardRecognitionSession.setRegionOfInterestAspectRatio(
+                Constants.previewAspectRatio
+            )
             await cardRecognitionSession.setDelegate(self)
-            _ = await cameraSession.start()
-            _ = await cardRecognitionSession.setCameraSession(cameraSession)
-            state.preview.captureSession = await cameraSession.captureSession
+            if await cameraSession.start(), await cardRecognitionSession.setCameraSession(cameraSession) {
+                state.preview.captureSession = await cameraSession.captureSession
+            } else {
+                completion(.failure(.init(message: "Unable to start scanning.", code: .generic(.mobile))))
+            }
         }
     }
 
@@ -49,6 +57,7 @@ final class DefaultCardScannerViewModel: ViewModel {
 
     private let cameraSession: CameraSession
     private let cardRecognitionSession: CardRecognitionSession
+    private let completion: (Result<POScannedCard, POFailure>) -> Void
 
     @AnimatablePublished
     private var _state: CardScannerViewModelState! // swiftlint:disable:this implicitly_unwrapped_optional
@@ -66,6 +75,11 @@ final class DefaultCardScannerViewModel: ViewModel {
 extension DefaultCardScannerViewModel: CardRecognitionSessionDelegate {
 
     func cardRecognitionSession(_ session: CardRecognitionSession, didRecognize card: POScannedCard) {
-        print(card.number) // todo(andrii-vysotskyi): complete with given card
+        // todo(andrii-vysotskyi): ensure completion is called only once.
+        Task {
+            await session.setDelegate(nil)
+            await session.stop()
+        }
+        completion(.success(card))
     }
 }
