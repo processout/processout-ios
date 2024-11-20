@@ -2,7 +2,7 @@
 //  CardAttributeDetector.swift
 //  ProcessOutUI
 //
-//  Created by Andrii Vysotskyi on 22.02.2024.
+//  Created by Andrii Vysotskyi on 20.11.2024.
 //
 
 protocol CardAttributeDetector<Attribute> {
