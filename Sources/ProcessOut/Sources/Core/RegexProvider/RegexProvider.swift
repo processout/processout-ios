@@ -9,14 +9,15 @@ import Foundation
 
 // swiftlint:disable legacy_objc_type
 
-final class RegexProvider: @unchecked Sendable {
+@_spi(PO)
+public final class PORegexProvider: @unchecked Sendable {
 
-    static let shared = RegexProvider()
+    public static let shared = PORegexProvider()
 
     // MARK: - RegexProviderType
 
     /// Returns regular expression with given pattern if one is valid.
-    func regex(with pattern: String) -> NSRegularExpression? {
+    public func regex(with pattern: String) -> NSRegularExpression? {
         if let regex = cache.object(forKey: pattern as NSString) {
             return regex
         }
