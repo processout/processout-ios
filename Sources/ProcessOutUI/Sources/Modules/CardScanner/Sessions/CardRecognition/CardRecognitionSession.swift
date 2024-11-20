@@ -12,7 +12,14 @@ import UIKit
 
 actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
 
-    override init() {
+    init(
+        numberDetector: some CardAttributeDetector<String>,
+        expirationDetector: some CardAttributeDetector<String>,
+        logger: POLogger
+    ) {
+        self.numberDetector = numberDetector
+        self.expirationDetector = expirationDetector
+        self.logger = logger
         regionOfInterestAspectRatio = 1
         super.init()
     }
@@ -31,6 +38,10 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
 
     func setRegionOfInterestAspectRatio(_ aspectRatio: CGFloat) {
         self.regionOfInterestAspectRatio = aspectRatio
+    }
+
+    func setDelegate(_ delegate: CardRecognitionSessionDelegate?) {
+        self.delegate = delegate
     }
 
     /// Invalidates recognition session effectively stopping recognition.
@@ -63,12 +74,19 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
 
     // MARK: - Private Properties
 
+    private let numberDetector: any CardAttributeDetector<String>
+    private let expirationDetector: any CardAttributeDetector<String>
+    private let logger: POLogger
+
     private var cameraSession: CameraSession?
     private var videoDataOutput: AVCaptureVideoDataOutput?
     private var regionOfInterestAspectRatio: CGFloat
 
     /// Boolean value indicating whether new video frames should be discarded.
     private nonisolated(unsafe) var shouldDiscardVideoFrames = POUnfairlyLocked(wrappedValue: false)
+
+    /// Delegate.
+    private weak var delegate: CardRecognitionSessionDelegate?
 
     // MARK: - Video Output
 
@@ -94,15 +112,18 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
             let handler = VNImageRequestHandler(ciImage: correctedImage)
             try handler.perform([textRequest])
         } catch {
-            return // todo(andrii-vysotskyi): log error
+            logger.debug("Failed to perform recognition request: \(error).")
+            return
         }
-        // todo(andrii-vysotskyi): handle textRequest.results
+        if let card = scannedCard(in: textRequest.results) {
+            await delegate?.cardRecognitionSession(self, didRecognize: card)
+        }
     }
 
     private func createTextRecognitionRequest(for image: CIImage) -> VNRecognizeTextRequest {
         let request = VNRecognizeTextRequest()
         request.recognitionLevel = .accurate
-        request.usesLanguageCorrection = true
+        request.usesLanguageCorrection = false
         request.recognitionLanguages = ["en-US"]
         request.regionOfInterest = regionOfInterest(inside: image, aspectRatio: regionOfInterestAspectRatio)
         return request
@@ -171,4 +192,17 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
     }
 
     // MARK: - Card Attributes
+
+    private func scannedCard(in observations: [VNRecognizedTextObservation]?) -> POScannedCard? {
+        let candidates = observations?
+            .compactMap { $0.topCandidates(1).first }
+            .map(\.string)
+        guard let candidates, !candidates.isEmpty,
+              let number = numberDetector.firstMatch(in: candidates) else {
+            return nil
+        }
+        let expiration = expirationDetector.firstMatch(in: candidates)
+        // todo(andrii-vysotskyi): match cardholder name
+        return POScannedCard(number: number, expiration: expiration, cardholder: nil)
+    }
 }

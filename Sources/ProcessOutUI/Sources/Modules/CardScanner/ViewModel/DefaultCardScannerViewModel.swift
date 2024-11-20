@@ -11,9 +11,9 @@ import UIKit
 
 final class DefaultCardScannerViewModel: ViewModel {
 
-    init() {
-        self.cameraSession = .init()
-        self.cardRecognitionSession = .init()
+    init(cameraSession: CameraSession, cardRecognitionSession: CardRecognitionSession) {
+        self.cameraSession = cameraSession
+        self.cardRecognitionSession = cardRecognitionSession
         commonInit()
     }
 
@@ -32,6 +32,7 @@ final class DefaultCardScannerViewModel: ViewModel {
         // todo(andrii-vysotskyi): abort on error
         Task { @MainActor in
             await cardRecognitionSession.setRegionOfInterestAspectRatio(Constants.previewAspectRatio)
+            await cardRecognitionSession.setDelegate(self)
             _ = await cameraSession.start()
             _ = await cardRecognitionSession.setCameraSession(cameraSession)
             state.preview.captureSession = await cameraSession.captureSession
@@ -59,5 +60,12 @@ final class DefaultCardScannerViewModel: ViewModel {
             title: String(resource: .CardScanner.title),
             preview: .init(captureSession: nil, aspectRatio: Constants.previewAspectRatio)
         )
+    }
+}
+
+extension DefaultCardScannerViewModel: CardRecognitionSessionDelegate {
+
+    func cardRecognitionSession(_ session: CardRecognitionSession, didRecognize card: POScannedCard) {
+        print(card.number) // todo(andrii-vysotskyi): complete with given card
     }
 }

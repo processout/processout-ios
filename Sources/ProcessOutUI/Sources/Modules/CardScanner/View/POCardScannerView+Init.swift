@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 20.11.2024.
 //
 
+@_spi(PO) import ProcessOut
+
 @available(iOS 14, *)
 extension POCardScannerView {
 
@@ -15,7 +17,18 @@ extension POCardScannerView {
     /// more than once — which might result in unexpected behavior.
     public init() {
         let viewModel = {
-            DefaultCardScannerViewModel()
+            DefaultCardScannerViewModel(
+                cameraSession: .init(),
+                cardRecognitionSession: .init(
+                    numberDetector: CardNumberDetector(
+                        regexProvider: .shared, formatter: .init()
+                    ),
+                    expirationDetector: CardExpirationDetector(
+                        regexProvider: .shared, formatter: .init()
+                    ),
+                    logger: ProcessOut.shared.logger
+                )
+            )
         }
         self = .init(viewModel: viewModel())
     }
