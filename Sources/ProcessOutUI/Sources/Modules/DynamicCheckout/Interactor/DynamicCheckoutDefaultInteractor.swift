@@ -79,36 +79,17 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     func select(methodId: String) {
-        switch state {
-        case .started(let currentState):
-            setSelectedStateUnchecked(methodId: methodId, startedState: currentState)
-        case .selected(let currentState) where currentState.paymentMethod.id != methodId:
-            setSelectedStateUnchecked(methodId: methodId, startedState: currentState.snapshot)
-        case .selected:
-            logger.debug("Method \(methodId) is already selected, ignored.")
-        case .restarting(var newState):
-            newState.pendingPaymentMethodId = methodId
-            newState.shouldStartPendingPaymentMethod = false
-            state = .restarting(newState)
-        case .paymentProcessing:
-            restart(toProcess: methodId, shouldStart: false)
-        default:
-            logger.debug("Unable to change selection in unsupported state: \(state).")
-        }
+        select(methodId: methodId, shouldStart: false)
     }
 
     func startPayment(methodId: String) {
         switch state {
-        case .started(let currentState):
-            send(event: .willSelectPaymentMethod)
-            continuePaymentProcessingUnchecked(
-                paymentMethodId: methodId, shouldSavePaymentMethod: nil, startedState: currentState
-            )
+        case .started:
+            select(methodId: methodId, shouldStart: true)
         case .selected(let currentState):
+            let shouldSave = currentState.paymentMethod.id == methodId && currentState.shouldSavePaymentMethod == true
             continuePaymentProcessingUnchecked(
-                paymentMethodId: methodId,
-                shouldSavePaymentMethod: currentState.shouldSavePaymentMethod,
-                startedState: currentState.snapshot
+                paymentMethodId: methodId, shouldSavePaymentMethod: shouldSave, startedState: currentState.snapshot
             )
         case .paymentProcessing:
             restart(toProcess: methodId, shouldStart: true)
@@ -138,10 +119,10 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     func didRequestCancelConfirmation() {
-        // Only nAPM interactor should be notified for now.
         if case .paymentProcessing(let currentState) = state {
             currentState.nativeAlternativePaymentInteractor?.didRequestCancelConfirmation()
         }
+        send(event: .didRequestCancelConfirmation)
     }
 
     // MARK: - Private Properties
@@ -250,6 +231,7 @@ final class DynamicCheckoutDefaultInteractor:
             setFailureState(error: error)
             return
         }
+        send(event: .didFailPaymentMethod(.init(paymentMethod: currentState.paymentMethod, failure: failure)))
         if delegate?.dynamicCheckout(shouldContinueAfter: failure) != false {
             let task = Task {
                 await continueRestart(reason: .failure(failure))
@@ -316,11 +298,7 @@ final class DynamicCheckoutDefaultInteractor:
             logger.debug("Ignoring pending method selection because it is not available or not set.")
             return
         }
-        if currentState.shouldStartPendingPaymentMethod {
-            startPayment(methodId: methodId)
-        } else {
-            select(methodId: methodId)
-        }
+        select(methodId: methodId, shouldStart: currentState.shouldStartPendingPaymentMethod)
         // todo(andrii-vysotskyi): decide whether input should be preserved for card tokenization
     }
 
@@ -345,20 +323,58 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Selected State
 
-    private func setSelectedStateUnchecked(methodId: String, startedState: State.Started) {
-        guard let selectedPaymentMethod = startedState.paymentMethods.first(where: { $0.id == methodId }) else {
-            assertionFailure("Unable to resolve requested payment method.")
-            return
+    private func select(methodId: String, shouldStart: Bool) {
+        switch state {
+        case .started(let currentState):
+            guard let paymentMethod = paymentMethod(withId: methodId, in: currentState) else {
+                return
+            }
+            send(event: .willSelectPaymentMethod(paymentMethod))
+            setSelectedStateUnchecked(
+                paymentMethod: paymentMethod, shouldStart: shouldStart, startedState: currentState
+            )
+        case .selected(let currentState) where currentState.paymentMethod.id != methodId:
+            guard let paymentMethod = paymentMethod(withId: methodId, in: currentState.snapshot) else {
+                return
+            }
+            send(event: .willSelectPaymentMethod(paymentMethod))
+            setSelectedStateUnchecked(
+                paymentMethod: paymentMethod, shouldStart: shouldStart, startedState: currentState.snapshot
+            )
+        case .restarting(var currentState):
+            guard let paymentMethod = paymentMethod(withId: methodId, in: currentState.snapshot.snapshot) else {
+                return
+            }
+            send(event: .willSelectPaymentMethod(paymentMethod))
+            currentState.pendingPaymentMethodId = methodId
+            currentState.shouldStartPendingPaymentMethod = shouldStart
+            state = .restarting(currentState)
+        case .paymentProcessing(let currentState):
+            guard let paymentMethod = paymentMethod(withId: methodId, in: currentState.snapshot) else {
+                return
+            }
+            send(event: .willSelectPaymentMethod(paymentMethod))
+            restart(toProcess: methodId, shouldStart: shouldStart)
+        default:
+            logger.debug("Unable to change selection in unsupported state: \(state).")
         }
-        send(event: .willSelectPaymentMethod)
+    }
+
+    private func setSelectedStateUnchecked(
+        paymentMethod: PODynamicCheckoutPaymentMethod, shouldStart: Bool, startedState: State.Started
+    ) {
+        send(event: .didSelectPaymentMethod(paymentMethod))
         var newStartedState = startedState
         newStartedState.recentErrorDescription = nil
         let newState = State.Selected(
             snapshot: newStartedState,
-            paymentMethod: selectedPaymentMethod,
-            shouldSavePaymentMethod: canSave(paymentMethod: selectedPaymentMethod) ? false : nil
+            paymentMethod: paymentMethod,
+            shouldSavePaymentMethod: canSave(paymentMethod: paymentMethod) ? false : nil
         )
         state = .selected(newState)
+        if shouldStart {
+            startPayment(methodId: paymentMethod.id)
+        }
     }
 
     private func canSave(paymentMethod: PODynamicCheckoutPaymentMethod) -> Bool {
@@ -374,8 +390,7 @@ final class DynamicCheckoutDefaultInteractor:
     private func continuePaymentProcessingUnchecked(
         paymentMethodId: String, shouldSavePaymentMethod: Bool?, startedState: State.Started
     ) {
-        guard let paymentMethod = startedState.paymentMethods.first(where: { $0.id == paymentMethodId }) else {
-            assertionFailure("Unable to resolve requested payment method.")
+        guard let paymentMethod = paymentMethod(withId: paymentMethodId, in: startedState) else {
             return
         }
         var newStartedState = startedState
@@ -707,6 +722,14 @@ final class DynamicCheckoutDefaultInteractor:
         )
         let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request, using: paymentMethod)
         try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
+    }
+
+    private func paymentMethod(withId id: String, in state: State.Started) -> PODynamicCheckoutPaymentMethod? {
+        if let paymentMethod = state.paymentMethods.first(where: { $0.id == id }) {
+            return paymentMethod
+        }
+        logger.debug("Unable to resolve payment method: \(id).")
+        return nil
     }
 }
 

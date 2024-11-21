@@ -5,11 +5,21 @@
 //  Created by Andrii Vysotskyi on 29.02.2024.
 //
 
-import ProcessOut
+@_spi(PO) import ProcessOut
 
 /// Events emitted by dynamic checkout module during its lifecycle.
 @_spi(PO)
 public enum PODynamicCheckoutEvent: Sendable {
+
+    /// Payment method failure event details.
+    public struct DidFailPaymentMethod: Sendable {
+
+        /// Payment method that failed.
+        public let paymentMethod: PODynamicCheckoutPaymentMethod
+
+        /// Failure details.
+        public let failure: POFailure
+    }
 
     /// Initial event that is sent prior any other event.
     case willStart
@@ -19,7 +29,17 @@ public enum PODynamicCheckoutEvent: Sendable {
     case didStart
 
     /// Invoked when users requests selection of another payment method.
-    case willSelectPaymentMethod
+    case willSelectPaymentMethod(_ paymentMethod: PODynamicCheckoutPaymentMethod)
+
+    /// Payment method selection is not immediate, this event is sent when payment
+    /// method selection succeeds.
+    case didSelectPaymentMethod(_ paymentMethod: PODynamicCheckoutPaymentMethod)
+
+    /// Event is sent when certain payment method fails with retryable error.
+    case didFailPaymentMethod(DidFailPaymentMethod)
+
+    /// Event is sent when user asked to confirm cancellation.
+    case didRequestCancelConfirmation
 
     /// Event is sent after payment was confirmed to be captured. This is a final event.
     case didCompletePayment
