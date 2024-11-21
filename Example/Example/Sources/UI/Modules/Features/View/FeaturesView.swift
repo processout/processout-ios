@@ -20,9 +20,6 @@ struct FeaturesView: View {
                 NavigationLink(String(localized: .Features.cardPayment)) {
                     CardPaymentView()
                 }
-                NavigationLink("Card scanner") {
-                    POCardScannerView()
-                }
                 NavigationLink(String(localized: .Features.dynamicCheckout)) {
                     DynamicCheckoutView()
                 }

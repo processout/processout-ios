@@ -411,9 +411,6 @@
         }
       }
     },
-    "features.card-scanner" : {
-
-    },
     "features.dynamic-checkout" : {
       "localizations" : {
         "en" : {
