@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 // TODOs:
@@ -22,6 +23,9 @@ struct CardTokenizationViewModelState {
 
         /// Section title if any.
         let title: String?
+
+        /// Trailing button.
+        let trailingButton: POButtonViewModel?
 
         /// Section items.
         let items: [Item]
@@ -87,6 +91,14 @@ struct CardTokenizationViewModelState {
         let description: String
     }
 
+    struct CardScanner: Identifiable {
+
+        let id: String
+
+        /// Completion.
+        let completion: (Result<POScannedCard, POFailure>) -> Void
+    }
+
     /// Screen title.
     let title: String?
 
@@ -98,6 +110,9 @@ struct CardTokenizationViewModelState {
 
     /// Currently focused input identifier.
     var focusedInputId: AnyHashable?
+
+    /// Card scanner.
+    var cardScanner: CardScanner?
 }
 
 extension CardTokenizationViewModelState: AnimationIdentityProvider {

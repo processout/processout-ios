@@ -18,8 +18,16 @@ struct CardTokenizationSectionView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: POSpacing.small) {
-            if let title = section.title {
-                Text(title).textStyle(style.sectionTitle)
+            HStack {
+                if let title = section.title {
+                    Text(title)
+                        .textStyle(style.sectionTitle)
+                }
+                Spacer()
+                if let button = section.trailingButton {
+                    Button.create(with: button)
+                        .foregroundColor(style.sectionTitle.color)
+                }
             }
             ForEach(section.items) { element in
                 CardTokenizationItemView(item: element, focusedInputId: $focusedInputId)

@@ -43,6 +43,9 @@ struct CardTokenizationContentView: View {
             .padding(EdgeInsets(horizontal: 0, vertical: insets))
             .frame(maxWidth: .infinity)
         }
+        .sheet(item: $viewModel.state.cardScanner) { scanner in
+            POCardScannerView(completion: scanner.completion)
+        }
         .backport.geometryGroup()
     }
 

@@ -94,7 +94,12 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             cardInformationItems.append(.error(errorItem))
         }
         let sections = [
-            State.Section(id: SectionId.cardInformation, title: nil, items: cardInformationItems),
+            State.Section(
+                id: SectionId.cardInformation,
+                title: nil,
+                trailingButton: createCardScanButton(),
+                items: cardInformationItems
+            ),
             preferredSchemeSection(startedState: startedState),
             billingAddressSection(startedState: startedState),
             futurePaymentsSection(startedState: startedState)
@@ -106,6 +111,18 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             focusedInputId: focusedInputId(startedState: startedState, isSubmitting: isSubmitting)
         )
         return startedState
+    }
+
+    private func createCardScanButton() -> POButtonViewModel? {
+        let openScanner: @MainActor () -> Void = { [weak self] in
+            self?.state.cardScanner = .init(id: "card-scanner") { result in
+                guard case .success(let card) = result else {
+                    return
+                }
+                self?.interactor.update(parameterId: \.number, value: card.number)
+            }
+        }
+        return .init(id: "scan-card-button", icon: Image(systemName: "camera"), action: openScanner)
     }
 
     // MARK: - Title
@@ -198,6 +215,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         let section = State.Section(
             id: SectionId.preferredScheme,
             title: String(resource: .CardTokenization.PreferredScheme.title),
+            trailingButton: nil,
             items: [.picker(pickerItem)]
         )
         return section
@@ -221,6 +239,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         let section = CardTokenizationViewModelState.Section(
             id: SectionId.billingAddress,
             title: String(resource: .CardTokenization.BillingAddress.title),
+            trailingButton: nil,
             items: items
         )
         return section
@@ -275,7 +294,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             )
         )
         let section = CardTokenizationViewModelState.Section(
-            id: SectionId.futurePayments, title: nil, items: [.toggle(toggleItem)]
+            id: SectionId.futurePayments, title: nil, trailingButton: nil, items: [.toggle(toggleItem)]
         )
         return section
     }
