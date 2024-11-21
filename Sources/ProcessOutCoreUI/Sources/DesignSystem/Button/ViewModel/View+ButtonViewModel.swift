@@ -39,9 +39,11 @@ private struct ButtonWrapper: View {
 
     // MARK: - Private Methods
 
-    private var buttonLabel: Label<Text, some View> {
+    private var buttonLabel: Label<some View, some View> {
         Label {
-            Text(viewModel.title)
+            if let title = viewModel.title {
+                Text(title)
+            }
         } icon: {
             viewModel.icon
         }
