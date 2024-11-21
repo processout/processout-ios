@@ -26,4 +26,9 @@ public enum PODynamicCheckoutEvent: Sendable {
 
     /// Event is sent in case unretryable error occurs. This is a final event.
     case didFail(failure: POFailure)
+
+    /// Placeholder to allow adding additional events while staying backward compatible.
+    /// - Warning: Don't match this case directly, instead use default.
+    @_spi(PO)
+    case unknown
 }
