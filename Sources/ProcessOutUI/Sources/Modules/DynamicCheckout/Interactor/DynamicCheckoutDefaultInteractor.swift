@@ -231,7 +231,7 @@ final class DynamicCheckoutDefaultInteractor:
             setFailureState(error: error)
             return
         }
-        send(event: .didFailPaymentMethod(.init(paymentMethod: currentState.paymentMethod, failure: failure)))
+        send(event: .didFailPayment(.init(paymentMethod: currentState.paymentMethod, failure: failure)))
         if delegate?.dynamicCheckout(shouldContinueAfter: failure) != false {
             let task = Task {
                 await continueRestart(reason: .failure(failure))

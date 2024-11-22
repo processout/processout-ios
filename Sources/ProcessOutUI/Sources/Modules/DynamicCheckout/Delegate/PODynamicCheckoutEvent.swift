@@ -12,7 +12,7 @@
 public enum PODynamicCheckoutEvent: Sendable {
 
     /// Payment method failure event details.
-    public struct DidFailPaymentMethod: Sendable {
+    public struct DidFailPayment: Sendable {
 
         /// Payment method that failed.
         public let paymentMethod: PODynamicCheckoutPaymentMethod
@@ -36,7 +36,7 @@ public enum PODynamicCheckoutEvent: Sendable {
     case didSelectPaymentMethod(_ paymentMethod: PODynamicCheckoutPaymentMethod)
 
     /// Event is sent when certain payment method fails with retryable error.
-    case didFailPaymentMethod(DidFailPaymentMethod)
+    case didFailPayment(DidFailPayment)
 
     /// Event is sent when user asked to confirm cancellation.
     case didRequestCancelConfirmation
