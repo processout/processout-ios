@@ -25,6 +25,8 @@ public struct POCardScannerView: View {
             Text(viewModel.state.title)
             CameraPreviewView()
                 .cameraPreviewCaptureSession(viewModel.state.preview.captureSession)
+                .background(Color.gray)
+                .border(style: .regular(color: .clear))
                 .aspectRatio(viewModel.state.preview.aspectRatio, contentMode: .fit)
                 .frame(maxWidth: .infinity)
         }
