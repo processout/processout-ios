@@ -20,7 +20,6 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
         self.numberDetector = numberDetector
         self.expirationDetector = expirationDetector
         self.logger = logger
-        regionOfInterestAspectRatio = 1
         super.init()
     }
 
@@ -34,10 +33,6 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
         self.videoDataOutput = videoOutput
         self.cameraSession = cameraSession
         return true
-    }
-
-    func setRegionOfInterestAspectRatio(_ aspectRatio: CGFloat) {
-        self.regionOfInterestAspectRatio = aspectRatio
     }
 
     func setDelegate(_ delegate: CardRecognitionSessionDelegate?) {
@@ -80,7 +75,6 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
 
     private var cameraSession: CameraSession?
     private var videoDataOutput: AVCaptureVideoDataOutput?
-    private var regionOfInterestAspectRatio: CGFloat
 
     /// Boolean value indicating whether new video frames should be discarded.
     private nonisolated(unsafe) var shouldDiscardVideoFrames = POUnfairlyLocked(wrappedValue: false)
@@ -107,8 +101,8 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
         let correctedImage = await self.corrected(
             image: image, videoOrientation: videoOrientation
         )
-        let textRequest = createTextRecognitionRequest(for: correctedImage)
-        let shapeRequest = createCardShapeRecognitionRequest(for: correctedImage)
+        let textRequest = await createTextRecognitionRequest(for: correctedImage)
+        let shapeRequest = await createCardShapeRecognitionRequest(for: correctedImage)
         do {
             let handler = VNImageRequestHandler(ciImage: correctedImage)
             try handler.perform([textRequest, shapeRequest])
@@ -123,40 +117,43 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
         await delegate?.cardRecognitionSession(self, didRecognize: card)
     }
 
-    private func createTextRecognitionRequest(for image: CIImage) -> VNRecognizeTextRequest {
+    private func createTextRecognitionRequest(for image: CIImage) async -> VNRecognizeTextRequest {
         let request = VNRecognizeTextRequest()
         request.recognitionLevel = .accurate
         request.usesLanguageCorrection = false
         request.recognitionLanguages = ["en-US"]
-        request.regionOfInterest = regionOfInterest(inside: image, aspectRatio: regionOfInterestAspectRatio)
+        request.regionOfInterest = await regionOfInterest(inside: image)
         return request
     }
 
-    private func createCardShapeRecognitionRequest(for image: CIImage) -> VNDetectRectanglesRequest {
-        // ISO/IEC 7810 based ± 10%
+    private func createCardShapeRecognitionRequest(for image: CIImage) async -> VNDetectRectanglesRequest {
         let request = VNDetectRectanglesRequest()
         request.maximumObservations = 1
-        request.minimumAspectRatio = 1.586 * 0.9
+        request.minimumAspectRatio = 1.586 * 0.9 // ISO/IEC 7810 based ± 10%
         request.maximumAspectRatio = 1.586 * 1.1
         request.minimumSize = 0.5
         request.minimumConfidence = 0.5
-        request.regionOfInterest = regionOfInterest(inside: image, aspectRatio: regionOfInterestAspectRatio)
+        request.regionOfInterest = await regionOfInterest(inside: image)
         return request
     }
 
-    private func regionOfInterest(inside image: CIImage, aspectRatio: CGFloat) -> CGRect {
-        let scaledRect = AVMakeRect(
-            aspectRatio: CGSize(width: aspectRatio, height: 1),
-            insideRect: image.extent
-        )
-        return VNNormalizedRectForImageRect(scaledRect, Int(image.extent.width), Int(image.extent.height))
+    private func regionOfInterest(inside image: CIImage) async -> CGRect {
+        if let aspectRatio = await videoPreviewLayerAspectRatio {
+            let scaledRect = AVMakeRect(
+                aspectRatio: CGSize(width: aspectRatio, height: 1),
+                insideRect: image.extent
+            )
+            return VNNormalizedRectForImageRect(scaledRect, Int(image.extent.width), Int(image.extent.height))
+        } else {
+            return CGRect(x: 0, y: 0, width: 1, height: 1)
+        }
     }
 
     // MARK: - Image Correction
 
     private func corrected(image: CIImage, videoOrientation: AVCaptureVideoOrientation) async -> CIImage {
         let rotatedImage = image.transformed(
-            by: .init(rotationAngle: await videoRotatioAngle(for: videoOrientation))
+            by: .init(rotationAngle: await videoRotationAngle(for: videoOrientation))
         )
         let translatedImage = rotatedImage.transformed(
             by: .init(translationX: -rotatedImage.extent.origin.x, y: -rotatedImage.extent.origin.y)
@@ -165,7 +162,7 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
     }
 
     /// Returns rotation angle in radians.
-    private func videoRotatioAngle(for videoOrientation: AVCaptureVideoOrientation) async -> CGFloat {
+    private func videoRotationAngle(for videoOrientation: AVCaptureVideoOrientation) async -> CGFloat {
         var angle: CGFloat
         switch videoOrientation {
         case .landscapeLeft:
@@ -190,16 +187,31 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
         return (angle / 180).truncatingRemainder(dividingBy: 360) * .pi
     }
 
-    // MARK: - Preview Orientation
+    // MARK: - Preview Layer
 
     private var videoPreviewLayerOrientation: UIInterfaceOrientation? {
+        get async {
+            await videoPreviewLayer?.owningView?.window?.windowScene?.interfaceOrientation
+        }
+    }
+
+    private var videoPreviewLayerAspectRatio: CGFloat? {
+        get async {
+            guard let size = await videoPreviewLayer?.owningView?.bounds.size else {
+                return nil
+            }
+            return size.width / size.height
+        }
+    }
+
+    private var videoPreviewLayer: AVCaptureVideoPreviewLayer? {
         get async {
             guard let captureSession = await cameraSession?.captureSession else {
                 return nil
             }
             for connection in captureSession.connections {
-                if let scene = await connection.videoPreviewLayer?.owningView?.window?.windowScene {
-                    return await scene.interfaceOrientation
+                if let layer = connection.videoPreviewLayer {
+                    return layer
                 }
             }
             return nil
