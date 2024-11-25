@@ -30,9 +30,6 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
             return
         }
         Task { @MainActor in
-//            await cardRecognitionSession.setRegionOfInterestAspectRatio(
-//                Constants.cardAspectRatio
-//            )
             await cardRecognitionSession.setDelegate(self)
             if await cameraSession.start(), await cardRecognitionSession.setCameraSession(cameraSession) {
                 state = .started(.init(captureSession: await cameraSession.captureSession))
