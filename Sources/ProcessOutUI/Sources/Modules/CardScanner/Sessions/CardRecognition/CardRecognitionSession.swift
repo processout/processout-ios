@@ -14,7 +14,7 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
 
     init(
         numberDetector: some CardAttributeDetector<String>,
-        expirationDetector: some CardAttributeDetector<String>,
+        expirationDetector: some CardAttributeDetector<POScannedCard.Expiration>,
         logger: POLogger
     ) {
         self.numberDetector = numberDetector
@@ -70,7 +70,7 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
     // MARK: - Private Properties
 
     private let numberDetector: any CardAttributeDetector<String>
-    private let expirationDetector: any CardAttributeDetector<String>
+    private let expirationDetector: any CardAttributeDetector<POScannedCard.Expiration>
     private let logger: POLogger
 
     private var cameraSession: CameraSession?
@@ -215,6 +215,6 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
         }
         let expiration = expirationDetector.firstMatch(in: candidates)
         // todo(andrii-vysotskyi): match cardholder name
-        return POScannedCard(number: number, expiration: expiration, cardholder: nil)
+        return POScannedCard(number: number, expiration: expiration)
     }
 }

@@ -16,7 +16,7 @@ struct CardExpirationDetector: CardAttributeDetector {
         calendar = Calendar(identifier: .iso8601)
     }
 
-    func firstMatch(in candidates: [String]) -> String? {
+    func firstMatch(in candidates: [String]) -> POScannedCard.Expiration? {
         guard let regex = regexProvider.regex(with: "(0[1-9]|1[0-2])[.\\/](\\d{4}|\\d{2})") else {
             return nil
         }
@@ -34,7 +34,8 @@ struct CardExpirationDetector: CardAttributeDetector {
             guard isDateInFuture(month: month, year: year) else {
                 continue
             }
-            return formatter.string(from: String(month) + String(year % 100))
+            let description = formatter.string(from: String(month) + String(year % 100))
+            return .init(month: month, year: year, description: description)
         }
         return nil
     }
