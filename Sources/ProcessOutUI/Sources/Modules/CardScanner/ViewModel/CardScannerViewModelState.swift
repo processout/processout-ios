@@ -12,7 +12,7 @@ struct CardScannerViewModelState {
     struct Preview {
 
         /// Capture session.
-        var captureSession: AVCaptureSession?
+        let captureSession: AVCaptureSession?
 
         /// Preview aspect ratio.
         let aspectRatio: CGFloat
@@ -22,10 +22,7 @@ struct CardScannerViewModelState {
     let title: String
 
     /// Preview.
-    var preview: Preview
-
-    /// Boolean flag indicating wh
-    var didComplete: Bool
+    let preview: Preview
 }
 
 extension CardScannerViewModelState: AnimationIdentityProvider {

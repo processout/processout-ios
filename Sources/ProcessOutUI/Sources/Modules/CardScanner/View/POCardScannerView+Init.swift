@@ -26,11 +26,13 @@ extension POCardScannerView {
                 ),
                 logger: ProcessOut.shared.logger
             )
-            return DefaultCardScannerViewModel(
+            let interactor = DefaultCardScannerInteractor(
                 cameraSession: .init(),
                 cardRecognitionSession: cardRecognitionSession,
+                logger: ProcessOut.shared.logger,
                 completion: completion
             )
+            return DefaultCardScannerViewModel(interactor: interactor)
         }
         self = .init(viewModel: viewModel())
     }

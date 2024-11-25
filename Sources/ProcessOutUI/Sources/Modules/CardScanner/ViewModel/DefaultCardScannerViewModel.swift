@@ -5,26 +5,19 @@
 //  Created by Andrii Vysotskyi on 12.11.2024.
 //
 
-import Combine
+import AVFoundation
 import UIKit
 @_spi(PO) import ProcessOut
 
 final class DefaultCardScannerViewModel: ViewModel {
 
-    init(
-        cameraSession: CameraSession,
-        cardRecognitionSession: CardRecognitionSession,
-        completion: @escaping (Result<POScannedCard, POFailure>) -> Void
-    ) {
-        self.cameraSession = cameraSession
-        self.cardRecognitionSession = cardRecognitionSession
-        self.completion = completion
-        commonInit()
+    init(interactor: some CardScannerInteractor) {
+        self.interactor = interactor
+        observeChanges(interactor: interactor)
     }
 
     deinit {
-        // todo(andrii-vysotskyi): set cancelled state if needed.
-        Task { [cameraSession] in await cameraSession.stop() }
+        Task { [interactor] in await interactor.cancel() }
     }
 
     // MARK: - CardScannerViewModel
@@ -35,17 +28,7 @@ final class DefaultCardScannerViewModel: ViewModel {
     }
 
     func start() {
-        Task { @MainActor in
-            await cardRecognitionSession.setRegionOfInterestAspectRatio(
-                Constants.previewAspectRatio
-            )
-            await cardRecognitionSession.setDelegate(self)
-            if await cameraSession.start(), await cardRecognitionSession.setCameraSession(cameraSession) {
-                state.preview.captureSession = await cameraSession.captureSession
-            } else {
-                setCompletedState(with: .failure(.init(message: "Unable to start scanning.", code: .generic(.mobile))))
-            }
-        }
+        $_state.performWithoutAnimation(interactor.start)
     }
 
     // MARK: - Private Nested Types
@@ -56,39 +39,35 @@ final class DefaultCardScannerViewModel: ViewModel {
 
     // MARK: - Private Properties
 
-    private let cameraSession: CameraSession
-    private let cardRecognitionSession: CardRecognitionSession
-    private let completion: (Result<POScannedCard, POFailure>) -> Void
+    private let interactor: any CardScannerInteractor
 
     @AnimatablePublished
     private var _state: CardScannerViewModelState! // swiftlint:disable:this implicitly_unwrapped_optional
 
-    // MARK: - Private Methods
+    // MARK: - Interactor Observation
 
-    private func commonInit() {
+    private func observeChanges(interactor: some Interactor) {
+        interactor.didChange = { [weak self] in
+            self?.updateWithInteractorState()
+        }
+        updateWithInteractorState()
+    }
+
+    private func updateWithInteractorState() {
+        let captureSession: AVCaptureSession?
+        switch interactor.state {
+        case .idle:
+            captureSession = nil
+        case .starting:
+            captureSession = nil
+        case .started(let currentState):
+            captureSession = currentState.captureSession
+        case .completed:
+            return
+        }
         state = .init(
             title: String(resource: .CardScanner.title),
-            preview: .init(captureSession: nil, aspectRatio: Constants.previewAspectRatio),
-            didComplete: false
+            preview: .init(captureSession: captureSession, aspectRatio: Constants.previewAspectRatio)
         )
-    }
-
-    private func setCompletedState(with result: Result<POScannedCard, POFailure>) {
-        guard !state.didComplete else {
-            return // Ignore attempt to complete
-        }
-        state.didComplete = true
-        completion(result)
-    }
-}
-
-extension DefaultCardScannerViewModel: CardRecognitionSessionDelegate {
-
-    func cardRecognitionSession(_ session: CardRecognitionSession, didRecognize card: POScannedCard) {
-        Task {
-            await session.setDelegate(nil)
-            await session.stop()
-        }
-        setCompletedState(with: .success(card))
     }
 }
