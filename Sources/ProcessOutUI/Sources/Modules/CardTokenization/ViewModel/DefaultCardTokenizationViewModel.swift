@@ -119,7 +119,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                 guard case .success(let card) = result else {
                     return
                 }
-                self?.interactor.update(parameterId: \.number, value: card.number)
+                self?.interactor.update(with: card)
             }
         }
         return .init(id: "scan-card-button", icon: Image(systemName: "camera"), action: openScanner)
