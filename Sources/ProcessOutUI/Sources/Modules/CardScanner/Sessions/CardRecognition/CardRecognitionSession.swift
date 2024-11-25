@@ -108,17 +108,19 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
             image: image, videoOrientation: videoOrientation
         )
         let textRequest = createTextRecognitionRequest(for: correctedImage)
+        let shapeRequest = createCardShapeRecognitionRequest(for: correctedImage)
         do {
             let handler = VNImageRequestHandler(ciImage: correctedImage)
-            try handler.perform([textRequest])
+            try handler.perform([textRequest, shapeRequest])
         } catch {
             logger.debug("Failed to perform recognition request: \(error).")
             return
         }
-        if let card = scannedCard(in: textRequest.results) {
-            logger.debug("Did recognize card details: \(card).")
-            await delegate?.cardRecognitionSession(self, didRecognize: card)
+        guard !(shapeRequest.results?.isEmpty ?? true), let card = scannedCard(in: textRequest.results) else {
+            return
         }
+        logger.debug("Did recognize card details: \(card).")
+        await delegate?.cardRecognitionSession(self, didRecognize: card)
     }
 
     private func createTextRecognitionRequest(for image: CIImage) -> VNRecognizeTextRequest {
@@ -126,6 +128,18 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
         request.recognitionLevel = .accurate
         request.usesLanguageCorrection = false
         request.recognitionLanguages = ["en-US"]
+        request.regionOfInterest = regionOfInterest(inside: image, aspectRatio: regionOfInterestAspectRatio)
+        return request
+    }
+
+    private func createCardShapeRecognitionRequest(for image: CIImage) -> VNDetectRectanglesRequest {
+        // ISO/IEC 7810 based ± 10%
+        let request = VNDetectRectanglesRequest()
+        request.maximumObservations = 1
+        request.minimumAspectRatio = 1.586 * 0.9
+        request.maximumAspectRatio = 1.586 * 1.1
+        request.minimumSize = 0.5
+        request.minimumConfidence = 0.5
         request.regionOfInterest = regionOfInterest(inside: image, aspectRatio: regionOfInterestAspectRatio)
         return request
     }
