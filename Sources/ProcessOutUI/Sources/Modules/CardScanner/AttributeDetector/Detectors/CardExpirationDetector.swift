@@ -16,11 +16,11 @@ struct CardExpirationDetector: CardAttributeDetector {
         calendar = Calendar(identifier: .iso8601)
     }
 
-    func firstMatch(in candidates: [String]) -> POScannedCard.Expiration? {
+    func firstMatch(in candidates: inout [String]) -> POScannedCard.Expiration? {
         guard let regex = regexProvider.regex(with: "(0[1-9]|1[0-2])[.\\/](\\d{4}|\\d{2})") else {
             return nil
         }
-        for candidate in candidates {
+        for (offset, candidate) in candidates.enumerated() {
             let candidate = candidate.removingCharacters(in: .whitespacesAndNewlines)
             let range = NSRange(candidate.startIndex..., in: candidate)
             guard let match = regex.firstMatch(in: candidate, range: range) else {
@@ -34,6 +34,7 @@ struct CardExpirationDetector: CardAttributeDetector {
             guard isDateInFuture(month: month, year: year) else {
                 continue
             }
+            candidates.remove(at: offset)
             let description = formatter.string(from: String(month) + String(year % 100))
             return .init(month: month, year: year, description: description)
         }

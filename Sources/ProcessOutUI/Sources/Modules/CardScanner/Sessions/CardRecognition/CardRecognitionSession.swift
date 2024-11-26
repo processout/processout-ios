@@ -15,10 +15,12 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
     init(
         numberDetector: some CardAttributeDetector<String>,
         expirationDetector: some CardAttributeDetector<POScannedCard.Expiration>,
+        cardholderDetector: some CardAttributeDetector<String>,
         logger: POLogger
     ) {
         self.numberDetector = numberDetector
         self.expirationDetector = expirationDetector
+        self.cardholderDetector = cardholderDetector
         self.logger = logger
         super.init()
     }
@@ -71,6 +73,7 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
 
     private let numberDetector: any CardAttributeDetector<String>
     private let expirationDetector: any CardAttributeDetector<POScannedCard.Expiration>
+    private let cardholderDetector: any CardAttributeDetector<String>
     private let logger: POLogger
 
     private var cameraSession: CameraSession?
@@ -206,15 +209,14 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
     // MARK: - Card Attributes
 
     private func scannedCard(in observations: [VNRecognizedTextObservation]?) -> POScannedCard? {
-        let candidates = observations?
+        var candidates = observations?
             .compactMap { $0.topCandidates(1).first }
-            .map(\.string)
-        guard let candidates, !candidates.isEmpty,
-              let number = numberDetector.firstMatch(in: candidates) else {
+            .map(\.string) ?? []
+        guard let number = numberDetector.firstMatch(in: &candidates) else {
             return nil
         }
-        let expiration = expirationDetector.firstMatch(in: candidates)
-        // todo(andrii-vysotskyi): match cardholder name
-        return POScannedCard(number: number, expiration: expiration)
+        let expiration = expirationDetector.firstMatch(in: &candidates)
+        let cardholder = cardholderDetector.firstMatch(in: &candidates)
+        return POScannedCard(number: number, expiration: expiration, cardholder: cardholder)
     }
 }

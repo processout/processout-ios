@@ -10,5 +10,5 @@ protocol CardAttributeDetector<Attribute> {
     associatedtype Attribute
 
     /// Attempts to match attribute in given candidates.
-    func firstMatch(in candidates: [String]) -> Attribute?
+    func firstMatch(in candidates: inout [String]) -> Attribute?
 }

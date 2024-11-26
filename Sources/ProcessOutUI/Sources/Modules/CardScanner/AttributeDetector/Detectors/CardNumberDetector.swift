@@ -15,11 +15,11 @@ struct CardNumberDetector: CardAttributeDetector {
         self.formatter = formatter
     }
 
-    func firstMatch(in candidates: [String]) -> String? {
+    func firstMatch(in candidates: inout [String]) -> String? {
         guard let numberRegex = regexProvider.regex(with: "(?:\\d\\s*){12,19}") else {
             return nil
         }
-        for candidate in candidates {
+        for (offset, candidate) in candidates.enumerated() {
             let range = NSRange(candidate.startIndex..., in: candidate)
             guard let match = numberRegex.firstMatch(in: candidate, range: range) else {
                 continue
@@ -28,6 +28,7 @@ struct CardNumberDetector: CardAttributeDetector {
             guard isLengthValid(number: number), isChecksumValid(number: number) else {
                 continue
             }
+            candidates.remove(at: offset)
             return formatter.string(from: number)
         }
         return nil
