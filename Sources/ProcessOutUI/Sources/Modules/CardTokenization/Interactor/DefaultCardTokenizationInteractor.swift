@@ -56,12 +56,16 @@ final class DefaultCardTokenizationInteractor:
         }
         logger.debug("Will update parameters with scanned card: '\(scannedCard)'")
         var newState = currentState
+        newState.number.value = cardNumberFormatter.string(from: scannedCard.number)
+        newState.number.isValid = true
         if let expiration = scannedCard.expiration {
             newState.expiration.value = cardExpirationFormatter.string(from: expiration.description)
             newState.expiration.isValid = true
         }
-        newState.number.value = cardNumberFormatter.string(from: scannedCard.number)
-        newState.number.isValid = true
+        if newState.cardholderName.shouldCollect, let cardholderName = scannedCard.cardholder {
+            newState.cardholderName.value = cardholderName
+            newState.cardholderName.isValid = true
+        }
         // swiftlint:disable:next line_length
         guard newState.number.value != currentState.number.value || newState.expiration.value != currentState.expiration.value else {
             logger.debug("Ignoring same card details \(scannedCard)")
