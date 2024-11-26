@@ -24,4 +24,7 @@ public struct POScannedCard: Sendable {
 
     /// Expiration month and year.
     public let expiration: Expiration?
+
+    /// Cardholder name.
+    public let cardholder: String?
 }
