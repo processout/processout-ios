@@ -26,5 +26,5 @@ public struct POScannedCard: Sendable {
     public let expiration: Expiration?
 
     /// Cardholder name.
-    public let cardholder: String?
+    public let cardholderName: String?
 }

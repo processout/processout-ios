@@ -62,7 +62,7 @@ final class DefaultCardTokenizationInteractor:
             newState.expiration.value = cardExpirationFormatter.string(from: expiration.description)
             newState.expiration.isValid = true
         }
-        if newState.cardholderName.shouldCollect, let cardholderName = scannedCard.cardholder {
+        if newState.cardholderName.shouldCollect, let cardholderName = scannedCard.cardholderName {
             newState.cardholderName.value = cardholderName
             newState.cardholderName.isValid = true
         }

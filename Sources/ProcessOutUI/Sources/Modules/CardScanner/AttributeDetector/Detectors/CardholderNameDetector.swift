@@ -1,5 +1,5 @@
 //
-//  CardholderDetector.swift
+//  CardholderNameDetector.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 25.11.2024.
@@ -7,9 +7,9 @@
 
 import NaturalLanguage
 
-struct CardholderDetector: CardAttributeDetector {
+struct CardholderNameDetector: CardAttributeDetector {
 
-    init(restrictedWords: [String] = CardholderDetector.defaultRestrictedWords) {
+    init(restrictedWords: [String] = CardholderNameDetector.defaultRestrictedWords) {
         self.restrictedWords = restrictedWords
     }
 
@@ -66,7 +66,7 @@ struct CardholderDetector: CardAttributeDetector {
 
 // swiftlint:disable strict_fileprivate
 
-extension CardholderDetector {
+extension CardholderNameDetector {
 
     fileprivate static let defaultRestrictedWords: [String] = [
         "visa",
