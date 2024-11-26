@@ -119,6 +119,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                 guard case .success(let card) = result else {
                     return
                 }
+                self?.state.cardScanner = nil
                 self?.interactor.update(with: card)
             }
         }
