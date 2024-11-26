@@ -11,7 +11,6 @@ import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 // TODOs:
-// - Support scanning card details with camera
 // - Allow selecting card co-scheme when authorizing invoice or assigning token
 
 struct CardTokenizationViewModelState {
