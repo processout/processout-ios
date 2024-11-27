@@ -41,23 +41,8 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
     }
 
     override func cancel() {
-        switch state {
-        case .starting, .started:
-            Task { @MainActor in
-                await cardRecognitionSession.stop()
-                await cardRecognitionSession.setDelegate(nil)
-                await cameraSession.stop()
-            }
-        default:
-            break
-        }
+
         setFailureState(with: .init(message: "Card scanning has been canceled.", code: .cancelled))
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let cardAspectRatio: CGFloat = 1.586 // ISO/IEC 7810 based
     }
 
     // MARK: - Private Properties
@@ -76,6 +61,7 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
             state = .completed(.success(card))
             completion(.success(card))
         }
+        stopSessions()
     }
 
     // MARK: - Failure State
@@ -87,16 +73,23 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
             state = .completed(.failure(failure))
             completion(.failure(failure))
         }
+        stopSessions()
+    }
+
+    // MARK: - Misc
+
+    private func stopSessions() {
+        Task { @MainActor in
+            await cardRecognitionSession.stop()
+            await cardRecognitionSession.setDelegate(nil)
+            await cameraSession.stop()
+        }
     }
 }
 
 extension DefaultCardScannerInteractor: CardRecognitionSessionDelegate {
 
     func cardRecognitionSession(_ session: CardRecognitionSession, didRecognize card: POScannedCard) {
-        Task {
-            await session.setDelegate(nil)
-            await session.stop()
-        }
         setSuccessState(with: card)
     }
 }
