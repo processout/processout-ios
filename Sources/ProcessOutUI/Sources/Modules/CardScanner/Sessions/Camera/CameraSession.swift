@@ -7,6 +7,7 @@
 
 import AVFoundation
 import CoreImage
+@_spi(PO) import ProcessOut
 
 /// An actor that manages the capture pipeline, which includes the capture session, device inputs, and capture outputs.
 /// The app defines it as an `actor` type to ensure that all camera operations happen off of the `@MainActor`.
@@ -51,7 +52,7 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         didOutput sampleBuffer: CMSampleBuffer,
         from connection: AVCaptureConnection
     ) {
-        guard let imageBuffer = sampleBuffer.imageBuffer else {
+        guard !shouldDiscardVideoFrames.wrappedValue, let imageBuffer = sampleBuffer.imageBuffer else {
             return
         }
         let image = CIImage(cvImageBuffer: imageBuffer)
@@ -60,7 +61,9 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
                 image: image, videoOrientation: connection.videoOrientation
             )
             await delegate?.cameraSession(self, didOutput: correctedImage)
+            shouldDiscardVideoFrames.withLock { $0 = false }
         }
+        shouldDiscardVideoFrames.withLock { $0 = true }
     }
 
     // MARK: - Private Properties
@@ -69,6 +72,9 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     private var observations: [NSObjectProtocol]
     private var activeVideoInput: AVCaptureDeviceInput?
     private var activeVideoDataOutput: AVCaptureVideoDataOutput?
+
+    /// Boolean value indicating whether new video frames should be discarded.
+    private nonisolated(unsafe) var shouldDiscardVideoFrames = POUnfairlyLocked(wrappedValue: false)
 
     private weak var delegate: CameraSessionDelegate?
 

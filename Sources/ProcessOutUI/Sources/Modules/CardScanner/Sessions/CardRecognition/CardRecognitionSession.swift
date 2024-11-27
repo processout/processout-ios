@@ -37,35 +37,7 @@ actor CardRecognitionSession: CameraSessionDelegate {
 
     // MARK: - CameraSessionDelegate
 
-    nonisolated func cameraSession(_ session: CameraSession, didOutput image: CIImage) {
-        guard !shouldDiscardVideoFrames.wrappedValue else {
-            return
-        }
-        Task {
-            await self.performRecognition(on: image)
-            shouldDiscardVideoFrames.withLock { $0 = false }
-        }
-        shouldDiscardVideoFrames.withLock { $0 = true }
-    }
-
-    // MARK: - Private Properties
-
-    private let numberDetector: any CardAttributeDetector<String>
-    private let expirationDetector: any CardAttributeDetector<POScannedCard.Expiration>
-    private let cardholderNameDetector: any CardAttributeDetector<String>
-    private let logger: POLogger
-
-    private var cameraSession: CameraSession?
-
-    /// Boolean value indicating whether new video frames should be discarded.
-    private nonisolated(unsafe) var shouldDiscardVideoFrames = POUnfairlyLocked(wrappedValue: false)
-
-    /// Delegate.
-    private weak var delegate: CardRecognitionSessionDelegate?
-
-    // MARK: - Vision
-
-    private func performRecognition(on image: CIImage) async {
+    func cameraSession(_ session: CameraSession, didOutput image: CIImage) async {
         let textRequest = createTextRecognitionRequest()
         let shapeRequest = createCardShapeRecognitionRequest()
         do {
@@ -81,6 +53,20 @@ actor CardRecognitionSession: CameraSessionDelegate {
             await delegate?.cardRecognitionSession(self, didRecognize: card)
         }
     }
+
+    // MARK: - Private Properties
+
+    private let numberDetector: any CardAttributeDetector<String>
+    private let expirationDetector: any CardAttributeDetector<POScannedCard.Expiration>
+    private let cardholderNameDetector: any CardAttributeDetector<String>
+    private let logger: POLogger
+
+    private var cameraSession: CameraSession?
+
+    /// Delegate.
+    private weak var delegate: CardRecognitionSessionDelegate?
+
+    // MARK: - Vision
 
     private func createTextRecognitionRequest() -> VNRecognizeTextRequest {
         let request = VNRecognizeTextRequest()

@@ -10,5 +10,5 @@ import CoreImage
 protocol CameraSessionDelegate: AnyObject, Sendable {
 
     /// Informs delegate about output image.
-    func cameraSession(_ session: CameraSession, didOutput image: CIImage)
+    func cameraSession(_ session: CameraSession, didOutput image: CIImage) async
 }
