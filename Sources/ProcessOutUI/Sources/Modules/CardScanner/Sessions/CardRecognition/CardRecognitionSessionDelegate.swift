@@ -10,4 +10,8 @@ protocol CardRecognitionSessionDelegate: AnyObject, Sendable {
     /// Notifies delegate of recognized card.
     @MainActor
     func cardRecognitionSession(_ session: CardRecognitionSession, didRecognize card: POScannedCard)
+
+    /// Notifies delegate of recognized card.
+    @MainActor
+    func cardRecognitionSessionDidFailToRecognizeCard(_ session: CardRecognitionSession)
 }

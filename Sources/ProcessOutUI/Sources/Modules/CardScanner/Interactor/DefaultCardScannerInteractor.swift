@@ -91,4 +91,8 @@ extension DefaultCardScannerInteractor: CardRecognitionSessionDelegate {
     func cardRecognitionSession(_ session: CardRecognitionSession, didRecognize card: POScannedCard) {
         setSuccessState(with: card)
     }
+
+    func cardRecognitionSessionDidFailToRecognizeCard(_ session: CardRecognitionSession) {
+        // todo(andrii-vysotskyi): discard scanned card
+    }
 }
