@@ -79,7 +79,6 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
 
     private func stopSessions() {
         Task { @MainActor in
-            await cardRecognitionSession.stop()
             await cardRecognitionSession.setDelegate(nil)
             await cameraSession.stop()
         }

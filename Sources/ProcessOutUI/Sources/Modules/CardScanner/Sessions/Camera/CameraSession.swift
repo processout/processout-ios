@@ -6,18 +6,24 @@
 //
 
 import AVFoundation
+import CoreImage
 
 /// An actor that manages the capture pipeline, which includes the capture session, device inputs, and capture outputs.
 /// The app defines it as an `actor` type to ensure that all camera operations happen off of the `@MainActor`.
-actor CameraSession {
+actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
 
-    init() {
+    override init() {
         isConfigured = false
         observations = []
+        super.init()
     }
 
     /// Capture session.
     let captureSession = AVCaptureSession()
+
+    func setDelegate(_ delegate: CameraSessionDelegate?) {
+        self.delegate = delegate
+    }
 
     @discardableResult
     func start() async -> Bool {
@@ -38,31 +44,33 @@ actor CameraSession {
         captureSession.stopRunning()
     }
 
-    // MARK: - Outputs Management
+    // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
 
-    func addOutput(_ output: AVCaptureOutput) -> Bool {
-        guard captureSession.canAddOutput(output) else {
-            return false
+    nonisolated func captureOutput(
+        _ output: AVCaptureOutput,
+        didOutput sampleBuffer: CMSampleBuffer,
+        from connection: AVCaptureConnection
+    ) {
+        guard let imageBuffer = sampleBuffer.imageBuffer else {
+            return
         }
-        captureSession.beginConfiguration()
-        captureSession.addOutput(output)
-        captureSession.commitConfiguration()
-        return true
-    }
-
-    func removeOutput(_ output: AVCaptureOutput) {
-        captureSession.beginConfiguration()
-        captureSession.removeOutput(output)
-        captureSession.commitConfiguration()
+        let image = CIImage(cvImageBuffer: imageBuffer)
+        Task {
+            let correctedImage = await self.corrected(
+                image: image, videoOrientation: connection.videoOrientation
+            )
+            await delegate?.cameraSession(self, didOutput: correctedImage)
+        }
     }
 
     // MARK: - Private Properties
 
     private var isConfigured: Bool
     private var observations: [NSObjectProtocol]
-
-    /// The video input for the currently selected device camera.
     private var activeVideoInput: AVCaptureDeviceInput?
+    private var activeVideoDataOutput: AVCaptureVideoDataOutput?
+
+    private weak var delegate: CameraSessionDelegate?
 
     // MARK: - Authorization
 
@@ -91,7 +99,11 @@ actor CameraSession {
             return true // Return early if already configured.
         }
         observeNotifications()
-        guard configureSessionInput() else {
+        captureSession.beginConfiguration()
+        defer {
+            captureSession.commitConfiguration()
+        }
+        guard configureSessionInput(), configureSessionOutput() else {
             return false
         }
         isConfigured = true
@@ -99,6 +111,9 @@ actor CameraSession {
     }
 
     private func configureSessionInput() -> Bool {
+        guard activeVideoInput == nil else {
+            return true // Already configured
+        }
         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
             return false
         }
@@ -112,10 +127,21 @@ actor CameraSession {
         guard captureSession.canAddInput(videoInput) else {
             return false
         }
-        captureSession.beginConfiguration()
         captureSession.addInput(videoInput)
-        captureSession.commitConfiguration()
         self.activeVideoInput = videoInput
+        return true
+    }
+
+    private func configureSessionOutput() -> Bool {
+        guard activeVideoDataOutput == nil else {
+            return true // Already configured
+        }
+        let videoOutput = createVideoOutput()
+        guard captureSession.canAddOutput(videoOutput) else {
+            return false
+        }
+        captureSession.addOutput(videoOutput)
+        self.activeVideoDataOutput = videoOutput
         return true
     }
 
@@ -131,6 +157,17 @@ actor CameraSession {
             device.automaticallyEnablesLowLightBoostWhenAvailable = true
         }
         device.unlockForConfiguration()
+    }
+
+    private func createVideoOutput() -> AVCaptureVideoDataOutput {
+        let output = AVCaptureVideoDataOutput()
+        output.alwaysDiscardsLateVideoFrames = true
+        output.videoSettings = [
+            kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)
+        ]
+        let queue = DispatchQueue(label: "processout.camera-session", qos: .userInitiated)
+        output.setSampleBufferDelegate(self, queue: queue)
+        return output
     }
 
     // MARK: - Notifications
@@ -154,5 +191,60 @@ actor CameraSession {
         }
         // If the system resets media services, the capture session stops running.
         Task { await start() }
+    }
+
+    // MARK: - Image Correction
+
+    private func corrected(image: CIImage, videoOrientation: AVCaptureVideoOrientation) async -> CIImage {
+        let rotatedImage = image.transformed(
+            by: .init(rotationAngle: await videoRotationAngle(for: videoOrientation))
+        )
+        let translatedImage = rotatedImage.transformed(
+            by: .init(translationX: -rotatedImage.extent.origin.x, y: -rotatedImage.extent.origin.y)
+        )
+        if let aspectRatio = await videoPreviewLayer?.owningView?.bounds.size {
+            let scaledRect = AVMakeRect(
+                aspectRatio: aspectRatio, insideRect: translatedImage.extent
+            )
+            return translatedImage.cropped(to: scaledRect)
+        }
+        return translatedImage
+    }
+
+    /// Returns rotation angle in radians.
+    private func videoRotationAngle(for videoOrientation: AVCaptureVideoOrientation) async -> CGFloat {
+        var angle: CGFloat
+        switch videoOrientation {
+        case .landscapeLeft:
+            angle = 90
+        case .portraitUpsideDown:
+            angle = 180
+        case .landscapeRight:
+            angle = 270
+        default:
+            angle = 0
+        }
+        switch await videoPreviewLayer?.owningView?.window?.windowScene?.interfaceOrientation {
+        case .landscapeRight:
+            angle += 90
+        case .portraitUpsideDown:
+            angle += 180
+        case .landscapeLeft:
+            angle += 270
+        default:
+            angle += 0
+        }
+        return (angle / 180).truncatingRemainder(dividingBy: 360) * .pi
+    }
+
+    // MARK: - Preview Layer
+
+    private var videoPreviewLayer: AVCaptureVideoPreviewLayer? {
+        for connection in captureSession.connections {
+            if let layer = connection.videoPreviewLayer {
+                return layer
+            }
+        }
+        return nil
     }
 }

@@ -10,7 +10,7 @@ import Vision
 import UIKit
 @_spi(PO) import ProcessOut
 
-actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
+actor CardRecognitionSession: CameraSessionDelegate {
 
     init(
         numberDetector: some CardAttributeDetector<String>,
@@ -22,17 +22,11 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
         self.expirationDetector = expirationDetector
         self.cardholderNameDetector = cardholderNameDetector
         self.logger = logger
-        super.init()
     }
 
     /// Starts recognition session using giving camera session as a source.
     func setCameraSession(_ cameraSession: CameraSession) async -> Bool {
-        await stop()
-        let videoOutput = createVideoOutput()
-        guard await cameraSession.addOutput(videoOutput) else {
-            return false
-        }
-        self.videoDataOutput = videoOutput
+        await cameraSession.setDelegate(self)
         self.cameraSession = cameraSession
         return true
     }
@@ -41,29 +35,14 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
         self.delegate = delegate
     }
 
-    /// Invalidates recognition session effectively stopping recognition.
-    func stop() async {
-        if let cameraSession, let videoDataOutput {
-            await cameraSession.removeOutput(videoDataOutput)
-        }
-        cameraSession = nil
-        videoDataOutput = nil
-    }
+    // MARK: - CameraSessionDelegate
 
-    // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
-
-    nonisolated func captureOutput(
-        _ output: AVCaptureOutput,
-        didOutput sampleBuffer: CMSampleBuffer,
-        from connection: AVCaptureConnection
-    ) {
-        guard !shouldDiscardVideoFrames.wrappedValue,
-              let imageBuffer = sampleBuffer.imageBuffer else {
+    nonisolated func cameraSession(_ session: CameraSession, didOutput image: CIImage) {
+        guard !shouldDiscardVideoFrames.wrappedValue else {
             return
         }
-        let image = CIImage(cvImageBuffer: imageBuffer)
         Task {
-            await self.performRecognition(on: image, with: connection.videoOrientation)
+            await self.performRecognition(on: image)
             shouldDiscardVideoFrames.withLock { $0 = false }
         }
         shouldDiscardVideoFrames.withLock { $0 = true }
@@ -77,7 +56,6 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
     private let logger: POLogger
 
     private var cameraSession: CameraSession?
-    private var videoDataOutput: AVCaptureVideoDataOutput?
 
     /// Boolean value indicating whether new video frames should be discarded.
     private nonisolated(unsafe) var shouldDiscardVideoFrames = POUnfairlyLocked(wrappedValue: false)
@@ -85,29 +63,13 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
     /// Delegate.
     private weak var delegate: CardRecognitionSessionDelegate?
 
-    // MARK: - Video Output
-
-    private func createVideoOutput() -> AVCaptureVideoDataOutput {
-        let output = AVCaptureVideoDataOutput()
-        output.alwaysDiscardsLateVideoFrames = true
-        output.videoSettings = [
-            kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)
-        ]
-        let queue = DispatchQueue(label: "processout.card-recognition-session", qos: .userInitiated)
-        output.setSampleBufferDelegate(self, queue: queue)
-        return output
-    }
-
     // MARK: - Vision
 
-    private func performRecognition(on image: CIImage, with videoOrientation: AVCaptureVideoOrientation) async {
-        let correctedImage = await self.corrected(
-            image: image, videoOrientation: videoOrientation
-        )
+    private func performRecognition(on image: CIImage) async {
         let textRequest = createTextRecognitionRequest()
         let shapeRequest = createCardShapeRecognitionRequest()
         do {
-            let handler = VNImageRequestHandler(ciImage: correctedImage)
+            let handler = VNImageRequestHandler(ciImage: image)
             try handler.perform([textRequest, shapeRequest])
         } catch {
             logger.debug("Failed to perform recognition request: \(error).")
@@ -149,66 +111,6 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
                 observation.topCandidates(1).first
             }
         return candidates ?? []
-    }
-
-    // MARK: - Image Correction
-
-    private func corrected(image: CIImage, videoOrientation: AVCaptureVideoOrientation) async -> CIImage {
-        let rotatedImage = image.transformed(
-            by: .init(rotationAngle: await videoRotationAngle(for: videoOrientation))
-        )
-        let translatedImage = rotatedImage.transformed(
-            by: .init(translationX: -rotatedImage.extent.origin.x, y: -rotatedImage.extent.origin.y)
-        )
-        if let aspectRatio = await videoPreviewLayer?.owningView?.bounds.size {
-            let scaledRect = AVMakeRect(
-                aspectRatio: aspectRatio, insideRect: translatedImage.extent
-            )
-            return translatedImage.cropped(to: scaledRect)
-        }
-        return translatedImage
-    }
-
-    /// Returns rotation angle in radians.
-    private func videoRotationAngle(for videoOrientation: AVCaptureVideoOrientation) async -> CGFloat {
-        var angle: CGFloat
-        switch videoOrientation {
-        case .landscapeLeft:
-            angle = 90
-        case .portraitUpsideDown:
-            angle = 180
-        case .landscapeRight:
-            angle = 270
-        default:
-            angle = 0
-        }
-        switch await videoPreviewLayer?.owningView?.window?.windowScene?.interfaceOrientation {
-        case .landscapeRight:
-            angle += 90
-        case .portraitUpsideDown:
-            angle += 180
-        case .landscapeLeft:
-            angle += 270
-        default:
-            angle += 0
-        }
-        return (angle / 180).truncatingRemainder(dividingBy: 360) * .pi
-    }
-
-    // MARK: - Preview Layer
-
-    private var videoPreviewLayer: AVCaptureVideoPreviewLayer? {
-        get async {
-            guard let captureSession = await cameraSession?.captureSession else {
-                return nil
-            }
-            for connection in captureSession.connections {
-                if let layer = connection.videoPreviewLayer {
-                    return layer
-                }
-            }
-            return nil
-        }
     }
 
     // MARK: - Card Attributes
