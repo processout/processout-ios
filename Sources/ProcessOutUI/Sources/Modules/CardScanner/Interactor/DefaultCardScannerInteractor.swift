@@ -41,7 +41,6 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
     }
 
     override func cancel() {
-
         setFailureState(with: .init(message: "Card scanning has been canceled.", code: .cancelled))
     }
 
