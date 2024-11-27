@@ -114,11 +114,11 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
             logger.debug("Failed to perform recognition request: \(error).")
             return
         }
-        guard !(shapeRequest.results?.isEmpty ?? true), let card = scannedCard(in: textRequest.results) else {
-            return
+        let recognizedTexts = self.recognizedTexts(for: textRequest.results, inside: shapeRequest.results?.first)
+        if let card = scannedCard(in: recognizedTexts) {
+            logger.debug("Did recognize card details: \(card).")
+            await delegate?.cardRecognitionSession(self, didRecognize: card)
         }
-        logger.debug("Did recognize card details: \(card).")
-        await delegate?.cardRecognitionSession(self, didRecognize: card)
     }
 
     private func createTextRecognitionRequest(regionOfInterest: CGRect) -> VNRecognizeTextRequest {
@@ -135,8 +135,8 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
         request.maximumObservations = 1
         request.minimumAspectRatio = 1.586 * 0.9 // ISO/IEC 7810 based ± 10%
         request.maximumAspectRatio = 1.586 * 1.1
-        request.minimumSize = 0.5
-        request.minimumConfidence = 0.5
+        request.minimumSize = 0.8
+        request.minimumConfidence = 0.8
         request.regionOfInterest = regionOfInterest
         return request
     }
@@ -150,6 +150,19 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
         } else {
             return CGRect(x: 0, y: 0, width: 1, height: 1)
         }
+    }
+
+    private func recognizedTexts(
+        for textObservation: [VNRecognizedTextObservation]?, inside rectangleObservation: VNRectangleObservation?
+    ) -> [VNRecognizedText] {
+        guard rectangleObservation != nil else {
+            return [] // Abort recognition if card shape is not detected
+        }
+        let candidates = textObservation?
+            .compactMap { observation in
+                observation.topCandidates(1).first
+            }
+        return candidates ?? []
     }
 
     // MARK: - Image Correction
@@ -208,10 +221,8 @@ actor CardRecognitionSession: NSObject, AVCaptureVideoDataOutputSampleBufferDele
 
     // MARK: - Card Attributes
 
-    private func scannedCard(in observations: [VNRecognizedTextObservation]?) -> POScannedCard? {
-        var candidates = observations?
-            .compactMap { $0.topCandidates(1).first }
-            .map(\.string) ?? []
+    private func scannedCard(in recognizedTexts: [VNRecognizedText]) -> POScannedCard? {
+        var candidates = recognizedTexts.compactMap { $0.string }
         guard let number = numberDetector.firstMatch(in: &candidates) else {
             return nil
         }
