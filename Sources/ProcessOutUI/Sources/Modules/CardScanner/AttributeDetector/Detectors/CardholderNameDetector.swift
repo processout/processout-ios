@@ -85,6 +85,8 @@ extension CardholderNameDetector {
         "expiry",
         "date",
         "expiration",
+        "cvv",
+        "cvc",
         "cash",
         "back",
         "td",
