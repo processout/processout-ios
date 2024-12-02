@@ -20,30 +20,31 @@ public struct POCardScannerView: View {
     // MARK: - View
 
     public var body: some View {
-        VStack(spacing: POSpacing.medium) {
-            Text(viewModel.state.title)
-            if let description = viewModel.state.description {
-                Text(description)
-            }
-            CameraPreviewView()
-                .cameraPreviewCaptureSession(viewModel.state.preview.captureSession)
-                .background(Color.gray)
-                .backport.overlay {
-                    if let cardViewModel = viewModel.state.recognizedCard {
-                        CardScannerCardView(viewModel: cardViewModel)
-                    }
+        let configuration = POCardScannerStyleConfiguration(
+            title: {
+                Text(viewModel.state.title)
+            },
+            description: {
+                if let description = viewModel.state.description {
+                    Text(description)
                 }
-                .border(style: .regular(color: .clear))
-                .aspectRatio(viewModel.state.preview.aspectRatio, contentMode: .fit)
-                .frame(maxWidth: .infinity)
-        }
-        .padding(.vertical, POSpacing.medium)
-        .padding(.horizontal, POSpacing.large)
-        .onAppear(perform: viewModel.start)
+            },
+            videoPreview: {
+                CameraPreviewView()
+                    .cameraPreviewCaptureSession(viewModel.state.preview.captureSession)
+                    .aspectRatio(viewModel.state.preview.aspectRatio, contentMode: .fit)
+                    .frame(maxWidth: .infinity)
+            }
+        )
+        AnyView(style.makeBody(configuration: configuration))
+            .onAppear(perform: viewModel.start)
     }
 
     // MARK: - Private Properties
 
     @StateObject
     private var viewModel: AnyViewModel<CardScannerViewModelState>
+
+    @Environment(\.cardScannerStyle)
+    private var style
 }
