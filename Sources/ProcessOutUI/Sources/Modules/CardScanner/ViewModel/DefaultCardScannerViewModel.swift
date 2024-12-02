@@ -8,6 +8,7 @@
 import AVFoundation
 import UIKit
 @_spi(PO) import ProcessOut
+@_spi(PO) import ProcessOutCoreUI
 
 final class DefaultCardScannerViewModel: ViewModel {
 
@@ -54,24 +55,25 @@ final class DefaultCardScannerViewModel: ViewModel {
     }
 
     private func updateWithInteractorState() {
-        let captureSession: AVCaptureSession?, scannedCard: POScannedCard?
         switch interactor.state {
         case .idle, .starting:
-            captureSession = nil
-            scannedCard = nil
+            update(withCaptureSession: nil, scannedCard: nil)
         case .started(let currentState):
-            captureSession = currentState.captureSession
-            scannedCard = currentState.card
+            update(withCaptureSession: currentState.captureSession, scannedCard: currentState.card)
         case .completed:
             return
         }
+    }
+
+    private func update(withCaptureSession captureSession: AVCaptureSession?, scannedCard: POScannedCard?) {
         state = .init(
             title: title,
             description: description,
             preview: .init(
                 captureSession: captureSession, aspectRatio: Constants.previewAspectRatio
             ),
-            recognizedCard: cardViewModel(with: scannedCard)
+            recognizedCard: cardViewModel(with: scannedCard),
+            cancelButton: cancelButtonViewModel
         )
     }
 
@@ -91,6 +93,22 @@ final class DefaultCardScannerViewModel: ViewModel {
             return nil
         }
         return description
+    }
+
+    private var cancelButtonViewModel: POButtonViewModel? {
+        guard let configuration = interactor.configuration.cancelButton else {
+            return nil
+        }
+        let viewModel = POButtonViewModel(
+            id: "cancel-button",
+            title: configuration.title ?? String(resource: .CardScanner.cancelButton),
+            icon: configuration.icon,
+            confirmation: configuration.confirmation.map { .cancel(with: $0, onAppear: nil) },
+            action: { [weak self] in
+                self?.interactor.cancel()
+            }
+        )
+        return viewModel
     }
 
     private func cardViewModel(with card: POScannedCard?) -> CardScannerViewModelState.Card? {

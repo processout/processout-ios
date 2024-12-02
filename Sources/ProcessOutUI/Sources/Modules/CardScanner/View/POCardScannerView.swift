@@ -36,6 +36,12 @@ public struct POCardScannerView: View {
                     .cameraPreviewCaptureSession(viewModel.state.preview.captureSession)
                     .aspectRatio(viewModel.state.preview.aspectRatio, contentMode: .fit)
                     .frame(maxWidth: .infinity)
+            },
+            cancelButton: {
+                if let viewModel = viewModel.state.cancelButton {
+                    Button.create(with: viewModel)
+                        .backport.poControlSize(.small)
+                }
             }
         )
         AnyView(style.makeBody(configuration: configuration))

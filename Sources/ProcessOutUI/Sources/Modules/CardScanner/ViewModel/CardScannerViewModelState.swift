@@ -6,6 +6,7 @@
 //
 
 import AVFoundation
+@_spi(PO) import ProcessOutCoreUI
 
 struct CardScannerViewModelState {
 
@@ -41,6 +42,9 @@ struct CardScannerViewModelState {
 
     /// Recognized card details.
     let recognizedCard: Card?
+
+    /// Cancel button.
+    let cancelButton: POButtonViewModel?
 }
 
 extension CardScannerViewModelState: AnimationIdentityProvider {

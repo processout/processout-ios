@@ -16,5 +16,8 @@ extension POStringResource {
 
         /// Card scanner description.
         static let description = POStringResource("card-scanner.description", comment: "")
+
+        /// Cancel button title.
+        static let cancelButton = POStringResource("card-scanner.cancel-button", comment: "")
     }
 }

@@ -19,7 +19,8 @@ extension POCardScannerStyle where Self == PODefaultCardScannerStyle {
             videoPreview: .init(
                 backgroundColor: Color(poResource: .Button.Primary.Background.default),
                 border: .init(radius: POSpacing.small, width: 0, color: .clear)
-            )
+            ),
+            cancelButton: .secondary
         )
     }
 }

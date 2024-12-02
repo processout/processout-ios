@@ -36,10 +36,19 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
     /// Video preview style.
     public let videoPreview: VideoPreview
 
-    public init(title: POTextStyle, description: POTextStyle, videoPreview: VideoPreview) {
+    /// Cancel button style.
+    public let cancelButton: any ButtonStyle
+
+    public init(
+        title: POTextStyle,
+        description: POTextStyle,
+        videoPreview: VideoPreview,
+        cancelButton: any ButtonStyle
+    ) {
         self.title = title
         self.description = description
         self.videoPreview = videoPreview
+        self.cancelButton = cancelButton
     }
 
     // MARK: - POCardUpdateView
@@ -55,6 +64,8 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
             configuration.videoPreview
                 .background(videoPreview.backgroundColor)
                 .border(style: videoPreview.border)
+            configuration.cancelButton
+                .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
         }
         .padding(POSpacing.medium)
     }
