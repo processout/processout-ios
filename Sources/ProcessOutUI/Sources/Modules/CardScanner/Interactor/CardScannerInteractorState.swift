@@ -14,6 +14,9 @@ enum CardScannerInteractorState: InteractorState {
 
         /// Capture session.
         let captureSession: AVCaptureSession
+
+        /// Currently scanned card details.
+        var card: POScannedCard?
     }
 
     /// Idle state.

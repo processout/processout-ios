@@ -49,8 +49,9 @@ actor CardRecognitionSession: CameraSessionDelegate {
         }
         let recognizedTexts = self.recognizedTexts(for: textRequest.results, inside: shapeRequest.results?.first)
         if let card = scannedCard(in: recognizedTexts) {
-            logger.debug("Did recognize card details: \(card).")
-            await delegate?.cardRecognitionSession(self, didRecognize: card)
+            await validate(scannedCard: card)
+        } else {
+            await abortScannedCardValidation()
         }
     }
 
@@ -62,8 +63,6 @@ actor CardRecognitionSession: CameraSessionDelegate {
     private let logger: POLogger
 
     private var cameraSession: CameraSession?
-
-    /// Delegate.
     private weak var delegate: CardRecognitionSessionDelegate?
 
     // MARK: - Vision
@@ -109,5 +108,44 @@ actor CardRecognitionSession: CameraSessionDelegate {
         let expiration = expirationDetector.firstMatch(in: &candidates)
         let cardholderName = cardholderNameDetector.firstMatch(in: &candidates)
         return POScannedCard(number: number, expiration: expiration, cardholderName: cardholderName)
+    }
+
+    // MARK: - Validation
+
+    private var cardValidationTask: Task<Void, Never>?
+    private var activeScannedCard: POScannedCard?
+
+    private func validate(scannedCard: POScannedCard) async {
+        if scannedCard != activeScannedCard {
+            await abortScannedCardValidation()
+        }
+        guard cardValidationTask == nil else {
+            return
+        }
+        cardValidationTask = Task {
+            try? await Task.sleep(seconds: 2)
+            guard !Task.isCancelled else {
+                return
+            }
+            logger.debug("Did recognize card: \(scannedCard).")
+            activeScannedCard = nil
+            await delegate?.cardRecognitionSession(self, didRecognizeCard: scannedCard)
+        }
+        logger.debug("Will validate scanned card: \(scannedCard).")
+        activeScannedCard = scannedCard
+        await delegate?.cardRecognitionSession(self, willValidateCard: scannedCard)
+    }
+
+    private func abortScannedCardValidation() async {
+        if let task = cardValidationTask {
+            task.cancel()
+            cardValidationTask = nil
+        }
+        guard let card = activeScannedCard else {
+            return
+        }
+        logger.debug("Card validation was interrupted: \(card).")
+        activeScannedCard = nil
+        await delegate?.cardRecognitionSession(self, didFailToValidateCard: card)
     }
 }

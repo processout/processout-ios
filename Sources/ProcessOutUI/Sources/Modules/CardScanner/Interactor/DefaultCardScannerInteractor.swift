@@ -83,15 +83,29 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
             await cameraSession.stop()
         }
     }
+
+    private func setRecognizedCard(_ card: POScannedCard?) {
+        guard case .started(let currentState) = state else {
+            logger.debug("Ignoring attempt to update card in unsupported state: \(state).")
+            return
+        }
+        var newState = currentState
+        newState.card = card
+        self.state = .started(newState)
+    }
 }
 
 extension DefaultCardScannerInteractor: CardRecognitionSessionDelegate {
 
-    func cardRecognitionSession(_ session: CardRecognitionSession, didRecognize card: POScannedCard) {
-        setSuccessState(with: card)
+    func cardRecognitionSession(_ session: CardRecognitionSession, willValidateCard card: POScannedCard) {
+        setRecognizedCard(card)
     }
 
-    func cardRecognitionSessionDidFailToRecognizeCard(_ session: CardRecognitionSession) {
-        // todo(andrii-vysotskyi): discard scanned card
+    func cardRecognitionSession(_ session: CardRecognitionSession, didFailToValidateCard card: POScannedCard) {
+        setRecognizedCard(nil)
+    }
+
+    func cardRecognitionSession(_ session: CardRecognitionSession, didRecognizeCard card: POScannedCard) {
+        setSuccessState(with: card)
     }
 }

@@ -5,9 +5,9 @@
 //  Created by Andrii Vysotskyi on 20.11.2024.
 //
 
-public struct POScannedCard: Sendable {
+public struct POScannedCard: Sendable, Equatable {
 
-    public struct Expiration: Sendable, CustomStringConvertible {
+    public struct Expiration: Sendable, Equatable, CustomStringConvertible {
 
         /// Expiration month.
         public let month: Int
