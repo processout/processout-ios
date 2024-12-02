@@ -13,5 +13,8 @@ extension POStringResource {
 
         /// Card scanner title.
         static let title = POStringResource("card-scanner.title", comment: "")
+
+        /// Card scanner description.
+        static let description = POStringResource("card-scanner.description", comment: "")
     }
 }

@@ -11,11 +11,13 @@ import AVFoundation
 final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorState>, CardScannerInteractor {
 
     init(
+        configuration: POCardScannerConfiguration,
         cameraSession: CameraSession,
         cardRecognitionSession: CardRecognitionSession,
         logger: POLogger,
         completion: @escaping (Result<POScannedCard, POFailure>) -> Void
     ) {
+        self.configuration = configuration
         self.cameraSession = cameraSession
         self.cardRecognitionSession = cardRecognitionSession
         self.logger = logger
@@ -24,6 +26,8 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
     }
 
     // MARK: - CardScannerInteractor
+
+    let configuration: POCardScannerConfiguration
 
     override func start() {
         guard case .idle = state else {

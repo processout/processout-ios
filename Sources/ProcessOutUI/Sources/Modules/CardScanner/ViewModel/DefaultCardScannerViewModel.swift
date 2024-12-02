@@ -66,11 +66,31 @@ final class DefaultCardScannerViewModel: ViewModel {
             return
         }
         state = .init(
-            title: String(resource: .CardScanner.title),
-            description: "Position your card in the frame to scan it.",
-            preview: .init(captureSession: captureSession, aspectRatio: Constants.previewAspectRatio),
+            title: title,
+            description: description,
+            preview: .init(
+                captureSession: captureSession, aspectRatio: Constants.previewAspectRatio
+            ),
             recognizedCard: cardViewModel(with: scannedCard)
         )
+    }
+
+    // MARK: - Misc
+
+    private var title: String? {
+        let title = interactor.configuration.title ?? String(resource: .CardScanner.title)
+        guard !title.isEmpty else {
+            return nil
+        }
+        return description
+    }
+
+    private var description: String? {
+        let description = interactor.configuration.description ?? String(resource: .CardScanner.description)
+        guard !description.isEmpty else {
+            return nil
+        }
+        return description
     }
 
     private func cardViewModel(with card: POScannedCard?) -> CardScannerViewModelState.Card? {

@@ -31,7 +31,7 @@ struct CardScannerViewModelState {
     }
 
     /// Screen title.
-    let title: String
+    let title: String?
 
     /// Description.
     let description: String?
@@ -46,6 +46,6 @@ struct CardScannerViewModelState {
 extension CardScannerViewModelState: AnimationIdentityProvider {
 
     var animationIdentity: AnyHashable {
-        [title, AnyHashable(preview.aspectRatio)]
+        [title, description, AnyHashable(preview.aspectRatio)]
     }
 }

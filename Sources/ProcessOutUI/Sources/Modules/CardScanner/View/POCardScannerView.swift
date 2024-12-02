@@ -22,7 +22,9 @@ public struct POCardScannerView: View {
     public var body: some View {
         let configuration = POCardScannerStyleConfiguration(
             title: {
-                Text(viewModel.state.title)
+                if let title = viewModel.state.title {
+                    Text(title)
+                }
             },
             description: {
                 if let description = viewModel.state.description {
