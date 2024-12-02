@@ -42,3 +42,17 @@ public struct POTypography: Sendable {
         self.paragraphSpacing = paragraphSpacing
     }
 }
+
+extension POTypography {
+
+    /// Returns a typography object that is the same as the typography, but has
+    /// size, line height and paragraph spacing scaled.
+    func scaledBy(_ scale: CGFloat) -> POTypography {
+        .init(
+            font: font.withSize(font.pointSize * scale),
+            textStyle: textStyle,
+            lineHeight: lineHeight * scale,
+            paragraphSpacing: paragraphSpacing * scale
+        )
+    }
+}

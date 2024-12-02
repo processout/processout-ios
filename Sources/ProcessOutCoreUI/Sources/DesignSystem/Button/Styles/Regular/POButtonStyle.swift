@@ -48,7 +48,7 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
                         .progressViewStyle(progressStyle)
                 } else {
                     configuration.label
-                        .textStyle(currentStyle.title)
+                        .textStyle(currentStyle.title.scaledBy(labelTypographyScale(for: controlSize)))
                         .lineLimit(1)
                 }
             }
@@ -83,6 +83,15 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
             return 32
         case .regular:
             return 44
+        }
+    }
+
+    private func labelTypographyScale(for controlSize: POControlSize) -> CGFloat {
+        switch controlSize {
+        case .small:
+            return 0.85
+        case .regular:
+            return 1
         }
     }
 }
