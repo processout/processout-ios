@@ -38,7 +38,7 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
     // MARK: - ButtonStyle
 
     public func makeBody(configuration: Configuration) -> some View {
-        ContentView { isEnabled, isLoading in
+        ContentView { isEnabled, isLoading, controlSize in
             let currentStyle = stateStyle(
                 isEnabled: isEnabled, isLoading: isLoading, isPressed: configuration.isPressed
             )
@@ -52,8 +52,8 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
                         .lineLimit(1)
                 }
             }
-            .padding(Constants.padding)
-            .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
+            .padding(.init(horizontal: POSpacing.small, vertical: POSpacing.extraSmall))
+            .frame(maxWidth: .infinity, minHeight: minHeight(for: controlSize))
             .background(currentStyle.backgroundColor)
             .border(style: currentStyle.border)
             .shadow(style: currentStyle.shadow)
@@ -76,6 +76,15 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
         }
         return isPressed ? highlighted : normal
     }
+
+    private func minHeight(for controlSize: POControlSize) -> CGFloat {
+        switch controlSize {
+        case .small:
+            return 32
+        case .regular:
+            return 44
+        }
+    }
 }
 
 // Environments are not propagated directly to ButtonStyle in any iOS before 14.5 workaround is
@@ -83,19 +92,22 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
 private struct ContentView<Content: View>: View {
 
     @ViewBuilder
-    let content: (_ isEnabled: Bool, _ isLoading: Bool) -> Content
+    let content: (_ isEnabled: Bool, _ isLoading: Bool, _ controlSize: POControlSize) -> Content
+
+    // MARK: - View
 
     var body: some View {
-        content(isEnabled, isLoading)
+        content(isEnabled, isLoading, controlSize)
     }
 
     // MARK: - Private Properties
 
-    @Environment(\.isEnabled) private var isEnabled
-    @Environment(\.isButtonLoading) private var isLoading
-}
+    @Environment(\.isEnabled)
+    private var isEnabled
 
-private enum Constants {
-    static let minHeight: CGFloat = 44
-    static let padding = EdgeInsets(horizontal: POSpacing.small, vertical: POSpacing.extraSmall)
+    @Environment(\.isButtonLoading)
+    private var isLoading
+
+    @Environment(\.poControlSize)
+    private var controlSize
 }

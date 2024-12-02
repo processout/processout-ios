@@ -43,7 +43,7 @@ public struct POBrandButtonStyle: ButtonStyle {
 
     public func makeBody(configuration: Configuration) -> some View {
         // todo(andrii-vysotskyi): add overlay or accept configuration for disabled state if needed
-        ContentView { isEnabled, isLoading, brandColor in
+        ContentView { isEnabled, isLoading, brandColor, controlSize in
             let isBrandColorLight = UIColor(brandColor).isLight() != false
             ZStack {
                 if isLoading {
@@ -55,8 +55,8 @@ public struct POBrandButtonStyle: ButtonStyle {
                         .lineLimit(1)
                 }
             }
-            .padding(Constants.padding)
-            .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
+            .padding(.init(horizontal: POSpacing.small, vertical: POSpacing.extraSmall))
+            .frame(maxWidth: .infinity, minHeight: minHeight(for: controlSize))
             .backport.background {
                 let adjustment = brightnessAdjustment(
                     isPressed: configuration.isPressed, isBrandColorLight: isBrandColorLight
@@ -74,13 +74,6 @@ public struct POBrandButtonStyle: ButtonStyle {
         .backport.geometryGroup()
     }
 
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let padding = EdgeInsets(horizontal: POSpacing.small, vertical: POSpacing.extraSmall)
-        static let minHeight: CGFloat = 44
-    }
-
     // MARK: - Private Methods
 
     private func brightnessAdjustment(isPressed: Bool, isBrandColorLight: Bool) -> Double {
@@ -88,6 +81,15 @@ public struct POBrandButtonStyle: ButtonStyle {
             return 0
         }
         return isBrandColorLight ? -0.08 : 0.15 // Darken if color is light or brighten otherwise
+    }
+
+    private func minHeight(for controlSize: POControlSize) -> CGFloat {
+        switch controlSize {
+        case .small:
+            return 32
+        case .regular:
+            return 44
+        }
     }
 }
 
@@ -97,10 +99,10 @@ public struct POBrandButtonStyle: ButtonStyle {
 private struct ContentView<Content: View>: View {
 
     @ViewBuilder
-    let content: (_ isEnabled: Bool, _ isLoading: Bool, _ brandColor: Color) -> Content
+    let content: (_ isEnabled: Bool, _ isLoading: Bool, _ brandColor: Color, _ controlSize: POControlSize) -> Content
 
     var body: some View {
-        content(isEnabled, isLoading, brandColor)
+        content(isEnabled, isLoading, brandColor, controlSize)
     }
 
     // MARK: - Private Properties
@@ -116,6 +118,9 @@ private struct ContentView<Content: View>: View {
 
     @Environment(\.colorScheme)
     private var colorScheme
+
+    @Environment(\.poControlSize)
+    private var controlSize
 
     // MARK: - Private Methods
 
