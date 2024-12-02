@@ -18,11 +18,29 @@ struct CardScannerViewModelState {
         let aspectRatio: CGFloat
     }
 
+    struct Card {
+
+        /// Card number.
+        let number: String
+
+        /// Card expiration.
+        let expiration: String?
+
+        /// Cardholder name.
+        let cardholderName: String?
+    }
+
     /// Screen title.
     let title: String
 
+    /// Description.
+    let description: String?
+
     /// Preview.
     let preview: Preview
+
+    /// Recognized card details.
+    let recognizedCard: Card?
 }
 
 extension CardScannerViewModelState: AnimationIdentityProvider {

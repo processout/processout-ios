@@ -54,20 +54,29 @@ final class DefaultCardScannerViewModel: ViewModel {
     }
 
     private func updateWithInteractorState() {
-        let captureSession: AVCaptureSession?
+        let captureSession: AVCaptureSession?, scannedCard: POScannedCard?
         switch interactor.state {
-        case .idle:
+        case .idle, .starting:
             captureSession = nil
-        case .starting:
-            captureSession = nil
+            scannedCard = nil
         case .started(let currentState):
             captureSession = currentState.captureSession
+            scannedCard = currentState.card
         case .completed:
             return
         }
         state = .init(
             title: String(resource: .CardScanner.title),
-            preview: .init(captureSession: captureSession, aspectRatio: Constants.previewAspectRatio)
+            description: "Position your card in the frame to scan it.",
+            preview: .init(captureSession: captureSession, aspectRatio: Constants.previewAspectRatio),
+            recognizedCard: cardViewModel(with: scannedCard)
         )
+    }
+
+    private func cardViewModel(with card: POScannedCard?) -> CardScannerViewModelState.Card? {
+        guard let card else {
+            return nil
+        }
+        return .init(number: card.number, expiration: card.expiration?.description, cardholderName: card.cardholderName)
     }
 }
