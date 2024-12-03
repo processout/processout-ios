@@ -45,10 +45,10 @@ struct CardTokenizationContentView: View {
         }
         .sheet(item: $viewModel.state.cardScanner) { scanner in
             if #available(iOS 16.0, *) {
-                POCardScannerView(completion: scanner.completion)
+                POCardScannerView(configuration: scanner.configuration, completion: scanner.completion)
                     .presentationDetents([.fraction(0.75)])
             } else {
-                POCardScannerView(completion: scanner.completion)
+                POCardScannerView(configuration: scanner.configuration, completion: scanner.completion)
             }
         }
         .backport.geometryGroup()

@@ -94,6 +94,9 @@ struct CardTokenizationViewModelState {
 
         let id: String
 
+        /// Card scanner configuration.
+        let configuration: POCardScannerConfiguration
+
         /// Completion.
         let completion: (Result<POScannedCard, POFailure>) -> Void
     }
