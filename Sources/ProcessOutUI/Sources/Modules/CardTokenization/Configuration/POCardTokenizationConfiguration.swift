@@ -73,6 +73,22 @@ public struct POCardTokenizationConfiguration: Sendable {
 
     /// Submit button configuration.
     @MainActor
+    public struct CardScanButton: Sendable {
+
+        /// Button title, such as "Scan card". Pass `nil` title to use default value.
+        public let title: String?
+
+        /// Button icon. Pass `nil` title to use default value.
+        public let icon: AnyView?
+
+        public init<Icon: View>(title: String? = nil, icon: Icon? = AnyView?.none) {
+            self.title = title
+            self.icon = icon.map(AnyView.init(erasing:))
+        }
+    }
+
+    /// Submit button configuration.
+    @MainActor
     @preconcurrency
     public struct SubmitButton: Sendable {
 
@@ -140,6 +156,9 @@ public struct POCardTokenizationConfiguration: Sendable {
     /// to choose whether to save their card details for future payments.
     public let isSavingAllowed: Bool
 
+    /// Card scan button configuration.
+    public let cardScanButton: CardScanButton?
+
     /// Submit button configuration.
     public let submitButton: SubmitButton
 
@@ -157,6 +176,7 @@ public struct POCardTokenizationConfiguration: Sendable {
         cvc: TextField? = .init(),
         billingAddress: BillingAddress = .init(),
         isSavingAllowed: Bool = false,
+        cardScanButton: CardScanButton? = .init(),
         submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = .init(),
         metadata: [String: String]? = nil
@@ -166,6 +186,7 @@ public struct POCardTokenizationConfiguration: Sendable {
         self.cardNumber = cardNumber
         self.expirationDate = expirationDate
         self.cvc = cvc
+        self.cardScanButton = cardScanButton
         self.submitButton = submitButton
         self.cancelButton = cancelButton
         self.billingAddress = billingAddress
@@ -206,6 +227,7 @@ extension POCardTokenizationConfiguration {
         title: String? = nil,
         isCardholderNameInputVisible: Bool = true,
         shouldCollectCvc: Bool = true,
+        cardScanButton: CardScanButton? = .init(),
         primaryActionTitle: String? = nil,
         cancelActionTitle: String? = nil,
         billingAddress: POBillingAddressConfiguration = .init(),
@@ -217,6 +239,7 @@ extension POCardTokenizationConfiguration {
         self.cardNumber = .init()
         self.expirationDate = .init()
         self.cvc = shouldCollectCvc ? .init() : nil
+        self.cardScanButton = cardScanButton
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = cancelActionTitle?.isEmpty == true ? nil : .init(title: cancelActionTitle)
         self.billingAddress = billingAddress

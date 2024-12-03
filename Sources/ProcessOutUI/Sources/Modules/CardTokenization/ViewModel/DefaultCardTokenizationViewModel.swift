@@ -140,7 +140,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             )
         ]
         let items = [
-            cardScanButton(),
+            createCardScanButtonItem(),
             createItem(
                 parameter: startedState.number,
                 placeholder: configuration.cardNumber.prompt ?? String(resource: .CardTokenization.CardDetails.number),
@@ -175,20 +175,22 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         return configuration.cardNumber.icon
     }
 
-    private func cardScanButton() -> State.Item? {
-        // todo(andrii-vysotskyi): validate availability
+    private func createCardScanButtonItem() -> State.Item? {
+        guard let buttonConfiguration = configuration.cardScanButton else {
+            return nil
+        }
         let openScanner: @MainActor () -> Void = { [weak self] in
             self?.state.cardScanner = .init(id: "card-scanner") { result in
-                // self?.state.cardScanner = nil
                 if case .success(let card) = result {
                     self?.interactor.update(with: card)
                 }
+                // self?.state.cardScanner = nil
             }
         }
         let viewModel = POButtonViewModel(
             id: "scan-card-button",
-            title: String(resource: .CardTokenization.Button.scanCard),
-            icon: Image(systemName: "camera"),
+            title: buttonConfiguration.title ?? String(resource: .CardTokenization.Button.scanCard),
+            icon: buttonConfiguration.icon ?? AnyView(Image(systemName: "camera")),
             action: openScanner
         )
         return .button(viewModel)
