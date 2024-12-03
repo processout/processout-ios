@@ -71,7 +71,7 @@ public struct POCardTokenizationConfiguration: Sendable {
         }
     }
 
-    /// Submit button configuration.
+    /// Card scan button configuration.
     @MainActor
     public struct CardScanButton: Sendable {
 

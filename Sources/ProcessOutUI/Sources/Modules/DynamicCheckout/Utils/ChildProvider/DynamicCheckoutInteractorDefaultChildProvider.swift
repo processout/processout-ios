@@ -82,6 +82,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             cvc: methodConfiguration.cvcRequired ? textFieldConfiguration(with: configuration.card.cvc) : nil,
             billingAddress: billingAddressConfiguration(with: methodConfiguration),
             isSavingAllowed: methodConfiguration.savingAllowed,
+            cardScanButton: configuration.card.cardScanButton.map { scanCardButtonConfiguration(with: $0) },
             submitButton: submitButtonConfiguration(with: configuration.submitButton),
             cancelButton: configuration.cancelButton.map { cancelButtonConfiguration(with: $0) },
             metadata: configuration.card.metadata
@@ -103,6 +104,12 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         with configuration: PODynamicCheckoutCardConfiguration.TextField
     ) -> POCardTokenizationConfiguration.TextField {
         .init(prompt: configuration.prompt, icon: configuration.icon)
+    }
+
+    private func scanCardButtonConfiguration(
+        with configuration: PODynamicCheckoutCardConfiguration.CardScanButton
+    ) -> POCardTokenizationConfiguration.CardScanButton {
+        .init(title: configuration.title, icon: configuration.icon)
     }
 
     private func submitButtonConfiguration(
