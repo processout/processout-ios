@@ -5,8 +5,6 @@
 //  Created by Andrii Vysotskyi on 08.09.2023.
 //
 
-#if DEBUG
-
 import SwiftUI
 
 extension View {
@@ -28,18 +26,18 @@ private struct SizeModifier: ViewModifier {
                 }
             )
             .onPreferenceChange(SizePreferenceKey.self) { size in
-                action(size)
+                if let size {
+                    action(size)
+                }
             }
     }
 }
 
 private struct SizePreferenceKey: PreferenceKey {
 
-    static let defaultValue: CGSize = .zero
+    static let defaultValue: CGSize? = nil
 
-    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+    static func reduce(value: inout CGSize?, nextValue: () -> CGSize?) {
         value = nextValue()
     }
 }
-
-#endif
