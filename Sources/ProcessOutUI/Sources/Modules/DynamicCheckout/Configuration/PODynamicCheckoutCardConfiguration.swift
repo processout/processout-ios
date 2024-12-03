@@ -49,22 +49,6 @@ public struct PODynamicCheckoutCardConfiguration: Sendable {
         }
     }
 
-    /// Card scan button configuration.
-    @MainActor
-    public struct CardScanButton: Sendable {
-
-        /// Button title, such as "Scan card". Pass `nil` title to use default value.
-        public let title: String?
-
-        /// Button icon. Pass `nil` title to use default value.
-        public let icon: AnyView?
-
-        public init<Icon: View>(title: String? = nil, icon: Icon? = AnyView?.none) {
-            self.title = title
-            self.icon = icon.map(AnyView.init(erasing:))
-        }
-    }
-
     /// Configuration for the cardholder name text field.
     public let cardholderName: TextField
 
@@ -76,9 +60,6 @@ public struct PODynamicCheckoutCardConfiguration: Sendable {
 
     /// Configuration for the CVC text field.
     public let cvc: TextField
-
-    /// Card scan button configuration.
-    public let cardScanButton: CardScanButton?
 
     /// Card billing address collection configuration.
     public let billingAddress: BillingAddress
@@ -92,7 +73,6 @@ public struct PODynamicCheckoutCardConfiguration: Sendable {
         cardNumber: TextField = .init(),
         expirationDate: TextField = .init(),
         cvc: TextField = .init(),
-        cardScanButton: CardScanButton? = .init(),
         billingAddress: BillingAddress = BillingAddress(),
         metadata: [String: String]? = nil
     ) {
@@ -100,7 +80,6 @@ public struct PODynamicCheckoutCardConfiguration: Sendable {
         self.cardNumber = cardNumber
         self.expirationDate = expirationDate
         self.cvc = cvc
-        self.cardScanButton = cardScanButton
         self.billingAddress = billingAddress
         self.metadata = metadata
     }
