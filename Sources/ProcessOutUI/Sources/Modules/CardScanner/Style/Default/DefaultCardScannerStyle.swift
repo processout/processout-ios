@@ -91,13 +91,20 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
 
     public func makeBody(configuration: Configuration) -> some View {
         VStack(spacing: POSpacing.medium) {
-            VStack(spacing: POSpacing.small) {
-                configuration.title
-                    .textStyle(title)
-                configuration.description
-                    .textStyle(description)
+            POToolbar(alignment: .top, spacing: POSpacing.small) {
+                EmptyView()
+            } principal: {
+                VStack(spacing: POSpacing.small) {
+                    configuration.title
+                        .textStyle(title)
+                    configuration.description
+                        .textStyle(description)
+                }
+                .multilineTextAlignment(.center)
+                .padding(.top, POSpacing.large)
+            } trailing: {
+                EmptyView()
             }
-            .multilineTextAlignment(.center)
             configuration.videoPreview
                 .background(videoPreview.backgroundColor)
                 .backport.overlay {
