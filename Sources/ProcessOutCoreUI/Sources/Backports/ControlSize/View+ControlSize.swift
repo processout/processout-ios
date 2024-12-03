@@ -29,7 +29,7 @@ extension EnvironmentValues {
     /// The size to apply to controls within a view.
     ///
     /// The default is ``POControlSize/regular``.
-    @available(iOS, deprecated: 17, message: "Use View/controlSize directly.")
+    @available(iOS, deprecated: 15, message: "Use View/controlSize directly.")
     public internal(set) var poControlSize: POControlSize {
         get { self[Key.self] }
         set { self[Key.self] = newValue }

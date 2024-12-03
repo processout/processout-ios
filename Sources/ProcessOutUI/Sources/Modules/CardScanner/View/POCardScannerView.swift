@@ -57,7 +57,6 @@ public struct POCardScannerView: View {
             cancelButton: {
                 if let viewModel = viewModel.state.cancelButton {
                     Button.create(with: viewModel)
-                        .backport.poControlSize(.small)
                 }
             },
             card: cardStyleConfiguration
