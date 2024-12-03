@@ -97,6 +97,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                 configuration.description
                     .textStyle(description)
             }
+            .multilineTextAlignment(.center)
             configuration.videoPreview
                 .background(videoPreview.backgroundColor)
                 .backport.overlay {
