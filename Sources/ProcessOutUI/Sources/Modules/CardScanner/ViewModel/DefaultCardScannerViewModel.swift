@@ -84,7 +84,7 @@ final class DefaultCardScannerViewModel: ViewModel {
         guard !title.isEmpty else {
             return nil
         }
-        return description
+        return title
     }
 
     private var description: String? {
