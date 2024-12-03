@@ -106,7 +106,6 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                 .border(style: videoPreview.border)
             configuration.cancelButton
                 .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
-                .backport.poControlSize(.small)
         }
         .padding(POSpacing.medium)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
