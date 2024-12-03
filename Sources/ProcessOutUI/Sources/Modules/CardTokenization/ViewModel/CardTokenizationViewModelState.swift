@@ -23,15 +23,17 @@ struct CardTokenizationViewModelState {
         /// Section title if any.
         let title: String?
 
-        /// Trailing button.
-        let trailingButton: POButtonViewModel?
-
         /// Section items.
         let items: [Item]
     }
 
     enum Item {
-        case group(GroupItem), input(InputItem), picker(PickerItem), toggle(ToggleItem), error(ErrorItem)
+        case group(GroupItem)
+        case input(InputItem)
+        case picker(PickerItem)
+        case toggle(ToggleItem)
+        case button(ButtonItem)
+        case error(ErrorItem)
     }
 
     struct GroupItem: Identifiable {
@@ -42,8 +44,6 @@ struct CardTokenizationViewModelState {
         /// Group items.
         let items: [Item]
     }
-
-    typealias InputItem = POTextFieldViewModel
 
     struct PickerItem: Identifiable {
 
@@ -98,6 +98,9 @@ struct CardTokenizationViewModelState {
         let completion: (Result<POScannedCard, POFailure>) -> Void
     }
 
+    typealias InputItem = POTextFieldViewModel
+    typealias ButtonItem = POButtonViewModel
+
     /// Screen title.
     let title: String?
 
@@ -139,6 +142,8 @@ extension CardTokenizationViewModelState.Item: Identifiable {
         case .toggle(let item):
             return item.id
         case .group(let item):
+            return item.id
+        case .button(let item):
             return item.id
         case .error(let item):
             return item.id

@@ -97,7 +97,6 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             State.Section(
                 id: SectionId.cardInformation,
                 title: nil,
-                trailingButton: createCardScanButton(),
                 items: cardInformationItems
             ),
             preferredSchemeSection(startedState: startedState),
@@ -111,19 +110,6 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             focusedInputId: focusedInputId(startedState: startedState, isSubmitting: isSubmitting)
         )
         return startedState
-    }
-
-    private func createCardScanButton() -> POButtonViewModel? {
-        let openScanner: @MainActor () -> Void = { [weak self] in
-            self?.state.cardScanner = .init(id: "card-scanner") { result in
-                guard case .success(let card) = result else {
-                    return
-                }
-                self?.state.cardScanner = nil
-                self?.interactor.update(with: card)
-            }
-        }
-        return .init(id: "scan-card-button", icon: Image(systemName: "camera"), action: openScanner)
     }
 
     // MARK: - Title
@@ -154,6 +140,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             )
         ]
         let items = [
+            cardScanButton(),
             createItem(
                 parameter: startedState.number,
                 placeholder: configuration.cardNumber.prompt ?? String(resource: .CardTokenization.CardDetails.number),
@@ -188,6 +175,25 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         return configuration.cardNumber.icon
     }
 
+    private func cardScanButton() -> State.Item? {
+        // todo(andrii-vysotskyi): validate availability
+        let openScanner: @MainActor () -> Void = { [weak self] in
+            self?.state.cardScanner = .init(id: "card-scanner") { result in
+                // self?.state.cardScanner = nil
+                if case .success(let card) = result {
+                    self?.interactor.update(with: card)
+                }
+            }
+        }
+        let viewModel = POButtonViewModel(
+            id: "scan-card-button",
+            title: String(resource: .CardTokenization.Button.scanCard),
+            icon: Image(systemName: "camera"),
+            action: openScanner
+        )
+        return .button(viewModel)
+    }
+
     // MARK: - Preferred Scheme
 
     private func preferredSchemeSection(
@@ -216,7 +222,6 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         let section = State.Section(
             id: SectionId.preferredScheme,
             title: String(resource: .CardTokenization.PreferredScheme.title),
-            trailingButton: nil,
             items: [.picker(pickerItem)]
         )
         return section
@@ -240,7 +245,6 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         let section = CardTokenizationViewModelState.Section(
             id: SectionId.billingAddress,
             title: String(resource: .CardTokenization.BillingAddress.title),
-            trailingButton: nil,
             items: items
         )
         return section
@@ -295,7 +299,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             )
         )
         let section = CardTokenizationViewModelState.Section(
-            id: SectionId.futurePayments, title: nil, trailingButton: nil, items: [.toggle(toggleItem)]
+            id: SectionId.futurePayments, title: nil, items: [.toggle(toggleItem)]
         )
         return section
     }
