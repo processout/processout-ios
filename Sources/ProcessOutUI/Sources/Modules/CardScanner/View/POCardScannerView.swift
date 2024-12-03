@@ -20,6 +20,23 @@ public struct POCardScannerView: View {
     // MARK: - View
 
     public var body: some View {
+        AnyView(
+            style.makeBody(configuration: styleConfiguration)
+        )
+        .onAppear(perform: viewModel.start)
+    }
+
+    // MARK: - Private Properties
+
+    @StateObject
+    private var viewModel: AnyViewModel<CardScannerViewModelState>
+
+    @Environment(\.cardScannerStyle)
+    private var style
+
+    // MARK: - Private Methods
+
+    private var styleConfiguration: POCardScannerStyleConfiguration {
         let configuration = POCardScannerStyleConfiguration(
             title: {
                 if let title = viewModel.state.title {
@@ -42,17 +59,31 @@ public struct POCardScannerView: View {
                     Button.create(with: viewModel)
                         .backport.poControlSize(.small)
                 }
-            }
+            },
+            card: cardStyleConfiguration
         )
-        AnyView(style.makeBody(configuration: configuration))
-            .onAppear(perform: viewModel.start)
+        return configuration
     }
 
-    // MARK: - Private Properties
-
-    @StateObject
-    private var viewModel: AnyViewModel<CardScannerViewModelState>
-
-    @Environment(\.cardScannerStyle)
-    private var style
+    private var cardStyleConfiguration: POCardScannerStyleConfiguration.Card? {
+        guard let viewModel = self.viewModel.state.recognizedCard else {
+            return nil
+        }
+        let cardConfiguration = POCardScannerStyleConfiguration.Card(
+            number: {
+                Text(viewModel.number)
+            },
+            expiration: {
+                if let expiration = viewModel.expiration {
+                    Text(expiration)
+                }
+            },
+            cardholderName: {
+                if let cardholderName = viewModel.cardholderName {
+                    Text(cardholderName)
+                }
+            }
+        )
+        return cardConfiguration
+    }
 }

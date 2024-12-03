@@ -18,9 +18,17 @@ extension POCardScannerStyle where Self == PODefaultCardScannerStyle {
             description: POTextStyle(color: Color(poResource: .Text.muted), typography: .body2),
             videoPreview: .init(
                 backgroundColor: Color(poResource: .Button.Primary.Background.default),
-                border: .init(radius: POSpacing.small, width: 0, color: .clear)
+                border: .init(radius: POSpacing.small, width: 0, color: .clear),
+                overlayColor: .black.opacity(0.4)
             ),
-            cancelButton: .secondary
+            card: .init(
+                number: .init(color: Color(poResource: .Text.inverse), typography: .title),
+                cardholderName: .init(color: Color(poResource: .Text.inverse), typography: .body1),
+                expiration: .init(color: Color(poResource: .Text.inverse), typography: .body1),
+                border: .init(radius: POSpacing.small, width: 1, color: Color(poResource: .Text.inverse))
+            ),
+            cancelButton: .secondary,
+            backgroundColor: Color(poResource: .Surface.default)
         )
     }
 }
