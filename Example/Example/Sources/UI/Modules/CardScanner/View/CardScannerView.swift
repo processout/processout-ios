@@ -45,7 +45,7 @@ struct CardScannerView: View {
         switch result {
         case .success(let scannedCard):
             let text = String(
-                localized: .CardScanner.errorMessage,
+                localized: .CardScanner.successMessage,
                 replacements: scannedCard.number,
                 scannedCard.cardholderName ?? "N/A",
                 scannedCard.expiration?.description ?? "N/A"
