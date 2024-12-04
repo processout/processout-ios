@@ -16,6 +16,9 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
     /// Style for normal state.
     public let normal: POButtonStateStyle
 
+    /// Style to use when button is selected.
+    public let selected: POButtonStateStyle
+
     /// Style for highlighted state.
     public let highlighted: POButtonStateStyle
 
@@ -27,11 +30,13 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
 
     public init(
         normal: POButtonStateStyle,
+        selected: POButtonStateStyle? = nil,
         highlighted: POButtonStateStyle,
         disabled: POButtonStateStyle,
         progressStyle: ProgressStyle
     ) {
         self.normal = normal
+        self.selected = selected ?? normal
         self.highlighted = highlighted
         self.disabled = disabled
         self.progressStyle = progressStyle
@@ -40,9 +45,9 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
     // MARK: - ButtonStyle
 
     public func makeBody(configuration: Configuration) -> some View {
-        ContentView { isEnabled, isLoading, controlSize in
+        ContentView { isSelected, isEnabled, isLoading, controlSize in
             let currentStyle = stateStyle(
-                isEnabled: isEnabled, isLoading: isLoading, isPressed: configuration.isPressed
+                isSelected: isSelected, isEnabled: isEnabled, isLoading: isLoading, isPressed: configuration.isPressed
             )
             ZStack {
                 if isLoading {
@@ -69,14 +74,20 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
 
     // MARK: - Private Methods
 
-    private func stateStyle(isEnabled: Bool, isLoading: Bool, isPressed: Bool) -> POButtonStateStyle {
+    private func stateStyle(isSelected: Bool, isEnabled: Bool, isLoading: Bool, isPressed: Bool) -> POButtonStateStyle {
         if isLoading {
             return normal
         }
         if !isEnabled {
             return disabled
         }
-        return isPressed ? highlighted : normal
+        if isPressed {
+            return highlighted
+        }
+        if isSelected {
+            return selected
+        }
+        return normal
     }
 
     private func minHeight(for controlSize: POControlSize) -> CGFloat {
@@ -104,15 +115,18 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
 private struct ContentView<Content: View>: View {
 
     @ViewBuilder
-    let content: (_ isEnabled: Bool, _ isLoading: Bool, _ controlSize: POControlSize) -> Content
+    let content: (_ isSelected: Bool, _ isEnabled: Bool, _ isLoading: Bool, _ controlSize: POControlSize) -> Content
 
     // MARK: - View
 
     var body: some View {
-        content(isEnabled, isLoading, controlSize)
+        content(isSelected, isEnabled, isLoading, controlSize)
     }
 
     // MARK: - Private Properties
+
+    @Environment(\.isRadioButtonSelected)
+    private var isSelected
 
     @Environment(\.isEnabled)
     private var isEnabled
