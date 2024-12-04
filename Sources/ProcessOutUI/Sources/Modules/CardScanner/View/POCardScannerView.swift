@@ -11,6 +11,7 @@ import AVFoundation
 
 @_spi(PO)
 @available(iOS 14, *)
+@MainActor
 public struct POCardScannerView: View {
 
     init(viewModel: @autoclosure @escaping () -> some ViewModel<CardScannerViewModelState>) {

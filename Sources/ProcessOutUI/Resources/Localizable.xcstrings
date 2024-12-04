@@ -1323,6 +1323,16 @@
         }
       }
     },
+    "card-tokenization.scan-card.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan card"
+          }
+        }
+      }
+    },
     "card-tokenization.submit-button.title" : {
       "localizations" : {
         "ar" : {
