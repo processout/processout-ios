@@ -44,6 +44,7 @@ actor CardRecognitionSession: CameraSessionDelegate {
             let handler = VNImageRequestHandler(ciImage: image)
             try handler.perform([textRequest, shapeRequest])
         } catch {
+            await abortScannedCardValidation()
             logger.debug("Failed to perform recognition request: \(error).")
             return
         }
@@ -78,9 +79,10 @@ actor CardRecognitionSession: CameraSessionDelegate {
     private func createCardShapeRecognitionRequest() -> VNDetectRectanglesRequest {
         let request = VNDetectRectanglesRequest()
         request.maximumObservations = 1
-        request.minimumAspectRatio = 1.586 * 0.9 // ISO/IEC 7810 based ± 10%
-        request.maximumAspectRatio = 1.586 * 1.1
-        request.minimumSize = 0.8
+        let idealAspectRatio: VNAspectRatio = 0.631 // ISO/IEC 7810 based ± 10%
+        request.minimumAspectRatio = idealAspectRatio * 0.9
+        request.maximumAspectRatio = idealAspectRatio * 1.1
+        request.minimumSize = 0.7
         request.minimumConfidence = 0.8
         return request
     }
@@ -88,14 +90,32 @@ actor CardRecognitionSession: CameraSessionDelegate {
     private func recognizedTexts(
         for textObservation: [VNRecognizedTextObservation]?, inside rectangleObservation: VNRectangleObservation?
     ) -> [VNRecognizedText] {
-        guard rectangleObservation != nil else {
+        guard let rectangleObservation else {
             return [] // Abort recognition if card shape is not detected
         }
         let candidates = textObservation?
+            .filter { textObservation in
+                shouldInclude(textObservation: textObservation, cardRectangleObservation: rectangleObservation)
+            }
             .compactMap { observation in
                 observation.topCandidates(1).first
             }
         return candidates ?? []
+    }
+
+    private func shouldInclude(
+        textObservation: VNRecognizedTextObservation, cardRectangleObservation: VNRectangleObservation
+    ) -> Bool {
+        let boundingBoxInsetMultiplier = -1.15 // Expands bounding box by 15% of its size
+        let textObservationBox = textObservation.boundingBox.insetBy(
+            dx: textObservation.boundingBox.size.width * boundingBoxInsetMultiplier,
+            dy: textObservation.boundingBox.size.height * boundingBoxInsetMultiplier
+        )
+        let cardObservationBox = cardRectangleObservation.boundingBox.insetBy(
+            dx: cardRectangleObservation.boundingBox.width * boundingBoxInsetMultiplier,
+            dy: cardRectangleObservation.boundingBox.height * boundingBoxInsetMultiplier
+        )
+        return textObservationBox.intersects(cardObservationBox)
     }
 
     // MARK: - Card Attributes
