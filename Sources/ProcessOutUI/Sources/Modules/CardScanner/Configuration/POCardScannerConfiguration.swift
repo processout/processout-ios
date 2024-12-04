@@ -52,3 +52,13 @@ public struct POCardScannerConfiguration: Sendable {
         self.cancelButton = cancelButton
     }
 }
+
+extension POCardScannerConfiguration {
+
+    /// Default configuration.
+    @inlinable
+    @MainActor
+    static var `default`: POCardScannerConfiguration {
+        POCardScannerConfiguration()
+    }
+}
