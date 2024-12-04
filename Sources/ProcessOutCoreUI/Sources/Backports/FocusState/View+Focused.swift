@@ -30,6 +30,7 @@ extension POBackport where Wrapped: View {
 }
 
 @available(iOS 14, *)
+@MainActor
 private struct FocusModifier<Value: Hashable>: ViewModifier {
 
     /// The state binding to register.

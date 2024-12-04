@@ -20,6 +20,12 @@ extension View {
 extension EnvironmentValues {
 
     /// Text content type.
-    @Entry
-    var poTextContentType: UITextContentType?
+    var poTextContentType: UITextContentType? {
+        get { self[Key.self] }
+        set { self[Key.self] = newValue }
+    }
+
+    private struct Key: EnvironmentKey {
+        static let defaultValue: UITextContentType? = nil
+    }
 }

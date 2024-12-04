@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 struct AttributedStringBuilder {
 
     /// The typography of the text.
@@ -114,7 +114,7 @@ struct AttributedStringBuilder {
     }
 }
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 extension AttributedStringBuilder {
 
     func with(updates: (inout AttributedStringBuilder) -> Void) -> AttributedStringBuilder {

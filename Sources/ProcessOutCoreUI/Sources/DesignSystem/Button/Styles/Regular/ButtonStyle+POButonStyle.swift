@@ -12,6 +12,8 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
 
     /// Default style for primary button.
     @_disfavoredOverload
+    @MainActor
+    @preconcurrency
     public static var primary: POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(
@@ -38,6 +40,8 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
 
     /// Default style for secondary button.
     @_disfavoredOverload
+    @MainActor
+    @preconcurrency
     public static var secondary: POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(

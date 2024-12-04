@@ -5,6 +5,10 @@ set -euo pipefail
 # Create temp directory
 WORK_DIR=$(mktemp -d)
 
+# Navigate to project root
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+cd "$SCRIPT_DIR/../.."
+
 # Clean project
 xcodebuild clean
 

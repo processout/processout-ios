@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 struct DefaultCodeFieldStyle: CodeFieldStyle {
 
     func makeBody(configuration: Configuration) -> some View {

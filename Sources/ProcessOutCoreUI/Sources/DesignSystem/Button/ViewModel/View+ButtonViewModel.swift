@@ -11,12 +11,14 @@ extension Button where Label == AnyView {
 
     @_spi(PO)
     @available(iOS 14, *)
+    @MainActor
     public static func create(with viewModel: POButtonViewModel) -> some View {
         ButtonWrapper(viewModel: viewModel)
     }
 }
 
 @available(iOS 14, *)
+@MainActor
 private struct ButtonWrapper: View {
 
     let viewModel: POButtonViewModel

@@ -9,6 +9,8 @@ import SwiftUI
 
 /// Defines button style in all possible states.
 @available(iOS 14, *)
+@MainActor
+@preconcurrency
 public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
 
     /// Style for normal state.
@@ -98,6 +100,7 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
 
 // Environments are not propagated directly to ButtonStyle in any iOS before 14.5 workaround is
 // to wrap content into additional view and extract them.
+@MainActor
 private struct ContentView<Content: View>: View {
 
     @ViewBuilder

@@ -84,3 +84,13 @@ public struct PODynamicCheckoutCardConfiguration: Sendable {
         self.metadata = metadata
     }
 }
+
+extension PODynamicCheckoutCardConfiguration {
+
+    /// Default configuration.
+    @MainActor
+    @inlinable
+    static var `default`: PODynamicCheckoutCardConfiguration {
+        PODynamicCheckoutCardConfiguration()
+    }
+}

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct CheckboxView: View {
 
     /// Determines whether the checkbox is selected or not.

@@ -9,6 +9,7 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
+@MainActor
 struct DynamicCheckoutPaymentSuccessView: View {
 
     let item: DynamicCheckoutViewModelItem.Success

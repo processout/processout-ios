@@ -10,6 +10,8 @@ import SwiftUI
 
 /// View that allows user to pay with APM natively.
 @available(iOS 14, *)
+@MainActor
+@preconcurrency
 public struct PONativeAlternativePaymentView: View {
 
     init(viewModel: @autoclosure @escaping () -> AnyViewModel<NativeAlternativePaymentViewModelState>) {

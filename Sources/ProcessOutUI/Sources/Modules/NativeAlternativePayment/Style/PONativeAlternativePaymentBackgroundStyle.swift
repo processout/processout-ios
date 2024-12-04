@@ -10,6 +10,7 @@ import SwiftUI
 
 /// Native alternative payment method screen background style.
 @MainActor
+@preconcurrency
 public struct PONativeAlternativePaymentBackgroundStyle {
 
     /// Regular background color.

@@ -10,6 +10,8 @@ import SwiftUI
 
 /// View that allows user to enter card details and tokenize it.
 @available(iOS 14, *)
+@MainActor
+@preconcurrency
 public struct POCardUpdateView: View {
 
     init(viewModel: @autoclosure @escaping () -> some CardUpdateViewModel) {

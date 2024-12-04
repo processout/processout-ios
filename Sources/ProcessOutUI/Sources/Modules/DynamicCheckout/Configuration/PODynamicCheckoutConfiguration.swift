@@ -95,11 +95,11 @@ public struct PODynamicCheckoutConfiguration: Sendable {
     /// Capture success screen configuration. In order to avoid showing success screen to user pass `nil`.
     public let paymentSuccess: PaymentSuccess?
 
-    /// Creates configuration instance.
+    // Creates configuration instance.
     public init(
         invoiceRequest: POInvoiceRequest,
-        card: PODynamicCheckoutCardConfiguration = .init(),
-        alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .init(),
+        card: PODynamicCheckoutCardConfiguration = .default,
+        alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .default,
         passKitPaymentButtonType: PKPaymentButtonType = .plain,
         allowsSkippingPaymentList: Bool = true,
         submitButton: SubmitButton = .init(),

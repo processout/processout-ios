@@ -178,6 +178,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
 
     // MARK: - Unknown
 
+    @_spi(PO)
     public struct Unknown: Sendable {
 
         /// Transient ID assigned to method during decoding.
@@ -224,7 +225,9 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
     /// Customer token.
     case customerToken(CustomerToken)
 
-    /// Unknown payment method.
+    /// Placeholder to allow adding additional payment methods while staying backward compatible.
+    /// - Warning: Don't match this case directly, instead use default.
+    @_spi(PO)
     case unknown(Unknown)
 }
 

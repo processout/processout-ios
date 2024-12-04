@@ -19,6 +19,7 @@ extension POTextField where Trailing == AnyView {
 }
 
 @available(iOS 14, *)
+@MainActor
 private struct TextFieldWrapper: View {
 
     let viewModel: POTextFieldViewModel

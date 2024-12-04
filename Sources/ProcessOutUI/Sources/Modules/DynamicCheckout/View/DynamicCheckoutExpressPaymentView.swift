@@ -8,7 +8,8 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
+@MainActor
 struct DynamicCheckoutExpressPaymentView: View {
 
     let item: DynamicCheckoutViewModelItem.ExpressPayment
@@ -31,6 +32,7 @@ struct DynamicCheckoutExpressPaymentView: View {
         .buttonStyle(POAnyButtonStyle(erasing: style.expressPaymentButtonStyle))
         .disabled(item.isLoading)
         .buttonLoading(item.isLoading)
+        .buttonBrandColor(item.brandColor)
         .fontNumberSpacing(.monospaced)
     }
 

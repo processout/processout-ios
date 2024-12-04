@@ -262,4 +262,14 @@ extension POCardTokenizationConfiguration {
     }
 }
 
+extension POCardTokenizationConfiguration {
+
+    /// Default configuration.
+    @MainActor
+    @inlinable
+    static var `default`: POCardTokenizationConfiguration {
+        POCardTokenizationConfiguration()
+    }
+}
+
 // swiftlint:enable nesting
