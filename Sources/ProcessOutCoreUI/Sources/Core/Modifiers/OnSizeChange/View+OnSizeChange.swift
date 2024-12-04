@@ -9,7 +9,8 @@ import SwiftUI
 
 extension View {
 
-    func onSizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
+    @_spi(PO)
+    public func onSizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
         modifier(SizeModifier(action: action))
     }
 }
@@ -19,25 +20,24 @@ private struct SizeModifier: ViewModifier {
     let action: (CGSize) -> Void
 
     func body(content: Content) -> some View {
-        content
-            .background(
-                GeometryReader { geometry in
-                    Color.clear.preference(key: SizePreferenceKey.self, value: geometry.size)
-                }
-            )
-            .onPreferenceChange(SizePreferenceKey.self) { size in
-                if let size {
-                    action(size)
-                }
+        content.backport.background {
+            GeometryReader { geometry in
+                Color.clear.preference(key: SizePreferenceKey.self, value: geometry.size)
             }
+            .onPreferenceChange(SizePreferenceKey.self) { size in
+                if let size { action(size) }
+            }
+        }
     }
 }
 
 private struct SizePreferenceKey: PreferenceKey {
 
-    static let defaultValue: CGSize? = nil
-
     static func reduce(value: inout CGSize?, nextValue: () -> CGSize?) {
-        value = nextValue()
+        if let nextValue = nextValue() {
+            value = nextValue
+        }
     }
+
+    static let defaultValue: CGSize? = nil
 }
