@@ -116,7 +116,9 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
         }
         .padding(POSpacing.medium)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(backgroundColor)
+        .backport.background {
+            backgroundColor.ignoresSafeArea()
+        }
     }
 
     // MARK: - Private Methods

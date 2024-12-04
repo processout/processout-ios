@@ -22,6 +22,9 @@ public protocol POCardScannerStyle: Sendable {
     @ViewBuilder
     func makeBody(configuration: Configuration) -> Self.Body
 
+    /// Background color.
+    var backgroundColor: Color { get }
+
     /// The properties of a card scanner.
     typealias Configuration = POCardScannerStyleConfiguration
 }
