@@ -50,13 +50,19 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
         setFailureState(with: .init(message: "Card scanning has been canceled.", code: .cancelled))
     }
 
-    func setTorchEnabled(_ isEnabled: Bool) async {
-        guard await cameraSession.setTorchEnabled(isEnabled),
-              case .started(let currentState) = state else {
+    func setTorchEnabled(_ isEnabled: Bool) {
+        guard case .started(let currentState) = state else {
+            logger.debug("Ignoring attempt to change torch state in unsupported state: \(state).")
             return
         }
+        if let task = currentState.isTorchEnabled.updateTask {
+            task.cancel()
+        }
         var newState = currentState
-        newState.isTorchEnabled = isEnabled
+        newState.isTorchEnabled.desired = isEnabled
+        newState.isTorchEnabled.updateTask = Task {
+            await enableTorch(isEnabled)
+        }
         state = .started(newState)
     }
 
@@ -73,7 +79,10 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
         guard case .starting = state else {
             return
         }
-        let newState = State.Started(captureSession: captureSession, isTorchEnabled: isTorchEnabled)
+        let newState = State.Started(
+            captureSession: captureSession,
+            isTorchEnabled: .init(current: isTorchEnabled)
+        )
         state = .started(newState)
     }
 
@@ -99,6 +108,19 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
             completion(.failure(failure))
         }
         stopSessions()
+    }
+
+    // MARK: - Torch
+
+    private func enableTorch(_ isEnabled: Bool) async {
+        await cameraSession.setTorchEnabled(isEnabled)
+        let isTorchEnabled = await cameraSession.isTorchEnabled
+        guard case .started(let currentState) = state, !Task.isCancelled else {
+            return
+        }
+        var newState = currentState
+        newState.isTorchEnabled = .init(current: isTorchEnabled)
+        state = .started(newState)
     }
 
     // MARK: - Misc

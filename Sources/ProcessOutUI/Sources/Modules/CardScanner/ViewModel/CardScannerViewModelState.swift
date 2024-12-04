@@ -6,6 +6,7 @@
 //
 
 import AVFoundation
+import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 struct CardScannerViewModelState {
@@ -36,6 +37,9 @@ struct CardScannerViewModelState {
 
     /// Description.
     let description: String?
+
+    /// Boolean value indicating whether torch is enabled.
+    var isTorchEnabled: Binding<Bool>
 
     /// Preview.
     let preview: Preview

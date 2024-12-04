@@ -10,13 +10,25 @@ import ProcessOut
 
 enum CardScannerInteractorState: InteractorState {
 
+    struct Value<T> {
+
+        /// Current value.
+        var current: T
+
+        /// Desired value.
+        var desired: T?
+
+        /// Task that is responsible for current update if any.
+        var updateTask: Task<Void, Never>?
+    }
+
     struct Started {
 
         /// Capture session.
         let captureSession: AVCaptureSession
 
         /// Boolean flag indicating whether torch is enabled.
-        var isTorchEnabled: Bool
+        var isTorchEnabled: Value<Bool>
 
         /// Currently scanned card details.
         var card: POScannedCard?

@@ -46,6 +46,7 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         captureSession.stopRunning()
     }
 
+    @discardableResult
     func setTorchEnabled(_ isEnabled: Bool) -> Bool {
         guard let device = activeVideoInput?.device else {
             return false

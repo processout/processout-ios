@@ -41,6 +41,9 @@ public struct POCardScannerStyleConfiguration {
     /// Card scanner description.
     public let description: AnyView
 
+    /// Torch toggle.
+    public let torchToggle: AnyView
+
     /// Video preview view.
     public let videoPreview: AnyView
 
@@ -54,12 +57,14 @@ public struct POCardScannerStyleConfiguration {
     init(
         @ViewBuilder title: () -> some View,
         @ViewBuilder description: () -> some View,
+        @ViewBuilder torchToggle: () -> some View,
         @ViewBuilder videoPreview: () -> some View,
         @ViewBuilder cancelButton: () -> some View,
         card: Card?
     ) {
         self.title = AnyView(title())
         self.description = AnyView(description())
+        self.torchToggle = AnyView(torchToggle())
         self.videoPreview = AnyView(videoPreview())
         self.cancelButton = AnyView(cancelButton())
         self.card = card

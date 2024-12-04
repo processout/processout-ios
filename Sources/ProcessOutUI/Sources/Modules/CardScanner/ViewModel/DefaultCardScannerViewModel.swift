@@ -57,22 +57,43 @@ final class DefaultCardScannerViewModel: ViewModel {
     private func updateWithInteractorState() {
         switch interactor.state {
         case .idle, .starting:
-            update(withCaptureSession: nil, scannedCard: nil)
+            updateWithStartingState()
         case .started(let currentState):
-            update(withCaptureSession: currentState.captureSession, scannedCard: currentState.card)
+            update(with: currentState)
         case .completed:
             return
         }
     }
 
-    private func update(withCaptureSession captureSession: AVCaptureSession?, scannedCard: POScannedCard?) {
+    private func updateWithStartingState() {
         state = .init(
             title: title,
             description: description,
+            isTorchEnabled: .constant(false),
             preview: .init(
-                captureSession: captureSession, aspectRatio: Constants.previewAspectRatio
+                captureSession: nil, aspectRatio: Constants.previewAspectRatio
             ),
-            recognizedCard: cardViewModel(with: scannedCard),
+            recognizedCard: nil,
+            cancelButton: cancelButtonViewModel
+        )
+    }
+
+    private func update(with startedState: CardScannerInteractorState.Started) {
+        state = .init(
+            title: title,
+            description: description,
+            isTorchEnabled: .init(
+                get: {
+                    startedState.isTorchEnabled.desired ?? startedState.isTorchEnabled.current
+                },
+                set: { [weak self] newValue in
+                    self?.interactor.setTorchEnabled(newValue)
+                }
+            ),
+            preview: .init(
+                captureSession: startedState.captureSession, aspectRatio: Constants.previewAspectRatio
+            ),
+            recognizedCard: cardViewModel(with: startedState.card),
             cancelButton: cancelButtonViewModel
         )
     }

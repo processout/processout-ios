@@ -49,6 +49,12 @@ public struct POCardScannerView: View {
                     Text(description)
                 }
             },
+            torchToggle: {
+                Toggle(isOn: viewModel.state.isTorchEnabled) {
+                    EmptyView()
+                }
+                .fixedSize()
+            },
             videoPreview: {
                 CameraPreviewView()
                     .cameraPreviewCaptureSession(viewModel.state.preview.captureSession)

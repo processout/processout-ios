@@ -92,7 +92,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
     public func makeBody(configuration: Configuration) -> some View {
         VStack(spacing: POSpacing.medium) {
             POToolbar(alignment: .top, spacing: POSpacing.small) {
-                EmptyView()
+                configuration.torchToggle
             } principal: {
                 VStack(spacing: POSpacing.small) {
                     configuration.title
@@ -168,3 +168,6 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
         }
     }
 }
+
+// .shadow(color: .black.opacity(32), radius: 4, x: 0, y: 1)
+// .shadow(color: .black.opacity(32), radius: 16, x: 0, y: 4)
