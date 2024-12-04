@@ -88,17 +88,21 @@ actor CardRecognitionSession: CameraSessionDelegate {
     }
 
     private func recognizedTexts(
-        for textObservation: [VNRecognizedTextObservation]?, inside rectangleObservation: VNRectangleObservation?
+        for textObservations: [VNRecognizedTextObservation]?, inside rectangleObservation: VNRectangleObservation?
     ) -> [VNRecognizedText] {
         guard let rectangleObservation else {
             return [] // Abort recognition if card shape is not detected
         }
-        let candidates = textObservation?
+        let candidates = textObservations?
             .filter { textObservation in
                 shouldInclude(textObservation: textObservation, cardRectangleObservation: rectangleObservation)
             }
-            .compactMap { observation in
-                observation.topCandidates(1).first
+            .sorted { lhs, rhs in
+                // Sort observations bottom-to-top as cardholder names are often in the lower half of the card.
+                lhs.boundingBox.minY > rhs.boundingBox.minY
+            }
+            .compactMap { textObservation in
+                textObservation.topCandidates(1).first
             }
         return candidates ?? []
     }
