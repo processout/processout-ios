@@ -36,7 +36,9 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
         Task { @MainActor in
             await cardRecognitionSession.setDelegate(self)
             if await cameraSession.start(), await cardRecognitionSession.setCameraSession(cameraSession) {
-                state = .started(.init(captureSession: await cameraSession.captureSession))
+                let captureSession = await cameraSession.captureSession
+                let isTorchEnabled = await cameraSession.isTorchEnabled
+                setStartedState(captureSession: captureSession, isTorchEnabled: isTorchEnabled)
             } else {
                 setFailureState(with: .init(message: "Unable to start scanning.", code: .generic(.mobile)))
             }
@@ -48,12 +50,32 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
         setFailureState(with: .init(message: "Card scanning has been canceled.", code: .cancelled))
     }
 
+    func setTorchEnabled(_ isEnabled: Bool) async {
+        guard await cameraSession.setTorchEnabled(isEnabled),
+              case .started(let currentState) = state else {
+            return
+        }
+        var newState = currentState
+        newState.isTorchEnabled = isEnabled
+        state = .started(newState)
+    }
+
     // MARK: - Private Properties
 
     private let cameraSession: CameraSession
     private let cardRecognitionSession: CardRecognitionSession
     private let logger: POLogger
     private let completion: (Result<POScannedCard, POFailure>) -> Void
+
+    // MARK: - Started State
+
+    private func setStartedState(captureSession: AVCaptureSession, isTorchEnabled: Bool) {
+        guard case .starting = state else {
+            return
+        }
+        let newState = State.Started(captureSession: captureSession, isTorchEnabled: isTorchEnabled)
+        state = .started(newState)
+    }
 
     // MARK: - Success State
 

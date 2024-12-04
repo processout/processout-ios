@@ -15,6 +15,9 @@ enum CardScannerInteractorState: InteractorState {
         /// Capture session.
         let captureSession: AVCaptureSession
 
+        /// Boolean flag indicating whether torch is enabled.
+        var isTorchEnabled: Bool
+
         /// Currently scanned card details.
         var card: POScannedCard?
     }

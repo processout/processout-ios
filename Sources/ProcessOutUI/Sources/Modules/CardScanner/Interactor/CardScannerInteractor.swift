@@ -9,4 +9,7 @@ protocol CardScannerInteractor: BaseInteractor<CardScannerInteractorState> {
 
     /// Card scanner configuration.
     var configuration: POCardScannerConfiguration { get }
+
+    /// Enables or disables torch based on given value.
+    func setTorchEnabled(_ isEnabled: Bool) async
 }

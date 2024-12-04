@@ -13,9 +13,10 @@ import CoreImage
 /// The app defines it as an `actor` type to ensure that all camera operations happen off of the `@MainActor`.
 actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
 
-    override init() {
+    init(logger: POLogger) {
         isConfigured = false
         observations = []
+        self.logger = logger
         super.init()
     }
 
@@ -45,6 +46,34 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         captureSession.stopRunning()
     }
 
+    func setTorchEnabled(_ isEnabled: Bool) -> Bool {
+        guard let device = activeVideoInput?.device else {
+            return false
+        }
+        guard device.hasTorch else {
+            return false
+        }
+        do {
+            try device.lockForConfiguration()
+            defer {
+                device.unlockForConfiguration()
+            }
+            if isEnabled {
+                try device.setTorchModeOn(level: AVCaptureDevice.maxAvailableTorchLevel)
+            } else {
+                try device.setTorchModeOn(level: 0)
+            }
+        } catch {
+            logger.debug("Did fail to change torch level: \(error).")
+            return false
+        }
+        return true
+    }
+
+    var isTorchEnabled: Bool {
+        abs(activeVideoInput?.device.torchLevel ?? 0) > 0
+    }
+
     // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
 
     nonisolated func captureOutput(
@@ -68,15 +97,16 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
 
     // MARK: - Private Properties
 
+    private let logger: POLogger
+
     private var isConfigured: Bool
     private var observations: [NSObjectProtocol]
     private var activeVideoInput: AVCaptureDeviceInput?
     private var activeVideoDataOutput: AVCaptureVideoDataOutput?
+    private weak var delegate: CameraSessionDelegate?
 
     /// Boolean value indicating whether new video frames should be discarded.
     private nonisolated(unsafe) var shouldDiscardVideoFrames = POUnfairlyLocked(wrappedValue: false)
-
-    private weak var delegate: CameraSessionDelegate?
 
     // MARK: - Authorization
 
