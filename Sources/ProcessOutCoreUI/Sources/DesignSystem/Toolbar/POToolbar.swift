@@ -34,11 +34,12 @@ public struct POToolbar<Leading: View, Principal: View, Trailing: View>: View {
                     .onSizeChange { size in
                         leadingSize = size
                     }
-                Spacer()
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 trailing()
                     .onSizeChange { size in
                         trailingSize = size
                     }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
             }
             principal()
                 .padding(.horizontal, max(leadingSize?.width ?? 0, trailingSize?.width ?? 0))
