@@ -23,7 +23,7 @@ extension View {
     @_spi(PO)
     @ViewBuilder
     public func controlWidth(_ controlWidth: POControlWidth) -> some View {
-        environment(\.poControlWidth, controlWidth).controlSize
+        environment(\.poControlWidth, controlWidth)
     }
 }
 
