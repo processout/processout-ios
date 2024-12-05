@@ -17,7 +17,7 @@ extension View {
 
 extension EnvironmentValues {
 
-    /// Indicates whether radio button is currently selected. It is expected that
+    /// Indicates whether control is currently selected. It is expected that
     /// `ButtonStyle` implementation should respond to this environment
     /// changes (see ``PORadioButtonStyle`` as a reference).
     public var poControlSelected: Bool {
