@@ -164,7 +164,7 @@ public struct POCardTokenizationConfiguration: Sendable {
 
     /// Card scanner configuration.
     @_spi(PO)
-    public var cardScanner: CardScanner? = .init()
+    public var cardScanner: CardScanner?
 
     /// Boolean flag determines whether user will be asked to select scheme if co-scheme is available.
     @_spi(PO)
