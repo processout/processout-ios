@@ -184,7 +184,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                 if case .success(let card) = result {
                     self?.interactor.update(with: card)
                 }
-                // self?.state.cardScanner = nil
+                self?.state.cardScanner = nil
             }
         }
         let viewModel = POButtonViewModel(
