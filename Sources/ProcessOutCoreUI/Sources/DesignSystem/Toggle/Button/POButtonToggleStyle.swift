@@ -30,11 +30,3 @@ public struct POButtonToggleStyle: ToggleStyle {
 
     private let buttonStyle: any ButtonStyle
 }
-
-@available(iOS 14, *)
-extension ToggleStyle where Self == POButtonToggleStyle {
-
-    public static var poButton: POButtonToggleStyle {
-        POButtonToggleStyle(buttonStyle: .ghost)
-    }
-}

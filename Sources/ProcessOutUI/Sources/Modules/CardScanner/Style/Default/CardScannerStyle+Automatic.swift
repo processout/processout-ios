@@ -16,6 +16,7 @@ extension POCardScannerStyle where Self == PODefaultCardScannerStyle {
         PODefaultCardScannerStyle(
             title: POTextStyle(color: Color(poResource: .Text.primary), typography: .body1),
             description: POTextStyle(color: Color(poResource: .Text.muted), typography: .body2),
+            torchToggle: POButtonToggleStyle(buttonStyle: .ghost),
             videoPreview: .init(
                 backgroundColor: Color(poResource: .Button.Primary.Background.default),
                 border: .init(radius: POSpacing.small, width: 0, color: .clear),

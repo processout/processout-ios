@@ -59,6 +59,9 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
     /// Description style.
     public let description: POTextStyle
 
+    /// Torch toggle style.
+    public let torchToggle: any ToggleStyle
+
     /// Video preview style.
     public let videoPreview: VideoPreview
 
@@ -74,6 +77,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
     public init(
         title: POTextStyle,
         description: POTextStyle,
+        torchToggle: any ToggleStyle,
         videoPreview: VideoPreview,
         card: Card,
         cancelButton: any ButtonStyle,
@@ -81,6 +85,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
     ) {
         self.title = title
         self.description = description
+        self.torchToggle = torchToggle
         self.videoPreview = videoPreview
         self.card = card
         self.cancelButton = cancelButton
@@ -93,6 +98,10 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
         VStack(spacing: POSpacing.medium) {
             POToolbar(alignment: .top, spacing: POSpacing.small) {
                 configuration.torchToggle
+                    .poToggleStyle(torchToggle)
+                    .buttonStyle(.ghost)
+                    .backport.poControlSize(.small)
+                    .controlWidth(.regular)
             } principal: {
                 VStack(spacing: POSpacing.small) {
                     configuration.title
