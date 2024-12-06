@@ -115,6 +115,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                 EmptyView()
             }
             configuration.videoPreview
+                .frame(maxWidth: .infinity)
                 .background(videoPreview.backgroundColor)
                 .backport.overlay {
                     makeBody(cardConfiguration: configuration.card)
@@ -156,6 +157,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                     .tracking(card.number.typography.font.pointSize * 0.05)
                     .textStyle(card.number)
                     .minimumScaleFactor(0.01)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
                 HStack(alignment: .bottom, spacing: POSpacing.small) {
                     configuration?.cardholderName?
                         .tracking(card.cardholderName.typography.font.pointSize * 0.05)
@@ -167,6 +169,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                         .textStyle(card.expiration)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
+                .frame(maxHeight: .infinity, alignment: .top)
             }
             .lineLimit(1)
             .allowsTightening(true)
