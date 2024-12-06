@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+/// Toggle style that uses a Button to represent the toggle's behavior, styled with a
+/// user-provided ButtonStyle
 @available(iOS 14, *)
 public struct POButtonToggleStyle: ToggleStyle {
 
