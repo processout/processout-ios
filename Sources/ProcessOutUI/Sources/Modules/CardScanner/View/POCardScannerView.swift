@@ -59,9 +59,8 @@ public struct POCardScannerView: View {
             },
             videoPreview: {
                 CameraPreviewView()
-                    .cameraPreviewCaptureSession(viewModel.state.preview.captureSession)
+                    .cameraSessionPreviewSource(viewModel.state.preview.source)
                     .aspectRatio(viewModel.state.preview.aspectRatio, contentMode: .fit)
-                    .frame(maxWidth: .infinity)
             },
             cancelButton: {
                 if let viewModel = viewModel.state.cancelButton {

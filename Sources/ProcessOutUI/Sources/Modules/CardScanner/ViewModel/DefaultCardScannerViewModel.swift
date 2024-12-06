@@ -71,7 +71,7 @@ final class DefaultCardScannerViewModel: ViewModel {
             description: description,
             isTorchEnabled: .constant(false),
             preview: .init(
-                captureSession: nil, aspectRatio: Constants.previewAspectRatio
+                source: nil, aspectRatio: Constants.previewAspectRatio
             ),
             recognizedCard: nil,
             cancelButton: cancelButtonViewModel
@@ -91,7 +91,7 @@ final class DefaultCardScannerViewModel: ViewModel {
                 }
             ),
             preview: .init(
-                captureSession: startedState.captureSession, aspectRatio: Constants.previewAspectRatio
+                source: startedState.previewSource, aspectRatio: Constants.previewAspectRatio
             ),
             recognizedCard: cardViewModel(with: startedState.card),
             cancelButton: cancelButtonViewModel

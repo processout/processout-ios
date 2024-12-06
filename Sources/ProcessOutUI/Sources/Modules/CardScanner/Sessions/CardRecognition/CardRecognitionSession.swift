@@ -44,23 +44,22 @@ actor CardRecognitionSession: CameraSessionDelegate {
             let handler = VNImageRequestHandler(ciImage: image)
             try handler.perform([textRequest, shapeRequest])
         } catch {
-            await abortScannedCardValidation()
             logger.debug("Failed to perform recognition request: \(error).")
+            await process(scannedCard: nil)
             return
         }
-        let recognizedTexts = self.recognizedTexts(for: textRequest.results, inside: shapeRequest.results?.first)
-        if let card = scannedCard(in: recognizedTexts) {
-            await validate(scannedCard: card)
-        } else {
-            await abortScannedCardValidation()
-        }
+        let recognizedTexts = recognizedTexts(for: textRequest.results, inside: shapeRequest.results?.first)
+        await process(scannedCard: scannedCard(in: recognizedTexts))
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let minimumConfidence: VNConfidence = 0.8
     }
 
     // MARK: - Private Properties
 
-    private let numberDetector: any CardAttributeDetector<String>
-    private let expirationDetector: any CardAttributeDetector<POScannedCard.Expiration>
-    private let cardholderNameDetector: any CardAttributeDetector<String>
     private let logger: POLogger
 
     private var cameraSession: CameraSession?
@@ -82,8 +81,8 @@ actor CardRecognitionSession: CameraSessionDelegate {
         let idealAspectRatio: VNAspectRatio = 0.631 // ISO/IEC 7810 based ± 10%
         request.minimumAspectRatio = idealAspectRatio * 0.9
         request.maximumAspectRatio = idealAspectRatio * 1.1
-        request.minimumSize = 0.7
-        request.minimumConfidence = 0.8
+        request.minimumSize = 0.25
+        request.minimumConfidence = Constants.minimumConfidence
         return request
     }
 
@@ -99,7 +98,7 @@ actor CardRecognitionSession: CameraSessionDelegate {
             }
             .sorted { lhs, rhs in
                 // Sort observations bottom-to-top as cardholder names are often in the lower half of the card.
-                lhs.boundingBox.minY > rhs.boundingBox.minY
+                lhs.boundingBox.minY < rhs.boundingBox.minY
             }
             .compactMap { textObservation in
                 textObservation.topCandidates(1).first
@@ -110,19 +109,17 @@ actor CardRecognitionSession: CameraSessionDelegate {
     private func shouldInclude(
         textObservation: VNRecognizedTextObservation, cardRectangleObservation: VNRectangleObservation
     ) -> Bool {
-        let boundingBoxInsetMultiplier = -1.15 // Expands bounding box by 15% of its size
-        let textObservationBox = textObservation.boundingBox.insetBy(
-            dx: textObservation.boundingBox.size.width * boundingBoxInsetMultiplier,
-            dy: textObservation.boundingBox.size.height * boundingBoxInsetMultiplier
-        )
-        let cardObservationBox = cardRectangleObservation.boundingBox.insetBy(
-            dx: cardRectangleObservation.boundingBox.width * boundingBoxInsetMultiplier,
-            dy: cardRectangleObservation.boundingBox.height * boundingBoxInsetMultiplier
-        )
-        return textObservationBox.intersects(cardObservationBox)
+        guard textObservation.confidence > Constants.minimumConfidence else {
+            return false
+        }
+        return textObservation.boundingBox.intersects(cardRectangleObservation.boundingBox)
     }
 
     // MARK: - Card Attributes
+
+    private let numberDetector: any CardAttributeDetector<String>
+    private let expirationDetector: any CardAttributeDetector<POScannedCard.Expiration>
+    private let cardholderNameDetector: any CardAttributeDetector<String>
 
     private func scannedCard(in recognizedTexts: [VNRecognizedText]) -> POScannedCard? {
         var candidates = recognizedTexts.compactMap { $0.string }
@@ -134,42 +131,21 @@ actor CardRecognitionSession: CameraSessionDelegate {
         return POScannedCard(number: number, expiration: expiration, cardholderName: cardholderName)
     }
 
-    // MARK: - Validation
+    // MARK: - Scanned Card Processing
 
-    private var cardValidationTask: Task<Void, Never>?
-    private var activeScannedCard: POScannedCard?
+    private let errorCorrection = CardRecognitionSessionErrorCorrection()
+    private var lastErrorCorrectedCard: POScannedCard?
 
-    private func validate(scannedCard: POScannedCard) async {
-        if scannedCard != activeScannedCard {
-            await abortScannedCardValidation()
-        }
-        guard cardValidationTask == nil else {
+    private func process(scannedCard: POScannedCard?) async {
+        guard let errorCorrectedCard = errorCorrection.add(scannedCard: scannedCard) else {
             return
         }
-        cardValidationTask = Task {
-            try? await Task.sleep(seconds: 2)
-            guard !Task.isCancelled else {
-                return
-            }
-            logger.debug("Did recognize card: \(scannedCard).")
-            activeScannedCard = nil
-            await delegate?.cardRecognitionSession(self, didRecognizeCard: scannedCard)
+        if errorCorrectedCard != lastErrorCorrectedCard {
+            lastErrorCorrectedCard = errorCorrectedCard
+            await delegate?.cardRecognitionSession(self, didUpdateCard: errorCorrectedCard)
         }
-        logger.debug("Will validate scanned card: \(scannedCard).")
-        activeScannedCard = scannedCard
-        await delegate?.cardRecognitionSession(self, willValidateCard: scannedCard)
-    }
-
-    private func abortScannedCardValidation() async {
-        if let task = cardValidationTask {
-            task.cancel()
-            cardValidationTask = nil
+        if errorCorrection.isConfident {
+            await delegate?.cardRecognitionSession(self, didRecognizeCard: errorCorrectedCard)
         }
-        guard let card = activeScannedCard else {
-            return
-        }
-        logger.debug("Card validation was interrupted: \(card).")
-        activeScannedCard = nil
-        await delegate?.cardRecognitionSession(self, didFailToValidateCard: card)
     }
 }

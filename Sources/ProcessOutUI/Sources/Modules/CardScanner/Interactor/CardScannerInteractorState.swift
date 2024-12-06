@@ -24,8 +24,8 @@ enum CardScannerInteractorState: InteractorState {
 
     struct Started {
 
-        /// Capture session.
-        let captureSession: AVCaptureSession
+        /// Preview source.
+        let previewSource: CameraSessionPreviewSource
 
         /// Boolean flag indicating whether torch is enabled.
         var isTorchEnabled: Value<Bool>

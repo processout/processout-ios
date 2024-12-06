@@ -36,9 +36,9 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
         Task { @MainActor in
             await cardRecognitionSession.setDelegate(self)
             if await cameraSession.start(), await cardRecognitionSession.setCameraSession(cameraSession) {
-                let captureSession = await cameraSession.captureSession
+                let previewSource = await cameraSession.previewSource
                 let isTorchEnabled = await cameraSession.isTorchEnabled
-                setStartedState(captureSession: captureSession, isTorchEnabled: isTorchEnabled)
+                setStartedState(previewSource: previewSource, isTorchEnabled: isTorchEnabled)
             } else {
                 setFailureState(with: .init(message: "Unable to start scanning.", code: .generic(.mobile)))
             }
@@ -75,13 +75,12 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
 
     // MARK: - Started State
 
-    private func setStartedState(captureSession: AVCaptureSession, isTorchEnabled: Bool) {
+    private func setStartedState(previewSource: CameraSessionPreviewSource, isTorchEnabled: Bool) {
         guard case .starting = state else {
             return
         }
         let newState = State.Started(
-            captureSession: captureSession,
-            isTorchEnabled: .init(current: isTorchEnabled)
+            previewSource: previewSource, isTorchEnabled: .init(current: isTorchEnabled)
         )
         state = .started(newState)
     }
@@ -145,12 +144,8 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
 
 extension DefaultCardScannerInteractor: CardRecognitionSessionDelegate {
 
-    func cardRecognitionSession(_ session: CardRecognitionSession, willValidateCard card: POScannedCard) {
+    func cardRecognitionSession(_ session: CardRecognitionSession, didUpdateCard card: POScannedCard) {
         setRecognizedCard(card)
-    }
-
-    func cardRecognitionSession(_ session: CardRecognitionSession, didFailToValidateCard card: POScannedCard) {
-        setRecognizedCard(nil)
     }
 
     func cardRecognitionSession(_ session: CardRecognitionSession, didRecognizeCard card: POScannedCard) {

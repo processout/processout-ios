@@ -5,23 +5,57 @@
 //  Created by Andrii Vysotskyi on 12.11.2024.
 //
 
+// swiftlint:disable type_body_length
+
 import AVFoundation
 import CoreImage
 @_spi(PO) import ProcessOut
 
 /// An actor that manages the capture pipeline, which includes the capture session, device inputs, and capture outputs.
 /// The app defines it as an `actor` type to ensure that all camera operations happen off of the `@MainActor`.
-actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
+actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, CameraSessionPreviewSource {
 
     init(logger: POLogger) {
+        dispatchQueue = DispatchQueue(label: "processout.camera-session", qos: .userInitiated)
+        executor = DispatchQueueExecutor(queue: dispatchQueue)
         isConfigured = false
         observations = []
         self.logger = logger
         super.init()
     }
 
-    /// Capture session.
-    let captureSession = AVCaptureSession()
+    // MARK: - Actor
+
+    nonisolated var unownedExecutor: UnownedSerialExecutor {
+        executor.asUnownedSerialExecutor()
+    }
+
+    // MARK: - Preview Source
+
+    var previewSource: CameraSessionPreviewSource {
+        self
+    }
+
+    nonisolated func connect(to target: any CameraSessionPreviewTarget) {
+        Task {
+            await target.setCameraSession(self, captureSession: captureSession)
+        }
+    }
+
+    @discardableResult
+    func addConnection(_ connection: AVCaptureConnection) -> Bool {
+        captureSession.beginConfiguration()
+        defer {
+            captureSession.commitConfiguration()
+        }
+        if captureSession.canAddConnection(connection) {
+            captureSession.addConnection(connection)
+            return true
+        }
+        return false
+    }
+
+    // MARK: - Camera Session
 
     func setDelegate(_ delegate: CameraSessionDelegate?) {
         self.delegate = delegate
@@ -62,7 +96,7 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
             if isEnabled {
                 try device.setTorchModeOn(level: AVCaptureDevice.maxAvailableTorchLevel)
             } else {
-                try device.setTorchModeOn(level: 0)
+                device.torchMode = .off
             }
         } catch {
             logger.debug("Did fail to change torch level: \(error).")
@@ -72,7 +106,10 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     }
 
     var isTorchEnabled: Bool {
-        abs(activeVideoInput?.device.torchLevel ?? 0) > 0
+        guard let device = activeVideoInput?.device else {
+            return false
+        }
+        return device.torchMode != .off
     }
 
     // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
@@ -98,7 +135,10 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
 
     // MARK: - Private Properties
 
+    private let dispatchQueue: DispatchQueue
+    private let executor: any SerialExecutor
     private let logger: POLogger
+    private let captureSession = AVCaptureSession()
 
     private var isConfigured: Bool
     private var observations: [NSObjectProtocol]
@@ -202,8 +242,7 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         output.videoSettings = [
             kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)
         ]
-        let queue = DispatchQueue(label: "processout.camera-session", qos: .userInitiated)
-        output.setSampleBufferDelegate(self, queue: queue)
+        output.setSampleBufferDelegate(self, queue: dispatchQueue)
         return output
     }
 
@@ -232,6 +271,7 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
 
     // MARK: - Image Correction
 
+    @MainActor
     private func corrected(image: CIImage, videoOrientation: AVCaptureVideoOrientation) async -> CIImage {
         let rotatedImage = image.transformed(
             by: .init(rotationAngle: await videoRotationAngle(for: videoOrientation))
@@ -249,6 +289,7 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     }
 
     /// Returns rotation angle in radians.
+    @MainActor
     private func videoRotationAngle(for videoOrientation: AVCaptureVideoOrientation) async -> CGFloat {
         var angle: CGFloat
         switch videoOrientation {
@@ -285,3 +326,5 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         return nil
     }
 }
+
+// swiftlint:enable type_body_length

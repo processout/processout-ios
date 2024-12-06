@@ -13,8 +13,8 @@ struct CardScannerViewModelState {
 
     struct Preview {
 
-        /// Capture session.
-        let captureSession: AVCaptureSession?
+        /// Preview source.
+        let source: CameraSessionPreviewSource?
 
         /// Preview aspect ratio.
         let aspectRatio: CGFloat

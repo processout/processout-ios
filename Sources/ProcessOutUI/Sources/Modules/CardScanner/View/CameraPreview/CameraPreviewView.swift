@@ -23,11 +23,11 @@ private struct CameraPreviewViewRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: CameraPreviewUiView, context: Context) {
-        uiView.setSession(context.environment.cameraPreviewCaptureSession)
+        uiView.setPreviewSource(context.environment.cameraSessionPreviewSource)
     }
 }
 
-private final class CameraPreviewUiView: UIView {
+private final class CameraPreviewUiView: UIView, CameraSessionPreviewTarget {
 
     init() {
         super.init(frame: .zero)
@@ -53,11 +53,29 @@ private final class CameraPreviewUiView: UIView {
         super.layer as! AVCaptureVideoPreviewLayer // swiftlint:disable:this force_cast
     }
 
-    // MARK: -
+    // MARK: - Preview Target
 
-    func setSession(_ session: AVCaptureSession?) {
-        layer.session = session
-        updateInterfaceOrientation()
+    func setPreviewSource(_ source: CameraSessionPreviewSource?) {
+        if let source {
+            source.connect(to: self)
+        } else {
+            layer.session = nil
+        }
+    }
+
+    func setCameraSession(_ cameraSession: CameraSession, captureSession: AVCaptureSession) {
+        guard layer.session != captureSession else {
+            return
+        }
+        guard let videoPort = videoPort(with: captureSession) else {
+            return
+        }
+        let connection = AVCaptureConnection(inputPort: videoPort, videoPreviewLayer: layer)
+        Task { @MainActor in
+            await cameraSession.addConnection(connection)
+            updateInterfaceOrientation()
+        }
+        layer.setSessionWithNoConnection(captureSession)
     }
 
     // MARK: - Private Methods
@@ -105,12 +123,16 @@ private final class CameraPreviewUiView: UIView {
     }
 
     private func shouldMatchInputDeviceOrientation(in session: AVCaptureSession) -> Bool {
+        videoPort(with: session)?.sourceDevicePosition != .unspecified
+    }
+
+    private func videoPort(with session: AVCaptureSession) -> AVCaptureInput.Port? {
         let videoInputs = session.inputs.compactMap { input in
             input as? AVCaptureDeviceInput
         }
         guard let videoInput = videoInputs.first else {
-            return false // No video inputs
+            return nil
         }
-        return videoInput.device.position != .unspecified
+        return videoInput.ports(for: .video, sourceDeviceType: nil, sourceDevicePosition: .unspecified).first
     }
 }

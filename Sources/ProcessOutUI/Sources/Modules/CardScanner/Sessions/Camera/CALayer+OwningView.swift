@@ -9,6 +9,7 @@ import UIKit
 
 extension CALayer {
 
+    @MainActor
     var owningView: UIView? {
         var currentLayer: CALayer? = self
         while let current = currentLayer {
