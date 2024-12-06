@@ -41,7 +41,7 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
                 .buttonStyle(
                     POAnyButtonStyle(erasing: style.radioButton)
                 )
-                .radioButtonSelected(item.isSelected)
+                .controlSelected(item.isSelected)
             }
             .animation(.default, value: item.isLoading)
             if let information = item.additionalInformation {

@@ -11,7 +11,7 @@ import Foundation
 public final class POPhoneNumberFormatter: Formatter {
 
     public init(metadataProvider: POPhoneNumberMetadataProvider = PODefaultPhoneNumberMetadataProvider.shared) {
-        regexProvider = RegexProvider.shared
+        regexProvider = PORegexProvider.shared
         self.metadataProvider = metadataProvider
         super.init()
     }
@@ -101,7 +101,7 @@ public final class POPhoneNumberFormatter: Formatter {
 
     // MARK: - Private Properties
 
-    private let regexProvider: RegexProvider
+    private let regexProvider: PORegexProvider
     private let metadataProvider: POPhoneNumberMetadataProvider
 
     // MARK: - Full National Number Formatting

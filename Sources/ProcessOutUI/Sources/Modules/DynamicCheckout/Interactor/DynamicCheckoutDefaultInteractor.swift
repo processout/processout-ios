@@ -51,8 +51,10 @@ final class DynamicCheckoutDefaultInteractor:
                 switch invoice.transaction?.status {
                 case .waiting:
                     setStartedState(invoice: invoice, clientSecret: configuration.invoiceRequest.clientSecret)
-                    send(event: .didStart)
-                    initiateDefaultPaymentIfNeeded()
+                    if case .started = state {
+                        send(event: .didStart)
+                        initiateDefaultPaymentIfNeeded()
+                    }
                 case .authorized, .completed:
                     setSuccessState()
                 default:

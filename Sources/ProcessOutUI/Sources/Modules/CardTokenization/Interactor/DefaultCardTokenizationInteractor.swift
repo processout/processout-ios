@@ -50,6 +50,36 @@ final class DefaultCardTokenizationInteractor:
         logger.debug("Did start card tokenization flow")
     }
 
+    func update(with scannedCard: POScannedCard) {
+        guard case .started(let currentState) = state else {
+            return
+        }
+        logger.debug("Will update parameters with scanned card: '\(scannedCard)'")
+        var newState = currentState
+        newState.number.value = cardNumberFormatter.string(from: scannedCard.number)
+        newState.number.isValid = true
+        if let expiration = scannedCard.expiration {
+            newState.expiration.value = cardExpirationFormatter.string(from: expiration.description)
+            newState.expiration.isValid = true
+        }
+        if newState.cardholderName.shouldCollect, let cardholderName = scannedCard.cardholderName {
+            newState.cardholderName.value = cardholderName
+            newState.cardholderName.isValid = true
+        }
+        // swiftlint:disable:next line_length
+        guard newState.number.value != currentState.number.value || newState.expiration.value != currentState.expiration.value else {
+            logger.debug("Ignoring same card details \(scannedCard)")
+            return
+        }
+        if newState.areParametersValid {
+            logger.debug("Card information is no longer invalid, will reset error message")
+            newState.recentErrorMessage = nil
+        }
+        cardNumberSubject.send(newState.number.value)
+        state = .started(newState)
+        delegate?.cardTokenizationDidEmitEvent(.parametersChanged)
+    }
+
     func update(parameterId: State.ParameterId, value: String) {
         guard case .started(var newState) = state else {
             return

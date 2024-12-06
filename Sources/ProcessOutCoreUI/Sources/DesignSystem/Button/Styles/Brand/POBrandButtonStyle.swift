@@ -44,66 +44,70 @@ public struct POBrandButtonStyle: ButtonStyle {
     // MARK: - ButtonStyle
 
     public func makeBody(configuration: Configuration) -> some View {
-        // todo(andrii-vysotskyi): add overlay or accept configuration for disabled state if needed
-        ContentView { isEnabled, isLoading, brandColor in
-            let isBrandColorLight = UIColor(brandColor).isLight() != false
-            ZStack {
-                if isLoading {
-                    ProgressView()
-                        .poProgressViewStyle(progressStyle)
-                } else {
-                    configuration.label
-                        .textStyle(title)
-                        .lineLimit(1)
-                }
-            }
-            .padding(Constants.padding)
-            .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
-            .backport.background {
-                let adjustment = brightnessAdjustment(
-                    isPressed: configuration.isPressed, isBrandColorLight: isBrandColorLight
-                )
-                brandColor.brightness(adjustment)
-            }
-            .border(style: border)
-            .shadow(style: shadow)
-            .colorScheme(isBrandColorLight ? .light : .dark)
-            .contentShape(.rect)
-            .animation(.default, value: isEnabled)
-            .animation(.default, value: AnyHashable(brandColor))
-            .allowsHitTesting(isEnabled)
-        }
-        .backport.geometryGroup()
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let padding = EdgeInsets(horizontal: POSpacing.small, vertical: POSpacing.extraSmall)
-        static let minHeight: CGFloat = 44
-    }
-
-    // MARK: - Private Methods
-
-    private func brightnessAdjustment(isPressed: Bool, isBrandColorLight: Bool) -> Double {
-        guard isPressed else {
-            return 0
-        }
-        return isBrandColorLight ? -0.08 : 0.15 // Darken if color is light or brighten otherwise
+        ButtonStyleBox(
+            title: title,
+            border: border,
+            shadow: shadow,
+            progressStyle: progressStyle,
+            configuration: configuration
+        )
     }
 }
 
-// Environments are not propagated directly to ButtonStyle in any iOS before 14.5 workaround is
-// to wrap content into additional view and extract them.
-@available(iOS 14, *)
+// Environments may not be propagated directly to ButtonStyle. Workaround is
+// to wrap content into additional view and use environments as usual.
+@available(iOS 14.0, *)
 @MainActor
-private struct ContentView<Content: View>: View {
+private struct ButtonStyleBox: View {
 
-    @ViewBuilder
-    let content: (_ isEnabled: Bool, _ isLoading: Bool, _ brandColor: Color) -> Content
+    /// Title style.
+    let title: POTextStyle
+
+    /// Border style.
+    let border: POBorderStyle
+
+    /// Shadow style.
+    let shadow: POShadowStyle
+
+    /// Progress view style.
+    let progressStyle: any ProgressViewStyle
+
+    /// Button style configuration.
+    let configuration: ButtonStyleConfiguration
+
+    // MARK: -
 
     var body: some View {
-        content(isEnabled, isLoading, brandColor)
+        // todo(andrii-vysotskyi): add overlay or accept configuration for disabled state if needed
+        let isBrandColorLight = UIColor(brandColor).isLight() != false
+        ZStack {
+            if isLoading {
+                ProgressView()
+                    .poProgressViewStyle(progressStyle)
+            } else {
+                configuration.label
+                    .textStyle(title.scaledBy(labelTypographyScale))
+                    .lineLimit(1)
+            }
+        }
+        .padding(
+            .init(horizontal: POSpacing.small, vertical: POSpacing.extraSmall)
+        )
+        .frame(minWidth: minSize, maxWidth: maxWidth, minHeight: minSize)
+        .backport.background {
+            let adjustment = brightnessAdjustment(
+                isPressed: configuration.isPressed, isBrandColorLight: isBrandColorLight
+            )
+            brandColor.brightness(adjustment)
+        }
+        .border(style: border)
+        .shadow(style: shadow)
+        .colorScheme(isBrandColorLight ? .light : .dark)
+        .contentShape(.rect)
+        .animation(.default, value: isEnabled)
+        .animation(.default, value: AnyHashable(brandColor))
+        .allowsHitTesting(isEnabled)
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
@@ -120,11 +124,39 @@ private struct ContentView<Content: View>: View {
     @Environment(\.colorScheme)
     private var colorScheme
 
+    @Environment(\.poControlSize)
+    private var controlSize
+
+    @Environment(\.poControlWidth)
+    private var controlWidth
+
     // MARK: - Private Methods
 
     private var brandColor: Color {
         let interfaceStyle = UIUserInterfaceStyle(colorScheme)
         let traitCollection = UITraitCollection(userInterfaceStyle: interfaceStyle)
         return Color(uiBrandColor.resolvedColor(with: traitCollection))
+    }
+
+    private func brightnessAdjustment(isPressed: Bool, isBrandColorLight: Bool) -> Double {
+        guard isPressed else {
+            return 0
+        }
+        return isBrandColorLight ? -0.08 : 0.15 // Darken if color is light or brighten otherwise
+    }
+
+    private var minSize: CGFloat {
+        let sizes: [POControlSize: CGFloat] = [.small: 32, .regular: 44]
+        return sizes[controlSize]! // swiftlint:disable:this force_unwrapping
+    }
+
+    private var maxWidth: CGFloat? {
+        let widths: [POControlWidth: CGFloat] = [.expanded: .infinity]
+        return widths[controlWidth]
+    }
+
+    private var labelTypographyScale: CGFloat {
+        let scales: [POControlSize: CGFloat] = [.small: 0.867]
+        return scales[controlSize] ?? 1.0
     }
 }

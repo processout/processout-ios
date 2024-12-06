@@ -34,6 +34,10 @@ struct CardTokenizationItemView: View {
         case .toggle(let toggleItem):
             Toggle(toggleItem.title, isOn: toggleItem.$isSelected)
                 .poToggleStyle(style.toggle)
+        case .button(let buttonItem):
+            Button.create(with: buttonItem)
+                .buttonStyle(forPrimaryRole: style.actionsContainer.primary, fallback: style.actionsContainer.secondary)
+                .backport.poControlSize(.small)
         case .error(let errorItem):
             Text(errorItem.description)
                 .textStyle(style.errorDescription)

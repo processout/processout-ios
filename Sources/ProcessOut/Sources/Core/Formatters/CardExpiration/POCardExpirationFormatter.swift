@@ -11,7 +11,7 @@ import Foundation
 public final class POCardExpirationFormatter: Formatter {
 
     override public init() {
-        regexProvider = RegexProvider.shared
+        regexProvider = PORegexProvider.shared
         super.init()
     }
 
@@ -88,7 +88,7 @@ public final class POCardExpirationFormatter: Formatter {
 
     // MARK: - Private Properties
 
-    private let regexProvider: RegexProvider
+    private let regexProvider: PORegexProvider
 
     // MARK: - Private Methods
 

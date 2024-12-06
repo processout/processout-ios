@@ -117,7 +117,7 @@ private struct ContentView<Content: View>: View {
 
     // MARK: - Private Properties
 
-    @Environment(\.isRadioButtonSelected)
+    @Environment(\.poControlSelected)
     private var isSelected
 
     @Environment(\.isControlInvalid)

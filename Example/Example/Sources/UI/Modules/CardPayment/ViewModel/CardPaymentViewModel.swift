@@ -8,7 +8,7 @@
 import Combine
 import SwiftUI
 @_spi(PO) import ProcessOut
-import ProcessOutUI
+@_spi(PO) import ProcessOutUI
 import ProcessOutCheckout3DS
 import Checkout3DS
 
@@ -44,11 +44,12 @@ final class CardPaymentViewModel: ObservableObject {
     }
 
     private func setCardTokenizationItem() {
-        let configuration = POCardTokenizationConfiguration(
+        var configuration = POCardTokenizationConfiguration(
             cardholderName: nil,
             isSavingAllowed: true,
             cancelButton: .init(icon: Image(systemName: "xmark"))
         )
+        configuration.cardScanner = .init()
         let cardTokenizationItem = CardPaymentViewModelState.CardTokenization(
             id: UUID().uuidString,
             configuration: configuration,

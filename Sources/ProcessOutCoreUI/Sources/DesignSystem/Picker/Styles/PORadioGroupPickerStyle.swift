@@ -22,7 +22,7 @@ public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerSt
                     .padding(.vertical, POSpacing.extraSmall)
                     .frame(minHeight: Constants.minHeight)
                     .contentShape(.rect)
-                    .radioButtonSelected(element.isSelected)
+                    .controlSelected(element.isSelected)
             }
         }
         .buttonStyle(radioButtonStyle)

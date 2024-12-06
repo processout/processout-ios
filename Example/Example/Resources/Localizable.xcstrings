@@ -201,6 +201,46 @@
         }
       }
     },
+    "card-scanner.error-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to scan card."
+          }
+        }
+      }
+    },
+    "card-scanner.scan" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan Card"
+          }
+        }
+      }
+    },
+    "card-scanner.success-message-%@-%@-%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Card scanning completed:\n- Card Number: %1$@\n- Expiration Date: %2$@\n- Cardholder Name: %3$@"
+          }
+        }
+      }
+    },
+    "card-scanner.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Card Scanner"
+          }
+        }
+      }
+    },
     "configuration-scanner.title" : {
       "localizations" : {
         "en" : {
@@ -407,6 +447,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Card Payment"
+          }
+        }
+      }
+    },
+    "features.card-scanner" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Card Scanner"
           }
         }
       }

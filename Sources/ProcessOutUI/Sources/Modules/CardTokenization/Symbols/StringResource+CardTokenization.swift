@@ -76,6 +76,9 @@ extension POStringResource {
 
         enum Button {
 
+            /// Card scan button title.
+            static let scanCard = POStringResource("card-tokenization.scan-card.title", comment: "")
+
             /// Submit button title.
             static let submit = POStringResource("card-tokenization.submit-button.title", comment: "")
 

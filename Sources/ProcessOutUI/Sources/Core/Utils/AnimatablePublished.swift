@@ -89,4 +89,16 @@ protocol AnimationIdentityProvider {
     var animationIdentity: AnyHashable { get }
 }
 
+extension Optional: AnimationIdentityProvider where Wrapped: AnimationIdentityProvider {
+
+    var animationIdentity: AnyHashable {
+        switch self {
+        case .none:
+            return ""
+        case .some(let wrapped):
+            return wrapped.animationIdentity
+        }
+    }
+}
+
 // swiftlint:enable fatal_error_message unused_setter_value

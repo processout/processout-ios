@@ -20,7 +20,8 @@ struct CardTokenizationSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: POSpacing.small) {
             if let title = section.title {
-                Text(title).textStyle(style.sectionTitle)
+                Text(title)
+                    .textStyle(style.sectionTitle)
             }
             ForEach(section.items) { element in
                 CardTokenizationItemView(item: element, focusedInputId: $focusedInputId)

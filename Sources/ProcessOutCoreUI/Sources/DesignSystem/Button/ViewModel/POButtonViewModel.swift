@@ -47,7 +47,7 @@ public struct POButtonViewModel {
     }
 
     /// Action title.
-    public let title: String
+    public let title: String?
 
     /// Icon view.
     public let icon: AnyView?
@@ -68,10 +68,10 @@ public struct POButtonViewModel {
     public let action: @MainActor () -> Void
 
     /// Creates view model with given parameters.
-    public init(
+    public init<Icon: View>(
         id: String,
-        title: String,
-        icon: AnyView? = nil,
+        title: String? = nil,
+        icon: Icon? = AnyView?.none,
         isEnabled: Bool = true,
         isLoading: Bool = false,
         role: POButtonRole? = nil,
@@ -80,7 +80,7 @@ public struct POButtonViewModel {
     ) {
         _id = id
         self.title = title
-        self.icon = icon
+        self.icon = icon.map(AnyView.init(erasing:))
         self.isEnabled = isEnabled
         self.isLoading = isLoading
         self.role = role

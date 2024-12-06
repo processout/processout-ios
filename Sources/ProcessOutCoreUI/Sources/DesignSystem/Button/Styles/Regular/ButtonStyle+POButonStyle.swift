@@ -65,4 +65,37 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
             progressStyle: CircularProgressViewStyle(tint: Color(poResource: .Text.primary))
         )
     }
+
+    /// Default style for ghost button.
+    @_disfavoredOverload
+    @MainActor
+    public static var ghost: POButtonStyle<CircularProgressViewStyle> {
+        POButtonStyle(
+            normal: .init(
+                title: .init(color: Color(poResource: .Button.Ghost.Title.default), typography: .button),
+                border: .clear,
+                shadow: .clear,
+                backgroundColor: .clear
+            ),
+            selected: .init(
+                title: .init(color: Color(poResource: .Button.Ghost.Title.pressed), typography: .button),
+                border: .clear,
+                shadow: .clear,
+                backgroundColor: Color(poResource: .Button.Ghost.Background.selected)
+            ),
+            highlighted: .init(
+                title: .init(color: Color(poResource: .Button.Ghost.Title.pressed), typography: .button),
+                border: .clear,
+                shadow: .clear,
+                backgroundColor: Color(poResource: .Button.Ghost.Background.pressed)
+            ),
+            disabled: .init(
+                title: .init(color: Color(poResource: .Button.Ghost.Title.disabled), typography: .button),
+                border: .clear,
+                shadow: .clear,
+                backgroundColor: Color(poResource: .Button.Ghost.Background.disabled)
+            ),
+            progressStyle: CircularProgressViewStyle(tint: Color(poResource: .Button.Ghost.Title.default))
+        )
+    }
 }

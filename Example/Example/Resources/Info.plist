@@ -29,6 +29,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>This application requires camera access to scan codes for project configuration.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This application requires access to your photo library to save payment information.</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
@@ -43,9 +47,5 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
-	<key>NSCameraUsageDescription</key>
-	<string>This application requires camera access to scan codes for project configuration.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This application requires access to your photo library to save payment information.</string>
 </dict>
 </plist>

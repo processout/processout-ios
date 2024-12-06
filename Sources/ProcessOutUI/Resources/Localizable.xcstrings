@@ -749,6 +749,36 @@
         }
       }
     },
+    "card-scanner.cancel-button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add manually"
+          }
+        }
+      }
+    },
+    "card-scanner.description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position your card in the frame to scan it."
+          }
+        }
+      }
+    },
+    "card-scanner.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan card"
+          }
+        }
+      }
+    },
     "card-tokenization.billing-address.street" : {
       "localizations" : {
         "ar" : {
@@ -1289,6 +1319,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Guardar este cartão para futuros pagamentos"
+          }
+        }
+      }
+    },
+    "card-tokenization.scan-card.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan card"
           }
         }
       }

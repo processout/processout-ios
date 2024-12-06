@@ -21,6 +21,7 @@
 - ``POButtonStyle/secondary``
 - ``POBrandButtonStyle``
 - ``POBrandButtonStyle/brand``
+- ``SwiftUICore/EnvironmentValues/poButtonBrandColor``
 - ``POPassKitPaymentButtonStyle``
 
 ### Radio Button
@@ -28,14 +29,22 @@
 - ``PORadioButtonStyle``
 - ``PORadioButtonStateStyle``
 - ``PORadioButtonKnobStateStyle``
-- ``SwiftUICore/EnvironmentValues/isRadioButtonSelected``
 - ``PORadioButtonStyle/radio``
 
-### Checkbox
+### Toggle
 
 - ``POCheckboxToggleStyle``
 - ``POCheckboxToggleStateStyle``
+- ``POButtonToggleStyle``
 - ``SwiftUI/ToggleStyle/poCheckbox``
+
+### Control
+
+- ``POControlSize``
+- ``POControlWidth``
+- ``SwiftUICore/EnvironmentValues/poControlSelected``
+- ``SwiftUICore/EnvironmentValues/poControlWidth``
+- ``SwiftUICore/EnvironmentValues/poControlSize``
 
 ### Actions Container
 

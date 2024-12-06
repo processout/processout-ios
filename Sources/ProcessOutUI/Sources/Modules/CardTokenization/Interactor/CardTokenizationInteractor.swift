@@ -16,6 +16,9 @@ protocol CardTokenizationInteractor: Interactor<CardTokenizationInteractorState>
     /// Tokenization configuration.
     var configuration: POCardTokenizationConfiguration { get }
 
+    /// Updates parameters with scanned card details.
+    func update(with scannedCard: POScannedCard)
+
     /// Updates card information parameter with given id.
     func update(parameterId: State.ParameterId, value: String)
 

@@ -82,8 +82,6 @@ extension UserDefaultsStorage where Value: ExpressibleByNilLiteral {
 
     /// Creates a property that can read and write an Optional string user
     /// default.
-    ///
-    /// Defaults to nil if there is no restored value.
     init(wrappedValue: Value = nil, _ key: String, store: UserDefaults = .standard) where Value == String? {
         if let wrappedValue {
             store.register(defaults: [key: wrappedValue])
@@ -91,7 +89,11 @@ extension UserDefaultsStorage where Value: ExpressibleByNilLiteral {
         let storage = Storage {
             store.string(forKey: key) as Any
         } set: { newValue in
-            store.set(newValue as! String?, forKey: key)
+            if let newValue = newValue as? String {
+                store.set(newValue, forKey: key)
+            } else {
+                store.removeObject(forKey: key)
+            }
         }
         self.init(storage: storage)
     }

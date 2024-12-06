@@ -94,7 +94,11 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             cardInformationItems.append(.error(errorItem))
         }
         let sections = [
-            State.Section(id: SectionId.cardInformation, title: nil, items: cardInformationItems),
+            State.Section(
+                id: SectionId.cardInformation,
+                title: nil,
+                items: cardInformationItems
+            ),
             preferredSchemeSection(startedState: startedState),
             billingAddressSection(startedState: startedState),
             futurePaymentsSection(startedState: startedState)
@@ -136,6 +140,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             )
         ]
         let items = [
+            createCardScanButtonItem(),
             createItem(
                 parameter: startedState.number,
                 placeholder: configuration.cardNumber.prompt ?? String(resource: .CardTokenization.CardDetails.number),
@@ -168,6 +173,31 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             return AnyView(image)
         }
         return configuration.cardNumber.icon
+    }
+
+    private func createCardScanButtonItem() -> State.Item? {
+        guard let cardScanner = configuration.cardScanner else {
+            return nil
+        }
+        let openScanner: @MainActor () -> Void = { [weak self] in
+            self?.state.cardScanner = .init(id: "card-scanner", configuration: cardScanner.configuration) { result in
+                if case .success(let card) = result {
+                    self?.interactor.update(with: card)
+                }
+                self?.state.cardScanner = nil
+            }
+        }
+        let defaultIcon = Image(poResource: .camera)
+            .renderingMode(.template)
+            .resizable()
+            .frame(width: 16, height: 16)
+        let viewModel = POButtonViewModel(
+            id: "scan-card-button",
+            title: cardScanner.scanButton.title ?? String(resource: .CardTokenization.Button.scanCard),
+            icon: cardScanner.scanButton.icon ?? AnyView(defaultIcon),
+            action: openScanner
+        )
+        return .button(viewModel)
     }
 
     // MARK: - Preferred Scheme

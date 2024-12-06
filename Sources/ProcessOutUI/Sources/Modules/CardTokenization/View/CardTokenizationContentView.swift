@@ -44,6 +44,22 @@ struct CardTokenizationContentView: View {
             .padding(EdgeInsets(horizontal: 0, vertical: insets))
             .frame(maxWidth: .infinity)
         }
+        .sheet(item: $viewModel.state.cardScanner) { scanner in
+            POCardScannerView(configuration: scanner.configuration, completion: scanner.completion)
+                .fittedPresentationDetent()
+                .modify { content in
+                    if #available(iOS 16.4, *) {
+                        content
+                            .presentationCornerRadius(24)
+                            .presentationBackgroundInteraction(.disabled)
+                    } else {
+                        content
+                    }
+                }
+                .backport.background {
+                    cardScannerStyle.backgroundColor.ignoresSafeArea()
+                }
+        }
         .backport.geometryGroup()
     }
 
@@ -53,6 +69,9 @@ struct CardTokenizationContentView: View {
 
     @Environment(\.cardTokenizationStyle)
     private var style
+
+    @Environment(\.cardScannerStyle)
+    private var cardScannerStyle
 
     @ObservedObject
     private var viewModel: AnyViewModel<CardTokenizationViewModelState>
