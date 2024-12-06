@@ -180,6 +180,3 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
         }
     }
 }
-
-// .shadow(color: .black.opacity(32), radius: 4, x: 0, y: 1)
-// .shadow(color: .black.opacity(32), radius: 16, x: 0, y: 4)

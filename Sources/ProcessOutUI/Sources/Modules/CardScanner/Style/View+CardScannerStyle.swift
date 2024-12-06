@@ -21,9 +21,7 @@ extension View {
 @_spi(PO)
 extension EnvironmentValues {
 
-    /// The size to apply to controls within a view.
-    ///
-    /// The default is ``POControlSize/regular``.
+    /// The style to apply to card scanner views.
     @MainActor
     public var cardScannerStyle: any POCardScannerStyle {
         get { self[Key.self] ?? .automatic }

@@ -78,6 +78,9 @@ extension POImageResource {
         static let back = POImageResource(name: "Card/Back")
     }
 
+    /// The "Camera" asset catalog image resource.
+    static let camera = POImageResource(name: "Camera")
+
     /// The "Lightning" asset catalog image resource.
     static let lightning = POImageResource(name: "Lightning")
 

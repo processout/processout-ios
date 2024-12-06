@@ -13,7 +13,7 @@ import SwiftUI
 @MainActor
 public protocol POCardScannerStyle: Sendable {
 
-    /// A view representing the appearance and interaction of a `POPicker`.
+    /// A view representing the appearance and interaction of a `POCardScannerStyle`.
     associatedtype Body: View
 
     /// Returns the appearance and interaction content for a `POCardScannerView`.
