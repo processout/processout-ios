@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ProcessOut
+@_spi(PO) import ProcessOutCoreUI
 @_spi(PO) import ProcessOutUI
 
 struct CardScannerView: View {
@@ -25,7 +26,10 @@ struct CardScannerView: View {
             POCardScannerView { result in
                 didScanCard(result: result)
             }
-            .presentationDetents([.medium, .large])
+            .fittedPresentationDetent()
+            .background {
+                PODefaultCardScannerStyle.automatic.backgroundColor.ignoresSafeArea()
+            }
         }
         .navigationTitle(String(localized: .CardScanner.title))
         .navigationBarTitleDisplayMode(.inline)
@@ -47,8 +51,8 @@ struct CardScannerView: View {
             let text = String(
                 localized: .CardScanner.successMessage,
                 replacements: scannedCard.number,
-                scannedCard.cardholderName ?? "N/A",
-                scannedCard.expiration?.description ?? "N/A"
+                scannedCard.expiration?.description ?? "N/A",
+                scannedCard.cardholderName ?? "N/A"
             )
             message = .init(text: text, severity: .success)
         case .failure(let failure) where failure.code != .cancelled:
