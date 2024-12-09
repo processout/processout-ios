@@ -122,19 +122,19 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
     private func alternativePaymentConfiguration(
         invoiceId: String, gatewayConfigurationId: String
     ) -> PONativeAlternativePaymentConfiguration {
-        var configuration = PONativeAlternativePaymentConfiguration(
+        let configuration = PONativeAlternativePaymentConfiguration(
             invoiceId: invoiceId,
             gatewayConfigurationId: gatewayConfigurationId,
             title: "",
             shouldHorizontallyCenterCodeInput: false,
             inlineSingleSelectValuesLimit: configuration.alternativePayment.inlineSingleSelectValuesLimit,
+            barcodeInteraction: barcodeInteraction(
+                with: self.configuration.alternativePayment.barcodeInteraction
+            ),
             submitButton: submitButtonConfiguration(with: configuration.submitButton),
             cancelButton: configuration.cancelButton.map { cancelButtonConfiguration(with: $0) },
             paymentConfirmation: alternativePaymentConfirmationConfiguration(),
             success: nil
-        )
-        configuration.barcodeInteraction = barcodeInteraction(
-            with: self.configuration.alternativePayment.barcodeInteraction
         )
         return configuration
     }

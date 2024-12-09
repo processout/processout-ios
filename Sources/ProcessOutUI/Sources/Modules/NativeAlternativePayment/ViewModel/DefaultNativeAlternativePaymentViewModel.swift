@@ -219,7 +219,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func createActions(state: InteractorState.AwaitingCapture) -> [POButtonViewModel] {
         let actions = [
             createConfirmPaymentCaptureAction(state: state),
-            createSaveImageAction(state: state),
+            createSaveBarcodeImageAction(state: state),
             cancelAction(
                 configuration: configuration.paymentConfirmation.cancelButton,
                 isEnabled: state.isCancellable
@@ -248,16 +248,19 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         return action
     }
 
-    private func createSaveImageAction(state: InteractorState.AwaitingCapture) -> POButtonViewModel? {
+    private func createSaveBarcodeImageAction(state: InteractorState.AwaitingCapture) -> POButtonViewModel? {
         guard let customerAction = state.customerAction,
               let image = customerAction.image,
-              !customerAction.isImageDecorative else {
+              let barcodeType = customerAction.barcodeType else {
             return nil
         }
         let buttonConfiguration = interactor.configuration.barcodeInteraction.saveButton
+        let defaultTitle = String(
+            resource: .NativeAlternativePayment.Button.saveBarcode, replacements: barcodeType.rawValue.uppercased()
+        )
         let viewModel = POButtonViewModel(
             id: "barcode-button",
-            title: buttonConfiguration.title ?? String(resource: .NativeAlternativePayment.Button.saveBarcode),
+            title: buttonConfiguration.title ?? defaultTitle,
             icon: buttonConfiguration.icon,
             action: { [weak self] in
                 self?.saveImageToPhotoLibraryOrShowError(image)

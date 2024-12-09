@@ -83,7 +83,6 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     }
 
     /// Configuration options for barcode interaction.
-    @_spi(PO)
     @MainActor
     @preconcurrency
     public struct BarcodeInteraction: Sendable {
@@ -179,8 +178,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     public let inlineSingleSelectValuesLimit: Int
 
     /// Barcode interaction configuration.
-    @_spi(PO)
-    public var barcodeInteraction: BarcodeInteraction
+    public let barcodeInteraction: BarcodeInteraction
 
     /// Submit button configuration.
     public let submitButton: SubmitButton
@@ -201,6 +199,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
         title: String? = nil,
         shouldHorizontallyCenterCodeInput: Bool = true,
         inlineSingleSelectValuesLimit: Int = 5,
+        barcodeInteraction: BarcodeInteraction = .init(),
         submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = nil,
         paymentConfirmation: Confirmation = .init(),
@@ -215,7 +214,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
         self.cancelButton = cancelButton
         self.paymentConfirmation = paymentConfirmation
         self.success = success
-        self.barcodeInteraction = .init()
+        self.barcodeInteraction = barcodeInteraction
     }
 }
 

@@ -8,11 +8,10 @@
 import Foundation
 
 /// Represents a barcode with its type and encoded data.
-@_spi(PO)
 public struct POBarcode: Decodable, Sendable {
 
     /// Represents the type of barcode (e.g., QR code, UPC, etc.).
-    public struct BarcodeType: RawRepresentable, Sendable, Hashable {
+    public struct BarcodeType: RawRepresentable, Sendable {
 
         /// The string value representing the type of barcode.
         public let rawValue: String
@@ -34,6 +33,13 @@ extension POBarcode.BarcodeType: Decodable {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(String.self)
+    }
+}
+
+extension POBarcode.BarcodeType: Hashable {
+
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.rawValue.lowercased() == rhs.rawValue.lowercased()
     }
 }
 
