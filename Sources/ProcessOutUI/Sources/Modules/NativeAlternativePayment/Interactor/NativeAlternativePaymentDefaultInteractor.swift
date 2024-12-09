@@ -340,19 +340,16 @@ final class NativeAlternativePaymentDefaultInteractor:
         guard let message else {
             return nil
         }
-        let image: UIImage?, isImageDecorative: Bool
         if let barcode = parameterValues?.customerActionBarcode {
             let minimumSize = CGSize(width: 250, height: 250)
-            image = barcodeImageProvider.image(for: barcode, minimumSize: minimumSize)
+            let image = barcodeImageProvider.image(for: barcode, minimumSize: minimumSize)
             if image == nil {
                 throw POFailure(message: "Unable to generate barcode image.", code: .internal(.mobile))
             }
-            isImageDecorative = false
-        } else {
-            image = await imagesRepository.image(at: gateway.customerActionImageUrl)
-            isImageDecorative = true
+            return .init(message: message, image: image, barcodeType: barcode.type)
         }
-        return .init(message: message, image: image, isImageDecorative: isImageDecorative)
+        let image = await imagesRepository.image(at: gateway.customerActionImageUrl)
+        return .init(message: message, image: image, barcodeType: nil)
     }
 
     // MARK: - Captured State

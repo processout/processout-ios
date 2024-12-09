@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 import UIKit
-import ProcessOut
+@_spi(PO) import ProcessOut
 
 enum NativeAlternativePaymentInteractorState {
 
@@ -102,8 +102,9 @@ enum NativeAlternativePaymentInteractorState {
         /// Action image.
         let image: UIImage?
 
-        /// Boolean value indicating whether the image is decorative (i.e., not meant for user interaction).
-        let isImageDecorative: Bool
+        /// Specifies the type of barcode represented by the `image`. If the image does not
+        /// represent a barcode, this property is `nil`.
+        let barcodeType: POBarcode.BarcodeType?
     }
 
     /// Initial interactor state.
