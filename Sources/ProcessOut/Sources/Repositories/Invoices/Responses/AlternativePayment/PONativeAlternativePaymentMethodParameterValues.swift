@@ -18,7 +18,6 @@ public struct PONativeAlternativePaymentMethodParameterValues: Decodable, Sendab
     public let customerActionMessage: String?
 
     /// A barcode that represents the customer's action, such as a QR code for payment.
-    @_spi(PO)
     public let customerActionBarcode: POBarcode?
 
     /// Payment provider name.
