@@ -17,18 +17,20 @@ function import_localization {
 
   # Constants
   BASE_LANGUAGE_XLIFF="$WORK_DIR/export/$BASE_LANGUAGE.xcloc/Localized Contents/$BASE_LANGUAGE.xliff"
+  SCHEME="ProcessOutUI"
 
   # Export base localization
   xcodebuild -exportLocalizations \
     -project ProcessOut.xcodeproj \
+    -scheme $SCHEME \
     -localizationPath $WORK_DIR/export \
     -exportLanguage $BASE_LANGUAGE
 
   # Preprocess XLIFF
-  ./Scripts/Localization/PreprocessXliff.swift "$BASE_LANGUAGE_XLIFF" $1
+  ./Scripts/Localization/PreprocessXliff.swift "$BASE_LANGUAGE_XLIFF" "$1"
 
   # Import localization
-  xcodebuild -importLocalizations -project ProcessOut.xcodeproj -localizationPath $1
+  xcodebuild -importLocalizations -project ProcessOut.xcodeproj -scheme $SCHEME -localizationPath "$1"
 }
 
 # Configure exports
@@ -38,7 +40,7 @@ export -f import_localization
 # Validates arguments acount
 test $# -eq 1
 
-IMPORT_DIR=$1
+IMPORT_DIR="$1"
 
 # Create directories
 mkdir -p $WORK_DIR/import
@@ -54,4 +56,4 @@ mkdir -p $WORK_DIR/export
 #     --unzip-to $WORK_DIR/import
 
 # Import available localizations
-find $IMPORT_DIR -name '*.xliff' -exec /bin/bash -c 'import_localization "$0"' {} \;
+find "$IMPORT_DIR" -name '*.xliff' -exec /bin/bash -c 'import_localization "$0"' {} \;
