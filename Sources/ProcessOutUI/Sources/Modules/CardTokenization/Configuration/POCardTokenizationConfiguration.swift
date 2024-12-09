@@ -54,6 +54,39 @@ public struct POCardTokenizationConfiguration: Sendable {
         }
     }
 
+    /// Card scanner configuration.
+    @_spi(PO)
+    @MainActor
+    public struct CardScanner {
+
+        /// Card scan button configuration.
+        @MainActor
+        public struct ScanButton: Sendable {
+
+            /// Button title, such as "Scan card". Pass `nil` title to use default value.
+            public let title: String?
+
+            /// Button icon. Pass `nil` title to use default value.
+            public let icon: AnyView?
+
+            public init<Icon: View>(title: String? = nil, icon: Icon? = AnyView?.none) {
+                self.title = title
+                self.icon = icon.map(AnyView.init(erasing:))
+            }
+        }
+
+        /// Scanner configuration.
+        public let configuration: POCardScannerConfiguration
+
+        /// Scan button.
+        public let scanButton: ScanButton
+
+        public init(configuration: POCardScannerConfiguration = .init(), scanButton: ScanButton = .init()) {
+            self.configuration = configuration
+            self.scanButton = scanButton
+        }
+    }
+
     /// Text field configuration.
     @MainActor
     @preconcurrency
@@ -128,6 +161,10 @@ public struct POCardTokenizationConfiguration: Sendable {
 
     /// Configuration for the CVC text field. Set to `nil` if CVC collection is not required.
     public let cvc: TextField?
+
+    /// Card scanner configuration.
+    @_spi(PO)
+    public var cardScanner: CardScanner?
 
     /// Boolean flag determines whether user will be asked to select scheme if co-scheme is available.
     @_spi(PO)

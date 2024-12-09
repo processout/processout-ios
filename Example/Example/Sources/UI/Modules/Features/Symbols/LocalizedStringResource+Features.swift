@@ -23,6 +23,9 @@ extension LocalizedStringResource {
         /// Card payment.
         static let cardPayment = LocalizedStringResource("features.card-payment")
 
+        /// Card scanner.
+        static let cardScanner = LocalizedStringResource("features.card-scanner")
+
         /// Dynamic checkout.
         static let dynamicCheckout = LocalizedStringResource("features.dynamic-checkout")
 

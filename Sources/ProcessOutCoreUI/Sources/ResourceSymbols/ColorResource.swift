@@ -83,6 +83,36 @@ extension POColorResource {
                 public static let selected = POColorResource(name: "Button/Secondary/Border/Selected")
             }
         }
+
+        /// The "Button/Ghost" asset catalog resource namespace.
+        public enum Ghost {
+
+            /// The "Button/Ghost/Background" asset catalog resource namespace.
+            public enum Background {
+
+                /// The "Button/Ghost/Background/Disabled" asset catalog color resource.
+                public static let disabled = POColorResource(name: "Button/Ghost/Background/Disabled")
+
+                /// The "Button/Ghost/Background/Pressed" asset catalog color resource.
+                public static let pressed = POColorResource(name: "Button/Ghost/Background/Pressed")
+
+                /// The "Button/Ghost/Background/Selected" asset catalog color resource.
+                public static let selected = POColorResource(name: "Button/Ghost/Background/Selected")
+            }
+
+            /// The "Button/Ghost/Title" asset catalog resource namespace.
+            public enum Title {
+
+                /// The "Button/Ghost/Title/Default" asset catalog color resource.
+                public static let `default` = POColorResource(name: "Button/Ghost/Title/Default")
+
+                /// The "Button/Ghost/Title/Disabled" asset catalog color resource.
+                public static let disabled = POColorResource(name: "Button/Ghost/Title/Disabled")
+
+                /// The "Button/Ghost/Title/Pressed" asset catalog color resource.
+                public static let pressed = POColorResource(name: "Button/Ghost/Title/Pressed")
+            }
+        }
     }
 
     /// The "Input" asset catalog resource namespace.

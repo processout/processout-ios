@@ -16,6 +16,9 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
     /// Style for normal state.
     public let normal: POButtonStateStyle
 
+    /// Style to use when button is selected.
+    public let selected: POButtonStateStyle
+
     /// Style for highlighted state.
     public let highlighted: POButtonStateStyle
 
@@ -27,11 +30,13 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
 
     public init(
         normal: POButtonStateStyle,
+        selected: POButtonStateStyle? = nil,
         highlighted: POButtonStateStyle,
         disabled: POButtonStateStyle,
         progressStyle: ProgressStyle
     ) {
         self.normal = normal
+        self.selected = selected ?? normal
         self.highlighted = highlighted
         self.disabled = disabled
         self.progressStyle = progressStyle
@@ -40,65 +45,107 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
     // MARK: - ButtonStyle
 
     public func makeBody(configuration: Configuration) -> some View {
-        ContentView { isEnabled, isLoading in
-            let currentStyle = stateStyle(
-                isEnabled: isEnabled, isLoading: isLoading, isPressed: configuration.isPressed
-            )
-            ZStack {
-                if isLoading {
-                    ProgressView()
-                        .progressViewStyle(progressStyle)
-                } else {
-                    configuration.label
-                        .textStyle(currentStyle.title)
-                        .lineLimit(1)
-                }
+        ButtonStyleBox(
+            normal: normal,
+            selected: selected,
+            highlighted: highlighted,
+            disabled: disabled,
+            progressStyle: progressStyle,
+            configuration: configuration
+        )
+    }
+}
+
+// Environments may not be propagated directly to ButtonStyle. Workaround is
+// to wrap content into additional view and use environments as usual.
+@available(iOS 14.0, *)
+@MainActor
+private struct ButtonStyleBox<ProgressStyle: ProgressViewStyle>: View {
+
+    /// State styles.
+    let normal, selected, highlighted, disabled: POButtonStateStyle
+
+    /// Progress view style.
+    let progressStyle: ProgressStyle
+
+    /// Button style configuration.
+    let configuration: ButtonStyleConfiguration
+
+    // MARK: - View
+
+    var body: some View {
+        let currentStyle = stateStyle(isPressed: configuration.isPressed)
+        ZStack {
+            if isLoading {
+                ProgressView()
+                    .progressViewStyle(progressStyle)
+            } else {
+                configuration.label
+                    .textStyle(currentStyle.title.scaledBy(labelTypographyScale))
+                    .lineLimit(1)
             }
-            .padding(Constants.padding)
-            .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
-            .background(currentStyle.backgroundColor)
-            .border(style: currentStyle.border)
-            .shadow(style: currentStyle.shadow)
-            .contentShape(.standardHittableRect)
-            .animation(.default, value: isLoading)
-            .animation(.default, value: isEnabled)
-            .allowsHitTesting(isEnabled && !isLoading)
         }
+        .padding(
+            .init(horizontal: POSpacing.small, vertical: POSpacing.extraSmall)
+        )
+        .frame(minWidth: minSize, maxWidth: maxWidth, minHeight: minSize)
+        .background(currentStyle.backgroundColor)
+        .border(style: currentStyle.border)
+        .shadow(style: currentStyle.shadow)
+        .contentShape(.standardHittableRect)
+        .animation(.default, value: isLoading)
+        .animation(.default, value: isEnabled)
+        .allowsHitTesting(isEnabled && !isLoading)
         .backport.geometryGroup()
     }
 
+    // MARK: - Private Properties
+
+    @Environment(\.poControlSelected)
+    private var isSelected
+
+    @Environment(\.isEnabled)
+    private var isEnabled
+
+    @Environment(\.isButtonLoading)
+    private var isLoading
+
+    @Environment(\.poControlSize)
+    private var controlSize
+
+    @Environment(\.poControlWidth)
+    private var controlWidth
+
     // MARK: - Private Methods
 
-    private func stateStyle(isEnabled: Bool, isLoading: Bool, isPressed: Bool) -> POButtonStateStyle {
+    private func stateStyle(isPressed: Bool) -> POButtonStateStyle {
         if isLoading {
             return normal
         }
         if !isEnabled {
             return disabled
         }
-        return isPressed ? highlighted : normal
-    }
-}
-
-// Environments are not propagated directly to ButtonStyle in any iOS before 14.5 workaround is
-// to wrap content into additional view and extract them.
-@MainActor
-private struct ContentView<Content: View>: View {
-
-    @ViewBuilder
-    let content: (_ isEnabled: Bool, _ isLoading: Bool) -> Content
-
-    var body: some View {
-        content(isEnabled, isLoading)
+        if isPressed {
+            return highlighted
+        }
+        if isSelected {
+            return selected
+        }
+        return normal
     }
 
-    // MARK: - Private Properties
+    private var minSize: CGFloat {
+        let sizes: [POControlSize: CGFloat] = [.small: 32, .regular: 44]
+        return sizes[controlSize]! // swiftlint:disable:this force_unwrapping
+    }
 
-    @Environment(\.isEnabled) private var isEnabled
-    @Environment(\.isButtonLoading) private var isLoading
-}
+    private var maxWidth: CGFloat? {
+        let widths: [POControlWidth: CGFloat] = [.expanded: .infinity]
+        return widths[controlWidth]
+    }
 
-private enum Constants {
-    static let minHeight: CGFloat = 44
-    static let padding = EdgeInsets(horizontal: POSpacing.small, vertical: POSpacing.extraSmall)
+    private var labelTypographyScale: CGFloat {
+        let scales: [POControlSize: CGFloat] = [.small: 0.867]
+        return scales[controlSize] ?? 1.0
+    }
 }

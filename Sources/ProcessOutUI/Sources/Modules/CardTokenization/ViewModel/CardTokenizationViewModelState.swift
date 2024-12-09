@@ -7,10 +7,10 @@
 
 import Foundation
 import SwiftUI
+import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 // TODOs:
-// - Support scanning card details with camera
 // - Allow selecting card co-scheme when authorizing invoice or assigning token
 
 struct CardTokenizationViewModelState {
@@ -28,7 +28,12 @@ struct CardTokenizationViewModelState {
     }
 
     enum Item {
-        case group(GroupItem), input(InputItem), picker(PickerItem), toggle(ToggleItem), error(ErrorItem)
+        case group(GroupItem)
+        case input(InputItem)
+        case picker(PickerItem)
+        case toggle(ToggleItem)
+        case button(ButtonItem)
+        case error(ErrorItem)
     }
 
     struct GroupItem: Identifiable {
@@ -39,8 +44,6 @@ struct CardTokenizationViewModelState {
         /// Group items.
         let items: [Item]
     }
-
-    typealias InputItem = POTextFieldViewModel
 
     struct PickerItem: Identifiable {
 
@@ -87,6 +90,20 @@ struct CardTokenizationViewModelState {
         let description: String
     }
 
+    struct CardScanner: Identifiable {
+
+        let id: String
+
+        /// Card scanner configuration.
+        let configuration: POCardScannerConfiguration
+
+        /// Completion.
+        let completion: (Result<POScannedCard, POFailure>) -> Void
+    }
+
+    typealias InputItem = POTextFieldViewModel
+    typealias ButtonItem = POButtonViewModel
+
     /// Screen title.
     let title: String?
 
@@ -98,6 +115,9 @@ struct CardTokenizationViewModelState {
 
     /// Currently focused input identifier.
     var focusedInputId: AnyHashable?
+
+    /// Card scanner.
+    var cardScanner: CardScanner?
 }
 
 extension CardTokenizationViewModelState: AnimationIdentityProvider {
@@ -125,6 +145,8 @@ extension CardTokenizationViewModelState.Item: Identifiable {
         case .toggle(let item):
             return item.id
         case .group(let item):
+            return item.id
+        case .button(let item):
             return item.id
         case .error(let item):
             return item.id
