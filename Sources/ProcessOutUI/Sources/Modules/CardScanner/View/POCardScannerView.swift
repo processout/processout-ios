@@ -9,7 +9,6 @@ import SwiftUI
 import AVFoundation
 @_spi(PO) import ProcessOutCoreUI
 
-@_spi(PO)
 @available(iOS 14, *)
 @MainActor
 public struct POCardScannerView: View {

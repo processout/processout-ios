@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 20.11.2024.
 //
 
-@_spi(PO)
+/// Scanned card details.
 public struct POScannedCard: Sendable, Hashable {
 
     public struct Expiration: Sendable, Hashable, CustomStringConvertible {
