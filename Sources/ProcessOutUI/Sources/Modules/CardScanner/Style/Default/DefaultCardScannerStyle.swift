@@ -172,6 +172,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
             }
             .lineLimit(1)
             .allowsTightening(true)
+            .colorScheme(.dark)
             .shadow(style: .init(color: .black.opacity(0.32), offset: .init(width: 0, height: 4), radius: 16))
             .shadow(style: .init(color: .black.opacity(0.32), offset: .init(width: 0, height: 1), radius: 4))
             .padding(POSpacing.extraLarge)
@@ -179,5 +180,6 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
             .border(style: card.border)
             .padding(POSpacing.large)
         }
+        .animation(.default, value: configuration == nil)
     }
 }
