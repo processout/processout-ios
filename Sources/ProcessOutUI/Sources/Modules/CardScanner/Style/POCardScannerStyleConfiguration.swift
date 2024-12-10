@@ -8,7 +8,6 @@
 import SwiftUI
 
 /// The properties of a card scanner style.
-@_spi(PO)
 @MainActor
 public struct POCardScannerStyleConfiguration {
 

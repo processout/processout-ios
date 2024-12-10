@@ -10,7 +10,6 @@ import SwiftUI
 
 /// The default card scanner style.
 @available(iOS 14, *)
-@_spi(PO)
 public struct PODefaultCardScannerStyle: POCardScannerStyle {
 
     public struct VideoPreview {
