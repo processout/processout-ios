@@ -31,10 +31,10 @@ struct CardExpirationDetector: CardAttributeDetector {
             guard let month = Int(monthDescription), let year = Int(yearDescription).map(normalized(year:)) else {
                 continue
             }
+            candidates.remove(at: offset)
             guard isDateInFuture(month: month, year: year) else {
                 continue
             }
-            candidates.remove(at: offset)
             let description = formatter.string(from: String(month) + String(year % 100))
             return .init(month: month, year: year, description: description)
         }
