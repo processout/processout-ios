@@ -88,8 +88,9 @@ public struct PODynamicCheckoutCardConfiguration: Sendable {
 extension PODynamicCheckoutCardConfiguration {
 
     /// Default configuration.
-    @MainActor
+    /// - NOTE:Only used to fix compatibility issue with Xcode 15.
     @inlinable
+    @MainActor
     static var `default`: PODynamicCheckoutCardConfiguration {
         PODynamicCheckoutCardConfiguration()
     }
