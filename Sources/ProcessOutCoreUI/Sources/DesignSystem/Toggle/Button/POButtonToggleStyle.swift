@@ -10,6 +10,7 @@ import SwiftUI
 /// Toggle style that uses a Button to represent the toggle's behavior, styled with a
 /// user-provided ButtonStyle
 @available(iOS 14, *)
+@MainActor
 public struct POButtonToggleStyle: ToggleStyle {
 
     public init(buttonStyle: some ButtonStyle) {
@@ -24,7 +25,7 @@ public struct POButtonToggleStyle: ToggleStyle {
         } label: {
             configuration.label
         }
-        .buttonStyle(.ghost)
+        .buttonStyle(POAnyButtonStyle(erasing: buttonStyle))
         .controlSelected(configuration.isOn)
     }
 
