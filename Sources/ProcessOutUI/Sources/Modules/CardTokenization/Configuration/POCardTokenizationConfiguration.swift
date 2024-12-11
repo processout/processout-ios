@@ -55,7 +55,6 @@ public struct POCardTokenizationConfiguration: Sendable {
     }
 
     /// Card scanner configuration.
-    @_spi(PO)
     @MainActor
     public struct CardScanner {
 
@@ -75,15 +74,15 @@ public struct POCardTokenizationConfiguration: Sendable {
             }
         }
 
-        /// Scanner configuration.
-        public let configuration: POCardScannerConfiguration
-
         /// Scan button.
         public let scanButton: ScanButton
 
-        public init(configuration: POCardScannerConfiguration = .init(), scanButton: ScanButton = .init()) {
-            self.configuration = configuration
+        /// Scanner configuration.
+        public let configuration: POCardScannerConfiguration
+
+        public init(scanButton: ScanButton = .init(), configuration: POCardScannerConfiguration = .init()) {
             self.scanButton = scanButton
+            self.configuration = configuration
         }
     }
 
@@ -163,8 +162,7 @@ public struct POCardTokenizationConfiguration: Sendable {
     public let cvc: TextField?
 
     /// Card scanner configuration.
-    @_spi(PO)
-    public var cardScanner: CardScanner?
+    public let cardScanner: CardScanner?
 
     /// Boolean flag determines whether user will be asked to select scheme if co-scheme is available.
     @_spi(PO)
@@ -192,6 +190,7 @@ public struct POCardTokenizationConfiguration: Sendable {
         cardNumber: TextField = .init(),
         expirationDate: TextField = .init(),
         cvc: TextField? = .init(),
+        cardScanner: CardScanner? = .init(),
         billingAddress: BillingAddress = .init(),
         isSavingAllowed: Bool = false,
         submitButton: SubmitButton = .init(),
@@ -203,6 +202,7 @@ public struct POCardTokenizationConfiguration: Sendable {
         self.cardNumber = cardNumber
         self.expirationDate = expirationDate
         self.cvc = cvc
+        self.cardScanner = cardScanner
         self.submitButton = submitButton
         self.cancelButton = cancelButton
         self.billingAddress = billingAddress
@@ -243,6 +243,7 @@ extension POCardTokenizationConfiguration {
         title: String? = nil,
         isCardholderNameInputVisible: Bool = true,
         shouldCollectCvc: Bool = true,
+        cardScanner: CardScanner? = .init(),
         primaryActionTitle: String? = nil,
         cancelActionTitle: String? = nil,
         billingAddress: POBillingAddressConfiguration = .init(),
@@ -254,6 +255,7 @@ extension POCardTokenizationConfiguration {
         self.cardNumber = .init()
         self.expirationDate = .init()
         self.cvc = shouldCollectCvc ? .init() : nil
+        self.cardScanner = cardScanner
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = cancelActionTitle?.isEmpty == true ? nil : .init(title: cancelActionTitle)
         self.billingAddress = billingAddress

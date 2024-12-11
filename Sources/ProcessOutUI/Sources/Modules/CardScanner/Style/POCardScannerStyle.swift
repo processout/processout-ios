@@ -9,7 +9,6 @@ import SwiftUI
 
 /// A type that specifies the appearance and interaction of all card scanners
 /// within a view hierarchy.
-@_spi(PO)
 @MainActor
 public protocol POCardScannerStyle: Sendable {
 

@@ -8,7 +8,6 @@
 import SwiftUI
 
 /// Card scanner view configuration.
-@_spi(PO)
 @MainActor
 public struct POCardScannerConfiguration: Sendable {
 

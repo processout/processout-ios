@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@_spi(PO)
 extension View {
 
     /// Sets the style for card scanner views within this view.
@@ -18,12 +17,11 @@ extension View {
 }
 
 @available(iOS 14, *)
-@_spi(PO)
 extension EnvironmentValues {
 
     /// The style to apply to card scanner views.
     @MainActor
-    public var cardScannerStyle: any POCardScannerStyle {
+    public internal(set) var cardScannerStyle: any POCardScannerStyle {
         get { self[Key.self] ?? .automatic }
         set { self[Key.self] = newValue }
     }

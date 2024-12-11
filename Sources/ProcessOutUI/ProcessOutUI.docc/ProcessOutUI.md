@@ -71,6 +71,17 @@
 <!--- ``PODynamicCheckoutEvent``-->
 <!--- ``PODynamicCheckoutInvoiceInvalidationReason``-->
 
+### Card Scanner
+
+- ``POCardScannerView``
+- ``POScannedCard``
+- ``POCardScannerConfiguration``
+- ``POCardScannerStyle``
+- ``POCardScannerStyleConfiguration``
+- ``PODefaultCardScannerStyle``
+- ``SwiftUICore/EnvironmentValues/cardScannerStyle``
+- ``SwiftUICore/View/cardScannerStyle(_:)``
+
 ### Utils
 
 - ``POConfirmationDialogConfiguration``

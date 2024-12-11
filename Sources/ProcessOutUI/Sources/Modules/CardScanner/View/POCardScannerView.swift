@@ -9,7 +9,9 @@ import SwiftUI
 import AVFoundation
 @_spi(PO) import ProcessOutCoreUI
 
-@_spi(PO)
+/// `POCardScannerView` is a SwiftUI view that allows users to scan payment cards using
+/// the camera. It provides a streamlined interface to automatically recognize card details: number,
+/// expiration date, and cardholder name.
 @available(iOS 14, *)
 @MainActor
 public struct POCardScannerView: View {
