@@ -36,7 +36,7 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
         Task { @MainActor in
             await cardRecognitionSession.setDelegate(self)
             if await cameraSession.start(), await cardRecognitionSession.setCameraSession(cameraSession) {
-                let previewSource = await cameraSession.previewSource
+                let previewSource = cameraSession.previewSource
                 let isTorchEnabled = await cameraSession.isTorchEnabled
                 setStartedState(previewSource: previewSource, isTorchEnabled: isTorchEnabled)
             } else {

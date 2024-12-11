@@ -32,7 +32,7 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, Cam
 
     // MARK: - Preview Source
 
-    var previewSource: CameraSessionPreviewSource {
+    nonisolated var previewSource: CameraSessionPreviewSource {
         self
     }
 
