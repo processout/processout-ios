@@ -250,7 +250,7 @@ actor CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, Cam
 
     private func observeNotifications() {
         let errorsObservation = NotificationCenter.default.addObserver(
-            forName: AVCaptureSession.runtimeErrorNotification,
+            forName: .AVCaptureSessionRuntimeError,
             object: nil,
             queue: nil,
             using: { [weak self] notification in

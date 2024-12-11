@@ -80,7 +80,7 @@ public struct POCardTokenizationConfiguration: Sendable {
         /// Scanner configuration.
         public let configuration: POCardScannerConfiguration
 
-        public init(scanButton: ScanButton = .init(), configuration: POCardScannerConfiguration = .init()) {
+        public init(scanButton: ScanButton = .init(), configuration: POCardScannerConfiguration = .default) {
             self.scanButton = scanButton
             self.configuration = configuration
         }
@@ -190,7 +190,7 @@ public struct POCardTokenizationConfiguration: Sendable {
         cardNumber: TextField = .init(),
         expirationDate: TextField = .init(),
         cvc: TextField? = .init(),
-        cardScanner: CardScanner? = .init(),
+        cardScanner: CardScanner? = .default,
         billingAddress: BillingAddress = .init(),
         isSavingAllowed: Bool = false,
         submitButton: SubmitButton = .init(),
@@ -243,7 +243,7 @@ extension POCardTokenizationConfiguration {
         title: String? = nil,
         isCardholderNameInputVisible: Bool = true,
         shouldCollectCvc: Bool = true,
-        cardScanner: CardScanner? = .init(),
+        cardScanner: CardScanner? = .default,
         primaryActionTitle: String? = nil,
         cancelActionTitle: String? = nil,
         billingAddress: POBillingAddressConfiguration = .init(),
@@ -267,10 +267,22 @@ extension POCardTokenizationConfiguration {
 extension POCardTokenizationConfiguration {
 
     /// Default configuration.
+    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
     @MainActor
     @inlinable
     static var `default`: POCardTokenizationConfiguration {
         POCardTokenizationConfiguration()
+    }
+}
+
+extension POCardTokenizationConfiguration.CardScanner {
+
+    /// Default configuration.
+    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
+    @inlinable
+    @MainActor
+    static var `default`: POCardTokenizationConfiguration.CardScanner {
+        POCardTokenizationConfiguration.CardScanner()
     }
 }
 
