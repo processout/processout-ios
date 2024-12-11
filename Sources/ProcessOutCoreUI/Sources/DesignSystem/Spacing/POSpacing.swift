@@ -25,4 +25,7 @@ public enum POSpacing {
 
     /// Extra large spacing.
     public static let extraLarge: CGFloat = 30
+
+    /// Extra extra large spacing.
+    public static let extraExtraLarge: CGFloat = 60
 }

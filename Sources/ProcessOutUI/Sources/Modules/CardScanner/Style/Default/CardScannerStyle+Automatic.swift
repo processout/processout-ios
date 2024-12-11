@@ -23,9 +23,9 @@ extension POCardScannerStyle where Self == PODefaultCardScannerStyle {
                 overlayColor: .black.opacity(0.4)
             ),
             card: .init(
-                number: .init(color: Color(poResource: .Text.primary), typography: .title),
-                cardholderName: .init(color: Color(poResource: .Text.primary), typography: .body1),
-                expiration: .init(color: Color(poResource: .Text.primary), typography: .body1),
+                number: .init(color: Color(poResource: .Text.primary), typography: .extraLargeTitle),
+                cardholderName: .init(color: Color(poResource: .Text.primary), typography: .body3),
+                expiration: .init(color: Color(poResource: .Text.primary), typography: .body3),
                 border: .init(radius: POSpacing.small, width: 1, color: Color(poResource: .Text.inverse))
             ),
             cancelButton: .secondary,

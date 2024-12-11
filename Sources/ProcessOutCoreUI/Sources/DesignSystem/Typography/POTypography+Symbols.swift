@@ -10,6 +10,9 @@ import UIKit
 @_spi(PO)
 extension POTypography {
 
+    /// Use for extra large titles.
+    public static let extraLargeTitle = POTypography(font: UIFont(.WorkSans.regular, size: 36))
+
     /// Use for titles.
     public static let title = POTypography(font: UIFont(.WorkSans.medium, size: 20), lineHeight: 24)
 
@@ -21,6 +24,9 @@ extension POTypography {
 
     /// Secondary body text for supporting content.
     public static let body2 = POTypography(font: UIFont(.WorkSans.regular, size: 14), lineHeight: 18)
+
+    /// Tertiary body text for supporting content.
+    public static let body3 = POTypography(font: UIFont(.WorkSans.regular, size: 16))
 
     /// Text used on buttons or interactive elements.
     public static let button = POTypography(font: UIFont(.WorkSans.medium, size: 14), lineHeight: 18)
