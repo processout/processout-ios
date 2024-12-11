@@ -117,7 +117,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                 .frame(maxWidth: .infinity)
                 .background(videoPreview.backgroundColor)
                 .backport.overlay {
-                    makeBody(cardConfiguration: configuration.card)
+                    cardOverlay(with: configuration.card)
                 }
                 .border(style: videoPreview.border)
             configuration.cancelButton
@@ -141,7 +141,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
     // MARK: - Private Methods
 
     @ViewBuilder
-    private func makeBody(cardConfiguration configuration: Configuration.Card?) -> some View {
+    private func cardOverlay(with configuration: Configuration.Card?) -> some View {
         ZStack {
             videoPreview.overlayColor
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -151,35 +151,39 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                         .border(style: card.border)
                         .padding(POSpacing.large)
                 }
-            VStack(alignment: .leading, spacing: POSpacing.small) {
-                configuration?.number
-                    .tracking(card.number.typography.font.pointSize * 0.05)
-                    .textStyle(card.number)
-                    .minimumScaleFactor(0.01)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
-                HStack(alignment: .bottom, spacing: POSpacing.small) {
-                    configuration?.cardholderName?
-                        .tracking(card.cardholderName.typography.font.pointSize * 0.05)
-                        .textStyle(card.cardholderName)
-                        .lineLimit(2)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    configuration?.expiration?
-                        .tracking(card.expiration.typography.font.pointSize * 0.05)
-                        .textStyle(card.expiration)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .frame(maxHeight: .infinity, alignment: .top)
-            }
-            .lineLimit(1)
-            .allowsTightening(true)
-            .colorScheme(.dark)
-            .shadow(style: .init(color: .black.opacity(0.32), offset: .init(width: 0, height: 4), radius: 16))
-            .shadow(style: .init(color: .black.opacity(0.32), offset: .init(width: 0, height: 1), radius: 4))
-            .padding(POSpacing.extraLarge)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .border(style: card.border)
-            .padding(POSpacing.large)
+            cardDetails(with: configuration)
+                .padding(POSpacing.extraLarge)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .border(style: card.border)
+                .padding(POSpacing.large)
         }
         .animation(.default, value: configuration == nil)
+    }
+
+    private func cardDetails(with configuration: Configuration.Card?) -> some View {
+        VStack(alignment: .leading, spacing: POSpacing.small) {
+            configuration?.number
+                .tracking(card.number.typography.font.pointSize * 0.05)
+                .textStyle(card.number)
+                .minimumScaleFactor(0.01)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+            HStack(alignment: .bottom, spacing: POSpacing.small) {
+                configuration?.cardholderName?
+                    .tracking(card.cardholderName.typography.font.pointSize * 0.05)
+                    .textStyle(card.cardholderName)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                configuration?.expiration?
+                    .tracking(card.expiration.typography.font.pointSize * 0.05)
+                    .textStyle(card.expiration)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+        }
+        .lineLimit(1)
+        .allowsTightening(true)
+        .colorScheme(.dark)
+        .shadow(style: .init(color: .black.opacity(0.32), offset: .init(width: 0, height: 4), radius: 16))
+        .shadow(style: .init(color: .black.opacity(0.32), offset: .init(width: 0, height: 1), radius: 4))
     }
 }
