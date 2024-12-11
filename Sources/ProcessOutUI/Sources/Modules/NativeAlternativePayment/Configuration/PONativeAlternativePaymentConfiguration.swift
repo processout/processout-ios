@@ -396,7 +396,7 @@ extension PONativeAlternativePaymentConfiguration.CancelButton {
 extension PONativeAlternativePaymentConfiguration.BarcodeInteraction {
 
     /// Default configuration.
-    /// - NOTE:Only used to fix compatibility issue with Xcode 15.
+    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
     @inlinable
     @MainActor
     static var `default`: PONativeAlternativePaymentConfiguration.BarcodeInteraction {

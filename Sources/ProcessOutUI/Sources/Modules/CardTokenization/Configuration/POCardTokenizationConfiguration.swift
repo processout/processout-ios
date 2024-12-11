@@ -267,7 +267,7 @@ extension POCardTokenizationConfiguration {
 extension POCardTokenizationConfiguration {
 
     /// Default configuration.
-    /// - NOTE:Only used to fix compatibility issue with Xcode 15.
+    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
     @MainActor
     @inlinable
     static var `default`: POCardTokenizationConfiguration {
@@ -278,7 +278,7 @@ extension POCardTokenizationConfiguration {
 extension POCardTokenizationConfiguration.CardScanner {
 
     /// Default configuration.
-    /// - NOTE:Only used to fix compatibility issue with Xcode 15.
+    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
     @inlinable
     @MainActor
     static var `default`: POCardTokenizationConfiguration.CardScanner {
