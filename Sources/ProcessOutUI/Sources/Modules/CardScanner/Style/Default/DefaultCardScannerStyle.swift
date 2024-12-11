@@ -157,7 +157,6 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                 .border(style: card.border)
                 .padding(POSpacing.large)
         }
-        .animation(.default, value: configuration == nil)
     }
 
     private func cardDetails(with configuration: Configuration.Card?) -> some View {
@@ -165,6 +164,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
             configuration?.number
                 .tracking(card.number.typography.font.pointSize * 0.05)
                 .textStyle(card.number)
+                .animation(.default, value: configuration?.number == nil)
                 .frame(maxHeight: .infinity, alignment: .bottom)
             HStack(alignment: .top, spacing: 0) {
                 configuration?.cardholderName?
@@ -180,6 +180,8 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                 Spacer(minLength: 0)
                     .frame(maxWidth: POSpacing.extraExtraLarge)
             }
+            .animation(.default, value: configuration?.cardholderName == nil)
+            .animation(.default, value: configuration?.expiration == nil)
             .frame(maxHeight: .infinity, alignment: .top)
         }
         .allowsTightening(true)
