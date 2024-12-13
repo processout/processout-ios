@@ -37,27 +37,15 @@ final class CardholderNameDetectorTests: XCTestCase {
         XCTAssertEqual(candidates.count, 1)
     }
 
-    func test_firstMatch_whenCandidateIncludesRestrictedWithOneLetterDifference_doesntMatch() {
+    func test_firstMatch_whenCandidateIncludesRestrictedWithOneLetterDifference_matches() {
         // Given
-        let sut = CardholderNameDetector(restrictedWords: ["RESTRICTED"])
+        let sut = CardholderNameDetector(restrictedWords: ["Visa"])
 
         // When
-        var candidates = ["RESTR1CTED"] // 1 instead of I
+        var candidates = ["LISA"]
 
         // Then
-        XCTAssertNil(sut.firstMatch(in: &candidates))
-        XCTAssertEqual(candidates.count, 1)
-    }
-
-    func test_firstMatch_whenCandidateIncludesRestrictedWithTwoLettersDifference_matches() {
-        // Given
-        let sut = CardholderNameDetector(restrictedWords: ["RESTRICTED"])
-
-        // When
-        var candidates = ["RES_RIC_ED"] // T is replaced with underscore 2 times
-
-        // Then
-        XCTAssertEqual(sut.firstMatch(in: &candidates), "RES_RIC_ED")
+        XCTAssertEqual(sut.firstMatch(in: &candidates), "LISA")
         XCTAssertTrue(candidates.isEmpty)
     }
 

@@ -83,6 +83,20 @@ final class CardExpirationDetectorTests: XCTestCase {
         XCTAssertEqual(candidates, ["TEST"])
     }
 
+    func test_firstMatch_removesExpiredCandidates() {
+        // Given
+        let sut = CardExpirationDetector(regexProvider: .shared, formatter: .init())
+
+        // When
+        var candidates = [
+            "01/01", "04/40", "02/02"
+        ]
+
+        // Then
+        XCTAssertNotNil(sut.firstMatch(in: &candidates))
+        XCTAssertTrue(candidates.isEmpty)
+    }
+
     // MARK: - Utils
 
     private func expirations(months: ClosedRange<Int>, monthFormat: String, year: String) -> [String] {
