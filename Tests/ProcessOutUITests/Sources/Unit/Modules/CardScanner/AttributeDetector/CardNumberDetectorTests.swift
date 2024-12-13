@@ -49,7 +49,7 @@ final class CardNumberDetectorTests: XCTestCase {
         // Then
         let match = sut.firstMatch(in: &candidates)
         XCTAssertEqual(match, "4242 4242 4242")
-        XCTAssertEqual(candidates.count, 1)
+        XCTAssertEqual(candidates, ["TEST"])
     }
 
     func test_firstMatch_whenCandidateLengthIsValidButChecksumIsInvalid_doesNotMatch() {
