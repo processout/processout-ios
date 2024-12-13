@@ -20,7 +20,8 @@ struct CardExpirationDetector: CardAttributeDetector {
         guard let regex = regexProvider.regex(with: "(0[1-9]|1[0-2])[.\\/](\\d{4}|\\d{2})") else {
             return nil
         }
-        for (offset, candidate) in candidates.enumerated() {
+        var matchedExpiration: POScannedCard.Expiration?
+        for (offset, candidate) in candidates.enumerated().reversed() {
             let candidate = candidate.removingCharacters(in: .whitespacesAndNewlines)
             let range = NSRange(candidate.startIndex..., in: candidate)
             guard let match = regex.firstMatch(in: candidate, range: range) else {
@@ -36,9 +37,9 @@ struct CardExpirationDetector: CardAttributeDetector {
                 continue
             }
             let description = formatter.string(from: String(month) + String(year % 100))
-            return .init(month: month, year: year, description: description)
+            matchedExpiration = .init(month: month, year: year, description: description)
         }
-        return nil
+        return matchedExpiration
     }
 
     // MARK: - Private Properties
