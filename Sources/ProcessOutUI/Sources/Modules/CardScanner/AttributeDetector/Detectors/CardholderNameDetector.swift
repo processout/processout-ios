@@ -18,7 +18,6 @@ struct CardholderNameDetector: CardAttributeDetector {
     func firstMatch(in candidates: inout [String]) -> String? {
         for (offset, candidate) in candidates.enumerated() {
             let normalizedCandidate = candidate
-                .applyingTransform(.toLatin, reverse: false)?
                 .applyingTransform(.stripDiacritics, reverse: false)?
                 .uppercased()
             guard let normalizedCandidate else {
