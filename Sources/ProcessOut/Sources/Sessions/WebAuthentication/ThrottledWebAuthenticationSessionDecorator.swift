@@ -46,12 +46,11 @@ actor ThrottledWebAuthenticationSessionDecorator: WebAuthenticationSession {
         guard let lastAuthenticationTime else {
             return
         }
-        let elapsedTime = DispatchTime.now().uptimeNanoseconds - lastAuthenticationTime.uptimeNanoseconds
-        let expectedDelay = 1 * NSEC_PER_SEC
-        let delay = expectedDelay.subtractingReportingOverflow(elapsedTime)
-        guard !delay.overflow else {
+        let minimumDelay: TimeInterval = 1
+        let delay = minimumDelay - (DispatchTime.now().uptimeSeconds - lastAuthenticationTime.uptimeSeconds)
+        guard delay > 0 else {
             return
         }
-        try? await Task.sleep(nanoseconds: delay.partialValue)
+        try? await Task.sleep(seconds: delay)
     }
 }
