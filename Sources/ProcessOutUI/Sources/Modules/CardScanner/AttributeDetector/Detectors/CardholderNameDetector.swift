@@ -58,8 +58,7 @@ struct CardholderNameDetector: CardAttributeDetector {
     }
 
     private func areSimilar(string: String, and secondString: String) -> Bool {
-        let differencesCount = string.difference(from: secondString).count
-        return differencesCount <= 1
+        string == secondString // Check for exact match to avoid potential false negatives, e.g. Visa <-> Lisa
     }
 }
 
