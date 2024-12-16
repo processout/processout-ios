@@ -32,7 +32,7 @@ extension POCardScannerView {
             )
             let interactor = DefaultCardScannerInteractor(
                 configuration: configuration,
-                cameraSession: .init(logger: ProcessOut.shared.logger),
+                cameraSession: DefaultCameraSession(logger: ProcessOut.shared.logger),
                 cardRecognitionSession: cardRecognitionSession,
                 logger: ProcessOut.shared.logger,
                 completion: completion
