@@ -5,12 +5,14 @@
 //  Created by Andrii Vysotskyi on 24.11.2023.
 //
 
-import XCTest
+import Foundation
+import Testing
 @testable import ProcessOut
 
-final class FallbackDecodableTests: XCTestCase {
+struct FallbackDecodableTests {
 
-    func test_fallbackDecodable_whenValueIsNotPresent_decodesEmptyString() throws {
+    @Test
+    func fallbackDecodable_whenValueIsNotPresent_decodesEmptyString() throws {
         // Given
         let decoder = JSONDecoder()
         let data = Data("{}".utf8)
@@ -19,10 +21,11 @@ final class FallbackDecodableTests: XCTestCase {
         let container = try decoder.decode(Container.self, from: data)
 
         // Then
-        XCTAssertTrue(container.value.isEmpty)
+        #expect(container.value.isEmpty)
     }
 
-    func test_fallbackDecodable_whenValueIsNull_decodesEmptyString() throws {
+    @Test
+    func fallbackDecodable_whenValueIsNull_decodesEmptyString() throws {
         // Given
         let decoder = JSONDecoder()
         let data = Data(#"{ "value": null }"#.utf8)
@@ -31,10 +34,11 @@ final class FallbackDecodableTests: XCTestCase {
         let container = try decoder.decode(Container.self, from: data)
 
         // Then
-        XCTAssertTrue(container.value.isEmpty)
+        #expect(container.value.isEmpty)
     }
 
-    func test_fallbackDecodable_whenValueIsAvailable_decodesIt() throws {
+    @Test
+    func fallbackDecodable_whenValueIsAvailable_decodesIt() throws {
         // Given
         let decoder = JSONDecoder()
         let data = Data(#"{ "value": "1" }"#.utf8)
@@ -43,7 +47,7 @@ final class FallbackDecodableTests: XCTestCase {
         let container = try decoder.decode(Container.self, from: data)
 
         // Then
-        XCTAssertEqual(container.value, "1")
+        #expect(container.value == "1")
     }
 }
 
