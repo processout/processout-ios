@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 10.10.2024.
 //
 
-@testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 import XCTest
 
 final class ThrottledWebAuthenticationSessionDecoratorTests: XCTestCase {
@@ -42,8 +42,8 @@ final class ThrottledWebAuthenticationSessionDecoratorTests: XCTestCase {
         mockSession.authenticateFromClosure = { _ in
             // Then
             if let lastAuthenticationStartTime {
-                let delay = Int(DispatchTime.now().uptimeNanoseconds - lastAuthenticationStartTime.uptimeNanoseconds)
-                let expectedDelay = 1_000_000_000, tolerance = 500_000_000 // 1 and 0.5 seconds respectfully
+                let delay = DispatchTime.now().uptimeSeconds - lastAuthenticationStartTime.uptimeSeconds
+                let expectedDelay: TimeInterval = 1, tolerance: TimeInterval = 0.5
                 XCTAssertTrue(abs(delay - expectedDelay) <= tolerance)
             }
             lastAuthenticationStartTime = DispatchTime.now()

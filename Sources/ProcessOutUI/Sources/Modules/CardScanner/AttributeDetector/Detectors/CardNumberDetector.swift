@@ -25,7 +25,7 @@ struct CardNumberDetector: CardAttributeDetector {
                 continue
             }
             let number = candidate.substring(with: match.range).filter { !$0.isWhitespace }
-            guard isLengthValid(number: number), isChecksumValid(number: number) else {
+            guard isChecksumValid(number: number) else {
                 continue
             }
             candidates.remove(at: offset)
@@ -40,10 +40,6 @@ struct CardNumberDetector: CardAttributeDetector {
     private let formatter: POCardNumberFormatter
 
     // MARK: - Private Methods
-
-    private func isLengthValid(number: String) -> Bool {
-        number.count >= 12 && number.count <= 19
-    }
 
     private func isChecksumValid(number: String) -> Bool {
         var checkDigit = 0

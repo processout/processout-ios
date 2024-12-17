@@ -16,19 +16,21 @@ actor CardRecognitionSession: CameraSessionDelegate {
         numberDetector: some CardAttributeDetector<String>,
         expirationDetector: some CardAttributeDetector<POScannedCard.Expiration>,
         cardholderNameDetector: some CardAttributeDetector<String>,
+        errorCorrection: CardRecognitionSessionErrorCorrection,
         logger: POLogger
     ) {
         self.numberDetector = numberDetector
         self.expirationDetector = expirationDetector
         self.cardholderNameDetector = cardholderNameDetector
+        self.errorCorrection = errorCorrection
         self.logger = logger
     }
 
     /// Starts recognition session using giving camera session as a source.
-    func setCameraSession(_ cameraSession: CameraSession) async -> Bool {
+    func setCameraSession(_ cameraSession: CameraSession) async {
+        await self.cameraSession?.setDelegate(nil)
         await cameraSession.setDelegate(self)
         self.cameraSession = cameraSession
-        return true
     }
 
     func setDelegate(_ delegate: CardRecognitionSessionDelegate?) {
@@ -133,7 +135,7 @@ actor CardRecognitionSession: CameraSessionDelegate {
 
     // MARK: - Scanned Card Processing
 
-    private let errorCorrection = CardRecognitionSessionErrorCorrection()
+    private let errorCorrection: CardRecognitionSessionErrorCorrection
     private var lastErrorCorrectedCard: POScannedCard?
 
     private func process(scannedCard: POScannedCard?) async {
