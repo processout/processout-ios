@@ -5,33 +5,34 @@
 //  Created by Andrii Vysotskyi on 16.05.2023.
 //
 
-import XCTest
+import Testing
 @testable @_spi(PO) import ProcessOut
 
-final class DefaultPhoneNumberMetadataProviderTests: XCTestCase {
+struct DefaultPhoneNumberMetadataProviderTests {
 
-    override func setUp() {
-        super.setUp()
+    init() {
         sut = .shared
     }
 
-    func test_metadata_returnValidMetadata() {
+    @Test
+    func metadata_returnValidMetadata() {
         // When
         let metadata = sut.metadata(for: "1")
 
         // Then
-        XCTAssertNotNil(metadata)
+        #expect(metadata != nil)
     }
 
-    func test_metadata_whenCountryCodeContainsEasternArabicNumerals_returnValidMetadata() {
+    @Test
+    func metadata_whenCountryCodeContainsEasternArabicNumerals_returnValidMetadata() {
         // When
         let metadata = sut.metadata(for: "١")
 
         // Then
-        XCTAssertEqual(metadata?.countryCode, "1")
+        #expect(metadata?.countryCode == "1")
     }
 
     // MARK: - Private Properties
 
-    private var sut: PODefaultPhoneNumberMetadataProvider!
+    private let sut: PODefaultPhoneNumberMetadataProvider
 }

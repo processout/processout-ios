@@ -5,49 +5,53 @@
 //  Created by Andrii Vysotskyi on 21.07.2023.
 //
 
-import XCTest
+import Testing
 @testable @_spi(PO) import ProcessOut
 
-final class CardExpirationFormatterTests: XCTestCase {
+struct CardExpirationFormatterTests {
 
-    override func setUp() {
-        super.setUp()
+    init() {
         sut = POCardExpirationFormatter()
     }
 
-    func test_string() {
+    @Test
+    func string() {
         // When
         let formatted = sut.string(from: "1230")
 
         // Then
-        XCTAssertEqual(formatted, "12 / 30")
+        #expect(formatted == "12 / 30")
     }
 
-    func test_string_whenStringHasNoDigits_returnsEmptyString() {
+    @Test
+    func string_whenStringHasNoDigits_returnsEmptyString() {
         // When
         let formatted = sut.string(from: "a")
 
         // Then
-        XCTAssertEqual(formatted, "")
+        #expect(formatted.isEmpty)
     }
 
-    func test_string_whenStringIsPrefixedWithZeros_keepsZingleZero() {
+    @Test
+    func string_whenStringIsPrefixedWithZeros_keepsZingleZero() {
         // When
         let formatted = sut.string(from: "001")
 
         // Then
-        XCTAssertEqual(formatted, "01 / ")
+        #expect(formatted == "01 / ")
     }
 
-    func test_string_whenStringHasOnlyZeros_returnsZero() {
+    @Test
+    func string_whenStringHasOnlyZeros_returnsZero() {
         // When
         let formatted = sut.string(from: "000")
 
         // Then
-        XCTAssertEqual(formatted, "0")
+        #expect(formatted == "0")
     }
 
-    func test_string_returnsPaddedMonth() {
+    @Test
+    func string_returnsPaddedMonth() {
         // Given
         let strings = (2...9).map(\.description)
 
@@ -56,54 +60,59 @@ final class CardExpirationFormatterTests: XCTestCase {
 
         // Then
         let allSatisfy = formatted.allSatisfy { $0.first == "0" }
-        XCTAssertTrue(allSatisfy)
+        #expect(allSatisfy)
     }
 
-    func test_string_whenMonthIsIncomplete_returnsIt() {
+    @Test
+    func string_whenMonthIsIncomplete_returnsIt() {
         // When
         let formatted = sut.string(from: "1")
 
         // Then
-        XCTAssertEqual(formatted, "1")
+        #expect(formatted == "1")
     }
 
     // MARK: - Expiration Month
 
-    func test_expirationMonth_returnsValue() {
+    @Test
+    func expirationMonth_returnsValue() {
         // When
         let month = sut.expirationMonth(from: "01")
 
         // Then
-        XCTAssertEqual(month, 1)
+        #expect(month == 1)
     }
 
-    func test_expirationMonth_whenMonthIsInvalid_returnsNil() {
+    @Test
+    func expirationMonth_whenMonthIsInvalid_returnsNil() {
         // When
         let month = sut.expirationMonth(from: "0")
 
         // Then
-        XCTAssertEqual(month, nil)
+        #expect(month == nil)
     }
 
     // MARK: - Expiration Year
 
-    func test_expirationYear_returnsValue() {
+    @Test
+    func expirationYear_returnsValue() {
         // When
         let year = sut.expirationYear(from: "01/1")
 
         // Then
-        XCTAssertEqual(year, 1)
+        #expect(year == 1)
     }
 
-    func test_expirationYear_whenYearComponentIsNotSet_returnsNil() {
+    @Test
+    func expirationYear_whenYearComponentIsNotSet_returnsNil() {
         // When
         let year = sut.expirationYear(from: "01/")
 
         // Then
-        XCTAssertEqual(year, nil)
+        #expect(year == nil)
     }
 
     // MARK: - Private Properties
 
-    private var sut: POCardExpirationFormatter!
+    private let sut: POCardExpirationFormatter
 }
