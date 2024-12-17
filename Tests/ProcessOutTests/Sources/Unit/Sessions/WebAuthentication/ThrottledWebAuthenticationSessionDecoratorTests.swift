@@ -5,14 +5,16 @@
 //  Created by Andrii Vysotskyi on 10.10.2024.
 //
 
+import Foundation
+import Testing
 @testable @_spi(PO) import ProcessOut
-import XCTest
 
-final class ThrottledWebAuthenticationSessionDecoratorTests: XCTestCase {
+struct ThrottledWebAuthenticationSessionDecoratorTests {
 
     // MARK: - Wait
 
-    func test_authenticate_allowsOneAuthenticationAtTime() async throws {
+    @Test
+    func authenticate_allowsOneAuthenticationAtTime() async throws {
         // Given
         let mockSession = MockWebAuthenticationSession()
         mockSession.authenticateFromClosure = { _ in
@@ -31,10 +33,11 @@ final class ThrottledWebAuthenticationSessionDecoratorTests: XCTestCase {
         try await Task.sleep(for: .seconds(1))
 
         // Then
-        XCTAssertEqual(mockSession.authenticateCallsCount, 1)
+        #expect(mockSession.authenticateCallsCount == 1)
     }
 
-    func test_authenticate_throttlesAuthentications() async throws {
+    @Test
+    func authenticate_throttlesAuthentications() async throws {
         var lastAuthenticationStartTime: DispatchTime?
 
         // Given
@@ -44,7 +47,7 @@ final class ThrottledWebAuthenticationSessionDecoratorTests: XCTestCase {
             if let lastAuthenticationStartTime {
                 let delay = DispatchTime.now().uptimeSeconds - lastAuthenticationStartTime.uptimeSeconds
                 let expectedDelay: TimeInterval = 1, tolerance: TimeInterval = 0.5
-                XCTAssertTrue(abs(delay - expectedDelay) <= tolerance)
+                #expect(abs(delay - expectedDelay) <= tolerance)
             }
             lastAuthenticationStartTime = DispatchTime.now()
             return URL(string: "response.com")!
