@@ -6,20 +6,20 @@
 //
 
 import Foundation
-import XCTest
+import Testing
 @testable @_spi(PO) import ProcessOut
 
-final class HttpConnectorRetryDecoratorTests: XCTestCase {
+struct HttpConnectorRetryDecoratorTests {
 
-    override func setUp() {
-        super.setUp()
+    init() {
         mock = MockHttpConnector()
         sut = HttpConnectorRetryDecorator(
             connector: mock, retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1)
         )
     }
 
-    func test_execute_whenRequestMethodIsPost_addsSameIdempotencyKeyHeader() async throws {
+    @Test
+    func execute_whenRequestMethodIsPost_addsSameIdempotencyKeyHeader() async throws {
         // Given
         let request = HttpConnectorRequest<VoidCodable>.post(path: "")
         var previousIdempotencyKey: String?
@@ -28,9 +28,9 @@ final class HttpConnectorRetryDecoratorTests: XCTestCase {
         mock.executeFromClosure = { request in
             let request = request as! HttpConnectorRequest<VoidCodable> // swiftlint:disable:this force_cast
             let idempotencyKey = request.headers["Idempotency-Key"]
-            XCTAssertNotNil(idempotencyKey)
+            #expect(idempotencyKey != nil)
             if previousIdempotencyKey != nil {
-                XCTAssertEqual(previousIdempotencyKey, idempotencyKey)
+                #expect(previousIdempotencyKey == idempotencyKey)
             }
             previousIdempotencyKey = idempotencyKey
             throw HttpConnectorFailure(code: .networkUnreachable, underlyingError: nil)
@@ -40,11 +40,11 @@ final class HttpConnectorRetryDecoratorTests: XCTestCase {
         _ = try? await sut.execute(request: request)
 
         // Then
-        XCTAssertNotNil(previousIdempotencyKey)
-        XCTAssertEqual(mock.executeCallsCount, 2)
+        #expect(previousIdempotencyKey != nil && mock.executeCallsCount == 2)
     }
 
-    func test_execute_whenRequestMethodIsGetOrPut_doesntAddIdempotencyKeyHeader() async throws {
+    @Test
+    func execute_whenRequestMethodIsGetOrPut_doesntAddIdempotencyKeyHeader() async throws {
         // Given
         let requests = [
             HttpConnectorRequest<VoidCodable>.get(path: ""),
@@ -55,8 +55,7 @@ final class HttpConnectorRetryDecoratorTests: XCTestCase {
         mock.executeFromClosure = { request in
             // Then
             let request = request as! HttpConnectorRequest<VoidCodable> // swiftlint:disable:this force_cast
-            let idempotencyKey = request.headers["Idempotency-Key"]
-            XCTAssertNil(idempotencyKey)
+            #expect(request.headers["Idempotency-Key"] == nil)
             throw HttpConnectorFailure(code: .networkUnreachable, underlyingError: nil)
         }
 
@@ -68,6 +67,6 @@ final class HttpConnectorRetryDecoratorTests: XCTestCase {
 
     // MARK: - Private Properties
 
-    private var mock: MockHttpConnector!
-    private var sut: HttpConnector!
+    private let mock: MockHttpConnector
+    private let sut: HttpConnector
 }

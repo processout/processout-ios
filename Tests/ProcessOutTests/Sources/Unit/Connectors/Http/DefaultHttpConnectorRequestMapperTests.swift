@@ -6,23 +6,27 @@
 //
 
 import Foundation
-import XCTest
+import Testing
 @testable @_spi(PO) import ProcessOut
 
-final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
+struct DefaultHttpConnectorRequestMapperTests {
 
     // MARK: - Request Path
 
-    func test_urlRequest_whenPathIsInvalid_fails() async throws {
+    @Test
+    func urlRequest_whenPathIsInvalid_fails() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.get(path: "|")
 
         // Then
-        await assertThrowsError(try await sut.urlRequest(from: request))
+        await withKnownIssue {
+            _ = try await sut.urlRequest(from: request)
+        }
     }
 
-    func test_urlRequest_whenPathIsValid_succeeds() async throws {
+    @Test
+    func urlRequest_whenPathIsValid_succeeds() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.get(path: "/test/path")
@@ -31,12 +35,13 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         let urlRequest = try await sut.urlRequest(from: request)
 
         // Then
-        XCTAssertEqual(urlRequest.url?.path(), request.path)
+        #expect(urlRequest.url?.path() == request.path)
     }
 
     // MARK: - Request Body
 
-    func test_urlRequest_whenBodyIsSet_encodesBody() async throws {
+    @Test
+    func urlRequest_whenBodyIsSet_encodesBody() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.post(path: "", body: "body")
@@ -45,10 +50,11 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         let urlRequest = try await sut.urlRequest(from: request)
 
         // Then
-        XCTAssertEqual(urlRequest.httpBody, Data(#""body""#.utf8))
+        #expect(urlRequest.httpBody == Data(#""body""#.utf8))
     }
 
-    func test_urlRequest_whenIncludesDeviceMetadataButBodyIsNotSet_encodesBody() async throws {
+    @Test
+    func urlRequest_whenIncludesDeviceMetadataButBodyIsNotSet_encodesBody() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.post(path: "", includesDeviceMetadata: true)
@@ -59,10 +65,11 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         // Then
         // swiftlint:disable:next line_length
         let expectedBody = #"{"device":{"appLanguage":"en","appScreenHeight":2,"appScreenWidth":1,"appTimeZoneOffset":3,"channel":"test"}}"#
-        XCTAssertEqual(urlRequest.httpBody, Data(expectedBody.utf8))
+        #expect(urlRequest.httpBody == Data(expectedBody.utf8))
     }
 
-    func test_urlRequest_whenIncludesDeviceMetadataAndBodyIsSet_encodesBody() async throws {
+    @Test
+    func urlRequest_whenIncludesDeviceMetadataAndBodyIsSet_encodesBody() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.post(
@@ -75,10 +82,11 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         // Then
         // swiftlint:disable:next line_length
         let expectedBody = #"{"device":{"appLanguage":"en","appScreenHeight":2,"appScreenWidth":1,"appTimeZoneOffset":3,"channel":"test"},"key":"value"}"#
-        XCTAssertEqual(urlRequest.httpBody, Data(expectedBody.utf8))
+        #expect(urlRequest.httpBody == Data(expectedBody.utf8))
     }
 
-    func test_urlRequest_whenBodyIsNotSet_returnsRequestWithoutBody() async throws {
+    @Test
+    func urlRequest_whenBodyIsNotSet_returnsRequestWithoutBody() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.get(path: "")
@@ -87,21 +95,25 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         let urlRequest = try await sut.urlRequest(from: request)
 
         // Then
-        XCTAssertNil(urlRequest.httpBody)
+        #expect(urlRequest.httpBody == nil)
     }
 
-    func test_urlRequest_whenBodyIsInvalid_fails() async throws {
+    @Test
+    func urlRequest_whenBodyIsInvalid_fails() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.post(path: "", body: Float.infinity)
 
         // Then
-        await assertThrowsError(try await sut.urlRequest(from: request))
+        await withKnownIssue {
+            _ = try await sut.urlRequest(from: request)
+        }
     }
 
     // MARK: - Request Query
 
-    func test_urlRequest_whenQueryIsSet_succeeds() async throws {
+    @Test
+    func urlRequest_whenQueryIsSet_succeeds() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.get(path: "", query: ["key": "value"])
@@ -110,12 +122,13 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         let urlRequest = try await sut.urlRequest(from: request)
 
         // Then
-        XCTAssertEqual(urlRequest.url?.query(), "key=value")
+        #expect(urlRequest.url?.query() == "key=value")
     }
 
     // MARK: - Request Headers
 
-    func test_urlRequest_addsUserAgent() async throws {
+    @Test
+    func urlRequest_addsUserAgent() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.get(path: "")
@@ -126,10 +139,11 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         // Then
         let userAgent = urlRequest.value(forHTTPHeaderField: "user-agent")
         let userAgentRegex = /^iOS\/4 ProcessOut iOS-Bindings\/1\.2\.3$/
-        XCTAssertNotNil(userAgent?.firstMatch(of: userAgentRegex))
+        #expect(userAgent?.firstMatch(of: userAgentRegex) != nil)
     }
 
-    func test_urlRequest_whenPrivateKeyIsNotRequired_addsAuthorization() async throws {
+    @Test
+    func urlRequest_whenPrivateKeyIsNotRequired_addsAuthorization() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.get(path: "")
@@ -139,10 +153,11 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
 
         // Then
         let authorization = urlRequest.value(forHTTPHeaderField: "Authorization")
-        XCTAssertEqual(authorization, "Basic PElEPjo=")
+        #expect(authorization == "Basic PElEPjo=")
     }
 
-    func test_urlRequest_whenPrivateKeyIsRequired_addsAuthorization() async throws {
+    @Test
+    func urlRequest_whenPrivateKeyIsRequired_addsAuthorization() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.get(path: "", requiresPrivateKey: true)
@@ -152,10 +167,11 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
 
         // Then
         let authorization = urlRequest.value(forHTTPHeaderField: "Authorization")
-        XCTAssertEqual(authorization, "Basic PElEPjo8S0VZPg==")
+        #expect(authorization == "Basic PElEPjo8S0VZPg==")
     }
 
-    func test_urlRequest_addsDefaultHeaders() async throws {
+    @Test
+    func urlRequest_addsDefaultHeaders() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.get(path: "")
@@ -166,11 +182,12 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         // Then
         let expectedHeaders = ["User-Agent", "Accept-Language", "Content-Type", "Authorization"]
         for header in expectedHeaders {
-            XCTAssertNotNil(urlRequest.value(forHTTPHeaderField: header))
+            #expect(urlRequest.value(forHTTPHeaderField: header) != nil)
         }
     }
 
-    func test_urlRequest_addsJsonContentTypeHeader() async throws {
+    @Test
+    func urlRequest_addsJsonContentTypeHeader() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.get(path: "")
@@ -180,10 +197,11 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
 
         // Then
         let idempotencyKey = urlRequest.value(forHTTPHeaderField: "Content-Type")
-        XCTAssertEqual(idempotencyKey, "application/json")
+        #expect(idempotencyKey == "application/json")
     }
 
-    func test_urlRequest_whenRequestHeaderIsSet_overridesDefaultHeader() async throws {
+    @Test
+    func urlRequest_whenRequestHeaderIsSet_overridesDefaultHeader() async throws {
         // Given
         let sut = createMapper(configuration: defaultConfiguration)
         let request = HttpConnectorRequest<VoidCodable>.get(path: "", headers: ["Content-Type": "test"])
@@ -192,7 +210,7 @@ final class DefaultHttpConnectorRequestMapperTests: XCTestCase {
         let urlRequest = try await sut.urlRequest(from: request)
 
         // Then
-        XCTAssertEqual(urlRequest.value(forHTTPHeaderField: "Content-Type"), "test")
+        #expect(urlRequest.value(forHTTPHeaderField: "Content-Type") == "test")
     }
 
     // MARK: - Private Nested Types
