@@ -5,11 +5,11 @@
 //  Created by Andrii Vysotskyi on 17.04.2023.
 //
 
-import XCTest
+import Testing
 import ProcessOutCheckout3DS
 
-final class Checkout3DSServiceTests: XCTestCase {
+struct Checkout3DSServiceTests {
 
-    // swiftlint:disable:next empty_xctest_method
-    func testExample() throws { }
+    @Test
+    func example() throws { }
 }
