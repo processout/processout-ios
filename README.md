@@ -57,7 +57,7 @@ Before going further please make sure that you have installed all dependencies s
 
 ### Running tests
 
-To run tests locally use `./Scripts/Test.sh` script. It is also possible to run them directly in Xcode from the ProcessOut target in `ProcessOut.xcodeproj`.
+To run tests locally use `./Scripts/Tests/Run.sh` script. It is also possible to run them directly in Xcode from the ProcessOut target in `ProcessOut.xcodeproj`.
 
 ## License
 
