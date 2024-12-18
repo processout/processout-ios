@@ -5,24 +5,23 @@
 //  Created by Andrii Vysotskyi on 07.07.2023.
 //
 
-import XCTest
+import Testing
 @testable @_spi(PO) import ProcessOut
 
-final class CustomerTokensServiceTests: XCTestCase {
+struct CustomerTokensServiceTests {
 
-    override func setUp() {
-        super.setUp()
-        let configuration = ProcessOutConfiguration(
-            projectId: Constants.projectId, privateKey: Constants.projectPrivateKey
+    init() async {
+        let processOut = await ProcessOut(
+            configuration: .init(projectId: Constants.projectId, privateKey: Constants.projectPrivateKey)
         )
-        ProcessOut.configure(configuration: configuration, force: true)
-        sut = ProcessOut.shared.customerTokens
-        cardsService = ProcessOut.shared.cards
+        sut = processOut.customerTokens
+        cardsService = processOut.cards
     }
 
     // MARK: - Tests
 
-    func test_createCustomerToken_returnsToken() async throws {
+    @Test
+    func createCustomerToken_returnsToken() async throws {
         // Given
         let request = POCreateCustomerTokenRequest(customerId: Constants.customerId)
 
@@ -30,10 +29,11 @@ final class CustomerTokensServiceTests: XCTestCase {
         let token = try await sut.createCustomerToken(request: request)
 
         // Then
-        XCTAssertEqual(token.customerId, request.customerId)
+        #expect(token.customerId == request.customerId)
     }
 
-    func test_assignCustomerToken_whenVerifyIsSetToFalse_assignsNewSource() async throws {
+    @Test
+    func assignCustomerToken_whenVerifyIsSetToFalse_assignsNewSource() async throws {
         // Given
         let card = try await cardsService.tokenize(
             request: .init(number: "4242424242424242", expMonth: 12, expYear: 40, cvc: "737")
@@ -48,10 +48,11 @@ final class CustomerTokensServiceTests: XCTestCase {
         let updatedToken = try await sut.assignCustomerToken(request: request, threeDSService: Mock3DS2Service())
 
         // Then
-        XCTAssertEqual(updatedToken.cardId, card.id)
+        #expect(updatedToken.cardId == card.id)
     }
 
-    func test_assignCustomerToken_whenVerifyIsSetToTrue_triggers3DS() async throws {
+    @Test
+    func assignCustomerToken_whenVerifyIsSetToTrue_triggers3DS() async throws {
         // Given
         let card = try await cardsService.tokenize(
             request: .init(number: "4000000000000101", expMonth: 12, expYear: 40, cvc: "737")
@@ -72,13 +73,13 @@ final class CustomerTokensServiceTests: XCTestCase {
         _ = try? await sut.assignCustomerToken(request: request, threeDSService: threeDSService)
 
         // Then
-        XCTAssertEqual(threeDSService.authenticationRequestParametersCallsCount, 1)
+        #expect(threeDSService.authenticationRequestParametersCallsCount == 1)
     }
 
     // MARK: - Private Properties
 
-    private var sut: POCustomerTokensService!
-    private var cardsService: POCardsService!
+    private let sut: POCustomerTokensService
+    private let cardsService: POCardsService
 
     // MARK: - Private Methods
 
