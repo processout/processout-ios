@@ -93,8 +93,7 @@ public final class ProcessOut: @unchecked Sendable {
     // MARK: - Private Methods
 
     @MainActor
-    // swiftlint:disable:next function_body_length
-    private init(configuration: ProcessOutConfiguration) {
+    init(configuration: ProcessOutConfiguration) { // swiftlint:disable:this function_body_length
         self._configuration = .init(wrappedValue: configuration)
         let deviceMetadataProvider = Self.createDeviceMetadataProvider()
         // Telemetry connector logs are not submitted to backend to avoid recursion.
