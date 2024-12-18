@@ -13,6 +13,6 @@ for PRODUCT in "ProcessOut" "ProcessOutUI" "ProcessOutCheckout3DS"; do
     xcodebuild clean build \
         -destination "$DESTINATION" \
         -project $PROJECT \
-        -scheme $PRODUCT \
+        -scheme $PRODUCT |
         xcpretty
 done
