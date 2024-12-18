@@ -5,16 +5,15 @@
 //  Created by Andrii Vysotskyi on 16.12.2024.
 //
 
-import XCTest
 import SwiftUI
 import UIKit
+import Testing
 @_spi(PO) import ProcessOut
 @testable import ProcessOutUI
 
-final class CardRecognitionSessionTests: XCTestCase {
+final class CardRecognitionSessionTests {
 
-    override func setUp() {
-        super.setUp()
+    init() {
         sut = CardRecognitionSession(
             numberDetector: CardNumberDetector(
                 regexProvider: .shared, formatter: .init()
@@ -30,7 +29,8 @@ final class CardRecognitionSessionTests: XCTestCase {
 
     // MARK: - Tests
 
-    func test_setCameraSession_setsCameraSessionDelegate() async {
+    @Test
+    func setCameraSession_setsCameraSessionDelegate() async {
         // Given
         let cameraSession = MockCameraSession()
 
@@ -38,11 +38,11 @@ final class CardRecognitionSessionTests: XCTestCase {
         await sut.setCameraSession(cameraSession)
 
         // Then
-        let isDelegateSet = await cameraSession.delegate != nil
-        XCTAssertTrue(isDelegateSet)
+        await #expect(cameraSession.delegate != nil)
     }
 
-    func test_cameraSessionDidOutput_whenCardImageIsValid_updatesDelegateUpdatedImage() async {
+    @Test
+    func cameraSessionDidOutput_whenCardImageIsValid_updatesDelegateUpdatedImage() async {
         // Given
         let cameraSession = MockCameraSession(), recognitionSessionDelegate = MockCardRecognitionSessionDelegate()
         await sut.setDelegate(recognitionSessionDelegate)
@@ -60,11 +60,10 @@ final class CardRecognitionSessionTests: XCTestCase {
             expiration: .init(month: 4, year: 2040, description: "04 / 40"),
             cardholderName: "JOHN DOE"
         )
-        let lastUpdatedCard = await recognitionSessionDelegate.lastUpdatedCard
-        XCTAssertTrue(lastUpdatedCard == expectedCard)
+        await #expect(recognitionSessionDelegate.lastUpdatedCard == expectedCard)
     }
 
     // MARK: - Private Properties
 
-    private var sut: CardRecognitionSession!
+    private let sut: CardRecognitionSession
 }

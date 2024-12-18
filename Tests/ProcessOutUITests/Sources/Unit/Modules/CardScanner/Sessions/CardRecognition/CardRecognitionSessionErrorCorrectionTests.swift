@@ -5,13 +5,14 @@
 //  Created by Andrii Vysotskyi on 16.12.2024.
 //
 
-import XCTest
+import Testing
 @_spi(PO) import ProcessOut
 @testable import ProcessOutUI
 
-final class CardRecognitionSessionErrorCorrectionTests: XCTestCase {
+struct CardRecognitionSessionErrorCorrectionTests {
 
-    func test_add_whenScannedCardIsNonNil_returnsCorrectedCard() {
+    @Test
+    func add_whenScannedCardIsNonNil_returnsCorrectedCard() {
         // Given
         let sut = CardRecognitionSessionErrorCorrection()
 
@@ -20,10 +21,11 @@ final class CardRecognitionSessionErrorCorrectionTests: XCTestCase {
         let correctedCard = sut.add(scannedCard: scannedCard)
 
         // Then
-        XCTAssertEqual(correctedCard, scannedCard)
+        #expect(correctedCard == scannedCard)
     }
 
-    func test_add_whenErrorCorrectionDurationIsReached_changesConfidence() async {
+    @Test
+    func add_whenErrorCorrectionDurationIsReached_changesConfidence() async {
         // Given
         let sut = CardRecognitionSessionErrorCorrection(errorCorrectionDuration: 0.5)
 
@@ -34,10 +36,11 @@ final class CardRecognitionSessionErrorCorrectionTests: XCTestCase {
         try? await Task.sleep(seconds: 1)
 
         // Then
-        XCTAssertTrue(sut.isConfident)
+        #expect(sut.isConfident)
     }
 
-    func test_add_whenErrorCorrectionDurationIsNotReached_doesntChangeConfidence() {
+    @Test
+    func add_whenErrorCorrectionDurationIsNotReached_doesntChangeConfidence() {
         // Given
         let sut = CardRecognitionSessionErrorCorrection(errorCorrectionDuration: 0.5)
 
@@ -47,10 +50,11 @@ final class CardRecognitionSessionErrorCorrectionTests: XCTestCase {
         )
 
         // Then
-        XCTAssertFalse(sut.isConfident)
+        #expect(!sut.isConfident)
     }
 
-    func test_add_returnsMostFrequentNumber() {
+    @Test
+    func add_returnsMostFrequentNumber() {
         // Given
         let sut = CardRecognitionSessionErrorCorrection()
         var recentCorrectedCard: POScannedCard?
@@ -66,10 +70,11 @@ final class CardRecognitionSessionErrorCorrectionTests: XCTestCase {
         }
 
         // Then
-        XCTAssertEqual(recentCorrectedCard?.number, "2")
+        #expect(recentCorrectedCard?.number == "2")
     }
 
-    func test_add_returnsMostFrequentExpiration() {
+    @Test
+    func add_returnsMostFrequentExpiration() {
         // Given
         let sut = CardRecognitionSessionErrorCorrection()
         var recentCorrectedCard: POScannedCard?
@@ -85,10 +90,11 @@ final class CardRecognitionSessionErrorCorrectionTests: XCTestCase {
         }
 
         // Then
-        XCTAssertTrue(recentCorrectedCard?.expiration == .init(month: 2, year: 3, description: ""))
+        #expect(recentCorrectedCard?.expiration == .init(month: 2, year: 3, description: ""))
     }
 
-    func test_add_returnsMostFrequentCardholder() {
+    @Test
+    func add_returnsMostFrequentCardholder() {
         // Given
         let sut = CardRecognitionSessionErrorCorrection()
         var recentCorrectedCard: POScannedCard?
@@ -104,6 +110,6 @@ final class CardRecognitionSessionErrorCorrectionTests: XCTestCase {
         }
 
         // Then
-        XCTAssertTrue(recentCorrectedCard?.cardholderName == "2")
+        #expect(recentCorrectedCard?.cardholderName == "2")
     }
 }

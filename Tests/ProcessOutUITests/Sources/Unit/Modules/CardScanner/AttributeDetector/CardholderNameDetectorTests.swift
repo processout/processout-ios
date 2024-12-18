@@ -5,13 +5,14 @@
 //  Created by Andrii Vysotskyi on 13.12.2024.
 //
 
-import XCTest
+import Testing
 @_spi(PO) import ProcessOut
 @testable import ProcessOutUI
 
-final class CardholderNameDetectorTests: XCTestCase {
+struct CardholderNameDetectorTests {
 
-    func test_firstMatch_whenCandidateDoesntIncludeRestrictedWords_matches() {
+    @Test
+    func firstMatch_whenCandidateDoesntIncludeRestrictedWords_matches() {
         // Given
         let sut = CardholderNameDetector(restrictedWords: ["RESTRICTED"])
 
@@ -20,11 +21,11 @@ final class CardholderNameDetectorTests: XCTestCase {
 
         // Then
         let match = sut.firstMatch(in: &candidates)
-        XCTAssertEqual(match, "Test")
-        XCTAssertTrue(candidates.isEmpty)
+        #expect(match == "Test" && candidates.isEmpty)
     }
 
-    func test_firstMatch_whenCandidateIncludesRestrictedWordAndCaseIsDifferent_doesntMatch() {
+    @Test
+    func firstMatch_whenCandidateIncludesRestrictedWordAndCaseIsDifferent_doesntMatch() {
         // Given
         let restrictedWord = "RESTRICTED"
         let sut = CardholderNameDetector(restrictedWords: [restrictedWord])
@@ -33,11 +34,11 @@ final class CardholderNameDetectorTests: XCTestCase {
         var candidates = [restrictedWord.lowercased()]
 
         // Then
-        XCTAssertNil(sut.firstMatch(in: &candidates))
-        XCTAssertEqual(candidates.count, 1)
+        #expect(sut.firstMatch(in: &candidates) == nil && candidates.count == 1)
     }
 
-    func test_firstMatch_whenCandidateIncludesRestrictedWithOneLetterDifference_matches() {
+    @Test
+    func firstMatch_whenCandidateIncludesRestrictedWithOneLetterDifference_matches() {
         // Given
         let sut = CardholderNameDetector(restrictedWords: ["Visa"])
 
@@ -45,11 +46,11 @@ final class CardholderNameDetectorTests: XCTestCase {
         var candidates = ["LISA"]
 
         // Then
-        XCTAssertEqual(sut.firstMatch(in: &candidates), "LISA")
-        XCTAssertTrue(candidates.isEmpty)
+        #expect(sut.firstMatch(in: &candidates) == "LISA" && candidates.isEmpty)
     }
 
-    func test_firstMatch_whenCandidateWithMultipleWordsIncludesRestrictedWord_doesntMatch() {
+    @Test
+    func firstMatch_whenCandidateWithMultipleWordsIncludesRestrictedWord_doesntMatch() {
         // Given
         let sut = CardholderNameDetector(restrictedWords: ["TEST"])
 
@@ -57,6 +58,6 @@ final class CardholderNameDetectorTests: XCTestCase {
         var candidates = ["One test two"]
 
         // Then
-        XCTAssertNil(sut.firstMatch(in: &candidates))
+        #expect(sut.firstMatch(in: &candidates) == nil)
     }
 }

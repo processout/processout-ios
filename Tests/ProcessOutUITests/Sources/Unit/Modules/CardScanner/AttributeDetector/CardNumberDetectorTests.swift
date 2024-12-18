@@ -5,13 +5,14 @@
 //  Created by Andrii Vysotskyi on 13.12.2024.
 //
 
-import XCTest
+import Testing
 @_spi(PO) import ProcessOut
 @testable import ProcessOutUI
 
-final class CardNumberDetectorTests: XCTestCase {
+struct CardNumberDetectorTests {
 
-    func test_firstMatch_whenCandidateLengthAndChecksumAreValid_matches() {
+    @Test
+    func firstMatch_whenCandidateLengthAndChecksumAreValid_matches() {
         // Given
         let sut = CardNumberDetector(regexProvider: .shared, formatter: .init())
 
@@ -20,11 +21,11 @@ final class CardNumberDetectorTests: XCTestCase {
 
         // Then
         let match = sut.firstMatch(in: &candidates)
-        XCTAssertEqual(match, "4242 4242 4242")
-        XCTAssertTrue(candidates.isEmpty)
+        #expect(match == "4242 4242 4242" && candidates.isEmpty)
     }
 
-    func test_firstMatch_whenValidCandidateContainsWhitespaces_matches() {
+    @Test
+    func firstMatch_whenValidCandidateContainsWhitespaces_matches() {
         // Given
         let sut = CardNumberDetector(regexProvider: .shared, formatter: .init())
 
@@ -33,11 +34,11 @@ final class CardNumberDetectorTests: XCTestCase {
 
         // Then
         let match = sut.firstMatch(in: &candidates)
-        XCTAssertEqual(match, "4242 4242 4242")
-        XCTAssertTrue(candidates.isEmpty)
+        #expect(match == "4242 4242 4242" && candidates.isEmpty)
     }
 
-    func test_firstMatch_whenCandidatesContainsValidAndInvalidNumbers_matchesValid() {
+    @Test
+    func firstMatch_whenCandidatesContainsValidAndInvalidNumbers_matchesValid() {
         // Given
         let sut = CardNumberDetector(regexProvider: .shared, formatter: .init())
 
@@ -48,11 +49,11 @@ final class CardNumberDetectorTests: XCTestCase {
 
         // Then
         let match = sut.firstMatch(in: &candidates)
-        XCTAssertEqual(match, "4242 4242 4242")
-        XCTAssertEqual(candidates, ["TEST"])
+        #expect(match == "4242 4242 4242" && candidates == ["TEST"])
     }
 
-    func test_firstMatch_whenCandidateLengthIsValidButChecksumIsInvalid_doesNotMatch() {
+    @Test
+    func firstMatch_whenCandidateLengthIsValidButChecksumIsInvalid_doesNotMatch() {
         // Given
         let sut = CardNumberDetector(regexProvider: .shared, formatter: .init())
 
@@ -60,12 +61,11 @@ final class CardNumberDetectorTests: XCTestCase {
         var candidates = ["4242424242424243"] // Invalid checksum
 
         // Then
-        let match = sut.firstMatch(in: &candidates)
-        XCTAssertNil(match)
-        XCTAssertEqual(candidates.count, 1)
+        #expect(sut.firstMatch(in: &candidates) == nil && candidates.count == 1)
     }
 
-    func test_firstMatch_whenCandidatesAreTooShort_doesNotMatch() {
+    @Test
+    func firstMatch_whenCandidatesAreTooShort_doesNotMatch() {
         // Given
         let sut = CardNumberDetector(regexProvider: .shared, formatter: .init())
 
@@ -85,12 +85,11 @@ final class CardNumberDetectorTests: XCTestCase {
         ]
 
         // Then
-        let match = sut.firstMatch(in: &candidates)
-        XCTAssertNil(match)
-        XCTAssertEqual(candidates.count, 11)
+        #expect(sut.firstMatch(in: &candidates) == nil && candidates.count == 11)
     }
 
-    func test_firstMatch_whenCandidateIsTooLong_doesNotMatch() {
+    @Test
+    func firstMatch_whenCandidateIsTooLong_doesNotMatch() {
         // Given
         let sut = CardNumberDetector(regexProvider: .shared, formatter: .init())
 
@@ -98,8 +97,6 @@ final class CardNumberDetectorTests: XCTestCase {
         var candidates = ["4242 4242 4242 4242 4242"]
 
         // Then
-        let match = sut.firstMatch(in: &candidates)
-        XCTAssertNil(match)
-        XCTAssertEqual(candidates.count, 1)
+        #expect(sut.firstMatch(in: &candidates) == nil && candidates.count == 1)
     }
 }
