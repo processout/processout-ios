@@ -5,158 +5,123 @@
 //  Created by Andrii Vysotskyi on 10.10.2024.
 //
 
+import Testing
 @testable import ProcessOut
-import XCTest
 
-final class AsyncSemaphoreTests: XCTestCase {
+struct AsyncSemaphoreTests {
 
     // MARK: - Wait
 
-    func test_wait_whenInitialValueIsZero_suspends() async {
+    @Test
+    func wait_whenInitialValueIsZero_suspends() async throws {
         // Given
         let sut = AsyncSemaphore(value: 0)
-        let expectation = XCTestExpectation()
-        expectation.isInverted = true
 
         // When
         Task {
             await sut.wait()
-            expectation.fulfill()
+            Issue.record("Semaphore is expected to be in waiting state.")
         }
-
-        // Then
-        await fulfillment(of: [expectation], timeout: 1)
+        try await Task.sleep(for: .seconds(1))
     }
 
-    func test_wait_whenInitialValueIsGreaterThanZero_doesntSuspend() async {
+    @Test
+    func wait_whenInitialValueIsGreaterThanZero_doesntSuspend() async {
         // Given
         let sut = AsyncSemaphore(value: 1)
-        let expectation = XCTestExpectation()
 
         // When
-        Task {
-            await sut.wait()
-            expectation.fulfill()
-        }
-
-        // Then
-        await fulfillment(of: [expectation], timeout: 1)
+        await sut.wait()
     }
 
-    func test_wait_whenSemaphoreIsBlocked_suspendsSecondFunc() async {
+    @Test
+    func wait_whenSemaphoreIsBlocked_suspendsSecondFunc() async throws {
         // Given
         let sut = AsyncSemaphore(value: 1)
-        let expectation1 = XCTestExpectation(), expectation2 = XCTestExpectation()
-        expectation2.isInverted = true
 
         // When
+        await sut.wait()
         Task {
             await sut.wait()
-            expectation1.fulfill()
-            await sut.wait()
-            expectation2.fulfill()
+            Issue.record("Semaphore is expected to be in waiting state.")
         }
-
-        // Then
-        await fulfillment(of: [expectation1, expectation2], timeout: 1)
+        try await Task.sleep(for: .seconds(1))
     }
 
     // MARK: - Wait Unless Cancelled
 
-    func test_waitUnlessCancelled_whenInitialValueIsZero_suspendsAndDoesntThrow() async {
+    @Test
+    func waitUnlessCancelled_whenInitialValueIsZero_suspendsAndDoesntThrow() async throws {
         // Given
         let sut = AsyncSemaphore(value: 0)
-        let expectation = XCTestExpectation()
-        expectation.isInverted = true
 
         // When
         Task {
-            do {
+            await #expect(throws: Never.self) {
                 try await sut.waitUnlessCancelled()
-                expectation.fulfill()
-            } catch {
-                XCTFail("Unexpected error.")
+                Issue.record("Semaphore is expected to be in waiting state.")
             }
         }
-
-        // Then
-        await fulfillment(of: [expectation], timeout: 1)
+        try await Task.sleep(for: .seconds(1))
     }
 
-    func test_waitUnlessCancelled_whenInitialValueIsGreaterThanZero_doesntSuspendNorThrow() async {
+    @Test
+    func waitUnlessCancelled_whenInitialValueIsGreaterThanZero_doesntSuspendNorThrow() async {
         // Given
         let sut = AsyncSemaphore(value: 1)
-        let expectation = XCTestExpectation()
-
-        // When
-        Task {
-            do {
-                try await sut.waitUnlessCancelled()
-                expectation.fulfill()
-            } catch {
-                XCTFail("Unexpected error.")
-            }
-        }
-
-        // Then
-        await fulfillment(of: [expectation], timeout: 1)
-    }
-
-    func test_waitUnlessCancelled_whenSemaphoreIsBlocked_suspendsSecondFuncAndDoesntThrow() async {
-        // Given
-        let sut = AsyncSemaphore(value: 1)
-        let expectation1 = XCTestExpectation(), expectation2 = XCTestExpectation()
-        expectation2.isInverted = true
-
-        // When
-        Task {
-            do {
-                try await sut.waitUnlessCancelled()
-                expectation1.fulfill()
-                try await sut.waitUnlessCancelled()
-                expectation2.fulfill()
-            } catch {
-                XCTFail("Unexpected error.")
-            }
-        }
-
-        // Then
-        await fulfillment(of: [expectation1, expectation2], timeout: 1)
-    }
-
-    func test_waitUnlessCancelled_whenCancelledImmediately_throwsCancellationError() async {
-        // Given
-        let sut = AsyncSemaphore(value: 0)
-        let expectation = XCTestExpectation()
 
         // When
         let task = Task {
-            do {
+            try await sut.waitUnlessCancelled()
+        }
+
+        // Then
+        await #expect(throws: Never.self) {
+            _ = try await task.value
+        }
+    }
+
+    @Test
+    func waitUnlessCancelled_whenSemaphoreIsBlocked_suspendsSecondFuncAndDoesntThrow() async throws {
+        // Given
+        let sut = AsyncSemaphore(value: 1)
+
+        // When
+        try await sut.waitUnlessCancelled()
+        Task {
+            await #expect(throws: Never.self) {
                 try await sut.waitUnlessCancelled()
-            } catch {
-                XCTAssertTrue(error is CancellationError)
-                expectation.fulfill()
+                Issue.record("Semaphore is expected to be in waiting state.")
             }
+        }
+        try await Task.sleep(for: .seconds(1))
+    }
+
+    @Test
+    func waitUnlessCancelled_whenCancelledImmediately_throwsCancellationError() async {
+        // Given
+        let sut = AsyncSemaphore(value: 0)
+
+        // When
+        let task = Task {
+            try await sut.waitUnlessCancelled()
         }
         task.cancel()
 
         // Then
-        await fulfillment(of: [expectation], timeout: 1)
+        await #expect(throws: CancellationError.self) {
+            _ = try await task.value
+        }
     }
 
-    func test_waitUnlessCancelled_whenCancelledAfterDelay_throwsCancellationError() async {
+    @Test
+    func waitUnlessCancelled_whenCancelledAfterDelay_throwsCancellationError() async {
         // Given
         let sut = AsyncSemaphore(value: 0)
-        let expectation = XCTestExpectation()
 
         // When
         let task = Task {
-            do {
-                try await sut.waitUnlessCancelled()
-            } catch {
-                XCTAssertTrue(error is CancellationError)
-                expectation.fulfill()
-            }
+            try await sut.waitUnlessCancelled()
         }
         Task {
             try await Task.sleep(for: .seconds(0.5))
@@ -164,25 +129,23 @@ final class AsyncSemaphoreTests: XCTestCase {
         }
 
         // Then
-        await fulfillment(of: [expectation], timeout: 2)
+        await #expect(throws: CancellationError.self) {
+            _ = try await task.value
+        }
     }
 
     // MARK: - Signal
 
-    func test_signal_whenSemaphoreIsBlocked_resumesWhenSignalled() async {
+    @Test
+    func signal_whenSemaphoreIsBlocked_resumesWhenSignalled() async {
         // Given
         let sut = AsyncSemaphore(value: 1)
-        let expectation = XCTestExpectation()
 
         // When
-        Task {
-            await sut.wait()
-            sut.signal()
-            await sut.wait()
-            expectation.fulfill()
-        }
+        await sut.wait()
+        sut.signal()
 
         // Then
-        await fulfillment(of: [expectation], timeout: 1)
+        await sut.wait()
     }
 }

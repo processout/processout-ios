@@ -5,88 +5,96 @@
 //  Created by Andrii Vysotskyi on 12.05.2023.
 //
 
-import XCTest
+import Testing
 @testable @_spi(PO) import ProcessOut
 
-final class FormattingUtilsTests: XCTestCase {
+struct FormattingUtilsTests {
 
-    func test_adjustedCursorOffset_whenNotGreedy_doesNotIncludeSignificants() {
+    @Test
+    func adjustedCursorOffset_whenNotGreedy_doesNotIncludeSignificants() {
         // When
         let offset = POFormattingUtils.adjustedCursorOffset(
             in: "1 2", source: "12", sourceCursorOffset: 1, significantCharacters: .decimalDigits, greedy: false
         )
 
         // Then
-        XCTAssertEqual(offset, 1)
+        #expect(offset == 1)
     }
 
-    func test_adjustedCursorOffset_whenGreedy_includesNonSignificants() {
+    @Test
+    func adjustedCursorOffset_whenGreedy_includesNonSignificants() {
         // When
         let offset = POFormattingUtils.adjustedCursorOffset(
             in: "1 2", source: "12", sourceCursorOffset: 1, significantCharacters: .decimalDigits
         )
 
         // Then
-        XCTAssertEqual(offset, 2)
+        #expect(offset == 2)
     }
 
-    func test_adjustedCursorOffset_whenCursorPrefixChanges_returnValidOffset() {
+    @Test
+    func adjustedCursorOffset_whenCursorPrefixChanges_returnValidOffset() {
         // When
         let offset = POFormattingUtils.adjustedCursorOffset(
             in: "+12", source: "12", sourceCursorOffset: 1, significantCharacters: .decimalDigits
         )
 
         // Then
-        XCTAssertEqual(offset, 2)
+        #expect(offset == 2)
     }
 
-    func test_adjustedCursorOffset_whenCursorSuffixChanges_returnEndOfTarget() {
+    @Test
+    func adjustedCursorOffset_whenCursorSuffixChanges_returnEndOfTarget() {
         // When
         let offset = POFormattingUtils.adjustedCursorOffset(
             in: "2", source: "1", sourceCursorOffset: 0, significantCharacters: .decimalDigits
         )
 
         // Then
-        XCTAssertEqual(offset, 1)
+        #expect(offset == 1)
     }
 
-    func test_adjustedCursorOffset_whenNewCharacterIsAddedToCursorSuffix_returnEndOfTarget() {
+    @Test
+    func adjustedCursorOffset_whenNewCharacterIsAddedToCursorSuffix_returnEndOfTarget() {
         // When
         let offset = POFormattingUtils.adjustedCursorOffset(
             in: "123", source: "12", sourceCursorOffset: 1, significantCharacters: .decimalDigits
         )
 
         // Then
-        XCTAssertEqual(offset, 3)
+        #expect(offset == 3)
     }
 
-    func test_adjustedCursorOffset_whenSourceIsSameAsTarget_returnsSameOffset() {
+    @Test
+    func adjustedCursorOffset_whenSourceIsSameAsTarget_returnsSameOffset() {
         // When
         let offset = POFormattingUtils.adjustedCursorOffset(
             in: "1", source: "1", sourceCursorOffset: 0, significantCharacters: .decimalDigits
         )
 
         // Then
-        XCTAssertEqual(offset, 0)
+        #expect(offset == 0)
     }
 
-    func test_adjustedCursorOffset_whenSourceIsEmpty_returnEndOfTarget() {
+    @Test
+    func adjustedCursorOffset_whenSourceIsEmpty_returnEndOfTarget() {
         // When
         let offset = POFormattingUtils.adjustedCursorOffset(
             in: "1", source: "", sourceCursorOffset: 0, significantCharacters: .decimalDigits
         )
 
         // Then
-        XCTAssertEqual(offset, 1)
+        #expect(offset == 1)
     }
 
-    func test_adjustedCursorOffset_whenTargetIsEmpty_returnStartOfTarget() {
+    @Test
+    func adjustedCursorOffset_whenTargetIsEmpty_returnStartOfTarget() {
         // When
         let offset = POFormattingUtils.adjustedCursorOffset(
             in: "", source: "0", sourceCursorOffset: 1, significantCharacters: .decimalDigits
         )
 
         // Then
-        XCTAssertEqual(offset, 0)
+        #expect(offset == 0)
     }
 }

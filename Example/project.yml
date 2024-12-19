@@ -36,22 +36,9 @@ targets:
     dependencies:
       - package: ProcessOutUI
       - package: ProcessOutCheckout3DS
-  ExampleUiTests:
-    type: bundle.ui-testing
-    sources: ExampleUiTests
-    platform: iOS
-    settings:
-      GENERATE_INFOPLIST_FILE: 1
-      PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-example-ui-tests
-    dependencies:
-      - target: Example
 
 schemes:
   Example:
     build:
       targets:
         Example: all
-        ExampleUiTests: [test]
-    test:
-      gatherCoverageData: true
-      targets: [ExampleUiTests]

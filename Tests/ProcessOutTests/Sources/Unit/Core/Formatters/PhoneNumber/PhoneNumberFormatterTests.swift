@@ -5,59 +5,65 @@
 //  Created by Andrii Vysotskyi on 12.05.2023.
 //
 
-import XCTest
+import Foundation
+import Testing
 @testable @_spi(PO) import ProcessOut
 
-final class PhoneNumberFormatterTests: XCTestCase {
+struct PhoneNumberFormatterTests {
 
-    override func setUp() {
-        super.setUp()
+    init() {
         metadataProvider = MockPhoneNumberMetadataProvider()
         metadataProvider.metadata = nil
         sut = POPhoneNumberFormatter(metadataProvider: metadataProvider)
     }
 
-    func test_normalized_retainsDigitsAndPlus() {
+    @Test
+    func normalized_retainsDigitsAndPlus() {
         // When
         let normalizedNumber = sut.normalized(number: "+1#")
 
         // Then
-        XCTAssertEqual(normalizedNumber, "+1")
+        #expect(normalizedNumber == "+1")
     }
 
-    func test_string_whenNumberIsEmpty_returnsEmptyString() {
+    @Test
+    func string_whenNumberIsEmpty_returnsEmptyString() {
         // When
         let formattedNumber = sut.string(from: "")
 
         // Then
-        XCTAssertEqual(formattedNumber, "")
+        #expect(formattedNumber.isEmpty)
     }
 
-    func test_string_whenNumberDoesNotHaveDigitsNorPlus_returnsEmptyString() {
+    @Test
+    func string_whenNumberDoesNotHaveDigitsNorPlus_returnsEmptyString() {
         // When
         let formattedNumber = sut.string(from: "#")
 
         // Then
-        XCTAssertEqual(formattedNumber, "")
+        #expect(formattedNumber.isEmpty)
     }
 
-    func test_string_whenNumberHasOnlyPluses_returnsSinglePlus() {
+    @Test
+    func string_whenNumberHasOnlyPluses_returnsSinglePlus() {
         // When
         let formattedNumber = sut.string(from: "++")
 
         // Then
-        XCTAssertEqual(formattedNumber, "+")
+        #expect(formattedNumber == "+")
     }
 
-    func test_string_whenNumbersCountryCodeIsUnknown_returnsDigitsPrefixedWithPlus() {
+    @Test
+    func string_whenNumbersCountryCodeIsUnknown_returnsDigitsPrefixedWithPlus() {
         // When
         let formattedNumber = sut.string(from: "1")
 
         // Then
-        XCTAssertEqual(formattedNumber, "+1")
+        #expect(formattedNumber == "+1")
     }
 
-    func test_string_whenNumberHasOnlyCountryCode_returnsCountryCodePrefixedWithPlus() {
+    @Test
+    func string_whenNumberHasOnlyCountryCode_returnsCountryCodePrefixedWithPlus() {
         // Given
         metadataProvider.metadata = .init(countryCode: "0", formats: [])
 
@@ -65,10 +71,11 @@ final class PhoneNumberFormatterTests: XCTestCase {
         let formattedNumber = sut.string(from: "0")
 
         // Then
-        XCTAssertEqual(formattedNumber, "+0")
+        #expect(formattedNumber == "+0")
     }
 
-    func test_string_whenNumberIsComplete_returnsFormattedNumber() {
+    @Test
+    func string_whenNumberIsComplete_returnsFormattedNumber() {
         // Given
         let format = POPhoneNumberFormat(pattern: "(\\d)(\\d)", leading: [".*"], format: "$1-$2")
         metadataProvider.metadata = POPhoneNumberMetadata(countryCode: "1", formats: [format])
@@ -77,10 +84,11 @@ final class PhoneNumberFormatterTests: XCTestCase {
         let formattedNumber = sut.string(from: "123#")
 
         // Then
-        XCTAssertEqual(formattedNumber, "+1 2-3")
+        #expect(formattedNumber == "+1 2-3")
     }
 
-    func test_string_whenNationalNumberLeadingDigitsAreUnknown_formatsCountryCode() {
+    @Test
+    func string_whenNationalNumberLeadingDigitsAreUnknown_formatsCountryCode() {
         // Given
         let format = POPhoneNumberFormat(pattern: "", leading: [""], format: "")
         metadataProvider.metadata = POPhoneNumberMetadata(countryCode: "1", formats: [format])
@@ -89,10 +97,11 @@ final class PhoneNumberFormatterTests: XCTestCase {
         let formattedNumber = sut.string(from: "123")
 
         // Then
-        XCTAssertEqual(formattedNumber, "+1 23")
+        #expect(formattedNumber == "+1 23")
     }
 
-    func test_string_whenNationalNumberLengthExceedsMaximumLength_formatsCountryCode() {
+    @Test
+    func string_whenNationalNumberLengthExceedsMaximumLength_formatsCountryCode() {
         // Given
         let format = POPhoneNumberFormat(pattern: "", leading: [], format: "")
         metadataProvider.metadata = POPhoneNumberMetadata(countryCode: "1", formats: [format])
@@ -101,10 +110,11 @@ final class PhoneNumberFormatterTests: XCTestCase {
         let formattedNumber = sut.string(from: "1123456789123456")
 
         // Then
-        XCTAssertEqual(formattedNumber, "+1 123456789123456")
+        #expect(formattedNumber == "+1 123456789123456")
     }
 
-    func test_string_whenNumberContainsEasternArabicNumerals_returnsFormattedNumberWithLatinNumerals() {
+    @Test
+    func string_whenNumberContainsEasternArabicNumerals_returnsFormattedNumberWithLatinNumerals() {
         // Given
         let format = POPhoneNumberFormat(pattern: "(\\d)(\\d+)", leading: [".*"], format: "$1-$2")
         metadataProvider.metadata = POPhoneNumberMetadata(countryCode: "1", formats: [format])
@@ -113,10 +123,11 @@ final class PhoneNumberFormatterTests: XCTestCase {
         let formattedNumber = sut.string(from: "١٢٣")
 
         // Then
-        XCTAssertEqual(formattedNumber, "+1 2-3")
+        #expect(formattedNumber == "+1 2-3")
     }
 
-    func test_string_whenNumberIsPartial_returnsFormattedNumberWithoutTrailingSeparators() {
+    @Test
+    func string_whenNumberIsPartial_returnsFormattedNumberWithoutTrailingSeparators() {
         // Given
         let format = POPhoneNumberFormat(pattern: "(\\d)(\\d)(\\d)", leading: [".*"], format: "$1-$2-$3")
         metadataProvider.metadata = POPhoneNumberMetadata(countryCode: "1", formats: [format])
@@ -125,10 +136,11 @@ final class PhoneNumberFormatterTests: XCTestCase {
         let formattedNumber = sut.string(from: "123")
 
         // Then
-        XCTAssertEqual(formattedNumber, "+1 2-3")
+        #expect(formattedNumber == "+1 2-3")
     }
 
-    func test_isPartialStringValid_formatsPartialString() {
+    @Test
+    func isPartialStringValid_formatsPartialString() {
         // Given
         var partialString = "1" as NSString // swiftlint:disable:this legacy_objc_type
 
@@ -142,11 +154,11 @@ final class PhoneNumberFormatterTests: XCTestCase {
         )
 
         // Then
-        XCTAssert(isValid)
-        XCTAssertEqual(partialString, "+1")
+        #expect(isValid && partialString == "+1")
     }
 
-    func test_isPartialStringValid_whenAddingText_updatesSelectedRange() {
+    @Test
+    func isPartialStringValid_whenAddingText_updatesSelectedRange() {
         // Given
         var partialString = "001" as NSString // swiftlint:disable:this legacy_objc_type
         var proposedSelectedRange = NSRange(location: -1, length: -1)
@@ -161,10 +173,11 @@ final class PhoneNumberFormatterTests: XCTestCase {
         )
 
         // Then
-        XCTAssertEqual(proposedSelectedRange, NSRange(location: 3, length: 0))
+        #expect(proposedSelectedRange == NSRange(location: 3, length: 0))
     }
 
-    func test_isPartialStringValid_whenRemovingText_updatesSelectedRange() {
+    @Test
+    func isPartialStringValid_whenRemovingText_updatesSelectedRange() {
         // Given
         var partialString = "14" as NSString // swiftlint:disable:this legacy_objc_type
         var proposedSelectedRange = NSRange(location: -1, length: -1)
@@ -179,11 +192,11 @@ final class PhoneNumberFormatterTests: XCTestCase {
         )
 
         // Then
-        XCTAssertEqual(proposedSelectedRange, NSRange(location: 2, length: 0))
+        #expect(proposedSelectedRange == NSRange(location: 2, length: 0))
     }
 
     // MARK: - Private Properties
 
-    private var metadataProvider: MockPhoneNumberMetadataProvider!
-    private var sut: POPhoneNumberFormatter!
+    private let metadataProvider: MockPhoneNumberMetadataProvider
+    private let sut: POPhoneNumberFormatter
 }

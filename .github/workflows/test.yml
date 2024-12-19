@@ -11,10 +11,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   run-tests:
-    strategy:
-      matrix:
-        os: [macos-14, macos-15]
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: Bootstrap Project
@@ -22,4 +19,14 @@ jobs:
         with:
           test-project-constants: ${{ secrets.TEST_PROJECT_CONSTANTS }}
       - name: Run Unit Tests
-        run: source Scripts/Test.sh
+        run: source Scripts/Tests/Run.sh
+  run-tests-legacy:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bootstrap Project
+        uses: ./.github/actions/bootstrap-project
+        with:
+          test-project-constants: ${{ secrets.TEST_PROJECT_CONSTANTS }}
+      - name: Run Unit Tests
+        run: source Scripts/Tests/Run@Xcode-15.sh

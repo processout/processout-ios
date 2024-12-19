@@ -5,13 +5,12 @@
 //  Created by Andrii Vysotskyi on 14.11.2023.
 //
 
-import XCTest
+import Testing
 @testable import ProcessOutUI
 
-final class CardSchemeProviderTests: XCTestCase {
+struct CardSchemeProviderTests {
 
-    override func setUp() {
-        super.setUp()
+    init() {
         let issuers: [CardSchemeProvider.Issuer] = [
             .init(scheme: "range", numbers: .range(10...11), length: 2),
             .init(scheme: "exact", numbers: .exact(1), length: 1),
@@ -20,63 +19,70 @@ final class CardSchemeProviderTests: XCTestCase {
         sut = CardSchemeProvider(issuers: issuers)
     }
 
-    func test_scheme_whenNumberStartsWithZero_returnsNil() {
+    @Test
+    func scheme_whenNumberStartsWithZero_returnsNil() {
         // When
         let scheme = sut.scheme(cardNumber: "0")
 
         // Then
-        XCTAssertNil(scheme)
+        #expect(scheme == nil)
     }
 
-    func test_scheme_whenNumberDoesntContainDigits_returnsNil() {
+    @Test
+    func scheme_whenNumberDoesntContainDigits_returnsNil() {
         // When
         let scheme = sut.scheme(cardNumber: "a")
 
         // Then
-        XCTAssertNil(scheme)
+        #expect(scheme == nil)
     }
 
-    func test_scheme_whenNumberLengthExceedsIinMinLength_returnsScheme() {
+    @Test
+    func scheme_whenNumberLengthExceedsIinMinLength_returnsScheme() {
         // When
         let scheme = sut.scheme(cardNumber: "1234 5678 9")
 
         // Then
-        XCTAssertNotNil(scheme)
+        #expect(scheme != nil)
     }
 
-    func test_scheme_whenNumberMatchesExactPattern_returnsScheme() {
+    @Test
+    func scheme_whenNumberMatchesExactPattern_returnsScheme() {
         // When
         let scheme = sut.scheme(cardNumber: "1")
 
         // Then
-        XCTAssertEqual(scheme?.rawValue, "exact")
+        #expect(scheme?.rawValue == "exact")
     }
 
-    func test_scheme_whenNumberMatchesSetPattern_returnsScheme() {
+    @Test
+    func scheme_whenNumberMatchesSetPattern_returnsScheme() {
         // When
         let scheme = sut.scheme(cardNumber: "2")
 
         // Then
-        XCTAssertEqual(scheme?.rawValue, "set")
+        #expect(scheme?.rawValue == "set")
     }
 
-    func test_scheme_whenNumberMatchesRangePattern_returnsScheme() {
+    @Test
+    func scheme_whenNumberMatchesRangePattern_returnsScheme() {
         // When
         let scheme = sut.scheme(cardNumber: "10")
 
         // Then
-        XCTAssertEqual(scheme?.rawValue, "range")
+        #expect(scheme?.rawValue == "range")
     }
 
-    func test_scheme_whenNumberIsUnknown_returnsNil() {
+    @Test
+    func scheme_whenNumberIsUnknown_returnsNil() {
         // When
         let scheme = sut.scheme(cardNumber: "9")
 
         // Then
-        XCTAssertNil(scheme)
+        #expect(scheme == nil)
     }
 
     // MARK: - Private Properties
 
-    private var sut: CardSchemeProvider!
+    private let sut: CardSchemeProvider
 }

@@ -5,59 +5,63 @@
 //  Created by Andrii Vysotskyi on 14.11.2023.
 //
 
-import XCTest
+import Testing
 @testable import ProcessOutUI
 
-final class CardSecurityCodeFormatterTests: XCTestCase {
+struct CardSecurityCodeFormatterTests {
 
-    override func setUp() {
-        super.setUp()
+    init() {
         sut = CardSecurityCodeFormatter()
     }
 
-    func test_string_returnsOnlyDigits() {
+    @Test
+    func string_returnsOnlyDigits() {
         // When
         let formatted = sut.string(from: "1a2")
 
         // Then
-        XCTAssertEqual(formatted, "12")
+        #expect(formatted == "12")
     }
 
-    func test_string_whenStringHasNoDigits_returnsEmptyString() {
+    @Test
+    func string_whenStringHasNoDigits_returnsEmptyString() {
         // When
         let formatted = sut.string(from: "a")
 
         // Then
-        XCTAssertEqual(formatted, "")
+        #expect(formatted.isEmpty)
     }
 
-    func test_string_whenSchemeIsNotSetAndInputLengthExceeds4_removesRedundantSuffix() {
+    @Test
+    func string_whenSchemeIsNotSetAndInputLengthExceeds4_removesRedundantSuffix() {
         // When
         let formatted = sut.string(from: "12345")
 
         // Then
-        XCTAssertEqual(formatted, "1234")
+        #expect(formatted == "1234")
     }
 
-    func test_string_whenSchemeIsAmexAndInputLengthExceeds4_removesRedundantSuffix() {
+    @Test
+    func string_whenSchemeIsAmexAndInputLengthExceeds4_removesRedundantSuffix() {
         // When
         sut.scheme = .amex
         let formatted = sut.string(from: "12345")
 
         // Then
-        XCTAssertEqual(formatted, "1234")
+        #expect(formatted == "1234")
     }
 
-    func test_string_whenSchemeIsNotAmexAndInputLengthExceeds3_removesRedundantSuffix() {
+    @Test
+    func string_whenSchemeIsNotAmexAndInputLengthExceeds3_removesRedundantSuffix() {
         // When
         sut.scheme = .visa
         let formatted = sut.string(from: "12345")
 
         // Then
-        XCTAssertEqual(formatted, "123")
+        #expect(formatted == "123")
     }
 
     // MARK: - Private Properties
 
-    private var sut: CardSecurityCodeFormatter!
+    private let sut: CardSecurityCodeFormatter
 }

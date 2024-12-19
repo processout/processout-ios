@@ -6,20 +6,20 @@
 //
 
 import Foundation
-import XCTest
+import Testing
 @testable import ProcessOut
 
-final class GatewayConfigurationsRepositoryTests: XCTestCase {
+struct GatewayConfigurationsRepositoryTests {
 
-    override func setUp() {
-        super.setUp()
-        ProcessOut.configure(configuration: .init(projectId: Constants.projectId), force: true)
-        sut = ProcessOut.shared.gatewayConfigurations
+    init() async {
+        let processOut = await ProcessOut(configuration: .init(projectId: Constants.projectId))
+        sut = processOut.gatewayConfigurations
     }
 
     // MARK: - Tests
 
-    func test_all_returnsConfigurations() async throws {
+    @Test
+    func all_returnsConfigurations() async throws {
         // Given
         let request = POAllGatewayConfigurationsRequest(filter: nil, paginationOptions: nil)
 
@@ -27,10 +27,11 @@ final class GatewayConfigurationsRepositoryTests: XCTestCase {
         let response = try await sut.all(request: request)
 
         // Then
-        XCTAssertFalse(response.gatewayConfigurations.isEmpty)
+        #expect(!response.gatewayConfigurations.isEmpty)
     }
 
-    func test_find_returnsConfiguration() async throws {
+    @Test
+    func find_returnsConfiguration() async throws {
         // Given
         let configurationId = "gway_conf_VJEp8Y6ZCqiiwkSa3JioJrwdVM3bVgJd"
         let request = POFindGatewayConfigurationRequest(id: configurationId)
@@ -39,10 +40,11 @@ final class GatewayConfigurationsRepositoryTests: XCTestCase {
         let configuration = try await sut.find(request: request)
 
         // Then
-        XCTAssertEqual(configurationId, configuration.id)
+        #expect(configurationId == configuration.id)
     }
 
-    func test_find_whenExpandsGateway_returnsConfigurationWithGateway() async throws {
+    @Test
+    func find_whenExpandsGateway_returnsConfigurationWithGateway() async throws {
         // Given
         let request = POFindGatewayConfigurationRequest(
             id: "gway_conf_VJEp8Y6ZCqiiwkSa3JioJrwdVM3bVgJd", expands: .gateway
@@ -52,10 +54,10 @@ final class GatewayConfigurationsRepositoryTests: XCTestCase {
         let configuration = try await sut.find(request: request)
 
         // Then
-        XCTAssertNotNil(configuration.gateway)
+        #expect(configuration.gateway != nil)
     }
 
     // MARK: - Private Properties
 
-    private var sut: POGatewayConfigurationsRepository!
+    private let sut: POGatewayConfigurationsRepository
 }

@@ -5,13 +5,14 @@
 //  Created by Andrii Vysotskyi on 13.12.2024.
 //
 
-import XCTest
+import Testing
 @_spi(PO) import ProcessOut
 @testable import ProcessOutUI
 
-final class CardExpirationDetectorTests: XCTestCase {
+struct CardExpirationDetectorTests {
 
-    func test_firstMatch_whenMonthAndYearAreValid_matches() {
+    @Test
+    func firstMatch_whenMonthAndYearAreValid_matches() {
         // Given
         let sut = CardExpirationDetector(regexProvider: .shared, formatter: .init())
 
@@ -22,12 +23,12 @@ final class CardExpirationDetectorTests: XCTestCase {
         for month in validExpirationMonths {
             var candidates = expirations(months: month...month, monthFormat: "%02d", year: "40")
             let match = sut.firstMatch(in: &candidates)
-            XCTAssertTrue(match?.month == month && match?.year == 2040)
-            XCTAssertTrue(candidates.isEmpty)
+            #expect(match?.month == month && match?.year == 2040 && candidates.isEmpty)
         }
     }
 
-    func test_firstMatch_whenValidCandidateContainsWhitespaces_matches() {
+    @Test
+    func firstMatch_whenValidCandidateContainsWhitespaces_matches() {
         // Given
         let sut = CardExpirationDetector(regexProvider: .shared, formatter: .init())
 
@@ -36,11 +37,11 @@ final class CardExpirationDetectorTests: XCTestCase {
 
         // Then
         let match = sut.firstMatch(in: &candidates)
-        XCTAssertTrue(match?.month == 1 && match?.year == 2040)
-        XCTAssertTrue(candidates.isEmpty)
+        #expect(match?.month == 1 && match?.year == 2040 && candidates.isEmpty)
     }
 
-    func test_firstMatch_whenMonthIsInvalid_doesNotMatch() {
+    @Test
+    func firstMatch_whenMonthIsInvalid_doesNotMatch() {
         // Given
         let sut = CardExpirationDetector(regexProvider: .shared, formatter: .init())
 
@@ -52,11 +53,11 @@ final class CardExpirationDetectorTests: XCTestCase {
         ].flatMap { $0 }
 
         // Then
-        XCTAssertNil(sut.firstMatch(in: &candidates))
-        XCTAssertEqual(candidates.count, 98)
+        #expect(sut.firstMatch(in: &candidates) == nil && candidates.count == 98)
     }
 
-    func test_firstMatch_whenDateIsInPast_doesNotMatchButConsumesCandidate() {
+    @Test
+    func firstMatch_whenDateIsInPast_doesNotMatchButConsumesCandidate() {
         // Given
         let sut = CardExpirationDetector(regexProvider: .shared, formatter: .init())
 
@@ -64,11 +65,11 @@ final class CardExpirationDetectorTests: XCTestCase {
         var candidates = ["01/01"]
 
         // Then
-        XCTAssertNil(sut.firstMatch(in: &candidates))
-        XCTAssertTrue(candidates.isEmpty)
+        #expect(sut.firstMatch(in: &candidates) == nil && candidates.isEmpty)
     }
 
-    func test_firstMatch_whenCandidatesContainsValidAndInvalidExpirations_matchesValid() {
+    @Test
+    func firstMatch_whenCandidatesContainsValidAndInvalidExpirations_matchesValid() {
         // Given
         let sut = CardExpirationDetector(regexProvider: .shared, formatter: .init())
 
@@ -79,11 +80,11 @@ final class CardExpirationDetectorTests: XCTestCase {
 
         // Then
         let match = sut.firstMatch(in: &candidates)
-        XCTAssertTrue(match?.month == 4 && match?.year == 2040)
-        XCTAssertEqual(candidates, ["TEST"])
+        #expect(match?.month == 4 && match?.year == 2040 && candidates == ["TEST"])
     }
 
-    func test_firstMatch_removesExpiredCandidates() {
+    @Test
+    func firstMatch_removesExpiredCandidates() {
         // Given
         let sut = CardExpirationDetector(regexProvider: .shared, formatter: .init())
 
@@ -93,8 +94,7 @@ final class CardExpirationDetectorTests: XCTestCase {
         ]
 
         // Then
-        XCTAssertNotNil(sut.firstMatch(in: &candidates))
-        XCTAssertTrue(candidates.isEmpty)
+        #expect(sut.firstMatch(in: &candidates) != nil && candidates.isEmpty)
     }
 
     // MARK: - Utils

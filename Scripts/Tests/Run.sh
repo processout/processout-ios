@@ -3,7 +3,7 @@
 set -euo pipefail
 
 PROJECT='ProcessOut.xcodeproj'
-DESTINATION=$(./Scripts/TestDestination.swift)
+DESTINATION=$(./Scripts/Tests/Destination.swift)
 
 # Run Tests
 for PRODUCT in "ProcessOut" "ProcessOutUI" "ProcessOutCheckout3DS"; do
@@ -14,5 +14,3 @@ for PRODUCT in "ProcessOut" "ProcessOutUI" "ProcessOutCheckout3DS"; do
         -enableCodeCoverage NO |
         xcpretty
 done
-
-# todo(andrii-vysotskyi): run example target tests when POM-144 is resolved

@@ -5,33 +5,34 @@
 //  Created by Andrii Vysotskyi on 14.11.2023.
 //
 
-import XCTest
+import Testing
 @testable import ProcessOutUI
 
-final class CardSchemeImageProviderTests: XCTestCase {
+struct CardSchemeImageProviderTests {
 
-    override func setUp() {
-        super.setUp()
+    init() {
         sut = .shared
     }
 
-    func test_image_whenSchemeIsUnrecognized_returnsNil() {
+    @Test
+    func image_whenSchemeIsUnrecognized_returnsNil() {
         // When
         let image = sut.image(for: "unknown")
 
         // Then
-        XCTAssertNil(image)
+        #expect(image == nil)
     }
 
-    func test_image_whenSchemeIsKnown_returnsImage() {
+    @Test
+    func image_whenSchemeIsKnown_returnsImage() {
         // When
         let image = sut.image(for: .visa)
 
         // Then
-        XCTAssertNotNil(image)
+        #expect(image != nil)
     }
 
     // MARK: - Private Properties
 
-    private var sut: CardSchemeImageProvider!
+    private let sut: CardSchemeImageProvider
 }

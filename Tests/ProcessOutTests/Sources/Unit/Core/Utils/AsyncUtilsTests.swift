@@ -5,14 +5,16 @@
 //  Created by Andrii Vysotskyi on 11.12.2023.
 //
 
+import Foundation
+import Testing
 @testable @_spi(PO) import ProcessOut
-import XCTest
 
-final class AsyncUtilsTests: XCTestCase {
+struct AsyncUtilsTests {
 
     // MARK: - Timeout
 
-    func test_withTimeout_whenOperationCompletesBeforeTimeout_ignoresTimeout() async throws {
+    @Test
+    func withTimeout_whenOperationCompletesBeforeTimeout_ignoresTimeout() async throws {
         // Given
         let timeout: TimeInterval = 10
         let operationDuration: TimeInterval = 1
@@ -24,10 +26,11 @@ final class AsyncUtilsTests: XCTestCase {
         }
 
         // Then
-        XCTAssertEqual(value, "value")
+        #expect(value == "value")
     }
 
-    func test_withTimeout_whenCancellableOperationTimesOut_throwsError() async {
+    @Test
+    func withTimeout_whenCancellableOperationTimesOut_throwsError() async throws {
         // Given
         let timeout: TimeInterval = 1
         let operation = { @Sendable in
@@ -35,18 +38,18 @@ final class AsyncUtilsTests: XCTestCase {
         }
 
         // When
-        let error = await assertThrowsError(
+        try await withKnownIssue {
             try await withTimeout(timeout, error: Failure.timeout, perform: operation)
-        )
-
-        // Then
-        if let failure = error as? Failure, failure == .timeout {
-            return
+        } matching: { issue in
+            if let failure = issue.error as? Failure, failure == .timeout {
+                return true
+            }
+            return false
         }
-        XCTFail("Expected timeout failure.")
     }
 
-    func test_withTimeout_whenNonCancellableOperationTimesOut_ignoresTimeout() async throws {
+    @Test
+    func withTimeout_whenNonCancellableOperationTimesOut_ignoresTimeout() async throws {
         // Given
         let timeout: TimeInterval = 1
         let operationDuration: TimeInterval = 3
@@ -57,7 +60,8 @@ final class AsyncUtilsTests: XCTestCase {
         }
     }
 
-    func test_withTimeout_whenOperationIsCancelledBeforeTimeout_propagatesError() async throws {
+    @Test
+    func withTimeout_whenOperationIsCancelledBeforeTimeout_propagatesError() async throws {
         // Given
         let timeout: TimeInterval = 1
         let operation = { @Sendable in
@@ -75,11 +79,12 @@ final class AsyncUtilsTests: XCTestCase {
         case .failure(let error) where error is CancellationError:
             break
         default:
-            XCTFail("Expected cancellation error")
+            Issue.record("Expected cancellation error.")
         }
     }
 
-    func test_withTimeout_whenOperationThrowsBeforeTimeout_propagatesError() async throws {
+    @Test
+    func withTimeout_whenOperationThrowsBeforeTimeout_propagatesError() async throws {
         // Given
         let timeout: TimeInterval = 3
         let operation = { @Sendable in
@@ -97,13 +102,14 @@ final class AsyncUtilsTests: XCTestCase {
         case .failure(let failure as Failure) where failure == .generic:
             break
         default:
-            XCTFail("Expected generic error")
+            Issue.record("Expected generic error.")
         }
     }
 
     // MARK: - Retry
 
-    func test_retry_whenTimeoutIsZero_executesOperationOnce() async throws {
+    @Test
+    func retry_whenTimeoutIsZero_executesOperationOnce() async throws {
         // Given
         let isOperationExecuted = POUnfairlyLocked<Bool>(wrappedValue: false)
 
@@ -120,12 +126,13 @@ final class AsyncUtilsTests: XCTestCase {
         )
 
         // Then
-        XCTAssertTrue(isOperationExecuted.wrappedValue)
+        #expect(isOperationExecuted.wrappedValue)
     }
 
-    func test_retry_whenTimesOut_throwsTimeoutError() async {
+    @Test
+    func retry_whenTimesOut_throwsTimeoutError() async throws {
         // When
-        let error = await assertThrowsError(
+        try await withKnownIssue {
             try await retry(
                 operation: {
                     try await Task.sleep(for: .seconds(3))
@@ -134,16 +141,16 @@ final class AsyncUtilsTests: XCTestCase {
                 timeout: 1,
                 timeoutError: Failure.timeout
             )
-        )
-
-        // Then
-        if let failure = error as? Failure, failure == .timeout {
-            return
+        } matching: { issue in
+            if let failure = issue.error as? Failure, failure == .timeout {
+                return true
+            }
+            return false
         }
-        XCTFail("Expected timeout failure.")
     }
 
-    func test_retry_checksRetryCondition_whenRetryStrategyIsSet() async throws {
+    @Test
+    func retry_checksRetryCondition_whenRetryStrategyIsSet() async throws {
         // Given
         let isConditionChecked = POUnfairlyLocked<Bool>(wrappedValue: false)
 
@@ -162,10 +169,11 @@ final class AsyncUtilsTests: XCTestCase {
         )
 
         // Then
-        XCTAssertTrue(isConditionChecked.wrappedValue)
+        #expect(isConditionChecked.wrappedValue)
     }
 
-    func test_retry_retriesOperation_whenRetryStrategyIsSet() async throws {
+    @Test
+    func retry_retriesOperation_whenRetryStrategyIsSet() async throws {
         // Given
         let operationStartsCount = POUnfairlyLocked<Int>(wrappedValue: 0)
 
@@ -183,11 +191,11 @@ final class AsyncUtilsTests: XCTestCase {
         )
 
         // Then
-        XCTAssertEqual(operationStartsCount.wrappedValue, 2)
+        #expect(operationStartsCount.wrappedValue == 2)
     }
 
-    // swiftlint:disable:next line_length
-    func test_retry_whenCancelledDuringRetryDelayAndOperationIsCancellable_completesWithCancellationError() async throws {
+    @Test
+    func retry_whenCancelledDuringRetryDelayAndOperationIsCancellable_completesWithCancellationError() async throws {
         // Given
         let task = Task {
             try await retry(
@@ -212,10 +220,11 @@ final class AsyncUtilsTests: XCTestCase {
         if case .failure(let failure) = await task.result, failure is CancellationError {
             return
         }
-        XCTFail("Expected cancellation error")
+        Issue.record("Expected cancellation error.")
     }
 
-    func test_retry_whenRetryCountIsExceeded_completesWithRecentResult() async throws {
+    @Test
+    func retry_whenRetryCountIsExceeded_completesWithRecentResult() async throws {
         // Given
         let recentOperationValue = POUnfairlyLocked<String>(wrappedValue: "")
 
@@ -236,10 +245,11 @@ final class AsyncUtilsTests: XCTestCase {
         )
 
         // Then
-        XCTAssertEqual(recentOperationValue.wrappedValue, value)
+        #expect(recentOperationValue.wrappedValue == value)
     }
 
-    func test_retry_whenRetryConditionResolvesFalse_completesWithRecentResult() async throws {
+    @Test
+    func retry_whenRetryConditionResolvesFalse_completesWithRecentResult() async throws {
         // Given
         let recentOperationValue = POUnfairlyLocked<String>(wrappedValue: "")
 
@@ -260,10 +270,11 @@ final class AsyncUtilsTests: XCTestCase {
         )
 
         // Then
-        XCTAssertEqual(recentOperationValue.wrappedValue, value)
+        #expect(recentOperationValue.wrappedValue == value)
     }
 
-    func test_retry_whenCancelledImmediately_completesWithCancellationError() async throws {
+    @Test
+    func retry_whenCancelledImmediately_completesWithCancellationError() async throws {
         // Given
         let task = Task {
             try await retry(
@@ -285,7 +296,7 @@ final class AsyncUtilsTests: XCTestCase {
         if case .failure(let failure) = await task.result, failure is CancellationError {
             return
         }
-        XCTFail("Expected cancellation error")
+        Issue.record("Expected cancellation error.")
     }
 
     // MARK: - Private Nested Types
