@@ -26,6 +26,10 @@ struct DynamicCheckoutView: View {
                 delegate: item.delegate,
                 completion: item.completion
             )
+            // Using the sheet modifier interferes with the default ScrollView behavior,
+            // preventing it from canceling subview interactions during a scroll.
+            // Adding a drag gesture is a workaround to resolve this issue.
+            .gesture(DragGesture(minimumDistance: 0))
         }
         .onSubmit {
             viewModel.pay()
