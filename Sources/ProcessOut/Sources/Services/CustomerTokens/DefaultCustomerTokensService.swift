@@ -7,9 +7,15 @@
 
 final class DefaultCustomerTokensService: POCustomerTokensService {
 
-    init(repository: CustomerTokensRepository, customerActionsService: CustomerActionsService, logger: POLogger) {
+    init(
+        repository: CustomerTokensRepository,
+        customerActionsService: CustomerActionsService,
+        eventEmitter: POEventEmitter,
+        logger: POLogger
+    ) {
         self.repository = repository
         self.customerActionsService = customerActionsService
+        self.eventEmitter = eventEmitter
         self.logger = logger
     }
 
@@ -30,6 +36,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
 
     func deleteCustomerToken(request: PODeleteCustomerTokenRequest) async throws {
         try await repository.delete(request: request)
+        eventEmitter.emit(event: POCustomerTokenDeletedEvent(customerId: request.customerId, tokenId: request.tokenId))
     }
 
     func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
@@ -40,6 +47,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
 
     private let repository: CustomerTokensRepository
     private let customerActionsService: CustomerActionsService
+    private let eventEmitter: POEventEmitter
     private let logger: POLogger
 
     // MARK: - Private Methods

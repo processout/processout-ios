@@ -144,15 +144,18 @@ public final class ProcessOut: @unchecked Sendable {
         cards = Self.createCardsService(
             httpConnector: httpConnector, logger: serviceLogger
         )
+        eventEmitter = LocalEventEmitter(logger: serviceLogger)
         customerTokens = Self.createCustomerTokensService(
-            httpConnector: httpConnector, customerActionsService: customerActionsService, logger: serviceLogger
+            httpConnector: httpConnector,
+            customerActionsService: customerActionsService,
+            eventEmitter: eventEmitter,
+            logger: serviceLogger
         )
         logger = Self.createLogger(
             for: Constants.applicationLoggerCategory,
             configuration: configuration,
             additionalDestinations: telemetryService
         )
-        eventEmitter = LocalEventEmitter(logger: logger)
     }
 
     // MARK: - Services
@@ -198,11 +201,17 @@ public final class ProcessOut: @unchecked Sendable {
     }
 
     private static func createCustomerTokensService(
-        httpConnector: HttpConnector, customerActionsService: CustomerActionsService, logger: POLogger
+        httpConnector: HttpConnector,
+        customerActionsService: CustomerActionsService,
+        eventEmitter: POEventEmitter,
+        logger: POLogger
     ) -> POCustomerTokensService {
         let repository = HttpCustomerTokensRepository(connector: httpConnector)
         return DefaultCustomerTokensService(
-            repository: repository, customerActionsService: customerActionsService, logger: logger
+            repository: repository,
+            customerActionsService: customerActionsService,
+            eventEmitter: eventEmitter,
+            logger: logger
         )
     }
 

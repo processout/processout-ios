@@ -11,8 +11,11 @@ import Foundation
 public protocol POEventEmitter: Sendable {
 
     /// Emits given event.
+    @discardableResult
     func emit<Event: POEventEmitterEvent>(event: Event) -> Bool
 
     /// Adds subscription for given event.
-    func on<Event: POEventEmitterEvent>(_ eventType: Event.Type, listener: @escaping (Event) -> Bool) -> AnyObject
+    func on<Event: POEventEmitterEvent>(
+        _ eventType: Event.Type, listener: @escaping @Sendable (Event) -> Bool
+    ) -> sending AnyObject
 }
