@@ -28,6 +28,10 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
         }
     }
 
+    func deleteCustomerToken(request: PODeleteCustomerTokenRequest) async throws {
+        try await repository.delete(request: request)
+    }
+
     func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
         try await repository.createCustomerToken(request: request)
     }

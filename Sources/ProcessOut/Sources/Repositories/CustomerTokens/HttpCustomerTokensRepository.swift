@@ -37,6 +37,14 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
         return try await connector.execute(request: httpRequest).token
     }
 
+    func delete(request: PODeleteCustomerTokenRequest) async throws {
+        let httpRequest = HttpConnectorRequest<VoidCodable>.delete(
+            path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",
+            headers: ["X-Processout-Client-Secret": request.clientSecret]
+        )
+        _ = try await connector.execute(request: httpRequest)
+    }
+
     // MARK: - Private Properties
 
     private let connector: HttpConnector

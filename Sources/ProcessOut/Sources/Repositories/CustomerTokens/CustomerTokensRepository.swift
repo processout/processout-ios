@@ -12,4 +12,7 @@ protocol CustomerTokensRepository: PORepository {
 
     /// Create customer token.
     func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken
+
+    /// Deletes given customer token.
+    func delete(request: PODeleteCustomerTokenRequest) async throws
 }
