@@ -10,7 +10,7 @@ import Foundation
 struct HttpConnectorRequest<Value: Decodable & Sendable>: Sendable {
 
     enum Method: String {
-        case get, put, post
+        case get, put, post, delete
     }
 
     typealias Body = Sendable & Encodable
@@ -98,6 +98,24 @@ extension HttpConnectorRequest {
             body: body,
             headers: headers,
             includesDeviceMetadata: includesDeviceMetadata,
+            requiresPrivateKey: requiresPrivateKey
+        )
+    }
+
+    static func delete(
+        path: String,
+        query: [String: CustomStringConvertible] = [:],
+        headers: [String: String] = [:],
+        requiresPrivateKey: Bool = false
+    ) -> Self {
+        .init(
+            id: UUID().uuidString,
+            method: .delete,
+            path: path,
+            query: query.mapValues(\.description),
+            body: nil,
+            headers: headers,
+            includesDeviceMetadata: false,
             requiresPrivateKey: requiresPrivateKey
         )
     }
