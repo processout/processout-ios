@@ -9,6 +9,7 @@ import SwiftUI
 
 extension Group {
 
+    /// Constructs a group from the subviews of the given view.
     @_spi(PO)
     public init<Base: View, Result: View>(
         poSubviews view: Base,
