@@ -12,9 +12,21 @@ import SwiftUI
 @available(iOS 14, *)
 public struct PODefaultSavedPaymentMethodStyle: POSavedPaymentMethodStyle {
 
+    /// Description text style.
+    public let description: POTextStyle
+
     // MARK: - POSavedPaymentMethodStyle
 
     public func makeBody(configuration: Configuration) -> some View {
-        Text("Hello World")
+        HStack(spacing: POSpacing.small) {
+            configuration.icon
+                .frame(width: 24, height: 24)
+            configuration.description
+                .textStyle(description)
+                .lineLimit(1)
+            Spacer()
+            configuration.deleteButton
+        }
+        .padding(POSpacing.large)
     }
 }

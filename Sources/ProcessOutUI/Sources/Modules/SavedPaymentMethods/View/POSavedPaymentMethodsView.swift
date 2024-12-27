@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOutCoreUI
 
 /// Saved payment methods root view.
 @available(iOS 14, *)
@@ -20,10 +21,24 @@ public struct POSavedPaymentMethodsView: View {
     // MARK: - View
 
     public var body: some View {
-        Text("Hello, World!")
+        let configuration = POSavedPaymentMethodsStyleConfiguration {
+            Text("Manage saved payment methods")
+        } paymentMethods: {
+            ForEach(viewModel.state.paymentMethods) { paymentMethod in
+                SavedPaymentMethodView(viewModel: paymentMethod)
+            }
+        } cancelButton: {
+            Button("Cancel") { }
+        }
+        AnyView(style.makeBody(configuration: configuration))
+            .backport.geometryGroup()
+            .onAppear(perform: viewModel.start)
     }
 
     // MARK: - Private Properties
+
+    @Environment(\.savedPaymentMethodsStyle)
+    private var style
 
     @StateObject
     private var viewModel: AnyViewModel<SavedPaymentMethodsViewModelState>

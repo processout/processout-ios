@@ -66,12 +66,32 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
     // MARK: - Started
 
     private func update(with interactorState: SavedPaymentMethodsInteractorState.Started) {
-        state = .init(paymentMethods: [])
+        let paymentMethodsViewModels = interactorState.paymentMethods.map(createViewModel)
+        state = .init(paymentMethods: paymentMethodsViewModels)
     }
 
     // MARK: - Removing
 
     private func update(with interactorState: SavedPaymentMethodsInteractorState.Removing) {
-        state = .init(paymentMethods: [])
+        let paymentMethodsViewModels = interactorState.startedStateSnapshot.paymentMethods.map(createViewModel)
+        state = .init(paymentMethods: paymentMethodsViewModels)
+    }
+
+    // MARK: - Utils
+
+    private func createViewModel(
+        for paymentMethod: SavedPaymentMethodsInteractorState.PaymentMethod
+    ) -> SavedPaymentMethodsViewModelState.PaymentMethod {
+        let delete: () -> Void = { [weak self] in
+            self?.interactor.delete(customerTokenId: paymentMethod.customerTokenId)
+        }
+        let viewModel = SavedPaymentMethodsViewModelState.PaymentMethod(
+            id: paymentMethod.customerTokenId,
+            logo: paymentMethod.logo,
+            name: paymentMethod.name,
+            description: paymentMethod.description,
+            delete: delete
+        )
+        return viewModel
     }
 }

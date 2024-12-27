@@ -11,6 +11,9 @@ import SwiftUI
 @MainActor
 public struct POSavedPaymentMethodStyleConfiguration {
 
+    /// Payment method icon.
+    public let icon: AnyView
+
     /// Payment method name.
     public let name: AnyView
 
@@ -22,10 +25,12 @@ public struct POSavedPaymentMethodStyleConfiguration {
 
     /// Creates configuration.
     init(
+        @ViewBuilder icon: () -> some View,
         @ViewBuilder name: () -> some View,
         @ViewBuilder description: () -> some View,
         @ViewBuilder deleteButton: () -> some View
     ) {
+        self.icon = AnyView(icon())
         self.name = AnyView(name())
         self.description = AnyView(description())
         self.deleteButton = AnyView(deleteButton())

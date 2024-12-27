@@ -11,11 +11,11 @@ import SwiftUI
 @MainActor
 public struct POSavedPaymentMethodsStyleConfiguration {
 
-    /// Card scanner title.
+    /// Saved payment methods view title.
     public let title: AnyView
 
-    /// Card scanner description.
-    public let description: AnyView
+    /// Payment methods.
+    public let paymentMethods: AnyView
 
     /// Cancel button.
     public let cancelButton: AnyView
@@ -23,11 +23,11 @@ public struct POSavedPaymentMethodsStyleConfiguration {
     /// Creates configuration.
     init(
         @ViewBuilder title: () -> some View,
-        @ViewBuilder description: () -> some View,
+        @ViewBuilder paymentMethods: () -> some View,
         @ViewBuilder cancelButton: () -> some View
     ) {
         self.title = AnyView(title())
-        self.description = AnyView(description())
+        self.paymentMethods = AnyView(paymentMethods())
         self.cancelButton = AnyView(cancelButton())
     }
 }
