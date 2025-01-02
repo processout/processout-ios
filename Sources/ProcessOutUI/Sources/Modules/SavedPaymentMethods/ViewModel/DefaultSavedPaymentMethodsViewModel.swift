@@ -66,21 +66,28 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
     // MARK: - Started
 
     private func update(with interactorState: SavedPaymentMethodsInteractorState.Started) {
-        let paymentMethodsViewModels = interactorState.paymentMethods.map(createViewModel)
+        let paymentMethodsViewModels = interactorState.paymentMethods.map { paymentMethod in
+            createViewModel(for: paymentMethod, isBeingRemoved: false)
+        }
         state = .init(paymentMethods: paymentMethodsViewModels)
     }
 
     // MARK: - Removing
 
     private func update(with interactorState: SavedPaymentMethodsInteractorState.Removing) {
-        let paymentMethodsViewModels = interactorState.startedStateSnapshot.paymentMethods.map(createViewModel)
+        var removedIds = Set(interactorState.pendingRemovalCustomerTokenIds)
+        removedIds.insert(interactorState.removedCustomerTokenId)
+        let paymentMethodsViewModels = interactorState.startedStateSnapshot.paymentMethods.map { paymentMethod in
+            let isBeingRemoved = removedIds.contains(paymentMethod.customerTokenId)
+            return createViewModel(for: paymentMethod, isBeingRemoved: isBeingRemoved)
+        }
         state = .init(paymentMethods: paymentMethodsViewModels)
     }
 
     // MARK: - Utils
 
     private func createViewModel(
-        for paymentMethod: SavedPaymentMethodsInteractorState.PaymentMethod
+        for paymentMethod: SavedPaymentMethodsInteractorState.PaymentMethod, isBeingRemoved: Bool
     ) -> SavedPaymentMethodsViewModelState.PaymentMethod {
         let deleteButton = POButtonViewModel(
             id: "delete-button",
@@ -89,7 +96,7 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
                 .resizable()
                 .renderingMode(.template),
             isEnabled: true,
-            isLoading: false,
+            isLoading: isBeingRemoved,
             role: nil,
             confirmation: nil,
             action: { [weak self] in
