@@ -18,6 +18,11 @@ public struct PODefaultSavedPaymentMethodStyle: POSavedPaymentMethodStyle {
     /// Delete button style.
     public let deleteButton: any ButtonStyle
 
+    public init(description: POTextStyle, deleteButton: any ButtonStyle) {
+        self.description = description
+        self.deleteButton = deleteButton
+    }
+
     // MARK: - POSavedPaymentMethodStyle
 
     public func makeBody(configuration: Configuration) -> some View {
