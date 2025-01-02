@@ -37,25 +37,33 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
                 .fill(border.color)
                 .frame(height: 1)
             ScrollView {
+                makeBody(paymentMethods: configuration.paymentMethods)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    // MARK: - Private Properties
+
+    @ViewBuilder
+    private func makeBody(paymentMethods: AnyView) -> some View {
+        Group(poSubviews: paymentMethods) { subviews in
+            if !subviews.isEmpty {
                 VStack(spacing: 0) {
-                    Group(poSubviews: configuration.paymentMethods) { subviews in
-                        ForEach(subviews) { subview in
-                            subview
-                            if subview.id != subviews.last?.id {
-                                Rectangle()
-                                    .fill(border.color)
-                                    .frame(height: 1)
-                            }
+                    ForEach(subviews) { subview in
+                        subview
+                        if subview.id != subviews.last?.id {
+                            Rectangle()
+                                .fill(border.color)
+                                .frame(height: 1)
                         }
                     }
                 }
-                .frame(maxWidth: .infinity)
+                .compositingGroup()
                 .border(style: border)
-                .padding(POSpacing.large)
-                .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
         }
+        .padding(POSpacing.large)
         .frame(maxWidth: .infinity)
     }
 }
