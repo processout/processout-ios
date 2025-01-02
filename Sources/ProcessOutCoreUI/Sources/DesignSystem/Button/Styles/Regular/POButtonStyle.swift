@@ -81,8 +81,7 @@ private struct ButtonStyleBox<ProgressStyle: ProgressViewStyle>: View {
                     .progressViewStyle(progressStyle)
             } else {
                 configuration.label
-                    .textStyle(currentStyle.title.scaledBy(labelTypographyScale))
-                    .lineLimit(1)
+                    .labelStyle(ButtonLabelStyle(titleStyle: currentStyle.title))
             }
         }
         .padding(
@@ -142,10 +141,5 @@ private struct ButtonStyleBox<ProgressStyle: ProgressViewStyle>: View {
     private var maxWidth: CGFloat? {
         let widths: [POControlWidth: CGFloat] = [.expanded: .infinity]
         return widths[controlWidth]
-    }
-
-    private var labelTypographyScale: CGFloat {
-        let scales: [POControlSize: CGFloat] = [.small: 0.867]
-        return scales[controlSize] ?? 1.0
     }
 }
