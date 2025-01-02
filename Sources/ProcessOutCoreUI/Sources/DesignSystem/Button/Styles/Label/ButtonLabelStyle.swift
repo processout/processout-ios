@@ -33,6 +33,7 @@ private struct ContentView: View {
                 .textStyle(scaledTitleStyle)
         } icon: {
             configuration.icon
+                .foregroundColor(titleStyle.color)
                 .scaledToFit()
                 .frame(maxHeight: scaledIconMaxHeight)
         }

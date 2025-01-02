@@ -84,9 +84,7 @@ private struct ButtonStyleBox<ProgressStyle: ProgressViewStyle>: View {
                     .labelStyle(ButtonLabelStyle(titleStyle: currentStyle.title))
             }
         }
-        .padding(
-            .init(horizontal: POSpacing.small, vertical: POSpacing.extraSmall)
-        )
+        .padding(POSpacing.small)
         .frame(minWidth: minSize, maxWidth: maxWidth, minHeight: minSize)
         .background(currentStyle.backgroundColor)
         .border(style: currentStyle.border)

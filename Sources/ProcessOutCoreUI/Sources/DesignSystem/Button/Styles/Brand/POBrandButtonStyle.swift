@@ -89,9 +89,7 @@ private struct ButtonStyleBox: View {
                     .labelStyle(ButtonLabelStyle(titleStyle: title))
             }
         }
-        .padding(
-            .init(horizontal: POSpacing.small, vertical: POSpacing.extraSmall)
-        )
+        .padding(POSpacing.small)
         .frame(minWidth: minSize, maxWidth: maxWidth, minHeight: minSize)
         .backport.background {
             let adjustment = brightnessAdjustment(
