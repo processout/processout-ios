@@ -82,15 +82,26 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
     private func createViewModel(
         for paymentMethod: SavedPaymentMethodsInteractorState.PaymentMethod
     ) -> SavedPaymentMethodsViewModelState.PaymentMethod {
-        let delete: () -> Void = { [weak self] in
-            self?.interactor.delete(customerTokenId: paymentMethod.customerTokenId)
-        }
+        let deleteButton = POButtonViewModel(
+            id: "delete-button",
+            title: nil,
+            icon: Image(poResource: .delete)
+                .resizable()
+                .renderingMode(.template),
+            isEnabled: true,
+            isLoading: false,
+            role: nil,
+            confirmation: nil,
+            action: { [weak self] in
+                self?.interactor.delete(customerTokenId: paymentMethod.customerTokenId)
+            }
+        )
         let viewModel = SavedPaymentMethodsViewModelState.PaymentMethod(
             id: paymentMethod.customerTokenId,
             logo: paymentMethod.logo,
             name: paymentMethod.name,
             description: paymentMethod.description,
-            delete: delete
+            deleteButton: deleteButton
         )
         return viewModel
     }

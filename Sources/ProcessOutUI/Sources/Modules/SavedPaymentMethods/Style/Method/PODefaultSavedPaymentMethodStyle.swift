@@ -15,6 +15,9 @@ public struct PODefaultSavedPaymentMethodStyle: POSavedPaymentMethodStyle {
     /// Description text style.
     public let description: POTextStyle
 
+    /// Delete button style.
+    public let deleteButton: any ButtonStyle
+
     // MARK: - POSavedPaymentMethodStyle
 
     public func makeBody(configuration: Configuration) -> some View {
@@ -26,6 +29,7 @@ public struct PODefaultSavedPaymentMethodStyle: POSavedPaymentMethodStyle {
                 .lineLimit(1)
             Spacer()
             configuration.deleteButton
+                .buttonStyle(POAnyButtonStyle(erasing: deleteButton))
         }
         .padding(POSpacing.large)
     }

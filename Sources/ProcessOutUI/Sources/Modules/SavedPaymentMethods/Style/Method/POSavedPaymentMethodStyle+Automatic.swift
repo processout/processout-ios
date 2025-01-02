@@ -14,7 +14,8 @@ extension POSavedPaymentMethodStyle where Self == PODefaultSavedPaymentMethodSty
     /// The default saved payment method style.
     public static var automatic: PODefaultSavedPaymentMethodStyle {
         PODefaultSavedPaymentMethodStyle(
-            description: POTextStyle(color: Color(poResource: .Text.primary), typography: .button)
+            description: POTextStyle(color: Color(poResource: .Text.primary), typography: .button),
+            deleteButton: .ghost(titleColor: Color(poResource: .Text.error))
         )
     }
 }

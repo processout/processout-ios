@@ -27,9 +27,10 @@ struct SavedPaymentMethodView: View {
                 Text(description)
             }
         } deleteButton: {
-            Button("Delete") {
-                viewModel.delete()
-            }
+            Button
+                .create(with: viewModel.deleteButton)
+                .backport.poControlSize(.small)
+                .controlWidth(.regular)
         }
         AnyView(style.makeBody(configuration: configuration))
             .backport.geometryGroup()

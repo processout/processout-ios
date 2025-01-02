@@ -6,6 +6,7 @@
 //
 
 import ProcessOut
+@_spi(PO) import ProcessOutCoreUI
 
 struct SavedPaymentMethodsViewModelState {
 
@@ -23,8 +24,8 @@ struct SavedPaymentMethodsViewModelState {
         /// Description.
         let description: String?
 
-        /// Requests payment method removal.
-        let delete: () -> Void
+        /// Payment method removal button.
+        let deleteButton: POButtonViewModel
     }
 
     /// Available payment methods.
