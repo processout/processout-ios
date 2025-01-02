@@ -190,7 +190,6 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         let defaultIcon = Image(poResource: .camera)
             .renderingMode(.template)
             .resizable()
-            .frame(width: 16, height: 16)
         let viewModel = POButtonViewModel(
             id: "scan-card-button",
             title: cardScanner.scanButton.title ?? String(resource: .CardTokenization.Button.scanCard),

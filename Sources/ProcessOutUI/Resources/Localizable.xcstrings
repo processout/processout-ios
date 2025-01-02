@@ -647,6 +647,9 @@
         }
       }
     },
+    "Cancel" : {
+
+    },
     "cancel-confirmation.cancel" : {
       "localizations" : {
         "ar" : {
@@ -1735,6 +1738,9 @@
         }
       }
     },
+    "Delete" : {
+
+    },
     "dynamic-checkout.cancel-button" : {
       "localizations" : {
         "ar" : {
@@ -1972,6 +1978,9 @@
           }
         }
       }
+    },
+    "Manage saved payment methods" : {
+
     },
     "native-alternative-payment.barcode-error.confirm" : {
       "localizations" : {
