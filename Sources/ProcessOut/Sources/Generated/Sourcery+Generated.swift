@@ -1,4 +1,4 @@
-// Generated using Sourcery 2.2.5 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 2.2.6 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 import Foundation
@@ -215,6 +215,19 @@ extension POCustomerTokensService {
     ) -> POCancellable {
         invoke(completion: completion) {
             try await assignCustomerToken(request: request, threeDSService: threeDSService)
+        }
+    }
+
+    /// Deletes customer token.
+    @available(*, deprecated, message: "Use the async method instead.")
+    @preconcurrency
+    @discardableResult
+    public func deleteCustomerToken(
+        request: PODeleteCustomerTokenRequest,
+        completion: sending @escaping @isolated(any) (Result<Void, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await deleteCustomerToken(request: request)
         }
     }
 
@@ -484,6 +497,18 @@ extension POCustomerTokensService {
     ) -> POCancellable {
         invoke(completion: completion) {
             try await assignCustomerToken(request: request, threeDSService: threeDSService)
+        }
+    }
+
+    /// Deletes customer token.
+    @available(*, deprecated, message: "Use the async method instead.")
+    @discardableResult
+    public func deleteCustomerToken(
+        request: PODeleteCustomerTokenRequest,
+        completion: @escaping @MainActor (Result<Void, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await deleteCustomerToken(request: request)
         }
     }
 
