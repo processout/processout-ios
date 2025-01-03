@@ -77,32 +77,29 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
 
     public func makeBody(configuration: Configuration) -> some View {
         VStack(spacing: 0) {
-            HStack {
-                configuration.title
-                    .textStyle(toolbar.title)
-                Spacer()
-                configuration.cancelButton
-                    .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
-                    .backport.poControlSize(.regular)
-                    .controlWidth(.regular)
-                    .offset(x: 14)
+            if #unavailable(iOS 15) {
+                makeToolbarBody(configuration: configuration)
             }
-            .padding(POSpacing.large)
-            .background(toolbar.backgroundColor)
-            Rectangle()
-                .fill(toolbar.dividerColor)
-                .frame(height: 1)
             ScrollView {
                 Group {
                     if configuration.isLoading {
                         ProgressView()
                             .poProgressViewStyle(progressView)
                     } else {
-                        makeBody(paymentMethods: configuration.paymentMethods)
+                        makeContentBody(paymentMethods: configuration.paymentMethods)
                     }
                 }
                 .padding(POSpacing.large)
                 .frame(maxWidth: .infinity)
+            }
+            .modify { content in
+                if #available(iOS 15, *) {
+                    content.safeAreaInset(edge: .top) {
+                        makeToolbarBody(configuration: configuration)
+                    }
+                } else {
+                    content
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -112,7 +109,7 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
     // MARK: - Private Properties
 
     @ViewBuilder
-    private func makeBody(paymentMethods: AnyView) -> some View {
+    private func makeContentBody(paymentMethods: AnyView) -> some View {
         Group(poSubviews: paymentMethods) { subviews in
             if !subviews.isEmpty {
                 VStack(spacing: 0) {
@@ -129,6 +126,27 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
                 .border(style: content.border)
             }
         }
+    }
+
+    @ViewBuilder
+    private func makeToolbarBody(configuration: Configuration) -> some View {
+        VStack(spacing: 0) {
+            HStack {
+                configuration.title
+                    .textStyle(toolbar.title)
+                Spacer()
+                configuration.cancelButton
+                    .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
+                    .backport.poControlSize(.regular)
+                    .controlWidth(.regular)
+                    .offset(x: 14)
+            }
+            .padding(POSpacing.large)
+            Rectangle()
+                .fill(toolbar.dividerColor)
+                .frame(height: 1)
+        }
+        .background(toolbar.backgroundColor)
     }
 }
 
