@@ -37,6 +37,9 @@ struct SavedPaymentMethodsViewModelState {
     /// Boolean value indicating whether payment methods are being loaded.
     let isLoading: Bool
 
+    /// Message if any.
+    let message: POMessage?
+
     /// Cancel button.
     let cancelButton: POButtonViewModel?
 }
@@ -44,10 +47,10 @@ struct SavedPaymentMethodsViewModelState {
 extension SavedPaymentMethodsViewModelState: AnimationIdentityProvider {
 
     var animationIdentity: AnyHashable {
-        [paymentMethods.map(\.id), AnyHashable(cancelButton?.id)]
+        [paymentMethods.map(\.id), AnyHashable(cancelButton?.id), AnyHashable(message?.id)]
     }
 
     static var idle: SavedPaymentMethodsViewModelState {
-        .init(title: nil, paymentMethods: [], isLoading: false, cancelButton: nil)
+        .init(title: nil, paymentMethods: [], isLoading: false, message: nil, cancelButton: nil)
     }
 }

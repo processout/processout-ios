@@ -32,6 +32,11 @@ public struct POSavedPaymentMethodsView: View {
                     SavedPaymentMethodView(viewModel: paymentMethod)
                 }
             },
+            message: {
+                if let viewModel = viewModel.state.message {
+                    POMessageView(message: viewModel)
+                }
+            },
             cancelButton: {
                 if let viewModel = viewModel.state.cancelButton {
                     Button.create(with: viewModel)
@@ -54,15 +59,15 @@ public struct POSavedPaymentMethodsView: View {
 }
 
 // todo(andrii-vysotskyi): complete before PR
+// * Add missing properties to configuration object
 // * Support empty state ?
-// * Support "runtime" errors
 // * Add directly to example
 // * Support transition from dynamic checkout
-// * Add slide to delete ?
-// * Add missing properties to configuration object
 // * Support customization through the dynamic checkout
 // * Remove deleted payment method in dynamic checkout
 // * Decide if name should be visible in default style
-// * Update in-project doc
-// * Add documentation to process out
+// * Add documentation
+//   * In-project
+//   * Process Out
 // * Add tests
+// * Add slide to delete

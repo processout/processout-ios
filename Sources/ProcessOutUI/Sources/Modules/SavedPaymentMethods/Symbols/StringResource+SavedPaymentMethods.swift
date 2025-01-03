@@ -13,5 +13,8 @@ extension POStringResource {
 
         /// Screen title.
         static let title = POStringResource("saved-payment-methods.title", comment: "")
+
+        /// Generic error.
+        static let genericError = POStringResource("saved-payment-methods.generic-error", comment: "")
     }
 }

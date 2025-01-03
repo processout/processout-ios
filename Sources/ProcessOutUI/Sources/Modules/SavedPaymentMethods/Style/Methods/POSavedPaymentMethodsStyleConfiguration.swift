@@ -19,6 +19,9 @@ public struct POSavedPaymentMethodsStyleConfiguration {
     /// Payment methods.
     public let paymentMethods: AnyView
 
+    /// Message.
+    public let message: AnyView
+
     /// Cancel button.
     public let cancelButton: AnyView
 
@@ -31,11 +34,13 @@ public struct POSavedPaymentMethodsStyleConfiguration {
     init(
         @ViewBuilder title: () -> some View,
         @ViewBuilder paymentMethods: () -> some View,
+        @ViewBuilder message: () -> some View,
         @ViewBuilder cancelButton: () -> some View,
         isLoading: Bool
     ) {
         self.title = AnyView(title())
         self.paymentMethods = AnyView(paymentMethods())
+        self.message = AnyView(message())
         self.cancelButton = AnyView(cancelButton())
         self.isLoading = isLoading
     }

@@ -24,7 +24,7 @@ enum SavedPaymentMethodsInteractorState {
         let customerId: String
 
         /// Recent failure.
-        let recentFailure: POFailure?
+        var recentFailure: POFailure?
     }
 
     struct Removing {

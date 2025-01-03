@@ -53,6 +53,9 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
     /// Border style.
     public let progressView: any ProgressViewStyle
 
+    /// Message view style.
+    public let messageView: any POMessageViewStyle
+
     /// Cancel button style.
     public let cancelButton: any ButtonStyle
 
@@ -63,12 +66,14 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
         toolbar: Toolbar,
         content: Content,
         progressView: some ProgressViewStyle,
+        messageView: some POMessageViewStyle,
         cancelButton: some ButtonStyle,
         backgroundColor: Color
     ) {
         self.toolbar = toolbar
         self.content = content
         self.progressView = progressView
+        self.messageView = messageView
         self.cancelButton = cancelButton
         self.backgroundColor = backgroundColor
     }
@@ -81,7 +86,9 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
                 makeToolbarBody(configuration: configuration)
             }
             ScrollView {
-                Group {
+                VStack(spacing: POSpacing.medium) {
+                    configuration.message
+                        .messageViewStyle(messageView)
                     if configuration.isLoading {
                         ProgressView()
                             .poProgressViewStyle(progressView)

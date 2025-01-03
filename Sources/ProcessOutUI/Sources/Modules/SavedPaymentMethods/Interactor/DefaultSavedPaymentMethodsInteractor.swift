@@ -167,8 +167,10 @@ final class DefaultSavedPaymentMethodsInteractor:
                 setStartedState(afterDeletionError: error)
             }
         }
+        var nextStartedStateSnapshot = startedState
+        nextStartedStateSnapshot.recentFailure = nil
         let nextState = State.Removing(
-            startedStateSnapshot: startedState,
+            startedStateSnapshot: nextStartedStateSnapshot,
             removedCustomerTokenId: customerTokenId,
             task: task,
             pendingRemovalCustomerTokenIds: pendingRemovalCustomerTokenIds

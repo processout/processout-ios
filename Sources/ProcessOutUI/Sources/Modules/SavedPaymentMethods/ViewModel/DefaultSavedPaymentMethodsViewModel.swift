@@ -61,7 +61,11 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
 
     private func updateWithStartingState() {
         state = .init(
-            title: createTitle(), paymentMethods: [], isLoading: true, cancelButton: createCancelButton()
+            title: createTitle(),
+            paymentMethods: [],
+            isLoading: true,
+            message: nil,
+            cancelButton: createCancelButton()
         )
     }
 
@@ -75,6 +79,7 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             title: createTitle(),
             paymentMethods: paymentMethodsViewModels,
             isLoading: false,
+            message: createMessage(failure: interactorState.recentFailure),
             cancelButton: createCancelButton()
         )
     }
@@ -92,6 +97,7 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             title: createTitle(),
             paymentMethods: paymentMethodsViewModels,
             isLoading: false,
+            message: createMessage(failure: interactorState.startedStateSnapshot.recentFailure),
             cancelButton: createCancelButton()
         )
     }
@@ -140,5 +146,12 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             }
         )
         return viewModel
+    }
+
+    private func createMessage(failure: POFailure?) -> POMessage? {
+        guard failure != nil else {
+            return nil
+        }
+        return .init(id: "error-message", text: String(resource: .SavedPaymentMethods.genericError), severity: .error)
     }
 }

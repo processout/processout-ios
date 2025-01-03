@@ -24,6 +24,7 @@ extension POSavedPaymentMethodsStyle where Self == PODefaultSavedPaymentMethodsS
                 dividerColor: Color(poResource: .Border.subtle)
             ),
             progressView: .circular,
+            messageView: .toast,
             cancelButton: .ghost,
             backgroundColor: Color(poResource: .Surface.default)
         )
