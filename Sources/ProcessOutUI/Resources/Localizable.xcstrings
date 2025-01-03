@@ -647,9 +647,6 @@
         }
       }
     },
-    "Cancel" : {
-
-    },
     "cancel-confirmation.cancel" : {
       "localizations" : {
         "ar" : {
@@ -1738,9 +1735,6 @@
         }
       }
     },
-    "Delete" : {
-
-    },
     "dynamic-checkout.cancel-button" : {
       "localizations" : {
         "ar" : {
@@ -1978,9 +1972,6 @@
           }
         }
       }
-    },
-    "Manage saved payment methods" : {
-
     },
     "native-alternative-payment.barcode-error.confirm" : {
       "localizations" : {
@@ -2650,6 +2641,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pagar com %@"
+          }
+        }
+      }
+    },
+    "saved-payment-methods.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage saved payment methods"
           }
         }
       }

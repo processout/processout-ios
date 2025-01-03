@@ -23,7 +23,9 @@ public struct POSavedPaymentMethodsView: View {
     public var body: some View {
         let configuration = POSavedPaymentMethodsStyleConfiguration(
             title: {
-                Text("Manage saved payment methods")
+                if let title = viewModel.state.title {
+                    Text(title)
+                }
             },
             paymentMethods: {
                 ForEach(viewModel.state.paymentMethods) { paymentMethod in
@@ -68,4 +70,3 @@ public struct POSavedPaymentMethodsView: View {
 // * Update in-project doc
 // * Add documentation to process out
 // * Add tests
-// * Revise icons sizes

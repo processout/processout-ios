@@ -28,6 +28,9 @@ struct SavedPaymentMethodsViewModelState {
         let deleteButton: POButtonViewModel
     }
 
+    /// Screen title.
+    let title: String?
+
     /// Available payment methods.
     let paymentMethods: [PaymentMethod]
 
@@ -45,6 +48,6 @@ extension SavedPaymentMethodsViewModelState: AnimationIdentityProvider {
     }
 
     static var idle: SavedPaymentMethodsViewModelState {
-        .init(paymentMethods: [], isLoading: false, cancelButton: nil)
+        .init(title: nil, paymentMethods: [], isLoading: false, cancelButton: nil)
     }
 }

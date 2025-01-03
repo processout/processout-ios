@@ -61,7 +61,7 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
 
     private func updateWithStartingState() {
         state = .init(
-            paymentMethods: [], isLoading: true, cancelButton: createCancelButton()
+            title: createTitle(), paymentMethods: [], isLoading: true, cancelButton: createCancelButton()
         )
     }
 
@@ -72,7 +72,10 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             createViewModel(for: paymentMethod, isBeingRemoved: false)
         }
         state = .init(
-            paymentMethods: paymentMethodsViewModels, isLoading: false, cancelButton: createCancelButton()
+            title: createTitle(),
+            paymentMethods: paymentMethodsViewModels,
+            isLoading: false,
+            cancelButton: createCancelButton()
         )
     }
 
@@ -86,11 +89,18 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             return createViewModel(for: paymentMethod, isBeingRemoved: isBeingRemoved)
         }
         state = .init(
-            paymentMethods: paymentMethodsViewModels, isLoading: false, cancelButton: createCancelButton()
+            title: createTitle(),
+            paymentMethods: paymentMethodsViewModels,
+            isLoading: false,
+            cancelButton: createCancelButton()
         )
     }
 
     // MARK: - Utils
+
+    private func createTitle() -> String? {
+        String(resource: .SavedPaymentMethods.title)
+    }
 
     private func createViewModel(
         for paymentMethod: SavedPaymentMethodsInteractorState.PaymentMethod, isBeingRemoved: Bool
