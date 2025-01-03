@@ -60,7 +60,7 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
     // MARK: - Starting State
 
     private func updateWithStartingState() {
-        state = .init(paymentMethods: [])
+        state = .init(paymentMethods: [], isLoading: true)
     }
 
     // MARK: - Started
@@ -69,7 +69,7 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
         let paymentMethodsViewModels = interactorState.paymentMethods.map { paymentMethod in
             createViewModel(for: paymentMethod, isBeingRemoved: false)
         }
-        state = .init(paymentMethods: paymentMethodsViewModels)
+        state = .init(paymentMethods: paymentMethodsViewModels, isLoading: false)
     }
 
     // MARK: - Removing
@@ -81,7 +81,7 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             let isBeingRemoved = removedIds.contains(paymentMethod.customerTokenId)
             return createViewModel(for: paymentMethod, isBeingRemoved: isBeingRemoved)
         }
-        state = .init(paymentMethods: paymentMethodsViewModels)
+        state = .init(paymentMethods: paymentMethodsViewModels, isLoading: false)
     }
 
     // MARK: - Utils

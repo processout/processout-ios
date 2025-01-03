@@ -18,9 +18,13 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
     /// Border style.
     public let border: POBorderStyle
 
-    public init(title: POTextStyle, border: POBorderStyle) {
+    /// Border style.
+    public let progressView: any ProgressViewStyle
+
+    public init(title: POTextStyle, border: POBorderStyle, progressView: some ProgressViewStyle) {
         self.title = title
         self.border = border
+        self.progressView = progressView
     }
 
     // MARK: - POSavedPaymentMethodsStyle
@@ -37,7 +41,16 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
                 .fill(border.color)
                 .frame(height: 1)
             ScrollView {
-                makeBody(paymentMethods: configuration.paymentMethods)
+                Group {
+                    if configuration.isLoading {
+                        ProgressView()
+                            .poProgressViewStyle(progressView)
+                    } else {
+                        makeBody(paymentMethods: configuration.paymentMethods)
+                    }
+                }
+                .padding(POSpacing.large)
+                .frame(maxWidth: .infinity)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -63,8 +76,6 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
                 .border(style: border)
             }
         }
-        .padding(POSpacing.large)
-        .frame(maxWidth: .infinity)
     }
 }
 

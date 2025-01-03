@@ -11,6 +11,8 @@ import SwiftUI
 @MainActor
 public struct POSavedPaymentMethodsStyleConfiguration {
 
+    // MARK: - Getting the view
+
     /// Saved payment methods view title.
     public let title: AnyView
 
@@ -20,14 +22,21 @@ public struct POSavedPaymentMethodsStyleConfiguration {
     /// Cancel button.
     public let cancelButton: AnyView
 
+    // MARK: - Managing the view state
+
+    /// Boolean value indicating whether screen is currently being loaded.
+    public let isLoading: Bool
+
     /// Creates configuration.
     init(
         @ViewBuilder title: () -> some View,
         @ViewBuilder paymentMethods: () -> some View,
-        @ViewBuilder cancelButton: () -> some View
+        @ViewBuilder cancelButton: () -> some View,
+        isLoading: Bool
     ) {
         self.title = AnyView(title())
         self.paymentMethods = AnyView(paymentMethods())
         self.cancelButton = AnyView(cancelButton())
+        self.isLoading = isLoading
     }
 }

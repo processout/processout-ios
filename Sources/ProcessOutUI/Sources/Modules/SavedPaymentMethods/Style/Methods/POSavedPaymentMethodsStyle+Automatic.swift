@@ -15,7 +15,8 @@ extension POSavedPaymentMethodsStyle where Self == PODefaultSavedPaymentMethodsS
     public static var automatic: PODefaultSavedPaymentMethodsStyle {
         PODefaultSavedPaymentMethodsStyle(
             title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
-            border: .regular(color: Color(poResource: .Border.subtle))
+            border: .regular(color: Color(poResource: .Border.subtle)),
+            progressView: .circular
         )
     }
 }

@@ -30,6 +30,9 @@ struct SavedPaymentMethodsViewModelState {
 
     /// Available payment methods.
     let paymentMethods: [PaymentMethod]
+
+    /// Boolean value indicating whether payment methods are being loaded.
+    let isLoading: Bool
 }
 
 extension SavedPaymentMethodsViewModelState: AnimationIdentityProvider {
@@ -39,6 +42,6 @@ extension SavedPaymentMethodsViewModelState: AnimationIdentityProvider {
     }
 
     static var idle: SavedPaymentMethodsViewModelState {
-        .init(paymentMethods: [])
+        .init(paymentMethods: [], isLoading: false)
     }
 }

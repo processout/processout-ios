@@ -21,15 +21,20 @@ public struct POSavedPaymentMethodsView: View {
     // MARK: - View
 
     public var body: some View {
-        let configuration = POSavedPaymentMethodsStyleConfiguration {
-            Text("Manage saved payment methods")
-        } paymentMethods: {
-            ForEach(viewModel.state.paymentMethods) { paymentMethod in
-                SavedPaymentMethodView(viewModel: paymentMethod)
-            }
-        } cancelButton: {
-            Button("Cancel") { }
-        }
+        let configuration = POSavedPaymentMethodsStyleConfiguration(
+            title: {
+                Text("Manage saved payment methods")
+            },
+            paymentMethods: {
+                ForEach(viewModel.state.paymentMethods) { paymentMethod in
+                    SavedPaymentMethodView(viewModel: paymentMethod)
+                }
+            },
+            cancelButton: {
+                Button("Cancel") { }
+            },
+            isLoading: viewModel.state.isLoading
+        )
         AnyView(style.makeBody(configuration: configuration))
             .backport.geometryGroup()
             .onAppear(perform: viewModel.start)
@@ -43,3 +48,23 @@ public struct POSavedPaymentMethodsView: View {
     @StateObject
     private var viewModel: AnyViewModel<SavedPaymentMethodsViewModelState>
 }
+
+// todo(andrii-vysotskyi): complete before PR
+// * Support empty state ?
+// * Support "runtime" errors
+// * Add cancel button
+// * Support background customization
+//    - Navigation
+//    - Screen
+//    - Individual payment method
+// * Add directly to example
+// * Support transition from dynamic checkout
+// * Add slide to delete ?
+// * Add missing properties to configuration object
+// * Support customization through the dynamic checkout
+// * Remove deleted payment method in dynamic checkout
+// * Decide if name should be visible in default style
+// * Update in-project doc
+// * Add documentation to process out
+// * Add tests
+// * Revise icons sizes
