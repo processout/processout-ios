@@ -21,10 +21,19 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
     /// Border style.
     public let progressView: any ProgressViewStyle
 
-    public init(title: POTextStyle, border: POBorderStyle, progressView: some ProgressViewStyle) {
+    /// Cancel button style.
+    public let cancelButton: any ButtonStyle
+
+    public init(
+        title: POTextStyle,
+        border: POBorderStyle,
+        progressView: some ProgressViewStyle,
+        cancelButton: some ButtonStyle
+    ) {
         self.title = title
         self.border = border
         self.progressView = progressView
+        self.cancelButton = cancelButton
     }
 
     // MARK: - POSavedPaymentMethodsStyle
@@ -35,6 +44,11 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
                 configuration.title
                     .textStyle(title)
                 Spacer()
+                configuration.cancelButton
+                    .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
+                    .backport.poControlSize(.regular)
+                    .controlWidth(.regular)
+                    .offset(x: 14)
             }
             .padding(POSpacing.large)
             Rectangle()

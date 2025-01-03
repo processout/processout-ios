@@ -102,8 +102,8 @@ final class DefaultSavedPaymentMethodsInteractor:
         }
         let paymentMethods = invoice.paymentMethods?.compactMap { paymentMethod in
             self.paymentMethod(with: paymentMethod)
-        }
-        if let customerId = invoice.customerId, let paymentMethods, !paymentMethods.isEmpty {
+        } ?? []
+        if let customerId = invoice.customerId, !paymentMethods.isEmpty {
             state = .started(.init(paymentMethods: paymentMethods, customerId: customerId, recentFailure: nil))
         } else {
             let message = "Unable to start interactor. Payment methods and customer ID must be set."

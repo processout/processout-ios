@@ -16,7 +16,8 @@ extension POSavedPaymentMethodsStyle where Self == PODefaultSavedPaymentMethodsS
         PODefaultSavedPaymentMethodsStyle(
             title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
             border: .regular(color: Color(poResource: .Border.subtle)),
-            progressView: .circular
+            progressView: .circular,
+            cancelButton: .ghost
         )
     }
 }

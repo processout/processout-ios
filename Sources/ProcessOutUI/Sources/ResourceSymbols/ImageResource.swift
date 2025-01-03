@@ -92,4 +92,7 @@ extension POImageResource {
 
     /// The "Success" asset catalog image resource.
     static let success = POImageResource(name: "Success")
+
+    /// The "Close" asset catalog image resource.
+    static let close = POImageResource(name: "Close")
 }

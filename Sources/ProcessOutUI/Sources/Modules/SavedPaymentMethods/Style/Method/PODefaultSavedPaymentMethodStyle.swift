@@ -35,6 +35,8 @@ public struct PODefaultSavedPaymentMethodStyle: POSavedPaymentMethodStyle {
             Spacer()
             configuration.deleteButton
                 .buttonStyle(POAnyButtonStyle(erasing: deleteButton))
+                .backport.poControlSize(.small)
+                .controlWidth(.regular)
         }
         .padding(POSpacing.large)
     }

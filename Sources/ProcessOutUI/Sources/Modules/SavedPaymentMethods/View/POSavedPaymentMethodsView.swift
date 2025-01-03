@@ -31,7 +31,9 @@ public struct POSavedPaymentMethodsView: View {
                 }
             },
             cancelButton: {
-                Button("Cancel") { }
+                if let viewModel = viewModel.state.cancelButton {
+                    Button.create(with: viewModel)
+                }
             },
             isLoading: viewModel.state.isLoading
         )
@@ -52,7 +54,6 @@ public struct POSavedPaymentMethodsView: View {
 // todo(andrii-vysotskyi): complete before PR
 // * Support empty state ?
 // * Support "runtime" errors
-// * Add cancel button
 // * Support background customization
 //    - Navigation
 //    - Screen

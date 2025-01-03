@@ -21,7 +21,7 @@ final class AnyViewModel<State>: ViewModel {
         }
     }
 
-    // MARK: - CardTokenizationViewModel
+    // MARK: - ViewModel
 
     func start() {
         base.start()
