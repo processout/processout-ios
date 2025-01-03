@@ -56,10 +56,6 @@ public struct POSavedPaymentMethodsView: View {
 // todo(andrii-vysotskyi): complete before PR
 // * Support empty state ?
 // * Support "runtime" errors
-// * Support background customization
-//    - Navigation
-//    - Screen
-//    - Individual payment method
 // * Add directly to example
 // * Support transition from dynamic checkout
 // * Add slide to delete ?

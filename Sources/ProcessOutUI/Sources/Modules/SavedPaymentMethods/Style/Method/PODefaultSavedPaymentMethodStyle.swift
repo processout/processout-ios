@@ -18,9 +18,13 @@ public struct PODefaultSavedPaymentMethodStyle: POSavedPaymentMethodStyle {
     /// Delete button style.
     public let deleteButton: any ButtonStyle
 
-    public init(description: POTextStyle, deleteButton: any ButtonStyle) {
+    /// Background color.
+    public let backgroundColor: Color
+
+    public init(description: POTextStyle, deleteButton: any ButtonStyle, backgroundColor: Color) {
         self.description = description
         self.deleteButton = deleteButton
+        self.backgroundColor = backgroundColor
     }
 
     // MARK: - POSavedPaymentMethodStyle
@@ -39,5 +43,6 @@ public struct PODefaultSavedPaymentMethodStyle: POSavedPaymentMethodStyle {
                 .controlWidth(.regular)
         }
         .padding(POSpacing.large)
+        .background(backgroundColor)
     }
 }

@@ -12,11 +12,43 @@ import SwiftUI
 @available(iOS 14, *)
 public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
 
-    /// Title style.
-    public let title: POTextStyle
+    public struct Toolbar {
 
-    /// Border style.
-    public let border: POBorderStyle
+        /// Title style.
+        public let title: POTextStyle
+
+        /// Divider color.
+        public let dividerColor: Color
+
+        /// Toolbar background color.
+        public let backgroundColor: Color
+
+        public init(title: POTextStyle, dividerColor: Color, backgroundColor: Color) {
+            self.title = title
+            self.dividerColor = dividerColor
+            self.backgroundColor = backgroundColor
+        }
+    }
+
+    public struct Content {
+
+        /// Border style.
+        public let border: POBorderStyle
+
+        /// Divider color.
+        public let dividerColor: Color
+
+        public init(border: POBorderStyle, dividerColor: Color) {
+            self.border = border
+            self.dividerColor = dividerColor
+        }
+    }
+
+    /// Toolbar style.
+    public let toolbar: Toolbar
+
+    /// Content style.
+    public let content: Content
 
     /// Border style.
     public let progressView: any ProgressViewStyle
@@ -24,16 +56,21 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
     /// Cancel button style.
     public let cancelButton: any ButtonStyle
 
+    /// Background color.
+    public let backgroundColor: Color
+
     public init(
-        title: POTextStyle,
-        border: POBorderStyle,
+        toolbar: Toolbar,
+        content: Content,
         progressView: some ProgressViewStyle,
-        cancelButton: some ButtonStyle
+        cancelButton: some ButtonStyle,
+        backgroundColor: Color
     ) {
-        self.title = title
-        self.border = border
+        self.toolbar = toolbar
+        self.content = content
         self.progressView = progressView
         self.cancelButton = cancelButton
+        self.backgroundColor = backgroundColor
     }
 
     // MARK: - POSavedPaymentMethodsStyle
@@ -42,7 +79,7 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
         VStack(spacing: 0) {
             HStack {
                 configuration.title
-                    .textStyle(title)
+                    .textStyle(toolbar.title)
                 Spacer()
                 configuration.cancelButton
                     .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
@@ -51,8 +88,9 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
                     .offset(x: 14)
             }
             .padding(POSpacing.large)
+            .background(toolbar.backgroundColor)
             Rectangle()
-                .fill(border.color)
+                .fill(toolbar.dividerColor)
                 .frame(height: 1)
             ScrollView {
                 Group {
@@ -68,6 +106,7 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(backgroundColor.ignoresSafeArea())
     }
 
     // MARK: - Private Properties
@@ -81,13 +120,13 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
                         subview
                         if subview.id != subviews.last?.id {
                             Rectangle()
-                                .fill(border.color)
+                                .fill(content.dividerColor)
                                 .frame(height: 1)
                         }
                     }
                 }
                 .compositingGroup()
-                .border(style: border)
+                .border(style: content.border)
             }
         }
     }
