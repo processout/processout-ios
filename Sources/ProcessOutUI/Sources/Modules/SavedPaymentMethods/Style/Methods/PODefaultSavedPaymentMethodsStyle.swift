@@ -113,7 +113,7 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
         .background(backgroundColor.ignoresSafeArea())
     }
 
-    // MARK: - Private Properties
+    // MARK: - Content
 
     @ViewBuilder
     private func makeContentBody(paymentMethods: AnyView) -> some View {
@@ -135,18 +135,31 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
         }
     }
 
+    // MARK: - Toolbar
+
     @ViewBuilder
     private func makeToolbarBody(configuration: Configuration) -> some View {
+        let toolbarItemsView = TupleView(
+            (configuration.title, configuration.cancelButton)
+        )
+        Group(poSubviews: toolbarItemsView) { toolbarItemsViews in
+            if !toolbarItemsViews.isEmpty {
+                uncheckedMakeToolbarBody(configuration: configuration)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func uncheckedMakeToolbarBody(configuration: Configuration) -> some View {
         VStack(spacing: 0) {
-            HStack {
+            HStack(spacing: POSpacing.medium) {
                 configuration.title
                     .textStyle(toolbar.title)
-                Spacer()
+                Spacer(minLength: 0)
                 configuration.cancelButton
                     .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
                     .backport.poControlSize(.regular)
                     .controlWidth(.regular)
-                    .offset(x: 14)
             }
             .padding(POSpacing.large)
             Rectangle()
