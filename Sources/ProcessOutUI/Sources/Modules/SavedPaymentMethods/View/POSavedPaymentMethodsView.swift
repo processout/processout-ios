@@ -63,7 +63,6 @@ public struct POSavedPaymentMethodsView: View {
 // * Support empty state ?
 // * Decide if name should be visible in default style
 // * Add slide to delete
-// * Add directly to example
 // * Support transition from dynamic checkout
 // * Support customization through the dynamic checkout
 // * Remove deleted payment method in dynamic checkout
