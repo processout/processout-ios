@@ -2645,6 +2645,16 @@
         }
       }
     },
+    "saved-payment-methods.generic-error" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong, please try again."
+          }
+        }
+      }
+    },
     "saved-payment-methods.title" : {
       "localizations" : {
         "en" : {

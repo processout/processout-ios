@@ -86,7 +86,7 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
                 makeToolbarBody(configuration: configuration)
             }
             ScrollView {
-                VStack(spacing: POSpacing.medium) {
+                VStack(spacing: POSpacing.small) {
                     configuration.message
                         .messageViewStyle(messageView)
                     if configuration.isLoading {
@@ -169,5 +169,3 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
         .background(toolbar.backgroundColor)
     }
 }
-
-// ._safeAreaInsets(EdgeInsets(top: 150, leading: 16, bottom: 16, trailing: 16))

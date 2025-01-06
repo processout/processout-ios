@@ -136,7 +136,9 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             title: configuration.title,
             icon: configuration.icon,
             isLoading: isLoading,
-            confirmation: nil,
+            confirmation: configuration.confirmation.map { configuration in
+                .delete(with: configuration)
+            },
             action: { [weak self] in
                 self?.interactor.delete(customerTokenId: paymentMethod.customerTokenId)
             }
@@ -156,7 +158,9 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             title: configuration.title,
             icon: configuration.icon,
             role: .cancel,
-            confirmation: nil,
+            confirmation: configuration.confirmation.map { configuration in
+                .cancel(with: configuration)
+            },
             action: { [weak self] in
                 self?.interactor.cancel()
             }
