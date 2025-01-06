@@ -100,6 +100,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                     .poToggleStyle(torchToggle)
                     .backport.poControlSize(.small)
                     .controlWidth(.regular)
+                    .padding(.leading, POSpacing.extraSmall)
             } principal: {
                 VStack(spacing: POSpacing.small) {
                     configuration.title
