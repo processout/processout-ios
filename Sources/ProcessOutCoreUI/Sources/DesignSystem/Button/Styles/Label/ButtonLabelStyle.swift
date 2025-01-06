@@ -22,7 +22,11 @@ struct ButtonLabelStyle: LabelStyle {
 @available(iOS 14.0, *)
 private struct ContentView: View {
 
-    let configuration: LabelStyleConfiguration, titleStyle: POTextStyle
+    init(configuration: LabelStyleConfiguration, titleStyle: POTextStyle) {
+        self.configuration = configuration
+        self.titleStyle = titleStyle
+        self._iconScale = .init(wrappedValue: 1, relativeTo: titleStyle.typography.textStyle)
+    }
 
     // MARK: - View
 
@@ -35,11 +39,13 @@ private struct ContentView: View {
             configuration.icon
                 .foregroundColor(titleStyle.color)
                 .scaledToFit()
-                .frame(maxHeight: scaledIconMaxHeight)
+                .frame(height: scaledIconHeight)
         }
     }
 
     // MARK: - Private Properties
+
+    private let configuration: LabelStyleConfiguration, titleStyle: POTextStyle
 
     @Environment(\.poControlSize)
     private var controlSize
@@ -49,7 +55,7 @@ private struct ContentView: View {
 
     // MARK: - Private Methods
 
-    private var scaledIconMaxHeight: CGFloat {
+    private var scaledIconHeight: CGFloat {
         let sizes: [POControlSize: CGFloat] = [.regular: 20, .small: 16]
         return sizes[controlSize]! * iconScale // swiftlint:disable:this force_unwrapping
     }
