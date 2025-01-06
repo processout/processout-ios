@@ -8,6 +8,9 @@
 @MainActor
 protocol SavedPaymentMethodsInteractor: Interactor<SavedPaymentMethodsInteractorState> {
 
+    /// Configuration.
+    var configuration: POSavedPaymentMethodsConfiguration { get }
+
     /// Deletes customer token ID.
     func delete(customerTokenId: String)
 }

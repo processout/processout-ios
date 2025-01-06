@@ -59,15 +59,15 @@ public struct POSavedPaymentMethodsView: View {
 }
 
 // todo(andrii-vysotskyi): complete before PR
-// * Add missing properties to configuration object
+
 // * Support empty state ?
+// * Decide if name should be visible in default style
+// * Add slide to delete
 // * Add directly to example
 // * Support transition from dynamic checkout
 // * Support customization through the dynamic checkout
 // * Remove deleted payment method in dynamic checkout
-// * Decide if name should be visible in default style
 // * Add documentation
 //   * In-project
 //   * Process Out
 // * Add tests
-// * Add slide to delete

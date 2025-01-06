@@ -27,6 +27,8 @@ final class DefaultSavedPaymentMethodsInteractor:
 
     // MARK: - SavedPaymentMethodsInteractor
 
+    let configuration: POSavedPaymentMethodsConfiguration
+
     override func start() {
         guard case .idle = state else {
             logger.debug("Ignoring attempt to start interactor in unsupported state: \(state).")
@@ -76,7 +78,6 @@ final class DefaultSavedPaymentMethodsInteractor:
 
     // MARK: - Private Properties
 
-    private let configuration: POSavedPaymentMethodsConfiguration
     private let invoicesService: POInvoicesService
     private let customerTokensService: POCustomerTokensService
     private let logger: POLogger

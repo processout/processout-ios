@@ -105,40 +105,56 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
     // MARK: - Utils
 
     private func createTitle() -> String? {
-        String(resource: .SavedPaymentMethods.title)
+        let title = interactor.configuration.title ?? String(resource: .SavedPaymentMethods.title)
+        guard !title.isEmpty else {
+            return nil
+        }
+        return title
     }
 
     private func createViewModel(
         for paymentMethod: SavedPaymentMethodsInteractorState.PaymentMethod, isBeingRemoved: Bool
     ) -> SavedPaymentMethodsViewModelState.PaymentMethod {
-        let deleteButton = POButtonViewModel(
-            id: "delete-button",
-            title: nil,
-            icon: Image(poResource: .delete)
-                .resizable()
-                .renderingMode(.template),
-            isLoading: isBeingRemoved,
-            confirmation: nil,
-            action: { [weak self] in
-                self?.interactor.delete(customerTokenId: paymentMethod.customerTokenId)
-            }
-        )
         let viewModel = SavedPaymentMethodsViewModelState.PaymentMethod(
             id: paymentMethod.customerTokenId,
             logo: paymentMethod.logo,
             name: paymentMethod.name,
             description: paymentMethod.description,
-            deleteButton: deleteButton
+            deleteButton: createDeleteButton(paymentMethod: paymentMethod, isLoading: isBeingRemoved)
+        )
+        return viewModel
+    }
+
+    private func createDeleteButton(
+        paymentMethod: SavedPaymentMethodsInteractorState.PaymentMethod, isLoading: Bool
+    ) -> POButtonViewModel {
+        let configuration = interactor.configuration.paymentMethod.deleteButton.resolved(
+            defaultTitle: nil, icon: Image(poResource: .delete).resizable().renderingMode(.template)
+        )
+        let viewModel = POButtonViewModel(
+            id: "delete-button",
+            title: configuration.title,
+            icon: configuration.icon,
+            isLoading: isLoading,
+            confirmation: nil,
+            action: { [weak self] in
+                self?.interactor.delete(customerTokenId: paymentMethod.customerTokenId)
+            }
         )
         return viewModel
     }
 
     private func createCancelButton() -> POButtonViewModel? {
+        let configuration = interactor.configuration.cancelButton?.resolved(
+            defaultTitle: nil, icon: Image(poResource: .close).resizable().renderingMode(.template)
+        )
+        guard let configuration else {
+            return nil
+        }
         let viewModel = POButtonViewModel(
             id: "cancel-button",
-            icon: Image(poResource: .close)
-                .resizable()
-                .renderingMode(.template),
+            title: configuration.title,
+            icon: configuration.icon,
             role: .cancel,
             confirmation: nil,
             action: { [weak self] in
