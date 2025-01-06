@@ -28,18 +28,23 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
     /// Progress view style. Only used with normal state.
     public let progressStyle: ProgressStyle
 
+    /// Boolean value indicating whether content is padded.
+    public let isContentPadded: Bool
+
     public init(
         normal: POButtonStateStyle,
         selected: POButtonStateStyle? = nil,
         highlighted: POButtonStateStyle,
         disabled: POButtonStateStyle,
-        progressStyle: ProgressStyle
+        progressStyle: ProgressStyle,
+        isContentPadded: Bool = true
     ) {
         self.normal = normal
         self.selected = selected ?? normal
         self.highlighted = highlighted
         self.disabled = disabled
         self.progressStyle = progressStyle
+        self.isContentPadded = isContentPadded
     }
 
     // MARK: - ButtonStyle
@@ -51,6 +56,7 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
             highlighted: highlighted,
             disabled: disabled,
             progressStyle: progressStyle,
+            isContentPadded: isContentPadded,
             configuration: configuration
         )
     }
@@ -68,6 +74,9 @@ private struct ButtonStyleBox<ProgressStyle: ProgressViewStyle>: View {
     /// Progress view style.
     let progressStyle: ProgressStyle
 
+    /// Indicates whether content is padded.
+    let isContentPadded: Bool
+
     /// Button style configuration.
     let configuration: ButtonStyleConfiguration
 
@@ -75,25 +84,36 @@ private struct ButtonStyleBox<ProgressStyle: ProgressViewStyle>: View {
 
     var body: some View {
         let currentStyle = stateStyle(isPressed: configuration.isPressed)
-        ZStack {
-            if isLoading {
-                ProgressView()
-                    .progressViewStyle(progressStyle)
-            } else {
-                configuration.label
-                    .labelStyle(ButtonLabelStyle(titleStyle: currentStyle.title))
+        configuration.label
+            .labelStyle(ButtonLabelStyle(titleStyle: currentStyle.title))
+            .opacity(
+                isLoading ? 0 : 1
+            )
+            .backport.overlay {
+                if isLoading {
+                    ProgressView().progressViewStyle(progressStyle)
+                }
             }
-        }
-        .padding(POSpacing.small)
-        .frame(minWidth: minSize, maxWidth: maxWidth, minHeight: minSize)
-        .background(currentStyle.backgroundColor)
-        .border(style: currentStyle.border)
-        .shadow(style: currentStyle.shadow)
-        .contentShape(.standardHittableRect)
-        .animation(.default, value: isLoading)
-        .animation(.default, value: isEnabled)
-        .allowsHitTesting(isEnabled && !isLoading)
-        .backport.geometryGroup()
+            .modify(when: isContentPadded) { content in
+                content
+                    .padding(POSpacing.small)
+                    .frame(minWidth: minSize, maxWidth: maxWidth, minHeight: minSize)
+            }
+            .backport.background {
+                currentStyle.backgroundColor
+                    .border(style: currentStyle.border)
+                    .shadow(style: currentStyle.shadow)
+                    .modify(when: !isContentPadded) { content in
+                        content
+                            .frame(minWidth: minSize, minHeight: minSize)
+                            .padding(-POSpacing.small)
+                    }
+            }
+            .contentShape(.standardHittableRect)
+            .animation(.default, value: isLoading)
+            .animation(.default, value: isEnabled)
+            .allowsHitTesting(isEnabled && !isLoading)
+            .backport.geometryGroup()
     }
 
     // MARK: - Private Properties

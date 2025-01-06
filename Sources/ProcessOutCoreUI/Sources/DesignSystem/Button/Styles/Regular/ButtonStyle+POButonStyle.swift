@@ -96,7 +96,8 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Ghost.Background.disabled)
             ),
-            progressStyle: CircularProgressViewStyle(tint: Color(poResource: .Button.Ghost.Title.default))
+            progressStyle: CircularProgressViewStyle(tint: Color(poResource: .Button.Ghost.Title.default)),
+            isContentPadded: false
         )
     }
 
