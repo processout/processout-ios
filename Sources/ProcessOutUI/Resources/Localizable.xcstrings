@@ -1735,6 +1735,15 @@
         }
       }
     },
+    "delete-confirmation.cancel" : {
+
+    },
+    "delete-confirmation.confirm" : {
+
+    },
+    "delete-confirmation.title" : {
+
+    },
     "dynamic-checkout.cancel-button" : {
       "localizations" : {
         "ar" : {

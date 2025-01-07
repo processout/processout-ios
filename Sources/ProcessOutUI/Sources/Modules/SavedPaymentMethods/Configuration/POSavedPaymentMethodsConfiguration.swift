@@ -9,7 +9,6 @@ import SwiftUI
 import ProcessOut
 
 /// Saved payment methods configuration.
-@_spi(PO)
 @MainActor
 public struct POSavedPaymentMethodsConfiguration: Sendable {
 

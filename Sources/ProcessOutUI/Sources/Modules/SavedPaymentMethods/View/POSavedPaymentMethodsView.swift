@@ -10,7 +10,6 @@ import SwiftUI
 
 /// Saved payment methods root view.
 @available(iOS 14, *)
-@_spi(PO)
 @MainActor
 public struct POSavedPaymentMethodsView: View {
 
@@ -60,11 +59,9 @@ public struct POSavedPaymentMethodsView: View {
 
 // todo(andrii-vysotskyi): complete before PR
 
-// * Support empty state ?
+// * Support empty state
 // * Support transition from dynamic checkout
 // * Support customization through the dynamic checkout
 // * Remove deleted payment method in dynamic checkout
-// * Add documentation
-//   * In-project
-//   * Process Out
+// * Add documentation to docs.processout.com
 // * Add tests
