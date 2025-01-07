@@ -61,8 +61,6 @@ public struct POSavedPaymentMethodsView: View {
 // todo(andrii-vysotskyi): complete before PR
 
 // * Support empty state ?
-// * Decide if name should be visible in default style
-// * Add slide to delete
 // * Support transition from dynamic checkout
 // * Support customization through the dynamic checkout
 // * Remove deleted payment method in dynamic checkout
@@ -70,5 +68,3 @@ public struct POSavedPaymentMethodsView: View {
 //   * In-project
 //   * Process Out
 // * Add tests
-
-// ._safeAreaInsets(EdgeInsets(top: 150, leading: 16, bottom: 16, trailing: 16))
