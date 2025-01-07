@@ -62,6 +62,6 @@ public struct POSavedPaymentMethodsView: View {
 // * Support empty state
 // * Support transition from dynamic checkout
 // * Support customization through the dynamic checkout
-// * Remove deleted payment method in dynamic checkout
 // * Add documentation to docs.processout.com
 // * Add tests
+// * Make cancel confirmation text more generic

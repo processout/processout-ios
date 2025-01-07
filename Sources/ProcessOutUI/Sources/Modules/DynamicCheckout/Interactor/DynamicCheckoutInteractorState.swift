@@ -19,7 +19,7 @@ enum DynamicCheckoutInteractorState {
     struct Restarting {
 
         /// Payment processing state.
-        let snapshot: PaymentProcessing
+        var snapshot: PaymentProcessing
 
         /// Restart task.
         let task: Task<Void, Never>
@@ -38,7 +38,7 @@ enum DynamicCheckoutInteractorState {
     struct Started {
 
         /// Express payment methods.
-        let paymentMethods: [PODynamicCheckoutPaymentMethod]
+        var paymentMethods: [PODynamicCheckoutPaymentMethod]
 
         /// Defines whether payment is cancellable.
         let isCancellable: Bool
@@ -56,7 +56,7 @@ enum DynamicCheckoutInteractorState {
     struct Selected {
 
         /// Started state snapshot.
-        let snapshot: Started
+        var snapshot: Started
 
         /// Selected payment method.
         let paymentMethod: PODynamicCheckoutPaymentMethod
@@ -69,7 +69,7 @@ enum DynamicCheckoutInteractorState {
     struct PaymentProcessing {
 
         /// Started state snapshot.
-        let snapshot: Started
+        var snapshot: Started
 
         /// Payment method ID that is currently being processed.
         let paymentMethod: PODynamicCheckoutPaymentMethod
