@@ -18,31 +18,30 @@ final class DefaultWebAuthenticationSession:
     // MARK: - WebAuthenticationSession
 
     func authenticate(using request: WebAuthenticationRequest) async throws -> URL {
-        let sessionProxy = WebAuthenticationSessionProxy()
+        let operationProxy = WebAuthenticationOperationProxy()
         return try await withTaskCancellationHandler(
             operation: {
                 try await withCheckedThrowingContinuation { continuation in
-                    guard !Task.isCancelled else {
-                        let failure = POFailure(message: "Authentication session was cancelled.", code: .cancelled)
+                    if Task.isCancelled {
+                        let failure = POFailure(message: "Authentication was cancelled.", code: .cancelled)
                         continuation.resume(throwing: failure)
-                        return
-                    }
-                    let session = Self.createAuthenticationSession(with: request) { result in
-                        sessionProxy.invalidate()
-                        continuation.resume(with: result)
-                    }
-                    session.prefersEphemeralWebBrowserSession = true
-                    session.presentationContextProvider = self
-                    sessionProxy.setSession(session, continuation: continuation)
-                    if !session.start() {
-                        // swiftlint:disable:next line_length
-                        let failure = POFailure(message: "Unable to start authentication session.", code: .generic(.mobile))
-                        continuation.resume(throwing: failure)
+                    } else {
+                        let session = Self.createAuthenticationSession(with: request) { result in
+                            operationProxy.setCompleted(with: result)
+                        }
+                        session.prefersEphemeralWebBrowserSession = true
+                        session.presentationContextProvider = self
+                        operationProxy.set(session: session, continuation: continuation)
+                        guard !session.start() else {
+                            return
+                        }
+                        let failure = POFailure(message: "Unable to start authentication.", code: .generic(.mobile))
+                        operationProxy.setCompleted(with: .failure(failure))
                     }
                 }
             },
             onCancel: {
-                sessionProxy.cancel()
+                Task { @MainActor in operationProxy.cancel() }
             }
         )
     }
@@ -110,35 +109,47 @@ final class DefaultWebAuthenticationSession:
 }
 
 @MainActor
-private final class WebAuthenticationSessionProxy: Sendable {
+private final class WebAuthenticationOperationProxy: Sendable {
 
-    func setSession(_ session: ASWebAuthenticationSession, continuation: CheckedContinuation<URL, Error>) {
-        self.session = session
-        self.continuation = continuation
-    }
-
-    func invalidate() {
-        session = nil
-        continuation = nil
-    }
-
-    nonisolated func cancel() {
-        Task { @MainActor in
-            _cancel()
+    func set(session: ASWebAuthenticationSession, continuation: CheckedContinuation<URL, Error>) {
+        switch state {
+        case nil:
+            state = .processing(continuation, session)
+        case .processing:
+            assertionFailure("Already in processing state.")
+        case .completed(let result):
+            continuation.resume(with: result)
         }
+    }
+
+    func setCompleted(with newResult: Result<URL, POFailure>) {
+        switch state {
+        case nil:
+            state = .completed(newResult)
+        case let .processing(continuation, _):
+            continuation.resume(with: newResult)
+            state = .completed(newResult)
+        case .completed:
+            break // Already completed
+        }
+    }
+
+    func cancel() {
+        if case .processing(_, let session) = state {
+            session.cancel()
+        }
+        let failure = POFailure(message: "Authentication was cancelled.", code: .cancelled)
+        setCompleted(with: .failure(failure))
+    }
+
+    // MARK: - Private Nested Types
+
+    @MainActor
+    private enum State: Sendable {
+        case processing(CheckedContinuation<URL, Error>, ASWebAuthenticationSession), completed(Result<URL, POFailure>)
     }
 
     // MARK: - Private Properties
 
-    private var session: ASWebAuthenticationSession?
-    private var continuation: CheckedContinuation<URL, Error>?
-
-    // MARK: - Private Methods
-
-    private func _cancel() {
-        let failure = POFailure(message: "Authentication session was cancelled.", code: .cancelled)
-        session?.cancel()
-        continuation?.resume(throwing: failure)
-        invalidate()
-    }
+    private var state: State?
 }
