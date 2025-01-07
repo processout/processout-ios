@@ -101,7 +101,7 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
             }
             .modify { content in
                 if #available(iOS 15, *) {
-                    content.safeAreaInset(edge: .top) {
+                    content.safeAreaInset(edge: .top, spacing: 0) {
                         makeToolbarBody(configuration: configuration)
                     }
                 } else {
