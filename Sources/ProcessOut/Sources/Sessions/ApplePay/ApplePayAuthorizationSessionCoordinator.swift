@@ -18,7 +18,7 @@ final class ApplePayAuthorizationSessionCoordinator: NSObject, PKPaymentAuthoriz
     /// Payment information.
     var payment: PKPayment?
 
-    func setContinuation(continuation: CheckedContinuation<Void, Never>) {
+    func setContinuation(_ continuation: CheckedContinuation<Void, Never>) {
         switch state {
         case .processing:
             preconditionFailure("Continuation is already set.")
