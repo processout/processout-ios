@@ -49,6 +49,9 @@ public struct PODynamicCheckoutView: View {
         }
         .backport.geometryGroup()
         .onAppear(perform: viewModel.start)
+        .sheet(item: $viewModel.state.savedPaymentMethods) { viewModel in
+            POSavedPaymentMethodsView(configuration: viewModel.configuration, completion: viewModel.completion)
+        }
         .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
     }
 

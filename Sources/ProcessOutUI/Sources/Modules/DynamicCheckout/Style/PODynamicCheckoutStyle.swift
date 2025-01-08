@@ -19,6 +19,21 @@ import SwiftUI
 public struct PODynamicCheckoutStyle {
 
     @MainActor
+    public struct SectionHeader {
+
+        /// Header title.
+        public let title: POTextStyle
+
+        /// Headers trailing button.
+        public let trailingButton: any ButtonStyle
+
+        public init(title: POTextStyle, trailingButton: some ButtonStyle) {
+            self.title = title
+            self.trailingButton = trailingButton
+        }
+    }
+
+    @MainActor
     public struct RegularPaymentMethod {
 
         /// Payment method title.
@@ -56,6 +71,9 @@ public struct PODynamicCheckoutStyle {
             self.backgroundColor = backgroundColor
         }
     }
+
+    /// Payment methods are organized into sections. This style control its header appearance.
+    public let sectionHeader: SectionHeader
 
     /// PassKit payment button style.
     public let passKitPaymentButtonStyle: POPassKitPaymentButtonStyle
@@ -106,6 +124,7 @@ public struct PODynamicCheckoutStyle {
 
     /// Creates dynamic checkout style.
     public init(
+        sectionHeader: SectionHeader,
         passKitPaymentButtonStyle: POPassKitPaymentButtonStyle,
         expressPaymentButtonStyle: some ButtonStyle,
         regularPaymentMethod: RegularPaymentMethod,
@@ -122,6 +141,7 @@ public struct PODynamicCheckoutStyle {
         actionsContainer: POActionsContainerStyle,
         paymentSuccess: PaymentSuccess
     ) {
+        self.sectionHeader = sectionHeader
         self.passKitPaymentButtonStyle = passKitPaymentButtonStyle
         self.expressPaymentButtonStyle = expressPaymentButtonStyle
         self.regularPaymentMethod = regularPaymentMethod

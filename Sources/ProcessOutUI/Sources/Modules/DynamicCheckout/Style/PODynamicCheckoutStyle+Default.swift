@@ -13,6 +13,7 @@ extension PODynamicCheckoutStyle {
 
     /// Default dynamic checkout style.
     public static let `default` = PODynamicCheckoutStyle(
+        sectionHeader: .default,
         passKitPaymentButtonStyle: POPassKitPaymentButtonStyle(),
         expressPaymentButtonStyle: .brand,
         regularPaymentMethod: .default,
@@ -32,11 +33,21 @@ extension PODynamicCheckoutStyle {
 }
 
 @available(iOS 14, *)
-extension PODynamicCheckoutStyle.RegularPaymentMethod {
+extension PODynamicCheckoutStyle.SectionHeader {
 
     /// Default dynamic checkout regular payment method style.
     public static let `default` = Self(
         title: POTextStyle(color: Color(poResource: .Text.primary), typography: .subheading),
+        trailingButton: .ghost
+    )
+}
+
+@available(iOS 14, *)
+extension PODynamicCheckoutStyle.RegularPaymentMethod {
+
+    /// Default dynamic checkout regular payment method style.
+    public static let `default` = Self(
+        title: POTextStyle(color: Color(poResource: .Text.primary), typography: .body1),
         informationText: POTextStyle(color: Color(poResource: .Text.muted), typography: .body2),
         border: POBorderStyle.regular(color: Color(poResource: .Border.subtle)),
         backgroundColor: Color(poResource: .Surface.default)
