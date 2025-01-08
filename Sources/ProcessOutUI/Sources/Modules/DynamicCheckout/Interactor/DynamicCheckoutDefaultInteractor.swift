@@ -130,6 +130,33 @@ final class DynamicCheckoutDefaultInteractor:
         send(event: .didRequestCancelConfirmation)
     }
 
+    func savedPaymentMethodsConfiguration() -> POSavedPaymentMethodsConfiguration {
+        let invoiceRequest: POInvoiceRequest
+        switch state {
+        case .started(let currentState):
+            invoiceRequest = .init(invoiceId: currentState.invoice.id, clientSecret: currentState.clientSecret)
+        case .starting(let currentState):
+            invoiceRequest = configuration.invoiceRequest
+        case .restarting(let currentState):
+            invoiceRequest = .init(
+                invoiceId: currentState.snapshot.snapshot.invoice.id,
+                clientSecret: currentState.snapshot.snapshot.clientSecret
+            )
+        case .selected(let currentState):
+            invoiceRequest = .init(
+                invoiceId: currentState.snapshot.invoice.id, clientSecret: currentState.snapshot.clientSecret
+            )
+        case .paymentProcessing(let currentState):
+            invoiceRequest = .init(
+                invoiceId: currentState.snapshot.invoice.id, clientSecret: currentState.snapshot.clientSecret
+            )
+        default:
+            preconditionFailure("Unable to resolve configuration in current state.")
+        }
+        let configuration = delegate?.dynamicCheckout(savedPaymentMethodsConfigurationWith: invoiceRequest)
+        return configuration ?? .init(invoiceRequest: invoiceRequest)
+    }
+
     // MARK: - Private Properties
 
     private let childProvider: DynamicCheckoutInteractorChildProvider

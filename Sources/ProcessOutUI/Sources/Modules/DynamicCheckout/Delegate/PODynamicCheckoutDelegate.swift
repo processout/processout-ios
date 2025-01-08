@@ -41,6 +41,12 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
         newInvoiceFor invoice: POInvoice, invalidationReason: PODynamicCheckoutInvoiceInvalidationReason
     ) async -> POInvoiceRequest?
 
+    /// Allows your implementation to customize saved payment methods configuration.
+    @MainActor
+    func dynamicCheckout(
+        savedPaymentMethodsConfigurationWith invoiceRequest: POInvoiceRequest
+    ) -> POSavedPaymentMethodsConfiguration
+
     // MARK: - Card Payment
 
     /// Invoked when module emits event.
@@ -91,6 +97,13 @@ extension PODynamicCheckoutDelegate {
         newInvoiceFor invoice: POInvoice, invalidationReason: PODynamicCheckoutInvoiceInvalidationReason
     ) async -> POInvoiceRequest? {
         nil
+    }
+
+    @MainActor
+    public func dynamicCheckout(
+        savedPaymentMethodsConfigurationWith invoiceRequest: POInvoiceRequest
+    ) -> POSavedPaymentMethodsConfiguration {
+        .init(invoiceRequest: invoiceRequest)
     }
 
     @MainActor

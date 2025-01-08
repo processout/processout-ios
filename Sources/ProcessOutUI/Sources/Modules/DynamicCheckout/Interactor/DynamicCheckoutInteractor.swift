@@ -23,4 +23,7 @@ protocol DynamicCheckoutInteractor: Interactor<DynamicCheckoutInteractorState> {
 
     /// Notifies interactor that user requested cancel confirmation.
     func didRequestCancelConfirmation()
+
+    /// Returns saved payment methods configuration.
+    func savedPaymentMethodsConfiguration() -> POSavedPaymentMethodsConfiguration
 }

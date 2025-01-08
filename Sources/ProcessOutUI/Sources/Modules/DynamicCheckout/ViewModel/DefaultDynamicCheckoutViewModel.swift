@@ -194,7 +194,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 icon: settingsButtonConfiguration.icon,
                 confirmation: nil,
                 action: { [weak self] in
-                    self?.openExpressCheckoutSettings(state: state)
+                    self?.openExpressCheckoutSettings()
                 }
             )
         } else {
@@ -203,12 +203,10 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         return .init(title: configuration.title, button: settingsButton)
     }
 
-    private func openExpressCheckoutSettings(state: DynamicCheckoutInteractorState.Started) {
+    private func openExpressCheckoutSettings() {
         let viewModel = DynamicCheckoutViewModelState.SavedPaymentMethods(
             id: UUID().uuidString,
-            configuration: .init(
-                invoiceRequest: .init(invoiceId: state.invoice.id, clientSecret: state.clientSecret)
-            ),
+            configuration: interactor.savedPaymentMethodsConfiguration(),
             completion: { [weak self]_ in
                 self?.state.savedPaymentMethods = nil
             }
