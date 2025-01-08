@@ -111,7 +111,12 @@ private final class WebAuthenticationOperationProxy: Sendable {
     func set(session: ASWebAuthenticationSession, continuation: CheckedContinuation<URL, Error>) {
         switch state {
         case nil:
-            state = .processing(continuation, session)
+            let newState = State.Processing(
+                continuation: continuation,
+                session: session,
+                startTime: .now()
+            )
+            state = .processing(newState)
         case .processing:
             assertionFailure("Already in processing state.")
         case .completed(let result):
@@ -123,8 +128,8 @@ private final class WebAuthenticationOperationProxy: Sendable {
         switch state {
         case nil:
             state = .completed(newResult)
-        case let .processing(continuation, _):
-            continuation.resume(with: newResult)
+        case .processing(let currentState):
+            currentState.continuation.resume(with: newResult)
             state = .completed(newResult)
         case .completed:
             break // Already completed
@@ -132,21 +137,53 @@ private final class WebAuthenticationOperationProxy: Sendable {
     }
 
     func cancel() {
-        if case .processing(_, let session) = state {
-            session.cancel()
-        }
+        cancelAuthenticationSessionIfNeeded()
         let failure = POFailure(message: "Authentication was cancelled.", code: .cancelled)
         setCompleted(with: .failure(failure))
     }
-
     // MARK: - Private Nested Types
 
     @MainActor
     private enum State: Sendable {
-        case processing(CheckedContinuation<URL, Error>, ASWebAuthenticationSession), completed(Result<URL, POFailure>)
+
+        @MainActor
+        struct Processing: Sendable { // swiftlint:disable:this nesting
+
+            /// Continuation.
+            let continuation: CheckedContinuation<URL, Error>
+
+            /// Authentication session.
+            let session: ASWebAuthenticationSession
+
+            /// Start tme.
+            let startTime: DispatchTime
+        }
+
+        case processing(Processing), completed(Result<URL, POFailure>)
     }
 
     // MARK: - Private Properties
 
     private var state: State?
+
+    // MARK: - Private Methods
+
+    /// Cancels the current ASWebAuthenticationSession if needed.
+    private func cancelAuthenticationSessionIfNeeded() {
+        guard case .processing(let currentState) = state else {
+            return
+        }
+        // Calling `cancel` before session is actually presented seems to have no effect. This workaround adds
+        // a delay to ensure cancel is called at least 0.3 seconds after the session start.
+        let minimumDelay: TimeInterval = 0.3
+        let delay = minimumDelay - (DispatchTime.now().uptimeSeconds - currentState.startTime.uptimeSeconds)
+        if delay > 0 {
+            Task { @MainActor in
+                try? await Task.sleep(seconds: delay)
+                currentState.session.cancel()
+            }
+        } else {
+            currentState.session.cancel()
+        }
+    }
 }
