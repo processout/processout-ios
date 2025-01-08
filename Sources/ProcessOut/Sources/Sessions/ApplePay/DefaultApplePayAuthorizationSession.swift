@@ -20,7 +20,7 @@ final class DefaultApplePayAuthorizationSession: ApplePayAuthorizationSession {
         }
         await withTaskCancellationHandler {
             await withCheckedContinuation { continuation in
-                coordinator.setContinuation(continuation: continuation)
+                coordinator.setContinuation(continuation)
             }
         } onCancel: {
             Task { @MainActor in
