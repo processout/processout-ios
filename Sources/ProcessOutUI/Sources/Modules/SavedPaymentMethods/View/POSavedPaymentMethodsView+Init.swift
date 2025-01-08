@@ -21,7 +21,7 @@ extension POSavedPaymentMethodsView {
     ) {
         let viewModel = {
             var logger = ProcessOut.shared.logger
-            logger[attributeKey: .invoiceId] = configuration.invoiceId
+            logger[attributeKey: .invoiceId] = configuration.invoiceRequest.invoiceId
             let interactor = DefaultSavedPaymentMethodsInteractor(
                 configuration: configuration,
                 invoicesService: ProcessOut.shared.invoices,

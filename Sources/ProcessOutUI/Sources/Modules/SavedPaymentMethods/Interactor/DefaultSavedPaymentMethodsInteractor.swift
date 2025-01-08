@@ -36,10 +36,7 @@ final class DefaultSavedPaymentMethodsInteractor:
         }
         let task = Task { [invoicesService] in
             do {
-                let invoiceRequest = POInvoiceRequest(
-                    invoiceId: configuration.invoiceId, clientSecret: configuration.clientSecret
-                )
-                let invoice = try await invoicesService.invoice(request: invoiceRequest)
+                let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
                 setStartedState(invoice: invoice)
             } catch {
                 setFailureState(error)
@@ -159,7 +156,7 @@ final class DefaultSavedPaymentMethodsInteractor:
             let request = PODeleteCustomerTokenRequest(
                 customerId: startedState.customerId,
                 tokenId: customerTokenId,
-                clientSecret: configuration.clientSecret
+                clientSecret: configuration.invoiceRequest.clientSecret ?? ""
             )
             do {
                 try await customerTokensService.deleteCustomerToken(request: request)

@@ -69,14 +69,10 @@ public struct POSavedPaymentMethodsConfiguration: Sendable {
         }
     }
 
-    /// Requested invoice ID.
-    public let invoiceId: String
-
-    /// A secret key associated with the client making the request.
-    ///
-    /// This key ensures that the payment methods saved by the customer are
-    /// included in the response if the invoice has an assigned customerID.
-    public let clientSecret: String
+    /// Invoice request.
+    /// - NOTE: Make sure that client secret is set to ensures that payment methods saved by the customer are
+    /// included in the response.
+    public let invoiceRequest: POInvoiceRequest
 
     /// Custom title. Use empty string to hide title.
     public let title: String?
@@ -88,14 +84,12 @@ public struct POSavedPaymentMethodsConfiguration: Sendable {
     public let cancelButton: CancelButton?
 
     public init(
-        invoiceId: String,
-        clientSecret: String,
+        invoiceRequest: POInvoiceRequest,
         title: String? = nil,
         paymentMethod: PaymentMethod = .init(),
         cancelButton: CancelButton? = .init()
     ) {
-        self.invoiceId = invoiceId
-        self.clientSecret = clientSecret
+        self.invoiceRequest = invoiceRequest
         self.title = title
         self.paymentMethod = paymentMethod
         self.cancelButton = cancelButton

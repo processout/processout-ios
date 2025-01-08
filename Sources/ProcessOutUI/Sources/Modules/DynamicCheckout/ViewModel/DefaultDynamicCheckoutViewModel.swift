@@ -187,15 +187,14 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         let settingsButtonConfiguration = configuration.settingsButton?.resolved(
             defaultTitle: nil, icon: Image(poResource: .settings)
         )
-        // swiftlint:disable:next line_length
-        let settingsButton: POButtonViewModel? = if let settingsButtonConfiguration, let clientSecret = state.clientSecret {
+        let settingsButton: POButtonViewModel? = if let settingsButtonConfiguration {
             POButtonViewModel(
                 id: ButtonId.expressCheckoutSettings,
                 title: settingsButtonConfiguration.title,
                 icon: settingsButtonConfiguration.icon,
                 confirmation: nil,
                 action: { [weak self] in
-                    self?.openExpressCheckoutSettings(state: state, clientSecret: clientSecret)
+                    self?.openExpressCheckoutSettings(state: state)
                 }
             )
         } else {
@@ -204,10 +203,12 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         return .init(title: configuration.title, button: settingsButton)
     }
 
-    private func openExpressCheckoutSettings(state: DynamicCheckoutInteractorState.Started, clientSecret: String) {
+    private func openExpressCheckoutSettings(state: DynamicCheckoutInteractorState.Started) {
         let viewModel = DynamicCheckoutViewModelState.SavedPaymentMethods(
             id: UUID().uuidString,
-            configuration: .init(invoiceId: state.invoice.id, clientSecret: clientSecret),
+            configuration: .init(
+                invoiceRequest: .init(invoiceId: state.invoice.id, clientSecret: state.clientSecret)
+            ),
             completion: { [weak self]_ in
                 self?.state.savedPaymentMethods = nil
             }

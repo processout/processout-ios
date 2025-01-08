@@ -40,8 +40,7 @@ final class SavedPaymentMethodsViewModel: ObservableObject {
         do {
             let invoice = try await createInvoice()
             let configuration = POSavedPaymentMethodsConfiguration(
-                invoiceId: invoice.id,
-                clientSecret: invoice.clientSecret ?? "",
+                invoiceRequest: .init(invoiceId: invoice.id, clientSecret: invoice.clientSecret ?? ""),
                 cancelButton: .init(confirmation: .init())
             )
             let viewModel = SavedPaymentMethodsViewModelState.SavedPaymentMethods(
