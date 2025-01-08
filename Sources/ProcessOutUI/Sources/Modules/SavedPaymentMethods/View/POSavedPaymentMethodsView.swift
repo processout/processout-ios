@@ -60,7 +60,6 @@ public struct POSavedPaymentMethodsView: View {
 // todo(andrii-vysotskyi): complete before PR
 
 // * Support empty state
-// * Support transition from dynamic checkout
 // * Support customization through the dynamic checkout
 // * Add documentation to docs.processout.com
 // * Add tests
