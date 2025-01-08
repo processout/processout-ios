@@ -187,11 +187,12 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         let settingsButtonConfiguration = configuration.settingsButton?.resolved(
             defaultTitle: nil, icon: Image(poResource: .settings)
         )
-        let settingsButton: POButtonViewModel? = if let clientSecret = state.clientSecret {
+        // swiftlint:disable:next line_length
+        let settingsButton: POButtonViewModel? = if let settingsButtonConfiguration, let clientSecret = state.clientSecret {
             POButtonViewModel(
                 id: ButtonId.expressCheckoutSettings,
-                title: settingsButtonConfiguration?.title,
-                icon: settingsButtonConfiguration?.icon,
+                title: settingsButtonConfiguration.title,
+                icon: settingsButtonConfiguration.icon,
                 confirmation: nil,
                 action: { [weak self] in
                     self?.openExpressCheckoutSettings(state: state, clientSecret: clientSecret)
