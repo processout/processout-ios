@@ -95,4 +95,7 @@ extension POImageResource {
 
     /// The "Close" asset catalog image resource.
     static let close = POImageResource(name: "Close")
+
+    /// The "Settings" asset catalog image resource.
+    static let settings = POImageResource(name: "Settings")
 }
