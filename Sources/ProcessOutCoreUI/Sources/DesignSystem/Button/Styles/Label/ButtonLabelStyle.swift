@@ -51,7 +51,7 @@ private struct ContentView: View {
     private var controlSize
 
     @POBackport.ScaledMetric
-    private var iconScale: CGFloat = 1
+    private var iconScale: CGFloat
 
     // MARK: - Private Methods
 
