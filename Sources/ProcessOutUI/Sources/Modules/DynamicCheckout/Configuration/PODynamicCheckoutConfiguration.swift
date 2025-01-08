@@ -14,6 +14,36 @@ import ProcessOut
 @MainActor
 public struct PODynamicCheckoutConfiguration: Sendable {
 
+    @MainActor
+    public struct ExpressCheckout {
+
+        /// Express checkout section title.
+        public let title: String?
+
+        /// Settings button configuration.
+        public let settingsButton: ExpressCheckoutSettingsButton?
+
+        public init(title: String? = nil, settingsButton: ExpressCheckoutSettingsButton? = .init()) {
+            self.title = title
+            self.settingsButton = settingsButton
+        }
+    }
+
+    @MainActor
+    public struct ExpressCheckoutSettingsButton: Sendable {
+
+        /// Button title, such as "Settings". Pass `nil` title to use default value.
+        public let title: String?
+
+        /// Button icon. Pass `nil` to use default value.
+        public let icon: AnyView?
+
+        public init<Icon: View>(title: String? = nil, icon: Icon? = AnyView?.none) {
+            self.title = title
+            self.icon = icon.map(AnyView.init(erasing:))
+        }
+    }
+
     /// Payment success configuration.
     @MainActor
     public struct PaymentSuccess: Sendable {
@@ -73,6 +103,9 @@ public struct PODynamicCheckoutConfiguration: Sendable {
     /// Request to fetch invoice to initiate a payment.
     public let invoiceRequest: POInvoiceRequest
 
+    /// Express checkout section configuration.
+    public let expressCheckout: ExpressCheckout
+
     /// Card collection configuration.
     public let card: PODynamicCheckoutCardConfiguration
 
@@ -98,6 +131,7 @@ public struct PODynamicCheckoutConfiguration: Sendable {
     // Creates configuration instance.
     public init(
         invoiceRequest: POInvoiceRequest,
+        expressCheckout: ExpressCheckout = .default,
         card: PODynamicCheckoutCardConfiguration = .default,
         alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .default,
         passKitPaymentButtonType: PKPaymentButtonType = .plain,
@@ -107,6 +141,7 @@ public struct PODynamicCheckoutConfiguration: Sendable {
         paymentSuccess: PaymentSuccess? = .init()
     ) {
         self.invoiceRequest = invoiceRequest
+        self.expressCheckout = expressCheckout
         self.card = card
         self.alternativePayment = alternativePayment
         self.passKitPaymentButtonType = passKitPaymentButtonType
@@ -114,5 +149,16 @@ public struct PODynamicCheckoutConfiguration: Sendable {
         self.submitButton = submitButton
         self.cancelButton = cancelButton
         self.paymentSuccess = paymentSuccess
+    }
+}
+
+extension PODynamicCheckoutConfiguration.ExpressCheckout {
+
+    /// Default configuration.
+    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
+    @inlinable
+    @MainActor
+    static var `default`: PODynamicCheckoutConfiguration.ExpressCheckout {
+        PODynamicCheckoutConfiguration.ExpressCheckout()
     }
 }

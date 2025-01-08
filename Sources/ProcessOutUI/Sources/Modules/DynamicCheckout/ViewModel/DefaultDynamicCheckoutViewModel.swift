@@ -178,11 +178,20 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func createExpressMethodsSectionHeader(
         state: DynamicCheckoutInteractorState.Started
     ) -> DynamicCheckoutViewModelState.SectionHeader? {
+        let configuration = interactor.configuration.expressCheckout.resolved(
+            defaultTitle: String(resource: .DynamicCheckout.expressCheckout)
+        )
+        guard configuration.title != nil || configuration.settingsButton != nil else {
+            return nil
+        }
+        let settingsButtonConfiguration = configuration.settingsButton?.resolved(
+            defaultTitle: nil, icon: Image(poResource: .settings)
+        )
         let settingsButton: POButtonViewModel? = if let clientSecret = state.clientSecret {
             POButtonViewModel(
                 id: ButtonId.expressCheckoutSettings,
-                title: nil,
-                icon: Image(poResource: .settings),
+                title: settingsButtonConfiguration?.title,
+                icon: settingsButtonConfiguration?.icon,
                 confirmation: nil,
                 action: { [weak self] in
                     self?.openExpressCheckoutSettings(state: state, clientSecret: clientSecret)
@@ -191,7 +200,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         } else {
             nil
         }
-        return .init(title: String(resource: .DynamicCheckout.expressCheckout), button: settingsButton)
+        return .init(title: configuration.title, button: settingsButton)
     }
 
     private func openExpressCheckoutSettings(state: DynamicCheckoutInteractorState.Started, clientSecret: String) {
