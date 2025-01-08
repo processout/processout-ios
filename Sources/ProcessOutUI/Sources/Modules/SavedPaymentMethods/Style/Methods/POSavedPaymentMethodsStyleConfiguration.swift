@@ -16,6 +16,9 @@ public struct POSavedPaymentMethodsStyleConfiguration {
     /// Saved payment methods view title.
     public let title: AnyView
 
+    /// Content unavailable view.
+    public let contentUnavailable: AnyView
+
     /// Payment methods.
     public let paymentMethods: AnyView
 
@@ -33,12 +36,14 @@ public struct POSavedPaymentMethodsStyleConfiguration {
     /// Creates configuration.
     init(
         @ViewBuilder title: () -> some View,
+        @ViewBuilder contentUnavailable: () -> some View,
         @ViewBuilder paymentMethods: () -> some View,
         @ViewBuilder message: () -> some View,
         @ViewBuilder cancelButton: () -> some View,
         isLoading: Bool
     ) {
         self.title = AnyView(title())
+        self.contentUnavailable = AnyView(contentUnavailable())
         self.paymentMethods = AnyView(paymentMethods())
         self.message = AnyView(message())
         self.cancelButton = AnyView(cancelButton())

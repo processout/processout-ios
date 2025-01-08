@@ -98,4 +98,7 @@ extension POImageResource {
 
     /// The "Settings" asset catalog image resource.
     static let settings = POImageResource(name: "Settings")
+
+    /// The "CreditCard" asset catalog image resource.
+    static let creditCard = POImageResource(name: "CreditCard")
 }

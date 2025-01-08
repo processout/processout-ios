@@ -98,16 +98,15 @@ final class DefaultSavedPaymentMethodsInteractor:
         guard case .starting = state else {
             return
         }
+        guard let customerId = invoice.customerId else {
+            let failure = POFailure(message: "Unable to start interactor without customer ID.", code: .generic(.mobile))
+            setFailureState(failure)
+            return
+        }
         let paymentMethods = invoice.paymentMethods?.compactMap { paymentMethod in
             self.paymentMethod(with: paymentMethod)
         } ?? []
-        if let customerId = invoice.customerId, !paymentMethods.isEmpty {
-            state = .started(.init(paymentMethods: paymentMethods, customerId: customerId, recentFailure: nil))
-        } else {
-            let message = "Unable to start interactor. Payment methods and customer ID must be set."
-            let failure = POFailure(message: message, code: .generic(.mobile))
-            setFailureState(failure)
-        }
+        state = .started(.init(paymentMethods: paymentMethods, customerId: customerId, recentFailure: nil))
     }
 
     private func setStartedState(afterDeletionError error: Error) {

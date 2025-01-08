@@ -26,6 +26,19 @@ public struct POSavedPaymentMethodsView: View {
                     Text(title)
                 }
             },
+            contentUnavailable: {
+                if viewModel.state.isContentUnavailable {
+                    POContentUnavailableView {
+                        Label {
+                            Text("No saved payment methods")
+                        } icon: {
+                            Image(poResource: .creditCard).resizable()
+                        }
+                    } description: {
+                        Text("The next time you save a payment method, it will appear here.")
+                    }
+                }
+            },
             paymentMethods: {
                 ForEach(viewModel.state.paymentMethods) { paymentMethod in
                     SavedPaymentMethodView(viewModel: paymentMethod)

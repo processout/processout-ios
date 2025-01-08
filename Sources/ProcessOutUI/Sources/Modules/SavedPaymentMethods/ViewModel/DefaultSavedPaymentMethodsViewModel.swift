@@ -62,6 +62,7 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
     private func updateWithStartingState() {
         state = .init(
             title: createTitle(),
+            isContentUnavailable: false,
             paymentMethods: [],
             isLoading: true,
             message: nil,
@@ -77,6 +78,7 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
         }
         state = .init(
             title: createTitle(),
+            isContentUnavailable: interactorState.paymentMethods.isEmpty,
             paymentMethods: paymentMethodsViewModels,
             isLoading: false,
             message: createMessage(failure: interactorState.recentFailure),
@@ -95,6 +97,7 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
         }
         state = .init(
             title: createTitle(),
+            isContentUnavailable: paymentMethodsViewModels.isEmpty,
             paymentMethods: paymentMethodsViewModels,
             isLoading: false,
             message: createMessage(failure: interactorState.startedStateSnapshot.recentFailure),

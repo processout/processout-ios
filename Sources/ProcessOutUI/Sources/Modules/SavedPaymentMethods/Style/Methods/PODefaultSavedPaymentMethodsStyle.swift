@@ -108,6 +108,9 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
                     content
                 }
             }
+            .backport.overlay {
+                configuration.contentUnavailable
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(backgroundColor.ignoresSafeArea())

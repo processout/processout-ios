@@ -31,6 +31,9 @@ struct SavedPaymentMethodsViewModelState {
     /// Screen title.
     let title: String?
 
+    /// Boolean value indicating whether content is unavailable.
+    let isContentUnavailable: Bool
+
     /// Available payment methods.
     let paymentMethods: [PaymentMethod]
 
@@ -47,10 +50,17 @@ struct SavedPaymentMethodsViewModelState {
 extension SavedPaymentMethodsViewModelState: AnimationIdentityProvider {
 
     var animationIdentity: AnyHashable {
-        [paymentMethods.map(\.id), AnyHashable(cancelButton?.id), AnyHashable(message?.id)]
+        [isContentUnavailable, paymentMethods.map(\.id), AnyHashable(cancelButton?.id), AnyHashable(message?.id)]
     }
 
     static var idle: SavedPaymentMethodsViewModelState {
-        .init(title: nil, paymentMethods: [], isLoading: false, message: nil, cancelButton: nil)
+        SavedPaymentMethodsViewModelState(
+            title: nil,
+            isContentUnavailable: false,
+            paymentMethods: [],
+            isLoading: false,
+            message: nil,
+            cancelButton: nil
+        )
     }
 }
