@@ -135,7 +135,7 @@ final class DynamicCheckoutDefaultInteractor:
         switch state {
         case .started(let currentState):
             invoiceRequest = .init(invoiceId: currentState.invoice.id, clientSecret: currentState.clientSecret)
-        case .starting(let currentState):
+        case .starting:
             invoiceRequest = configuration.invoiceRequest
         case .restarting(let currentState):
             invoiceRequest = .init(
