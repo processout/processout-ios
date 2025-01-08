@@ -22,19 +22,16 @@ final class DefaultWebAuthenticationSession:
         return try await withTaskCancellationHandler(
             operation: {
                 try await withCheckedThrowingContinuation { continuation in
+                    let session = Self.createAuthenticationSession(with: request) { result in
+                        operationProxy.setCompleted(with: result)
+                    }
+                    session.prefersEphemeralWebBrowserSession = true
+                    session.presentationContextProvider = self
+                    operationProxy.set(session: session, continuation: continuation)
                     if Task.isCancelled {
                         let failure = POFailure(message: "Authentication was cancelled.", code: .cancelled)
-                        continuation.resume(throwing: failure)
-                    } else {
-                        let session = Self.createAuthenticationSession(with: request) { result in
-                            operationProxy.setCompleted(with: result)
-                        }
-                        session.prefersEphemeralWebBrowserSession = true
-                        session.presentationContextProvider = self
-                        operationProxy.set(session: session, continuation: continuation)
-                        guard !session.start() else {
-                            return
-                        }
+                        operationProxy.setCompleted(with: .failure(failure))
+                    } else if !session.start() {
                         let failure = POFailure(message: "Unable to start authentication.", code: .generic(.mobile))
                         operationProxy.setCompleted(with: .failure(failure))
                     }
