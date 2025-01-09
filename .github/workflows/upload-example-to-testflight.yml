@@ -13,6 +13,8 @@ jobs:
         uses: ./.github/actions/select-xcode
       - name: Bootstrap Project
         working-directory: ./Example
+        env:
+          EXAMPLE_ENTITLEMENTS: ${{ secrets.EXAMPLE_ENTITLEMENTS }}
         run: ./Scripts/BootstrapProject.sh
       - name: Import Certificates
         working-directory: ./Example
