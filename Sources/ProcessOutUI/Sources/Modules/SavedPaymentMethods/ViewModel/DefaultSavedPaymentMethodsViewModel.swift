@@ -130,7 +130,10 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
 
     private func createDeleteButton(
         paymentMethod: SavedPaymentMethodsInteractorState.PaymentMethod, isLoading: Bool
-    ) -> POButtonViewModel {
+    ) -> POButtonViewModel? {
+        guard paymentMethod.removalAllowed else {
+            return nil
+        }
         let configuration = interactor.configuration.paymentMethod.deleteButton.resolved(
             defaultTitle: nil, icon: Image(poResource: .delete).resizable().renderingMode(.template)
         )

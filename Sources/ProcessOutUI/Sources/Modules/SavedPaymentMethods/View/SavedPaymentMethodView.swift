@@ -27,7 +27,9 @@ struct SavedPaymentMethodView: View {
                 Text(description)
             }
         } deleteButton: {
-            Button.create(with: viewModel.deleteButton)
+            if let viewModel = viewModel.deleteButton {
+                Button.create(with: viewModel)
+            }
         }
         AnyView(style.makeBody(configuration: configuration))
             .backport.geometryGroup()

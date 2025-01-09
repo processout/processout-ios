@@ -174,6 +174,9 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
 
         /// Property is set to non-nil value when redirect is required to authorize alternative payment.
         public let redirectUrl: URL?
+
+        /// Indicates whether the user should be able to remove this customer token.
+        public let removalAllowed: Bool = true
     }
 
     // MARK: - Unknown

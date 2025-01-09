@@ -25,7 +25,7 @@ struct SavedPaymentMethodsViewModelState {
         let description: String?
 
         /// Payment method removal button.
-        let deleteButton: POButtonViewModel
+        let deleteButton: POButtonViewModel?
     }
 
     /// Screen title.
