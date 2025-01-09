@@ -178,29 +178,44 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func createExpressMethodsSectionHeader(
         state: DynamicCheckoutInteractorState.Started
     ) -> DynamicCheckoutViewModelState.SectionHeader? {
-        let configuration = interactor.configuration.expressCheckout.resolved(
+        let resolvedConfiguration = interactor.configuration.expressCheckout.resolved(
             defaultTitle: String(resource: .DynamicCheckout.expressCheckout)
         )
-        guard configuration.title != nil || configuration.settingsButton != nil else {
+        let settingsButton = createExpressMethodsSettingsButton(
+            paymentMethods: state.paymentMethods, configuration: resolvedConfiguration.settingsButton
+        )
+        guard resolvedConfiguration.title != nil || settingsButton != nil else {
             return nil
         }
-        let settingsButtonConfiguration = configuration.settingsButton?.resolved(
+        return .init(title: resolvedConfiguration.title, button: settingsButton)
+    }
+
+    private func createExpressMethodsSettingsButton(
+        paymentMethods: [PODynamicCheckoutPaymentMethod],
+        configuration: PODynamicCheckoutConfiguration.ExpressCheckoutSettingsButton?
+    ) -> POButtonViewModel? {
+        let resolvedConfiguration = configuration?.resolved(
             defaultTitle: nil, icon: Image(poResource: .settings)
         )
-        let settingsButton: POButtonViewModel? = if let settingsButtonConfiguration {
-            POButtonViewModel(
-                id: ButtonId.expressCheckoutSettings,
-                title: settingsButtonConfiguration.title,
-                icon: settingsButtonConfiguration.icon,
-                confirmation: nil,
-                action: { [weak self] in
-                    self?.openExpressCheckoutSettings()
-                }
-            )
-        } else {
-            nil
+        let containsCustomerTokenPaymentMethod = paymentMethods.contains { paymentMethod in
+            if case .customerToken = paymentMethod {
+                return true
+            }
+            return false
         }
-        return .init(title: configuration.title, button: settingsButton)
+        guard let resolvedConfiguration, containsCustomerTokenPaymentMethod else {
+            return nil
+        }
+        let viewModel = POButtonViewModel(
+            id: ButtonId.expressCheckoutSettings,
+            title: resolvedConfiguration.title,
+            icon: resolvedConfiguration.icon,
+            confirmation: nil,
+            action: { [weak self] in
+                self?.openExpressCheckoutSettings()
+            }
+        )
+        return viewModel
     }
 
     private func openExpressCheckoutSettings() {
