@@ -11,6 +11,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Select Xcode Version
         uses: ./.github/actions/select-xcode
+      - name: Generate Entitlements
+        working-directory: ./Example
+        env:
+          EXAMPLE_ENTITLEMENTS: ${{ secrets.EXAMPLE_ENTITLEMENTS }}
+        run: ./Scripts/Distribution/GenerateEntitlements.sh
       - name: Bootstrap Project
         working-directory: ./Example
         run: ./Scripts/BootstrapProject.sh
