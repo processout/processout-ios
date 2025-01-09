@@ -57,7 +57,7 @@ enum SavedPaymentMethodsInteractorState {
         let description: String?
 
         /// Indicates whether user should be able to remove this payment method.
-        let removalAllowed: Bool
+        let removingAllowed: Bool
     }
 
     case idle, starting(Starting), started(Started), removing(Removing), completed(Result<Void, POFailure>)

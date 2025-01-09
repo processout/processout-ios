@@ -167,7 +167,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public let configuration: CustomerTokenConfiguration
     }
 
-    public struct CustomerTokenConfiguration: Decodable, Sendable {
+    public struct CustomerTokenConfiguration: Sendable {
 
         /// Customer token ID.
         public let customerTokenId: String
@@ -176,7 +176,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public let redirectUrl: URL?
 
         /// Indicates whether the user should be able to remove this customer token.
-        public let removalAllowed: Bool = true
+        public let removingAllowed: Bool
     }
 
     // MARK: - Unknown
@@ -328,5 +328,21 @@ extension PODynamicCheckoutPaymentMethod {
         case .applePay, .unknown:
             return nil
         }
+    }
+}
+
+extension PODynamicCheckoutPaymentMethod.CustomerTokenConfiguration: Decodable {
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.customerTokenId = try container.decode(String.self, forKey: .customerTokenId)
+        self.redirectUrl = try container.decodeIfPresent(URL.self, forKey: .redirectUrl)
+        self.removingAllowed = try container.decodeIfPresent(Bool.self, forKey: .removingAllowed) ?? true
+    }
+
+    // MARK: - Private Methods
+
+    private enum CodingKeys: String, CodingKey {
+        case customerTokenId, redirectUrl, removingAllowed
     }
 }
