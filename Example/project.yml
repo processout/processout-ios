@@ -33,6 +33,7 @@ targets:
     settings:
       TARGETED_DEVICE_FAMILY: 1
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-example
+      CODE_SIGN_ENTITLEMENTS: Example/Example.entitlements
     dependencies:
       - package: ProcessOutUI
       - package: ProcessOutCheckout3DS
