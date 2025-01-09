@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 /// Saved payment methods root view.
@@ -30,12 +31,12 @@ public struct POSavedPaymentMethodsView: View {
                 if viewModel.state.isContentUnavailable {
                     POContentUnavailableView {
                         Label {
-                            Text("No saved payment methods")
+                            Text(String(resource: .SavedPaymentMethods.ContentUnavailable.title))
                         } icon: {
                             Image(poResource: .creditCard).resizable()
                         }
                     } description: {
-                        Text("The next time you save a payment method, it will appear here.")
+                        Text(String(resource: .SavedPaymentMethods.ContentUnavailable.description))
                     }
                 }
             },

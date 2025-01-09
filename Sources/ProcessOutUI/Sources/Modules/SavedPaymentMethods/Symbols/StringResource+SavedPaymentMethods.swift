@@ -14,6 +14,17 @@ extension POStringResource {
         /// Screen title.
         static let title = POStringResource("saved-payment-methods.title", comment: "")
 
+        enum ContentUnavailable { // swiftlint:disable:this nesting
+
+            /// Title.
+            static let title = POStringResource("saved-payment-methods.content-unavailable.title", comment: "")
+
+            /// Description
+            static let description = POStringResource(
+                "saved-payment-methods.content-unavailable.description", comment: ""
+            )
+        }
+
         /// Generic error.
         static let genericError = POStringResource("saved-payment-methods.generic-error", comment: "")
     }
