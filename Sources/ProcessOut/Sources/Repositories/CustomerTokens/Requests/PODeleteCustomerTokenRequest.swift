@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 26.12.2024.
 //
 
+/// Request to use to remove existing customer token.
 public struct PODeleteCustomerTokenRequest {
 
     /// ID of your customer
