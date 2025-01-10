@@ -70,11 +70,3 @@ public struct POSavedPaymentMethodsView: View {
     @StateObject
     private var viewModel: AnyViewModel<SavedPaymentMethodsViewModelState>
 }
-
-// todo(andrii-vysotskyi): complete before PR
-
-// * Support empty state
-// * Support customization through the dynamic checkout
-// * Add documentation to docs.processout.com
-// * Add tests
-// * Make cancel confirmation text more generic

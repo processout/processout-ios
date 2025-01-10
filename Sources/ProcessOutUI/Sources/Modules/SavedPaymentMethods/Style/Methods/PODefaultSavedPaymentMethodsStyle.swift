@@ -8,7 +8,7 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-/// The default card scanner style.
+/// The default saved payment methods style.
 @available(iOS 14, *)
 public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
 
