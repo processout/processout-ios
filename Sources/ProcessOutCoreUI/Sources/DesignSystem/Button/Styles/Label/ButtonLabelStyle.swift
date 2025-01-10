@@ -20,6 +20,7 @@ struct ButtonLabelStyle: LabelStyle {
 }
 
 @available(iOS 14.0, *)
+@MainActor
 private struct ContentView: View {
 
     init(configuration: LabelStyleConfiguration, titleStyle: POTextStyle) {

@@ -11,6 +11,7 @@ extension Group {
 
     /// Constructs a group from the subviews of the given view.
     @_spi(PO)
+    @MainActor
     public init<Base: View, Result: View>(
         poSubviews view: Base,
         @ViewBuilder transform: @escaping (_VariadicView.Children) -> Result
@@ -20,6 +21,7 @@ extension Group {
 }
 
 @_spi(PO)
+@MainActor
 public struct POSubviewsTransformView<Subviews: View, Content: View>: View {
 
     init(subviews: Subviews, @ViewBuilder transform: @escaping (_VariadicView.Children) -> Content) {
@@ -38,6 +40,7 @@ public struct POSubviewsTransformView<Subviews: View, Content: View>: View {
     let tree: _VariadicView.Tree<SubviewsTransformViewRoot<Content>, Subviews>
 }
 
+@MainActor
 @usableFromInline
 struct SubviewsTransformViewRoot<Content: View>: _VariadicView_MultiViewRoot {
 
