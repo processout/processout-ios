@@ -8,17 +8,32 @@
 import SwiftUI
 
 @available(iOS 14.0, *)
+@MainActor
 struct DefaultContentUnavailableViewLabelStyle: LabelStyle {
 
-    init(title: POTextStyle, description: POTextStyle) {
+    let title: POTextStyle, description: POTextStyle
+
+    // MARK: - LabelStyle
+
+    func makeBody(configuration: Configuration) -> some View {
+        StyleBox(configuration: configuration, title: title, description: description)
+    }
+}
+
+@available(iOS 14.0, *)
+@MainActor
+private struct StyleBox: View {
+
+    init(configuration: LabelStyleConfiguration, title: POTextStyle, description: POTextStyle) {
+        self.configuration = configuration
         self.title = title
         self.description = description
         self._iconScale = .init(wrappedValue: 1, relativeTo: title.typography.textStyle)
     }
 
-    // MARK: - LabelStyle
+    // MARK: - View
 
-    func makeBody(configuration: Configuration) -> some View {
+    var body: some View {
         VStack(spacing: POSpacing.large) {
             configuration.icon
                 .scaledToFit()
@@ -31,7 +46,7 @@ struct DefaultContentUnavailableViewLabelStyle: LabelStyle {
 
     // MARK: - Private Properties
 
-    private let title: POTextStyle, description: POTextStyle
+    private let configuration: LabelStyleConfiguration, title: POTextStyle, description: POTextStyle
 
     @POBackport.ScaledMetric
     private var iconScale: CGFloat
