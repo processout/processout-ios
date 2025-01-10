@@ -17,5 +17,5 @@ public protocol POEventEmitter: Sendable {
     /// Adds subscription for given event.
     func on<Event: POEventEmitterEvent>(
         _ eventType: Event.Type, listener: @escaping @Sendable (Event) -> Bool
-    ) -> sending AnyObject
+    ) -> AnyObject
 }
