@@ -86,7 +86,7 @@ public struct POSavedPaymentMethodsConfiguration: Sendable {
     public init(
         invoiceRequest: POInvoiceRequest,
         title: String? = nil,
-        paymentMethod: PaymentMethod = .init(),
+        paymentMethod: PaymentMethod = .init(deleteButton: .init()),
         cancelButton: CancelButton? = .init()
     ) {
         self.invoiceRequest = invoiceRequest
