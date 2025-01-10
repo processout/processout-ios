@@ -23,7 +23,6 @@ public struct POInvoice: Decodable, Sendable {
     public let returnUrl: URL?
 
     /// Customer ID associated with invoice.
-    @_spi(PO)
     public let customerId: String?
 
     /// Dynamic checkout details resolved for specific invoice.
