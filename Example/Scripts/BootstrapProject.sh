@@ -11,7 +11,7 @@ brew bundle -q
 
 # Generate entitlements
 ENTITLEMENTS_PATH="./Example/Example.entitlements"
-if [ -n "${EXAMPLE_ENTITLEMENTS}" ]; then
+if [ -n "${EXAMPLE_ENTITLEMENTS:-}" ]; then
     echo -n $EXAMPLE_ENTITLEMENTS | base64 -d -o $ENTITLEMENTS_PATH
 fi
 
