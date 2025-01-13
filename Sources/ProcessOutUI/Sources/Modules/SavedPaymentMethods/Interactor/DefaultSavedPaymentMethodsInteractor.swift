@@ -186,7 +186,7 @@ final class DefaultSavedPaymentMethodsInteractor:
             logo: customerToken.display.logo,
             name: customerToken.display.name,
             description: customerToken.display.description,
-            removingAllowed: customerToken.configuration.removingAllowed
+            deletingAllowed: customerToken.configuration.deletingAllowed
         )
         return paymentMethod
     }
