@@ -10,6 +10,20 @@
 
 extension POButtonViewModel.Confirmation {
 
+    static func paymentCancel(
+        with configuration: POConfirmationDialogConfiguration, onAppear: (() -> Void)? = nil
+    ) -> Self {
+        let confirmation = POButtonViewModel.Confirmation(
+            title: configuration.title ?? String(resource: .PaymentCancelConfirmation.title),
+            message: configuration.message,
+            confirmButtonTitle: configuration.confirmActionTitle
+                ?? String(resource: .PaymentCancelConfirmation.confirm),
+            cancelButtonTitle: configuration.cancelActionTitle ?? String(resource: .PaymentCancelConfirmation.cancel),
+            onAppear: onAppear
+        )
+        return confirmation
+    }
+
     static func cancel(with configuration: POConfirmationDialogConfiguration, onAppear: (() -> Void)? = nil) -> Self {
         let confirmation = POButtonViewModel.Confirmation(
             title: configuration.title ?? String(resource: .CancelConfirmation.title),
@@ -34,6 +48,18 @@ extension POButtonViewModel.Confirmation {
 }
 
 extension POStringResource {
+
+    enum PaymentCancelConfirmation {
+
+        /// Confirmation title.
+        static let title = POStringResource("payment-cancel-confirmation.title", comment: "")
+
+        /// Confirm button title.
+        static let confirm = POStringResource("payment-cancel-confirmation.confirm", comment: "")
+
+        /// Cancel button title.
+        static let cancel = POStringResource("payment-cancel-confirmation.cancel", comment: "")
+    }
 
     enum CancelConfirmation {
 
