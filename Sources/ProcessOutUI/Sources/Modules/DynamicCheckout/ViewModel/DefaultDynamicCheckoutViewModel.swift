@@ -198,8 +198,8 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             defaultTitle: nil, icon: Image(poResource: .settings)
         )
         let containsCustomerTokenPaymentMethod = paymentMethods.contains { paymentMethod in
-            if case .customerToken = paymentMethod {
-                return true
+            if case .customerToken(let paymentMethod) = paymentMethod {
+                return paymentMethod.configuration.deletingAllowed
             }
             return false
         }
