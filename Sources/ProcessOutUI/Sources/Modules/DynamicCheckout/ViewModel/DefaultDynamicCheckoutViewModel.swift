@@ -195,7 +195,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         configuration: PODynamicCheckoutConfiguration.ExpressCheckoutSettingsButton?
     ) -> POButtonViewModel? {
         let resolvedConfiguration = configuration?.resolved(
-            defaultTitle: nil, icon: Image(poResource: .settings)
+            defaultTitle: nil, icon: Image(poResource: .settings).resizable().renderingMode(.template)
         )
         let containsCustomerTokenPaymentMethod = paymentMethods.contains { paymentMethod in
             if case .customerToken(let paymentMethod) = paymentMethod {

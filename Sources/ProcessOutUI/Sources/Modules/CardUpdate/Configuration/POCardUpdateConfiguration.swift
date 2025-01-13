@@ -11,12 +11,12 @@ import SwiftUI
 /// Use `nil` as a value for a nullable property to indicate that default value should be used.
 @MainActor
 @preconcurrency
-public struct POCardUpdateConfiguration: Sendable {
+public struct POCardUpdateConfiguration {
 
     /// Text field configuration.
     @MainActor
     @preconcurrency
-    public struct TextField: Sendable {
+    public struct TextField {
 
         /// Text providing users with guidance on what to type into the text field.
         public let prompt: String?
@@ -33,7 +33,7 @@ public struct POCardUpdateConfiguration: Sendable {
     /// Button configuration.
     @MainActor
     @preconcurrency
-    public struct SubmitButton: Sendable {
+    public struct SubmitButton {
 
         /// Button title, such as "Pay". Pass `nil` title to use default value.
         public let title: String?
@@ -50,7 +50,7 @@ public struct POCardUpdateConfiguration: Sendable {
     /// Cancel button configuration.
     @MainActor
     @preconcurrency
-    public struct CancelButton: Sendable {
+    public struct CancelButton {
 
         /// Button title. Pass `nil` title to use default value.
         public let title: String?

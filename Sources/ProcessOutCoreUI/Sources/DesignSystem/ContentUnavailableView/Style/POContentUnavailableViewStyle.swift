@@ -10,7 +10,7 @@ import SwiftUI
 /// A type that specifies the appearance and interaction of all content unavailable views
 /// within a view hierarchy.
 @MainActor
-public protocol POContentUnavailableViewStyle: Sendable {
+public protocol POContentUnavailableViewStyle {
 
     /// A view representing the appearance and interaction of a `POContentUnavailableViewStyle`.
     associatedtype Body: View
