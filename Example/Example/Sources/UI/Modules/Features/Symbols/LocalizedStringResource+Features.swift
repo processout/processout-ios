@@ -29,6 +29,9 @@ extension LocalizedStringResource {
         /// Dynamic checkout.
         static let dynamicCheckout = LocalizedStringResource("features.dynamic-checkout")
 
+        /// Saved payment methods
+        static let savedPaymentMethods = LocalizedStringResource("features.saved-payment-methods")
+
         /// ApplePay.
         static let applePay = LocalizedStringResource("features.apple-pay")
 

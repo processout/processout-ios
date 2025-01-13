@@ -121,6 +121,7 @@ private extension POInvoice { // swiftlint:disable:this no_extension_access_modi
             amount: .init(value: amount),
             currency: currency,
             returnUrl: returnUrl,
+            customerId: customerId,
             paymentMethods: paymentMethods,
             clientSecret: newClientSecret,
             transaction: transaction

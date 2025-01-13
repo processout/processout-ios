@@ -22,6 +22,7 @@ final class DynamicCheckoutDefaultInteractor:
         invoicesService: POInvoicesService,
         cardsService: POCardsService,
         alternativePaymentsService: POAlternativePaymentsService,
+        eventEmitter: POEventEmitter,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
@@ -31,6 +32,7 @@ final class DynamicCheckoutDefaultInteractor:
         self.invoicesService = invoicesService
         self.cardsService = cardsService
         self.alternativePaymentsService = alternativePaymentsService
+        self.eventEmitter = eventEmitter
         self.logger = logger
         self.completion = completion
         super.init(state: .idle)
@@ -66,6 +68,7 @@ final class DynamicCheckoutDefaultInteractor:
             }
         }
         state = .starting(.init(task: task))
+        observeGlobalEvents()
     }
 
     func setShouldSaveSelectedPaymentMethod(_ shouldSave: Bool) {
@@ -127,12 +130,40 @@ final class DynamicCheckoutDefaultInteractor:
         send(event: .didRequestCancelConfirmation)
     }
 
+    func savedPaymentMethodsConfiguration() -> POSavedPaymentMethodsConfiguration {
+        let invoiceRequest: POInvoiceRequest
+        switch state {
+        case .started(let currentState):
+            invoiceRequest = .init(invoiceId: currentState.invoice.id, clientSecret: currentState.clientSecret)
+        case .starting:
+            invoiceRequest = configuration.invoiceRequest
+        case .restarting(let currentState):
+            invoiceRequest = .init(
+                invoiceId: currentState.snapshot.snapshot.invoice.id,
+                clientSecret: currentState.snapshot.snapshot.clientSecret
+            )
+        case .selected(let currentState):
+            invoiceRequest = .init(
+                invoiceId: currentState.snapshot.invoice.id, clientSecret: currentState.snapshot.clientSecret
+            )
+        case .paymentProcessing(let currentState):
+            invoiceRequest = .init(
+                invoiceId: currentState.snapshot.invoice.id, clientSecret: currentState.snapshot.clientSecret
+            )
+        default:
+            preconditionFailure("Unable to resolve configuration in current state.")
+        }
+        let configuration = delegate?.dynamicCheckout(savedPaymentMethodsConfigurationWith: invoiceRequest)
+        return configuration ?? .init(invoiceRequest: invoiceRequest)
+    }
+
     // MARK: - Private Properties
 
     private let childProvider: DynamicCheckoutInteractorChildProvider
     private let invoicesService: POInvoicesService
     private let cardsService: POCardsService
     private let alternativePaymentsService: POAlternativePaymentsService
+    private let eventEmitter: POEventEmitter
     private let completion: (Result<Void, POFailure>) -> Void
 
     private var logger: POLogger
@@ -695,6 +726,66 @@ final class DynamicCheckoutDefaultInteractor:
     private func send(event: PODynamicCheckoutEvent) {
         logger.debug("Did send event: '\(event)'")
         delegate?.dynamicCheckout(didEmitEvent: event)
+    }
+
+    // MARK: - Global Events
+
+    private var customerTokenDeletedSubscription: AnyObject?
+
+    private func observeGlobalEvents() {
+        customerTokenDeletedSubscription = eventEmitter.on(POCustomerTokenDeletedEvent.self) { [weak self] event in
+            Task { @MainActor [weak self] in
+                self?.onCustomerTokenDeleted(event: event)
+            }
+            return true
+        }
+    }
+
+    private func onCustomerTokenDeleted(event: POCustomerTokenDeletedEvent) {
+        switch state {
+        case .restarting(let currentState) where currentState.snapshot.snapshot.invoice.customerId == event.customerId:
+            var newStartedState = currentState.snapshot.snapshot
+            newStartedState.paymentMethods.removeAll { paymentMethod in
+                paymentMethod.id == event.tokenId
+            }
+            var newState = currentState
+            newState.snapshot.snapshot = newStartedState
+            if currentState.pendingPaymentMethodId == event.tokenId {
+                newState.pendingPaymentMethodId = nil
+                newState.shouldStartPendingPaymentMethod = false
+            }
+            state = .restarting(newState)
+        case .started(let currentState) where currentState.invoice.customerId == event.customerId:
+            var newState = currentState
+            newState.paymentMethods.removeAll { paymentMethod in
+                paymentMethod.id == event.tokenId
+            }
+            state = .started(newState)
+        case .selected(let currentState) where currentState.snapshot.invoice.customerId == event.customerId:
+            var newStartedState = currentState.snapshot
+            newStartedState.paymentMethods.removeAll { paymentMethod in
+                paymentMethod.id == event.tokenId
+            }
+            if currentState.paymentMethod.id == event.tokenId {
+                state = .started(newStartedState)
+            } else {
+                var newState = currentState
+                newState.snapshot = newStartedState
+                state = .selected(newState)
+            }
+        case .paymentProcessing(let currentState) where currentState.snapshot.invoice.customerId == event.customerId:
+            // Even if the currently processed payment method was deleted, the underlying operation
+            // is not canceled, allowing it to complete naturally.
+            var newStartedState = currentState.snapshot
+            newStartedState.paymentMethods.removeAll { paymentMethod in
+                paymentMethod.id == event.tokenId
+            }
+            var newState = currentState
+            newState.snapshot = newStartedState
+            state = .paymentProcessing(newState)
+        default:
+            break // Nothing to do
+        }
     }
 
     // MARK: - Utils

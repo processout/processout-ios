@@ -471,6 +471,16 @@
         }
       }
     },
+    "features.saved-payment-methods" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved Payment Methods (Beta)"
+          }
+        }
+      }
+    },
     "features.title" : {
       "localizations" : {
         "en" : {
@@ -527,6 +537,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Invoice"
+          }
+        }
+      }
+    },
+    "saved-payment-methods.error-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to mange saved payment methods. Please try again."
+          }
+        }
+      }
+    },
+    "saved-payment-methods.manage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage"
+          }
+        }
+      }
+    },
+    "saved-payment-methods.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved Payment Methods"
           }
         }
       }

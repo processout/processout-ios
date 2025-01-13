@@ -98,9 +98,9 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
             POToolbar(alignment: .top, spacing: POSpacing.small) {
                 configuration.torchToggle
                     .poToggleStyle(torchToggle)
-                    .buttonStyle(.ghost)
                     .backport.poControlSize(.small)
                     .controlWidth(.regular)
+                    .padding(.leading, POSpacing.extraSmall)
             } principal: {
                 VStack(spacing: POSpacing.small) {
                     configuration.title

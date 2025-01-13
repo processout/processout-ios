@@ -20,6 +20,9 @@ public protocol POCustomerTokensService: POService { // sourcery: AutoCompletion
         request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
     ) async throws -> POCustomerToken
 
+    /// Deletes customer token.
+    func deleteCustomerToken(request: PODeleteCustomerTokenRequest) async throws
+
     /// Creates customer token using given request.
     @_spi(PO)
     func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken

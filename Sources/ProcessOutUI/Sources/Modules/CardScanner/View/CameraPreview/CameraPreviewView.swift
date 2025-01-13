@@ -9,6 +9,7 @@ import AVFoundation
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
+@MainActor
 struct CameraPreviewView: View {
 
     var body: some View {
@@ -16,6 +17,7 @@ struct CameraPreviewView: View {
     }
 }
 
+@MainActor
 private struct CameraPreviewViewRepresentable: UIViewRepresentable {
 
     func makeUIView(context: Context) -> CameraPreviewUiView {

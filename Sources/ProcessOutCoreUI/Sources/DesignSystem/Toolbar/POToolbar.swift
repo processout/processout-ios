@@ -9,6 +9,7 @@ import SwiftUI
 
 /// Simplified toolbar view.
 @_spi(PO)
+@MainActor
 public struct POToolbar<Leading: View, Principal: View, Trailing: View>: View {
 
     public init(

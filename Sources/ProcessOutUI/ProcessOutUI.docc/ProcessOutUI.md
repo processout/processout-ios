@@ -37,6 +37,17 @@
 - ``POCardUpdateInformation``
 - ``POCardUpdateEvent``
 
+### Card Scanner
+
+- ``POCardScannerView``
+- ``POScannedCard``
+- ``POCardScannerConfiguration``
+- ``POCardScannerStyle``
+- ``POCardScannerStyleConfiguration``
+- ``PODefaultCardScannerStyle``
+- ``SwiftUICore/EnvironmentValues/cardScannerStyle``
+- ``SwiftUICore/View/cardScannerStyle(_:)``
+
 ### Alternative Payment Method
 
 - ``SafariServices/SFSafariViewController/init(request:returnUrl:safariConfiguration:completion:)``
@@ -71,16 +82,18 @@
 <!--- ``PODynamicCheckoutEvent``-->
 <!--- ``PODynamicCheckoutInvoiceInvalidationReason``-->
 
-### Card Scanner
+### Saved Payment Methods
 
-- ``POCardScannerView``
-- ``POScannedCard``
-- ``POCardScannerConfiguration``
-- ``POCardScannerStyle``
-- ``POCardScannerStyleConfiguration``
-- ``PODefaultCardScannerStyle``
-- ``SwiftUICore/EnvironmentValues/cardScannerStyle``
-- ``SwiftUICore/View/cardScannerStyle(_:)``
+- ``POSavedPaymentMethodsView``
+- ``POSavedPaymentMethodsConfiguration``
+- ``POSavedPaymentMethodsStyle``
+- ``POSavedPaymentMethodsStyleConfiguration``
+- ``PODefaultSavedPaymentMethodsStyle``
+- ``SwiftUICore/View/savedPaymentMethodsStyle(_:)``
+- ``POSavedPaymentMethodStyle``
+- ``POSavedPaymentMethodStyleConfiguration``
+- ``PODefaultSavedPaymentMethodStyle``
+- ``SwiftUICore/View/savedPaymentMethodStyle(_:)``
 
 ### Utils
 

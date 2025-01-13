@@ -167,13 +167,16 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public let configuration: CustomerTokenConfiguration
     }
 
-    public struct CustomerTokenConfiguration: Decodable, Sendable {
+    public struct CustomerTokenConfiguration: Sendable, Decodable {
 
         /// Customer token ID.
         public let customerTokenId: String
 
         /// Property is set to non-nil value when redirect is required to authorize alternative payment.
         public let redirectUrl: URL?
+
+        /// Indicates whether the user should be able to remove this customer token.
+        public let deletingAllowed: Bool
     }
 
     // MARK: - Unknown

@@ -36,7 +36,9 @@ final class LocalEventEmitter: POEventEmitter, @unchecked Sendable {
         return isHandled
     }
 
-    func on<Event: POEventEmitterEvent>(_ eventType: Event.Type, listener: @escaping (Event) -> Bool) -> AnyObject {
+    func on<Event: POEventEmitterEvent>(
+        _ eventType: Event.Type, listener: @escaping @Sendable (Event) -> Bool
+    ) -> AnyObject {
         let subscription = Subscription { event in
             guard let event = event as? Event else {
                 return false

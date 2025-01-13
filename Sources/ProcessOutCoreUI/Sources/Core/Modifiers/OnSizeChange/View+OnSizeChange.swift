@@ -27,7 +27,9 @@ private struct SizeModifier: ViewModifier {
                 Color.clear.preference(key: SizePreferenceKey.self, value: geometry.size)
             }
             .onPreferenceChange(SizePreferenceKey.self) { size in
-                if let size { action(size) }
+                if let size {
+                    action(size)
+                }
             }
         }
     }

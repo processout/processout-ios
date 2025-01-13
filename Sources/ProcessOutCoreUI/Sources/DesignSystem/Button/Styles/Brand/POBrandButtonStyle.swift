@@ -80,34 +80,32 @@ private struct ButtonStyleBox: View {
     var body: some View {
         // todo(andrii-vysotskyi): add overlay or accept configuration for disabled state if needed
         let isBrandColorLight = UIColor(brandColor).isLight() != false
-        ZStack {
-            if isLoading {
-                ProgressView()
-                    .poProgressViewStyle(progressStyle)
-            } else {
-                configuration.label
-                    .textStyle(title.scaledBy(labelTypographyScale))
-                    .lineLimit(1)
-            }
-        }
-        .padding(
-            .init(horizontal: POSpacing.small, vertical: POSpacing.extraSmall)
-        )
-        .frame(minWidth: minSize, maxWidth: maxWidth, minHeight: minSize)
-        .backport.background {
-            let adjustment = brightnessAdjustment(
-                isPressed: configuration.isPressed, isBrandColorLight: isBrandColorLight
+        configuration.label
+            .labelStyle(ButtonLabelStyle(titleStyle: title))
+            .opacity(
+                isLoading ? 0 : 1
             )
-            brandColor.brightness(adjustment)
-        }
-        .border(style: border)
-        .shadow(style: shadow)
-        .colorScheme(isBrandColorLight ? .light : .dark)
-        .contentShape(.rect)
-        .animation(.default, value: isEnabled)
-        .animation(.default, value: AnyHashable(brandColor))
-        .allowsHitTesting(isEnabled)
-        .backport.geometryGroup()
+            .backport.overlay {
+                if isLoading {
+                    ProgressView().poProgressViewStyle(progressStyle)
+                }
+            }
+            .padding(POSpacing.small)
+            .frame(minWidth: minSize, maxWidth: maxWidth, minHeight: minSize)
+            .backport.background {
+                let adjustment = brightnessAdjustment(
+                    isPressed: configuration.isPressed, isBrandColorLight: isBrandColorLight
+                )
+                brandColor.brightness(adjustment)
+            }
+            .border(style: border)
+            .shadow(style: shadow)
+            .colorScheme(isBrandColorLight ? .light : .dark)
+            .contentShape(.standardHittableRect)
+            .animation(.default, value: isEnabled)
+            .animation(.default, value: AnyHashable(brandColor))
+            .allowsHitTesting(isEnabled)
+            .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
@@ -153,10 +151,5 @@ private struct ButtonStyleBox: View {
     private var maxWidth: CGFloat? {
         let widths: [POControlWidth: CGFloat] = [.expanded: .infinity]
         return widths[controlWidth]
-    }
-
-    private var labelTypographyScale: CGFloat {
-        let scales: [POControlSize: CGFloat] = [.small: 0.867]
-        return scales[controlSize] ?? 1.0
     }
 }

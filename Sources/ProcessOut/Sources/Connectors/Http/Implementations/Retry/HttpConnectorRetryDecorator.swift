@@ -55,9 +55,9 @@ final class HttpConnectorRetryDecorator: HttpConnector {
     private func addingIdempotencyKey<Value>(request: HttpConnectorRequest<Value>) -> HttpConnectorRequest<Value> {
         var updatedHeaders = request.headers
         switch request.method {
-        case .get, .put:
+        case .get:
             return request
-        case .post:
+        case .post, .put, .delete:
             updatedHeaders["Idempotency-Key"] = UUID().uuidString
         }
         let request = HttpConnectorRequest(

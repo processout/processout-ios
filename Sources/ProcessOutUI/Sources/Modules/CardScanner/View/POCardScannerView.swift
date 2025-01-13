@@ -53,9 +53,13 @@ public struct POCardScannerView: View {
             },
             torchToggle: {
                 Toggle(isOn: viewModel.state.isTorchEnabled) {
-                    let isOn = viewModel.state.isTorchEnabled.wrappedValue
-                    let icon = isOn ? Image(poResource: .lightningSlash) : Image(poResource: .lightning)
-                    icon.renderingMode(.template).resizable().frame(width: 16, height: 16)
+                    Label {
+                        EmptyView()
+                    } icon: {
+                        let isOn = viewModel.state.isTorchEnabled.wrappedValue
+                        let icon = Image(poResource: isOn ? .lightningSlash : .lightning)
+                        icon.renderingMode(.template).resizable()
+                    }
                 }
                 .fixedSize()
             },

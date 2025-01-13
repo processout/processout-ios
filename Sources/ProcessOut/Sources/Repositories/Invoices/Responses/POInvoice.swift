@@ -22,6 +22,9 @@ public struct POInvoice: Decodable, Sendable {
     /// Application will be redirected to this URL in case of success. Useful for web based operations. 
     public let returnUrl: URL?
 
+    /// Customer ID associated with invoice.
+    public let customerId: String?
+
     /// Dynamic checkout details resolved for specific invoice.
     @_spi(PO)
     public let paymentMethods: [PODynamicCheckoutPaymentMethod]?

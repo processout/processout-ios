@@ -26,6 +26,9 @@ struct FeaturesView: View {
                 NavigationLink(String(localized: .Features.dynamicCheckout)) {
                     DynamicCheckoutView()
                 }
+                NavigationLink(String(localized: .Features.savedPaymentMethods)) {
+                    SavedPaymentMethodsView()
+                }
                 if isApplePayAvailable {
                     NavigationLink(String(localized: .Features.applePay)) {
                         ApplePayView()

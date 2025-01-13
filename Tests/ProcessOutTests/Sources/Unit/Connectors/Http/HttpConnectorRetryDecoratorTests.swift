@@ -18,10 +18,15 @@ struct HttpConnectorRetryDecoratorTests {
         )
     }
 
-    @Test
-    func execute_whenRequestMethodIsPost_addsSameIdempotencyKeyHeader() async throws {
+    @Test(
+        arguments: [
+            HttpConnectorRequest<VoidCodable>.post(path: ""), .delete(path: ""), .put(path: "")
+        ]
+    )
+    func execute_whenRequestMethodIsPostOrDeleteOrPut_addsSameIdempotencyKeyHeader(
+        request: HttpConnectorRequest<VoidCodable>
+    ) async throws {
         // Given
-        let request = HttpConnectorRequest<VoidCodable>.post(path: "")
         var previousIdempotencyKey: String?
 
         // Then
@@ -44,11 +49,10 @@ struct HttpConnectorRetryDecoratorTests {
     }
 
     @Test
-    func execute_whenRequestMethodIsGetOrPut_doesntAddIdempotencyKeyHeader() async throws {
+    func execute_whenRequestMethodIsGet_doesntAddIdempotencyKeyHeader() async throws {
         // Given
         let requests = [
-            HttpConnectorRequest<VoidCodable>.get(path: ""),
-            HttpConnectorRequest<VoidCodable>.put(path: "")
+            HttpConnectorRequest<VoidCodable>.get(path: "")
         ]
 
         // Then

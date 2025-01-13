@@ -87,6 +87,18 @@ extension POImageResource {
     /// The "LightningSlash" asset catalog image resource.
     static let lightningSlash = POImageResource(name: "LightningSlash")
 
+    /// The "Delete" asset catalog image resource.
+    static let delete = POImageResource(name: "Delete")
+
     /// The "Success" asset catalog image resource.
     static let success = POImageResource(name: "Success")
+
+    /// The "Close" asset catalog image resource.
+    static let close = POImageResource(name: "Close")
+
+    /// The "Settings" asset catalog image resource.
+    static let settings = POImageResource(name: "Settings")
+
+    /// The "CreditCard" asset catalog image resource.
+    static let creditCard = POImageResource(name: "CreditCard")
 }
