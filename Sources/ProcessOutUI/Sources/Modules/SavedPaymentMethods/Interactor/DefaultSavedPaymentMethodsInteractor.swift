@@ -35,6 +35,13 @@ final class DefaultSavedPaymentMethodsInteractor:
             return
         }
         let task = Task { [invoicesService] in
+            guard configuration.invoiceRequest.clientSecret != nil else {
+                let failure = POFailure(
+                    message: "Client secret must be set to access customer's payment methods.", code: .generic(.mobile)
+                )
+                setFailureState(failure)
+                return
+            }
             do {
                 let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
                 setStartedState(invoice: invoice)
