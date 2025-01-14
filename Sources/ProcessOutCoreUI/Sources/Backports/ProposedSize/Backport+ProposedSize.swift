@@ -10,7 +10,7 @@ import SwiftUI
 
 extension POBackport where Wrapped: Any {
 
-    public struct ProposedSize: Sendable, BitwiseCopyable, Hashable {
+    public struct ProposedSize: Sendable, Hashable {
 
         public init(_ proposedSize: _ProposedSize) {
             self = unsafeBitCast(proposedSize, to: ProposedSize.self)
@@ -52,3 +52,7 @@ extension POBackport.ProposedSize {
         .init(width: width ?? size.width, height: height ?? size.height)
     }
 }
+
+#if compiler(>=6.0)
+extension POBackport.ProposedSize: BitwiseCopyable { }
+#endif
