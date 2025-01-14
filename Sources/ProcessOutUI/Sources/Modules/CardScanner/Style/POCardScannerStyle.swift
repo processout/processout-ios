@@ -10,7 +10,7 @@ import SwiftUI
 /// A type that specifies the appearance and interaction of all card scanners
 /// within a view hierarchy.
 @MainActor
-public protocol POCardScannerStyle {
+public protocol POCardScannerStyle: Sendable {
 
     /// A view representing the appearance and interaction of a `POCardScannerStyle`.
     associatedtype Body: View

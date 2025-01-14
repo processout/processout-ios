@@ -9,7 +9,7 @@ import SwiftUI
 
 @MainActor
 @preconcurrency
-public protocol POMessageViewStyle {
+public protocol POMessageViewStyle: Sendable {
 
     /// A view that represents the body of a message.
     associatedtype Body: View

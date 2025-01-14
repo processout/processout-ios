@@ -12,7 +12,7 @@ import SwiftUI
 @_spi(PO)
 @MainActor
 @preconcurrency
-public protocol POPickerStyle {
+public protocol POPickerStyle: Sendable {
 
     /// A view representing the appearance and interaction of a `POPicker`.
     associatedtype Body: View

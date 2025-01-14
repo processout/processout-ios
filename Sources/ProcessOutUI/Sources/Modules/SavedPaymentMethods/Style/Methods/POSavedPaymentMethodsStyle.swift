@@ -10,7 +10,7 @@ import SwiftUI
 /// A type that specifies the appearance and interaction of all save payment methods
 /// views within a view hierarchy.
 @MainActor
-public protocol POSavedPaymentMethodsStyle {
+public protocol POSavedPaymentMethodsStyle: Sendable {
 
     /// A view representing the appearance and interaction of a `POSavedPaymentMethodsStyle`.
     associatedtype Body: View
