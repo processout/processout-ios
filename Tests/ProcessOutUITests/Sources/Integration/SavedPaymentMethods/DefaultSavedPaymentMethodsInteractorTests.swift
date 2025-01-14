@@ -175,6 +175,7 @@ struct DefaultSavedPaymentMethodsInteractorTests {
         if case .removing(let currentState) = sut.state {
             _ = await currentState.task.result
             if case .removing(let currentState) = sut.state {
+                #expect(currentState.removedCustomerTokenId == customerTokens[1].id)
                 _ = await currentState.task.result
             } else {
                 Issue.record("Unexpected interactor state.")
