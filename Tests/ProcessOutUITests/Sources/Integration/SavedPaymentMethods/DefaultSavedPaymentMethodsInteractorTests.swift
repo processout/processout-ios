@@ -150,6 +150,44 @@ struct DefaultSavedPaymentMethodsInteractorTests {
     }
 
     @Test
+    func delete_whenAlreadyRemoving_queuesRemoval() async throws {
+        // Given
+        let customer = try await customersService.createCustomer(
+            request: .init()
+        )
+        let customerTokens = [
+            try await createCardCustomerToken(customerId: customer.id),
+            try await createCardCustomerToken(customerId: customer.id)
+        ]
+        let invoice = try await invoicesService.createInvoice(
+            request: .init(name: UUID().uuidString, amount: 1, currency: "USD", customerId: customer.id)
+        )
+        let sut = createInteractor(
+            configuration: .init(invoiceRequest: .init(invoiceId: invoice.id, clientSecret: invoice.clientSecret))
+        )
+        await start(interactor: sut)
+
+        // When
+        sut.delete(customerTokenId: customerTokens[0].id)
+
+        // Then
+        sut.delete(customerTokenId: customerTokens[1].id)
+        if case .removing(let currentState) = sut.state {
+            _ = await currentState.task.result
+            if case .removing(let currentState) = sut.state {
+                _ = await currentState.task.result
+            } else {
+                Issue.record("Unexpected interactor state.")
+            }
+        }
+        if case .started(let currentState) = sut.state {
+            #expect(currentState.paymentMethods.isEmpty)
+        } else {
+            Issue.record("Unexpected interactor state.")
+        }
+    }
+
+    @Test
     func cancel_whenStarting_completesWithFailure() async throws {
         // Given
         let sut = createInteractor(
