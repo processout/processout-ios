@@ -558,17 +558,21 @@ final class DynamicCheckoutDefaultInteractor:
     ) {
         let task = Task { @MainActor in
             do {
-                let saveSource = shouldSavePaymentMethod ?? false
-                let source = if saveSource {
-                    method.configuration.gatewayConfigurationId
+                let source: String, saveSource = shouldSavePaymentMethod ?? false
+                if saveSource {
+                    source = method.configuration.gatewayConfigurationId
                 } else {
-                    // swiftlint:disable:next line_length
-                    try await alternativePaymentsService.authenticate(using: method.configuration.redirectUrl).gatewayToken
+                    let request = POAlternativePaymentAuthenticationRequest(
+                        url: method.configuration.redirectUrl,
+                        prefersEphemeralSession: false
+                    )
+                    source = try await alternativePaymentsService.authenticate(request: request).gatewayToken
                 }
                 try await authorizeInvoice(
                     using: .alternativePayment(method),
                     source: source,
                     saveSource: saveSource,
+                    prefersEphemeralWebAuthenticationSession: false,
                     startedState: startedState
                 )
                 setSuccessState()
@@ -661,10 +665,14 @@ final class DynamicCheckoutDefaultInteractor:
             do {
                 var source = method.configuration.customerTokenId
                 if let redirectUrl = method.configuration.redirectUrl {
-                    source = try await alternativePaymentsService.authenticate(using: redirectUrl).gatewayToken
+                    source = try await alternativePaymentsService.authenticate(request: .init(url: redirectUrl, prefersEphemeralSession: method.type == .card)).gatewayToken
                 }
                 try await authorizeInvoice(
-                    using: .customerToken(method), source: source, saveSource: false, startedState: startedState
+                    using: .customerToken(method),
+                    source: source,
+                    saveSource: false,
+                    prefersEphemeralWebAuthenticationSession: method.type == .card,
+                    startedState: startedState
                 )
                 setSuccessState()
             } catch {
@@ -803,6 +811,7 @@ final class DynamicCheckoutDefaultInteractor:
         using paymentMethod: PODynamicCheckoutPaymentMethod,
         source: String,
         saveSource: Bool,
+        prefersEphemeralWebAuthenticationSession: Bool,
         startedState: State.Started
     ) async throws {
         guard let delegate else {
@@ -813,7 +822,8 @@ final class DynamicCheckoutDefaultInteractor:
             source: source,
             saveSource: saveSource,
             allowFallbackToSale: true,
-            clientSecret: startedState.clientSecret
+            clientSecret: startedState.clientSecret,
+            prefersEphemeralWebAuthenticationSession: prefersEphemeralWebAuthenticationSession
         )
         let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request, using: paymentMethod)
         try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
@@ -845,6 +855,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
             using: currentState.paymentMethod,
             source: card.id,
             saveSource: save,
+            prefersEphemeralWebAuthenticationSession: true,
             startedState: currentState.snapshot
         )
     }
