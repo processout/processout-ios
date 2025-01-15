@@ -10,7 +10,7 @@ import SwiftUI
 /// Defines input control style in both normal and error states.
 @MainActor
 @preconcurrency
-public struct POInputStyle: Sendable {
+public struct POInputStyle {
 
     /// Style for normal state.
     public let normal: POInputStateStyle

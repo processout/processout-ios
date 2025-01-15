@@ -3,6 +3,16 @@
     {
       "filename" : "CreditCard.pdf",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "CreditCard-Dark.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

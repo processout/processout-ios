@@ -106,7 +106,7 @@ final class DefaultWebAuthenticationSession:
 }
 
 @MainActor
-private final class WebAuthenticationOperationProxy: Sendable {
+private final class WebAuthenticationOperationProxy {
 
     func set(session: ASWebAuthenticationSession, continuation: CheckedContinuation<URL, Error>) {
         switch state {
@@ -144,10 +144,10 @@ private final class WebAuthenticationOperationProxy: Sendable {
     // MARK: - Private Nested Types
 
     @MainActor
-    private enum State: Sendable {
+    private enum State {
 
         @MainActor
-        struct Processing: Sendable { // swiftlint:disable:this nesting
+        struct Processing { // swiftlint:disable:this nesting
 
             /// Continuation.
             let continuation: CheckedContinuation<URL, Error>

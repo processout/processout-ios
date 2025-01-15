@@ -11,7 +11,7 @@ import PassKit
 @available(iOS 14, *)
 @MainActor
 @preconcurrency
-public struct POPassKitPaymentButtonStyle: Sendable {
+public struct POPassKitPaymentButtonStyle {
 
     /// Native style value.
     public let style: PKPaymentButtonStyle

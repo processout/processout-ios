@@ -195,7 +195,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         configuration: PODynamicCheckoutConfiguration.ExpressCheckoutSettingsButton?
     ) -> POButtonViewModel? {
         let resolvedConfiguration = configuration?.resolved(
-            defaultTitle: nil, icon: Image(poResource: .settings)
+            defaultTitle: nil, icon: Image(poResource: .settings).resizable().renderingMode(.template)
         )
         let containsCustomerTokenPaymentMethod = paymentMethods.contains { paymentMethod in
             if case .customerToken(let paymentMethod) = paymentMethod {
@@ -620,7 +620,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             isEnabled: isEnabled,
             role: .cancel,
             confirmation: confirmation.map { configuration in
-                .cancel(with: configuration) { [weak self] in self?.interactor.didRequestCancelConfirmation() }
+                .paymentCancel(with: configuration) { [weak self] in self?.interactor.didRequestCancelConfirmation() }
             },
             action: { [weak self] in
                 self?.interactor.cancel()

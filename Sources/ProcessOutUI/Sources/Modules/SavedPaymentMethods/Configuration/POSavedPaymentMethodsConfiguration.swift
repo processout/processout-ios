@@ -10,7 +10,7 @@ import ProcessOut
 
 /// Saved payment methods configuration.
 @MainActor
-public struct POSavedPaymentMethodsConfiguration: Sendable {
+public struct POSavedPaymentMethodsConfiguration {
 
     @MainActor
     public struct PaymentMethod {
@@ -47,7 +47,7 @@ public struct POSavedPaymentMethodsConfiguration: Sendable {
     }
 
     @MainActor
-    public struct CancelButton: Sendable {
+    public struct CancelButton {
 
         /// Cancel button title. Use `nil` for default title.
         public let title: String?

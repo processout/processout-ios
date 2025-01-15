@@ -14,12 +14,12 @@ import ProcessOut
 /// A configuration object that defines how a native alternative payment view content.
 @MainActor
 @preconcurrency
-public struct PONativeAlternativePaymentConfiguration: Sendable {
+public struct PONativeAlternativePaymentConfiguration {
 
     /// Payment confirmation configuration.
     @MainActor
     @preconcurrency
-    public struct Confirmation: Sendable {
+    public struct Confirmation {
 
         /// Boolean value that specifies whether module should wait for payment confirmation from PSP or will
         /// complete right after all user's input is submitted. Default value is `true`.
@@ -68,7 +68,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     /// Payment success configuration.
     @MainActor
     @preconcurrency
-    public struct Success: Sendable {
+    public struct Success {
 
         /// Custom success message to display user when payment completes.
         public let message: String?
@@ -87,7 +87,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     /// Configuration options for barcode interaction.
     @MainActor
     @preconcurrency
-    public struct BarcodeInteraction: Sendable {
+    public struct BarcodeInteraction {
 
         /// Button title.
         public let saveButton: SubmitButton
@@ -113,7 +113,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     /// Button configuration.
     @MainActor
     @preconcurrency
-    public struct SubmitButton: Sendable {
+    public struct SubmitButton {
 
         /// Button title, such as "Pay". Pass `nil` to use default value.
         public let title: String?
@@ -130,7 +130,7 @@ public struct PONativeAlternativePaymentConfiguration: Sendable {
     /// Cancel button configuration.
     @MainActor
     @preconcurrency
-    public struct CancelButton: Sendable {
+    public struct CancelButton {
 
         /// Button title. Pass `nil` title to use default value.
         public let title: String?

@@ -11,10 +11,10 @@ import SwiftUI
 /// Alternative payment specific dynamic checkout configuration.
 @_spi(PO)
 @MainActor
-public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
+public struct PODynamicCheckoutAlternativePaymentConfiguration {
 
     @MainActor
-    public struct PaymentConfirmation: Sendable {
+    public struct PaymentConfirmation {
 
         /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
         /// Default timeout is 3 minutes while maximum value is 15 minutes.
@@ -50,7 +50,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
 
     /// Configuration options for barcode interaction.
     @MainActor
-    public struct BarcodeInteraction: Sendable {
+    public struct BarcodeInteraction {
 
         /// Save button configuration.
         public let saveButton: PODynamicCheckoutConfiguration.SubmitButton
@@ -74,7 +74,7 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration: Sendable {
     }
 
     @MainActor
-    public struct CancelButton: Sendable {
+    public struct CancelButton {
 
         /// Cancel button title. Use `nil` for default title.
         public let title: String?
