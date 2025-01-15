@@ -1,6 +1,5 @@
 parent_config: ../.swiftlint.yml
 included:
   - Example/Sources
-  - ExampleUiTests/Sources
 excluded:
   - Example/Sources/Generated

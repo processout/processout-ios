@@ -11,11 +11,11 @@ import ProcessOut
 /// Card specific dynamic checkout configuration.
 @_spi(PO)
 @MainActor
-public struct PODynamicCheckoutCardConfiguration: Sendable {
+public struct PODynamicCheckoutCardConfiguration {
 
     /// Billing address collection configuration.
     @MainActor
-    public struct BillingAddress: Sendable {
+    public struct BillingAddress {
 
         /// Default address information.
         public let defaultAddress: POContact?
@@ -35,7 +35,7 @@ public struct PODynamicCheckoutCardConfiguration: Sendable {
 
     /// Text field configuration.
     @MainActor
-    public struct TextField: Sendable {
+    public struct TextField {
 
         /// Text providing users with guidance on what to type into the text field.
         public let prompt: String?

@@ -48,6 +48,10 @@ public final class ProcessOut: @unchecked Sendable {
 
     // MARK: - SPI
 
+    /// Customer service.
+    @_spi(PO)
+    public let customers: POCustomersService
+
     /// Images repository.
     @_spi(PO)
     public let images: POImagesRepository = UrlSessionImagesRepository(session: .shared)
@@ -150,6 +154,9 @@ public final class ProcessOut: @unchecked Sendable {
             customerActionsService: customerActionsService,
             eventEmitter: eventEmitter,
             logger: serviceLogger
+        )
+        customers = DefaultCustomersService(
+            repository: HttpCustomersRepository(connector: httpConnector)
         )
         logger = Self.createLogger(
             for: Constants.applicationLoggerCategory,

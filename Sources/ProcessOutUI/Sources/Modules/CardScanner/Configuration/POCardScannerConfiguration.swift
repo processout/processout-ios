@@ -9,11 +9,11 @@ import SwiftUI
 
 /// Card scanner view configuration.
 @MainActor
-public struct POCardScannerConfiguration: Sendable {
+public struct POCardScannerConfiguration {
 
     /// Cancel button configuration.
     @MainActor
-    public struct CancelButton: Sendable {
+    public struct CancelButton {
 
         /// Button title. Pass `nil` title to use default value.
         public let title: String?

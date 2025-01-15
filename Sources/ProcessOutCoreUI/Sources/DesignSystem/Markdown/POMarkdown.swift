@@ -17,13 +17,7 @@ public struct POMarkdown: View {
     }
 
     public var body: some View {
-        if #unavailable(iOS 16) {
-            HorizontalSizeReader { width in
-                TextViewRepresentable(string: string, preferredWidth: width)
-            }
-        } else {
-            TextViewRepresentable(string: string, preferredWidth: 0)
-        }
+        TextViewRepresentable(string: string)
     }
 
     // MARK: - Private Properties
@@ -38,11 +32,6 @@ private struct TextViewRepresentable: UIViewRepresentable {
     /// The text that the view displays.
     let string: String
 
-    /// The preferred maximum width, in points.
-    /// - NOTE: value of this property is ignored when iOS 16 is available.
-    @available(iOS, deprecated: 16)
-    let preferredWidth: CGFloat
-
     // MARK: - UIViewRepresentable
 
     func makeUIView(context: Context) -> TextView {
@@ -55,19 +44,19 @@ private struct TextViewRepresentable: UIViewRepresentable {
         textView.isScrollEnabled = false
         textView.isEditable = false
         textView.isSelectable = true
-        textView.setContentHuggingPriority(.required, for: .vertical)
-        textView.setContentCompressionResistancePriority(.required, for: .vertical)
-        textView.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        textView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         return textView
+    }
+
+    // swiftlint:disable:next identifier_name
+    func _overrideSizeThatFits(_ size: inout CGSize, in proposedSize: _ProposedSize, uiView: UIViewType) {
+        let proposal = POBackport<Any>.ProposedSize(proposedSize).replacingUnspecifiedDimensions(by: .zero)
+        size = uiView.attributedText.sizeThatFits(proposedSize: proposal)
     }
 
     @available(iOS 16, *)
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: TextView, context: Context) -> CGSize? {
-        if let width = proposal.width {
-            return uiView.attributedText.sizeThatFits(width: width)
-        }
-        return uiView.attributedText.sizeThatFits(height: proposal.height ?? 0)
+        let proposal = proposal.replacingUnspecifiedDimensions(by: .zero)
+        return uiView.attributedText.sizeThatFits(proposedSize: proposal)
     }
 
     func updateUIView(_ textView: TextView, context: Context) {
@@ -81,7 +70,6 @@ private struct TextViewRepresentable: UIViewRepresentable {
             lineBreakMode: .byWordWrapping
         )
         textView.attributedText = builder.build(markdown: string)
-        textView.preferredWidth = preferredWidth
     }
 
     // MARK: - Private Properties
@@ -104,52 +92,19 @@ private struct TextViewRepresentable: UIViewRepresentable {
 
 private final class TextView: UITextView {
 
-    /// - NOTE: value of this property is ignored when iOS 16 is available.
-    var preferredWidth: CGFloat = 0 {
-        didSet { invalidateIntrinsicContentSize() }
-    }
-
-    // swiftlint:disable:next implicitly_unwrapped_optional
-    override var attributedText: NSAttributedString! {
-        didSet { invalidateIntrinsicContentSize() }
-    }
-
     override var intrinsicContentSize: CGSize {
-        if #unavailable(iOS 16) {
-            // todo(andrii-vysotskyi): decide if size should be cached
-            return attributedText.sizeThatFits(width: preferredWidth)
-        }
-        return super.intrinsicContentSize
+        CGSize(width: UIView.noIntrinsicMetric, height: UIView.noIntrinsicMetric)
     }
 }
 
 extension NSAttributedString {
 
-    // swiftlint:disable:next strict_fileprivate
-    fileprivate func sizeThatFits(width: CGFloat) -> CGSize {
-        let proposedSize = CGSize(width: width, height: .greatestFiniteMagnitude)
-        let boundingRect = boundingRect(
-            with: proposedSize, options: boundingRectOptions, context: nil
-        )
-        return CGSize(width: max(ceil(boundingRect.width), width), height: ceil(boundingRect.height))
-    }
-
-    // swiftlint:disable:next strict_fileprivate
-    fileprivate func sizeThatFits(height: CGFloat) -> CGSize {
-        let proposedSize = CGSize(width: .greatestFiniteMagnitude, height: height)
-        let boundingRect = boundingRect(
-            with: proposedSize, options: boundingRectOptions, context: nil
-        )
-        return CGSize(width: ceil(boundingRect.width), height: max(ceil(boundingRect.height), height))
-    }
-
-    // MARK: -
-
-    private var boundingRectOptions: NSStringDrawingOptions {
-        var options: NSStringDrawingOptions = [.usesLineFragmentOrigin]
+    func sizeThatFits(proposedSize: CGSize) -> CGSize {
+        var boundingRectOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin]
         if #available(iOS 16, *) {
-            options.insert(.usesFontLeading)
+            boundingRectOptions.insert(.usesFontLeading)
         }
-        return options
+        let boundingRect = boundingRect(with: proposedSize, options: boundingRectOptions, context: nil)
+        return CGSize(width: ceil(boundingRect.width), height: ceil(boundingRect.height))
     }
 }

@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 07.07.2023.
 //
 
+import Foundation
+import os
 import Testing
 @testable @_spi(PO) import ProcessOut
 
@@ -16,6 +18,8 @@ struct CustomerTokensServiceTests {
         )
         sut = processOut.customerTokens
         cardsService = processOut.cards
+        invoicesService = processOut.invoices
+        eventEmitter = processOut.eventEmitter
     }
 
     // MARK: - Tests
@@ -76,10 +80,40 @@ struct CustomerTokensServiceTests {
         #expect(threeDSService.authenticationRequestParametersCallsCount == 1)
     }
 
+    @Test
+    func deleteCustomerToken_sendsEvent() async throws {
+        // Given
+        let invoice = try await invoicesService.createInvoice(
+            request: .init(name: UUID().uuidString, amount: 1, currency: "USD", customerId: Constants.customerId)
+        )
+        let token = try await createToken(verify: false)
+        let didReceiveEvent = OSAllocatedUnfairLock(uncheckedState: false)
+
+        // When
+        let eventSubscription = eventEmitter.on(POCustomerTokenDeletedEvent.self) { event in
+            #expect(event.customerId == Constants.customerId)
+            #expect(event.tokenId == token.id)
+            didReceiveEvent.withLock { $0 = true }
+            return true
+        }
+        let request = PODeleteCustomerTokenRequest(
+            customerId: token.customerId,
+            tokenId: token.id,
+            clientSecret: invoice.clientSecret ?? ""
+        )
+        try await sut.deleteCustomerToken(request: request)
+
+        // Then
+        didReceiveEvent.withLock { #expect($0 == true) }
+        _ = eventSubscription
+    }
+
     // MARK: - Private Properties
 
     private let sut: POCustomerTokensService
     private let cardsService: POCardsService
+    private let invoicesService: POInvoicesService
+    private let eventEmitter: POEventEmitter
 
     // MARK: - Private Methods
 

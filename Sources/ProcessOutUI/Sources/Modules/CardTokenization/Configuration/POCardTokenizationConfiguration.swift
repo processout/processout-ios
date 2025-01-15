@@ -15,12 +15,12 @@ import ProcessOut
 /// Use `nil` as a value for a nullable property to indicate that default value should be used.
 @MainActor
 @preconcurrency
-public struct POCardTokenizationConfiguration: Sendable {
+public struct POCardTokenizationConfiguration {
 
     /// Billing address collection configuration.
     @MainActor
     @preconcurrency
-    public struct BillingAddress: Sendable {
+    public struct BillingAddress {
 
         @available(*, deprecated, message: "Use POBillingAddressCollectionMode directly.")
         public typealias CollectionMode = POBillingAddressCollectionMode
@@ -60,7 +60,7 @@ public struct POCardTokenizationConfiguration: Sendable {
 
         /// Card scan button configuration.
         @MainActor
-        public struct ScanButton: Sendable {
+        public struct ScanButton {
 
             /// Button title, such as "Scan card". Pass `nil` title to use default value.
             public let title: String?
@@ -89,7 +89,7 @@ public struct POCardTokenizationConfiguration: Sendable {
     /// Text field configuration.
     @MainActor
     @preconcurrency
-    public struct TextField: Sendable {
+    public struct TextField {
 
         /// Text providing users with guidance on what to type into the text field.
         public let prompt: String?
@@ -106,7 +106,7 @@ public struct POCardTokenizationConfiguration: Sendable {
     /// Submit button configuration.
     @MainActor
     @preconcurrency
-    public struct SubmitButton: Sendable {
+    public struct SubmitButton {
 
         /// Button title, such as "Pay". Pass `nil` title to use default value.
         public let title: String?
@@ -123,7 +123,7 @@ public struct POCardTokenizationConfiguration: Sendable {
     /// Cancel button configuration.
     @MainActor
     @preconcurrency
-    public struct CancelButton: Sendable {
+    public struct CancelButton {
 
         /// Button title. Pass `nil` title to use default value.
         public let title: String?

@@ -686,31 +686,31 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إلغاء الدفع"
+            "value" : "إلغاء"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancel payment"
+            "value" : "Cancel"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Annuler le paiement"
+            "value" : "Annuler"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anuluj płatność"
+            "value" : "Anuluj"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelar pagamento"
+            "value" : "Cancelar"
           }
         }
       }
@@ -720,31 +720,31 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إلغاء الدفع؟"
+            "value" : "إلغاء؟"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancel payment?"
+            "value" : "Cancel?"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Annuler le paiement ?"
+            "value" : "Annuler ?"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anulować płatność?"
+            "value" : "Anulować?"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelar pagamento?"
+            "value" : "Cancelar?"
           }
         }
       }
@@ -2352,6 +2352,18 @@
         "ar" : {
           "variations" : {
             "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "إن الطول غير صالح، الرجاء التقيد بـ %d حرفًا."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "إن الطول غير صالح، الرجاء التقيد بـ %d حرفًا."
+                }
+              },
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -2359,6 +2371,18 @@
                 }
               },
               "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "إن الطول غير صالح، الرجاء التقيد بـ %d حرفًا."
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "إن الطول غير صالح، الرجاء التقيد بـ %d حرفًا."
+                }
+              },
+              "zero" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "إن الطول غير صالح، الرجاء التقيد بـ %d حرفًا."
@@ -2388,6 +2412,18 @@
         "fr" : {
           "variations" : {
             "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Longueur incorrecte, %d caractères sont attendus."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Longueur incorrecte, %d caractères sont attendus."
+                }
+              },
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -2399,6 +2435,18 @@
                   "state" : "translated",
                   "value" : "Longueur incorrecte, %d caractères sont attendus."
                 }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Longueur incorrecte, %d caractères sont attendus."
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Longueur incorrecte, %d caractères sont attendus."
+                }
               }
             }
           }
@@ -2406,6 +2454,18 @@
         "pl" : {
           "variations" : {
             "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nieprawidłowa długość. Oczekiwano %d znaków."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nieprawidłowa długość. Oczekiwano %d znaków."
+                }
+              },
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -2417,6 +2477,18 @@
                   "state" : "translated",
                   "value" : "Nieprawidłowa długość. Oczekiwano %d znaków."
                 }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nieprawidłowa długość. Oczekiwano %d znaków."
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nieprawidłowa długość. Oczekiwano %d znaków."
+                }
               }
             }
           }
@@ -2424,6 +2496,18 @@
         "pt-PT" : {
           "variations" : {
             "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Quantidade de caracteres incorreta, espera-se %d caracteres."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Quantidade de caracteres incorreta, espera-se %d caracteres."
+                }
+              },
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
@@ -2431,6 +2515,18 @@
                 }
               },
               "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Quantidade de caracteres incorreta, espera-se %d caracteres."
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Quantidade de caracteres incorreta, espera-se %d caracteres."
+                }
+              },
+              "zero" : {
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "Quantidade de caracteres incorreta, espera-se %d caracteres."
@@ -2777,6 +2873,108 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pagar com %@"
+          }
+        }
+      }
+    },
+    "payment-cancel-confirmation.cancel" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ليس الآن"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas maintenant"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie teraz"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agora não"
+          }
+        }
+      }
+    },
+    "payment-cancel-confirmation.confirm" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء الدفع"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel payment"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler le paiement"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anuluj płatność"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar pagamento"
+          }
+        }
+      }
+    },
+    "payment-cancel-confirmation.title" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء الدفع؟"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel payment?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler le paiement ?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anulować płatność?"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar pagamento?"
           }
         }
       }

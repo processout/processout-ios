@@ -124,7 +124,7 @@ final class DefaultCardScannerViewModel: ViewModel {
             id: "cancel-button",
             title: configuration.title ?? String(resource: .CardScanner.cancelButton),
             icon: configuration.icon,
-            confirmation: configuration.confirmation.map { .cancel(with: $0, onAppear: nil) },
+            confirmation: configuration.confirmation.map { .cancel(with: $0) },
             action: { [weak self] in
                 self?.interactor.cancel()
             }

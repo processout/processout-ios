@@ -6,4 +6,5 @@ set -euo pipefail
 export PATH="/opt/homebrew/bin:$PATH"
 
 # Lint
-swiftlint lint --strict
+# todo(andrii-vysotskyi): reenable when disable paths are fixed https://github.com/realm/SwiftLint/issues/5953
+# swiftlint lint --strict

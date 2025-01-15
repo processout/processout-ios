@@ -12,7 +12,7 @@ import ProcessOut
 /// Dynamic checkout configuration.
 @_spi(PO)
 @MainActor
-public struct PODynamicCheckoutConfiguration: Sendable {
+public struct PODynamicCheckoutConfiguration {
 
     @MainActor
     public struct ExpressCheckout {
@@ -30,7 +30,7 @@ public struct PODynamicCheckoutConfiguration: Sendable {
     }
 
     @MainActor
-    public struct ExpressCheckoutSettingsButton: Sendable {
+    public struct ExpressCheckoutSettingsButton {
 
         /// Button title, such as "Settings". Pass `nil` title to use default value.
         public let title: String?
@@ -46,7 +46,7 @@ public struct PODynamicCheckoutConfiguration: Sendable {
 
     /// Payment success configuration.
     @MainActor
-    public struct PaymentSuccess: Sendable {
+    public struct PaymentSuccess {
 
         /// Custom success message to display user when payment completes.
         public let message: String?
@@ -63,7 +63,7 @@ public struct PODynamicCheckoutConfiguration: Sendable {
 
     /// Submit button configuration.
     @MainActor
-    public struct SubmitButton: Sendable {
+    public struct SubmitButton {
 
         /// Button title, such as "Pay". Pass `nil` title to use default value.
         public let title: String?
@@ -79,7 +79,7 @@ public struct PODynamicCheckoutConfiguration: Sendable {
 
     /// Cancel button configuration.
     @MainActor
-    public struct CancelButton: Sendable {
+    public struct CancelButton {
 
         /// Button title. Pass `nil` title to use default value.
         public let title: String?
