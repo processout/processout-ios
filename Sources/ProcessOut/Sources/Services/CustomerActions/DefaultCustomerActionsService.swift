@@ -26,9 +26,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     // MARK: - CustomerActionsService
 
-    func handle(
-        action: _CustomerAction, threeDSService: PO3DS2Service, webAuthenticationCallback: POWebAuthenticationCallback?
-    ) async throws -> String {
+    func handle(request: CustomerActionRequest, threeDSService: PO3DS2Service) async throws -> String {
         do {
             try await semaphore.waitUnlessCancelled()
         } catch {
@@ -38,15 +36,25 @@ final class DefaultCustomerActionsService: CustomerActionsService {
             semaphore.signal()
         }
         do {
-            switch action.type {
+            switch request.customerAction.type {
             case .fingerprintMobile:
-                return try await fingerprint(encodedConfiguration: action.value, threeDSService: threeDSService)
+                return try await fingerprint(
+                    encodedConfiguration: request.customerAction.value, threeDSService: threeDSService
+                )
             case .challengeMobile:
-                return try await challenge(encodedChallenge: action.value, threeDSService: threeDSService)
+                return try await challenge(
+                    encodedChallenge: request.customerAction.value, threeDSService: threeDSService
+                )
             case .fingerprint:
-                return try await fingerprint(url: action.value, callback: webAuthenticationCallback)
+                return try await fingerprint(
+                    url: request.customerAction.value, callback: request.webAuthenticationCallback
+                )
             case .redirect, .url:
-                return try await redirect(url: action.value, callback: webAuthenticationCallback)
+                return try await redirect(
+                    url: request.customerAction.value,
+                    callback: request.webAuthenticationCallback,
+                    prefersEphemeralSession: request.prefersEphemeralWebAuthenticationSession
+                )
             }
         } catch let error as POFailure {
             throw error
@@ -113,7 +121,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
                 message: "Unable to complete device fingerprinting within the expected time.", code: .timeout(.mobile)
             )
             return try await withTimeout(Constants.webFingerprintTimeout, error: timeoutError) {
-                try await self.redirect(url: url.absoluteString, callback: callback)
+                try await self.redirect(url: url.absoluteString, callback: callback, prefersEphemeralSession: true)
             }
         } catch let failure as POFailure where failure.code == .timeout(.mobile) {
             // Fingerprinting timeout is treated differently from other errors.
@@ -122,12 +130,16 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         }
     }
 
-    private func redirect(url: String, callback: POWebAuthenticationCallback?) async throws -> String {
+    private func redirect(
+        url: String, callback: POWebAuthenticationCallback?, prefersEphemeralSession: Bool
+    ) async throws -> String {
         guard let url = URL(string: url) else {
             logger.error("Unable to create URL from string: \(url).")
             throw POFailure(message: "Can't process customer action.", code: .internal(.mobile), underlyingError: nil)
         }
-        let returnUrl = try await self.webSession.authenticate(using: .init(url: url, callback: callback))
+        let returnUrl = try await self.webSession.authenticate(
+            using: .init(url: url, callback: callback, prefersEphemeralSession: prefersEphemeralSession)
+        )
         let queryItems = URLComponents(string: returnUrl.absoluteString)?.queryItems
         return queryItems?.first { $0.name == "token" }?.value ?? ""
     }
