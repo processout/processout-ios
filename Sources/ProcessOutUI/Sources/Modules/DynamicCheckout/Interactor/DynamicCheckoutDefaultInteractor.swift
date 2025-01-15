@@ -92,7 +92,9 @@ final class DynamicCheckoutDefaultInteractor:
         case .started:
             select(methodId: methodId, shouldStart: true)
         case .selected(let currentState):
-            let shouldSave = currentState.paymentMethod.id == methodId && currentState.shouldSavePaymentMethod == true
+            let shouldSave = currentState.shouldSavePaymentMethod.map { shouldSave in
+                currentState.paymentMethod.id == methodId && shouldSave
+            }
             continuePaymentProcessingUnchecked(
                 paymentMethodId: methodId, shouldSavePaymentMethod: shouldSave, startedState: currentState.snapshot
             )
