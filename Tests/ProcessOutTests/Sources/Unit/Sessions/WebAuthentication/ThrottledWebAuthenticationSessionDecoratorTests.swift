@@ -25,10 +25,14 @@ struct ThrottledWebAuthenticationSessionDecoratorTests {
 
         // When
         Task {
-            _ = try await sut.authenticate(using: .init(url: URL(string: "request1.com")!, callback: nil))
+            _ = try await sut.authenticate(
+                using: .init(url: URL(string: "request1.com")!, callback: nil, prefersEphemeralSession: true)
+            )
         }
         Task {
-            _ = try await sut.authenticate(using: .init(url: URL(string: "request2.com")!, callback: nil))
+            _ = try await sut.authenticate(
+                using: .init(url: URL(string: "request2.com")!, callback: nil, prefersEphemeralSession: true)
+            )
         }
         try await Task.sleep(for: .seconds(1))
 
@@ -55,7 +59,11 @@ struct ThrottledWebAuthenticationSessionDecoratorTests {
         let sut = ThrottledWebAuthenticationSessionDecorator(session: mockSession)
 
         // When
-        _ = try await sut.authenticate(using: .init(url: URL(string: "request1.com")!, callback: nil))
-        _ = try await sut.authenticate(using: .init(url: URL(string: "request2.com")!, callback: nil))
+        _ = try await sut.authenticate(
+            using: .init(url: URL(string: "request1.com")!, callback: nil, prefersEphemeralSession: true)
+        )
+        _ = try await sut.authenticate(
+            using: .init(url: URL(string: "request2.com")!, callback: nil, prefersEphemeralSession: true)
+        )
     }
 }
