@@ -14,4 +14,8 @@ struct WebAuthenticationRequest {
 
     /// Callback.
     let callback: POWebAuthenticationCallback?
+
+    /// A boolean value that indicates whether the session should ask the browser for
+    /// a private authentication session.
+    let prefersEphemeralSession: Bool
 }
