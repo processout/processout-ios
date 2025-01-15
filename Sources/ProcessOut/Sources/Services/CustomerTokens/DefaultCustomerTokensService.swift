@@ -59,10 +59,13 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
         if let customerAction = response.customerAction {
             let newRequest: POAssignCustomerTokenRequest
             do {
+                let customerActionRequest = CustomerActionRequest(
+                    customerAction: customerAction,
+                    webAuthenticationCallback: request.webAuthenticationCallback,
+                    prefersEphemeralWebAuthenticationSession: true
+                )
                 let newSource = try await customerActionsService.handle(
-                    action: customerAction,
-                    threeDSService: threeDSService,
-                    webAuthenticationCallback: request.webAuthenticationCallback
+                    request: customerActionRequest, threeDSService: threeDSService
                 )
                 newRequest = request.replacing(source: newSource)
             } catch {
