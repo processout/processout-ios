@@ -10,6 +10,7 @@ import Foundation
 /// Alternative payment raw authentication request.
 public struct POAlternativePaymentAuthenticationRequest: Sendable {
 
+    /// URL where user should be redirected to perform authentication.
     public let url: URL
 
     /// An object used to evaluate navigation events in a web authentication session.
