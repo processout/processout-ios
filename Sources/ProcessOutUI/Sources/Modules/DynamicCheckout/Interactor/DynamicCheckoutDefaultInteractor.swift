@@ -665,7 +665,11 @@ final class DynamicCheckoutDefaultInteractor:
             do {
                 var source = method.configuration.customerTokenId
                 if let redirectUrl = method.configuration.redirectUrl {
-                    source = try await alternativePaymentsService.authenticate(request: .init(url: redirectUrl, prefersEphemeralSession: method.type == .card)).gatewayToken
+                    let request = POAlternativePaymentAuthenticationRequest(
+                        url: redirectUrl,
+                        prefersEphemeralSession: method.type == .card
+                    )
+                    source = try await alternativePaymentsService.authenticate(request: request).gatewayToken
                 }
                 try await authorizeInvoice(
                     using: .customerToken(method),
