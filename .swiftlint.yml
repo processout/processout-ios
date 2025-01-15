@@ -91,5 +91,6 @@ opt_in_rules:
 disabled_rules:
   - todo
   - optional_data_string_conversion
+  - redundant_sendable # todo(andrii-vysotskyi): reenable when https://github.com/realm/SwiftLint/issues/5958 is released
 
 reporter: "xcode"
