@@ -135,6 +135,7 @@ extension POColorResource {
     }
 
     /// The "Input" asset catalog resource namespace.
+    @available(*, deprecated)
     public enum Input {
 
         /// The "Input/Background" asset catalog resource namespace.
@@ -168,6 +169,7 @@ extension POColorResource {
     }
 
     /// The "Surface" asset catalog resource namespace.
+    @available(*, deprecated)
     public enum Surface {
 
         /// The "Surface/Default" asset catalog color resource.
@@ -183,23 +185,26 @@ extension POColorResource {
     /// The "Text" asset catalog resource namespace.
     public enum Text {
 
-        /// The "Text/Disabled" asset catalog color resource.
-        public static let disabled = POColorResource(name: "Text/Disabled")
+        /// The "Text/Primary" asset catalog color resource.
+        public static let primary = POColorResource(name: "Text/Primary")
 
-        /// The "Text/Error" asset catalog color resource.
-        public static let error = POColorResource(name: "Text/Error")
+        /// The "Text/Secondary" asset catalog color resource.
+        public static let secondary = POColorResource(name: "Text/Secondary")
 
-        /// The "Text/Muted" asset catalog color resource.
-        public static let muted = POColorResource(name: "Text/Muted")
+        /// The "Text/Tertiary" asset catalog color resource.
+        public static let tertiary = POColorResource(name: "Text/Tertiary")
 
         /// The "Text/Inverse" asset catalog color resource.
         public static let inverse = POColorResource(name: "Text/Inverse")
 
-        /// The "Text/Primary" asset catalog color resource.
-        public static let primary = POColorResource(name: "Text/Primary")
+        /// The "Text/Disabled" asset catalog color resource.
+        public static let disabled = POColorResource(name: "Text/Disabled")
 
         /// The "Text/Success" asset catalog color resource.
         public static let success = POColorResource(name: "Text/Success")
+
+        /// The "Text/Error" asset catalog color resource.
+        public static let error = POColorResource(name: "Text/Error")
     }
 }
 
