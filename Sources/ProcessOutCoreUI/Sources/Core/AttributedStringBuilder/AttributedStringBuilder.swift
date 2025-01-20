@@ -61,6 +61,9 @@ struct AttributedStringBuilder {
         let lineHeightMultiple = typography.lineHeight / typography.font.lineHeight
         attributes[.font] = font
         attributes[.baselineOffset] = Self.baselineOffset(font: font, lineHeightMultiple: lineHeightMultiple)
+        if #available(iOS 16, *) {
+            attributes[.kern] = typography.kerning
+        }
         attributes[.foregroundColor] = resolvedForegroundColor()
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.maximumLineHeight = font.lineHeight * lineHeightMultiple

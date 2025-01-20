@@ -16,51 +16,50 @@ extension View {
     @available(iOS 14, *)
     @MainActor
     public func textStyle(_ style: POTextStyle, addPadding: Bool = true) -> some View {
-        modifier(ContentModifier(style: style, addPadding: addPadding))
-    }
-}
-
-@available(iOS 14, *)
-extension EnvironmentValues {
-
-    var textStyle: POTextStyle {
-        get { self[Key.self] }
-        set { self[Key.self] = newValue }
+        typography(style.typography, addPadding: addPadding)
+            .foregroundColor(style.color)
+            .environment(\.textStyle, style)
     }
 
-    // MARK: - Private Nested Types
-
-    private struct Key: EnvironmentKey {
-        static let defaultValue = POTextStyle(color: Color(poResource: .Text.primary), typography: .body2)
+    @_spi(PO)
+    @available(iOS 14, *)
+    @MainActor
+    public func typography(_ typography: POTypography, addPadding: Bool = true) -> some View {
+        modifier(TypographyModifier(typography: typography, addPadding: addPadding))
     }
 }
 
 @available(iOS 14, *)
 @MainActor
-private struct ContentModifier: ViewModifier {
+private struct TypographyModifier: ViewModifier {
 
-    init(style: POTextStyle, addPadding: Bool) {
-        self.style = style
+    init(typography: POTypography, addPadding: Bool) {
+        self.typography = typography
         self.addPadding = addPadding
-        _multiplier = .init(wrappedValue: 1, relativeTo: style.typography.textStyle)
+        _multiplier = .init(wrappedValue: 1, relativeTo: typography.textStyle)
     }
 
+    // MARK: - ViewModifier
+
     func body(content: Content) -> some View {
-        let font = style.typography.font
-            .addingFeatures(fontFeatures)
-            .withSize(style.typography.font.pointSize * multiplier)
-        let lineSpacing = (style.typography.lineHeight / style.typography.font.lineHeight - 1) * font.lineHeight
+        let resolvedFont = self.resolvedFont()
+        let lineSpacing = (typography.lineHeight / typography.font.lineHeight - 1) * resolvedFont.lineHeight
         return content
-            .font(Font(font))
+            .font(Font(resolvedFont))
             .lineSpacing(lineSpacing)
+            .modify { content in
+                if #available(iOS 16, *) {
+                    content.kerning(typography.kerning)
+                } else {
+                    content
+                }
+            }
             .padding(.vertical, addPadding ? lineSpacing / 2 : 0)
-            .foregroundColor(style.color)
-            .environment(\.textStyle, style)
     }
 
     // MARK: - Private Properties
 
-    private let style: POTextStyle
+    private let typography: POTypography
     private let addPadding: Bool
 
     @POBackport.ScaledMetric
@@ -68,4 +67,10 @@ private struct ContentModifier: ViewModifier {
 
     @Environment(\.fontFeatures)
     private var fontFeatures
+
+    // MARK: - Private Methods
+
+    private func resolvedFont() -> UIFont {
+        typography.font.addingFeatures(fontFeatures).withSize(typography.font.pointSize * multiplier)
+    }
 }
