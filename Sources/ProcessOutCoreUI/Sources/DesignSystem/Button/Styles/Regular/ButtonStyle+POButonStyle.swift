@@ -19,7 +19,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
             normal: .init(
                 title: .init(
                     color: Color(poResource: .Button.Primary.Title.default),
-                    typography: .Text.s15(weight: .medium)
+                    typography: .Text.s14(weight: .medium)
                 ),
                 border: .clear,
                 shadow: .clear,
@@ -28,7 +28,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
             highlighted: .init(
                 title: .init(
                     color: Color(poResource: .Button.Primary.Title.pressed),
-                    typography: .Text.s15(weight: .medium)
+                    typography: .Text.s14(weight: .medium)
                 ),
                 border: .clear,
                 shadow: .clear,
@@ -37,7 +37,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
             disabled: .init(
                 title: .init(
                     color: Color(poResource: .Button.Primary.Title.disabled),
-                    typography: .Text.s15(weight: .medium)
+                    typography: .Text.s14(weight: .medium)
                 ),
                 border: .clear,
                 shadow: .clear,
@@ -56,7 +56,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
             normal: .init(
                 title: .init(
                     color: Color(poResource: .Button.Secondary.Title.default),
-                    typography: .Text.s15(weight: .medium)
+                    typography: .Text.s14(weight: .medium)
                 ),
                 border: .clear,
                 shadow: .clear,
@@ -65,7 +65,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
             highlighted: .init(
                 title: .init(
                     color: Color(poResource: .Button.Secondary.Title.pressed),
-                    typography: .Text.s15(weight: .medium)
+                    typography: .Text.s14(weight: .medium)
                 ),
                 border: .clear,
                 shadow: .clear,
@@ -74,7 +74,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
             disabled: .init(
                 title: .init(
                     color: Color(poResource: .Button.Secondary.Title.disabled),
-                    typography: .Text.s15(weight: .medium)
+                    typography: .Text.s14(weight: .medium)
                 ),
                 border: .clear,
                 shadow: .clear,
@@ -91,25 +91,37 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
     public static func ghost(titleColor: Color?) -> POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(
-                title: .init(color: titleColor ?? Color(poResource: .Button.Ghost.Title.default), typography: .button),
+                title: .init(
+                    color: titleColor ?? Color(poResource: .Button.Ghost.Title.default),
+                    typography: .Text.s14(weight: .medium)
+                ),
                 border: .clear,
                 shadow: .clear,
-                backgroundColor: .clear
+                backgroundColor: Color(poResource: .Button.Ghost.Background.default)
             ),
             selected: .init(
-                title: .init(color: titleColor ?? Color(poResource: .Button.Ghost.Title.pressed), typography: .button),
+                title: .init(
+                    color: titleColor ?? Color(poResource: .Button.Ghost.Title.selected),
+                    typography: .Text.s14(weight: .medium)
+                ),
                 border: .clear,
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Ghost.Background.selected)
             ),
             highlighted: .init(
-                title: .init(color: titleColor ?? Color(poResource: .Button.Ghost.Title.pressed), typography: .button),
+                title: .init(
+                    color: titleColor ?? Color(poResource: .Button.Ghost.Title.pressed),
+                    typography: .Text.s14(weight: .medium)
+                ),
                 border: .clear,
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Ghost.Background.pressed)
             ),
             disabled: .init(
-                title: .init(color: Color(poResource: .Button.Ghost.Title.disabled), typography: .button),
+                title: .init(
+                    color: Color(poResource: .Button.Ghost.Title.disabled),
+                    typography: .Text.s14(weight: .medium)
+                ),
                 border: .clear,
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Ghost.Background.disabled)
