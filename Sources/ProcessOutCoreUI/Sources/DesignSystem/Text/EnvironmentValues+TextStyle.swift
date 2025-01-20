@@ -18,6 +18,6 @@ extension EnvironmentValues {
     // MARK: - Private Nested Types
 
     private struct Key: EnvironmentKey {
-        static let defaultValue = POTextStyle(color: Color(poResource: .Text.primary), typography: .body2)
+        static let defaultValue = POTextStyle(color: Color(poResource: .Text.primary), typography: .Text.s14())
     }
 }
