@@ -8,6 +8,7 @@
 import UIKit
 
 @_spi(PO)
+@available(*, deprecated)
 extension POTypography {
 
     /// Use for extra large titles.
