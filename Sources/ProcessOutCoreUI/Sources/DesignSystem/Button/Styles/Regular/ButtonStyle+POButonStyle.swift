@@ -17,24 +17,33 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
     public static var primary: POButtonStyle<CircularProgressViewStyle> {
         POButtonStyle(
             normal: .init(
-                title: .init(color: Color(poResource: .Text.inverse), typography: .button),
+                title: .init(
+                    color: Color(poResource: .Button.Primary.Title.default),
+                    typography: .Text.s15(weight: .medium)
+                ),
                 border: .clear,
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Primary.Background.default)
             ),
             highlighted: .init(
-                title: .init(color: Color(poResource: .Text.inverse), typography: .button),
+                title: .init(
+                    color: Color(poResource: .Button.Primary.Title.pressed),
+                    typography: .Text.s15(weight: .medium)
+                ),
                 border: .clear,
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Primary.Background.pressed)
             ),
             disabled: .init(
-                title: .init(color: Color(poResource: .Text.disabled), typography: .button),
+                title: .init(
+                    color: Color(poResource: .Button.Primary.Title.disabled),
+                    typography: .Text.s15(weight: .medium)
+                ),
                 border: .clear,
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Primary.Background.disabled)
             ),
-            progressStyle: CircularProgressViewStyle(tint: Color(poResource: .Text.inverse))
+            progressStyle: CircularProgressViewStyle(tint: Color(poResource: .Button.Primary.Title.default))
         )
     }
 
