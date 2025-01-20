@@ -83,17 +83,17 @@ extension POColorResource {
                 public static let pressed = POColorResource(name: "Button/Secondary/Background/Pressed")
             }
 
-            /// The "Button/Secondary/Border" asset catalog resource namespace.
-            public enum Border {
+            /// The "Button/Secondary/Title" asset catalog resource namespace.
+            public enum Title {
 
-                /// The "Button/Secondary/Border/Default" asset catalog color resource.
-                public static let `default` = POColorResource(name: "Button/Secondary/Border/Default")
+                /// The "Button/Secondary/Title/Default" asset catalog color resource.
+                public static let `default` = POColorResource(name: "Button/Secondary/Title/Default")
 
-                /// The "Button/Secondary/Border/Disabled" asset catalog color resource.
-                public static let disabled = POColorResource(name: "Button/Secondary/Border/Disabled")
+                /// The "Button/Secondary/Title/Disabled" asset catalog color resource.
+                public static let disabled = POColorResource(name: "Button/Secondary/Title/Disabled")
 
-                /// The "Button/Secondary/Border/Selected" asset catalog color resource.
-                public static let selected = POColorResource(name: "Button/Secondary/Border/Selected")
+                /// The "Button/Secondary/Title/Pressed" asset catalog color resource.
+                public static let pressed = POColorResource(name: "Button/Secondary/Title/Pressed")
             }
         }
 
