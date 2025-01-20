@@ -24,6 +24,7 @@ struct FontResource: Sendable {
 
 extension FontResource {
 
+    @available(*, deprecated)
     enum WorkSans {
 
         /// The "WorkSans/Regular" font resource.
@@ -31,6 +32,10 @@ extension FontResource {
 
         /// The "WorkSans/Medium" font resource.
         static let medium = FontResource(weight: .medium, family: "Work Sans", resource: "WorkSans.ttf")
+    }
+
+    static func workSans(withWeight weight: UIFont.Weight) -> FontResource {
+        .init(weight: weight, family: "Work Sans", resource: "WorkSans.ttf")
     }
 
     static func register() {
