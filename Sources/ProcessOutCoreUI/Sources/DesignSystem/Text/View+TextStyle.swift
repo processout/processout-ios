@@ -49,7 +49,7 @@ private struct TypographyModifier: ViewModifier {
             .lineSpacing(lineSpacing)
             .modify { content in
                 if #available(iOS 16, *) {
-                    content.kerning(typography.kerning)
+                    content.kerning(typography.kerning * multiplier)
                 } else {
                     content
                 }
