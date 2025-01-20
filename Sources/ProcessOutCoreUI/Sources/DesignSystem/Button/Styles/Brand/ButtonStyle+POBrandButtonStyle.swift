@@ -16,9 +16,13 @@ extension ButtonStyle where Self == POBrandButtonStyle {
     @preconcurrency
     public static var brand: POBrandButtonStyle {
         POBrandButtonStyle(
-            title: .init(color: Color(poResource: .Text.primary), typography: .button),
+            title: .init(
+                color: Color(poResource: .Button.Primary.Title.default),
+                typography: .Text.s14(weight: .medium)
+            ),
             border: .clear,
-            shadow: .clear
+            shadow: .clear,
+            progressStyle: CircularProgressViewStyle(tint: Color(poResource: .Button.Primary.Title.default))
         )
     }
 }
