@@ -146,6 +146,12 @@ extension POColorResource {
 
             /// The "Input/Background/Disabled" asset catalog color resource.
             public static let disabled = POColorResource(name: "Input/Background/Disabled")
+
+            /// The "Input/Background/Error" asset catalog color resource.
+            public static let error = POColorResource(name: "Input/Background/Error")
+
+            /// The "Input/Background/Focused" asset catalog color resource.
+            public static let focused = POColorResource(name: "Input/Background/Focused")
         }
 
         /// The "Input/Border" asset catalog resource namespace.
@@ -162,24 +168,68 @@ extension POColorResource {
 
             /// The "Input/Border/Focused" asset catalog color resource.
             public static let focused = POColorResource(name: "Input/Border/Focused")
+        }
 
-            /// The "Input/Border/Hover" asset catalog color resource.
-            public static let hover = POColorResource(name: "Input/Border/Hover")
+        /// The "Input/Placeholder" asset catalog resource namespace.
+        public enum Placeholder {
+
+            /// The "Input/Placeholder/Default" asset catalog color resource.
+            public static let `default` = POColorResource(name: "Input/Placeholder/Default")
+
+            /// The "Input/Placeholder/Disabled" asset catalog color resource.
+            public static let disabled = POColorResource(name: "Input/Placeholder/Disabled")
+
+            /// The "Input/Placeholder/Error" asset catalog color resource.
+            public static let error = POColorResource(name: "Input/Placeholder/Error")
+
+            /// The "Input/Placeholder/Focused" asset catalog color resource.
+            public static let focused = POColorResource(name: "Input/Placeholder/Focused")
+        }
+
+        /// The "Input/Text" asset catalog resource namespace.
+        public enum Text {
+
+            /// The "Input/Text/Default" asset catalog color resource.
+            public static let `default` = POColorResource(name: "Input/Text/Default")
+
+            /// The "Input/Text/Disabled" asset catalog color resource.
+            public static let disabled = POColorResource(name: "Input/Text/Disabled")
+
+            /// The "Input/Text/Error" asset catalog color resource.
+            public static let error = POColorResource(name: "Input/Text/Error")
+
+            /// The "Input/Text/Focused" asset catalog color resource.
+            public static let focused = POColorResource(name: "Input/Text/Focused")
+        }
+
+        /// The "Input/Tint" asset catalog resource namespace.
+        public enum Tint {
+
+            /// The "Input/Tint/Default" asset catalog color resource.
+            public static let `default` = POColorResource(name: "Input/Tint/Default")
+
+            /// The "Input/Tint/Disabled" asset catalog color resource.
+            public static let disabled = POColorResource(name: "Input/Tint/Disabled")
+
+            /// The "Input/Tint/Error" asset catalog color resource.
+            public static let error = POColorResource(name: "Input/Tint/Error")
+
+            /// The "Input/Tint/Focused" asset catalog color resource.
+            public static let focused = POColorResource(name: "Input/Tint/Focused")
         }
     }
 
     /// The "Surface" asset catalog resource namespace.
-    @available(*, deprecated)
     public enum Surface {
 
         /// The "Surface/Default" asset catalog color resource.
         public static let `default` = POColorResource(name: "Surface/Default")
 
-        /// The "Surface/Success" asset catalog color resource.
-        public static let success = POColorResource(name: "Surface/Success")
+        /// The "Surface/SuccessSubtle" asset catalog color resource.
+        public static let successSubtle = POColorResource(name: "Surface/SuccessSubtle")
 
-        /// The "Surface/Error" asset catalog color resource.
-        public static let error = POColorResource(name: "Surface/Error")
+        /// The "Surface/ErrorSubtle" asset catalog color resource.
+        public static let errorSubtle = POColorResource(name: "Surface/ErrorSubtle")
     }
 
     /// The "Text" asset catalog resource namespace.
