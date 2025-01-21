@@ -219,6 +219,109 @@ extension POColorResource {
         }
     }
 
+    /// The "Radio" asset catalog resource namespace.
+    public enum Radio {
+
+        /// The "Radio/Knob" asset catalog resource namespace.
+        public enum Knob {
+
+            /// The "Radio/Knob/Background" asset catalog resource namespace.
+            public enum Background {
+
+                /// The "Radio/Knob/Background/Default" asset catalog color resource.
+                public static let `default` = POColorResource(name: "Radio/Knob/Background/Default")
+
+                /// The "Radio/Knob/Background/Disabled" asset catalog color resource.
+                public static let disabled = POColorResource(name: "Radio/Knob/Background/Disabled")
+
+                /// The "Radio/Knob/Background/Error" asset catalog color resource.
+                public static let error = POColorResource(name: "Radio/Knob/Background/Error")
+
+                /// The "Radio/Knob/Background/Pressed" asset catalog color resource.
+                public static let pressed = POColorResource(name: "Radio/Knob/Background/Pressed")
+
+                /// The "Radio/Knob/Background/Selected" asset catalog color resource.
+                public static let selected = POColorResource(name: "Radio/Knob/Background/Selected")
+            }
+
+            /// The "Radio/Knob/Border" asset catalog resource namespace.
+            public enum Border {
+
+                /// The "Radio/Knob/Border/Default" asset catalog color resource.
+                public static let `default` = POColorResource(name: "Radio/Knob/Border/Default")
+
+                /// The "Radio/Knob/Border/Disabled" asset catalog color resource.
+                public static let disabled = POColorResource(name: "Radio/Knob/Border/Disabled")
+
+                /// The "Radio/Knob/Border/Error" asset catalog color resource.
+                public static let error = POColorResource(name: "Radio/Knob/Border/Error")
+
+                /// The "Radio/Knob/Border/Pressed" asset catalog color resource.
+                public static let pressed = POColorResource(name: "Radio/Knob/Border/Pressed")
+
+                /// The "Radio/Knob/Border/Selected" asset catalog color resource.
+                public static let selected = POColorResource(name: "Radio/Knob/Border/Selected")
+            }
+
+            /// The "Radio/Knob/Value" asset catalog resource namespace.
+            public enum Value {
+
+                /// The "Radio/Knob/Value/Default" asset catalog color resource.
+                public static let `default` = POColorResource(name: "Radio/Knob/Value/Default")
+
+                /// The "Radio/Knob/Value/Disabled" asset catalog color resource.
+                public static let disabled = POColorResource(name: "Radio/Knob/Value/Disabled")
+
+                /// The "Radio/Knob/Value/Error" asset catalog color resource.
+                public static let error = POColorResource(name: "Radio/Knob/Value/Error")
+
+                /// The "Radio/Knob/Value/Pressed" asset catalog color resource.
+                public static let pressed = POColorResource(name: "Radio/Knob/Value/Pressed")
+
+                /// The "Radio/Knob/Value/Selected" asset catalog color resource.
+                public static let selected = POColorResource(name: "Radio/Knob/Value/Selected")
+            }
+        }
+
+        /// The "Radio/Text" asset catalog resource namespace.
+        public enum Text {
+
+            /// The "Radio/Text/Default" asset catalog color resource.
+            public static let `default` = POColorResource(name: "Radio/Text/Default")
+
+            /// The "Radio/Text/Disabled" asset catalog color resource.
+            public static let disabled = POColorResource(name: "Radio/Text/Disabled")
+
+            /// The "Radio/Text/Error" asset catalog color resource.
+            public static let error = POColorResource(name: "Radio/Text/Error")
+
+            /// The "Radio/Text/Pressed" asset catalog color resource.
+            public static let pressed = POColorResource(name: "Radio/Text/Pressed")
+
+            /// The "Radio/Text/Selected" asset catalog color resource.
+            public static let selected = POColorResource(name: "Radio/Text/Selected")
+        }
+
+        /// The "Radio/Background" asset catalog resource namespace.
+        public enum Background {
+
+            /// The "Radio/Background/Default" asset catalog color resource.
+            public static let `default` = POColorResource(name: "Radio/Background/Default")
+
+            /// The "Radio/Background/Disabled" asset catalog color resource.
+            public static let disabled = POColorResource(name: "Radio/Background/Disabled")
+
+            /// The "Radio/Background/Error" asset catalog color resource.
+            public static let error = POColorResource(name: "Radio/Background/Error")
+
+            /// The "Radio/Background/Pressed" asset catalog color resource.
+            public static let pressed = POColorResource(name: "Radio/Background/Pressed")
+
+            /// The "Radio/Background/Selected" asset catalog color resource.
+            public static let selected = POColorResource(name: "Radio/Background/Selected")
+        }
+    }
+
     /// The "Surface" asset catalog resource namespace.
     public enum Surface {
 

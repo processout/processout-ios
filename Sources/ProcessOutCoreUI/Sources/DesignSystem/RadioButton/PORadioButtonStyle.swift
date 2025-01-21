@@ -19,7 +19,7 @@ public struct PORadioButtonStyle: ButtonStyle {
     /// Style to use when radio button is selected.
     public let selected: PORadioButtonStateStyle
 
-    /// Style to use when radio button is highlighted. Note that radio can transition
+    /// Style to use when radio button is highlighted. Note that radio can't transition
     /// to this state when already selected.
     public let highlighted: PORadioButtonStateStyle
 
@@ -47,72 +47,36 @@ public struct PORadioButtonStyle: ButtonStyle {
     // MARK: - ButtonStyle
 
     public func makeBody(configuration: Configuration) -> some View {
-        ContentView { isSelected, isInvalid, isEnabled in
-            let style = resolveStyle(
-                isSelected: isSelected, isInvalid: isInvalid, isPressed: configuration.isPressed, isEnabled: isEnabled
-            )
-            Label(
-                title: {
-                    configuration.label
-                        .textStyle(style.value, addPadding: false)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                },
-                icon: {
-                    ZStack {
-                        Circle()
-                            .fill(style.knob.backgroundColor)
-                        Circle()
-                            .strokeBorder(style.knob.border.color, lineWidth: style.knob.border.width)
-                        Circle()
-                            .fill(style.knob.innerCircleColor)
-                            .frame(width: style.knob.innerCircleRadius * 2)
-                    }
-                    .frame(width: Constants.knobSize, height: Constants.knobSize)
-                }
-            )
-            .animation(.default, value: isSelected)
-            .animation(.default, value: isEnabled)
-        }
-        .backport.geometryGroup()
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let knobSize: CGFloat = 22
-    }
-
-    // MARK: - Private Methods
-
-    private func resolveStyle(
-        isSelected: Bool, isInvalid: Bool, isPressed: Bool, isEnabled: Bool
-    ) -> PORadioButtonStateStyle {
-        if !isEnabled {
-            return disabled
-        }
-        if isSelected {
-            return selected
-        }
-        if isPressed {
-            return highlighted
-        }
-        if isInvalid {
-            return error
-        }
-        return normal
+        ContentView(
+            normal: normal,
+            selected: selected,
+            highlighted: highlighted,
+            error: error,
+            disabled: disabled,
+            configuration: configuration
+        )
     }
 }
 
 // Environments are not propagated directly to ButtonStyle in any iOS before 14.
+@available(iOS 14, *)
 @MainActor
-@preconcurrency
-private struct ContentView<Content: View>: View {
+private struct ContentView: View {
 
-    @ViewBuilder
-    let content: (_ isSelected: Bool, _ isInvalid: Bool, _ isEnabled: Bool) -> Content
+    /// Specific states style.
+    let normal, selected, highlighted, error, disabled: PORadioButtonStateStyle
+
+    /// Button configuration.
+    let configuration: ButtonStyleConfiguration
+
+    // MARK: - View
 
     var body: some View {
-        content(isSelected, isInvalid, isEnabled)
+        StateContentView(isSelected: isSelected, style: resolvedStyle(), configuration: configuration)
+            .contentShape(.standardHittableRect)
+            .animation(.default, value: isSelected)
+            .animation(.default, value: isEnabled)
+            .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
@@ -125,4 +89,97 @@ private struct ContentView<Content: View>: View {
 
     @Environment(\.isEnabled)
     private var isEnabled
+
+    // MARK: - Private Methods
+
+    private func resolvedStyle() -> PORadioButtonStateStyle {
+        if !isEnabled {
+            return disabled
+        }
+        if isSelected {
+            if isInvalid {
+                return error
+            }
+            return selected
+        }
+        if configuration.isPressed {
+            return highlighted
+        }
+        if isInvalid {
+            return error
+        }
+        return normal
+    }
+}
+
+@available(iOS 14, *)
+@MainActor
+private struct StateContentView: View {
+
+    init(isSelected: Bool, style: PORadioButtonStateStyle, configuration: ButtonStyleConfiguration) {
+        self.isSelected = isSelected
+        self.style = style
+        self.configuration = configuration
+        self._knobScale = .init(wrappedValue: 1, relativeTo: style.value.typography.textStyle)
+    }
+
+    // MARK: - View
+
+    var body: some View {
+        Label(
+            title: {
+                configuration.label
+                    .textStyle(style.value, addPadding: false)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            },
+            icon: {
+                ZStack {
+                    Circle()
+                        .fill(style.knob.backgroundColor)
+                    Circle()
+                        .strokeBorder(style.knob.border.color, lineWidth: style.knob.border.width)
+                    Circle()
+                        .fill(style.knob.innerCircleColor)
+                        .frame(width: isSelected ? style.knob.innerCircleRadius * 2 * knobScale : 0)
+                }
+                .frame(width: Constants.knobSize * knobScale, height: Constants.knobSize * knobScale)
+            }
+        )
+        .backport.background {
+            style.backgroundColor
+                .cornerRadius(POSpacing.extraSmall)
+                .padding(Constants.backgroundPadding)
+        }
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let knobSize: CGFloat = 22
+        static let backgroundPadding = EdgeInsets(horizontal: -10, vertical: -12)
+    }
+
+    // MARK: - Private Properties
+
+    private let isSelected: Bool, style: PORadioButtonStateStyle, configuration: ButtonStyleConfiguration
+
+    @POBackport.ScaledMetric
+    private var knobScale: CGFloat
+}
+
+@available(iOS 18, *)
+#Preview(traits: .sizeThatFitsLayout) {
+    @Previewable @State var isOn = false
+    Button {
+        isOn = true
+    } label: {
+        Label {
+            Text("Label")
+        } icon: {
+            EmptyView()
+        }
+    }
+    .buttonStyle(.radio)
+    .controlSelected(isOn)
+    .padding()
 }
