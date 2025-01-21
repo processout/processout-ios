@@ -242,6 +242,9 @@ extension POColorResource {
 
                 /// The "Radio/Knob/Background/Selected" asset catalog color resource.
                 public static let selected = POColorResource(name: "Radio/Knob/Background/Selected")
+
+                /// The "Radio/Knob/Background/SelectedPressed" asset catalog color resource.
+                public static let selectedPressed = POColorResource(name: "Radio/Knob/Background/SelectedPressed")
             }
 
             /// The "Radio/Knob/Border" asset catalog resource namespace.
@@ -261,6 +264,9 @@ extension POColorResource {
 
                 /// The "Radio/Knob/Border/Selected" asset catalog color resource.
                 public static let selected = POColorResource(name: "Radio/Knob/Border/Selected")
+
+                /// The "Radio/Knob/Border/SelectedPressed" asset catalog color resource.
+                public static let selectedPressed = POColorResource(name: "Radio/Knob/Border/SelectedPressed")
             }
 
             /// The "Radio/Knob/Value" asset catalog resource namespace.
@@ -280,6 +286,9 @@ extension POColorResource {
 
                 /// The "Radio/Knob/Value/Selected" asset catalog color resource.
                 public static let selected = POColorResource(name: "Radio/Knob/Value/Selected")
+
+                /// The "Radio/Knob/Value/SelectedPressed" asset catalog color resource.
+                public static let selectedPressed = POColorResource(name: "Radio/Knob/Value/SelectedPressed")
             }
         }
 
@@ -300,6 +309,9 @@ extension POColorResource {
 
             /// The "Radio/Text/Selected" asset catalog color resource.
             public static let selected = POColorResource(name: "Radio/Text/Selected")
+
+            /// The "Radio/Text/SelectedPressed" asset catalog color resource.
+            public static let selectedPressed = POColorResource(name: "Radio/Text/SelectedPressed")
         }
 
         /// The "Radio/Background" asset catalog resource namespace.
@@ -319,6 +331,9 @@ extension POColorResource {
 
             /// The "Radio/Background/Selected" asset catalog color resource.
             public static let selected = POColorResource(name: "Radio/Background/Selected")
+
+            /// The "Radio/Background/SelectedPressed" asset catalog color resource.
+            public static let selectedPressed = POColorResource(name: "Radio/Background/SelectedPressed")
         }
     }
 
