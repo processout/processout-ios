@@ -1,5 +1,5 @@
 //
-//  CheckboxToggleView.swift
+//  CheckboxToggleCheckmarkView.swift
 //  ProcessOutCoreUI
 //
 //  Created by Andrii Vysotskyi on 29.07.2024.
@@ -9,7 +9,7 @@ import SwiftUI
 
 @available(iOS 14, *)
 @MainActor
-struct CheckboxToggleView: View {
+struct CheckboxToggleCheckmarkView: View {
 
     init(style: POCheckboxToggleStateStyle.Checkmark, textStyle: UIFont.TextStyle?) {
         self.style = style

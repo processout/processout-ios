@@ -51,15 +51,15 @@ private struct ContentView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             },
             icon: {
-                CheckboxToggleView(style: style.checkmark, textStyle: style.value.typography.textStyle)
+                CheckboxToggleCheckmarkView(style: style.checkmark, textStyle: style.value.typography.textStyle)
             }
         )
-        .contentShape(.standardHittableRect)
         .backport.background {
             style.backgroundColor
                 .cornerRadius(POSpacing.extraSmall)
                 .padding(Constants.backgroundPadding)
         }
+        .contentShape(.standardHittableRect)
         .animation(.default, value: isSelected)
         .animation(.default, value: isEnabled)
         .backport.geometryGroup()
