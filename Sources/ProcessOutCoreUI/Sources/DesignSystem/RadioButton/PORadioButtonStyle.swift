@@ -72,11 +72,32 @@ private struct ContentView: View {
     // MARK: - View
 
     var body: some View {
-        StateContentView(isSelected: isSelected, style: resolvedStyle(), configuration: configuration)
-            .contentShape(.standardHittableRect)
-            .animation(.default, value: isSelected)
-            .animation(.default, value: isEnabled)
-            .backport.geometryGroup()
+        let style = resolvedStyle()
+        Label(
+            title: {
+                configuration.label
+                    .textStyle(style.value, addPadding: false)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            },
+            icon: {
+                RadioButtonKnobView(style: style.knob, textStyle: style.value.typography.textStyle)
+            }
+        )
+        .backport.background {
+            style.backgroundColor
+                .cornerRadius(POSpacing.extraSmall)
+                .padding(Constants.backgroundPadding)
+        }
+        .contentShape(.standardHittableRect)
+        .animation(.default, value: isSelected)
+        .animation(.default, value: isEnabled)
+        .backport.geometryGroup()
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let backgroundPadding = EdgeInsets(horizontal: -10, vertical: -12)
     }
 
     // MARK: - Private Properties
@@ -110,76 +131,4 @@ private struct ContentView: View {
         }
         return normal
     }
-}
-
-@available(iOS 14, *)
-@MainActor
-private struct StateContentView: View {
-
-    init(isSelected: Bool, style: PORadioButtonStateStyle, configuration: ButtonStyleConfiguration) {
-        self.isSelected = isSelected
-        self.style = style
-        self.configuration = configuration
-        self._knobScale = .init(wrappedValue: 1, relativeTo: style.value.typography.textStyle)
-    }
-
-    // MARK: - View
-
-    var body: some View {
-        Label(
-            title: {
-                configuration.label
-                    .textStyle(style.value, addPadding: false)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            },
-            icon: {
-                ZStack {
-                    Circle()
-                        .fill(style.knob.backgroundColor)
-                    Circle()
-                        .strokeBorder(style.knob.border.color, lineWidth: style.knob.border.width)
-                    Circle()
-                        .fill(style.knob.innerCircleColor)
-                        .frame(width: isSelected ? style.knob.innerCircleRadius * 2 * knobScale : 0)
-                }
-                .frame(width: Constants.knobSize * knobScale, height: Constants.knobSize * knobScale)
-            }
-        )
-        .backport.background {
-            style.backgroundColor
-                .cornerRadius(POSpacing.extraSmall)
-                .padding(Constants.backgroundPadding)
-        }
-    }
-
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let knobSize: CGFloat = 22
-        static let backgroundPadding = EdgeInsets(horizontal: -10, vertical: -12)
-    }
-
-    // MARK: - Private Properties
-
-    private let isSelected: Bool, style: PORadioButtonStateStyle, configuration: ButtonStyleConfiguration
-
-    @POBackport.ScaledMetric
-    private var knobScale: CGFloat
-}
-
-@available(iOS 18, *)
-#Preview(traits: .sizeThatFitsLayout) {
-    @Previewable @State var isOn = false
-    Button {
-        isOn = true
-    } label: {
-        Label {
-            Text("Label")
-        } icon: {
-            EmptyView()
-        }
-    }
-    .buttonStyle(.radio)
-    .controlSelected(isOn)
-    .padding()
 }
