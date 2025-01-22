@@ -10,7 +10,7 @@ import SwiftUI
 extension POBorderStyle {
 
     /// Creates border style with given color that should be used with buttons.
-    static func button(color: Color) -> POBorderStyle {
+    static func button(color: Color = .clear) -> POBorderStyle {
         .init(radius: 6, width: 1, color: color)
     }
 }
