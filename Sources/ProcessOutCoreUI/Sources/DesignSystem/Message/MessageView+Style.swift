@@ -22,7 +22,7 @@ extension EnvironmentValues {
 
     @MainActor
     var messageViewStyle: any POMessageViewStyle {
-        get { self[Key.self] ?? .toast /* Workaround to allow use of MainActor isolated default value. */ }
+        get { self[Key.self] ?? .toast }
         set { self[Key.self] = newValue }
     }
 
