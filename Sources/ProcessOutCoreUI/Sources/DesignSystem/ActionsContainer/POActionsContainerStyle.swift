@@ -50,7 +50,7 @@ extension POActionsContainerStyle {
     public static let `default` = POActionsContainerStyle(
         primary: .primary,
         secondary: .secondary,
-        separatorColor: Color(poResource: .Border.subtle),
+        separatorColor: Color(poResource: .Border.primary),
         backgroundColor: Color(poResource: .Surface.default)
     )
 }
