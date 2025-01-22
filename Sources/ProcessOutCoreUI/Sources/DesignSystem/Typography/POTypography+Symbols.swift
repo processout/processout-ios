@@ -37,11 +37,6 @@ extension POTypography {
 
     /// Smaller text for secondary labels or headings.
     public static let label2 = POTypography(font: UIFont(.WorkSans.regular, size: 14), lineHeight: 18)
-
-    /// Registers all custom fonts.
-    public static func registerFonts() {
-        FontResource.register()
-    }
 }
 
 @_spi(PO)
@@ -59,20 +54,20 @@ extension POTypography {
             if #available(iOS 16, *) {
                 let kernings: [UIFont.Weight: CGFloat] = [.regular: -0.2, .medium: -0.15, .semibold: -0.1]
                 let kerning = kernings[weight] ?? 0.0
-                return .init(font: .init(.workSans(withWeight: weight), size: 20), lineHeight: 22, kerning: kerning)
+                return .init(font: .init(.workSans(withWeight: weight), size: 20), kerning: kerning)
             }
-            return .init(font: .init(.workSans(withWeight: weight), size: 20), lineHeight: 22)
+            return .init(font: .init(.workSans(withWeight: weight), size: 20))
         }
 
         public static func s24(weight: UIFont.Weight = .regular) -> POTypography {
             validateWeight(weight: weight)
-            return .init(font: .init(.workSans(withWeight: weight), size: 24), lineHeight: 28)
+            return .init(font: .init(.workSans(withWeight: weight), size: 24))
         }
 
         public static func s28(weight: UIFont.Weight = .regular) -> POTypography {
             // Height should be different when weight is semibold.
             validateWeight(weight: weight)
-            return .init(font: .init(.workSans(withWeight: weight), size: 28), lineHeight: 32)
+            return .init(font: .init(.workSans(withWeight: weight), size: 28))
         }
 
         public static func s32(weight: UIFont.Weight = .regular) -> POTypography {
@@ -97,7 +92,7 @@ extension POTypography {
 
         public static func s48(weight: UIFont.Weight = .regular) -> POTypography {
             validateWeight(weight: weight)
-            return .init(font: .init(.workSans(withWeight: weight), size: 48), lineHeight: 56)
+            return .init(font: .init(.workSans(withWeight: weight), size: 48))
         }
 
         public static func s64(weight: UIFont.Weight = .regular) -> POTypography {
@@ -116,9 +111,9 @@ extension POTypography {
         public static func s12(weight: UIFont.Weight = .regular) -> POTypography {
             validateWeight(weight: weight)
             if #available(iOS 16, *) {
-                return .init(font: .init(.workSans(withWeight: weight), size: 12), lineHeight: 14, kerning: 0.15)
+                return .init(font: .init(.workSans(withWeight: weight), size: 12), kerning: 0.15)
             }
-            return .init(font: .init(.workSans(withWeight: weight), size: 12), lineHeight: 14)
+            return .init(font: .init(.workSans(withWeight: weight), size: 12))
         }
 
         public static func s13(weight: UIFont.Weight = .regular) -> POTypography {
@@ -166,7 +161,7 @@ extension POTypography {
 
         public static func s24(weight: UIFont.Weight = .regular) -> POTypography {
             validateWeight(weight: weight)
-            return .init(font: .init(.workSans(withWeight: weight), size: 24), lineHeight: 28)
+            return .init(font: .init(.workSans(withWeight: weight), size: 24))
         }
     }
 
@@ -214,6 +209,11 @@ extension POTypography {
             validateWeight(weight: weight)
             return .init(font: .init(.workSans(withWeight: weight), size: 24), lineHeight: 40, paragraphSpacing: 36)
         }
+    }
+
+    /// Registers all custom fonts.
+    public static func registerFonts() {
+        FontResource.register()
     }
 
     // MARK: - Private Methods
