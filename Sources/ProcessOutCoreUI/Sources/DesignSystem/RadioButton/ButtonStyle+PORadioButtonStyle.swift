@@ -17,7 +17,7 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             normal: .init(
                 knob: .init(
                     backgroundColor: Color(poResource: .Radio.Knob.Background.default),
-                    border: .regular(color: Color(poResource: .Radio.Knob.Border.default)),
+                    border: .radioButton(color: Color(poResource: .Radio.Knob.Border.default)),
                     innerCircleColor: Color(poResource: .Radio.Knob.Value.default),
                     innerCircleRadius: 4
                 ),
@@ -30,7 +30,7 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             selected: .init(
                 knob: .init(
                     backgroundColor: Color(poResource: .Radio.Knob.Background.selected),
-                    border: .regular(color: Color(poResource: .Radio.Knob.Border.selected)),
+                    border: .radioButton(color: Color(poResource: .Radio.Knob.Border.selected)),
                     innerCircleColor: Color(poResource: .Radio.Knob.Value.selected),
                     innerCircleRadius: 4
                 ),
@@ -43,7 +43,7 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             highlighted: .init(
                 knob: .init(
                     backgroundColor: Color(poResource: .Radio.Knob.Background.pressed),
-                    border: .regular(color: Color(poResource: .Radio.Knob.Border.pressed)),
+                    border: .radioButton(color: Color(poResource: .Radio.Knob.Border.pressed)),
                     innerCircleColor: Color(poResource: .Radio.Knob.Value.pressed),
                     innerCircleRadius: 4
                 ),
@@ -56,7 +56,7 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             error: .init(
                 knob: .init(
                     backgroundColor: Color(poResource: .Radio.Knob.Background.error),
-                    border: .regular(color: Color(poResource: .Radio.Knob.Border.error)),
+                    border: .radioButton(color: Color(poResource: .Radio.Knob.Border.error)),
                     innerCircleColor: Color(poResource: .Radio.Knob.Value.error),
                     innerCircleRadius: 4
                 ),
@@ -69,7 +69,7 @@ extension ButtonStyle where Self == PORadioButtonStyle {
             disabled: .init(
                 knob: .init(
                     backgroundColor: Color(poResource: .Radio.Knob.Background.disabled),
-                    border: .regular(color: Color(poResource: .Radio.Knob.Border.disabled)),
+                    border: .radioButton(color: Color(poResource: .Radio.Knob.Border.disabled)),
                     innerCircleColor: Color(poResource: .Radio.Knob.Value.disabled),
                     innerCircleRadius: 3
                 ),
