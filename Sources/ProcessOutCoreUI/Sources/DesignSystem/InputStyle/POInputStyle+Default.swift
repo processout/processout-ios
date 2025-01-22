@@ -45,7 +45,7 @@ extension POInputStyle {
                     typography: typography
                 ),
                 backgroundColor: Color.Input.Background.default,
-                border: .regular(color: Color.Input.Border.default),
+                border: .input(color: Color.Input.Border.default),
                 shadow: .clear,
                 tintColor: Color.Input.tint
             ),
@@ -59,7 +59,7 @@ extension POInputStyle {
                     typography: typography
                 ),
                 backgroundColor: Color.Input.Background.error,
-                border: .regular(color: Color.Input.Border.error),
+                border: .input(color: Color.Input.Border.error),
                 shadow: .clear,
                 tintColor: Color.Input.tint
             ),
@@ -73,7 +73,7 @@ extension POInputStyle {
                     typography: typography
                 ),
                 backgroundColor: Color.Input.Background.focused,
-                border: .regular(color: Color.Input.Border.focused),
+                border: .input(color: Color.Input.Border.focused),
                 shadow: .clear,
                 tintColor: Color.Input.tint
             ),
@@ -87,7 +87,7 @@ extension POInputStyle {
                     typography: typography
                 ),
                 backgroundColor: Color.Input.Background.errorFocused,
-                border: .regular(color: Color.Input.Border.errorFocused),
+                border: .input(color: Color.Input.Border.errorFocused),
                 shadow: .clear,
                 tintColor: Color.Input.tint
             )
