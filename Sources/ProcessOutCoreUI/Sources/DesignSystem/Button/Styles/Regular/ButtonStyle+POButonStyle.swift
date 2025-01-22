@@ -21,7 +21,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                     color: Color(poResource: .Button.Primary.Title.default),
                     typography: .Text.s14(weight: .medium)
                 ),
-                border: .clear,
+                border: .button(color: .clear),
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Primary.Background.default)
             ),
@@ -30,7 +30,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                     color: Color(poResource: .Button.Primary.Title.pressed),
                     typography: .Text.s14(weight: .medium)
                 ),
-                border: .clear,
+                border: .button(color: .clear),
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Primary.Background.pressed)
             ),
@@ -39,7 +39,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                     color: Color(poResource: .Button.Primary.Title.disabled),
                     typography: .Text.s14(weight: .medium)
                 ),
-                border: .clear,
+                border: .button(color: .clear),
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Primary.Background.disabled)
             ),
@@ -58,7 +58,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                     color: Color(poResource: .Button.Secondary.Title.default),
                     typography: .Text.s14(weight: .medium)
                 ),
-                border: .clear,
+                border: .button(color: .clear),
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Secondary.Background.default)
             ),
@@ -67,7 +67,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                     color: Color(poResource: .Button.Secondary.Title.pressed),
                     typography: .Text.s14(weight: .medium)
                 ),
-                border: .clear,
+                border: .button(color: .clear),
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Secondary.Background.pressed)
             ),
@@ -76,7 +76,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                     color: Color(poResource: .Button.Secondary.Title.disabled),
                     typography: .Text.s14(weight: .medium)
                 ),
-                border: .clear,
+                border: .button(color: .clear),
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Secondary.Background.disabled)
             ),
@@ -95,7 +95,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                     color: titleColor ?? Color(poResource: .Button.Ghost.Title.default),
                     typography: .Text.s14(weight: .medium)
                 ),
-                border: .clear,
+                border: .button(color: .clear),
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Ghost.Background.default)
             ),
@@ -104,7 +104,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                     color: titleColor ?? Color(poResource: .Button.Ghost.Title.selected),
                     typography: .Text.s14(weight: .medium)
                 ),
-                border: .clear,
+                border: .button(color: .clear),
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Ghost.Background.selected)
             ),
@@ -113,7 +113,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                     color: titleColor ?? Color(poResource: .Button.Ghost.Title.pressed),
                     typography: .Text.s14(weight: .medium)
                 ),
-                border: .clear,
+                border: .button(color: .clear),
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Ghost.Background.pressed)
             ),
@@ -122,7 +122,7 @@ extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
                     color: Color(poResource: .Button.Ghost.Title.disabled),
                     typography: .Text.s14(weight: .medium)
                 ),
-                border: .clear,
+                border: .button(color: .clear),
                 shadow: .clear,
                 backgroundColor: Color(poResource: .Button.Ghost.Background.disabled)
             ),

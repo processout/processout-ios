@@ -19,7 +19,7 @@ extension ButtonStyle where Self == POBrandButtonStyle {
             title: .init(
                 color: Color(poResource: .Text.primary), typography: .Text.s14(weight: .medium)
             ),
-            border: .clear,
+            border: .button(color: .clear),
             shadow: .clear,
             progressStyle: CircularProgressViewStyle(tint: Color(poResource: .Text.primary))
         )
