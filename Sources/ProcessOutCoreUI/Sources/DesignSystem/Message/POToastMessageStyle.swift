@@ -51,12 +51,13 @@ public struct POToastMessageStyle: POMessageViewStyle {
         let style = style(for: configuration.severity)
         Label(
             title: {
-                configuration.label.textStyle(style.text)
+                configuration.label
             },
             icon: {
-                style.icon?.foregroundColor(style.text.color)
+                style.icon
             }
         )
+        .textStyle(style.text)
         .padding(POSpacing.medium)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(style.backgroundColor)
@@ -86,8 +87,8 @@ extension POToastMessageStyle.Severity {
     /// Error style.
     public static let error = Self(
         icon: Image(poResource: .info).renderingMode(.template),
-        border: .regular(color: Color(poResource: .Input.Border.error)),
-        backgroundColor: Color(poResource: .Surface.error),
-        text: POTextStyle(color: Color(poResource: .Text.primary), typography: .body2)
+        border: .regular(color: Color.Toast.border),
+        backgroundColor: Color.Toast.background,
+        text: POTextStyle(color: Color.Toast.text, typography: .Text.s13(weight: .medium))
     )
 }
