@@ -19,7 +19,7 @@ extension ToggleStyle where Self == POCheckboxToggleStyle {
                     color: Color(poResource: .Radio.Knob.Value.default),
                     width: 1.25,
                     backgroundColor: Color(poResource: .Radio.Knob.Background.default),
-                    border: .regular(color: Color(poResource: .Radio.Knob.Border.default))
+                    border: .checkbox(color: Color(poResource: .Radio.Knob.Border.default))
                 ),
                 value: POTextStyle(
                     color: Color(poResource: .Radio.Text.default),
@@ -32,7 +32,7 @@ extension ToggleStyle where Self == POCheckboxToggleStyle {
                     color: Color(poResource: .Radio.Knob.Value.pressed),
                     width: 1.25,
                     backgroundColor: Color(poResource: .Radio.Knob.Background.pressed),
-                    border: .regular(color: Color(poResource: .Radio.Knob.Border.pressed))
+                    border: .checkbox(color: Color(poResource: .Radio.Knob.Border.pressed))
                 ),
                 value: POTextStyle(
                     color: Color(poResource: .Radio.Text.pressed),
@@ -45,7 +45,7 @@ extension ToggleStyle where Self == POCheckboxToggleStyle {
                     color: Color(poResource: .Radio.Knob.Value.selected),
                     width: 1.25,
                     backgroundColor: Color(poResource: .Radio.Knob.Background.selected),
-                    border: .regular(color: Color(poResource: .Radio.Knob.Border.selected))
+                    border: .checkbox(color: Color(poResource: .Radio.Knob.Border.selected))
                 ),
                 value: POTextStyle(
                     color: Color(poResource: .Radio.Text.selected),
@@ -58,7 +58,7 @@ extension ToggleStyle where Self == POCheckboxToggleStyle {
                     color: Color(poResource: .Radio.Knob.Value.selectedPressed),
                     width: 1.25,
                     backgroundColor: Color(poResource: .Radio.Knob.Background.selectedPressed),
-                    border: .regular(color: Color(poResource: .Radio.Knob.Border.selectedPressed))
+                    border: .checkbox(color: Color(poResource: .Radio.Knob.Border.selectedPressed))
                 ),
                 value: POTextStyle(
                     color: Color(poResource: .Radio.Text.selectedPressed),
@@ -71,7 +71,7 @@ extension ToggleStyle where Self == POCheckboxToggleStyle {
                     color: Color(poResource: .Radio.Knob.Value.error),
                     width: 1.25,
                     backgroundColor: Color(poResource: .Radio.Knob.Background.error),
-                    border: .regular(color: Color(poResource: .Radio.Knob.Border.error))
+                    border: .checkbox(color: Color(poResource: .Radio.Knob.Border.error))
                 ),
                 value: POTextStyle(
                     color: Color(poResource: .Radio.Text.error),
@@ -84,7 +84,7 @@ extension ToggleStyle where Self == POCheckboxToggleStyle {
                     color: Color(poResource: .Radio.Knob.Value.disabled),
                     width: 1.25,
                     backgroundColor: Color(poResource: .Radio.Knob.Background.disabled),
-                    border: .regular(color: Color(poResource: .Radio.Knob.Border.disabled))
+                    border: .checkbox(color: Color(poResource: .Radio.Knob.Border.disabled))
                 ),
                 value: POTextStyle(
                     color: Color(poResource: .Radio.Text.disabled),
