@@ -13,7 +13,7 @@ extension POInputStyle {
     public static let medium = `default`(typography: .Text.s14(weight: .regular))
 
     /// Large input style.
-    public static let large = `default`(typography: .Text.s24(weight: .regular))
+    public static let large = `default`(typography: .Text.s20(weight: .medium))
 
     // MARK: - Utils
 
@@ -38,11 +38,11 @@ extension POInputStyle {
             normal: .init(
                 text: .init(
                     color: Color.Input.Text.default,
-                    typography: .Text.s14(weight: .regular)
+                    typography: typography
                 ),
                 placeholder: .init(
                     color: Color.Input.Placeholder.default,
-                    typography: .Text.s14(weight: .regular)
+                    typography: typography
                 ),
                 backgroundColor: Color.Input.Background.default,
                 border: .regular(color: Color.Input.Border.default),
@@ -52,11 +52,11 @@ extension POInputStyle {
             error: .init(
                 text: .init(
                     color: Color.Input.Text.error,
-                    typography: .Text.s14(weight: .regular)
+                    typography: typography
                 ),
                 placeholder: .init(
                     color: Color.Input.Placeholder.error,
-                    typography: .Text.s14(weight: .regular)
+                    typography: typography
                 ),
                 backgroundColor: Color.Input.Background.error,
                 border: .regular(color: Color.Input.Border.error),
@@ -66,11 +66,11 @@ extension POInputStyle {
             focused: .init(
                 text: .init(
                     color: Color.Input.Text.focused,
-                    typography: .Text.s14(weight: .regular)
+                    typography: typography
                 ),
                 placeholder: .init(
                     color: Color.Input.Placeholder.focused,
-                    typography: .Text.s14(weight: .regular)
+                    typography: typography
                 ),
                 backgroundColor: Color.Input.Background.focused,
                 border: .regular(color: Color.Input.Border.focused),
@@ -80,11 +80,11 @@ extension POInputStyle {
             errorFocused: .init(
                 text: .init(
                     color: Color.Input.Text.errorFocused,
-                    typography: .Text.s14(weight: .regular)
+                    typography: typography
                 ),
                 placeholder: .init(
                     color: Color.Input.Placeholder.errorFocused,
-                    typography: .Text.s14(weight: .regular)
+                    typography: typography
                 ),
                 backgroundColor: Color.Input.Background.errorFocused,
                 border: .regular(color: Color.Input.Border.errorFocused),
