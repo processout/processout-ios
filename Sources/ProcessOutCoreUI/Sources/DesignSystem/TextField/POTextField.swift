@@ -18,7 +18,10 @@ public struct POTextField<Trailing: View>: View {
     ///   If `formatter` can't perform the conversion, the text field doesn't modify `binding.value`.
     ///   - prompt: A `String` which provides users with guidance on what to enter into the text field.
     public init(
-        text: Binding<String>, formatter: Formatter? = nil, prompt: String = "", trailingView: Trailing = EmptyView()
+        text: Binding<String>,
+        formatter: Formatter? = nil,
+        prompt: String = "",
+        trailingView: Trailing = EmptyView()
     ) {
         self._text = text
         self.formatter = formatter
