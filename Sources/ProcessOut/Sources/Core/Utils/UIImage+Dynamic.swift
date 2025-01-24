@@ -10,7 +10,7 @@ import UIKit
 extension UIImage {
 
     @MainActor
-    static func dynamic(lightImage: UIImage?, darkImage: UIImage?) -> UIImage? {
+    static func dynamic(lightImage: UIImage?, darkImage: UIImage?) async -> UIImage? {
         // When image with scale greater than 3 is registered asset created explicitly produced
         // image is malformed and doesn't contain images for light nor dark styles.
         guard let image = lightImage ?? darkImage else {
@@ -21,18 +21,19 @@ extension UIImage {
             return image
         }
         if let lightImage {
-            register(image: lightImage, with: .light, in: imageAsset)
+            await register(image: lightImage, with: .light, in: imageAsset)
         }
         if let darkImage {
-            register(image: darkImage, with: .dark, in: imageAsset)
+            await register(image: darkImage, with: .dark, in: imageAsset)
         }
         return image
     }
 
     // MARK: - Private Methods
 
-    private static func register(image: UIImage, with style: UIUserInterfaceStyle, in asset: UIImageAsset) {
-        let scaledImage = image.rescaledToMatchDeviceScale()
+    @MainActor
+    private static func register(image: UIImage, with style: UIUserInterfaceStyle, in asset: UIImageAsset) async {
+        let scaledImage = await image.rescaledToMatchDeviceScale()
         let styleTrait = UITraitCollection(userInterfaceStyle: style)
         let traits = UITraitCollection(
             traitsFrom: [scaledImage.traitCollection, styleTrait]
@@ -40,7 +41,7 @@ extension UIImage {
         asset.register(scaledImage, with: traits)
     }
 
-    private func rescaledToMatchDeviceScale() -> UIImage {
+    private func rescaledToMatchDeviceScale() async -> UIImage {
         // Rescales the image when its scale exceeds the device's display scale.
         // This avoids issues with displaying dynamic images in SwiftUI.
         let format = UIGraphicsImageRendererFormat.preferred()
