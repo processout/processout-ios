@@ -21,7 +21,8 @@ final class UrlSessionImagesRepository: POImagesRepository {
             for url in urls {
                 group.addTask {
                     let image = try? await UIImage(data: session.data(from: url).0, scale: scale)
-                    return (url, image)
+                    let scaledImage = image?.rescaledToMatchDeviceScale()
+                    return (url, scaledImage)
                 }
             }
             var images: [URL: UIImage] = [:]
