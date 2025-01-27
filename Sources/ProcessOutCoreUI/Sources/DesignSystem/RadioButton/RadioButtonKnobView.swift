@@ -33,7 +33,7 @@ struct RadioButtonKnobView: View {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let size: CGFloat = 22
+        static let size: CGFloat = 16
     }
 
     // MARK: - Private Properties

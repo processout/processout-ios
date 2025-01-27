@@ -76,7 +76,7 @@ private struct ContentView: View {
         Label(
             title: {
                 configuration.label
-                    .textStyle(style.value, addPadding: false)
+                    .textStyle(style.value)
                     .frame(maxWidth: .infinity, alignment: .leading)
             },
             icon: {
@@ -97,7 +97,7 @@ private struct ContentView: View {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let backgroundPadding = EdgeInsets(horizontal: -10, vertical: -12)
+        static let backgroundPadding = EdgeInsets(horizontal: -10, vertical: -11)
     }
 
     // MARK: - Private Properties
