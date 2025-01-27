@@ -48,10 +48,10 @@ extension POContentUnavailableViewStyle where Self == PODefaultContentUnavailabl
     public static var automatic: PODefaultContentUnavailableViewStyle {
         PODefaultContentUnavailableViewStyle(
             title: .init(
-                color: Color(poResource: .Text.primary), typography: .Text.s16(weight: .medium)
+                color: Color.Text.primary, typography: .Text.s16(weight: .medium)
             ),
             description: .init(
-                color: Color(poResource: .Text.secondary), typography: .Text.s14(weight: .regular)
+                color: Color.Text.secondary, typography: .Text.s14(weight: .regular)
             )
         )
     }
