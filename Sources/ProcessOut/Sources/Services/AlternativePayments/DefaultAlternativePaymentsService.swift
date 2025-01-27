@@ -22,11 +22,39 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
     // MARK: - POAlternativePaymentsService
 
     func tokenize(request: POAlternativePaymentTokenizationRequest) async throws -> POAlternativePaymentResponse {
-        try await authenticate(using: url(for: request), callback: request.callback)
+        let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+            url: try url(for: request),
+            callback: request.callback,
+            prefersEphemeralSession: request.prefersEphemeralSession
+        )
+        return try await authenticate(request: authenticationRequest)
     }
 
     func authorize(request: POAlternativePaymentAuthorizationRequest) async throws -> POAlternativePaymentResponse {
-        try await authenticate(using: url(for: request), callback: request.callback)
+        let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+            url: try url(for: request),
+            callback: request.callback,
+            prefersEphemeralSession: request.prefersEphemeralSession
+        )
+        return try await authenticate(request: authenticationRequest)
+    }
+
+    func authenticate(request: POAlternativePaymentAuthenticationRequest) async throws -> POAlternativePaymentResponse {
+        do {
+            let returnUrl = try await webSession.authenticate(
+                using: .init(
+                    url: request.url,
+                    callback: request.callback,
+                    prefersEphemeralSession: request.prefersEphemeralSession
+                )
+            )
+            let response = try response(from: returnUrl)
+            logger.debug("Did authenticate alternative payment: \(response.gatewayToken)")
+            return response
+        } catch {
+            logger.debug("Did fail to authenticate alternative payment: \(error)")
+            throw error
+        }
     }
 
     func url(for request: POAlternativePaymentTokenizationRequest) throws -> URL {
@@ -40,20 +68,6 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
             pathComponents += ["tokenized", tokenId]
         }
         return try url(with: pathComponents, additionalData: request.additionalData)
-    }
-
-    func authenticate(
-        using url: URL, callback: POWebAuthenticationCallback?
-    ) async throws -> POAlternativePaymentResponse {
-        do {
-            let returnUrl = try await webSession.authenticate(using: .init(url: url, callback: callback))
-            let response = try response(from: returnUrl)
-            logger.debug("Did authenticate alternative payment: \(response.gatewayToken)")
-            return response
-        } catch {
-            logger.debug("Did fail to authenticate alternative payment: \(error)")
-            throw error
-        }
     }
 
     @available(*, deprecated)

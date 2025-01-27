@@ -103,7 +103,9 @@ final class AlternativePaymentsInteractor {
 
     func authorize(invoice: POInvoice, gatewayConfigurationId: String, saveSource: Bool) async throws {
         let request = POAlternativePaymentAuthorizationRequest(
-            invoiceId: invoice.id, gatewayConfigurationId: gatewayConfigurationId
+            invoiceId: invoice.id,
+            gatewayConfigurationId: gatewayConfigurationId,
+            prefersEphemeralSession: false
         )
         let response = try await alternativePaymentsService.authorize(request: request)
         let authorizationRequest = POInvoiceAuthorizationRequest(
@@ -111,7 +113,8 @@ final class AlternativePaymentsInteractor {
             source: response.gatewayToken,
             saveSource: saveSource,
             allowFallbackToSale: true,
-            clientSecret: invoice.clientSecret
+            clientSecret: invoice.clientSecret,
+            prefersEphemeralWebAuthenticationSession: false
         )
         let threeDSService = POTest3DSService()
         try await invoicesService.authorizeInvoice(request: authorizationRequest, threeDSService: threeDSService)
@@ -127,7 +130,8 @@ final class AlternativePaymentsInteractor {
         let tokenizationRequest = POAlternativePaymentTokenizationRequest(
             customerId: Example.Constants.customerId,
             customerTokenId: token.id,
-            gatewayConfigurationId: gatewayConfigurationId
+            gatewayConfigurationId: gatewayConfigurationId,
+            prefersEphemeralSession: false
         )
         let tokenAssignRequest = POAssignCustomerTokenRequest(
             customerId: Example.Constants.customerId,
@@ -142,7 +146,8 @@ final class AlternativePaymentsInteractor {
         let invoiceAuthorizationRequest = POInvoiceAuthorizationRequest(
             invoiceId: invoice.id,
             source: customerToken.id,
-            allowFallbackToSale: true
+            allowFallbackToSale: true,
+            prefersEphemeralWebAuthenticationSession: false
         )
         let threeDSService = POTest3DSService()
         try await invoicesService.authorizeInvoice(request: invoiceAuthorizationRequest, threeDSService: threeDSService)

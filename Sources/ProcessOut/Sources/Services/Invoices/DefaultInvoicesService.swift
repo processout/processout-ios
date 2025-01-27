@@ -97,10 +97,13 @@ final class DefaultInvoicesService: POInvoicesService {
         }
         let newRequest: POInvoiceAuthorizationRequest
         do {
+            let customerActionRequest = CustomerActionRequest(
+                customerAction: customerAction,
+                webAuthenticationCallback: request.webAuthenticationCallback,
+                prefersEphemeralWebAuthenticationSession: request.prefersEphemeralWebAuthenticationSession
+            )
             let newSource = try await customerActionsService.handle(
-                action: customerAction,
-                threeDSService: threeDSService,
-                webAuthenticationCallback: request.webAuthenticationCallback
+                request: customerActionRequest, threeDSService: threeDSService
             )
             newRequest = request.replacing(source: newSource)
         } catch {

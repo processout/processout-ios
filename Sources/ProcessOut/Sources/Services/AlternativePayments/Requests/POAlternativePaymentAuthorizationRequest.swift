@@ -26,18 +26,30 @@ public struct POAlternativePaymentAuthorizationRequest: Sendable {
     /// An object used to evaluate navigation events in a web authentication session.
     public let callback: POWebAuthenticationCallback?
 
+    /// A boolean value that indicates whether the session should ask the browser for a
+    /// private authentication session.
+    ///
+    /// Set `prefersEphemeralSession` to true to request that the browser
+    /// doesn’t share cookies or other browsing data between the authentication session
+    /// and the user’s normal browser session.
+    ///
+    /// The value of this property is `true` by default.
+    public let prefersEphemeralSession: Bool
+
     /// Creates authorization request.
     public init(
         invoiceId: String,
         gatewayConfigurationId: String,
         customerTokenId: String? = nil,
         additionalData: [String: String]? = nil,
-        callback: POWebAuthenticationCallback? = nil
+        callback: POWebAuthenticationCallback? = nil,
+        prefersEphemeralSession: Bool = true
     ) {
         self.invoiceId = invoiceId
         self.gatewayConfigurationId = gatewayConfigurationId
         self.customerTokenId = customerTokenId
         self.additionalData = additionalData
         self.callback = callback
+        self.prefersEphemeralSession = prefersEphemeralSession
     }
 }

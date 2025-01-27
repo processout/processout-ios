@@ -25,7 +25,7 @@ final class DefaultWebAuthenticationSession:
                     let session = Self.createAuthenticationSession(with: request) { result in
                         operationProxy.setCompleted(with: result)
                     }
-                    session.prefersEphemeralWebBrowserSession = true
+                    session.prefersEphemeralWebBrowserSession = request.prefersEphemeralSession
                     session.presentationContextProvider = self
                     operationProxy.set(session: session, continuation: continuation)
                     if Task.isCancelled {
