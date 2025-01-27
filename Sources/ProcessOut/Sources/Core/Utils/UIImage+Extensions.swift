@@ -17,7 +17,7 @@ extension UIImage {
             return self
         }
         let renderer = UIGraphicsImageRenderer(size: size, format: format)
-        let resizedImage = renderer.image { context in
+        let resizedImage = renderer.image { _ in
             draw(in: CGRect(origin: .zero, size: size))
         }
         return resizedImage.withRenderingMode(renderingMode)

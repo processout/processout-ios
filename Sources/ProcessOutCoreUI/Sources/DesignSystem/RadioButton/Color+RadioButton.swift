@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// swiftlint:disable nesting
+
 extension Color {
 
     /// The "Radio" color namespace.
@@ -175,3 +177,5 @@ extension Color {
         }
     }
 }
+
+// swiftlint:enable nesting

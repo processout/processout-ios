@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// swiftlint:disable nesting
+
 extension Color {
 
     /// The "Button" color namespace.
@@ -147,3 +149,5 @@ extension Color {
         }
     }
 }
+
+// swiftlint:enable nesting
