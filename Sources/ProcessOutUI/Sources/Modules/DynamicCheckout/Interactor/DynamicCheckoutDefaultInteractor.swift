@@ -290,20 +290,19 @@ final class DynamicCheckoutDefaultInteractor:
             default:
                 shouldCreateNewInvoice = currentState.snapshot.shouldInvalidateInvoice
             }
-            let invoice: POInvoice, clientSecret: String?
             if shouldCreateNewInvoice {
                 guard let invoiceRequest = await delegate?.dynamicCheckout(
                     newInvoiceFor: currentState.snapshot.snapshot.invoice, invalidationReason: reason
                 ) else {
                     throw POFailure(message: "Unable to restart dynamic checkout.", code: .generic(.mobile))
                 }
-                invoice = try await invoicesService.invoice(request: invoiceRequest)
-                clientSecret = invoiceRequest.clientSecret
+                finishRestart(
+                    with: try await invoicesService.invoice(request: invoiceRequest),
+                    clientSecret: invoiceRequest.clientSecret
+                )
             } else {
-                invoice = currentState.snapshot.snapshot.invoice
-                clientSecret = currentState.snapshot.snapshot.clientSecret
+                finishRestartWithExistingInvoice()
             }
-            finishRestart(with: invoice, clientSecret: clientSecret)
         } catch {
             setFailureState(error: error)
         }
@@ -329,11 +328,33 @@ final class DynamicCheckoutDefaultInteractor:
             errorDescription = failureDescription(currentState.failure)
         }
         setStartedState(invoice: newInvoice, clientSecret: clientSecret, errorDescription: errorDescription)
-        guard let methodId = currentState.pendingPaymentMethodId, isPendingPaymentMethodAvailable else {
+        if let methodId = currentState.pendingPaymentMethodId, isPendingPaymentMethodAvailable {
+            // todo(andrii-vysotskyi): decide whether input should be preserved for card tokenization
+            select(methodId: methodId, shouldStart: currentState.shouldStartPendingPaymentMethod)
+        } else {
             logger.debug("Ignoring pending method selection because it is not available or not set.")
+        }
+    }
+
+    private func finishRestartWithExistingInvoice() {
+        guard case .restarting(let currentState) = state else {
+            logger.debug("Unexpected state to finish restart: \(state).")
             return
         }
-        select(methodId: methodId, shouldStart: currentState.shouldStartPendingPaymentMethod)
+        let newState = DynamicCheckoutInteractorState.Started(
+            paymentMethods: currentState.snapshot.snapshot.paymentMethods,
+            isCancellable: currentState.snapshot.snapshot.isCancellable,
+            invoice: currentState.snapshot.snapshot.invoice,
+            clientSecret: currentState.snapshot.snapshot.clientSecret,
+            recentErrorDescription: failureDescription(currentState.failure)
+        )
+        state = .started(newState)
+        logger.debug("Did restart dynamic checkout flow.")
+        if let methodId = currentState.pendingPaymentMethodId {
+            select(methodId: methodId, shouldStart: currentState.shouldStartPendingPaymentMethod)
+        } else {
+            logger.debug("Ignoring pending method selection because it is not available or not set.")
+        }
         // todo(andrii-vysotskyi): decide whether input should be preserved for card tokenization
     }
 
