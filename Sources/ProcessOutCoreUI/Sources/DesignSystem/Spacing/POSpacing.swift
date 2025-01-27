@@ -10,6 +10,9 @@ import Foundation
 @_spi(PO)
 public enum POSpacing {
 
+    /// Extra extra small spacing.
+    public static let extraExtraSmall: CGFloat = 2
+
     /// Extra small spacing.
     public static let extraSmall: CGFloat = 4
 
