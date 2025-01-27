@@ -17,11 +17,11 @@ extension ButtonStyle where Self == POBrandButtonStyle {
     public static var brand: POBrandButtonStyle {
         POBrandButtonStyle(
             title: .init(
-                color: Color(poResource: .Text.primary), typography: .Text.s14(weight: .medium)
+                color: .Text.primary, typography: .Text.s14(weight: .medium)
             ),
             border: .button(color: .clear),
             shadow: .clear,
-            progressStyle: CircularProgressViewStyle(tint: Color(poResource: .Text.primary))
+            progressStyle: CircularProgressViewStyle(tint: .Text.primary)
         )
     }
 }
