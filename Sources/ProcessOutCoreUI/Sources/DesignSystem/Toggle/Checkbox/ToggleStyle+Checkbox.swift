@@ -16,81 +16,81 @@ extension ToggleStyle where Self == POCheckboxToggleStyle {
         POCheckboxToggleStyle(
             normal: .init(
                 checkmark: .init(
-                    color: Color(poResource: .Radio.Knob.Value.default),
+                    color: .Radio.Knob.Value.default,
                     width: 1.25,
-                    backgroundColor: Color(poResource: .Radio.Knob.Background.default),
-                    border: .checkbox(color: Color(poResource: .Radio.Knob.Border.default))
+                    backgroundColor: .Radio.Knob.Background.default,
+                    border: .checkbox(color: .Radio.Knob.Border.default)
                 ),
                 value: POTextStyle(
-                    color: Color(poResource: .Radio.Text.default),
+                    color: .Radio.Text.default,
                     typography: .Text.s14(weight: .medium)
                 ),
-                backgroundColor: Color(poResource: .Radio.Background.default)
+                backgroundColor: .Radio.Background.default
             ),
             highlighted: .init(
                 checkmark: .init(
-                    color: Color(poResource: .Radio.Knob.Value.pressed),
+                    color: .Radio.Knob.Value.pressed,
                     width: 1.25,
-                    backgroundColor: Color(poResource: .Radio.Knob.Background.pressed),
-                    border: .checkbox(color: Color(poResource: .Radio.Knob.Border.pressed))
+                    backgroundColor: .Radio.Knob.Background.pressed,
+                    border: .checkbox(color: .Radio.Knob.Border.pressed)
                 ),
                 value: POTextStyle(
-                    color: Color(poResource: .Radio.Text.pressed),
+                    color: .Radio.Text.pressed,
                     typography: .Text.s14(weight: .medium)
                 ),
-                backgroundColor: Color(poResource: .Radio.Background.pressed)
+                backgroundColor: .Radio.Background.pressed
             ),
             selected: .init(
                 checkmark: .init(
-                    color: Color(poResource: .Radio.Knob.Value.selected),
+                    color: .Radio.Knob.Value.selected,
                     width: 1.25,
-                    backgroundColor: Color(poResource: .Radio.Knob.Background.selected),
-                    border: .checkbox(color: Color(poResource: .Radio.Knob.Border.selected))
+                    backgroundColor: .Radio.Knob.Background.selected,
+                    border: .checkbox(color: .Radio.Knob.Border.selected)
                 ),
                 value: POTextStyle(
-                    color: Color(poResource: .Radio.Text.selected),
+                    color: .Radio.Text.selected,
                     typography: .Text.s14(weight: .medium)
                 ),
-                backgroundColor: Color(poResource: .Radio.Background.selected)
+                backgroundColor: .Radio.Background.selected
             ),
             selectedHighlighted: .init(
                 checkmark: .init(
-                    color: Color(poResource: .Radio.Knob.Value.selectedPressed),
+                    color: .Radio.Knob.Value.selectedPressed,
                     width: 1.25,
-                    backgroundColor: Color(poResource: .Radio.Knob.Background.selectedPressed),
-                    border: .checkbox(color: Color(poResource: .Radio.Knob.Border.selectedPressed))
+                    backgroundColor: .Radio.Knob.Background.selectedPressed,
+                    border: .checkbox(color: .Radio.Knob.Border.selectedPressed)
                 ),
                 value: POTextStyle(
-                    color: Color(poResource: .Radio.Text.selectedPressed),
+                    color: .Radio.Text.selectedPressed,
                     typography: .Text.s14(weight: .medium)
                 ),
-                backgroundColor: Color(poResource: .Radio.Background.selectedPressed)
+                backgroundColor: .Radio.Background.selectedPressed
             ),
             error: .init(
                 checkmark: .init(
-                    color: Color(poResource: .Radio.Knob.Value.error),
+                    color: .Radio.Knob.Value.error,
                     width: 1.25,
-                    backgroundColor: Color(poResource: .Radio.Knob.Background.error),
-                    border: .checkbox(color: Color(poResource: .Radio.Knob.Border.error))
+                    backgroundColor: .Radio.Knob.Background.error,
+                    border: .checkbox(color: .Radio.Knob.Border.error)
                 ),
                 value: POTextStyle(
-                    color: Color(poResource: .Radio.Text.error),
+                    color: .Radio.Text.error,
                     typography: .Text.s14(weight: .medium)
                 ),
-                backgroundColor: Color(poResource: .Radio.Background.error)
+                backgroundColor: .Radio.Background.error
             ),
             disabled: .init(
                 checkmark: .init(
-                    color: Color(poResource: .Radio.Knob.Value.disabled),
+                    color: .Radio.Knob.Value.disabled,
                     width: 1.25,
-                    backgroundColor: Color(poResource: .Radio.Knob.Background.disabled),
-                    border: .checkbox(color: Color(poResource: .Radio.Knob.Border.disabled))
+                    backgroundColor: .Radio.Knob.Background.disabled,
+                    border: .checkbox(color: .Radio.Knob.Border.disabled)
                 ),
                 value: POTextStyle(
-                    color: Color(poResource: .Radio.Text.disabled),
+                    color: .Radio.Text.disabled,
                     typography: .Text.s14(weight: .medium)
                 ),
-                backgroundColor: Color(poResource: .Radio.Background.disabled)
+                backgroundColor: .Radio.Background.disabled
             )
         )
     }

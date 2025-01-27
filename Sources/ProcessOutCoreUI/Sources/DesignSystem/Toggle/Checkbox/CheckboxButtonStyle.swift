@@ -68,7 +68,7 @@ private struct ContentView: View {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let backgroundPadding = EdgeInsets(horizontal: -10, vertical: -12)
+        static let backgroundPadding = EdgeInsets(horizontal: -10, vertical: -11)
     }
 
     // MARK: - Private Properties

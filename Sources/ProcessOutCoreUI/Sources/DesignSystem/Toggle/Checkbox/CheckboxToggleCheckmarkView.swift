@@ -34,7 +34,7 @@ struct CheckboxToggleCheckmarkView: View {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let size: CGFloat = 22
+        static let size: CGFloat = 16
         static let checkmarkSize = Constants.size * 0.75
     }
 
