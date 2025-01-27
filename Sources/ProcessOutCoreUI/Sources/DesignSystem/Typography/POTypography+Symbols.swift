@@ -8,103 +8,7 @@
 import UIKit
 
 @_spi(PO)
-@available(*, deprecated)
 extension POTypography {
-
-    /// Use for extra large titles.
-    public static let extraLargeTitle = POTypography(font: UIFont(.WorkSans.regular, size: 36))
-
-    /// Use for titles.
-    public static let title = POTypography(font: UIFont(.WorkSans.medium, size: 20), lineHeight: 24)
-
-    /// Subheading typography.
-    public static let subheading = POTypography(font: UIFont(.WorkSans.medium, size: 18), lineHeight: 24)
-
-    /// Primary body text for readability and consistency.
-    public static let body1 = POTypography(font: UIFont(.WorkSans.medium, size: 16), lineHeight: 24)
-
-    /// Secondary body text for supporting content.
-    public static let body2 = POTypography(font: UIFont(.WorkSans.regular, size: 14), lineHeight: 18)
-
-    /// Tertiary body text for supporting content.
-    public static let body3 = POTypography(font: UIFont(.WorkSans.regular, size: 16))
-
-    /// Text used on buttons or interactive elements.
-    public static let button = POTypography(font: UIFont(.WorkSans.medium, size: 14), lineHeight: 18)
-
-    /// Large text for prominent labels or headings.
-    public static let label1 = POTypography(font: UIFont(.WorkSans.medium, size: 14), lineHeight: 18)
-
-    /// Smaller text for secondary labels or headings.
-    public static let label2 = POTypography(font: UIFont(.WorkSans.regular, size: 14), lineHeight: 18)
-}
-
-@_spi(PO)
-extension POTypography {
-
-    public enum Header {
-
-        public static func s18(weight: UIFont.Weight = .regular) -> POTypography {
-            validateWeight(weight: weight)
-            return .init(font: .init(.workSans(withWeight: weight), size: 18), lineHeight: 22)
-        }
-
-        public static func s20(weight: UIFont.Weight = .regular) -> POTypography {
-            validateWeight(weight: weight)
-            if #available(iOS 16, *) {
-                let kernings: [UIFont.Weight: CGFloat] = [.regular: -0.2, .medium: -0.15, .semibold: -0.1]
-                let kerning = kernings[weight] ?? 0.0
-                return .init(font: .init(.workSans(withWeight: weight), size: 20), kerning: kerning)
-            }
-            return .init(font: .init(.workSans(withWeight: weight), size: 20))
-        }
-
-        public static func s24(weight: UIFont.Weight = .regular) -> POTypography {
-            validateWeight(weight: weight)
-            return .init(font: .init(.workSans(withWeight: weight), size: 24))
-        }
-
-        public static func s28(weight: UIFont.Weight = .regular) -> POTypography {
-            // Height should be different when weight is semibold.
-            validateWeight(weight: weight)
-            return .init(font: .init(.workSans(withWeight: weight), size: 28))
-        }
-
-        public static func s32(weight: UIFont.Weight = .regular) -> POTypography {
-            validateWeight(weight: weight)
-            return .init(font: .init(.workSans(withWeight: weight), size: 32), lineHeight: 40)
-        }
-
-        public static func s36(weight: UIFont.Weight = .regular) -> POTypography {
-            validateWeight(weight: weight)
-            return .init(font: .init(.workSans(withWeight: weight), size: 36), lineHeight: 44)
-        }
-
-        public static func s40(weight: UIFont.Weight = .regular) -> POTypography {
-            validateWeight(weight: weight)
-            if #available(iOS 16, *) {
-                let kernings: [UIFont.Weight: CGFloat] = [.regular: -0.3, .medium: -0.25, .semibold: -0.2]
-                let kerning = kernings[weight] ?? 0.0
-                return .init(font: .init(.workSans(withWeight: weight), size: 40), lineHeight: 48, kerning: kerning)
-            }
-            return .init(font: .init(.workSans(withWeight: weight), size: 40), lineHeight: 48)
-        }
-
-        public static func s48(weight: UIFont.Weight = .regular) -> POTypography {
-            validateWeight(weight: weight)
-            return .init(font: .init(.workSans(withWeight: weight), size: 48))
-        }
-
-        public static func s64(weight: UIFont.Weight = .regular) -> POTypography {
-            validateWeight(weight: weight)
-            if #available(iOS 16, *) {
-                let kernings: [UIFont.Weight: CGFloat] = [.regular: -1, .medium: -0.8, .semibold: -0.6]
-                let kerning = kernings[weight] ?? 0.0
-                return .init(font: .init(.workSans(withWeight: weight), size: 64), lineHeight: 80, kerning: kerning)
-            }
-            return .init(font: .init(.workSans(withWeight: weight), size: 64), lineHeight: 80)
-        }
-    }
 
     public enum Text {
 
@@ -167,47 +71,9 @@ extension POTypography {
 
     public enum Paragraph {
 
-        public static func s14(weight: UIFont.Weight = .regular) -> POTypography {
-            validateWeight(weight: weight)
-            return .init(font: .init(.workSans(withWeight: weight), size: 14), lineHeight: 24, paragraphSpacing: 24)
-        }
-
         public static func s16(weight: UIFont.Weight = .regular) -> POTypography {
             validateWeight(weight: weight)
             return .init(font: .init(.workSans(withWeight: weight), size: 16), lineHeight: 28, paragraphSpacing: 28)
-        }
-
-        public static func s18(weight: UIFont.Weight = .regular) -> POTypography {
-            validateWeight(weight: weight)
-            if #available(iOS 16, *) {
-                let kernings: [UIFont.Weight: CGFloat] = [.medium: 0.1, .semibold: 0.1]
-                return .init(
-                    font: .init(.workSans(withWeight: weight), size: 18),
-                    lineHeight: 32,
-                    paragraphSpacing: 32,
-                    kerning: kernings[weight] ?? 0.0
-                )
-            }
-            return .init(font: .init(.workSans(withWeight: weight), size: 18), lineHeight: 32, paragraphSpacing: 32)
-        }
-
-        public static func s20(weight: UIFont.Weight = .regular) -> POTypography {
-            validateWeight(weight: weight)
-            if #available(iOS 16, *) {
-                let kernings: [UIFont.Weight: CGFloat] = [.regular: -0.2, .medium: -0.15, .semibold: -0.1]
-                return .init(
-                    font: .init(.workSans(withWeight: weight), size: 20),
-                    lineHeight: 32,
-                    paragraphSpacing: 32,
-                    kerning: kernings[weight] ?? 0.0
-                )
-            }
-            return .init(font: .init(.workSans(withWeight: weight), size: 20), lineHeight: 32, paragraphSpacing: 32)
-        }
-
-        public static func s24(weight: UIFont.Weight = .regular) -> POTypography {
-            validateWeight(weight: weight)
-            return .init(font: .init(.workSans(withWeight: weight), size: 24), lineHeight: 40, paragraphSpacing: 36)
         }
     }
 
