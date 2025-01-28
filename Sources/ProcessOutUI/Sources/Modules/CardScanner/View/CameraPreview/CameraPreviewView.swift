@@ -42,7 +42,7 @@ private final class CameraPreviewUiView: UIView, CameraSessionPreviewTarget {
     }
 
     deinit {
-        setPreviewSource(nil)
+        removePreviewLayerFromCameraSession()
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -62,24 +62,21 @@ private final class CameraPreviewUiView: UIView, CameraSessionPreviewTarget {
         if let source {
             source.connect(to: self)
         } else {
-            layer.session = nil
+            removePreviewLayerFromCameraSession()
         }
     }
 
-    func setCameraSession(_ cameraSession: CameraSession, captureSession: AVCaptureSession) {
-        guard layer.session != captureSession else {
-            return
-        }
-        guard let videoPort = videoPort(with: captureSession) else {
-            return
-        }
-        let connection = AVCaptureConnection(inputPort: videoPort, videoPreviewLayer: layer)
+    func setCameraSession(_ cameraSession: CameraSession) {
         Task { @MainActor in
-            await cameraSession.addConnection(connection)
+            await cameraSession.addPreviewLayer(layer)
             updateInterfaceOrientation()
         }
-        layer.setSessionWithNoConnection(captureSession)
+        self.cameraSession = cameraSession
     }
+
+    // MARK: - Private Properties
+
+    private weak var cameraSession: CameraSession?
 
     // MARK: - Private Methods
 
@@ -108,7 +105,7 @@ private final class CameraPreviewUiView: UIView, CameraSessionPreviewTarget {
     private func updateInterfaceOrientation() {
         let interfaceOrientation = window?.windowScene?.interfaceOrientation ?? .unknown
         let rotationAngle: CGFloat
-        if let session = layer.session, shouldMatchInputDeviceOrientation(in: session) {
+        if shouldMatchInputDeviceOrientation() {
             switch interfaceOrientation {
             case .landscapeLeft:
                 rotationAngle = .pi / 2
@@ -125,17 +122,18 @@ private final class CameraPreviewUiView: UIView, CameraSessionPreviewTarget {
         transform = .init(rotationAngle: rotationAngle)
     }
 
-    private func shouldMatchInputDeviceOrientation(in session: AVCaptureSession) -> Bool {
-        videoPort(with: session)?.sourceDevicePosition != .unspecified
+    private func shouldMatchInputDeviceOrientation() -> Bool {
+        let videoPort = layer.connection?.inputPorts.first { port in
+            port.mediaType == .video
+        }
+        return videoPort?.sourceDevicePosition != .unspecified
     }
 
-    private func videoPort(with session: AVCaptureSession) -> AVCaptureInput.Port? {
-        let videoInputs = session.inputs.compactMap { input in
-            input as? AVCaptureDeviceInput
+    // MARK: -
+
+    private func removePreviewLayerFromCameraSession() {
+        Task { @MainActor [layer, cameraSession] in
+            await cameraSession?.removePreviewLayer(layer)
         }
-        guard let videoInput = videoInputs.first else {
-            return nil
-        }
-        return videoInput.ports(for: .video, sourceDeviceType: nil, sourceDevicePosition: .unspecified).first
     }
 }

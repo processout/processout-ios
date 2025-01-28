@@ -19,5 +19,5 @@ protocol CameraSessionPreviewTarget: Sendable {
 
     /// Sets the capture session on the destination.
     @MainActor
-    func setCameraSession(_ cameraSession: CameraSession, captureSession: AVCaptureSession)
+    func setCameraSession(_ cameraSession: CameraSession)
 }
