@@ -42,6 +42,7 @@ private final class CameraPreviewUiView: UIView, CameraSessionPreviewTarget {
     }
 
     deinit {
+        setPreviewSource(nil)
         NotificationCenter.default.removeObserver(self)
     }
 
