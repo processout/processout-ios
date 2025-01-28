@@ -122,7 +122,7 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
     private func makeContentBody(paymentMethods: AnyView) -> some View {
         Group(poSubviews: paymentMethods) { subviews in
             if !subviews.isEmpty {
-                VStack(spacing: 0) {
+                LazyVStack(spacing: 0) {
                     ForEach(subviews) { subview in
                         subview
                         if subview.id != subviews.last?.id {
