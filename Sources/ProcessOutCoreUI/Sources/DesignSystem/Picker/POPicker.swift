@@ -10,53 +10,33 @@ import SwiftUI
 @_spi(PO)
 @available(iOS 14, *)
 @MainActor
-public struct POPicker<Data: RandomAccessCollection, Id: Hashable>: View {
+public struct POPicker<SelectionValue: Hashable, Content: View>: View {
 
     // swiftlint:disable:next line_length
-    public init(_ data: Data, selection: Binding<Id?>, content: @escaping (Data.Element) -> Text) where Data.Element: Identifiable, Data.Element.ID == Id {
-        self.data = data
-        self.id = \.id
+    public init(selection: Binding<SelectionValue?>, @ViewBuilder content: () -> Content) {
         self._selection = selection
-        self.content = content
+        self.content = content()
     }
 
     public var body: some View {
-        let configuration = POPickerStyleConfiguration(
-            elements: data.map(createConfigurationElement), isInvalid: isInvalid
-        )
+        let selection = Binding<AnyHashable?> {
+            self.selection
+        } set: { newValue in
+            self.selection = newValue?.base as? SelectionValue
+        }
+        let configuration = POPickerStyleConfiguration(selection: selection) {
+            content
+        }
         AnyView(style.makeBody(configuration: configuration))
     }
 
     // MARK: - Private Properties
 
-    private let data: Data
-    private let id: KeyPath<Data.Element, Id>
-    private let content: (Data.Element) -> Text
+    private let content: Content
 
     @Binding
-    private var selection: Id?
+    private var selection: SelectionValue?
 
     @Environment(\.pickerStyle)
     private var style
-
-    @Environment(\.isControlInvalid)
-    private var isInvalid
-
-    // MARK: - Private Methods
-
-    private func createConfigurationElement(element: Data.Element) -> POPickerStyleConfigurationElement {
-        let element = POPickerStyleConfigurationElement(
-            id: AnyHashable(element[keyPath: id]),
-            makeBody: {
-                content(element)
-            },
-            isSelected: selection == element[keyPath: id],
-            select: {
-                withAnimation {
-                    selection = element[keyPath: id]
-                }
-            }
-        )
-        return element
-    }
 }

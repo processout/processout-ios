@@ -20,31 +20,24 @@ public protocol POPickerStyle: Sendable {
     /// Returns the appearance and interaction content for a `POPicker`.
     ///
     /// - Parameter configuration : The properties of the date picker.
-    @ViewBuilder func makeBody(configuration: POPickerStyleConfiguration) -> Self.Body
+    @ViewBuilder func makeBody(configuration: Configuration) -> Self.Body
+
+    /// The properties of a picker.
+    typealias Configuration = POPickerStyleConfiguration
 }
 
 @_spi(PO)
 public struct POPickerStyleConfiguration {
 
-    /// Picker elements.
-    public let elements: [POPickerStyleConfigurationElement]
+    /// The date value being displayed and selected.
+    @Binding
+    public var selection: AnyHashable?
 
-    /// Boolean value indicating whether selection (or lack of it) makes picker invalid.
-    public let isInvalid: Bool
-}
+    /// Content.
+    public let content: AnyView
 
-@_spi(PO)
-public struct POPickerStyleConfigurationElement: Identifiable {
-
-    /// The stable identity of the element.
-    public let id: AnyHashable
-
-    /// Returns the appearance for the picker element.
-    public let makeBody: () -> Text
-
-    /// Boolean value indicating whether element is currently selected.
-    public let isSelected: Bool
-
-    /// Invoke to select element.
-    public let select: () -> Void
+    init(selection: Binding<AnyHashable?>, @ViewBuilder content: () -> some View) {
+        self._selection = selection
+        self.content = AnyView(content())
+    }
 }
