@@ -18,7 +18,10 @@ public struct POTextField<Trailing: View>: View {
     ///   If `formatter` can't perform the conversion, the text field doesn't modify `binding.value`.
     ///   - prompt: A `String` which provides users with guidance on what to enter into the text field.
     public init(
-        text: Binding<String>, formatter: Formatter? = nil, prompt: String = "", trailingView: Trailing = EmptyView()
+        text: Binding<String>,
+        formatter: Formatter? = nil,
+        prompt: String = "",
+        trailingView: Trailing = EmptyView()
     ) {
         self._text = text
         self.formatter = formatter
@@ -27,29 +30,18 @@ public struct POTextField<Trailing: View>: View {
     }
 
     public var body: some View {
-        let style = style.resolve(isInvalid: isInvalid, isFocused: focusCoordinator.isEditing)
-        HStack {
-            ZStack(alignment: .leading) {
-                TextFieldRepresentable(text: $text, formatter: formatter, style: style)
-                Text(prompt)
-                    .lineLimit(1)
-                    .textStyle(style.placeholder)
-                    .allowsHitTesting(false)
-                    .opacity(text.isEmpty ? 1 : 0)
-                    .transaction { transaction in
-                        transaction.animation = nil
-                    }
+        let configuration = POTextFieldStyleConfiguration(
+            text: $text,
+            isEditing: focusCoordinator.isEditing,
+            textField: {
+                TextFieldRepresentable(text: $text, formatter: formatter)
+            },
+            prompt: Text(prompt),
+            trailingView: {
+                trailingView
             }
-            trailingView.foregroundColor(text.isEmpty ? style.placeholder.color : style.text.color)
-        }
-        .padding(Constants.padding)
-        .frame(maxWidth: .infinity, minHeight: Constants.minHeight)
-        .background(style.backgroundColor)
-        .border(style: style.border)
-        .shadow(style: style.shadow)
-        .accentColor(style.tintColor)
-        .animation(.default, value: isInvalid)
-        .backport.geometryGroup()
+        )
+        AnyView(style.makeBody(configuration: configuration))
     }
 
     // MARK: - Private Properties
@@ -61,11 +53,8 @@ public struct POTextField<Trailing: View>: View {
     @Binding
     private var text: String
 
-    @Environment(\.inputStyle)
+    @Environment(\.poTextFieldStyle)
     private var style
-
-    @Environment(\.isControlInvalid)
-    private var isInvalid
 
     @EnvironmentObject
     private var focusCoordinator: FocusCoordinator
@@ -80,11 +69,10 @@ private enum Constants {
 @MainActor
 private struct TextFieldRepresentable: UIViewRepresentable {
 
-    init(text: Binding<String>, formatter: Formatter?, style: POInputStateStyle) {
+    init(text: Binding<String>, formatter: Formatter?) {
         self._text = text
+        self._multiplier = .init(wrappedValue: 1)
         self.formatter = formatter
-        self.style = style
-        _multiplier = .init(wrappedValue: 1, relativeTo: style.text.typography.textStyle)
     }
 
     let formatter: Formatter?
@@ -136,10 +124,11 @@ private struct TextFieldRepresentable: UIViewRepresentable {
 
     // MARK: - Private Properties
 
-    private let style: POInputStateStyle
-
     @POBackport.ScaledMetric
     private var multiplier: CGFloat
+
+    @Environment(\.textStyle)
+    private var textStyle
 
     @Environment(\.poKeyboardType)
     private var keyboardType
@@ -162,8 +151,9 @@ private struct TextFieldRepresentable: UIViewRepresentable {
         if textField.text != text {
             textField.text = text
         }
-        textField.font = style.text.typography.font.withSize(style.text.typography.font.pointSize * multiplier)
-        textField.textColor = UIColor(style.text.color)
+        let multiplier = $multiplier.value(with: textStyle.typography.textStyle)
+        textField.font = textStyle.typography.font.withSize(textStyle.typography.font.pointSize * multiplier)
+        textField.textColor = UIColor(textStyle.color)
     }
 }
 
