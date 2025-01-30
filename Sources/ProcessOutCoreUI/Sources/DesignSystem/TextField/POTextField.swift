@@ -60,11 +60,6 @@ public struct POTextField<Trailing: View>: View {
     private var focusCoordinator: FocusCoordinator
 }
 
-private enum Constants {
-    static let minHeight: CGFloat = 48
-    static let padding = EdgeInsets(horizontal: POSpacing.medium, vertical: POSpacing.extraSmall)
-}
-
 @available(iOS 14, *)
 @MainActor
 private struct TextFieldRepresentable: UIViewRepresentable {
