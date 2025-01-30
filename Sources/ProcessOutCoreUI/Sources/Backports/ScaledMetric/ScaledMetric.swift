@@ -30,6 +30,14 @@ extension POBackport where Wrapped == Any {
 
         /// The value scaled based on the current environment.
         var wrappedValue: Value {
+            value(with: textStyle)
+        }
+
+        var projectedValue: Self {
+            self
+        }
+
+        func value(with textStyle: UIFont.TextStyle?) -> Value {
             let metrics = textStyle.map(UIFontMetrics.init)
             let uiSizeCategory = UIContentSizeCategory(sizeCategory)
             let traits = UITraitCollection(preferredContentSizeCategory: uiSizeCategory)
