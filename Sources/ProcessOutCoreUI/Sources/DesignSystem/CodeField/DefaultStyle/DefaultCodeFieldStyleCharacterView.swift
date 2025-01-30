@@ -27,7 +27,7 @@ struct DefaultCodeFieldStyleCharacterView: View {
     // MARK: - View
 
     var body: some View {
-        let style = style.resolve(isInvalid: isInvalid, isFocused: focusCoordinator.isEditing && caretPosition != nil)
+        let style = style.resolve(isInvalid: isInvalid, isFocused: caretPosition != nil)
         Text(value.description)
             .textStyle(style.text)
             .lineLimit(1)
@@ -52,9 +52,6 @@ struct DefaultCodeFieldStyleCharacterView: View {
 
     @Environment(\.isControlInvalid)
     private var isInvalid
-
-    @EnvironmentObject
-    private var focusCoordinator: FocusCoordinator
 
     // MARK: -
 

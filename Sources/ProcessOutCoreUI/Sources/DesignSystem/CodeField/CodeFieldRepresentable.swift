@@ -21,11 +21,14 @@ struct CodeFieldRepresentable: UIViewRepresentable {
     @Binding
     private(set) var isMenuVisible: Bool
 
+    @Binding
+    var focusableView: FocusableViewProxy
+
     // MARK: - UIViewRepresentable
 
     func makeUIView(context: Context) -> CodeFieldView {
         let codeField = CodeFieldView(coordinator: context.coordinator)
-        focusCoordinator.track(control: codeField)
+        codeField.delegate = context.coordinator
         return codeField
     }
 
@@ -39,11 +42,6 @@ struct CodeFieldRepresentable: UIViewRepresentable {
     func makeCoordinator() -> CodeFieldViewCoordinator {
         CodeFieldViewCoordinator()
     }
-
-    // MARK: - Private Properties
-
-    @EnvironmentObject
-    private var focusCoordinator: FocusCoordinator
 
     // MARK: - Private Methods
 
