@@ -34,6 +34,7 @@ extension POPickerStyle where Self == POMenuPickerStyle {
     }
 }
 
+@MainActor
 @available(iOS 14, *)
 private struct ContentView: View {
 
