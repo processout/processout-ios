@@ -17,12 +17,18 @@ public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerSt
 
     public func makeBody(configuration: POPickerStyleConfiguration) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            ForEach(configuration.elements) { element in
-                Button(action: element.select, label: element.makeBody)
+            Group(poSubviews: configuration.content) { children in
+                ForEach(children) { child in
+                    Button {
+                        configuration.selection = child.id
+                    } label: {
+                        child
+                    }
                     .padding(.vertical, POSpacing.extraSmall)
                     .frame(minHeight: Constants.minHeight)
                     .contentShape(.rect)
-                    .controlSelected(element.isSelected)
+                    .controlSelected(child.id == configuration.selection)
+                }
             }
         }
         .buttonStyle(radioButtonStyle)

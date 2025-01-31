@@ -10,7 +10,6 @@ import SwiftUI
 @available(iOS 14, *)
 extension POTextField where Trailing == AnyView {
 
-    @_spi(PO)
     public static func create(
         with viewModel: POTextFieldViewModel, focusedInputId: Binding<AnyHashable?>
     ) -> some View {

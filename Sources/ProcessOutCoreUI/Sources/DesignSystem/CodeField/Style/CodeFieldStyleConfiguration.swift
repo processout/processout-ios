@@ -5,32 +5,27 @@
 //  Created by Andrii Vysotskyi on 13.06.2024.
 //
 
+import SwiftUI
+
 struct CodeFieldStyleConfiguration {
-
-    typealias Index = String.Index
-
-    /// Code field maximum length
-    let length: Int
 
     /// Text.
     let text: String
 
+    /// Code field maximum length
+    let length: Int
+
     /// Current index.
-    let index: Index?
+    @Binding
+    var insertionPoint: String.Index?
 
-    /// Changes current index.
-    func setIndex(_ index: Index) {
-        _setIndex(index)
-    }
+    /// Boolean value indicating whether code field is currently being edited.
+    let isEditing: Bool
 
-    init(length: Int, text: String, index: Index?, setIndex: @escaping (Index?) -> Void) {
-        self.length = length
+    init(text: String, length: Int, insertionPoint: Binding<String.Index?>, isEditing: Bool) {
         self.text = text
-        self.index = index
-        self._setIndex = setIndex
+        self.length = length
+        self._insertionPoint = insertionPoint
+        self.isEditing = isEditing
     }
-
-    // MARK: - Private Properties
-
-    private let _setIndex: (_ index: Index) -> Void
 }

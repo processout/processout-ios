@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 13.06.2024.
 //
 
-import Foundation
+import SwiftUI
 
 @MainActor
 final class CodeFieldViewCoordinator {
@@ -46,5 +46,30 @@ final class CodeFieldViewCoordinator {
         let index = text.index(before: currentIndex)
         representable.text.remove(at: index)
         representable.textIndex = index
+    }
+}
+
+extension CodeFieldViewCoordinator: CodeFieldDelegate {
+
+    func codeField(_ codeField: CodeFieldView, didMoveToWindow window: UIWindow?) {
+        updateFocusableViewProxy(with: codeField)
+    }
+
+    func codeFieldDidBeginEditing(_ codeField: CodeFieldView) {
+        updateFocusableViewProxy(with: codeField)
+    }
+
+    func codeFieldDidEndEditing(_ codeField: CodeFieldView) {
+        updateFocusableViewProxy(with: codeField)
+    }
+
+    // MARK: - Private Methods
+
+    private func updateFocusableViewProxy(with codeField: CodeFieldView) {
+        if codeField.window == nil {
+            representable.focusableView = .init()
+        } else {
+            representable.focusableView = .init(uiControl: codeField)
+        }
     }
 }

@@ -91,7 +91,10 @@ final class DynamicCheckoutViewModel: ObservableObject {
                 amount: state.invoice.amount,
                 currency: state.invoice.currencyCode,
                 returnUrl: Constants.returnUrl,
-                customerId: Constants.customerId
+                customerId: Constants.customerId,
+                details: [
+                    .init(name: "Test", amount: state.invoice.amount, quantity: 1)
+                ]
             )
             return try await invoicesService.createInvoice(request: request)
         } else {
@@ -126,7 +129,10 @@ extension DynamicCheckoutViewModel: PODynamicCheckoutDelegate {
             amount: invoice.amount,
             currency: invoice.currency,
             returnUrl: invoice.returnUrl,
-            customerId: Constants.customerId
+            customerId: Constants.customerId,
+            details: [
+                .init(name: "Test", amount: invoice.amount, quantity: 1)
+            ]
         )
         if let invoice = try? await invoicesService.createInvoice(request: request) {
             return .init(invoiceId: invoice.id, clientSecret: invoice.clientSecret)

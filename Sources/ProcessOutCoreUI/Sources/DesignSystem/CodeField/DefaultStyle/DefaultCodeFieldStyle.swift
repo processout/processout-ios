@@ -11,13 +11,13 @@ import SwiftUI
 struct DefaultCodeFieldStyle: CodeFieldStyle {
 
     func makeBody(configuration: Configuration) -> some View {
-        let text = paddedText(configuration: configuration)
+        let paddedText = self.paddedText(configuration: configuration)
         HStack(spacing: POSpacing.extraSmall) {
-            ForEach(Array(text.indices), id: \.self) { index in
-                let caretPosition = caretPosition(at: index, configuration: configuration)
-                DefaultCodeFieldStyleCharacterView(value: text[index], caretPosition: caretPosition) { position in
-                    set(index: index, at: position, configuration: configuration)
-                }
+            ForEach(Array(paddedText.indices), id: \.self) { index in
+                DefaultCodeFieldStyleCharacterView(
+                    value: paddedText[index],
+                    caretAlignment: caretAlignment(forCharacterAt: index, configuration: configuration)
+                )
             }
         }
     }
@@ -34,35 +34,33 @@ struct DefaultCodeFieldStyle: CodeFieldStyle {
         configuration.text.padding(toLength: configuration.length, withPad: Constants.pad, startingAt: 0)
     }
 
-    private func set(
-        index: String.Index,
-        at position: DefaultCodeFieldStyleCharacterView.CaretPosition,
-        configuration: Configuration
-    ) {
-        var newIndex = index
-        if position == .after, index < configuration.text.endIndex {
-            newIndex = configuration.text.index(after: newIndex)
-        }
-        if configuration.text.indices.contains(newIndex) {
-            configuration.setIndex(newIndex)
-        } else {
-            configuration.setIndex(configuration.text.endIndex)
-        }
-    }
-
-    private func caretPosition(
-        at index: String.Index, configuration: Configuration
-    ) -> DefaultCodeFieldStyleCharacterView.CaretPosition? {
-        guard let selectedIndex = configuration.index else {
+    private func caretAlignment(
+        forCharacterAt index: String.Index, configuration: Configuration
+    ) -> Binding<DefaultCodeFieldStyleCharacterView.CaretAlignment?> {
+        let binding = Binding<DefaultCodeFieldStyleCharacterView.CaretAlignment?> {
+            guard let insertionPoint = configuration.insertionPoint, configuration.isEditing else {
+                return nil
+            }
+            if index == insertionPoint {
+                return .leading
+            }
+            if index == configuration.text.indices.last,
+               insertionPoint == configuration.text.endIndex,
+               configuration.text.count == configuration.length {
+                return .trailing
+            }
             return nil
+        } set: { newAlignment in
+            var newInsertionPoint = index
+            if newAlignment == .trailing, index < configuration.text.endIndex {
+                newInsertionPoint = configuration.text.index(after: newInsertionPoint)
+            }
+            if configuration.text.indices.contains(newInsertionPoint) {
+                configuration.insertionPoint = newInsertionPoint
+            } else {
+                configuration.insertionPoint = configuration.text.endIndex
+            }
         }
-        if index == selectedIndex {
-            return .before
-        }
-        // swiftlint:disable:next line_length
-        if index == configuration.text.indices.last, selectedIndex == configuration.text.endIndex, configuration.text.count == configuration.length {
-            return .after
-        }
-        return nil
+        return binding
     }
 }

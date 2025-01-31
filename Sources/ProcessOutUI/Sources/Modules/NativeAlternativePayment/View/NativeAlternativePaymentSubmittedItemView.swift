@@ -45,6 +45,7 @@ struct NativeAlternativePaymentSubmittedItemView: View {
                     .foregroundColor(descriptionStyle.color)
             }
         }
+        .frame(maxWidth: .infinity)
         .padding(.top, topPadding)
         .padding(.horizontal, horizontalPadding)
     }
