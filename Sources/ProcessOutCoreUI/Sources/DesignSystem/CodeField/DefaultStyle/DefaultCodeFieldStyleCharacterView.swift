@@ -11,29 +11,27 @@ import SwiftUI
 @MainActor
 struct DefaultCodeFieldStyleCharacterView: View {
 
-    enum CaretPosition: Equatable {
-        case before, after
+    enum CaretAlignment: Equatable {
+        case leading, trailing
     }
 
     /// Single value.
     let value: Character
 
-    /// Caret position.
-    let caretPosition: CaretPosition?
-
-    /// Closure is called when user requests caret position change.
-    let select: (CaretPosition) -> Void
+    /// Caret alignment.
+    @Binding
+    var caretAlignment: CaretAlignment?
 
     // MARK: - View
 
     var body: some View {
-        let style = style.resolve(isInvalid: isInvalid, isFocused: caretPosition != nil)
+        let style = style.resolve(isInvalid: isInvalid, isFocused: caretAlignment != nil)
         Text(value.description)
             .textStyle(style.text)
             .lineLimit(1)
             .minimumScaleFactor(0.001)
             .padding(.horizontal, POSpacing.extraSmall)
-            .overlay(caretPosition.map(makeCaretOverlay))
+            .overlay(makeCaretOverlay())
             .padding(POSpacing.extraSmall)
             .frame(maxWidth: 44, idealHeight: 48)
             .fixedSize(horizontal: false, vertical: true)
@@ -56,12 +54,14 @@ struct DefaultCodeFieldStyleCharacterView: View {
     // MARK: -
 
     @ViewBuilder
-    private func makeCaretOverlay(position: CaretPosition) -> some View {
-        Rectangle()
-            .fill(Color.accentColor)
-            .frame(width: 2)
-            .blink(animation: .easeInOut(duration: 0.4))
-            .frame(maxWidth: .infinity, alignment: caretPosition == .before ? .leading : .trailing)
+    private func makeCaretOverlay() -> some View {
+        if let caretAlignment {
+            Rectangle()
+                .fill(Color.accentColor)
+                .frame(width: 2)
+                .blink(animation: .easeInOut(duration: 0.4))
+                .frame(maxWidth: .infinity, alignment: caretAlignment == .leading ? .leading : .trailing)
+        }
     }
 
     private var makeSelectionOverlay: some View {
@@ -69,10 +69,10 @@ struct DefaultCodeFieldStyleCharacterView: View {
         // so two separate views are used to understand what view part was tapped.
         HStack(spacing: 0) {
             Color.clear.contentShape(.rect).onTapGesture {
-                select(.before)
+                caretAlignment = .leading
             }
             Color.clear.contentShape(.rect).onTapGesture {
-                select(.after)
+                caretAlignment = .trailing
             }
         }
     }

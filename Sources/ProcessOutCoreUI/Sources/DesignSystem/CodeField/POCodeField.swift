@@ -21,10 +21,15 @@ public struct POCodeField: View {
     // MARK: - View
 
     public var body: some View {
-        let configuration = CodeFieldStyleConfiguration(length: length, text: text, index: textIndex) { newIndex in
-            focusableView.setFocused(true)
-            textIndex = newIndex
+        let insertionPoint = Binding<String.Index?>.init {
+            textIndex
+        } set: { newInsertionPoint in
+            focusableView.setFocused(newInsertionPoint != nil)
+            textIndex = newInsertionPoint
         }
+        let configuration = CodeFieldStyleConfiguration(
+            text: text, length: length, insertionPoint: insertionPoint, isEditing: focusableView.isFocused
+        )
         AnyView(style.makeBody(configuration: configuration))
             .background(
                 CodeFieldRepresentable(
