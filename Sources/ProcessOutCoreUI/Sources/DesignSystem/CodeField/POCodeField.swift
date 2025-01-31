@@ -21,7 +21,7 @@ public struct POCodeField: View {
     // MARK: - View
 
     public var body: some View {
-        let insertionPoint = Binding<String.Index?>.init {
+        let insertionPoint = Binding<String.Index?> {
             textIndex
         } set: { newInsertionPoint in
             focusableView.setFocused(newInsertionPoint != nil)

@@ -12,7 +12,6 @@ import SwiftUI
 @MainActor
 public struct POPicker<SelectionValue: Hashable, Content: View>: View {
 
-    // swiftlint:disable:next line_length
     public init(selection: Binding<SelectionValue?>, @ViewBuilder content: () -> Content) {
         self._selection = selection
         self.content = content()
