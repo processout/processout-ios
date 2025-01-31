@@ -96,7 +96,6 @@ public final class ProcessOut: @unchecked Sendable {
 
     // MARK: - Private Methods
 
-    @_spi(PO)
     @MainActor
     public init(configuration: ProcessOutConfiguration) { // swiftlint:disable:this function_body_length
         self._configuration = .init(wrappedValue: configuration)
