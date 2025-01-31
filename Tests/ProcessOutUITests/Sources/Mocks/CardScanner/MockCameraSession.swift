@@ -59,7 +59,11 @@ actor MockCameraSession: CameraSession {
 
 extension MockCameraSession {
 
-    func addConnection(_ connection: AVCaptureConnection) -> Bool {
+    func addPreviewLayer(_ layer: AVCaptureVideoPreviewLayer) {
+        fatalError("Not implemented.")
+    }
+
+    func removePreviewLayer(_ layer: AVCaptureVideoPreviewLayer) {
         fatalError("Not implemented.")
     }
 

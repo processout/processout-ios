@@ -27,7 +27,7 @@ public struct POTextField<Trailing: View>: View {
     public var body: some View {
         let configuration = POTextFieldStyleConfiguration(
             text: $text,
-            isEditing: focusableView.isFocused ?? false,
+            isEditing: focusableView.isFocused,
             textField: {
                 TextFieldRepresentable(text: $text, formatter: formatter, focusableView: $focusableView)
             },
