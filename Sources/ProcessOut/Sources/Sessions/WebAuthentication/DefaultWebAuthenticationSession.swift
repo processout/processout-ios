@@ -48,9 +48,19 @@ final class DefaultWebAuthenticationSession:
     nonisolated func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         MainActor.assumeIsolated {
             let application = UIApplication.shared
-            let scene = application.connectedScenes.first { $0 is UIWindowScene } as? UIWindowScene
-            let window = scene?.windows.first(where: \.isKeyWindow)
-            return window ?? ASPresentationAnchor()
+            for scene in application.connectedScenes {
+                // The scene of returned presentation anchor is expected to be in
+                // foreground active state otherwise authentication start fails.
+                if scene.activationState != .foregroundActive {
+                    continue
+                }
+                let windowScene = scene as? UIWindowScene
+                guard let window = windowScene?.windows.first(where: \.isKeyWindow) else {
+                    continue
+                }
+                return window
+            }
+            return ASPresentationAnchor()
         }
     }
 
