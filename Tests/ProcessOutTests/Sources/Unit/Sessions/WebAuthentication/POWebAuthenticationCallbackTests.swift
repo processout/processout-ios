@@ -12,7 +12,7 @@ import Testing
 struct POWebAuthenticationCallbackTests {
 
     @Test
-    func matches_whenSchemeIsNotNormalized() {
+    func matches_whenCustomSchemeIsNotNormalized() {
         // Given
         let sut = POWebAuthenticationCallback.customScheme("TeSt")
 
@@ -23,9 +23,20 @@ struct POWebAuthenticationCallbackTests {
         #expect(sut.matches(url: url))
     }
 
+    func matches_whenCustomSchemesAreDifferent_dontMatch() {
+        // Given
+        let sut = POWebAuthenticationCallback.customScheme("one")
+
+        // When
+        let url = URL(string: "two://")!
+
+        // Then
+        #expect(!sut.matches(url: url))
+    }
+
     @Test
     @available(iOS 17.4, *)
-    func matches_whenHostAndPathAreNotNormalized() {
+    func matches_whenHttpsHostAndPathAreNotNormalized() {
         // Given
         let sut = POWebAuthenticationCallback.https(host: "tëst.com", path: "path/")
 
@@ -34,5 +45,44 @@ struct POWebAuthenticationCallbackTests {
 
         // Then
         #expect(sut.matches(url: url))
+    }
+
+    @Test
+    @available(iOS 17.4, *)
+    func matches_whenHttpsPathIsEmpty() {
+        // Given
+        let sut = POWebAuthenticationCallback.https(host: "test.com", path: "")
+
+        // When
+        let url = URL(string: "https://test.com///")!
+
+        // Then
+        #expect(sut.matches(url: url))
+    }
+
+    @Test
+    @available(iOS 17.4, *)
+    func matches_whenHttpsHostsAreDifferent_doesntMatch() {
+        // Given
+        let sut = POWebAuthenticationCallback.https(host: "one.com", path: "")
+
+        // When
+        let url = URL(string: "https://two.com")!
+
+        // Then
+        #expect(!sut.matches(url: url))
+    }
+
+    @Test
+    @available(iOS 17.4, *)
+    func matches_whenSchemeIsNotHttps_doesntMatch() {
+        // Given
+        let sut = POWebAuthenticationCallback.https(host: "test.com", path: "")
+
+        // When
+        let url = URL(string: "custom://test.com")!
+
+        // Then
+        #expect(!sut.matches(url: url))
     }
 }
