@@ -24,11 +24,20 @@ public struct POWebAuthenticationCallback: Sendable {
 
     /// Determines whether the given URL matches the callback criteria.
     func matches(url: URL) -> Bool {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+            return false
+        }
         switch value {
         case .scheme(let scheme):
-            return scheme == url.scheme
+            var testComponents = URLComponents()
+            testComponents.scheme = scheme
+            return components.normalizedScheme == testComponents.normalizedScheme
         case let .https(host, path):
-            return url.host == host && url.path == path
+            var testComponents = URLComponents()
+            testComponents.host = host
+            testComponents.path = path
+            return components.normalizedHost == testComponents.normalizedHost
+                && components.normalizedPath == testComponents.normalizedPath
         }
     }
 }
