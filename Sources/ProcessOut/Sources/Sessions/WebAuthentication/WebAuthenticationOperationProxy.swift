@@ -14,7 +14,7 @@ final class WebAuthenticationOperationProxy {
         self.callback = callback
         self.eventEmitter = eventEmitter
     }
-    
+
     func set(session: ASWebAuthenticationSession, continuation: CheckedContinuation<URL, Error>) {
         switch state {
         case nil:
