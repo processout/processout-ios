@@ -11,14 +11,15 @@ import AuthenticationServices
 final class DefaultWebAuthenticationSession:
     NSObject, WebAuthenticationSession, ASWebAuthenticationPresentationContextProviding {
 
-    override nonisolated init() {
-        // Ignored
+    nonisolated init(eventEmitter: POEventEmitter) {
+        self.eventEmitter = eventEmitter
+        super.init()
     }
 
     // MARK: - WebAuthenticationSession
 
     func authenticate(using request: WebAuthenticationRequest) async throws -> URL {
-        let operationProxy = WebAuthenticationOperationProxy()
+        let operationProxy = WebAuthenticationOperationProxy(eventEmitter: eventEmitter)
         return try await withTaskCancellationHandler(
             operation: {
                 try await withCheckedThrowingContinuation { continuation in
@@ -63,6 +64,10 @@ final class DefaultWebAuthenticationSession:
             return ASPresentationAnchor()
         }
     }
+
+    // MARK: - Private Properties
+
+    private let eventEmitter: POEventEmitter
 
     // MARK: - Private Methods
 
@@ -118,6 +123,10 @@ final class DefaultWebAuthenticationSession:
 @MainActor
 private final class WebAuthenticationOperationProxy {
 
+    init(eventEmitter: POEventEmitter) {
+        self.eventEmitter = eventEmitter
+    }
+
     func set(session: ASWebAuthenticationSession, continuation: CheckedContinuation<URL, Error>) {
         switch state {
         case nil:
@@ -127,6 +136,7 @@ private final class WebAuthenticationOperationProxy {
                 startTime: .now()
             )
             state = .processing(newState)
+            observeEvents()
         case .processing:
             assertionFailure("Already in processing state.")
         case .completed(let result):
@@ -144,6 +154,7 @@ private final class WebAuthenticationOperationProxy {
         case .completed:
             break // Already completed
         }
+        deepLinkObservation = nil
     }
 
     func cancel() {
@@ -151,6 +162,7 @@ private final class WebAuthenticationOperationProxy {
         let failure = POFailure(message: "Authentication was cancelled.", code: .cancelled)
         setCompleted(with: .failure(failure))
     }
+
     // MARK: - Private Nested Types
 
     @MainActor
@@ -174,7 +186,8 @@ private final class WebAuthenticationOperationProxy {
 
     // MARK: - Private Properties
 
-    private var state: State?
+    private let eventEmitter: POEventEmitter
+    private var state: State?, deepLinkObservation: AnyObject?
 
     // MARK: - Private Methods
 
@@ -194,6 +207,16 @@ private final class WebAuthenticationOperationProxy {
             }
         } else {
             currentState.session.cancel()
+        }
+    }
+
+    private func observeEvents() {
+        // todo(andrii-vysotskyi): match url content
+        deepLinkObservation = eventEmitter.on(PODeepLinkReceivedEvent.self) { [weak self] event in
+            Task { @MainActor in
+                self?.setCompleted(with: .success(event.url))
+            }
+            return true
         }
     }
 }
