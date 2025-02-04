@@ -19,7 +19,9 @@ final class DefaultWebAuthenticationSession:
     // MARK: - WebAuthenticationSession
 
     func authenticate(using request: WebAuthenticationRequest) async throws -> URL {
-        let operationProxy = WebAuthenticationOperationProxy(eventEmitter: eventEmitter)
+        let operationProxy = WebAuthenticationOperationProxy(
+            callback: request.callback, eventEmitter: eventEmitter
+        )
         return try await withTaskCancellationHandler(
             operation: {
                 try await withCheckedThrowingContinuation { continuation in

@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 31.10.2024.
 //
 
+import Foundation
+
 /// An object used to evaluate navigation events in a web authentication session.
 public struct POWebAuthenticationCallback: Sendable {
 
@@ -19,6 +21,16 @@ public struct POWebAuthenticationCallback: Sendable {
 
     /// Actual callback value.
     let value: Value
+
+    /// Determines whether the given URL matches the callback criteria.
+    func matches(url: URL) -> Bool {
+        switch value {
+        case .scheme(let scheme):
+            return scheme == url.scheme
+        case let .https(host, path):
+            return url.host == host && url.path == path
+        }
+    }
 }
 
 extension POWebAuthenticationCallback {

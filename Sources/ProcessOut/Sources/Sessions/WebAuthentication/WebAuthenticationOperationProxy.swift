@@ -10,22 +10,22 @@ import AuthenticationServices
 @MainActor
 final class WebAuthenticationOperationProxy {
 
-    init(eventEmitter: POEventEmitter) {
+    init(callback: POWebAuthenticationCallback?, eventEmitter: POEventEmitter) {
+        self.callback = callback
         self.eventEmitter = eventEmitter
     }
-
+    
     func set(session: ASWebAuthenticationSession, continuation: CheckedContinuation<URL, Error>) {
         switch state {
         case nil:
             let observation = eventEmitter.on(PODeepLinkReceivedEvent.self) { [weak self] event in
-                // todo(andrii-vysotskyi): validate URL against request.callback
-                Task { @MainActor in
-                    self?.setCompleted(with: .success(event.url))
-                }
-                return true
+                self?.setCompleted(with: event) ?? false
             }
             let newState = State.Processing(
-                continuation: continuation, session: session, observation: observation, startTime: .now()
+                continuation: continuation,
+                session: session,
+                observation: observation,
+                startTime: .now()
             )
             state = .processing(newState)
         case .processing:
@@ -81,7 +81,7 @@ final class WebAuthenticationOperationProxy {
 
     // MARK: - Private Properties
 
-    private let eventEmitter: POEventEmitter
+    private nonisolated let callback: POWebAuthenticationCallback?, eventEmitter: POEventEmitter
     private var state: State?
 
     // MARK: - Private Methods
@@ -103,5 +103,15 @@ final class WebAuthenticationOperationProxy {
         } else {
             currentState.session.cancel()
         }
+    }
+
+    private nonisolated func setCompleted(with event: PODeepLinkReceivedEvent) -> Bool {
+        if let callback, !callback.matches(url: event.url) {
+            return false
+        }
+        Task { @MainActor in
+            setCompleted(with: .success(event.url))
+        }
+        return true
     }
 }
