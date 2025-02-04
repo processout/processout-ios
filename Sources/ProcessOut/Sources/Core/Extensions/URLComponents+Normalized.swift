@@ -24,14 +24,16 @@ extension URLComponents {
     }
 
     var normalizedPath: String {
-        var hadSuffix = false, path = self.path
-        while path.hasSuffix("/") {
-            path.removeLast()
-            hadSuffix = true
+        var normalizedPath = "", previousCharacter = self.path.first
+        path.forEach { character in
+            if character != "/" || previousCharacter != character {
+                normalizedPath += character.description
+            }
+            previousCharacter = character
         }
-        if hadSuffix || path.isEmpty {
-            path += "/"
+        if normalizedPath.isEmpty {
+            return "/"
         }
-        return path
+        return normalizedPath
     }
 }
