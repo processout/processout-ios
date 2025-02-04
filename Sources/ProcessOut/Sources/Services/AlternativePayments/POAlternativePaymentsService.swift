@@ -84,4 +84,9 @@ extension POAlternativePaymentsService {
     ) async throws -> POAlternativePaymentResponse {
         try await authenticate(request: .init(url: url, callback: callback))
     }
+
+    @_spi(PO)
+    public func replace(configuration: POAlternativePaymentsServiceConfiguration) {
+        // NOP
+    }
 }
