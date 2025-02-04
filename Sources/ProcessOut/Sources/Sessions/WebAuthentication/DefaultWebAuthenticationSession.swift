@@ -149,6 +149,7 @@ private final class WebAuthenticationOperationProxy {
         case nil:
             state = .completed(newResult)
         case .processing(let currentState):
+            currentState.session.cancel() // todo(andrii-vysotskyi): decide if this should always happen
             currentState.continuation.resume(with: newResult)
             state = .completed(newResult)
         case .completed:
