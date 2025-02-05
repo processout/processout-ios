@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Alternative payments service configuration.
 @_spi(PO)
 public struct POAlternativePaymentsServiceConfiguration: Sendable {
 
