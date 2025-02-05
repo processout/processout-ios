@@ -38,10 +38,10 @@ struct POWebAuthenticationCallbackTests {
     @available(iOS 17.4, *)
     func matches_whenHttpsHostAndPathAreNotNormalized() {
         // Given
-        let sut = POWebAuthenticationCallback.https(host: "tëst.com", path: "path/")
+        let sut = POWebAuthenticationCallback.https(host: "tëst.com", path: "~path/")
 
         // When
-        let url = URL(string: "https://xn--tst-jma.COM.//path///")!
+        let url = URL(string: "https://xn--tst-jma.COM.//%7Epath///")!
 
         // Then
         #expect(sut.matches(url: url))
