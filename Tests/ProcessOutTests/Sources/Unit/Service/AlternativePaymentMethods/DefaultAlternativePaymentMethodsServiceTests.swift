@@ -12,7 +12,7 @@ import Testing
 struct DefaultAlternativePaymentMethodsServiceTests {
 
     init() {
-        let configuration = POAlternativePaymentsServiceConfiguration(
+        let configuration = AlternativePaymentsServiceConfiguration(
             projectId: "proj_test", baseUrl: URL(string: "https://example.com")!
         )
         let webSession = MockWebAuthenticationSession()

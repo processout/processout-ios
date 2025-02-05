@@ -10,7 +10,7 @@ import Foundation
 final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
 
     init(
-        configuration: POAlternativePaymentsServiceConfiguration,
+        configuration: AlternativePaymentsServiceConfiguration,
         webSession: WebAuthenticationSession,
         logger: POLogger
     ) {
@@ -115,9 +115,15 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
         return .init(gatewayToken: gatewayToken, customerId: nil, tokenId: tokenId, returnType: .authorization)
     }
 
+    // MARK: -
+
+    func replace(configuration: AlternativePaymentsServiceConfiguration) {
+        self.configuration.withLock { $0 = configuration }
+    }
+
     // MARK: - Private
 
-    private let configuration: POUnfairlyLocked<POAlternativePaymentsServiceConfiguration>
+    private let configuration: POUnfairlyLocked<AlternativePaymentsServiceConfiguration>
     private let logger: POLogger
     private let webSession: WebAuthenticationSession
 
@@ -138,10 +144,6 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
             return url
         }
         throw POFailure(message: "Unable to create redirect URL.", code: .generic(.mobile))
-    }
-
-    func replace(configuration: POAlternativePaymentsServiceConfiguration) {
-        self.configuration.withLock { $0 = configuration }
     }
 
     // MARK: - Response

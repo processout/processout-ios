@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 14.10.2024.
 //
 
-// swiftlint:disable force_unwrapping
+// swiftlint:disable force_unwrapping type_body_length
 
 import Foundation
 import UIKit
@@ -28,7 +28,9 @@ public final class ProcessOut: @unchecked Sendable {
     public let invoices: POInvoicesService
 
     /// Alternative payments service.
-    public let alternativePayments: POAlternativePaymentsService
+    public var alternativePayments: POAlternativePaymentsService {
+        _alternativePayments
+    }
 
     /// Cards service.
     public let cards: POCardsService
@@ -86,6 +88,7 @@ public final class ProcessOut: @unchecked Sendable {
 
     // MARK: - Private Properties
 
+    private let _alternativePayments: DefaultAlternativePaymentsService
     private let telemetryService: TelemetryService
     private let httpConnector: HttpConnector
     private let telemetryHttpConnector: HttpConnector
@@ -142,7 +145,7 @@ public final class ProcessOut: @unchecked Sendable {
         invoices = Self.createInvoicesService(
             httpConnector: httpConnector, customerActionsService: customerActionsService, logger: serviceLogger
         )
-        alternativePayments = Self.createAlternativePaymentsService(
+        _alternativePayments = Self.createAlternativePaymentsService(
             configuration: configuration, webAuthenticationSession: webAuthenticationSession, logger: serviceLogger
         )
         cards = Self.createCardsService(
@@ -180,7 +183,7 @@ public final class ProcessOut: @unchecked Sendable {
         configuration: ProcessOutConfiguration,
         webAuthenticationSession webSession: WebAuthenticationSession,
         logger: POLogger
-    ) -> POAlternativePaymentsService {
+    ) -> DefaultAlternativePaymentsService {
         let serviceConfiguration = Self.alternativePaymentsConfiguration(with: configuration)
         return DefaultAlternativePaymentsService(
             configuration: serviceConfiguration, webSession: webSession, logger: logger
@@ -189,7 +192,7 @@ public final class ProcessOut: @unchecked Sendable {
 
     private static func alternativePaymentsConfiguration(
         with configuration: ProcessOutConfiguration
-    ) -> POAlternativePaymentsServiceConfiguration {
+    ) -> AlternativePaymentsServiceConfiguration {
         .init(projectId: configuration.projectId, baseUrl: configuration.environment.checkoutBaseUrl)
     }
 
@@ -309,7 +312,9 @@ public final class ProcessOut: @unchecked Sendable {
     // MARK: - Configuration Update
 
     private func replaceServicesConfiguration(with configuration: ProcessOutConfiguration) {
-        alternativePayments.replace(configuration: Self.alternativePaymentsConfiguration(with: configuration))
+        _alternativePayments.replace(
+            configuration: Self.alternativePaymentsConfiguration(with: configuration)
+        )
         telemetryService.replace(configuration: Self.telemetryConfiguration(with: configuration))
     }
 
@@ -389,4 +394,4 @@ extension ProcessOut {
     }
 }
 
-// swiftlint:enable force_unwrapping
+// swiftlint:enable force_unwrapping type_body_length
