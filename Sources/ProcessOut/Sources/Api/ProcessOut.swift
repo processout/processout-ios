@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 14.10.2024.
 //
 
-// swiftlint:disable force_unwrapping
+// swiftlint:disable force_unwrapping type_body_length
 
 import Foundation
 import UIKit
@@ -394,4 +394,4 @@ extension ProcessOut {
     }
 }
 
-// swiftlint:enable force_unwrapping
+// swiftlint:enable force_unwrapping type_body_length
