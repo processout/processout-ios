@@ -32,7 +32,7 @@ final class WebAuthenticationOperationProxy {
             assertionFailure("Already in processing state.")
         case .completed(let result):
             continuation.resume(with: result)
-            session.cancel()
+            cancel(session: session)
         }
     }
 
@@ -43,14 +43,16 @@ final class WebAuthenticationOperationProxy {
         case .processing(let currentState):
             state = .completed(newResult)
             currentState.continuation.resume(with: newResult)
-            cancelAuthenticationSessionIfNeeded()
+            cancel(session: currentState.session, startTime: currentState.startTime)
         case .completed:
             break // Already completed
         }
     }
 
     func cancel() {
-        cancelAuthenticationSessionIfNeeded()
+        if case .processing(let currentState) = state {
+            cancel(session: currentState.session, startTime: currentState.startTime)
+        }
         let failure = POFailure(message: "Authentication was cancelled.", code: .cancelled)
         setCompleted(with: .failure(failure))
     }
@@ -86,22 +88,18 @@ final class WebAuthenticationOperationProxy {
 
     // MARK: - Private Methods
 
-    /// Cancels the current ASWebAuthenticationSession if needed.
-    private func cancelAuthenticationSessionIfNeeded() {
-        guard case .processing(let currentState) = state else {
-            return
-        }
-        // Calling `cancel` before session is actually presented seems to have no effect. This workaround adds
-        // a delay to ensure cancel is called at least 0.3 seconds after the session start.
+    /// Cancels given session.
+    ///
+    /// Calling `cancel` before session is actually presented seems to have no effect. This method uses
+    /// a workaround that adds a delay to ensure cancel is called at least 0.3 seconds after the session start.
+    private func cancel(session: ASWebAuthenticationSession, startTime: DispatchTime = DispatchTime.now()) {
         let minimumDelay: TimeInterval = 0.3
-        let delay = minimumDelay - (DispatchTime.now().uptimeSeconds - currentState.startTime.uptimeSeconds)
-        if delay > 0 {
-            Task { @MainActor in
+        Task { @MainActor in
+            let delay = minimumDelay - (DispatchTime.now().uptimeSeconds - startTime.uptimeSeconds)
+            if delay > 0 {
                 try? await Task.sleep(seconds: delay)
-                currentState.session.cancel()
             }
-        } else {
-            currentState.session.cancel()
+            session.cancel()
         }
     }
 
