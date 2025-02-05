@@ -393,9 +393,6 @@ extension POFailureCode {
             rawValue: "request.gateway.operation-not-supported"
         )
 
-        /// The provided idempotency key is invalid.
-        public static let invalidIdempotency = POFailureCode(rawValue: "request.idempotency-key.invalid")
-
         /// The pagination parameters in the request are invalid.
         public static let invalidPagination = POFailureCode(rawValue: "request.pagination.invalid")
 
@@ -442,7 +439,7 @@ extension POFailureCode {
         public static let unknown = POFailureCode(rawValue: "gateway.unknown-error")
 
         /// The gateway encountered an internal error.
-        public static let `internal` = POFailureCode(rawValue: "gateway.internal-error")
+        public static let `internal` = POFailureCode(rawValue: "gateway-internal-error")
 
         /// The payment request to the gateway timed out.
         public static let timeout = POFailureCode(rawValue: "gateway.timeout")
