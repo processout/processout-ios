@@ -33,10 +33,9 @@ public struct POWebAuthenticationCallback: Sendable {
             testComponents.scheme = scheme
             return components.normalizedScheme == testComponents.normalizedScheme
         case let .https(host, path):
-            var testComponents = URLComponents()
-            testComponents.scheme = "https"
-            testComponents.host = host
-            testComponents.path = path
+            guard let testComponents = URLComponents(string: "https://\(host)/\(path)") else {
+                return false
+            }
             return components.normalizedScheme == testComponents.normalizedScheme
                 && components.normalizedHost == testComponents.normalizedHost
                 && components.normalizedPath == testComponents.normalizedPath
