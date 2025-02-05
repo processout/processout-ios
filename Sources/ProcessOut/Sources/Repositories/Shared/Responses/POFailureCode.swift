@@ -625,7 +625,6 @@ extension POFailureCode.Namespace {
 extension POFailureCode.Namespace {
 
     static func namespace(for rawErrorCode: String) -> Self? {
-        // todo(andrii-vysotskyi): maybe add regex pattern
         let knownNamespaces: [Self] = [
             .authentication, .card, .requestValidation, .request, .customer, .gateway, .mobile, .resource
         ]
