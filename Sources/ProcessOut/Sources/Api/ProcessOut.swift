@@ -135,8 +135,9 @@ public final class ProcessOut: @unchecked Sendable {
             deviceMetadataProvider: deviceMetadataProvider,
             logger: connectorLogger
         )
+        eventEmitter = LocalEventEmitter(logger: serviceLogger)
         let webAuthenticationSession = ThrottledWebAuthenticationSessionDecorator(
-            session: DefaultWebAuthenticationSession()
+            session: DefaultWebAuthenticationSession(eventEmitter: eventEmitter)
         )
         let customerActionsService = Self.createCustomerActionsService(
             webAuthenticationSession: webAuthenticationSession, logger: serviceLogger
@@ -151,7 +152,6 @@ public final class ProcessOut: @unchecked Sendable {
         cards = Self.createCardsService(
             httpConnector: httpConnector, logger: serviceLogger
         )
-        eventEmitter = LocalEventEmitter(logger: serviceLogger)
         customerTokens = Self.createCustomerTokensService(
             httpConnector: httpConnector,
             customerActionsService: customerActionsService,
