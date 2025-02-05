@@ -43,7 +43,7 @@ final class WebAuthenticationOperationProxy {
         case .processing(let currentState):
             state = .completed(newResult)
             currentState.continuation.resume(with: newResult)
-            currentState.session.cancel()
+            cancelAuthenticationSessionIfNeeded()
         case .completed:
             break // Already completed
         }
