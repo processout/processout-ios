@@ -65,10 +65,6 @@ public protocol POAlternativePaymentsService: POService {
     /// - Returns: response parsed from given url.
     @available(*, deprecated, message: "Use tokenize(request:) or authorize(request:) instead to process payment.")
     func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse
-
-    /// Replaces configuration.
-    @_spi(PO)
-    func replace(configuration: POAlternativePaymentsServiceConfiguration)
 }
 
 extension POAlternativePaymentsService {
@@ -83,10 +79,5 @@ extension POAlternativePaymentsService {
         using url: URL, callback: POWebAuthenticationCallback? = nil
     ) async throws -> POAlternativePaymentResponse {
         try await authenticate(request: .init(url: url, callback: callback))
-    }
-
-    @_spi(PO)
-    public func replace(configuration: POAlternativePaymentsServiceConfiguration) {
-        // NOP
     }
 }
