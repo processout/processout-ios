@@ -455,6 +455,10 @@ extension POFailureCode {
 
         /// Internal error.
         public static let `internal` = POFailureCode(rawValue: "processout-mobile.internal")
+
+        /// Cancellation error.
+        @available(*, deprecated, message: "Use Customer.cancelled instead.")
+        public static let cancelled = POFailureCode(rawValue: "processout-mobile.cancelled")
     }
 
     public enum Resource {
