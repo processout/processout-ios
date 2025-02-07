@@ -385,7 +385,7 @@ private func invoke<T>(
         } catch let failure as POFailure {
             await completion(.failure(failure))
         } catch {
-            let failure = POFailure(message: "Something went wrong.", code: .internal(.mobile), underlyingError: error)
+            let failure = POFailure(message: "Something went wrong.", code: .Mobile.internal, underlyingError: error)
             await completion(.failure(failure))
         }
     }
@@ -656,7 +656,7 @@ private func invoke<T>(
         } catch let failure as POFailure {
             completion(.failure(failure))
         } catch {
-            let failure = POFailure(message: "Something went wrong.", code: .internal(.mobile), underlyingError: error)
+            let failure = POFailure(message: "Something went wrong.", code: .Mobile.internal, underlyingError: error)
             completion(.failure(failure))
         }
     }

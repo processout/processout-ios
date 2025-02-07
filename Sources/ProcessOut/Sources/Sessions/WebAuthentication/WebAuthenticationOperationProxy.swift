@@ -53,7 +53,7 @@ final class WebAuthenticationOperationProxy {
         if case .processing(let currentState) = state {
             cancel(session: currentState.session, startTime: currentState.startTime)
         }
-        let failure = POFailure(message: "Authentication was cancelled.", code: .cancelled)
+        let failure = POFailure(message: "Authentication was cancelled.", code: .Mobile.cancelled)
         setCompleted(with: .failure(failure))
     }
 

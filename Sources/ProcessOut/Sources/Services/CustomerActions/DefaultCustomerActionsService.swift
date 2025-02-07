@@ -30,7 +30,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         do {
             try await semaphore.waitUnlessCancelled()
         } catch {
-            throw POFailure(message: "Customer action handling was cancelled.", code: .cancelled)
+            throw POFailure(message: "Customer action handling was cancelled.", code: .Mobile.cancelled)
         }
         defer {
             semaphore.signal()
@@ -59,7 +59,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         } catch let error as POFailure {
             throw error
         } catch {
-            throw POFailure(message: "Can't process customer action.", code: .generic(.mobile), underlyingError: error)
+            throw POFailure(message: "Can't process customer action.", code: .Mobile.generic, underlyingError: error)
         }
     }
 
@@ -103,7 +103,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
             encodedChallengeResult = try String(decoding: encoder.encode(result), as: UTF8.self)
         } catch {
             logger.error("Did fail to encode CRES: \(error).")
-            throw POFailure(message: "Can't process customer action.", code: .internal(.mobile), underlyingError: error)
+            throw POFailure(message: "Can't process customer action.", code: .Mobile.internal, underlyingError: error)
         }
         let response = AuthenticationResponse(url: nil, body: encodedChallengeResult)
         return try encode(authenticationResponse: response)
@@ -114,16 +114,16 @@ final class DefaultCustomerActionsService: CustomerActionsService {
     private func fingerprint(url: String, callback: POWebAuthenticationCallback?) async throws -> String {
         guard let url = URL(string: url) else {
             logger.error("Unable to create URL from string: \(url).")
-            throw POFailure(message: "Can't process customer action.", code: .internal(.mobile), underlyingError: nil)
+            throw POFailure(message: "Can't process customer action.", code: .Mobile.internal, underlyingError: nil)
         }
         do {
             let timeoutError = POFailure(
-                message: "Unable to complete device fingerprinting within the expected time.", code: .timeout(.mobile)
+                message: "Unable to complete device fingerprinting within the expected time.", code: .Mobile.timeout
             )
             return try await withTimeout(Constants.webFingerprintTimeout, error: timeoutError) {
                 try await self.redirect(url: url.absoluteString, callback: callback, prefersEphemeralSession: true)
             }
-        } catch let failure as POFailure where failure.code == .timeout(.mobile) {
+        } catch let failure as POFailure where failure.failureCode == .Mobile.timeout {
             // Fingerprinting timeout is treated differently from other errors.
             let response = AuthenticationResponse(url: url, body: Constants.fingerprintTimeoutResponseBody)
             return try encode(authenticationResponse: response)
@@ -135,7 +135,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
     ) async throws -> String {
         guard let url = URL(string: url) else {
             logger.error("Unable to create URL from string: \(url).")
-            throw POFailure(message: "Can't process customer action.", code: .internal(.mobile), underlyingError: nil)
+            throw POFailure(message: "Can't process customer action.", code: .Mobile.internal, underlyingError: nil)
         }
         let returnUrl = try await self.webSession.authenticate(
             using: .init(url: url, callback: callback, prefersEphemeralSession: prefersEphemeralSession)
@@ -152,13 +152,13 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         )
         guard let data = Data(base64Encoded: paddedString) else {
             logger.error("Failed to decode customer action: invalid base64 payload.")
-            throw POFailure(message: "Can't process customer action.", code: .internal(.mobile))
+            throw POFailure(message: "Can't process customer action.", code: .Mobile.internal)
         }
         do {
             return try decoder.decode(type, from: data)
         } catch {
             logger.error("Unable to decode customer action: \(error).")
-            throw POFailure(message: "Can't process customer action.", code: .internal(.mobile), underlyingError: error)
+            throw POFailure(message: "Can't process customer action.", code: .Mobile.internal, underlyingError: error)
         }
     }
 
@@ -183,7 +183,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
             return String(decoding: requestParametersData, as: UTF8.self)
         } catch {
             logger.error("Did fail to encode AREQ parameters: \(error).")
-            throw POFailure(message: "Can't process customer action.", code: .internal(.mobile), underlyingError: error)
+            throw POFailure(message: "Can't process customer action.", code: .Mobile.internal, underlyingError: error)
         }
     }
 
@@ -193,7 +193,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
             return try Constants.tokenPrefix + encoder.encode(authenticationResponse).base64EncodedString()
         } catch {
             logger.error("Did fail to encode AREQ parameters or CRES: \(error).")
-            throw POFailure(message: "Can't process customer action.", code: .internal(.mobile), underlyingError: error)
+            throw POFailure(message: "Can't process customer action.", code: .Mobile.internal, underlyingError: error)
         }
     }
 }

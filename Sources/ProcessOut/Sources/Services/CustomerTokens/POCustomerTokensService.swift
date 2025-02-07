@@ -32,6 +32,6 @@ extension POCustomerTokensService {
 
     @_spi(PO)
     public func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
-        throw POFailure(code: .generic(.mobile))
+        throw POFailure(code: .Mobile.generic)
     }
 }

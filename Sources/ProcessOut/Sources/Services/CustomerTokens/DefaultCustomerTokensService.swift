@@ -82,7 +82,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
             return token
         }
         logger.error("Unexpected response, either token or action should be set.")
-        throw POFailure(message: "Unable to assign customer token.", code: .internal(.mobile))
+        throw POFailure(message: "Unable to assign customer token.", code: .Mobile.internal)
     }
 }
 

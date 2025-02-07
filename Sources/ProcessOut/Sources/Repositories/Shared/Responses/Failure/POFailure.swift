@@ -55,7 +55,7 @@ extension POFailure: CustomDebugStringConvertible {
 
     public var debugDescription: String {
         let parameters = [
-            ("code", code.rawValue),
+            ("code", failureCode.rawValue),
             ("message", message),
             ("underlyingError", underlyingError.map(String.init(describing:)))
         ]

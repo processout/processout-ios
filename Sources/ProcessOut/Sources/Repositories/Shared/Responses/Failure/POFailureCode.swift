@@ -447,18 +447,21 @@ extension POFailureCode {
 
     public enum Mobile {
 
+        /// Some error happend on SDK's side while processing request.
+        public static let generic = POFailureCode(rawValue: "processout-mobile.generic.error")
+
         /// No network connection.
         public static let networkUnreachable = POFailureCode(rawValue: "processout-mobile.network-unreachable")
 
         /// Timeout error.
         public static let timeout = POFailureCode(rawValue: "processout-mobile.timeout")
 
-        /// Internal error.
-        public static let `internal` = POFailureCode(rawValue: "processout-mobile.internal")
-
         /// Cancellation error.
         @available(*, deprecated, message: "Use Customer.cancelled instead.")
         public static let cancelled = POFailureCode(rawValue: "processout-mobile.cancelled")
+
+        /// Internal error.
+        public static let `internal` = POFailureCode(rawValue: "processout-mobile.internal")
     }
 
     public enum Resource {
