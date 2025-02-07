@@ -37,179 +37,179 @@ extension POFailureCode {
     public enum Card {
 
         /// The card limits were reached (ex: amounts, transactions volume) and the customer should contact its bank.
-        public static let cardExceededLimits = POFailureCode(rawValue: "card.exceeded-limits")
+        public static let exceededLimits = POFailureCode(rawValue: "card.exceeded-limits")
 
         /// The card CVC check failed
-        public static let cardFailedCvc = POFailureCode(rawValue: "card.failed-cvc")
+        public static let failedCvc = POFailureCode(rawValue: "card.failed-cvc")
 
         /// The card holder bank could not process the payment
-        public static let cardIssuerDown = POFailureCode(rawValue: "card.issuer-down")
+        public static let issuerDown = POFailureCode(rawValue: "card.issuer-down")
 
         /// The card holder bank failed to process the transaction.
-        public static let cardIssuerFailed = POFailureCode(rawValue: "card.issuer-failed")
+        public static let issuerFailed = POFailureCode(rawValue: "card.issuer-failed")
 
         /// The card has no money left in its bank account, the customer should add more funds.
-        public static let cardNoMoney = POFailureCode(rawValue: "card.no-money")
+        public static let noMoney = POFailureCode(rawValue: "card.no-money")
 
         /// The card is not authorized to make the payment.
-        public static let cardNotAuthorized = POFailureCode(rawValue: "card.not-authorized")
+        public static let notAuthorized = POFailureCode(rawValue: "card.not-authorized")
 
         /// The card requires a 3DS authentication to be performed, for example in the scope of 3DS2/SCA.
-        public static let cardNeedsAuthentication = POFailureCode(rawValue: "card.needs-authentication")
+        public static let needsAuthentication = POFailureCode(rawValue: "card.needs-authentication")
 
         /// Similarly to payment.declined, the card payment was declined with no further information.
-        public static let cardDeclined = POFailureCode(rawValue: "card.declined")
+        public static let declined = POFailureCode(rawValue: "card.declined")
 
-        /// Do Not Honor is the default error code sent by bank, without any additional information.
-        public static let cardDoNotHonor = POFailureCode(rawValue: "card.do-not-honor")
+        /// Error code sent by bank, without any additional information.
+        public static let doNotHonor = POFailureCode(rawValue: "card.do-not-honor")
 
         /// No action was done by the payment provider, and should be retried.
-        public static let cardNoActionTaken = POFailureCode(rawValue: "card.no-action-taken")
+        public static let noActionTaken = POFailureCode(rawValue: "card.no-action-taken")
 
         /// The payment should be retried.
-        public static let cardPleaseRetry = POFailureCode(rawValue: "card.please-retry")
+        public static let pleaseRetry = POFailureCode(rawValue: "card.please-retry")
 
         /// The transaction represented a security threat during its processing and was declined.
-        public static let cardSecurityViolation = POFailureCode(rawValue: "card.security-violation")
+        public static let securityViolation = POFailureCode(rawValue: "card.security-violation")
 
         /// The acquirer used by the payment processor failed to process the transaction.
-        public static let cardAcquirerFailed = POFailureCode(rawValue: "card.acquirer-failed")
+        public static let acquirerFailed = POFailureCode(rawValue: "card.acquirer-failed")
 
         /// The processing failed at the acquirer or card holder bank level.
-        public static let cardProcessingError = POFailureCode(rawValue: "card.processing-error")
+        public static let processingError = POFailureCode(rawValue: "card.processing-error")
 
         /// The card maximum payment attempts were reached, the customer should contact its bank.
-        public static let cardMaximumAttempts = POFailureCode(rawValue: "card.maximum-attempts")
+        public static let maximumAttempts = POFailureCode(rawValue: "card.maximum-attempts")
 
         /// The card holder bank declined the payment, and should be contacted by your customer.
-        public static let cardContactBank = POFailureCode(rawValue: "card.contact-bank")
+        public static let contactBank = POFailureCode(rawValue: "card.contact-bank")
 
         /// The card withdrawal limit was reached, the customer should contact its bank.
-        public static let cardExceededWithdrawalLimit = POFailureCode(rawValue: "card.exceeded-withdrawal-limit")
+        public static let exceededWithdrawalLimit = POFailureCode(rawValue: "card.exceeded-withdrawal-limit")
 
         /// The card activity limit was reached, the customer should contact its bank.
-        public static let cardExceededActivityLimits = POFailureCode(rawValue: "card.exceeded-activity-limits")
+        public static let exceededActivityLimits = POFailureCode(rawValue: "card.exceeded-activity-limits")
 
         /// The transaction had high chances of being a duplicate, and was declined.
-        public static let cardDuplicate = POFailureCode(rawValue: "card.duplicate")
+        public static let duplicate = POFailureCode(rawValue: "card.duplicate")
 
         /// The payment provider could not find the card issuer bank.
-        public static let cardIssuerNotFound = POFailureCode(rawValue: "card.issuer-not-found")
+        public static let issuerNotFound = POFailureCode(rawValue: "card.issuer-not-found")
 
         /// The payment provider failed to contact the card network to process the transaction.
-        public static let cardNetworkFailed = POFailureCode(rawValue: "card.network-failed")
+        public static let networkFailed = POFailureCode(rawValue: "card.network-failed")
 
         /// The card is not supported by the payment provider.
-        public static let cardNotSupported = POFailureCode(rawValue: "card.not-supported")
+        public static let notSupported = POFailureCode(rawValue: "card.not-supported")
 
         /// The currency is not supported by this card.
-        public static let cardCurrencyUnsupported = POFailureCode(rawValue: "card.currency-unsupported")
+        public static let currencyUnsupported = POFailureCode(rawValue: "card.currency-unsupported")
 
         /// The card type was not supported by the payment provider.
-        public static let cardTypeNotSupported = POFailureCode(rawValue: "card.type-not-supported")
+        public static let typeNotSupported = POFailureCode(rawValue: "card.type-not-supported")
 
         /// The card was not activated yet by the card holder or its bank.
-        public static let cardNotActivated = POFailureCode(rawValue: "card.not-activated")
+        public static let notActivated = POFailureCode(rawValue: "card.not-activated")
 
         /// The card was expired.
-        public static let cardExpired = POFailureCode(rawValue: "card.expired")
+        public static let expired = POFailureCode(rawValue: "card.expired")
 
         /// The card was invalid (invalid number/expiration date/CVC).
-        public static let cardInvalid = POFailureCode(rawValue: "card.invalid")
+        public static let invalid = POFailureCode(rawValue: "card.invalid")
 
         /// The card has an invalid number.
-        public static let cardInvalidNumber = POFailureCode(rawValue: "card.invalid-number")
+        public static let invalidNumber = POFailureCode(rawValue: "card.invalid-number")
 
         /// The card PIN was invalid. This error code does not apply for online payments.
-        public static let cardInvalidPin = POFailureCode(rawValue: "card.invalid-pin")
+        public static let invalidPin = POFailureCode(rawValue: "card.invalid-pin")
 
         /// The name on the card was invalid (potential AVS failure).
-        public static let cardInvalidName = POFailureCode(rawValue: "card.invalid-name")
+        public static let invalidName = POFailureCode(rawValue: "card.invalid-name")
 
         /// The card expiration date was invalid.
-        public static let cardInvalidExpiryDate = POFailureCode(rawValue: "card.invalid-expiry-date")
+        public static let invalidExpiryDate = POFailureCode(rawValue: "card.invalid-expiry-date")
 
         /// The card expiration month was invalid.
-        public static let cardInvalidExpiryMonth = POFailureCode(rawValue: "card.invalid-expiry-month")
+        public static let invalidExpiryMonth = POFailureCode(rawValue: "card.invalid-expiry-month")
 
         /// The card expiration year was invalid.
-        public static let cardInvalidExpiryYear = POFailureCode(rawValue: "card.invalid-expiry-year")
+        public static let invalidExpiryYear = POFailureCode(rawValue: "card.invalid-expiry-year")
 
         /// The card holder ZIP code was invalid (potential AVS failure).
-        public static let cardInvalidZip = POFailureCode(rawValue: "card.invalid-zip")
+        public static let invalidZip = POFailureCode(rawValue: "card.invalid-zip")
 
         /// The card holder address was invalid (potential AVS failure).
-        public static let cardInvalidAddress = POFailureCode(rawValue: "card.invalid-address")
+        public static let invalidAddress = POFailureCode(rawValue: "card.invalid-address")
 
         /// The card CVC was missing, but needed to process the payment.
-        public static let cardMissingCvc = POFailureCode(rawValue: "card.missing-cvc")
+        public static let missingCvc = POFailureCode(rawValue: "card.missing-cvc")
 
         /// Invalid CVC.
-        public static let cardInvalidCvc = POFailureCode(rawValue: "card.invalid-cvc")
+        public static let invalidCvc = POFailureCode(rawValue: "card.invalid-cvc")
 
         /// The card expiry date was missing, but needed to process the payment.
-        public static let cardMissingExpiry = POFailureCode(rawValue: "card.missing-expiry")
+        public static let missingExpiry = POFailureCode(rawValue: "card.missing-expiry")
 
         /// The card number was missing.
-        public static let cardMissingNumber = POFailureCode(rawValue: "card.missing-number")
+        public static let missingNumber = POFailureCode(rawValue: "card.missing-number")
 
         /// The card 3DS verification process was missing but needed to process the payment.
-        public static let cardMissing3DS = POFailureCode(rawValue: "card.missing-3ds")
+        public static let missing3DS = POFailureCode(rawValue: "card.missing-3ds")
 
         /// The card AVS check failed.
-        public static let cardFailedAvs = POFailureCode(rawValue: "card.failed-avs")
+        public static let failedAvs = POFailureCode(rawValue: "card.failed-avs")
 
         /// The card AVS check failed on the postal code.
-        public static let cardFailedAvsPostal = POFailureCode(rawValue: "card.failed-avs-postal")
+        public static let failedAvsPostal = POFailureCode(rawValue: "card.failed-avs-postal")
 
         /// The card does not support 3DS authentication (but a 3DS authentication was requested).
         public static let cardUnsupported3DS = POFailureCode(rawValue: "card.unsupported-3ds")
 
         /// The transaction was blocked from authorization due to the 3DS transaction status being in
         /// the authenticating phase.
-        public static let cardPending3DS = POFailureCode(rawValue: "card.pending-3ds")
+        public static let pending3DS = POFailureCode(rawValue: "card.pending-3ds")
 
         /// The card 3DS check failed.
-        public static let cardFailed3DS = POFailureCode(rawValue: "card.failed-3ds")
+        public static let failed3DS = POFailureCode(rawValue: "card.failed-3ds")
 
         /// The card 3DS check expired and needs to be retried.
-        public static let cardExpired3DS = POFailureCode(rawValue: "card.expired-3ds")
+        public static let expired3DS = POFailureCode(rawValue: "card.expired-3ds")
 
         /// The card AVS check failed on the address.
-        public static let cardFailedAvsAddress = POFailureCode(rawValue: "card.failed-avs-address")
+        public static let failedAvsAddress = POFailureCode(rawValue: "card.failed-avs-address")
 
         /// Both the card CVC and AVS checks failed.
-        public static let cardFailedCvcAndAvs = POFailureCode(rawValue: "card.failed-cvc-and-avs")
+        public static let failedCvcAndAvs = POFailureCode(rawValue: "card.failed-cvc-and-avs")
 
         /// The track data of the card was invalid (expiration date or CVC).
-        public static let cardBadTrackData = POFailureCode(rawValue: "card.bad-track-data")
+        public static let badTrackData = POFailureCode(rawValue: "card.bad-track-data")
 
         /// The card was not yet registered and can therefore not process payments.
-        public static let cardNotRegistered = POFailureCode(rawValue: "card.not-registered")
+        public static let notRegistered = POFailureCode(rawValue: "card.not-registered")
 
         /// The card was stolen.
-        public static let cardStolen = POFailureCode(rawValue: "card.stolen")
+        public static let stolen = POFailureCode(rawValue: "card.stolen")
 
         /// The card was lost by its card holder.
-        public static let cardLost = POFailureCode(rawValue: "card.lost")
+        public static let lost = POFailureCode(rawValue: "card.lost")
 
         /// The payment should not be retried.
-        public static let cardDontRetry = POFailureCode(rawValue: "card.dont-retry")
+        public static let dontRetry = POFailureCode(rawValue: "card.dont-retry")
 
-        /// The card bank account was invalid, the customer should contact its bank.
-        public static let cardInvalidAccount = POFailureCode(rawValue: "card.invalid-account")
+        /// The card account was invalid.
+        public static let invalidAccount = POFailureCode(rawValue: "card.invalid-account")
 
         /// The card was revoked.
-        public static let cardRevoked = POFailureCode(rawValue: "card.revoked")
+        public static let revoked = POFailureCode(rawValue: "card.revoked")
 
         /// All the card holder cards were revoked.
-        public static let cardRevokedAll = POFailureCode(rawValue: "card.revoked-all")
+        public static let revokedAll = POFailureCode(rawValue: "card.revoked-all")
 
         /// The card was a test card and can't be used to process live transactions.
-        public static let cardTest = POFailureCode(rawValue: "card.test")
+        public static let test = POFailureCode(rawValue: "card.test")
 
         /// The card was blacklisted from the payment provider
-        public static let cardBlacklisted = POFailureCode(rawValue: "card.blacklisted")
+        public static let blacklisted = POFailureCode(rawValue: "card.blacklisted")
     }
 
     public enum RequestValidation {
@@ -435,33 +435,14 @@ extension POFailureCode {
         /// This can be caused by validation errors, fraud prevention tools, or other specific errors.
         public static let declined = POFailureCode(rawValue: "gateway.declined")
 
-        /// Gateway encountered an unknown error.
-        public static let unknown = POFailureCode(rawValue: "gateway.unknown-error")
+        /// The payment request to the gateway timed out.
+        public static let timeout = POFailureCode(rawValue: "gateway.timeout")
 
         /// The gateway encountered an internal error.
         public static let `internal` = POFailureCode(rawValue: "gateway-internal-error")
 
-        /// The payment request to the gateway timed out.
-        public static let timeout = POFailureCode(rawValue: "gateway.timeout")
-    }
-
-    public enum Mobile {
-
-        /// Some error happend on SDK's side while processing request.
-        public static let generic = POFailureCode(rawValue: "processout-mobile.generic.error")
-
-        /// No network connection.
-        public static let networkUnreachable = POFailureCode(rawValue: "processout-mobile.network-unreachable")
-
-        /// Timeout error.
-        public static let timeout = POFailureCode(rawValue: "processout-mobile.timeout")
-
-        /// Cancellation error.
-        @available(*, deprecated, message: "Use Customer.cancelled instead.")
-        public static let cancelled = POFailureCode(rawValue: "processout-mobile.cancelled")
-
-        /// Internal error.
-        public static let `internal` = POFailureCode(rawValue: "processout-mobile.internal")
+        /// Gateway encountered an unknown error.
+        public static let unknown = POFailureCode(rawValue: "gateway.unknown-error")
     }
 
     public enum Resource {
@@ -583,6 +564,25 @@ extension POFailureCode {
         public static let resourceNotLinked = POFailureCode(rawValue: "resource.not-linked")
     }
 
+    public enum Mobile {
+
+        /// Some error happend on SDK's side while processing request.
+        public static let generic = POFailureCode(rawValue: "processout-mobile.generic.error")
+
+        /// No network connection.
+        public static let networkUnreachable = POFailureCode(rawValue: "processout-mobile.network-unreachable")
+
+        /// Timeout error.
+        public static let timeout = POFailureCode(rawValue: "processout-mobile.timeout")
+
+        /// Cancellation error.
+        @available(*, deprecated, message: "Use Customer.cancelled instead.")
+        public static let cancelled = POFailureCode(rawValue: "processout-mobile.cancelled")
+
+        /// Internal error.
+        public static let `internal` = POFailureCode(rawValue: "processout-mobile.internal")
+    }
+
     public enum Generic {
 
         /// The payment was declined, but no further details were provided.
@@ -619,11 +619,11 @@ extension POFailureCode.Namespace {
     /// Gateway errors.
     public static let gateway = POFailureCode.Namespace(rawValue: "gateway")
 
-    /// Mobile errors.
-    public static let mobile = POFailureCode.Namespace(rawValue: "processout-mobile")
-
     /// Resource errors.
     public static let resource = POFailureCode.Namespace(rawValue: "resource")
+
+    /// Mobile SDK errors.
+    public static let mobile = POFailureCode.Namespace(rawValue: "processout-mobile")
 }
 
 extension POFailureCode.Namespace {

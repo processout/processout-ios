@@ -60,13 +60,13 @@ public final class PODefaultPassKitPaymentErrorMapper: POPassKitPaymentErrorMapp
         case .Resource.countryNotFound:
             pkCode = .billingContactInvalidError
             userInfo = [.postalAddressUserInfoKey: CNPostalAddressCountryKey]
-        case .Card.cardInvalidName:
+        case .Card.invalidName:
             pkCode = .billingContactInvalidError
             userInfo = [.contactFieldUserInfoKey: PKContactField.name]
-        case .Card.cardInvalidZip:
+        case .Card.invalidZip:
             pkCode = .billingContactInvalidError
             userInfo = [.postalAddressUserInfoKey: CNPostalAddressPostalCodeKey]
-        case .Card.cardInvalidAddress:
+        case .Card.invalidAddress:
             pkCode = .billingContactInvalidError
             userInfo = [:]
         case .RequestValidation.invalidShippingMethod, .RequestValidation.invalidShippingDelay:
