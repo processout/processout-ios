@@ -7,20 +7,11 @@
 
 // swiftlint:disable inclusive_language file_length
 
-/// Failure code description.
+/// Represents a failure code that describes an error encountered during a request.
 public struct POFailureCode: Sendable, Equatable {
 
-    public struct Namespace: Sendable, Equatable {
-
-        public let rawValue: String
-    }
-
-    public let rawValue: String, namespace: Namespace?
-
-    init(rawValue: String) {
-        self.rawValue = rawValue
-        self.namespace = Namespace.namespace(for: rawValue)
-    }
+    /// The raw string representation of the failure code.
+    public let rawValue: String
 }
 
 extension POFailureCode {
@@ -596,46 +587,6 @@ extension POFailureCode {
 
         /// This service is not supported.
         public static let serviceNotSupported = POFailureCode(rawValue: "service.not-supported")
-    }
-}
-
-extension POFailureCode.Namespace {
-
-    /// Authentication errors.
-    public static let authentication = POFailureCode.Namespace(rawValue: "request.authentication")
-
-    /// Card errors.
-    public static let card = POFailureCode.Namespace(rawValue: "card")
-
-    /// Request validation errors.
-    public static let requestValidation = POFailureCode.Namespace(rawValue: "request.validation")
-
-    /// Request errors.
-    public static let request = POFailureCode.Namespace(rawValue: "request")
-
-    /// Customer errors.
-    public static let customer = POFailureCode.Namespace(rawValue: "customer")
-
-    /// Gateway errors.
-    public static let gateway = POFailureCode.Namespace(rawValue: "gateway")
-
-    /// Resource errors.
-    public static let resource = POFailureCode.Namespace(rawValue: "resource")
-
-    /// Mobile SDK errors.
-    public static let mobile = POFailureCode.Namespace(rawValue: "processout-mobile")
-}
-
-extension POFailureCode.Namespace {
-
-    static func namespace(for rawErrorCode: String) -> Self? {
-        let knownNamespaces: [Self] = [
-            .authentication, .card, .requestValidation, .request, .customer, .gateway, .mobile, .resource
-        ]
-        for namespace in knownNamespaces where rawErrorCode.hasPrefix(namespace.rawValue) {
-            return namespace
-        }
-        return nil
     }
 }
 
