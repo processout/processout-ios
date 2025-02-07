@@ -33,7 +33,7 @@ public final class POCheckout3DSService: PO3DS2Service {
             )
             self.service = service
             guard await delegate?.checkout3DSService(self, shouldContinueWith: await service.warnings) ?? true else {
-                throw POFailure(code: .cancelled)
+                throw POFailure(code: .Mobile.cancelled)
             }
             let authenticationRequest = authenticationRequest(
                 with: try await service.createTransaction().getAuthenticationRequestParameters()
@@ -53,7 +53,7 @@ public final class POCheckout3DSService: PO3DS2Service {
         delegate?.checkout3DSService(self, willPerformChallengeWith: parameters)
         do {
             guard let transaction = service?.createTransaction() else {
-                throw POFailure(code: .generic(.mobile))
+                throw POFailure(code: .Mobile.generic)
             }
             observeDeepLinks()
             let authenticationResult = try await transaction.doChallenge(
@@ -127,7 +127,7 @@ public final class POCheckout3DSService: PO3DS2Service {
         if let error = error as? AuthenticationError {
             return errorMapper.convert(error: error)
         }
-        return POFailure(code: .generic(.mobile), underlyingError: error)
+        return POFailure(code: .Mobile.generic, underlyingError: error)
     }
 
     private func observeDeepLinks() {
