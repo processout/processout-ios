@@ -567,7 +567,6 @@ extension POFailureCode {
         public static let timeout = POFailureCode(rawValue: "processout-mobile.timeout")
 
         /// Cancellation error.
-        @available(*, deprecated, message: "Use Customer.cancelled instead.")
         public static let cancelled = POFailureCode(rawValue: "processout-mobile.cancelled")
 
         /// Internal error.
