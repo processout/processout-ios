@@ -462,6 +462,10 @@ extension POFailure.Code {
             self = .timeout(code)
         } else if let code = POFailure.InternalCode(rawValue: rawValue) {
             self = .internal(code)
+        } else if POFailure.Code.cancelled.rawValue == rawValue {
+            self = .cancelled
+        } else if POFailure.Code.networkUnreachable.rawValue == rawValue {
+            self = .networkUnreachable
         } else {
             self = .unknown(rawValue: rawValue)
         }
