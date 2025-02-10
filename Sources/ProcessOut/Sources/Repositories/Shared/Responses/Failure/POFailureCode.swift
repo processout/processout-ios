@@ -12,6 +12,10 @@ public struct POFailureCode: Sendable, Equatable {
 
     /// The raw string representation of the failure code.
     public let rawValue: String
+
+    init(rawValue: String) {
+        self.rawValue = rawValue.lowercased()
+    }
 }
 
 public func ~= (pattern: POFailureCode, value: Error) -> Bool {

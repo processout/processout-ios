@@ -12,6 +12,10 @@ extension POFailureCode {
 
         /// The raw string value of the namespace.
         public let rawValue: String
+
+        init(rawValue: String) {
+            self.rawValue = rawValue.lowercased()
+        }
     }
 
     /// The namespace associated with the failure code.
