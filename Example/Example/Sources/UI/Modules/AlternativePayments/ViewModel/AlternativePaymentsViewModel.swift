@@ -116,13 +116,13 @@ final class AlternativePaymentsViewModel: ObservableObject {
     }
 
     private func updateStateMessage(with error: Error) {
-        if let failure = error as? POFailure, failure.code == .cancelled {
-            return
-        }
         let errorMessage: String
-        if let failure = error as? POFailure, let message = failure.message {
-            errorMessage = message
-        } else {
+        switch error {
+        case .Mobile.cancelled, .Customer.cancelled:
+            return
+        case let failure as POFailure:
+            errorMessage = failure.message ?? String(localized: .AlternativePayments.errorMessage)
+        default:
             errorMessage = String(localized: .AlternativePayments.errorMessage)
         }
         state.message = .init(text: errorMessage, severity: .error)

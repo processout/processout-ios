@@ -14,6 +14,13 @@ public struct POFailureCode: Sendable, Equatable {
     public let rawValue: String
 }
 
+public func ~= (pattern: POFailureCode, value: Error) -> Bool {
+    if let failure = value as? POFailure {
+        return failure.failureCode == pattern
+    }
+    return false
+}
+
 extension POFailureCode {
 
     public enum Authentication {
