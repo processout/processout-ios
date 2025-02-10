@@ -246,9 +246,6 @@ extension POFailureCode {
             rawValue: "request.validation.invalid-detail-condition"
         )
 
-        /// The device channel specified is invalid.
-        public static let invalidDeviceChannel = POFailureCode(rawValue: "request.validation.invalid-device-channel")
-
         /// The specified duration value is invalid.
         public static let invalidDuration = POFailureCode(rawValue: "request.validation.invalid-duration")
 
@@ -270,9 +267,6 @@ extension POFailureCode {
 
         /// The specified ID is invalid.
         public static let invalidId = POFailureCode(rawValue: "request.validation.invalid-id")
-
-        /// The provided IP address is invalid.
-        public static let invalidIpAddress = POFailureCode(rawValue: "request.validation.invalid-ip-address")
 
         /// The legal document provided is invalid.
         public static let invalidLegalDocument = POFailureCode(rawValue: "request.validation.invalid-legal-document")
@@ -437,7 +431,7 @@ extension POFailureCode {
         public static let timeout = POFailureCode(rawValue: "gateway.timeout")
 
         /// The gateway encountered an internal error.
-        public static let `internal` = POFailureCode(rawValue: "gateway-internal-error")
+        public static let `internal` = POFailureCode(rawValue: "gateway.internal-error")
 
         /// Gateway encountered an unknown error.
         public static let unknown = POFailureCode(rawValue: "gateway.unknown-error")
@@ -445,66 +439,20 @@ extension POFailureCode {
 
     public enum Resource {
 
-        /// The specified activity was not found.
-        public static let activityNotFound = POFailureCode(rawValue: "resource.activity.not-found")
-
-        /// The specified add-on was not found.
-        public static let addonNotFound = POFailureCode(rawValue: "resource.addon.not-found")
-
-        /// The requested alert was not found.
-        public static let alertNotFound = POFailureCode(rawValue: "resource.alert.not-found")
-
         /// The API key was not found.
         public static let apiKeyNotFound = POFailureCode(rawValue: "resource.api-key.not-found")
-
-        /// The requested API request was not found.
-        public static let apiRequestNotFound = POFailureCode(rawValue: "resource.api-request.not-found")
-
-        /// The specified API version was not found.
-        public static let apiVersionNotFound = POFailureCode(rawValue: "resource.api-version.not-found")
-
-        /// The Apple Pay configuration was not found.
-        public static let applepayConfigurationNotFound = POFailureCode(
-            rawValue: "resource.applepay-configuration.not-found"
-        )
-
-        /// The requested board was not found.
-        public static let boardNotFound = POFailureCode(rawValue: "resource.board.not-found")
 
         /// The specified card was not found.
         public static let cardNotFound = POFailureCode(rawValue: "resource.card.not-found")
 
-        /// The requested chart was not found.
-        public static let chartNotFound = POFailureCode(rawValue: "resource.chart.not-found")
-
-        /// The specified collaborator was not found.
-        public static let collaboratorNotFound = POFailureCode(rawValue: "resource.collaborator.not-found")
-
         /// The country was not found.
         public static let countryNotFound = POFailureCode(rawValue: "resource.country.not-found")
-
-        /// The coupon was not found.
-        public static let couponNotFound = POFailureCode(rawValue: "resource.coupon.not-found")
 
         /// The specified currency was not found.
         public static let currencyNotFound = POFailureCode(rawValue: "resource.currency.not-found")
 
         /// The requested customer was not found.
         public static let customerNotFound = POFailureCode(rawValue: "resource.customer.not-found")
-
-        /// The discount was not found.
-        public static let discountNotFound = POFailureCode(rawValue: "resource.discount.not-found")
-
-        /// The specified event was not found.
-        public static let eventNotFound = POFailureCode(rawValue: "resource.event.not-found")
-
-        /// The requested export was not found.
-        public static let exportNotFound = POFailureCode(rawValue: "resource.export.not-found")
-
-        /// The fraud service configuration was not found.
-        public static let fraudServiceConfigurationNotFound = POFailureCode(
-            rawValue: "resource.fraud-service-configuration.not-found"
-        )
 
         /// The requested gateway was not found.
         public static let gatewayNotFound = POFailureCode(rawValue: "resource.gateway.not-found")
@@ -520,46 +468,11 @@ extension POFailureCode {
         /// The invoice was not found.
         public static let invoiceNotFound = POFailureCode(rawValue: "resource.invoice.not-found")
 
-        /// The requested payout was not found.
-        public static let payoutNotFound = POFailureCode(rawValue: "resource.payout.not-found")
-
-        /// The specified permission group was not found.
-        public static let permissionGroupNotFound = POFailureCode(rawValue: "resource.permission-group.not-found")
-
-        /// The requested plan was not found.
-        public static let planNotFound = POFailureCode(rawValue: "resource.plan.not-found")
-
-        /// The product was not found.
-        public static let productNotFound = POFailureCode(rawValue: "resource.product.not-found")
-
         /// The requested project was not found.
         public static let projectNotFound = POFailureCode(rawValue: "resource.project.not-found")
 
-        /// The refund was not found.
-        public static let refundNotFound = POFailureCode(rawValue: "resource.refund.not-found")
-
-        /// The specified subscription was not found.
-        public static let subscriptionNotFound = POFailureCode(rawValue: "resource.subscription.not-found")
-
         /// The requested token was not found.
         public static let tokenNotFound = POFailureCode(rawValue: "resource.token.not-found")
-
-        /// The tokenization request was not found.
-        public static let tokenizationRequestNotFound = POFailureCode(
-            rawValue: "resource.tokenization-request.not-found"
-        )
-
-        /// The transaction was not found.
-        public static let transactionNotFound = POFailureCode(rawValue: "resource.transaction.not-found")
-
-        /// The specified user was not found.
-        public static let userNotFound = POFailureCode(rawValue: "resource.user.not-found")
-
-        /// The webhook endpoint was not found.
-        public static let webhookEndpointNotFound = POFailureCode(rawValue: "resource.webhook-endpoint.not-found")
-
-        /// Indicates that resource is not linked.
-        public static let resourceNotLinked = POFailureCode(rawValue: "resource.not-linked")
     }
 
     public enum Mobile {
@@ -591,7 +504,7 @@ extension POFailureCode {
         /// This operation is not supported in the sandbox environment.
         public static let sandboxNotSupported = POFailureCode(rawValue: "sandbox.not-supported")
 
-        /// This service is not supported.
+        /// Gateway method is not supported.
         public static let serviceNotSupported = POFailureCode(rawValue: "service.not-supported")
     }
 }
