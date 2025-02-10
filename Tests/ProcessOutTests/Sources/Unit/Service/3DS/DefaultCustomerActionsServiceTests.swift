@@ -43,7 +43,7 @@ struct DefaultThreeDSServiceTests {
                 threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure, case .internal(.mobile) = failure.code {
+            if case .Mobile.internal = issue.error {
                 return true
             }
             return false
@@ -70,7 +70,7 @@ struct DefaultThreeDSServiceTests {
         )
         threeDSService.authenticationRequestParametersFromClosure = { configuration in
             #expect(configuration == expectedConfiguration)
-            throw POFailure(code: .generic(.mobile))
+            throw POFailure(code: .Mobile.generic)
         }
 
         // When
@@ -90,7 +90,7 @@ struct DefaultThreeDSServiceTests {
     @Test
     func handle_whenDelegateAuthenticationRequestFails_propagatesFailure() async throws {
         // Given
-        let expectedError = POFailure(code: .unknown(rawValue: "test-error"))
+        let expectedError = POFailure(code: .init(rawValue: "test-error"))
         threeDSService.authenticationRequestParametersFromClosure = { _ in
             throw expectedError
         }
@@ -107,7 +107,7 @@ struct DefaultThreeDSServiceTests {
                 threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure, failure.code == expectedError.code {
+            if let failure = issue.error as? POFailure, failure.failureCode == expectedError.failureCode {
                 return true
             }
             return false
@@ -133,7 +133,7 @@ struct DefaultThreeDSServiceTests {
                 threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure, case .internal(.mobile) = failure.code {
+            if case .Mobile.internal = issue.error {
                 return true
             }
             return false
@@ -192,8 +192,8 @@ struct DefaultThreeDSServiceTests {
                 threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure {
-                return failure.code == .internal(.mobile)
+            if case .Mobile.internal = issue.error {
+                return true
             }
             return false
         }
@@ -229,7 +229,7 @@ struct DefaultThreeDSServiceTests {
     @Test
     func handle_whenDelegateDoChallengeFails_propagatesFailure() async throws {
         // Given
-        let expectedError = POFailure(code: .unknown(rawValue: "test-error"))
+        let expectedError = POFailure(code: .init(rawValue: "test-error"))
         threeDSService.performChallengeFromClosure = { _ in
             throw expectedError
         }
@@ -246,7 +246,7 @@ struct DefaultThreeDSServiceTests {
             )
         } matching: { issue in
             if let failure = issue.error as? POFailure {
-                return failure.code == expectedError.code
+                return failure.failureCode == expectedError.failureCode
             }
             return false
         }
@@ -334,8 +334,8 @@ struct DefaultThreeDSServiceTests {
                 threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure {
-                return failure.code == .internal(.mobile)
+            if case .Mobile.internal = issue.error {
+                return true
             }
             return false
         }
@@ -388,7 +388,7 @@ struct DefaultThreeDSServiceTests {
     func handle_whenRedirectFails_propagatesError() async throws {
         // Given
         webSession.authenticateFromClosure = { _ in
-            throw POFailure(code: .unknown(rawValue: "test-error"))
+            throw POFailure(code: .init(rawValue: "test-error"))
         }
 
         let customerAction = _CustomerAction(type: .redirect, value: "example.com")
@@ -404,8 +404,8 @@ struct DefaultThreeDSServiceTests {
                 threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure {
-                return failure.code == .unknown(rawValue: "test-error")
+            if case POFailureCode(rawValue: "test-error") = issue.error {
+                return true
             }
             return false
         }
@@ -461,7 +461,7 @@ struct DefaultThreeDSServiceTests {
     func handle_whenFingerprintFails_propagatesError() async throws {
         // Given
         webSession.authenticateFromClosure = { _ in
-            throw POFailure(code: .unknown(rawValue: "test-error"))
+            throw POFailure(code: .init(rawValue: "test-error"))
         }
         let customerAction = _CustomerAction(type: .fingerprint, value: "example.com")
 
@@ -476,8 +476,8 @@ struct DefaultThreeDSServiceTests {
                 threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure {
-                return failure.code == .unknown(rawValue: "test-error")
+            if case POFailureCode(rawValue: "test-error") = issue.error {
+                return true
             }
             return false
         }
@@ -487,7 +487,7 @@ struct DefaultThreeDSServiceTests {
     func handle_whenFingerprintFailsWithTimeoutError_succeeds() async throws {
         // Given
         webSession.authenticateFromClosure = { _ in
-            throw POFailure(code: .timeout(.mobile))
+            throw POFailure(code: .Mobile.timeout)
         }
         let customerAction = _CustomerAction(type: .fingerprint, value: "example.com")
 

@@ -402,6 +402,7 @@ extension POFailure {
 
     /// Creates failure instance.
     @available(*, deprecated, message: "Create failure with POFailureCode instead.")
+    @_disfavoredOverload
     public init(
         message: String? = nil,
         code: Code,

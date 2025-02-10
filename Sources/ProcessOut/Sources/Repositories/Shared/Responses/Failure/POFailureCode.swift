@@ -18,7 +18,7 @@ public struct POFailureCode: Sendable, Equatable {
     }
 }
 
-public func ~= (pattern: POFailureCode, value: Error) -> Bool {
+public func ~= (pattern: POFailureCode, value: Error?) -> Bool {
     if let failure = value as? POFailure {
         return failure.failureCode == pattern
     }
