@@ -27,9 +27,9 @@ For example if you are using scene delegate it may look like following:
 ```swift
 func scene(_ scene: UIScene, openURLContexts urlContexts: Set<UIOpenURLContext>) {
     guard let url = urlContexts.first?.url else {
-    return
-}
-let isHandled = ProcessOut.shared.processDeepLink(url: url)
-print(isHandled)
+        return
+    }
+    let isHandled = ProcessOut.shared.processDeepLink(url: url)
+    print(isHandled)
 }
 ```
