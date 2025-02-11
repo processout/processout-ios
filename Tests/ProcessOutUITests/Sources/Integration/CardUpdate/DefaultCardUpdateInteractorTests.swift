@@ -26,14 +26,14 @@ struct DefaultCardUpdateInteractorTests {
         let sut = createSut(configuration: configuration)
 
         // When
-        await confirmation { confirm in
-            sut.didChange = {
-                if case .starting = sut.state {
-                    confirm()
-                }
-            }
-            sut.start()
-            try? await Task.sleep(for: .seconds(1))
+        sut.start()
+
+        // Then
+        switch sut.state {
+        case .starting:
+            break
+        default:
+            Issue.record("Unexpected state.")
         }
     }
 
@@ -47,14 +47,17 @@ struct DefaultCardUpdateInteractorTests {
 
         // When
         sut.start()
-        try? await Task.sleep(for: .seconds(1))
+        if case .starting(let currentState) = sut.state {
+            _ = await currentState.task.result
+        }
 
         // Then
-        guard case .started(let startedState) = sut.state else {
+        switch sut.state {
+        case .started(let currentState):
+            #expect(currentState.scheme == .visa)
+        default:
             Issue.record("Unexpected state.")
-            return
         }
-        #expect(startedState.scheme == .visa)
     }
 
     @Test
@@ -67,14 +70,17 @@ struct DefaultCardUpdateInteractorTests {
 
         // When
         sut.start()
-        try? await Task.sleep(for: .seconds(1))
+        if case .starting(let currentState) = sut.state {
+            _ = await currentState.task.result
+        }
 
         // Then
-        guard case .started(let startedState) = sut.state else {
+        switch sut.state {
+        case .started(let currentState):
+            #expect(currentState.scheme == .visa && currentState.preferredScheme == .carteBancaire)
+        default:
             Issue.record("Unexpected state.")
-            return
         }
-        #expect(startedState.scheme == .visa && startedState.preferredScheme == .carteBancaire)
     }
 
     @Test
@@ -85,15 +91,16 @@ struct DefaultCardUpdateInteractorTests {
 
         // When
         sut.start()
+        if case .starting(let currentState) = sut.state {
+            _ = await currentState.task.result
+        }
 
         // Then
-        await confirmation { confirm in
-            sut.didChange = { [weak sut] in
-                if case .started(let startedState) = sut?.state, startedState.scheme == .visa {
-                    confirm()
-                }
-            }
-            try? await Task.sleep(for: .seconds(3))
+        switch sut.state {
+        case .started(let currentState):
+            #expect(currentState.scheme == .visa)
+        default:
+            Issue.record("Unexpected state.")
         }
     }
 
@@ -107,15 +114,16 @@ struct DefaultCardUpdateInteractorTests {
 
         // When
         sut.start()
+        if case .starting(let currentState) = sut.state {
+            _ = await currentState.task.result
+        }
 
         // Then
-        await confirmation { confirm in
-            sut.didChange = { [weak sut] in
-                if case .started(let startedState) = sut?.state, startedState.scheme == .visa {
-                    confirm()
-                }
-            }
-            try? await Task.sleep(for: .seconds(1))
+        switch sut.state {
+        case .started(let currentState):
+            #expect(currentState.scheme == .visa)
+        default:
+            Issue.record("Unexpected state.")
         }
     }
 
@@ -129,7 +137,9 @@ struct DefaultCardUpdateInteractorTests {
 
         // When
         sut.start()
-        try? await Task.sleep(for: .seconds(1))
+        if case .starting(let currentState) = sut.state {
+            _ = await currentState.task.result
+        }
 
         // Then
         sut.cancel()
@@ -164,7 +174,9 @@ struct DefaultCardUpdateInteractorTests {
 
         // When
         sut.start()
-        try? await Task.sleep(for: .seconds(1))
+        if case .starting(let currentState) = sut.state {
+            _ = await currentState.task.result
+        }
         sut.update(cvc: "1 23 45")
 
         // Then
@@ -185,17 +197,20 @@ struct DefaultCardUpdateInteractorTests {
 
         // When
         sut.start()
-        try? await Task.sleep(for: .seconds(1))
+        if case .starting(let currentState) = sut.state {
+            _ = await currentState.task.result
+        }
         sut.submit()
+        if case .updating(let currentState) = sut.state {
+            _ = await currentState.task.result
+        }
 
         // Then
-        await confirmation { confirm in
-            sut.didChange = { [weak sut] in
-                if case .started(let startedState) = sut?.state, startedState.recentErrorMessage != nil {
-                    confirm()
-                }
-            }
-            try? await Task.sleep(for: .seconds(3))
+        switch sut.state {
+        case .started(let currentState):
+            #expect(currentState.recentErrorMessage != nil)
+        default:
+            Issue.record("Unexpected state.")
         }
     }
 
@@ -209,18 +224,21 @@ struct DefaultCardUpdateInteractorTests {
 
         // When
         sut.start()
-        try? await Task.sleep(for: .seconds(1))
+        if case .starting(let currentState) = sut.state {
+            _ = await currentState.task.result
+        }
         sut.update(cvc: "123")
         sut.submit()
+        if case .updating(let currentState) = sut.state {
+            _ = await currentState.task.result
+        }
 
         // Then
-        await confirmation { confirm in
-            sut.didChange = { [weak sut] in
-                if case .completed = sut?.state {
-                    confirm()
-                }
-            }
-            try? await Task.sleep(for: .seconds(3))
+        switch sut.state {
+        case .completed:
+            break
+        default:
+            Issue.record("Unexpected state.")
         }
     }
 
