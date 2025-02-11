@@ -23,7 +23,7 @@ final class HttpConnectorErrorDecorator: HttpConnector {
             throw failureMapper.failure(from: error)
         } catch {
             logger.error("Unexpected error: \(error).")
-            throw POFailure(message: "Something went wrong.", code: .internal(.mobile), underlyingError: error)
+            throw POFailure(message: "Something went wrong.", code: .Mobile.internal, underlyingError: error)
         }
     }
 

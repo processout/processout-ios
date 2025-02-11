@@ -63,16 +63,16 @@ final class SavedPaymentMethodsViewModel: ObservableObject {
     }
 
     private func setMessage(with error: Error) {
-        var errorMessage: String?
-        if let failure = error as? POFailure {
-            guard failure.code != .cancelled else {
-                return
-            }
-            errorMessage = failure.message
+        let errorMessage: String
+        switch error {
+        case .Mobile.cancelled, .Customer.cancelled:
+            return
+        case let failure as POFailure:
+            errorMessage = failure.message ?? String(localized: .SavedPaymentMethods.errorMessage)
+        default:
+            errorMessage = String(localized: .SavedPaymentMethods.errorMessage)
         }
-        state.message = .init(
-            text: errorMessage ?? String(localized: .SavedPaymentMethods.errorMessage), severity: .error
-        )
+        state.message = .init(text: errorMessage, severity: .error)
     }
 
     private func createInvoice() async throws -> POInvoice {

@@ -204,8 +204,8 @@ struct DefaultSavedPaymentMethodsInteractorTests {
             try withKnownIssue {
                 _ = try result.get()
             } matching: { issue in
-                if let failure = issue.error as? POFailure {
-                    return failure.code == .cancelled
+                if case .Mobile.cancelled = issue.error {
+                    return true
                 }
                 return false
             }

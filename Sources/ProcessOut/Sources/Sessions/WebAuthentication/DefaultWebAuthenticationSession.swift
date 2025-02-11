@@ -32,10 +32,10 @@ final class DefaultWebAuthenticationSession:
                     session.presentationContextProvider = self
                     operationProxy.set(session: session, continuation: continuation)
                     if Task.isCancelled {
-                        let failure = POFailure(message: "Authentication was cancelled.", code: .cancelled)
+                        let failure = POFailure(message: "Authentication was cancelled.", code: .Mobile.cancelled)
                         operationProxy.setCompleted(with: .failure(failure))
                     } else if !session.start() {
-                        let failure = POFailure(message: "Unable to start authentication.", code: .generic(.mobile))
+                        let failure = POFailure(message: "Unable to start authentication.", code: .Mobile.generic)
                         operationProxy.setCompleted(with: .failure(failure))
                     }
                 }
@@ -107,16 +107,16 @@ final class DefaultWebAuthenticationSession:
 
     private static func converted(error: Error) -> POFailure {
         guard let error = error as? ASWebAuthenticationSessionError else {
-            return POFailure(code: .generic(.mobile), underlyingError: error)
+            return POFailure(code: .Mobile.generic, underlyingError: error)
         }
-        let poCode: POFailure.Code
+        let poCode: POFailureCode
         switch error.code {
         case .canceledLogin:
-            poCode = .cancelled
+            poCode = .Mobile.cancelled
         case .presentationContextNotProvided, .presentationContextInvalid:
-            poCode = .internal(.mobile)
+            poCode = .Mobile.internal
         @unknown default:
-            poCode = .generic(.mobile)
+            poCode = .Mobile.generic
         }
         return POFailure(code: poCode, underlyingError: error)
     }

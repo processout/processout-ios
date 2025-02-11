@@ -112,7 +112,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         default:
             break // Ignored
         }
-        setFailureState(failure: POFailure(message: "Card update has been canceled.", code: .cancelled))
+        setFailureState(failure: POFailure(message: "Card update has been canceled.", code: .Mobile.cancelled))
     }
 
     // MARK: - Private Properties
@@ -206,7 +206,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             failure = error
         } else {
             logger.error("Unexpected error type: \(error).")
-            failure = POFailure(message: "Something went wrong.", code: .generic(.mobile), underlyingError: error)
+            failure = POFailure(message: "Something went wrong.", code: .Mobile.generic, underlyingError: error)
         }
         if delegate?.shouldContinueUpdate(after: failure) != false {
             var newState = currentState.snapshot
@@ -221,17 +221,17 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
     private func errorMessage(for failure: POFailure, areParametersValid: inout Bool) -> String? {
         // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
         var errorMessage: POStringResource
-        switch failure.code {
-        case .generic(.requestInvalidCard),
-             .generic(.cardInvalid),
-             .generic(.cardBadTrackData),
-             .generic(.cardMissingCvc),
-             .generic(.cardInvalidCvc),
-             .generic(.cardFailedCvc),
-             .generic(.cardFailedCvcAndAvs):
+        switch failure.failureCode {
+        case .Request.invalidCard,
+             .Card.invalid,
+             .Card.badTrackData,
+             .Card.missingCvc,
+             .Card.invalidCvc,
+             .Card.failedCvc,
+             .Card.failedCvcAndAvs:
             areParametersValid = false
             errorMessage = .CardUpdate.Error.cvc
-        case .cancelled:
+        case .Mobile.cancelled, .Customer.cancelled:
             return nil
         default:
             areParametersValid = true

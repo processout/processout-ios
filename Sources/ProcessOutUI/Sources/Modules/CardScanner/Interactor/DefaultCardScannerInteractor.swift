@@ -41,14 +41,14 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
                 let isTorchEnabled = await cameraSession.isTorchEnabled
                 setStartedState(previewSource: previewSource, isTorchEnabled: isTorchEnabled)
             } else {
-                setFailureState(with: .init(message: "Unable to start scanning.", code: .generic(.mobile)))
+                setFailureState(with: .init(message: "Unable to start scanning.", code: .Mobile.generic))
             }
         }
         state = .starting
     }
 
     override func cancel() {
-        setFailureState(with: .init(message: "Card scanning has been canceled.", code: .cancelled))
+        setFailureState(with: .init(message: "Card scanning has been canceled.", code: .Mobile.cancelled))
     }
 
     func setTorchEnabled(_ isEnabled: Bool) {

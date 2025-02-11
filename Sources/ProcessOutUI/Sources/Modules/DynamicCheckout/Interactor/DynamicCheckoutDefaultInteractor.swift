@@ -61,7 +61,7 @@ final class DynamicCheckoutDefaultInteractor:
                     setSuccessState()
                 default:
                     let message = "Unsupported invoice state, please create new invoice and restart checkout."
-                    throw POFailure(message: message, code: .generic(.mobile))
+                    throw POFailure(message: message, code: .Mobile.generic)
                 }
             } catch {
                 setFailureState(error: error)
@@ -122,7 +122,7 @@ final class DynamicCheckoutDefaultInteractor:
         default:
             break // No ongoing operation to cancel
         }
-        setFailureState(error: POFailure(message: "Dynamic checkout has been canceled.", code: .cancelled))
+        setFailureState(error: POFailure(message: "Dynamic checkout has been canceled.", code: .Mobile.cancelled))
     }
 
     func didRequestCancelConfirmation() {
@@ -194,7 +194,7 @@ final class DynamicCheckoutDefaultInteractor:
             logger[attributeKey: .invoiceId] = invoice.id
             logger.debug("Did start dynamic checkout flow.")
         } else {
-            let failure = POFailure(message: "Payment methods are not available.", code: .generic(.mobile))
+            let failure = POFailure(message: "Payment methods are not available.", code: .Mobile.generic)
             setFailureState(error: failure)
         }
     }
@@ -283,18 +283,25 @@ final class DynamicCheckoutDefaultInteractor:
             return
         }
         do {
-            let shouldCreateNewInvoice: Bool
-            switch currentState.failure?.code {
-            case .internal, .validation, .notFound, .generic, .unknown:
-                shouldCreateNewInvoice = true // todo(andrii-vysotskyi): decide whether errors list is correct
+            let shouldCreateNewInvoice = switch currentState.failure?.failureCode {
+            case nil:
+                currentState.snapshot.shouldInvalidateInvoice
+            case .Mobile.networkUnreachable,
+                 .Mobile.timeout,
+                 .Mobile.cancelled,
+                 .Gateway.timeout,
+                 .Customer.cancelled,
+                 .Authentication.invalid,
+                 .Authentication.invalidProjectId:
+                currentState.snapshot.shouldInvalidateInvoice
             default:
-                shouldCreateNewInvoice = currentState.snapshot.shouldInvalidateInvoice
+                true
             }
             if shouldCreateNewInvoice {
                 guard let invoiceRequest = await delegate?.dynamicCheckout(
                     newInvoiceFor: currentState.snapshot.snapshot.invoice, invalidationReason: reason
                 ) else {
-                    throw POFailure(message: "Unable to restart dynamic checkout.", code: .generic(.mobile))
+                    throw POFailure(message: "Unable to restart dynamic checkout.", code: .Mobile.generic)
                 }
                 finishRestart(
                     with: try await invoicesService.invoice(request: invoiceRequest),
@@ -315,7 +322,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         guard let transaction = newInvoice.transaction, transaction.status == .waiting else {
             // Another restart is not attempted to prevent potential recursion
-            let failure = POFailure(message: "Unsupported invoice state.", code: .generic(.mobile))
+            let failure = POFailure(message: "Unsupported invoice state.", code: .Mobile.generic)
             setFailureState(error: failure)
             return
         }
@@ -359,8 +366,8 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     private func failureDescription(_ failure: POFailure?) -> String? {
-        switch failure?.code {
-        case .cancelled, nil:
+        switch failure?.failureCode {
+        case .Mobile.cancelled, .Customer.cancelled, nil:
             return nil
         default:
             return String(resource: .DynamicCheckout.Error.generic)
@@ -475,7 +482,7 @@ final class DynamicCheckoutDefaultInteractor:
         let task = Task { @MainActor in
             do {
                 guard let delegate else {
-                    throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
+                    throw POFailure(message: "Delegate must be set to authorize invoice.", code: .Mobile.generic)
                 }
                 let request = pkPaymentRequest(for: method, invoice: startedState.invoice)
                 await delegate.dynamicCheckout(willAuthorizeInvoiceWith: request)
@@ -734,7 +741,7 @@ final class DynamicCheckoutDefaultInteractor:
             failure = error
         } else {
             logger.error("Unexpected error type: \(error)")
-            failure = POFailure(code: .generic(.mobile), underlyingError: error)
+            failure = POFailure(code: .Mobile.generic, underlyingError: error)
         }
         state = .failure(failure)
         send(event: .didFail(failure: failure))
@@ -840,7 +847,7 @@ final class DynamicCheckoutDefaultInteractor:
         startedState: State.Started
     ) async throws {
         guard let delegate else {
-            throw POFailure(message: "Delegate must be set to authorize invoice.", code: .generic(.mobile))
+            throw POFailure(message: "Delegate must be set to authorize invoice.", code: .Mobile.generic)
         }
         var request = POInvoiceAuthorizationRequest(
             invoiceId: startedState.invoice.id,
@@ -874,7 +881,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         invalidateInvoiceIfPossible()
         guard case .paymentProcessing(let currentState) = state else {
             logger.error("Unable to process card in unsupported state: \(state).")
-            throw POFailure(message: "Something went wrong.", code: .internal(.mobile))
+            throw POFailure(message: "Something went wrong.", code: .Mobile.internal)
         }
         try await authorizeInvoice(
             using: currentState.paymentMethod,

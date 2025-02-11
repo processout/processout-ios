@@ -57,17 +57,17 @@ final class DefaultInvoicesService: POInvoicesService {
                 case let .success(response):
                     return response.state != .captured
                 case let .failure(failure as POFailure):
-                    let retriableCodes: [POFailure.Code] = [
-                        .networkUnreachable, .timeout(.mobile), .internal(.mobile)
+                    let retriableCodes: [POFailureCode] = [
+                        .Mobile.networkUnreachable, .Mobile.timeout, .Mobile.internal
                     ]
-                    return retriableCodes.contains(failure.code)
+                    return retriableCodes.contains(failure.failureCode)
                 case .failure:
                     return false
                 }
             },
             timeout: captureTimeout,
             timeoutError: POFailure(
-                message: "Unable to capture alternative payment within the expected time.", code: .timeout(.mobile)
+                message: "Unable to capture alternative payment within the expected time.", code: .Mobile.timeout
             ),
             retryStrategy: .init(function: .exponential(interval: 0.15, rate: 1.45), minimum: 3, maximum: 90)
         )

@@ -55,7 +55,7 @@ final class DefaultCardsService: POCardsService {
             request: request.paymentRequest, delegate: coordinator
         )
         guard let card = coordinator.card else {
-            throw POFailure(message: "Tokenization was cancelled.", code: .cancelled)
+            throw POFailure(message: "Tokenization was cancelled.", code: .Mobile.cancelled)
         }
         return card
     }
@@ -76,7 +76,7 @@ final class DefaultCardsService: POCardsService {
         } else if filteredNumber.count >= 6 {
             iinLength = 6
         } else {
-            throw POFailure(message: "IIN must have at least 6 digits.", code: .generic(.mobile))
+            throw POFailure(message: "IIN must have at least 6 digits.", code: .Mobile.generic)
         }
         return String(filteredNumber.prefix(iinLength))
     }

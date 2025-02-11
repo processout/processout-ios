@@ -35,66 +35,55 @@ public final class PODefaultPassKitPaymentErrorMapper: POPassKitPaymentErrorMapp
 
     // MARK: - Private Methods
 
-    private func map(failure: POFailure) -> NSError? {
-        let pkCode: PKPaymentError.Code?
-        var userInfo: [String: Any] = [:]
-        switch failure.code {
-        case .validation(let code):
-            pkCode = map(validationCode: code, userInfo: &userInfo)
-        case .notFound(.country):
+    // swiftlint:disable:next cyclomatic_complexity
+    private func map(failure: POFailure) -> PKPaymentError? {
+        let pkCode: PKPaymentError.Code, userInfo: [PKPaymentErrorKey: Any]
+        switch failure.failureCode {
+        case .RequestValidation.invalidName, .RequestValidation.missingName:
             pkCode = .billingContactInvalidError
-            userInfo[PKPaymentErrorKey.postalAddressUserInfoKey.rawValue] = CNPostalAddressCountryKey
-        case .generic(let code):
-            pkCode = map(genericCode: code, userInfo: &userInfo)
-        case .networkUnreachable:
+            userInfo = [.contactFieldUserInfoKey: PKContactField.name]
+        case .RequestValidation.invalidEmail, .RequestValidation.missingEmail:
+            pkCode = .billingContactInvalidError
+            userInfo = [.contactFieldUserInfoKey: PKContactField.emailAddress]
+        case .RequestValidation.invalidPhoneNumber:
+            pkCode = .billingContactInvalidError
+            userInfo = [.contactFieldUserInfoKey: PKContactField.phoneNumber]
+        case .RequestValidation.invalidAddress:
+            pkCode = .billingContactInvalidError
+            userInfo = [:]
+        case .RequestValidation.invalidCountry:
+            pkCode = .billingContactInvalidError
+            userInfo = [.postalAddressUserInfoKey: CNPostalAddressCountryKey]
+        case .Gateway.invalidState:
+            pkCode = .billingContactInvalidError
+            userInfo = [.postalAddressUserInfoKey: CNPostalAddressStateKey]
+        case .Resource.countryNotFound:
+            pkCode = .billingContactInvalidError
+            userInfo = [.postalAddressUserInfoKey: CNPostalAddressCountryKey]
+        case .Card.invalidName:
+            pkCode = .billingContactInvalidError
+            userInfo = [.contactFieldUserInfoKey: PKContactField.name]
+        case .Card.invalidZip:
+            pkCode = .billingContactInvalidError
+            userInfo = [.postalAddressUserInfoKey: CNPostalAddressPostalCodeKey]
+        case .Card.invalidAddress:
+            pkCode = .billingContactInvalidError
+            userInfo = [:]
+        case .RequestValidation.invalidShippingMethod, .RequestValidation.invalidShippingDelay:
+            pkCode = .shippingContactInvalidError
+            userInfo = [:]
+        case .Mobile.networkUnreachable:
             pkCode = .unknownError
+            userInfo = [:]
         default:
             return nil
         }
-        guard let pkCode else {
-            return nil
+        let rawUserInfo = userInfo.reduce(into: [:]) { partialResult, element in
+            partialResult[element.key.rawValue] = element.value
         }
         // Apple documentation states that localizedDescription found in user info will be displayed to user
         // but that seems to be wrong when returned error is used to initialize PKPaymentAuthorizationResult,
         // so value is not set and we are relying on Apple to resolve proper description.
-        return NSError(domain: PKPaymentError.errorDomain, code: pkCode.rawValue, userInfo: userInfo)
-    }
-
-    /// Maps given code to PKPaymentError code and fills user info with details if possible.
-    private func map(genericCode code: POFailure.GenericCode, userInfo: inout [String: Any]) -> PKPaymentError.Code? {
-        switch code {
-        case .cardInvalidName:
-            userInfo[PKPaymentErrorKey.contactFieldUserInfoKey.rawValue] = PKContactField.name
-        case .cardInvalidZip:
-            userInfo[PKPaymentErrorKey.postalAddressUserInfoKey.rawValue] = CNPostalAddressPostalCodeKey
-        case .cardInvalidAddress:
-            break
-        default:
-            return nil
-        }
-        return .billingContactInvalidError
-    }
-
-    /// Maps given code to PKPaymentError code and fills user info with details if possible.
-    private func map(
-        validationCode code: POFailure.ValidationCode, userInfo: inout [String: Any]
-    ) -> PKPaymentError.Code? {
-        switch code {
-        case .invalidName, .missingName:
-            userInfo[PKPaymentErrorKey.contactFieldUserInfoKey.rawValue] = PKContactField.name
-        case .invalidEmail, .missingEmail:
-            userInfo[PKPaymentErrorKey.contactFieldUserInfoKey.rawValue] = PKContactField.emailAddress
-        case .invalidPhoneNumber:
-            userInfo[PKPaymentErrorKey.contactFieldUserInfoKey.rawValue] = PKContactField.phoneNumber
-        case .invalidAddress:
-            break
-        case .invalidCountry:
-            userInfo[PKPaymentErrorKey.postalAddressUserInfoKey.rawValue] = CNPostalAddressCountryKey
-        case .invalidState:
-            userInfo[PKPaymentErrorKey.postalAddressUserInfoKey.rawValue] = CNPostalAddressStateKey
-        default:
-            return nil
-        }
-        return .billingContactInvalidError
+        return PKPaymentError(pkCode, userInfo: rawUserInfo)
     }
 }
