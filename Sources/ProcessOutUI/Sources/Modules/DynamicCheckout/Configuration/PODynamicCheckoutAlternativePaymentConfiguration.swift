@@ -125,14 +125,3 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
         self.paymentConfirmation = paymentConfirmation
     }
 }
-
-extension PODynamicCheckoutAlternativePaymentConfiguration {
-
-    /// Default configuration.
-    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
-    @inlinable
-    @MainActor
-    static var `default`: PODynamicCheckoutAlternativePaymentConfiguration {
-        PODynamicCheckoutAlternativePaymentConfiguration()
-    }
-}

@@ -51,14 +51,3 @@ public struct POCardScannerConfiguration {
         self.cancelButton = cancelButton
     }
 }
-
-extension POCardScannerConfiguration {
-
-    /// Default configuration.
-    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
-    @inlinable
-    @MainActor
-    static var `default`: POCardScannerConfiguration {
-        POCardScannerConfiguration()
-    }
-}
