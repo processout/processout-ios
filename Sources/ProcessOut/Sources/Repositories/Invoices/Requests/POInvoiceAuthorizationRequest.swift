@@ -73,6 +73,16 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
     /// An object used to evaluate navigation events in a web authentication session.
     public let webAuthenticationCallback: POWebAuthenticationCallback? // sourcery:coding: skip
 
+    /// A boolean value that indicates whether the web authentication session should ask the browse
+    /// for a private authentication session.
+    ///
+    /// Set `prefersEphemeralWebAuthenticationSession` to true to request that the browser
+    /// doesn’t share cookies or other browsing data between the authentication session
+    /// and the user’s normal browser session.
+    ///
+    /// The value of this property is `true` by default.
+    public let prefersEphemeralWebAuthenticationSession: Bool // sourcery:coding: skip
+
     public init(
         invoiceId: String,
         source: String,
@@ -90,7 +100,8 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
         allowFallbackToSale: Bool = false,
         clientSecret: String? = nil,
         metadata: [String: String]? = nil,
-        webAuthenticationCallback: POWebAuthenticationCallback? = nil
+        webAuthenticationCallback: POWebAuthenticationCallback? = nil,
+        prefersEphemeralWebAuthenticationSession: Bool = true
     ) {
         self.invoiceId = invoiceId
         self.source = source
@@ -108,5 +119,6 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
         self.clientSecret = clientSecret
         self.metadata = metadata
         self.webAuthenticationCallback = webAuthenticationCallback
+        self.prefersEphemeralWebAuthenticationSession = prefersEphemeralWebAuthenticationSession
     }
 }

@@ -131,18 +131,15 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             barcodeInteraction: barcodeInteraction(
                 with: self.configuration.alternativePayment.barcodeInteraction
             ),
-            submitButton: submitButtonConfiguration(with: configuration.submitButton),
+            submitButton: .init(
+                title: configuration.submitButton.title ?? String(resource: .DynamicCheckout.Button.pay),
+                icon: configuration.submitButton.icon
+            ),
             cancelButton: configuration.cancelButton.map { cancelButtonConfiguration(with: $0) },
             paymentConfirmation: alternativePaymentConfirmationConfiguration(),
             success: nil
         )
         return configuration
-    }
-
-    private func submitButtonConfiguration(
-        with configuration: PODynamicCheckoutConfiguration.SubmitButton
-    ) -> PONativeAlternativePaymentConfiguration.SubmitButton {
-        .init(title: configuration.title ?? String(resource: .DynamicCheckout.Button.pay), icon: configuration.icon)
     }
 
     private func cancelButtonConfiguration(
@@ -155,7 +152,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         with interaction: PODynamicCheckoutAlternativePaymentConfiguration.BarcodeInteraction
     ) -> PONativeAlternativePaymentConfiguration.BarcodeInteraction {
         PONativeAlternativePaymentConfiguration.BarcodeInteraction(
-            saveButton: submitButtonConfiguration(with: interaction.saveButton),
+            saveButton: .init(title: interaction.saveButton.title, icon: interaction.saveButton.icon),
             saveErrorConfirmation: interaction.saveErrorConfirmation,
             generateHapticFeedback: interaction.generateHapticFeedback
         )
@@ -168,7 +165,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             showProgressViewAfter: configuration.alternativePayment.paymentConfirmation.showProgressViewAfter,
             hideGatewayDetails: true,
             confirmButton: configuration.alternativePayment.paymentConfirmation.confirmButton.map { configuration in
-                submitButtonConfiguration(with: configuration)
+                .init(title: configuration.title, icon: configuration.icon)
             },
             cancelButton: configuration.alternativePayment.paymentConfirmation.cancelButton.map { configuration in
                 cancelButtonConfiguration(with: configuration)

@@ -74,14 +74,16 @@ final class DynamicCheckoutViewModel: ObservableObject {
     }
 
     private func setMessage(with error: Error) {
-        var errorMessage: String?
-        if let failure = error as? POFailure {
-            guard failure.code != .cancelled else {
-                return
-            }
-            errorMessage = failure.message
+        let errorMessage: String
+        switch error {
+        case .Mobile.cancelled, .Customer.cancelled:
+            return
+        case let failure as POFailure:
+            errorMessage = failure.message ?? String(localized: .DynamicCheckout.errorMessage)
+        default:
+            errorMessage = String(localized: .DynamicCheckout.errorMessage)
         }
-        state.message = .init(text: errorMessage ?? String(localized: .DynamicCheckout.errorMessage), severity: .error)
+        state.message = .init(text: errorMessage, severity: .error)
     }
 
     private func createInvoice() async throws -> POInvoice {
@@ -91,7 +93,10 @@ final class DynamicCheckoutViewModel: ObservableObject {
                 amount: state.invoice.amount,
                 currency: state.invoice.currencyCode,
                 returnUrl: Constants.returnUrl,
-                customerId: Constants.customerId
+                customerId: Constants.customerId,
+                details: [
+                    .init(name: "Test", amount: state.invoice.amount, quantity: 1)
+                ]
             )
             return try await invoicesService.createInvoice(request: request)
         } else {
@@ -126,7 +131,10 @@ extension DynamicCheckoutViewModel: PODynamicCheckoutDelegate {
             amount: invoice.amount,
             currency: invoice.currency,
             returnUrl: invoice.returnUrl,
-            customerId: Constants.customerId
+            customerId: Constants.customerId,
+            details: [
+                .init(name: "Test", amount: invoice.amount, quantity: 1)
+            ]
         )
         if let invoice = try? await invoicesService.createInvoice(request: request) {
             return .init(invoiceId: invoice.id, clientSecret: invoice.clientSecret)

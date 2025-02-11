@@ -57,17 +57,17 @@ final class DefaultInvoicesService: POInvoicesService {
                 case let .success(response):
                     return response.state != .captured
                 case let .failure(failure as POFailure):
-                    let retriableCodes: [POFailure.Code] = [
-                        .networkUnreachable, .timeout(.mobile), .internal(.mobile)
+                    let retriableCodes: [POFailureCode] = [
+                        .Mobile.networkUnreachable, .Mobile.timeout, .Mobile.internal
                     ]
-                    return retriableCodes.contains(failure.code)
+                    return retriableCodes.contains(failure.failureCode)
                 case .failure:
                     return false
                 }
             },
             timeout: captureTimeout,
             timeoutError: POFailure(
-                message: "Unable to capture alternative payment within the expected time.", code: .timeout(.mobile)
+                message: "Unable to capture alternative payment within the expected time.", code: .Mobile.timeout
             ),
             retryStrategy: .init(function: .exponential(interval: 0.15, rate: 1.45), minimum: 3, maximum: 90)
         )
@@ -97,10 +97,13 @@ final class DefaultInvoicesService: POInvoicesService {
         }
         let newRequest: POInvoiceAuthorizationRequest
         do {
+            let customerActionRequest = CustomerActionRequest(
+                customerAction: customerAction,
+                webAuthenticationCallback: request.webAuthenticationCallback,
+                prefersEphemeralWebAuthenticationSession: request.prefersEphemeralWebAuthenticationSession
+            )
             let newSource = try await customerActionsService.handle(
-                action: customerAction,
-                threeDSService: threeDSService,
-                webAuthenticationCallback: request.webAuthenticationCallback
+                request: customerActionRequest, threeDSService: threeDSService
             )
             newRequest = request.replacing(source: newSource)
         } catch {

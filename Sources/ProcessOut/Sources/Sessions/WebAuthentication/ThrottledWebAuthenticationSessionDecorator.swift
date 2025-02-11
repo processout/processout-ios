@@ -20,7 +20,7 @@ actor ThrottledWebAuthenticationSessionDecorator: WebAuthenticationSession {
         do {
             try await semaphore.waitUnlessCancelled()
         } catch {
-            throw POFailure(message: "Authentication session was cancelled.", code: .cancelled)
+            throw POFailure(message: "Authentication session was cancelled.", code: .Mobile.cancelled)
         }
         defer {
             lastAuthenticationTime = DispatchTime.now()

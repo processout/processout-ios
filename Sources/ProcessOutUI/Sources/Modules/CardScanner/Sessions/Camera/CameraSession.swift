@@ -9,7 +9,7 @@ import AVFoundation
 import CoreImage
 
 /// A session that manages the capture pipeline, which includes the capture session, device inputs, and capture outputs.
-protocol CameraSession: Sendable {
+protocol CameraSession: Sendable, AnyObject {
 
     /// Starts camera session.
     @discardableResult
@@ -18,12 +18,16 @@ protocol CameraSession: Sendable {
     /// Stops camera session.
     func stop() async
 
-    /// Adds an AVCaptureConnection to the session.
-    @discardableResult
-    func addConnection(_ connection: AVCaptureConnection) async -> Bool
-
     /// Adds delegate to camera session.
     func setDelegate(_ delegate: CameraSessionDelegate?) async
+
+    // MARK: - Preview
+
+    /// Adds given preview layer to camera session.
+    func addPreviewLayer(_ layer: AVCaptureVideoPreviewLayer) async
+
+    /// Removes given preview layer from camera session.
+    func removePreviewLayer(_ layer: AVCaptureVideoPreviewLayer) async
 
     // MARK: - Torch
 

@@ -1,42 +1,35 @@
 //
-//  POFailure.swift
+//  POFailure+Legacy.swift
 //  ProcessOut
 //
-//  Created by Andrii Vysotskyi on 12.10.2022.
+//  Created by Andrii Vysotskyi on 06.02.2025.
 //
 
 // swiftlint:disable file_length
 
-import Foundation
+extension POFailure {
 
-/// Information about an error that occurred.
-public struct POFailure: Error {
-
-    public struct InvalidField: Decodable, Sendable {
-
-        /// Field name.
-        public let name: String
-
-        /// Message describing an error.
-        public let message: String
-
-        @_spi(PO)
-        public init(name: String, message: String) {
-            self.name = name
-            self.message = message
-        }
-    }
-
+    @available(*, deprecated, message: "Use POFailureCode instead.")
     public enum InternalCode: String, Sendable {
+
+        /// The gateway encountered an internal error.
         case gateway = "gateway-internal-error"
+
+        /// Mobile SDK encountered an internal error.
         case mobile = "processout-mobile.internal"
     }
 
+    @available(*, deprecated, message: "Use POFailureCode instead.")
     public enum TimeoutCode: String, Sendable {
+
+        /// The payment request to the gateway timed out.
         case gateway = "gateway.timeout"
+
+        /// Mobile SDK timeout error.
         case mobile = "processout-mobile.timeout"
     }
 
+    @available(*, deprecated, message: "Use POFailureCode instead.")
     public enum ValidationCode: String, Sendable {
         case general                   = "request.validation.error"
         case gateway                   = "gateway.validation-error"
@@ -89,6 +82,7 @@ public struct POFailure: Error {
         case missingType               = "request.validation.missing-type"
     }
 
+    @available(*, deprecated, message: "Use POFailureCode instead.")
     public enum NotFoundCode: String, Sendable {
         case activity                  = "resource.activity.not-found"
         case addon                     = "resource.addon.not-found"
@@ -128,11 +122,17 @@ public struct POFailure: Error {
         case webhookEndpoint           = "resource.webhook-endpoint.not-found"
     }
 
+    @available(*, deprecated, message: "Use POFailureCode instead.")
     public enum AuthenticationCode: String, Sendable {
-        case invalid          = "request.authentication.invalid"
+
+        /// Invalid authentication details.
+        case invalid = "request.authentication.invalid"
+
+        /// Invalid project ID.
         case invalidProjectId = "request.authentication.invalid-project-id"
     }
 
+    @available(*, deprecated, message: "Use POFailureCode instead.")
     public enum GenericCode: String, Sendable {
 
         /// The card limits were reached (ex: amounts, transactions volume) and the customer should contact its bank.
@@ -363,6 +363,7 @@ public struct POFailure: Error {
         case serviceNotSupported                 = "service.not-supported"
     }
 
+    @available(*, deprecated, message: "Use POFailureCode instead.")
     public enum Code: Hashable, Sendable {
 
         /// No network connection.
@@ -393,29 +394,29 @@ public struct POFailure: Error {
         case unknown(rawValue: String)
     }
 
-    /// Failure message. Not intented to be used as a user facing string.
-    public let message: String?
-
     /// Failure code.
-    public let code: Code
-
-    /// Invalid fields if any.
-    public let invalidFields: [InvalidField]?
-
-    /// Underlying error for inspection.
-    public let underlyingError: Error?
+    @available(*, deprecated, message: "Use failureCode property instead.")
+    public var code: Code {
+        .init(code: failureCode)
+    }
 
     /// Creates failure instance.
+    @available(*, deprecated, message: "Create failure with POFailureCode instead.")
+    @_disfavoredOverload
     public init(
-        message: String? = nil, code: Code, invalidFields: [InvalidField]? = nil, underlyingError: Error? = nil
+        message: String? = nil,
+        code: Code,
+        invalidFields: [InvalidField]? = nil,
+        underlyingError: Error? = nil
     ) {
         self.message = message
-        self.code = code
+        self.failureCode = .init(rawValue: code.rawValue)
         self.invalidFields = invalidFields
         self.underlyingError = underlyingError
     }
 }
 
+@available(*, deprecated, message: "Use POFailureCode instead.")
 extension POFailure.Code {
 
     /// Code raw value.
@@ -444,23 +445,30 @@ extension POFailure.Code {
     }
 }
 
-extension POFailure: CustomDebugStringConvertible {
+@available(*, deprecated)
+extension POFailure.Code {
 
-    public var debugDescription: String {
-        let parameters = [
-            ("code", code.rawValue),
-            ("message", message),
-            ("underlyingError", underlyingError.map(String.init(describing:)))
-        ]
-        let parametersDescription = parameters
-            .compactMap { name, value -> String? in
-                guard let value else {
-                    return nil
-                }
-                return "\(name): '\(value)'"
-            }
-            .joined(separator: ", ")
-        return "POFailure(\(parametersDescription))"
+    init(code: POFailureCode) {
+        let rawValue = code.rawValue
+        if let code = POFailure.AuthenticationCode(rawValue: rawValue) {
+            self = .authentication(code)
+        } else if let code = POFailure.NotFoundCode(rawValue: rawValue) {
+            self = .notFound(code)
+        } else if let code = POFailure.ValidationCode(rawValue: rawValue) {
+            self = .validation(code)
+        } else if let code = POFailure.GenericCode(rawValue: rawValue) {
+            self = .generic(code)
+        } else if let code = POFailure.TimeoutCode(rawValue: rawValue) {
+            self = .timeout(code)
+        } else if let code = POFailure.InternalCode(rawValue: rawValue) {
+            self = .internal(code)
+        } else if POFailure.Code.cancelled.rawValue == rawValue {
+            self = .cancelled
+        } else if POFailure.Code.networkUnreachable.rawValue == rawValue {
+            self = .networkUnreachable
+        } else {
+            self = .unknown(rawValue: rawValue)
+        }
     }
 }
 

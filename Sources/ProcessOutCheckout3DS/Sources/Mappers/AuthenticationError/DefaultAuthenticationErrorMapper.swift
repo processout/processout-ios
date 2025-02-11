@@ -11,20 +11,20 @@ import Checkout3DS
 struct DefaultAuthenticationErrorMapper: AuthenticationErrorMapper {
 
     func convert(error: AuthenticationError) -> POFailure {
-        let code: POFailure.Code
+        let code: POFailureCode
         switch error {
         case .challengeCancelled:
-            code = .cancelled
+            code = .Mobile.cancelled
         case .challengeTimeout, .connectionTimeout:
-            code = .timeout(.mobile)
+            code = .Mobile.timeout
         case .noInternetConnectivity,
              .connectionFailed,
              .connectionLost,
              .internationalRoamingOff,
              .unknownNetworkError:
-            code = .networkUnreachable
+            code = .Mobile.networkUnreachable
         default:
-            code = .generic(.mobile)
+            code = .Mobile.generic
         }
         return POFailure(code: code, underlyingError: error)
     }

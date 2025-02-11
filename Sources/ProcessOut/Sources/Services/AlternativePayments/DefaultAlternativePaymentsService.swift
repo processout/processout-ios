@@ -10,7 +10,7 @@ import Foundation
 final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
 
     init(
-        configuration: POAlternativePaymentsServiceConfiguration,
+        configuration: AlternativePaymentsServiceConfiguration,
         webSession: WebAuthenticationSession,
         logger: POLogger
     ) {
@@ -22,11 +22,39 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
     // MARK: - POAlternativePaymentsService
 
     func tokenize(request: POAlternativePaymentTokenizationRequest) async throws -> POAlternativePaymentResponse {
-        try await authenticate(using: url(for: request), callback: request.callback)
+        let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+            url: try url(for: request),
+            callback: request.callback,
+            prefersEphemeralSession: request.prefersEphemeralSession
+        )
+        return try await authenticate(request: authenticationRequest)
     }
 
     func authorize(request: POAlternativePaymentAuthorizationRequest) async throws -> POAlternativePaymentResponse {
-        try await authenticate(using: url(for: request), callback: request.callback)
+        let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+            url: try url(for: request),
+            callback: request.callback,
+            prefersEphemeralSession: request.prefersEphemeralSession
+        )
+        return try await authenticate(request: authenticationRequest)
+    }
+
+    func authenticate(request: POAlternativePaymentAuthenticationRequest) async throws -> POAlternativePaymentResponse {
+        do {
+            let returnUrl = try await webSession.authenticate(
+                using: .init(
+                    url: request.url,
+                    callback: request.callback,
+                    prefersEphemeralSession: request.prefersEphemeralSession
+                )
+            )
+            let response = try response(from: returnUrl)
+            logger.debug("Did authenticate alternative payment: \(response.gatewayToken)")
+            return response
+        } catch {
+            logger.debug("Did fail to authenticate alternative payment: \(error)")
+            throw error
+        }
     }
 
     func url(for request: POAlternativePaymentTokenizationRequest) throws -> URL {
@@ -40,20 +68,6 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
             pathComponents += ["tokenized", tokenId]
         }
         return try url(with: pathComponents, additionalData: request.additionalData)
-    }
-
-    func authenticate(
-        using url: URL, callback: POWebAuthenticationCallback?
-    ) async throws -> POAlternativePaymentResponse {
-        do {
-            let returnUrl = try await webSession.authenticate(using: .init(url: url, callback: callback))
-            let response = try response(from: returnUrl)
-            logger.debug("Did authenticate alternative payment: \(response.gatewayToken)")
-            return response
-        } catch {
-            logger.debug("Did fail to authenticate alternative payment: \(error)")
-            throw error
-        }
     }
 
     @available(*, deprecated)
@@ -88,7 +102,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
         }
         let queryItems = components.queryItems ?? []
         if let errorCode = queryItems.queryItemValue(name: "error_code") {
-            throw POFailure(code: createFailureCode(rawValue: errorCode))
+            throw POFailure(code: .init(rawValue: errorCode))
         }
         let gatewayToken = queryItems.queryItemValue(name: "token") ?? ""
         if gatewayToken.isEmpty {
@@ -101,9 +115,15 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
         return .init(gatewayToken: gatewayToken, customerId: nil, tokenId: tokenId, returnType: .authorization)
     }
 
+    // MARK: -
+
+    func replace(configuration: AlternativePaymentsServiceConfiguration) {
+        self.configuration.withLock { $0 = configuration }
+    }
+
     // MARK: - Private
 
-    private let configuration: POUnfairlyLocked<POAlternativePaymentsServiceConfiguration>
+    private let configuration: POUnfairlyLocked<AlternativePaymentsServiceConfiguration>
     private let logger: POLogger
     private let webSession: WebAuthenticationSession
 
@@ -123,11 +143,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
         if let url = components.url {
             return url
         }
-        throw POFailure(message: "Unable to create redirect URL.", code: .generic(.mobile))
-    }
-
-    func replace(configuration: POAlternativePaymentsServiceConfiguration) {
-        self.configuration.withLock { $0 = configuration }
+        throw POFailure(message: "Unable to create redirect URL.", code: .Mobile.generic)
     }
 
     // MARK: - Response
@@ -135,34 +151,17 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
     private func response(from url: URL) throws -> POAlternativePaymentResponse {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             let message = "Invalid or malformed alternative payment method URL response provided."
-            throw POFailure(message: message, code: .generic(.mobile), underlyingError: nil)
+            throw POFailure(message: message, code: .Mobile.generic, underlyingError: nil)
         }
         let queryItems = components.queryItems ?? []
         if let errorCode = queryItems.queryItemValue(name: "error_code") {
-            throw POFailure(code: createFailureCode(rawValue: errorCode))
+            throw POFailure(code: .init(rawValue: errorCode))
         }
         let gatewayToken = queryItems.queryItemValue(name: "token") ?? ""
         if gatewayToken.isEmpty {
             logger.debug("Gateway 'token' is not set in \(url), this may be an error.")
         }
         return .init(gatewayToken: gatewayToken)
-    }
-
-    private func createFailureCode(rawValue: String) -> POFailure.Code {
-        if let code = POFailure.AuthenticationCode(rawValue: rawValue) {
-            return .authentication(code)
-        } else if let code = POFailure.NotFoundCode(rawValue: rawValue) {
-            return .notFound(code)
-        } else if let code = POFailure.ValidationCode(rawValue: rawValue) {
-            return .validation(code)
-        } else if let code = POFailure.GenericCode(rawValue: rawValue) {
-            return .generic(code)
-        } else if let code = POFailure.TimeoutCode(rawValue: rawValue) {
-            return .timeout(code)
-        } else if let code = POFailure.InternalCode(rawValue: rawValue) {
-            return .internal(code)
-        }
-        return .unknown(rawValue: rawValue)
     }
 }
 

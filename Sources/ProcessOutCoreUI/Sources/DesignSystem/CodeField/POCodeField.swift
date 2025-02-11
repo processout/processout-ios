@@ -21,14 +21,23 @@ public struct POCodeField: View {
     // MARK: - View
 
     public var body: some View {
-        let configuration = CodeFieldStyleConfiguration(length: length, text: text, index: textIndex) { newIndex in
-            focusCoordinator.beginEditing()
-            textIndex = newIndex
+        let insertionPoint = Binding<String.Index?> {
+            textIndex
+        } set: { newInsertionPoint in
+            focusableView.setFocused(newInsertionPoint != nil)
+            textIndex = newInsertionPoint
         }
+        let configuration = CodeFieldStyleConfiguration(
+            text: text, length: length, insertionPoint: insertionPoint, isEditing: focusableView.isFocused
+        )
         AnyView(style.makeBody(configuration: configuration))
             .background(
                 CodeFieldRepresentable(
-                    length: length, text: $text, textIndex: $textIndex, isMenuVisible: $isMenuVisible
+                    length: length,
+                    text: $text,
+                    textIndex: $textIndex,
+                    isMenuVisible: $isMenuVisible,
+                    focusableView: $focusableView
                 )
             )
             .onLongPressGesture {
@@ -40,14 +49,15 @@ public struct POCodeField: View {
             .onReceive(notification: UIMenuController.didHideMenuNotification) { _ in
                 isMenuVisible = false
             }
-            .backport.onChange(of: focusCoordinator.isEditing) {
-                if !focusCoordinator.isEditing {
+            .backport.onChange(of: focusableView.isFocused) {
+                if !focusableView.isFocused {
                     textIndex = nil
                     isMenuVisible = false
                 } else if textIndex == nil {
                     textIndex = text.endIndex
                 }
             }
+            .preference(key: FocusableViewProxyPreferenceKey.self, value: focusableView)
             .backport.geometryGroup()
     }
 
@@ -67,6 +77,6 @@ public struct POCodeField: View {
     @Environment(\.codeFieldStyle)
     private var style
 
-    @EnvironmentObject
-    private var focusCoordinator: FocusCoordinator
+    @State
+    private var focusableView = FocusableViewProxy()
 }

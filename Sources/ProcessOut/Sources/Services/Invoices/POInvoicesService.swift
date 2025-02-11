@@ -43,6 +43,6 @@ extension POInvoicesService {
 
     @_spi(PO)
     public func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
-        throw POFailure(code: .generic(.mobile))
+        throw POFailure(code: .Mobile.generic)
     }
 }

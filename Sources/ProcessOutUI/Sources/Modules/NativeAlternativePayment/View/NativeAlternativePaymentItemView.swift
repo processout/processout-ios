@@ -33,8 +33,10 @@ struct NativeAlternativePaymentItemView: View {
                 .inputStyle(style.codeInput)
                 .padding(.horizontal, horizontalPadding)
         case .picker(let pickerItem):
-            POPicker(pickerItem.options, selection: pickerItem.$selectedOptionId) { option in
-                Text(option.title)
+            POPicker(selection: pickerItem.$selectedOptionId) {
+                ForEach(pickerItem.options) { option in
+                    Text(option.title)
+                }
             }
             .modify(when: pickerItem.preferrsInline) { view in
                 let style = PORadioGroupPickerStyle(radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton))

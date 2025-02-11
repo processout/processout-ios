@@ -30,11 +30,19 @@ public protocol POAlternativePaymentsService: POService {
     /// any UI-related tasks immediately after this method completes, consider adding a delay.
     func authorize(request: POAlternativePaymentAuthorizationRequest) async throws -> POAlternativePaymentResponse
 
+    /// Authenticates alternative payment using given request.
+    ///
+    /// - NOTE: The underlying implementation uses `ASWebAuthenticationSession`, which triggers its
+    /// completion handler before dismissing the view controller. To avoid presentation issues, if you plan to perform
+    /// any UI-related tasks immediately after this method completes, consider adding a delay.
+    func authenticate(request: POAlternativePaymentAuthenticationRequest) async throws -> POAlternativePaymentResponse
+
     /// Authenticates alternative payment using given raw URL.
     ///
     /// - NOTE: The underlying implementation uses `ASWebAuthenticationSession`, which triggers its
     /// completion handler before dismissing the view controller. To avoid presentation issues, if you plan to perform
     /// any UI-related tasks immediately after this method completes, consider adding a delay.
+    @available(*, deprecated, message: "Use authenticate(request:) instead.")
     func authenticate(
         using url: URL, callback: POWebAuthenticationCallback?
     ) async throws -> POAlternativePaymentResponse
@@ -57,10 +65,6 @@ public protocol POAlternativePaymentsService: POService {
     /// - Returns: response parsed from given url.
     @available(*, deprecated, message: "Use tokenize(request:) or authorize(request:) instead to process payment.")
     func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse
-
-    /// Replaces configuration.
-    @_spi(PO)
-    func replace(configuration: POAlternativePaymentsServiceConfiguration)
 }
 
 extension POAlternativePaymentsService {
@@ -70,7 +74,10 @@ extension POAlternativePaymentsService {
     /// - NOTE: The underlying implementation uses `ASWebAuthenticationSession`, which triggers its
     /// completion handler before dismissing the view controller. To avoid presentation issues, if you plan to perform
     /// any UI-related tasks immediately after this method completes, consider adding a delay.
-    public func authenticate(using url: URL) async throws -> POAlternativePaymentResponse {
-        try await authenticate(using: url, callback: nil)
+    @available(*, deprecated, message: "Use authenticate(request:) instead.")
+    public func authenticate(
+        using url: URL, callback: POWebAuthenticationCallback? = nil
+    ) async throws -> POAlternativePaymentResponse {
+        try await authenticate(request: .init(url: url, callback: callback))
     }
 }

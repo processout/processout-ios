@@ -52,22 +52,32 @@ actor DefaultCameraSession:
         captureSession.stopRunning()
     }
 
-    @discardableResult
-    func addConnection(_ connection: AVCaptureConnection) -> Bool {
-        captureSession.beginConfiguration()
-        defer {
-            captureSession.commitConfiguration()
-        }
-        if captureSession.canAddConnection(connection) {
-            captureSession.addConnection(connection)
-            return true
-        }
-        return false
-    }
-
     func setDelegate(_ delegate: CameraSessionDelegate?) {
         self.delegate = delegate
     }
+
+    // MARK: - Preview
+
+    func addPreviewLayer(_ layer: AVCaptureVideoPreviewLayer) {
+        guard layer.session != captureSession else {
+            logger.debug("Ignoring attempt to add preview layer that is already associated with same session..")
+            return
+        }
+        layer.session = captureSession
+    }
+
+    func removePreviewLayer(_ layer: AVCaptureVideoPreviewLayer) {
+        guard let session = layer.session else {
+            logger.debug("Preview layer has no associated session, ignoring removal attempt.")
+            return
+        }
+        if session !== captureSession {
+            logger.error("Will remove preview layer that is not associated with this session.")
+        }
+        layer.session = nil
+    }
+
+    // MARK: - Torch
 
     var isTorchEnabled: Bool {
         guard let device = activeVideoInput?.device else {
@@ -101,14 +111,14 @@ actor DefaultCameraSession:
         return true
     }
 
+    // MARK: - CameraSessionPreviewSource
+
     nonisolated var previewSource: CameraSessionPreviewSource {
         self
     }
 
     nonisolated func connect(to target: any CameraSessionPreviewTarget) {
-        Task {
-            await target.setCameraSession(self, captureSession: captureSession)
-        }
+        Task { await target.setCameraSession(self) }
     }
 
     // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate

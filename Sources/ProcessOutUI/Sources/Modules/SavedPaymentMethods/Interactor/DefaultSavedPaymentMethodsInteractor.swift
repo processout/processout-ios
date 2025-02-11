@@ -37,7 +37,7 @@ final class DefaultSavedPaymentMethodsInteractor:
         let task = Task { [invoicesService] in
             guard configuration.invoiceRequest.clientSecret != nil else {
                 let failure = POFailure(
-                    message: "Client secret must be set to access customer's payment methods.", code: .generic(.mobile)
+                    message: "Client secret must be set to access customer's payment methods.", code: .Mobile.generic
                 )
                 setFailureState(failure)
                 return
@@ -61,7 +61,7 @@ final class DefaultSavedPaymentMethodsInteractor:
         default:
             break
         }
-        setFailureState(POFailure(code: .cancelled))
+        setFailureState(POFailure(code: .Mobile.cancelled))
     }
 
     func delete(customerTokenId: String) {
@@ -106,7 +106,7 @@ final class DefaultSavedPaymentMethodsInteractor:
             return
         }
         guard let customerId = invoice.customerId else {
-            let failure = POFailure(message: "Unable to start interactor without customer ID.", code: .generic(.mobile))
+            let failure = POFailure(message: "Unable to start interactor without customer ID.", code: .Mobile.generic)
             setFailureState(failure)
             return
         }
@@ -202,6 +202,6 @@ final class DefaultSavedPaymentMethodsInteractor:
         if let failure = error as? POFailure {
             return failure
         }
-        return POFailure(message: "Something went wrong.", code: .generic(.mobile), underlyingError: error)
+        return POFailure(message: "Something went wrong.", code: .Mobile.generic, underlyingError: error)
     }
 }

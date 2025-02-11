@@ -70,7 +70,7 @@ struct CustomerTokensServiceTests {
         )
         let threeDSService = Mock3DS2Service()
         threeDSService.authenticationRequestParametersFromClosure = { _ in
-            throw POFailure(code: .cancelled)
+            throw POFailure(code: .Mobile.cancelled)
         }
 
         // When

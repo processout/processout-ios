@@ -41,7 +41,7 @@ final class DefaultApplePayCardTokenizationRequestMapper: ApplePayCardTokenizati
             return tokenizationRequest
         } catch {
             logger.error("Did fail to decode payment data \(error).")
-            throw POFailure(message: "Something went wrong.", code: .internal(.mobile), underlyingError: error)
+            throw POFailure(message: "Something went wrong.", code: .Mobile.internal, underlyingError: error)
         }
     }
 

@@ -168,7 +168,7 @@ final class DefaultCardTokenizationInteractor:
         if case .tokenizing(let currentState) = state {
             currentState.task.cancel()
         }
-        setFailureState(failure: POFailure(message: "Card tokenization has been canceled.", code: .cancelled))
+        setFailureState(failure: POFailure(message: "Card tokenization has been canceled.", code: .Mobile.cancelled))
     }
 
     // MARK: - Private Nested Types
@@ -213,7 +213,7 @@ final class DefaultCardTokenizationInteractor:
             failure = error
         } else {
             logger.error("Unexpected error type: \(error).")
-            failure = POFailure(message: "Something went wrong.", code: .generic(.mobile), underlyingError: error)
+            failure = POFailure(message: "Something went wrong.", code: .Mobile.generic, underlyingError: error)
         }
         if delegate?.shouldContinueTokenization(after: failure) != false {
             var newState = currentState.snapshot
@@ -232,32 +232,32 @@ final class DefaultCardTokenizationInteractor:
     private func errorMessage(for failure: POFailure, invalidParameterIds: inout [State.ParameterId]) -> String? {
         // todo(andrii-vysotskyi): remove hardcoded message when backend is updated with localized values
         let errorMessage: POStringResource
-        switch failure.code {
-        case .generic(.requestInvalidCard), .generic(.cardInvalid):
+        switch failure.failureCode {
+        case .Request.invalidCard, .Card.invalid:
             invalidParameterIds.append(contentsOf: [\.number, \.expiration, \.cvc, \.cardholderName])
             errorMessage = .CardTokenization.Error.card
-        case .generic(.cardInvalidNumber), .generic(.cardMissingNumber):
+        case .Card.invalidNumber, .Card.missingNumber:
             invalidParameterIds.append(\.number)
             errorMessage = .CardTokenization.Error.cardNumber
-        case .generic(.cardInvalidExpiryDate),
-             .generic(.cardMissingExpiry),
-             .generic(.cardInvalidExpiryMonth),
-             .generic(.cardInvalidExpiryYear):
+        case .Card.invalidExpiryDate,
+             .Card.missingExpiry,
+             .Card.invalidExpiryMonth,
+             .Card.invalidExpiryYear:
             invalidParameterIds.append(\.expiration)
             errorMessage = .CardTokenization.Error.cardExpiration
-        case .generic(.cardBadTrackData):
+        case .Card.badTrackData:
             invalidParameterIds.append(contentsOf: [\.expiration, \.cvc])
             errorMessage = .CardTokenization.Error.trackData
-        case .generic(.cardMissingCvc),
-             .generic(.cardFailedCvc),
-             .generic(.cardFailedCvcAndAvs),
-             .generic(.cardInvalidCvc):
+        case .Card.missingCvc,
+             .Card.failedCvc,
+             .Card.failedCvcAndAvs,
+             .Card.invalidCvc:
             invalidParameterIds.append(\.cvc)
             errorMessage = .CardTokenization.Error.cvc
-        case .generic(.cardInvalidName):
+        case .Card.invalidName:
             invalidParameterIds.append(\.cardholderName)
             errorMessage = .CardTokenization.Error.cardholderName
-        case .cancelled:
+        case .Mobile.cancelled, .Customer.cancelled:
             return nil
         default:
             errorMessage = .CardTokenization.Error.generic

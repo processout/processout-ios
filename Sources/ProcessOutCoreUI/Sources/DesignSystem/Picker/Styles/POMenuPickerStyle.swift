@@ -16,9 +16,42 @@ public struct POMenuPickerStyle: POPickerStyle {
     }
 
     public func makeBody(configuration: POPickerStyleConfiguration) -> some View {
+        ContentView(inputStyle: inputStyle, configuration: configuration)
+    }
+
+    // MARK: - Private Properties
+
+    private let inputStyle: POInputStyle
+}
+
+@available(iOS 14, *)
+extension POPickerStyle where Self == POMenuPickerStyle {
+
+    /// A picker style that presents the options as a menu when the user
+    /// presses a button, or as a submenu when nested within a larger menu.
+    public static var menu: POMenuPickerStyle {
+        POMenuPickerStyle(inputStyle: .medium)
+    }
+}
+
+@MainActor
+@available(iOS 14, *)
+private struct ContentView: View {
+
+    let inputStyle: POInputStyle, configuration: POPickerStyleConfiguration
+
+    // MARK: - View
+
+    var body: some View {
         Menu {
-            ForEach(configuration.elements) { element in
-                Button(action: element.select, label: element.makeBody)
+            Group(poSubviews: configuration.content) { children in
+                ForEach(children) { child in
+                    Button {
+                        configuration.selection = child.id
+                    } label: {
+                        child
+                    }
+                }
             }
         } label: {
             label(configuration: configuration)
@@ -35,20 +68,26 @@ public struct POMenuPickerStyle: POPickerStyle {
 
     // MARK: - Private Properties
 
-    private let inputStyle: POInputStyle
+    @Environment(\.isControlInvalid)
+    private var isInvalid
 
     // MARK: - Private Methods
 
     @ViewBuilder
     private func label(configuration: POPickerStyleConfiguration) -> some View {
-        let style = configuration.isInvalid ? inputStyle.error : inputStyle.normal
+        let style = isInvalid ? inputStyle.error : inputStyle.normal
         HStack(spacing: POSpacing.small) {
-            if let element = configuration.elements.first(where: \.isSelected) {
-                element.makeBody().textStyle(style.text)
-            } else {
-                Text(verbatim: "").textStyle(style.placeholder)
+            Group(poSubviews: configuration.content) { children in
+                let selectedChild = children.first { child in
+                    child.id == configuration.selection
+                }
+                if let selectedChild {
+                    selectedChild.textStyle(style.text)
+                } else {
+                    Text(verbatim: "").textStyle(style.placeholder)
+                }
             }
-            Spacer()
+            .frame(maxWidth: .infinity, alignment: .leading)
             Image(poResource: .chevronDown)
                 .renderingMode(.template)
                 .foregroundColor(style.text.color)
@@ -62,15 +101,5 @@ public struct POMenuPickerStyle: POPickerStyle {
         .background(style.backgroundColor)
         .border(style: style.border)
         .shadow(style: style.shadow)
-    }
-}
-
-@available(iOS 14, *)
-extension POPickerStyle where Self == POMenuPickerStyle {
-
-    /// A picker style that presents the options as a menu when the user
-    /// presses a button, or as a submenu when nested within a larger menu.
-    public static var menu: POMenuPickerStyle {
-        POMenuPickerStyle(inputStyle: .medium)
     }
 }

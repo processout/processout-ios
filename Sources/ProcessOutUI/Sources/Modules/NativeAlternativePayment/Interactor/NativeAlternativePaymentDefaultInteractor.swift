@@ -66,11 +66,11 @@ final class NativeAlternativePaymentDefaultInteractor:
                 case .failed:
                     throw POFailure(
                         message: "A payment attempt was made previously and is currently in a failed state.",
-                        code: .generic(.mobile)
+                        code: .Mobile.generic
                     )
                 @unknown default:
                     logger.error("Unexpected alternative payment state: \(transactionDetails.state.debugDescription).")
-                    throw POFailure(message: "Something went wrong.", code: .internal(.mobile))
+                    throw POFailure(message: "Something went wrong.", code: .Mobile.internal)
                 }
             } catch {
                 setFailureState(error: error)
@@ -147,10 +147,10 @@ final class NativeAlternativePaymentDefaultInteractor:
                 case .customerInput:
                     await restoreStartedStateAfterSubmission(paymentResponse: response)
                 case .failed:
-                    throw POFailure(message: "The submitted parameters are not valid.", code: .generic(.mobile))
+                    throw POFailure(message: "The submitted parameters are not valid.", code: .Mobile.generic)
                 @unknown default:
                     throw POFailure(
-                        message: "Unexpected alternative payment state: \(response.state).", code: .internal(.mobile)
+                        message: "Unexpected alternative payment state: \(response.state).", code: .Mobile.internal
                     )
                 }
             } catch {
@@ -179,7 +179,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         default:
             break
         }
-        setFailureState(error: POFailure(message: "Alternative payment has been canceled.", code: .cancelled))
+        setFailureState(error: POFailure(message: "Alternative payment has been canceled.", code: .Mobile.cancelled))
     }
 
     func didRequestCancelConfirmation() {
@@ -344,7 +344,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             let minimumSize = CGSize(width: 250, height: 250)
             let image = barcodeImageProvider.image(for: barcode, minimumSize: minimumSize)
             if image == nil {
-                throw POFailure(message: "Unable to generate barcode image.", code: .internal(.mobile))
+                throw POFailure(message: "Unable to generate barcode image.", code: .Mobile.internal)
             }
             return .init(message: message, image: image, barcodeType: barcode.type)
         }
@@ -448,7 +448,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             failure = error
         } else {
             logger.error("Unexpected error type: \(error)")
-            failure = POFailure(message: "Something went wrong.", code: .generic(.mobile), underlyingError: error)
+            failure = POFailure(message: "Something went wrong.", code: .Mobile.generic, underlyingError: error)
         }
         state = .failure(failure)
         send(event: .didFail(failure: failure))
@@ -619,7 +619,9 @@ final class NativeAlternativePaymentDefaultInteractor:
             return validatedValues
         }
         throw POFailure(
-            message: "Submitted parameters are not valid.", code: .validation(.general), invalidFields: invalidFields
+            message: "Submitted parameters are not valid.",
+            code: .RequestValidation.general,
+            invalidFields: invalidFields
         )
     }
 

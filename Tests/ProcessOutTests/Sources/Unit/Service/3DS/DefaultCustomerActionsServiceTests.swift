@@ -35,10 +35,15 @@ struct DefaultThreeDSServiceTests {
         // When
         try await withKnownIssue {
             _ = try await sut.handle(
-                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+                request: .init(
+                    customerAction: customerAction,
+                    webAuthenticationCallback: nil,
+                    prefersEphemeralWebAuthenticationSession: true
+                ),
+                threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure, case .internal(.mobile) = failure.code {
+            if case .Mobile.internal = issue.error {
                 return true
             }
             return false
@@ -65,12 +70,17 @@ struct DefaultThreeDSServiceTests {
         )
         threeDSService.authenticationRequestParametersFromClosure = { configuration in
             #expect(configuration == expectedConfiguration)
-            throw POFailure(code: .generic(.mobile))
+            throw POFailure(code: .Mobile.generic)
         }
 
         // When
         _ = try? await sut.handle(
-            action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            request: .init(
+                customerAction: customerAction,
+                webAuthenticationCallback: nil,
+                prefersEphemeralWebAuthenticationSession: true
+            ),
+            threeDSService: threeDSService
         )
 
         // Then
@@ -80,7 +90,7 @@ struct DefaultThreeDSServiceTests {
     @Test
     func handle_whenDelegateAuthenticationRequestFails_propagatesFailure() async throws {
         // Given
-        let expectedError = POFailure(code: .unknown(rawValue: "test-error"))
+        let expectedError = POFailure(code: .init(rawValue: "test-error"))
         threeDSService.authenticationRequestParametersFromClosure = { _ in
             throw expectedError
         }
@@ -89,10 +99,15 @@ struct DefaultThreeDSServiceTests {
         // When
         try await withKnownIssue {
             _ = try await sut.handle(
-                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+                request: .init(
+                    customerAction: customerAction,
+                    webAuthenticationCallback: nil,
+                    prefersEphemeralWebAuthenticationSession: true
+                ),
+                threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure, failure.code == expectedError.code {
+            if let failure = issue.error as? POFailure, failure.failureCode == expectedError.failureCode {
                 return true
             }
             return false
@@ -110,10 +125,15 @@ struct DefaultThreeDSServiceTests {
         // When
         try await withKnownIssue {
             _ = try await sut.handle(
-                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+                request: .init(
+                    customerAction: customerAction,
+                    webAuthenticationCallback: nil,
+                    prefersEphemeralWebAuthenticationSession: true
+                ),
+                threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure, case .internal(.mobile) = failure.code {
+            if case .Mobile.internal = issue.error {
                 return true
             }
             return false
@@ -137,7 +157,12 @@ struct DefaultThreeDSServiceTests {
 
         // When
         let token = try await sut.handle(
-            action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            request: .init(
+                customerAction: customerAction,
+                webAuthenticationCallback: nil,
+                prefersEphemeralWebAuthenticationSession: true
+            ),
+            threeDSService: threeDSService
         )
 
         // Then
@@ -159,11 +184,16 @@ struct DefaultThreeDSServiceTests {
         // When
         try await withKnownIssue {
             _ = try await sut.handle(
-                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+                request: .init(
+                    customerAction: customerAction,
+                    webAuthenticationCallback: nil,
+                    prefersEphemeralWebAuthenticationSession: true
+                ),
+                threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure {
-                return failure.code == .internal(.mobile)
+            if case .Mobile.internal = issue.error {
+                return true
             }
             return false
         }
@@ -186,9 +216,12 @@ struct DefaultThreeDSServiceTests {
 
         // When
         _ = try await sut.handle(
-            action: Self.defaultChallengeMobileCustomerAction,
-            threeDSService: threeDSService,
-            webAuthenticationCallback: nil
+            request: .init(
+                customerAction: Self.defaultChallengeMobileCustomerAction,
+                webAuthenticationCallback: nil,
+                prefersEphemeralWebAuthenticationSession: true
+            ),
+            threeDSService: threeDSService
         )
         #expect(threeDSService.performChallengeCallsCount == 1)
     }
@@ -196,7 +229,7 @@ struct DefaultThreeDSServiceTests {
     @Test
     func handle_whenDelegateDoChallengeFails_propagatesFailure() async throws {
         // Given
-        let expectedError = POFailure(code: .unknown(rawValue: "test-error"))
+        let expectedError = POFailure(code: .init(rawValue: "test-error"))
         threeDSService.performChallengeFromClosure = { _ in
             throw expectedError
         }
@@ -204,13 +237,16 @@ struct DefaultThreeDSServiceTests {
         // When
         try await withKnownIssue {
             _ = try await sut.handle(
-                action: Self.defaultChallengeMobileCustomerAction,
-                threeDSService: threeDSService,
-                webAuthenticationCallback: nil
+                request: .init(
+                    customerAction: Self.defaultChallengeMobileCustomerAction,
+                    webAuthenticationCallback: nil,
+                    prefersEphemeralWebAuthenticationSession: true
+                ),
+                threeDSService: threeDSService
             )
         } matching: { issue in
             if let failure = issue.error as? POFailure {
-                return failure.code == expectedError.code
+                return failure.failureCode == expectedError.failureCode
             }
             return false
         }
@@ -225,9 +261,12 @@ struct DefaultThreeDSServiceTests {
 
         // When
         let token = try await sut.handle(
-            action: Self.defaultChallengeMobileCustomerAction,
-            threeDSService: threeDSService,
-            webAuthenticationCallback: nil
+            request: .init(
+                customerAction: Self.defaultChallengeMobileCustomerAction,
+                webAuthenticationCallback: nil,
+                prefersEphemeralWebAuthenticationSession: true
+            ),
+            threeDSService: threeDSService
         )
 
         // Then
@@ -243,9 +282,12 @@ struct DefaultThreeDSServiceTests {
 
         // When
         let token = try await sut.handle(
-            action: Self.defaultChallengeMobileCustomerAction,
-            threeDSService: threeDSService,
-            webAuthenticationCallback: nil
+            request: .init(
+                customerAction: Self.defaultChallengeMobileCustomerAction,
+                webAuthenticationCallback: nil,
+                prefersEphemeralWebAuthenticationSession: true
+            ),
+            threeDSService: threeDSService
         )
 
         // Then
@@ -264,7 +306,12 @@ struct DefaultThreeDSServiceTests {
 
         // When
         _ = try await sut.handle(
-            action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            request: .init(
+                customerAction: customerAction,
+                webAuthenticationCallback: nil,
+                prefersEphemeralWebAuthenticationSession: true
+            ),
+            threeDSService: threeDSService
         )
 
         // Then
@@ -274,16 +321,21 @@ struct DefaultThreeDSServiceTests {
     @Test(arguments: [_CustomerAction.ActionType.redirect, .url, .fingerprint])
     func handle_whenRedirectOrFingerprintValueIsNotValidUrl_fails(actionType: _CustomerAction.ActionType) async throws {
         // Given
-        let action = _CustomerAction(type: actionType, value: "")
+        let customerAction = _CustomerAction(type: actionType, value: "")
 
         // When
         try await withKnownIssue {
             _ = try await sut.handle(
-                action: action, threeDSService: threeDSService, webAuthenticationCallback: nil
+                request: .init(
+                    customerAction: customerAction,
+                    webAuthenticationCallback: nil,
+                    prefersEphemeralWebAuthenticationSession: true
+                ),
+                threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure {
-                return failure.code == .internal(.mobile)
+            if case .Mobile.internal = issue.error {
+                return true
             }
             return false
         }
@@ -299,7 +351,14 @@ struct DefaultThreeDSServiceTests {
         let customerAction = _CustomerAction(type: .redirect, value: "example.com")
 
         // When
-        _ = try await sut.handle(action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil)
+        _ = try await sut.handle(
+            request: .init(
+                customerAction: customerAction,
+                webAuthenticationCallback: nil,
+                prefersEphemeralWebAuthenticationSession: true
+            ),
+            threeDSService: threeDSService
+        )
         #expect(webSession.authenticateCallsCount == 1)
     }
 
@@ -313,7 +372,12 @@ struct DefaultThreeDSServiceTests {
 
         // When
         let value = try await sut.handle(
-            action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            request: .init(
+                customerAction: customerAction,
+                webAuthenticationCallback: nil,
+                prefersEphemeralWebAuthenticationSession: true
+            ),
+            threeDSService: threeDSService
         )
 
         // Then
@@ -324,7 +388,7 @@ struct DefaultThreeDSServiceTests {
     func handle_whenRedirectFails_propagatesError() async throws {
         // Given
         webSession.authenticateFromClosure = { _ in
-            throw POFailure(code: .unknown(rawValue: "test-error"))
+            throw POFailure(code: .init(rawValue: "test-error"))
         }
 
         let customerAction = _CustomerAction(type: .redirect, value: "example.com")
@@ -332,11 +396,16 @@ struct DefaultThreeDSServiceTests {
         // When
         try await withKnownIssue {
             _ = try await sut.handle(
-                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+                request: .init(
+                    customerAction: customerAction,
+                    webAuthenticationCallback: nil,
+                    prefersEphemeralWebAuthenticationSession: true
+                ),
+                threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure {
-                return failure.code == .unknown(rawValue: "test-error")
+            if case POFailureCode(rawValue: "test-error") = issue.error {
+                return true
             }
             return false
         }
@@ -355,7 +424,14 @@ struct DefaultThreeDSServiceTests {
         let customerAction = _CustomerAction(type: .fingerprint, value: expectedRedirectUrl.absoluteString)
 
         // When
-        _ = try await sut.handle(action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil)
+        _ = try await sut.handle(
+            request: .init(
+                customerAction: customerAction,
+                webAuthenticationCallback: nil,
+                prefersEphemeralWebAuthenticationSession: true
+            ),
+            threeDSService: threeDSService
+        )
         #expect(webSession.authenticateCallsCount == 1)
     }
 
@@ -369,7 +445,12 @@ struct DefaultThreeDSServiceTests {
 
         // When
         let value = try await sut.handle(
-            action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            request: .init(
+                customerAction: customerAction,
+                webAuthenticationCallback: nil,
+                prefersEphemeralWebAuthenticationSession: true
+            ),
+            threeDSService: threeDSService
         )
 
         // Then
@@ -380,18 +461,23 @@ struct DefaultThreeDSServiceTests {
     func handle_whenFingerprintFails_propagatesError() async throws {
         // Given
         webSession.authenticateFromClosure = { _ in
-            throw POFailure(code: .unknown(rawValue: "test-error"))
+            throw POFailure(code: .init(rawValue: "test-error"))
         }
         let customerAction = _CustomerAction(type: .fingerprint, value: "example.com")
 
         // When
         try await withKnownIssue {
             _ = try await sut.handle(
-                action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+                request: .init(
+                    customerAction: customerAction,
+                    webAuthenticationCallback: nil,
+                    prefersEphemeralWebAuthenticationSession: true
+                ),
+                threeDSService: threeDSService
             )
         } matching: { issue in
-            if let failure = issue.error as? POFailure {
-                return failure.code == .unknown(rawValue: "test-error")
+            if case POFailureCode(rawValue: "test-error") = issue.error {
+                return true
             }
             return false
         }
@@ -401,16 +487,21 @@ struct DefaultThreeDSServiceTests {
     func handle_whenFingerprintFailsWithTimeoutError_succeeds() async throws {
         // Given
         webSession.authenticateFromClosure = { _ in
-            throw POFailure(code: .timeout(.mobile))
+            throw POFailure(code: .Mobile.timeout)
         }
         let customerAction = _CustomerAction(type: .fingerprint, value: "example.com")
 
         // When
         let value = try await sut.handle(
-            action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            request: .init(
+                customerAction: customerAction,
+                webAuthenticationCallback: nil,
+                prefersEphemeralWebAuthenticationSession: true
+            ),
+            threeDSService: threeDSService
         )
 
-            // Then
+        // Then
         let expectedValue = """
             gway_req_eyJib2R5IjoieyBcInRocmVlRFMyRmluZ2VycHJpbnRUaW1lb3V0XCI6IHRydWUgfSIsInVybCI6ImV4YW1wbGUuY29tIn0=
             """
@@ -428,7 +519,12 @@ struct DefaultThreeDSServiceTests {
 
         // When
         let value = try await sut.handle(
-            action: customerAction, threeDSService: threeDSService, webAuthenticationCallback: nil
+            request: .init(
+                customerAction: customerAction,
+                webAuthenticationCallback: nil,
+                prefersEphemeralWebAuthenticationSession: true
+            ),
+            threeDSService: threeDSService
         )
 
         // Then

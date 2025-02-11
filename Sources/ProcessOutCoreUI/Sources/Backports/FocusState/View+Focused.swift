@@ -44,48 +44,26 @@ private struct FocusModifier<Value: Hashable>: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .onDidAppear {
-                isVisible = true
-            }
-            .onDisappear {
-                isVisible = false
-            }
-            .backport.onChange(of: binding) {
-                updateFirstResponder()
-            }
-            .backport.onChange(of: coordinator.isEditing) {
-                if coordinator.isEditing {
-                    binding = value
-                } else if binding == value {
-                    binding = nil
+            .onPreferenceChange(FocusableViewProxyPreferenceKey.self) { newFocusableView in
+                MainActor.assumeIsolated {
+                    if newFocusableView.isFocused {
+                        binding = value
+                    } else if focusableView.isFocused, binding == value {
+                        binding = nil
+                    }
+                    self.focusableView = newFocusableView
                 }
             }
-            .backport.onChange(of: isVisible) {
-                updateFirstResponder()
+            .backport.onChange(of: binding) {
+                focusableView.setFocused(binding == value)
             }
-            .environmentObject(coordinator)
+            .backport.onChange(of: focusableView.id) {
+                focusableView.setFocused(binding == value)
+            }
     }
 
     // MARK: - Private Properties
 
-    /// Indicates whether
     @State
-    private var isVisible = false
-
-    @StateObject
-    private var coordinator = FocusCoordinator()
-
-    // MARK: - Private Methods
-
-    private func updateFirstResponder() {
-        if isVisible {
-            if binding == value {
-                coordinator.beginEditing()
-            } else if binding == nil {
-                coordinator.endEditing()
-            }
-        } else if binding == value {
-            binding = nil
-        }
-    }
+    private var focusableView = FocusableViewProxy()
 }

@@ -23,6 +23,17 @@ final class CodeFieldView: UIControl, UITextInput {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: -
+
+    weak var delegate: CodeFieldDelegate?
+
+    // MARK: - UIView
+
+    override func didMoveToWindow() {
+        delegate?.codeField(self, didMoveToWindow: window)
+        super.didMoveToWindow()
+    }
+
     // MARK: - UIControl
 
     override var canBecomeFirstResponder: Bool {
@@ -35,7 +46,7 @@ final class CodeFieldView: UIControl, UITextInput {
             return true
         }
         if super.becomeFirstResponder() {
-            sendActions(for: .editingDidBegin)
+            delegate?.codeFieldDidBeginEditing(self)
             return true
         }
         return false
@@ -47,7 +58,7 @@ final class CodeFieldView: UIControl, UITextInput {
             return false
         }
         if super.resignFirstResponder() {
-            sendActions(for: .editingDidEnd)
+            delegate?.codeFieldDidEndEditing(self)
             return true
         }
         return false

@@ -59,10 +59,13 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
         if let customerAction = response.customerAction {
             let newRequest: POAssignCustomerTokenRequest
             do {
+                let customerActionRequest = CustomerActionRequest(
+                    customerAction: customerAction,
+                    webAuthenticationCallback: request.webAuthenticationCallback,
+                    prefersEphemeralWebAuthenticationSession: true
+                )
                 let newSource = try await customerActionsService.handle(
-                    action: customerAction,
-                    threeDSService: threeDSService,
-                    webAuthenticationCallback: request.webAuthenticationCallback
+                    request: customerActionRequest, threeDSService: threeDSService
                 )
                 newRequest = request.replacing(source: newSource)
             } catch {
@@ -79,7 +82,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
             return token
         }
         logger.error("Unexpected response, either token or action should be set.")
-        throw POFailure(message: "Unable to assign customer token.", code: .internal(.mobile))
+        throw POFailure(message: "Unable to assign customer token.", code: .Mobile.internal)
     }
 }
 

@@ -27,6 +27,7 @@ ProcessOut.configure(configuration: configuration)
 All errors that could happen as a result of interaction with the SDK are represented by ``POFailure`` type.
 
 - ``POFailure``
+- ``POFailureCode``
 
 ### 3DS
 
@@ -61,6 +62,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``POAlternativePaymentsService``
 - ``POAlternativePaymentAuthorizationRequest``
 - ``POAlternativePaymentTokenizationRequest``
+- ``POAlternativePaymentAuthenticationRequest``
 - ``POAlternativePaymentResponse``
 - ``POAlternativePaymentMethodsService``
 - ``POAlternativePaymentMethodsServiceType``

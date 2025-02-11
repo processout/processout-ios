@@ -163,6 +163,9 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         /// Payment flow.
         public let flow: Flow?
 
+        /// Customer token type.
+        public let type: CustomerTokenType
+
         /// Payment configuration.
         public let configuration: CustomerTokenConfiguration
     }
@@ -177,6 +180,15 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
 
         /// Indicates whether the user should be able to remove this customer token.
         public let deletingAllowed: Bool
+    }
+
+    public enum CustomerTokenType: Sendable, Hashable {
+
+        /// Customer token represents card.
+        case card
+
+        /// Customer token represents alternative payment method.
+        case alternativePaymentMethod
     }
 
     // MARK: - Unknown
@@ -278,8 +290,10 @@ extension PODynamicCheckoutPaymentMethod.CustomerToken: Decodable {
         )
         do {
             configuration = try container.decode(Configuration.self, forKey: .cardCustomerToken)
+            type = .card
         } catch {
             configuration = try container.decode(Configuration.self, forKey: .apmCustomerToken)
+            type = .alternativePaymentMethod
         }
     }
 

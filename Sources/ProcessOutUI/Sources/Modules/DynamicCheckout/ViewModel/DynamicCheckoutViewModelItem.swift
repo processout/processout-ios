@@ -166,6 +166,7 @@ extension DynamicCheckoutViewModelItem: Identifiable, AnimationIdentityProvider 
                 item.id,
                 AnyHashable(item.content == nil),
                 item.info.additionalInformation == nil,
+                item.info.shouldSave == nil,
                 item.submitButton?.id
             ]
         default:
