@@ -200,7 +200,14 @@ actor DefaultCameraSession:
         guard activeVideoInput == nil else {
             return true // Already configured
         }
-        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
+        let discoverySession = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [
+                .builtInTripleCamera, .builtInDualWideCamera, .builtInUltraWideCamera, .builtInWideAngleCamera
+            ],
+            mediaType: .video,
+            position: .back
+        )
+        guard let device = discoverySession.devices.first else {
             return false
         }
         let videoInput: AVCaptureDeviceInput
@@ -241,6 +248,9 @@ actor DefaultCameraSession:
         }
         if device.isLowLightBoostSupported {
             device.automaticallyEnablesLowLightBoostWhenAvailable = true
+        }
+        if device.isAutoFocusRangeRestrictionSupported {
+            device.autoFocusRangeRestriction = .near
         }
         device.unlockForConfiguration()
     }
