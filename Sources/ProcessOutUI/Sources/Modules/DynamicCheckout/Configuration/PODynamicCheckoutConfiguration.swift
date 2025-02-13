@@ -131,9 +131,9 @@ public struct PODynamicCheckoutConfiguration {
     // Creates configuration instance.
     public init(
         invoiceRequest: POInvoiceRequest,
-        expressCheckout: ExpressCheckout = .default,
-        card: PODynamicCheckoutCardConfiguration = .default,
-        alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .default,
+        expressCheckout: ExpressCheckout = .init(),
+        card: PODynamicCheckoutCardConfiguration = .init(),
+        alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .init(),
         passKitPaymentButtonType: PKPaymentButtonType = .plain,
         allowsSkippingPaymentList: Bool = true,
         submitButton: SubmitButton = .init(),
@@ -149,16 +149,5 @@ public struct PODynamicCheckoutConfiguration {
         self.submitButton = submitButton
         self.cancelButton = cancelButton
         self.paymentSuccess = paymentSuccess
-    }
-}
-
-extension PODynamicCheckoutConfiguration.ExpressCheckout {
-
-    /// Default configuration.
-    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
-    @inlinable
-    @MainActor
-    static var `default`: PODynamicCheckoutConfiguration.ExpressCheckout {
-        PODynamicCheckoutConfiguration.ExpressCheckout()
     }
 }

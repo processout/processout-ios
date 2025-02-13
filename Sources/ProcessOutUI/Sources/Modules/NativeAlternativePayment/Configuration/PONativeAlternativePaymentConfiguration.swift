@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 23.11.2023.
 //
 
-// swiftlint:disable strict_fileprivate file_length
+// swiftlint:disable strict_fileprivate
 
 import Foundation
 import SwiftUI
@@ -201,7 +201,7 @@ public struct PONativeAlternativePaymentConfiguration {
         title: String? = nil,
         shouldHorizontallyCenterCodeInput: Bool = true,
         inlineSingleSelectValuesLimit: Int = 5,
-        barcodeInteraction: BarcodeInteraction = .default,
+        barcodeInteraction: BarcodeInteraction = .init(),
         submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = nil,
         paymentConfirmation: Confirmation = .init(),
@@ -393,15 +393,4 @@ extension PONativeAlternativePaymentConfiguration.CancelButton {
     }
 }
 
-extension PONativeAlternativePaymentConfiguration.BarcodeInteraction {
-
-    /// Default configuration.
-    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
-    @inlinable
-    @MainActor
-    static var `default`: PONativeAlternativePaymentConfiguration.BarcodeInteraction {
-        .init()
-    }
-}
-
-// swiftlint:enable strict_fileprivate file_length
+// swiftlint:enable strict_fileprivate

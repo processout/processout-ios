@@ -18,7 +18,7 @@ struct DynamicCheckoutPaymentMethodButtonsView: View {
     // MARK: - View
 
     var body: some View {
-        let buttons = self.buttons.filter(isIncluded)
+        let buttons = self.buttons.filter { isIncluded(button: $0) }
         VStack(spacing: POSpacing.small) {
             ForEach(buttons) { buttonViewModel in
                 Button.create(with: buttonViewModel)

@@ -7,15 +7,13 @@
 
 import Foundation
 
-// todo(andrii-vysotskyi): annotate operations with @isolated(any) after removing support for Xcode 15.4 CLT.
-
 // MARK: - Timeout
 
 /// - Warning: operation should support cancellation, otherwise calling this method has no effect.
 func withTimeout<T: Sendable>(
     _ timeout: TimeInterval,
     error timeoutError: Error,
-    @_inheritActorContext perform operation: @escaping @Sendable () async throws -> T
+    perform operation: @escaping @Sendable @isolated(any) () async throws -> T
 ) async throws -> T {
     let isTimedOut = POUnfairlyLocked(wrappedValue: false)
     let task = Task(operation: operation)
@@ -50,7 +48,7 @@ func withTimeout<T: Sendable>(
 // MARK: - Retry
 
 func retry<T: Sendable>(
-    @_inheritActorContext operation: @escaping @Sendable () async throws -> T,
+    operation: @escaping @Sendable @isolated(any) () async throws -> T,
     while condition: @escaping @Sendable (Result<T, Error>) -> Bool,
     timeout: TimeInterval,
     timeoutError: Error,
@@ -69,7 +67,7 @@ func retry<T: Sendable>(
 }
 
 private func retry<T: Sendable>(
-    @_inheritActorContext operation: @escaping @Sendable () async throws -> T,
+    operation: @escaping @Sendable @isolated(any) () async throws -> T,
     after result: Result<T, Error>,
     while condition: @escaping (Result<T, Error>) -> Bool,
     retryStrategy: RetryStrategy?,

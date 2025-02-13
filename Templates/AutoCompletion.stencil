@@ -1,6 +1,5 @@
 // MARK: - AutoCompletion
 
-#if compiler(>=6.0)
 {% for type in types.protocols|annotated:"AutoCompletion" %}
 
 extension {{ type.name }} {
@@ -53,6 +52,5 @@ private func invoke<T>(
     }
 }
 
-#endif
 {% endif %}
 {% endfor %}

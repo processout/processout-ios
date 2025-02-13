@@ -29,8 +29,11 @@ struct TextFieldRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ textField: UITextField, context: Context) {
-        // todo(andrii-vysotskyi): use context.animate after Xcode 15 is no longer required
-        if context.transaction.animation != nil {
+        if #available(iOS 18.0, *) {
+            context.animate {
+                updateText(textField)
+            }
+        } else if context.transaction.animation != nil {
             UIView.animate(withDuration: Constants.animationDuration) {
                 updateText(textField)
             }

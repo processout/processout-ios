@@ -10,7 +10,7 @@ import SwiftUI
 
 @_spi(PO)
 @MainActor
-public struct POButtonViewModel {
+public struct POButtonViewModel: Identifiable {
 
     /// Confirmation dialog configuration.
     @MainActor
@@ -46,6 +46,9 @@ public struct POButtonViewModel {
         }
     }
 
+    /// View model ID.
+    public nonisolated let id: String
+
     /// Action title.
     public let title: String?
 
@@ -78,7 +81,7 @@ public struct POButtonViewModel {
         confirmation: Confirmation? = nil,
         action: @escaping @MainActor () -> Void
     ) {
-        _id = id
+        self.id = id
         self.title = title
         self.icon = icon.map(AnyView.init(erasing:))
         self.isEnabled = isEnabled
@@ -86,16 +89,5 @@ public struct POButtonViewModel {
         self.role = role
         self.confirmation = confirmation
         self.action = action
-    }
-
-    // MARK: - Private Properties
-
-    private let _id: String
-}
-
-extension POButtonViewModel: Identifiable {
-
-    public nonisolated var id: String {
-        _id // todo(andrii-vysotskyi): use nonisolated stored property
     }
 }

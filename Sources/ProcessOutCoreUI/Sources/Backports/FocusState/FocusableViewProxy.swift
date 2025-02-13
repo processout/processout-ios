@@ -7,22 +7,23 @@
 
 import UIKit
 
-struct FocusableViewProxy {
-
-    init() {
-        isFocused = false
-    }
+struct FocusableViewProxy: @unchecked Sendable {
 
     /// - NOTE: Proxy won't track changes to responder state automatically.
+    @MainActor
     init(uiControl: UIControl) {
+        self.id = ObjectIdentifier(uiControl)
         self.uiControl = uiControl
         isFocused = uiControl.isFirstResponder
     }
 
-    /// Underlying focusable view ID.
-    var id: AnyHashable {
-        AnyHashable(uiControl.map(ObjectIdentifier.init))
+    init() {
+        id = AnyHashable(nil as ObjectIdentifier?)
+        isFocused = false
     }
+
+    /// Underlying focusable view ID.
+    let id: AnyHashable
 
     /// Boolean value indicating whether is currently focused. Nil indicates that value
     /// is unknown probably because there is no underlying focusable view.
@@ -30,6 +31,7 @@ struct FocusableViewProxy {
 
     /// Changes focus state of underlying focusable view if any.
     @discardableResult
+    @MainActor
     func setFocused(_ focused: Bool) -> Bool {
         guard let uiControl else {
             return false // Ignoring attempt to change focus state, control is not set.

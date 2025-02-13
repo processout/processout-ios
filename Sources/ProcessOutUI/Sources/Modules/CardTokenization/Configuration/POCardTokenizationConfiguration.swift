@@ -80,7 +80,7 @@ public struct POCardTokenizationConfiguration {
         /// Scanner configuration.
         public let configuration: POCardScannerConfiguration
 
-        public init(scanButton: ScanButton = .init(), configuration: POCardScannerConfiguration = .default) {
+        public init(scanButton: ScanButton = .init(), configuration: POCardScannerConfiguration = .init()) {
             self.scanButton = scanButton
             self.configuration = configuration
         }
@@ -190,7 +190,7 @@ public struct POCardTokenizationConfiguration {
         cardNumber: TextField = .init(),
         expirationDate: TextField = .init(),
         cvc: TextField? = .init(),
-        cardScanner: CardScanner? = .default,
+        cardScanner: CardScanner? = .init(),
         billingAddress: BillingAddress = .init(),
         isSavingAllowed: Bool = false,
         submitButton: SubmitButton = .init(),
@@ -243,7 +243,7 @@ extension POCardTokenizationConfiguration {
         title: String? = nil,
         isCardholderNameInputVisible: Bool = true,
         shouldCollectCvc: Bool = true,
-        cardScanner: CardScanner? = .default,
+        cardScanner: CardScanner? = .init(),
         primaryActionTitle: String? = nil,
         cancelActionTitle: String? = nil,
         billingAddress: POBillingAddressConfiguration = .init(),
@@ -261,28 +261,6 @@ extension POCardTokenizationConfiguration {
         self.billingAddress = billingAddress
         self.isSavingAllowed = isSavingAllowed
         self.metadata = metadata
-    }
-}
-
-extension POCardTokenizationConfiguration {
-
-    /// Default configuration.
-    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
-    @MainActor
-    @inlinable
-    static var `default`: POCardTokenizationConfiguration {
-        POCardTokenizationConfiguration()
-    }
-}
-
-extension POCardTokenizationConfiguration.CardScanner {
-
-    /// Default configuration.
-    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
-    @inlinable
-    @MainActor
-    static var `default`: POCardTokenizationConfiguration.CardScanner {
-        POCardTokenizationConfiguration.CardScanner()
     }
 }
 

@@ -84,14 +84,3 @@ public struct PODynamicCheckoutCardConfiguration {
         self.metadata = metadata
     }
 }
-
-extension PODynamicCheckoutCardConfiguration {
-
-    /// Default configuration.
-    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
-    @inlinable
-    @MainActor
-    static var `default`: PODynamicCheckoutCardConfiguration {
-        PODynamicCheckoutCardConfiguration()
-    }
-}
