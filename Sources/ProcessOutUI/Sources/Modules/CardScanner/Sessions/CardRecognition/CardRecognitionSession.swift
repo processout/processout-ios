@@ -91,9 +91,6 @@ actor CardRecognitionSession: CameraSessionDelegate {
     private func recognizedTexts(
         for textObservations: [VNRecognizedTextObservation]?, inside rectangleObservation: VNRectangleObservation?
     ) -> [VNRecognizedText] {
-        guard let rectangleObservation else {
-            return [] // Abort recognition if card shape is not detected
-        }
         let candidates = textObservations?
             .filter { textObservation in
                 shouldInclude(textObservation: textObservation, cardRectangleObservation: rectangleObservation)
@@ -109,11 +106,15 @@ actor CardRecognitionSession: CameraSessionDelegate {
     }
 
     private func shouldInclude(
-        textObservation: VNRecognizedTextObservation, cardRectangleObservation: VNRectangleObservation
+        textObservation: VNRecognizedTextObservation, cardRectangleObservation: VNRectangleObservation?
     ) -> Bool {
         guard textObservation.confidence > Constants.minimumConfidence else {
             return false
         }
+        guard let cardRectangleObservation else {
+            return true
+        }
+        // Only include text observations within detected card shape if any.
         return textObservation.boundingBox.intersects(cardRectangleObservation.boundingBox)
     }
 
