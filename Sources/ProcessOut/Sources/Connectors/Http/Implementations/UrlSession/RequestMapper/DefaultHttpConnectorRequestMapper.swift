@@ -21,11 +21,15 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         self.logger = logger
     }
 
-    func urlRequest(from request: HttpConnectorRequest<some Decodable>) async throws -> URLRequest {
+    // MARK: - HttpConnectorRequestMapper
+
+    typealias Failure = HttpConnectorFailure
+
+    func urlRequest(from request: HttpConnectorRequest<some Decodable>) async throws(Failure) -> URLRequest {
         let configuration = configuration.wrappedValue
         guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
             logger.error("Unable to create a request with base URL \(configuration.baseUrl)")
-            throw HttpConnectorFailure(code: .internal, underlyingError: nil)
+            throw Failure(code: .internal, underlyingError: nil)
         }
         components.path = request.path
         components.queryItems = request.query.map { item in
@@ -33,7 +37,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         }
         guard let resourceURL = components.url else {
             logger.error("Unable to encode request URL components")
-            throw HttpConnectorFailure(code: .internal, underlyingError: nil)
+            throw Failure(code: .internal, underlyingError: nil)
         }
         var sessionRequest = URLRequest(url: resourceURL)
         sessionRequest.httpMethod = request.method.rawValue.uppercased()
@@ -64,7 +68,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     private func encodedRequestBody(
         _ request: HttpConnectorRequest<some Decodable>, configuration: HttpConnectorConfiguration
-    ) async throws -> Data? {
+    ) async throws(Failure) -> Data? {
         let decoratedBody: Encodable?
         if request.includesDeviceMetadata {
             let metadata = await deviceMetadataProvider.deviceMetadata
@@ -79,7 +83,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
             return try encoder.encode(decoratedBody)
         } catch {
             logger.error("Did fail to encode request body: '\(error)'")
-            throw HttpConnectorFailure(code: .encoding, underlyingError: error)
+            throw Failure(code: .encoding, underlyingError: error)
         }
     }
 

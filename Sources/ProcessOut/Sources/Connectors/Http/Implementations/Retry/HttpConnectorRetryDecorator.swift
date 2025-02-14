@@ -9,19 +9,25 @@ import Foundation
 
 final class HttpConnectorRetryDecorator: HttpConnector {
 
-    init(connector: HttpConnector, retryStrategy: RetryStrategy) {
+    init(connector: any HttpConnector<Failure>, retryStrategy: RetryStrategy) {
         self.connector = connector
         self.retryStrategy = retryStrategy
     }
 
-    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value> {
+    // MARK: - HttpConnector
+
+    typealias Failure = HttpConnectorFailure
+
+    func execute<Value>(
+        request: HttpConnectorRequest<Value>
+    ) async throws(Failure) -> HttpConnectorResponse<Value> {
         let updatedRequest = addingIdempotencyKey(request: request)
         return try await retry(
-            operation: { [connector] in
+            operation: { [connector] () throws(Failure) in
                 try await connector.execute(request: updatedRequest)
             },
             while: { result in
-                guard case .failure(let failure as Failure) = result else {
+                guard case .failure(let failure) = result else {
                     return false
                 }
                 switch failure.code {
@@ -36,7 +42,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
                 }
             },
             timeout: 3600, // 1 hour
-            timeoutError: HttpConnectorFailure(code: .timeout, underlyingError: nil),
+            timeoutError: .init(code: .timeout, underlyingError: nil),
             retryStrategy: retryStrategy
         )
     }
@@ -47,7 +53,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnector
+    private let connector: any HttpConnector<Failure>
     private let retryStrategy: RetryStrategy
 
     // MARK: - Private Methods
