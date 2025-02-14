@@ -12,7 +12,7 @@ final class UrlSessionHttpConnector: HttpConnector {
 
     init(
         sessionConfiguration: URLSessionConfiguration,
-        requestMapper: any HttpConnectorRequestMapper<Failure>,
+        requestMapper: any HttpConnectorRequestMapper,
         decoder: JSONDecoder,
         logger: POLogger
     ) {
@@ -57,7 +57,7 @@ final class UrlSessionHttpConnector: HttpConnector {
     // MARK: - Private Properties
 
     private let session: URLSession
-    private let requestMapper: any HttpConnectorRequestMapper<Failure>
+    private let requestMapper: HttpConnectorRequestMapper
     private let decoder: JSONDecoder
     private let logger: POLogger
     private let urlRequestFormatter: UrlRequestFormatter

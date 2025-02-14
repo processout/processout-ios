@@ -7,9 +7,9 @@
 
 import Foundation
 
-protocol HttpConnectorRequestMapper<Failure>: Sendable {
+protocol HttpConnectorRequestMapper: Sendable {
 
-    associatedtype Failure: Error
+    typealias Failure = HttpConnectorFailure
 
     /// Transforms given `HttpConnectorRequest` to `URLRequest`.
     func urlRequest(from request: HttpConnectorRequest<some Decodable>) async throws(Failure) -> URLRequest
