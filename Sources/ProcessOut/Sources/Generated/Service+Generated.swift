@@ -1,5 +1,5 @@
 //
-//  Completion+Auto.swift
+//  Service+Generated.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 13.02.2025.
@@ -7,13 +7,13 @@
 
 // todo(andrii-vysotskyi): remove before releasing 5.0.0
 
+@available(*, deprecated, message: "Use async counterparts instead.")
 extension POCardsService {
 
     /// Allows to retrieve card issuer information based on IIN.
     ///
     /// - Parameters:
     ///   - iin: Card issuer identification number. Length should be at least 6 otherwise error is thrown.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func issuerInformation(
@@ -29,7 +29,6 @@ extension POCardsService {
     /// to use the card for multiple payments then you can use the card token to create a reusable customer token.
     /// Note that once you have used the card token either for a payment or to create a customer token, the card
     /// token becomes invalid and you cannot use it for any further actions.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func tokenize(
@@ -42,7 +41,6 @@ extension POCardsService {
     }
 
     /// Updates card information.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func updateCard(
@@ -55,7 +53,6 @@ extension POCardsService {
     }
 
     /// Tokenize previously authorized payment.
-    @available(*, deprecated, message: "Use the async method instead.")
     @MainActor
     @preconcurrency
     @discardableResult
@@ -69,7 +66,6 @@ extension POCardsService {
     }
 
     /// Authorize given payment request and tokenize it.
-    @available(*, deprecated, message: "Use the async method instead.")
     @MainActor
     @preconcurrency
     @discardableResult
@@ -84,7 +80,6 @@ extension POCardsService {
     }
 
     /// Authorize given payment request and tokenize it.
-    @available(*, deprecated, message: "Use the async method instead.")
     @MainActor
     @preconcurrency
     @discardableResult
@@ -98,10 +93,10 @@ extension POCardsService {
     }
 }
 
+@available(*, deprecated, message: "Use async counterparts instead.")
 extension POCustomerTokensService {
 
     /// Assigns new source to existing customer token and optionally verifies it.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func assignCustomerToken(
@@ -115,7 +110,6 @@ extension POCustomerTokensService {
     }
 
     /// Deletes customer token.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func deleteCustomerToken(
@@ -126,26 +120,12 @@ extension POCustomerTokensService {
             try await deleteCustomerToken(request: request)
         }
     }
-
-    /// Creates customer token using given request.
-    @available(*, deprecated, message: "Use the async method instead.")
-    @_spi(PO)
-    @preconcurrency
-    @discardableResult
-    public func createCustomerToken(
-        request: POCreateCustomerTokenRequest,
-        completion: sending @escaping @isolated(any) (Result<POCustomerToken, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) { () throws(POFailure) in
-            try await createCustomerToken(request: request)
-        }
-    }
 }
 
+@available(*, deprecated, message: "Use async counterparts instead.")
 extension POGatewayConfigurationsRepository {
 
     /// Returns available gateway configurations.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func all(
@@ -158,7 +138,6 @@ extension POGatewayConfigurationsRepository {
     }
 
     /// Searches configuration with given request.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func find(
@@ -171,7 +150,6 @@ extension POGatewayConfigurationsRepository {
     }
 
     /// Returns available gateway configurations.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func all(
@@ -183,10 +161,10 @@ extension POGatewayConfigurationsRepository {
     }
 }
 
+@available(*, deprecated, message: "Use async counterparts instead.")
 extension POInvoicesService {
 
     /// Requests information needed to continue existing payment or start new one.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func nativeAlternativePaymentMethodTransactionDetails(
@@ -202,7 +180,6 @@ extension POInvoicesService {
     ///
     /// Some Native APMs require further information to be collected back from the customer. You can inspect
     /// `nativeApm` in response object to understand if additional data is required.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func initiatePayment(
@@ -215,7 +192,6 @@ extension POInvoicesService {
     }
 
     /// Invoice details.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func invoice(
@@ -228,7 +204,6 @@ extension POInvoicesService {
     }
 
     /// Performs invoice authorization with given request.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func authorizeInvoice(
@@ -242,7 +217,6 @@ extension POInvoicesService {
     }
 
     /// Captures native alternative payament.
-    @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
     @discardableResult
     public func captureNativeAlternativePayment(
@@ -253,37 +227,20 @@ extension POInvoicesService {
             try await captureNativeAlternativePayment(request: request)
         }
     }
-
-    /// Creates invoice with given parameters.
-    @available(*, deprecated, message: "Use the async method instead.")
-    @_spi(PO)
-    @preconcurrency
-    @discardableResult
-    public func createInvoice(
-        request: POInvoiceCreationRequest,
-        completion: sending @escaping @isolated(any) (Result<POInvoice, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) { () throws(POFailure) -> POInvoice in
-            try await createInvoice(request: request)
-        }
-    }
 }
 
 /// Invokes given completion with a result of async operation.
+@available(*, deprecated)
 private func invoke<T>(
     completion: sending @escaping @isolated(any) (Result<T, POFailure>) -> Void,
     withResultOf operation: @escaping @MainActor () async throws(POFailure) -> T
 ) -> POCancellable {
     Task { @MainActor in
-        do {
+        do throws(POFailure) {
             let returnValue = try await operation()
             await completion(.success(returnValue))
-        } catch let failure as POFailure {
-            await completion(.failure(failure))
         } catch {
-            let failure = POFailure(message: "Something went wrong.", code: .Mobile.internal, underlyingError: error)
-            await completion(.failure(failure))
+            await completion(.failure(error))
         }
     }
 }
-
