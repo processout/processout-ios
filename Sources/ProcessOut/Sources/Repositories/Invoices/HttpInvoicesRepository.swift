@@ -9,7 +9,7 @@ import Foundation
 
 final class HttpInvoicesRepository: InvoicesRepository {
 
-    init(connector: HttpConnector) {
+    init(connector: any HttpConnector<Failure>) {
         self.connector = connector
     }
 
@@ -17,7 +17,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
 
     func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest
-    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
+    ) async throws(Failure) -> PONativeAlternativePaymentMethodTransactionDetails {
         struct Response: Decodable, Sendable {
             let nativeApm: PONativeAlternativePaymentMethodTransactionDetails
         }
@@ -29,7 +29,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
 
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse {
+    ) async throws(Failure) -> PONativeAlternativePaymentMethodResponse {
         struct Request: Encodable, Sendable {
             struct NativeApm: Encodable, Sendable { // swiftlint:disable:this nesting
                 let parameterValues: [String: String]
@@ -50,7 +50,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
         return try await connector.execute(request: httpRequest).nativeApm
     }
 
-    func invoice(request: POInvoiceRequest) async throws -> POInvoice {
+    func invoice(request: POInvoiceRequest) async throws(Failure) -> POInvoice {
         struct Response: Decodable, Sendable {
             let invoice: POInvoice
         }
@@ -68,7 +68,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
         return response.value.invoice.replacing(clientSecret: clientSecret)
     }
 
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> _CustomerAction? {
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws(Failure) -> _CustomerAction? {
         struct Response: Decodable, Sendable {
             let customerAction: _CustomerAction?
         }
@@ -86,7 +86,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
 
     func captureNativeAlternativePayment(
         request: NativeAlternativePaymentCaptureRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse {
+    ) async throws(Failure) -> PONativeAlternativePaymentMethodResponse {
         struct Response: Decodable, Sendable {
             let nativeApm: PONativeAlternativePaymentMethodResponse
         }
@@ -96,7 +96,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
         return try await connector.execute(request: httpRequest).nativeApm
     }
 
-    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
+    func createInvoice(request: POInvoiceCreationRequest) async throws(Failure) -> POInvoice {
         struct Response: Decodable, Sendable {
             let invoice: POInvoice
         }
@@ -110,7 +110,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnector
+    private let connector: any HttpConnector<Failure>
 }
 
 private extension POInvoice { // swiftlint:disable:this no_extension_access_modifier

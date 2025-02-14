@@ -9,13 +9,15 @@ import Foundation
 
 final class HttpCustomerTokensRepository: CustomerTokensRepository {
 
-    init(connector: HttpConnector) {
+    init(connector: any HttpConnector<Failure>) {
         self.connector = connector
     }
 
     // MARK: - CustomerTokensRepository
 
-    func assignCustomerToken(request: POAssignCustomerTokenRequest) async throws -> AssignCustomerTokenResponse {
+    func assignCustomerToken(
+        request: POAssignCustomerTokenRequest
+    ) async throws(Failure) -> AssignCustomerTokenResponse {
         let httpRequest = HttpConnectorRequest<AssignCustomerTokenResponse>.put(
             path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",
             body: request,
@@ -24,7 +26,7 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
         return try await connector.execute(request: httpRequest)
     }
 
-    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
+    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws(Failure) -> POCustomerToken {
         struct Response: Decodable {
             let token: POCustomerToken
         }
@@ -37,7 +39,7 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
         return try await connector.execute(request: httpRequest).token
     }
 
-    func delete(request: PODeleteCustomerTokenRequest) async throws {
+    func delete(request: PODeleteCustomerTokenRequest) async throws(Failure) {
         let httpRequest = HttpConnectorRequest<VoidCodable>.delete(
             path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",
             headers: ["X-Processout-Client-Secret": request.clientSecret]
@@ -47,5 +49,5 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnector
+    private let connector: any HttpConnector<Failure>
 }
