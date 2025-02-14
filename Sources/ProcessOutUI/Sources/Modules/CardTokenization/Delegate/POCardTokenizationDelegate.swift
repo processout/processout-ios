@@ -7,6 +7,8 @@
 
 import ProcessOut
 
+// todo(andrii-vysotskyi): migrate to typed throws before releasing 5.0.0
+
 /// Card tokenization module delegate definition.
 @preconcurrency
 public protocol POCardTokenizationDelegate: AnyObject, Sendable {
