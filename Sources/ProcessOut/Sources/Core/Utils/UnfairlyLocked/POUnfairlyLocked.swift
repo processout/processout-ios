@@ -31,7 +31,7 @@ public final class POUnfairlyLocked<Value>: @unchecked Sendable {
         self
     }
 
-    public func withLock<R>(_ body: (inout Value) throws -> R) rethrows -> R {
+    public func withLock<R, E: Error>(_ body: (inout Value) throws(E) -> R) throws(E) -> R {
         defer {
             os_unfair_lock_unlock(unfairLock)
         }
@@ -47,8 +47,10 @@ public final class POUnfairlyLocked<Value>: @unchecked Sendable {
 
 extension POUnfairlyLocked where Value == Void {
 
-    public func withLock<R>(_ body: () throws -> R) rethrows -> R {
-        try withLock { _ in try body() }
+    public func withLock<R, E: Error>(_ body: () throws(E) -> R) throws(E) -> R {
+        try withLock { _ throws(E) in
+            try body()
+        }
     }
 }
 
