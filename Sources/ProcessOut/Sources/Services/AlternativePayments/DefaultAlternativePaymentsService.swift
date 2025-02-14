@@ -21,7 +21,9 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
 
     // MARK: - POAlternativePaymentsService
 
-    func tokenize(request: POAlternativePaymentTokenizationRequest) async throws -> POAlternativePaymentResponse {
+    func tokenize(
+        request: POAlternativePaymentTokenizationRequest
+    ) async throws(Failure) -> POAlternativePaymentResponse {
         let authenticationRequest = POAlternativePaymentAuthenticationRequest(
             url: try url(for: request),
             callback: request.callback,
@@ -30,7 +32,9 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
         return try await authenticate(request: authenticationRequest)
     }
 
-    func authorize(request: POAlternativePaymentAuthorizationRequest) async throws -> POAlternativePaymentResponse {
+    func authorize(
+        request: POAlternativePaymentAuthorizationRequest
+    ) async throws(Failure) -> POAlternativePaymentResponse {
         let authenticationRequest = POAlternativePaymentAuthenticationRequest(
             url: try url(for: request),
             callback: request.callback,
@@ -39,7 +43,9 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
         return try await authenticate(request: authenticationRequest)
     }
 
-    func authenticate(request: POAlternativePaymentAuthenticationRequest) async throws -> POAlternativePaymentResponse {
+    func authenticate(
+        request: POAlternativePaymentAuthenticationRequest
+    ) async throws(Failure) -> POAlternativePaymentResponse {
         do {
             let returnUrl = try await webSession.authenticate(
                 using: .init(
@@ -57,12 +63,12 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
         }
     }
 
-    func url(for request: POAlternativePaymentTokenizationRequest) throws -> URL {
+    func url(for request: POAlternativePaymentTokenizationRequest) throws(Failure) -> URL {
         let pathComponents = [request.customerId, request.customerTokenId, "redirect", request.gatewayConfigurationId]
         return try url(with: pathComponents, additionalData: request.additionalData)
     }
 
-    func url(for request: POAlternativePaymentAuthorizationRequest) throws -> URL {
+    func url(for request: POAlternativePaymentAuthorizationRequest) throws(Failure) -> URL {
         var pathComponents = [request.invoiceId, "redirect", request.gatewayConfigurationId]
         if let tokenId = request.customerTokenId {
             pathComponents += ["tokenized", tokenId]
@@ -95,7 +101,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
     }
 
     @available(*, deprecated)
-    func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse {
+    func alternativePaymentMethodResponse(url: URL) throws(Failure) -> POAlternativePaymentMethodResponse {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             let message = "Invalid or malformed alternative payment method URL response provided."
             throw POFailure(message: message, code: .generic(.mobile), underlyingError: nil)
@@ -130,7 +136,9 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
     // MARK: - Request
 
     /// - NOTE: Method prepends project ID to path components automatically.
-    private func url(with additionalPathComponents: [String], additionalData: [String: String]?) throws -> URL {
+    private func url(
+        with additionalPathComponents: [String], additionalData: [String: String]?
+    ) throws(Failure) -> URL {
         let configuration = configuration.wrappedValue
         guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
             preconditionFailure("Invalid base URL.")
@@ -148,7 +156,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
 
     // MARK: - Response
 
-    private func response(from url: URL) throws -> POAlternativePaymentResponse {
+    private func response(from url: URL) throws(Failure) -> POAlternativePaymentResponse {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             let message = "Invalid or malformed alternative payment method URL response provided."
             throw POFailure(message: message, code: .Mobile.generic, underlyingError: nil)

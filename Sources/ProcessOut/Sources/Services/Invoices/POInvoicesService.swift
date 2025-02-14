@@ -15,7 +15,7 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
     /// Requests information needed to continue existing payment or start new one.
     func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest
-    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails
+    ) async throws(Failure) -> PONativeAlternativePaymentMethodTransactionDetails
 
     /// Initiates native alternative payment with a given request.
     ///
@@ -23,26 +23,28 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
     /// `nativeApm` in response object to understand if additional data is required.
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse
+    ) async throws(Failure) -> PONativeAlternativePaymentMethodResponse
 
     /// Invoice details.
-    func invoice(request: POInvoiceRequest) async throws -> POInvoice
+    func invoice(request: POInvoiceRequest) async throws(Failure) -> POInvoice
 
     /// Performs invoice authorization with given request.
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws(Failure)
 
     /// Captures native alternative payament.
-    func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws
+    func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws(Failure)
 
     /// Creates invoice with given parameters.
     @_spi(PO)
-    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice
+    func createInvoice( // sourcery:completion: skip
+        request: POInvoiceCreationRequest
+    ) async throws(Failure) -> POInvoice
 }
 
 extension POInvoicesService {
 
     @_spi(PO)
-    public func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
+    public func createInvoice(request: POInvoiceCreationRequest) async throws(Failure) -> POInvoice {
         throw POFailure(code: .Mobile.generic)
     }
 }

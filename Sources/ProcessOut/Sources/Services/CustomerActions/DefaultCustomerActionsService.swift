@@ -26,7 +26,9 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     // MARK: - CustomerActionsService
 
-    func handle(request: CustomerActionRequest, threeDSService: PO3DS2Service) async throws -> String {
+    func handle(
+        request: CustomerActionRequest, threeDSService: PO3DS2Service
+    ) async throws(POFailure) -> String {
         do {
             try await semaphore.waitUnlessCancelled()
         } catch {
@@ -146,7 +148,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     // MARK: - Coding
 
-    private func decode<T: Decodable>(_ type: T.Type, from string: String) throws -> T {
+    private func decode<T: Decodable>(_ type: T.Type, from string: String) throws(POFailure) -> T {
         let paddedString = string.padding(
             toLength: string.count + (4 - string.count % 4) % 4, withPad: "=", startingAt: 0
         )
@@ -162,7 +164,9 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         }
     }
 
-    private func encode(requestParameters parameters: PO3DS2AuthenticationRequestParameters) throws -> String {
+    private func encode(
+        requestParameters parameters: PO3DS2AuthenticationRequestParameters
+    ) throws(POFailure) -> String {
         do {
             // Using JSONSerialization helps avoid creating boilerplate objects for JSON Web Key for coding.
             // Implementation doesn't validate JWK correctness and simply re-encodes given value.
@@ -188,7 +192,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
     }
 
     /// Encodes given response and creates token with it.
-    private func encode(authenticationResponse: AuthenticationResponse) throws -> String {
+    private func encode(authenticationResponse: AuthenticationResponse) throws(POFailure) -> String {
         do {
             return try Constants.tokenPrefix + encoder.encode(authenticationResponse).base64EncodedString()
         } catch {

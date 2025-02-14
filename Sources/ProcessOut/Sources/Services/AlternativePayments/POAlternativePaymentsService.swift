@@ -21,21 +21,27 @@ public protocol POAlternativePaymentsService: POService {
     /// - NOTE: The underlying implementation uses `ASWebAuthenticationSession`, which triggers its
     /// completion handler before dismissing the view controller. To avoid presentation issues, if you plan to perform
     /// any UI-related tasks immediately after this method completes, consider adding a delay.
-    func tokenize(request: POAlternativePaymentTokenizationRequest) async throws -> POAlternativePaymentResponse
+    func tokenize(
+        request: POAlternativePaymentTokenizationRequest
+    ) async throws(Failure) -> POAlternativePaymentResponse
 
     /// Authorizes invoice using given request.
     ///
     /// - NOTE: The underlying implementation uses `ASWebAuthenticationSession`, which triggers its
     /// completion handler before dismissing the view controller. To avoid presentation issues, if you plan to perform
     /// any UI-related tasks immediately after this method completes, consider adding a delay.
-    func authorize(request: POAlternativePaymentAuthorizationRequest) async throws -> POAlternativePaymentResponse
+    func authorize(
+        request: POAlternativePaymentAuthorizationRequest
+    ) async throws(Failure) -> POAlternativePaymentResponse
 
     /// Authenticates alternative payment using given request.
     ///
     /// - NOTE: The underlying implementation uses `ASWebAuthenticationSession`, which triggers its
     /// completion handler before dismissing the view controller. To avoid presentation issues, if you plan to perform
     /// any UI-related tasks immediately after this method completes, consider adding a delay.
-    func authenticate(request: POAlternativePaymentAuthenticationRequest) async throws -> POAlternativePaymentResponse
+    func authenticate(
+        request: POAlternativePaymentAuthenticationRequest
+    ) async throws(Failure) -> POAlternativePaymentResponse
 
     /// Authenticates alternative payment using given raw URL.
     ///
@@ -45,13 +51,13 @@ public protocol POAlternativePaymentsService: POService {
     @available(*, deprecated, message: "Use authenticate(request:) instead.")
     func authenticate(
         using url: URL, callback: POWebAuthenticationCallback?
-    ) async throws -> POAlternativePaymentResponse
+    ) async throws(Failure) -> POAlternativePaymentResponse
 
     /// Creates redirect URL for given tokenization request.
-    func url(for request: POAlternativePaymentTokenizationRequest) throws -> URL
+    func url(for request: POAlternativePaymentTokenizationRequest) throws(Failure) -> URL
 
     /// Creates redirect URL for given authorization request.
-    func url(for request: POAlternativePaymentAuthorizationRequest) throws -> URL
+    func url(for request: POAlternativePaymentAuthorizationRequest) throws(Failure) -> URL
 
     /// Creates the redirection URL for APM Payments and APM token creation.
     ///
@@ -64,7 +70,7 @@ public protocol POAlternativePaymentsService: POService {
     /// - Parameter url: url response that our checkout service sends back when the customer gets redirected.
     /// - Returns: response parsed from given url.
     @available(*, deprecated, message: "Use tokenize(request:) or authorize(request:) instead to process payment.")
-    func alternativePaymentMethodResponse(url: URL) throws -> POAlternativePaymentMethodResponse
+    func alternativePaymentMethodResponse(url: URL) throws(Failure) -> POAlternativePaymentMethodResponse
 }
 
 extension POAlternativePaymentsService {
@@ -77,7 +83,7 @@ extension POAlternativePaymentsService {
     @available(*, deprecated, message: "Use authenticate(request:) instead.")
     public func authenticate(
         using url: URL, callback: POWebAuthenticationCallback? = nil
-    ) async throws -> POAlternativePaymentResponse {
+    ) async throws(Failure) -> POAlternativePaymentResponse {
         try await authenticate(request: .init(url: url, callback: callback))
     }
 }

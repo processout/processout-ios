@@ -15,7 +15,7 @@ final class DefaultCustomersService: POCustomersService {
 
     // MARK: - POCustomersService
 
-    func createCustomer(request: POCustomerCreationRequest) async throws -> POCustomer {
+    func createCustomer(request: POCustomerCreationRequest) async throws(Failure) -> POCustomer {
         try await repository.createCustomer(request: request)
     }
 
