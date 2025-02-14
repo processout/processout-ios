@@ -9,10 +9,12 @@
 public typealias POCancellableType = POCancellable
 
 /// A protocol indicating that an activity or action supports cancellation.
+@available(*, deprecated)
 public protocol POCancellable: Sendable {
 
     /// Cancel the activity.
     func cancel()
 }
 
+@available(*, deprecated)
 extension Task: POCancellable { }
