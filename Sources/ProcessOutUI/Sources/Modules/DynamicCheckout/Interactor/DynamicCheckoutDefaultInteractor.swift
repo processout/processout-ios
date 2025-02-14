@@ -48,7 +48,7 @@ final class DynamicCheckoutDefaultInteractor:
         }
         send(event: .willStart)
         let task = Task { @MainActor in
-            do {
+            do throws(POFailure) {
                 let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
                 switch invoice.transaction?.status {
                 case .waiting:
@@ -252,7 +252,7 @@ final class DynamicCheckoutDefaultInteractor:
         state = .restarting(newState)
     }
 
-    private func restart(toRecoverPaymentProcessingError error: Error) {
+    private func restart(toRecoverPaymentProcessingError error: POFailure) {
         logger.info("Did fail to process payment: \(error)")
         guard !Task.isCancelled else {
             logger.debug("Associated task was cancelled, won't recover.")
@@ -262,16 +262,12 @@ final class DynamicCheckoutDefaultInteractor:
             logger.debug("Can only restart interactor during payment processing, ignored.")
             return
         }
-        guard let failure = error as? POFailure else {
-            setFailureState(error: error)
-            return
-        }
-        send(event: .didFailPayment(.init(paymentMethod: currentState.paymentMethod, failure: failure)))
-        if delegate?.dynamicCheckout(shouldContinueAfter: failure) != false {
+        send(event: .didFailPayment(.init(paymentMethod: currentState.paymentMethod, failure: error)))
+        if delegate?.dynamicCheckout(shouldContinueAfter: error) != false {
             let task = Task {
-                await continueRestart(reason: .failure(failure))
+                await continueRestart(reason: .failure(error))
             }
-            state = .restarting(.init(snapshot: currentState, task: task, failure: failure))
+            state = .restarting(.init(snapshot: currentState, task: task, failure: error))
         } else {
             setFailureState(error: error)
         }
@@ -282,7 +278,7 @@ final class DynamicCheckoutDefaultInteractor:
             logger.debug("Unable continue restart in unsupported state: \(state).")
             return
         }
-        do {
+        do throws(POFailure) {
             let shouldCreateNewInvoice = switch currentState.failure?.failureCode {
             case nil:
                 currentState.snapshot.shouldInvalidateInvoice
@@ -480,7 +476,7 @@ final class DynamicCheckoutDefaultInteractor:
 
     private func startPassKitPayment(method: PODynamicCheckoutPaymentMethod.ApplePay, startedState: State.Started) {
         let task = Task { @MainActor in
-            do {
+            do throws(POFailure) {
                 guard let delegate else {
                     throw POFailure(message: "Delegate must be set to authorize invoice.", code: .Mobile.generic)
                 }
@@ -585,7 +581,7 @@ final class DynamicCheckoutDefaultInteractor:
         startedState: State.Started
     ) {
         let task = Task { @MainActor in
-            do {
+            do throws(POFailure) {
                 let source: String, saveSource = shouldSavePaymentMethod ?? false
                 if saveSource {
                     source = method.configuration.gatewayConfigurationId
@@ -690,7 +686,7 @@ final class DynamicCheckoutDefaultInteractor:
         method: PODynamicCheckoutPaymentMethod.CustomerToken, startedState: State.Started
     ) {
         let task = Task { @MainActor in
-            do {
+            do throws(POFailure) {
                 var source = method.configuration.customerTokenId
                 if let redirectUrl = method.configuration.redirectUrl {
                     let request = POAlternativePaymentAuthenticationRequest(
@@ -726,7 +722,7 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Failure State
 
-    private func setFailureState(error: Error) {
+    private func setFailureState(error: POFailure) {
         guard !Task.isCancelled else {
             logger.debug("Associated task is cancelled, ignored.")
             return
@@ -736,16 +732,9 @@ final class DynamicCheckoutDefaultInteractor:
             return
         }
         logger.warn("Did fail to process dynamic checkout payment: '\(error)'.")
-        let failure: POFailure
-        if let error = error as? POFailure {
-            failure = error
-        } else {
-            logger.error("Unexpected error type: \(error)")
-            failure = POFailure(code: .Mobile.generic, underlyingError: error)
-        }
-        state = .failure(failure)
-        send(event: .didFail(failure: failure))
-        completion(.failure(failure))
+        state = .failure(error)
+        send(event: .didFail(failure: error))
+        completion(.failure(error))
     }
 
     // MARK: - Success State
@@ -845,7 +834,7 @@ final class DynamicCheckoutDefaultInteractor:
         saveSource: Bool,
         prefersEphemeralWebAuthenticationSession: Bool,
         startedState: State.Started
-    ) async throws {
+    ) async throws(POFailure) {
         guard let delegate else {
             throw POFailure(message: "Delegate must be set to authorize invoice.", code: .Mobile.generic)
         }
