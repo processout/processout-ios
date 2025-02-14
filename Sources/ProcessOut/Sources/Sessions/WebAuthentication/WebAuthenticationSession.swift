@@ -10,5 +10,5 @@ import Foundation
 protocol WebAuthenticationSession: Sendable {
 
     /// Begins a web authentication session.
-    func authenticate(using request: WebAuthenticationRequest) async throws -> URL
+    func authenticate(using request: WebAuthenticationRequest) async throws(POFailure) -> URL
 }
