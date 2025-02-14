@@ -11,7 +11,7 @@ final class DefaultApplePayAuthorizationSession: ApplePayAuthorizationSession {
 
     func authorize(
         request: PKPaymentRequest, delegate: ApplePayAuthorizationSessionDelegate?
-    ) async throws -> PKPayment {
+    ) async throws(POFailure) -> PKPayment {
         let controller = PKPaymentAuthorizationController(paymentRequest: request)
         let coordinator = ApplePayAuthorizationSessionCoordinator(delegate: delegate)
         controller.delegate = coordinator
