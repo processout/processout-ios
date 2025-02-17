@@ -18,13 +18,13 @@ final class DefaultWebAuthenticationSession:
 
     // MARK: - WebAuthenticationSession
 
-    func authenticate(using request: WebAuthenticationRequest) async throws -> URL {
+    func authenticate(using request: WebAuthenticationRequest) async throws(POFailure) -> URL {
         let operationProxy = WebAuthenticationOperationProxy(
             callback: request.callback, eventEmitter: eventEmitter
         )
-        return try await withTaskCancellationHandler(
-            operation: {
-                try await withCheckedThrowingContinuation { continuation in
+        return try await poWithTaskCancellationHandler(
+            operation: { () throws(POFailure) -> URL in
+                try await poWithCheckedContinuation { continuation in
                     let session = Self.createAuthenticationSession(with: request) { result in
                         operationProxy.setCompleted(with: result)
                     }

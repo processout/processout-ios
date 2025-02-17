@@ -20,7 +20,7 @@ struct AsyncUtilsTests {
         let operationDuration: TimeInterval = 1
 
         // When
-        let value = try await withTimeout(timeout, error: Failure.timeout) {
+        let value = try await withTimeout(timeout, error: Failure.timeout) { () throws(Failure) in
             try? await Task.sleep(for: .seconds(operationDuration))
             return "value"
         }
@@ -55,7 +55,7 @@ struct AsyncUtilsTests {
         let operationDuration: TimeInterval = 3
 
         // When
-        try await withTimeout(timeout, error: Failure.timeout) {
+        try await withTimeout(timeout, error: Failure.timeout) { () throws(Failure) in
             try? await Task.sleep(for: .seconds(operationDuration))
         }
     }
@@ -115,7 +115,7 @@ struct AsyncUtilsTests {
 
         // When
         try await retry(
-            operation: {
+            operation: { () throws(Failure) in
                 isOperationExecuted.withLock { $0 = true }
             },
             while: { _ in
@@ -156,7 +156,7 @@ struct AsyncUtilsTests {
 
         // When
         _ = try await retry(
-            operation: {
+            operation: { () throws(Failure) in
                 ""
             },
             while: { _ in
@@ -179,7 +179,7 @@ struct AsyncUtilsTests {
 
         // When
         _ = try await retry(
-            operation: {
+            operation: { () throws(Failure) in
                 operationStartsCount.withLock { $0 += 1 }
             },
             while: { _ in
@@ -230,7 +230,7 @@ struct AsyncUtilsTests {
 
         // When
         let value = try await retry(
-            operation: {
+            operation: { () throws(Failure) in
                 recentOperationValue.withLock { value in
                     value = UUID().uuidString
                     return value
@@ -255,7 +255,7 @@ struct AsyncUtilsTests {
 
         // When
         let value = try await retry(
-            operation: {
+            operation: { () throws(Failure) in
                 recentOperationValue.withLock { value in
                     value = UUID().uuidString
                     return value

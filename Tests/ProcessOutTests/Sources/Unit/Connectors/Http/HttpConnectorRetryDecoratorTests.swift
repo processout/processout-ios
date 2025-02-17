@@ -30,7 +30,7 @@ struct HttpConnectorRetryDecoratorTests {
         var previousIdempotencyKey: String?
 
         // Then
-        mock.executeFromClosure = { request in
+        mock.executeFromClosure = { request throws(HttpConnectorFailure) in
             let request = request as! HttpConnectorRequest<VoidCodable> // swiftlint:disable:this force_cast
             let idempotencyKey = request.headers["Idempotency-Key"]
             #expect(idempotencyKey != nil)
@@ -56,7 +56,7 @@ struct HttpConnectorRetryDecoratorTests {
         ]
 
         // Then
-        mock.executeFromClosure = { request in
+        mock.executeFromClosure = { request throws(HttpConnectorFailure) in
             // Then
             let request = request as! HttpConnectorRequest<VoidCodable> // swiftlint:disable:this force_cast
             #expect(request.headers["Idempotency-Key"] == nil)
@@ -72,5 +72,5 @@ struct HttpConnectorRetryDecoratorTests {
     // MARK: - Private Properties
 
     private let mock: MockHttpConnector
-    private let sut: HttpConnector
+    private let sut: any HttpConnector<HttpConnectorFailure>
 }

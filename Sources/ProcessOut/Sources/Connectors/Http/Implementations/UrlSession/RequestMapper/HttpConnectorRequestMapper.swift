@@ -9,8 +9,10 @@ import Foundation
 
 protocol HttpConnectorRequestMapper: Sendable {
 
+    typealias Failure = HttpConnectorFailure
+
     /// Transforms given `HttpConnectorRequest` to `URLRequest`.
-    func urlRequest(from request: HttpConnectorRequest<some Decodable>) async throws -> URLRequest
+    func urlRequest(from request: HttpConnectorRequest<some Decodable>) async throws(Failure) -> URLRequest
 
     /// Replaces current configuration.
     func replace(configuration: HttpConnectorConfiguration)

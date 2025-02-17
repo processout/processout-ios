@@ -14,7 +14,7 @@ final class ProcessOutHttpConnectorBuilder {
         configuration: HttpConnectorConfiguration,
         deviceMetadataProvider: DeviceMetadataProvider,
         logger: POLogger
-    ) -> HttpConnector {
+    ) -> any HttpConnector<POFailure> {
         let requestMapper = DefaultHttpConnectorRequestMapper(
             configuration: configuration,
             encoder: encoder,

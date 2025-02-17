@@ -10,20 +10,25 @@ import Foundation
 /// Transforms errors from underlying connector to `POFailure` instances.
 final class HttpConnectorErrorDecorator: HttpConnector {
 
-    init(connector: HttpConnector, failureMapper: HttpConnectorFailureMapper, logger: POLogger) {
+    init(
+        connector: any HttpConnector<HttpConnectorFailure>,
+        failureMapper: HttpConnectorFailureMapper,
+        logger: POLogger
+    ) {
         self.connector = connector
         self.failureMapper = failureMapper
         self.logger = logger
     }
 
-    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value> {
+    // MARK: - HttpConnector
+
+    typealias Failure = POFailure
+
+    func execute<Value>(request: HttpConnectorRequest<Value>) async throws(Failure) -> HttpConnectorResponse<Value> {
         do {
             return try await connector.execute(request: request)
-        } catch let error as HttpConnectorFailure {
-            throw failureMapper.failure(from: error)
         } catch {
-            logger.error("Unexpected error: \(error).")
-            throw POFailure(message: "Something went wrong.", code: .Mobile.internal, underlyingError: error)
+            throw failureMapper.failure(from: error)
         }
     }
 
@@ -33,7 +38,7 @@ final class HttpConnectorErrorDecorator: HttpConnector {
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnector
+    private let connector: any HttpConnector<HttpConnectorFailure>
     private let failureMapper: HttpConnectorFailureMapper
     private let logger: POLogger
 }

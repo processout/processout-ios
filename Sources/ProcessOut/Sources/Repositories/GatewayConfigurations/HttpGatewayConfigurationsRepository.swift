@@ -9,13 +9,13 @@ import Foundation
 
 final class HttpGatewayConfigurationsRepository: POGatewayConfigurationsRepository {
 
-    init(connector: HttpConnector) {
+    init(connector: any HttpConnector<Failure>) {
         self.connector = connector
     }
 
     // MARK: - POGatewayConfigurationsRepository
 
-    func all(request: POAllGatewayConfigurationsRequest) async throws -> POAllGatewayConfigurationsResponse {
+    func all(request: POAllGatewayConfigurationsRequest) async throws(Failure) -> POAllGatewayConfigurationsResponse {
         var query = request.paginationOptions?.queryItems ?? [:]
         query["filter"] = request.filter?.rawValue
         query["with_disabled"] = request.includeDisabled
@@ -26,7 +26,7 @@ final class HttpGatewayConfigurationsRepository: POGatewayConfigurationsReposito
         return try await connector.execute(request: request)
     }
 
-    func find(request: POFindGatewayConfigurationRequest) async throws -> POGatewayConfiguration {
+    func find(request: POFindGatewayConfigurationRequest) async throws(Failure) -> POGatewayConfiguration {
         struct Response: Decodable, Sendable {
             let gatewayConfiguration: POGatewayConfiguration
         }
@@ -41,5 +41,5 @@ final class HttpGatewayConfigurationsRepository: POGatewayConfigurationsReposito
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnector
+    private let connector: any HttpConnector<Failure>
 }

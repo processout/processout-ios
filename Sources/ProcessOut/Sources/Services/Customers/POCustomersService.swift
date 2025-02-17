@@ -9,5 +9,5 @@
 public protocol POCustomersService: POService {
 
     /// Creates customer with given parameters.
-    func createCustomer(request: POCustomerCreationRequest) async throws -> POCustomer
+    func createCustomer(request: POCustomerCreationRequest) async throws(Failure) -> POCustomer
 }

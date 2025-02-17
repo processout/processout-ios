@@ -11,5 +11,7 @@ protocol CustomerActionsService: POService {
     /// - Parameters:
     ///   - request: customer action request.
     ///   - threeDSService: delegate that would perform 3DS2 handling
-    func handle(request: CustomerActionRequest, threeDSService: PO3DS2Service) async throws -> String
+    func handle(
+        request: CustomerActionRequest, threeDSService: PO3DS2Service
+    ) async throws(Failure) -> String
 }

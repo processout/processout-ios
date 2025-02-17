@@ -16,7 +16,7 @@ actor ThrottledWebAuthenticationSessionDecorator: WebAuthenticationSession {
 
     // MARK: - WebAuthenticationSession
 
-    func authenticate(using request: WebAuthenticationRequest) async throws -> URL {
+    func authenticate(using request: WebAuthenticationRequest) async throws(POFailure) -> URL {
         do {
             try await semaphore.waitUnlessCancelled()
         } catch {

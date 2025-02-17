@@ -12,7 +12,7 @@ final class UrlSessionHttpConnector: HttpConnector {
 
     init(
         sessionConfiguration: URLSessionConfiguration,
-        requestMapper: HttpConnectorRequestMapper,
+        requestMapper: any HttpConnectorRequestMapper,
         decoder: JSONDecoder,
         logger: POLogger
     ) {
@@ -24,9 +24,13 @@ final class UrlSessionHttpConnector: HttpConnector {
         urlResponseFormatter = UrlResponseFormatter(includesHeaders: false)
     }
 
-    // MARK: - HttpConnectorType
+    // MARK: - HttpConnector
 
-    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value> {
+    typealias Failure = HttpConnectorFailure
+
+    func execute<Value>(
+        request: HttpConnectorRequest<Value>
+    ) async throws(Failure) -> HttpConnectorResponse<Value> {
         let sessionRequest = try await requestMapper.urlRequest(from: request)
         var logger = self.logger
         logger[attributeKey: "RequestId"] = request.id
@@ -63,7 +67,7 @@ final class UrlSessionHttpConnector: HttpConnector {
 
     private func decodeResponse<Value: Decodable>(
         _ valueType: Value.Type, from data: Data, response: URLResponse, logger: POLogger
-    ) throws -> HttpConnectorResponse<Value> {
+    ) throws(Failure) -> HttpConnectorResponse<Value> {
         guard let response = response as? HTTPURLResponse else {
             logger.error("Unexpected url response type.")
             throw Failure(code: .internal, underlyingError: nil)
@@ -76,10 +80,12 @@ final class UrlSessionHttpConnector: HttpConnector {
                 let headers = response.allHeaderFields as? [String: String] ?? [:]
                 return HttpConnectorResponse(value: value, headers: headers)
             }
-            let serverCode = try decoder.decode(HttpConnectorFailure.Server.self, from: data)
+            let serverCode = try decoder.decode(Failure.Server.self, from: data)
             throw Failure(code: .server(serverCode, statusCode: response.statusCode), underlyingError: nil)
-        } catch let error as DecodingError {
-            logger.error("Did fail to decode response: '\(error)'")
+        } catch let error as Failure {
+            throw error
+        } catch {
+            logger.error("Did fail to decode response: '\(error)'.")
             throw Failure(code: .decoding(statusCode: response.statusCode), underlyingError: error)
         }
     }

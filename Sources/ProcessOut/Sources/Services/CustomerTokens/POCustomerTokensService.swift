@@ -18,20 +18,22 @@ public protocol POCustomerTokensService: POService { // sourcery: AutoCompletion
     /// Assigns new source to existing customer token and optionally verifies it.
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
-    ) async throws -> POCustomerToken
+    ) async throws(Failure) -> POCustomerToken
 
     /// Deletes customer token.
-    func deleteCustomerToken(request: PODeleteCustomerTokenRequest) async throws
+    func deleteCustomerToken(request: PODeleteCustomerTokenRequest) async throws(Failure)
 
     /// Creates customer token using given request.
     @_spi(PO)
-    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken
+    func createCustomerToken( // sourcery:completion: skip
+        request: POCreateCustomerTokenRequest
+    ) async throws(Failure) -> POCustomerToken
 }
 
 extension POCustomerTokensService {
 
     @_spi(PO)
-    public func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
+    public func createCustomerToken(request: POCreateCustomerTokenRequest) async throws(Failure) -> POCustomerToken {
         throw POFailure(code: .Mobile.generic)
     }
 }

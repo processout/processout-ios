@@ -19,21 +19,21 @@ final class DefaultInvoicesService: POInvoicesService {
 
     func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest
-    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
+    ) async throws(Failure) -> PONativeAlternativePaymentMethodTransactionDetails {
         try await repository.nativeAlternativePaymentMethodTransactionDetails(request: request)
     }
 
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse {
+    ) async throws(Failure) -> PONativeAlternativePaymentMethodResponse {
         try await repository.initiatePayment(request: request)
     }
 
-    func invoice(request: POInvoiceRequest) async throws -> POInvoice {
+    func invoice(request: POInvoiceRequest) async throws(Failure) -> POInvoice {
         try await repository.invoice(request: request)
     }
 
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws(Failure) {
         do {
             try await _authorizeInvoice(request: request, threeDSService: threeDSService)
         } catch {
@@ -43,10 +43,10 @@ final class DefaultInvoicesService: POInvoicesService {
         await threeDSService.clean()
     }
 
-    func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws {
+    func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws(Failure) {
         let captureTimeout = min(request.timeout ?? .greatestFiniteMagnitude, Constants.maximumCaptureTimeout)
         _ = try await retry(
-            operation: { [repository] in
+            operation: { [repository] () throws(Failure) -> PONativeAlternativePaymentMethodResponse in
                 let request = NativeAlternativePaymentCaptureRequest(
                     invoiceId: request.invoiceId, source: request.gatewayConfigurationId
                 )
@@ -56,13 +56,11 @@ final class DefaultInvoicesService: POInvoicesService {
                 switch result {
                 case let .success(response):
                     return response.state != .captured
-                case let .failure(failure as POFailure):
+                case let .failure(failure):
                     let retriableCodes: [POFailureCode] = [
                         .Mobile.networkUnreachable, .Mobile.timeout, .Mobile.internal
                     ]
                     return retriableCodes.contains(failure.failureCode)
-                case .failure:
-                    return false
                 }
             },
             timeout: captureTimeout,
@@ -73,7 +71,7 @@ final class DefaultInvoicesService: POInvoicesService {
         )
     }
 
-    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
+    func createInvoice(request: POInvoiceCreationRequest) async throws(Failure) -> POInvoice {
         try await repository.createInvoice(request: request)
     }
 
@@ -91,7 +89,9 @@ final class DefaultInvoicesService: POInvoicesService {
 
     // MARK: - Private Methods
 
-    private func _authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
+    private func _authorizeInvoice(
+        request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service
+    ) async throws(Failure) {
         guard let customerAction = try await repository.authorizeInvoice(request: request) else {
             return
         }

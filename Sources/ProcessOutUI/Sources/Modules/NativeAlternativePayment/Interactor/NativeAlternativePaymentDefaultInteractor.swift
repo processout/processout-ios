@@ -44,7 +44,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         logger.info("Starting native alternative payment.")
         send(event: .willStart)
         let task = Task { @MainActor in
-            do {
+            do throws(POFailure) {
                 let request = PONativeAlternativePaymentMethodTransactionDetailsRequest(
                     invoiceId: configuration.invoiceId,
                     gatewayConfigurationId: configuration.gatewayConfigurationId
@@ -123,7 +123,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         let task = Task { @MainActor in
-            do {
+            do throws(POFailure) {
                 let request = PONativeAlternativePaymentMethodRequest(
                     invoiceId: configuration.invoiceId,
                     gatewayConfigurationId: configuration.gatewayConfigurationId,
@@ -304,7 +304,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         )
         var newState = currentState
         newState.task = Task { @MainActor in
-            do {
+            do throws(POFailure) {
                 try await invoicesService.captureNativeAlternativePayment(request: request)
                 setCapturedState(paymentProvider: currentState.paymentProvider)
             } catch {
@@ -334,7 +334,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func customerAction(
         with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
         gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
-    ) async throws -> NativeAlternativePaymentInteractorState.CaptureCustomerAction? {
+    ) async throws(POFailure) -> NativeAlternativePaymentInteractorState.CaptureCustomerAction? {
         // todo(andrii-vysotskyi): decide if `null` customer action should be allowed
         let message = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
         guard let message else {
@@ -382,12 +382,8 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Submission Recovery
 
-    private func attemptRecoverSubmissionError(_ error: Error, replaceErrorMessages: Bool) {
+    private func attemptRecoverSubmissionError(_ error: POFailure, replaceErrorMessages: Bool) {
         logger.info("Did fail to submit parameters: \(error)")
-        guard let failure = error as? POFailure else {
-            setFailureState(error: error)
-            return
-        }
         var newState: State.Started
         switch state {
         case let .started(state):
@@ -398,12 +394,12 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.debug("Ignoring attempt to recover submission error from unsupported state: \(state).")
             return
         }
-        let invalidFields = failure.invalidFields.map { invalidFields in
+        let invalidFields = error.invalidFields.map { invalidFields in
             Dictionary(grouping: invalidFields, by: \.name).compactMapValues(\.first)
         }
         guard let invalidFields = invalidFields, !invalidFields.isEmpty else {
             logger.debug("Submission error is not recoverable, aborting.")
-            setFailureState(error: failure)
+            setFailureState(error: error)
             return
         }
         for (offset, parameter) in newState.parameters.enumerated() {
@@ -418,7 +414,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             newState.parameters[offset].recentErrorMessage = errorMessage
         }
         state = .started(newState)
-        send(event: .didFailToSubmitParameters(failure: failure))
+        send(event: .didFailToSubmitParameters(failure: error))
         logger.debug("One or more parameters are not valid: \(invalidFields), waiting for parameters to update.")
     }
 
@@ -437,7 +433,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Failure State
 
-    private func setFailureState(error: Error) {
+    private func setFailureState(error: POFailure) {
         guard !state.isSink else {
             logger.debug("Already in a sink state, ignoring attempt to set failure state with: \(error).")
             return
@@ -598,7 +594,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func validatedValues(
         for parameters: [NativeAlternativePaymentInteractorState.Parameter]
-    ) throws -> [String: String] {
+    ) throws(POFailure) -> [String: String] {
         var validatedValues: [String: String] = [:]
         var invalidFields: [POFailure.InvalidField] = []
         parameters.forEach { parameter in

@@ -17,8 +17,12 @@ struct ThrottledWebAuthenticationSessionDecoratorTests {
     func authenticate_allowsOneAuthenticationAtTime() async throws {
         // Given
         let mockSession = MockWebAuthenticationSession()
-        mockSession.authenticateFromClosure = { _ in
-            try await Task.sleep(for: .seconds(5))
+        mockSession.authenticateFromClosure = { _ throws(POFailure) in
+            do {
+                try await Task.sleep(for: .seconds(5))
+            } catch {
+                throw POFailure(code: .Mobile.cancelled)
+            }
             return URL(string: "response.com")!
         }
         let sut = ThrottledWebAuthenticationSessionDecorator(session: mockSession)

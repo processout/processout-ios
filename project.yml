@@ -70,7 +70,7 @@ targets:
   ProcessOutTests:
     type: bundle.unit-test
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "18.0"
     settings:
       TARGET_ROOT: $(PROJECT_DIR)/Tests/ProcessOutTests
     dependencies:
@@ -79,7 +79,7 @@ targets:
   ProcessOutUITests:
     type: bundle.unit-test
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "18.0"
     settings:
       TARGET_ROOT: $(PROJECT_DIR)/Tests/ProcessOutUITests
     dependencies:
@@ -104,7 +104,7 @@ targets:
   ProcessOutCheckout3DSTests:
     type: bundle.unit-test
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "18.0"
     settings:
       TARGET_ROOT: $(PROJECT_DIR)/Tests/ProcessOutCheckout3DSTests
     dependencies:
