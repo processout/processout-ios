@@ -16,7 +16,6 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
     public let source: String
 
     /// If you want us to save the payment source by creating a customer token during the authorization.
-    /// Only supported with card payment source.
     public let saveSource: Bool
 
     /// Boolean value indicating if authorization is incremental. Default value is `false`.
@@ -38,7 +37,8 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
 
     /// Can be used to to provide specific ids to indicate which of items provided in invoice details list
     /// are subject to capture.
-    public let invoiceDetailIds: [String]?
+    @available(*, deprecated, message: "Only available when capturing invoice.")
+    public let invoiceDetailIds: [String]? = nil // sourcery:coding: skip
 
     /// Allows to specify if transaction blocking due to MasterCard Merchant Advice Code should be applied or not.
     /// Default is `false`.
@@ -48,6 +48,7 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
     public let initialSchemeTransactionId: String?
 
     /// You can set this property to arrange for the payment to be captured automatically after a time delay.
+    /// - NOTE: Instead of using this property set invoice auto capture date instead.
     public let autoCaptureAt: Date?
 
     /// Amount of money to capture when partial captures are available. Note that this only applies if you are
@@ -56,8 +57,9 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
     public var captureAmount: Decimal?
 
     /// Set to true if you want to authorize payment without capturing. Note that you must capture the payment on
-    /// the server if you use this option. Default value is `true`.
-    public let authorizeOnly: Bool
+    /// the server if you use this option. Value is always `true`.
+    @available(*, deprecated, message: "Only available when capturing invoice.")
+    public let authorizeOnly = true // sourcery:coding: skip
 
     /// Setting this property to `true` allows to prefer doing an authorization, but to fall back to
     /// a sale payment if separation between authorization and capture is not available. Default
@@ -88,6 +90,45 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
         source: String,
         saveSource: Bool = false,
         incremental: Bool = false,
+        preferredScheme: POCardScheme? = nil,
+        thirdPartySdkVersion: String? = nil,
+        overrideMacBlocking: Bool = false,
+        initialSchemeTransactionId: String? = nil,
+        autoCaptureAt: Date? = nil,
+        captureAmount: Decimal? = nil,
+        allowFallbackToSale: Bool = false,
+        clientSecret: String? = nil,
+        metadata: [String: String]? = nil,
+        webAuthenticationCallback: POWebAuthenticationCallback? = nil,
+        prefersEphemeralWebAuthenticationSession: Bool = true
+    ) {
+        self.invoiceId = invoiceId
+        self.source = source
+        self.saveSource = saveSource
+        self.incremental = incremental
+        self._preferredScheme = .init(wrappedValue: preferredScheme?.rawValue)
+        self.thirdPartySdkVersion = thirdPartySdkVersion
+        self.overrideMacBlocking = overrideMacBlocking
+        self.initialSchemeTransactionId = initialSchemeTransactionId
+        self.autoCaptureAt = autoCaptureAt
+        self._captureAmount = .init(value: captureAmount)
+        self.allowFallbackToSale = allowFallbackToSale
+        self.clientSecret = clientSecret
+        self.metadata = metadata
+        self.webAuthenticationCallback = webAuthenticationCallback
+        self.prefersEphemeralWebAuthenticationSession = prefersEphemeralWebAuthenticationSession
+    }
+}
+
+extension POInvoiceAuthorizationRequest {
+
+    @available(*, deprecated)
+    @_disfavoredOverload
+    public init(
+        invoiceId: String,
+        source: String,
+        saveSource: Bool = false,
+        incremental: Bool = false,
         enableThreeDS2 _: Bool = true,
         preferredScheme: String? = nil,
         thirdPartySdkVersion: String? = nil,
@@ -109,12 +150,10 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
         self.incremental = incremental
         self._preferredScheme = .init(wrappedValue: preferredScheme)
         self.thirdPartySdkVersion = thirdPartySdkVersion
-        self.invoiceDetailIds = invoiceDetailIds
         self.overrideMacBlocking = overrideMacBlocking
         self.initialSchemeTransactionId = initialSchemeTransactionId
         self.autoCaptureAt = autoCaptureAt
         self._captureAmount = .init(value: captureAmount)
-        self.authorizeOnly = authorizeOnly
         self.allowFallbackToSale = allowFallbackToSale
         self.clientSecret = clientSecret
         self.metadata = metadata
