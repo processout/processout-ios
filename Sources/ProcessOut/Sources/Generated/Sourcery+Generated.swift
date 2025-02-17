@@ -9,6 +9,7 @@ import UIKit
 extension DeviceMetadata {
 
     enum CodingKeys: String, CodingKey {
+        case id
         case appLanguage
         case appScreenWidth
         case appScreenHeight
@@ -96,12 +97,10 @@ extension POInvoiceAuthorizationRequest {
         case enableThreeDS2 = "enable_three_d_s_2"
         case preferredScheme
         case thirdPartySdkVersion
-        case invoiceDetailIds
         case overrideMacBlocking
         case initialSchemeTransactionId
         case autoCaptureAt
         case captureAmount
-        case authorizeOnly
         case allowFallbackToSale
         case metadata
     }
