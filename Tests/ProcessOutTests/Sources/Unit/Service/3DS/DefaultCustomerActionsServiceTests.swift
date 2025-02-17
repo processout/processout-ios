@@ -387,7 +387,7 @@ struct DefaultThreeDSServiceTests {
     @Test
     func handle_whenRedirectFails_propagatesError() async throws {
         // Given
-        webSession.authenticateFromClosure = { _ in
+        webSession.authenticateFromClosure = { _ throws(POFailure) in
             throw POFailure(code: .init(rawValue: "test-error"))
         }
 
@@ -460,7 +460,7 @@ struct DefaultThreeDSServiceTests {
     @Test
     func handle_whenFingerprintFails_propagatesError() async throws {
         // Given
-        webSession.authenticateFromClosure = { _ in
+        webSession.authenticateFromClosure = { _ throws(POFailure) in
             throw POFailure(code: .init(rawValue: "test-error"))
         }
         let customerAction = _CustomerAction(type: .fingerprint, value: "example.com")
@@ -486,7 +486,7 @@ struct DefaultThreeDSServiceTests {
     @Test
     func handle_whenFingerprintFailsWithTimeoutError_succeeds() async throws {
         // Given
-        webSession.authenticateFromClosure = { _ in
+        webSession.authenticateFromClosure = { _ throws(POFailure) in
             throw POFailure(code: .Mobile.timeout)
         }
         let customerAction = _CustomerAction(type: .fingerprint, value: "example.com")
@@ -511,8 +511,12 @@ struct DefaultThreeDSServiceTests {
     @Test
     func handle_whenFingerprintTakesTooLong_succeedsWithTimeout() async throws {
         // Given
-        webSession.authenticateFromClosure = { _ in
-            try await Task.sleep(seconds: 15)
+        webSession.authenticateFromClosure = { _ throws(POFailure) in
+            do {
+                try await Task.sleep(seconds: 15)
+            } catch {
+                throw POFailure(code: .Mobile.cancelled)
+            }
             return URL(string: "test://return")!
         }
         let customerAction = _CustomerAction(type: .fingerprint, value: "example.com")

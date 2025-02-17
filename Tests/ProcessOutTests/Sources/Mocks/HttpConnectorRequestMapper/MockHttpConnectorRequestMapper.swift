@@ -14,13 +14,15 @@ final class MockHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         lock.withLock { _urlRequestFromCallsCount }
     }
 
-    var urlRequestFromClosure: (() throws -> URLRequest)! {
+    var urlRequestFromClosure: (() throws(Failure) -> URLRequest)! {
         get { lock.withLock { _urlRequestFromClosure } }
         set { lock.withLock { _urlRequestFromClosure = newValue } }
     }
 
-    func urlRequest(from request: HttpConnectorRequest<some Decodable>) throws -> URLRequest {
-        try lock.withLock {
+    // MARK: - HttpConnectorRequestMapper
+
+    func urlRequest(from request: HttpConnectorRequest<some Decodable>) throws(Failure) -> URLRequest {
+        try lock.withLock { () throws(Failure) in
             _urlRequestFromCallsCount += 1
             return try _urlRequestFromClosure()
         }
@@ -35,5 +37,5 @@ final class MockHttpConnectorRequestMapper: HttpConnectorRequestMapper {
     private let lock = POUnfairlyLocked()
 
     private nonisolated(unsafe) var _urlRequestFromCallsCount = 0
-    private nonisolated(unsafe) var _urlRequestFromClosure: (() throws -> URLRequest)!
+    private nonisolated(unsafe) var _urlRequestFromClosure: (() throws(Failure) -> URLRequest)!
 }

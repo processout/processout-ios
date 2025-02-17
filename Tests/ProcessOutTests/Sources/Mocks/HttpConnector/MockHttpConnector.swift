@@ -13,14 +13,16 @@ final class MockHttpConnector: HttpConnector {
         lock.withLock { _executeCallsCount }
     }
 
-    var executeFromClosure: ((Any) async throws -> Any)! {
+    var executeFromClosure: ((Any) async throws(Failure) -> Any)! {
         get { lock.withLock { _executeFromClosure } }
         set { lock.withLock { _executeFromClosure = newValue } }
     }
 
     // MARK: - HttpConnector
 
-    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value> {
+    typealias Failure = HttpConnectorFailure
+
+    func execute<Value>(request: HttpConnectorRequest<Value>) async throws(Failure) -> HttpConnectorResponse<Value> {
         let executeFromClosure = lock.withLock {
             _executeCallsCount += 1
             return _executeFromClosure
@@ -38,5 +40,5 @@ final class MockHttpConnector: HttpConnector {
     private let lock = POUnfairlyLocked()
 
     private nonisolated(unsafe) var _executeCallsCount = 0
-    private nonisolated(unsafe) var _executeFromClosure: ((Any) async throws -> Any)!
+    private nonisolated(unsafe) var _executeFromClosure: ((Any) async throws(Failure) -> Any)!
 }

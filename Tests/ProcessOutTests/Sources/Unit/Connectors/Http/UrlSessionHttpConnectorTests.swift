@@ -34,7 +34,7 @@ final class UrlSessionHttpConnectorTests {
     func execute_whenRequestMapperFailsWithHttpConnectorFailure_failsWithSameFailure() async throws {
         // Given
         let codingError = NSError(domain: "", code: 1234)
-        requestMapper.urlRequestFromClosure = {
+        requestMapper.urlRequestFromClosure = { () throws(HttpConnectorFailure) in
             throw HttpConnectorFailure(code: .encoding, underlyingError: codingError)
         }
 
