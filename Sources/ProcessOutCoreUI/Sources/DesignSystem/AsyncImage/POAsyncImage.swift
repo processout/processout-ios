@@ -17,7 +17,7 @@ public struct POAsyncImage<Content: View>: View {
     ///   and returns the view to display for the specified phase.
     public init(
         id: AnyHashable,
-        image: @Sendable @escaping () async throws -> Image?,
+        @_inheritActorContext image: @Sendable @escaping () async throws -> Image?,
         transaction: Transaction,
         @ViewBuilder content: @escaping (POAsyncImagePhase) -> Content
     ) {
