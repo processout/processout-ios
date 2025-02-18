@@ -10,7 +10,7 @@ import Foundation
 struct DeviceMetadata: Encodable, Sendable { // sourcery: AutoCodingKeys
 
     /// Current device identifier.
-    let id: String? // sourcery:coding: skip
+    let id: String?
 
     /// Installation identifier. Value changes if host application is reinstalled.
     let installationId: String? // sourcery:coding: skip

@@ -11,7 +11,7 @@ struct StubDeviceMetadataProvider: DeviceMetadataProvider {
 
     var deviceMetadata: DeviceMetadata {
         DeviceMetadata(
-            id: "",
+            id: "id",
             installationId: nil,
             systemVersion: "4",
             model: "model",
