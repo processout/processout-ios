@@ -126,7 +126,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
         }
         .padding(
             .init(
-                top: POSpacing.medium,
+                top: POSpacing.large,
                 leading: POSpacing.medium,
                 bottom: POSpacing.extraLarge,
                 trailing: POSpacing.medium
@@ -162,19 +162,16 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
     private func cardDetails(with configuration: Configuration.Card?) -> some View {
         VStack(alignment: .leading, spacing: POSpacing.small) {
             configuration?.number
-                .tracking(card.number.typography.font.pointSize * 0.05)
                 .textStyle(card.number)
                 .animation(.default, value: configuration?.number == nil)
                 .frame(maxHeight: .infinity, alignment: .bottom)
             HStack(alignment: .top, spacing: 0) {
                 configuration?.cardholderName?
-                    .tracking(card.cardholderName.typography.font.pointSize * 0.05)
                     .textStyle(card.cardholderName)
                     .lineLimit(2)
                     .layoutPriority(1)
                 Spacer(minLength: POSpacing.large)
                 configuration?.expiration?
-                    .tracking(card.expiration.typography.font.pointSize * 0.05)
                     .textStyle(card.expiration)
                     .layoutPriority(1)
                 Spacer(minLength: 0)

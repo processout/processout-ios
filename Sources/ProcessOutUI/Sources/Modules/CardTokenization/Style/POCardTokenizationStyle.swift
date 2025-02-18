@@ -73,14 +73,14 @@ extension POCardTokenizationStyle {
     /// Default card tokenization style.
     public static var `default`: POCardTokenizationStyle {
         POCardTokenizationStyle(
-            title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
-            sectionTitle: POTextStyle(color: Color(poResource: .Text.primary), typography: .label1),
+            title: POTextStyle(color: Color.Text.primary, typography: .Text.s20(weight: .medium)),
+            sectionTitle: POTextStyle(color: Color.Input.Label.default, typography: .Text.s14(weight: .medium)),
             input: .medium,
             radioButton: .radio,
-            errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
-            backgroundColor: Color(poResource: .Surface.default),
+            errorDescription: POTextStyle(color: Color.Input.Label.error, typography: .Text.s12(weight: .regular)),
+            backgroundColor: Color.Surface.primary,
             actionsContainer: .default,
-            separatorColor: Color(poResource: .Border.subtle)
+            separatorColor: Color.Border.primary
         )
     }
 }

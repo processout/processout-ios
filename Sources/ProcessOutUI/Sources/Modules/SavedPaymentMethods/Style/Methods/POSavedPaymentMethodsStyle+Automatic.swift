@@ -15,18 +15,18 @@ extension POSavedPaymentMethodsStyle where Self == PODefaultSavedPaymentMethodsS
     public static var automatic: PODefaultSavedPaymentMethodsStyle {
         PODefaultSavedPaymentMethodsStyle(
             toolbar: .init(
-                title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
-                dividerColor: Color(poResource: .Border.subtle),
-                backgroundColor: Color(poResource: .Surface.default)
+                title: POTextStyle(color: Color.Text.primary, typography: .Text.s20(weight: .medium)),
+                dividerColor: Color.Border.primary,
+                backgroundColor: Color.Surface.primary
             ),
             content: .init(
-                border: .regular(color: Color(poResource: .Border.subtle)),
-                dividerColor: Color(poResource: .Border.subtle)
+                border: .regular(color: Color.Border.primary),
+                dividerColor: Color.Border.primary
             ),
             progressView: .circular,
             messageView: .toast,
             cancelButton: .ghost,
-            backgroundColor: Color(poResource: .Surface.default)
+            backgroundColor: Color.Surface.primary
         )
     }
 }

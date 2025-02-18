@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 06.06.2023.
 //
 
-import UIKit
+import SwiftUI
 
 /// Describes radio button style in a particular state, for example when selected.
 public struct PORadioButtonStateStyle: Sendable {
@@ -16,9 +16,13 @@ public struct PORadioButtonStateStyle: Sendable {
     /// Radio button's value style.
     public let value: POTextStyle
 
+    /// Background color.
+    public let backgroundColor: Color
+
     /// Creates state style.
-    public init(knob: PORadioButtonKnobStateStyle, value: POTextStyle) {
+    public init(knob: PORadioButtonKnobStateStyle, value: POTextStyle, backgroundColor: Color = .clear) {
         self.knob = knob
         self.value = value
+        self.backgroundColor = backgroundColor
     }
 }

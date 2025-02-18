@@ -39,9 +39,13 @@ public struct POCheckboxToggleStateStyle: Sendable {
     /// Text style.
     public let value: POTextStyle
 
+    /// Background color.
+    public let backgroundColor: Color
+
     /// Creates style instance.
-    public init(checkmark: Checkmark, value: POTextStyle) {
+    public init(checkmark: Checkmark, value: POTextStyle, backgroundColor: Color = .clear) {
         self.checkmark = checkmark
         self.value = value
+        self.backgroundColor = backgroundColor
     }
 }
