@@ -16,6 +16,9 @@ public protocol POImagesRepository: PORepository {
 
     /// Attempts to download images at given URLs.
     func images(at urls: [URL], scale: CGFloat) async -> [URL: UIImage]
+
+    /// Downloads image for given resource.
+    func image(resource: POImageRemoteResource) async -> UIImage?
 }
 
 extension POImagesRepository {
@@ -36,13 +39,5 @@ extension POImagesRepository {
         let urls = [url1, url2].compactMap { $0 }
         let images = await images(at: urls, scale: scale) as [URL?: UIImage]
         return (images[url1], images[url2])
-    }
-
-    /// Downloads image for given resource.
-    @MainActor
-    public func image(resource: POImageRemoteResource) async -> UIImage? {
-        async let lightImage = image(at: resource.lightUrl.raster, scale: resource.lightUrl.scale)
-        async let darkImage  = image(at: resource.darkUrl?.raster, scale: resource.darkUrl?.scale ?? 1)
-        return await UIImage.dynamic(lightImage: lightImage, darkImage: darkImage)
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-final class UrlSessionImagesRepository: POImagesRepository, @unchecked Sendable {
+final class UrlSessionImagesRepository: POImagesRepository {
 
     init(session: URLSession) {
         self.session = session
@@ -18,15 +18,16 @@ final class UrlSessionImagesRepository: POImagesRepository, @unchecked Sendable 
     // MARK: - ImagesRepository
 
     func image(at url: URL, scale: CGFloat) async -> UIImage? {
-        let cacheKey = CacheKey(url: url, scale: scale)
-        if let image = cache.object(forKey: cacheKey) {
+        let cacheKey = ImageResource.url(url, scale: scale)
+        if let image = cache.value(forKey: cacheKey) {
             return image
         }
-        if let image = try? await UIImage(data: session.data(from: url).0, scale: scale) {
-            cache.setObject(image, forKey: cacheKey)
-            return image
+        guard let image = try? await UIImage(data: session.data(from: url).0, scale: scale) else {
+            return nil
         }
-        return nil
+        let scaledImage = image.rescaledToMatchDeviceScale()
+        cache.insert(scaledImage, forKey: cacheKey)
+        return scaledImage
     }
 
     func images(at urls: [URL], scale: CGFloat) async -> [URL: UIImage] {
@@ -45,34 +46,27 @@ final class UrlSessionImagesRepository: POImagesRepository, @unchecked Sendable 
         }
     }
 
+    func image(resource: POImageRemoteResource) async -> UIImage? {
+        if let image = cache.value(forKey: .remote(resource)) {
+            return image
+        }
+        async let lightImage = image(at: resource.lightUrl.raster, scale: resource.lightUrl.scale)
+        async let darkImage  = image(at: resource.darkUrl?.raster, scale: resource.darkUrl?.scale ?? 1)
+        guard let image = await UIImage.dynamic(lightImage: lightImage, darkImage: darkImage) else {
+            return nil
+        }
+        cache.insert(image, forKey: .remote(resource))
+        return image
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum ImageResource: Sendable, Hashable {
+        case url(URL, scale: CGFloat), remote(POImageRemoteResource)
+    }
+
     // MARK: - Private Properties
 
     private let session: URLSession
-    private let cache: NSCache<CacheKey, UIImage>
-}
-
-private final class CacheKey: NSObject {
-
-    init(url: URL, scale: CGFloat) {
-        self.url = url
-        self.scale = scale
-    }
-
-    let url: URL, scale: CGFloat
-
-    // MARK: - NSObject
-
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let other = object as? CacheKey else {
-            return false
-        }
-        return url == other.url && scale == other.scale
-    }
-
-    override var hash: Int {
-        var hasher = Hasher()
-        hasher.combine(url)
-        hasher.combine(scale)
-        return hasher.finalize()
-    }
+    private let cache: Cache<ImageResource, UIImage>
 }
