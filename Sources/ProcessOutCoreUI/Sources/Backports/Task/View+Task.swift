@@ -14,7 +14,9 @@ extension POBackport where Wrapped: View {
     @available(iOS 14, *)
     @ViewBuilder
     public func task<T>(
-        id value: T, priority: TaskPriority = .userInitiated, _ action: @escaping @Sendable () async -> Void
+        id value: T = 0,
+        priority: TaskPriority = .userInitiated,
+        @_inheritActorContext _ action: @escaping @Sendable () async -> Void
     ) -> some View where T: Equatable {
         if #available(iOS 15, *) {
             wrapped.task(id: value, priority: priority, action)
@@ -22,24 +24,13 @@ extension POBackport where Wrapped: View {
             wrapped.modifier(TaskModifier(id: value, priority: priority, action: action))
         }
     }
-
-    @ViewBuilder
-    @available(iOS, deprecated: 15)
-    @available(iOS 14, *)
-    public func task(
-        priority: TaskPriority = .userInitiated, _ action: @escaping @Sendable () async -> Void
-    ) -> some View {
-        task(id: 0, priority: priority, action)
-    }
 }
 
 @available(iOS 14, *)
 @MainActor
 private struct TaskModifier<Id: Equatable>: ViewModifier {
 
-    let id: Id
-    let priority: TaskPriority
-    let action: @Sendable () async -> Void
+    let id: Id, priority: TaskPriority, action: @Sendable () async -> Void
 
     // MARK: - ViewModifier
 
@@ -49,10 +40,10 @@ private struct TaskModifier<Id: Equatable>: ViewModifier {
                 task?.cancel()
                 task = Task(priority: priority, operation: action)
             }
-            .backport.onChange(of: id, perform: {
+            .backport.onChange(of: id) {
                 task?.cancel()
                 task = Task(priority: priority, operation: action)
-            })
+            }
             .onDisappear {
                 task?.cancel()
                 task = nil

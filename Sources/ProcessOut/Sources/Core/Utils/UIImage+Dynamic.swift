@@ -9,10 +9,22 @@ import UIKit
 
 extension UIImage {
 
+    func rescaledToMatchDeviceScale() -> UIImage {
+        // Rescales the image when its scale exceeds the device's display scale.
+        // This avoids issues with displaying images in SwiftUI.
+        let format = UIGraphicsImageRendererFormat.preferred()
+        guard scale > format.scale, size != .zero else {
+            return self
+        }
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        let resizedImage = renderer.image { _ in
+            draw(in: CGRect(origin: .zero, size: size))
+        }
+        return resizedImage.withRenderingMode(renderingMode)
+    }
+
     @MainActor
     static func dynamic(lightImage: UIImage?, darkImage: UIImage?) -> UIImage? {
-        // When image with scale greater than 3 is registered asset created explicitly produced image
-        // is malformed and doesn't contain images for light nor dark styles.
         guard let image = lightImage ?? darkImage else {
             return nil
         }
