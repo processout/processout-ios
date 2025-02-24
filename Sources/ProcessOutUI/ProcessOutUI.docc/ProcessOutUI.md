@@ -86,6 +86,7 @@
 
 - ``POSavedPaymentMethodsView``
 - ``POSavedPaymentMethodsConfiguration``
+- ``POSavedPaymentMethodsDelegate``
 - ``POSavedPaymentMethodsStyle``
 - ``POSavedPaymentMethodsStyleConfiguration``
 - ``PODefaultSavedPaymentMethodsStyle``
