@@ -94,45 +94,47 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
     // MARK: - POCardScannerStyle
 
     public func makeBody(configuration: Configuration) -> some View {
-        VStack(spacing: POSpacing.medium) {
-            POToolbar(alignment: .top, spacing: POSpacing.small) {
-                configuration.torchToggle
-                    .poToggleStyle(torchToggle)
+        ScrollView {
+            VStack(spacing: POSpacing.medium) {
+                POToolbar(alignment: .top, spacing: POSpacing.small) {
+                    configuration.torchToggle
+                        .poToggleStyle(torchToggle)
+                        .backport.poControlSize(.small)
+                        .controlWidth(.regular)
+                        .padding(.leading, POSpacing.extraSmall)
+                } principal: {
+                    VStack(spacing: POSpacing.small) {
+                        configuration.title
+                            .textStyle(title)
+                        configuration.description
+                            .textStyle(description)
+                    }
+                    .multilineTextAlignment(.center)
+                    .padding(.top, POSpacing.large)
+                } trailing: {
+                    EmptyView()
+                }
+                configuration.videoPreview
+                    .frame(maxWidth: .infinity)
+                    .background(videoPreview.backgroundColor)
+                    .backport.overlay {
+                        cardOverlay(with: configuration.card)
+                    }
+                    .border(style: videoPreview.border)
+                configuration.cancelButton
+                    .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
                     .backport.poControlSize(.small)
-                    .controlWidth(.regular)
-                    .padding(.leading, POSpacing.extraSmall)
-            } principal: {
-                VStack(spacing: POSpacing.small) {
-                    configuration.title
-                        .textStyle(title)
-                    configuration.description
-                        .textStyle(description)
-                }
-                .multilineTextAlignment(.center)
-                .padding(.top, POSpacing.large)
-            } trailing: {
-                EmptyView()
             }
-            configuration.videoPreview
-                .frame(maxWidth: .infinity)
-                .background(videoPreview.backgroundColor)
-                .backport.overlay {
-                    cardOverlay(with: configuration.card)
-                }
-                .border(style: videoPreview.border)
-            configuration.cancelButton
-                .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
-                .backport.poControlSize(.small)
-        }
-        .padding(
-            .init(
-                top: POSpacing.medium,
-                leading: POSpacing.medium,
-                bottom: POSpacing.extraLarge,
-                trailing: POSpacing.medium
+            .padding(
+                .init(
+                    top: POSpacing.medium,
+                    leading: POSpacing.medium,
+                    bottom: POSpacing.extraLarge,
+                    trailing: POSpacing.medium
+                )
             )
-        )
-        .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity)
+        }
         .backport.background {
             backgroundColor.ignoresSafeArea()
         }
