@@ -5,9 +5,11 @@
 //  Created by Andrii Vysotskyi on 20.12.2024.
 //
 
-import ProcessOut
+@_spi(PO) import ProcessOut
 
 enum SavedPaymentMethodsInteractorState {
+
+    typealias PaymentMethod = PODynamicCheckoutPaymentMethod.CustomerToken
 
     struct Starting {
 
@@ -32,32 +34,14 @@ enum SavedPaymentMethodsInteractorState {
         /// Started state snapshot.
         let startedStateSnapshot: Started
 
-        /// Customer tokens that are being removed and associated tasks.
-        let removedCustomerTokenId: String
+        /// Payment method that is currently being removed.
+        let removedPaymentMethod: PaymentMethod
 
         /// Associated removal task.
         let task: Task<Void, Never>
 
         /// Payment methods that are pending removal.
         var pendingRemovalCustomerTokenIds: [String]
-    }
-
-    struct PaymentMethod {
-
-        /// Customer token ID.
-        let customerTokenId: String
-
-        /// Payment method's logo.
-        let logo: POImageRemoteResource
-
-        /// Name.
-        let name: String
-
-        /// Description.
-        let description: String?
-
-        /// Indicates whether user should be able to remove this payment method.
-        let deletingAllowed: Bool
     }
 
     case idle, starting(Starting), started(Started), removing(Removing), completed(Result<Void, POFailure>)

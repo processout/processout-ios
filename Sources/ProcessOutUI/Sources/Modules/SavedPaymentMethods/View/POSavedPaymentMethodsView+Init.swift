@@ -17,6 +17,7 @@ extension POSavedPaymentMethodsView {
     /// more than once — which might result in unexpected behaviour.
     public init(
         configuration: POSavedPaymentMethodsConfiguration,
+        delegate: POSavedPaymentMethodsDelegate? = nil,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         let viewModel = {
@@ -24,6 +25,7 @@ extension POSavedPaymentMethodsView {
             logger[attributeKey: .invoiceId] = configuration.invoiceRequest.invoiceId
             let interactor = DefaultSavedPaymentMethodsInteractor(
                 configuration: configuration,
+                delegate: delegate,
                 invoicesService: ProcessOut.shared.invoices,
                 customerTokensService: ProcessOut.shared.customerTokens,
                 logger: logger,
