@@ -70,7 +70,7 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
     /// mandatory to provide defaults for all parameters.
     @MainActor
     func dynamicCheckout(
-        alternativePaymentDefaultsFor parameters: [PONativeAlternativePaymentMethodParameter]
+        alternativePaymentDefaultsWith request: PODynamicCheckoutAlternativePaymentDefaultsRequest
     ) async -> [String: String]
 
     // MARK: - Pass Kit
@@ -123,7 +123,7 @@ extension PODynamicCheckoutDelegate {
 
     @MainActor
     public func dynamicCheckout(
-        alternativePaymentDefaultsFor parameters: [PONativeAlternativePaymentMethodParameter]
+        alternativePaymentDefaultsWith request: PODynamicCheckoutAlternativePaymentDefaultsRequest
     ) async -> [String: String] {
         [:]
     }

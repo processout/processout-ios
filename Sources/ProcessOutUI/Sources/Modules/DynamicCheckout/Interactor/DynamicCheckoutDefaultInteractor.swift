@@ -920,7 +920,16 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
     func nativeAlternativePayment(
         defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]
     ) async -> [String: String] {
-        await delegate?.dynamicCheckout(alternativePaymentDefaultsFor: parameters) ?? [:]
+        guard case .paymentProcessing(let currentState) = state,
+              let interactor = currentState.nativeAlternativePaymentInteractor else {
+            logger.error("Unable to resolve default values in current state: \(state).")
+            return [:]
+        }
+        let request = PODynamicCheckoutAlternativePaymentDefaultsRequest(
+            gatewayConfigurationId: interactor.configuration.gatewayConfigurationId,
+            parameters: parameters
+        )
+        return await delegate?.dynamicCheckout(alternativePaymentDefaultsWith: request) ?? [:]
     }
 }
 
