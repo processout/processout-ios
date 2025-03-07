@@ -6,18 +6,6 @@ import UIKit
 
 // MARK: - AutoCodingKeys
 
-extension DeviceMetadata {
-
-    enum CodingKeys: String, CodingKey {
-        case id
-        case appLanguage
-        case appScreenWidth
-        case appScreenHeight
-        case appTimeZoneOffset
-        case channel
-    }
-}
-
 extension NativeAlternativePaymentCaptureRequest {
 
     enum CodingKeys: String, CodingKey {
@@ -28,6 +16,8 @@ extension NativeAlternativePaymentCaptureRequest {
 extension POAssignCustomerTokenRequest {
 
     enum CodingKeys: String, CodingKey {
+        case customerId
+        case tokenId
         case source
         case preferredScheme
         case verify
@@ -35,23 +25,7 @@ extension POAssignCustomerTokenRequest {
         case enableThreeDS2 = "enable_three_d_s_2"
         case thirdPartySdkVersion
         case metadata
-    }
-}
-
-extension POCardUpdateRequest {
-
-    enum CodingKeys: String, CodingKey {
-        case cvc
-        case preferredScheme
-    }
-}
-
-extension POCreateCustomerTokenRequest {
-
-    enum CodingKeys: String, CodingKey {
-        case verify
-        case returnUrl
-        case invoiceReturnUrl
+        case webAuthenticationCallback
     }
 }
 
@@ -91,6 +65,7 @@ extension PODynamicCheckoutPaymentMethod.NativeAlternativePayment {
 extension POInvoiceAuthorizationRequest {
 
     enum CodingKeys: String, CodingKey {
+        case invoiceId
         case source
         case saveSource
         case incremental
@@ -102,7 +77,10 @@ extension POInvoiceAuthorizationRequest {
         case autoCaptureAt
         case captureAmount
         case allowFallbackToSale
+        case clientSecret
         case metadata
+        case webAuthenticationCallback
+        case prefersEphemeralWebAuthenticationSession
     }
 }
 
