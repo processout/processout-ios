@@ -6,7 +6,7 @@
 //
 
 /// Request to use to remove existing customer token.
-public struct PODeleteCustomerTokenRequest: Sendable {
+public struct PODeleteCustomerTokenRequest: Sendable, Codable {
 
     /// ID of your customer
     public let customerId: String
