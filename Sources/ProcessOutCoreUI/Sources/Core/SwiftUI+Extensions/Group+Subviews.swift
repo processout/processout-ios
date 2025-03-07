@@ -22,14 +22,17 @@ extension Group {
 
 @_spi(PO)
 @MainActor
+@frozen
 public struct POSubviewsTransformView<Subviews: View, Content: View>: View {
 
+    @inlinable
     init(subviews: Subviews, @ViewBuilder transform: @escaping (_VariadicView.Children) -> Content) {
         tree = .init(.init(transform: transform)) { subviews }
     }
 
     // MARK: - View
 
+    @inlinable
     public var body: some View {
         tree
     }
@@ -37,12 +40,13 @@ public struct POSubviewsTransformView<Subviews: View, Content: View>: View {
     // MARK: - Private Properties
 
     @usableFromInline
-    let tree: _VariadicView.Tree<SubviewsTransformViewRoot<Content>, Subviews>
+    let tree: _VariadicView.Tree<POSubviewsTransformViewRoot<Content>, Subviews>
 }
 
+@_spi(PO)
 @MainActor
-@usableFromInline
-struct SubviewsTransformViewRoot<Content: View>: _VariadicView_MultiViewRoot {
+@frozen
+public struct POSubviewsTransformViewRoot<Content: View>: _VariadicView_MultiViewRoot {
 
     @inlinable
     init(transform: @escaping (_VariadicView.Children) -> Content) {
@@ -51,8 +55,8 @@ struct SubviewsTransformViewRoot<Content: View>: _VariadicView_MultiViewRoot {
 
     // MARK: - _VariadicView_MultiViewRoot
 
-    @usableFromInline
-    func body(children: _VariadicView.Children) -> Content {
+    @inlinable
+    public func body(children: _VariadicView.Children) -> Content {
         transform(children)
     }
 
