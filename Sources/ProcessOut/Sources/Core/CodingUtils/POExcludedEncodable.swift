@@ -12,8 +12,6 @@ public typealias POImmutableExcludedCodable = POExcludedEncodable
 
 /// Property wrapper that allows to exclude property from being encoded without forcing owning parent to define
 /// custom `CodingKeys`.
-///
-/// - NOTE: Wrapped value is immutable.
 @propertyWrapper
 public struct POExcludedEncodable<Value: Codable>: Codable {
 
