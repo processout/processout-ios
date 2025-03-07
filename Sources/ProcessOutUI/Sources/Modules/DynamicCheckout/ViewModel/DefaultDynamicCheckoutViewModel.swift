@@ -642,7 +642,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         case .customerToken(let method):
             return method.flow == .express
         case .unknown:
-            preconditionFailure("Unexpected payment method.")
+            return false
+        @unknown default:
+            return false
         }
     }
 
@@ -657,6 +659,8 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         case .customerToken(let paymentMethod):
             return paymentMethod.configuration.redirectUrl != nil
         case .applePay, .unknown:
+            return nil
+        @unknown default:
             return nil
         }
     }

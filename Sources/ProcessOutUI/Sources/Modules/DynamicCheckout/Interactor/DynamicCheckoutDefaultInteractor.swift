@@ -471,7 +471,7 @@ final class DynamicCheckoutDefaultInteractor:
             startNativeAlternativePayment(method: method, startedState: newStartedState)
         case .customerToken(let method):
             startCustomerTokenPayment(method: method, startedState: newStartedState)
-        case .unknown:
+        default:
             logger.error("Attempted to start unknown payment method.")
         }
     }
