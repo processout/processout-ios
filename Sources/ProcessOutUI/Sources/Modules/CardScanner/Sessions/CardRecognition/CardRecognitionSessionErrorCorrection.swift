@@ -35,7 +35,7 @@ final class CardRecognitionSessionErrorCorrection {
             if let isExpired = scannedCard.expiration?.isExpired, isExpired, !shouldScanExpiredCard {
                 invalidateFrequencies(with: scannedCard)
             } else {
-                updateFrequencies(with: scannedCard)
+                incrementFrequencies(with: scannedCard)
             }
         }
         return errorCorrectedCard
@@ -52,7 +52,7 @@ final class CardRecognitionSessionErrorCorrection {
 
     // MARK: - Private Methods
 
-    private func updateFrequencies(with scannedCard: POScannedCard) {
+    private func incrementFrequencies(with scannedCard: POScannedCard) {
         numbers[scannedCard.number, default: 0] += 1
         if let expiration = scannedCard.expiration {
             expirations[expiration, default: 0] += 1
