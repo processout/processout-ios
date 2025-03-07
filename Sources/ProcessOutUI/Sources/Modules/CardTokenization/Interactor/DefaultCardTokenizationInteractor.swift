@@ -433,6 +433,8 @@ final class DefaultCardTokenizationInteractor:
             return false
         case .full:
             return true
+        @unknown default:
+            return true // Collect all possible fields
         }
     }
 
