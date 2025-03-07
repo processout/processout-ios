@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PONativeAlternativePaymentMethodResponse: Decodable, Sendable {
+public struct PONativeAlternativePaymentMethodResponse: Codable, Sendable {
 
     /// Payment's state.
     public let state: PONativeAlternativePaymentMethodState
