@@ -46,21 +46,3 @@ public struct POImmutableStringCodableDecimal: Codable, Sendable {
 }
 
 // swiftlint:enable legacy_objc_type
-
-extension KeyedEncodingContainer {
-
-    public mutating func encode(
-        _ value: POImmutableStringCodableDecimal, forKey key: KeyedEncodingContainer<K>.Key
-    ) throws {
-        try value.encode(to: superEncoder(forKey: key))
-    }
-}
-
-extension KeyedDecodingContainer {
-
-    public func decode(
-        _ type: POImmutableStringCodableDecimal.Type, forKey key: KeyedDecodingContainer<K>.Key
-    ) throws -> POImmutableStringCodableDecimal {
-        try type.init(from: try superDecoder(forKey: key))
-    }
-}

@@ -31,13 +31,18 @@ public struct POImmutableStringCodableOptionalDecimal: Codable, Sendable {
         throw DecodingError.dataCorrupted(context)
     }
 
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(description)
+    }
+
+    @available(*, deprecated)
     public init(value: Decimal?) {
         self.wrappedValue = value
     }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(description)
+    public init(wrappedValue: Decimal?) {
+        self.wrappedValue = wrappedValue
     }
 
     // MARK: - Private Properties
@@ -49,22 +54,24 @@ public struct POImmutableStringCodableOptionalDecimal: Codable, Sendable {
     }
 }
 
-// swiftlint:enable legacy_objc_type
+extension KeyedDecodingContainer {
+
+    public func decode(
+        _ type: POImmutableStringCodableOptionalDecimal.Type, forKey key: KeyedDecodingContainer<K>.Key
+    ) throws -> POImmutableStringCodableOptionalDecimal {
+        let wrapper = try decodeIfPresent(POImmutableStringCodableOptionalDecimal.self, forKey: key)
+        return wrapper ?? .init(wrappedValue: nil)
+    }
+}
 
 extension KeyedEncodingContainer {
 
     public mutating func encode(
         _ value: POImmutableStringCodableOptionalDecimal, forKey key: KeyedEncodingContainer<K>.Key
     ) throws {
-        try value.encode(to: superEncoder(forKey: key))
+        let wrapper = value.wrappedValue.map { _ in value }
+        try encodeIfPresent(wrapper, forKey: key)
     }
 }
 
-extension KeyedDecodingContainer {
-
-    public func decode(
-        _ type: POImmutableStringCodableOptionalDecimal.Type, forKey key: KeyedDecodingContainer<K>.Key
-    ) throws -> POImmutableStringCodableOptionalDecimal {
-        try type.init(from: try superDecoder(forKey: key))
-    }
-}
+// swiftlint:enable legacy_objc_type
