@@ -10,14 +10,15 @@ import Foundation
 
 final class CardRecognitionSessionErrorCorrection {
 
-    init(errorCorrectionDuration: TimeInterval = 3) {
+    init(errorCorrectionDuration: TimeInterval = 3, shouldScanExpiredCard: Bool = false) {
         self.errorCorrectionDuration = errorCorrectionDuration
+        self.shouldScanExpiredCard = shouldScanExpiredCard
         numbers = [:]
         expirations = [:]
         names = [:]
     }
 
-    /// Boolean value indicating whether error corrected card is confdent recognition.
+    /// Boolean value indicating whether error corrected card is confident recognition.
     var isConfident: Bool {
         guard let startTime else {
             return false
@@ -31,9 +32,11 @@ final class CardRecognitionSessionErrorCorrection {
             return errorCorrectedCard // Enough confidence is already reached, ignored.
         }
         if let scannedCard {
-            startTime = startTime ?? DispatchTime.now()
-            updateFrequencies(with: scannedCard)
-            assert(errorCorrectedCard != nil, "Corrected card must be available after frequencies update.")
+            if let isExpired = scannedCard.expiration?.isExpired, isExpired, !shouldScanExpiredCard {
+                invalidateFrequencies(with: scannedCard)
+            } else {
+                updateFrequencies(with: scannedCard)
+            }
         }
         return errorCorrectedCard
     }
@@ -41,6 +44,7 @@ final class CardRecognitionSessionErrorCorrection {
     // MARK: - Private Properties
 
     private let errorCorrectionDuration: TimeInterval
+    private let shouldScanExpiredCard: Bool
     private var numbers: [String: Int]
     private var expirations: [POScannedCard.Expiration: Int]
     private var names: [String: Int]
@@ -56,6 +60,17 @@ final class CardRecognitionSessionErrorCorrection {
         if let cardholderName = scannedCard.cardholderName {
             names[cardholderName, default: 0] += 1
         }
+        startTime = startTime ?? DispatchTime.now()
+    }
+
+    private func invalidateFrequencies(with expiredCard: POScannedCard) {
+        numbers[expiredCard.number] = nil
+        guard numbers.isEmpty else {
+            return
+        }
+        names.removeAll()
+        expirations.removeAll()
+        startTime = nil
     }
 
     private var errorCorrectedCard: POScannedCard? {

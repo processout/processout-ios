@@ -33,11 +33,9 @@ struct CardExpirationDetector: CardAttributeDetector {
                 continue
             }
             candidates.remove(at: offset)
-            guard isDateInFuture(month: month, year: year) else {
-                continue
-            }
+            let isExpired = !isDateInFuture(month: month, year: year)
             let description = formatter.string(from: String(month) + String(year % 100))
-            matchedExpiration = .init(month: month, year: year, description: description)
+            matchedExpiration = .init(month: month, year: year, isExpired: isExpired, description: description)
         }
         return matchedExpiration
     }
