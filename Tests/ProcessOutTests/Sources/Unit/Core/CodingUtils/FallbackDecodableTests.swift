@@ -49,9 +49,20 @@ struct FallbackDecodableTests {
         // Then
         #expect(container.value == "1")
     }
+
+    @Test
+    func encode() throws {
+        // Given
+        let sut = Container(value: "")
+        let encoder = JSONEncoder()
+
+        // Then
+        let encoded = String(decoding: try encoder.encode(sut), as: UTF8.self)
+        #expect(encoded == #"{"value":""}"#)
+    }
 }
 
-private struct Container: Decodable {
+private struct Container: Codable {
 
     @POFallbackDecodable<POEmptyStringProvider>
     var value: String

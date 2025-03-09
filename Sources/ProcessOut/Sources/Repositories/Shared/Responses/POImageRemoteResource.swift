@@ -8,7 +8,7 @@
 import Foundation
 
 /// Image resource with light/dark image variations.
-public struct POImageRemoteResource: Hashable, Decodable, Sendable {
+public struct POImageRemoteResource: Hashable, Codable, Sendable {
 
     public struct ResourceUrl: Hashable, Sendable {
 
@@ -26,7 +26,7 @@ public struct POImageRemoteResource: Hashable, Decodable, Sendable {
     public let darkUrl: ResourceUrl?
 }
 
-extension POImageRemoteResource.ResourceUrl: Decodable {
+extension POImageRemoteResource.ResourceUrl: Codable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -34,9 +34,15 @@ extension POImageRemoteResource.ResourceUrl: Decodable {
         scale = 4
     }
 
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(raster, forKey: .raster)
+        try container.encode(scale, forKey: .scale)
+    }
+
     // MARK: - Private Nested Types
 
     private enum CodingKeys: String, CodingKey {
-        case raster
+        case raster, scale
     }
 }

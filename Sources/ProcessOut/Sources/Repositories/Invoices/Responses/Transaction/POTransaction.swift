@@ -9,7 +9,7 @@ import Foundation
 
 /// Transaction details.
 @_spi(PO)
-public struct POTransaction: Decodable, Sendable {
+public struct POTransaction: Codable, Sendable {
 
     /// Transaction status.
     public let status: POTransactionStatus?

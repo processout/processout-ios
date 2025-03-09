@@ -7,9 +7,9 @@
 
 import Foundation
 
-public struct POFindGatewayConfigurationRequest: Sendable {
+public struct POFindGatewayConfigurationRequest: Sendable, Codable {
 
-    public enum ExpandedProperty: String, Hashable, Sendable {
+    public enum ExpandedProperty: String, Hashable, Sendable, Codable {
         case gateway
     }
 

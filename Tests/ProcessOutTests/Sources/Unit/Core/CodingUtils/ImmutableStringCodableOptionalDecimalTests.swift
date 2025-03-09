@@ -41,6 +41,18 @@ struct ImmutableStringCodableOptionalDecimalTests {
     }
 
     @Test
+    func decode_whenInContainerAndValueIsNotSet_decodesNil() throws {
+        // Given
+        let data = Data(#"{}"#.utf8)
+
+        // When
+        let container = try decoder.decode(Container.self, from: data)
+
+        // Then
+        #expect(container.number == nil)
+    }
+
+    @Test
     func decode_whenInContainer_encodesString() throws {
         // Given
         let data = Data(#"{"number":"1234"}"#.utf8)
@@ -77,7 +89,7 @@ struct ImmutableStringCodableOptionalDecimalTests {
     @Test
     func encode_returnsStringData() throws {
         // Given
-        let decimal = POImmutableStringCodableOptionalDecimal(value: Decimal(1234))
+        let decimal = POImmutableStringCodableOptionalDecimal(wrappedValue: Decimal(1234))
 
         // When
         let data = try encoder.encode(decimal)
@@ -89,13 +101,25 @@ struct ImmutableStringCodableOptionalDecimalTests {
     @Test
     func encode_whenInContainer_encodesString() throws {
         // Given
-        let value = Container(number: POImmutableStringCodableOptionalDecimal(value: Decimal(1234)))
+        let value = Container(number: Decimal(1234))
 
         // When
         let data = try encoder.encode(value)
 
         // Then
         #expect(Data(#"{"number":"1234"}"#.utf8) == data)
+    }
+
+    @Test
+    func encode_whenValueIsNil() throws {
+        // Given
+        let sut = Container(number: nil)
+
+        // When
+        let encoded = String(decoding: try encoder.encode(sut), as: UTF8.self)
+
+        // Then
+        #expect(#"{}"# == encoded)
     }
 
     // MARK: - Private Properties

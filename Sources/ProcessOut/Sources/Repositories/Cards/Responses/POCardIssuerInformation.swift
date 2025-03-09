@@ -6,7 +6,7 @@
 //
 
 /// Holds information about card issuing institution that issued the card to the card holder.
-public struct POCardIssuerInformation: Decodable, Sendable {
+public struct POCardIssuerInformation: Codable, Sendable {
 
     /// Scheme of the card.
     @POTypedRepresentation<String, POCardScheme>

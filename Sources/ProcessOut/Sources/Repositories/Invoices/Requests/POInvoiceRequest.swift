@@ -6,7 +6,7 @@
 //
 
 /// Request to get single invoice details.
-public struct POInvoiceRequest: Sendable {
+public struct POInvoiceRequest: Sendable, Codable {
 
     /// Requested invoice ID.
     public let invoiceId: String

@@ -176,10 +176,15 @@ extension POCardScheme {
     public static let mir: POCardScheme = "nspk mir"
 }
 
-extension POCardScheme: Decodable {
+extension POCardScheme: Codable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(String.self)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
     }
 }

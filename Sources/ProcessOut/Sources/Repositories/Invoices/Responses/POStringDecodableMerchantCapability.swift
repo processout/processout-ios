@@ -9,7 +9,7 @@ import PassKit
 
 /// Property wrapper allowing to decode `PKMerchantCapability`.
 @propertyWrapper
-public struct POStringDecodableMerchantCapability: Decodable, Sendable {
+public struct POStringDecodableMerchantCapability: Codable, Sendable {
 
     public let wrappedValue: PKMerchantCapability
 
@@ -29,24 +29,26 @@ public struct POStringDecodableMerchantCapability: Decodable, Sendable {
             case .emv:
                 capabilities.insert(.emv)
             case nil:
-                capabilities = []
+                continue
             }
         }
         self.wrappedValue = capabilities
     }
 
-    // MARK: - Private
-
-    private enum MerchantCapability: String, Decodable {
-        case threeDS = "supports3DS", credit = "supportsCredit", debit = "supportsDebit", emv = "supportsEMV"
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        let capabilities: [MerchantCapability: PKMerchantCapability] = [
+            .credit: .credit, .debit: .debit, .threeDS: .threeDSecure, .emv: .emv
+        ]
+        let includedCapabilities = capabilities
+            .filter { wrappedValue.contains($0.value) }
+            .compactMap(\.key)
+        try container.encode(contentsOf: includedCapabilities)
     }
-}
 
-extension KeyedDecodingContainer {
+    // MARK: - Private Nested Types
 
-    public func decode(
-        _ type: POStringDecodableMerchantCapability.Type, forKey key: K
-    ) throws -> POStringDecodableMerchantCapability {
-        try type.init(from: try superDecoder(forKey: key))
+    private enum MerchantCapability: String, Codable {
+        case threeDS = "supports3DS", credit = "supportsCredit", debit = "supportsDebit", emv = "supportsEMV"
     }
 }

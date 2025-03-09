@@ -7,16 +7,16 @@
 
 import Foundation
 
-public struct POGatewayConfiguration: Decodable, Sendable {
+public struct POGatewayConfiguration: Codable, Sendable {
 
     @available(*, deprecated, message: "Use POInvoicesService/nativeAlternativePaymentMethodTransactionDetails(request:) instead.") // swiftlint:disable:this line_length
-    public struct NativeAlternativePaymentMethodConfig: Decodable, Sendable {
+    public struct NativeAlternativePaymentMethodConfig: Codable, Sendable {
 
         /// Configuration parameters.
         public let parameters: [PONativeAlternativePaymentMethodParameter]
     }
 
-    public struct Gateway: Decodable, Sendable {
+    public struct Gateway: Codable, Sendable {
 
         /// Name is the name of the payment gateway.
         public let name: String

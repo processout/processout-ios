@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PONativeAlternativePaymentMethodTransactionDetailsRequest: Sendable { // swiftlint:disable:this type_name
+public struct PONativeAlternativePaymentMethodTransactionDetailsRequest: Sendable, Codable { // swiftlint:disable:this type_name line_length
 
     /// Invoice identifier.
     public let invoiceId: String

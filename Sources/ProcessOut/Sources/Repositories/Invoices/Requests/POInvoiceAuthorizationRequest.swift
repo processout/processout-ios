@@ -7,10 +7,11 @@
 
 import Foundation
 
-public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: AutoCodingKeys
+public struct POInvoiceAuthorizationRequest: Codable, Sendable { // sourcery: AutoCodingKeys
 
     /// Invoice identifier to to perform authorization for.
-    public let invoiceId: String // sourcery:coding: skip
+    @POExcludedEncodable
+    public private(set) var invoiceId: String
 
     /// Payment source to use for authorization.
     public let source: String
@@ -67,13 +68,15 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
     public let allowFallbackToSale: Bool
 
     /// A secret key associated with the client making the request.
-    public let clientSecret: String? // sourcery:coding: skip
+    @POExcludedEncodable
+    public private(set) var clientSecret: String?
 
     /// Operation metadata.
     public let metadata: [String: String]?
 
     /// An object used to evaluate navigation events in a web authentication session.
-    public let webAuthenticationCallback: POWebAuthenticationCallback? // sourcery:coding: skip
+    @POExcludedEncodable
+    public private(set) var webAuthenticationCallback: POWebAuthenticationCallback?
 
     /// A boolean value that indicates whether the web authentication session should ask the browse
     /// for a private authentication session.
@@ -83,7 +86,8 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
     /// and the user’s normal browser session.
     ///
     /// The value of this property is `true` by default.
-    public let prefersEphemeralWebAuthenticationSession: Bool // sourcery:coding: skip
+    @POExcludedEncodable
+    public private(set) var prefersEphemeralWebAuthenticationSession: Bool
 
     public init(
         invoiceId: String,
@@ -111,7 +115,7 @@ public struct POInvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: 
         self.overrideMacBlocking = overrideMacBlocking
         self.initialSchemeTransactionId = initialSchemeTransactionId
         self.autoCaptureAt = autoCaptureAt
-        self._captureAmount = .init(value: captureAmount)
+        self._captureAmount = .init(wrappedValue: captureAmount)
         self.allowFallbackToSale = allowFallbackToSale
         self.clientSecret = clientSecret
         self.metadata = metadata

@@ -6,7 +6,7 @@
 //
 
 /// Billing address collection modes.
-public enum POBillingAddressCollectionMode: String, Decodable, Sendable {
+public enum POBillingAddressCollectionMode: String, Codable, Sendable {
 
     /// Only collect address components that are needed for particular payment method.
     case automatic

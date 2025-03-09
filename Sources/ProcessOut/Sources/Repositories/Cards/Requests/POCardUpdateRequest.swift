@@ -6,10 +6,10 @@
 //
 
 /// Updated card details.
-public struct POCardUpdateRequest: Encodable, Sendable {  // sourcery: AutoCodingKeys
+public struct POCardUpdateRequest: Codable, Sendable {
 
     /// Card id.
-    public let cardId: String // sourcery:coding: skip
+    public let cardId: String
 
     /// New cvc.
     /// Pass `nil` to keep existing value.

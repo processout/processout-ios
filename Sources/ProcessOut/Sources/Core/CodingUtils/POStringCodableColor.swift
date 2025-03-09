@@ -10,7 +10,7 @@ import UIKit
 
 /// Property wrapper that allows to decode UIColor from string representations.
 @propertyWrapper
-public struct POStringCodableColor: Decodable, Sendable {
+public struct POStringCodableColor: Codable, Sendable {
 
     public var wrappedValue: UIColor
 
@@ -36,6 +36,12 @@ public struct POStringCodableColor: Decodable, Sendable {
         self.wrappedValue = dynamicColor
     }
 
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(Self.encodeColor(wrappedValue, style: .light), forKey: .light)
+        try container.encode(Self.encodeColor(wrappedValue, style: .dark), forKey: .dark)
+    }
+
     // MARK: - Private Nested Types
 
     private enum CodingKeys: String, CodingKey {
@@ -56,11 +62,20 @@ public struct POStringCodableColor: Decodable, Sendable {
         let alpha = CGFloat(value & 0xFF) / 255
         return UIColor(red: red, green: green, blue: blue, alpha: alpha)
     }
-}
 
-extension KeyedDecodingContainer {
-
-    public func decode(_ type: POStringCodableColor.Type, forKey key: K) throws -> POStringCodableColor {
-        try type.init(from: try superDecoder(forKey: key))
+    private static func encodeColor(_ color: UIColor, style: UIUserInterfaceStyle) -> String {
+        let resolvedColor = color.resolvedColor(
+            with: .init(userInterfaceStyle: style)
+        )
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        resolvedColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        // swiftlint:disable operator_usage_whitespace
+        let encodedColor =
+            (Int(red   * 255) & 0xFF) << 24 |
+            (Int(green * 255) & 0xFF) << 16 |
+            (Int(blue  * 255) & 0xFF) << 08 |
+             Int(alpha * 255) & 0xFF
+        // swiftlint:enable operator_usage_whitespace
+        return String(encodedColor, radix: 16, uppercase: true)
     }
 }

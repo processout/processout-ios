@@ -70,6 +70,10 @@ extension POTypedRepresentation: Equatable where Wrapped: Equatable {
     }
 }
 
+extension POTypedRepresentation: Sendable where Wrapped: Sendable { }
+
+// MARK: - Coding
+
 extension POTypedRepresentation: Encodable where Wrapped: Encodable {
 
     public func encode(to encoder: any Encoder) throws {
@@ -85,22 +89,22 @@ extension POTypedRepresentation: Decodable where Wrapped: Decodable {
     }
 }
 
-extension KeyedEncodingContainer {
-
-    public mutating func encode<Wrapped: Encodable, Representation: RawRepresentable>(
-        _ value: POTypedRepresentation<Wrapped, Representation>, forKey key: KeyedEncodingContainer<K>.Key
-    ) throws {
-        try value.encode(to: superEncoder(forKey: key))
-    }
-}
-
 extension KeyedDecodingContainer {
 
-    public func decode<Wrapped: Decodable, Representation: RawRepresentable>(
-        _ type: POTypedRepresentation<Wrapped, Representation>.Type, forKey key: KeyedDecodingContainer<K>.Key
-    ) throws -> POTypedRepresentation<Wrapped, Representation> {
-        try type.init(from: try superDecoder(forKey: key))
+    public func decode<T: RawRepresentable>(
+        _ type: POTypedRepresentation<T.RawValue?, T>.Type, forKey key: KeyedDecodingContainer<K>.Key
+    ) throws -> POTypedRepresentation<T.RawValue?, T> where T.RawValue: Decodable {
+        let wrapper = try decodeIfPresent(POTypedRepresentation<T.RawValue?, T>.self, forKey: key)
+        return wrapper ?? .init(wrappedValue: nil)
     }
 }
 
-extension POTypedRepresentation: Sendable where Wrapped: Sendable { }
+extension KeyedEncodingContainer {
+
+    public mutating func encode<T: RawRepresentable>(
+        _ value: POTypedRepresentation<T.RawValue?, T>, forKey key: KeyedEncodingContainer<K>.Key
+    ) throws where T.RawValue: Encodable {
+        let wrapper = value.typed.map { _ in value }
+        try encodeIfPresent(wrapper, forKey: key)
+    }
+}

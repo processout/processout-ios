@@ -8,10 +8,11 @@
 import Foundation
 
 @_spi(PO)
-public struct POCreateCustomerTokenRequest: Encodable, Sendable { // sourcery: AutoCodingKeys
+public struct POCreateCustomerTokenRequest: Codable, Sendable {
 
     /// Customer id to associate created token with.
-    public let customerId: String // sourcery:coding: skip
+    @POExcludedEncodable
+    public private(set) var customerId: String
 
     /// Flag if you wish to verify the customer token by making zero value transaction. Applicable for cards only.
     public let verify: Bool
