@@ -42,12 +42,22 @@ public struct POCardScannerConfiguration {
     /// Custom description. Use empty string to hide description.
     public let description: String?
 
+    /// A Boolean value that determines whether the card scanner should allow scanning of expired cards.
+    /// Default value is `false`.
+    public let shouldScanExpiredCard: Bool
+
     /// Cancel button configuration.
     public let cancelButton: CancelButton?
 
-    public init(title: String? = nil, description: String? = nil, cancelButton: CancelButton? = .init()) {
+    public init(
+        title: String? = nil,
+        description: String? = nil,
+        shouldScanExpiredCard: Bool = false,
+        cancelButton: CancelButton? = .init()
+    ) {
         self.title = title
         self.description = description
+        self.shouldScanExpiredCard = shouldScanExpiredCard
         self.cancelButton = cancelButton
     }
 }

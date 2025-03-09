@@ -10,7 +10,7 @@ protocol CardRecognitionSessionDelegate: AnyObject, Sendable {
 
     /// Called when the session updates currently recognized card info.
     @MainActor
-    func cardRecognitionSession(_ session: CardRecognitionSession, didUpdateCard card: POScannedCard)
+    func cardRecognitionSession(_ session: CardRecognitionSession, didUpdateCard card: POScannedCard?)
 
     /// Called when the session successfully recognizes a card.
     @MainActor

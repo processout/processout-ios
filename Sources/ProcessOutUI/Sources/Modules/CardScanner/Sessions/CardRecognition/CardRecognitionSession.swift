@@ -140,15 +140,14 @@ actor CardRecognitionSession: CameraSessionDelegate {
     private var lastErrorCorrectedCard: POScannedCard?
 
     private func process(scannedCard: POScannedCard?) async {
-        guard let errorCorrectedCard = errorCorrection.add(scannedCard: scannedCard) else {
-            return
-        }
+        let errorCorrectedCard = errorCorrection.add(scannedCard: scannedCard)
         if errorCorrectedCard != lastErrorCorrectedCard {
             lastErrorCorrectedCard = errorCorrectedCard
             await delegate?.cardRecognitionSession(self, didUpdateCard: errorCorrectedCard)
         }
-        if errorCorrection.isConfident {
-            await delegate?.cardRecognitionSession(self, didRecognizeCard: errorCorrectedCard)
+        guard let errorCorrectedCard, errorCorrection.isConfident else {
+            return
         }
+        await delegate?.cardRecognitionSession(self, didRecognizeCard: errorCorrectedCard)
     }
 }
