@@ -33,9 +33,9 @@ final class CardRecognitionSessionErrorCorrection {
         }
         if let scannedCard {
             if let isExpired = scannedCard.expiration?.isExpired, isExpired, !shouldScanExpiredCard {
-                invalidateFrequencies(with: scannedCard)
+                updateFrequencies(withExpiredCard: scannedCard)
             } else {
-                incrementFrequencies(with: scannedCard)
+                updateFrequencies(withScannedCard: scannedCard)
             }
         }
         return errorCorrectedCard
@@ -45,14 +45,12 @@ final class CardRecognitionSessionErrorCorrection {
 
     private let errorCorrectionDuration: TimeInterval
     private let shouldScanExpiredCard: Bool
-    private var numbers: [String: Int]
-    private var expirations: [POScannedCard.Expiration: Int]
-    private var names: [String: Int]
+    private var numbers: [String: Int], expirations: [POScannedCard.Expiration: Int], names: [String: Int]
     private var startTime: DispatchTime?
 
     // MARK: - Private Methods
 
-    private func incrementFrequencies(with scannedCard: POScannedCard) {
+    private func updateFrequencies(withScannedCard scannedCard: POScannedCard) {
         numbers[scannedCard.number, default: 0] += 1
         if let expiration = scannedCard.expiration {
             expirations[expiration, default: 0] += 1
@@ -63,18 +61,22 @@ final class CardRecognitionSessionErrorCorrection {
         startTime = startTime ?? DispatchTime.now()
     }
 
-    private func invalidateFrequencies(with expiredCard: POScannedCard) {
-        numbers[expiredCard.number] = nil
-        guard numbers.isEmpty else {
+    private func updateFrequencies(withExpiredCard expiredCard: POScannedCard) {
+        // Assign a minimal frequency value to the expired card. This ensures that
+        // the card number remains in the recognized set but is deprioritized.
+        numbers[expiredCard.number, default: 0] = .min
+        guard errorCorrectedCard == nil else {
             return
         }
+        // No valid recognized cards remain, so reset associated metadata and set
+        // `startTime` to nil, allowing recognition to restart fresh.
         names.removeAll()
         expirations.removeAll()
         startTime = nil
     }
 
     private var errorCorrectedCard: POScannedCard? {
-        let number = numbers.max { lhs, rhs in
+        let number = numbers.filter { $0.value > 0 }.max { lhs, rhs in
             lhs.value < rhs.value
         }
         guard let number = number?.key else {
