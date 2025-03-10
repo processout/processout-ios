@@ -28,7 +28,7 @@ extension POCardScannerView {
                     regexProvider: .shared, formatter: .init()
                 ),
                 cardholderNameDetector: CardholderNameDetector(),
-                errorCorrection: .init(),
+                errorCorrection: .init(shouldScanExpiredCard: configuration.shouldScanExpiredCard),
                 logger: ProcessOut.shared.logger
             )
             let interactor = DefaultCardScannerInteractor(
