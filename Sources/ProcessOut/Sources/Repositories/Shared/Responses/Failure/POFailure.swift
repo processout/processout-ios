@@ -10,7 +10,7 @@ import Foundation
 /// Information about an error that occurred.
 public struct POFailure: Error {
 
-    public struct InvalidField: Decodable, Sendable {
+    public struct InvalidField: Codable, Sendable {
 
         /// Field name.
         public let name: String
@@ -48,6 +48,30 @@ public struct POFailure: Error {
         self.failureCode = code
         self.invalidFields = invalidFields
         self.underlyingError = underlyingError
+    }
+}
+
+extension POFailure: Codable {
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        message = try container.decodeIfPresent(String.self, forKey: .message)
+        failureCode = try container.decode(POFailureCode.self, forKey: .code)
+        invalidFields = try container.decodeIfPresent([InvalidField].self, forKey: .invalidFields)
+        underlyingError = nil
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(message, forKey: .message)
+        try container.encode(failureCode, forKey: .code)
+        try container.encodeIfPresent(invalidFields, forKey: .invalidFields)
+    }
+
+    // MARK: - Private Properties
+
+    private enum CodingKeys: String, CodingKey {
+        case message, code, invalidFields
     }
 }
 
