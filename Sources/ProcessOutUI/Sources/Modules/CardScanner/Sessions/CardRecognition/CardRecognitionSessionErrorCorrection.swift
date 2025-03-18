@@ -10,14 +10,15 @@ import Foundation
 
 final class CardRecognitionSessionErrorCorrection {
 
-    init(errorCorrectionDuration: TimeInterval = 3) {
+    init(errorCorrectionDuration: TimeInterval = 3, shouldScanExpiredCard: Bool = false) {
         self.errorCorrectionDuration = errorCorrectionDuration
+        self.shouldScanExpiredCard = shouldScanExpiredCard
         numbers = [:]
         expirations = [:]
         names = [:]
     }
 
-    /// Boolean value indicating whether error corrected card is confdent recognition.
+    /// Boolean value indicating whether error corrected card is confident recognition.
     var isConfident: Bool {
         guard let startTime else {
             return false
@@ -31,9 +32,11 @@ final class CardRecognitionSessionErrorCorrection {
             return errorCorrectedCard // Enough confidence is already reached, ignored.
         }
         if let scannedCard {
-            startTime = startTime ?? DispatchTime.now()
-            updateFrequencies(with: scannedCard)
-            assert(errorCorrectedCard != nil, "Corrected card must be available after frequencies update.")
+            if let isExpired = scannedCard.expiration?.isExpired, isExpired, !shouldScanExpiredCard {
+                updateFrequencies(withExpiredCard: scannedCard)
+            } else {
+                updateFrequencies(withScannedCard: scannedCard)
+            }
         }
         return errorCorrectedCard
     }
@@ -41,14 +44,13 @@ final class CardRecognitionSessionErrorCorrection {
     // MARK: - Private Properties
 
     private let errorCorrectionDuration: TimeInterval
-    private var numbers: [String: Int]
-    private var expirations: [POScannedCard.Expiration: Int]
-    private var names: [String: Int]
+    private let shouldScanExpiredCard: Bool
+    private var numbers: [String: Int], expirations: [POScannedCard.Expiration: Int], names: [String: Int]
     private var startTime: DispatchTime?
 
     // MARK: - Private Methods
 
-    private func updateFrequencies(with scannedCard: POScannedCard) {
+    private func updateFrequencies(withScannedCard scannedCard: POScannedCard) {
         numbers[scannedCard.number, default: 0] += 1
         if let expiration = scannedCard.expiration {
             expirations[expiration, default: 0] += 1
@@ -56,10 +58,25 @@ final class CardRecognitionSessionErrorCorrection {
         if let cardholderName = scannedCard.cardholderName {
             names[cardholderName, default: 0] += 1
         }
+        startTime = startTime ?? DispatchTime.now()
+    }
+
+    private func updateFrequencies(withExpiredCard expiredCard: POScannedCard) {
+        // Assign a minimal frequency value to the expired card. This ensures that
+        // the card number remains in the recognized set but is deprioritized.
+        numbers[expiredCard.number, default: 0] = .min
+        guard errorCorrectedCard == nil else {
+            return
+        }
+        // No valid recognized cards remain, so reset associated metadata and set
+        // `startTime` to nil, allowing recognition to restart fresh.
+        names.removeAll()
+        expirations.removeAll()
+        startTime = nil
     }
 
     private var errorCorrectedCard: POScannedCard? {
-        let number = numbers.max { lhs, rhs in
+        let number = numbers.filter { $0.value > 0 }.max { lhs, rhs in
             lhs.value < rhs.value
         }
         guard let number = number?.key else {

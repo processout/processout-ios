@@ -145,7 +145,7 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
 
 extension DefaultCardScannerInteractor: CardRecognitionSessionDelegate {
 
-    func cardRecognitionSession(_ session: CardRecognitionSession, didUpdateCard card: POScannedCard) {
+    func cardRecognitionSession(_ session: CardRecognitionSession, didUpdateCard card: POScannedCard?) {
         setRecognizedCard(card)
     }
 

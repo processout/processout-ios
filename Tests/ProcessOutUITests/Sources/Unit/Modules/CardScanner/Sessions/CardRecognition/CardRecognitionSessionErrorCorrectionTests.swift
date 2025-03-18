@@ -81,16 +81,28 @@ struct CardRecognitionSessionErrorCorrectionTests {
 
         // When
         let cards: [POScannedCard] = [
-            .init(number: "", expiration: .init(month: 1, year: 1, description: ""), cardholderName: nil),
-            .init(number: "", expiration: .init(month: 2, year: 3, description: ""), cardholderName: nil),
-            .init(number: "", expiration: .init(month: 2, year: 3, description: ""), cardholderName: nil)
+            .init(
+                number: "",
+                expiration: .init(month: 1, year: 1, isExpired: false, description: ""),
+                cardholderName: nil
+            ),
+            .init(
+                number: "",
+                expiration: .init(month: 2, year: 3, isExpired: false, description: ""),
+                cardholderName: nil
+            ),
+            .init(
+                number: "",
+                expiration: .init(month: 2, year: 3, isExpired: false, description: ""),
+                cardholderName: nil
+            )
         ]
         for card in cards {
             recentCorrectedCard = sut.add(scannedCard: card)
         }
 
         // Then
-        #expect(recentCorrectedCard?.expiration == .init(month: 2, year: 3, description: ""))
+        #expect(recentCorrectedCard?.expiration == .init(month: 2, year: 3, isExpired: false, description: ""))
     }
 
     @Test
