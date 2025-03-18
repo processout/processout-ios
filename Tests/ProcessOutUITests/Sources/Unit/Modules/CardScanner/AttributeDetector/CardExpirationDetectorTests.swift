@@ -101,6 +101,19 @@ struct CardExpirationDetectorTests {
         #expect(sut.firstMatch(in: &candidates) != nil && candidates.isEmpty)
     }
 
+    @Test
+    func firstMatch_whenMultipleExpirationsArePresent_matchesRecent() {
+        // Given
+        let sut = CardExpirationDetector(regexProvider: .shared, formatter: .init())
+
+        // When
+        var candidates = ["01/01 03/40 02/20"]
+
+        // Then
+        let match = sut.firstMatch(in: &candidates)
+        #expect(match?.month == 3 && match?.year == 2040 && candidates.isEmpty)
+    }
+
     // MARK: - Utils
 
     private func expirations(months: ClosedRange<Int>, monthFormat: String, year: String) -> [String] {
