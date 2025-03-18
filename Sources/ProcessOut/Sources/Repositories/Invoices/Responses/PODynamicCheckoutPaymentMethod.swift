@@ -45,7 +45,8 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public var merchantCapabilities: PKMerchantCapability
 
         /// The payment methods that are supported.
-        public let supportedNetworks: Set<POCardScheme>
+        @POCodablePassKitPaymentNetworks
+        public var supportedNetworks: Set<PKPaymentNetwork>
     }
 
     // MARK: - Native APM
