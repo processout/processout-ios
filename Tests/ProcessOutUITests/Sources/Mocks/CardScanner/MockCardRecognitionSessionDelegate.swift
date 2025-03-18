@@ -16,7 +16,7 @@ final class MockCardRecognitionSessionDelegate: CardRecognitionSessionDelegate {
 
     // MARK: - CardRecognitionSessionDelegate
 
-    func cardRecognitionSession(_ session: CardRecognitionSession, didUpdateCard card: POScannedCard) {
+    func cardRecognitionSession(_ session: CardRecognitionSession, didUpdateCard card: POScannedCard?) {
         didUpdateCardCallsCount += 1
         lastUpdatedCard = card
     }

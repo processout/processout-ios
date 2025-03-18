@@ -17,7 +17,7 @@ struct CardExpirationDetector: CardAttributeDetector {
     }
 
     func firstMatch(in candidates: inout [String]) -> POScannedCard.Expiration? {
-        guard let regex = regexProvider.regex(with: "(0?[1-9]|1[0-2])[\\/.-](\\d{4}|\\d{2})") else {
+        guard let regex = regexProvider.regex(with: "((?<!\\d)[1-9]|0[1-9]|1[0-2])[\\/.-](\\d{4}|\\d{2})") else {
             return nil
         }
         var matchedExpirations: [POScannedCard.Expiration] = []

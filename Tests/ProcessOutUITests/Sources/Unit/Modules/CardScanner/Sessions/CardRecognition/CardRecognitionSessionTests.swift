@@ -57,7 +57,7 @@ final class CardRecognitionSessionTests {
         // Then
         let expectedCard = POScannedCard(
             number: "5454 5454 5454 5454",
-            expiration: .init(month: 4, year: 2040, description: "04 / 40"),
+            expiration: .init(month: 4, year: 2040, isExpired: false, description: "04 / 40"),
             cardholderName: "JOHN DOE"
         )
         await #expect(recognitionSessionDelegate.lastUpdatedCard == expectedCard)

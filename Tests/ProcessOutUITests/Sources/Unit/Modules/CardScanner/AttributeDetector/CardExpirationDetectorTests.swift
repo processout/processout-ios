@@ -21,9 +21,12 @@ struct CardExpirationDetectorTests {
 
         // Then
         for month in validExpirationMonths {
-            var candidates = expirations(months: month...month, monthFormat: "%02d", year: "40")
-            let match = sut.firstMatch(in: &candidates)
-            #expect(match?.month == month && match?.year == 2040 && candidates.isEmpty)
+            let monthFormats = ["%02d", "%d"]
+            for monthFormat in monthFormats {
+                var candidates = expirations(months: month...month, monthFormat: monthFormat, year: "40")
+                let match = sut.firstMatch(in: &candidates)
+                #expect(match?.month == month && match?.year == 2040 && candidates.isEmpty)
+            }
         }
     }
 
@@ -48,16 +51,16 @@ struct CardExpirationDetectorTests {
         // When
         var candidates = [
             ["0", "00"],
-            expirations(months: 1...9, monthFormat: "%d", year: "40"),
             expirations(months: 13...99, monthFormat: "%d", year: "40")
         ].flatMap { $0 }
 
         // Then
-        #expect(sut.firstMatch(in: &candidates) == nil && candidates.count == 98)
+        print(candidates)
+        #expect(sut.firstMatch(in: &candidates) == nil && candidates.count == 89)
     }
 
     @Test
-    func firstMatch_whenDateIsInPast_doesNotMatchButConsumesCandidate() {
+    func firstMatch_whenDateIsInPast_matches() {
         // Given
         let sut = CardExpirationDetector(regexProvider: .shared, formatter: .init())
 
@@ -65,7 +68,8 @@ struct CardExpirationDetectorTests {
         var candidates = ["01/01"]
 
         // Then
-        #expect(sut.firstMatch(in: &candidates) == nil && candidates.isEmpty)
+        let match = sut.firstMatch(in: &candidates)
+        #expect(match?.month == 1 && match?.year == 2001 && match?.isExpired == true && candidates.isEmpty)
     }
 
     @Test
