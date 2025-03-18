@@ -17,7 +17,7 @@ public struct POScannedCard: Sendable, Hashable {
         public let year: Int
 
         /// A Boolean value that indicates whether the card's expiration date has passed, making the card expired.
-        let isExpired: Bool
+        public let isExpired: Bool
 
         /// Formatted description.
         public let description: String
