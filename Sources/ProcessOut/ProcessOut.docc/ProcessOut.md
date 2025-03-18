@@ -160,6 +160,7 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POEmptyStringProvider``
 - ``POTypedRepresentation``
 - ``POStringDecodableMerchantCapability``
+- ``POCodablePassKitPaymentNetworks``
 - ``POBillingAddressCollectionMode``
 - ``PORepository``
 - ``POService``
