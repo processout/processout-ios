@@ -9,7 +9,7 @@
 ///
 /// - NOTE: Make sure to supply proper `additionalData` specific for particular payment
 /// method.
-public struct POAlternativePaymentTokenizationRequest: Sendable {
+public struct POAlternativePaymentTokenizationRequest: Sendable, Codable {
 
     /// Customer ID that may be used for creating APM recurring token.
     public let customerId: String
@@ -24,7 +24,8 @@ public struct POAlternativePaymentTokenizationRequest: Sendable {
     public let additionalData: [String: String]?
 
     /// An object used to evaluate navigation events in a web authentication session.
-    public let callback: POWebAuthenticationCallback?
+    @POExcludedEncodable
+    public private(set) var callback: POWebAuthenticationCallback?
 
     /// A boolean value that indicates whether the session should ask the browser for a
     /// private authentication session.
@@ -34,7 +35,8 @@ public struct POAlternativePaymentTokenizationRequest: Sendable {
     /// and the user’s normal browser session.
     ///
     /// The value of this property is `true` by default.
-    public let prefersEphemeralSession: Bool
+    @POExcludedEncodable
+    public private(set) var prefersEphemeralSession: Bool
 
     /// Creates tokenization request.
     public init(

@@ -6,7 +6,7 @@
 //
 
 /// Contains information about completion of the challenge process.
-public struct PO3DS2ChallengeResult: Encodable, Sendable {
+public struct PO3DS2ChallengeResult: Codable, Sendable {
 
     /// The transaction status that was received in the final challenge response.
     public let transactionStatus: String

@@ -8,13 +8,15 @@
 import Foundation
 
 /// Request to use to assign new source to existing customer token and potentially verify it.
-public struct POAssignCustomerTokenRequest: Encodable, Sendable { // sourcery: AutoCodingKeys
+public struct POAssignCustomerTokenRequest: Codable, Sendable { // sourcery: AutoCodingKeys
 
     /// Id of the customer who token belongs to.
-    public let customerId: String // sourcery:coding: skip
+    @POExcludedEncodable
+    public private(set) var customerId: String
 
     /// Tokens that belong to the customer.
-    public let tokenId: String // sourcery:coding: skip
+    @POExcludedEncodable
+    public private(set) var tokenId: String
 
     /// Payment source to associate with token. The source can be a card, an APM or a gateway request. For the source
     /// to be valid, you must not have used it for any previous payment or to create any other customer tokens.
@@ -46,7 +48,8 @@ public struct POAssignCustomerTokenRequest: Encodable, Sendable { // sourcery: A
     public let metadata: [String: String]?
 
     /// An object used to evaluate navigation events in a web authentication session.
-    public let webAuthenticationCallback: POWebAuthenticationCallback? // sourcery:coding: skip
+    @POExcludedEncodable
+    public private(set) var webAuthenticationCallback: POWebAuthenticationCallback?
 
     /// Creates request instance.
     public init(

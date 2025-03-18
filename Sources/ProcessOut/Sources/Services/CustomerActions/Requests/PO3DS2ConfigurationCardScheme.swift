@@ -8,7 +8,7 @@
 // todo(andrii-vysotskyi): remove when updating to 5.0.0
 
 /// Available card schemes.
-public enum PO3DS2ConfigurationCardScheme: RawRepresentable, Decodable, Hashable, Sendable {
+public enum PO3DS2ConfigurationCardScheme: RawRepresentable, Hashable, Sendable {
 
     /// Known card schemes.
     case visa, mastercard, europay, carteBancaire, jcb, diners, discover, unionpay, americanExpress
@@ -72,4 +72,17 @@ public enum PO3DS2ConfigurationCardScheme: RawRepresentable, Decodable, Hashable
         Constants.unionpay: .unionpay,
         Constants.americanExpress: .americanExpress
     ]
+}
+
+extension PO3DS2ConfigurationCardScheme: Codable {
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self = .init(rawValue: try container.decode(String.self))
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
 }

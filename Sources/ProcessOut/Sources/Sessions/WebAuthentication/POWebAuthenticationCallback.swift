@@ -63,3 +63,55 @@ extension POWebAuthenticationCallback {
         .init(value: .https(host: host, path: path))
     }
 }
+
+// MARK: - Coding
+
+extension POWebAuthenticationCallback: Codable {
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.value = try container.decode(POWebAuthenticationCallback.Value.self)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(value)
+    }
+}
+
+extension POWebAuthenticationCallback.Value: Codable {
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let value = try container.decodeIfPresent(String.self, forKey: .scheme) {
+            self = .scheme(value)
+        } else {
+            let value = try container.decode(Https.self, forKey: .https)
+            self = .https(host: value.host, path: value.path)
+        }
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .scheme(let scheme):
+            try container.encode(scheme, forKey: .scheme)
+        case let .https(host, path):
+            try container.encode(Https(host: host, path: path), forKey: .https)
+        }
+    }
+
+    // MARK: - Private Nested Types
+
+    private struct Https: Codable {
+        let host, path: String
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case scheme, https
+    }
+
+    private enum HttpsCodingKeys: String, CodingKey {
+        case host, path
+    }
+}

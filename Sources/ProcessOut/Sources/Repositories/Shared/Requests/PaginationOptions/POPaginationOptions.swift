@@ -7,9 +7,9 @@
 
 import Foundation
 
-public struct POPaginationOptions: Sendable {
+public struct POPaginationOptions: Sendable, Codable {
 
-    public enum Order: String, Sendable {
+    public enum Order: String, Sendable, Codable {
         case ascending = "asc", descending = "desc"
     }
 
@@ -34,5 +34,34 @@ public struct POPaginationOptions: Sendable {
         self.position = position
         self.limit = limit
         self.order = order
+    }
+}
+
+extension POPaginationOptions.Position: Codable {
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let value = try container.decodeIfPresent(String.self, forKey: .before) {
+            self = .before(value)
+        } else {
+            let value = try container.decode(String.self, forKey: .after)
+            self = .after(value)
+        }
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .before(let value):
+            try container.encode(value, forKey: .before)
+        case .after(let value):
+            try container.encode(value, forKey: .after)
+        }
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum CodingKeys: String, CodingKey {
+        case before, after
     }
 }

@@ -17,7 +17,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
 
     // MARK: - Apple Pay
 
-    public struct ApplePay: Decodable, Sendable { // sourcery: AutoCodingKeys
+    public struct ApplePay: Codable, Sendable { // sourcery: AutoCodingKeys
 
         /// Payment method ID.
         @_spi(PO)
@@ -32,7 +32,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public let configuration: ApplePayConfiguration // sourcery:coding: key="applepay"
     }
 
-    public struct ApplePayConfiguration: Decodable, Sendable {
+    public struct ApplePayConfiguration: Codable, Sendable {
 
         /// Merchant ID.
         public let merchantId: String
@@ -50,7 +50,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
 
     // MARK: - Native APM
 
-    public struct NativeAlternativePayment: Decodable, Sendable { // sourcery: AutoCodingKeys
+    public struct NativeAlternativePayment: Codable, Sendable { // sourcery: AutoCodingKeys
 
         /// Payment method ID.
         @_spi(PO)
@@ -65,7 +65,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public let configuration: NativeAlternativePaymentConfiguration // sourcery:coding: key="apm"
     }
 
-    public struct NativeAlternativePaymentConfiguration: Decodable, Sendable {
+    public struct NativeAlternativePaymentConfiguration: Codable, Sendable {
 
         /// Gateway configuration ID.
         public let gatewayConfigurationId: String
@@ -73,7 +73,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
 
     // MARK: - APM
 
-    public struct AlternativePayment: Decodable, Sendable { // sourcery: AutoCodingKeys
+    public struct AlternativePayment: Codable, Sendable { // sourcery: AutoCodingKeys
 
         /// Payment method ID.
         @_spi(PO)
@@ -91,7 +91,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public let configuration: AlternativePaymentConfiguration // sourcery:coding: key="apm"
     }
 
-    public struct AlternativePaymentConfiguration: Decodable, Sendable {
+    public struct AlternativePaymentConfiguration: Codable, Sendable {
 
         /// Gateway configuration ID.
         public let gatewayConfigurationId: String
@@ -106,7 +106,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
 
     // MARK: - Card
 
-    public struct Card: Decodable, Sendable { // sourcery: AutoCodingKeys
+    public struct Card: Codable, Sendable { // sourcery: AutoCodingKeys
 
         /// Payment method ID.
         @_spi(PO)
@@ -119,7 +119,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public let configuration: CardConfiguration // sourcery:coding: key="card"
     }
 
-    public struct CardConfiguration: Decodable, Sendable {
+    public struct CardConfiguration: Codable, Sendable {
 
         /// Defines whether user will be asked to select scheme if co-scheme is available.
         let schemeSelectionAllowed: Bool
@@ -138,7 +138,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public let billingAddress: BillingAddressConfiguration
     }
 
-    public struct BillingAddressConfiguration: Decodable, Sendable {
+    public struct BillingAddressConfiguration: Codable, Sendable {
 
         /// List of ISO country codes that is supported for the billing address. When nil, all countries are supported.
         public let restrictToCountryCodes: Set<String>?
@@ -170,7 +170,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public let configuration: CustomerTokenConfiguration
     }
 
-    public struct CustomerTokenConfiguration: Sendable, Decodable {
+    public struct CustomerTokenConfiguration: Sendable, Codable {
 
         /// Customer token ID.
         public let customerTokenId: String
@@ -182,7 +182,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public let deletingAllowed: Bool
     }
 
-    public enum CustomerTokenType: Sendable, Hashable {
+    public enum CustomerTokenType: String, Sendable, Hashable, Codable {
 
         /// Customer token represents card.
         case card
@@ -206,7 +206,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
 
     // MARK: - Common
 
-    public struct Display: Decodable, Sendable {
+    public struct Display: Codable, Sendable {
 
         /// Display name.
         public let name: String
@@ -221,7 +221,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         public private(set) var brandColor: UIColor
     }
 
-    public enum Flow: String, Decodable, Sendable {
+    public enum Flow: String, Codable, Sendable {
         case express
     }
 
@@ -246,7 +246,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
     case unknown(Unknown)
 }
 
-extension PODynamicCheckoutPaymentMethod: Decodable {
+extension PODynamicCheckoutPaymentMethod: Codable {
 
     public init(from decoder: any Decoder) throws {
         let type = try decoder.container(keyedBy: CodingKeys.self).decode(String.self, forKey: .type)
@@ -271,6 +271,32 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
         }
     }
 
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .applePay(let applePay):
+            try container.encode("applepay", forKey: .type)
+            try applePay.encode(to: encoder)
+        case .alternativePayment(let alternativePayment):
+            try container.encode("apm", forKey: .type)
+            try alternativePayment.encode(to: encoder)
+        case .nativeAlternativePayment(let nativeAlternativePayment):
+            try container.encode("apm", forKey: .type)
+            try nativeAlternativePayment.encode(to: encoder)
+        case .card(let card):
+            try container.encode("card", forKey: .type)
+            try card.encode(to: encoder)
+        case .customerToken(let customerToken) where customerToken.type == .card:
+            try container.encode("card_customer_token", forKey: .type)
+            try customerToken.encode(to: encoder)
+        case .customerToken(let customerToken):
+            try container.encode("apm_customer_token", forKey: .type)
+            try customerToken.encode(to: encoder)
+        case .unknown(let unknown):
+            try container.encode(unknown.type, forKey: .type)
+        }
+    }
+
     // MARK: - Private Nested Types
 
     private enum CodingKeys: String, CodingKey {
@@ -278,7 +304,7 @@ extension PODynamicCheckoutPaymentMethod: Decodable {
     }
 }
 
-extension PODynamicCheckoutPaymentMethod.CustomerToken: Decodable {
+extension PODynamicCheckoutPaymentMethod.CustomerToken: Codable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -294,6 +320,18 @@ extension PODynamicCheckoutPaymentMethod.CustomerToken: Decodable {
         } catch {
             configuration = try container.decode(Configuration.self, forKey: .apmCustomerToken)
             type = .alternativePaymentMethod
+        }
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(display, forKey: .display)
+        try container.encodeIfPresent(flow, forKey: .flow)
+        switch type {
+        case .card:
+            try container.encode(configuration, forKey: .cardCustomerToken)
+        case .alternativePaymentMethod:
+            try container.encode(configuration, forKey: .apmCustomerToken)
         }
     }
 

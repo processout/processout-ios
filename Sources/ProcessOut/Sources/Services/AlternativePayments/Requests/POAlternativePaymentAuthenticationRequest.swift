@@ -8,13 +8,14 @@
 import Foundation
 
 /// Alternative payment raw authentication request.
-public struct POAlternativePaymentAuthenticationRequest: Sendable {
+public struct POAlternativePaymentAuthenticationRequest: Sendable, Codable {
 
     /// URL where user should be redirected to perform authentication.
     public let url: URL
 
     /// An object used to evaluate navigation events in a web authentication session.
-    public let callback: POWebAuthenticationCallback?
+    @POExcludedEncodable
+    public private(set) var callback: POWebAuthenticationCallback?
 
     /// A boolean value that indicates whether the session should ask the browser for a
     /// private authentication session.
@@ -24,7 +25,8 @@ public struct POAlternativePaymentAuthenticationRequest: Sendable {
     /// and the user’s normal browser session.
     ///
     /// The value of this property is `true` by default.
-    public let prefersEphemeralSession: Bool
+    @POExcludedEncodable
+    public private(set) var prefersEphemeralSession: Bool
 
     public init(url: URL, callback: POWebAuthenticationCallback? = nil, prefersEphemeralSession: Bool = true) {
         self.url = url

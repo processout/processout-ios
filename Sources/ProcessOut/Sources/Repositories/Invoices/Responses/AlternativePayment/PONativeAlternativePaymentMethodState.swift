@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum PONativeAlternativePaymentMethodState: String, Decodable, Sendable {
+public enum PONativeAlternativePaymentMethodState: String, Codable, Sendable {
 
     /// Additional input is required.
     case customerInput = "CUSTOMER_INPUT"

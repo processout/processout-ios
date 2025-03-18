@@ -65,6 +65,23 @@ struct POStringCodableColorTests {
         expectEqual(color: colorWrapper.wrappedValue, to: 0x0057B7FF, style: .dark)
     }
 
+    @Test
+    func encode() throws {
+        // Given
+        let sut = UIColor(
+            red: CGFloat(0x5B) / 255, green: CGFloat(0xFD) / 255, blue: CGFloat(0x8D) / 255, alpha: CGFloat(0x39) / 255
+        )
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+
+        // Then
+        let codableSut = POStringCodableColor(value: sut)
+        let encodedColor = String(
+            decoding: try encoder.encode(codableSut), as: UTF8.self
+        )
+        #expect(encodedColor == #"{"dark":"5BFD8D39","light":"5BFD8D39"}"#)
+    }
+
     // MARK: - Private Methods
 
     private func expectEqual(color: UIColor, to hex: UInt64, style: UIUserInterfaceStyle) {
