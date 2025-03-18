@@ -11,7 +11,8 @@ import ProcessOut
 @available(iOS 14, *)
 extension PKPaymentNetwork {
 
-    init?(poScheme: POCardScheme) {
+    @_spi(PO)
+    public init?(poScheme: POCardScheme) {
         if let scheme = Self.schemes[poScheme] {
             self = scheme
         } else {
