@@ -17,7 +17,7 @@ public struct POCodablePassKitPaymentNetworks: Codable, Sendable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
-        schemes = try container.decode(Set<POPassKitPaymentNetworkCodingAdapter>.self)
+        schemes = try container.decode(Set<POCodablePassKitPaymentNetwork>.self)
         wrappedValue = Set(schemes.map(\.wrappedValue))
     }
 
@@ -28,16 +28,17 @@ public struct POCodablePassKitPaymentNetworks: Codable, Sendable {
 
     // MARK: - Private Properties
 
-    private let schemes: Set<POPassKitPaymentNetworkCodingAdapter>
+    private let schemes: Set<POCodablePassKitPaymentNetwork>
 }
 
-private struct POPassKitPaymentNetworkCodingAdapter: Codable, Sendable, Hashable {
+@propertyWrapper
+public struct POCodablePassKitPaymentNetwork: Codable, Sendable, Hashable {
 
-    let wrappedValue: PKPaymentNetwork
+    public let wrappedValue: PKPaymentNetwork
 
     // MARK: - Decodable
 
-    init(from decoder: any Decoder) throws {
+    public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         scheme = try container.decode(POCardScheme.self)
         guard let network = Self.networks[scheme] else {
@@ -49,7 +50,7 @@ private struct POPassKitPaymentNetworkCodingAdapter: Codable, Sendable, Hashable
         wrappedValue = network
     }
 
-    func encode(to encoder: any Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(scheme) // Encode original value.
     }
