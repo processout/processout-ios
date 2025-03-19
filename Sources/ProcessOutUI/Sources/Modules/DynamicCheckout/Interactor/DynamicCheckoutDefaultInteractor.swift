@@ -526,7 +526,6 @@ final class DynamicCheckoutDefaultInteractor:
         request.countryCode = paymentMethod.configuration.countryCode
         request.merchantCapabilities = paymentMethod.configuration.merchantCapabilities
         request.supportedNetworks = paymentMethod.configuration.supportedNetworks
-            .compactMap(PKPaymentNetwork.init(poScheme:))
             .filter(availableNetworks.contains)
         request.currencyCode = invoice.currency
         return request
