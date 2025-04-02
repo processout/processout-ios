@@ -17,8 +17,8 @@ public struct POCodablePassKitPaymentNetworks: Codable, Sendable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
-        schemes = try container.decode(Set<POCodablePassKitPaymentNetwork>.self)
-        wrappedValue = Set(schemes.map(\.wrappedValue))
+        schemes = try container.decode(Set<CodablePassKitPaymentNetwork>.self)
+        wrappedValue = Set(schemes.compactMap(\.wrappedValue))
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -28,37 +28,40 @@ public struct POCodablePassKitPaymentNetworks: Codable, Sendable {
 
     // MARK: - Private Properties
 
-    private let schemes: Set<POCodablePassKitPaymentNetwork>
+    private let schemes: Set<CodablePassKitPaymentNetwork>
 }
 
-@propertyWrapper
-public struct POCodablePassKitPaymentNetwork: Codable, Sendable, Hashable {
+private struct CodablePassKitPaymentNetwork: Codable, Sendable, Hashable {
 
-    public let wrappedValue: PKPaymentNetwork
+    let wrappedValue: PKPaymentNetwork?
 
     // MARK: - Decodable
 
-    public init(from decoder: any Decoder) throws {
+    init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
-        scheme = try container.decode(POCardScheme.self)
-        guard let network = Self.networks[scheme] else {
-            let context = DecodingError.Context(
-                codingPath: container.codingPath, debugDescription: "Unknown payment network: '\(scheme)'."
-            )
-            throw DecodingError.dataCorrupted(context)
+        let scheme = try container.decode(POCardScheme.self)
+        if let network = Self.networks[scheme] {
+            wrappedValue = network
+            self.scheme = scheme
+        } else {
+            wrappedValue = nil
+            self.scheme = nil
         }
-        wrappedValue = network
     }
 
-    public func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
-        try container.encode(scheme) // Encode original value.
+        if let scheme {
+            try container.encode(scheme) // Encode original value.
+        } else {
+            try container.encodeNil()
+        }
     }
 
     // MARK: - Private Properties
 
     /// Original scheme.
-    private let scheme: POCardScheme
+    private let scheme: POCardScheme?
 
     private static let networks: [POCardScheme: PKPaymentNetwork] = {
         var schemes: [POCardScheme: PKPaymentNetwork] = [

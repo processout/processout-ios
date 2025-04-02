@@ -71,7 +71,7 @@ extension POCardScheme {
     public static let cielo: POCardScheme = "cielo"
 
     /// Domestic debit and credit card brand of Brazil.
-    public static let elo: POCardScheme = "elp"
+    public static let elo: POCardScheme = "elo"
 
     /// Domestic debit and credit card brand of Brazil.
     public static let hipercard: POCardScheme = "hipercard"
