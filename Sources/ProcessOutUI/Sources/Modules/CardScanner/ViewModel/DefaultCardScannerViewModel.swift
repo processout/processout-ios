@@ -32,12 +32,6 @@ final class DefaultCardScannerViewModel: ViewModel {
         $_state.performWithoutAnimation(interactor.start)
     }
 
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let previewAspectRatio: CGFloat = 1.586 // ISO/IEC 7810 based
-    }
-
     // MARK: - Private Properties
 
     private let interactor: any CardScannerInteractor
@@ -70,9 +64,7 @@ final class DefaultCardScannerViewModel: ViewModel {
             title: title,
             description: description,
             isTorchEnabled: .constant(false),
-            preview: .init(
-                source: nil, aspectRatio: Constants.previewAspectRatio
-            ),
+            preview: .init(source: nil),
             recognizedCard: nil,
             cancelButton: cancelButtonViewModel
         )
@@ -90,9 +82,7 @@ final class DefaultCardScannerViewModel: ViewModel {
                     self?.interactor.setTorchEnabled(newValue)
                 }
             ),
-            preview: .init(
-                source: startedState.previewSource, aspectRatio: Constants.previewAspectRatio
-            ),
+            preview: .init(source: startedState.previewSource),
             recognizedCard: cardViewModel(with: startedState.card),
             cancelButton: cancelButtonViewModel
         )

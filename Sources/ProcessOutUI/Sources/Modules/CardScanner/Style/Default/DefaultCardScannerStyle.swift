@@ -23,10 +23,19 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
         /// Video preview overlay color.
         public let overlayColor: Color
 
-        public init(backgroundColor: Color, border: POBorderStyle, overlayColor: Color) {
+        /// Video preview overlay width.
+        public let overlayWidth: CGFloat
+
+        public init(
+            backgroundColor: Color,
+            border: POBorderStyle,
+            overlayColor: Color,
+            overlayWidth: CGFloat? = nil
+        ) {
             self.backgroundColor = backgroundColor
             self.border = border
             self.overlayColor = overlayColor
+            self.overlayWidth = overlayWidth ?? POSpacing.large
         }
     }
 
@@ -114,12 +123,17 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                 } trailing: {
                     EmptyView()
                 }
-                configuration.videoPreview
+                Color.clear
+                    .aspectRatio(Constants.previewAspectRatio, contentMode: .fit)
+                    .padding(videoPreview.overlayWidth)
                     .frame(maxWidth: .infinity)
-                    .background(videoPreview.backgroundColor)
                     .backport.overlay {
-                        cardOverlay(with: configuration.card)
+                        ZStack {
+                            configuration.videoPreview
+                            cardOverlay(with: configuration.card)
+                        }
                     }
+                    .background(videoPreview.backgroundColor)
                     .border(style: videoPreview.border)
                 configuration.cancelButton
                     .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
@@ -140,6 +154,12 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
         }
     }
 
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let previewAspectRatio: CGFloat = 1.586 // ISO/IEC 7810 based
+    }
+
     // MARK: - Private Methods
 
     @ViewBuilder
@@ -151,13 +171,13 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                     Rectangle()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .border(style: card.border)
-                        .padding(POSpacing.large)
+                        .padding(videoPreview.overlayWidth)
                 }
             cardDetails(with: configuration)
                 .padding(POSpacing.extraLarge)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .border(style: card.border)
-                .padding(POSpacing.large)
+                .padding(videoPreview.overlayWidth)
         }
     }
 
