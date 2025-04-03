@@ -42,6 +42,7 @@
 - ``POCardScannerView``
 - ``POScannedCard``
 - ``POCardScannerConfiguration``
+- ``POCardScannerDelegate``
 - ``POCardScannerStyle``
 - ``POCardScannerStyleConfiguration``
 - ``PODefaultCardScannerStyle``
