@@ -152,4 +152,8 @@ extension DefaultCardScannerInteractor: CardRecognitionSessionDelegate {
     func cardRecognitionSession(_ session: CardRecognitionSession, didRecognizeCard card: POScannedCard) {
         setSuccessState(with: card)
     }
+
+    func cardRecognitionSession(_ session: CardRecognitionSession, regionOfInterestInside rect: CGRect) -> CGRect? {
+        nil
+    }
 }

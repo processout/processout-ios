@@ -54,6 +54,10 @@ actor CardRecognitionSession: CameraSessionDelegate {
         await process(scannedCard: scannedCard(in: recognizedTexts))
     }
 
+    func cameraSession(_ session: CameraSession, regionOfInterestInside rect: CGRect) async -> CGRect? {
+        await delegate?.cardRecognitionSession(self, regionOfInterestInside: rect)
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {
