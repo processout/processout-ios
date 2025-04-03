@@ -304,9 +304,8 @@ actor DefaultCameraSession:
             )
             let previewTransform = CGAffineTransform
                 .identity
-                .translatedBy(x: -scaledRect.midX, y: -scaledRect.midY)
                 .scaledBy(x: previewSize.width / scaledRect.width, y: previewSize.height / scaledRect.height)
-                .translatedBy(x: previewSize.width / 2, y: previewSize.height / 2)
+                .translatedBy(x: -scaledRect.minX, y: -scaledRect.minY)
             let croppedRect = await delegate?
                 .cameraSession(self, regionOfInterestInside: scaledRect.applying(previewTransform))?
                 .applying(previewTransform.inverted())
