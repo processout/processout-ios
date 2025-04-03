@@ -23,19 +23,19 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
         /// Video preview overlay color.
         public let overlayColor: Color
 
-        /// Video preview overlay width.
-        public let overlayWidth: CGFloat
+        /// Video preview overlay insets.
+        public let overlayInsets: EdgeInsets
 
         public init(
             backgroundColor: Color,
             border: POBorderStyle,
             overlayColor: Color,
-            overlayWidth: CGFloat? = nil
+            overlayInsets: EdgeInsets? = nil
         ) {
             self.backgroundColor = backgroundColor
             self.border = border
             self.overlayColor = overlayColor
-            self.overlayWidth = overlayWidth ?? POSpacing.large
+            self.overlayInsets = overlayInsets ?? .init(horizontal: POSpacing.large, vertical: POSpacing.large)
         }
     }
 
@@ -125,7 +125,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                 }
                 Color.clear
                     .aspectRatio(Constants.previewAspectRatio, contentMode: .fit)
-                    .padding(videoPreview.overlayWidth)
+                    .padding(videoPreview.overlayInsets)
                     .frame(maxWidth: .infinity)
                     .backport.overlay {
                         ZStack {
@@ -171,13 +171,13 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                     Rectangle()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .border(style: card.border)
-                        .padding(videoPreview.overlayWidth)
+                        .padding(videoPreview.overlayInsets)
                 }
             cardDetails(with: configuration)
                 .padding(POSpacing.extraLarge)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .border(style: card.border)
-                .padding(videoPreview.overlayWidth)
+                .padding(videoPreview.overlayInsets)
         }
     }
 
