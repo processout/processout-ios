@@ -8,7 +8,6 @@
 @_spi(PO) import ProcessOut
 
 /// Events emitted by the saved payment methods view throughout its lifecycle.
-@_spi(PO)
 public enum POSavedPaymentMethodsEvent: Sendable {
 
     public typealias PaymentMethod = PODynamicCheckoutPaymentMethod.CustomerToken
