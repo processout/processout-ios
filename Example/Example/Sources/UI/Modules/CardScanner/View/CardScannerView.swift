@@ -8,7 +8,7 @@
 import SwiftUI
 import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
-@_spi(PO) import ProcessOutUI
+import ProcessOutUI
 
 struct CardScannerView: View {
 

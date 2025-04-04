@@ -7,7 +7,7 @@
 
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
-@_spi(PO) import ProcessOutUI
+import ProcessOutUI
 
 struct SavedPaymentMethodsView: View {
 

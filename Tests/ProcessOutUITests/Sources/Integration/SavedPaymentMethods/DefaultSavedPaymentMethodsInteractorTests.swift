@@ -9,7 +9,7 @@ import Foundation
 import Testing
 import SwiftUI
 @testable @_spi(PO) import ProcessOut
-@testable @_spi(PO) import ProcessOutUI
+@testable import ProcessOutUI
 
 @MainActor
 struct DefaultSavedPaymentMethodsInteractorTests {

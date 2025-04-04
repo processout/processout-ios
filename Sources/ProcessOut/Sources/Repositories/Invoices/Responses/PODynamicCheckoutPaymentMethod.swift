@@ -12,7 +12,6 @@ import PassKit
 /// Dynamic checkout payment method description.
 ///
 /// - Warning: New cases may be added in future minor releases.
-@_spi(PO)
 public enum PODynamicCheckoutPaymentMethod: Sendable {
 
     // MARK: - Apple Pay

@@ -9,7 +9,6 @@
 public protocol POSavedPaymentMethodsDelegate: AnyObject, Sendable {
 
     /// Invoked when view emits an event.
-    @_spi(PO)
     @MainActor
     func savedPaymentMethods(didEmitEvent event: POSavedPaymentMethodsEvent)
 }
@@ -17,7 +16,6 @@ public protocol POSavedPaymentMethodsDelegate: AnyObject, Sendable {
 extension POSavedPaymentMethodsDelegate {
 
     @MainActor
-    @_spi(PO)
     public func savedPaymentMethods(didEmitEvent event: POSavedPaymentMethodsEvent) {
         // NOP
     }
