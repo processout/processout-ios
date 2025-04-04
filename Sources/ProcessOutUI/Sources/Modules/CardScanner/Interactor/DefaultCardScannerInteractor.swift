@@ -12,12 +12,14 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
 
     init(
         configuration: POCardScannerConfiguration,
+        delegate: POCardScannerDelegate?,
         cameraSession: CameraSession,
         cardRecognitionSession: CardRecognitionSession,
         logger: POLogger,
         completion: @escaping (Result<POScannedCard, POFailure>) -> Void
     ) {
         self.configuration = configuration
+        self.delegate = delegate
         self.cameraSession = cameraSession
         self.cardRecognitionSession = cardRecognitionSession
         self.logger = logger
@@ -73,6 +75,8 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
     private let cardRecognitionSession: CardRecognitionSession
     private let logger: POLogger
     private let completion: (Result<POScannedCard, POFailure>) -> Void
+
+    private weak var delegate: POCardScannerDelegate?
 
     // MARK: - Started State
 
@@ -151,5 +155,9 @@ extension DefaultCardScannerInteractor: CardRecognitionSessionDelegate {
 
     func cardRecognitionSession(_ session: CardRecognitionSession, didRecognizeCard card: POScannedCard) {
         setSuccessState(with: card)
+    }
+
+    func cardRecognitionSession(_ session: CardRecognitionSession, regionOfInterestInside rect: CGRect) -> CGRect? {
+        delegate?.cardScanner(regionOfInterestInside: rect)
     }
 }

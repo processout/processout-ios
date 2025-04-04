@@ -15,9 +15,6 @@ struct CardScannerViewModelState {
 
         /// Preview source.
         let source: CameraSessionPreviewSource?
-
-        /// Preview aspect ratio.
-        let aspectRatio: CGFloat
     }
 
     struct Card {
@@ -54,6 +51,6 @@ struct CardScannerViewModelState {
 extension CardScannerViewModelState: AnimationIdentityProvider {
 
     var animationIdentity: AnyHashable {
-        [title, description, AnyHashable(preview.aspectRatio)]
+        [title, description]
     }
 }

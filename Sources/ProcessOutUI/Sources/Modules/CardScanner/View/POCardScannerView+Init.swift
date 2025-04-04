@@ -17,6 +17,7 @@ extension POCardScannerView {
     /// more than once — which might result in unexpected behavior.
     public init(
         configuration: POCardScannerConfiguration = .init(),
+        delegate: POCardScannerDelegate? = nil,
         completion: @escaping (Result<POScannedCard, POFailure>) -> Void
     ) {
         let viewModel = {
@@ -33,6 +34,7 @@ extension POCardScannerView {
             )
             let interactor = DefaultCardScannerInteractor(
                 configuration: configuration,
+                delegate: delegate,
                 cameraSession: DefaultCameraSession(logger: ProcessOut.shared.logger),
                 cardRecognitionSession: cardRecognitionSession,
                 logger: ProcessOut.shared.logger,
