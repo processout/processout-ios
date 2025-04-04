@@ -8,7 +8,7 @@
 import Combine
 import SwiftUI
 @_spi(PO) import ProcessOut
-@_spi(PO) import ProcessOutUI
+import ProcessOutUI
 import ProcessOutCheckout3DS
 import Checkout3DS
 

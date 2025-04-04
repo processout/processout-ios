@@ -7,7 +7,7 @@
 
 import Foundation
 import Testing
-@testable @_spi(PO) import ProcessOut
+@testable import ProcessOut
 
 struct DefaultAlternativePaymentMethodsServiceTests {
 

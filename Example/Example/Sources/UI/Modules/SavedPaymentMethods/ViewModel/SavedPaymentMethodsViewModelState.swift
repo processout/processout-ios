@@ -7,7 +7,7 @@
 
 import Foundation
 import ProcessOut
-@_spi(PO) import ProcessOutUI
+import ProcessOutUI
 
 struct SavedPaymentMethodsViewModelState {
 

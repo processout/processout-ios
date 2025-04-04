@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@_spi(PO) import ProcessOut
+import ProcessOut
 
 enum AlternativePaymentsInteractorState {
 
