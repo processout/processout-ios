@@ -6,7 +6,6 @@
 //
 
 /// Transaction status.
-@_spi(PO)
 public struct POTransactionStatus: RawRepresentable, Sendable, Hashable {
 
     /// Raw status.

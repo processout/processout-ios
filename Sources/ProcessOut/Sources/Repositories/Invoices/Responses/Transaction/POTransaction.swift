@@ -8,7 +8,6 @@
 import Foundation
 
 /// Transaction details.
-@_spi(PO)
 public struct POTransaction: Codable, Sendable {
 
     /// Transaction status.
