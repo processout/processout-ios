@@ -32,7 +32,8 @@ public struct POCustomerToken: Codable, Sendable {
     public let invoiceId: String?
 
     /// Source used to create the token (which will usually be a Card).
-    public let type: String
+    @POTypedRepresentation<String, POCustomerTokenType>
+    public private(set) var type: String
 
     /// Description that will be sent to the tokenization gateway service.
     public let description: String?

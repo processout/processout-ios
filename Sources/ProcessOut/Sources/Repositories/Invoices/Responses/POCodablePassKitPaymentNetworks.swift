@@ -33,13 +33,13 @@ public struct POCodablePassKitPaymentNetworks: Codable, Sendable {
 
 private struct CodablePassKitPaymentNetwork: Codable, Sendable, Hashable {
 
-    let wrappedValue: PKPaymentNetwork?
+    let wrappedValue: PKPaymentNetwork?, scheme: POCardScheme
 
     // MARK: - Decodable
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
-        let scheme = try container.decode(POCardScheme.self)
+        scheme = try container.decode(POCardScheme.self)
         if let network = Self.networks[scheme] {
             wrappedValue = network
         } else {
@@ -49,11 +49,7 @@ private struct CodablePassKitPaymentNetwork: Codable, Sendable, Hashable {
 
     func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
-        if let network = wrappedValue, let scheme = Self.schemes[network] {
-            try container.encode(scheme)
-        } else {
-            try container.encodeNil()
-        }
+        try container.encode(scheme)
     }
 
     // MARK: - Private Properties
@@ -105,15 +101,6 @@ private struct CodablePassKitPaymentNetwork: Codable, Sendable, Hashable {
         if #available(iOS 14, *) {
             schemes[.girocard] = .girocard
             schemes["barcode"] = .barcode
-        }
-        return schemes
-    }()
-
-    private static let schemes: [PKPaymentNetwork: POCardScheme] = {
-        var schemes: [PKPaymentNetwork: POCardScheme] = [:]
-        schemes.reserveCapacity(Self.networks.count)
-        for (scheme, network) in Self.networks {
-            schemes[network] = scheme
         }
         return schemes
     }()
