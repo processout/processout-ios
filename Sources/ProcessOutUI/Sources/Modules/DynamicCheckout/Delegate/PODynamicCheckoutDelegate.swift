@@ -58,6 +58,11 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
     @MainActor
     func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String?
 
+    /// Notifies the delegate before a card scanning session begins and allows
+    /// providing a delegate to handle scanning events.
+    @MainActor
+    func dynamicCheckout(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate?
+
     // MARK: - Alternative Payment
 
     /// Invoked when module emits alternative payment event.
@@ -114,6 +119,11 @@ extension PODynamicCheckoutDelegate {
     @MainActor
     public func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String? {
         issuerInformation.scheme
+    }
+
+    @MainActor
+    func dynamicCheckout(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate? {
+        nil
     }
 
     @MainActor

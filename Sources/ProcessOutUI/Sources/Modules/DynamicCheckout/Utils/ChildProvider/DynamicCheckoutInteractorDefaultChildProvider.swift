@@ -80,6 +80,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             cardNumber: textFieldConfiguration(with: configuration.card.cardNumber),
             expirationDate: textFieldConfiguration(with: configuration.card.expirationDate),
             cvc: methodConfiguration.cvcRequired ? textFieldConfiguration(with: configuration.card.cvc) : nil,
+            cardScanner: configuration.card.cardScanner.map(POCardTokenizationConfiguration.CardScanner.init),
             billingAddress: billingAddressConfiguration(with: methodConfiguration),
             isSavingAllowed: methodConfiguration.savingAllowed,
             submitButton: submitButtonConfiguration(with: configuration.submitButton),
@@ -184,3 +185,22 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         )
     }
 }
+
+// swiftlint:disable no_extension_access_modifier
+
+private extension POCardTokenizationConfiguration.CardScanner {
+
+    init(configuration: PODynamicCheckoutCardConfiguration.CardScanner) {
+        let scanButton = POCardTokenizationConfiguration.CardScanner.ScanButton(configuration: configuration.scanButton)
+        self.init(scanButton: scanButton, configuration: configuration.configuration)
+    }
+}
+
+private extension POCardTokenizationConfiguration.CardScanner.ScanButton {
+
+    init(configuration: PODynamicCheckoutCardConfiguration.CardScanner.ScanButton) {
+        self.init(title: configuration.title, icon: configuration.icon)
+    }
+}
+
+// swiftlint:enable no_extension_access_modifier

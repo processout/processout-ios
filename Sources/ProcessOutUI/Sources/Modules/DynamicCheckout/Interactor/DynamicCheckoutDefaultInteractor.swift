@@ -901,6 +901,10 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         }
         return !currentState.shouldInvalidateInvoice
     }
+
+    func cardTokenization(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate? {
+        delegate?.dynamicCheckout(willScanCardWith: configuration)
+    }
 }
 
 @available(iOS 14, *)
