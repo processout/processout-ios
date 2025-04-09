@@ -122,7 +122,7 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
     public struct CardConfiguration: Codable, Sendable {
 
         /// Defines whether user will be asked to select scheme if co-scheme is available.
-        let schemeSelectionAllowed: Bool
+        public let schemeSelectionAllowed: Bool
 
         /// Indicates whether should collect card CVC.
         public let cvcRequired: Bool
