@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// A picker style that presents the options as a menu when the user presses a button.
+@_spi(PO)
 @available(iOS 14, *)
 public struct POMenuPickerStyle: POPickerStyle {
 

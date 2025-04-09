@@ -9,7 +9,9 @@ import SwiftUI
 
 /// A type that specifies the appearance and interaction of all pickers
 /// within a view hierarchy.
+@_spi(PO)
 @MainActor
+@preconcurrency
 public protocol POPickerStyle: Sendable {
 
     /// A view representing the appearance and interaction of a `POPicker`.
@@ -24,7 +26,7 @@ public protocol POPickerStyle: Sendable {
     typealias Configuration = POPickerStyleConfiguration
 }
 
-/// The properties of a `POPicker`.
+@_spi(PO)
 public struct POPickerStyleConfiguration {
 
     /// The date value being displayed and selected.

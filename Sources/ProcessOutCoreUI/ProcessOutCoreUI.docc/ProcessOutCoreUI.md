@@ -38,13 +38,6 @@
 - ``POButtonToggleStyle``
 - ``SwiftUI/ToggleStyle/poCheckbox``
 
-### Picker
-
-- ``POPickerStyle``
-- ``POPickerStyleConfiguration``
-- ``POMenuPickerStyle``
-- ``PORadioGroupPickerStyle``
-
 ### Control
 
 - ``POControlSize``
