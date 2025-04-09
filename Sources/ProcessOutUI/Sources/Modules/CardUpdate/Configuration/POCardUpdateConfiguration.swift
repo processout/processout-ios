@@ -78,9 +78,13 @@ public struct POCardUpdateConfiguration {
         /// Preferred scheme section title. Set `nil` to use default value, or empty string `""` to remove title.
         public let title: String?
 
+        /// Boolean flag indicating whether inline style is preferred, `true` by default.
+        public let prefersInline: Bool
+
         /// Creates scheme selection configuration.
-        public init(title: String? = nil) {
+        public init(title: String? = nil, prefersInline: Bool = true) {
             self.title = title
+            self.prefersInline = prefersInline
         }
     }
 
