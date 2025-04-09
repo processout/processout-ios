@@ -7,13 +7,15 @@
 
 import SwiftUI
 
-@_spi(PO)
+/// A picker style that presents the options as a group of radio buttons.
 @available(iOS 14, *)
 public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerStyle {
 
     public init(radioButtonStyle: RadioButtonStyle = PORadioButtonStyle.radio) {
         self.radioButtonStyle = radioButtonStyle
     }
+
+    // MARK: - POPickerStyle
 
     public func makeBody(configuration: POPickerStyleConfiguration) -> some View {
         VStack(alignment: .leading, spacing: 0) {
