@@ -57,7 +57,7 @@ struct CardTokenizationViewModelState {
         @Binding var selectedOptionId: String?
 
         /// Boolean flag indicating whether inline style is preferred.
-        let preferrsInline: Bool
+        let prefersInline: Bool
     }
 
     struct PickerItemOption: Identifiable {

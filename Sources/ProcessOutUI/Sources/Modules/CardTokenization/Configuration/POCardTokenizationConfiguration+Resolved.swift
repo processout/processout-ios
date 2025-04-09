@@ -14,6 +14,6 @@ extension POCardTokenizationConfiguration.PreferredScheme {
         } else {
             title ?? defaultTitle()
         }
-        return .init(title: resolvedTitle)
+        return .init(title: resolvedTitle, prefersInline: prefersInline)
     }
 }
