@@ -8,7 +8,7 @@
 extension POCardTokenizationConfiguration.PreferredScheme {
 
     /// Returns resolved configuration.
-    func resolved(defaultTitle: @autoclosure () -> String?) -> POCardTokenizationConfiguration.PreferredScheme {
+    func resolved(defaultTitle: @autoclosure () -> String?) -> Self {
         let resolvedTitle: String? = if title?.isEmpty == true {
             nil
         } else {
