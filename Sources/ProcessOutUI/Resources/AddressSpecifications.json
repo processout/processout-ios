@@ -1644,8 +1644,7 @@
   "VA": {
     "units": [
       "street",
-      "postcode",
-      "city"
+      "postcode"
     ]
   },
   "VC": {
