@@ -178,12 +178,12 @@ public struct POCardTokenizationConfiguration {
     /// Configuration for the CVC text field. Set to `nil` if CVC collection is not required.
     public let cvc: TextField?
 
-    /// Card scanner configuration.
-    public let cardScanner: CardScanner?
-
     /// Preferred scheme selection configuration.
     /// If value is non-nil user will be asked to select scheme if co-scheme is available.
     public let preferredScheme: PreferredScheme?
+
+    /// Card scanner configuration.
+    public let cardScanner: CardScanner?
 
     /// Card billing address collection configuration.
     public let billingAddress: BillingAddress
@@ -207,8 +207,8 @@ public struct POCardTokenizationConfiguration {
         cardNumber: TextField = .init(),
         expirationDate: TextField = .init(),
         cvc: TextField? = .init(),
-        cardScanner: CardScanner? = .init(),
         preferredScheme: PreferredScheme? = .init(),
+        cardScanner: CardScanner? = .init(),
         billingAddress: BillingAddress = .init(),
         isSavingAllowed: Bool = false,
         submitButton: SubmitButton = .init(),
@@ -220,8 +220,8 @@ public struct POCardTokenizationConfiguration {
         self.cardNumber = cardNumber
         self.expirationDate = expirationDate
         self.cvc = cvc
-        self.cardScanner = cardScanner
         self.preferredScheme = preferredScheme
+        self.cardScanner = cardScanner
         self.submitButton = submitButton
         self.cancelButton = cancelButton
         self.billingAddress = billingAddress

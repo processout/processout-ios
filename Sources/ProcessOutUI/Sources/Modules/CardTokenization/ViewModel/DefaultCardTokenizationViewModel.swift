@@ -179,13 +179,19 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         guard let cardScanner = configuration.cardScanner else {
             return nil
         }
+        let cardScannerDelegate = interactor.delegate?.cardTokenization(willScanCardWith: cardScanner.configuration)
         let openScanner: @MainActor () -> Void = { [weak self] in
-            self?.state.cardScanner = .init(id: "card-scanner", configuration: cardScanner.configuration) { result in
-                if case .success(let card) = result {
-                    self?.interactor.update(with: card)
+            self?.state.cardScanner = .init(
+                id: "card-scanner",
+                configuration: cardScanner.configuration,
+                delegate: cardScannerDelegate,
+                completion: { result in
+                    if case .success(let card) = result {
+                        self?.interactor.update(with: card)
+                    }
+                    self?.state.cardScanner = nil
                 }
-                self?.state.cardScanner = nil
-            }
+            )
         }
         let defaultIcon = Image(poResource: .camera)
             .renderingMode(.template)

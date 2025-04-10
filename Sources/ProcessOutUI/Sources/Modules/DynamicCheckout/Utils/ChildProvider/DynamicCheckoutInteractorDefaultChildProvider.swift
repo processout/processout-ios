@@ -84,6 +84,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
                 schemeSelectionAllowed: methodConfiguration.schemeSelectionAllowed,
                 configuration: configuration.card.preferredScheme
             ),
+            cardScanner: configuration.card.cardScanner.map(POCardTokenizationConfiguration.CardScanner.init),
             billingAddress: billingAddressConfiguration(with: methodConfiguration),
             isSavingAllowed: methodConfiguration.savingAllowed,
             submitButton: submitButtonConfiguration(with: configuration.submitButton),
@@ -198,6 +199,21 @@ private extension POCardTokenizationConfiguration.PreferredScheme {
             return nil
         }
         self = .init(title: configuration.title, prefersInline: configuration.prefersInline)
+    }
+}
+
+private extension POCardTokenizationConfiguration.CardScanner {
+
+    init(configuration: PODynamicCheckoutCardConfiguration.CardScanner) {
+        let scanButton = POCardTokenizationConfiguration.CardScanner.ScanButton(configuration: configuration.scanButton)
+        self.init(scanButton: scanButton, configuration: configuration.configuration)
+    }
+}
+
+private extension POCardTokenizationConfiguration.CardScanner.ScanButton {
+
+    init(configuration: PODynamicCheckoutCardConfiguration.CardScanner.ScanButton) {
+        self.init(title: configuration.title, icon: configuration.icon)
     }
 }
 

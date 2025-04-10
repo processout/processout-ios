@@ -43,6 +43,13 @@ public protocol POCardTokenizationDelegate: AnyObject, Sendable {
     /// Default implementation returns `true`.
     @MainActor
     func shouldContinueTokenization(after failure: POFailure) -> Bool
+
+    // MARK: - Card Scanning
+
+    /// Notifies the delegate before a card scanning session begins and allows providing
+    /// a delegate to handle scanning events.
+    @MainActor
+    func cardTokenization(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate?
 }
 
 extension POCardTokenizationDelegate {
@@ -71,5 +78,10 @@ extension POCardTokenizationDelegate {
     @MainActor
     public func shouldContinueTokenization(after failure: POFailure) -> Bool {
         true
+    }
+
+    @MainActor
+    public func cardTokenization(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate? {
+        nil
     }
 }
