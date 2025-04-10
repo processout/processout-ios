@@ -62,12 +62,24 @@
       "city"
     ]
   },
+  "AQ": {
+    "units": [
+      "street"
+    ]
+  },
   "AR": {
     "units": [
       "street",
       "postcode",
       "city",
       "province"
+    ]
+  },
+  "AS": {
+    "units": [
+      "street",
+      "city",
+      "zip"
     ]
   },
   "AT": {
@@ -255,6 +267,12 @@
       "postcode"
     ]
   },
+  "CC": {
+    "units": [
+      "street",
+      "postcode"
+    ]
+  },
   "CD": {
     "units": [
       "street",
@@ -330,6 +348,14 @@
       "postcode"
     ]
   },
+  "CU": {
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
+    ]
+  },
   "CV": {
     "units": [
       "street",
@@ -342,6 +368,12 @@
     "units": [
       "street",
       "city"
+    ]
+  },
+  "CX": {
+    "units": [
+      "street",
+      "postcode"
     ]
   },
   "CY": {
@@ -466,6 +498,14 @@
       "street",
       "city",
       "postcode"
+    ]
+  },
+  "FM": {
+    "units": [
+      "street",
+      "city",
+      "state",
+      "zip"
     ]
   },
   "FO": {
@@ -616,6 +656,12 @@
       "street"
     ]
   },
+  "HM": {
+    "units": [
+      "street",
+      "postcode"
+    ]
+  },
   "HN": {
     "units": [
       "street",
@@ -691,6 +737,14 @@
     ]
   },
   "IQ": {
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
+    ]
+  },
+  "IR": {
     "units": [
       "street",
       "city",
@@ -781,6 +835,14 @@
       "street",
       "city",
       "island"
+    ]
+  },
+  "KP": {
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
     ]
   },
   "KR": {
@@ -930,6 +992,14 @@
       "city"
     ]
   },
+  "MH": {
+    "units": [
+      "street",
+      "city",
+      "state",
+      "zip"
+    ]
+  },
   "MK": {
     "units": [
       "street",
@@ -961,6 +1031,13 @@
   "MO": {
     "units": [
       "street"
+    ]
+  },
+  "MP": {
+    "units": [
+      "street",
+      "city",
+      "zip"
     ]
   },
   "MQ": {
@@ -1052,6 +1129,12 @@
       "street",
       "postcode",
       "city"
+    ]
+  },
+  "NF": {
+    "units": [
+      "street",
+      "postcode"
     ]
   },
   "NG": {
@@ -1272,6 +1355,14 @@
       "island"
     ]
   },
+  "SD": {
+    "units": [
+      "street",
+      "city",
+      "state",
+      "postcode"
+    ]
+  },
   "SE": {
     "units": [
       "street",
@@ -1374,6 +1465,14 @@
     "units": [
       "street",
       "city"
+    ]
+  },
+  "SY": {
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
     ]
   },
   "SZ": {
@@ -1512,6 +1611,12 @@
       "city"
     ]
   },
+  "UM": {
+    "units": [
+      "street",
+      "zip"
+    ]
+  },
   "US": {
     "units": [
       "street",
@@ -1563,6 +1668,13 @@
       "street",
       "city",
       "postcode"
+    ]
+  },
+  "VI": {
+    "units": [
+      "street",
+      "city",
+      "zip"
     ]
   },
   "VN": {
