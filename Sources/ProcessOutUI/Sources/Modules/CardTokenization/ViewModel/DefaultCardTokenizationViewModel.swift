@@ -204,11 +204,14 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func preferredSchemeSection(
         startedState: InteractorState.Started
     ) -> CardTokenizationViewModelState.Section? {
-        guard configuration.isSchemeSelectionAllowed,
+        guard let schemeConfiguration = configuration.preferredScheme,
               let issuerInformation = startedState.issuerInformation,
               let coScheme = issuerInformation.coScheme else {
             return nil
         }
+        let resolvedSchemeConfiguration = schemeConfiguration.resolved(
+            defaultTitle: String(resource: .CardTokenization.PreferredScheme.title)
+        )
         let pickerItem = State.PickerItem(
             id: ItemId.scheme,
             options: [
@@ -222,12 +225,10 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                     self?.interactor.setPreferredScheme(newScheme ?? issuerInformation.$scheme.typed)
                 }
             ),
-            preferrsInline: true
+            prefersInline: resolvedSchemeConfiguration.prefersInline
         )
         let section = State.Section(
-            id: SectionId.preferredScheme,
-            title: String(resource: .CardTokenization.PreferredScheme.title),
-            items: [.picker(pickerItem)]
+            id: SectionId.preferredScheme, title: resolvedSchemeConfiguration.title, items: [.picker(pickerItem)]
         )
         return section
     }
@@ -376,7 +377,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             }
         )
         let item = CardTokenizationViewModelState.PickerItem(
-            id: parameter.id, options: options, selectedOptionId: selectedOptionId, preferrsInline: false
+            id: parameter.id, options: options, selectedOptionId: selectedOptionId, prefersInline: false
         )
         return .picker(item)
     }

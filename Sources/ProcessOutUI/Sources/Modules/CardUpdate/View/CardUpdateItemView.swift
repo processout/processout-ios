@@ -23,17 +23,16 @@ struct CardUpdateItemView: View {
             POTextField.create(with: item, focusedInputId: $focusedInputId)
                 .inputStyle(style.input)
         case .picker(let pickerItem):
-            // todo(andrii-vysotskyi): use injected style when scheme selection is public
             POPicker(selection: pickerItem.$selectedOptionId) {
                 ForEach(pickerItem.options) { option in
                     Text(option.title)
                 }
             }
-            .modify(when: pickerItem.preferrsInline) { view in
-                let style = PORadioGroupPickerStyle(radioButtonStyle: .radio)
+            .modify(when: pickerItem.prefersInline) { view in
+                let style = PORadioGroupPickerStyle(radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton))
                 view.pickerStyle(style)
             }
-            .pickerStyle(POMenuPickerStyle(inputStyle: .medium))
+            .pickerStyle(POMenuPickerStyle(inputStyle: style.input))
         case .error(let errorItem):
             Text(errorItem.description)
                 .textStyle(style.errorDescription)
