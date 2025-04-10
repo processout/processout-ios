@@ -1,11 +1,4 @@
 {
-  "AC": {
-    "units": [
-      "street",
-      "city",
-      "postcode"
-    ]
-  },
   "AD": {
     "units": [
       "street",
@@ -1476,13 +1469,6 @@
     ]
   },
   "SZ": {
-    "units": [
-      "street",
-      "city",
-      "postcode"
-    ]
-  },
-  "TA": {
     "units": [
       "street",
       "city",
