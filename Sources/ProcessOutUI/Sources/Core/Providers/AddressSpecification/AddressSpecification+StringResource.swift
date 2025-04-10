@@ -8,7 +8,7 @@
 import Foundation
 @_spi(PO) import ProcessOut
 
-extension AddressSpecification.CityUnit {
+extension AddressSpecification.Unit.City {
 
     var stringResource: POStringResource {
         let resources: [Self: POStringResource] = [
@@ -21,7 +21,7 @@ extension AddressSpecification.CityUnit {
     }
 }
 
-extension AddressSpecification.StateUnit {
+extension AddressSpecification.Unit.State {
 
     var stringResource: POStringResource {
         let resources: [Self: POStringResource] = [
@@ -41,7 +41,7 @@ extension AddressSpecification.StateUnit {
     }
 }
 
-extension AddressSpecification.PostcodeUnit {
+extension AddressSpecification.Unit.Postcode {
 
     var stringResource: POStringResource {
         let resources: [Self: POStringResource] = [
