@@ -14,10 +14,9 @@
     ]
   },
   "AE": {
-    "stateUnit": "emirate",
     "units": [
       "street",
-      "state"
+      "emirate"
     ]
   },
   "AF": {
@@ -28,7 +27,12 @@
     ]
   },
   "AG": {
-
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
+    ]
   },
   "AI": {
     "units": [
@@ -49,7 +53,7 @@
       "street",
       "postcode",
       "city",
-      "state"
+      "province"
     ]
   },
   "AO": {
@@ -63,7 +67,7 @@
       "street",
       "postcode",
       "city",
-      "state"
+      "province"
     ]
   },
   "AT": {
@@ -74,8 +78,12 @@
     ]
   },
   "AU": {
-    "cityUnit": "suburb",
-    "stateUnit": "state"
+    "units": [
+      "street",
+      "suburb",
+      "state",
+      "postcode"
+    ]
   },
   "AW": {
     "units": [
@@ -105,7 +113,12 @@
     ]
   },
   "BB": {
-    "stateUnit": "parish"
+    "units": [
+      "street",
+      "city",
+      "parish",
+      "postcode"
+    ]
   },
   "BD": {
     "units": [
@@ -187,14 +200,18 @@
     ]
   },
   "BR": {
-    "stateUnit": "state"
-  },
-  "BS": {
-    "stateUnit": "island",
     "units": [
       "street",
       "city",
-      "state"
+      "state",
+      "postcode"
+    ]
+  },
+  "BS": {
+    "units": [
+      "street",
+      "city",
+      "island"
     ]
   },
   "BT": {
@@ -218,7 +235,7 @@
   },
   "BY": {
     "units": [
-      "state",
+      "province",
       "postcode",
       "city",
       "street"
@@ -231,59 +248,11 @@
     ]
   },
   "CA": {
-    "states": [
-      {
-        "abbreviation": "AB",
-        "name": "Alberta"
-      },
-      {
-        "abbreviation": "BC",
-        "name": "British Columbia"
-      },
-      {
-        "abbreviation": "MB",
-        "name": "Manitoba"
-      },
-      {
-        "abbreviation": "NB",
-        "name": "New Brunswick"
-      },
-      {
-        "abbreviation": "NL",
-        "name": "Newfoundland and Labrador"
-      },
-      {
-        "abbreviation": "NT",
-        "name": "Northwest Territories"
-      },
-      {
-        "abbreviation": "NS",
-        "name": "Nova Scotia"
-      },
-      {
-        "abbreviation": "NU",
-        "name": "Nunavut"
-      },
-      {
-        "abbreviation": "ON",
-        "name": "Ontario"
-      },
-      {
-        "abbreviation": "PE",
-        "name": "Prince Edward Island"
-      },
-      {
-        "abbreviation": "QC",
-        "name": "Quebec"
-      },
-      {
-        "abbreviation": "SK",
-        "name": "Saskatchewan"
-      },
-      {
-        "abbreviation": "YT",
-        "name": "Yukon"
-      }
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
     ]
   },
   "CD": {
@@ -328,7 +297,7 @@
       "street",
       "postcode",
       "city",
-      "state"
+      "province"
     ]
   },
   "CM": {
@@ -340,29 +309,33 @@
   "CN": {
     "units": [
       "postcode",
-      "state",
+      "province",
       "city",
       "street"
     ]
   },
   "CO": {
-    "stateUnit": "department"
+    "units": [
+      "street",
+      "city",
+      "department",
+      "postcode"
+    ]
   },
   "CR": {
     "units": [
       "street",
-      "state",
+      "province",
       "city",
       "postcode"
     ]
   },
   "CV": {
-    "stateUnit": "island",
     "units": [
       "street",
       "postcode",
       "city",
-      "state"
+      "island"
     ]
   },
   "CW": {
@@ -440,7 +413,12 @@
     ]
   },
   "EG": {
-
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
+    ]
   },
   "EH": {
     "units": [
@@ -460,7 +438,7 @@
       "street",
       "postcode",
       "city",
-      "state"
+      "province"
     ]
   },
   "ET": {
@@ -511,10 +489,9 @@
     ]
   },
   "GB": {
-    "cityUnit": "postTown",
     "units": [
       "street",
-      "city",
+      "postTown",
       "postcode"
     ]
   },
@@ -539,7 +516,12 @@
     ]
   },
   "GG": {
-
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
+    ]
   },
   "GH": {
     "units": [
@@ -608,11 +590,10 @@
     ]
   },
   "GU": {
-    "postcodeUnit": "zip",
     "units": [
       "street",
       "city",
-      "postcode"
+      "zip"
     ]
   },
   "GW": {
@@ -629,16 +610,19 @@
     ]
   },
   "HK": {
-    "cityUnit": "district",
-    "stateUnit": "area",
     "units": [
-      "state",
-      "city",
+      "area",
+      "district",
       "street"
     ]
   },
   "HN": {
-    "stateUnit": "department"
+    "units": [
+      "street",
+      "city",
+      "department",
+      "postcode"
+    ]
   },
   "HR": {
     "units": [
@@ -662,11 +646,20 @@
     ]
   },
   "ID": {
-
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
+    ]
   },
   "IE": {
-    "postcodeUnit": "eircode",
-    "stateUnit": "county"
+    "units": [
+      "street",
+      "city",
+      "county",
+      "eircode"
+    ]
   },
   "IL": {
     "units": [
@@ -683,12 +676,10 @@
     ]
   },
   "IN": {
-    "postcodeUnit": "pin",
-    "stateUnit": "state",
     "units": [
       "street",
       "city",
-      "postcode",
+      "pin",
       "state"
     ]
   },
@@ -700,7 +691,12 @@
     ]
   },
   "IQ": {
-
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
+    ]
   },
   "IS": {
     "units": [
@@ -714,18 +710,22 @@
       "street",
       "postcode",
       "city",
-      "state"
+      "province"
     ]
   },
   "JE": {
-
-  },
-  "JM": {
-    "stateUnit": "parish",
     "units": [
       "street",
       "city",
-      "state"
+      "province",
+      "postcode"
+    ]
+  },
+  "JM": {
+    "units": [
+      "street",
+      "city",
+      "parish"
     ]
   },
   "JO": {
@@ -736,10 +736,9 @@
     ]
   },
   "JP": {
-    "stateUnit": "prefecture",
     "units": [
       "postcode",
-      "state",
+      "prefecture",
       "street"
     ]
   },
@@ -765,10 +764,9 @@
     ]
   },
   "KI": {
-    "stateUnit": "island",
     "units": [
       "street",
-      "state",
+      "island",
       "city"
     ]
   },
@@ -779,17 +777,15 @@
     ]
   },
   "KN": {
-    "stateUnit": "island",
     "units": [
       "street",
       "city",
-      "state"
+      "island"
     ]
   },
   "KR": {
-    "stateUnit": "doSi",
     "units": [
-      "state",
+      "doSi",
       "city",
       "street",
       "postcode"
@@ -803,17 +799,16 @@
     ]
   },
   "KY": {
-    "stateUnit": "island",
     "units": [
       "street",
-      "state",
+      "island",
       "postcode"
     ]
   },
   "KZ": {
     "units": [
       "postcode",
-      "state",
+      "province",
       "city",
       "street"
     ]
@@ -956,7 +951,12 @@
     ]
   },
   "MN": {
-
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
+    ]
   },
   "MO": {
     "units": [
@@ -1010,7 +1010,6 @@
     ]
   },
   "MX": {
-    "stateUnit": "state",
     "units": [
       "street",
       "postcode",
@@ -1019,7 +1018,6 @@
     ]
   },
   "MY": {
-    "stateUnit": "state",
     "units": [
       "street",
       "postcode",
@@ -1032,7 +1030,7 @@
       "street",
       "postcode",
       "city",
-      "state"
+      "province"
     ]
   },
   "NA": {
@@ -1057,7 +1055,6 @@
     ]
   },
   "NG": {
-    "stateUnit": "state",
     "units": [
       "street",
       "city",
@@ -1066,12 +1063,11 @@
     ]
   },
   "NI": {
-    "stateUnit": "department",
     "units": [
       "street",
       "postcode",
       "city",
-      "state"
+      "department"
     ]
   },
   "NL": {
@@ -1082,11 +1078,10 @@
     ]
   },
   "NO": {
-    "cityUnit": "postTown",
     "units": [
       "street",
       "postcode",
-      "city"
+      "postTown"
     ]
   },
   "NP": {
@@ -1097,10 +1092,9 @@
     ]
   },
   "NR": {
-    "stateUnit": "prefecture",
     "units": [
       "street",
-      "state"
+      "prefecture"
     ]
   },
   "NU": {
@@ -1127,25 +1121,23 @@
     "units": [
       "street",
       "city",
-      "state"
+      "province"
     ]
   },
   "PE": {
-    "cityUnit": "district",
     "units": [
       "street",
-      "city",
+      "district",
       "postcode",
-      "state"
+      "province"
     ]
   },
   "PF": {
-    "stateUnit": "island",
     "units": [
       "street",
       "postcode",
       "city",
-      "state"
+      "island"
     ]
   },
   "PG": {
@@ -1153,7 +1145,7 @@
       "street",
       "city",
       "postcode",
-      "state"
+      "province"
     ]
   },
   "PH": {
@@ -1161,7 +1153,7 @@
       "street",
       "city",
       "postcode",
-      "state"
+      "province"
     ]
   },
   "PK": {
@@ -1193,11 +1185,10 @@
     ]
   },
   "PR": {
-    "postcodeUnit": "zip",
     "units": [
       "street",
       "city",
-      "postcode"
+      "zip"
     ]
   },
   "PS": {
@@ -1248,7 +1239,12 @@
     ]
   },
   "RU": {
-    "stateUnit": "oblast"
+    "units": [
+      "street",
+      "city",
+      "oblast",
+      "postcode"
+    ]
   },
   "RW": {
     "units": [
@@ -1270,20 +1266,18 @@
     ]
   },
   "SC": {
-    "stateUnit": "island",
     "units": [
       "street",
       "city",
-      "state"
+      "island"
     ]
   },
   "SE": {
-    "cityUnit": "postTown",
     "units": [
       "street",
-      "state",
+      "province",
       "postcode",
-      "city"
+      "postTown"
     ]
   },
   "SG": {
@@ -1302,17 +1296,16 @@
   "SI": {
     "units": [
       "street",
-      "state",
+      "province",
       "postcode",
       "city"
     ]
   },
   "SJ": {
-    "cityUnit": "postTown",
     "units": [
       "street",
       "postcode",
-      "city"
+      "postTown"
     ]
   },
   "SK": {
@@ -1343,13 +1336,18 @@
     ]
   },
   "SO": {
-
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
+    ]
   },
   "SR": {
     "units": [
       "street",
       "city",
-      "state"
+      "province"
     ]
   },
   "SS": {
@@ -1369,7 +1367,7 @@
       "street",
       "postcode",
       "city",
-      "state"
+      "province"
     ]
   },
   "SX": {
@@ -1418,7 +1416,12 @@
     ]
   },
   "TH": {
-
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
+    ]
   },
   "TJ": {
     "units": [
@@ -1460,12 +1463,11 @@
     ]
   },
   "TR": {
-    "cityUnit": "district",
     "units": [
       "street",
       "postcode",
-      "city",
-      "state"
+      "district",
+      "province"
     ]
   },
   "TT": {
@@ -1475,18 +1477,16 @@
     ]
   },
   "TV": {
-    "stateUnit": "island",
     "units": [
       "street",
       "city",
-      "state"
+      "island"
     ]
   },
   "TW": {
-    "stateUnit": "county",
     "units": [
       "postcode",
-      "state",
+      "county",
       "city",
       "street"
     ]
@@ -1499,7 +1499,12 @@
     ]
   },
   "UA": {
-    "stateUnit": "oblast"
+    "units": [
+      "street",
+      "city",
+      "oblast",
+      "postcode"
+    ]
   },
   "UG": {
     "units": [
@@ -1508,257 +1513,11 @@
     ]
   },
   "US": {
-    "postcodeUnit": "zip",
-    "stateUnit": "state",
-    "states": [
-      {
-        "abbreviation": "AL",
-        "name": "Alabama"
-      },
-      {
-        "abbreviation": "AK",
-        "name": "Alaska"
-      },
-      {
-        "abbreviation": "AS",
-        "name": "American Samoa"
-      },
-      {
-        "abbreviation": "AZ",
-        "name": "Arizona"
-      },
-      {
-        "abbreviation": "AR",
-        "name": "Arkansas"
-      },
-      {
-        "abbreviation": "AA",
-        "name": "Armed Forces (AA)"
-      },
-      {
-        "abbreviation": "AE",
-        "name": "Armed Forces (AE)"
-      },
-      {
-        "abbreviation": "AP",
-        "name": "Armed Forces (AP)"
-      },
-      {
-        "abbreviation": "CA",
-        "name": "California"
-      },
-      {
-        "abbreviation": "CO",
-        "name": "Colorado"
-      },
-      {
-        "abbreviation": "CT",
-        "name": "Connecticut"
-      },
-      {
-        "abbreviation": "DE",
-        "name": "Delaware"
-      },
-      {
-        "abbreviation": "DC",
-        "name": "District of Columbia"
-      },
-      {
-        "abbreviation": "FL",
-        "name": "Florida"
-      },
-      {
-        "abbreviation": "GA",
-        "name": "Georgia"
-      },
-      {
-        "abbreviation": "GU",
-        "name": "Guam"
-      },
-      {
-        "abbreviation": "HI",
-        "name": "Hawaii"
-      },
-      {
-        "abbreviation": "ID",
-        "name": "Idaho"
-      },
-      {
-        "abbreviation": "IL",
-        "name": "Illinois"
-      },
-      {
-        "abbreviation": "IN",
-        "name": "Indiana"
-      },
-      {
-        "abbreviation": "IA",
-        "name": "Iowa"
-      },
-      {
-        "abbreviation": "KS",
-        "name": "Kansas"
-      },
-      {
-        "abbreviation": "KY",
-        "name": "Kentucky"
-      },
-      {
-        "abbreviation": "LA",
-        "name": "Louisiana"
-      },
-      {
-        "abbreviation": "ME",
-        "name": "Maine"
-      },
-      {
-        "abbreviation": "MH",
-        "name": "Marshall Islands"
-      },
-      {
-        "abbreviation": "MD",
-        "name": "Maryland"
-      },
-      {
-        "abbreviation": "MA",
-        "name": "Massachusetts"
-      },
-      {
-        "abbreviation": "MI",
-        "name": "Michigan"
-      },
-      {
-        "abbreviation": "FM",
-        "name": "Micronesia"
-      },
-      {
-        "abbreviation": "MN",
-        "name": "Minnesota"
-      },
-      {
-        "abbreviation": "MS",
-        "name": "Mississippi"
-      },
-      {
-        "abbreviation": "MO",
-        "name": "Missouri"
-      },
-      {
-        "abbreviation": "MT",
-        "name": "Montana"
-      },
-      {
-        "abbreviation": "NE",
-        "name": "Nebraska"
-      },
-      {
-        "abbreviation": "NV",
-        "name": "Nevada"
-      },
-      {
-        "abbreviation": "NH",
-        "name": "New Hampshire"
-      },
-      {
-        "abbreviation": "NJ",
-        "name": "New Jersey"
-      },
-      {
-        "abbreviation": "NM",
-        "name": "New Mexico"
-      },
-      {
-        "abbreviation": "NY",
-        "name": "New York"
-      },
-      {
-        "abbreviation": "NC",
-        "name": "North Carolina"
-      },
-      {
-        "abbreviation": "ND",
-        "name": "North Dakota"
-      },
-      {
-        "abbreviation": "MP",
-        "name": "Northern Mariana Islands"
-      },
-      {
-        "abbreviation": "OH",
-        "name": "Ohio"
-      },
-      {
-        "abbreviation": "OK",
-        "name": "Oklahoma"
-      },
-      {
-        "abbreviation": "OR",
-        "name": "Oregon"
-      },
-      {
-        "abbreviation": "PW",
-        "name": "Palau"
-      },
-      {
-        "abbreviation": "PA",
-        "name": "Pennsylvania"
-      },
-      {
-        "abbreviation": "PR",
-        "name": "Puerto Rico"
-      },
-      {
-        "abbreviation": "RI",
-        "name": "Rhode Island"
-      },
-      {
-        "abbreviation": "SC",
-        "name": "South Carolina"
-      },
-      {
-        "abbreviation": "SD",
-        "name": "South Dakota"
-      },
-      {
-        "abbreviation": "TN",
-        "name": "Tennessee"
-      },
-      {
-        "abbreviation": "TX",
-        "name": "Texas"
-      },
-      {
-        "abbreviation": "UT",
-        "name": "Utah"
-      },
-      {
-        "abbreviation": "VT",
-        "name": "Vermont"
-      },
-      {
-        "abbreviation": "VI",
-        "name": "Virgin Islands"
-      },
-      {
-        "abbreviation": "VA",
-        "name": "Virginia"
-      },
-      {
-        "abbreviation": "WA",
-        "name": "Washington"
-      },
-      {
-        "abbreviation": "WV",
-        "name": "West Virginia"
-      },
-      {
-        "abbreviation": "WI",
-        "name": "Wisconsin"
-      },
-      {
-        "abbreviation": "WY",
-        "name": "Wyoming"
-      }
+    "units": [
+      "street",
+      "city",
+      "state",
+      "zip"
     ]
   },
   "UY": {
@@ -1766,7 +1525,7 @@
       "street",
       "postcode",
       "city",
-      "state"
+      "province"
     ]
   },
   "UZ": {
@@ -1774,7 +1533,7 @@
       "street",
       "postcode",
       "city",
-      "state"
+      "province"
     ]
   },
   "VA": {
@@ -1792,7 +1551,6 @@
     ]
   },
   "VE": {
-    "stateUnit": "state",
     "units": [
       "street",
       "city",
@@ -1808,7 +1566,12 @@
     ]
   },
   "VN": {
-
+    "units": [
+      "street",
+      "city",
+      "province",
+      "postcode"
+    ]
   },
   "VU": {
     "units": [

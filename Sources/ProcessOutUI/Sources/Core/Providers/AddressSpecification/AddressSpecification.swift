@@ -5,60 +5,99 @@
 //  Created by Andrii Vysotskyi on 26.10.2023.
 //
 
-struct AddressSpecification: Sendable {
+// swiftlint:disable nesting
 
-    enum Unit: String, CaseIterable, Decodable, Sendable {
-        case street, city, state, postcode
-    }
+struct AddressSpecification: Sendable, Codable {
 
-    enum CityUnit: String, Decodable, Sendable {
-        case city, district, postTown, suburb
-    }
+    enum Unit: Sendable {
 
-    enum StateUnit: String, Decodable, Sendable {
-        case area, county, department, doSi, emirate, island, oblast, parish, prefecture, province, state
-    }
+        enum City: String, Codable, Sendable {
+            case city, district, postTown, suburb
+        }
 
-    enum PostcodeUnit: String, Decodable, Sendable {
-        case postcode, eircode, pin, zip
-    }
+        enum State: String, Codable, Sendable {
+            case area, county, department, doSi, emirate, island, oblast, parish, prefecture, province, state
+        }
 
-    struct State: Decodable, Sendable {
-        let abbreviation, name: String
+        enum Postcode: String, Codable, Sendable {
+            case postcode, eircode, pin, zip
+        }
+
+        case street, city(City), state(State), postcode(Postcode)
     }
 
     /// Available address units.
     /// - NOTE: Order defines how components will later be positioned in UI.
+    /// Address units.
     let units: [Unit]
-
-    /// City unit.
-    let cityUnit: CityUnit
-
-    /// State unit.
-    let stateUnit: StateUnit
-
-    /// Available states.
-    let states: [State]
-
-    /// Postal code unit.
-    let postcodeUnit: PostcodeUnit
 }
 
-extension AddressSpecification: Decodable {
+extension AddressSpecification.Unit {
 
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        units = try container.decodeIfPresent([Unit].self, forKey: .units) ?? Unit.allCases
-        cityUnit = try container.decodeIfPresent(CityUnit.self, forKey: .cityUnit) ?? .city
-        stateUnit = try container.decodeIfPresent(StateUnit.self, forKey: .stateUnit) ?? .province
-        states = try container.decodeIfPresent([State].self, forKey: .states) ?? []
-        postcodeUnit = try container.decodeIfPresent(PostcodeUnit.self, forKey: .postcodeUnit) ?? .postcode
+    enum Plain {
+        case street, city, state, postcode
     }
 
-    // MARK: - Private Nested Types
+    var plain: Plain {
+        switch self {
+        case .street:
+            return .street
+        case .city:
+            return .city
+        case .state:
+            return .state
+        case .postcode:
+            return .postcode
+        }
+    }
+}
 
-    private enum CodingKeys: String, CodingKey {
-        case units, cityUnit, stateUnit, states, postcodeUnit
+extension AddressSpecification.Unit: RawRepresentable {
+
+    init?(rawValue: String) {
+        if rawValue == "street" {
+            self = .street
+        } else if let city = City(rawValue: rawValue) {
+            self = .city(city)
+        } else if let state = State(rawValue: rawValue) {
+            self = .state(state)
+        } else if let postcode = Postcode(rawValue: rawValue) {
+            self = .postcode(postcode)
+        } else {
+            return nil
+        }
+    }
+
+    var rawValue: String {
+        switch self {
+        case .street:
+            return "street"
+        case .city(let city):
+            return city.rawValue
+        case .state(let state):
+            return state.rawValue
+        case .postcode(let postcode):
+            return postcode.rawValue
+        }
+    }
+}
+
+extension AddressSpecification.Unit: Codable {
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        guard let unit = Self(rawValue: rawValue) else {
+            let debugDescription = "Unknown raw value: \(rawValue)."
+            let context = DecodingError.Context(codingPath: container.codingPath, debugDescription: debugDescription)
+            throw DecodingError.dataCorrupted(context)
+        }
+        self = unit
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
     }
 }
 
@@ -66,6 +105,8 @@ extension AddressSpecification {
 
     /// Default address specification.
     static var `default`: AddressSpecification {
-        .init(units: Unit.allCases, cityUnit: .city, stateUnit: .province, states: [], postcodeUnit: .postcode)
+        .init(units: [.street, .city(.city), .state(.province), .postcode(.postcode)])
     }
 }
+
+// swiftlint:enable nesting

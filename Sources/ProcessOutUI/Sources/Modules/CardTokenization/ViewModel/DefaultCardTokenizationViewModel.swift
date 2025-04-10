@@ -279,14 +279,14 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                 )
             ]
             items.append(contentsOf: streetItems)
-        case .city:
-            let placeholder = String(resource: startedState.address.specification.cityUnit.stringResource)
+        case .city(let city):
+            let placeholder = String(resource: city.stringResource)
             items.append(createItem(parameter: startedState.address.city, placeholder: placeholder))
-        case .state:
-            let placeholder = String(resource: startedState.address.specification.stateUnit.stringResource)
+        case .state(let state):
+            let placeholder = String(resource: state.stringResource)
             items.append(createItem(parameter: startedState.address.state, placeholder: placeholder))
-        case .postcode:
-            let placeholder = String(resource: startedState.address.specification.postcodeUnit.stringResource)
+        case .postcode(let postcode):
+            let placeholder = String(resource: postcode.stringResource)
             items.append(createItem(parameter: startedState.address.postalCode, placeholder: placeholder))
         }
         return items.compactMap { $0 }

@@ -403,7 +403,8 @@ final class DefaultCardTokenizationInteractor:
         if !parameters.country.availableValues.map(\.value).contains(countryCode) {
             assertionFailure("Country code \(countryCode) is not supported.")
         }
-        let parameterss: [WritableKeyPath<State.AddressParameters, State.Parameter>: AddressSpecification.Unit] = [
+        // swiftlint:disable:next line_length identifier_name
+        let _parameters: [WritableKeyPath<State.AddressParameters, State.Parameter>: AddressSpecification.Unit.Plain] = [
             \.street1: .street,
             \.street2: .street,
             \.city: .city,
@@ -411,7 +412,7 @@ final class DefaultCardTokenizationInteractor:
             \.postalCode: .postcode
         ]
         let specification = AddressSpecificationProvider.shared.specification(for: countryCode)
-        for (id, unit) in parameterss {
+        for (id, unit) in _parameters {
             let shouldCollect = shouldCollect(unit: unit, specification: specification, countryCode: countryCode)
             parameters[keyPath: id].shouldCollect = shouldCollect
         }
@@ -420,9 +421,9 @@ final class DefaultCardTokenizationInteractor:
     }
 
     private func shouldCollect(
-        unit: AddressSpecification.Unit, specification: AddressSpecification, countryCode: String
+        unit: AddressSpecification.Unit.Plain, specification: AddressSpecification, countryCode: String
     ) -> Bool {
-        guard specification.units.contains(unit) else {
+        guard specification.units.contains(where: { $0.plain == unit }) else {
             return false
         }
         switch configuration.billingAddress.mode {
