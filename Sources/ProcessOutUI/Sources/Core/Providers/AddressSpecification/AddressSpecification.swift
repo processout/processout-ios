@@ -7,19 +7,19 @@
 
 // swiftlint:disable nesting
 
-struct AddressSpecification: Sendable, Codable {
+struct AddressSpecification: Sendable, Decodable {
 
     enum Unit: Sendable {
 
-        enum City: String, Codable, Sendable {
+        enum City: String, Sendable {
             case city, district, postTown, suburb
         }
 
-        enum State: String, Codable, Sendable {
+        enum State: String, Sendable {
             case area, county, department, doSi, emirate, island, oblast, parish, prefecture, province, state
         }
 
-        enum Postcode: String, Codable, Sendable {
+        enum Postcode: String, Sendable {
             case postcode, eircode, pin, zip
         }
 
@@ -52,37 +52,7 @@ extension AddressSpecification.Unit {
     }
 }
 
-extension AddressSpecification.Unit: RawRepresentable {
-
-    init?(rawValue: String) {
-        if rawValue == "street" {
-            self = .street
-        } else if let city = City(rawValue: rawValue) {
-            self = .city(city)
-        } else if let state = State(rawValue: rawValue) {
-            self = .state(state)
-        } else if let postcode = Postcode(rawValue: rawValue) {
-            self = .postcode(postcode)
-        } else {
-            return nil
-        }
-    }
-
-    var rawValue: String {
-        switch self {
-        case .street:
-            return "street"
-        case .city(let city):
-            return city.rawValue
-        case .state(let state):
-            return state.rawValue
-        case .postcode(let postcode):
-            return postcode.rawValue
-        }
-    }
-}
-
-extension AddressSpecification.Unit: Codable {
+extension AddressSpecification.Unit: Decodable {
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -95,9 +65,20 @@ extension AddressSpecification.Unit: Codable {
         self = unit
     }
 
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(rawValue)
+    // MARK: - Private Methods
+
+    private init?(rawValue: String) {
+        if rawValue == "street" {
+            self = .street
+        } else if let city = City(rawValue: rawValue) {
+            self = .city(city)
+        } else if let state = State(rawValue: rawValue) {
+            self = .state(state)
+        } else if let postcode = Postcode(rawValue: rawValue) {
+            self = .postcode(postcode)
+        } else {
+            return nil
+        }
     }
 }
 
