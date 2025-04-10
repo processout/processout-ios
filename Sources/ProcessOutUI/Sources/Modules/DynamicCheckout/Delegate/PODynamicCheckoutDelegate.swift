@@ -122,7 +122,7 @@ extension PODynamicCheckoutDelegate {
     }
 
     @MainActor
-    func dynamicCheckout(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate? {
+    public func dynamicCheckout(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate? {
         nil
     }
 

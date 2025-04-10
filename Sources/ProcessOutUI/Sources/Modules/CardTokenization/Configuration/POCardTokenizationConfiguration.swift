@@ -9,7 +9,7 @@
 
 import Foundation
 import SwiftUI
-import ProcessOut
+@_spi(PO) import ProcessOut
 
 /// A configuration object that defines a card tokenization module behaves.
 /// Use `nil` as a value for a nullable property to indicate that default value should be used.
@@ -146,6 +146,23 @@ public struct POCardTokenizationConfiguration {
         }
     }
 
+    /// Preferred scheme selection configuration.
+    @MainActor
+    public struct PreferredScheme {
+
+        /// Preferred scheme section title. Set `nil` to use default value, or empty string `""` to remove title.
+        public let title: String?
+
+        /// Boolean flag indicating whether inline style is preferred, `true` by default.
+        public let prefersInline: Bool
+
+        /// Creates scheme selection configuration.
+        public init(title: String? = nil, prefersInline: Bool = true) {
+            self.title = title
+            self.prefersInline = prefersInline
+        }
+    }
+
     /// Custom title. Use empty string to hide title.
     public let title: String?
 
@@ -161,12 +178,12 @@ public struct POCardTokenizationConfiguration {
     /// Configuration for the CVC text field. Set to `nil` if CVC collection is not required.
     public let cvc: TextField?
 
+    /// Preferred scheme selection configuration.
+    /// If value is non-nil user will be asked to select scheme if co-scheme is available.
+    public let preferredScheme: PreferredScheme?
+
     /// Card scanner configuration.
     public let cardScanner: CardScanner?
-
-    /// Boolean flag determines whether user will be asked to select scheme if co-scheme is available.
-    @_spi(PO)
-    public var isSchemeSelectionAllowed: Bool = false
 
     /// Card billing address collection configuration.
     public let billingAddress: BillingAddress
@@ -190,6 +207,7 @@ public struct POCardTokenizationConfiguration {
         cardNumber: TextField = .init(),
         expirationDate: TextField = .init(),
         cvc: TextField? = .init(),
+        preferredScheme: PreferredScheme? = .init(),
         cardScanner: CardScanner? = .init(),
         billingAddress: BillingAddress = .init(),
         isSavingAllowed: Bool = false,
@@ -202,6 +220,7 @@ public struct POCardTokenizationConfiguration {
         self.cardNumber = cardNumber
         self.expirationDate = expirationDate
         self.cvc = cvc
+        self.preferredScheme = preferredScheme
         self.cardScanner = cardScanner
         self.submitButton = submitButton
         self.cancelButton = cancelButton
@@ -256,6 +275,7 @@ extension POCardTokenizationConfiguration {
         self.expirationDate = .init()
         self.cvc = shouldCollectCvc ? .init() : nil
         self.cardScanner = cardScanner
+        self.preferredScheme = .init()
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = cancelActionTitle?.isEmpty == true ? nil : .init(title: cancelActionTitle)
         self.billingAddress = billingAddress

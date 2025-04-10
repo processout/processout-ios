@@ -80,6 +80,10 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             cardNumber: textFieldConfiguration(with: configuration.card.cardNumber),
             expirationDate: textFieldConfiguration(with: configuration.card.expirationDate),
             cvc: methodConfiguration.cvcRequired ? textFieldConfiguration(with: configuration.card.cvc) : nil,
+            preferredScheme: .init(
+                schemeSelectionAllowed: methodConfiguration.schemeSelectionAllowed,
+                configuration: configuration.card.preferredScheme
+            ),
             cardScanner: configuration.card.cardScanner.map(POCardTokenizationConfiguration.CardScanner.init),
             billingAddress: billingAddressConfiguration(with: methodConfiguration),
             isSavingAllowed: methodConfiguration.savingAllowed,
@@ -187,6 +191,16 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
 }
 
 // swiftlint:disable no_extension_access_modifier
+
+private extension POCardTokenizationConfiguration.PreferredScheme {
+
+    init?(schemeSelectionAllowed: Bool, configuration: PODynamicCheckoutCardConfiguration.PreferredScheme) {
+        guard schemeSelectionAllowed else {
+            return nil
+        }
+        self = .init(title: configuration.title, prefersInline: configuration.prefersInline)
+    }
+}
 
 private extension POCardTokenizationConfiguration.CardScanner {
 

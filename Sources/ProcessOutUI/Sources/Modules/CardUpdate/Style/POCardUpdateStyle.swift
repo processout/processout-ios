@@ -20,8 +20,14 @@ public struct POCardUpdateStyle {
     /// Title style.
     public let title: POTextStyle
 
+    /// Section title text style.
+    public let sectionTitle: POTextStyle
+
     /// Input style.
     public let input: POInputStyle
+
+    /// Radio button style.
+    public let radioButton: any ButtonStyle
 
     /// Error description text style.
     public let errorDescription: POTextStyle
@@ -40,7 +46,9 @@ public struct POCardUpdateStyle {
 
     public init(
         title: POTextStyle,
+        sectionTitle: POTextStyle? = nil,
         input: POInputStyle,
+        radioButton: (any ButtonStyle)? = nil,
         errorDescription: POTextStyle,
         backgroundColor: Color,
         actionsContainer: POActionsContainerStyle,
@@ -48,7 +56,9 @@ public struct POCardUpdateStyle {
         separatorColor: Color
     ) {
         self.title = title
+        self.sectionTitle = sectionTitle ?? POTextStyle(color: Color(poResource: .Text.primary), typography: .label1)
         self.input = input
+        self.radioButton = radioButton ?? .radio
         self.errorDescription = errorDescription
         self.backgroundColor = backgroundColor
         self.actionsContainer = actionsContainer

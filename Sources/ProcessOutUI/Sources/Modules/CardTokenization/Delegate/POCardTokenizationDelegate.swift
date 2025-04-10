@@ -81,7 +81,7 @@ extension POCardTokenizationDelegate {
     }
 
     @MainActor
-    func cardTokenization(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate? {
+    public func cardTokenization(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate? {
         nil
     }
 }
