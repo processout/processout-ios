@@ -20,6 +20,8 @@ protocol DynamicCheckoutInteractorChildProvider {
     /// Creates and returns native APM interactor..
     @MainActor
     func nativeAlternativePaymentInteractor(
-        invoiceId: String, gatewayConfigurationId: String
+        invoiceId: String,
+        gatewayConfigurationId: String,
+        configuration: PODynamicCheckoutAlternativePaymentConfiguration
     ) -> any NativeAlternativePaymentInteractor
 }
