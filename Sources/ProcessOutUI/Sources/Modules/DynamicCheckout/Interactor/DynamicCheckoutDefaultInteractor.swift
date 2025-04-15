@@ -534,9 +534,7 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Card Payment
 
     private func startCardPayment(method: PODynamicCheckoutPaymentMethod.Card, startedState: State.Started) {
-        let interactor = childProvider.cardTokenizationInteractor(
-            invoiceId: startedState.invoice.id, configuration: method.configuration
-        )
+        let interactor = childProvider.cardTokenizationInteractor(for: method, invoiceId: startedState.invoice.id)
         interactor.delegate = self
         interactor.willChange = { [weak self] state in
             self?.cardTokenization(willChangeState: state)
@@ -628,9 +626,7 @@ final class DynamicCheckoutDefaultInteractor:
         let configuration = delegate?.dynamicCheckout(willStartAlternativePayment: method)
             ?? configuration.alternativePayment
         let interactor = childProvider.nativeAlternativePaymentInteractor(
-            invoiceId: startedState.invoice.id,
-            gatewayConfigurationId: method.configuration.gatewayConfigurationId,
-            configuration: configuration
+            for: method, invoiceId: startedState.invoice.id, configuration: configuration
         )
         interactor.delegate = self
         interactor.willChange = { [weak self] state in

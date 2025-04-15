@@ -28,31 +28,31 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
     // MARK: - DynamicCheckoutInteractorChildProvider
 
     func cardTokenizationInteractor(
-        invoiceId: String, configuration: PODynamicCheckoutPaymentMethod.CardConfiguration
+        for paymentMethod: PODynamicCheckoutPaymentMethod.Card, invoiceId: String
     ) -> any CardTokenizationInteractor {
         var logger = logger
         logger[attributeKey: .invoiceId] = invoiceId
         let interactor = DefaultCardTokenizationInteractor(
             cardsService: cardsService,
             logger: logger,
-            configuration: cardTokenizationConfiguration(with: configuration),
+            configuration: cardTokenizationConfiguration(with: paymentMethod.configuration),
             completion: { _ in }
         )
         return interactor
     }
 
     func nativeAlternativePaymentInteractor(
+        for paymentMethod: PODynamicCheckoutPaymentMethod.NativeAlternativePayment,
         invoiceId: String,
-        gatewayConfigurationId: String,
         configuration: PODynamicCheckoutAlternativePaymentConfiguration
     ) -> any NativeAlternativePaymentInteractor {
         var logger = self.logger
         logger[attributeKey: .invoiceId] = invoiceId
-        logger[attributeKey: .gatewayConfigurationId] = gatewayConfigurationId
+        logger[attributeKey: .gatewayConfigurationId] = paymentMethod.configuration.gatewayConfigurationId
         let interactor = NativeAlternativePaymentDefaultInteractor(
             configuration: alternativePaymentConfiguration(
                 invoiceId: invoiceId,
-                gatewayConfigurationId: gatewayConfigurationId,
+                gatewayConfigurationId: paymentMethod.configuration.gatewayConfigurationId,
                 configuration: configuration
             ),
             invoicesService: invoicesService,
@@ -85,8 +85,8 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             expirationDate: textFieldConfiguration(with: configuration.card.expirationDate),
             cvc: methodConfiguration.cvcRequired ? textFieldConfiguration(with: configuration.card.cvc) : nil,
             preferredScheme: .init(
-                schemeSelectionAllowed: methodConfiguration.schemeSelectionAllowed,
-                configuration: configuration.card.preferredScheme
+                configuration: configuration.card.preferredScheme,
+                schemeSelectionAllowed: methodConfiguration.schemeSelectionAllowed
             ),
             cardScanner: configuration.card.cardScanner.map(POCardTokenizationConfiguration.CardScanner.init),
             billingAddress: billingAddressConfiguration(with: methodConfiguration),
@@ -197,7 +197,7 @@ private extension PONativeAlternativePaymentConfiguration.BarcodeInteraction {
 
 private extension POCardTokenizationConfiguration.PreferredScheme {
 
-    init?(schemeSelectionAllowed: Bool, configuration: PODynamicCheckoutCardConfiguration.PreferredScheme) {
+    init?(configuration: PODynamicCheckoutCardConfiguration.PreferredScheme, schemeSelectionAllowed: Bool) {
         guard schemeSelectionAllowed else {
             return nil
         }
