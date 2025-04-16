@@ -165,10 +165,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     }
 
     private func cardNumberIcon(startedState: InteractorState.Started) -> AnyView? {
-        // Scheme icon takes precedence over inject icon.
-        let scheme = startedState.issuerInformation?.coScheme != nil
-            ? startedState.preferredScheme
-            : startedState.issuerInformation?.$scheme.typed
+        let scheme = startedState.preferredScheme
+            ?? startedState.issuerInformation?.$scheme.typed
+            ?? startedState.preliminaryScheme
         if let image = scheme.flatMap(CardSchemeImageProvider.shared.image) {
             return AnyView(image)
         }

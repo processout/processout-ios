@@ -24,6 +24,9 @@ enum CardTokenizationInteractorState {
         /// Name of cardholder.
         var cardholderName: Parameter
 
+        /// Preliminary card scheme not yet confirmed by API.
+        var preliminaryScheme: POCardScheme?
+
         /// Card issuer information based on number.
         var issuerInformation: POCardIssuerInformation?
 

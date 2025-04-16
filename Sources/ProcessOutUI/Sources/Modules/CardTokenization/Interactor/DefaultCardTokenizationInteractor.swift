@@ -310,42 +310,52 @@ final class DefaultCardTokenizationInteractor:
     }
 
     private func updateIssuerInformation(iin: String) -> Task<Void, Never>? {
-        if let scheme = CardSchemeProvider.shared.scheme(cardNumber: iin) {
-            let information = POCardIssuerInformation(scheme: scheme)
-            update(issuerInformation: information, resolvePreferredScheme: false)
-        } else {
-            update(issuerInformation: nil, resolvePreferredScheme: false)
-        }
+        update(
+            preliminaryScheme: CardSchemeProvider.shared.scheme(cardNumber: iin)
+        )
         guard iin.count >= Constants.iinLength else {
             return nil
         }
         let task = Task { @MainActor [weak self, cardsService] in
-            // Inability to select co-scheme is considered minor issue and we still want
-            // users to be able to continue tokenization. So errors are silently ignored.
+            // Inability to select co-scheme is considered minor issue at this stage and we still
+            // want users to be able to continue tokenization. So errors are silently ignored.
             if let information = try? await cardsService.issuerInformation(iin: iin), !Task.isCancelled {
-                self?.update(issuerInformation: information, resolvePreferredScheme: true)
+                self?.update(issuerInformation: information)
             }
         }
         return task
     }
 
-    /// Updates started state with given issuer information, which includes scheme and possibly CVC.
-    private func update(issuerInformation: POCardIssuerInformation?, resolvePreferredScheme: Bool) {
+    private func update(preliminaryScheme: POCardScheme?) {
         guard case .started(var startedState) = state else {
             logger.debug("Unable to update issuer information in current state: \(state)")
             return
         }
+        startedState.preliminaryScheme = preliminaryScheme
+        startedState.issuerInformation = nil
+        startedState.preferredScheme = nil
+        let securityCodeFormatter = CardSecurityCodeFormatter()
+        securityCodeFormatter.scheme = preliminaryScheme
+        startedState.cvc.value = securityCodeFormatter.string(from: startedState.cvc.value)
+        startedState.cvc.formatter = securityCodeFormatter
+        state = .started(startedState)
+    }
+
+    private func update(issuerInformation: POCardIssuerInformation) {
+        guard case .started(var startedState) = state else {
+            logger.debug("Unable to update issuer information in current state: \(state)")
+            return
+        }
+        startedState.preliminaryScheme = nil
         startedState.issuerInformation = issuerInformation
-        if !resolvePreferredScheme {
-            startedState.preferredScheme = nil
-        } else if let issuerInformation, let delegate = delegate {
+        if let delegate = delegate {
             let scheme = delegate.cardTokenization(preferredSchemeWith: issuerInformation)
             startedState.preferredScheme = scheme
         } else {
-            startedState.preferredScheme = issuerInformation?.$scheme.typed
+            startedState.preferredScheme = issuerInformation.$scheme.typed
         }
         let securityCodeFormatter = CardSecurityCodeFormatter()
-        securityCodeFormatter.scheme = issuerInformation?.$scheme.typed
+        securityCodeFormatter.scheme = issuerInformation.$scheme.typed
         startedState.cvc.value = securityCodeFormatter.string(from: startedState.cvc.value)
         startedState.cvc.formatter = securityCodeFormatter
         state = .started(startedState)
