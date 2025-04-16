@@ -59,9 +59,10 @@ extension POCardTokenizationDelegate {
         // Ignored
     }
 
+    @available(*, deprecated) // Silences deprecation warning.
     @MainActor
     public func cardTokenization(didTokenizeCard card: POCard, shouldSaveCard: Bool) async throws {
-        // Ignored
+        try await processTokenizedCard(card: card)
     }
 
     @available(*, deprecated, message: "Implement cardTokenization(didTokenizeCard:save:) method instead.")

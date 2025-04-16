@@ -154,7 +154,6 @@ final class DefaultCardTokenizationInteractor:
                 logger.debug("Did tokenize card: \(String(describing: card))")
                 delegate?.cardTokenizationDidEmitEvent(.didTokenize(card: card))
                 try await delegate?.cardTokenization(didTokenizeCard: card, shouldSaveCard: currentState.shouldSaveCard)
-                try await delegate?.processTokenizedCard(card: card)
                 setTokenizedState(card: card)
             } catch {
                 attemptRecoverTokenizationError(error)
