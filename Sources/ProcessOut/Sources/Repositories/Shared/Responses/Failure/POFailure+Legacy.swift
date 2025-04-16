@@ -410,6 +410,7 @@ extension POFailure {
         underlyingError: Error? = nil
     ) {
         self.message = message
+        self.errorDescription = nil
         self.failureCode = .init(rawValue: code.rawValue)
         self.invalidFields = invalidFields
         self.underlyingError = underlyingError
