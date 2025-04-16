@@ -26,13 +26,11 @@ public protocol POCardTokenizationDelegate: AnyObject, Sendable {
     @MainActor
     func cardTokenization(didTokenizeCard card: POCard, shouldSaveCard: Bool) async throws
 
-    /// Allows delegate to additionally process tokenized card before ending module's lifecycle. For example
-    /// it is possible to authorize an invoice or assign customer token. Default implementation does nothing.
-    ///
-    /// - NOTE: When possible please prefer throwing `POFailure` instead of other error types.
-    @available(*, deprecated, message: "Implement cardTokenization(didTokenizeCard:save:) method instead.")
+    /// Asks the delegate to evaluate whether a card is eligible for tokenization based on its issuer information.
     @MainActor
-    func processTokenizedCard(card: POCard) async throws
+    func cardTokenization(
+        evaluateEligibilityWith request: POCardTokenizationEligibilityRequest
+    ) -> POCardTokenizationEligibilityEvaluation
 
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
@@ -43,6 +41,16 @@ public protocol POCardTokenizationDelegate: AnyObject, Sendable {
     /// Default implementation returns `true`.
     @MainActor
     func shouldContinueTokenization(after failure: POFailure) -> Bool
+
+    // MARK: - Deprecations
+
+    /// Allows delegate to additionally process tokenized card before ending module's lifecycle. For example
+    /// it is possible to authorize an invoice or assign customer token. Default implementation does nothing.
+    ///
+    /// - NOTE: When possible please prefer throwing `POFailure` instead of other error types.
+    @available(*, deprecated, message: "Implement cardTokenization(didTokenizeCard:save:) method instead.")
+    @MainActor
+    func processTokenizedCard(card: POCard) async throws
 
     // MARK: - Card Scanning
 
@@ -69,6 +77,13 @@ extension POCardTokenizationDelegate {
     @MainActor
     public func processTokenizedCard(card: POCard) async throws {
         // Ignored
+    }
+
+    @MainActor
+    public func cardTokenization(
+        evaluateEligibilityWith request: POCardTokenizationEligibilityRequest
+    ) -> POCardTokenizationEligibilityEvaluation {
+        .eligible()
     }
 
     @MainActor
