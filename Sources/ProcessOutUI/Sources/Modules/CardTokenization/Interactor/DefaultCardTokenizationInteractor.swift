@@ -148,9 +148,10 @@ final class DefaultCardTokenizationInteractor:
         logger.debug("Will tokenize card")
         delegate?.cardTokenizationDidEmitEvent(.willTokenizeCard)
         let task = Task { @MainActor in
-            let request = createCardTokenizationRequest(with: currentState)
             do {
-                let card = try await cardsService.tokenize(request: request)
+                let card = try await cardsService.tokenize(
+                    request: createCardTokenizationRequest(with: currentState)
+                )
                 logger.debug("Did tokenize card: \(String(describing: card))")
                 delegate?.cardTokenizationDidEmitEvent(.didTokenize(card: card))
                 try await delegate?.cardTokenization(didTokenizeCard: card, shouldSaveCard: currentState.shouldSaveCard)
@@ -338,8 +339,8 @@ final class DefaultCardTokenizationInteractor:
         if !resolvePreferredScheme {
             startedState.preferredScheme = nil
         } else if let issuerInformation, let delegate = delegate {
-            let rawScheme = delegate.preferredScheme(issuerInformation: issuerInformation)
-            startedState.preferredScheme = rawScheme.map(POCardScheme.init)
+            let scheme = delegate.cardTokenization(preferredSchemeWith: issuerInformation)
+            startedState.preferredScheme = scheme
         } else {
             startedState.preferredScheme = issuerInformation?.$scheme.typed
         }

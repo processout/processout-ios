@@ -56,7 +56,7 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
     @MainActor
-    func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String?
+    func dynamicCheckout(preferredSchemeWith issuerInformation: POCardIssuerInformation) -> POCardScheme?
 
     /// Notifies the delegate before a card scanning session begins and allows
     /// providing a delegate to handle scanning events.
@@ -117,8 +117,8 @@ extension PODynamicCheckoutDelegate {
     }
 
     @MainActor
-    public func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String? {
-        issuerInformation.scheme
+    public func dynamicCheckout(preferredSchemeWith issuerInformation: POCardIssuerInformation) -> POCardScheme? {
+        issuerInformation.$scheme.typed
     }
 
     @MainActor

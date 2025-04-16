@@ -33,9 +33,9 @@ public protocol POCardTokenizationDelegate: AnyObject, Sendable {
     ) -> POCardTokenizationEligibilityEvaluation
 
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
-    /// implementation returns primary scheme.
+    /// implementation uses primary scheme.
     @MainActor
-    func preferredScheme(issuerInformation: POCardIssuerInformation) -> String?
+    func cardTokenization(preferredSchemeWith issuerInformation: POCardIssuerInformation) -> POCardScheme?
 
     /// Asks delegate whether user should be allowed to continue after failure or module should complete.
     /// Default implementation returns `true`.
@@ -43,6 +43,12 @@ public protocol POCardTokenizationDelegate: AnyObject, Sendable {
     func shouldContinueTokenization(after failure: POFailure) -> Bool
 
     // MARK: - Deprecations
+
+    /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
+    /// implementation uses primary scheme.
+    @available(*, deprecated, message: "Implement cardTokenization(preferredSchemeWith:) method instead.")
+    @MainActor
+    func preferredScheme(issuerInformation: POCardIssuerInformation) -> String?
 
     /// Allows delegate to additionally process tokenized card before ending module's lifecycle. For example
     /// it is possible to authorize an invoice or assign customer token. Default implementation does nothing.
@@ -67,7 +73,11 @@ extension POCardTokenizationDelegate {
         // Ignored
     }
 
-    @available(*, deprecated) // Silences deprecation warning.
+    @MainActor
+    public func cardTokenization(preferredSchemeWith issuerInformation: POCardIssuerInformation) -> POCardScheme? {
+        preferredScheme(issuerInformation: issuerInformation).map(POCardScheme.init)
+    }
+
     @MainActor
     public func cardTokenization(didTokenizeCard card: POCard, shouldSaveCard: Bool) async throws {
         try await processTokenizedCard(card: card)

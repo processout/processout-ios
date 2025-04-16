@@ -891,8 +891,8 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         )
     }
 
-    func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
-        delegate?.dynamicCheckout(preferredSchemeFor: issuerInformation)
+    func cardTokenization(preferredSchemeWith issuerInformation: POCardIssuerInformation) -> POCardScheme? {
+        delegate?.dynamicCheckout(preferredSchemeWith: issuerInformation)
     }
 
     func shouldContinueTokenization(after failure: POFailure) -> Bool {
