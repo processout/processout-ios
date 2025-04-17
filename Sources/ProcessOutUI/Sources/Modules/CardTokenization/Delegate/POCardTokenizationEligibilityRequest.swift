@@ -10,7 +10,7 @@ import ProcessOut
 public struct POCardTokenizationEligibilityRequest: Sendable {
 
     /// Card's issuer identification number.
-    public let partialIin: String
+    public let iin: String
 
     /// Resolved issuer information.
     public let issuerInformation: POCardIssuerInformation?

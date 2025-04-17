@@ -10,7 +10,7 @@ import ProcessOut
 public struct POCardTokenizationEligibilityEvaluation: Sendable {
 
     enum Eligibility {
-        case notEligible(POFailure), eligible(schemes: Set<POCardScheme>?)
+        case notEligible(POFailure?), eligible(schemes: Set<POCardScheme>?)
     }
 
     let eligibility: Eligibility
@@ -18,7 +18,7 @@ public struct POCardTokenizationEligibilityEvaluation: Sendable {
 
 extension POCardTokenizationEligibilityEvaluation {
 
-    public static func notEligible(failure: POFailure) -> Self {
+    public static func notEligible(failure: POFailure?) -> Self {
         .init(eligibility: .notEligible(failure))
     }
 

@@ -24,14 +24,8 @@ enum CardTokenizationInteractorState {
         /// Name of cardholder.
         var cardholderName: Parameter
 
-        /// Preliminary card scheme not yet confirmed by API.
-        var preliminaryScheme: POCardScheme?
-
-        /// Card issuer information based on number.
-        var issuerInformation: POCardIssuerInformation?
-
-        /// Preferred scheme.
-        var preferredScheme: POCardScheme?
+        /// Card information.
+        var cardInformation: CardInformation = .init()
 
         /// Billing address parameters.
         var address: AddressParameters
@@ -106,6 +100,33 @@ enum CardTokenizationInteractorState {
         let value: String
     }
 
+    struct CardInformation {
+
+        /// Partial issuer identification number.
+        var partialIin = ""
+
+        /// Preliminary card scheme not yet confirmed by API.
+        var preliminaryScheme: POCardScheme?
+
+        /// Card issuer information based on number.
+        var issuerInformation: ValueUpdate<POCardIssuerInformation>?
+
+        /// Preferred scheme.
+        var preferredScheme: POCardScheme?
+
+        /// Card eligibility.
+        var eligibility: POCardTokenizationEligibilityEvaluation.Eligibility?
+    }
+
+    enum ValueUpdate<T> {
+
+        /// Value is currently being updated.
+        case updating(task: Task<Void, Error>)
+
+        /// Value is available.
+        case completed(T)
+    }
+
     typealias ParameterId = WritableKeyPath<Started, Parameter>
 
     case idle
@@ -149,5 +170,38 @@ extension CardTokenizationInteractorState.Started {
     var areParametersValid: Bool {
         let parameters = [number, expiration, cvc, cardholderName]
         return parameters.allSatisfy(\.isValid) && address.areParametersValid
+    }
+}
+
+extension CardTokenizationInteractorState.ValueUpdate {
+
+    /// Current value if available.
+    var currentValue: T? {
+        if case .completed(let value) = self {
+            return value
+        }
+        return nil
+    }
+}
+
+extension CardTokenizationInteractorState.CardInformation {
+
+    /// Currently supported schemes based on issuer information that are eligible.
+    var supportedEligibleSchemes: [POCardScheme]? {
+        guard case .completed(let issuerInformation) = self.issuerInformation else {
+            return nil
+        }
+        let schemes = [issuerInformation.$scheme.typed, issuerInformation.$coScheme.typed].compactMap { $0 }
+        switch eligibility {
+        case .notEligible:
+            return []
+        case .eligible(let eligibleSchemes?):
+            return schemes.filter(eligibleSchemes.contains)
+        case .eligible:
+            break
+        case nil:
+            return nil
+        }
+        return schemes
     }
 }
