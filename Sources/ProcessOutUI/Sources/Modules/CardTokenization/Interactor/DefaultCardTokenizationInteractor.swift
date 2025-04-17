@@ -322,7 +322,7 @@ final class DefaultCardTokenizationInteractor:
             let issuerInformation = try await cardsService.issuerInformation(
                 iin: currentState.cardInformation.partialIin
             )
-            newCardInformation = createCardInformation(
+            newCardInformation = await createCardInformation(
                 with: issuerInformation, iin: currentState.cardInformation.partialIin
             )
         } catch {
@@ -345,11 +345,11 @@ final class DefaultCardTokenizationInteractor:
 
     private func createCardInformation(
         with issuerInformation: POCardIssuerInformation, iin: String
-    ) -> CardTokenizationInteractorState.CardInformation {
+    ) async -> CardTokenizationInteractorState.CardInformation {
         var cardInformation = CardTokenizationInteractorState.CardInformation(
             partialIin: iin, issuerInformation: .completed(issuerInformation)
         )
-        cardInformation.eligibility = delegate?.cardTokenization(
+        cardInformation.eligibility = await delegate?.cardTokenization(
             evaluateEligibilityWith: .init(iin: iin, issuerInformation: issuerInformation)
         ).eligibility ?? .eligible(schemes: nil)
         let supportedEligibleSchemes = cardInformation.supportedEligibleSchemes ?? []

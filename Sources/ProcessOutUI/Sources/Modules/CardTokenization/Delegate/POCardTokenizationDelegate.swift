@@ -30,7 +30,7 @@ public protocol POCardTokenizationDelegate: AnyObject, Sendable {
     @MainActor
     func cardTokenization(
         evaluateEligibilityWith request: POCardTokenizationEligibilityRequest
-    ) -> POCardTokenizationEligibilityEvaluation
+    ) async -> POCardTokenizationEligibilityEvaluation
 
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation uses primary scheme.
@@ -92,7 +92,7 @@ extension POCardTokenizationDelegate {
     @MainActor
     public func cardTokenization(
         evaluateEligibilityWith request: POCardTokenizationEligibilityRequest
-    ) -> POCardTokenizationEligibilityEvaluation {
+    ) async -> POCardTokenizationEligibilityEvaluation {
         .eligible()
     }
 
