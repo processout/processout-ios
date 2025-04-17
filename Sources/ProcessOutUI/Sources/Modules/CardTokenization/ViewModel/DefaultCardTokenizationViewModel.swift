@@ -46,6 +46,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
 
     private enum ItemId {
         static let error = "error"
+        static let eligibilityError = "eligibility-error"
         static let trackData = "track-data"
         static let scheme = "card-scheme"
         static let cardSave = "card-save"
@@ -91,6 +92,14 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         var cardInformationItems = cardInformationInputItems(startedState: startedState)
         if let error = startedState.recentErrorMessage {
             let errorItem = State.ErrorItem(id: ItemId.error, description: error)
+            cardInformationItems.append(.error(errorItem))
+        }
+        if case .notEligible(let failure) = startedState.cardInformation.eligibility {
+            // todo(andrii-vysotskyi): use localized description
+            let errorItem = State.ErrorItem(
+                id: ItemId.eligibilityError,
+                description: failure?.errorDescription ?? "Card is not supported."
+            )
             cardInformationItems.append(.error(errorItem))
         }
         let sections = [
@@ -165,9 +174,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     }
 
     private func cardNumberIcon(startedState: InteractorState.Started) -> AnyView? {
-        let scheme = startedState.preferredScheme
-            ?? startedState.issuerInformation?.$scheme.typed
-            ?? startedState.preliminaryScheme
+        let scheme = startedState.cardInformation.preferredScheme
+            ?? startedState.cardInformation.issuerInformation?.currentValue?.$scheme.typed
+            ?? startedState.cardInformation.preliminaryScheme
         if let image = scheme.flatMap(CardSchemeImageProvider.shared.image) {
             return AnyView(image)
         }
@@ -210,8 +219,8 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         startedState: InteractorState.Started
     ) -> CardTokenizationViewModelState.Section? {
         guard let schemeConfiguration = configuration.preferredScheme,
-              let issuerInformation = startedState.issuerInformation,
-              let coScheme = issuerInformation.coScheme else {
+              let supportedEligibleSchemes = startedState.cardInformation.supportedEligibleSchemes,
+              supportedEligibleSchemes.count > 1 else {
             return nil
         }
         let resolvedSchemeConfiguration = schemeConfiguration.resolved(
@@ -219,15 +228,15 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         )
         let pickerItem = State.PickerItem(
             id: ItemId.scheme,
-            options: [
-                .init(id: issuerInformation.scheme, title: issuerInformation.scheme.capitalized),
-                .init(id: coScheme, title: coScheme.capitalized)
-            ],
+            options: supportedEligibleSchemes.map { scheme in
+                .init(id: scheme.rawValue, title: scheme.rawValue.capitalized)
+            },
             selectedOptionId: .init(
-                get: { startedState.preferredScheme?.rawValue },
+                get: { startedState.cardInformation.preferredScheme?.rawValue },
                 set: { [weak self] newValue in
-                    let newScheme = newValue.map(POCardScheme.init)
-                    self?.interactor.setPreferredScheme(newScheme ?? issuerInformation.$scheme.typed)
+                    if let newScheme = newValue.map(POCardScheme.init) {
+                        self?.interactor.setPreferredScheme(newScheme)
+                    }
                 }
             ),
             prefersInline: resolvedSchemeConfiguration.prefersInline
@@ -402,12 +411,17 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func submitAction(
         startedState: InteractorState.Started, isSubmitting: Bool
     ) -> POButtonViewModel? {
+        let cardNotEligible = if case .notEligible = startedState.cardInformation.eligibility {
+            true
+        } else {
+            false
+        }
         let buttonConfiguration = configuration.submitButton
         let action = POButtonViewModel(
             id: "primary-button",
             title: buttonConfiguration.title ?? String(resource: .CardTokenization.Button.submit),
             icon: buttonConfiguration.icon,
-            isEnabled: startedState.areParametersValid,
+            isEnabled: startedState.areParametersValid && !cardNotEligible,
             isLoading: isSubmitting,
             role: .primary,
             action: { [weak self] in
