@@ -18,11 +18,12 @@ public protocol POCardTokenizationDelegate: AnyObject, Sendable {
     /// Allows delegate to additionally process tokenized card before ending module's lifecycle. For example
     /// it is possible to authorize an invoice or assign customer token. Default implementation does nothing.
     ///
+    /// Your implementation may throw a `POFailure` containing a localized `errorDescription` that will be
+    /// shown directly to the user.
+    ///
     /// - Parameters:
     ///   - card: Tokenized card instance.
     ///   - shouldSaveCard: A Boolean value indicating whether the user has requested card to be saved.
-    ///
-    /// - NOTE: When possible please prefer throwing `POFailure` instead of other error types.
     @MainActor
     func cardTokenization(didTokenizeCard card: POCard, shouldSaveCard: Bool) async throws
 

@@ -20,6 +20,8 @@ public struct POCardTokenizationEligibilityEvaluation: Sendable {
 extension POCardTokenizationEligibilityEvaluation {
 
     /// Returns an instance indicating that the card is not eligible, with optional failure details.
+    ///
+    /// You may provide a ``POFailure`` containing a localized `errorDescription` that will be shown directly to the user.
     public static func notEligible(failure: POFailure? = nil) -> Self {
         .init(rawValue: .notEligible(failure))
     }
