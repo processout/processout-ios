@@ -20,7 +20,7 @@ public struct POCardTokenizationEligibilityEvaluation: Sendable {
 extension POCardTokenizationEligibilityEvaluation {
 
     /// Returns an instance indicating that the card is not eligible, with optional failure details.
-    public static func notEligible(failure: POFailure?) -> Self {
+    public static func notEligible(failure: POFailure? = nil) -> Self {
         .init(rawValue: .notEligible(failure))
     }
 
