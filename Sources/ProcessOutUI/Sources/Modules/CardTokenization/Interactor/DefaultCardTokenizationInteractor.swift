@@ -357,6 +357,12 @@ final class DefaultCardTokenizationInteractor:
             evaluateEligibilityWith: .init(iin: iin, issuerInformation: issuerInformation)
         ).rawValue ?? .eligible(scheme: nil)
         let supportedEligibleSchemes = cardInformation.supportedEligibleSchemes ?? []
+        if case .eligible(let eligibleScheme?) = cardInformation.eligibility {
+            assert(
+                supportedEligibleSchemes.contains(eligibleScheme),
+                "Eligible scheme must be card's scheme or co-scheme."
+            )
+        }
         if supportedEligibleSchemes.count > 1,
            let preferredScheme = delegate?.cardTokenization(preferredSchemeWith: issuerInformation) {
             cardInformation.preferredScheme = preferredScheme
