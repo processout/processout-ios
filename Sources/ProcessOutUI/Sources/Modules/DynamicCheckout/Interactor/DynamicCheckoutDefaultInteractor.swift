@@ -534,9 +534,7 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Card Payment
 
     private func startCardPayment(method: PODynamicCheckoutPaymentMethod.Card, startedState: State.Started) {
-        let interactor = childProvider.cardTokenizationInteractor(
-            invoiceId: startedState.invoice.id, configuration: method.configuration
-        )
+        let interactor = childProvider.cardTokenizationInteractor(for: method, invoiceId: startedState.invoice.id)
         interactor.delegate = self
         interactor.willChange = { [weak self] state in
             self?.cardTokenization(willChangeState: state)
@@ -625,9 +623,10 @@ final class DynamicCheckoutDefaultInteractor:
     private func startNativeAlternativePayment(
         method: PODynamicCheckoutPaymentMethod.NativeAlternativePayment, startedState: State.Started
     ) {
+        let configuration = delegate?.dynamicCheckout(willStartAlternativePayment: method)
+            ?? configuration.alternativePayment
         let interactor = childProvider.nativeAlternativePaymentInteractor(
-            invoiceId: startedState.invoice.id,
-            gatewayConfigurationId: method.configuration.gatewayConfigurationId
+            for: method, invoiceId: startedState.invoice.id, configuration: configuration
         )
         interactor.delegate = self
         interactor.willChange = { [weak self] state in
@@ -924,13 +923,12 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
         defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]
     ) async -> [String: String] {
         guard case .paymentProcessing(let currentState) = state,
-              let interactor = currentState.nativeAlternativePaymentInteractor else {
+              case .nativeAlternativePayment(let paymentMethod) = currentState.paymentMethod else {
             logger.error("Unable to resolve default values in current state: \(state).")
             return [:]
         }
         let request = PODynamicCheckoutAlternativePaymentDefaultsRequest(
-            gatewayConfigurationId: interactor.configuration.gatewayConfigurationId,
-            parameters: parameters
+            paymentMethod: paymentMethod, parameters: parameters
         )
         return await delegate?.dynamicCheckout(alternativePaymentDefaultsWith: request) ?? [:]
     }

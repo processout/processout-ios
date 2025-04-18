@@ -494,7 +494,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let title: String?, icon: AnyView?, confirmation: POConfirmationDialogConfiguration?
         if state.isAwaitingNativeAlternativePaymentCapture {
-            let configuration = interactor.configuration.alternativePayment.paymentConfirmation.cancelButton
+            let configuration = state.nativeAlternativePaymentInteractor?.configuration.paymentConfirmation.cancelButton
             title = configuration?.title
             icon = configuration?.icon
             confirmation = configuration?.confirmation
