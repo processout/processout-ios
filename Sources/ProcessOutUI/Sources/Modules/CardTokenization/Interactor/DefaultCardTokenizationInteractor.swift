@@ -246,7 +246,7 @@ final class DefaultCardTokenizationInteractor:
         default:
             errorMessage = .CardTokenization.Error.generic
         }
-        return String(resource: errorMessage)
+        return failure.errorDescription ?? String(resource: errorMessage)
     }
 
     // MARK: - Failure State
