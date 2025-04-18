@@ -332,12 +332,19 @@ final class DefaultCardTokenizationInteractor:
             return
         }
         var newState = currentState
-        newState.cardInformation = newCardInformation
-        if case .notEligible = newState.cardInformation.eligibility {
-            newState.number.issues.insert(.eligibility)
-        }
-        update(cvc: &newState.cvc, for: newState.cardInformation.preferredScheme)
+        update(state: &newState, with: newCardInformation)
         state = .started(newState)
+    }
+
+    private func update(
+        state: inout CardTokenizationInteractorState.Started,
+        with cardInformation: CardTokenizationInteractorState.CardInformation
+    ) {
+        state.cardInformation = cardInformation
+        if case .notEligible = cardInformation.eligibility {
+            state.number.issues.insert(.eligibility)
+        }
+        update(cvc: &state.cvc, for: cardInformation.preferredScheme)
     }
 
     private func createCardInformation(
@@ -507,11 +514,7 @@ final class DefaultCardTokenizationInteractor:
                     return
                 }
                 var newState = currentState.snapshot
-                newState.cardInformation = cardInformation
-                if case .notEligible = cardInformation.eligibility {
-                    newState.number.issues.insert(.eligibility)
-                }
-                update(cvc: &newState.cvc, for: cardInformation.preferredScheme)
+                update(state: &newState, with: cardInformation)
                 state = .started(newState)
                 if let schemes = cardInformation.supportedEligibleSchemes, schemes.count == 1 {
                     setTokenizingState()
