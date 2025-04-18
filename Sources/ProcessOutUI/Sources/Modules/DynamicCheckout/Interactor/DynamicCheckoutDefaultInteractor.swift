@@ -566,7 +566,7 @@ final class DynamicCheckoutDefaultInteractor:
         case .started:
             currentState.isCancellable = currentState.snapshot.isCancellable
             self.state = .paymentProcessing(currentState)
-        case .tokenizing:
+        case .tokenizing, .evaluatingEligibility:
             currentState.isCancellable = false
             self.state = .paymentProcessing(currentState)
         case .tokenized:

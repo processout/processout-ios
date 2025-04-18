@@ -50,6 +50,15 @@ enum CardTokenizationInteractorState {
         let task: Task<Void, Never>
     }
 
+    struct EvaluatingEligibility {
+
+        /// Started state snapshot.
+        let snapshot: Started
+
+        /// Evaluation task.
+        let task: Task<Void, Never>
+    }
+
     struct AddressParameters {
 
         /// Billing address country.
@@ -142,6 +151,10 @@ enum CardTokenizationInteractorState {
 
     /// Interactor has started and is ready.
     case started(Started)
+
+    /// Tokenization was requested before card eligibility was determined, so now
+    /// it's being evaluated explicitly.
+    case evaluatingEligibility(EvaluatingEligibility)
 
     /// Card information is currently being tokenized.
     case tokenizing(Tokenizing)

@@ -78,8 +78,11 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         case .tokenizing(let currentState):
             let newState = convertToState(startedState: currentState.snapshot, isSubmitting: true)
             self.state = newState
-        default:
-            break
+        case .evaluatingEligibility(let currentState):
+            let newState = convertToState(startedState: currentState.snapshot, isSubmitting: true)
+            self.state = newState
+        case .tokenized, .failure:
+            break // Ignored
         }
     }
 
