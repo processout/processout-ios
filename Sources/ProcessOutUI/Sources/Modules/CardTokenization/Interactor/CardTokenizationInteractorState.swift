@@ -217,8 +217,7 @@ extension CardTokenizationInteractorState.CardInformation {
         switch eligibility {
         case .notEligible:
             return []
-        case .eligible(let eligibleScheme?):
-            precondition(schemes.contains(eligibleScheme))
+        case .eligible(let eligibleScheme?) where schemes.contains(eligibleScheme):
             return [eligibleScheme]
         case .eligible:
             break
