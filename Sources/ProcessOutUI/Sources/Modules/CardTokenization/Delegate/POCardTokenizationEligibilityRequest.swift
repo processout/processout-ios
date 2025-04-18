@@ -13,5 +13,5 @@ public struct POCardTokenizationEligibilityRequest: Sendable {
     public let iin: String
 
     /// Resolved issuer information.
-    public let issuerInformation: POCardIssuerInformation?
+    public let issuerInformation: POCardIssuerInformation
 }
