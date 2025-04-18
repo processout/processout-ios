@@ -1259,6 +1259,40 @@
         }
       }
     },
+    "card-tokenization.error.eligibility" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكننا قبول هذه البطاقة. يرجى المحاولة باستخدام بطاقة أخرى."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We can’t accept this card. Please try a different one."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nous ne pouvons pas accepter cette carte. Veuillez en essayer une autre."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie możemy zaakceptować tej karty. Spróbuj użyć innej."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não podemos aceitar este cartão. Por favor, tente com outro."
+          }
+        }
+      }
+    },
     "card-tokenization.error.generic" : {
       "localizations" : {
         "ar" : {

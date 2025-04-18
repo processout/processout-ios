@@ -223,7 +223,7 @@ extension POFailureCode {
         /// The card was a test card and can't be used to process live transactions.
         public static let test = POFailureCode(rawValue: "card.test")
 
-        /// The card was blacklisted from the payment provider
+        /// The card was blacklisted from the payment provider.
         public static let blacklisted = POFailureCode(rawValue: "card.blacklisted")
     }
 

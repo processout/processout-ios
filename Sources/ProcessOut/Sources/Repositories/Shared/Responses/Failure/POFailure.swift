@@ -8,7 +8,7 @@
 import Foundation
 
 /// Information about an error that occurred.
-public struct POFailure: Error {
+public struct POFailure: LocalizedError {
 
     public struct InvalidField: Codable, Sendable {
 
@@ -28,6 +28,9 @@ public struct POFailure: Error {
     /// Failure message. Not intented to be used as a user facing string.
     public let message: String?
 
+    /// Localized error description if any.
+    public let errorDescription: String?
+
     /// Failure code.
     public let failureCode: POFailureCode
 
@@ -40,11 +43,13 @@ public struct POFailure: Error {
     /// Creates failure instance.
     public init(
         message: String? = nil,
+        errorDescription: String? = nil,
         code: POFailureCode,
         invalidFields: [InvalidField]? = nil,
         underlyingError: Error? = nil
     ) {
         self.message = message
+        self.errorDescription = errorDescription
         self.failureCode = code
         self.invalidFields = invalidFields
         self.underlyingError = underlyingError
@@ -56,6 +61,7 @@ extension POFailure: Codable {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         message = try container.decodeIfPresent(String.self, forKey: .message)
+        errorDescription = nil
         failureCode = try container.decode(POFailureCode.self, forKey: .code)
         invalidFields = try container.decodeIfPresent([InvalidField].self, forKey: .invalidFields)
         underlyingError = nil
