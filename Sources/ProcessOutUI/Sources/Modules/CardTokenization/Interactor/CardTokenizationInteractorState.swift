@@ -124,7 +124,7 @@ enum CardTokenizationInteractorState {
         var preferredScheme: POCardScheme?
 
         /// Card eligibility.
-        var eligibility: POCardTokenizationEligibilityEvaluation.Eligibility?
+        var eligibility: POCardTokenizationEligibilityEvaluation.RawValue?
     }
 
     enum ValueUpdate<T> {
@@ -204,8 +204,9 @@ extension CardTokenizationInteractorState.CardInformation {
         switch eligibility {
         case .notEligible:
             return []
-        case .eligible(let eligibleSchemes?):
-            return schemes.filter(eligibleSchemes.contains)
+        case .eligible(let eligibleScheme?):
+            precondition(schemes.contains(eligibleScheme))
+            return [eligibleScheme]
         case .eligible:
             break
         case nil:

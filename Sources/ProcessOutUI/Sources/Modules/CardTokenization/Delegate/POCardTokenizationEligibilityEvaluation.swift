@@ -7,22 +7,25 @@
 
 import ProcessOut
 
+/// Represents the eligibility evaluation of a card for tokenization.
 public struct POCardTokenizationEligibilityEvaluation: Sendable {
 
-    enum Eligibility {
-        case notEligible(POFailure?), eligible(schemes: Set<POCardScheme>?)
+    enum RawValue: Sendable {
+        case notEligible(POFailure?), eligible(scheme: POCardScheme?)
     }
 
-    let eligibility: Eligibility
+    let rawValue: RawValue
 }
 
 extension POCardTokenizationEligibilityEvaluation {
 
+    /// Returns an instance indicating that the card is not eligible, with optional failure details.
     public static func notEligible(failure: POFailure?) -> Self {
-        .init(eligibility: .notEligible(failure))
+        .init(rawValue: .notEligible(failure))
     }
 
-    public static func eligible(schemes: Set<POCardScheme>? = nil) -> Self {
-        .init(eligibility: .eligible(schemes: schemes))
+    /// Returns an instance indicating that the card is eligible, optionally restricted to a specific card scheme.
+    public static func eligible(scheme: POCardScheme? = nil) -> Self {
+        .init(rawValue: .eligible(scheme: scheme))
     }
 }

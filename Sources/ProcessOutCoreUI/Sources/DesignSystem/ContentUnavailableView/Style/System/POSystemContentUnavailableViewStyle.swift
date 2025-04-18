@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// The content unavailable view style that uses system ``ContentUnavailableView``.
+/// The content unavailable view style that uses system `ContentUnavailableView`.
 @available(iOS 17, *)
 public struct POSystemContentUnavailableViewStyle: POContentUnavailableViewStyle {
 
@@ -23,7 +23,7 @@ public struct POSystemContentUnavailableViewStyle: POContentUnavailableViewStyle
 @available(iOS 17, *)
 extension POContentUnavailableViewStyle where Self == POSystemContentUnavailableViewStyle {
 
-    /// The content unavailable view style that uses system ``ContentUnavailableView``.
+    /// The content unavailable view style that uses system `ContentUnavailableView`.
     public static var system: POSystemContentUnavailableViewStyle {
         POSystemContentUnavailableViewStyle()
     }

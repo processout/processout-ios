@@ -7,6 +7,8 @@
 
 import ProcessOut
 
+/// Represents a request to evaluate whether a card is eligible for tokenization
+/// based on its issuer information.
 public struct POCardTokenizationEligibilityRequest: Sendable {
 
     /// Card's issuer identification number.
