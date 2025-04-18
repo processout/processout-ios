@@ -10,6 +10,10 @@ import ProcessOut
 
 enum CardTokenizationInteractorState {
 
+    enum ParameterIssue: Hashable {
+        case validation, eligibility
+    }
+
     struct Started {
 
         /// Number of the card.
@@ -79,7 +83,12 @@ enum CardTokenizationInteractorState {
         var value: String = ""
 
         /// Indicates whether parameter is valid.
-        var isValid = true
+        var isValid: Bool {
+            issues.isEmpty
+        }
+
+        /// Parameter issues.
+        var issues: Set<ParameterIssue> = []
 
         /// Boolean flag indicating whether parameter should be collected.
         var shouldCollect = true // todo(andrii-vysotskyi): consider migrating to optional parameters

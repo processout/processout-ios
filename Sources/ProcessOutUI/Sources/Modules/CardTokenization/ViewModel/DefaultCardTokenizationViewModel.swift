@@ -46,7 +46,6 @@ final class DefaultCardTokenizationViewModel: ViewModel {
 
     private enum ItemId {
         static let error = "error"
-        static let eligibilityError = "eligibility-error"
         static let trackData = "track-data"
         static let scheme = "card-scheme"
         static let cardSave = "card-save"
@@ -90,16 +89,14 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         startedState: InteractorState.Started, isSubmitting: Bool
     ) -> CardTokenizationViewModelState {
         var cardInformationItems = cardInformationInputItems(startedState: startedState)
-        if let error = startedState.recentErrorMessage {
-            let errorItem = State.ErrorItem(id: ItemId.error, description: error)
-            cardInformationItems.append(.error(errorItem))
-        }
         if case .notEligible(let failure) = startedState.cardInformation.eligibility {
             // todo(andrii-vysotskyi): use localized description
             let errorItem = State.ErrorItem(
-                id: ItemId.eligibilityError,
-                description: failure?.errorDescription ?? "Card is not supported."
+                id: ItemId.error, description: failure?.errorDescription ?? "Card is not supported."
             )
+            cardInformationItems.append(.error(errorItem))
+        } else if let error = startedState.recentErrorMessage {
+            let errorItem = State.ErrorItem(id: ItemId.error, description: error)
             cardInformationItems.append(.error(errorItem))
         }
         let sections = [
@@ -411,17 +408,12 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func submitAction(
         startedState: InteractorState.Started, isSubmitting: Bool
     ) -> POButtonViewModel? {
-        let cardNotEligible = if case .notEligible = startedState.cardInformation.eligibility {
-            true
-        } else {
-            false
-        }
         let buttonConfiguration = configuration.submitButton
         let action = POButtonViewModel(
             id: "primary-button",
             title: buttonConfiguration.title ?? String(resource: .CardTokenization.Button.submit),
             icon: buttonConfiguration.icon,
-            isEnabled: startedState.areParametersValid && !cardNotEligible,
+            isEnabled: startedState.areParametersValid,
             isLoading: isSubmitting,
             role: .primary,
             action: { [weak self] in

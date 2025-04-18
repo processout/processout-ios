@@ -56,25 +56,25 @@ final class DefaultCardTokenizationInteractor:
         logger.debug("Will update parameters with scanned card: '\(scannedCard)'")
         var newState = currentState
         newState.number.value = cardNumberFormatter.string(from: scannedCard.number)
-        newState.number.isValid = true
+        newState.number.issues.remove(.validation)
         if let expiration = scannedCard.expiration {
             newState.expiration.value = cardExpirationFormatter.string(from: expiration.description)
-            newState.expiration.isValid = true
+            newState.expiration.issues.remove(.validation)
         }
         if newState.cardholderName.shouldCollect, let cardholderName = scannedCard.cardholderName {
             newState.cardholderName.value = cardholderName
-            newState.cardholderName.isValid = true
+            newState.cardholderName.issues.remove(.validation)
         }
         // swiftlint:disable:next line_length
         guard newState.number.value != currentState.number.value || newState.expiration.value != currentState.expiration.value else {
             logger.debug("Ignoring same card details \(scannedCard)")
             return
         }
+        updateCardInformation(in: &newState, cardNumber: newState.number.value)
         if newState.areParametersValid {
             logger.debug("Card information is no longer invalid, will reset error message")
             newState.recentErrorMessage = nil
         }
-        updateCardInformation(in: &newState, cardNumber: newState.number.value)
         state = .started(newState)
         delegate?.cardTokenizationDidEmitEvent(.parametersChanged)
     }
@@ -91,11 +91,7 @@ final class DefaultCardTokenizationInteractor:
             return
         }
         newState[keyPath: parameterId].value = formattedValue
-        newState[keyPath: parameterId].isValid = true
-        if newState.areParametersValid {
-            logger.debug("Card information is no longer invalid, will reset error message")
-            newState.recentErrorMessage = nil
-        }
+        newState[keyPath: parameterId].issues.remove(.validation)
         switch parameterId {
         case newState.number.id:
             updateCardInformation(in: &newState, cardNumber: formattedValue)
@@ -103,6 +99,10 @@ final class DefaultCardTokenizationInteractor:
             updateAddressParameters(&newState.address)
         default:
             break
+        }
+        if newState.areParametersValid {
+            logger.debug("Card information is no longer invalid, will reset error message")
+            newState.recentErrorMessage = nil
         }
         state = .started(newState)
         delegate?.cardTokenizationDidEmitEvent(.parametersChanged)
@@ -134,30 +134,9 @@ final class DefaultCardTokenizationInteractor:
     }
 
     func tokenize() {
-        guard case .started(let currentState) = state else {
-            return
+        if ensureCardInformationIsSet() {
+            tokenizeWithoutCheckingCardInformation()
         }
-        guard currentState.areParametersValid else {
-            logger.debug("Ignoring attempt to tokenize invalid parameters.")
-            return
-        }
-        logger.debug("Will tokenize card")
-        delegate?.cardTokenizationDidEmitEvent(.willTokenizeCard)
-        let task = Task { @MainActor in
-            do {
-                let card = try await cardsService.tokenize(
-                    request: createCardTokenizationRequest(with: currentState)
-                )
-                logger.debug("Did tokenize card: \(String(describing: card))")
-                delegate?.cardTokenizationDidEmitEvent(.didTokenize(card: card))
-                try await delegate?.cardTokenization(didTokenizeCard: card, shouldSaveCard: currentState.shouldSaveCard)
-                setTokenizedState(card: card)
-            } catch {
-                attemptRecoverTokenizationError(error)
-            }
-        }
-        let tokenizingState = State.Tokenizing(snapshot: currentState, task: task)
-        state = .tokenizing(tokenizingState)
     }
 
     override func cancel() {
@@ -213,7 +192,7 @@ final class DefaultCardTokenizationInteractor:
             var invalidParameterIds: [State.ParameterId] = []
             newState.recentErrorMessage = errorMessage(for: failure, invalidParameterIds: &invalidParameterIds)
             for keyPath in invalidParameterIds {
-                newState[keyPath: keyPath].isValid = false
+                newState[keyPath: keyPath].issues.insert(.validation)
             }
             state = .started(newState)
             logger.debug("Did recover started state after failure: \(failure)")
@@ -288,9 +267,11 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - Card Information
 
     /// Updates card information with preliminary info and schedules an update with issuer information.
+    ///
+    /// This method has side effects and could update CVC and number parameters is required.
     private func updateCardInformation(in state: inout CardTokenizationInteractorState.Started, cardNumber: String) {
         let partialIin = String(cardNumber.filter(\.isNumber).prefix(Constants.iinLength))
-        guard partialIin != state.cardInformation.partialIin else {
+        guard partialIin != state.cardInformation.partialIin || state.cardInformation.issuerInformation == nil else {
             return
         }
         if case .updating(let task) = state.cardInformation.issuerInformation {
@@ -302,12 +283,13 @@ final class DefaultCardTokenizationInteractor:
             issuerInformation: nil,
             preferredScheme: nil
         )
+        state.number.issues.remove(.eligibility)
         update(cvc: &state.cvc, for: state.cardInformation.preliminaryScheme)
         guard partialIin.count == Constants.iinLength else {
             return
         }
         let issuerInformationUpdateTask = Task {
-            try await Task.sleep(seconds: 0.5) // Debounce
+            try await Task.sleep(seconds: 0.3) // Debounce
             await updateIssuerInformation()
         }
         state.cardInformation.issuerInformation = .updating(task: issuerInformationUpdateTask)
@@ -339,6 +321,9 @@ final class DefaultCardTokenizationInteractor:
         }
         var newState = currentState
         newState.cardInformation = newCardInformation
+        if case .notEligible = newState.cardInformation.eligibility {
+            newState.number.issues.insert(.eligibility)
+        }
         update(cvc: &newState.cvc, for: newState.cardInformation.preferredScheme)
         state = .started(newState)
     }
@@ -487,6 +472,58 @@ final class DefaultCardTokenizationInteractor:
             return parameter.value
         }
         return defaultValue
+    }
+
+    // MARK: - Tokenize
+
+    private func tokenizeWithoutCheckingCardInformation() {
+        guard case .started(let currentState) = state else {
+            return
+        }
+        guard currentState.areParametersValid else {
+            logger.debug("Ignoring attempt to tokenize invalid parameters.")
+            return
+        }
+        logger.debug("Will tokenize card")
+        delegate?.cardTokenizationDidEmitEvent(.willTokenizeCard)
+        let task = Task { @MainActor in
+            do {
+                let card = try await cardsService.tokenize(
+                    request: createCardTokenizationRequest(with: currentState)
+                )
+                logger.debug("Did tokenize card: \(String(describing: card))")
+                delegate?.cardTokenizationDidEmitEvent(.didTokenize(card: card))
+                try await delegate?.cardTokenization(didTokenizeCard: card, shouldSaveCard: currentState.shouldSaveCard)
+                setTokenizedState(card: card)
+            } catch {
+                attemptRecoverTokenizationError(error)
+            }
+        }
+        let tokenizingState = State.Tokenizing(snapshot: currentState, task: task)
+        state = .tokenizing(tokenizingState)
+    }
+
+    private func ensureCardInformationIsSet() -> Bool {
+        guard case .started(let currentState) = state else {
+            return false
+        }
+        if currentState.cardInformation.issuerInformation == nil {
+            var newState = currentState
+            updateCardInformation(in: &newState, cardNumber: currentState.number.value)
+            state = .started(newState)
+        }
+        switch currentState.cardInformation.issuerInformation {
+        case .updating(let task):
+            Task {
+                _ = await task.result
+                tokenizeWithoutCheckingCardInformation()
+            }
+            return false
+        case .completed:
+            return true
+        case nil:
+            return true // Probably number is too short, rely on server validation
+        }
     }
 }
 
