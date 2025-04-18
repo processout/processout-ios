@@ -72,6 +72,9 @@ extension POStringResource {
 
             /// Generic error description.
             static let generic = POStringResource("card-tokenization.error.generic", comment: "")
+
+            /// Generic eligibility error description.
+            static let eligibility = POStringResource("card-tokenization.error.eligibility", comment: "")
         }
 
         enum Button {

@@ -90,9 +90,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     ) -> CardTokenizationViewModelState {
         var cardInformationItems = cardInformationInputItems(startedState: startedState)
         if case .notEligible(let failure) = startedState.cardInformation.eligibility {
-            // todo(andrii-vysotskyi): use localized description
             let errorItem = State.ErrorItem(
-                id: ItemId.error, description: failure?.errorDescription ?? "Card is not supported."
+                id: ItemId.error,
+                description: failure?.errorDescription ?? String(resource: .CardTokenization.Error.eligibility)
             )
             cardInformationItems.append(.error(errorItem))
         } else if let error = startedState.recentErrorMessage {

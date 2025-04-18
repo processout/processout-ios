@@ -1259,6 +1259,9 @@
         }
       }
     },
+    "card-tokenization.error.eligibility" : {
+
+    },
     "card-tokenization.error.generic" : {
       "localizations" : {
         "ar" : {
