@@ -564,7 +564,7 @@ final class DynamicCheckoutDefaultInteractor:
         case .started:
             currentState.isCancellable = currentState.snapshot.isCancellable
             self.state = .paymentProcessing(currentState)
-        case .tokenizing:
+        case .tokenizing, .evaluatingEligibility:
             currentState.isCancellable = false
             self.state = .paymentProcessing(currentState)
         case .tokenized:
@@ -890,8 +890,8 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         )
     }
 
-    func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
-        delegate?.dynamicCheckout(preferredSchemeFor: issuerInformation)
+    func cardTokenization(preferredSchemeWith issuerInformation: POCardIssuerInformation) -> POCardScheme? {
+        delegate?.dynamicCheckout(preferredSchemeWith: issuerInformation)
     }
 
     func shouldContinueTokenization(after failure: POFailure) -> Bool {

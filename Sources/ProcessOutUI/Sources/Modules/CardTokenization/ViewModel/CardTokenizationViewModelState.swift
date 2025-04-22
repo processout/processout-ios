@@ -10,9 +10,6 @@ import SwiftUI
 import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-// TODOs:
-// - Allow selecting card co-scheme when authorizing invoice or assigning token
-
 struct CardTokenizationViewModelState {
 
     struct Section: Identifiable {

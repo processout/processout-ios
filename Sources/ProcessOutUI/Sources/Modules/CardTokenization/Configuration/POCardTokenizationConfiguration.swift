@@ -34,7 +34,7 @@ public struct POCardTokenizationConfiguration {
         /// Default address information.
         public let defaultAddress: POContact?
 
-        /// Whether the values included in ``POBillingAddressConfiguration/defaultAddress`` should be attached to the
+        /// Whether the values included in ``BillingAddress/defaultAddress`` should be attached to the
         /// card, this includes fields that aren't displayed in the form.
         ///
         /// If `false` (the default), those values will only be used to prefill the corresponding fields in the form.

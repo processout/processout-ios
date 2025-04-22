@@ -10,6 +10,10 @@ import ProcessOut
 
 enum CardTokenizationInteractorState {
 
+    enum ParameterIssue: Hashable {
+        case validation, eligibility
+    }
+
     struct Started {
 
         /// Number of the card.
@@ -24,11 +28,8 @@ enum CardTokenizationInteractorState {
         /// Name of cardholder.
         var cardholderName: Parameter
 
-        /// Card issuer information based on number.
-        var issuerInformation: POCardIssuerInformation?
-
-        /// Preferred scheme.
-        var preferredScheme: POCardScheme?
+        /// Card information.
+        var cardInformation: CardInformation = .init()
 
         /// Billing address parameters.
         var address: AddressParameters
@@ -46,6 +47,15 @@ enum CardTokenizationInteractorState {
         let snapshot: Started
 
         /// Tokenization task.
+        let task: Task<Void, Never>
+    }
+
+    struct EvaluatingEligibility {
+
+        /// Started state snapshot.
+        let snapshot: Started
+
+        /// Evaluation task.
         let task: Task<Void, Never>
     }
 
@@ -82,7 +92,12 @@ enum CardTokenizationInteractorState {
         var value: String = ""
 
         /// Indicates whether parameter is valid.
-        var isValid = true
+        var isValid: Bool {
+            issues.isEmpty
+        }
+
+        /// Parameter issues.
+        var issues: Set<ParameterIssue> = []
 
         /// Boolean flag indicating whether parameter should be collected.
         var shouldCollect = true // todo(andrii-vysotskyi): consider migrating to optional parameters
@@ -103,12 +118,43 @@ enum CardTokenizationInteractorState {
         let value: String
     }
 
+    struct CardInformation {
+
+        /// Partial issuer identification number.
+        var partialIin = ""
+
+        /// Preliminary card scheme not yet confirmed by API.
+        var preliminaryScheme: POCardScheme?
+
+        /// Card issuer information based on number.
+        var issuerInformation: ValueUpdate<POCardIssuerInformation>?
+
+        /// Preferred scheme.
+        var preferredScheme: POCardScheme?
+
+        /// Card eligibility.
+        var eligibility: POCardTokenizationEligibilityEvaluation.RawValue?
+    }
+
+    enum ValueUpdate<T> {
+
+        /// Value is currently being updated.
+        case updating(task: Task<Void, Error>)
+
+        /// Value is available.
+        case completed(T)
+    }
+
     typealias ParameterId = WritableKeyPath<Started, Parameter>
 
     case idle
 
     /// Interactor has started and is ready.
     case started(Started)
+
+    /// Tokenization was requested before card eligibility was determined, so now
+    /// it's being evaluated explicitly.
+    case evaluatingEligibility(EvaluatingEligibility)
 
     /// Card information is currently being tokenized.
     case tokenizing(Tokenizing)
@@ -146,5 +192,38 @@ extension CardTokenizationInteractorState.Started {
     var areParametersValid: Bool {
         let parameters = [number, expiration, cvc, cardholderName]
         return parameters.allSatisfy(\.isValid) && address.areParametersValid
+    }
+}
+
+extension CardTokenizationInteractorState.ValueUpdate {
+
+    /// Current value if available.
+    var currentValue: T? {
+        if case .completed(let value) = self {
+            return value
+        }
+        return nil
+    }
+}
+
+extension CardTokenizationInteractorState.CardInformation {
+
+    /// Currently supported schemes based on issuer information that are eligible.
+    var supportedEligibleSchemes: [POCardScheme]? {
+        guard case .completed(let issuerInformation) = self.issuerInformation else {
+            return nil
+        }
+        let schemes = [issuerInformation.$scheme.typed, issuerInformation.$coScheme.typed].compactMap { $0 }
+        switch eligibility {
+        case .notEligible:
+            return []
+        case .eligible(let eligibleScheme?) where schemes.contains(eligibleScheme):
+            return [eligibleScheme]
+        case .eligible:
+            break
+        case nil:
+            return nil
+        }
+        return schemes
     }
 }
