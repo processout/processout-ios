@@ -72,6 +72,7 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
     func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEvent)
 
     /// Notifies delegate that alternative payment is about to start and allows to override default configuration.
+    @MainActor
     func dynamicCheckout(
         willStartAlternativePayment: PODynamicCheckoutPaymentMethod.NativeAlternativePayment
     ) -> PODynamicCheckoutAlternativePaymentConfiguration?
@@ -111,12 +112,16 @@ extension PODynamicCheckoutDelegate {
         nil
     }
 
+    // MARK: - Saved Payment Methods
+
     @MainActor
     public func dynamicCheckout(
         savedPaymentMethodsConfigurationWith invoiceRequest: POInvoiceRequest
     ) -> POSavedPaymentMethodsConfiguration {
         .init(invoiceRequest: invoiceRequest)
     }
+
+    // MARK: - Card Payment
 
     @MainActor
     public func dynamicCheckout(didEmitCardTokenizationEvent event: POCardTokenizationEvent) {
@@ -133,12 +138,7 @@ extension PODynamicCheckoutDelegate {
         nil
     }
 
-    @MainActor
-    public func dynamicCheckout(
-        willStartAlternativePayment: PODynamicCheckoutPaymentMethod.AlternativePayment
-    ) -> PODynamicCheckoutAlternativePaymentConfiguration? {
-        nil
-    }
+    // MARK: - Alternative Payment
 
     @MainActor
     public func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEvent) {
@@ -147,10 +147,19 @@ extension PODynamicCheckoutDelegate {
 
     @MainActor
     public func dynamicCheckout(
+        willStartAlternativePayment: PODynamicCheckoutPaymentMethod.NativeAlternativePayment
+    ) -> PODynamicCheckoutAlternativePaymentConfiguration? {
+        nil
+    }
+
+    @MainActor
+    public func dynamicCheckout(
         alternativePaymentDefaultsWith request: PODynamicCheckoutAlternativePaymentDefaultsRequest
     ) async -> [String: String] {
         [:]
     }
+
+    // MARK: - Pass Kit
 
     @MainActor
     public func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {
