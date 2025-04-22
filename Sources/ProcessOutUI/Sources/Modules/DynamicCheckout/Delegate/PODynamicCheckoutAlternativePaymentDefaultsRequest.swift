@@ -11,8 +11,8 @@ import ProcessOut
 @_spi(PO)
 public struct PODynamicCheckoutAlternativePaymentDefaultsRequest {
 
-    /// Gateway configuration ID  that user is paying with.
-    public let gatewayConfigurationId: String
+    /// Payment method details.
+    public let paymentMethod: PODynamicCheckoutPaymentMethod.NativeAlternativePayment
 
     /// Current parameters.
     public let parameters: [PONativeAlternativePaymentMethodParameter]

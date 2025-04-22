@@ -41,6 +41,8 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
         newInvoiceFor invoice: POInvoice, invalidationReason: PODynamicCheckoutInvoiceInvalidationReason
     ) async -> POInvoiceRequest?
 
+    // MARK: - Saved Payment Methods
+
     /// Allows your implementation to customize saved payment methods configuration.
     @MainActor
     func dynamicCheckout(
@@ -68,6 +70,11 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
     /// Invoked when module emits alternative payment event.
     @MainActor
     func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEvent)
+
+    /// Notifies delegate that alternative payment is about to start and allows to override default configuration.
+    func dynamicCheckout(
+        willStartAlternativePayment: PODynamicCheckoutPaymentMethod.NativeAlternativePayment
+    ) -> PODynamicCheckoutAlternativePaymentConfiguration?
 
     /// Method provides an ability to supply default values for given parameters.
     ///
@@ -123,6 +130,13 @@ extension PODynamicCheckoutDelegate {
 
     @MainActor
     public func dynamicCheckout(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate? {
+        nil
+    }
+
+    @MainActor
+    public func dynamicCheckout(
+        willStartAlternativePayment: PODynamicCheckoutPaymentMethod.AlternativePayment
+    ) -> PODynamicCheckoutAlternativePaymentConfiguration? {
         nil
     }
 
