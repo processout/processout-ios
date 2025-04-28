@@ -229,7 +229,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         let pickerItem = State.PickerItem(
             id: ItemId.scheme,
             options: supportedEligibleSchemes.map { scheme in
-                .init(id: scheme.rawValue, title: scheme.rawValue.capitalized)
+                .init(id: scheme.rawValue, title: scheme.displayName ?? scheme.rawValue.capitalized)
             },
             selectedOptionId: .init(
                 get: { startedState.cardInformation.preferredScheme?.rawValue },

@@ -177,8 +177,8 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         let pickerItem = CardUpdateViewModelItem.Picker(
             id: ItemId.scheme,
             options: [
-                .init(id: scheme.rawValue, title: scheme.rawValue.capitalized),
-                .init(id: coScheme.rawValue, title: coScheme.rawValue.capitalized)
+                .init(id: scheme.rawValue, title: scheme.displayName ?? scheme.rawValue.capitalized),
+                .init(id: coScheme.rawValue, title: coScheme.displayName ?? coScheme.rawValue.capitalized)
             ],
             selectedOptionId: .init(
                 get: { startedState.preferredScheme?.rawValue },
