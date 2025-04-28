@@ -224,7 +224,7 @@ extension POCardScheme {
             .geCapital: "GE Capital",
             .newday: "NewDay",
             .sodexo: "Sodexo",
-            .globalBc: "BC카드",
+            .globalBc: "BC Global",
             .dinaCard: "DinaCard",
             .mada: "mada",
             .bancontact: "Bancontact",
