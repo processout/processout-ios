@@ -1,5 +1,5 @@
 //
-//  PONetcetera3DSServiceConfiguration.swift
+//  PONetcetera3DS2ServiceConfiguration.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 29.04.2025.
@@ -8,7 +8,7 @@
 import Foundation
 import ThreeDS_SDK
 
-public struct PONetcetera3DSServiceConfiguration {
+public struct PONetcetera3DS2ServiceConfiguration {
 
     /// Creates configuration instance.
     public init(

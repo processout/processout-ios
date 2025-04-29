@@ -15,7 +15,7 @@ import ThreeDS_SDK
 public actor PONetcetera3DS2Service: PO3DS2Service {
 
     public init(
-        configuration: PONetcetera3DSServiceConfiguration = .init(),
+        configuration: PONetcetera3DS2ServiceConfiguration = .init(),
         delegate: PONetcetera3DS2ServiceDelegate? = nil
     ) {
         self.configuration = configuration
@@ -89,7 +89,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
 
     // MARK: - Private Properties
 
-    private let service: ThreeDS2ServiceSDK, configuration: PONetcetera3DSServiceConfiguration
+    private let service: ThreeDS2ServiceSDK, configuration: PONetcetera3DS2ServiceConfiguration
     private var transaction: Transaction?
 
     // MARK: - Configuration
