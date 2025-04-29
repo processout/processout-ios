@@ -167,7 +167,13 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
 
     private func observeDeepLinks() {
         deepLinkObservation = eventEmitter.on(PODeepLinkReceivedEvent.self) { event in
-            ThreeDSSDKAppDelegate.shared.appOpened(url: event.url)
+            let userActivitySchemes: Set<String> = ["http", "https"]
+            if let scheme = event.url.scheme, userActivitySchemes.contains(scheme) {
+                let userActivity = NSUserActivity(activityType: NSUserActivityTypeBrowsingWeb)
+                userActivity.webpageURL = event.url
+                return ThreeDSSDKAppDelegate.shared.appOpened(userActivity: userActivity)
+            }
+            return ThreeDSSDKAppDelegate.shared.appOpened(url: event.url)
         }
     }
 }
