@@ -20,6 +20,8 @@ packages:
     path: ../
   ProcessOutCheckout3DS:
     path: ../
+  ProcessOutNetcetera3DS:
+    path: ../
 
 targets:
   Example:
@@ -37,6 +39,7 @@ targets:
     dependencies:
       - package: ProcessOutUI
       - package: ProcessOutCheckout3DS
+      - package: ProcessOutNetcetera3DS
 
 schemes:
   Example:

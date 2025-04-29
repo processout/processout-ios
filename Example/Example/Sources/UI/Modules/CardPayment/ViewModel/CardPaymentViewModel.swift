@@ -10,6 +10,7 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 import ProcessOutUI
 import ProcessOutCheckout3DS
+import ProcessOutNetcetera3DS
 import Checkout3DS
 
 @MainActor
@@ -38,7 +39,7 @@ final class CardPaymentViewModel: ObservableObject {
 
     private func commonInit() {
         state = .init(
-            authenticationService: .init(sources: [.test, .checkout], id: \.self, selection: .test),
+            authenticationService: .init(sources: [.test, .checkout, .netcetera], id: \.self, selection: .netcetera),
             cardTokenization: nil
         )
     }
@@ -94,6 +95,7 @@ extension CardPaymentViewModel: POCardTokenizationDelegate {
             invoiceId: invoice.id,
             source: card.id,
             saveSource: save,
+            thirdPartySdkVersion: "2.3.1",
             clientSecret: invoice.clientSecret
         )
         let threeDSService: PO3DS2Service
@@ -103,6 +105,8 @@ extension CardPaymentViewModel: POCardTokenizationDelegate {
         case .checkout:
             let delegate = DefaultCheckout3DSDelegate()
             threeDSService = POCheckout3DSService(delegate: delegate, environment: .sandbox)
+        case .netcetera:
+            threeDSService = PONetcetera3DS2Service()
         }
         try await invoicesService.authorizeInvoice(request: invoiceAuthorizationRequest, threeDSService: threeDSService)
     }

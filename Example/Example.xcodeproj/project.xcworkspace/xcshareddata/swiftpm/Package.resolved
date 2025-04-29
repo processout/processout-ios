@@ -1,4 +1,5 @@
 {
+  "originHash" : "84d96c2c15f5ada8cbe124661cdceee7dff8efd090311eee964b207c778e4c32",
   "pins" : [
     {
       "identity" : "checkout-3ds-sdk-ios",
@@ -19,6 +20,15 @@
       }
     },
     {
+      "identity" : "spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ios-3ds-sdk/SPM",
+      "state" : {
+        "revision" : "7704e16b2dd70f0e2332caa61ea7a072b34525fc",
+        "version" : "2.5.21"
+      }
+    },
+    {
       "identity" : "swift-cmark",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiftlang/swift-cmark",
@@ -28,5 +38,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
