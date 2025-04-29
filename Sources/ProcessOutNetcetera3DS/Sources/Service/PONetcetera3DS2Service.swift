@@ -20,7 +20,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
     ) {
         self.configuration = configuration
         self.delegate = delegate
-        service = .init()
+        service = .init(bundle: .module)
     }
 
     weak var delegate: PONetcetera3DS2ServiceDelegate?
@@ -40,7 +40,9 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         )
         self.transaction = transaction
         if self.configuration.showsProgressView {
-            try transaction.getProgressView().start()
+            try await MainActor.run {
+                try transaction.getProgressView().start()
+            }
         }
         if let version = self.configuration.bridgingExtensionVersion {
             transaction.useBridgingExtension(version: version)
@@ -55,6 +57,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
     public func performChallenge(
         with parameters: PO3DS2ChallengeParameters
     ) async throws -> PO3DS2ChallengeResult {
+        // fixme(andrii-vysotskyi): presenting controller is being dismissed by Netcetera unintentionally
         guard let transaction else {
             throw POFailure(message: "Unable to resolve current transaction.", code: .Mobile.internal)
         }
@@ -71,7 +74,9 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
 
     public func clean() async {
         if let transaction {
-            try? transaction.getProgressView().stop()
+            await MainActor.run {
+                try? transaction.getProgressView().stop()
+            }
             try? transaction.close()
             self.transaction = nil
         }
@@ -130,7 +135,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             )
         }
         let scheme = Scheme(
-            name: configuration.$scheme.typed()?.rawValue ?? "",
+            name: configuration.$scheme.typed()?.rawValue ?? "<unknown>",
             ids: [configuration.directoryServerId],
             logoImageName: nil,
             encryption: encryptionKey,
