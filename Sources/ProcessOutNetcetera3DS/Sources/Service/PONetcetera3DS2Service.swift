@@ -20,7 +20,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
     ) {
         self.configuration = configuration
         self.delegate = delegate
-        service = .init(bundle: .module)
+        service = .init()
     }
 
     weak var delegate: PONetcetera3DS2ServiceDelegate?
@@ -61,7 +61,11 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         guard let transaction else {
             throw POFailure(message: "Unable to resolve current transaction.", code: .Mobile.internal)
         }
-        guard let presentingViewController = await PresentingViewControllerProvider.find() else {
+        var presentingViewController = await PresentingViewControllerProvider.find()
+        await delegate?.netcetera3DS2Service(
+            self, willPerformChallengeOn: &presentingViewController
+        )
+        guard let presentingViewController  else {
             throw POFailure(message: "Unable to prepare presentation context.", code: .Mobile.generic)
         }
         let challengeStatus = try await transaction.doChallenge(
@@ -134,6 +138,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
                 message: "Unable to encode directory server public key.", code: .Mobile.generic, underlyingError: error
             )
         }
+        // todo(andrii-vysotskyi): validate certificates with Adyen
         let scheme = Scheme(
             name: configuration.$scheme.typed()?.rawValue ?? "<unknown>",
             ids: [configuration.directoryServerId],

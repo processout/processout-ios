@@ -16,6 +16,16 @@ public protocol PONetcetera3DS2ServiceDelegate: AnyObject, Sendable {
     func netcetera3DS2Service(
         _ service: PONetcetera3DS2Service, shouldContinueWith warnings: [Warning]
     ) async -> Bool
-}
 
-// todo(andrii-vysotskyi): decide whether locale and UI tweaks should be passed via delegate or statically
+    /// Notifies the delegate that a 3DS challenge is about to be performed using the specified view controller
+    /// as the presentation context.
+    ///
+    /// The delegate may assign a new value to the `viewController` parameter. If value remains `nil`
+    /// after this method returns, the challenge will fail.
+    ///
+    /// - Parameter viewController: The default presentation context for the challenge.
+    @MainActor
+    func netcetera3DS2Service(
+        _ service: PONetcetera3DS2Service, willPerformChallengeOn viewController: inout UIViewController?
+    ) async
+}
