@@ -16,12 +16,14 @@ public struct PONetcetera3DS2ServiceConfiguration {
         uiCustomizations: [String: UiCustomization]? = nil,
         showsProgressView: Bool = true,
         bridgingExtensionVersion: BridgingExtensionVersion? = nil,
+        returnUrl: URL? = nil,
         challengeTimeout: TimeInterval = 5 * 60
     ) {
         self.locale = locale
         self.uiCustomizations = uiCustomizations
         self.showsProgressView = showsProgressView
         self.bridgingExtensionVersion = bridgingExtensionVersion
+        self.returnUrl = returnUrl
         self.challengeTimeout = challengeTimeout
     }
 
@@ -44,6 +46,9 @@ public struct PONetcetera3DS2ServiceConfiguration {
     /// and if the required elements are present it will enable the OOB Automatic Switching Feature for
     /// Out of Band v2.2 challenges and masking of the challenge input for TEXT v2.2 challenges.
     public let bridgingExtensionVersion: BridgingExtensionVersion?
+
+    /// This is the URL of the application with which it can be called from another application during OOB challenge.
+    public let returnUrl: URL?
 
     /// Timeout interval within which the challenge process must be completed.
     /// The minimum timeout interval is defined to be 5 minutes.

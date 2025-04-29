@@ -5,12 +5,12 @@
 //  Created by Andrii Vysotskyi on 22.04.2025.
 //
 
-import ProcessOut
-import ThreeDS_SDK
+@_spi(PO) import ProcessOut
 @_spi(PO) import NetceteraShim
+import ThreeDS_SDK
 
 // todo(andrii-vysotskyi): add logs
-// todo(andrii-vysotskyi): handle deep links
+// todo(andrii-vysotskyi): map errors returned by Netcetera SDK
 
 public actor PONetcetera3DS2Service: PO3DS2Service {
 
@@ -18,9 +18,9 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         configuration: PONetcetera3DS2ServiceConfiguration = .init(),
         delegate: PONetcetera3DS2ServiceDelegate? = nil
     ) {
+        self.eventEmitter = ProcessOut.shared.eventEmitter
         self.configuration = configuration
         self.delegate = delegate
-        service = .init()
     }
 
     weak var delegate: PONetcetera3DS2ServiceDelegate?
@@ -30,11 +30,13 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
     public func authenticationRequestParameters(
         configuration: PO3DS2Configuration
     ) async throws -> PO3DS2AuthenticationRequestParameters {
+        let service = ThreeDS2ServiceSDK()
         try await service.initialize(
             try configurationParameters(with: configuration),
             locale: self.configuration.locale?.identifier,
             uiCustomizationMap: self.configuration.uiCustomizations
         )
+        self.service = service
         let transaction = try service.createTransaction(
             directoryServerId: configuration.directoryServerId, messageVersion: configuration.messageVersion
         )
@@ -57,7 +59,6 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
     public func performChallenge(
         with parameters: PO3DS2ChallengeParameters
     ) async throws -> PO3DS2ChallengeResult {
-        // fixme(andrii-vysotskyi): presenting controller is being dismissed by Netcetera unintentionally
         guard let transaction else {
             throw POFailure(message: "Unable to resolve current transaction.", code: .Mobile.internal)
         }
@@ -68,8 +69,14 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         guard let presentingViewController  else {
             throw POFailure(message: "Unable to prepare presentation context.", code: .Mobile.generic)
         }
+        let challengeParameters = ChallengeParameters(parameters: parameters)
+        if let returnUrl = configuration.returnUrl {
+            challengeParameters.setThreeDSRequestorAppURL(threeDSRequestorAppURL: returnUrl.absoluteString)
+            observeDeepLinks()
+        }
+        // fixme(andrii-vysotskyi): presenting controller is being dismissed by Netcetera unintentionally
         let challengeStatus = try await transaction.doChallenge(
-            challengeParameters: .init(parameters: parameters),
+            challengeParameters: challengeParameters,
             timeout: Int(configuration.challengeTimeout / 60),
             in: presentingViewController
         )
@@ -84,13 +91,17 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             try? transaction.close()
             self.transaction = nil
         }
-        try? service.cleanup()
+        if let service {
+            try? service.cleanup()
+            self.service = nil
+        }
+        deepLinkObservation = nil
     }
 
     // MARK: - Private Properties
 
-    private let service: ThreeDS2ServiceSDK, configuration: PONetcetera3DS2ServiceConfiguration
-    private var transaction: Transaction?
+    private let eventEmitter: POEventEmitter, configuration: PONetcetera3DS2ServiceConfiguration
+    private var service: ThreeDS2ServiceSDK?, transaction: Transaction?
 
     // MARK: - Configuration
 
@@ -148,5 +159,15 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             roots: configuration.directoryServerRootCertificates
         )
         return scheme
+    }
+
+    // MARK: - OOB
+
+    private var deepLinkObservation: AnyObject?
+
+    private func observeDeepLinks() {
+        deepLinkObservation = eventEmitter.on(PODeepLinkReceivedEvent.self) { event in
+            ThreeDSSDKAppDelegate.shared.appOpened(url: event.url)
+        }
     }
 }
