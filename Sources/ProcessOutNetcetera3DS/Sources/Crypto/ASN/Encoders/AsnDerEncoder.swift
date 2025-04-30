@@ -25,7 +25,7 @@ struct AsnDerEncoder: TopLevelAsnEncoder, AsnNodeVisitor {
         while encodedValue.count > 1 && encodedValue[0] == 0x00 && encodedValue[1] < 0x80 {
             encodedValue.removeFirst()
         }
-        if !encodedValue.isEmpty, encodedValue[0] >= 0x80 {
+        if let mostSignificantByte = encodedValue.first, mostSignificantByte >= 0x80 {
             encodedValue.insert(0x00, at: 0)
         }
         return encodedValue
