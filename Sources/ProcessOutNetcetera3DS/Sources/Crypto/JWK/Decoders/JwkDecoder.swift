@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class JwkDecoder: TopLevelJwkDecoder {
+struct JwkDecoder: TopLevelJwkDecoder {
 
     init() {
         decoder = .init()

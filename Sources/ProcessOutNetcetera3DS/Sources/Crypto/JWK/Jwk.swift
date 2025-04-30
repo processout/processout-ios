@@ -33,6 +33,11 @@ struct Jwk: Decodable {
 
     ///  Y coordinate of the EC point, base64url-encoded
     let y: String?
+
+    // MARK: - Certificates
+
+    /// The X.509 certificate chain, with each entry as a base64-encoded DER certificate.
+    let x5c: [String]?
 }
 
 // swiftlint:enable identifier_name

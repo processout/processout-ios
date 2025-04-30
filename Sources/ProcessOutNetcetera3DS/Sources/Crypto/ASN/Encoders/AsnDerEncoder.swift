@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class AsnDerEncoder: TopLevelAsnEncoder, AsnNodeVisitor {
+struct AsnDerEncoder: TopLevelAsnEncoder, AsnNodeVisitor {
 
     // MARK: - TopLevelAsnEncoder
 

@@ -9,7 +9,7 @@ import Foundation
 
 // swiftlint:disable identifier_name
 
-final class JwkAsnEncoder: TopLevelJwkEncoder {
+struct JwkAsnEncoder: TopLevelJwkEncoder {
 
     func encode(_ jwk: Jwk) throws(JwkEncodingError) -> AsnNode {
         switch jwk.kty {
