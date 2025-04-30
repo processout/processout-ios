@@ -18,10 +18,20 @@ extension PO3DS2ChallengeResult {
             throw POFailure(message: "Challenge was cancelled.", code: .Customer.cancelled)
         case .timedOut:
             throw POFailure(message: "Challenge timed out.", code: .Mobile.timeout)
-        case .protocolError:
-            throw POFailure(code: .Mobile.generic)
-        case .runtimeError:
-            throw POFailure(code: .Mobile.generic)
+        case .protocolError(let error):
+            throw POFailure(
+                message: "Challenge did fail with protocol error.", code: .Mobile.generic, underlyingError: error
+            )
+        case .runtimeError(let error):
+            throw POFailure(
+                message: "Challenge did fail with runtime error.", code: .Mobile.generic, underlyingError: error
+            )
         }
     }
 }
+
+// Adds error conformance retroactively.
+extension ProtocolErrorEvent: @retroactive Error { }
+
+// Adds error conformance retroactively.
+extension RuntimeErrorEvent: @retroactive Error { }
