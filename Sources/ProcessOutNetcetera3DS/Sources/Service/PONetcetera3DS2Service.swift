@@ -138,23 +138,27 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         guard !wellKnownIds.contains(configuration.directoryServerId) else {
             return nil // Rely on pre-configured values bundled with SDK
         }
-        let encryptionKey: String, encryptionKeyId: String?
+        let encryption: String, encryptionKeyId: String?
         do {
             let jwk = try JwkDecoder().decode(from: configuration.directoryServerPublicKey)
-            let asn = try JwkAsnEncoder().encode(jwk)
-            encryptionKey = AsnDerEncoder().encode(asn).base64EncodedString()
+            if let certificate = jwk.x5c?.first {
+                encryption = certificate
+            } else {
+                let asn = try JwkAsnEncoder().encode(jwk)
+                encryption = AsnDerEncoder().encode(asn).base64EncodedString()
+            }
             encryptionKeyId = jwk.kid
         } catch {
             throw POFailure(
                 message: "Unable to encode directory server public key.", code: .Mobile.generic, underlyingError: error
             )
         }
-        // todo(andrii-vysotskyi): validate certificates with Adyen
+        // todo(andrii-vysotskyi): validate root certificates with Adyen
         let scheme = Scheme(
             name: configuration.$scheme.typed()?.rawValue ?? "<unknown>",
             ids: [configuration.directoryServerId],
             logoImageName: nil,
-            encryption: encryptionKey,
+            encryption: encryption,
             encryptionKeyId: encryptionKeyId,
             roots: configuration.directoryServerRootCertificates
         )
