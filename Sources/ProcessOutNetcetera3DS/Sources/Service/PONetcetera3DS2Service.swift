@@ -10,7 +10,6 @@
 import ThreeDS_SDK
 
 // todo(andrii-vysotskyi): add logs
-// todo(andrii-vysotskyi): map errors returned by Netcetera SDK
 
 public actor PONetcetera3DS2Service: PO3DS2Service {
 

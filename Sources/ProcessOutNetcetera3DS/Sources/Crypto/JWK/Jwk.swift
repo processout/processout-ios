@@ -7,7 +7,7 @@
 
 // swiftlint:disable identifier_name
 
-struct Jwk: Decodable {
+struct Jwk: Decodable, Equatable {
 
     /// Key type.
     let kty: String
