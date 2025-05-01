@@ -9,8 +9,6 @@
 @_spi(PO) import NetceteraShim
 import ThreeDS_SDK
 
-// todo(andrii-vysotskyi): add logs
-
 public actor PONetcetera3DS2Service: PO3DS2Service {
 
     public init(
@@ -22,7 +20,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         self.delegate = delegate
     }
 
-    weak var delegate: PONetcetera3DS2ServiceDelegate?
+    public weak var delegate: PONetcetera3DS2ServiceDelegate?
 
     // MARK: - PO3DS2Service
 
@@ -97,6 +95,18 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         deepLinkObservation = nil
     }
 
+    // MARK: -
+
+    init(
+        configuration: PONetcetera3DS2ServiceConfiguration = .init(),
+        delegate: PONetcetera3DS2ServiceDelegate? = nil,
+        eventEmitter: POEventEmitter
+    ) {
+        self.eventEmitter = eventEmitter
+        self.configuration = configuration
+        self.delegate = delegate
+    }
+
     // MARK: - Private Properties
 
     private let eventEmitter: POEventEmitter, configuration: PONetcetera3DS2ServiceConfiguration
@@ -159,7 +169,8 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             logoImageName: nil,
             encryption: encryption,
             encryptionKeyId: encryptionKeyId,
-            roots: configuration.directoryServerRootCertificates
+            // swiftlint:disable:next line_length
+            roots: configuration.directoryServerRootCertificates.isEmpty ? nil : configuration.directoryServerRootCertificates
         )
         return scheme
     }
