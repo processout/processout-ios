@@ -8,6 +8,11 @@
 import Foundation
 import ThreeDS_SDK
 
+/// Configuration options for customizing the behavior and appearance of
+/// `PONetcetera3DS2Service`.
+///
+/// Use this struct to tailor how the 3DS2 service behaves, including UI customization,
+/// localization, challenge timeout, and support for Out-of-Band (OOB) challenges.
 public struct PONetcetera3DS2ServiceConfiguration {
 
     /// Creates configuration instance.

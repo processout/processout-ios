@@ -8,6 +8,7 @@
 import ProcessOut
 import ThreeDS_SDK
 
+/// A delegate that allows customization of the 3DS2 flow in `PONetcetera3DS2Service`.
 public protocol PONetcetera3DS2ServiceDelegate: AnyObject, Sendable {
 
     /// Asks delegate whether service should continue with given warnings. Default implementation
@@ -26,6 +27,7 @@ public protocol PONetcetera3DS2ServiceDelegate: AnyObject, Sendable {
     /// - Parameter viewController: The default presentation context for the challenge.
     @MainActor
     func netcetera3DS2Service(
-        _ service: PONetcetera3DS2Service, willPerformChallengeOn viewController: inout UIViewController?
+        _ service: PONetcetera3DS2Service,
+        willPerformChallengeOn viewController: inout UIViewController?
     ) async
 }

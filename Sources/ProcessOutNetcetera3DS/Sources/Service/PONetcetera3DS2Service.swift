@@ -9,8 +9,10 @@
 @_spi(PO) import NetceteraShim
 import ThreeDS_SDK
 
+/// A concrete implementation of `PO3DS2Service` using the Netcetera 3DS SDK.
 public actor PONetcetera3DS2Service: PO3DS2Service {
 
+    /// Creates a new instance of `PONetcetera3DS2Service`.
     public init(
         configuration: PONetcetera3DS2ServiceConfiguration = .init(),
         delegate: PONetcetera3DS2ServiceDelegate? = nil
@@ -20,6 +22,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         self.delegate = delegate
     }
 
+    /// Service's delegate.
     public weak var delegate: PONetcetera3DS2ServiceDelegate?
 
     // MARK: - PO3DS2Service
@@ -124,7 +127,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
                 try builder.add(scheme)
             }
             // todo(andrii-vysotskyi): restrict parameters for payment processors such as Stripe.
-            try builder.log(to: .noLog)
+            try builder.log(to: .error)
         } catch {
             throw POFailure(
                 message: "Unable to create configuration parameters.", code: .Mobile.generic, underlyingError: error
