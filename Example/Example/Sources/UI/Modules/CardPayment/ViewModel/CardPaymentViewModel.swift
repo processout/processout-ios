@@ -95,7 +95,6 @@ extension CardPaymentViewModel: POCardTokenizationDelegate {
             invoiceId: invoice.id,
             source: card.id,
             saveSource: save,
-            thirdPartySdkVersion: "2.3.1",
             clientSecret: invoice.clientSecret
         )
         let threeDSService: PO3DS2Service

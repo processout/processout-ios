@@ -9,6 +9,9 @@
 @preconcurrency
 public protocol PO3DS2Service: Sendable {
 
+    /// Returns the version of the 3DS SDK that is integrated with the 3DS Requestor App.
+    nonisolated var version: String? { get }
+
     /// Asks implementation to create request that will be passed to 3DS Server to create the AReq.
     func authenticationRequestParameters(
         configuration: PO3DS2Configuration
@@ -22,6 +25,10 @@ public protocol PO3DS2Service: Sendable {
 }
 
 extension PO3DS2Service {
+
+    public nonisolated var version: String? {
+        nil
+    }
 
     public func clean() async {
         // Ignored
