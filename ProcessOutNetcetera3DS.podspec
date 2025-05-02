@@ -13,5 +13,5 @@ Pod::Spec.new do |s|
   s.ios.resources         = 'Sources/ProcessOutNetcetera3DS/Resources/**/*'
   s.source_files          = 'Sources/ProcessOutNetcetera3DS/**/*.swift'
   s.dependency            'ProcessOut', s.version.to_s
-  s.dependency            'ThreeDS_SDK', '2.5.21'
+  s.dependency            'ThreeDS_SDK', '2.5.22'
 end

@@ -18,7 +18,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", exact: "3.2.5"),
         .package(url: "https://github.com/swiftlang/swift-cmark", from: "0.5.0"),
-        .package(url: "https://github.com/ios-3ds-sdk/SPM", from: "2.5.21")
+        .package(url: "https://github.com/ios-3ds-sdk/SPM", exact: "2.5.22")
     ],
     targets: [
         .target(
