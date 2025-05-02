@@ -94,6 +94,10 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         guard let presentingViewController  else {
             throw POFailure(message: "Unable to prepare presentation context.", code: .Mobile.generic)
         }
+        try await MainActor.run {
+            // Workaround to prevent Netcetera from modifing UI from background thread
+            try transaction.getProgressView().start()
+        }
         let challengeParameters = ChallengeParameters(parameters: parameters)
         if let returnUrl = configuration.returnUrl {
             challengeParameters.setThreeDSRequestorAppURL(threeDSRequestorAppURL: returnUrl.absoluteString)

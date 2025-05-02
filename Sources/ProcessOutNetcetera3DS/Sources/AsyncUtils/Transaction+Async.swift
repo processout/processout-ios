@@ -10,7 +10,6 @@ import ThreeDS_SDK
 extension Transaction {
 
     /// Initiates the challenge process.
-    @MainActor
     func doChallenge(
         challengeParameters: ChallengeParameters, timeout: Int, in viewController: UIViewController
     ) async throws -> ChallengeStatus {
