@@ -27,9 +27,27 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
 
     // MARK: - PO3DS2Service
 
+    /// Returns the version of the 3DS SDK that is integrated with the 3DS Requestor App.
+    public nonisolated var version: String? {
+        "2.5.22.0"
+    }
+
     public func authenticationRequestParameters(
         configuration: PO3DS2Configuration
     ) async throws -> PO3DS2AuthenticationRequestParameters {
+        try await Self.authenticationSemaphore.waitUnlessCancelled(
+            cancellationError: POFailure(message: "Authentication was cancelled.", code: .Mobile.cancelled)
+        )
+        shouldSignalAuthenticationSemaphoreAfterClean = true
+        try await executionSemaphore.waitUnlessCancelled(
+            cancellationError: POFailure(message: "Authentication was cancelled.", code: .Mobile.cancelled)
+        )
+        defer {
+            executionSemaphore.signal()
+        }
+        guard transaction == nil else {
+            throw POFailure(message: "Another authentication is already in progress.", code: .Mobile.generic)
+        }
         let service = ThreeDS2ServiceSDK()
         try await service.initialize(
             try configurationParameters(with: configuration),
@@ -41,6 +59,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             directoryServerId: configuration.directoryServerId, messageVersion: configuration.messageVersion
         )
         self.transaction = transaction
+        self.transactionId = configuration.directoryServerTransactionId
         if self.configuration.showsProgressView {
             try await MainActor.run {
                 try transaction.getProgressView().start()
@@ -59,7 +78,13 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
     public func performChallenge(
         with parameters: PO3DS2ChallengeParameters
     ) async throws -> PO3DS2ChallengeResult {
-        guard let transaction else {
+        try await executionSemaphore.waitUnlessCancelled(
+            cancellationError: POFailure(message: "Challenge was cancelled.", code: .Mobile.cancelled)
+        )
+        defer {
+            executionSemaphore.signal()
+        }
+        guard let transaction, transactionId == parameters.threeDSServerTransactionId else {
             throw POFailure(message: "Unable to resolve current transaction.", code: .Mobile.internal)
         }
         var presentingViewController = await PresentingViewControllerProvider.find()
@@ -84,6 +109,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
     }
 
     public func clean() async {
+        await executionSemaphore.wait()
         if let transaction {
             await MainActor.run {
                 try? transaction.getProgressView().stop()
@@ -91,11 +117,16 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             try? transaction.close()
             self.transaction = nil
         }
+        transactionId = nil
         if let service {
             try? service.cleanup()
             self.service = nil
         }
         deepLinkObservation = nil
+        if shouldSignalAuthenticationSemaphoreAfterClean {
+            Self.authenticationSemaphore.signal()
+        }
+        executionSemaphore.signal()
     }
 
     // MARK: -
@@ -108,12 +139,25 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         self.eventEmitter = eventEmitter
         self.configuration = configuration
         self.delegate = delegate
+        self.service = .init()
     }
 
     // MARK: - Private Properties
 
-    private let eventEmitter: POEventEmitter, configuration: PONetcetera3DS2ServiceConfiguration
-    private var service: ThreeDS2ServiceSDK?, transaction: Transaction?
+    private let configuration: PONetcetera3DS2ServiceConfiguration, eventEmitter: POEventEmitter
+    private var service: ThreeDS2ServiceSDK?, transaction: Transaction?, transactionId: String?
+
+    /// A semaphore used to ensure that only one method of this object runs at a time,
+    /// providing atomic-like behavior for method execution.
+    private let executionSemaphore = AsyncSemaphore(value: 1)
+
+    /// The Netcetera SDK, while allowing multiple instances, appears to have shared state issues
+    /// that can lead to incorrect behavior during concurrent authentication requests.
+    ///
+    /// This semaphore acts as a workaround to ensure that only one authentication process is
+    /// executed at a time, effectively enforcing singleton-like behavior.
+    private static let authenticationSemaphore = AsyncSemaphore(value: 1)
+    private var shouldSignalAuthenticationSemaphoreAfterClean = false // swiftlint:disable:this identifier_name
 
     // MARK: - Configuration
 
