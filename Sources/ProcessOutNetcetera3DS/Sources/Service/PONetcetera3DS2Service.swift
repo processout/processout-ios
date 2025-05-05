@@ -176,6 +176,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
                 try builder.add(scheme)
             }
             // todo(andrii-vysotskyi): restrict parameters for payment processors such as Stripe.
+            // try builder.restrictedParameters(["I003", "I004", "I011"]) // 1.7k, 1.2k, 11k
             try builder.log(to: .error)
         } catch {
             throw POFailure(
@@ -214,15 +215,17 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
                 message: "Unable to encode directory server public key.", code: .Mobile.generic, underlyingError: error
             )
         }
-        // todo(andrii-vysotskyi): validate root certificates with Adyen
+        var roots: [String]?
+        if !configuration.directoryServerRootCertificates.isEmpty {
+            roots = configuration.directoryServerRootCertificates.map(\.base64WithFixedPadding)
+        }
         let scheme = Scheme(
             name: configuration.$scheme.typed()?.rawValue ?? "<unknown>",
             ids: [configuration.directoryServerId],
             logoImageName: nil,
             encryption: encryption,
             encryptionKeyId: encryptionKeyId,
-            // swiftlint:disable:next line_length
-            roots: configuration.directoryServerRootCertificates.isEmpty ? nil : configuration.directoryServerRootCertificates
+            roots: roots
         )
         return scheme
     }
