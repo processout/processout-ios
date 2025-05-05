@@ -105,7 +105,8 @@ extension CardPaymentViewModel: POCardTokenizationDelegate {
             let delegate = DefaultCheckout3DSDelegate()
             threeDSService = POCheckout3DSService(delegate: delegate, environment: .sandbox)
         case .netcetera:
-            threeDSService = PONetcetera3DS2Service()
+            let configuration = PONetcetera3DS2ServiceConfiguration(returnUrl: Constants.returnUrl)
+            threeDSService = PONetcetera3DS2Service(configuration: configuration)
         }
         try await invoicesService.authorizeInvoice(request: invoiceAuthorizationRequest, threeDSService: threeDSService)
     }
