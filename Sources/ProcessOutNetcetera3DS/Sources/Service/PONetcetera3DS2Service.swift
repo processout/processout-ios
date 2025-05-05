@@ -128,6 +128,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         }
         deepLinkObservation = nil
         if shouldSignalAuthenticationSemaphoreAfterClean {
+            shouldSignalAuthenticationSemaphoreAfterClean = false
             Self.authenticationSemaphore.signal()
         }
         executionSemaphore.signal()
@@ -152,7 +153,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
     private var service: ThreeDS2ServiceSDK?, transaction: Transaction?, transactionId: String?
 
     /// A semaphore used to ensure that only one method of this object runs at a time,
-    /// providing atomic-like behavior for method execution.
+    /// providing atomic-like behavior.
     private let executionSemaphore = AsyncSemaphore(value: 1)
 
     /// The Netcetera SDK, while allowing multiple instances, appears to have shared state issues
