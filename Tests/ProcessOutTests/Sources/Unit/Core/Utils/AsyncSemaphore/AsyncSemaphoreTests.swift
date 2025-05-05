@@ -6,7 +6,7 @@
 //
 
 import Testing
-@testable import ProcessOut
+@testable @_spi(PO) import ProcessOut
 
 struct AsyncSemaphoreTests {
 
@@ -134,6 +134,23 @@ struct AsyncSemaphoreTests {
         }
     }
 
+    @Test
+    func waitUnlessCancelled_whenCancelled_throwsCustomCancellationError() async {
+        // Given
+        let sut = AsyncSemaphore(value: 0)
+
+        // When
+        let task = Task {
+            try await sut.waitUnlessCancelled(cancellationError: Failure())
+        }
+        task.cancel()
+
+        // Then
+        await #expect(throws: Failure.self) {
+            _ = try await task.value
+        }
+    }
+
     // MARK: - Signal
 
     @Test
@@ -148,4 +165,8 @@ struct AsyncSemaphoreTests {
         // Then
         await sut.wait()
     }
+
+    // MARK: - Private Nested Types
+
+    private struct Failure: Error { }
 }
