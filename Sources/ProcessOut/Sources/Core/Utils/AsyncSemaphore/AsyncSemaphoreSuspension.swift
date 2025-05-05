@@ -48,7 +48,8 @@ final class AsyncSemaphoreSuspension: Sendable {
 
     @discardableResult
     func setContinuation(
-        _ unsafeContinuation: UnsafeContinuation<Void, Error>, cancellationError: @Sendable @escaping () -> Error
+        _ unsafeContinuation: UnsafeContinuation<Void, Error>,
+        cancellationError: @Sendable @escaping () -> Error = { CancellationError() }
     ) -> Bool {
         state.withLock { state in
             switch state {
