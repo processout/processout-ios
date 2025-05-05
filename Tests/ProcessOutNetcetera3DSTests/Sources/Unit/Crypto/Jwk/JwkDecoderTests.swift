@@ -13,25 +13,15 @@ struct JwkDecoderTests {
 
     @Test
     func decode_whenEncodedValueEncodingIsInvalid_throws() throws {
-        try withKnownIssue {
+        #expect(throws: JwkDecodingError.self) {
             _ = try sut.decode(from: " ")
-        } matching: { issue in
-            if let error = issue.error as? JwkDecodingError, case .dataCorrupted = error {
-                return true
-            }
-            return false
         }
     }
 
     @Test
     func decode_whenEncodedValueIsValid_throws() throws {
-        try withKnownIssue {
+        #expect(throws: JwkDecodingError.self) {
             _ = try sut.decode(from: "")
-        } matching: { issue in
-            if let error = issue.error as? JwkDecodingError, case .dataCorrupted = error {
-                return true
-            }
-            return false
         }
     }
 

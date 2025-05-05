@@ -19,13 +19,8 @@ struct JwkAsnEncoderTests {
         let jwk = Jwk(kty: "oct", kid: nil, n: nil, e: nil, crv: nil, x: nil, y: nil, x5c: nil)
 
         // When
-        try withKnownIssue {
+        #expect(throws: JwkEncodingError.self) {
             _ = try sut.encode(jwk)
-        } matching: { issue in
-            if let error = issue.error as? JwkEncodingError, case .dataCorrupted = error {
-                return true
-            }
-            return false
         }
     }
 
@@ -52,13 +47,8 @@ struct JwkAsnEncoderTests {
         let jwk = Jwk(kty: "EC", kid: nil, n: nil, e: nil, crv: "secp256k1", x: "AQAB", y: "AQAB", x5c: nil)
 
         // When
-        try withKnownIssue {
+        #expect(throws: JwkEncodingError.self) {
             _ = try sut.encode(jwk)
-        } matching: { issue in
-            if let error = issue.error as? JwkEncodingError, case .dataCorrupted = error {
-                return true
-            }
-            return false
         }
     }
 
