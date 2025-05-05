@@ -55,7 +55,9 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
     private func _assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
     ) async throws -> POCustomerToken {
-        let request = request.replacing(thirdPartySdkVersion: threeDSService.version)
+        let request = request.replacing(
+            thirdPartySdkVersion: request.thirdPartySdkVersion ?? threeDSService.version
+        )
         let response = try await repository.assignCustomerToken(request: request)
         if let customerAction = response.customerAction {
             let newRequest: POAssignCustomerTokenRequest

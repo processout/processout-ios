@@ -92,7 +92,9 @@ final class DefaultInvoicesService: POInvoicesService {
     // MARK: - Private Methods
 
     private func _authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
-        let request = request.replacing(thirdPartySdkVersion: threeDSService.version)
+        let request = request.replacing(
+            thirdPartySdkVersion: request.thirdPartySdkVersion ?? threeDSService.version
+        )
         guard let customerAction = try await repository.authorizeInvoice(request: request) else {
             return
         }
