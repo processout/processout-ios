@@ -1,5 +1,5 @@
 //
-//  Data+Base64UrlEncodedTests.swift
+//  Data+Base64Tests.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 30.04.2025.

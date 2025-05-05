@@ -1,5 +1,5 @@
 //
-//  UnsignedInteger+Base128EncodedData.swift
+//  UnsignedInteger+Base128.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 25.04.2025.
