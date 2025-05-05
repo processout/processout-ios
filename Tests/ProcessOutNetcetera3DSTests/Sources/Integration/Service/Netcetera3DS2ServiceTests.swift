@@ -10,7 +10,6 @@ import Testing
 @testable import ProcessOutNetcetera3DS
 @_spi(PO) @testable import ProcessOut
 
-@Suite(.serialized)
 struct Netcetera3DS2ServiceTests {
 
     init() async {
@@ -35,6 +34,9 @@ struct Netcetera3DS2ServiceTests {
         await withKnownIssue {
             _ = try await sut.authenticationRequestParameters(configuration: configuration)
         }
+
+        // Cleanup
+        await sut.clean()
     }
 
     @Test
@@ -54,6 +56,9 @@ struct Netcetera3DS2ServiceTests {
 
         // Then
         #expect(!requestParameters.deviceData.isEmpty)
+
+        // Cleanup
+        await sut.clean()
     }
 
     @Test
@@ -85,6 +90,9 @@ struct Netcetera3DS2ServiceTests {
 
         // Then
         #expect(!requestParameters.deviceData.isEmpty)
+
+        // Cleanup
+        await sut.clean()
     }
 
     // MARK: - Private Properties
