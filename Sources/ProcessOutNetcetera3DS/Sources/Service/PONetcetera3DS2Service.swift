@@ -175,8 +175,9 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             if let scheme = try customScheme(with: configuration) {
                 try builder.add(scheme)
             }
-            // todo(andrii-vysotskyi): restrict parameters for payment processors such as Stripe.
-            // try builder.restrictedParameters(["I003", "I004", "I011"]) // 1.7k, 1.2k, 11k
+            // Restrict parameters known to produce large values to ensure compatibility with payment providers
+            // that impose size limits on authentication request parameters (e.g., Stripe - 5000 characters).
+            try builder.restrictedParameters(["I003", "I011"]) // 1.7k, 11k symbols
             try builder.log(to: .error)
         } catch {
             throw POFailure(
