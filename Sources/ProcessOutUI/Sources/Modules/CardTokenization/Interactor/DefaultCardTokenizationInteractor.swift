@@ -365,7 +365,13 @@ final class DefaultCardTokenizationInteractor:
         }
         if supportedEligibleSchemes.count > 1,
            let preferredScheme = delegate?.cardTokenization(preferredSchemeWith: issuerInformation) {
-            cardInformation.preferredScheme = preferredScheme
+            if supportedEligibleSchemes.contains(preferredScheme) {
+                cardInformation.preferredScheme = preferredScheme
+            } else {
+                logger.warn("Unable to set preferred scheme \(preferredScheme) that is not eligible.")
+                assertionFailure("Preferred scheme is not eligible.")
+                cardInformation.preferredScheme = supportedEligibleSchemes.first
+            }
         } else {
             cardInformation.preferredScheme = supportedEligibleSchemes.first
         }
