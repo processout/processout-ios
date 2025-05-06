@@ -85,7 +85,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             executionSemaphore.signal()
         }
         guard let transaction, transactionId == parameters.threeDSServerTransactionId else {
-            throw POFailure(message: "Unable to resolve current transaction.", code: .Mobile.internal)
+            throw POFailure(message: "Unable to resolve current transaction.", code: .Mobile.generic)
         }
         var presentingViewController = await PresentingViewControllerProvider.find()
         await delegate?.netcetera3DS2Service(
