@@ -31,3 +31,21 @@ public protocol PONetcetera3DS2ServiceDelegate: AnyObject, Sendable {
         willPerformChallengeOn viewController: inout UIViewController?
     ) async
 }
+
+extension PONetcetera3DS2ServiceDelegate {
+
+    @MainActor
+    public func netcetera3DS2Service(
+        _ service: PONetcetera3DS2Service, shouldContinueWith warnings: [Warning]
+    ) async -> Bool {
+        true
+    }
+
+    @MainActor
+    public func netcetera3DS2Service(
+        _ service: PONetcetera3DS2Service,
+        willPerformChallengeOn viewController: inout UIViewController?
+    ) async {
+        // NOP
+    }
+}
