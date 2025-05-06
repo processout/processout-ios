@@ -15,8 +15,21 @@ import ThreeDS_SDK
 /// localization, challenge timeout, and support for Out-of-Band (OOB) challenges.
 public struct PONetcetera3DS2ServiceConfiguration {
 
+    /// Defines the mode of device information collection, influencing which parameters are included
+    /// in the authentication request.
+    public enum AuthenticationMode {
+
+        /// Omits certain parameters to ensure the authentication request is compliant with
+        /// wider range of payment providers. This is the default mode.
+        case compatibility
+
+        /// Collects all available parameters without restrictions.
+        case full
+    }
+
     /// Creates configuration instance.
     public init(
+        authenticationMode: AuthenticationMode = .compatibility,
         locale: Locale? = nil,
         uiCustomizations: [String: UiCustomization]? = nil,
         showsProgressView: Bool = true,
@@ -24,6 +37,7 @@ public struct PONetcetera3DS2ServiceConfiguration {
         returnUrl: URL? = nil,
         challengeTimeout: TimeInterval = 5 * 60
     ) {
+        self.authenticationMode = authenticationMode
         self.locale = locale
         self.uiCustomizations = uiCustomizations
         self.showsProgressView = showsProgressView
@@ -31,6 +45,9 @@ public struct PONetcetera3DS2ServiceConfiguration {
         self.returnUrl = returnUrl
         self.challengeTimeout = challengeTimeout
     }
+
+    /// Defines the mode of device information collection.
+    public let authenticationMode: AuthenticationMode
 
     /// String that represents the locale for the app’s user interface.
     public let locale: Locale?

@@ -175,9 +175,15 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             if let scheme = try customScheme(with: configuration) {
                 try builder.add(scheme)
             }
-            // Restrict parameters known to produce large values to ensure compatibility with payment providers
-            // that impose size limits on authentication request parameters (e.g., Stripe - 5000 characters).
-            try builder.restrictedParameters(["I003", "I011"]) // 1.7k, 11k symbols
+            if case .compatibility = self.configuration.authenticationMode {
+                // Restrict parameters known to produce large values to maintain compatibility with payment
+                // providers that enforce size limits on the authentication request payload (e.g., Stripe
+                // limits payload to 5000 characters).
+                //
+                // - I003: Available font families
+                // - I011: Available locale identifiers
+                try builder.restrictedParameters(["I003", "I011"])
+            }
             try builder.log(to: .error)
         } catch {
             throw POFailure(
