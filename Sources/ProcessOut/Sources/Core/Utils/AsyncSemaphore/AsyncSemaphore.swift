@@ -7,12 +7,13 @@
 
 import Foundation
 
-actor AsyncSemaphore {
+@_spi(PO)
+public actor AsyncSemaphore {
 
     // MARK: - Creating a Semaphore
 
     /// Creates a semaphore.
-    init(value: UInt) {
+    public init(value: UInt) {
         initialValue = Int(value)
         self.value = Int(value)
     }
@@ -30,17 +31,17 @@ actor AsyncSemaphore {
     ///
     /// If the count is negative, the current task is suspended without blocking
     /// the thread. Otherwise, no suspension occurs.
-    func wait() async {
-        value -= 1
-        guard value < 0 else {
-            return
-        }
-        await withUnsafeContinuation { continuation in
-            let suspension = AsyncSemaphoreSuspension()
-            if suspension.setContinuation(continuation) {
-                suspensions.insert(suspension, at: 0)
+    public func wait() async {
+        if value == 0 {
+            await withUnsafeContinuation { continuation in
+                let suspension = AsyncSemaphoreSuspension()
+                if suspension.setContinuation(continuation) {
+                    suspensions.insert(suspension, at: 0)
+                }
             }
         }
+        assert(value > 0, "Value is expected to be positive after suspension.")
+        value -= 1
     }
 
     /// Decrements a semaphore with cancellation support.
@@ -48,32 +49,38 @@ actor AsyncSemaphore {
     /// If the count is negative, the current task is suspended without blocking
     /// the thread. Otherwise, no suspension occurs.
     ///
-    /// If canceled before signalling, this function throws `CancellationError`.
-    func waitUnlessCancelled() async throws {
-        try Task.checkCancellation()
-        value -= 1
-        guard value < 0 else {
-            return
+    /// If canceled before signalling, this function throws `cancellationError`.
+    public func waitUnlessCancelled(
+        cancellationError: @Sendable @escaping @autoclosure () -> Error = CancellationError()
+    ) async throws {
+        do {
+            try Task.checkCancellation()
+        } catch {
+            throw cancellationError()
         }
-        let suspension = AsyncSemaphoreSuspension()
-        try await withTaskCancellationHandler {
-            try await withUnsafeThrowingContinuation { continuation in
-                if suspension.setContinuation(continuation) {
-                    suspensions.insert(suspension, at: 0)
+        if value == 0 {
+            let suspension = AsyncSemaphoreSuspension()
+            try await withTaskCancellationHandler {
+                try await withUnsafeThrowingContinuation { continuation in
+                    if suspension.setContinuation(continuation, cancellationError: cancellationError) {
+                        suspensions.insert(suspension, at: 0)
+                    }
+                }
+            } onCancel: {
+                Task {
+                    await self.cancel(suspension: suspension)
                 }
             }
-        } onCancel: {
-            Task {
-                await self.cancel(suspension: suspension)
-            }
         }
+        assert(value > 0, "Value is expected to be positive after suspension.")
+        value -= 1
     }
 
     /// Signals the semaphore, incrementing its count.
     ///
     /// Increases the semaphore's count, potentially unblocking a suspended task
     /// if the count transitions from negative to non-negative.
-    nonisolated func signal() {
+    public nonisolated func signal() {
         Task {
             await signalSemaphore()
         }
@@ -91,17 +98,7 @@ actor AsyncSemaphore {
 
     // MARK: - Private Methods
 
-    private func incrementValue() {
-        if value == initialValue {
-            assertionFailure("The semaphore value cannot exceed its initial value.")
-        }
-        value += 1
-    }
-
-    // MARK: - Private Methods
-
     private func cancel(suspension: AsyncSemaphoreSuspension) {
-        incrementValue()
         if let index = suspensions.firstIndex(where: { $0 === suspension }) {
             suspensions.remove(at: index)
         }
@@ -109,7 +106,10 @@ actor AsyncSemaphore {
     }
 
     private func signalSemaphore() {
-        incrementValue()
+        if value == initialValue {
+            assertionFailure("The semaphore value cannot exceed its initial value.")
+        }
+        value += 1
         suspensions.popLast()?.resume()
     }
 }

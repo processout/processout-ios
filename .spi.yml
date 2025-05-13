@@ -2,4 +2,4 @@ version: 1
 builder:
   configs:
     - platform: ios
-      documentation_targets: [ProcessOut, ProcessOutCheckout3DS, ProcessOutUI, ProcessOutCoreUI]
+      documentation_targets: [ProcessOut, ProcessOutCheckout3DS, ProcessOutNetcetera3DS, ProcessOutUI, ProcessOutCoreUI]

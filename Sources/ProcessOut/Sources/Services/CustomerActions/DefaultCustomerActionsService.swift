@@ -27,11 +27,9 @@ final class DefaultCustomerActionsService: CustomerActionsService {
     // MARK: - CustomerActionsService
 
     func handle(request: CustomerActionRequest, threeDSService: PO3DS2Service) async throws -> String {
-        do {
-            try await semaphore.waitUnlessCancelled()
-        } catch {
-            throw POFailure(message: "Customer action handling was cancelled.", code: .Mobile.cancelled)
-        }
+        try await semaphore.waitUnlessCancelled(
+            cancellationError: POFailure(message: "Customer action handling was cancelled.", code: .Mobile.cancelled)
+        )
         defer {
             semaphore.signal()
         }

@@ -38,3 +38,28 @@ public struct PO3DS2Configuration: Codable, Hashable, Sendable {
         case messageVersion
     }
 }
+
+extension KeyedDecodingContainer {
+
+    public func decode(
+        _ type: POTypedRepresentation<PO3DS2ConfigurationCardScheme?, POCardScheme>.Type,
+        forKey key: KeyedDecodingContainer<K>.Key
+    ) throws -> POTypedRepresentation<PO3DS2ConfigurationCardScheme?, POCardScheme> {
+        let wrapper = try decodeIfPresent(
+            POTypedRepresentation<PO3DS2ConfigurationCardScheme?, POCardScheme>.self,
+            forKey: key
+        )
+        return wrapper ?? .init(wrappedValue: nil)
+    }
+}
+
+extension KeyedEncodingContainer {
+
+    public mutating func encode(
+        _ value: POTypedRepresentation<PO3DS2ConfigurationCardScheme?, POCardScheme>,
+        forKey key: KeyedEncodingContainer<K>.Key
+    ) throws {
+        let wrapper = value.typed().map { _ in value }
+        try encodeIfPresent(wrapper, forKey: key)
+    }
+}

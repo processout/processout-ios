@@ -12,7 +12,7 @@ final class AsyncSemaphoreSuspension: Sendable {
     func resume() {
         state.withLock { state in
             switch state {
-            case .suspendedUnlessCancelled(let unsafeContinuation):
+            case .suspendedUnlessCancelled(let unsafeContinuation, _):
                 state = .resumed
                 unsafeContinuation.resume()
             case .suspended(let unsafeContinuation):
@@ -31,9 +31,9 @@ final class AsyncSemaphoreSuspension: Sendable {
     func cancel() {
         state.withLock { state in
             switch state {
-            case .suspendedUnlessCancelled(let unsafeContinuation):
+            case let .suspendedUnlessCancelled(unsafeContinuation, cancellationError):
                 state = .cancelled
-                unsafeContinuation.resume(throwing: CancellationError())
+                unsafeContinuation.resume(throwing: cancellationError())
             case .suspended:
                 assertionFailure("Cancellation attempted on a continuation that does not support it.")
             case .cancelled:
@@ -47,17 +47,20 @@ final class AsyncSemaphoreSuspension: Sendable {
     }
 
     @discardableResult
-    func setContinuation(_ unsafeContinuation: UnsafeContinuation<Void, Error>) -> Bool {
+    func setContinuation(
+        _ unsafeContinuation: UnsafeContinuation<Void, Error>,
+        cancellationError: @Sendable @escaping () -> Error = { CancellationError() }
+    ) -> Bool {
         state.withLock { state in
             switch state {
             case .suspendedUnlessCancelled, .suspended:
                 preconditionFailure("The continuation is already established.")
             case .cancelled:
-                unsafeContinuation.resume(throwing: CancellationError())
+                unsafeContinuation.resume(throwing: cancellationError())
             case .resumed:
                 unsafeContinuation.resume()
             case nil:
-                state = .suspendedUnlessCancelled(unsafeContinuation)
+                state = .suspendedUnlessCancelled(unsafeContinuation, cancellationError: cancellationError)
                 return true
             }
             return false
@@ -89,7 +92,7 @@ final class AsyncSemaphoreSuspension: Sendable {
     private enum State {
 
         /// Waiting for a signal, with support for cancellation.
-        case suspendedUnlessCancelled(UnsafeContinuation<Void, Error>)
+        case suspendedUnlessCancelled(UnsafeContinuation<Void, Error>, cancellationError: @Sendable () -> Error)
 
         /// Waiting for a signal, with no support for cancellation.
         case suspended(UnsafeContinuation<Void, Never>)

@@ -1,0 +1,139 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "NetceteraShim",
+    "printedName": "NetceteraShim",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "ThreeDS_SDK",
+        "printedName": "ThreeDS_SDK",
+        "declKind": "Import",
+        "moduleName": "NetceteraShim",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "ConfigurationBuilder",
+        "printedName": "ConfigurationBuilder",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "poApiKey",
+            "printedName": "poApiKey()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "c:@CM@NetceteraShim@ThreeDS_SDK@objc(cs)NCAConfigurationBuilder(im)poApiKeyAndReturnError:",
+            "mangledName": "$s11ThreeDS_SDK20ConfigurationBuilderC13NetceteraShimE8poApiKeyyyKF",
+            "moduleName": "NetceteraShim",
+            "intro_iOS": "13",
+            "declAttributes": [
+              "Dynamic",
+              "AccessControl",
+              "SPIAccessControl",
+              "Available",
+              "ObjC"
+            ],
+            "isFromExtension": true,
+            "spi_group_names": [
+              "PO"
+            ],
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:@M@ThreeDS_SDK@objc(cs)NCAConfigurationBuilder",
+        "mangledName": "$s11ThreeDS_SDK20ConfigurationBuilderC",
+        "moduleName": "ThreeDS_SDK",
+        "objc_name": "NCAConfigurationBuilder",
+        "declAttributes": [
+          "ObjCMembers",
+          "ObjC"
+        ],
+        "superclassUsr": "c:objc(cs)NSObject",
+        "isExternal": true,
+        "hasMissingDesignatedInitializers": true,
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          }
+        ]
+      }
+    ],
+    "json_format_version": 8
+  },
+  "ConstValues": []
+}
