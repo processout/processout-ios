@@ -85,19 +85,25 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
             if #unavailable(iOS 15) {
                 makeToolbarBody(configuration: configuration)
             }
-            ScrollView {
-                VStack(spacing: POSpacing.small) {
-                    configuration.message
-                        .messageViewStyle(messageView)
-                    if configuration.isLoading {
-                        ProgressView()
-                            .poProgressViewStyle(progressView)
-                    } else {
+            ZStack {
+                if configuration.isLoading {
+                    ProgressView()
+                        .poProgressViewStyle(progressView)
+                        .padding(POSpacing.large)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+                ScrollView {
+                    VStack(spacing: POSpacing.small) {
+                        configuration
+                            .message
+                            .messageViewStyle(messageView)
+                        configuration
+                            .contentUnavailable
                         makeContentBody(paymentMethods: configuration.paymentMethods)
                     }
+                    .padding(POSpacing.large)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 }
-                .padding(POSpacing.large)
-                .frame(maxWidth: .infinity)
             }
             .modify { content in
                 if #available(iOS 15, *) {
@@ -107,9 +113,6 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
                 } else {
                     content
                 }
-            }
-            .backport.overlay {
-                configuration.contentUnavailable
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -121,20 +124,19 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
     @ViewBuilder
     private func makeContentBody(paymentMethods: AnyView) -> some View {
         Group(poSubviews: paymentMethods) { subviews in
-            if !subviews.isEmpty {
-                LazyVStack(spacing: 0) {
-                    ForEach(subviews) { subview in
-                        subview
-                        if subview.id != subviews.last?.id {
-                            Rectangle()
-                                .fill(content.dividerColor)
-                                .frame(height: 1)
-                        }
+            VStack(spacing: 0) {
+                ForEach(subviews) { subview in
+                    subview
+                    if subview.id != subviews.last?.id {
+                        Rectangle()
+                            .fill(content.dividerColor)
+                            .frame(height: 1)
                     }
                 }
-                .compositingGroup()
-                .border(style: content.border)
             }
+            .compositingGroup()
+            .border(style: content.border)
+            .modify(when: subviews.isEmpty) { _ in }
         }
     }
 
@@ -157,6 +159,7 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
         VStack(spacing: 0) {
             HStack(spacing: POSpacing.medium) {
                 configuration.title
+                    .fixedSize(horizontal: false, vertical: true)
                     .textStyle(toolbar.title)
                 Spacer(minLength: 0)
                 configuration.cancelButton

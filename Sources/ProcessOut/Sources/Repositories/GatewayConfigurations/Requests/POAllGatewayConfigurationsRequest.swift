@@ -5,9 +5,9 @@
 //  Created by Andrii Vysotskyi on 12.10.2022.
 //
 
-public struct POAllGatewayConfigurationsRequest: Sendable {
+public struct POAllGatewayConfigurationsRequest: Sendable, Codable {
 
-    public enum Filter: String, Sendable {
+    public enum Filter: String, Sendable, Codable {
 
         /// Gateways that allow payments using alternative payment methods that allow tokenization.
         case alternativePaymentMethodsWithTokenization // swiftlint:disable:this identifier_name

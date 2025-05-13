@@ -6,7 +6,7 @@
 //
 
 /// Holds information about card issuing institution that issued the card to the card holder.
-public struct POCardIssuerInformation: Decodable, Sendable {
+public struct POCardIssuerInformation: Codable, Sendable {
 
     /// Scheme of the card.
     @POTypedRepresentation<String, POCardScheme>
@@ -28,6 +28,9 @@ public struct POCardIssuerInformation: Decodable, Sendable {
     /// Card category.
     public let category: String?
 
+    /// Issuer country code.
+    public let country: String?
+
     @_spi(PO)
     public init(
         scheme: POCardScheme,
@@ -35,7 +38,8 @@ public struct POCardIssuerInformation: Decodable, Sendable {
         type: String? = nil,
         bankName: String? = nil,
         brand: String? = nil,
-        category: String? = nil
+        category: String? = nil,
+        country: String? = nil
     ) {
         self._scheme = .init(wrappedValue: scheme.rawValue)
         self._coScheme = .init(wrappedValue: coScheme?.rawValue)
@@ -43,5 +47,6 @@ public struct POCardIssuerInformation: Decodable, Sendable {
         self.bankName = bankName
         self.brand = brand
         self.category = category
+        self.country = country
     }
 }

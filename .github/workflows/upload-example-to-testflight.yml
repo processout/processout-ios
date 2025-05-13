@@ -4,6 +4,11 @@ on:
     branches:
       - 'master'
   workflow_dispatch:
+    inputs:
+      testflight_internal:
+        description: 'TestFlight Internal'
+        default: true
+        type: boolean
 jobs:
   export:
     runs-on: macos-15
@@ -28,4 +33,5 @@ jobs:
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+          TESTFLIGHT_INTERNAL_ONLY: ${{ inputs.testflight_internal || 'false' }}
         run: ./Scripts/Distribution/ExportApplication.sh

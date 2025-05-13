@@ -14,12 +14,14 @@ protocol DynamicCheckoutInteractorChildProvider {
     /// Creates and returns card tokenization interactor.
     @MainActor
     func cardTokenizationInteractor(
-        invoiceId: String, configuration: PODynamicCheckoutPaymentMethod.CardConfiguration
+        for paymentMethod: PODynamicCheckoutPaymentMethod.Card, invoiceId: String
     ) -> any CardTokenizationInteractor
 
     /// Creates and returns native APM interactor..
     @MainActor
     func nativeAlternativePaymentInteractor(
-        invoiceId: String, gatewayConfigurationId: String
+        for paymentMethod: PODynamicCheckoutPaymentMethod.NativeAlternativePayment,
+        invoiceId: String,
+        configuration: PODynamicCheckoutAlternativePaymentConfiguration
     ) -> any NativeAlternativePaymentInteractor
 }

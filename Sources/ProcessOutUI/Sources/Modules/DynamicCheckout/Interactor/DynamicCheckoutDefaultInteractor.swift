@@ -471,7 +471,7 @@ final class DynamicCheckoutDefaultInteractor:
             startNativeAlternativePayment(method: method, startedState: newStartedState)
         case .customerToken(let method):
             startCustomerTokenPayment(method: method, startedState: newStartedState)
-        case .unknown:
+        default:
             logger.error("Attempted to start unknown payment method.")
         }
     }
@@ -526,7 +526,6 @@ final class DynamicCheckoutDefaultInteractor:
         request.countryCode = paymentMethod.configuration.countryCode
         request.merchantCapabilities = paymentMethod.configuration.merchantCapabilities
         request.supportedNetworks = paymentMethod.configuration.supportedNetworks
-            .compactMap(PKPaymentNetwork.init(poScheme:))
             .filter(availableNetworks.contains)
         request.currencyCode = invoice.currency
         return request
@@ -535,9 +534,7 @@ final class DynamicCheckoutDefaultInteractor:
     // MARK: - Card Payment
 
     private func startCardPayment(method: PODynamicCheckoutPaymentMethod.Card, startedState: State.Started) {
-        let interactor = childProvider.cardTokenizationInteractor(
-            invoiceId: startedState.invoice.id, configuration: method.configuration
-        )
+        let interactor = childProvider.cardTokenizationInteractor(for: method, invoiceId: startedState.invoice.id)
         interactor.delegate = self
         interactor.willChange = { [weak self] state in
             self?.cardTokenization(willChangeState: state)
@@ -567,7 +564,7 @@ final class DynamicCheckoutDefaultInteractor:
         case .started:
             currentState.isCancellable = currentState.snapshot.isCancellable
             self.state = .paymentProcessing(currentState)
-        case .tokenizing:
+        case .tokenizing, .evaluatingEligibility:
             currentState.isCancellable = false
             self.state = .paymentProcessing(currentState)
         case .tokenized:
@@ -626,9 +623,10 @@ final class DynamicCheckoutDefaultInteractor:
     private func startNativeAlternativePayment(
         method: PODynamicCheckoutPaymentMethod.NativeAlternativePayment, startedState: State.Started
     ) {
+        let configuration = delegate?.dynamicCheckout(willStartAlternativePayment: method)
+            ?? configuration.alternativePayment
         let interactor = childProvider.nativeAlternativePaymentInteractor(
-            invoiceId: startedState.invoice.id,
-            gatewayConfigurationId: method.configuration.gatewayConfigurationId
+            for: method, invoiceId: startedState.invoice.id, configuration: configuration
         )
         interactor.delegate = self
         interactor.willChange = { [weak self] state in
@@ -892,8 +890,8 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         )
     }
 
-    func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
-        delegate?.dynamicCheckout(preferredSchemeFor: issuerInformation)
+    func cardTokenization(preferredSchemeWith issuerInformation: POCardIssuerInformation) -> POCardScheme? {
+        delegate?.dynamicCheckout(preferredSchemeWith: issuerInformation)
     }
 
     func shouldContinueTokenization(after failure: POFailure) -> Bool {
@@ -901,6 +899,10 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
             return false
         }
         return !currentState.shouldInvalidateInvoice
+    }
+
+    func cardTokenization(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate? {
+        delegate?.dynamicCheckout(willScanCardWith: configuration)
     }
 }
 
@@ -920,7 +922,15 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
     func nativeAlternativePayment(
         defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]
     ) async -> [String: String] {
-        await delegate?.dynamicCheckout(alternativePaymentDefaultsFor: parameters) ?? [:]
+        guard case .paymentProcessing(let currentState) = state,
+              case .nativeAlternativePayment(let paymentMethod) = currentState.paymentMethod else {
+            logger.error("Unable to resolve default values in current state: \(state).")
+            return [:]
+        }
+        let request = PODynamicCheckoutAlternativePaymentDefaultsRequest(
+            paymentMethod: paymentMethod, parameters: parameters
+        )
+        return await delegate?.dynamicCheckout(alternativePaymentDefaultsWith: request) ?? [:]
     }
 }
 

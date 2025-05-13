@@ -67,12 +67,12 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     private enum Constants {
         static let deviceChannel = "app"
-        static let tokenPrefix = "gway_req_"
-        static let fingerprintTimeoutResponseBody = #"{ "threeDS2FingerprintTimeout": true }"#
+        static let gatewayRequestPrefix = "gway_req_"
+        static let fingerprintTimeoutGatewayRequestBody = #"{ "threeDS2FingerprintTimeout": true }"#
         static let webFingerprintTimeout: TimeInterval = 10
     }
 
-    private struct AuthenticationResponse: Encodable {
+    private struct GatewayRequest: Encodable {
         let url: URL?
         let body: String
     }
@@ -91,8 +91,8 @@ final class DefaultCustomerActionsService: CustomerActionsService {
     private func fingerprint(encodedConfiguration: String, threeDSService: PO3DS2Service) async throws -> String {
         let configuration = try decode(PO3DS2Configuration.self, from: encodedConfiguration)
         let requestParameters = try await threeDSService.authenticationRequestParameters(configuration: configuration)
-        let response = AuthenticationResponse(url: nil, body: try self.encode(requestParameters: requestParameters))
-        return try encode(authenticationResponse: response)
+        let gatewayRequest = GatewayRequest(url: nil, body: try self.encode(requestParameters: requestParameters))
+        return try encode(gatewayRequest: gatewayRequest)
     }
 
     private func challenge(encodedChallenge: String, threeDSService: PO3DS2Service) async throws -> String {
@@ -105,8 +105,8 @@ final class DefaultCustomerActionsService: CustomerActionsService {
             logger.error("Did fail to encode CRES: \(error).")
             throw POFailure(message: "Can't process customer action.", code: .Mobile.internal, underlyingError: error)
         }
-        let response = AuthenticationResponse(url: nil, body: encodedChallengeResult)
-        return try encode(authenticationResponse: response)
+        let gatewayRequest = GatewayRequest(url: nil, body: encodedChallengeResult)
+        return try encode(gatewayRequest: gatewayRequest)
     }
 
     // MARK: - Redirects
@@ -125,8 +125,8 @@ final class DefaultCustomerActionsService: CustomerActionsService {
             }
         } catch let failure as POFailure where failure.failureCode == .Mobile.timeout {
             // Fingerprinting timeout is treated differently from other errors.
-            let response = AuthenticationResponse(url: url, body: Constants.fingerprintTimeoutResponseBody)
-            return try encode(authenticationResponse: response)
+            let gatewayRequest = GatewayRequest(url: url, body: Constants.fingerprintTimeoutGatewayRequestBody)
+            return try encode(gatewayRequest: gatewayRequest)
         }
     }
 
@@ -144,7 +144,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         return queryItems?.first { $0.name == "token" }?.value ?? ""
     }
 
-    // MARK: - Coding
+    // MARK: - Decoding
 
     private func decode<T: Decodable>(_ type: T.Type, from string: String) throws -> T {
         let paddedString = string.padding(
@@ -161,6 +161,8 @@ final class DefaultCustomerActionsService: CustomerActionsService {
             throw POFailure(message: "Can't process customer action.", code: .Mobile.internal, underlyingError: error)
         }
     }
+
+    // MARK: - Encoding
 
     private func encode(requestParameters parameters: PO3DS2AuthenticationRequestParameters) throws -> String {
         do {
@@ -187,12 +189,11 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         }
     }
 
-    /// Encodes given response and creates token with it.
-    private func encode(authenticationResponse: AuthenticationResponse) throws -> String {
+    private func encode(gatewayRequest: GatewayRequest) throws -> String {
         do {
-            return try Constants.tokenPrefix + encoder.encode(authenticationResponse).base64EncodedString()
+            return try Constants.gatewayRequestPrefix + encoder.encode(gatewayRequest).base64EncodedString()
         } catch {
-            logger.error("Did fail to encode AREQ parameters or CRES: \(error).")
+            logger.error("Did fail to encode gateway request: \(error).")
             throw POFailure(message: "Can't process customer action.", code: .Mobile.internal, underlyingError: error)
         }
     }

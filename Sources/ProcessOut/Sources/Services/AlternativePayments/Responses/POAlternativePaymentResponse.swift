@@ -8,7 +8,7 @@
 import Foundation
 
 /// Generic alternative payment response.
-public struct POAlternativePaymentResponse: Sendable {
+public struct POAlternativePaymentResponse: Sendable, Codable {
 
     /// Represents a gateway token.
     ///

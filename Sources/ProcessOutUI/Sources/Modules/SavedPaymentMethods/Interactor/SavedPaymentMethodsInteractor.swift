@@ -13,4 +13,7 @@ protocol SavedPaymentMethodsInteractor: Interactor<SavedPaymentMethodsInteractor
 
     /// Deletes customer token ID.
     func delete(customerTokenId: String)
+
+    /// Notifies interactor that user requested removal confirmation.
+    func didRequestRemovalConfirmation(customerTokenId: String)
 }

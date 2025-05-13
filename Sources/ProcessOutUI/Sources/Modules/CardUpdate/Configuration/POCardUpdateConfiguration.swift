@@ -71,6 +71,23 @@ public struct POCardUpdateConfiguration {
         }
     }
 
+    /// Preferred scheme selection configuration.
+    @MainActor
+    public struct PreferredScheme {
+
+        /// Preferred scheme section title. Set `nil` to use default value, or empty string `""` to remove title.
+        public let title: String?
+
+        /// Boolean flag indicating whether inline style is preferred, `true` by default.
+        public let prefersInline: Bool
+
+        /// Creates scheme selection configuration.
+        public init(title: String? = nil, prefersInline: Bool = true) {
+            self.title = title
+            self.prefersInline = prefersInline
+        }
+    }
+
     /// Card id that needs to be updated.
     public let cardId: String
 
@@ -84,9 +101,9 @@ public struct POCardUpdateConfiguration {
     /// Configuration for the CVC text field.
     public let cvc: TextField
 
-    /// Boolean flag determines whether user will be asked to select scheme if co-scheme is available.
-    @_spi(PO)
-    public var isSchemeSelectionAllowed: Bool = false
+    /// Preferred scheme selection configuration.
+    /// If value is non-nil user will be asked to select scheme if co-scheme is available.
+    public let preferredScheme: PreferredScheme?
 
     /// Submit button configuration.
     public let submitButton: SubmitButton
@@ -99,6 +116,7 @@ public struct POCardUpdateConfiguration {
         cardInformation: POCardUpdateInformation? = nil,
         title: String? = nil,
         cvc: TextField = .init(),
+        preferredScheme: PreferredScheme = .init(),
         submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = .init()
     ) {
@@ -106,6 +124,7 @@ public struct POCardUpdateConfiguration {
         self.cardInformation = cardInformation
         self.title = title
         self.cvc = cvc
+        self.preferredScheme = preferredScheme
         self.submitButton = submitButton
         self.cancelButton = cancelButton
     }
@@ -138,6 +157,7 @@ extension POCardUpdateConfiguration {
         self.cardInformation = cardInformation
         self.title = title
         self.cvc = .init()
+        self.preferredScheme = .init()
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = cancelActionTitle?.isEmpty == true ? nil : .init(title: cancelActionTitle)
     }

@@ -91,6 +91,7 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``POCustomerTokensService``
 - ``POAssignCustomerTokenRequest``
 - ``POCustomerToken``
+- ``POCustomerTokenType``
 - ``POCustomerTokensServiceType``
 - ``PODeleteCustomerTokenRequest``
 
@@ -108,6 +109,8 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``POInvoicesService``
 - ``POInvoiceRequest``
 - ``POInvoice``
+- ``POTransaction``
+- ``POTransactionStatus``
 - ``POInvoiceAuthorizationRequest``
 - ``PONativeAlternativePaymentCaptureRequest``
 - ``PONativeAlternativePaymentMethodParameter``
@@ -117,8 +120,8 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``PONativeAlternativePaymentMethodTransactionDetailsRequest``
 - ``PONativeAlternativePaymentMethodParameterValues``
 - ``PONativeAlternativePaymentMethodState``
+- ``PODynamicCheckoutPaymentMethod``
 - ``POInvoicesServiceType``
-<!--- ``PODynamicCheckoutPaymentMethod``-->
 
 ### Appearance
 
@@ -152,14 +155,7 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POWebAuthenticationCallback``
 - ``POPaginationOptions``
 - ``POCancellable``
-- ``POImmutableExcludedCodable``
-- ``POImmutableStringCodableDecimal``
-- ``POImmutableStringCodableOptionalDecimal``
-- ``POFallbackDecodable``
-- ``POFallbackValueProvider``
-- ``POEmptyStringProvider``
 - ``POTypedRepresentation``
-- ``POStringDecodableMerchantCapability``
 - ``POBillingAddressCollectionMode``
 - ``PORepository``
 - ``POService``
@@ -168,6 +164,18 @@ Types that describe properties such as shadow and border. And style of higher le
 - ``POServiceType``
 - ``POAutoAsync``
 - ``POAutoCompletion``
+
+### Coding Utils
+
+- ``POImmutableExcludedCodable``
+- ``POImmutableStringCodableDecimal``
+- ``POImmutableStringCodableOptionalDecimal``
+- ``POFallbackDecodable``
+- ``POFallbackValueProvider``
+- ``POEmptyStringProvider``
+- ``POStringDecodableMerchantCapability``
+- ``POCodablePassKitPaymentNetworks``
+- ``POExcludedEncodable``
 
 ### Legacy Declarations
 

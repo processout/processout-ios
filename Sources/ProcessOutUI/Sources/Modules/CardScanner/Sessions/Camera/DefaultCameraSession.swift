@@ -200,7 +200,14 @@ actor DefaultCameraSession:
         guard activeVideoInput == nil else {
             return true // Already configured
         }
-        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
+        let discoverySession = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [
+                .builtInTripleCamera, .builtInDualWideCamera, .builtInUltraWideCamera, .builtInWideAngleCamera
+            ],
+            mediaType: .video,
+            position: .back
+        )
+        guard let device = discoverySession.devices.first else {
             return false
         }
         let videoInput: AVCaptureDeviceInput
@@ -241,6 +248,9 @@ actor DefaultCameraSession:
         }
         if device.isLowLightBoostSupported {
             device.automaticallyEnablesLowLightBoostWhenAvailable = true
+        }
+        if device.isAutoFocusRangeRestrictionSupported {
+            device.autoFocusRangeRestriction = .near
         }
         device.unlockForConfiguration()
     }
@@ -288,11 +298,18 @@ actor DefaultCameraSession:
         let translatedImage = rotatedImage.transformed(
             by: .init(translationX: -rotatedImage.extent.origin.x, y: -rotatedImage.extent.origin.y)
         )
-        if let aspectRatio = await videoPreviewLayer?.owningView?.bounds.size {
+        if let previewSize = await videoPreviewLayer?.owningView?.bounds.size {
             let scaledRect = AVMakeRect(
-                aspectRatio: aspectRatio, insideRect: translatedImage.extent
+                aspectRatio: previewSize, insideRect: translatedImage.extent
             )
-            return translatedImage.cropped(to: scaledRect)
+            let previewTransform = CGAffineTransform
+                .identity
+                .scaledBy(x: previewSize.width / scaledRect.width, y: previewSize.height / scaledRect.height)
+                .translatedBy(x: -scaledRect.minX, y: -scaledRect.minY)
+            let croppedRect = await delegate?
+                .cameraSession(self, regionOfInterestInside: scaledRect.applying(previewTransform))?
+                .applying(previewTransform.inverted())
+            return translatedImage.cropped(to: croppedRect ?? scaledRect)
         }
         return translatedImage
     }

@@ -63,7 +63,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
     }
 
     func setPreferredScheme(_ scheme: POCardScheme) {
-        guard case .started(var startedState) = state, configuration.isSchemeSelectionAllowed else {
+        guard case .started(var startedState) = state, configuration.preferredScheme != nil else {
             return
         }
         let supportedSchemes = [startedState.scheme, startedState.coScheme].compactMap { $0 }
@@ -188,7 +188,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         if let scheme = cardInfo?.$preferredScheme.typed {
             return scheme
         }
-        guard configuration.isSchemeSelectionAllowed else {
+        guard configuration.preferredScheme != nil else {
             return nil
         }
         return issuerInformation?.$scheme.typed

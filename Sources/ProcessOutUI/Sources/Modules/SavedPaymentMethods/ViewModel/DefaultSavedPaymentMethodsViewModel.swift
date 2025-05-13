@@ -90,9 +90,9 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
 
     private func update(with interactorState: SavedPaymentMethodsInteractorState.Removing) {
         var removedIds = Set(interactorState.pendingRemovalCustomerTokenIds)
-        removedIds.insert(interactorState.removedCustomerTokenId)
+        removedIds.insert(interactorState.removedPaymentMethod.configuration.customerTokenId)
         let paymentMethodsViewModels = interactorState.startedStateSnapshot.paymentMethods.map { paymentMethod in
-            let isBeingRemoved = removedIds.contains(paymentMethod.customerTokenId)
+            let isBeingRemoved = removedIds.contains(paymentMethod.configuration.customerTokenId)
             return createViewModel(for: paymentMethod, isBeingRemoved: isBeingRemoved)
         }
         state = .init(
@@ -119,10 +119,10 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
         for paymentMethod: SavedPaymentMethodsInteractorState.PaymentMethod, isBeingRemoved: Bool
     ) -> SavedPaymentMethodsViewModelState.PaymentMethod {
         let viewModel = SavedPaymentMethodsViewModelState.PaymentMethod(
-            id: paymentMethod.customerTokenId,
-            logo: paymentMethod.logo,
-            name: paymentMethod.name,
-            description: paymentMethod.description,
+            id: paymentMethod.id,
+            logo: paymentMethod.display.logo,
+            name: paymentMethod.display.name,
+            description: paymentMethod.display.description,
             deleteButton: createDeleteButton(paymentMethod: paymentMethod, isLoading: isBeingRemoved)
         )
         return viewModel
@@ -131,22 +131,27 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
     private func createDeleteButton(
         paymentMethod: SavedPaymentMethodsInteractorState.PaymentMethod, isLoading: Bool
     ) -> POButtonViewModel? {
-        guard paymentMethod.deletingAllowed else {
+        guard paymentMethod.configuration.deletingAllowed else {
             return nil
         }
         let configuration = interactor.configuration.paymentMethod.deleteButton.resolved(
-            defaultTitle: nil, icon: Image(poResource: .delete).resizable().renderingMode(.template)
+            defaultTitle: nil,
+            icon: Image(poResource: .delete).resizable().renderingMode(.template)
         )
         let viewModel = POButtonViewModel(
             id: "delete-button",
             title: configuration.title,
             icon: configuration.icon,
             isLoading: isLoading,
-            confirmation: configuration.confirmation.map { configuration in
-                .delete(with: configuration)
+            confirmation: configuration.confirmation.map { [weak self] configuration in
+                .delete(with: configuration) {
+                    self?.interactor.didRequestRemovalConfirmation(
+                        customerTokenId: paymentMethod.configuration.customerTokenId
+                    )
+                }
             },
             action: { [weak self] in
-                self?.interactor.delete(customerTokenId: paymentMethod.customerTokenId)
+                self?.interactor.delete(customerTokenId: paymentMethod.configuration.customerTokenId)
             }
         )
         return viewModel

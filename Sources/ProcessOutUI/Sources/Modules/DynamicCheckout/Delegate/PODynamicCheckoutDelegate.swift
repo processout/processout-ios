@@ -41,6 +41,8 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
         newInvoiceFor invoice: POInvoice, invalidationReason: PODynamicCheckoutInvoiceInvalidationReason
     ) async -> POInvoiceRequest?
 
+    // MARK: - Saved Payment Methods
+
     /// Allows your implementation to customize saved payment methods configuration.
     @MainActor
     func dynamicCheckout(
@@ -56,7 +58,12 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
     @MainActor
-    func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String?
+    func dynamicCheckout(preferredSchemeWith issuerInformation: POCardIssuerInformation) -> POCardScheme?
+
+    /// Notifies the delegate before a card scanning session begins and allows
+    /// providing a delegate to handle scanning events.
+    @MainActor
+    func dynamicCheckout(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate?
 
     // MARK: - Alternative Payment
 
@@ -64,13 +71,19 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
     @MainActor
     func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEvent)
 
+    /// Notifies delegate that alternative payment is about to start and allows to override default configuration.
+    @MainActor
+    func dynamicCheckout(
+        willStartAlternativePayment: PODynamicCheckoutPaymentMethod.NativeAlternativePayment
+    ) -> PODynamicCheckoutAlternativePaymentConfiguration?
+
     /// Method provides an ability to supply default values for given parameters.
     ///
     /// - Returns: dictionary where key is a parameter key, and value is desired default. Please note that it is not
     /// mandatory to provide defaults for all parameters.
     @MainActor
     func dynamicCheckout(
-        alternativePaymentDefaultsFor parameters: [PONativeAlternativePaymentMethodParameter]
+        alternativePaymentDefaultsWith request: PODynamicCheckoutAlternativePaymentDefaultsRequest
     ) async -> [String: String]
 
     // MARK: - Pass Kit
@@ -99,6 +112,8 @@ extension PODynamicCheckoutDelegate {
         nil
     }
 
+    // MARK: - Saved Payment Methods
+
     @MainActor
     public func dynamicCheckout(
         savedPaymentMethodsConfigurationWith invoiceRequest: POInvoiceRequest
@@ -106,15 +121,24 @@ extension PODynamicCheckoutDelegate {
         .init(invoiceRequest: invoiceRequest)
     }
 
+    // MARK: - Card Payment
+
     @MainActor
     public func dynamicCheckout(didEmitCardTokenizationEvent event: POCardTokenizationEvent) {
         // Ignored
     }
 
     @MainActor
-    public func dynamicCheckout(preferredSchemeFor issuerInformation: POCardIssuerInformation) -> String? {
-        issuerInformation.scheme
+    public func dynamicCheckout(preferredSchemeWith issuerInformation: POCardIssuerInformation) -> POCardScheme? {
+        issuerInformation.$scheme.typed
     }
+
+    @MainActor
+    public func dynamicCheckout(willScanCardWith configuration: POCardScannerConfiguration) -> POCardScannerDelegate? {
+        nil
+    }
+
+    // MARK: - Alternative Payment
 
     @MainActor
     public func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEvent) {
@@ -123,10 +147,19 @@ extension PODynamicCheckoutDelegate {
 
     @MainActor
     public func dynamicCheckout(
-        alternativePaymentDefaultsFor parameters: [PONativeAlternativePaymentMethodParameter]
+        willStartAlternativePayment: PODynamicCheckoutPaymentMethod.NativeAlternativePayment
+    ) -> PODynamicCheckoutAlternativePaymentConfiguration? {
+        nil
+    }
+
+    @MainActor
+    public func dynamicCheckout(
+        alternativePaymentDefaultsWith request: PODynamicCheckoutAlternativePaymentDefaultsRequest
     ) async -> [String: String] {
         [:]
     }
+
+    // MARK: - Pass Kit
 
     @MainActor
     public func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {

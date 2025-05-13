@@ -78,8 +78,11 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         case .tokenizing(let currentState):
             let newState = convertToState(startedState: currentState.snapshot, isSubmitting: true)
             self.state = newState
-        default:
-            break
+        case .evaluatingEligibility(let currentState):
+            let newState = convertToState(startedState: currentState.snapshot, isSubmitting: true)
+            self.state = newState
+        case .tokenized, .failure:
+            break // Ignored
         }
     }
 
@@ -89,7 +92,13 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         startedState: InteractorState.Started, isSubmitting: Bool
     ) -> CardTokenizationViewModelState {
         var cardInformationItems = cardInformationInputItems(startedState: startedState)
-        if let error = startedState.recentErrorMessage {
+        if case .notEligible(let failure) = startedState.cardInformation.eligibility {
+            let errorItem = State.ErrorItem(
+                id: ItemId.error,
+                description: failure?.errorDescription ?? String(resource: .CardTokenization.Error.eligibility)
+            )
+            cardInformationItems.append(.error(errorItem))
+        } else if let error = startedState.recentErrorMessage {
             let errorItem = State.ErrorItem(id: ItemId.error, description: error)
             cardInformationItems.append(.error(errorItem))
         }
@@ -165,10 +174,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     }
 
     private func cardNumberIcon(startedState: InteractorState.Started) -> AnyView? {
-        // Scheme icon takes precedence over inject icon.
-        let scheme = startedState.issuerInformation?.coScheme != nil
-            ? startedState.preferredScheme
-            : startedState.issuerInformation?.$scheme.typed
+        let scheme = startedState.cardInformation.preferredScheme
+            ?? startedState.cardInformation.issuerInformation?.currentValue?.$scheme.typed
+            ?? startedState.cardInformation.preliminaryScheme
         if let image = scheme.flatMap(CardSchemeImageProvider.shared.image) {
             return AnyView(image)
         }
@@ -179,13 +187,19 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         guard let cardScanner = configuration.cardScanner else {
             return nil
         }
+        let cardScannerDelegate = interactor.delegate?.cardTokenization(willScanCardWith: cardScanner.configuration)
         let openScanner: @MainActor () -> Void = { [weak self] in
-            self?.state.cardScanner = .init(id: "card-scanner", configuration: cardScanner.configuration) { result in
-                if case .success(let card) = result {
-                    self?.interactor.update(with: card)
+            self?.state.cardScanner = .init(
+                id: "card-scanner",
+                configuration: cardScanner.configuration,
+                delegate: cardScannerDelegate,
+                completion: { result in
+                    if case .success(let card) = result {
+                        self?.interactor.update(with: card)
+                    }
+                    self?.state.cardScanner = nil
                 }
-                self?.state.cardScanner = nil
-            }
+            )
         }
         let defaultIcon = Image(poResource: .camera)
             .renderingMode(.template)
@@ -204,30 +218,31 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func preferredSchemeSection(
         startedState: InteractorState.Started
     ) -> CardTokenizationViewModelState.Section? {
-        guard configuration.isSchemeSelectionAllowed,
-              let issuerInformation = startedState.issuerInformation,
-              let coScheme = issuerInformation.coScheme else {
+        guard let schemeConfiguration = configuration.preferredScheme,
+              let supportedEligibleSchemes = startedState.cardInformation.supportedEligibleSchemes,
+              supportedEligibleSchemes.count > 1 else {
             return nil
         }
+        let resolvedSchemeConfiguration = schemeConfiguration.resolved(
+            defaultTitle: String(resource: .CardTokenization.PreferredScheme.title)
+        )
         let pickerItem = State.PickerItem(
             id: ItemId.scheme,
-            options: [
-                .init(id: issuerInformation.scheme, title: issuerInformation.scheme.capitalized),
-                .init(id: coScheme, title: coScheme.capitalized)
-            ],
+            options: supportedEligibleSchemes.map { scheme in
+                .init(id: scheme.rawValue, title: scheme.displayName ?? scheme.rawValue.capitalized)
+            },
             selectedOptionId: .init(
-                get: { startedState.preferredScheme?.rawValue },
+                get: { startedState.cardInformation.preferredScheme?.rawValue },
                 set: { [weak self] newValue in
-                    let newScheme = newValue.map(POCardScheme.init)
-                    self?.interactor.setPreferredScheme(newScheme ?? issuerInformation.$scheme.typed)
+                    if let newScheme = newValue.map(POCardScheme.init) {
+                        self?.interactor.setPreferredScheme(newScheme)
+                    }
                 }
             ),
-            preferrsInline: true
+            prefersInline: resolvedSchemeConfiguration.prefersInline
         )
         let section = State.Section(
-            id: SectionId.preferredScheme,
-            title: String(resource: .CardTokenization.PreferredScheme.title),
-            items: [.picker(pickerItem)]
+            id: SectionId.preferredScheme, title: resolvedSchemeConfiguration.title, items: [.picker(pickerItem)]
         )
         return section
     }
@@ -272,14 +287,14 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                 )
             ]
             items.append(contentsOf: streetItems)
-        case .city:
-            let placeholder = String(resource: startedState.address.specification.cityUnit.stringResource)
+        case .city(let city):
+            let placeholder = String(resource: city.stringResource)
             items.append(createItem(parameter: startedState.address.city, placeholder: placeholder))
-        case .state:
-            let placeholder = String(resource: startedState.address.specification.stateUnit.stringResource)
+        case .state(let state):
+            let placeholder = String(resource: state.stringResource)
             items.append(createItem(parameter: startedState.address.state, placeholder: placeholder))
-        case .postcode:
-            let placeholder = String(resource: startedState.address.specification.postcodeUnit.stringResource)
+        case .postcode(let postcode):
+            let placeholder = String(resource: postcode.stringResource)
             items.append(createItem(parameter: startedState.address.postalCode, placeholder: placeholder))
         }
         return items.compactMap { $0 }
@@ -376,7 +391,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             }
         )
         let item = CardTokenizationViewModelState.PickerItem(
-            id: parameter.id, options: options, selectedOptionId: selectedOptionId, preferrsInline: false
+            id: parameter.id, options: options, selectedOptionId: selectedOptionId, prefersInline: false
         )
         return .picker(item)
     }

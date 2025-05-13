@@ -6,7 +6,8 @@
 //
 
 import SwiftUI
-@_spi(PO) import ProcessOutUI
+@_spi(PO) import ProcessOutCoreUI
+import ProcessOutUI
 
 struct SavedPaymentMethodsView: View {
 
@@ -22,6 +23,7 @@ struct SavedPaymentMethodsView: View {
         }
         .sheet(item: $viewModel.state.savedPaymentMethods) { viewModel in
             POSavedPaymentMethodsView(configuration: viewModel.configuration, completion: viewModel.completion)
+                .fittedPresentationDetent()
         }
         .onSubmit {
             viewModel.manage()

@@ -23,6 +23,8 @@
 - ``POCardTokenizationConfiguration``
 - ``POBillingAddressConfiguration``
 - ``POCardTokenizationDelegate``
+- ``POCardTokenizationEligibilityEvaluation``
+- ``POCardTokenizationEligibilityRequest``
 - ``POCardTokenizationEvent``
 
 ### Card Update
@@ -42,18 +44,12 @@
 - ``POCardScannerView``
 - ``POScannedCard``
 - ``POCardScannerConfiguration``
+- ``POCardScannerDelegate``
 - ``POCardScannerStyle``
 - ``POCardScannerStyleConfiguration``
 - ``PODefaultCardScannerStyle``
 - ``SwiftUICore/EnvironmentValues/cardScannerStyle``
 - ``SwiftUICore/View/cardScannerStyle(_:)``
-
-### Alternative Payment Method
-
-- ``SafariServices/SFSafariViewController/init(request:returnUrl:safariConfiguration:completion:)``
-- ``SafariServices/SFSafariViewController/init(alternativePaymentMethodUrl:returnUrl:safariConfiguration:completion:)``
-- ``POWebAuthenticationSession/init(alternativePaymentMethodUrl:returnUrl:completion:)``
-- ``POWebAuthenticationSession/init(request:returnUrl:completion:)``
 
 ### Native Alternative Payment Method
 
@@ -86,6 +82,8 @@
 
 - ``POSavedPaymentMethodsView``
 - ``POSavedPaymentMethodsConfiguration``
+- ``POSavedPaymentMethodsDelegate``
+- ``POSavedPaymentMethodsEvent``
 - ``POSavedPaymentMethodsStyle``
 - ``POSavedPaymentMethodsStyleConfiguration``
 - ``PODefaultSavedPaymentMethodsStyle``
@@ -98,6 +96,13 @@
 ### Utils
 
 - ``POConfirmationDialogConfiguration``
+
+### Alternative Payment Method
+
+- ``SafariServices/SFSafariViewController/init(request:returnUrl:safariConfiguration:completion:)``
+- ``SafariServices/SFSafariViewController/init(alternativePaymentMethodUrl:returnUrl:safariConfiguration:completion:)``
+- ``POWebAuthenticationSession/init(alternativePaymentMethodUrl:returnUrl:completion:)``
+- ``POWebAuthenticationSession/init(request:returnUrl:completion:)``
 
 ### Apple Pay
 

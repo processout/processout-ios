@@ -8,7 +8,7 @@
 import Foundation
 
 /// Invoice details.
-public struct POInvoice: Decodable, Sendable {
+public struct POInvoice: Codable, Sendable {
 
     /// String value that uniquely identifies this invoice.
     public let id: String
@@ -26,7 +26,6 @@ public struct POInvoice: Decodable, Sendable {
     public let customerId: String?
 
     /// Dynamic checkout details resolved for specific invoice.
-    @_spi(PO)
     public let paymentMethods: [PODynamicCheckoutPaymentMethod]?
 
     /// Client secret.
@@ -34,6 +33,5 @@ public struct POInvoice: Decodable, Sendable {
     public let clientSecret: String?
 
     /// Transaction details.
-    @_spi(PO)
     public let transaction: POTransaction?
 }

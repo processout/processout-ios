@@ -47,5 +47,7 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>CFBundleDisplayName</key>
+	<string>ProcessOut</string>
 </dict>
 </plist>

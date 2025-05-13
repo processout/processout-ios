@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable, Sendable {
+public struct PONativeAlternativePaymentMethodTransactionDetails: Sendable, Codable {
 
     /// Payment gateway information.
     public struct Gateway: Sendable {
@@ -27,7 +27,7 @@ public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable, Sen
     }
 
     /// Invoice details.
-    public struct Invoice: Decodable, Sendable {
+    public struct Invoice: Codable, Sendable {
 
         /// Invoice amount.
         @POImmutableStringCodableDecimal
@@ -53,7 +53,7 @@ public struct PONativeAlternativePaymentMethodTransactionDetails: Decodable, Sen
     public let parameterValues: PONativeAlternativePaymentMethodParameterValues?
 }
 
-extension PONativeAlternativePaymentMethodTransactionDetails.Gateway: Decodable {
+extension PONativeAlternativePaymentMethodTransactionDetails.Gateway: Codable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -64,6 +64,14 @@ extension PONativeAlternativePaymentMethodTransactionDetails.Gateway: Decodable 
         customerActionMessage = try container
             .decodeIfPresent(String.self, forKey: .customerActionMessage)
             .map(MarkdownParser.escaped)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(displayName, forKey: .displayName)
+        try container.encode(logoUrl, forKey: .logoUrl)
+        try container.encodeIfPresent(customerActionImageUrl, forKey: .customerActionImageUrl)
+        try container.encodeIfPresent(customerActionMessage, forKey: .customerActionMessage)
     }
 
     // MARK: - Private Nested Types

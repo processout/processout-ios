@@ -9,7 +9,7 @@ import Foundation
 import Testing
 import SwiftUI
 @testable @_spi(PO) import ProcessOut
-@testable @_spi(PO) import ProcessOutUI
+@testable import ProcessOutUI
 
 @MainActor
 struct DefaultSavedPaymentMethodsInteractorTests {
@@ -114,7 +114,7 @@ struct DefaultSavedPaymentMethodsInteractorTests {
             return
         }
         #expect(startedState.paymentMethods.count == 1)
-        #expect(startedState.paymentMethods.first?.customerTokenId == customerToken.id)
+        #expect(startedState.paymentMethods.first?.configuration.customerTokenId == customerToken.id)
     }
 
     @Test
@@ -137,7 +137,7 @@ struct DefaultSavedPaymentMethodsInteractorTests {
 
         // Then
         if case .removing(let currentState) = sut.state {
-            #expect(currentState.removedCustomerTokenId == customerToken.id)
+            #expect(currentState.removedPaymentMethod.configuration.customerTokenId == customerToken.id)
             _ = await currentState.task.result
         } else {
             Issue.record("Unexpected interactor state.")
@@ -175,7 +175,7 @@ struct DefaultSavedPaymentMethodsInteractorTests {
         if case .removing(let currentState) = sut.state {
             _ = await currentState.task.result
             if case .removing(let currentState) = sut.state {
-                #expect(currentState.removedCustomerTokenId == customerTokens[1].id)
+                #expect(currentState.removedPaymentMethod.configuration.customerTokenId == customerTokens[1].id)
                 _ = await currentState.task.result
             } else {
                 Issue.record("Unexpected interactor state.")
@@ -229,6 +229,7 @@ struct DefaultSavedPaymentMethodsInteractorTests {
     ) -> any SavedPaymentMethodsInteractor {
         let interactor = DefaultSavedPaymentMethodsInteractor(
             configuration: configuration,
+            delegate: nil,
             invoicesService: invoicesService,
             customerTokensService: customerTokensService,
             logger: .stub,

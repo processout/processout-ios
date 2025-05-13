@@ -10,9 +10,6 @@ import SwiftUI
 import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-// TODOs:
-// - Allow selecting card co-scheme when authorizing invoice or assigning token
-
 struct CardTokenizationViewModelState {
 
     struct Section: Identifiable {
@@ -57,7 +54,7 @@ struct CardTokenizationViewModelState {
         @Binding var selectedOptionId: String?
 
         /// Boolean flag indicating whether inline style is preferred.
-        let preferrsInline: Bool
+        let prefersInline: Bool
     }
 
     struct PickerItemOption: Identifiable {
@@ -96,6 +93,9 @@ struct CardTokenizationViewModelState {
 
         /// Card scanner configuration.
         let configuration: POCardScannerConfiguration
+
+        /// Card scanner delegate.
+        weak var delegate: POCardScannerDelegate?
 
         /// Completion.
         let completion: (Result<POScannedCard, POFailure>) -> Void

@@ -13,6 +13,38 @@ import ProcessOut
 @MainActor
 public struct PODynamicCheckoutCardConfiguration {
 
+    /// Card scanner configuration.
+    @MainActor
+    public struct CardScanner {
+
+        /// Card scan button configuration.
+        @MainActor
+        public struct ScanButton { // swiftlint:disable:this nesting
+
+            /// Button title, such as "Scan card". Pass `nil` title to use default value.
+            public let title: String?
+
+            /// Button icon. Pass `nil` title to use default value.
+            public let icon: AnyView?
+
+            public init<Icon: View>(title: String? = nil, icon: Icon? = AnyView?.none) {
+                self.title = title
+                self.icon = icon.map(AnyView.init(erasing:))
+            }
+        }
+
+        /// Scan button.
+        public let scanButton: ScanButton
+
+        /// Scanner configuration.
+        public let configuration: POCardScannerConfiguration
+
+        public init(scanButton: ScanButton = .init(), configuration: POCardScannerConfiguration = .init()) {
+            self.scanButton = scanButton
+            self.configuration = configuration
+        }
+    }
+
     /// Billing address collection configuration.
     @MainActor
     public struct BillingAddress {
@@ -49,6 +81,23 @@ public struct PODynamicCheckoutCardConfiguration {
         }
     }
 
+    /// Preferred scheme selection configuration.
+    @MainActor
+    public struct PreferredScheme {
+
+        /// Preferred scheme section title. Set `nil` to use default value, or empty string `""` to remove title.
+        public let title: String?
+
+        /// Boolean flag indicating whether inline style is preferred, `true` by default.
+        public let prefersInline: Bool
+
+        /// Creates scheme selection configuration.
+        public init(title: String? = nil, prefersInline: Bool = true) {
+            self.title = title
+            self.prefersInline = prefersInline
+        }
+    }
+
     /// Configuration for the cardholder name text field.
     public let cardholderName: TextField
 
@@ -60,6 +109,12 @@ public struct PODynamicCheckoutCardConfiguration {
 
     /// Configuration for the CVC text field.
     public let cvc: TextField
+
+    /// Preferred scheme selection configuration.
+    public let preferredScheme: PreferredScheme
+
+    /// Card scanner configuration.
+    public let cardScanner: CardScanner?
 
     /// Card billing address collection configuration.
     public let billingAddress: BillingAddress
@@ -73,6 +128,8 @@ public struct PODynamicCheckoutCardConfiguration {
         cardNumber: TextField = .init(),
         expirationDate: TextField = .init(),
         cvc: TextField = .init(),
+        preferredScheme: PreferredScheme = .init(),
+        cardScanner: CardScanner = .init(),
         billingAddress: BillingAddress = BillingAddress(),
         metadata: [String: String]? = nil
     ) {
@@ -80,18 +137,9 @@ public struct PODynamicCheckoutCardConfiguration {
         self.cardNumber = cardNumber
         self.expirationDate = expirationDate
         self.cvc = cvc
+        self.preferredScheme = preferredScheme
+        self.cardScanner = cardScanner
         self.billingAddress = billingAddress
         self.metadata = metadata
-    }
-}
-
-extension PODynamicCheckoutCardConfiguration {
-
-    /// Default configuration.
-    /// - NOTE: Only used to fix compatibility issue with Xcode 15.
-    @inlinable
-    @MainActor
-    static var `default`: PODynamicCheckoutCardConfiguration {
-        PODynamicCheckoutCardConfiguration()
     }
 }

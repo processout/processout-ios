@@ -494,7 +494,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let title: String?, icon: AnyView?, confirmation: POConfirmationDialogConfiguration?
         if state.isAwaitingNativeAlternativePaymentCapture {
-            let configuration = interactor.configuration.alternativePayment.paymentConfirmation.cancelButton
+            let configuration = state.nativeAlternativePaymentInteractor?.configuration.paymentConfirmation.cancelButton
             title = configuration?.title
             icon = configuration?.icon
             confirmation = configuration?.confirmation
@@ -642,7 +642,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         case .customerToken(let method):
             return method.flow == .express
         case .unknown:
-            preconditionFailure("Unexpected payment method.")
+            return false
+        @unknown default:
+            return false
         }
     }
 
@@ -657,6 +659,8 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         case .customerToken(let paymentMethod):
             return paymentMethod.configuration.redirectUrl != nil
         case .applePay, .unknown:
+            return nil
+        @unknown default:
             return nil
         }
     }

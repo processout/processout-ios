@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct WebAuthenticationRequest {
+struct WebAuthenticationRequest: Sendable {
 
     /// A URL pointing to the authentication webpage.
     let url: URL

@@ -28,7 +28,7 @@ struct CardTokenizationItemView: View {
                     Text(option.title)
                 }
             }
-            .modify(when: pickerItem.preferrsInline) { view in
+            .modify(when: pickerItem.prefersInline) { view in
                 let style = PORadioGroupPickerStyle(radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton))
                 view.pickerStyle(style)
             }

@@ -25,6 +25,19 @@ public func ~= (pattern: POFailureCode, value: Error?) -> Bool {
     return false
 }
 
+extension POFailureCode: Codable {
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.rawValue = try container.decode(String.self)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+}
+
 extension POFailureCode {
 
     public enum Authentication {
@@ -210,7 +223,7 @@ extension POFailureCode {
         /// The card was a test card and can't be used to process live transactions.
         public static let test = POFailureCode(rawValue: "card.test")
 
-        /// The card was blacklisted from the payment provider
+        /// The card was blacklisted from the payment provider.
         public static let blacklisted = POFailureCode(rawValue: "card.blacklisted")
     }
 

@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 17.10.2024.
 //
 
-@_spi(PO) import ProcessOut
+import ProcessOut
 import UIKit
 
 protocol BarcodeImageProvider: Sendable {

@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 16.12.2024.
 //
 
+import AVFoundation
 @testable @_spi(PO) import ProcessOutUI
 
 @MainActor
@@ -16,7 +17,7 @@ final class MockCardRecognitionSessionDelegate: CardRecognitionSessionDelegate {
 
     // MARK: - CardRecognitionSessionDelegate
 
-    func cardRecognitionSession(_ session: CardRecognitionSession, didUpdateCard card: POScannedCard) {
+    func cardRecognitionSession(_ session: CardRecognitionSession, didUpdateCard card: POScannedCard?) {
         didUpdateCardCallsCount += 1
         lastUpdatedCard = card
     }
@@ -24,6 +25,10 @@ final class MockCardRecognitionSessionDelegate: CardRecognitionSessionDelegate {
     func cardRecognitionSession(_ session: CardRecognitionSession, didRecognizeCard card: POScannedCard) {
         didRecognizeCardCallsCount += 1
         lastRecognizedCard = card
+    }
+
+    func cardRecognitionSession(_ session: CardRecognitionSession, regionOfInterestInside rect: CGRect) -> CGRect? {
+        nil
     }
 
     // MARK: -

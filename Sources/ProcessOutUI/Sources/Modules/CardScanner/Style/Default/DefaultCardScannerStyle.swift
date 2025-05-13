@@ -23,10 +23,19 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
         /// Video preview overlay color.
         public let overlayColor: Color
 
-        public init(backgroundColor: Color, border: POBorderStyle, overlayColor: Color) {
+        /// Video preview overlay insets.
+        public let overlayInsets: EdgeInsets
+
+        public init(
+            backgroundColor: Color,
+            border: POBorderStyle,
+            overlayColor: Color,
+            overlayInsets: EdgeInsets? = nil
+        ) {
             self.backgroundColor = backgroundColor
             self.border = border
             self.overlayColor = overlayColor
+            self.overlayInsets = overlayInsets ?? .init(horizontal: POSpacing.large, vertical: POSpacing.large)
         }
     }
 
@@ -94,48 +103,61 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
     // MARK: - POCardScannerStyle
 
     public func makeBody(configuration: Configuration) -> some View {
-        VStack(spacing: POSpacing.medium) {
-            POToolbar(alignment: .top, spacing: POSpacing.small) {
-                configuration.torchToggle
-                    .poToggleStyle(torchToggle)
+        ScrollView {
+            VStack(spacing: POSpacing.medium) {
+                POToolbar(alignment: .top, spacing: POSpacing.small) {
+                    configuration.torchToggle
+                        .poToggleStyle(torchToggle)
+                        .backport.poControlSize(.small)
+                        .controlWidth(.regular)
+                        .padding(.leading, POSpacing.extraSmall)
+                } principal: {
+                    VStack(spacing: POSpacing.small) {
+                        configuration.title
+                            .textStyle(title)
+                        configuration.description
+                            .textStyle(description)
+                    }
+                    .multilineTextAlignment(.center)
+                    .padding(.top, POSpacing.large)
+                } trailing: {
+                    EmptyView()
+                }
+                Color.clear
+                    .aspectRatio(Constants.previewAspectRatio, contentMode: .fit)
+                    .padding(videoPreview.overlayInsets)
+                    .frame(maxWidth: .infinity)
+                    .backport.overlay {
+                        ZStack {
+                            configuration.videoPreview
+                            cardOverlay(with: configuration.card)
+                        }
+                    }
+                    .background(videoPreview.backgroundColor)
+                    .border(style: videoPreview.border)
+                configuration.cancelButton
+                    .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
                     .backport.poControlSize(.small)
-                    .controlWidth(.regular)
-                    .padding(.leading, POSpacing.extraSmall)
-            } principal: {
-                VStack(spacing: POSpacing.small) {
-                    configuration.title
-                        .textStyle(title)
-                    configuration.description
-                        .textStyle(description)
-                }
-                .multilineTextAlignment(.center)
-                .padding(.top, POSpacing.large)
-            } trailing: {
-                EmptyView()
             }
-            configuration.videoPreview
-                .frame(maxWidth: .infinity)
-                .background(videoPreview.backgroundColor)
-                .backport.overlay {
-                    cardOverlay(with: configuration.card)
-                }
-                .border(style: videoPreview.border)
-            configuration.cancelButton
-                .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
-                .backport.poControlSize(.small)
-        }
-        .padding(
-            .init(
-                top: POSpacing.large,
-                leading: POSpacing.medium,
-                bottom: POSpacing.extraLarge,
-                trailing: POSpacing.medium
+            .padding(
+                .init(
+                    top: POSpacing.large,
+                    leading: POSpacing.medium,
+                    bottom: POSpacing.extraLarge,
+                    trailing: POSpacing.medium
+                )
             )
-        )
-        .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity)
+        }
         .backport.background {
             backgroundColor.ignoresSafeArea()
         }
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let previewAspectRatio: CGFloat = 1.586 // ISO/IEC 7810 based
     }
 
     // MARK: - Private Methods
@@ -149,13 +171,13 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                     Rectangle()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .border(style: card.border)
-                        .padding(POSpacing.large)
+                        .padding(videoPreview.overlayInsets)
                 }
             cardDetails(with: configuration)
                 .padding(POSpacing.extraLarge)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .border(style: card.border)
-                .padding(POSpacing.large)
+                .padding(videoPreview.overlayInsets)
         }
     }
 

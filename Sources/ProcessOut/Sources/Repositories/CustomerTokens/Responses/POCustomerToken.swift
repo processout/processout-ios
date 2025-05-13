@@ -9,10 +9,10 @@ import Foundation
 
 /// Customer tokens (usually just called tokens for short) are objects that associate a payment source such as a
 /// card or APM token with a customer.
-public struct POCustomerToken: Decodable, Sendable {
+public struct POCustomerToken: Codable, Sendable {
 
     /// Customer token verification status.
-    public enum VerificationStatus: String, Decodable, Sendable {
+    public enum VerificationStatus: String, Codable, Sendable {
         case success, pending, failed, notRequested = "not-requested", unknown
     }
 
@@ -32,7 +32,8 @@ public struct POCustomerToken: Decodable, Sendable {
     public let invoiceId: String?
 
     /// Source used to create the token (which will usually be a Card).
-    public let type: String
+    @POTypedRepresentation<String, POCustomerTokenType>
+    public private(set) var type: String
 
     /// Description that will be sent to the tokenization gateway service.
     public let description: String?

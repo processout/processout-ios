@@ -51,6 +51,7 @@ public struct PODynamicCheckoutView: View {
         .onAppear(perform: viewModel.start)
         .sheet(item: $viewModel.state.savedPaymentMethods) { viewModel in
             POSavedPaymentMethodsView(configuration: viewModel.configuration, completion: viewModel.completion)
+                .fittedPresentationDetent()
         }
         .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
     }

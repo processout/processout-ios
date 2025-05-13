@@ -11,8 +11,15 @@ extension View {
 
     @_spi(PO)
     @MainActor
+    @ViewBuilder
     public func onSizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
-        modifier(SizeModifier(action: action))
+        if #available(iOS 16.0, *) {
+            onGeometryChange(for: CGSize.self, of: \.size) { newValue in
+                action(newValue)
+            }
+        } else {
+            modifier(SizeModifier(action: action))
+        }
     }
 }
 

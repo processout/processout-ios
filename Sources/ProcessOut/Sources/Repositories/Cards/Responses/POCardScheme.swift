@@ -71,7 +71,7 @@ extension POCardScheme {
     public static let cielo: POCardScheme = "cielo"
 
     /// Domestic debit and credit card brand of Brazil.
-    public static let elo: POCardScheme = "elp"
+    public static let elo: POCardScheme = "elo"
 
     /// Domestic debit and credit card brand of Brazil.
     public static let hipercard: POCardScheme = "hipercard"
@@ -176,10 +176,75 @@ extension POCardScheme {
     public static let mir: POCardScheme = "nspk mir"
 }
 
-extension POCardScheme: Decodable {
+extension POCardScheme: Codable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(String.self)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+}
+
+extension POCardScheme {
+
+    /// The internationally recognized name of the card scheme if available; otherwise, the local name or nil.
+    public var displayName: String? {
+        let names: [POCardScheme: String] = [
+            .visa: "Visa",
+            .carteBancaire: "Cartes Bancaires",
+            .mastercard: "Mastercard",
+            .amex: "American Express",
+            .unionPay: "UnionPay",
+            .dinersClub: "Diners Club",
+            .dinersClubCarteBlanche: "Diners Club Carte Blanche",
+            .dinersClubInternational: "Diners Club International",
+            .dinersClubUnitedStatesAndCanada: "Diners Club United States & Canada",
+            .discover: "Discover",
+            .jcb: "JCB",
+            .maestro: "Maestro",
+            .dankort: "Dankort",
+            .verve: "Verve",
+            .rupay: "RuPay",
+            .cielo: "Cielo",
+            .elo: "Elo",
+            .hipercard: "Hipercard",
+            .ourocard: "Ourocard",
+            .aura: "Aura",
+            .comprocard: "Comprocard",
+            .cabal: "Cabal",
+            .nyce: "NYCE",
+            .cirrus: "Cirrus",
+            .troy: "TROY",
+            .vPay: "V PAY",
+            .carnet: "CARNET",
+            .geCapital: "GE Capital",
+            .newday: "NewDay",
+            .sodexo: "Sodexo",
+            .globalBc: "BC Global",
+            .dinaCard: "DinaCard",
+            .mada: "mada",
+            .bancontact: "Bancontact",
+            .giropay: "giropay",
+            .privateLabel: "Private Label",
+            .atosPrivateLabel: "Atos Private Label",
+            .electron: "Visa Electron",
+            .idCredit: "iD Credit",
+            .interac: "Interac",
+            .quicPay: "QUICPay",
+            .suica: "Suica",
+            .girocard: "girocard",
+            .meeza: "Meeza",
+            .pagoBancomat: "PagoBANCOMAT",
+            .tmoney: "T-money",
+            .postFinance: "PostFinance Card",
+            .nanaco: "nanaco",
+            .waon: "WAON",
+            .mir: "Mir"
+        ]
+        return names[self]
     }
 }

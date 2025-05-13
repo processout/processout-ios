@@ -54,6 +54,10 @@ actor CardRecognitionSession: CameraSessionDelegate {
         await process(scannedCard: scannedCard(in: recognizedTexts))
     }
 
+    func cameraSession(_ session: CameraSession, regionOfInterestInside rect: CGRect) async -> CGRect? {
+        await delegate?.cardRecognitionSession(self, regionOfInterestInside: rect)
+    }
+
     // MARK: - Private Nested Types
 
     private enum Constants {
@@ -91,9 +95,6 @@ actor CardRecognitionSession: CameraSessionDelegate {
     private func recognizedTexts(
         for textObservations: [VNRecognizedTextObservation]?, inside rectangleObservation: VNRectangleObservation?
     ) -> [VNRecognizedText] {
-        guard let rectangleObservation else {
-            return [] // Abort recognition if card shape is not detected
-        }
         let candidates = textObservations?
             .filter { textObservation in
                 shouldInclude(textObservation: textObservation, cardRectangleObservation: rectangleObservation)
@@ -109,11 +110,15 @@ actor CardRecognitionSession: CameraSessionDelegate {
     }
 
     private func shouldInclude(
-        textObservation: VNRecognizedTextObservation, cardRectangleObservation: VNRectangleObservation
+        textObservation: VNRecognizedTextObservation, cardRectangleObservation: VNRectangleObservation?
     ) -> Bool {
         guard textObservation.confidence > Constants.minimumConfidence else {
             return false
         }
+        guard let cardRectangleObservation else {
+            return true
+        }
+        // Only include text observations within detected card shape if any.
         return textObservation.boundingBox.intersects(cardRectangleObservation.boundingBox)
     }
 
@@ -139,15 +144,14 @@ actor CardRecognitionSession: CameraSessionDelegate {
     private var lastErrorCorrectedCard: POScannedCard?
 
     private func process(scannedCard: POScannedCard?) async {
-        guard let errorCorrectedCard = errorCorrection.add(scannedCard: scannedCard) else {
-            return
-        }
+        let errorCorrectedCard = errorCorrection.add(scannedCard: scannedCard)
         if errorCorrectedCard != lastErrorCorrectedCard {
             lastErrorCorrectedCard = errorCorrectedCard
             await delegate?.cardRecognitionSession(self, didUpdateCard: errorCorrectedCard)
         }
-        if errorCorrection.isConfident {
-            await delegate?.cardRecognitionSession(self, didRecognizeCard: errorCorrectedCard)
+        guard let errorCorrectedCard, errorCorrection.isConfident else {
+            return
         }
+        await delegate?.cardRecognitionSession(self, didRecognizeCard: errorCorrectedCard)
     }
 }

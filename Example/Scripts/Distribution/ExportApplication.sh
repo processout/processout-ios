@@ -41,7 +41,7 @@ cd $WORK_DIR
 /usr/libexec/PlistBuddy "ExportOptions.plist" \
   -c "Add :method string 'app-store-connect'" \
   -c "Add :destination string 'upload'" \
-  -c "Add :testFlightInternalTestingOnly bool true" \
+  -c "Add :testFlightInternalTestingOnly bool $TESTFLIGHT_INTERNAL_ONLY" \
   -c "Add :manageAppVersionAndBuildNumber bool true" \
   -c "Add :teamID string '$DEVELOPMENT_TEAM_ID'"
 

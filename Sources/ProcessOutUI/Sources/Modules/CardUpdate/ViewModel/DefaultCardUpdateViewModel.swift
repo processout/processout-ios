@@ -166,16 +166,19 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     private func createPreferredSchemeSection(
         startedState: InteractorState.Started
     ) -> CardUpdateViewModelSection? {
-        guard configuration.isSchemeSelectionAllowed,
+        guard let preferredSchemeConfiguration = configuration.preferredScheme,
               let scheme = startedState.scheme,
               let coScheme = startedState.coScheme else {
             return nil
         }
+        let resolvedPreferredSchemeConfiguration = preferredSchemeConfiguration.resolved(
+            defaultTitle: String(resource: .CardUpdate.PreferredScheme.title)
+        )
         let pickerItem = CardUpdateViewModelItem.Picker(
             id: ItemId.scheme,
             options: [
-                .init(id: scheme.rawValue, title: scheme.rawValue.capitalized),
-                .init(id: coScheme.rawValue, title: coScheme.rawValue.capitalized)
+                .init(id: scheme.rawValue, title: scheme.displayName ?? scheme.rawValue.capitalized),
+                .init(id: coScheme.rawValue, title: coScheme.displayName ?? coScheme.rawValue.capitalized)
             ],
             selectedOptionId: .init(
                 get: { startedState.preferredScheme?.rawValue },
@@ -184,11 +187,11 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
                     self?.interactor.setPreferredScheme(newScheme ?? scheme)
                 }
             ),
-            preferrsInline: true
+            prefersInline: resolvedPreferredSchemeConfiguration.prefersInline
         )
         let section = CardUpdateViewModelSection(
             id: SectionId.preferredScheme,
-            title: String(resource: .CardUpdate.PreferredScheme.title),
+            title: resolvedPreferredSchemeConfiguration.title,
             items: [.picker(pickerItem)]
         )
         return section

@@ -20,9 +20,7 @@ struct CardUpdateSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: POSpacing.small) {
             if let title = section.title {
-                // todo(andrii-vysotskyi): use injected style when scheme selection is public
-                let textStyle = POTextStyle(color: .Input.Label.default, typography: .Text.s14(weight: .medium))
-                Text(title).textStyle(textStyle)
+                Text(title).textStyle(style.sectionTitle)
             }
             ForEach(section.items) { element in
                 CardUpdateItemView(item: element, focusedInputId: $focusedInputId)
@@ -31,4 +29,9 @@ struct CardUpdateSectionView: View {
         .fixedSize(horizontal: false, vertical: true)
         .backport.geometryGroup()
     }
+
+    // MARK: - Private Properties
+
+    @Environment(\.cardUpdateStyle)
+    private var style
 }

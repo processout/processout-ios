@@ -6,7 +6,6 @@
 //
 
 /// Transaction status.
-@_spi(PO)
 public struct POTransactionStatus: RawRepresentable, Sendable, Hashable {
 
     /// Raw status.
@@ -17,11 +16,16 @@ public struct POTransactionStatus: RawRepresentable, Sendable, Hashable {
     }
 }
 
-extension POTransactionStatus: Decodable {
+extension POTransactionStatus: Codable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(String.self)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
     }
 }
 
