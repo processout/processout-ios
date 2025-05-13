@@ -1,0 +1,4 @@
+framework module NetceteraShim {
+  header "NetceteraShim-Swift.h"
+  requires objc
+}

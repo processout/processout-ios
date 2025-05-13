@@ -92,6 +92,9 @@ final class DefaultInvoicesService: POInvoicesService {
     // MARK: - Private Methods
 
     private func _authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
+        let request = request.replacing(
+            thirdPartySdkVersion: request.thirdPartySdkVersion ?? threeDSService.version
+        )
         guard let customerAction = try await repository.authorizeInvoice(request: request) else {
             return
         }
@@ -116,14 +119,14 @@ final class DefaultInvoicesService: POInvoicesService {
 
 private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_extension_access_modifier
 
-    func replacing(source newSource: String) -> Self {
+    func replacing(source newSource: String? = nil, thirdPartySdkVersion newSdkVersion: String? = nil) -> Self {
         let updatedRequest = POInvoiceAuthorizationRequest(
             invoiceId: invoiceId,
-            source: newSource,
+            source: newSource ?? source,
             saveSource: saveSource,
             incremental: incremental,
             preferredScheme: $preferredScheme.typed,
-            thirdPartySdkVersion: thirdPartySdkVersion,
+            thirdPartySdkVersion: newSdkVersion ?? thirdPartySdkVersion,
             overrideMacBlocking: overrideMacBlocking,
             initialSchemeTransactionId: initialSchemeTransactionId,
             autoCaptureAt: autoCaptureAt,
