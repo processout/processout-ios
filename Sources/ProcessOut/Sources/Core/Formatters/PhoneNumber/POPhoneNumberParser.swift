@@ -12,6 +12,11 @@ public struct POPhoneNumberParser {
 
     public static let shared = POPhoneNumberParser()
 
+    init(metadataProvider: POPhoneNumberMetadataProvider = PODefaultPhoneNumberMetadataProvider.shared) {
+        regexProvider = PORegexProvider.shared
+        self.metadataProvider = metadataProvider
+    }
+
     // MARK: -
 
     public func parse(number: String, defaultRegion: String? = nil) -> POPhoneNumber? {
@@ -64,7 +69,6 @@ public struct POPhoneNumberParser {
         normalizedNumber = normalizedNumber.removingCharacters(
             in: CharacterSet(charactersIn: Constants.internationalCallPrefix)
         )
-        normalizedNumber = String(normalizedNumber.prefix(Constants.maxNumberLength))
         if isInternational {
             normalizedNumber.insert(contentsOf: Constants.internationalCallPrefix, at: normalizedNumber.startIndex)
         }
@@ -75,7 +79,6 @@ public struct POPhoneNumberParser {
 
     private enum Constants {
         static let internationalCallPrefix = "+"
-        static let maxNumberLength = 15 // E.164
     }
 
     // MARK: - Private Properties
@@ -84,11 +87,6 @@ public struct POPhoneNumberParser {
     private let metadataProvider: POPhoneNumberMetadataProvider
 
     // MARK: - Private Methods
-
-    private init() {
-        regexProvider = PORegexProvider.shared
-        metadataProvider = PODefaultPhoneNumberMetadataProvider.shared
-    }
 
     private func removeInternationalPrefixIfPresent(number: inout String) -> Bool {
         let isInternational = number.starts(with: Constants.internationalCallPrefix)

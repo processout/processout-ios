@@ -22,9 +22,9 @@ public final class POPhoneNumberFormatter: Formatter {
         case national
     }
 
-    override public init() {
+    public init(parser: POPhoneNumberParser = .shared) {
         regexProvider = .shared
-        parser = .shared
+        self.parser = parser
         super.init()
     }
 
@@ -220,7 +220,7 @@ public final class POPhoneNumberFormatter: Formatter {
 
     private func apply(assumption: OriginAssumption?, to number: inout String) {
         switch assumption {
-        case .international where !number.hasPrefix(Constants.plus):
+        case .international where !number.hasPrefix(Constants.plus) && !number.isEmpty:
             number.insert(contentsOf: Constants.plus, at: number.startIndex)
         case .national where number.hasPrefix(Constants.plus):
             number.removeFirst(1)
