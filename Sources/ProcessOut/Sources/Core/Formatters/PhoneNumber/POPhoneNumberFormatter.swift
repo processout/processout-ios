@@ -10,9 +10,21 @@ import Foundation
 @_spi(PO)
 public final class POPhoneNumberFormatter: Formatter {
 
-    public init(metadataProvider: POPhoneNumberMetadataProvider = PODefaultPhoneNumberMetadataProvider.shared) {
-        regexProvider = PORegexProvider.shared
-        self.metadataProvider = metadataProvider
+    /// Number original assumption.
+    public enum OriginAssumption {
+
+        /// Implementation assumes that input number is international even if it
+        /// doesn't have + prefix.
+        case international
+
+        /// Implementation assumes that input number is national even if it has +
+        /// prefix.
+        case national
+    }
+
+    override public init() {
+        regexProvider = .shared
+        parser = .shared
         super.init()
     }
 
@@ -21,38 +33,48 @@ public final class POPhoneNumberFormatter: Formatter {
         fatalError("init(coder:) has not been implemented")
     }
 
+    /// Default dial code.
+    public var defaultRegion: String?
+
+    /// Boolean value indicating whether when implementation should format number in international
+    /// format when possible.
+    public var preferInternationalFormat = true
+
+    /// Phone number origin context.
+    public var originAssumption: OriginAssumption? = .international // For backward compatibility
+
+    // MARK: -
+
     public func string(from partialNumber: String) -> String {
-        let normalizedNumber = normalized(number: partialNumber)
-        guard !normalizedNumber.isEmpty else {
-            return ""
+        var normalizedPartialNumber = normalized(number: partialNumber)
+        apply(assumption: originAssumption, to: &normalizedPartialNumber)
+        let phoneNumber = parser.parse(
+            number: normalizedPartialNumber, defaultRegion: defaultRegion
+        )
+        guard let phoneNumber else {
+            return parser.normalize(number: normalizedPartialNumber)
         }
-        var number = normalizedNumber.removingCharacters(in: Constants.significantCharactersWithoutPlus.inverted)
-        guard let metadata = extractMetadata(number: &number) else {
-            return formatted(countryCode: number, formattedNationalNumber: "")
+        var potentialFormats: [POPhoneNumberMetadata.Format] = []
+        // todo(andrii-vysotskyi): attempt to format as partial immediately for simplicity.
+        let formattedNationalNumber =
+            attemptToFormat(
+                nationalNumber: phoneNumber.national,
+                metadata: phoneNumber.metadata,
+                potentialFormats: &potentialFormats
+            ) ??
+            // Implementation failed to format national number. This may be caused by number being only
+            // partial or too long.
+            attemptToFormat(partialNationalNumber: phoneNumber.national, formats: potentialFormats)
+        guard preferInternationalFormat else {
+            return formattedNationalNumber ?? phoneNumber.national
         }
-        // swiftlint:disable:next line_length
-        guard number.count <= min(Constants.maxNationalNumberLength, Constants.maxNumberLength - metadata.countryCode.count),
-              !number.isEmpty else {
-            return formatted(countryCode: metadata.countryCode, formattedNationalNumber: number)
-        }
-        var potentialFormats: [POPhoneNumberFormat] = []
-        if let formatted = attemptToFormat(
-            nationalNumber: number, metadata: metadata, potentialFormats: &potentialFormats
-        ) {
-            return formatted
-        }
-        // Implementation failed to format national number. This may be caused by number being only
-        // partial so attempting to format number as partial instead.
-        if let formatted = attemptToFormat(
-            partialNationalNumber: number, formats: potentialFormats, countryCode: metadata.countryCode
-        ) {
-            return formatted
-        }
-        return formatted(countryCode: metadata.countryCode, formattedNationalNumber: number)
+        return formatToInternational(
+            nationalNumber: formattedNationalNumber ?? phoneNumber.national, countryCode: phoneNumber.countryCode
+        )
     }
 
     public func normalized(number: String) -> String {
-        number.removingCharacters(in: Constants.significantCharacters.inverted)
+        parser.normalize(number: number)
     }
 
     // MARK: - Formatter
@@ -90,10 +112,7 @@ public final class POPhoneNumberFormatter: Formatter {
 
     private enum Constants {
         static let significantCharacters = CharacterSet(charactersIn: "+").union(.decimalDigits)
-        static let significantCharactersWithoutPlus = CharacterSet.decimalDigits
-        static let maxCountryPrefixLength = 3
         static let maxNationalNumberLength = 14
-        static let maxNumberLength = 15
         static let placeholderDigit = "0"
         static let plus = "+"
         static let countryCodeSeparator = " "
@@ -102,29 +121,33 @@ public final class POPhoneNumberFormatter: Formatter {
     // MARK: - Private Properties
 
     private let regexProvider: PORegexProvider
-    private let metadataProvider: POPhoneNumberMetadataProvider
+    private let parser: POPhoneNumberParser
 
     // MARK: - Full National Number Formatting
 
     private func attemptToFormat(
-        nationalNumber: String, metadata: POPhoneNumberMetadata, potentialFormats: inout [POPhoneNumberFormat]
+        nationalNumber: String,
+        metadata: [POPhoneNumberMetadata],
+        potentialFormats: inout [POPhoneNumberMetadata.Format]
     ) -> String? {
         let range = NSRange(nationalNumber.startIndex ..< nationalNumber.endIndex, in: nationalNumber)
-        for format in metadata.formats {
+        for format in metadata.flatMap(\.formats) {
             guard shouldAttemptUsing(format: format, nationalNumber: nationalNumber, range: range),
                   let regex = regexProvider.regex(with: format.pattern) else {
                 continue
             }
             if let match = regex.firstMatch(in: nationalNumber, options: .anchored, range: range),
                match.range == range {
-                return formatted(nationalNumber: nationalNumber, countryCode: metadata.countryCode, format: format)
+                return formatted(nationalNumber: nationalNumber, format: format)
             }
             potentialFormats.append(format)
         }
         return nil
     }
 
-    private func shouldAttemptUsing(format: POPhoneNumberFormat, nationalNumber: String, range: NSRange) -> Bool {
+    private func shouldAttemptUsing(
+        format: POPhoneNumberMetadata.Format, nationalNumber: String, range: NSRange
+    ) -> Bool {
         for pattern in format.leading {
             guard let regex = regexProvider.regex(with: pattern) else {
                 continue
@@ -136,7 +159,7 @@ public final class POPhoneNumberFormatter: Formatter {
         return false
     }
 
-    private func formatted(nationalNumber: String, countryCode: String, format: POPhoneNumberFormat) -> String {
+    private func formatted(nationalNumber: String, format: POPhoneNumberMetadata.Format) -> String {
         let formattedNationalNumber: String
         if let formatRegex = regexProvider.regex(with: format.pattern) {
             let range = NSRange(nationalNumber.startIndex ..< nationalNumber.endIndex, in: nationalNumber)
@@ -146,18 +169,16 @@ public final class POPhoneNumberFormatter: Formatter {
         } else {
             formattedNationalNumber = nationalNumber
         }
-        return formatted(countryCode: countryCode, formattedNationalNumber: formattedNationalNumber)
+        return formattedNationalNumber
     }
 
     // MARK: - Partial National Number Formatting
 
-    private func attemptToFormat(
-        partialNationalNumber: String, formats: [POPhoneNumberFormat], countryCode: String
-    ) -> String? {
+    private func attemptToFormat(partialNationalNumber: String, formats: [POPhoneNumberMetadata.Format]) -> String? {
         let nationalNumber = partialNationalNumber.appending(
             String(
                 repeating: Constants.placeholderDigit,
-                count: Constants.maxNationalNumberLength - partialNationalNumber.count
+                count: max(Constants.maxNationalNumberLength - partialNationalNumber.count, 0)
             )
         )
         let range = NSRange(nationalNumber.startIndex ..< nationalNumber.endIndex, in: nationalNumber)
@@ -167,9 +188,9 @@ public final class POPhoneNumberFormatter: Formatter {
                   match.range.length >= partialNationalNumber.count else {
                 continue
             }
-            let formattedNumber = formatted(nationalNumber: nationalNumber, countryCode: countryCode, format: format)
+            let formattedNumber = formatted(nationalNumber: nationalNumber, format: format)
             return removingPlaceholderSuffix(
-                number: formattedNumber, expectedSignificantLength: partialNationalNumber.count + countryCode.count
+                number: formattedNumber, expectedSignificantLength: partialNationalNumber.count
             )
         }
         return nil
@@ -188,24 +209,23 @@ public final class POPhoneNumberFormatter: Formatter {
 
     // MARK: - Utils
 
-    private func extractMetadata(number: inout String) -> POPhoneNumberMetadata? {
-        let length = min(Constants.maxCountryPrefixLength, number.count)
-        for i in stride(from: 1, through: length, by: 1) { // swiftlint:disable:this identifier_name
-            let potentialCountryCode = String(number.prefix(i))
-            if let metadata = metadataProvider.metadata(for: potentialCountryCode) {
-                number.removeFirst(i)
-                return metadata
-            }
+    private func formatToInternational(nationalNumber: String, countryCode: String) -> String {
+        var formattedNumber = "\(Constants.plus)\(countryCode)"
+        if !nationalNumber.isEmpty {
+            formattedNumber.append(Constants.countryCodeSeparator)
+            formattedNumber.append(nationalNumber)
         }
-        return nil
+        return formattedNumber
     }
 
-    private func formatted(countryCode: String, formattedNationalNumber number: String) -> String {
-        var formattedNumber: String = "\(Constants.plus)\(countryCode)"
-        if !number.isEmpty {
-            formattedNumber += "\(Constants.countryCodeSeparator)\(number)"
+    private func apply(assumption: OriginAssumption?, to number: inout String) {
+        switch assumption {
+        case .international where !number.hasPrefix(Constants.plus):
+            number.insert(contentsOf: Constants.plus, at: number.startIndex)
+        case .national where number.hasPrefix(Constants.plus):
+            number.removeFirst(1)
+        default:
+            break
         }
-        // Formatted phone numbers are always converted to latin script for simplicity.
-        return formattedNumber.applyingTransform(.toLatin, reverse: false) ?? formattedNumber
     }
 }
