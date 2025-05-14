@@ -292,20 +292,6 @@ extension POInvoicesService {
         }
     }
 
-    /// Performs invoice authorization using given alternative payment method details.
-    @available(*, deprecated, message: "Use the async method instead.")
-    @_spi(PO)
-    @preconcurrency
-    @discardableResult
-    public func authorizeInvoice(
-        request: PONativeAlternativePaymentAuthorizationRequest,
-        completion: sending @escaping @isolated(any) (Result<PONativeAlternativePaymentAuthorizationResponse, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await authorizeInvoice(request: request)
-        }
-    }
-
     /// Creates invoice with given parameters.
     @available(*, deprecated, message: "Use the async method instead.")
     @_spi(PO)

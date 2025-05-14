@@ -20,7 +20,7 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 
     /// Performs invoice authorization using given alternative payment method details.
     @_spi(PO)
-    func authorizeInvoice(
+    func authorizeInvoice( // sourcery:completion: skip
         request: PONativeAlternativePaymentAuthorizationRequest
     ) async throws -> PONativeAlternativePaymentAuthorizationResponse
 
