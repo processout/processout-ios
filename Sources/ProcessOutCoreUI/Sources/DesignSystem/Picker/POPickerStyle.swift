@@ -36,8 +36,21 @@ public struct POPickerStyleConfiguration {
     /// Content.
     public let content: AnyView
 
-    init(selection: Binding<AnyHashable?>, @ViewBuilder content: () -> some View) {
+    /// Prompt.
+    public let prompt: AnyView
+
+    /// Label describing current value.
+    public let currentValueLabel: AnyView
+
+    init(
+        selection: Binding<AnyHashable?>,
+        @ViewBuilder content: () -> some View,
+        @ViewBuilder prompt: () -> some View,
+        @ViewBuilder currentValueLabel: () -> some View
+    ) {
         self._selection = selection
         self.content = AnyView(content())
+        self.prompt = AnyView(prompt())
+        self.currentValueLabel = AnyView(currentValueLabel())
     }
 }
