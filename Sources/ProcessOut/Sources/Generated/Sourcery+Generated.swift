@@ -265,6 +265,61 @@ extension POGatewayConfigurationsRepository {
 
 extension POInvoicesService {
 
+    /// Invoice details.
+    @available(*, deprecated, message: "Use the async method instead.")
+    @preconcurrency
+    @discardableResult
+    public func invoice(
+        request: POInvoiceRequest,
+        completion: sending @escaping @isolated(any) (Result<POInvoice, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await invoice(request: request)
+        }
+    }
+
+    /// Performs invoice authorization with given request.
+    @available(*, deprecated, message: "Use the async method instead.")
+    @preconcurrency
+    @discardableResult
+    public func authorizeInvoice(
+        request: POInvoiceAuthorizationRequest,
+        threeDSService: PO3DS2Service,
+        completion: sending @escaping @isolated(any) (Result<Void, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await authorizeInvoice(request: request, threeDSService: threeDSService)
+        }
+    }
+
+    /// Performs invoice authorization using given alternative payment method details.
+    @available(*, deprecated, message: "Use the async method instead.")
+    @_spi(PO)
+    @preconcurrency
+    @discardableResult
+    public func authorizeInvoice(
+        request: PONativeAlternativePaymentAuthorizationRequest,
+        completion: sending @escaping @isolated(any) (Result<PONativeAlternativePaymentAuthorizationResponse, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await authorizeInvoice(request: request)
+        }
+    }
+
+    /// Creates invoice with given parameters.
+    @available(*, deprecated, message: "Use the async method instead.")
+    @_spi(PO)
+    @preconcurrency
+    @discardableResult
+    public func createInvoice(
+        request: POInvoiceCreationRequest,
+        completion: sending @escaping @isolated(any) (Result<POInvoice, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await createInvoice(request: request)
+        }
+    }
+
     /// Requests information needed to continue existing payment or start new one.
     @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
@@ -294,33 +349,6 @@ extension POInvoicesService {
         }
     }
 
-    /// Invoice details.
-    @available(*, deprecated, message: "Use the async method instead.")
-    @preconcurrency
-    @discardableResult
-    public func invoice(
-        request: POInvoiceRequest,
-        completion: sending @escaping @isolated(any) (Result<POInvoice, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await invoice(request: request)
-        }
-    }
-
-    /// Performs invoice authorization with given request.
-    @available(*, deprecated, message: "Use the async method instead.")
-    @preconcurrency
-    @discardableResult
-    public func authorizeInvoice(
-        request: POInvoiceAuthorizationRequest,
-        threeDSService: PO3DS2Service,
-        completion: sending @escaping @isolated(any) (Result<Void, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await authorizeInvoice(request: request, threeDSService: threeDSService)
-        }
-    }
-
     /// Captures native alternative payament.
     @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
@@ -331,20 +359,6 @@ extension POInvoicesService {
     ) -> POCancellable {
         invoke(completion: completion) {
             try await captureNativeAlternativePayment(request: request)
-        }
-    }
-
-    /// Creates invoice with given parameters.
-    @available(*, deprecated, message: "Use the async method instead.")
-    @_spi(PO)
-    @preconcurrency
-    @discardableResult
-    public func createInvoice(
-        request: POInvoiceCreationRequest,
-        completion: sending @escaping @isolated(any) (Result<POInvoice, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await createInvoice(request: request)
         }
     }
 }
