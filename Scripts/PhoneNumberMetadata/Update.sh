@@ -24,13 +24,16 @@ test $# -eq 1 || fail "Expected tag or branch reference."
 # Go to temporary directory
 cd $WORK_DIR
 
-# Clone Google's libphonenumber
-git clone --depth 1 --branch $1 https://github.com/google/libphonenumber libphonenumber
+# Clone PhoneNumberKit (port of Google's libphonenumber)
+git clone --depth 1 --branch $1 https://github.com/marmelroy/PhoneNumberKit PhoneNumberKit
+
+# Go to resources
+cd PhoneNumberKit/PhoneNumberKit/Resources/
 
 mkdir -p $OUTPUT_DIR
 
-# Convert XML metadata to JSON
-"$SCRIPT_DIR/ConvertToJson.swift" "libphonenumber/resources/PhoneNumberMetadata.xml" "$OUTPUT_DIR/PhoneNumberMetadata.json"
+# Postprocess metadata
+"$SCRIPT_DIR/Postprocess.swift" "PhoneNumberMetadata.json" "$OUTPUT_DIR/PhoneNumberMetadata.json"
 
-# Write metadata
-echo $1 > "$OUTPUT_DIR/PhoneNumberMetadata.version"
+# # Write metadata
+cp .metadata-version "$OUTPUT_DIR/PhoneNumberMetadata.version"
