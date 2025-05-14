@@ -17,18 +17,6 @@ final class DefaultInvoicesService: POInvoicesService {
 
     // MARK: - POInvoicesService
 
-    func nativeAlternativePaymentMethodTransactionDetails(
-        request: PONativeAlternativePaymentMethodTransactionDetailsRequest
-    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
-        try await repository.nativeAlternativePaymentMethodTransactionDetails(request: request)
-    }
-
-    func initiatePayment(
-        request: PONativeAlternativePaymentMethodRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse {
-        try await repository.initiatePayment(request: request)
-    }
-
     func invoice(request: POInvoiceRequest) async throws -> POInvoice {
         try await repository.invoice(request: request)
     }
@@ -41,6 +29,28 @@ final class DefaultInvoicesService: POInvoicesService {
             throw error
         }
         await threeDSService.clean()
+    }
+
+    func authorizeInvoice(
+        request: PONativeAlternativePaymentAuthorizationRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
+        try await repository.authorizeInvoice(request: request)
+    }
+
+    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
+        try await repository.createInvoice(request: request)
+    }
+
+    func nativeAlternativePaymentMethodTransactionDetails(
+        request: PONativeAlternativePaymentMethodTransactionDetailsRequest
+    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
+        try await repository.nativeAlternativePaymentMethodTransactionDetails(request: request)
+    }
+
+    func initiatePayment(
+        request: PONativeAlternativePaymentMethodRequest
+    ) async throws -> PONativeAlternativePaymentMethodResponse {
+        try await repository.initiatePayment(request: request)
     }
 
     func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws {
@@ -71,10 +81,6 @@ final class DefaultInvoicesService: POInvoicesService {
             ),
             retryStrategy: .init(function: .exponential(interval: 0.15, rate: 1.45), minimum: 3, maximum: 90)
         )
-    }
-
-    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
-        try await repository.createInvoice(request: request)
     }
 
     // MARK: - Private Nested Types
