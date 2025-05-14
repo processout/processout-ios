@@ -16,7 +16,7 @@ public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerSt
     }
 
     public func makeBody(configuration: POPickerStyleConfiguration) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: POSpacing.extraExtraSmall) {
             Group(poSubviews: configuration.content) { children in
                 ForEach(children) { child in
                     Button {
@@ -24,8 +24,7 @@ public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerSt
                     } label: {
                         child
                     }
-                    .padding(.vertical, POSpacing.extraSmall)
-                    .frame(minHeight: Constants.minHeight)
+                    .padding(.vertical, Constants.verticalPadding)
                     .contentShape(.rect)
                     .controlSelected(child.id == configuration.selection)
                 }
@@ -49,5 +48,5 @@ extension POPickerStyle where Self == PORadioGroupPickerStyle<PORadioButtonStyle
 }
 
 private enum Constants {
-    static let minHeight: CGFloat = 44
+    static let verticalPadding: CGFloat = 11
 }

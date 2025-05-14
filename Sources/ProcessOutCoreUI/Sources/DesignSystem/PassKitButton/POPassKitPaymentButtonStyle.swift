@@ -22,7 +22,7 @@ public struct POPassKitPaymentButtonStyle {
     /// Creates style instance.
     public init(native: PKPaymentButtonStyle = .automatic) {
         self.style = native
-        self.cornerRadius = POSpacing.extraSmall
+        self.cornerRadius = POBorderStyle.button().radius
     }
 
     /// Creates style instance.

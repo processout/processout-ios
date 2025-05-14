@@ -56,7 +56,8 @@ public struct POCardUpdateStyle {
         separatorColor: Color
     ) {
         self.title = title
-        self.sectionTitle = sectionTitle ?? POTextStyle(color: Color(poResource: .Text.primary), typography: .label1)
+        self.sectionTitle = sectionTitle
+            ?? POTextStyle(color: .Input.Label.default, typography: .Text.s14(weight: .medium))
         self.input = input
         self.radioButton = radioButton ?? .radio
         self.errorDescription = errorDescription
@@ -73,13 +74,13 @@ extension POCardUpdateStyle {
     /// Default card update style.
     public static var `default`: POCardUpdateStyle {
         POCardUpdateStyle(
-            title: POTextStyle(color: Color(poResource: .Text.primary), typography: .title),
+            title: POTextStyle(color: Color.Text.primary, typography: .Text.s20(weight: .medium)),
             input: .medium,
-            errorDescription: POTextStyle(color: Color(poResource: .Text.error), typography: .label2),
-            backgroundColor: Color(poResource: .Surface.default),
+            errorDescription: POTextStyle(color: Color.Input.Label.error, typography: .Text.s12(weight: .regular)),
+            backgroundColor: Color.Surface.primary,
             actionsContainer: .default,
             progress: .circular,
-            separatorColor: Color(poResource: .Border.subtle)
+            separatorColor: Color.Border.primary
         )
     }
 }
