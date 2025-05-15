@@ -9,6 +9,10 @@ on:
         description: 'TestFlight Internal'
         default: true
         type: boolean
+
+permissions:
+  contents: read
+
 jobs:
   export:
     runs-on: macos-15
