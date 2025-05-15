@@ -22,11 +22,19 @@ public struct PONativeAlternativePaymentAuthorizationResponse: Sendable, Decodab
 
         /// Payment is captured.
         case captured = "CAPTURED"
+
+        /// Payment has failed.
+        case failed = "FAILED"
     }
 
     public enum NextStep: Sendable, Decodable {
 
         public struct SubmitData: Sendable, Decodable {
+
+            public struct ParameterDefinitions: Sendable, Decodable {
+
+                public let parameterDefinitions: [Parameter]
+            }
 
             public enum Parameter: Sendable, Decodable {
 
@@ -130,7 +138,7 @@ public struct PONativeAlternativePaymentAuthorizationResponse: Sendable, Decodab
                     public let required: Bool
 
                     /// Supported dialing codes.
-                    public let dialingCodes: [DialingCode]
+                    public let dialingCodes: [DialingCode]?
                 }
 
                 public struct Email: Sendable, Decodable {
@@ -255,7 +263,7 @@ public struct PONativeAlternativePaymentAuthorizationResponse: Sendable, Decodab
                 }
             }
 
-            public let parameters: [Parameter]
+            public let parameters: ParameterDefinitions
         }
 
         public struct Redirect: Sendable, Decodable {
@@ -401,9 +409,6 @@ public struct PONativeAlternativePaymentAuthorizationResponse: Sendable, Decodab
         }
     }
 
-    /// Gateway configuration ID.
-    public let gatewayConfigurationId: String
-
     /// Payment state.
     public let state: State
 
@@ -411,7 +416,7 @@ public struct PONativeAlternativePaymentAuthorizationResponse: Sendable, Decodab
     public let nextStep: NextStep?
 
     /// Instructions providing additional information to customer and/or describing additional actions.
-    public let customerInstructions: [CustomerInstruction]
+    public let customerInstructions: [CustomerInstruction]?
 }
 
 // swiftlint:enable nesting
