@@ -27,6 +27,15 @@ final class HttpInvoicesRepository: InvoicesRepository {
         return try await connector.execute(request: httpRequest).nativeApm
     }
 
+    func authorizeInvoice(
+        request: PONativeAlternativePaymentAuthorizationRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
+        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentAuthorizationResponse>.post(
+            path: "/invoices/\(request.invoiceId)/apm-payment", body: request
+        )
+        return try await connector.execute(request: httpRequest)
+    }
+
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
     ) async throws -> PONativeAlternativePaymentMethodResponse {
