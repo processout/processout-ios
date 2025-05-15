@@ -12,9 +12,16 @@ import SwiftUI
 @MainActor
 public struct POPicker<SelectionValue: Hashable, Content: View>: View {
 
-    public init(selection: Binding<SelectionValue?>, @ViewBuilder content: () -> Content) {
+    public init(
+        selection: Binding<SelectionValue?>,
+        @ViewBuilder content: () -> Content,
+        @ViewBuilder prompt: () -> some View = { EmptyView() },
+        @ViewBuilder currentValueLabel: () -> some View = { EmptyView() }
+    ) {
         self._selection = selection
         self.content = content()
+        self.prompt = AnyView(prompt())
+        self.currentValueLabel = AnyView(currentValueLabel())
     }
 
     public var body: some View {
@@ -25,13 +32,17 @@ public struct POPicker<SelectionValue: Hashable, Content: View>: View {
         }
         let configuration = POPickerStyleConfiguration(selection: selection) {
             content
+        } prompt: {
+            prompt
+        } currentValueLabel: {
+            currentValueLabel
         }
         AnyView(style.makeBody(configuration: configuration))
     }
 
     // MARK: - Private Properties
 
-    private let content: Content
+    private let content: Content, prompt: AnyView, currentValueLabel: AnyView
 
     @Binding
     private var selection: SelectionValue?
