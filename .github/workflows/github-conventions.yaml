@@ -5,6 +5,10 @@ on:
       - opened
       - edited
       - synchronize
+
+permissions:
+  pull-requests: read
+
 jobs:
   verify-pr-title:
     name: Verify Pull Request Title
