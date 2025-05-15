@@ -21,6 +21,12 @@ final class DefaultInvoicesService: POInvoicesService {
         try await repository.invoice(request: request)
     }
 
+    func nativeAlternativePayment( // sourcery:completion: skip
+        request: PONativeAlternativePaymentRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
+        try await repository.nativeAlternativePayment(request: request)
+    }
+
     func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
         do {
             try await _authorizeInvoice(request: request, threeDSService: threeDSService)
