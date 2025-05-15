@@ -6,6 +6,10 @@ on:
           description: 'Owner email'
           required: true
           type: string
+
+permissions:
+  contents: read
+
 jobs:
   add-owner:
     runs-on: macos-15
