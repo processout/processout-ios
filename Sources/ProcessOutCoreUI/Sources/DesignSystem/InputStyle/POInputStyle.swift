@@ -21,52 +21,19 @@ public struct POInputStyle {
     /// Style for focused state.
     public let focused: POInputStateStyle
 
+    /// Style for focused state while in error.
+    public let errorFocused: POInputStateStyle
+
     /// Creates style instance.
-    public init(normal: POInputStateStyle, error: POInputStateStyle, focused: POInputStateStyle? = nil) {
+    public init(
+        normal: POInputStateStyle,
+        error: POInputStateStyle,
+        focused: POInputStateStyle? = nil,
+        errorFocused: POInputStateStyle? = nil
+    ) {
         self.normal = normal
         self.error = error
         self.focused = focused ?? normal
-    }
-}
-
-extension POInputStyle {
-
-    /// Medium size input style.
-    public static let medium = `default`(typography: .body2)
-
-    /// Large input style.
-    public static let large = `default`(typography: .title)
-
-    // MARK: - Utils
-
-    /// Resolves state style with given context.
-    func resolve(isInvalid: Bool, isFocused: Bool) -> POInputStateStyle {
-        if isInvalid {
-            return error
-        } else if isFocused {
-            return focused
-        }
-        return normal
-    }
-
-    // MARK: - Private Methods
-
-    private static func `default`(typography: POTypography) -> POInputStyle {
-        let stateStyle = { (borderColorResource: POColorResource) in
-            POInputStateStyle(
-                text: .init(color: Color(poResource: .Text.primary), typography: typography),
-                placeholder: .init(color: Color(poResource: .Text.muted), typography: typography),
-                backgroundColor: Color(poResource: .Surface.default),
-                border: .regular(color: Color(poResource: borderColorResource)),
-                shadow: .clear,
-                tintColor: Color(poResource: .Text.primary)
-            )
-        }
-        let style = POInputStyle(
-            normal: stateStyle(.Input.Border.default),
-            error: stateStyle(.Input.Border.error),
-            focused: stateStyle(.Input.Border.focused)
-        )
-        return style
+        self.errorFocused = errorFocused ?? self.focused
     }
 }

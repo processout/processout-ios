@@ -16,55 +16,69 @@ extension ButtonStyle where Self == PORadioButtonStyle {
         PORadioButtonStyle(
             normal: .init(
                 knob: .init(
-                    backgroundColor: .clear,
-                    border: .regular(color: Color(poResource: .Input.Border.default)),
-                    innerCircleColor: Color(poResource: .Input.Border.default).opacity(0),
-                    innerCircleRadius: 0
+                    backgroundColor: .Radio.Knob.Background.default,
+                    border: .radioButton(color: .Radio.Knob.Border.default),
+                    innerCircleColor: .Radio.Knob.Value.default,
+                    innerCircleRadius: 4
                 ),
-                value: valueStyle
+                value: .init(
+                    color: .Radio.Text.default,
+                    typography: .Text.s14(weight: .medium)
+                ),
+                backgroundColor: .Radio.Background.default
             ),
             selected: .init(
                 knob: .init(
-                    backgroundColor: .clear,
-                    border: .regular(color: Color(poResource: .Button.Primary.Background.default)),
-                    innerCircleColor: Color(poResource: .Button.Primary.Background.default),
-                    innerCircleRadius: 5
+                    backgroundColor: .Radio.Knob.Background.selected,
+                    border: .radioButton(color: .Radio.Knob.Border.selected),
+                    innerCircleColor: .Radio.Knob.Value.selected,
+                    innerCircleRadius: 4
                 ),
-                value: valueStyle
+                value: .init(
+                    color: .Radio.Text.selected,
+                    typography: .Text.s14(weight: .medium)
+                ),
+                backgroundColor: .Radio.Background.selected
             ),
             highlighted: .init(
                 knob: .init(
-                    backgroundColor: .clear,
-                    border: .regular(color: Color(poResource: .Input.Border.hover)),
-                    innerCircleColor: Color(poResource: .Input.Border.hover).opacity(0),
-                    innerCircleRadius: 0
+                    backgroundColor: .Radio.Knob.Background.pressed,
+                    border: .radioButton(color: .Radio.Knob.Border.pressed),
+                    innerCircleColor: .Radio.Knob.Value.pressed,
+                    innerCircleRadius: 4
                 ),
-                value: valueStyle
+                value: .init(
+                    color: .Radio.Text.pressed,
+                    typography: .Text.s14(weight: .medium)
+                ),
+                backgroundColor: .Radio.Background.pressed
             ),
             error: .init(
                 knob: .init(
-                    backgroundColor: .clear,
-                    border: .regular(color: Color(poResource: .Text.error)),
-                    innerCircleColor: Color(poResource: .Text.error).opacity(0),
-                    innerCircleRadius: 0
+                    backgroundColor: .Radio.Knob.Background.error,
+                    border: .radioButton(color: .Radio.Knob.Border.error),
+                    innerCircleColor: .Radio.Knob.Value.error,
+                    innerCircleRadius: 4
                 ),
-                value: valueStyle
+                value: .init(
+                    color: .Radio.Text.error,
+                    typography: .Text.s14(weight: .medium)
+                ),
+                backgroundColor: .Radio.Background.error
             ),
             disabled: .init(
                 knob: .init(
-                    backgroundColor: .clear,
-                    border: .regular(color: Color(poResource: .Input.Border.disabled)),
-                    innerCircleColor: Color(poResource: .Input.Border.disabled).opacity(0),
-                    innerCircleRadius: 0
+                    backgroundColor: .Radio.Knob.Background.disabled,
+                    border: .radioButton(color: .Radio.Knob.Border.disabled),
+                    innerCircleColor: .Radio.Knob.Value.disabled,
+                    innerCircleRadius: 3
                 ),
-                value: valueStyle
+                value: .init(
+                    color: .Radio.Text.disabled,
+                    typography: .Text.s14(weight: .medium)
+                ),
+                backgroundColor: .Radio.Background.disabled
             )
         )
-    }
-
-    // MARK: - Private Properties
-
-    private static var valueStyle: POTextStyle {
-        POTextStyle(color: Color(poResource: .Text.primary), typography: .button)
     }
 }

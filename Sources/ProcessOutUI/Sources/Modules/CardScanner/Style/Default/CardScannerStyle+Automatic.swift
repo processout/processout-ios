@@ -14,22 +14,32 @@ extension POCardScannerStyle where Self == PODefaultCardScannerStyle {
     /// The default card scanner style.
     public static var automatic: PODefaultCardScannerStyle {
         PODefaultCardScannerStyle(
-            title: POTextStyle(color: Color(poResource: .Text.primary), typography: .body1),
-            description: POTextStyle(color: Color(poResource: .Text.muted), typography: .body2),
+            title: POTextStyle(
+                color: Color.Text.primary, typography: .Text.s16(weight: .medium)
+            ),
+            description: POTextStyle(
+                color: Color.Text.secondary, typography: .Text.s14()
+            ),
             torchToggle: POButtonToggleStyle(buttonStyle: .ghost),
             videoPreview: .init(
                 backgroundColor: .black,
-                border: .init(radius: POSpacing.small, width: 0, color: .clear),
+                border: .init(radius: 8, width: 0, color: .clear),
                 overlayColor: .black.opacity(0.4)
             ),
             card: .init(
-                number: .init(color: Color(poResource: .Text.primary), typography: .extraLargeTitle),
-                cardholderName: .init(color: Color(poResource: .Text.primary), typography: .body3),
-                expiration: .init(color: Color(poResource: .Text.primary), typography: .body3),
-                border: .init(radius: POSpacing.small, width: 1, color: Color(poResource: .Text.inverse))
+                number: .init(
+                    color: Color.Text.primary, typography: .Text.s24()
+                ),
+                cardholderName: .init(
+                    color: Color.Text.primary, typography: .Text.s16()
+                ),
+                expiration: .init(
+                    color: Color.Text.primary, typography: .Text.s16()
+                ),
+                border: .init(radius: 8, width: 1, color: Color.Text.inverse)
             ),
             cancelButton: .secondary,
-            backgroundColor: Color(poResource: .Surface.default)
+            backgroundColor: Color.Surface.primary
         )
     }
 }
