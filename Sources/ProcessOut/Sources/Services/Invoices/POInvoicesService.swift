@@ -56,6 +56,13 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 extension POInvoicesService {
 
     @_spi(PO)
+    public func nativeAlternativePayment(
+        request: PONativeAlternativePaymentRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
+        throw POFailure(code: .Mobile.generic)
+    }
+
+    @_spi(PO)
     public func authorizeInvoice(
         request: PONativeAlternativePaymentAuthorizationRequest
     ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
