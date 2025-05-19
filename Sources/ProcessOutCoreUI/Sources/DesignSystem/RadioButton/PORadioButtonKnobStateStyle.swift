@@ -14,7 +14,7 @@ public struct PORadioButtonKnobStateStyle: Sendable {
     public let backgroundColor: Color
 
     /// Border style.
-    /// - NOTE: component  ignores specified border radius so your implementation may pass 0.
+    /// - NOTE: component ignores specified border radius so your implementation may pass 0.
     public let border: POBorderStyle
 
     /// Color of inner circle displayed in the middle of radio button.

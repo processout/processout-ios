@@ -20,7 +20,7 @@ struct DefaultPhoneNumberMetadataProviderTests {
         let metadata = sut.metadata(for: "1")
 
         // Then
-        #expect(metadata != nil)
+        #expect(!metadata.isEmpty)
     }
 
     @Test
@@ -29,7 +29,7 @@ struct DefaultPhoneNumberMetadataProviderTests {
         let metadata = sut.metadata(for: "١")
 
         // Then
-        #expect(metadata?.countryCode == "1")
+        #expect(!metadata.isEmpty && metadata.first?.countryCode == "1")
     }
 
     // MARK: - Private Properties
