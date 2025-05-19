@@ -15,6 +15,12 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
     /// Invoice details.
     func invoice(request: POInvoiceRequest) async throws -> POInvoice
 
+    /// Returns native alternative payment details.
+    @_spi(PO)
+    func nativeAlternativePayment( // sourcery:completion: skip
+        request: PONativeAlternativePaymentRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse
+
     /// Performs invoice authorization with given request.
     func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws
 
@@ -48,6 +54,13 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 }
 
 extension POInvoicesService {
+
+    @_spi(PO)
+    public func nativeAlternativePayment(
+        request: PONativeAlternativePaymentRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
+        throw POFailure(code: .Mobile.generic)
+    }
 
     @_spi(PO)
     public func authorizeInvoice(

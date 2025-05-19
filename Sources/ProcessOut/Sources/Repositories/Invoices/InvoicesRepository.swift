@@ -10,6 +10,11 @@ protocol InvoicesRepository: PORepository {
     /// Invoice details.
     func invoice(request: POInvoiceRequest) async throws -> POInvoice
 
+    /// Returns alternative payment details.
+    func nativeAlternativePayment(
+        request: PONativeAlternativePaymentRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse
+
     /// Continue alternative payment.
     func authorizeInvoice(
         request: PONativeAlternativePaymentAuthorizationRequest
