@@ -21,7 +21,7 @@ final class DefaultInvoicesService: POInvoicesService {
         try await repository.invoice(request: request)
     }
 
-    func nativeAlternativePayment( // sourcery:completion: skip
+    func nativeAlternativePayment(
         request: PONativeAlternativePaymentRequest
     ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
         try await repository.nativeAlternativePayment(request: request)
