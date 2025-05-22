@@ -47,8 +47,12 @@ extension POContentUnavailableViewStyle where Self == PODefaultContentUnavailabl
     /// The default content unavailable view style.
     public static var automatic: PODefaultContentUnavailableViewStyle {
         PODefaultContentUnavailableViewStyle(
-            title: .init(color: Color(poResource: .Text.primary), typography: .body1),
-            description: .init(color: Color(poResource: .Text.muted), typography: .body2)
+            title: .init(
+                color: Color.Text.primary, typography: .Text.s16(weight: .medium)
+            ),
+            description: .init(
+                color: Color.Text.secondary, typography: .Text.s14(weight: .regular)
+            )
         )
     }
 }

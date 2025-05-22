@@ -4,7 +4,7 @@
 
 extension {{ type.name }} {
     {% for method in type.methods %}
-        {% if not method.isAsync and not method.throws %}
+        {% if not method.isAsync and not method.throws or method.annotations.completion.skip %}
             {% continue %}
         {% endif %}
 

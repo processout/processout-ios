@@ -18,6 +18,9 @@ struct CardPaymentViewModelState {
 
         /// Checkout service.
         case checkout
+
+        /// Netcetera 3DS SDK.
+        case netcetera
     }
 
     struct CardTokenization: Identifiable {

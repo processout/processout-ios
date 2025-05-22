@@ -17,20 +17,14 @@ final class DefaultInvoicesService: POInvoicesService {
 
     // MARK: - POInvoicesService
 
-    func nativeAlternativePaymentMethodTransactionDetails(
-        request: PONativeAlternativePaymentMethodTransactionDetailsRequest
-    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
-        try await repository.nativeAlternativePaymentMethodTransactionDetails(request: request)
-    }
-
-    func initiatePayment(
-        request: PONativeAlternativePaymentMethodRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse {
-        try await repository.initiatePayment(request: request)
-    }
-
     func invoice(request: POInvoiceRequest) async throws -> POInvoice {
         try await repository.invoice(request: request)
+    }
+
+    func nativeAlternativePayment(
+        request: PONativeAlternativePaymentRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
+        try await repository.nativeAlternativePayment(request: request)
     }
 
     func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
@@ -41,6 +35,28 @@ final class DefaultInvoicesService: POInvoicesService {
             throw error
         }
         await threeDSService.clean()
+    }
+
+    func authorizeInvoice(
+        request: PONativeAlternativePaymentAuthorizationRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
+        try await repository.authorizeInvoice(request: request)
+    }
+
+    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
+        try await repository.createInvoice(request: request)
+    }
+
+    func nativeAlternativePaymentMethodTransactionDetails(
+        request: PONativeAlternativePaymentMethodTransactionDetailsRequest
+    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
+        try await repository.nativeAlternativePaymentMethodTransactionDetails(request: request)
+    }
+
+    func initiatePayment(
+        request: PONativeAlternativePaymentMethodRequest
+    ) async throws -> PONativeAlternativePaymentMethodResponse {
+        try await repository.initiatePayment(request: request)
     }
 
     func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws {
@@ -73,10 +89,6 @@ final class DefaultInvoicesService: POInvoicesService {
         )
     }
 
-    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
-        try await repository.createInvoice(request: request)
-    }
-
     // MARK: - Private Nested Types
 
     private enum Constants {
@@ -92,6 +104,9 @@ final class DefaultInvoicesService: POInvoicesService {
     // MARK: - Private Methods
 
     private func _authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
+        let request = request.replacing(
+            thirdPartySdkVersion: request.thirdPartySdkVersion ?? threeDSService.version
+        )
         guard let customerAction = try await repository.authorizeInvoice(request: request) else {
             return
         }
@@ -116,14 +131,14 @@ final class DefaultInvoicesService: POInvoicesService {
 
 private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_extension_access_modifier
 
-    func replacing(source newSource: String) -> Self {
+    func replacing(source newSource: String? = nil, thirdPartySdkVersion newSdkVersion: String? = nil) -> Self {
         let updatedRequest = POInvoiceAuthorizationRequest(
             invoiceId: invoiceId,
-            source: newSource,
+            source: newSource ?? source,
             saveSource: saveSource,
             incremental: incremental,
             preferredScheme: $preferredScheme.typed,
-            thirdPartySdkVersion: thirdPartySdkVersion,
+            thirdPartySdkVersion: newSdkVersion ?? thirdPartySdkVersion,
             overrideMacBlocking: overrideMacBlocking,
             initialSchemeTransactionId: initialSchemeTransactionId,
             autoCaptureAt: autoCaptureAt,

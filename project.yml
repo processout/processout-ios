@@ -14,6 +14,9 @@ packages:
   Checkout3DSPackages:
     url: https://github.com/checkout/checkout-3ds-sdk-ios
     version: 3.2.5
+  ThreeDS_SDK:
+    url: https://github.com/ios-3ds-sdk/SPM.git
+    version: 2.5.22
 targets:
   ProcessOutCoreUI:
     type: framework
@@ -102,6 +105,22 @@ targets:
       - package: Checkout3DSPackages
       - target: ProcessOut
     sources: Sources/ProcessOutCheckout3DS
+  ProcessOutNetcetera3DS:
+    type: framework
+    platform: iOS
+    deploymentTarget: "13.0"
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.processout.netcetera-3ds-ios
+      TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutNetcetera3DS
+    preBuildScripts:
+      - path: Scripts/Lint.sh
+        name: Swiftlint
+        basedOnDependencyAnalysis: false
+    dependencies:
+      - package: ThreeDS_SDK
+      - target: ProcessOut
+      - framework: Vendor/NetceteraShim.xcframework
+    sources: Sources/ProcessOutNetcetera3DS
   ProcessOutCheckout3DSTests:
     type: bundle.unit-test
     platform: iOS
@@ -111,6 +130,15 @@ targets:
     dependencies:
       - target: ProcessOutCheckout3DS
     sources: Tests/ProcessOutCheckout3DSTests
+  ProcessOutNetcetera3DSTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "16.0"
+    settings:
+      TARGET_ROOT: $(PROJECT_DIR)/Tests/ProcessOutNetcetera3DSTests
+    dependencies:
+      - target: ProcessOutNetcetera3DS
+    sources: Tests/ProcessOutNetcetera3DSTests
 schemes:
   ProcessOut:
     build:
@@ -127,6 +155,13 @@ schemes:
     test:
       gatherCoverageData: true
       targets: [ProcessOutCheckout3DSTests]
+  ProcessOutNetcetera3DS:
+    build:
+      targets:
+        ProcessOutNetcetera3DS: all
+    test:
+      gatherCoverageData: true
+      targets: [ProcessOutNetcetera3DSTests]
   ProcessOutCoreUI:
     build:
       targets:

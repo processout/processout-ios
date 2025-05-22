@@ -11,6 +11,10 @@ on:
           - minor
           - patch
           - major
+
+permissions:
+  contents: read
+
 jobs:
   update-version:
     runs-on: macos-15

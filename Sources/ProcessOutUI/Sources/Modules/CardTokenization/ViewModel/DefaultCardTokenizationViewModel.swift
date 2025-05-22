@@ -78,8 +78,11 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         case .tokenizing(let currentState):
             let newState = convertToState(startedState: currentState.snapshot, isSubmitting: true)
             self.state = newState
-        default:
-            break
+        case .evaluatingEligibility(let currentState):
+            let newState = convertToState(startedState: currentState.snapshot, isSubmitting: true)
+            self.state = newState
+        case .tokenized, .failure:
+            break // Ignored
         }
     }
 
@@ -89,7 +92,13 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         startedState: InteractorState.Started, isSubmitting: Bool
     ) -> CardTokenizationViewModelState {
         var cardInformationItems = cardInformationInputItems(startedState: startedState)
-        if let error = startedState.recentErrorMessage {
+        if case .notEligible(let failure) = startedState.cardInformation.eligibility {
+            let errorItem = State.ErrorItem(
+                id: ItemId.error,
+                description: failure?.errorDescription ?? String(resource: .CardTokenization.Error.eligibility)
+            )
+            cardInformationItems.append(.error(errorItem))
+        } else if let error = startedState.recentErrorMessage {
             let errorItem = State.ErrorItem(id: ItemId.error, description: error)
             cardInformationItems.append(.error(errorItem))
         }
@@ -165,10 +174,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     }
 
     private func cardNumberIcon(startedState: InteractorState.Started) -> AnyView? {
-        // Scheme icon takes precedence over inject icon.
-        let scheme = startedState.issuerInformation?.coScheme != nil
-            ? startedState.preferredScheme
-            : startedState.issuerInformation?.$scheme.typed
+        let scheme = startedState.cardInformation.preferredScheme
+            ?? startedState.cardInformation.issuerInformation?.currentValue?.$scheme.typed
+            ?? startedState.cardInformation.preliminaryScheme
         if let image = scheme.flatMap(CardSchemeImageProvider.shared.image) {
             return AnyView(image)
         }
@@ -211,8 +219,8 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         startedState: InteractorState.Started
     ) -> CardTokenizationViewModelState.Section? {
         guard let schemeConfiguration = configuration.preferredScheme,
-              let issuerInformation = startedState.issuerInformation,
-              let coScheme = issuerInformation.coScheme else {
+              let supportedEligibleSchemes = startedState.cardInformation.supportedEligibleSchemes,
+              supportedEligibleSchemes.count > 1 else {
             return nil
         }
         let resolvedSchemeConfiguration = schemeConfiguration.resolved(
@@ -220,15 +228,15 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         )
         let pickerItem = State.PickerItem(
             id: ItemId.scheme,
-            options: [
-                .init(id: issuerInformation.scheme, title: issuerInformation.scheme.capitalized),
-                .init(id: coScheme, title: coScheme.capitalized)
-            ],
+            options: supportedEligibleSchemes.map { scheme in
+                .init(id: scheme.rawValue, title: scheme.displayName ?? scheme.rawValue.capitalized)
+            },
             selectedOptionId: .init(
-                get: { startedState.preferredScheme?.rawValue },
+                get: { startedState.cardInformation.preferredScheme?.rawValue },
                 set: { [weak self] newValue in
-                    let newScheme = newValue.map(POCardScheme.init)
-                    self?.interactor.setPreferredScheme(newScheme ?? issuerInformation.$scheme.typed)
+                    if let newScheme = newValue.map(POCardScheme.init) {
+                        self?.interactor.setPreferredScheme(newScheme)
+                    }
                 }
             ),
             prefersInline: resolvedSchemeConfiguration.prefersInline

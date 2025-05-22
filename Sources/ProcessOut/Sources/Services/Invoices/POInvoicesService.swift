@@ -12,6 +12,30 @@ public typealias POInvoicesServiceType = POInvoicesService
 
 public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 
+    /// Invoice details.
+    func invoice(request: POInvoiceRequest) async throws -> POInvoice
+
+    /// Returns native alternative payment details.
+    @_spi(PO)
+    func nativeAlternativePayment( // sourcery:completion: skip
+        request: PONativeAlternativePaymentRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse
+
+    /// Performs invoice authorization with given request.
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws
+
+    /// Performs invoice authorization using given alternative payment method details.
+    @_spi(PO)
+    func authorizeInvoice( // sourcery:completion: skip
+        request: PONativeAlternativePaymentAuthorizationRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse
+
+    /// Creates invoice with given parameters.
+    @_spi(PO)
+    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice
+
+    // MARK: - Alternative Payment (Deprecated)
+
     /// Requests information needed to continue existing payment or start new one.
     func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest
@@ -25,21 +49,25 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
         request: PONativeAlternativePaymentMethodRequest
     ) async throws -> PONativeAlternativePaymentMethodResponse
 
-    /// Invoice details.
-    func invoice(request: POInvoiceRequest) async throws -> POInvoice
-
-    /// Performs invoice authorization with given request.
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws
-
     /// Captures native alternative payament.
     func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws
-
-    /// Creates invoice with given parameters.
-    @_spi(PO)
-    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice
 }
 
 extension POInvoicesService {
+
+    @_spi(PO)
+    public func nativeAlternativePayment(
+        request: PONativeAlternativePaymentRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
+        throw POFailure(code: .Mobile.generic)
+    }
+
+    @_spi(PO)
+    public func authorizeInvoice(
+        request: PONativeAlternativePaymentAuthorizationRequest
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
+        throw POFailure(code: .Mobile.generic)
+    }
 
     @_spi(PO)
     public func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {

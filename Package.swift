@@ -12,11 +12,13 @@ let package = Package(
         .library(name: "ProcessOut", targets: ["ProcessOut"]),
         .library(name: "ProcessOutCoreUI", targets: ["ProcessOutCoreUI"]),
         .library(name: "ProcessOutUI", targets: ["ProcessOutUI"]),
-        .library(name: "ProcessOutCheckout3DS", targets: ["ProcessOutCheckout3DS"])
+        .library(name: "ProcessOutCheckout3DS", targets: ["ProcessOutCheckout3DS"]),
+        .library(name: "ProcessOutNetcetera3DS", targets: ["ProcessOutNetcetera3DS"])
     ],
     dependencies: [
         .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", exact: "3.2.5"),
-        .package(url: "https://github.com/swiftlang/swift-cmark", from: "0.5.0")
+        .package(url: "https://github.com/swiftlang/swift-cmark", from: "0.6.0"),
+        .package(url: "https://github.com/ios-3ds-sdk/SPM", exact: "2.5.22")
     ],
     targets: [
         .target(
@@ -37,6 +39,20 @@ let package = Package(
             resources: [
                 .process("Resources")
             ]
+        ),
+        .target(
+            name: "ProcessOutNetcetera3DS",
+            dependencies: [
+                .target(name: "ProcessOut"),
+                .target(name: "NetceteraShim"),
+                .product(name: "ThreeDS_SDK", package: "SPM")
+            ],
+            resources: [
+                .process("Resources")
+            ]
+        ),
+        .binaryTarget(
+            name: "NetceteraShim", path: "./Vendor/NetceteraShim.xcframework"
         ),
         .target(
             name: "ProcessOutUI",

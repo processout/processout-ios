@@ -71,6 +71,9 @@ private struct ContentView: View {
     @Environment(\.isControlInvalid)
     private var isInvalid
 
+    @Environment(\.poControlWidth)
+    private var poControlWidth
+
     // MARK: - Private Methods
 
     @ViewBuilder
@@ -81,13 +84,17 @@ private struct ContentView: View {
                 let selectedChild = children.first { child in
                     child.id == configuration.selection
                 }
-                if let selectedChild {
-                    selectedChild.textStyle(style.text)
-                } else {
-                    Text(verbatim: "").textStyle(style.placeholder)
+                ViewThatExists {
+                    configuration.currentValueLabel
+                    if let selectedChild {
+                        selectedChild
+                    } else {
+                        configuration.prompt
+                    }
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .textStyle(style.text)
+            .frame(maxWidth: maxWidth, alignment: .leading)
             Image(poResource: .chevronDown)
                 .renderingMode(.template)
                 .foregroundColor(style.text.color)
@@ -97,9 +104,14 @@ private struct ContentView: View {
         }
         .lineLimit(1)
         .padding(Constants.padding)
-        .frame(maxWidth: .infinity, minHeight: Constants.minHeight, alignment: .leading)
+        .frame(maxWidth: maxWidth, minHeight: Constants.minHeight, alignment: .leading)
         .background(style.backgroundColor)
         .border(style: style.border)
         .shadow(style: style.shadow)
+    }
+
+    private var maxWidth: CGFloat? {
+        let widths: [POControlWidth: CGFloat] = [.expanded: .infinity]
+        return widths[poControlWidth]
     }
 }

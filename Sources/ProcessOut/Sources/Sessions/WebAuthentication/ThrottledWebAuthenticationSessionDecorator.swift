@@ -17,11 +17,9 @@ actor ThrottledWebAuthenticationSessionDecorator: WebAuthenticationSession {
     // MARK: - WebAuthenticationSession
 
     func authenticate(using request: WebAuthenticationRequest) async throws -> URL {
-        do {
-            try await semaphore.waitUnlessCancelled()
-        } catch {
-            throw POFailure(message: "Authentication session was cancelled.", code: .Mobile.cancelled)
-        }
+        try await semaphore.waitUnlessCancelled(
+            cancellationError: POFailure(message: "Authentication session was cancelled.", code: .Mobile.cancelled)
+        )
         defer {
             lastAuthenticationTime = DispatchTime.now()
             semaphore.signal()
