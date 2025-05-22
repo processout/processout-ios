@@ -7,9 +7,9 @@
 
 /// Phone number.
 @_spi(PO)
-public struct POPhoneNumber {
+public struct POPhoneNumber: Sendable {
 
-    public struct Territory: Identifiable, Hashable {
+    public struct Territory: Identifiable, Hashable, Sendable {
 
         /// Country ID.
         public let id: String
@@ -27,31 +27,14 @@ public struct POPhoneNumber {
         }
     }
 
-    /// Available territories.
-    public var territories: [Territory]
-
     /// Currently selected territory.
     public var territory: Territory?
 
     /// Local phone number.
     public var number: String
 
-    public init(territories: [Territory]? = nil, territory: Territory? = nil, number: String) {
-        self.territories = territories ?? POPhoneNumber.Territory.all
+    public init(territory: Territory? = nil, number: String) {
         self.territory = territory
         self.number = number
-    }
-}
-
-extension POPhoneNumber.Territory {
-
-    static var all: [POPhoneNumber.Territory] {
-        // todo(andrii-vysotskyi): update supported territories
-        [
-            Self(id: "UA", displayName: "Ukraine", code: "380"),
-            Self(id: "PL", displayName: "Poland", code: "48"),
-            Self(id: "CA", displayName: "Canada", code: "1"),
-            Self(id: "US", displayName: "United States", code: "1")
-        ]
     }
 }

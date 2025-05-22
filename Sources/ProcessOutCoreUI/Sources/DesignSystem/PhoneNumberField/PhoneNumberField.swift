@@ -12,36 +12,37 @@ import SwiftUI
 @available(iOS 14.0, *)
 public struct POPhoneNumberField: View {
 
-    public init(phoneNumber: Binding<POPhoneNumber>) {
+    public init(phoneNumber: Binding<POPhoneNumber>, countryPrompt: () -> some View, numberPrompt: String) {
         self._phoneNumber = phoneNumber
+        self.countryPrompt = AnyView(countryPrompt())
+        self.numberPrompt = numberPrompt
     }
 
     // MARK: - View
 
     public var body: some View {
-        HStack(spacing: POSpacing.extraSmall) {
+        let configuration = POPhoneNumberFieldStyleConfiguration {
             POPicker(selection: $phoneNumber.territory) {
-                ForEach(phoneNumber.territories) { territory in
-                    Button { } label: {
-                        Text(territory.displayName)
-                        Text("+\(territory.code)")
-                    }
-                    .id(territory)
+                ForEach(availableTerritories ?? []) { territory in
+                    Text("\(territory.displayName) (+\(territory.code))")
+                        .id(territory)
                 }
             } prompt: {
-                Text("Country")
+                countryPrompt
             } currentValueLabel: {
                 if let territory = phoneNumber.territory {
                     Text("+\(territory.code)")
                 }
             }
-            .pickerStyle(POMenuPickerStyle.menu)
-            .controlWidth(.regular)
-            POTextField(text: $phoneNumber.number, formatter: formatter, prompt: "Number")
+        } number: {
+            POTextField(text: $phoneNumber.number, formatter: formatter, prompt: numberPrompt)
         }
+        AnyView(erasing: style.makeBody(configuration: configuration))
     }
 
     // MARK: - Private Properties
+
+    private let countryPrompt: AnyView, numberPrompt: String
 
     private var formatter: POPhoneNumberFormatter {
         let formatter = POPhoneNumberFormatter()
@@ -54,12 +55,28 @@ public struct POPhoneNumberField: View {
     @Binding
     private var phoneNumber: POPhoneNumber
 
-    // MARK: - Private Methods
+    @Environment(\.phoneNumberFieldTerritories)
+    private var availableTerritories
+
+    @Environment(\.phoneNumberFieldStyle)
+    private var style
 }
 
 @available(iOS 17.0, *)
 #Preview {
     @Previewable @State var number = POPhoneNumber(territory: nil, number: "")
-    POPhoneNumberField(phoneNumber: $number)
-        .padding()
+    POPhoneNumberField(
+        phoneNumber: $number,
+        countryPrompt: {
+            Text("Country")
+        },
+        numberPrompt: "Phone Number"
+    )
+    .phoneNumberFieldTerritories([
+        POPhoneNumber.Territory(id: "UA", displayName: "Ukraine", code: "380"),
+        POPhoneNumber.Territory(id: "PL", displayName: "Poland", code: "48"),
+        POPhoneNumber.Territory(id: "CA", displayName: "Canada", code: "1"),
+        POPhoneNumber.Territory(id: "US", displayName: "United States", code: "1")
+    ])
+    .padding()
 }
