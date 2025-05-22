@@ -7,8 +7,9 @@
 
 import SwiftUI
 
-// todo(andrii-vysotskyi): use colors from design system
+// todo(andrii-vysotskyi): use colors from design system once available
 
+@_spi(PO)
 @available(iOS 14.0, *)
 extension ProgressViewStyle where Self == POStepProgressViewStyle {
 
