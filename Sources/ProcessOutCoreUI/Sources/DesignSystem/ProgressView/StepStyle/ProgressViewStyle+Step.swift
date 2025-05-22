@@ -17,11 +17,11 @@ extension ProgressViewStyle where Self == POStepProgressViewStyle {
             notStarted: .init(
                 label: .init(
                     color: Color(red: 134 / 255, green: 134 / 255, blue: 134 / 255),
-                    typography: .body1
+                    typography: .Text.s15(weight: .medium)
                 ),
                 currentValueLabel: .init(
                     color: Color(red: 134 / 255, green: 134 / 255, blue: 134 / 255),
-                    typography: .label1
+                    typography: .Text.s12(weight: .medium)
                 ),
                 icon: .init(
                     checkmark: nil,
@@ -35,11 +35,11 @@ extension ProgressViewStyle where Self == POStepProgressViewStyle {
             started: .init(
                 label: .init(
                     color: Color(red: 88 / 255, green: 90 / 255, blue: 95 / 255),
-                    typography: .body1
+                    typography: .Text.s15(weight: .medium)
                 ),
                 currentValueLabel: .init(
                     color: Color(red: 134 / 255, green: 134 / 255, blue: 134 / 255),
-                    typography: .label1
+                    typography: .Text.s12(weight: .medium)
                 ),
                 icon: .init(
                     checkmark: nil,
@@ -53,11 +53,11 @@ extension ProgressViewStyle where Self == POStepProgressViewStyle {
             completed: .init(
                 label: .init(
                     color: Color(red: 76 / 255, green: 162 / 255, blue: 89 / 255),
-                    typography: .body1
+                    typography: .Text.s15(weight: .medium)
                 ),
                 currentValueLabel: .init(
                     color: Color(red: 76 / 255, green: 162 / 255, blue: 89 / 255),
-                    typography: .label1
+                    typography: .Text.s12(weight: .medium)
                 ),
                 icon: .init(
                     checkmark: .init(color: .white, width: 2),
