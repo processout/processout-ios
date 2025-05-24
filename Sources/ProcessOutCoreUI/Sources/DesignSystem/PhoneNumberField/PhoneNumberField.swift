@@ -38,6 +38,9 @@ public struct POPhoneNumberField: View {
             POTextField(text: $phoneNumber.number, formatter: formatter, prompt: numberPrompt)
         }
         AnyView(erasing: style.makeBody(configuration: configuration))
+            .onTextFieldEditingWillChange { newValue in
+                attemptToUpdatePhoneNumberTerritory(newValue: newValue)
+            }
     }
 
     // MARK: - Private Properties
@@ -46,7 +49,7 @@ public struct POPhoneNumberField: View {
 
     private var formatter: POPhoneNumberFormatter {
         let formatter = POPhoneNumberFormatter()
-        formatter.originAssumption = .national
+        formatter.originAssumption = nil
         formatter.preferInternationalFormat = false
         formatter.defaultRegion = phoneNumber.territory?.id
         return formatter
@@ -60,6 +63,17 @@ public struct POPhoneNumberField: View {
 
     @Environment(\.phoneNumberFieldStyle)
     private var style
+
+    // MARK: - Private Methods
+
+    private func attemptToUpdatePhoneNumberTerritory(newValue: String) {
+        let parser = POPhoneNumberParser()
+        guard let phoneNumber = parser.parse(number: newValue) else {
+            return
+        }
+        let newTerritory = availableTerritories?.first { $0.code == phoneNumber.countryCode }
+        self.phoneNumber.territory = newTerritory
+    }
 }
 
 @available(iOS 17.0, *)
