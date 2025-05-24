@@ -12,7 +12,7 @@ public struct POPhoneNumberParser {
 
     public static let shared = POPhoneNumberParser()
 
-    init(metadataProvider: POPhoneNumberMetadataProvider = PODefaultPhoneNumberMetadataProvider.shared) {
+    public init(metadataProvider: POPhoneNumberMetadataProvider = PODefaultPhoneNumberMetadataProvider.shared) {
         regexProvider = PORegexProvider.shared
         self.metadataProvider = metadataProvider
     }

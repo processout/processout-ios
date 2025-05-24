@@ -16,10 +16,6 @@ public final class POPhoneNumberFormatter: Formatter {
         /// Implementation assumes that input number is international even if it
         /// doesn't have + prefix.
         case international
-
-        /// Implementation assumes that input number is national even if it has +
-        /// prefix.
-        case national
     }
 
     public init(parser: POPhoneNumberParser = .shared) {
@@ -222,8 +218,6 @@ public final class POPhoneNumberFormatter: Formatter {
         switch assumption {
         case .international where !number.hasPrefix(Constants.plus) && !number.isEmpty:
             number.insert(contentsOf: Constants.plus, at: number.startIndex)
-        case .national where number.hasPrefix(Constants.plus):
-            number.removeFirst(1)
         default:
             break
         }

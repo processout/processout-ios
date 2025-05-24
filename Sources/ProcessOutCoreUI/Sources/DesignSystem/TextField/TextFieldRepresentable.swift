@@ -47,7 +47,13 @@ struct TextFieldRepresentable: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(text: $text, formatter: formatter, focusableView: $focusableView, submitAction: submitAction)
+        Coordinator(
+            text: $text,
+            formatter: formatter,
+            focusableView: $focusableView,
+            submitAction: submitAction,
+            editingWillChangeAction: editingWillChangeAction
+        )
     }
 
     static func dismantleUIView(_ textField: UITextField, coordinator: TextFieldCoordinator) {
@@ -62,6 +68,8 @@ struct TextFieldRepresentable: UIViewRepresentable {
 
     // MARK: - Private Properties
 
+    private let formatter: Formatter?
+
     @POBackport.ScaledMetric
     private var multiplier: CGFloat = 1.0
 
@@ -71,10 +79,11 @@ struct TextFieldRepresentable: UIViewRepresentable {
     @Environment(\.backportSubmitAction)
     private var submitAction
 
+    @Environment(\.textFieldEditingWillChangeAction)
+    private var editingWillChangeAction
+
     @Binding
     private var text: String
-
-    private let formatter: Formatter?
 
     @Binding
     private var focusableView: FocusableViewProxy
@@ -95,6 +104,7 @@ struct TextFieldRepresentable: UIViewRepresentable {
         coordinator.formatter = formatter
         coordinator.focusableView = $focusableView
         coordinator.submitAction = submitAction
+        coordinator.editingWillChangeAction = editingWillChangeAction
     }
 }
 

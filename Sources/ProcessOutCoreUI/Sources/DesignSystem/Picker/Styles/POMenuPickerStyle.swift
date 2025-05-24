@@ -89,7 +89,7 @@ private struct ContentView: View {
                     if let selectedChild {
                         selectedChild
                     } else {
-                        configuration.prompt
+                        configuration.prompt.textStyle(style.placeholder)
                     }
                 }
             }
