@@ -8,8 +8,8 @@
 import SwiftUI
 @_spi(PO) import ProcessOut
 
-@_spi(PO)
 @available(iOS 14.0, *)
+@_spi(PO)
 public struct POPhoneNumberField: View {
 
     public init(phoneNumber: Binding<POPhoneNumber>, countryPrompt: () -> some View, numberPrompt: String) {

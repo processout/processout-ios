@@ -32,7 +32,7 @@ targets:
     sources:
       - path: Sources/ProcessOutCoreUI
     dependencies:
-      - framework: Vendor/cmark_gfm.xcframework
+      - target: ProcessOut
   ProcessOutUI:
     type: framework
     platform: iOS
