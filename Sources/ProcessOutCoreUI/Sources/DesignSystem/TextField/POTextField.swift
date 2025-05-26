@@ -38,6 +38,9 @@ public struct POTextField<Trailing: View>: View {
         )
         AnyView(style.makeBody(configuration: configuration))
             .preference(key: FocusableViewProxyPreferenceKey.self, value: focusableView)
+            .backport.onChange(of: formatter) {
+                text = formatter?.string(for: text) ?? text
+            }
     }
 
     // MARK: - Private Properties

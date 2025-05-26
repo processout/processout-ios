@@ -14,16 +14,30 @@ final class TextFieldCoordinator: NSObject, TextFieldDelegate {
         text: Binding<String>,
         formatter: Formatter?,
         focusableView: Binding<FocusableViewProxy>,
-        submitAction: POBackport<Any>.SubmitAction
+        submitAction: POBackport<Any>.SubmitAction,
+        editingWillChangeAction: TextFieldEditingWillChangeAction
     ) {
         self.text = text
         self.formatter = formatter
         self.focusableView = focusableView
         self.submitAction = submitAction
+        self.editingWillChangeAction = editingWillChangeAction
     }
 
-    // swiftlint:disable:next line_length
-    var text: Binding<String>, formatter: Formatter?, focusableView: Binding<FocusableViewProxy>, submitAction: POBackport<Any>.SubmitAction
+    /// The text value bound to the text field.
+    var text: Binding<String>
+
+    /// Optional formatter for input/output conversion.
+    var formatter: Formatter?
+
+    /// Binding to control or observe focusable view behavior.
+    var focusableView: Binding<FocusableViewProxy>
+
+    /// Action to perform when the text field is submitted (e.g., on return key).
+    var submitAction: POBackport<Any>.SubmitAction
+
+    /// Called when text field editing state is about to change.
+    var editingWillChangeAction: TextFieldEditingWillChangeAction
 
     func mantle(textField: UITextField) {
         textField.delegate = self
@@ -63,6 +77,7 @@ final class TextFieldCoordinator: NSObject, TextFieldDelegate {
         var updatedString = originalString.replacingCharacters(in: range, with: string) as NSString
         // swiftlint:enable legacy_objc_type
         var proposedSelectedRange = NSRange(location: updatedString.length, length: 0)
+        editingWillChangeAction(newValue: updatedString as String)
         let isReplacementValid = formatter.isPartialStringValid(
             &updatedString,
             proposedSelectedRange: &proposedSelectedRange,
