@@ -23,8 +23,28 @@ final class DefaultInvoicesService: POInvoicesService {
 
     func nativeAlternativePayment(
         request: PONativeAlternativePaymentRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
-        try await repository.nativeAlternativePayment(request: request)
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
+        let repositoryRequest = NativeAlternativePaymentRequestV2(
+            invoiceId: request.invoiceId, gatewayConfigurationId: request.gatewayConfigurationId
+        )
+        let response = try await repository.nativeAlternativePayment(request: repositoryRequest)
+        guard case .pendingCapture = response.state, let captureConfirmation = request.captureConfirmation else {
+            return response
+        }
+        return try await retry(
+            operation: { [repository] in
+                try await repository.nativeAlternativePayment(request: repositoryRequest)
+            },
+            while: { result in
+                if case .success(let response) = result {
+                    return response.state == .pendingCapture
+                }
+                return false
+            },
+            timeout: captureConfirmation.timeout,
+            timeoutError: POFailure(code: .Mobile.timeout),
+            retryStrategy: .init(function: .exponential(interval: 0.15, rate: 1.45), minimum: 3, maximum: 90)
+        )
     }
 
     func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
@@ -38,8 +58,8 @@ final class DefaultInvoicesService: POInvoicesService {
     }
 
     func authorizeInvoice(
-        request: PONativeAlternativePaymentAuthorizationRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
+        request: PONativeAlternativePaymentAuthorizationRequestV2
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
         try await repository.authorizeInvoice(request: request)
     }
 

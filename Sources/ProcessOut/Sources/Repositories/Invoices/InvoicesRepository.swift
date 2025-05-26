@@ -12,13 +12,13 @@ protocol InvoicesRepository: PORepository {
 
     /// Returns alternative payment details.
     func nativeAlternativePayment(
-        request: PONativeAlternativePaymentRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponse
+        request: NativeAlternativePaymentRequestV2
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
 
     /// Continue alternative payment.
     func authorizeInvoice(
-        request: PONativeAlternativePaymentAuthorizationRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponse
+        request: PONativeAlternativePaymentAuthorizationRequestV2
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
 
     /// Performs invoice authorization with given request.
     func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> _CustomerAction?
