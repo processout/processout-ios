@@ -10,13 +10,11 @@ import SwiftUI
 extension View {
 
     /// Applies given `style` to text.
-    ///
-    /// - NOTE: When `addPadding` is set to true this method has a cumulative effect.
     @_spi(PO)
     @available(iOS 14, *)
     @MainActor
-    public func textStyle(_ style: POTextStyle, addPadding: Bool = true) -> some View {
-        typography(style.typography, addPadding: addPadding)
+    public func textStyle(_ style: POTextStyle) -> some View {
+        typography(style.typography)
             .foregroundColor(style.color)
             .environment(\.textStyle, style)
     }
@@ -24,8 +22,8 @@ extension View {
     @_spi(PO)
     @available(iOS 14, *)
     @MainActor
-    public func typography(_ typography: POTypography, addPadding: Bool = true) -> some View {
-        modifier(TypographyModifier(typography: typography, addPadding: addPadding))
+    public func typography(_ typography: POTypography) -> some View {
+        modifier(TypographyModifier(typography: typography))
     }
 }
 
@@ -33,9 +31,8 @@ extension View {
 @MainActor
 private struct TypographyModifier: ViewModifier {
 
-    init(typography: POTypography, addPadding: Bool) {
+    init(typography: POTypography) {
         self.typography = typography
-        self.addPadding = addPadding
         _multiplier = .init(wrappedValue: 1, relativeTo: typography.textStyle)
     }
 
@@ -43,10 +40,9 @@ private struct TypographyModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         let resolvedFont = self.resolvedFont()
-        let lineSpacing = (typography.lineHeight / typography.font.lineHeight - 1) * resolvedFont.lineHeight
         return content
             .font(Font(resolvedFont))
-            .lineSpacing(lineSpacing)
+            .environment(\._lineHeightMultiple, typography.lineHeight / typography.font.lineHeight)
             .modify { content in
                 if #available(iOS 16, *) {
                     content.kerning(typography.kerning * multiplier)
@@ -54,13 +50,11 @@ private struct TypographyModifier: ViewModifier {
                     content
                 }
             }
-            .padding(.vertical, addPadding ? lineSpacing / 2 : 0)
     }
 
     // MARK: - Private Properties
 
     private let typography: POTypography
-    private let addPadding: Bool
 
     @POBackport.ScaledMetric
     private var multiplier: CGFloat

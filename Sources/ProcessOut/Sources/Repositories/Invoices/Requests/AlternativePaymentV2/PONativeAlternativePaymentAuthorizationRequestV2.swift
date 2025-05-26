@@ -5,10 +5,8 @@
 //  Created by Andrii Vysotskyi on 13.05.2025.
 //
 
-// swiftlint:disable nesting
-
 @_spi(PO)
-public struct PONativeAlternativePaymentAuthorizationRequest: Sendable, Encodable {
+public struct PONativeAlternativePaymentAuthorizationRequestV2: Sendable, Encodable {
 
     public struct SubmitData: Sendable, Encodable {
 
@@ -18,15 +16,15 @@ public struct PONativeAlternativePaymentAuthorizationRequest: Sendable, Encodabl
 
     public struct Parameter: Sendable {
 
-        enum Value {
+        enum Value { // swiftlint:disable:this nesting
 
-            struct Phone: Encodable {
+            struct Phone: Encodable { // swiftlint:disable:this nesting
 
                 /// Phone dialing code.
                 let dialingCode: String
 
                 /// Value.
-                let value: String
+                let number: String
             }
 
             case string(String), phone(Phone)
@@ -52,20 +50,18 @@ public struct PONativeAlternativePaymentAuthorizationRequest: Sendable, Encodabl
     }
 }
 
-// swiftlint:enable nesting
-
-extension PONativeAlternativePaymentAuthorizationRequest.Parameter {
+extension PONativeAlternativePaymentAuthorizationRequestV2.Parameter {
 
     public static func string(_ value: String) -> Self {
         .init(value: .string(value))
     }
 
-    public static func phone(dialingCode: String, value: String) -> Self {
-        .init(value: .phone(.init(dialingCode: dialingCode, value: value)))
+    public static func phone(dialingCode: String, number: String) -> Self {
+        .init(value: .phone(.init(dialingCode: dialingCode, number: number)))
     }
 }
 
-extension PONativeAlternativePaymentAuthorizationRequest.Parameter: Encodable {
+extension PONativeAlternativePaymentAuthorizationRequestV2.Parameter: Encodable {
 
     public func encode(to encoder: any Encoder) throws {
         switch value {
