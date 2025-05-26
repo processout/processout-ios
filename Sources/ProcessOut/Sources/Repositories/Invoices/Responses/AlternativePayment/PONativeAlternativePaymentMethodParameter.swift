@@ -38,12 +38,6 @@ public struct PONativeAlternativePaymentMethodParameter: Codable, Sendable {
 
         /// Indicates whether value is selected by default.
         public let `default`: Bool?
-
-        public init(displayName: String, value: String, `default`: Bool? = nil) {
-            self.displayName = displayName
-            self.value = value
-            self.default = `default`
-        }
     }
 
     /// Name of the field that needs to be collected for the request e.g. blik_code.
@@ -65,20 +59,4 @@ public struct PONativeAlternativePaymentMethodParameter: Codable, Sendable {
 
     /// This property should be non-empty array of available values when `type` is `singleSelect`.
     public let availableValues: [AvailableValue]?
-
-    public init(
-        key: String,
-        type: ParameterType,
-        required: Bool,
-        length: Int? = nil,
-        displayName: String,
-        availableValues: [AvailableValue]? = nil
-    ) {
-        self.key = key
-        self.type = type
-        self.required = required
-        self.length = length
-        self.displayName = displayName
-        self.availableValues = availableValues
-    }
 }
