@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 import UIKit
-import ProcessOut
+@_spi(PO) import ProcessOut
 
 enum NativeAlternativePaymentInteractorState {
 
@@ -19,9 +19,6 @@ enum NativeAlternativePaymentInteractorState {
     }
 
     struct Started {
-
-        /// Transaction details.
-        let transactionDetails: PONativeAlternativePaymentMethodTransactionDetails
 
         /// Parameters that are expected from user.
         var parameters: [Parameter]
@@ -39,13 +36,22 @@ enum NativeAlternativePaymentInteractorState {
         let task: Task<Void, Never>
     }
 
+    struct AwaitingRedirect {
+
+        /// Redirect information.
+        let redirect: PONativeAlternativePaymentNextStepV2.Redirect
+    }
+
+    struct Redirecting {
+
+        /// Awaiting redirect state snapshot.
+        let snapshot: AwaitingRedirect
+    }
+
     struct AwaitingCapture {
 
-        /// Payment provider details.
-        let paymentProvider: PaymentProvider
-
-        /// Additional action details.
-        let customerAction: CaptureCustomerAction?
+        /// Additional customer instructions.
+        let customerInstructions: [NativeAlternativePaymentResolvedCustomerInstruction]
 
         /// Boolean value indicating whether user should be able to manually cancel payment in current state.
         var isCancellable: Bool
@@ -63,8 +69,8 @@ enum NativeAlternativePaymentInteractorState {
 
     struct Captured {
 
-        /// Payment provider details.
-        let paymentProvider: PaymentProvider
+        /// Additional customer instructions.
+        let customerInstructions: [NativeAlternativePaymentResolvedCustomerInstruction]
 
         /// Task that handles completion invocation.
         let completionTask: Task<Void, Never>
@@ -73,7 +79,7 @@ enum NativeAlternativePaymentInteractorState {
     struct Parameter {
 
         /// Parameter specification that includes but not limited to its type, length, name etc.
-        let specification: PONativeAlternativePaymentMethodParameter
+        let specification: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter
 
         /// Formatter that could be used to format parameter.
         let formatter: Formatter?
@@ -83,28 +89,6 @@ enum NativeAlternativePaymentInteractorState {
 
         /// The most recent error message associated with this parameter value.
         var recentErrorMessage: String?
-    }
-
-    struct PaymentProvider {
-
-        /// Payment provider name.
-        let name: String?
-
-        /// Payment provider or gateway logo image.
-        let image: UIImage?
-    }
-
-    struct CaptureCustomerAction {
-
-        /// Messaged describing additional actions that are needed from user in order to capture payment.
-        let message: String
-
-        /// Action image.
-        let image: UIImage?
-
-        /// Specifies the type of barcode represented by the `image`. If the image does not
-        /// represent a barcode, this property is `nil`.
-        let barcodeType: POBarcode.BarcodeType?
     }
 
     /// Initial interactor state.
@@ -121,6 +105,12 @@ enum NativeAlternativePaymentInteractorState {
 
     /// Parameter values are being submitted.
     case submitting(Submitting)
+
+    /// Interactor is awaiting for redirect.
+    case awaitingRedirect(AwaitingRedirect)
+
+    /// User is currently being redirected.
+    case redirecting(Redirecting)
 
     /// Parameter values were submitted.
     /// - NOTE: This is a sink state and it's only set if user opted out from awaiting capture.

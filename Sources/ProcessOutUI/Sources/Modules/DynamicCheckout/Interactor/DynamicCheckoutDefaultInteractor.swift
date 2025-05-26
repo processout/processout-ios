@@ -628,7 +628,7 @@ final class DynamicCheckoutDefaultInteractor:
         let interactor = childProvider.nativeAlternativePaymentInteractor(
             for: method, invoiceId: startedState.invoice.id, configuration: configuration
         )
-        interactor.delegate = self
+        // interactor.delegate = self
         interactor.willChange = { [weak self] state in
             self?.nativeAlternativePayment(willChangeState: state)
         }
@@ -670,6 +670,8 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.isReady = true
             currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)
+        case .awaitingRedirect, .redirecting:
+            preconditionFailure("Not supported yet.")
         case .awaitingCapture(let awaitingCaptureState):
             currentState.isCancellable = awaitingCaptureState.isCancellable
             currentState.isReady = true

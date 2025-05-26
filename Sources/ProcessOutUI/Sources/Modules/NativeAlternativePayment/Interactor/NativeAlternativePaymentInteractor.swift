@@ -12,7 +12,7 @@ protocol NativeAlternativePaymentInteractor: Interactor<NativeAlternativePayment
     var configuration: PONativeAlternativePaymentConfiguration { get }
 
     /// Delegate.
-    var delegate: PONativeAlternativePaymentDelegate? { get set }
+    var delegate: PONativeAlternativePaymentDelegateV2? { get set }
 
     /// Updates value for given key.
     func updateValue(_ value: String?, for key: String)

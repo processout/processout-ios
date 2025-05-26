@@ -50,6 +50,10 @@ struct NativeAlternativePaymentItemView: View {
                 .padding(.horizontal, horizontalPadding)
         case .submitted(let item):
             NativeAlternativePaymentSubmittedItemView(item: item, horizontalPadding: horizontalPadding)
+        case .message(let item):
+            PONativeAlternativePaymentMessageView(item: item)
+        case .image(let item):
+            Image(uiImage: item.image)
         }
     }
 

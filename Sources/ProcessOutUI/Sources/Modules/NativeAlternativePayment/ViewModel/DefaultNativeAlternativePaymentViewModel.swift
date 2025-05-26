@@ -123,7 +123,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             let section = NativeAlternativePaymentViewModelSection(
                 id: parameter.specification.key,
                 isCentered: isSectionCentered,
-                title: parameter.specification.displayName,
+                title: parameter.specification.label,
                 items: items,
                 error: parameter.recentErrorMessage
             )
@@ -143,17 +143,17 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createTitleSection(state: InteractorState.Started) -> NativeAlternativePaymentViewModelSection? {
-        let gatewayDisplayName = state.transactionDetails.gateway.displayName
-        // swiftlint:disable:next line_length
-        let title = configuration.title ?? String(resource: .NativeAlternativePayment.title, replacements: gatewayDisplayName)
-        guard !title.isEmpty else {
-            return nil
-        }
-        let item = NativeAlternativePaymentViewModelItem.Title(id: "title", text: title)
-        let section = NativeAlternativePaymentViewModelSection(
-            id: "title", isCentered: false, title: nil, items: [.title(item)], error: nil
-        )
-        return section
+        nil // todo(andrii-vysotskyi): fix title
+//        let gatewayDisplayName = state.transactionDetails.gateway.displayName
+//        let title = configuration.title ?? String(resource: .NativeAlternativePayment.title, replacements: gatewayDisplayName)
+//        guard !title.isEmpty else {
+//            return nil
+//        }
+//        let item = NativeAlternativePaymentViewModelItem.Title(id: "title", text: title)
+//        let section = NativeAlternativePaymentViewModelSection(
+//            id: "title", isCentered: false, title: nil, items: [.title(item)], error: nil
+//        )
+//        return section
     }
 
     private func createFocusedInputId(state: InteractorState.Started) -> AnyHashable? {
@@ -193,25 +193,37 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createSections(state: InteractorState.AwaitingCapture) -> [NativeAlternativePaymentViewModelSection] {
-        let item: NativeAlternativePaymentViewModelItem
-        if let customerAction = state.customerAction {
-            let submittedItem = NativeAlternativePaymentViewModelItem.Submitted(
-                id: "awaiting-capture",
-                title: state.paymentProvider.image == nil ? state.paymentProvider.name : nil,
-                logoImage: state.paymentProvider.image,
-                message: customerAction.message,
-                isMessageCompact: customerAction.message.count <= Constants.maximumCompactMessageLength,
-                image: customerAction.image,
-                isCaptured: false,
-                isProgressViewHidden: !state.isDelayed
-            )
-            item = .submitted(submittedItem)
+        // todo(andrii-vysotskyi): create proper sections
+        let items: [NativeAlternativePaymentViewModelItem]
+
+        if state.customerInstructions.isEmpty {
+            items = [.progress]
         } else {
-            // todo(andrii-vysotskyi): set additional text saying that payment is being processed.
-            item = .progress
+            var customerInstructionItems: [NativeAlternativePaymentViewModelItem] = []
+            for customerInstruction in state.customerInstructions {
+                let item = createItem(for: customerInstruction)
+                customerInstructionItems.append(item)
+            }
+            items = customerInstructionItems
         }
+//        if let customerAction = state.customerAction {
+//            let submittedItem = NativeAlternativePaymentViewModelItem.Submitted(
+//                id: "awaiting-capture",
+//                title: state.paymentProvider.image == nil ? state.paymentProvider.name : nil,
+//                logoImage: state.paymentProvider.image,
+//                message: customerAction.message,
+//                isMessageCompact: customerAction.message.count <= Constants.maximumCompactMessageLength,
+//                image: customerAction.image,
+//                isCaptured: false,
+//                isProgressViewHidden: !state.isDelayed
+//            )
+//            item = .submitted(submittedItem)
+//        } else {
+//            // todo(andrii-vysotskyi): set additional text saying that payment is being processed.
+//            item = .progress
+//        }
         let section = NativeAlternativePaymentViewModelSection(
-            id: "awaiting-capture", isCentered: true, title: nil, items: [item], error: nil
+            id: "awaiting-capture", isCentered: true, title: nil, items: items, error: nil
         )
         return [section]
     }
@@ -249,24 +261,26 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createSaveBarcodeImageAction(state: InteractorState.AwaitingCapture) -> POButtonViewModel? {
-        guard let customerAction = state.customerAction,
-              let image = customerAction.image,
-              let barcodeType = customerAction.barcodeType else {
-            return nil
-        }
-        let buttonConfiguration = interactor.configuration.barcodeInteraction.saveButton
-        let defaultTitle = String(
-            resource: .NativeAlternativePayment.Button.saveBarcode, replacements: barcodeType.rawValue.uppercased()
-        )
-        let viewModel = POButtonViewModel(
-            id: "barcode-button",
-            title: buttonConfiguration.title ?? defaultTitle,
-            icon: buttonConfiguration.icon,
-            action: { [weak self] in
-                self?.saveImageToPhotoLibraryOrShowError(image)
-            }
-        )
-        return viewModel
+        // todo(andrii-vysotskyi): create button per single instruction
+        nil
+//        guard let customerAction = state.customerAction,
+//              let image = customerAction.image,
+//              let barcodeType = customerAction.barcodeType else {
+//            return nil
+//        }
+//        let buttonConfiguration = interactor.configuration.barcodeInteraction.saveButton
+//        let defaultTitle = String(
+//            resource: .NativeAlternativePayment.Button.saveBarcode, replacements: barcodeType.rawValue.uppercased()
+//        )
+//        let viewModel = POButtonViewModel(
+//            id: "barcode-button",
+//            title: buttonConfiguration.title ?? defaultTitle,
+//            icon: buttonConfiguration.icon,
+//            action: { [weak self] in
+//                self?.saveImageToPhotoLibraryOrShowError(image)
+//            }
+//        )
+//        return viewModel
     }
 
     private func saveImageToPhotoLibraryOrShowError(_ image: UIImage) {
@@ -304,47 +318,48 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createSections(state: InteractorState.Captured) -> [NativeAlternativePaymentViewModelSection] {
-        let item = NativeAlternativePaymentViewModelItem.Submitted(
-            id: "captured",
-            title: state.paymentProvider.image == nil ? state.paymentProvider.name : nil,
-            logoImage: state.paymentProvider.image,
-            message: configuration.success?.message ?? String(resource: .NativeAlternativePayment.Success.message),
-            isMessageCompact: true,
-            image: UIImage(poResource: .success).withRenderingMode(.alwaysTemplate),
-            isCaptured: true,
-            isProgressViewHidden: true
-        )
-        let section = NativeAlternativePaymentViewModelSection(
-            id: "captured", isCentered: false, title: nil, items: [.submitted(item)], error: nil
-        )
-        return [section]
+        []
+//        let item = NativeAlternativePaymentViewModelItem.Submitted(
+//            id: "captured",
+//            title: state.paymentProvider.image == nil ? state.paymentProvider.name : nil,
+//            logoImage: state.paymentProvider.image,
+//            message: configuration.success?.message ?? String(resource: .NativeAlternativePayment.Success.message),
+//            isMessageCompact: true,
+//            image: UIImage(poResource: .success).withRenderingMode(.alwaysTemplate),
+//            isCaptured: true,
+//            isProgressViewHidden: true
+//        )
+//        let section = NativeAlternativePaymentViewModelSection(
+//            id: "captured", isCentered: false, title: nil, items: [.submitted(item)], error: nil
+//        )
+//        return [section]
     }
 
     // MARK: - Input Items
 
     // swiftlint:disable:next function_body_length
     private func createItem(parameter: InteractorState.Parameter) -> NativeAlternativePaymentViewModelItem {
-        switch parameter.specification.type {
-        case .numeric where (parameter.specification.length ?? .max) <= Constants.maximumCodeLength:
+        // todo(andrii-vysotskyi): support new parameter types
+        switch parameter.specification {
+        case .otp(let specification) where (specification.maxLength ?? .max) <= Constants.maximumCodeLength:
             let codeInputItem = NativeAlternativePaymentViewModelItem.CodeInput(
-                id: parameter.specification.key,
-                length: parameter.specification.length!, // swiftlint:disable:this force_unwrapping
+                id: specification.key,
+                length: specification.maxLength!, // swiftlint:disable:this force_unwrapping
                 value: .init(
                     get: { parameter.value ?? "" },
                     set: { [weak self] newValue in
-                        self?.interactor.updateValue(newValue, for: parameter.specification.key)
+                        self?.interactor.updateValue(newValue, for: specification.key)
                     }
                 ),
                 isInvalid: parameter.recentErrorMessage != nil
             )
             return .codeInput(codeInputItem)
-        case .singleSelect:
-            let optionsCount = parameter.specification.availableValues?.count ?? 0
+        case .singleSelect(let specification):
             let pickerItem = NativeAlternativePaymentViewModelItem.Picker(
-                id: parameter.specification.key,
-                options: parameter.specification.availableValues?.map { availableValue in
-                    .init(id: availableValue.value, title: availableValue.displayName)
-                } ?? [],
+                id: specification.key,
+                options: specification.availableValues.map { availableValue in
+                    .init(id: availableValue.value, title: availableValue.label)
+                },
                 selectedOptionId: .init(
                     get: { parameter.value },
                     set: { [weak self] newValue in
@@ -352,7 +367,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                     }
                 ),
                 isInvalid: parameter.recentErrorMessage != nil,
-                preferrsInline: optionsCount <= configuration.inlineSingleSelectValuesLimit
+                preferrsInline: specification.availableValues.count <= configuration.inlineSingleSelectValuesLimit
             )
             return .picker(pickerItem)
         default:
@@ -369,8 +384,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 isInvalid: parameter.recentErrorMessage != nil,
                 isEnabled: true,
                 formatter: parameter.formatter,
-                keyboard: keyboard(parameterType: parameter.specification.type),
-                contentType: contentType(parameterType: parameter.specification.type),
+                keyboard: keyboard(parameter: parameter.specification),
+                contentType: contentType(parameter: parameter.specification),
                 submitLabel: .next,
                 onSubmit: { [weak self] in
                     self?.submitFocusedInput()
@@ -381,31 +396,80 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func contentType(
-        parameterType: PONativeAlternativePaymentMethodParameter.ParameterType
+        parameter: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter
     ) -> UITextContentType? {
-        let contentTypes: [PONativeAlternativePaymentMethodParameter.ParameterType: UITextContentType] = [
-            .email: .emailAddress, .numeric: .oneTimeCode, .phone: .telephoneNumber
-        ]
-        return contentTypes[parameterType]
+        switch parameter {
+        case .phoneNumber:
+            return .telephoneNumber
+        case .email:
+            return .emailAddress
+        case .otp:
+            return .oneTimeCode
+        default:
+            return nil
+        }
     }
 
-    private func keyboard(
-        parameterType: PONativeAlternativePaymentMethodParameter.ParameterType
-    ) -> UIKeyboardType {
-        let keyboardTypes: [PONativeAlternativePaymentMethodParameter.ParameterType: UIKeyboardType] = [
-            .text: .asciiCapable, .email: .emailAddress, .numeric: .numberPad, .phone: .phonePad
-        ]
-        return keyboardTypes[parameterType] ?? .default
+    private func keyboard(parameter: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter) -> UIKeyboardType {
+        switch parameter {
+        case .text:
+            return .default
+        case .digits:
+            return .numberPad
+        case .phoneNumber:
+            return .phonePad
+        case .email:
+            return .emailAddress
+        case .card:
+            return .numberPad
+        case .otp(let specification):
+            switch specification.subtype {
+            case .digits:
+                return .numberPad
+            default:
+                return .default
+            }
+        default:
+            return .default
+        }
     }
 
-    private func placeholder(for parameter: PONativeAlternativePaymentMethodParameter) -> String {
-        switch parameter.type {
+    private func placeholder(for parameter: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter) -> String {
+        switch parameter {
         case .email:
             return String(resource: .NativeAlternativePayment.Placeholder.email)
-        case .phone:
+        case .phoneNumber:
             return String(resource: .NativeAlternativePayment.Placeholder.phone)
         default:
             return ""
+        }
+    }
+
+    // MARK: - Customer Instructions
+
+    private func createItem(
+        for customerInstruction: NativeAlternativePaymentResolvedCustomerInstruction
+    ) -> NativeAlternativePaymentViewModelItem {
+        switch customerInstruction {
+        case .barcode(let instruction):
+            let item = NativeAlternativePaymentViewModelItem.Image(
+                id: ObjectIdentifier(instruction.image), image: instruction.image
+            )
+            return .image(item)
+        case .text(let instruction):
+            let item = NativeAlternativePaymentViewModelItem.Message(
+                id: UUID().uuidString, // ???
+                title: instruction.label,
+                text: instruction.value
+            )
+            return .message(item)
+        case .image(let instruction):
+            let item = NativeAlternativePaymentViewModelItem.Image(
+                id: ObjectIdentifier(instruction), image: instruction
+            )
+            return .image(item)
+        case .group:
+            preconditionFailure("Not supported yet.")
         }
     }
 
@@ -437,13 +501,13 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         if let customTitle = configuration.submitButton.title {
             title = customTitle
         } else {
-            priceFormatter.currencyCode = state.transactionDetails.invoice.currencyCode
-            // swiftlint:disable:next legacy_objc_type line_length
-            if let formattedAmount = priceFormatter.string(from: state.transactionDetails.invoice.amount as NSDecimalNumber) {
-                title = String(resource: .NativeAlternativePayment.Button.submitAmount, replacements: formattedAmount)
-            } else {
-                title = String(resource: .NativeAlternativePayment.Button.submit)
-            }
+//            priceFormatter.currencyCode = state.transactionDetails.invoice.currencyCode
+//            if let formattedAmount = priceFormatter.string(from: state.transactionDetails.invoice.amount as NSDecimalNumber) {
+//                title = String(resource: .NativeAlternativePayment.Button.submitAmount, replacements: formattedAmount)
+//            } else {
+//                title = String(resource: .NativeAlternativePayment.Button.submit)
+//            }
+            title = String(resource: .NativeAlternativePayment.Button.submit) // todo(andrii-vysotskyi): fix title
         }
         guard !title.isEmpty else {
             return nil

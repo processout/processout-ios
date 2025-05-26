@@ -90,7 +90,40 @@ enum NativeAlternativePaymentViewModelItem {
         let isProgressViewHidden: Bool
     }
 
-    case progress, title(Title), input(Input), codeInput(CodeInput), picker(Picker), submitted(Submitted)
+    struct Message: Identifiable, Hashable {
+
+        let id: AnyHashable
+
+        /// Message title if any.
+        let title: String?
+
+        /// Message text.
+        let text: String
+    }
+
+    struct Image: Identifiable, Hashable {
+
+        let id: AnyHashable
+
+        /// Image illustrating action.
+        let image: UIImage
+    }
+
+    case progress
+
+    case title(Title)
+
+    case input(Input)
+
+    case codeInput(CodeInput)
+
+    case picker(Picker)
+
+    case submitted(Submitted)
+
+    case message(Message)
+
+    case image(Image)
 }
 
 extension NativeAlternativePaymentViewModelItem: Identifiable {
@@ -108,6 +141,10 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
         case .picker(let item):
             return item.id
         case .submitted(let item):
+            return item.id
+        case .message(let item):
+            return item.id
+        case .image(let item):
             return item.id
         }
     }
