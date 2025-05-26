@@ -27,14 +27,14 @@ public struct POPhoneNumber: Sendable {
         }
     }
 
-    /// Currently selected territory.
-    public var territory: Territory?
+    /// Currently selected territory ID.
+    public var territoryId: String?
 
     /// Local phone number.
     public var number: String
 
-    public init(territory: Territory? = nil, number: String) {
-        self.territory = territory
+    public init(territoryId: String? = nil, number: String) {
+        self.territoryId = territoryId
         self.number = number
     }
 }

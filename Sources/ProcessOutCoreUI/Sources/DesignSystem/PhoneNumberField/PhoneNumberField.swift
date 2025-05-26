@@ -22,15 +22,15 @@ public struct POPhoneNumberField: View {
 
     public var body: some View {
         let configuration = POPhoneNumberFieldStyleConfiguration {
-            POPicker(selection: $phoneNumber.territory) {
+            POPicker(selection: $phoneNumber.territoryId) {
                 ForEach(availableTerritories ?? []) { territory in
                     Text("\(territory.displayName) (+\(territory.code))")
-                        .id(territory)
                 }
             } prompt: {
                 countryPrompt
             } currentValueLabel: {
-                if let territory = phoneNumber.territory {
+                // todo(andrii-vysotskyi): confirm whether performance impact is negligible
+                if let territory = availableTerritories?.first(where: { $0.id == phoneNumber.territoryId }) {
                     Text("+\(territory.code)")
                 }
             }
@@ -51,7 +51,7 @@ public struct POPhoneNumberField: View {
         let formatter = POPhoneNumberFormatter()
         formatter.originAssumption = nil
         formatter.preferInternationalFormat = false
-        formatter.defaultRegion = phoneNumber.territory?.id
+        formatter.defaultRegion = phoneNumber.territoryId
         return formatter
     }
 
@@ -72,13 +72,13 @@ public struct POPhoneNumberField: View {
             return
         }
         let newTerritory = availableTerritories?.first { $0.code == phoneNumber.countryCode }
-        self.phoneNumber.territory = newTerritory
+        self.phoneNumber.territoryId = newTerritory?.id
     }
 }
 
 @available(iOS 17.0, *)
 #Preview {
-    @Previewable @State var number = POPhoneNumber(territory: nil, number: "")
+    @Previewable @State var number = POPhoneNumber(territoryId: nil, number: "")
     POPhoneNumberField(
         phoneNumber: $number,
         countryPrompt: {
