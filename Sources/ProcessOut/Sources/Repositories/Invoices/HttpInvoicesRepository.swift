@@ -28,18 +28,18 @@ final class HttpInvoicesRepository: InvoicesRepository {
     }
 
     func nativeAlternativePayment(
-        request: PONativeAlternativePaymentRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
-        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentAuthorizationResponse>.get(
+        request: NativeAlternativePaymentRequestV2
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
+        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentAuthorizationResponseV2>.get(
             path: "/invoices/\(request.invoiceId)/apm-payment/\(request.gatewayConfigurationId)"
         )
         return try await connector.execute(request: httpRequest)
     }
 
     func authorizeInvoice(
-        request: PONativeAlternativePaymentAuthorizationRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
-        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentAuthorizationResponse>.post(
+        request: PONativeAlternativePaymentAuthorizationRequestV2
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
+        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentAuthorizationResponseV2>.post(
             path: "/invoices/\(request.invoiceId)/apm-payment", body: request
         )
         return try await connector.execute(request: httpRequest)

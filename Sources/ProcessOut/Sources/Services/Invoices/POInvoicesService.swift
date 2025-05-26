@@ -19,7 +19,7 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
     @_spi(PO)
     func nativeAlternativePayment( // sourcery:completion: skip
         request: PONativeAlternativePaymentRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponse
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
 
     /// Performs invoice authorization with given request.
     func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws
@@ -27,8 +27,8 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
     /// Performs invoice authorization using given alternative payment method details.
     @_spi(PO)
     func authorizeInvoice( // sourcery:completion: skip
-        request: PONativeAlternativePaymentAuthorizationRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponse
+        request: PONativeAlternativePaymentAuthorizationRequestV2
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
 
     /// Creates invoice with given parameters.
     @_spi(PO)
@@ -58,14 +58,14 @@ extension POInvoicesService {
     @_spi(PO)
     public func nativeAlternativePayment(
         request: PONativeAlternativePaymentRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
         throw POFailure(code: .Mobile.generic)
     }
 
     @_spi(PO)
     public func authorizeInvoice(
-        request: PONativeAlternativePaymentAuthorizationRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponse {
+        request: PONativeAlternativePaymentAuthorizationRequestV2
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
         throw POFailure(code: .Mobile.generic)
     }
 

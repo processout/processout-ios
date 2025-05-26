@@ -69,7 +69,7 @@ let package = Package(
         .target(
             name: "ProcessOutCoreUI",
             dependencies: [
-                .product(name: "cmark-gfm", package: "swift-cmark")
+                .target(name: "ProcessOut")
             ],
             resources: [
                 .process("Resources")
