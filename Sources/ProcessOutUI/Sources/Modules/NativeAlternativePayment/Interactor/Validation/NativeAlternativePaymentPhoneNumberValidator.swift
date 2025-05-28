@@ -1,0 +1,26 @@
+//
+//  NativeAlternativePaymentPhoneNumberValidator.swift
+//  ProcessOut
+//
+//  Created by Andrii Vysotskyi on 27.05.2025.
+//
+
+@_spi(PO) import ProcessOut
+
+struct NativeAlternativePaymentPhoneNumberValidator: InputValidator {
+
+    /// A Boolean value indicating whether the input is required.
+    let required: Bool
+
+    // MARK: -
+
+    func validate(_ input: PONativeAlternativePaymentAuthorizationRequestV2.Parameter.Value.Phone?) -> InputValidation {
+        if input != nil {
+            return .valid
+        }
+        if required {
+            return .invalid(errorMessage: String(resource: .NativeAlternativePayment.Error.requiredParameter))
+        }
+        return .valid
+    }
+}
