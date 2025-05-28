@@ -23,7 +23,10 @@ public struct PONativeAlternativePaymentConfiguration {
 
         /// Boolean value that specifies whether module should wait for payment confirmation from PSP or will
         /// complete right after all user's input is submitted. Default value is `true`.
-        public let waitsConfirmation: Bool
+        @available(*, deprecated, message: "Implementation will always wait for payment confirmation.")
+        public var waitsConfirmation: Bool {
+            true
+        }
 
         /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
         /// Default timeout is 3 minutes while maximum value is 15 minutes.
@@ -56,7 +59,6 @@ public struct PONativeAlternativePaymentConfiguration {
             confirmButton: SubmitButton? = nil,
             cancelButton: CancelButton? = nil
         ) {
-            self.waitsConfirmation = waitsConfirmation
             self.timeout = timeout
             self.showProgressViewAfter = showProgressViewAfter
             self.hideGatewayDetails = hideGatewayDetails
@@ -373,7 +375,6 @@ extension PONativeAlternativePaymentConfiguration.Confirmation {
         confirmButton: ConfirmButton? = nil,
         secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction? = nil
     ) {
-        self.waitsConfirmation = waitsConfirmation
         self.timeout = timeout
         self.showProgressViewAfter = showProgressIndicatorAfter
         self.hideGatewayDetails = hideGatewayDetails
