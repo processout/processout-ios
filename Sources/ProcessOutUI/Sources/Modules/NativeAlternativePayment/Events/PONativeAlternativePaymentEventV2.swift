@@ -15,11 +15,6 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
 
         /// Available parameters.
         public let parameters: [PONativeAlternativePaymentNextStepV2.SubmitData.Parameter]
-
-        /// Parameter values.
-        /// - NOTE: For parameters other than `singleSelect` values are user facing including formatting.
-        /// - WARNING: Values could include sensitive information so make sure to protect them accordingly.
-        public let values: [String: String]
     }
 
     public struct DidSubmitParameters: Sendable {
@@ -36,11 +31,6 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
 
         /// Parameter definition that the user changed.
         public let parameter: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter
-
-        /// Parameter value.
-        /// - NOTE: For parameters other than `singleSelect` this is user facing value including formatting
-        /// - WARNING: Value could include sensitive information so make sure to protect it accordingly.
-        public let value: String
     }
 
     /// Initial event that is sent prior any other event.

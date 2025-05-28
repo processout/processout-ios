@@ -45,7 +45,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         send(event: .willStart)
         let task = Task { @MainActor in
             do {
-                let request = PONativeAlternativePaymentRequest(
+                let request = PONativeAlternativePaymentAuthorizationDetailsRequest(
                     invoiceId: configuration.invoiceId,
                     gatewayConfigurationId: configuration.gatewayConfigurationId
                 )
@@ -58,7 +58,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         state = .starting(.init(task: task))
     }
 
-    func updateValue(_ value: String?, for key: String) {
+    func updateValue(_ value: NativeAlternativePaymentInteractorState.ParameterValue, for key: String) {
         guard case var .started(newState) = state else {
             logger.debug("Unable to update value in unsupported state: \(state).")
             return
@@ -66,21 +66,16 @@ final class NativeAlternativePaymentDefaultInteractor:
         let parameter = newState.parameters
             .enumerated()
             .first(where: { $0.element.specification.key == key })
-        guard let parameter else {
+        guard let parameter, parameter.element.value != value else {
             logger.info("No value to update for key \(key).")
             return
         }
-        let formattedValue = parameter.element.formatter?.string(for: value ?? "") ?? value
-        guard parameter.element.value != formattedValue else {
-            logger.debug("Ignored the same value for key: \(key).")
-            return
-        }
         var updatedParameter = parameter.element
-        updatedParameter.value = formattedValue
+        updatedParameter.value = value
         updatedParameter.recentErrorMessage = nil
         newState.parameters[parameter.offset] = updatedParameter
         state = .started(newState)
-        didUpdate(parameter: parameter.element, to: formattedValue ?? "")
+        didUpdate(parameter: parameter.element, to: value)
     }
 
     func submit() {
@@ -181,11 +176,8 @@ final class NativeAlternativePaymentDefaultInteractor:
                 let failure = POFailure(message: "Unsupported next step.", code: .Mobile.generic)
                 setFailureState(error: failure)
             }
-        case .pendingCapture where configuration.paymentConfirmation.waitsConfirmation:
-            await setAwaitingCaptureState(payment: payment)
         case .pendingCapture:
-            logger.info("Payment capture wasn't requested, will attempt to set submitted state directly.")
-            setSubmittedState()
+            await setAwaitingCaptureState(payment: payment)
         case .captured:
             await setCapturedState(payment: payment)
         default:
@@ -206,7 +198,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.debug("Ignoring attempt to set started state in unsupported state: \(state).")
             return
         }
-        if nextStep.parameters.parameterDefinitions.isEmpty {
+        if parameters.isEmpty {
             logger.info("Will set started state with empty inputs, this may be unexpected.")
         }
         let startedState = State.Started(
@@ -287,7 +279,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         var newState = currentState
         newState.task = Task { @MainActor [configuration] in
             do {
-                let request = PONativeAlternativePaymentRequest(
+                let request = PONativeAlternativePaymentAuthorizationDetailsRequest(
                     invoiceId: configuration.invoiceId,
                     gatewayConfigurationId: configuration.gatewayConfigurationId,
                     captureConfirmation: .init(timeout: configuration.paymentConfirmation.timeout)
@@ -343,15 +335,6 @@ final class NativeAlternativePaymentDefaultInteractor:
         } catch {
             setFailureState(error: error)
         }
-    }
-
-    private func setSubmittedState() {
-        guard !state.isSink else {
-            logger.debug("Already in a sink state, ignoring attempt to set submitted state.")
-            return
-        }
-        state = .submitted
-        completion(.success(()))
     }
 
     // MARK: - Submission Recovery
@@ -461,20 +444,21 @@ final class NativeAlternativePaymentDefaultInteractor:
         delegate?.nativeAlternativePayment(didEmitEvent: event)
     }
 
-    private func didUpdate(parameter: NativeAlternativePaymentInteractorState.Parameter, to value: String) {
+    private func didUpdate(
+        parameter: NativeAlternativePaymentInteractorState.Parameter,
+        to value: NativeAlternativePaymentInteractorState.ParameterValue
+    ) {
         logger.debug("Did update parameter value '\(value)' for '\(parameter.specification.key)' key.")
         let parametersChangedEvent = PONativeAlternativePaymentEventV2.ParametersChanged(
-            parameter: parameter.specification, value: value
+            parameter: parameter.specification
         )
         send(event: .parametersChanged(parametersChangedEvent))
     }
 
     private func willSubmit(parameters: [NativeAlternativePaymentInteractorState.Parameter]) {
         logger.info("Will submit payment parameters")
-        let values = Dictionary(grouping: parameters, by: \.specification.key)
-            .compactMapValues(\.first?.value)
         let willSubmitParametersEvent = PONativeAlternativePaymentEventV2.WillSubmitParameters(
-            parameters: parameters.map(\.specification), values: values
+            parameters: parameters.map(\.specification)
         )
         send(event: .willSubmitParameters(willSubmitParametersEvent))
     }
@@ -485,12 +469,11 @@ final class NativeAlternativePaymentDefaultInteractor:
         specifications: [PONativeAlternativePaymentNextStepV2.SubmitData.Parameter]
     ) async -> [NativeAlternativePaymentInteractorState.Parameter] {
         var parameters = specifications.map { specification in
-            let formatter: Foundation.Formatter?
-            switch specification {
-            case .phoneNumber:
-                formatter = POPhoneNumberFormatter()
+            let formatter: Foundation.Formatter? = switch specification {
+            case .card:
+                POCardNumberFormatter()
             default:
-                formatter = nil
+                nil
             }
             return State.Parameter(specification: specification, formatter: formatter)
         }
@@ -589,29 +572,38 @@ final class NativeAlternativePaymentDefaultInteractor:
             defaultValuesFor: parameters.map(\.specification)
         )
         for (offset, parameter) in parameters.enumerated() {
-            let defaultValue: String?
-            if let value = defaultValues?[parameter.specification.key] {
-                switch parameter.specification {
-                case .singleSelect(let specification):
-                    let availableValues = specification.availableValues.map(\.value)
-                    precondition(availableValues.contains(value), "Unknown `singleSelect` parameter value.")
-                    defaultValue = value
-                default:
-                    defaultValue = parameter.formatter?.string(for: value) ?? value
-                }
-            } else {
-                defaultValue = self.defaultValue(for: parameter)
-            }
-            parameters[offset].value = defaultValue
+            parameters[offset].value = defaultValue(
+                for: parameter, fallback: defaultValues?[parameter.specification.key]
+            )
         }
     }
 
-    private func defaultValue(for parameter: NativeAlternativePaymentInteractorState.Parameter) -> String? {
-        if let formatter = parameter.formatter {
-            return formatter.string(for: "")
-        }
-        if case .singleSelect(let specification) = parameter.specification {
-            return specification.preselectedValue?.value
+    private func defaultValue(
+        for parameter: NativeAlternativePaymentInteractorState.Parameter,
+        fallback: PONativeAlternativePaymentAuthorizationRequestV2.Parameter?
+    ) -> NativeAlternativePaymentInteractorState.ParameterValue? {
+        switch parameter.specification {
+        case .singleSelect(let specification):
+            if case .string(let value) = fallback?.value {
+                let availableValues = Set(specification.availableValues.map(\.value))
+                precondition(availableValues.contains(value), "Unsupported `singleSelect` parameter value.")
+                return .string(value)
+            }
+            if let preselectedValue = specification.preselectedValue {
+                return .string(preselectedValue.value)
+            }
+        case .phoneNumber(let specification):
+            if case .phone(let value) = fallback?.value {
+                let dialingCode = specification.dialingCodes?.first(where: { $0.value == value.dialingCode })
+                guard let dialingCode else {
+                    preconditionFailure("Unsupported dialing code.")
+                }
+                return .phone(.init(regionCode: dialingCode.id, number: value.number))
+            }
+        default:
+            if case .string(let value) = fallback?.value {
+                return .string(parameter.formatter?.string(for: value) ?? value)
+            }
         }
         return nil
     }
@@ -624,17 +616,13 @@ final class NativeAlternativePaymentDefaultInteractor:
         var validatedValues: [String: PONativeAlternativePaymentAuthorizationRequestV2.Parameter] = [:]
         var invalidFields: [POFailure.InvalidField] = []
         parameters.forEach { parameter in
-            var normalizedValue = parameter.value
-            if case .phoneNumber = parameter.specification, let value = normalizedValue {
-                normalizedValue = POPhoneNumberFormatter().normalized(number: value)
-            }
-            if let normalizedValue, normalizedValue != parameter.value {
-                logger.debug("Will use updated value '\(normalizedValue)' for key '\(parameter.specification.key)'.")
-            }
-            if let invalidField = validate(value: normalizedValue ?? "", specification: parameter.specification) {
+            var invalidField: POFailure.InvalidField?
+            if let validatedValue = validate(parameter: parameter, validation: &invalidField) {
+                validatedValues[parameter.specification.key] = validatedValue
+            } else if let invalidField {
                 invalidFields.append(invalidField)
-            } else if let normalizedValue {
-                validatedValues[parameter.specification.key] = .string(normalizedValue)
+            } else {
+                preconditionFailure("Inconsistent validation state.")
             }
         }
         if invalidFields.isEmpty {
@@ -647,49 +635,97 @@ final class NativeAlternativePaymentDefaultInteractor:
         )
     }
 
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     private func validate(
-        value: String, specification: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter
-    ) -> POFailure.InvalidField? {
-        if value.isEmpty, specification.required {
-            let errorMessage = String(resource: .NativeAlternativePayment.Error.requiredParameter)
-            return .init(name: specification.key, message: errorMessage)
-        }
-        var errorMessage: String?
-        switch specification {
-        case .card(let parameter):
-            if validateLength(
-                of: value, min: parameter.minLength, max: parameter.maxLength, errorMessage: &errorMessage
-            ) {
-                return nil
+        parameter: NativeAlternativePaymentInteractorState.Parameter, validation: inout POFailure.InvalidField?
+    ) -> PONativeAlternativePaymentAuthorizationRequestV2.Parameter? {
+        let errorMessage: String?
+        switch parameter.specification {
+        case .text(let specification):
+            let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
+            let validator = NativeAlternativePaymentTextValidator(
+                minLength: specification.minLength,
+                maxLength: specification.maxLength,
+                required: specification.required
+            )
+            let validation = validator.validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map(PONativeAlternativePaymentAuthorizationRequestV2.Parameter.string)
             }
-        case .otp(let parameter):
-            if validateLength(
-                of: value, min: parameter.minLength, max: parameter.maxLength, errorMessage: &errorMessage
-            ) {
-                return nil
+            errorMessage = validation.errorMessage
+        case .singleSelect(let specification):
+            let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
+            let validation =
+                NativeAlternativePaymentTextValidator(required: specification.required).validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .string($0) }
             }
-        case .text, .singleSelect, .boolean, .digits, .phoneNumber, .email:
-            return nil // No additional validation
+            errorMessage = validation.errorMessage
+        case .boolean(let specification):
+            let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
+            let validation =
+                NativeAlternativePaymentTextValidator(required: specification.required).validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .string($0) }
+            }
+            errorMessage = validation.errorMessage
+        case .digits(let specification):
+            let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
+            let validator = NativeAlternativePaymentTextValidator(
+                minLength: specification.minLength,
+                maxLength: specification.maxLength,
+                required: specification.required
+            )
+            let validation = validator.validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .string($0) }
+            }
+            errorMessage = validation.errorMessage
+        case .phoneNumber(let specification):
+            let normalizedValue = NativeAlternativePaymentPhoneNumberNormalizer().normalize(input: parameter.value)
+            let validation =
+                NativeAlternativePaymentPhoneNumberValidator(required: specification.required).validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .init(value: .phone($0)) }
+            }
+            errorMessage = validation.errorMessage
+        case .email(let specification):
+            let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
+            let validation =
+                NativeAlternativePaymentTextValidator(required: specification.required).validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .string($0) }
+            }
+            errorMessage = validation.errorMessage
+        case .card(let specification):
+            let normalizedValue = NativeAlternativePaymentCardNumberNormalizer().normalize(input: parameter.value)
+            let validator = NativeAlternativePaymentTextValidator(
+                minLength: specification.minLength, maxLength: specification.maxLength, required: specification.required
+            )
+            let validation = validator.validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .string($0) }
+            }
+            errorMessage = validation.errorMessage
+        case .otp(let specification):
+            let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
+            let validator = NativeAlternativePaymentTextValidator(
+                minLength: specification.minLength, maxLength: specification.maxLength, required: specification.required
+            )
+            let validation = validator.validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .string($0) }
+            }
+            errorMessage = validation.errorMessage
         case .unknown:
             assertionFailure("Unable to validate unknown parameter.")
             return nil
         }
-        if let errorMessage {
-            return .init(name: specification.key, message: errorMessage)
-        }
+        validation = .init(
+            name: parameter.specification.key,
+            message: errorMessage ?? String(resource: .NativeAlternativePayment.Error.invalidValue)
+        )
         return nil
-    }
-
-    private func validateLength(of value: String, min: Int?, max: Int?, errorMessage: inout String?) -> Bool {
-        if let min, value.count < min {
-            errorMessage = String(resource: .NativeAlternativePayment.Error.invalidLength, replacements: min)
-            return false
-        }
-        if let max, value.count > max {
-            errorMessage = String(resource: .NativeAlternativePayment.Error.invalidLength, replacements: max)
-            return false
-        }
-        return true
     }
 }
 

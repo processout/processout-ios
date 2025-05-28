@@ -85,10 +85,24 @@ enum NativeAlternativePaymentInteractorState {
         let formatter: Formatter?
 
         /// Actual parameter value.
-        var value: String?
+        var value: ParameterValue?
 
         /// The most recent error message associated with this parameter value.
         var recentErrorMessage: String?
+    }
+
+    enum ParameterValue: Equatable {
+
+        struct Phone: Equatable { // swiftlint:disable:this nesting
+
+            /// Selected region code.
+            let regionCode: String?
+
+            /// National phone number value.
+            let number: String?
+        }
+
+        case string(String), phone(Phone)
     }
 
     /// Initial interactor state.
@@ -112,10 +126,6 @@ enum NativeAlternativePaymentInteractorState {
     /// User is currently being redirected.
     case redirecting(Redirecting)
 
-    /// Parameter values were submitted.
-    /// - NOTE: This is a sink state and it's only set if user opted out from awaiting capture.
-    case submitted
-
     /// Parameters were submitted and accepted.
     case awaitingCapture(AwaitingCapture)
 
@@ -135,7 +145,7 @@ extension NativeAlternativePaymentInteractorState: InteractorState {
 
     var isSink: Bool {
         switch self {
-        case .submitted, .captured, .failure:
+        case .captured, .failure:
             return true
         default:
             return false

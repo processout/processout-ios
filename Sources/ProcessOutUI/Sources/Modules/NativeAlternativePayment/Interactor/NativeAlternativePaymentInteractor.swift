@@ -15,7 +15,7 @@ protocol NativeAlternativePaymentInteractor: Interactor<NativeAlternativePayment
     var delegate: PONativeAlternativePaymentDelegateV2? { get set }
 
     /// Updates value for given key.
-    func updateValue(_ value: String?, for key: String)
+    func updateValue(_ value: State.ParameterValue, for key: String)
 
     /// Submits parameters.
     func submit()

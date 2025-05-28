@@ -22,5 +22,5 @@ public protocol PONativeAlternativePaymentDelegateV2: AnyObject, Sendable {
     @MainActor
     func nativeAlternativePayment(
         defaultValuesFor parameters: [PONativeAlternativePaymentNextStepV2.SubmitData.Parameter]
-    ) async -> [String: String]
+    ) async -> [String: PONativeAlternativePaymentAuthorizationRequestV2.Parameter]
 }
