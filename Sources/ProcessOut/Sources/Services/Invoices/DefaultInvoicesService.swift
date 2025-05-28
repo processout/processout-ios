@@ -22,9 +22,9 @@ final class DefaultInvoicesService: POInvoicesService {
     }
 
     func nativeAlternativePayment(
-        request: PONativeAlternativePaymentRequest
+        request: PONativeAlternativePaymentAuthorizationDetailsRequest
     ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
-        let repositoryRequest = NativeAlternativePaymentRequestV2(
+        let repositoryRequest = NativeAlternativePaymentAuthorizationDetailsRequestV2(
             invoiceId: request.invoiceId, gatewayConfigurationId: request.gatewayConfigurationId
         )
         let response = try await repository.nativeAlternativePayment(request: repositoryRequest)

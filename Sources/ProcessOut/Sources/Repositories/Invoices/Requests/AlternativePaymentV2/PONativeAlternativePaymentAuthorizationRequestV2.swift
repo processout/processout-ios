@@ -16,22 +16,34 @@ public struct PONativeAlternativePaymentAuthorizationRequestV2: Sendable, Encoda
 
     public struct Parameter: Sendable {
 
-        enum Value { // swiftlint:disable:this nesting
+        @_spi(PO)
+        public enum Value: Sendable { // swiftlint:disable:this nesting
 
-            struct Phone: Encodable { // swiftlint:disable:this nesting
+            public struct Phone: Encodable, Sendable { // swiftlint:disable:this nesting
 
                 /// Phone dialing code.
-                let dialingCode: String
+                public let dialingCode: String
 
                 /// Value.
-                let number: String
+                public let number: String
+
+                public init(dialingCode: String, number: String) {
+                    self.dialingCode = dialingCode
+                    self.number = number
+                }
             }
 
             case string(String), phone(Phone)
         }
 
         /// Parameter raw value.
-        let value: Value
+        @_spi(PO)
+        public let value: Value
+
+        @_spi(PO)
+        public init(value: Value) {
+            self.value = value
+        }
     }
 
     /// Invoice identifier.

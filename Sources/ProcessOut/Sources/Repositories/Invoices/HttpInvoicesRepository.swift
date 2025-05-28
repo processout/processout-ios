@@ -28,7 +28,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
     }
 
     func nativeAlternativePayment(
-        request: NativeAlternativePaymentRequestV2
+        request: NativeAlternativePaymentAuthorizationDetailsRequestV2
     ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
         let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentAuthorizationResponseV2>.get(
             path: "/invoices/\(request.invoiceId)/apm-payment/\(request.gatewayConfigurationId)"

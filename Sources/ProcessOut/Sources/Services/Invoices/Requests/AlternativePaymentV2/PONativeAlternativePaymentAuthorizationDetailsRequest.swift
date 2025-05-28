@@ -1,5 +1,5 @@
 //
-//  PONativeAlternativePaymentRequest.swift
+//  PONativeAlternativePaymentAuthorizationDetailsRequest.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 21.05.2025.
@@ -9,7 +9,7 @@ import Foundation
 
 /// Represents a request to initiate a native alternative payment.
 @_spi(PO)
-public struct PONativeAlternativePaymentRequest: Sendable {
+public struct PONativeAlternativePaymentAuthorizationDetailsRequest: Sendable { // swiftlint:disable:this type_name
 
     /// Configuration for automatic waiting until payment capture status changes or times out.
     public struct CaptureConfirmation: Sendable {

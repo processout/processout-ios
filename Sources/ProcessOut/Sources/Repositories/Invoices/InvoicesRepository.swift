@@ -12,7 +12,7 @@ protocol InvoicesRepository: PORepository {
 
     /// Returns alternative payment details.
     func nativeAlternativePayment(
-        request: NativeAlternativePaymentRequestV2
+        request: NativeAlternativePaymentAuthorizationDetailsRequestV2
     ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
 
     /// Continue alternative payment.
