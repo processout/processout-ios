@@ -24,7 +24,7 @@ public struct POPhoneNumberField: View {
         let configuration = POPhoneNumberFieldStyleConfiguration {
             POPicker(selection: $phoneNumber.territoryId) {
                 ForEach(availableTerritories ?? []) { territory in
-                    Text("\(territory.displayName) (+\(territory.code))")
+                    Text("+\(territory.code) \(territory.displayName)")
                 }
             } prompt: {
                 countryPrompt
