@@ -16,7 +16,7 @@ extension View {
                 _UnaryViewAdaptor(scaleEffect(scale, anchor: .center))
             }
         } else {
-            scaleEffect(scale, anchor: .center)
+            modifier(ScalingModifier(scale: scale))
         }
     }
 }
@@ -37,4 +37,36 @@ private struct ScalingLayout: Layout {
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
         subviews[0].place(at: .init(x: bounds.midX, y: bounds.midY), anchor: .center, proposal: proposal)
     }
+}
+
+@available(iOS, obsoleted: 16, message: "Use `ScalingLayout` instead.")
+private struct ScalingModifier: ViewModifier {
+
+    let scale: CGFloat
+
+    // MARK: - ViewModifier
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(scale, anchor: .center)
+            .onSizeChange { size in
+                padding = .init(
+                    horizontal: (size.width * scale - size.width) / 2,
+                    vertical: (size.height * scale - size.height) / 2
+                )
+            }
+            .padding(padding)
+    }
+
+    // MARK: - Private Properties
+
+    @State
+    private var padding = EdgeInsets(horizontal: 0, vertical: 0)
+}
+
+@available(iOS 17, *)
+#Preview {
+    Text("Preview")
+        .scale(0.5)
+        .background(Color.gray)
 }
