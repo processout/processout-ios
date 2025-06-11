@@ -92,14 +92,18 @@ private struct ContentView: View {
                     animation: nil,
                     value: {
                         ViewThatExists {
-                            configuration.currentValueLabel.textStyle(style.text)
+                            configuration.currentValueLabel
+                                .textStyle(style.text)
                             if let selectedChild {
-                                selectedChild.textStyle(style.text)
+                                selectedChild
+                                    .textStyle(style.text)
                             }
                         }
                     },
                     placeholder: {
-                        configuration.prompt.textStyle(style.placeholder)
+                        configuration.prompt
+                            .textStyle(style.placeholder)
+                            .fixedSize()
                     }
                 )
             }
