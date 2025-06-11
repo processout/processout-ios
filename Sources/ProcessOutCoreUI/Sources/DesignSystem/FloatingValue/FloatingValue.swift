@@ -36,7 +36,7 @@ struct FloatingValue<Value: View, ValueSizingView: View, Placeholder: View>: Vie
         ZStack(alignment: alignment) {
             VStack(alignment: alignment.horizontal, spacing: spacing) {
                 placeholder
-                    .scaleEffect(scale, anchor: .leading)
+                    .scale(scale)
                     .hidden()
                 ViewThatExists {
                     valueSizingView
@@ -46,7 +46,7 @@ struct FloatingValue<Value: View, ValueSizingView: View, Placeholder: View>: Vie
             }
             VStack(alignment: alignment.horizontal, spacing: spacing) {
                 placeholder
-                    .scaleEffect(isFloating ? scale : 1, anchor: .leading)
+                    .scale(isFloating ? scale : 1)
                 if isFloating {
                     ViewThatExists {
                         valueSizingView
@@ -58,7 +58,9 @@ struct FloatingValue<Value: View, ValueSizingView: View, Placeholder: View>: Vie
             .animation(animation, value: isFloating)
             VStack(alignment: alignment.horizontal, spacing: spacing) {
                 if isFloating {
-                    placeholder.scaleEffect(scale, anchor: .leading).hidden()
+                    placeholder
+                        .scale(scale)
+                        .hidden()
                 }
                 value
             }
