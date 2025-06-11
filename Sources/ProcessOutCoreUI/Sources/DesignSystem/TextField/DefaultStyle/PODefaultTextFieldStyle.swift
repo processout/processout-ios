@@ -27,17 +27,18 @@ private struct DefaultTextFieldStyleContentView: View {
     var body: some View {
         let resolvedStyle = inputStyle.resolve(isInvalid: isInvalid, isFocused: configuration.isEditing)
         HStack {
-            ZStack(alignment: .leading) {
+            FloatingValue(isFloating: !configuration.text.isEmpty, spacing: POSpacing.space2) {
                 configuration.textField
                     .textStyle(resolvedStyle.text)
+            } valueSizingView: {
+                Text(" ")
+                    .typography(resolvedStyle.text.typography)
+            } placeholder: {
                 configuration.prompt
                     .lineLimit(1)
                     .textStyle(resolvedStyle.placeholder)
+                    .fixedSize(horizontal: true, vertical: true)
                     .allowsHitTesting(false)
-                    .opacity(configuration.text.isEmpty ? 1 : 0)
-                    .transaction { transaction in
-                        transaction.animation = nil
-                    }
             }
             configuration.trailingView
                 .foregroundColor(
@@ -57,8 +58,10 @@ private struct DefaultTextFieldStyleContentView: View {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let minHeight: CGFloat = 48
-        static let padding = EdgeInsets(horizontal: POSpacing.medium, vertical: POSpacing.extraSmall)
+        static let padding = EdgeInsets(
+            top: POSpacing.space8, leading: POSpacing.space12, bottom: POSpacing.space8, trailing: POSpacing.space16
+        )
+        static let minHeight: CGFloat = 52
     }
 
     // MARK: - Private Properties
@@ -68,4 +71,11 @@ private struct DefaultTextFieldStyleContentView: View {
 
     @Environment(\.isControlInvalid)
     private var isInvalid
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    @Previewable @State var text = ""
+    POTextField(text: $text, prompt: "Placeholder")
+        .padding()
 }
