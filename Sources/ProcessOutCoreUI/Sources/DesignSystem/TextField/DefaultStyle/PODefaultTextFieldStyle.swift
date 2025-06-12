@@ -37,7 +37,6 @@ private struct DefaultTextFieldStyleContentView: View {
                 configuration.prompt
                     .lineLimit(1)
                     .textStyle(resolvedStyle.placeholder)
-                    .fixedSize()
                     .allowsHitTesting(false)
             }
             configuration.trailingView
