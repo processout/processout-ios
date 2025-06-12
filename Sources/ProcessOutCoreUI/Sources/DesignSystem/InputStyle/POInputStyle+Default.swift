@@ -10,7 +10,7 @@ import SwiftUI
 extension POInputStyle {
 
     /// Medium size input style.
-    public static let medium = `default`(typography: .Text.s14(weight: .regular))
+    public static let medium = `default`(typography: .Text.s15(weight: .medium))
 
     /// Large input style.
     public static let large = `default`(typography: .Text.s20(weight: .medium))

@@ -56,6 +56,18 @@ struct TextFieldRepresentable: UIViewRepresentable {
         )
     }
 
+    // swiftlint:disable:next identifier_name
+    func _overrideSizeThatFits(_ size: inout CGSize, in proposedSize: _ProposedSize, uiView: UIViewType) {
+        let proposal = POBackport<Any>.ProposedSize(proposedSize).replacingUnspecifiedDimensions(by: .zero)
+        size = .init(width: proposal.width, height: uiView.font?.lineHeight ?? proposal.height)
+    }
+
+    @available(iOS 16, *)
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: UITextField, context: Context) -> CGSize? {
+        let proposal = proposal.replacingUnspecifiedDimensions(by: .zero)
+        return .init(width: proposal.width, height: uiView.font?.lineHeight ?? proposal.height)
+    }
+
     static func dismantleUIView(_ textField: UITextField, coordinator: TextFieldCoordinator) {
         coordinator.dismantle(textField: textField)
     }
