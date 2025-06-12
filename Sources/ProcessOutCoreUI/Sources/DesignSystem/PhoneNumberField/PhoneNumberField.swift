@@ -24,14 +24,14 @@ public struct POPhoneNumberField: View {
         let configuration = POPhoneNumberFieldStyleConfiguration {
             POPicker(selection: $phoneNumber.territoryId) {
                 ForEach(availableTerritories ?? []) { territory in
-                    Text("+\(territory.code) \(territory.displayName)")
+                    Text("\(territory.code) \(territory.displayName)")
                 }
             } prompt: {
                 countryPrompt
             } currentValueLabel: {
                 // todo(andrii-vysotskyi): confirm whether performance impact is negligible
                 if let territory = availableTerritories?.first(where: { $0.id == phoneNumber.territoryId }) {
-                    Text("+\(territory.code)")
+                    Text(territory.code)
                 }
             }
         } number: {
@@ -87,10 +87,10 @@ public struct POPhoneNumberField: View {
         numberPrompt: "Phone Number"
     )
     .phoneNumberFieldTerritories([
-        POPhoneNumber.Territory(id: "UA", displayName: "Ukraine", code: "380"),
-        POPhoneNumber.Territory(id: "PL", displayName: "Poland", code: "48"),
-        POPhoneNumber.Territory(id: "CA", displayName: "Canada", code: "1"),
-        POPhoneNumber.Territory(id: "US", displayName: "United States", code: "1")
+        POPhoneNumber.Territory(id: "UA", displayName: "Ukraine", code: "+380"),
+        POPhoneNumber.Territory(id: "PL", displayName: "Poland", code: "+48"),
+        POPhoneNumber.Territory(id: "CA", displayName: "Canada", code: "+1"),
+        POPhoneNumber.Territory(id: "US", displayName: "United States", code: "+1")
     ])
     .padding()
 }
