@@ -65,6 +65,7 @@ struct FloatingValue<Value: View, ValueSizingView: View, Placeholder: View>: Vie
                 value
             }
         }
+        .backport.geometryGroup()
     }
 
     // MARK: - Private Properties
