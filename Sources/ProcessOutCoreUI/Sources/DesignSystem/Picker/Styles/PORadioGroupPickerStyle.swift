@@ -11,18 +11,21 @@ import SwiftUI
 @available(iOS 14, *)
 public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerStyle {
 
-    public init(radioButtonStyle: RadioButtonStyle = PORadioButtonStyle.radio) {
+    public init(radioButtonStyle: RadioButtonStyle = PORadioButtonStyle.radio, inputStyle: POInputStyle = .medium) {
         self.radioButtonStyle = radioButtonStyle
+        self.inputStyle = inputStyle
     }
 
     public func makeBody(configuration: POPickerStyleConfiguration) -> some View {
         ContentView(configuration: configuration)
             .buttonStyle(radioButtonStyle)
+            .inputStyle(inputStyle)
     }
 
     // MARK: - Private Properties
 
     private let radioButtonStyle: RadioButtonStyle
+    private let inputStyle: POInputStyle
 }
 
 @MainActor
