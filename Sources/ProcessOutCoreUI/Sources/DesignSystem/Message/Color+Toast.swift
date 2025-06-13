@@ -23,7 +23,7 @@ extension Color {
 
         /// Toast/Border color.
         static let border = Color(
-            light: UIColor(0x121314, alpha: 0.06), dark: UIColor(0xF6F8FB, alpha: 0.06)
+            light: UIColor(0x121314, alpha: 0.06), dark: UIColor(0xF6F8FB, alpha: 0.08)
         )
     }
 }

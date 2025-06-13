@@ -27,7 +27,7 @@ extension Color {
 
                 /// The "Button/Primary/Background/Disabled" color.
                 static let disabled = Color(
-                    light: UIColor(0xF0F2F4), dark: UIColor(0x2E3137)
+                    light: UIColor(0x121314, alpha: 0.04), dark: UIColor(0x2E3137)
                 )
 
                 /// The "Button/Primary/Background/Pressed" color.
@@ -46,7 +46,7 @@ extension Color {
 
                 /// The "Button/Primary/Title/Disabled" color.
                 static let disabled = Color(
-                    light: UIColor(0x8A8D93), dark: UIColor(0x707378)
+                    light: UIColor(0xC0C3C8), dark: UIColor(0x707378)
                 )
 
                 /// The "Button/Primary/Title/Pressed" color.
@@ -69,7 +69,7 @@ extension Color {
 
                 /// The "Button/Secondary/Background/Disabled" color.
                 static let disabled = Color(
-                    light: UIColor(0xF0F2F4), dark: UIColor(0x2E3137)
+                    light: UIColor(0x121314, alpha: 0.04), dark: UIColor(0x2E3137)
                 )
 
                 /// The "Button/Secondary/Background/Pressed" color.
@@ -88,7 +88,7 @@ extension Color {
 
                 /// The "Button/Secondary/Title/Disabled" color.
                 static let disabled = Color(
-                    light: UIColor(0x8A8D93), dark: UIColor(0x707378)
+                    light: UIColor(0xC0C3C8), dark: UIColor(0x707378)
                 )
 
                 /// The "Button/Secondary/Title/Pressed" color.
@@ -109,7 +109,7 @@ extension Color {
 
                 /// The "Button/Ghost/Background/Disabled" color.
                 static let disabled = Color(
-                    light: UIColor(0xF0F2F4), dark: UIColor(0x2E3137)
+                    light: UIColor(0x121314, alpha: 0.04), dark: UIColor(0x2E3137)
                 )
 
                 /// The "Button/Ghost/Background/Pressed" color.
@@ -128,12 +128,12 @@ extension Color {
 
                 /// The "Button/Ghost/Title/Default" color.
                 static let `default` = Color(
-                    light: UIColor(0x707378), dark: UIColor(0xC0C3C8)
+                    light: UIColor(0x585A5F), dark: UIColor(0xC0C3C8)
                 )
 
                 /// The "Button/Ghost/Title/Disabled" color.
                 static let disabled = Color(
-                    light: UIColor(0x8A8D93), dark: UIColor(0x707378)
+                    light: UIColor(0xC0C3C8), dark: UIColor(0x707378)
                 )
 
                 /// The "Button/Ghost/Title/Pressed" color.

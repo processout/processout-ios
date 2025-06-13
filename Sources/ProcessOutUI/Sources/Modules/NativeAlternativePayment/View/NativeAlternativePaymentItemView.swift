@@ -39,7 +39,10 @@ struct NativeAlternativePaymentItemView: View {
                 }
             }
             .modify(when: pickerItem.preferrsInline) { view in
-                let style = PORadioGroupPickerStyle(radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton))
+                let style = PORadioGroupPickerStyle(
+                    radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton),
+                    inputStyle: style.input
+                )
                 view.pickerStyle(style)
             }
             .pickerStyle(POMenuPickerStyle(inputStyle: style.input))

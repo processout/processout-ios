@@ -37,13 +37,12 @@ struct FloatingValue<Value: View, ValueSizingView: View, Placeholder: View>: Vie
             VStack(alignment: alignment.horizontal, spacing: spacing) {
                 placeholder
                     .scale(scale)
-                    .hidden()
                 ViewThatExists {
                     valueSizingView
                     value
                 }
-                .hidden()
             }
+            .hidden()
             VStack(alignment: alignment.horizontal, spacing: spacing) {
                 placeholder
                     .scale(isFloating ? scale : 1)

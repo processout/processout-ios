@@ -72,6 +72,7 @@ private struct ContentView: View {
     // MARK: - View
 
     var body: some View {
+        let geometry = self.geometry
         let style = resolvedStyle()
         Label(
             title: {
@@ -83,10 +84,12 @@ private struct ContentView: View {
                 RadioButtonKnobView(style: style.knob, textStyle: style.value.typography.textStyle)
             }
         )
+        .padding(geometry.padding)
+        .frame(minHeight: geometry.minHeight)
         .backport.background {
             style.backgroundColor
                 .cornerRadius(POSpacing.extraSmall)
-                .padding(Constants.backgroundPadding)
+                .padding(geometry.backgroundInsets)
         }
         .contentShape(.standardHittableRect)
         .animation(.default, value: isSelected)
@@ -96,8 +99,10 @@ private struct ContentView: View {
 
     // MARK: - Private Nested Types
 
-    private enum Constants {
-        static let backgroundPadding = EdgeInsets(horizontal: -10, vertical: -11)
+    private struct Geometry {
+        let padding: CGFloat
+        let minHeight: CGFloat?
+        let backgroundInsets: EdgeInsets
     }
 
     // MARK: - Private Properties
@@ -110,6 +115,9 @@ private struct ContentView: View {
 
     @Environment(\.isEnabled)
     private var isEnabled
+
+    @Environment(\.poControlSize)
+    private var controlSize
 
     // MARK: - Private Methods
 
@@ -131,4 +139,28 @@ private struct ContentView: View {
         }
         return normal
     }
+
+    private var geometry: Geometry {
+        switch controlSize {
+        case .regular:
+            return .init(
+                padding: POSpacing.space12,
+                minHeight: 48,
+                backgroundInsets: EdgeInsets()
+            )
+        case .small:
+            return .init(padding: 0, minHeight: nil, backgroundInsets: .init(horizontal: -10, vertical: -11))
+        }
+    }
+}
+
+@available(iOS 14, *)
+#Preview {
+    VStack(spacing: 2) {
+        Button("Radio Button") { }
+        Button("Radio Button") { }
+    }
+    .buttonStyle(PORadioButtonStyle.radio)
+    .padding()
+    .backport.poControlSize(.small)
 }
