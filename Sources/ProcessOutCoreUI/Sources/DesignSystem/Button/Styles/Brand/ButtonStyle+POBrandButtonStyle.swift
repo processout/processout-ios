@@ -17,7 +17,7 @@ extension ButtonStyle where Self == POBrandButtonStyle {
     public static var brand: POBrandButtonStyle {
         POBrandButtonStyle(
             title: .init(
-                color: .Text.primary, typography: .Text.s14(weight: .medium)
+                color: .Text.primary, typography: .Text.s15(weight: .medium)
             ),
             border: .button(color: .clear),
             shadow: .clear,
