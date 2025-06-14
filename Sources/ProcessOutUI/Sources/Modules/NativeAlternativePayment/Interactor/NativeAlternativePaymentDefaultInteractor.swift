@@ -60,19 +60,16 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.debug("Unable to update value in unsupported state: \(state).")
             return
         }
-        let parameter = newState.parameters
-            .enumerated()
-            .first(where: { $0.element.specification.key == key })
-        guard let parameter, parameter.element.value != value else {
+        guard let parameter = newState.parameters[key], parameter.value != value else {
             logger.info("No value to update for key \(key).")
             return
         }
-        var updatedParameter = parameter.element
+        var updatedParameter = parameter
         updatedParameter.value = value
         updatedParameter.recentErrorMessage = nil
-        newState.parameters[parameter.offset] = updatedParameter
+        newState.parameters[key] = updatedParameter
         state = .started(newState)
-        didUpdate(parameter: parameter.element, to: value)
+        didUpdate(parameter: parameter, to: value)
     }
 
     func submit() {
@@ -84,10 +81,10 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.debug("Ignoring attempt to submit invalid parameters.")
             return
         }
-        willSubmit(parameters: currentState.parameters)
+        willSubmit(parameters: Array(currentState.parameters.values))
         let values: [String: PONativeAlternativePaymentSubmitDataV2.Parameter]
         do {
-            values = try validatedValues(for: currentState.parameters)
+            values = try validatedValues(for: Array(currentState.parameters.values))
         } catch {
             attemptRecoverSubmissionError(error, replaceErrorMessages: false)
             return
@@ -154,13 +151,12 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func setState(with payment: NativeAlternativePaymentServiceAdapterResponse) async {
         switch payment.state {
         case .nextStepRequired:
-            switch payment.nextStep {
-            case .submitData(let nextStep):
-                await setStartedState(nextStep: nextStep)
-            case .redirect(let nextStep):
-                let newState = State.AwaitingRedirect(redirect: nextStep)
+            if let redirect = payment.redirect {
+                let newState = State.AwaitingRedirect(redirect: redirect)
                 state = .awaitingRedirect(newState)
-            default:
+            } else if let elements = payment.elements {
+                await setStartedState(elements: elements)
+            } else {
                 let failure = POFailure(message: "Unsupported next step.", code: .Mobile.generic)
                 setFailureState(error: failure)
             }
@@ -177,8 +173,8 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Starting State
 
-    private func setStartedState(nextStep: PONativeAlternativePaymentNextStepV2.SubmitData) async {
-        let parameters = await createParameters(specifications: nextStep.parameters.parameterDefinitions)
+    private func setStartedState(elements: [PONativeAlternativePaymentElementV2]) async {
+        let parameters = await createParameters(for: elements)
         switch state {
         case .starting, .submitting, .redirecting:
             break // todo(andrii-vysotskyi): check if more states should be supported
@@ -189,14 +185,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         if parameters.isEmpty {
             logger.info("Will set started state with empty inputs, this may be unexpected.")
         }
-        for parameter in parameters {
-            if case .unknown = parameter.specification {
-                let failure = POFailure(message: "Unable to proceed with unknown parameter.", code: .Mobile.generic)
-                setFailureState(error: failure)
-                return
-            }
-        }
         let startedState = State.Started(
+            elements: elements,
             parameters: parameters,
             isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
         )
@@ -231,7 +221,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func setAwaitingCompletionState(payment: NativeAlternativePaymentServiceAdapterResponse) async {
         do {
-            let customerInstructions = try await resolve(customerInstructions: payment.customerInstructions)
+            let resolvedElements = try await resolve(elements: payment.elements ?? [])
             switch state {
             case .starting, .submitting, .redirecting:
                 break
@@ -239,11 +229,11 @@ final class NativeAlternativePaymentDefaultInteractor:
                 logger.debug("Ignoring attempt to wait for payment confirmation from unsupported state.")
                 return
             }
-            send(event: .willWaitForPaymentConfirmation(.init(additionalActionExpected: !customerInstructions.isEmpty)))
+            send(event: .willWaitForPaymentConfirmation(.init()))
             let shouldConfirmPayment =
-                !customerInstructions.isEmpty && configuration.paymentConfirmation.confirmButton != nil
+                !resolvedElements.isEmpty && configuration.paymentConfirmation.confirmButton != nil
             let awaitingPaymentCompletionState = State.AwaitingCompletion(
-                customerInstructions: customerInstructions,
+                elements: resolvedElements,
                 isCancellable: configuration.paymentConfirmation.cancelButton?.disabledFor.isZero ?? true,
                 isDelayed: false,
                 shouldConfirmPayment: shouldConfirmPayment
@@ -304,7 +294,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func setCompletedState(payment: NativeAlternativePaymentServiceAdapterResponse) async {
         do {
-            let resolvedCustomerInstructions = try await resolve(customerInstructions: payment.customerInstructions)
+            let resolvedElements = try await resolve(elements: payment.elements ?? [])
             guard !state.isSink else {
                 logger.debug("Already in a sink state, ignoring attempt to set completed state.")
                 return
@@ -319,7 +309,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 completion(.success(()))
             }
             state = .completed(
-                .init(customerInstructions: resolvedCustomerInstructions, completionTask: task)
+                .init(elements: resolvedElements, completionTask: task)
             )
             send(event: .didCompletePayment)
         } catch {
@@ -353,7 +343,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             setFailureState(error: failure)
             return
         }
-        for (offset, parameter) in newState.parameters.enumerated() {
+        for parameter in newState.parameters.values {
             let errorMessage: String?
             if !replaceErrorMessages {
                 errorMessage = invalidFields[parameter.specification.key]?.message
@@ -362,7 +352,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             } else {
                 errorMessage = nil
             }
-            newState.parameters[offset].recentErrorMessage = errorMessage
+            newState.parameters[parameter.specification.key]?.recentErrorMessage = errorMessage
         }
         state = .started(newState)
         send(event: .didFailToSubmitParameters(failure: failure))
@@ -436,23 +426,30 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Utils
 
     private func createParameters(
-        specifications: [PONativeAlternativePaymentNextStepV2.SubmitData.Parameter]
-    ) async -> [NativeAlternativePaymentInteractorState.Parameter] {
-        var parameters = specifications.map { specification in
-            let formatter: Foundation.Formatter? = switch specification {
-            case .card:
-                POCardNumberFormatter()
-            default:
-                nil
+        for elements: [PONativeAlternativePaymentElementV2]
+    ) async -> [String: NativeAlternativePaymentInteractorState.Parameter] {
+        let parameters = elements.flatMap { element -> [State.Parameter] in
+            guard case let .form(form) = element else {
+                return []
             }
-            return State.Parameter(specification: specification, formatter: formatter)
+            let parameters = form.parameters.parameterDefinitions.map { specification in
+                let formatter: Foundation.Formatter? = switch specification {
+                case .card:
+                    POCardNumberFormatter()
+                default:
+                    nil
+                }
+                return State.Parameter(specification: specification, formatter: formatter)
+            }
+            return parameters
         }
-        await setDefaultValues(parameters: &parameters)
-        return parameters
+        var groupedParameters = Dictionary(grouping: parameters, by: \.specification.key).compactMapValues(\.first)
+        await setDefaultValues(parameters: &groupedParameters)
+        return groupedParameters
     }
 
     private func errorMessage(
-        parameter: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter
+        parameter: PONativeAlternativePaymentFormV2.Parameter
     ) -> String {
         // Server doesn't support localized error messages, so local generic error
         // description is used instead in case particular field is invalid.
@@ -494,18 +491,18 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Customer Instructions
 
     private func resolve(
-        customerInstructions: [PONativeAlternativePaymentCustomerInstructionV2]?
-    ) async throws -> [NativeAlternativePaymentResolvedCustomerInstruction] {
-        var resolvedInstructions: [NativeAlternativePaymentResolvedCustomerInstruction] = []
-        for instruction in customerInstructions ?? [] {
+        group: PONativeAlternativePaymentInstructionsGroupV2
+    ) async throws -> NativeAlternativePaymentResolvedElement.Group {
+        var resolvedInstructions: [NativeAlternativePaymentResolvedElement.Instruction] = []
+        for instruction in group.instructions {
             resolvedInstructions.append(try await resolve(customerInstruction: instruction))
         }
-        return resolvedInstructions
+        return .init(label: group.label, instructions: resolvedInstructions)
     }
 
     private func resolve(
         customerInstruction: PONativeAlternativePaymentCustomerInstructionV2
-    ) async throws -> NativeAlternativePaymentResolvedCustomerInstruction {
+    ) async throws -> NativeAlternativePaymentResolvedElement.Instruction {
         switch customerInstruction {
         case .barcode(let barcode):
             let minimumSize = CGSize(width: 250, height: 250)
@@ -521,11 +518,42 @@ final class NativeAlternativePaymentDefaultInteractor:
                 throw POFailure(message: "Unable to prepare customer instruction image.", code: .Mobile.internal)
             }
             return .image(image)
-        case .group(let group):
-            let resolvedInstructions = try await resolve(customerInstructions: group.instructions)
-            return .group(.init(label: group.label, instructions: resolvedInstructions))
         default:
             throw POFailure(message: "Unable to resolve unknown customer instruction.", code: .Mobile.generic)
+        }
+    }
+
+    // MARK: - Element
+
+    private func resolve(
+        elements: [PONativeAlternativePaymentElementV2]
+    ) async throws -> [NativeAlternativePaymentResolvedElement] {
+        var resolvedElements: [NativeAlternativePaymentResolvedElement] = []
+        for element in elements {
+            if let resolvedElement = try await resolve(element: element) {
+                resolvedElements.append(resolvedElement)
+            }
+        }
+        return resolvedElements
+    }
+
+    private func resolve(
+        element: PONativeAlternativePaymentElementV2
+    ) async throws -> NativeAlternativePaymentResolvedElement? {
+        switch element {
+        case .form(let form):
+            for parameter in form.parameters.parameterDefinitions {
+                if case .unknown = parameter {
+                    throw POFailure(message: "Unable to proceed with unknown parameter.", code: .Mobile.generic)
+                }
+            }
+            return .form(form)
+        case .customerInstruction(let instruction):
+            return .instruction(try await resolve(customerInstruction: instruction))
+        case .group(let group):
+            return .group(try await resolve(group: group))
+        case .unknown:
+            return nil
         }
     }
 
@@ -533,17 +561,17 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     /// Updates parameters with default values.
     private func setDefaultValues(
-        parameters: inout [NativeAlternativePaymentInteractorState.Parameter]
+        parameters: inout [String: NativeAlternativePaymentInteractorState.Parameter]
     ) async {
         guard !parameters.isEmpty else {
             return
         }
         let defaultValues = await delegate?.nativeAlternativePayment(
-            defaultValuesFor: parameters.map(\.specification)
+            defaultValuesFor: parameters.values.map(\.specification)
         )
-        for (offset, parameter) in parameters.enumerated() {
-            parameters[offset].value = defaultValue(
-                for: parameter, fallback: defaultValues?[parameter.specification.key]
+        for parameter in parameters.values {
+            parameters[parameter.specification.key]?.value = defaultValue(
+                for: parameter, fallback: defaultValues?[ parameter.specification.key]
             )
         }
     }

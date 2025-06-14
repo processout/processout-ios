@@ -20,8 +20,11 @@ enum NativeAlternativePaymentInteractorState {
 
     struct Started {
 
+        /// Elements.
+        var elements: [PONativeAlternativePaymentElementV2]
+
         /// Parameters that are expected from user.
-        var parameters: [Parameter]
+        var parameters: [String: Parameter]
 
         /// Boolean value indicating whether user should be able to manually cancel payment in current state.
         var isCancellable: Bool
@@ -39,7 +42,7 @@ enum NativeAlternativePaymentInteractorState {
     struct AwaitingRedirect {
 
         /// Redirect information.
-        let redirect: PONativeAlternativePaymentNextStepV2.Redirect
+        let redirect: PONativeAlternativePaymentRedirectV2
     }
 
     struct Redirecting {
@@ -50,8 +53,8 @@ enum NativeAlternativePaymentInteractorState {
 
     struct AwaitingCompletion {
 
-        /// Additional customer instructions.
-        let customerInstructions: [NativeAlternativePaymentResolvedCustomerInstruction]
+        /// Resolved elements.
+        let elements: [NativeAlternativePaymentResolvedElement]
 
         /// Boolean value indicating whether user should be able to manually cancel payment in current state.
         var isCancellable: Bool
@@ -69,8 +72,8 @@ enum NativeAlternativePaymentInteractorState {
 
     struct Completed {
 
-        /// Additional customer instructions.
-        let customerInstructions: [NativeAlternativePaymentResolvedCustomerInstruction]
+        /// Resolved elements.
+        let elements: [NativeAlternativePaymentResolvedElement]
 
         /// Task that handles completion invocation.
         let completionTask: Task<Void, Never>
@@ -79,7 +82,7 @@ enum NativeAlternativePaymentInteractorState {
     struct Parameter {
 
         /// Parameter specification that includes but not limited to its type, length, name etc.
-        let specification: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter
+        let specification: PONativeAlternativePaymentFormV2.Parameter
 
         /// Formatter that could be used to format parameter.
         let formatter: Formatter?
@@ -123,7 +126,7 @@ extension NativeAlternativePaymentInteractorState.Started {
 
     /// Boolean value that allows to determine whether all parameters are valid.
     var areParametersValid: Bool {
-        parameters.allSatisfy { $0.recentErrorMessage == nil }
+        parameters.values.allSatisfy { $0.recentErrorMessage == nil }
     }
 }
 

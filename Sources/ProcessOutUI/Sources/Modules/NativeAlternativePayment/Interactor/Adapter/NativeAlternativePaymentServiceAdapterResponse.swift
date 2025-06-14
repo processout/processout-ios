@@ -12,24 +12,24 @@ struct NativeAlternativePaymentServiceAdapterResponse {
     /// Payment state.
     let state: PONativeAlternativePaymentStateV2
 
-    /// Next step if any.
-    let nextStep: PONativeAlternativePaymentNextStepV2?
+    /// UI elements.
+    let elements: [PONativeAlternativePaymentElementV2]?
 
-    /// Instructions providing additional information to customer and/or describing additional actions.
-    let customerInstructions: [PONativeAlternativePaymentCustomerInstructionV2]?
+    /// Redirect details.
+    let redirect: PONativeAlternativePaymentRedirectV2?
 }
 
 extension NativeAlternativePaymentServiceAdapterResponse {
 
     init(authorizationResponse: PONativeAlternativePaymentAuthorizationResponseV2) {
         self.state = authorizationResponse.state
-        self.nextStep = authorizationResponse.nextStep
-        self.customerInstructions = authorizationResponse.customerInstructions
+        self.elements = authorizationResponse.elements
+        self.redirect = authorizationResponse.redirect
     }
 
     init(tokenizationResponse: PONativeAlternativePaymentTokenizationResponseV2) {
         self.state = tokenizationResponse.state
-        self.nextStep = tokenizationResponse.nextStep
-        self.customerInstructions = tokenizationResponse.customerInstructions
+        self.elements = tokenizationResponse.elements
+        self.redirect = tokenizationResponse.redirect
     }
 }

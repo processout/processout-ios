@@ -14,7 +14,7 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
     public struct WillSubmitParameters: Sendable {
 
         /// Available parameters.
-        public let parameters: [PONativeAlternativePaymentNextStepV2.SubmitData.Parameter]
+        public let parameters: [PONativeAlternativePaymentFormV2.Parameter]
     }
 
     public struct DidSubmitParameters: Sendable {
@@ -22,15 +22,12 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
         public let additionalParametersExpected: Bool
     }
 
-    public struct WillWaitForPaymentConfirmation: Sendable {
-
-        public let additionalActionExpected: Bool
-    }
+    public struct WillWaitForPaymentConfirmation: Sendable { }
 
     public struct ParametersChanged: Sendable {
 
         /// Parameter definition that the user changed.
-        public let parameter: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter
+        public let parameter: PONativeAlternativePaymentFormV2.Parameter
     }
 
     public struct DidFail: Sendable {

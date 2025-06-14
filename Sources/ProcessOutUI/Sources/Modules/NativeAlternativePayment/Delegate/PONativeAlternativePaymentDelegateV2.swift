@@ -21,6 +21,6 @@ public protocol PONativeAlternativePaymentDelegateV2: AnyObject, Sendable {
     /// - Returns: Dictionary where key is a parameter key, and value is desired default.
     @MainActor
     func nativeAlternativePayment(
-        defaultValuesFor parameters: [PONativeAlternativePaymentNextStepV2.SubmitData.Parameter]
+        defaultValuesFor parameters: [PONativeAlternativePaymentFormV2.Parameter]
     ) async -> [String: PONativeAlternativePaymentParameterValue]
 }
