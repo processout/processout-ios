@@ -7,13 +7,38 @@
 
 import SwiftUI
 
-/// A button that adds value to the pasteboard.
+/// A button that adds a value to the pasteboard.
 @available(iOS 14.0, *)
 @_spi(PO)
 public struct POCopyButton: View {
 
-    public init(value: String) {
-        self.value = value
+    /// Configuration for `POCopyButton`, allowing customization of the copied value and displayed text.
+    public struct Configuration {
+
+        /// Creates a new configuration for `POCopyButton`.
+        ///
+        /// - Parameters:
+        ///   - value: The string to be copied to the pasteboard.
+        ///   - copyTitle: The text shown before the copy action. Default is `"Copy"`.
+        ///   - copiedTitle: The text shown after the value has been copied. Default is `"Copied!"`.
+        public init(value: String, copyTitle: String, copiedTitle: String) {
+            self.value = value
+            self.copyTitle = copyTitle
+            self.copiedTitle = copiedTitle
+        }
+
+        /// The string value to be copied to the pasteboard when the button is tapped.
+        let value: String
+
+        /// The text shown on the button before the value is copied.
+        let copyTitle: String
+
+        /// The text shown on the button after the value has been copied.
+        let copiedTitle: String
+    }
+
+    public init(configuration: Configuration) {
+        self.configuration = configuration
         isShowingCopiedMessage = false
     }
 
@@ -24,7 +49,7 @@ public struct POCopyButton: View {
             copyToPasteboard()
         } label: {
             Label {
-                Text(isShowingCopiedMessage ? "Copied!" : "Copy")
+                Text(isShowingCopiedMessage ? configuration.copiedTitle : configuration.copyTitle)
             } icon: {
                 Image(poResource: isShowingCopiedMessage ? .check : .docOnDoc)
                     .resizable()
@@ -39,7 +64,7 @@ public struct POCopyButton: View {
 
     // MARK: - Private Properties
 
-    private let value: String
+    private let configuration: Configuration
 
     @State
     private var messageInvalidationTimer: Timer?
@@ -55,15 +80,6 @@ public struct POCopyButton: View {
             isShowingCopiedMessage = false
         }
         isShowingCopiedMessage = true
-        UIPasteboard.general.string = value
+        UIPasteboard.general.string = configuration.value
     }
-}
-
-@available(iOS 14, *)
-#Preview {
-    POCopyButton(value: "Value")
-        .buttonStyle(.secondary)
-        .backport.poControlSize(.small)
-        .controlWidth(.regular)
-        .padding()
 }
