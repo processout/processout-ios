@@ -26,11 +26,22 @@ extension PONativeAlternativePaymentView {
     ) {
         let viewModel = {
             var logger = ProcessOut.shared.logger
-            logger[attributeKey: .invoiceId] = configuration.invoiceId
-            logger[attributeKey: .gatewayConfigurationId] = configuration.gatewayConfigurationId
+            switch configuration.flow {
+            case .authorization(let flow):
+                logger[attributeKey: .invoiceId] = flow.invoiceId
+                logger[attributeKey: .gatewayConfigurationId] = flow.gatewayConfigurationId
+            case .tokenization(let flow):
+                logger[attributeKey: .customerId] = flow.customerId
+                logger[attributeKey: .customerTokenId] = flow.customerTokenId
+                logger[attributeKey: .gatewayConfigurationId] = flow.gatewayConfigurationId
+            }
             let interactor = NativeAlternativePaymentDefaultInteractor(
                 configuration: configuration,
-                invoicesService: ProcessOut.shared.invoices,
+                serviceAdapter: DefaultNativeAlternativePaymentServiceAdapter(
+                    invoicesService: ProcessOut.shared.invoices,
+                    tokensService: ProcessOut.shared.customerTokens,
+                    paymentConfirmationTimeout: configuration.paymentConfirmation.timeout
+                ),
                 imagesRepository: ProcessOut.shared.images,
                 barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
                 logger: logger,
@@ -64,7 +75,11 @@ extension PONativeAlternativePaymentView {
             logger[attributeKey: .gatewayConfigurationId] = configuration.gatewayConfigurationId
             let interactor = NativeAlternativePaymentDefaultInteractor(
                 configuration: configuration,
-                invoicesService: ProcessOut.shared.invoices,
+                serviceAdapter: DefaultNativeAlternativePaymentServiceAdapter(
+                    invoicesService: ProcessOut.shared.invoices,
+                    tokensService: ProcessOut.shared.customerTokens,
+                    paymentConfirmationTimeout: configuration.paymentConfirmation.timeout
+                ),
                 imagesRepository: ProcessOut.shared.images,
                 barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
                 logger: logger,
