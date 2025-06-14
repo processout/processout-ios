@@ -7,24 +7,21 @@
 
 protocol InvoicesRepository: PORepository {
 
+    /// Creates invoice with given parameters.
+    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice
+
     /// Invoice details.
     func invoice(request: POInvoiceRequest) async throws -> POInvoice
 
-    /// Returns alternative payment details.
-    func nativeAlternativePayment(
-        request: NativeAlternativePaymentAuthorizationDetailsRequestV2
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
+    // MARK: - Invoice Authorization
+
+    /// Performs invoice authorization with given request.
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> _CustomerAction?
 
     /// Continue alternative payment.
     func authorizeInvoice(
         request: PONativeAlternativePaymentAuthorizationRequestV2
     ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
-
-    /// Performs invoice authorization with given request.
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> _CustomerAction?
-
-    /// Creates invoice with given parameters.
-    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice
 
     // MARK: - Alternative Payment (Deprecated)
 

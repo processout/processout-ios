@@ -15,57 +15,16 @@ final class HttpInvoicesRepository: InvoicesRepository {
 
     // MARK: - InvoicesRepository
 
-    func nativeAlternativePaymentMethodTransactionDetails(
-        request: PONativeAlternativePaymentMethodTransactionDetailsRequest
-    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
+    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
         struct Response: Decodable, Sendable {
-            let nativeApm: PONativeAlternativePaymentMethodTransactionDetails
+            let invoice: POInvoice
         }
-        let httpRequest = HttpConnectorRequest<Response>.get(
-            path: "/invoices/\(request.invoiceId)/native-payment/\(request.gatewayConfigurationId)"
-        )
-        return try await connector.execute(request: httpRequest).nativeApm
-    }
-
-    func nativeAlternativePayment(
-        request: NativeAlternativePaymentAuthorizationDetailsRequestV2
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
-        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentAuthorizationResponseV2>.get(
-            path: "/invoices/\(request.invoiceId)/apm-payment/\(request.gatewayConfigurationId)"
-        )
-        return try await connector.execute(request: httpRequest)
-    }
-
-    func authorizeInvoice(
-        request: PONativeAlternativePaymentAuthorizationRequestV2
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
-        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentAuthorizationResponseV2>.post(
-            path: "/invoices/\(request.invoiceId)/apm-payment", body: request
-        )
-        return try await connector.execute(request: httpRequest)
-    }
-
-    func initiatePayment(
-        request: PONativeAlternativePaymentMethodRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse {
-        struct Request: Encodable, Sendable {
-            struct NativeApm: Encodable, Sendable { // swiftlint:disable:this nesting
-                let parameterValues: [String: String]
-            }
-            let gatewayConfigurationId: String
-            let nativeApm: NativeApm
-        }
-        struct Response: Decodable, Sendable {
-            let nativeApm: PONativeAlternativePaymentMethodResponse
-        }
-        let requestBox = Request(
-            gatewayConfigurationId: request.gatewayConfigurationId,
-            nativeApm: .init(parameterValues: request.parameters)
-        )
         let httpRequest = HttpConnectorRequest<Response>.post(
-            path: "/invoices/\(request.invoiceId)/native-payment", body: requestBox
+            path: "/invoices", body: request, includesDeviceMetadata: true, requiresPrivateKey: true
         )
-        return try await connector.execute(request: httpRequest).nativeApm
+        let response = try await connector.execute(request: httpRequest) as HttpConnectorResponse
+        let clientSecret = response.headers["x-processout-client-secret"]
+        return response.value.invoice.replacing(clientSecret: clientSecret)
     }
 
     func invoice(request: POInvoiceRequest) async throws -> POInvoice {
@@ -102,6 +61,52 @@ final class HttpInvoicesRepository: InvoicesRepository {
         return try await connector.execute(request: httpRequest).customerAction
     }
 
+    func authorizeInvoice(
+        request: PONativeAlternativePaymentAuthorizationRequestV2
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
+        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentAuthorizationResponseV2>.post(
+            path: "/invoices/\(request.invoiceId)/apm-payment", body: request
+        )
+        return try await connector.execute(request: httpRequest)
+    }
+
+    // MARK: - Deprecated
+
+    func nativeAlternativePaymentMethodTransactionDetails(
+        request: PONativeAlternativePaymentMethodTransactionDetailsRequest
+    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails {
+        struct Response: Decodable, Sendable {
+            let nativeApm: PONativeAlternativePaymentMethodTransactionDetails
+        }
+        let httpRequest = HttpConnectorRequest<Response>.get(
+            path: "/invoices/\(request.invoiceId)/native-payment/\(request.gatewayConfigurationId)"
+        )
+        return try await connector.execute(request: httpRequest).nativeApm
+    }
+
+    func initiatePayment(
+        request: PONativeAlternativePaymentMethodRequest
+    ) async throws -> PONativeAlternativePaymentMethodResponse {
+        struct Request: Encodable, Sendable {
+            struct NativeApm: Encodable, Sendable { // swiftlint:disable:this nesting
+                let parameterValues: [String: String]
+            }
+            let gatewayConfigurationId: String
+            let nativeApm: NativeApm
+        }
+        struct Response: Decodable, Sendable {
+            let nativeApm: PONativeAlternativePaymentMethodResponse
+        }
+        let requestBox = Request(
+            gatewayConfigurationId: request.gatewayConfigurationId,
+            nativeApm: .init(parameterValues: request.parameters)
+        )
+        let httpRequest = HttpConnectorRequest<Response>.post(
+            path: "/invoices/\(request.invoiceId)/native-payment", body: requestBox
+        )
+        return try await connector.execute(request: httpRequest).nativeApm
+    }
+
     func captureNativeAlternativePayment(
         request: NativeAlternativePaymentCaptureRequest
     ) async throws -> PONativeAlternativePaymentMethodResponse {
@@ -112,18 +117,6 @@ final class HttpInvoicesRepository: InvoicesRepository {
             path: "/invoices/\(request.invoiceId)/capture", body: request
         )
         return try await connector.execute(request: httpRequest).nativeApm
-    }
-
-    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
-        struct Response: Decodable, Sendable {
-            let invoice: POInvoice
-        }
-        let httpRequest = HttpConnectorRequest<Response>.post(
-            path: "/invoices", body: request, includesDeviceMetadata: true, requiresPrivateKey: true
-        )
-        let response = try await connector.execute(request: httpRequest) as HttpConnectorResponse
-        let clientSecret = response.headers["x-processout-client-secret"]
-        return response.value.invoice.replacing(clientSecret: clientSecret)
     }
 
     // MARK: - Private Properties

@@ -131,7 +131,7 @@ public enum PONativeAlternativePaymentNextStepV2: Sendable {
                 public let required: Bool
 
                 /// Supported dialing codes.
-                public let dialingCodes: [DialingCode]?
+                public let dialingCodes: [DialingCode]
             }
 
             /// Email parameter.
