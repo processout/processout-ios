@@ -8,8 +8,8 @@
 import Foundation
 import Combine
 import SwiftUI
-import ProcessOut
-import ProcessOutUI
+@_spi(PO) import ProcessOut
+@_spi(PO) import ProcessOutUI
 
 @MainActor
 final class AlternativePaymentsViewModel: ObservableObject {
@@ -178,8 +178,9 @@ final class AlternativePaymentsViewModel: ObservableObject {
     private func authorizeNatively(invoice: POInvoice, gatewayConfigurationId: String) async throws {
         try await withCheckedThrowingContinuation { continuation in
             let configuration = PONativeAlternativePaymentConfiguration(
-                invoiceId: invoice.id,
-                gatewayConfigurationId: gatewayConfigurationId,
+                flow: .authorization(
+                    .init(invoiceId: invoice.id, gatewayConfigurationId: gatewayConfigurationId)
+                ),
                 cancelButton: .init(
                     confirmation: .init()
                 ),
