@@ -75,9 +75,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             update(with: state)
         case .submitting(let state):
             update(withSubmittingState: state.snapshot)
-        case .awaitingCapture(let state):
+        case .awaitingCompletion(let state):
             update(with: state)
-        case .captured(let state) where configuration.success != nil:
+        case .completed(let state) where configuration.success != nil:
             update(with: state)
         default:
             break // Ignored
@@ -181,7 +181,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     // MARK: - Awaiting Capture State
 
-    private func update(with state: InteractorState.AwaitingCapture) {
+    private func update(with state: InteractorState.AwaitingCompletion) {
         let newState = NativeAlternativePaymentViewModelState(
             sections: createSections(state: state),
             actions: createActions(state: state),
@@ -192,7 +192,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         self.state = newState
     }
 
-    private func createSections(state: InteractorState.AwaitingCapture) -> [NativeAlternativePaymentViewModelSection] {
+    private func createSections(
+        state: InteractorState.AwaitingCompletion
+    ) -> [NativeAlternativePaymentViewModelSection] {
         // todo(andrii-vysotskyi): create proper sections
         let items: [NativeAlternativePaymentViewModelItem]
 
@@ -201,8 +203,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         } else {
             var customerInstructionItems: [NativeAlternativePaymentViewModelItem] = []
             for customerInstruction in state.customerInstructions {
-                let item = createItem(for: customerInstruction)
-                customerInstructionItems.append(item)
+                let items = createItems(for: customerInstruction)
+                customerInstructionItems.append(contentsOf: items)
             }
             items = customerInstructionItems
         }
@@ -228,7 +230,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         return [section]
     }
 
-    private func createActions(state: InteractorState.AwaitingCapture) -> [POButtonViewModel] {
+    private func createActions(state: InteractorState.AwaitingCompletion) -> [POButtonViewModel] {
         let actions = [
             createConfirmPaymentCaptureAction(state: state),
             createSaveBarcodeImageAction(state: state),
@@ -240,8 +242,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         return actions.compactMap { $0 }
     }
 
-    private func createConfirmPaymentCaptureAction(state: InteractorState.AwaitingCapture) -> POButtonViewModel? {
-        guard state.shouldConfirmCapture else {
+    private func createConfirmPaymentCaptureAction(state: InteractorState.AwaitingCompletion) -> POButtonViewModel? {
+        guard state.shouldConfirmPayment else {
             return nil
         }
         guard let buttonConfiguration = interactor.configuration.paymentConfirmation.confirmButton else {
@@ -254,13 +256,13 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             icon: buttonConfiguration.icon,
             role: .primary,
             action: { [weak self] in
-                self?.interactor.confirmCapture()
+                self?.interactor.confirmPayment()
             }
         )
         return action
     }
 
-    private func createSaveBarcodeImageAction(state: InteractorState.AwaitingCapture) -> POButtonViewModel? {
+    private func createSaveBarcodeImageAction(state: InteractorState.AwaitingCompletion) -> POButtonViewModel? {
         // todo(andrii-vysotskyi): create button per single instruction
         nil
 //        guard let customerAction = state.customerAction,
@@ -306,7 +308,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     // MARK: - Captured State
 
-    private func update(with state: InteractorState.Captured) {
+    private func update(with state: InteractorState.Completed) {
         let newState = NativeAlternativePaymentViewModelState(
             sections: createSections(state: state),
             actions: [],
@@ -317,7 +319,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         self.state = newState
     }
 
-    private func createSections(state: InteractorState.Captured) -> [NativeAlternativePaymentViewModelSection] {
+    private func createSections(state: InteractorState.Completed) -> [NativeAlternativePaymentViewModelSection] {
         []
 //        let item = NativeAlternativePaymentViewModelItem.Submitted(
 //            id: "captured",
@@ -337,62 +339,124 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     // MARK: - Input Items
 
-    // swiftlint:disable:next function_body_length
     private func createItem(parameter: InteractorState.Parameter) -> NativeAlternativePaymentViewModelItem {
         // todo(andrii-vysotskyi): support new parameter types
         switch parameter.specification {
-        case .otp(let specification) where (specification.maxLength ?? .max) <= Constants.maximumCodeLength:
-            let codeInputItem = NativeAlternativePaymentViewModelItem.CodeInput(
-                id: specification.key,
-                length: specification.maxLength!, // swiftlint:disable:this force_unwrapping
-                value: .init(
-                    get: { parameter.value ?? "" },
-                    set: { [weak self] newValue in
-                        self?.interactor.updateValue(newValue, for: specification.key)
-                    }
-                ),
-                isInvalid: parameter.recentErrorMessage != nil
-            )
-            return .codeInput(codeInputItem)
+        case .otp(let specification):
+            if let item = createItem(for: parameter, with: specification) {
+                return item
+            }
+        case .phoneNumber(let specification):
+            return createItem(for: parameter, with: specification)
         case .singleSelect(let specification):
-            let pickerItem = NativeAlternativePaymentViewModelItem.Picker(
-                id: specification.key,
-                options: specification.availableValues.map { availableValue in
-                    .init(id: availableValue.value, title: availableValue.label)
-                },
-                selectedOptionId: .init(
-                    get: { parameter.value },
-                    set: { [weak self] newValue in
-                        self?.interactor.updateValue(newValue, for: parameter.specification.key)
-                    }
-                ),
-                isInvalid: parameter.recentErrorMessage != nil,
-                preferrsInline: specification.availableValues.count <= configuration.inlineSingleSelectValuesLimit
-            )
-            return .picker(pickerItem)
+            return createItem(for: parameter, with: specification)
         default:
-            let inputItem = NativeAlternativePaymentViewModelItem.Input(
-                id: parameter.specification.key,
-                value: .init(
-                    get: { parameter.value ?? "" },
-                    set: { [weak self] newValue in
-                        self?.interactor.updateValue(newValue, for: parameter.specification.key)
-                    }
-                ),
-                placeholder: placeholder(for: parameter.specification),
-                icon: nil,
-                isInvalid: parameter.recentErrorMessage != nil,
-                isEnabled: true,
-                formatter: parameter.formatter,
-                keyboard: keyboard(parameter: parameter.specification),
-                contentType: contentType(parameter: parameter.specification),
-                submitLabel: .next,
-                onSubmit: { [weak self] in
-                    self?.submitFocusedInput()
-                }
-            )
-            return .input(inputItem)
+            break
         }
+        return createInputItem(for: parameter)
+    }
+
+    private func createItem(
+        for parameter: InteractorState.Parameter,
+        with specification: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter.Otp
+    ) -> NativeAlternativePaymentViewModelItem? {
+        guard let maxLength = specification.maxLength, maxLength <= Constants.maximumCodeLength else {
+            return nil
+        }
+        let value = Binding<String> {
+            if case .string(let value) = parameter.value {
+                return value
+            }
+            return ""
+        } set: { [weak self] newValue in
+            self?.interactor.updateValue(.string(newValue), for: specification.key)
+        }
+        let codeInputItem = NativeAlternativePaymentViewModelItem.CodeInput(
+            id: specification.key,
+            length: maxLength,
+            value: value,
+            isInvalid: parameter.recentErrorMessage != nil
+        )
+        return .codeInput(codeInputItem)
+    }
+
+    private func createItem(
+        for parameter: InteractorState.Parameter,
+        with specification: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter.PhoneNumber
+    ) -> NativeAlternativePaymentViewModelItem {
+        let territories = specification.dialingCodes.map { dialingCode in
+            let displayName = Locale.current.localizedString(forRegionCode: dialingCode.id)
+            return POPhoneNumber.Territory(id: dialingCode.id, displayName: displayName ?? "", code: dialingCode.value)
+        }
+        let value = Binding<ProcessOutCoreUI.POPhoneNumber> {
+            if case .phone(let value) = parameter.value {
+                return .init(territoryId: value.regionCode, number: value.number ?? "")
+            }
+            return .init(territoryId: nil, number: "")
+        } set: { [weak self] newValue in
+            self?.interactor.updateValue(
+                .phone(.init(regionCode: newValue.territoryId, number: newValue.number)),
+                for: parameter.specification.key
+            )
+        }
+        let phoneNumberInputItem = NativeAlternativePaymentViewModelItem.PhoneNumberInput(
+            id: specification.key,
+            territories: territories,
+            value: value,
+            isInvalid: parameter.recentErrorMessage != nil
+        )
+        return .phoneNumberInput(phoneNumberInputItem)
+    }
+
+    private func createItem(
+        for parameter: InteractorState.Parameter,
+        with specification: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter.SingleSelect
+    ) -> NativeAlternativePaymentViewModelItem {
+        let value = Binding<String?> {
+            if case .string(let currentValue) = parameter.value {
+                return currentValue
+            }
+            return nil
+        } set: { [weak self] newValue in
+            self?.interactor.updateValue(.string(newValue ?? ""), for: parameter.specification.key)
+        }
+        let pickerItem = NativeAlternativePaymentViewModelItem.Picker(
+            id: specification.key,
+            options: specification.availableValues.map { availableValue in
+                .init(id: availableValue.value, title: availableValue.label)
+            },
+            selectedOptionId: value,
+            isInvalid: parameter.recentErrorMessage != nil,
+            preferrsInline: specification.availableValues.count <= configuration.inlineSingleSelectValuesLimit
+        )
+        return .picker(pickerItem)
+    }
+
+    private func createInputItem(for parameter: InteractorState.Parameter) -> NativeAlternativePaymentViewModelItem {
+        let value = Binding<String> {
+            if case .string(let currentValue) = parameter.value {
+                return currentValue
+            }
+            return ""
+        } set: { [weak self] newValue in
+            self?.interactor.updateValue(.string(newValue), for: parameter.specification.key)
+        }
+        let inputItem = NativeAlternativePaymentViewModelItem.Input(
+            id: parameter.specification.key,
+            value: value,
+            placeholder: placeholder(for: parameter.specification),
+            icon: nil,
+            isInvalid: parameter.recentErrorMessage != nil,
+            isEnabled: true,
+            formatter: parameter.formatter,
+            keyboard: keyboard(parameter: parameter.specification),
+            contentType: contentType(parameter: parameter.specification),
+            submitLabel: .next,
+            onSubmit: { [weak self] in
+                self?.submitFocusedInput()
+            }
+        )
+        return .input(inputItem)
     }
 
     private func contentType(
@@ -422,13 +486,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             return .emailAddress
         case .card:
             return .numberPad
-        case .otp(let specification):
-            switch specification.subtype {
-            case .digits:
-                return .numberPad
-            default:
-                return .default
-            }
+        case .otp(let specification) where specification.subtype == .digits:
+            return .numberPad
         default:
             return .default
         }
@@ -447,29 +506,37 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     // MARK: - Customer Instructions
 
-    private func createItem(
+    private func createItems(
         for customerInstruction: NativeAlternativePaymentResolvedCustomerInstruction
-    ) -> NativeAlternativePaymentViewModelItem {
+    ) -> [NativeAlternativePaymentViewModelItem] {
         switch customerInstruction {
         case .barcode(let instruction):
-            let item = NativeAlternativePaymentViewModelItem.Image(
+            let imageItem = NativeAlternativePaymentViewModelItem.Image(
                 id: ObjectIdentifier(instruction.image), image: instruction.image
             )
-            return .image(item)
+            let buttonItem = NativeAlternativePaymentViewModelItem.Button(
+                id: "123", action: { }
+            )
+            return [.image(imageItem), .button(buttonItem)]
         case .text(let instruction):
             let item = NativeAlternativePaymentViewModelItem.Message(
-                id: UUID().uuidString, // ???
+                id: instruction.label, // ???
                 title: instruction.label,
                 text: instruction.value
             )
-            return .message(item)
+            return [.message(item)]
         case .image(let instruction):
             let item = NativeAlternativePaymentViewModelItem.Image(
                 id: ObjectIdentifier(instruction), image: instruction
             )
-            return .image(item)
-        case .group:
-            preconditionFailure("Not supported yet.")
+            return [.image(item)]
+        case .group(let item):
+            let item = NativeAlternativePaymentViewModelItem.Group(
+                id: item.label, // ???
+                label: item.label,
+                items: item.instructions.flatMap(createItems(for:))
+            )
+            return [.group(item)]
         }
     }
 

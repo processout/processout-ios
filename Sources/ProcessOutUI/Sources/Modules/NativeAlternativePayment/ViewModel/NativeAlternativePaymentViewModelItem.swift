@@ -8,7 +8,7 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-enum NativeAlternativePaymentViewModelItem {
+indirect enum NativeAlternativePaymentViewModelItem {
 
     struct Title: Identifiable, Hashable {
 
@@ -63,6 +63,21 @@ enum NativeAlternativePaymentViewModelItem {
         let isInvalid: Bool
     }
 
+    struct PhoneNumberInput: Identifiable {
+
+        let id: AnyHashable
+
+        /// Available territories.
+        let territories: [POPhoneNumber.Territory]
+
+        /// Current parameter's value.
+        @Binding var value: POPhoneNumber
+
+        /// Boolean value indicating whether value is valid.
+        let isInvalid: Bool
+    }
+
+    // no longer needed
     struct Submitted: Identifiable, Hashable {
 
         /// Item identifier.
@@ -109,6 +124,18 @@ enum NativeAlternativePaymentViewModelItem {
         let image: UIImage
     }
 
+    typealias Button = POButtonViewModel
+
+    struct Group {
+
+        let id: AnyHashable
+
+        let label: String?
+
+        /// Items
+        let items: [NativeAlternativePaymentViewModelItem]
+    }
+
     case progress
 
     case title(Title)
@@ -117,13 +144,19 @@ enum NativeAlternativePaymentViewModelItem {
 
     case codeInput(CodeInput)
 
+    case phoneNumberInput(PhoneNumberInput)
+
     case picker(Picker)
 
     case submitted(Submitted)
 
     case message(Message)
 
+    case group(Group)
+
     case image(Image)
+
+    case button(Button)
 }
 
 extension NativeAlternativePaymentViewModelItem: Identifiable {
@@ -138,6 +171,8 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
             return item.id
         case .codeInput(let item):
             return item.id
+        case .phoneNumberInput(let item):
+            return item.id
         case .picker(let item):
             return item.id
         case .submitted(let item):
@@ -145,6 +180,10 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
         case .message(let item):
             return item.id
         case .image(let item):
+            return item.id
+        case .group(let item):
+            return item.id
+        case .button(let item):
             return item.id
         }
     }
