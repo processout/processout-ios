@@ -10,8 +10,8 @@
 struct NativeAlternativePaymentPhoneNumberNormalizer: InputNormalizer {
 
     func normalize(
-        input: NativeAlternativePaymentInteractorState.ParameterValue?
-    ) -> PONativeAlternativePaymentAuthorizationRequestV2.Parameter.Value.Phone? {
+        input: PONativeAlternativePaymentParameterValue?
+    ) -> PONativeAlternativePaymentSubmitDataV2.Parameter.Value.Phone? {
         guard case .phone(let phoneNumber) = input else {
             return nil
         }

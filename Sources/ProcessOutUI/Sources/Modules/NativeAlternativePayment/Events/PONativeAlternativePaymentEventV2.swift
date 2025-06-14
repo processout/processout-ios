@@ -22,7 +22,7 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
         public let additionalParametersExpected: Bool
     }
 
-    public struct WillWaitForCaptureConfirmation: Sendable {
+    public struct WillWaitForPaymentConfirmation: Sendable {
 
         public let additionalActionExpected: Bool
     }
@@ -31,6 +31,12 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
 
         /// Parameter definition that the user changed.
         public let parameter: PONativeAlternativePaymentNextStepV2.SubmitData.Parameter
+    }
+
+    public struct DidFail: Sendable {
+
+        /// Failure.
+        public let failure: POFailure
     }
 
     /// Initial event that is sent prior any other event.
@@ -60,22 +66,22 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
     /// Sent in case parameters submission failed and if error is retriable, otherwise expect `didFail` event.
     case didFailToSubmitParameters(failure: POFailure)
 
-    /// Event is sent after all information is collected, and implementation is waiting for a PSP to confirm capture.
+    /// Event is sent after all information is collected, and implementation is waiting for a PSP to confirm payment.
     /// You could check associated value `additionalActionExpected` to understand whether user needs
     /// to execute additional action(s) outside application, for example confirming operation in his/her banking app
-    /// to make capture happen.
-    case willWaitForCaptureConfirmation(WillWaitForCaptureConfirmation)
+    /// to finalize payment.
+    case willWaitForPaymentConfirmation(WillWaitForPaymentConfirmation)
 
-    /// This event is triggered during the capture stage when the user confirms that they have completed
+    /// This event is triggered during the `PENDING` state when the user confirms that they have completed
     /// any required external action (if applicable). Once the event is triggered, the implementation
-    /// proceeds with the actual capture process.
+    /// proceeds with the actual completion confirmation process.
     case didConfirmPayment
 
-    /// Event is sent after payment was confirmed to be captured. This is a final event.
+    /// Event is sent after payment was confirmed to be completed. This is a final event.
     case didCompletePayment
 
     /// Event is sent in case unretryable error occurs. This is a final event.
-    case didFail(failure: POFailure)
+    case didFail(DidFail)
 
     // MARK: -
 

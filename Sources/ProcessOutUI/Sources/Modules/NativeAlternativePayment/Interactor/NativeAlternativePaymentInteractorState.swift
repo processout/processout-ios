@@ -48,7 +48,7 @@ enum NativeAlternativePaymentInteractorState {
         let snapshot: AwaitingRedirect
     }
 
-    struct AwaitingCapture {
+    struct AwaitingCompletion {
 
         /// Additional customer instructions.
         let customerInstructions: [NativeAlternativePaymentResolvedCustomerInstruction]
@@ -56,18 +56,18 @@ enum NativeAlternativePaymentInteractorState {
         /// Boolean value indicating whether user should be able to manually cancel payment in current state.
         var isCancellable: Bool
 
-        /// Capture task if any.
+        /// Completion confirmation task if any.
         /// - NOTE: For internal use by interactor only.
         var task: Task<Void, Never>?
 
-        /// Boolean value indicating whether capture takes longer than anticipated.
+        /// Boolean value indicating whether completion confirmation takes longer than anticipated.
         var isDelayed: Bool
 
-        /// Boolean value indicating whether payment should be manually confirmed by user to start capture.
-        var shouldConfirmCapture: Bool
+        /// Boolean value indicating whether payment should be manually confirmed by user to continue.
+        var shouldConfirmPayment: Bool
     }
 
-    struct Captured {
+    struct Completed {
 
         /// Additional customer instructions.
         let customerInstructions: [NativeAlternativePaymentResolvedCustomerInstruction]
@@ -85,24 +85,10 @@ enum NativeAlternativePaymentInteractorState {
         let formatter: Formatter?
 
         /// Actual parameter value.
-        var value: ParameterValue?
+        var value: PONativeAlternativePaymentParameterValue?
 
         /// The most recent error message associated with this parameter value.
         var recentErrorMessage: String?
-    }
-
-    enum ParameterValue: Equatable {
-
-        struct Phone: Equatable { // swiftlint:disable:this nesting
-
-            /// Selected region code.
-            let regionCode: String?
-
-            /// National phone number value.
-            let number: String?
-        }
-
-        case string(String), phone(Phone)
     }
 
     /// Initial interactor state.
@@ -127,10 +113,10 @@ enum NativeAlternativePaymentInteractorState {
     case redirecting(Redirecting)
 
     /// Parameters were submitted and accepted.
-    case awaitingCapture(AwaitingCapture)
+    case awaitingCompletion(AwaitingCompletion)
 
     /// Payment is completed.
-    case captured(Captured)
+    case completed(Completed)
 }
 
 extension NativeAlternativePaymentInteractorState.Started {
@@ -145,7 +131,7 @@ extension NativeAlternativePaymentInteractorState: InteractorState {
 
     var isSink: Bool {
         switch self {
-        case .captured, .failure:
+        case .completed, .failure:
             return true
         default:
             return false

@@ -7,7 +7,7 @@
 
 struct NativeAlternativePaymentTextNormalizer: InputNormalizer {
 
-    func normalize(input: NativeAlternativePaymentInteractorState.ParameterValue?) -> String? {
+    func normalize(input: PONativeAlternativePaymentParameterValue?) -> String? {
         if case .string(let value) = input {
             return value
         }

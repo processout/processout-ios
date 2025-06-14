@@ -58,9 +58,19 @@ extension POStringResource {
             /// Email is not valid.
             static let invalidEmail = POStringResource("native-alternative-payment.error.invalid-email", comment: "")
 
-            /// Plural format key: "%#@length@"
+            /// Invalid parameter length.
             static let invalidLength = POStringResource(
                 "native-alternative-payment.error.invalid-length-%d", comment: ""
+            )
+
+            /// Parameter is too short.
+            static let invalidMinLength = POStringResource(
+                "native-alternative-payment.error.invalid-min-length-%d", comment: ""
+            )
+
+            /// Parameter is too long.
+            static let invalidMaxLength = POStringResource(
+                "native-alternative-payment.error.invalid-max-length-%d", comment: ""
             )
 
             /// Number is not valid.

@@ -5,16 +5,57 @@
 //  Created by Andrii Vysotskyi on 23.11.2023.
 //
 
-// swiftlint:disable strict_fileprivate
-
 import Foundation
 import SwiftUI
-import ProcessOut
+@_spi(PO) import ProcessOut
+
+// swiftlint:disable strict_fileprivate file_length nesting
 
 /// A configuration object that defines how a native alternative payment view content.
 @MainActor
 @preconcurrency
 public struct PONativeAlternativePaymentConfiguration {
+
+    public enum Flow: Sendable {
+
+        public struct Authorization: Sendable {
+
+            public init(invoiceId: String, gatewayConfigurationId: String) {
+                self.invoiceId = invoiceId
+                self.gatewayConfigurationId = gatewayConfigurationId
+            }
+
+            /// Unique identifier for the invoice associated with this payment request.
+            public let invoiceId: String
+
+            /// Identifier of the payment gateway configuration to use for this payment.
+            public let gatewayConfigurationId: String
+        }
+
+        public struct Tokenization: Sendable {
+
+            public init(customerId: String, customerTokenId: String, gatewayConfigurationId: String) {
+                self.customerId = customerId
+                self.customerTokenId = customerTokenId
+                self.gatewayConfigurationId = gatewayConfigurationId
+            }
+
+            /// Customer ID.
+            public let customerId: String
+
+            /// Customer token ID.
+            public let customerTokenId: String
+
+            /// Gateway configuration identifier.
+            public let gatewayConfigurationId: String
+        }
+
+        /// Payment authorization flow.
+        case authorization(Authorization)
+
+        /// Payment tokenization flow.
+        case tokenization(Tokenization)
+    }
 
     /// Payment confirmation configuration.
     @MainActor
@@ -161,11 +202,8 @@ public struct PONativeAlternativePaymentConfiguration {
         }
     }
 
-    /// Invoice that should be authorized/captured.
-    public let invoiceId: String
-
-    /// Gateway configuration id that should be used to initiate native alternative payment.
-    public let gatewayConfigurationId: String
+    /// Payment flow.
+    public let flow: Flow
 
     /// Custom title.
     public let title: String?
@@ -198,8 +236,7 @@ public struct PONativeAlternativePaymentConfiguration {
 
     /// Creates configuration.
     public init(
-        invoiceId: String,
-        gatewayConfigurationId: String,
+        flow: Flow,
         title: String? = nil,
         shouldHorizontallyCenterCodeInput: Bool = true,
         inlineSingleSelectValuesLimit: Int = 5,
@@ -209,8 +246,7 @@ public struct PONativeAlternativePaymentConfiguration {
         paymentConfirmation: Confirmation = .init(),
         success: Success? = .init()
     ) {
-        self.invoiceId = invoiceId
-        self.gatewayConfigurationId = gatewayConfigurationId
+        self.flow = flow
         self.title = title
         self.shouldHorizontallyCenterCodeInput = shouldHorizontallyCenterCodeInput
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
@@ -239,6 +275,28 @@ extension PONativeAlternativePaymentConfiguration {
         case cancel(
             title: String? = nil, disabledFor: TimeInterval = 0, confirmation: POConfirmationDialogConfiguration? = nil
         )
+    }
+
+    /// Invoice that should be authorized/captured.
+    @available(*, deprecated, message: "Use flow instead.")
+    public var invoiceId: String {
+        switch flow {
+        case .authorization(let flow):
+            return flow.invoiceId
+        case .tokenization:
+            return ""
+        }
+    }
+
+    /// Gateway configuration id that should be used to initiate native alternative payment.
+    @available(*, deprecated, message: "Use flow instead.")
+    public var gatewayConfigurationId: String {
+        switch flow {
+        case .authorization(let flow):
+            return flow.gatewayConfigurationId
+        case .tokenization(let flow):
+            return flow.gatewayConfigurationId
+        }
     }
 
     /// Primary action text, such as "Pay".
@@ -302,8 +360,7 @@ extension PONativeAlternativePaymentConfiguration {
         paymentConfirmationTimeout: TimeInterval = 180,
         paymentConfirmationSecondaryAction: SecondaryAction? = nil
     ) {
-        self.invoiceId = invoiceId
-        self.gatewayConfigurationId = gatewayConfigurationId
+        self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
         self.title = title
         self.shouldHorizontallyCenterCodeInput = true
         self.success = skipSuccessScreen ? nil : .init(message: successMessage)
@@ -333,8 +390,7 @@ extension PONativeAlternativePaymentConfiguration {
         skipSuccessScreen: Bool = false,
         paymentConfirmation: Confirmation = .init()
     ) {
-        self.invoiceId = invoiceId
-        self.gatewayConfigurationId = gatewayConfigurationId
+        self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
         self.title = title
         self.shouldHorizontallyCenterCodeInput = shouldHorizontallyCenterCodeInput
         self.success = skipSuccessScreen ? nil : .init(message: successMessage)
@@ -343,6 +399,31 @@ extension PONativeAlternativePaymentConfiguration {
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.paymentConfirmation = paymentConfirmation
         self.barcodeInteraction = .init()
+    }
+
+    /// Creates configuration.
+    @available(*, deprecated, message: "Use init that accepts flow instead.")
+    public init(
+        invoiceId: String,
+        gatewayConfigurationId: String,
+        title: String? = nil,
+        shouldHorizontallyCenterCodeInput: Bool = true,
+        inlineSingleSelectValuesLimit: Int = 5,
+        barcodeInteraction: BarcodeInteraction = .init(),
+        submitButton: SubmitButton = .init(),
+        cancelButton: CancelButton? = nil,
+        paymentConfirmation: Confirmation = .init(),
+        success: Success? = .init()
+    ) {
+        self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
+        self.title = title
+        self.shouldHorizontallyCenterCodeInput = shouldHorizontallyCenterCodeInput
+        self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
+        self.submitButton = submitButton
+        self.cancelButton = cancelButton
+        self.paymentConfirmation = paymentConfirmation
+        self.success = success
+        self.barcodeInteraction = barcodeInteraction
     }
 }
 
@@ -394,4 +475,4 @@ extension PONativeAlternativePaymentConfiguration.CancelButton {
     }
 }
 
-// swiftlint:enable strict_fileprivate
+// swiftlint:enable strict_fileprivate file_length nesting

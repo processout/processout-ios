@@ -14,7 +14,7 @@ struct NativeAlternativePaymentPhoneNumberValidator: InputValidator {
 
     // MARK: -
 
-    func validate(_ input: PONativeAlternativePaymentAuthorizationRequestV2.Parameter.Value.Phone?) -> InputValidation {
+    func validate(_ input: PONativeAlternativePaymentSubmitDataV2.Parameter.Value.Phone?) -> InputValidation {
         if input != nil {
             return .valid
         }

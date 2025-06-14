@@ -9,7 +9,7 @@
 
 struct NativeAlternativePaymentCardNumberNormalizer: InputNormalizer {
 
-    func normalize(input: NativeAlternativePaymentInteractorState.ParameterValue?) -> String? {
+    func normalize(input: PONativeAlternativePaymentParameterValue?) -> String? {
         guard case .string(let value) = input else {
             return nil
         }
