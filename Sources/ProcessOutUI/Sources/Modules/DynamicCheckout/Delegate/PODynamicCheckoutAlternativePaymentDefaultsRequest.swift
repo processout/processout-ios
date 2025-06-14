@@ -15,5 +15,5 @@ public struct PODynamicCheckoutAlternativePaymentDefaultsRequest {
     public let paymentMethod: PODynamicCheckoutPaymentMethod.NativeAlternativePayment
 
     /// Current parameters.
-    public let parameters: [PONativeAlternativePaymentNextStepV2.SubmitData.Parameter]
+    public let parameters: [PONativeAlternativePaymentFormV2.Parameter]
 }

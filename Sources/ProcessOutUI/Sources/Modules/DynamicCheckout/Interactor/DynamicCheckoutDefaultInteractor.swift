@@ -922,7 +922,7 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegateV2
     }
 
     func nativeAlternativePayment(
-        defaultValuesFor parameters: [PONativeAlternativePaymentNextStepV2.SubmitData.Parameter]
+        defaultValuesFor parameters: [PONativeAlternativePaymentFormV2.Parameter]
     ) async -> [String: PONativeAlternativePaymentParameterValue] {
         guard case .paymentProcessing(let currentState) = state,
               case .nativeAlternativePayment(let paymentMethod) = currentState.paymentMethod else {
