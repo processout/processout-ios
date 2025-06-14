@@ -672,12 +672,12 @@ final class DynamicCheckoutDefaultInteractor:
             self.state = .paymentProcessing(currentState)
         case .awaitingRedirect, .redirecting:
             preconditionFailure("Not supported yet.")
-        case .awaitingCapture(let awaitingCaptureState):
+        case .awaitingCompletion(let awaitingCaptureState):
             currentState.isCancellable = awaitingCaptureState.isCancellable
             currentState.isReady = true
             currentState.isAwaitingNativeAlternativePaymentCapture = true
             self.state = .paymentProcessing(currentState)
-        case .submitted, .captured:
+        case .completed:
             setSuccessState()
         case .failure(let failure):
             restart(toRecoverPaymentProcessingError: failure)
@@ -909,9 +909,9 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
 }
 
 @available(iOS 14, *)
-extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
+extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegateV2 {
 
-    func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentMethodEvent) {
+    func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentEventV2) {
         switch event {
         case .willSubmitParameters:
             invalidateInvoiceIfPossible()
@@ -922,8 +922,8 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegate {
     }
 
     func nativeAlternativePayment(
-        defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]
-    ) async -> [String: String] {
+        defaultValuesFor parameters: [PONativeAlternativePaymentNextStepV2.SubmitData.Parameter]
+    ) async -> [String: PONativeAlternativePaymentParameterValue] {
         guard case .paymentProcessing(let currentState) = state,
               case .nativeAlternativePayment(let paymentMethod) = currentState.paymentMethod else {
             logger.error("Unable to resolve default values in current state: \(state).")

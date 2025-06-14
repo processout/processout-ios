@@ -55,7 +55,11 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
                 gatewayConfigurationId: paymentMethod.configuration.gatewayConfigurationId,
                 configuration: configuration
             ),
-            invoicesService: invoicesService,
+            serviceAdapter: DefaultNativeAlternativePaymentServiceAdapter(
+                invoicesService: ProcessOut.shared.invoices,
+                tokensService: ProcessOut.shared.customerTokens,
+                paymentConfirmationTimeout: configuration.paymentConfirmation.timeout
+            ),
             imagesRepository: imagesRepository,
             barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
             logger: logger,
@@ -134,8 +138,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         configuration: PODynamicCheckoutAlternativePaymentConfiguration
     ) -> PONativeAlternativePaymentConfiguration {
         let childConfiguration = PONativeAlternativePaymentConfiguration(
-            invoiceId: invoiceId,
-            gatewayConfigurationId: gatewayConfigurationId,
+            flow: .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId)),
             title: "",
             shouldHorizontallyCenterCodeInput: false,
             inlineSingleSelectValuesLimit: configuration.inlineSingleSelectValuesLimit,
@@ -159,7 +162,6 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
 private extension PONativeAlternativePaymentConfiguration.Confirmation {
 
     init(configuration: PODynamicCheckoutAlternativePaymentConfiguration.PaymentConfirmation) {
-        waitsConfirmation = true
         timeout = configuration.timeout
         showProgressViewAfter = configuration.showProgressViewAfter
         hideGatewayDetails = true
