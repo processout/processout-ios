@@ -15,17 +15,23 @@ public typealias POCustomerTokensServiceType = POCustomerTokensService
 /// for Merchant Initiated Transactions (MITs).
 public protocol POCustomerTokensService: POService { // sourcery: AutoCompletion
 
+    /// Creates customer token using given request.
+    @_spi(PO)
+    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken
+
     /// Assigns new source to existing customer token and optionally verifies it.
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
     ) async throws -> POCustomerToken
 
+    /// Tokenize alternative payment.
+    @_spi(PO)
+    func tokenize(
+        request: PONativeAlternativePaymentTokenizationRequestV2
+    ) async throws -> PONativeAlternativePaymentTokenizationResponseV2
+
     /// Deletes customer token.
     func deleteCustomerToken(request: PODeleteCustomerTokenRequest) async throws
-
-    /// Creates customer token using given request.
-    @_spi(PO)
-    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken
 }
 
 extension POCustomerTokensService {

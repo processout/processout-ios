@@ -17,34 +17,12 @@ final class DefaultInvoicesService: POInvoicesService {
 
     // MARK: - POInvoicesService
 
-    func invoice(request: POInvoiceRequest) async throws -> POInvoice {
-        try await repository.invoice(request: request)
+    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
+        try await repository.createInvoice(request: request)
     }
 
-    func nativeAlternativePayment(
-        request: PONativeAlternativePaymentAuthorizationDetailsRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
-        let repositoryRequest = NativeAlternativePaymentAuthorizationDetailsRequestV2(
-            invoiceId: request.invoiceId, gatewayConfigurationId: request.gatewayConfigurationId
-        )
-        let response = try await repository.nativeAlternativePayment(request: repositoryRequest)
-        guard case .pendingCapture = response.state, let captureConfirmation = request.captureConfirmation else {
-            return response
-        }
-        return try await retry(
-            operation: { [repository] in
-                try await repository.nativeAlternativePayment(request: repositoryRequest)
-            },
-            while: { result in
-                if case .success(let response) = result {
-                    return response.state == .pendingCapture
-                }
-                return false
-            },
-            timeout: captureConfirmation.timeout,
-            timeoutError: POFailure(code: .Mobile.timeout),
-            retryStrategy: .init(function: .exponential(interval: 0.15, rate: 1.45), minimum: 3, maximum: 90)
-        )
+    func invoice(request: POInvoiceRequest) async throws -> POInvoice {
+        try await repository.invoice(request: request)
     }
 
     func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
@@ -63,9 +41,7 @@ final class DefaultInvoicesService: POInvoicesService {
         try await repository.authorizeInvoice(request: request)
     }
 
-    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
-        try await repository.createInvoice(request: request)
-    }
+    // MARK: - Deprecated
 
     func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest
