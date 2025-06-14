@@ -35,17 +35,7 @@ public indirect enum PONativeAlternativePaymentCustomerInstructionV2: Sendable {
         public let value: POImageRemoteResource
     }
 
-    /// Group of customer instructions.
-    public struct Group: Sendable, Decodable {
-
-        /// Group label if any.
-        public let label: String?
-
-        /// Grouped instructions.
-        public let instructions: [PONativeAlternativePaymentCustomerInstructionV2]
-    }
-
-    case barcode(Barcode), text(Text), image(Image), group(Group)
+    case barcode(Barcode), text(Text), image(Image)
 
     // MARK: - Unknown Future Case
 
@@ -67,8 +57,6 @@ extension PONativeAlternativePaymentCustomerInstructionV2: Decodable {
             self = try .barcode(.init(from: decoder))
         case "text":
             self = try .text(.init(from: decoder))
-        case "group":
-            self = try .group(.init(from: decoder))
         case "image_url":
             self = try .image(.init(from: decoder))
         default:

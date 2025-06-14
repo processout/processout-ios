@@ -13,9 +13,9 @@ public struct PONativeAlternativePaymentAuthorizationResponseV2: Sendable, Decod
     /// Payment state.
     public let state: PONativeAlternativePaymentStateV2
 
-    /// Next step if any.
-    public let nextStep: PONativeAlternativePaymentNextStepV2?
+    /// UI elements.
+    public let elements: [PONativeAlternativePaymentElementV2]?
 
-    /// Instructions providing additional information to customer and/or describing additional actions.
-    public let customerInstructions: [PONativeAlternativePaymentCustomerInstructionV2]?
+    /// Redirect details.
+    public let redirect: PONativeAlternativePaymentRedirectV2?
 }
