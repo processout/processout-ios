@@ -44,7 +44,11 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
             path: "/customers/\(request.customerId)/tokens/\(request.customerTokenId)/tokenize",
             body: request
         )
-        return try await connector.execute(request: httpRequest)
+        do {
+            return try await connector.execute(request: httpRequest)
+        } catch {
+            return try recoverResponse(from: error)
+        }
     }
 
     func delete(request: PODeleteCustomerTokenRequest) async throws {
@@ -58,4 +62,15 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
     // MARK: - Private Properties
 
     private let connector: HttpConnector
+
+    // MARK: - Private Methods
+
+    private func recoverResponse(from error: Error) throws -> PONativeAlternativePaymentTokenizationResponseV2 {
+        guard let error = error as? POFailure,
+              let underlyingError = error.underlyingError as? HttpConnectorFailure,
+              let value = underlyingError.value as? PONativeAlternativePaymentTokenizationResponseV2 else {
+            throw error
+        }
+        return value
+    }
 }
