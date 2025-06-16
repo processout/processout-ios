@@ -17,11 +17,11 @@ extension ProgressViewStyle where Self == POStepProgressViewStyle {
         POStepProgressViewStyle(
             notStarted: .init(
                 label: .init(
-                    color: Color(red: 134 / 255, green: 134 / 255, blue: 134 / 255),
+                    color: Color.Text.tertiary,
                     typography: .Text.s15(weight: .medium)
                 ),
                 currentValueLabel: .init(
-                    color: Color(red: 134 / 255, green: 134 / 255, blue: 134 / 255),
+                    color: Color.Text.tertiary,
                     typography: .Text.s12(weight: .medium)
                 ),
                 icon: .init(
@@ -35,11 +35,11 @@ extension ProgressViewStyle where Self == POStepProgressViewStyle {
             ),
             started: .init(
                 label: .init(
-                    color: Color(red: 88 / 255, green: 90 / 255, blue: 95 / 255),
+                    color: Color.Text.primary,
                     typography: .Text.s15(weight: .medium)
                 ),
                 currentValueLabel: .init(
-                    color: Color(red: 134 / 255, green: 134 / 255, blue: 134 / 255),
+                    color: Color.Text.secondary,
                     typography: .Text.s12(weight: .medium)
                 ),
                 icon: .init(
@@ -48,16 +48,16 @@ extension ProgressViewStyle where Self == POStepProgressViewStyle {
                     border: .init(
                         radius: 9999, width: 1.5, color: Color(red: 0.792, green: 0.792, blue: 0.792)
                     ),
-                    halo: .init(color: Color.black.opacity(0.08), width: 6)
+                    halo: .init(color: Color.black.opacity(0.07), width: 6)
                 )
             ),
             completed: .init(
                 label: .init(
-                    color: Color(red: 76 / 255, green: 162 / 255, blue: 89 / 255),
+                    color: Color.Text.positive,
                     typography: .Text.s15(weight: .medium)
                 ),
                 currentValueLabel: .init(
-                    color: Color(red: 76 / 255, green: 162 / 255, blue: 89 / 255),
+                    color: Color.Text.positive,
                     typography: .Text.s12(weight: .medium)
                 ),
                 icon: .init(

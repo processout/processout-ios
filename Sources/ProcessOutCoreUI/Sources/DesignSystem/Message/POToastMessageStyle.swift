@@ -58,7 +58,9 @@ public struct POToastMessageStyle: POMessageViewStyle {
             }
         )
         .textStyle(style.text)
-        .padding(POSpacing.medium)
+        .padding(
+            .init(horizontal: POSpacing.space12, vertical: POSpacing.space8)
+        )
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(style.backgroundColor)
         .border(style: style.border)
@@ -89,6 +91,13 @@ extension POToastMessageStyle.Severity {
         icon: Image(poResource: .info).renderingMode(.template),
         border: .toast(color: Color.Toast.border),
         backgroundColor: Color.Toast.background,
-        text: POTextStyle(color: Color.Toast.text, typography: .Text.s13(weight: .medium))
+        text: POTextStyle(color: Color.Toast.text, typography: .Text.s14(weight: .medium))
     )
+}
+
+@available(iOS 14, *)
+#Preview {
+    POMessageView(message: .init(id: "id", text: "Messeeee e e e e eage", severity: .error))
+        .messageViewStyle(.toast)
+        .padding()
 }
