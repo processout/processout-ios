@@ -41,7 +41,7 @@ final class UrlSessionHttpConnector: HttpConnector {
             throw convertToFailure(urlError: error)
         } catch {
             logger.error("Request did fail with unknown error '\(error)'.")
-            throw Failure(code: .internal, underlyingError: error)
+            throw Failure(code: .internal, value: nil, underlyingError: error)
         }
         return try decodeResponse(Value.self, from: data, response: response, logger: logger)
     }
@@ -66,7 +66,7 @@ final class UrlSessionHttpConnector: HttpConnector {
     ) throws -> HttpConnectorResponse<Value> {
         guard let response = response as? HTTPURLResponse else {
             logger.error("Unexpected url response type.")
-            throw Failure(code: .internal, underlyingError: nil)
+            throw Failure(code: .internal, value: nil, underlyingError: nil)
         }
         let responseDescription = urlResponseFormatter.string(from: response, data: data)
         logger.debug("Received response: \(responseDescription)")
@@ -77,10 +77,14 @@ final class UrlSessionHttpConnector: HttpConnector {
                 return HttpConnectorResponse(value: value, headers: headers)
             }
             let serverCode = try decoder.decode(HttpConnectorFailure.Server.self, from: data)
-            throw Failure(code: .server(serverCode, statusCode: response.statusCode), underlyingError: nil)
+            throw Failure(
+                code: .server(serverCode, statusCode: response.statusCode),
+                value: try? decoder.decode(Value.self, from: data),
+                underlyingError: nil
+            )
         } catch let error as DecodingError {
             logger.error("Did fail to decode response: '\(error)'")
-            throw Failure(code: .decoding(statusCode: response.statusCode), underlyingError: error)
+            throw Failure(code: .decoding(statusCode: response.statusCode), value: nil, underlyingError: error)
         }
     }
 
@@ -96,7 +100,7 @@ final class UrlSessionHttpConnector: HttpConnector {
         default:
             code = .internal
         }
-        return Failure(code: code, underlyingError: error)
+        return Failure(code: code, value: nil, underlyingError: error)
     }
 }
 

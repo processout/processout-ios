@@ -25,7 +25,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         let configuration = configuration.wrappedValue
         guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
             logger.error("Unable to create a request with base URL \(configuration.baseUrl)")
-            throw HttpConnectorFailure(code: .internal, underlyingError: nil)
+            throw HttpConnectorFailure(code: .internal, value: nil, underlyingError: nil)
         }
         components.path = request.path
         components.queryItems = request.query.map { item in
@@ -33,7 +33,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         }
         guard let resourceURL = components.url else {
             logger.error("Unable to encode request URL components")
-            throw HttpConnectorFailure(code: .internal, underlyingError: nil)
+            throw HttpConnectorFailure(code: .internal, value: nil, underlyingError: nil)
         }
         var sessionRequest = URLRequest(url: resourceURL)
         sessionRequest.httpMethod = request.method.rawValue.uppercased()
@@ -79,7 +79,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
             return try encoder.encode(decoratedBody)
         } catch {
             logger.error("Did fail to encode request body: '\(error)'")
-            throw HttpConnectorFailure(code: .encoding, underlyingError: error)
+            throw HttpConnectorFailure(code: .encoding, value: nil, underlyingError: error)
         }
     }
 

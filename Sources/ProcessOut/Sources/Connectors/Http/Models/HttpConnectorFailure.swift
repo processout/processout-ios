@@ -55,6 +55,11 @@ struct HttpConnectorFailure: Error, Sendable {
     /// Failure code.
     let code: Code
 
+    /// Response value.
+    ///
+    /// Response could indicate failure but still contain valid payload.
+    let value: Sendable?
+
     /// Underlying error.
     let underlyingError: Error?
 }

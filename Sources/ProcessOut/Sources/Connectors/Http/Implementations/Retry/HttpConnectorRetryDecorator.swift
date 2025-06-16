@@ -36,7 +36,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
                 }
             },
             timeout: 3600, // 1 hour
-            timeoutError: HttpConnectorFailure(code: .timeout, underlyingError: nil),
+            timeoutError: HttpConnectorFailure(code: .timeout, value: nil, underlyingError: nil),
             retryStrategy: retryStrategy
         )
     }
