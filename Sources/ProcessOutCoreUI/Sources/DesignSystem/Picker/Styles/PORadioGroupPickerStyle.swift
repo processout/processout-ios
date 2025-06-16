@@ -85,7 +85,7 @@ extension POPickerStyle where Self == PORadioGroupPickerStyle<PORadioButtonStyle
     } prompt: {
         Text("Placeholder")
     }
-    .pickerStyle(.radioGroup)
+    .pickerStyle(.radioGroup as PORadioGroupPickerStyle)
     .padding()
     .controlInvalid(true)
 }
