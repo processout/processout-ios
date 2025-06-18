@@ -23,16 +23,16 @@ enum NativeAlternativePaymentResolvedElement {
             let type: POBarcode.BarcodeType
         }
 
-        struct Text: Sendable {
+        struct Message: Sendable {
 
-            /// Text label.
+            /// Message label.
             let label: String?
 
-            /// Text value markdown.
+            /// Message value markdown.
             let value: String
         }
 
-        case barcode(Barcode), text(Text), image(UIImage)
+        case barcode(Barcode), message(Message), image(UIImage)
     }
 
     struct Group: Sendable {

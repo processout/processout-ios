@@ -21,7 +21,7 @@ enum NativeAlternativePaymentInteractorState {
     struct Started {
 
         /// Elements.
-        var elements: [PONativeAlternativePaymentElementV2]
+        var elements: [NativeAlternativePaymentResolvedElement]
 
         /// Parameters that are expected from user.
         var parameters: [String: Parameter]

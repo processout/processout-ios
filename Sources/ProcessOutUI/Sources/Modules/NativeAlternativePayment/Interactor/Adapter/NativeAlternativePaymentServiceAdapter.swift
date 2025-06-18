@@ -8,6 +8,11 @@
 protocol NativeAlternativePaymentServiceAdapter {
 
     func continuePayment(
+        with request: NativeAlternativePaymentServiceAdapterRequest,
+        shouldRecoverErrors: Bool
+    ) async throws -> NativeAlternativePaymentServiceAdapterResponse
+
+    func expectPaymentCompletion(
         with request: NativeAlternativePaymentServiceAdapterRequest
     ) async throws -> NativeAlternativePaymentServiceAdapterResponse
 }

@@ -46,8 +46,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         let task = Task { @MainActor in
             do {
                 let request = NativeAlternativePaymentServiceAdapterRequest(flow: configuration.flow)
-                let payment = try await serviceAdapter.continuePayment(with: request)
-                await setState(with: payment)
+                let payment = try await serviceAdapter.continuePayment(with: request, shouldRecoverErrors: true)
+                try await setState(with: payment)
             } catch {
                 setFailureState(error: error)
             }
@@ -94,7 +94,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 let request = NativeAlternativePaymentServiceAdapterRequest(
                     flow: configuration.flow, submitData: .init(parameters: values)
                 )
-                let payment = try await serviceAdapter.continuePayment(with: request)
+                let payment = try await serviceAdapter.continuePayment(with: request, shouldRecoverErrors: false)
                 switch payment.state {
                 case .nextStepRequired:
                     send(event: .didSubmitParameters(.init(additionalParametersExpected: true)))
@@ -104,7 +104,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 default:
                     preconditionFailure("Unexpected payment state.")
                 }
-                await setState(with: payment)
+                try await setState(with: payment)
             } catch {
                 attemptRecoverSubmissionError(error, replaceErrorMessages: true)
             }
@@ -148,14 +148,14 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - State Handling
 
-    private func setState(with payment: NativeAlternativePaymentServiceAdapterResponse) async {
+    private func setState(with payment: NativeAlternativePaymentServiceAdapterResponse) async throws {
         switch payment.state {
         case .nextStepRequired:
             if let redirect = payment.redirect {
                 let newState = State.AwaitingRedirect(redirect: redirect)
                 state = .awaitingRedirect(newState)
             } else if let elements = payment.elements {
-                await setStartedState(elements: elements)
+                try await setStartedState(elements: elements)
             } else {
                 let failure = POFailure(message: "Unsupported next step.", code: .Mobile.generic)
                 setFailureState(error: failure)
@@ -173,7 +173,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Starting State
 
-    private func setStartedState(elements: [PONativeAlternativePaymentElementV2]) async {
+    private func setStartedState(elements: [PONativeAlternativePaymentElementV2]) async throws {
         let parameters = await createParameters(for: elements)
         switch state {
         case .starting, .submitting, .redirecting:
@@ -186,7 +186,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.info("Will set started state with empty inputs, this may be unexpected.")
         }
         let startedState = State.Started(
-            elements: elements,
+            elements: try await resolve(elements: elements),
             parameters: parameters,
             isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
         )
@@ -220,6 +220,11 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Awaiting Completion State
 
     private func setAwaitingCompletionState(payment: NativeAlternativePaymentServiceAdapterResponse) async {
+        if case .awaitingCompletion(let currentState) = state, !currentState.shouldConfirmPayment {
+            let failure = POFailure(code: .Mobile.generic)
+            setFailureState(error: failure)
+            return
+        }
         do {
             let resolvedElements = try await resolve(elements: payment.elements ?? [])
             switch state {
@@ -264,8 +269,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         newState.task = Task { @MainActor [configuration] in
             do {
                 let request = NativeAlternativePaymentServiceAdapterRequest(flow: configuration.flow)
-                let response = try await serviceAdapter.continuePayment(with: request)
-                await setState(with: response)
+                let response = try await serviceAdapter.expectPaymentCompletion(with: request)
+                try await setState(with: response)
             } catch {
                 setFailureState(error: error)
             }
@@ -511,8 +516,8 @@ final class NativeAlternativePaymentDefaultInteractor:
                 throw POFailure(message: "Unable to generate barcode image.", code: .Mobile.internal)
             }
             return .barcode(.init(image: image, type: barcode.value.type))
-        case .text(let text):
-            return .text(.init(label: text.label, value: text.value))
+        case .message(let message):
+            return .message(.init(label: message.label, value: message.value))
         case .image(let image):
             guard let image = await imagesRepository.image(resource: image.value) else {
                 throw POFailure(message: "Unable to prepare customer instruction image.", code: .Mobile.internal)
@@ -623,8 +628,6 @@ final class NativeAlternativePaymentDefaultInteractor:
                 validatedValues[parameter.specification.key] = validatedValue
             } else if let invalidField {
                 invalidFields.append(invalidField)
-            } else {
-                preconditionFailure("Inconsistent validation state.")
             }
         }
         if invalidFields.isEmpty {
