@@ -40,9 +40,11 @@ extension PONativeAlternativePaymentElementV2: Decodable {
         case "form":
             self = try .form(.init(from: decoder))
         case "instruction":
-            self = try .customerInstruction(.init(from: decoder))
+            self = try .customerInstruction(
+                container.decode(PONativeAlternativePaymentCustomerInstructionV2.self, forKey: .instruction)
+            )
         case "group":
-            self = try .group(.init(from: decoder))
+            self = try .group(container.decode(PONativeAlternativePaymentInstructionsGroupV2.self, forKey: .group))
         default:
             self = .unknown(type: type)
         }
@@ -51,6 +53,6 @@ extension PONativeAlternativePaymentElementV2: Decodable {
     // MARK: - Private Nested Types
 
     private enum CodingKeys: String, CodingKey {
-        case type
+        case type, instruction, group
     }
 }
