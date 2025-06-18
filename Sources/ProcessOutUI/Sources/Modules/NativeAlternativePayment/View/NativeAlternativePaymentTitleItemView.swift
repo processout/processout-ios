@@ -13,18 +13,12 @@ import SwiftUI
 struct NativeAlternativePaymentTitleItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem.Title
-    let horizontalPadding: CGFloat
 
     var body: some View {
-        VStack(alignment: .leading, spacing: POSpacing.large) {
-            Text(item.text)
-                .textStyle(style.title)
-                .padding(.horizontal, horizontalPadding)
-            Rectangle()
-                .fill(style.separatorColor)
-                .frame(height: 1)
-                .frame(maxWidth: .infinity)
-        }
+        Text(item.text)
+            .textStyle(style.title)
+            .padding(.bottom, POSpacing.large)
+            .preference(key: NativeAlternativePaymentViewSeparatorVisibilityPreferenceKey.self, value: true)
     }
 
     // MARK: - Private Properties

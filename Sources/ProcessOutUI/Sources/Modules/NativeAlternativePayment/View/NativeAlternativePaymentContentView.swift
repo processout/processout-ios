@@ -22,33 +22,25 @@ struct NativeAlternativePaymentContentView: View {
     var body: some View {
         ScrollViewReader { scrollView in
             VStack(spacing: POSpacing.large) {
-                let partition = sectionsPartition
-                ForEach(partition.top) { section in
-                    NativeAlternativePaymentSectionView(
-                        section: section,
-                        horizontalPadding: insets,
-                        focusedItemId: $viewModel.state.focusedItemId
-                    )
-                }
-                if !partition.center.isEmpty {
-                    VStack(spacing: POSpacing.large) {
-                        ForEach(partition.center) { section in
-                            NativeAlternativePaymentSectionView(
-                                section: section,
-                                horizontalPadding: insets,
-                                focusedItemId: $viewModel.state.focusedItemId
-                            )
-                        }
-                    }
-                    .backport.geometryGroup()
-                    .frame(maxHeight: .infinity)
+                ForEach(viewModel.state.items) { item in
+                    NativeAlternativePaymentItemView(item: item, focusedItemId: $viewModel.state.focusedItemId)
+                        .padding(.horizontal, insets)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .overlayPreferenceValue(
+                            NativeAlternativePaymentViewSeparatorVisibilityPreferenceKey.self,
+                            alignment: .bottom,
+                            { isVisible in
+                                separatorView(isVisible: isVisible)
+                            }
+                        )
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
+            .padding(.vertical, insets)
             .backport.onChange(of: viewModel.state.focusedItemId) {
                 scrollToFocusedInput(scrollView: scrollView)
             }
-            .padding(.vertical, insets)
-            .frame(maxWidth: .infinity)
+            .backport.geometryGroup()
         }
         .backport.geometryGroup()
         .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
@@ -61,34 +53,21 @@ struct NativeAlternativePaymentContentView: View {
     @Environment(\.nativeAlternativePaymentSizeClass)
     private var sizeClass
 
+    @Environment(\.nativeAlternativePaymentStyle)
+    private var style
+
     @ObservedObject
     private var viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>
 
-    // swiftlint:disable:next line_length
-    private var sectionsPartition: (top: [NativeAlternativePaymentViewModelSection], center: [NativeAlternativePaymentViewModelSection]) {
-        let sections = viewModel.state.sections
-        guard sizeClass == .regular else {
-            return (top: sections, center: [])
-        }
-        let index = sections.firstIndex { section in
-            section.items.contains(where: { shouldCenter(item: $0) })
-        }
-        guard let index else {
-            return (top: sections, center: [])
-        }
-        let top = Array(sections.prefix(upTo: index))
-        let center = Array(sections.suffix(from: index))
-        return (top, center)
-    }
-
     // MARK: - Private Methods
 
-    private func shouldCenter(item: NativeAlternativePaymentViewModelItem) -> Bool {
-        switch item {
-        case .title, .submitted:
-            return false
-        default:
-            return true
+    @ViewBuilder
+    private func separatorView(isVisible: Bool) -> some View {
+        if isVisible {
+            Rectangle()
+                .fill(style.separatorColor)
+                .frame(height: 1)
+                .frame(maxWidth: .infinity)
         }
     }
 

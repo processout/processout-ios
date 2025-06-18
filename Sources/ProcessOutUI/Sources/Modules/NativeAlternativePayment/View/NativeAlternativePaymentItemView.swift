@@ -13,7 +13,6 @@ import SwiftUI
 struct NativeAlternativePaymentItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem
-    let horizontalPadding: CGFloat
 
     @Binding
     private(set) var focusedItemId: AnyHashable?
@@ -21,39 +20,34 @@ struct NativeAlternativePaymentItemView: View {
     var body: some View {
         switch item {
         case .title(let item):
-            NativeAlternativePaymentTitleItemView(item: item, horizontalPadding: horizontalPadding)
+            NativeAlternativePaymentTitleItemView(item: item)
         case .input(let item):
             POTextField.create(with: item, focusedInputId: $focusedItemId)
                 .inputStyle(style.input)
-                .padding(.horizontal, horizontalPadding)
         case .codeInput(let item):
             POCodeField(text: item.$value, length: item.length)
                 .backport.focused($focusedItemId, equals: item.id)
                 .controlInvalid(item.isInvalid)
                 .inputStyle(style.codeInput)
-                .padding(.horizontal, horizontalPadding)
-        case .picker(let pickerItem):
-            POPicker(selection: pickerItem.$selectedOptionId) {
-                ForEach(pickerItem.options) { option in
-                    Text(option.title)
-                }
-            }
-            .modify(when: pickerItem.preferrsInline) { view in
-                let style = PORadioGroupPickerStyle(radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton))
-                view.pickerStyle(style)
-            }
-            .pickerStyle(POMenuPickerStyle(inputStyle: style.input))
-            .padding(.horizontal, horizontalPadding)
+        case .phoneNumberInput(let item):
+            view(for: item)
+        case .picker(let item):
+            view(for: item)
         case .progress:
             ProgressView()
                 .poProgressViewStyle(style.progressView)
-                .padding(.horizontal, horizontalPadding)
-        case .submitted(let item):
-            NativeAlternativePaymentSubmittedItemView(item: item, horizontalPadding: horizontalPadding)
-        case .message(let item):
-            PONativeAlternativePaymentMessageView(item: item)
+                .frame(maxWidth: .infinity)
+        case .messageInstruction(let item):
+            POMarkdown(item.value)
         case .image(let item):
             Image(uiImage: item.image)
+        case .group(let group):
+            view(for: group)
+        case .button(let item):
+            Button.create(with: item)
+                .buttonStyle(forPrimaryRole: style.actionsContainer.primary, fallback: style.actionsContainer.secondary)
+        case .message(let item):
+            POMessageView(message: item)
         }
     }
 
@@ -61,4 +55,49 @@ struct NativeAlternativePaymentItemView: View {
 
     @Environment(\.nativeAlternativePaymentStyle)
     private var style
+
+    // MARK: - Private Methods
+
+    private func view(for item: NativeAlternativePaymentViewModelItem.Picker) -> some View {
+        POPicker(selection: item.$selectedOptionId) {
+            ForEach(item.options) { option in
+                Text(option.title)
+            }
+        }
+        .modify(when: item.preferrsInline) { view in
+            let style = PORadioGroupPickerStyle(radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton))
+            view.pickerStyle(style)
+        }
+        .pickerStyle(POMenuPickerStyle(inputStyle: style.input))
+    }
+
+    private func view(for item: NativeAlternativePaymentViewModelItem.PhoneNumberInput) -> some View {
+        POPhoneNumberField(
+            phoneNumber: item.$value,
+            countryPrompt: {
+                Text(verbatim: "Country")
+            },
+            numberPrompt: item.prompt
+        )
+        .phoneNumberFieldTerritories(item.territories)
+        .phoneNumberFieldStyle(
+            PODefaultPhoneNumberFieldStyle(country: POMenuPickerStyle(inputStyle: style.input), number: .automatic)
+        )
+        .inputStyle(style.input)
+        .controlInvalid(item.isInvalid)
+    }
+
+    private func view(for group: NativeAlternativePaymentViewModelItem.Group) -> some View {
+        GroupBox {
+            VStack {
+                ForEach(group.items) { item in
+                    NativeAlternativePaymentItemView(item: item, focusedItemId: $focusedItemId)
+                }
+            }
+        } label: {
+            if let label = group.label {
+                Text(label)
+            }
+        }
+    }
 }
