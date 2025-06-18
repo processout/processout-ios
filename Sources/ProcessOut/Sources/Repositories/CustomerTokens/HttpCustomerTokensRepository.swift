@@ -46,7 +46,7 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
         )
         do {
             return try await connector.execute(request: httpRequest)
-        } catch {
+        } catch where request.shouldRecoverErrors {
             return try recoverResponse(from: error)
         }
     }
