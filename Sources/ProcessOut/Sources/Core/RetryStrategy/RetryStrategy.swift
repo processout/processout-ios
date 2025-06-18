@@ -7,9 +7,10 @@
 
 import Foundation
 
-struct RetryStrategy: Sendable {
+@_spi(PO)
+public struct RetryStrategy: Sendable {
 
-    struct Function: Sendable {
+    public struct Function: Sendable {
 
         func callAsFunction(retry: Int) -> TimeInterval {
             function(retry)
@@ -20,25 +21,25 @@ struct RetryStrategy: Sendable {
     }
 
     /// Returns time interval for given retry or `nil` if no retry should occur.
-    func interval(for retry: Int) -> TimeInterval {
+    public func interval(for retry: Int) -> TimeInterval {
         let delay = min(function(retry: retry), maximum)
         return max(delay * TimeInterval.random(in: 0.5 ... 1), minimum) // Apple equal jitter
     }
 
     /// Function to use to calculate delay for given attempt number.
-    let function: Function
+    public let function: Function
 
     /// Maximum number of retries.
-    let maximumRetries: Int
+    public let maximumRetries: Int
 
     /// Minimum delay value.
-    let minimum: TimeInterval
+    public let minimum: TimeInterval
 
     /// Maximum delay value.
-    let maximum: TimeInterval
+    public let maximum: TimeInterval
 
     /// Creates retry strategy.
-    init(
+    public init(
         function: Function,
         maximumRetries: Int = .max,
         minimum: TimeInterval = 0.1,
@@ -53,11 +54,11 @@ struct RetryStrategy: Sendable {
 
 extension RetryStrategy.Function {
 
-    static func linear(interval: TimeInterval) -> Self {
+    public static func linear(interval: TimeInterval) -> Self {
         .init { _ in interval }
     }
 
-    static func exponential(interval: TimeInterval, rate: Double) -> Self {
+    public static func exponential(interval: TimeInterval, rate: Double) -> Self {
         .init { interval * pow(rate, Double($0)) }
     }
 }
