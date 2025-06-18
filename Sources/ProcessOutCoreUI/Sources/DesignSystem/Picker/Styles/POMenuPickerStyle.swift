@@ -62,8 +62,10 @@ private struct ContentView: View {
     // MARK: - Private Nested Types
 
     private enum Constants {
-        static let minHeight: CGFloat = 48
-        static let padding = EdgeInsets(horizontal: POSpacing.medium, vertical: POSpacing.extraSmall)
+        static let padding = EdgeInsets(
+            top: POSpacing.space6, leading: POSpacing.space12, bottom: POSpacing.space6, trailing: POSpacing.space16
+        )
+        static let minHeight: CGFloat = 52
     }
 
     // MARK: - Private Properties
@@ -79,21 +81,32 @@ private struct ContentView: View {
     @ViewBuilder
     private func label(configuration: POPickerStyleConfiguration) -> some View {
         let style = isInvalid ? inputStyle.error : inputStyle.normal
-        HStack(spacing: POSpacing.small) {
+        HStack(spacing: POSpacing.space8) {
             Group(poSubviews: configuration.content) { children in
                 let selectedChild = children.first { child in
                     child.id == configuration.selection
                 }
-                ViewThatExists {
-                    configuration.currentValueLabel
-                    if let selectedChild {
-                        selectedChild
-                    } else {
-                        configuration.prompt.textStyle(style.placeholder)
+                FloatingValue(
+                    isFloating: configuration.selection != nil,
+                    spacing: POSpacing.space2,
+                    animation: nil,
+                    value: {
+                        ViewThatExists {
+                            configuration.currentValueLabel
+                                .textStyle(style.text)
+                            if let selectedChild {
+                                selectedChild
+                                    .textStyle(style.text)
+                            }
+                        }
+                    },
+                    placeholder: {
+                        configuration.prompt
+                            .textStyle(style.placeholder)
+                            .fixedSize()
                     }
-                }
+                )
             }
-            .textStyle(style.text)
             .frame(maxWidth: maxWidth, alignment: .leading)
             Image(poResource: .chevronDown)
                 .renderingMode(.template)
@@ -114,4 +127,17 @@ private struct ContentView: View {
         let widths: [POControlWidth: CGFloat] = [.expanded: .infinity]
         return widths[poControlWidth]
     }
+}
+
+@available(iOS 17, *)
+#Preview {
+    @Previewable @State var value: String?
+    POPicker(selection: $value) {
+        Text("Hello").id("1")
+        Text("World").id("2")
+    } prompt: {
+        Text("Placeholder")
+    }
+    .pickerStyle(POMenuPickerStyle(inputStyle: .medium))
+    .padding()
 }

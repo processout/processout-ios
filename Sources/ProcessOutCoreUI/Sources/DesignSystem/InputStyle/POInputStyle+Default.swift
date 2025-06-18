@@ -10,7 +10,7 @@ import SwiftUI
 extension POInputStyle {
 
     /// Medium size input style.
-    public static let medium = `default`(typography: .Text.s14(weight: .regular))
+    public static let medium = `default`(typography: .Text.s15(weight: .medium))
 
     /// Large input style.
     public static let large = `default`(typography: .Text.s20(weight: .medium))
@@ -51,43 +51,43 @@ extension POInputStyle {
             ),
             error: .init(
                 text: .init(
-                    color: Color.Input.Text.error,
+                    color: Color.Input.Text.default,
                     typography: typography
                 ),
                 placeholder: .init(
                     color: Color.Input.Placeholder.error,
                     typography: typography
                 ),
-                backgroundColor: Color.Input.Background.error,
+                backgroundColor: Color.Input.Background.default,
                 border: .input(color: Color.Input.Border.error),
                 shadow: .clear,
                 tintColor: Color.Input.tint
             ),
             focused: .init(
                 text: .init(
-                    color: Color.Input.Text.focused,
+                    color: Color.Input.Text.default,
                     typography: typography
                 ),
                 placeholder: .init(
-                    color: Color.Input.Placeholder.focused,
+                    color: Color.Input.Placeholder.default,
                     typography: typography
                 ),
-                backgroundColor: Color.Input.Background.focused,
+                backgroundColor: Color.Input.Background.default,
                 border: .input(color: Color.Input.Border.focused),
                 shadow: .clear,
                 tintColor: Color.Input.tint
             ),
             errorFocused: .init(
                 text: .init(
-                    color: Color.Input.Text.errorFocused,
+                    color: Color.Input.Text.default,
                     typography: typography
                 ),
                 placeholder: .init(
-                    color: Color.Input.Placeholder.errorFocused,
+                    color: Color.Input.Placeholder.error,
                     typography: typography
                 ),
-                backgroundColor: Color.Input.Background.errorFocused,
-                border: .input(color: Color.Input.Border.errorFocused),
+                backgroundColor: Color.Input.Background.default,
+                border: .input(color: Color.Input.Border.error),
                 shadow: .clear,
                 tintColor: Color.Input.tint
             )

@@ -11,12 +11,33 @@ import SwiftUI
 @available(iOS 14, *)
 public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerStyle {
 
-    public init(radioButtonStyle: RadioButtonStyle = PORadioButtonStyle.radio) {
+    public init(radioButtonStyle: RadioButtonStyle = PORadioButtonStyle.radio, inputStyle: POInputStyle = .medium) {
         self.radioButtonStyle = radioButtonStyle
+        self.inputStyle = inputStyle
     }
 
     public func makeBody(configuration: POPickerStyleConfiguration) -> some View {
-        VStack(alignment: .leading, spacing: POSpacing.extraExtraSmall) {
+        ContentView(configuration: configuration)
+            .buttonStyle(radioButtonStyle)
+            .inputStyle(inputStyle)
+    }
+
+    // MARK: - Private Properties
+
+    private let radioButtonStyle: RadioButtonStyle
+    private let inputStyle: POInputStyle
+}
+
+@MainActor
+@available(iOS 14, *)
+private struct ContentView: View {
+
+    let configuration: POPickerStyleConfiguration
+
+    // MARK: - View
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POSpacing.space2) {
             Group(poSubviews: configuration.content) { children in
                 ForEach(children) { child in
                     Button {
@@ -24,18 +45,26 @@ public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerSt
                     } label: {
                         child
                     }
-                    .padding(.vertical, Constants.verticalPadding)
                     .contentShape(.rect)
                     .controlSelected(child.id == configuration.selection)
                 }
             }
         }
-        .buttonStyle(radioButtonStyle)
+        .compositingGroup()
+        .padding(POSpacing.space4)
+        .border(
+            style: isControlInvalid ? inputStyle.error.border : inputStyle.normal.border
+        )
+        .animation(.default, value: isControlInvalid)
     }
 
     // MARK: - Private Properties
 
-    private let radioButtonStyle: RadioButtonStyle
+    @Environment(\.inputStyle)
+    private var inputStyle
+
+    @Environment(\.isControlInvalid)
+    private var isControlInvalid
 }
 
 @available(iOS 14, *)
@@ -47,6 +76,16 @@ extension POPickerStyle where Self == PORadioGroupPickerStyle<PORadioButtonStyle
     }
 }
 
-private enum Constants {
-    static let verticalPadding: CGFloat = 11
+@available(iOS 17, *)
+#Preview {
+    @Previewable @State var value: String?
+    POPicker(selection: $value) {
+        Text("Hello").id("1")
+        Text("World").id("2")
+    } prompt: {
+        Text("Placeholder")
+    }
+    .pickerStyle(.radioGroup as PORadioGroupPickerStyle)
+    .padding()
+    .controlInvalid(true)
 }

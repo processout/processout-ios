@@ -17,6 +17,9 @@ extension Color {
 
         /// Surface/Primary color.
         public static let successSubtle = Color(light: UIColor(0xE4F9E3), dark: UIColor(0x143225))
+
+        /// Surface/Primary color.
+        public static let elevated = Color(light: UIColor(0xFFFFFF), dark: UIColor(0x000000))
     }
 
     @_spi(PO)
@@ -28,11 +31,14 @@ extension Color {
         /// Text/Secondary color.
         public static let secondary = Color(light: UIColor(0x585A5F), dark: UIColor(0xC0C3C8))
 
+        /// Text/Tertiary color.
+        public static let tertiary = Color(light: UIColor(0x8A8D93), dark: UIColor(0x8A8D93))
+
         /// Text/Inverse color.
         public static let inverse = Color(light: UIColor(0xFFFFFF), dark: UIColor(0x000000))
 
         /// Text/Positive color.
-        public static let positive = Color(light: UIColor(0x0A4322), dark: UIColor(0xCFF3CD))
+        public static let positive = Color(light: UIColor(0x139947), dark: UIColor(0x28DE6B))
     }
 
     @_spi(PO)

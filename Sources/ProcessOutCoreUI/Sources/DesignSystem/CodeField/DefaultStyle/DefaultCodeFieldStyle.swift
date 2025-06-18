@@ -12,7 +12,7 @@ struct DefaultCodeFieldStyle: CodeFieldStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         let paddedText = self.paddedText(configuration: configuration)
-        HStack(spacing: POSpacing.extraSmall) {
+        HStack(spacing: POSpacing.space8) {
             ForEach(Array(paddedText.indices), id: \.self) { index in
                 DefaultCodeFieldStyleCharacterView(
                     value: paddedText[index],
@@ -63,4 +63,11 @@ struct DefaultCodeFieldStyle: CodeFieldStyle {
         }
         return binding
     }
+}
+
+@available(iOS 17, *)
+#Preview {
+    @Previewable @State var text = ""
+    POCodeField(text: $text, length: 6)
+        .inputStyle(.large)
 }

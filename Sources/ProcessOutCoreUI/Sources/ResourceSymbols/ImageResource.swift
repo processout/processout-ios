@@ -37,6 +37,12 @@ extension POImageResource {
 
     /// The "Info" asset catalog image resource.
     public static let chevronDown = POImageResource(name: "ChevronDown")
+
+    /// The "DocumentOnDocument" asset catalog image resource.
+    public static let docOnDoc = POImageResource(name: "DocumentOnDocument")
+
+    /// The "Check" asset catalog image resource.
+    public static let check = POImageResource(name: "Check")
 }
 
 extension Image {
