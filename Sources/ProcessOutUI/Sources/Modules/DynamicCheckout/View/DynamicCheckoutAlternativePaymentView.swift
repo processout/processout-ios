@@ -23,7 +23,6 @@ struct DynamicCheckoutAlternativePaymentView: View {
             NativeAlternativePaymentContentView(viewModel: viewModel, insets: 0)
                 .nativeAlternativePaymentSizeClass(.compact)
                 .nativeAlternativePaymentStyle(.init(dynamicCheckoutStyle: style))
-            DynamicCheckoutPaymentMethodButtonsView(buttons: viewModel.state.actions)
         }
     }
 
