@@ -46,8 +46,6 @@ indirect enum NativeAlternativePaymentViewModelItem {
         let title: String
     }
 
-    typealias Input = POTextFieldViewModel
-
     struct CodeInput: Identifiable {
 
         /// Item identifier.
@@ -73,39 +71,14 @@ indirect enum NativeAlternativePaymentViewModelItem {
         /// Current parameter's value.
         @Binding var value: POPhoneNumber
 
+        /// Prompt.
+        let prompt: String
+
         /// Boolean value indicating whether value is valid.
         let isInvalid: Bool
     }
 
-    // no longer needed
-    struct Submitted: Identifiable, Hashable {
-
-        /// Item identifier.
-        let id: AnyHashable
-
-        /// Title text.
-        let title: String?
-
-        /// Payment provider logo.
-        let logoImage: UIImage?
-
-        /// Message markdown.
-        let message: String
-
-        /// Boolean value indicating whether layout should be vertically compact.
-        let isMessageCompact: Bool
-
-        /// Image illustrating action.
-        let image: UIImage?
-
-        /// Boolean value that indicates whether payment is already captured.
-        let isCaptured: Bool
-
-        /// Defines whether progress view should be hidden or not.
-        let isProgressViewHidden: Bool
-    }
-
-    struct Message: Identifiable, Hashable {
+    struct MessageInstruction: Identifiable, Hashable {
 
         let id: AnyHashable
 
@@ -113,7 +86,7 @@ indirect enum NativeAlternativePaymentViewModelItem {
         let title: String?
 
         /// Message text.
-        let text: String
+        let value: String
     }
 
     struct Image: Identifiable, Hashable {
@@ -124,39 +97,49 @@ indirect enum NativeAlternativePaymentViewModelItem {
         let image: UIImage
     }
 
-    typealias Button = POButtonViewModel
-
     struct Group {
 
         let id: AnyHashable
 
+        /// Group label.
         let label: String?
 
         /// Items
         let items: [NativeAlternativePaymentViewModelItem]
     }
 
+    /// Loading indicator.
     case progress
 
+    /// Static title..
     case title(Title)
 
-    case input(Input)
+    /// Text input field.
+    case input(POTextFieldViewModel)
 
+    /// Code input field with fixed length.
     case codeInput(CodeInput)
 
+    /// Phone number input with selectable territories.
     case phoneNumberInput(PhoneNumberInput)
 
+    /// Picker with multiple options.
     case picker(Picker)
 
-    case submitted(Submitted)
+    /// Static message with optional title.
+    case messageInstruction(MessageInstruction)
 
-    case message(Message)
-
+    /// Group of items displayed together.
     case group(Group)
 
+    /// Image to illustrate an action.
     case image(Image)
 
-    case button(Button)
+    /// Action button.
+    case button(POButtonViewModel)
+
+    /// Informational message.
+    case message(POMessage)
 }
 
 extension NativeAlternativePaymentViewModelItem: Identifiable {
@@ -175,8 +158,6 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
             return item.id
         case .picker(let item):
             return item.id
-        case .submitted(let item):
-            return item.id
         case .message(let item):
             return item.id
         case .image(let item):
@@ -184,6 +165,8 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
         case .group(let item):
             return item.id
         case .button(let item):
+            return item.id
+        case .messageInstruction(let item):
             return item.id
         }
     }
@@ -195,22 +178,14 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
     }
 }
 
-extension NativeAlternativePaymentViewModelSection: AnimationIdentityProvider {
+extension NativeAlternativePaymentViewModelItem: AnimationIdentityProvider {
 
     var animationIdentity: AnyHashable {
-        [id, items.map(animationIdentity), error]
-    }
-
-    // MARK: - Private Methods
-
-    private func animationIdentity(of item: NativeAlternativePaymentViewModelItem) -> AnyHashable {
-        switch item {
+        switch self {
         case .title(let item):
             return item
-        case .submitted(let item):
-            return item
         default:
-            return item.id
+            return id
         }
     }
 }
