@@ -49,6 +49,8 @@ struct NativeAlternativePaymentItemView: View {
         case .message(let item):
             // todo(andrii-vysotskyi): support style customization
             POMessageView(message: item)
+        case .confirmationProgress(let item):
+            NativeAlternativePaymentConfirmationProgressItemView(item: item)
         }
     }
 

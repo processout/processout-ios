@@ -239,6 +239,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 !resolvedElements.isEmpty && configuration.paymentConfirmation.confirmButton != nil
             let awaitingPaymentCompletionState = State.AwaitingCompletion(
                 elements: resolvedElements,
+                estimatedCompletionDate: nil,
                 isCancellable: configuration.paymentConfirmation.cancelButton?.disabledFor.isZero ?? true,
                 isDelayed: false,
                 shouldConfirmPayment: shouldConfirmPayment
@@ -275,6 +276,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 setFailureState(error: error)
             }
         }
+        newState.estimatedCompletionDate = Date().addingTimeInterval(configuration.paymentConfirmation.timeout)
         newState.shouldConfirmPayment = false
         state = .awaitingCompletion(newState)
         logger.info("Waiting for payment completion confirmation.")
@@ -599,7 +601,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             if case .phone(let value) = fallback {
                 var regionCode: String?
                 if let valueRegionCode = value.regionCode {
-                    if specification.dialingCodes.contains(where: { $0.id == valueRegionCode }) {
+                    if specification.dialingCodes.contains(where: { $0.regionCode == valueRegionCode }) {
                         regionCode = valueRegionCode
                     } else {
                         assertionFailure("Unsupported region code.")

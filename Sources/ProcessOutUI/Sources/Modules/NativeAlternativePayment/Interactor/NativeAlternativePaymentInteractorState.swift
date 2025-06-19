@@ -56,6 +56,9 @@ enum NativeAlternativePaymentInteractorState {
         /// Resolved elements.
         let elements: [NativeAlternativePaymentResolvedElement]
 
+        /// Date when payment is expected to be completed.
+        var estimatedCompletionDate: Date?
+
         /// Boolean value indicating whether user should be able to manually cancel payment in current state.
         var isCancellable: Bool
 

@@ -186,9 +186,16 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     ) -> [NativeAlternativePaymentViewModelItem] {
         // todo(andrii-vysotskyi): use proper view
         // todo(andrii-vysotskyi): create title item
-        var items = createItems(for: state.elements, state: nil)
-        if items.isEmpty || state.isDelayed {
-            items.insert(.progress, at: 0)
+        var items: [NativeAlternativePaymentViewModelItem] = []
+        if state.shouldConfirmPayment {
+            items.append(
+                contentsOf: createItems(for: state.elements, state: nil)
+            )
+        } else if let estimatedCompletionDate = state.estimatedCompletionDate {
+            let confirmationProgressItem = NativeAlternativePaymentViewModelItem.ConfirmationProgress(
+                estimatedCompletionDate: estimatedCompletionDate
+            )
+            items.append(.confirmationProgress(confirmationProgressItem))
         }
         items += createButtonItems(state: state)
         return items
@@ -363,9 +370,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         for parameter: InteractorState.Parameter,
         with specification: PONativeAlternativePaymentFormV2.Parameter.PhoneNumber
     ) -> NativeAlternativePaymentViewModelItem {
-        let territories = specification.dialingCodes.map { dialingCode in
-            let displayName = Locale.current.localizedString(forRegionCode: dialingCode.id)
-            return POPhoneNumber.Territory(id: dialingCode.id, displayName: displayName ?? "", code: dialingCode.value)
+        let territories = specification.dialingCodes.map { dialingCode -> ProcessOutCoreUI.POPhoneNumber.Territory in
+            let displayName = Locale.current.localizedString(forRegionCode: dialingCode.regionCode)
+            return .init(id: dialingCode.regionCode, displayName: displayName ?? "", code: dialingCode.value)
         }
         let value = Binding<ProcessOutCoreUI.POPhoneNumber> {
             if case .phone(let value) = parameter.value {
