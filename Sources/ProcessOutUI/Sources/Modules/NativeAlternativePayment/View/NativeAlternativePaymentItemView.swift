@@ -38,7 +38,7 @@ struct NativeAlternativePaymentItemView: View {
                 .poProgressViewStyle(style.progressView)
                 .frame(maxWidth: .infinity)
         case .messageInstruction(let item):
-            POMarkdown(item.value)
+            view(for: item)
         case .image(let item):
             Image(uiImage: item.image)
         case .group(let group):
@@ -47,6 +47,7 @@ struct NativeAlternativePaymentItemView: View {
             Button.create(with: item)
                 .buttonStyle(forPrimaryRole: style.actionsContainer.primary, fallback: style.actionsContainer.secondary)
         case .message(let item):
+            // todo(andrii-vysotskyi): support style customization
             POMessageView(message: item)
         }
     }
@@ -101,6 +102,25 @@ struct NativeAlternativePaymentItemView: View {
             if let label = group.label {
                 Text(label)
             }
+        }
+        .groupBoxStyle(.poAutomatic)
+    }
+
+    @ViewBuilder
+    private func view(for item: NativeAlternativePaymentViewModelItem.MessageInstruction) -> some View {
+        if let title = item.title {
+            POLabeledContent {
+                POCopyButton(
+                    configuration: .init(value: item.value, copyTitle: "Copy", copiedTitle: "Copied!")
+                )
+                .backport.poControlSize(.small)
+                .controlWidth(.regular)
+                .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.secondary))
+            } label: {
+                POMarkdown(title)
+            }
+        } else {
+            POMarkdown(item.value)
         }
     }
 }
