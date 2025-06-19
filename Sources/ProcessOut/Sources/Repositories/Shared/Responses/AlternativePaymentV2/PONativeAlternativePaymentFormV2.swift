@@ -108,8 +108,8 @@ public struct PONativeAlternativePaymentFormV2: Sendable, Decodable {
 
             public struct DialingCode: Sendable, Decodable {
 
-                /// Country code ID.
-                public let id: String
+                /// Region code.
+                public let regionCode: String
 
                 /// Dialing code value.
                 public let value: String
