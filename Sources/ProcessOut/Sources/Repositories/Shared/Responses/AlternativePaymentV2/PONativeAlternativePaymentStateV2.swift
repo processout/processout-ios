@@ -37,6 +37,6 @@ extension PONativeAlternativePaymentStateV2 {
     /// Payment is pending.
     public static let pending = Self(rawValue: "PENDING")
 
-    /// Payment is completed.
-    public static let completed = Self(rawValue: "COMPLETED")
+    /// Payment is successfully completed.
+    public static let success = Self(rawValue: "SUCCESS")
 }

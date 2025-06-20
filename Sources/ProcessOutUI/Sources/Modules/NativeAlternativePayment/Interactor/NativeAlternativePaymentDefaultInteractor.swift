@@ -99,7 +99,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 case .nextStepRequired:
                     send(event: .didSubmitParameters(.init(additionalParametersExpected: true)))
                     logger.debug("More parameters are expected, waiting for parameters to update.")
-                case .completed, .pending:
+                case .success, .pending:
                     send(event: .didSubmitParameters(.init(additionalParametersExpected: false)))
                 default:
                     preconditionFailure("Unexpected payment state.")
@@ -162,7 +162,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
         case .pending:
             await setAwaitingCompletionState(payment: payment)
-        case .completed:
+        case .success:
             await setCompletedState(payment: payment)
         default:
             logger.error("Unexpected alternative payment state: \(payment.state).")
