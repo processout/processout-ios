@@ -92,7 +92,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func updateWithStartingState() {
         let items: [NativeAlternativePaymentViewModelItem] = [.progress]
-        self.state = NativeAlternativePaymentViewModelState(items: items, isCaptured: false)
+        self.state = NativeAlternativePaymentViewModelState(items: items)
     }
 
     // MARK: - Started State
@@ -100,7 +100,6 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func update(with state: InteractorState.Started) {
         let newState = NativeAlternativePaymentViewModelState(
             items: createItems(state: state, isSubmitting: false),
-            isCaptured: false,
             focusedItemId: createFocusedInputId(state: state),
             confirmationDialog: nil
         )
@@ -162,7 +161,6 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func update(withSubmittingState state: InteractorState.Started) {
         let newState = NativeAlternativePaymentViewModelState(
             items: createItems(state: state, isSubmitting: true),
-            isCaptured: false,
             focusedItemId: nil,
             confirmationDialog: nil
         )
@@ -174,7 +172,6 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func update(with state: InteractorState.AwaitingCompletion) {
         let newState = NativeAlternativePaymentViewModelState(
             items: createItems(state: state),
-            isCaptured: false,
             focusedItemId: nil,
             confirmationDialog: nil
         )
@@ -192,8 +189,12 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 contentsOf: createItems(for: state.elements, state: nil)
             )
         } else if let estimatedCompletionDate = state.estimatedCompletionDate {
+            let formatter = DateComponentsFormatter()
+            formatter.allowedUnits = [.minute, .second]
+            formatter.unitsStyle = .positional
+            formatter.zeroFormattingBehavior = [.pad]
             let confirmationProgressItem = NativeAlternativePaymentViewModelItem.ConfirmationProgress(
-                estimatedCompletionDate: estimatedCompletionDate
+                formatter: formatter, estimatedCompletionDate: estimatedCompletionDate
             )
             items.append(.confirmationProgress(confirmationProgressItem))
         }
@@ -260,7 +261,6 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func update(with state: InteractorState.Completed) {
         let newState = NativeAlternativePaymentViewModelState(
             items: createItems(state: state),
-            isCaptured: true,
             focusedItemId: nil,
             confirmationDialog: nil
         )
@@ -268,21 +268,17 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createItems(state: InteractorState.Completed) -> [NativeAlternativePaymentViewModelItem] {
-        []
-//        let item = NativeAlternativePaymentViewModelItem.Submitted(
-//            id: "captured",
-//            title: state.paymentProvider.image == nil ? state.paymentProvider.name : nil,
-//            logoImage: state.paymentProvider.image,
-//            message: configuration.success?.message ?? String(resource: .NativeAlternativePayment.Success.message),
-//            isMessageCompact: true,
-//            image: UIImage(poResource: .success).withRenderingMode(.alwaysTemplate),
-//            isCaptured: true,
-//            isProgressViewHidden: true
-//        )
-//        let section = NativeAlternativePaymentViewModelSection(
-//            id: "captured", isCentered: false, title: nil, items: [.submitted(item)], error: nil
-//        )
-//        return [section]
+        // todo(andrii-vysotskyi): localize strings
+        var items: [NativeAlternativePaymentViewModelItem] = [
+            .success(
+                .init(title: "Payment approved!", description: "You paid $40.00 to [shop-name]")
+            )
+        ]
+        items.append(
+            contentsOf: createItems(for: state.elements, state: nil)
+        )
+        // todo(andrii-vysotskyi): create done button if needed.
+        return items
     }
 
     // MARK: - Elements

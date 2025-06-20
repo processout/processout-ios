@@ -12,9 +12,6 @@ struct NativeAlternativePaymentViewModelState {
     /// Available items.
     let items: [NativeAlternativePaymentViewModelItem]
 
-    /// Boolean value that indicates whether payment is already captured.
-    let isCaptured: Bool
-
     /// Currently focused item identifier.
     var focusedItemId: AnyHashable?
 
@@ -33,6 +30,6 @@ extension NativeAlternativePaymentViewModelState {
 
     /// Idle state.
     static var idle: NativeAlternativePaymentViewModelState {
-        .init(items: [], isCaptured: false, focusedItemId: nil, confirmationDialog: nil)
+        .init(items: [], focusedItemId: nil, confirmationDialog: nil)
     }
 }

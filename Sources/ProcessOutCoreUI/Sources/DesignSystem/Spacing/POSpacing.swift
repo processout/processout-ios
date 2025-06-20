@@ -38,6 +38,12 @@ public enum POSpacing {
     /// 20pt spacing.
     public static let space20: CGFloat = 20
 
+    /// 24pt spacing.
+    public static let space24: CGFloat = 24
+
+    /// 28pt spacing.
+    public static let space28: CGFloat = 28
+
     // MARK: -
 
     /// Extra extra small spacing.

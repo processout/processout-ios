@@ -25,10 +25,7 @@ public struct PONativeAlternativePaymentView: View {
             NativeAlternativePaymentContentView(viewModel: viewModel, insets: POSpacing.large)
         }
         .backport.background {
-            let backgroundColor = viewModel.state.isCaptured ? style.background.success : style.background.regular
-            backgroundColor
-                .ignoresSafeArea()
-                .animation(.default, value: viewModel.state.isCaptured)
+            style.background.regular.ignoresSafeArea()
         }
         .onAppear(perform: viewModel.start)
     }

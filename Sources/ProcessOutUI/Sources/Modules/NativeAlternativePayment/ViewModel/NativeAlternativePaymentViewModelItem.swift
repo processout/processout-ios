@@ -110,8 +110,20 @@ indirect enum NativeAlternativePaymentViewModelItem {
 
     struct ConfirmationProgress {
 
+        /// Date components formatter.
+        let formatter: DateComponentsFormatter
+
         /// Date indicating when confirmation is estimated to end.
         let estimatedCompletionDate: Date
+    }
+
+    struct Success {
+
+        /// Success title.
+        let title: String
+
+        /// Success description.
+        let description: String
     }
 
     /// Loading indicator.
@@ -149,6 +161,9 @@ indirect enum NativeAlternativePaymentViewModelItem {
 
     /// Payment confirmation progress details.
     case confirmationProgress(ConfirmationProgress)
+
+    /// Payment success item.
+    case success(Success)
 }
 
 extension NativeAlternativePaymentViewModelItem: Identifiable {
@@ -179,6 +194,8 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
             return item.id
         case .confirmationProgress:
             return Constants.confirmationProgressId
+        case .success:
+            return Constants.successId
         }
     }
 
@@ -187,6 +204,7 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
     private enum Constants {
         static let progressId = UUID().uuidString
         static let confirmationProgressId = UUID().uuidString
+        static let successId = UUID().uuidString
     }
 }
 

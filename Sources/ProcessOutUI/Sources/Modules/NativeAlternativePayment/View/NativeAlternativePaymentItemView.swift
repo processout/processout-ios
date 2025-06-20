@@ -51,6 +51,8 @@ struct NativeAlternativePaymentItemView: View {
             POMessageView(message: item)
         case .confirmationProgress(let item):
             NativeAlternativePaymentConfirmationProgressItemView(item: item)
+        case .success(let item):
+            NativeAlternativePaymentSuccessItemView(item: item)
         }
     }
 
