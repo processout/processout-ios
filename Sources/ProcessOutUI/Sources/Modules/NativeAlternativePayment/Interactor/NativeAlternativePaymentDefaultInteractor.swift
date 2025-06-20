@@ -46,7 +46,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         let task = Task { @MainActor in
             do {
                 let request = NativeAlternativePaymentServiceAdapterRequest(flow: configuration.flow)
-                let payment = try await serviceAdapter.continuePayment(with: request, shouldRecoverErrors: true)
+                let payment = try await serviceAdapter.continuePayment(with: request)
                 try await setState(with: payment)
             } catch {
                 setFailureState(error: error)
@@ -94,7 +94,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 let request = NativeAlternativePaymentServiceAdapterRequest(
                     flow: configuration.flow, submitData: .init(parameters: values)
                 )
-                let payment = try await serviceAdapter.continuePayment(with: request, shouldRecoverErrors: false)
+                let payment = try await serviceAdapter.continuePayment(with: request)
                 switch payment.state {
                 case .nextStepRequired:
                     send(event: .didSubmitParameters(.init(additionalParametersExpected: true)))

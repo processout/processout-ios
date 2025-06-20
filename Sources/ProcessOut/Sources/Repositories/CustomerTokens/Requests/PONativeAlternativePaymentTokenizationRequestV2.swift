@@ -20,22 +20,15 @@ public struct PONativeAlternativePaymentTokenizationRequestV2: Sendable, Encodab
     /// Payment request parameters.
     public let submitData: PONativeAlternativePaymentSubmitDataV2?
 
-    /// Boolean value indicating whether implementation should attempt to extract
-    /// payload from error response.
-    @POExcludedEncodable
-    private(set) var shouldRecoverErrors: Bool
-
     public init(
         customerId: String,
         customerTokenId: String,
         gatewayConfigurationId: String,
-        submitData: PONativeAlternativePaymentSubmitDataV2? = nil,
-        shouldRecoverErrors: Bool = false
+        submitData: PONativeAlternativePaymentSubmitDataV2? = nil
     ) {
         self.customerId = customerId
         self.customerTokenId = customerTokenId
         self.gatewayConfigurationId = gatewayConfigurationId
         self.submitData = submitData
-        self.shouldRecoverErrors = shouldRecoverErrors
     }
 }

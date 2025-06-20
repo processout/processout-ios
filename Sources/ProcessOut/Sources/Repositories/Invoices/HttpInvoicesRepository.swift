@@ -67,11 +67,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
         let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentAuthorizationResponseV2>.post(
             path: "/invoices/\(request.invoiceId)/apm-payment", body: request
         )
-        do {
-            return try await connector.execute(request: httpRequest)
-        } catch where request.shouldRecoverErrors {
-            return try recoverResponse(from: error)
-        }
+        return try await connector.execute(request: httpRequest)
     }
 
     // MARK: - Deprecated
@@ -126,17 +122,6 @@ final class HttpInvoicesRepository: InvoicesRepository {
     // MARK: - Private Properties
 
     private let connector: HttpConnector
-
-    // MARK: - Private Methods
-
-    private func recoverResponse(from error: Error) throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
-        guard let error = error as? POFailure,
-              let underlyingError = error.underlyingError as? HttpConnectorFailure,
-              let value = underlyingError.value as? PONativeAlternativePaymentAuthorizationResponseV2 else {
-            throw error
-        }
-        return value
-    }
 }
 
 private extension POInvoice { // swiftlint:disable:this no_extension_access_modifier

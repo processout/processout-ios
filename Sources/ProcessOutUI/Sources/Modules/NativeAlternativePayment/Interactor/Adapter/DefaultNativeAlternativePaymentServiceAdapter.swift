@@ -24,15 +24,13 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
 
     func continuePayment(
         with request: NativeAlternativePaymentServiceAdapterRequest,
-        shouldRecoverErrors: Bool
     ) async throws -> NativeAlternativePaymentServiceAdapterResponse {
         switch request.flow {
         case .authorization(let flow):
             let authorizationRequest = PONativeAlternativePaymentAuthorizationRequestV2(
                 invoiceId: flow.invoiceId,
                 gatewayConfigurationId: flow.gatewayConfigurationId,
-                submitData: request.submitData,
-                shouldRecoverErrors: shouldRecoverErrors
+                submitData: request.submitData
             )
             let authorizationResponse = try await invoicesService.authorizeInvoice(request: authorizationRequest)
             return .init(authorizationResponse: authorizationResponse)
@@ -41,8 +39,7 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
                 customerId: flow.customerId,
                 customerTokenId: flow.customerTokenId,
                 gatewayConfigurationId: flow.gatewayConfigurationId,
-                submitData: request.submitData,
-                shouldRecoverErrors: shouldRecoverErrors
+                submitData: request.submitData
             )
             let tokenizationResponse = try await tokensService.tokenize(request: tokenizationRequest)
             return .init(tokenizationResponse: tokenizationResponse)
@@ -54,7 +51,7 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
     ) async throws -> NativeAlternativePaymentServiceAdapterResponse {
         try await retry(
             operation: {
-                try await self.continuePayment(with: request, shouldRecoverErrors: false)
+                try await self.continuePayment(with: request)
             },
             while: { result in
                 switch result {
