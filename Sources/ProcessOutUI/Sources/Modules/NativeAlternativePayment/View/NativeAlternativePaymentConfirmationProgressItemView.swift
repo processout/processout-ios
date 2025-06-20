@@ -18,7 +18,7 @@ struct NativeAlternativePaymentConfirmationProgressItemView: View { // swiftlint
     var body: some View {
         GroupBox {
             VStack(alignment: .leading, spacing: 28) {
-                ProgressView("Transfer sent", value: 1)
+                ProgressView("Payment sent", value: 1)
                 ProgressView(
                     value: 0.5,
                     label: {
@@ -28,6 +28,9 @@ struct NativeAlternativePaymentConfirmationProgressItemView: View { // swiftlint
                         Text("Please wait for \(remainingWaitDurationDescription) minutes")
                     }
                 )
+                .onAppear {
+                    updateRemainingWaitDuration()
+                }
                 .onReceive(timer) { _ in
                     updateRemainingWaitDuration()
                 }
@@ -48,11 +51,7 @@ struct NativeAlternativePaymentConfirmationProgressItemView: View { // swiftlint
     // MARK: - Private Methods
 
     private func updateRemainingWaitDuration() {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.minute, .second]
-        formatter.unitsStyle = .positional
-        formatter.zeroFormattingBehavior = [.pad]
-        // swiftlint:disable:next line_length
-        remainingWaitDurationDescription = formatter.string(from: item.estimatedCompletionDate.timeIntervalSinceNow) ?? ""
+        let remainingDuration = item.estimatedCompletionDate.timeIntervalSinceNow
+        remainingWaitDurationDescription = item.formatter.string(from: remainingDuration) ?? ""
     }
 }
