@@ -294,18 +294,22 @@ final class NativeAlternativePaymentDefaultInteractor:
                 logger.debug("Already in a sink state, ignoring attempt to set completed state.")
                 return
             }
-            // todo(andrii-vysotskyi): decide what to do with success screen where there are instructions
             let task = Task { @MainActor in
                 if let success = configuration.success {
-                    // Sleep errors are ignored. The goal is that if this task is cancelled we should still
-                    // invoke completion.
-                    try? await Task.sleep(seconds: success.duration)
+                    // Sleep errors are ignored. The goal is that if this task is
+                    // cancelled we should still invoke completion.
+                    // todo(andrii-vysotskyi): make configurable
+                    let shouldConfirm = !resolvedElements.isEmpty
+                    try? await Task.sleep(seconds: shouldConfirm ? 5 * 60 : success.duration)
                 }
                 completion(.success(()))
             }
-            state = .completed(
-                .init(paymentMethod: response.paymentMethod, elements: resolvedElements, completionTask: task)
+            let newState = State.Completed(
+                paymentMethod: response.paymentMethod,
+                elements: resolvedElements,
+                completionTask: task,
             )
+            state = .completed(newState)
             send(event: .didCompletePayment)
         } catch {
             setFailureState(error: error)

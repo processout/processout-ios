@@ -243,7 +243,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         }
     }
 
-    // MARK: - Captured State
+    // MARK: - Completed State
 
     private func update(with state: InteractorState.Completed) {
         let newState = NativeAlternativePaymentViewModelState(
@@ -265,8 +265,29 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         items.append(
             contentsOf: createItems(for: state.elements, state: nil)
         )
-        // todo(andrii-vysotskyi): create done button if needed.
+        if let doneButton = createDoneButton(state: state) {
+            items.append(doneButton)
+        }
         return items
+    }
+
+    private func createDoneButton(state: InteractorState.Completed) -> NativeAlternativePaymentViewModelItem? {
+        guard !state.elements.isEmpty else {
+            return nil
+        }
+        // todo(andrii-vysotskyi): localize and support configuration
+        let viewModel = POButtonViewModel(
+            id: "complete-payment-button",
+            title: "Done",
+            isEnabled: true,
+            isLoading: false,
+            role: .primary,
+            confirmation: nil,
+            action: { [weak self] in
+                self?.interactor.cancel()
+            }
+        )
+        return .button(viewModel)
     }
 
     // MARK: - Elements
