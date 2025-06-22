@@ -6,14 +6,18 @@
 //
 
 import SwiftUI
+import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 indirect enum NativeAlternativePaymentViewModelItem {
 
-    struct Title: Identifiable, Hashable {
+    struct Title: Identifiable {
 
         /// Item identifier.
         let id: AnyHashable
+
+        /// Icon resource.
+        let iconResource: POImageRemoteResource
 
         /// Title text.
         let text: String
@@ -213,7 +217,7 @@ extension NativeAlternativePaymentViewModelItem: AnimationIdentityProvider {
     var animationIdentity: AnyHashable {
         switch self {
         case .title(let item):
-            return item
+            return item.text
         default:
             return id
         }

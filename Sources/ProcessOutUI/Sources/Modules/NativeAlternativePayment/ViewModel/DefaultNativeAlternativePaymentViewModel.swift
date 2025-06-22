@@ -110,7 +110,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         state: InteractorState.Started, isSubmitting: Bool
     ) -> [NativeAlternativePaymentViewModelItem] {
         var items = [
-            createTitleItem(state: state)
+            createTitleItem(paymentMethod: state.paymentMethod)
         ]
         items += createItems(for: state.elements, state: state)
         items += createButtonItems(state: state, isSubmitting: isSubmitting)
@@ -125,20 +125,6 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             cancelAction(configuration: configuration.cancelButton, isEnabled: !isSubmitting && state.isCancellable)
         ]
         return actions.compactMap { $0 }.map { .button($0) }
-    }
-
-    private func createTitleItem(state: InteractorState.Started) -> NativeAlternativePaymentViewModelItem? {
-        nil // todo(andrii-vysotskyi): fix title
-//        let gatewayDisplayName = state.transactionDetails.gateway.displayName
-//        let title = configuration.title ?? String(resource: .NativeAlternativePayment.title, replacements: gatewayDisplayName)
-//        guard !title.isEmpty else {
-//            return nil
-//        }
-//        let item = NativeAlternativePaymentViewModelItem.Title(id: "title", text: title)
-//        let section = NativeAlternativePaymentViewModelSection(
-//            id: "title", isCentered: false, title: nil, items: [.title(item)], error: nil
-//        )
-//        return section
     }
 
     private func createFocusedInputId(state: InteractorState.Started) -> AnyHashable? {
@@ -182,8 +168,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         state: InteractorState.AwaitingCompletion
     ) -> [NativeAlternativePaymentViewModelItem] {
         // todo(andrii-vysotskyi): use proper view
-        // todo(andrii-vysotskyi): create title item
-        var items: [NativeAlternativePaymentViewModelItem] = []
+        var items: [NativeAlternativePaymentViewModelItem] = [
+            createTitleItem(paymentMethod: state.paymentMethod)
+        ]
         if state.shouldConfirmPayment {
             items.append(
                 contentsOf: createItems(for: state.elements, state: nil)
@@ -270,6 +257,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func createItems(state: InteractorState.Completed) -> [NativeAlternativePaymentViewModelItem] {
         // todo(andrii-vysotskyi): localize strings
         var items: [NativeAlternativePaymentViewModelItem] = [
+            createTitleItem(paymentMethod: state.paymentMethod),
             .success(
                 .init(title: "Payment approved!", description: "You paid $40.00 to [shop-name]")
             )
@@ -635,6 +623,17 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             return false
         }
         return true
+    }
+
+    private func createTitleItem(
+        paymentMethod: PONativeAlternativePaymentMethodV2
+    ) -> NativeAlternativePaymentViewModelItem {
+        let item = NativeAlternativePaymentViewModelItem.Title(
+            id: "Title",
+            iconResource: paymentMethod.logo,
+            text: paymentMethod.displayName
+        )
+        return .title(item)
     }
 }
 

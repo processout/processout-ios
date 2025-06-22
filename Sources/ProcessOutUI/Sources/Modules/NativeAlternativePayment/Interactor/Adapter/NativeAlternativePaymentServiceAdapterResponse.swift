@@ -12,6 +12,9 @@ struct NativeAlternativePaymentServiceAdapterResponse {
     /// Payment state.
     let state: PONativeAlternativePaymentStateV2
 
+    /// Payment method information.
+    let paymentMethod: PONativeAlternativePaymentMethodV2
+
     /// UI elements.
     let elements: [PONativeAlternativePaymentElementV2]?
 
@@ -23,12 +26,14 @@ extension NativeAlternativePaymentServiceAdapterResponse {
 
     init(authorizationResponse: PONativeAlternativePaymentAuthorizationResponseV2) {
         self.state = authorizationResponse.state
+        self.paymentMethod = authorizationResponse.paymentMethod
         self.elements = authorizationResponse.elements
         self.redirect = authorizationResponse.redirect
     }
 
     init(tokenizationResponse: PONativeAlternativePaymentTokenizationResponseV2) {
         self.state = tokenizationResponse.state
+        self.paymentMethod = tokenizationResponse.paymentMethod
         self.elements = tokenizationResponse.elements
         self.redirect = tokenizationResponse.redirect
     }

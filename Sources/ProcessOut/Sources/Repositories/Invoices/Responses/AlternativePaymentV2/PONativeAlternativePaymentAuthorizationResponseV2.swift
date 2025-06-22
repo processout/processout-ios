@@ -13,6 +13,9 @@ public struct PONativeAlternativePaymentAuthorizationResponseV2: Sendable, Decod
     /// Payment state.
     public let state: PONativeAlternativePaymentStateV2
 
+    /// Payment method information.
+    public let paymentMethod: PONativeAlternativePaymentMethodV2
+
     /// UI elements.
     public let elements: [PONativeAlternativePaymentElementV2]?
 

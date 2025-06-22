@@ -14,11 +14,23 @@ struct NativeAlternativePaymentTitleItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem.Title
 
+    // MARK: - View
+
     var body: some View {
-        Text(item.text)
-            .textStyle(style.title)
-            .padding(.bottom, POSpacing.large)
-            .preference(key: NativeAlternativePaymentViewSeparatorVisibilityPreferenceKey.self, value: true)
+        HStack(spacing: POSpacing.space16) {
+            Text(item.text)
+                .textStyle(style.title)
+            Spacer()
+            POAsyncImage(resource: item.iconResource) {
+                EmptyView()
+            } content: { phase in
+                if case .success(let image) = phase {
+                    image.resizable().scaledToFit().frame(maxHeight: 24)
+                }
+            }
+        }
+        .padding(.bottom, POSpacing.large)
+        .preference(key: NativeAlternativePaymentViewSeparatorVisibilityPreferenceKey.self, value: true)
     }
 
     // MARK: - Private Properties
