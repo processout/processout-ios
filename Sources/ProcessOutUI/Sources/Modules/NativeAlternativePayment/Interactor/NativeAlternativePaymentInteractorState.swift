@@ -47,11 +47,17 @@ enum NativeAlternativePaymentInteractorState {
         /// Payment method information.
         let paymentMethod: NativeAlternativePaymentResolvedPaymentMethod
 
+        /// Resolved elements.
+        let elements: [NativeAlternativePaymentResolvedElement]
+
         /// Redirect information.
         let redirect: PONativeAlternativePaymentRedirectV2
     }
 
     struct Redirecting {
+
+        /// Task associated with operation that actually handles the redirect.
+        let task: Task<Void, Never>
 
         /// Awaiting redirect state snapshot.
         let snapshot: AwaitingRedirect

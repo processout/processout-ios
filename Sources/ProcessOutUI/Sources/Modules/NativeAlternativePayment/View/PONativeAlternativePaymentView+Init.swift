@@ -42,6 +42,7 @@ extension PONativeAlternativePaymentView {
                     tokensService: ProcessOut.shared.customerTokens,
                     paymentConfirmationTimeout: configuration.paymentConfirmation.timeout
                 ),
+                alternativePaymentsService: ProcessOut.shared.alternativePayments,
                 imagesRepository: ProcessOut.shared.images,
                 barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
                 logger: logger,
@@ -80,6 +81,7 @@ extension PONativeAlternativePaymentView {
                     tokensService: ProcessOut.shared.customerTokens,
                     paymentConfirmationTimeout: configuration.paymentConfirmation.timeout
                 ),
+                alternativePaymentsService: ProcessOut.shared.alternativePayments,
                 imagesRepository: ProcessOut.shared.images,
                 barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
                 logger: logger,

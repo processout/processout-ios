@@ -18,6 +18,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     init(
         configuration: PONativeAlternativePaymentConfiguration,
         serviceAdapter: NativeAlternativePaymentServiceAdapter,
+        alternativePaymentsService: POAlternativePaymentsService,
         imagesRepository: POImagesRepository,
         barcodeImageProvider: BarcodeImageProvider,
         logger: POLogger,
@@ -25,6 +26,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     ) {
         self.configuration = configuration
         self.serviceAdapter = serviceAdapter
+        self.alternativePaymentsService = alternativePaymentsService
         self.imagesRepository = imagesRepository
         self.barcodeImageProvider = barcodeImageProvider
         self.logger = logger
@@ -116,6 +118,28 @@ final class NativeAlternativePaymentDefaultInteractor:
         confirmPayment(force: false)
     }
 
+    func confirmRedirect() {
+        guard case .awaitingRedirect(let currentState) = state else {
+            logger.debug("Ignoring redirect confirmation in unsupported state \(state).")
+            return
+        }
+        let task = Task {
+            do {
+                // todo(andrii-vysotskyi): allow non ephemeral sessions via configuration
+                let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+                    url: currentState.redirect.url, callback: nil, prefersEphemeralSession: true
+                )
+                _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
+                let response = try await serviceAdapter.continuePayment(with: .init(flow: configuration.flow))
+                try await setState(with: response)
+            } catch {
+                setFailureState(error: error)
+            }
+        }
+        let newState = State.Redirecting(task: task, snapshot: currentState)
+        state = .redirecting(newState)
+    }
+
     override func cancel() {
         switch state {
         case .starting(let currentState):
@@ -124,6 +148,8 @@ final class NativeAlternativePaymentDefaultInteractor:
             currentState.task.cancel()
         case .awaitingCompletion(let currentState):
             currentState.task?.cancel()
+        case .redirecting(let currentState):
+            currentState.task.cancel()
         case .completed(let currentState):
             // Intent here is not to cancel invocation of completion but to fast-forward
             // it by cancelling any ongoing delay operation if any.
@@ -141,6 +167,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Private Properties
 
     private let serviceAdapter: NativeAlternativePaymentServiceAdapter
+    private let alternativePaymentsService: POAlternativePaymentsService
     private let imagesRepository: POImagesRepository
     private let barcodeImageProvider: BarcodeImageProvider
     private let logger: POLogger
@@ -152,10 +179,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         switch response.state {
         case .nextStepRequired:
             if let redirect = response.redirect {
-                let newState = State.AwaitingRedirect(
-                    paymentMethod: await resolve(paymentMethod: response.paymentMethod), redirect: redirect
-                )
-                state = .awaitingRedirect(newState)
+                try await setAwaitingRedirectState(response: response, redirect: redirect)
             } else if let elements = response.elements {
                 try await setStartedState(paymentMethod: response.paymentMethod, elements: elements)
             } else {
@@ -285,6 +309,23 @@ final class NativeAlternativePaymentDefaultInteractor:
         newState.shouldConfirmPayment = false
         state = .awaitingCompletion(newState)
         logger.info("Waiting for payment completion confirmation.")
+    }
+
+    // MARK: - Redirect
+
+    private func setAwaitingRedirectState(
+        response: NativeAlternativePaymentServiceAdapterResponse,
+        redirect: PONativeAlternativePaymentRedirectV2
+    ) async throws {
+        let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
+        let elements = try await resolve(elements: response.elements ?? [])
+        guard case .awaitingRedirect = state else {
+            return
+        }
+        let newState = State.AwaitingRedirect(
+            paymentMethod: paymentMethod, elements: elements, redirect: redirect
+        )
+        state = .awaitingRedirect(newState)
     }
 
     // MARK: - Completed State

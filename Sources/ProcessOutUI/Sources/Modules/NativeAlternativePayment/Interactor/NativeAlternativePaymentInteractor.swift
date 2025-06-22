@@ -25,6 +25,9 @@ protocol NativeAlternativePaymentInteractor: Interactor<NativeAlternativePayment
     /// - NOTE: Implementation does nothing if manual confirmation is not needed.
     func confirmPayment()
 
+    /// Confirms redirect to external web page.
+    func confirmRedirect()
+
     /// Notifies interactor that user requested cancel confirmation.
     func didRequestCancelConfirmation()
 }

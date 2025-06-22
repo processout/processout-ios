@@ -75,10 +75,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             update(with: state)
         case .submitting(let state):
             update(withSubmittingState: state.snapshot)
-        case .awaitingRedirect:
-            assertionFailure("Not implemented")
-        case .redirecting:
-            assertionFailure("Not implemented")
+        case .awaitingRedirect(let state):
+            update(with: state)
+        case .redirecting(let state):
+            update(with: state)
         case .awaitingCompletion(let state):
             update(with: state)
         case .completed(let state) where configuration.success != nil:
@@ -241,6 +241,49 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 self.state.confirmationDialog = dialog
             }
         }
+    }
+
+    // MARK: - Redirect
+
+    private func update(with state: InteractorState.AwaitingRedirect, isRedirecting: Bool = false) {
+        var items: [NativeAlternativePaymentViewModelItem] = [
+            createTitleItem(paymentMethod: state.paymentMethod)
+        ]
+        items.append(
+            contentsOf: createItems(for: state.elements, state: nil)
+        )
+        items.append(
+            createRedirectButton(state: state, isRedirecting: isRedirecting)
+        )
+        if let viewModel = cancelAction(configuration: interactor.configuration.cancelButton, isEnabled: true) {
+            items.append(.button(viewModel))
+        }
+        let newState = NativeAlternativePaymentViewModelState(
+            items: items, focusedItemId: nil, confirmationDialog: nil
+        )
+        self.state = newState
+    }
+
+    private func update(with state: InteractorState.Redirecting) {
+        update(with: state.snapshot, isRedirecting: true)
+    }
+
+    private func createRedirectButton(
+        state: InteractorState.AwaitingRedirect, isRedirecting: Bool
+    ) -> NativeAlternativePaymentViewModelItem {
+        // todo(andrii-vysotskyi): support customization
+        let viewModel = POButtonViewModel(
+            id: "redirect-button",
+            title: state.redirect.hint,
+            isEnabled: true,
+            isLoading: isRedirecting,
+            role: .primary,
+            confirmation: nil,
+            action: { [weak self] in
+                self?.interactor.confirmRedirect()
+            }
+        )
+        return .button(viewModel)
     }
 
     // MARK: - Completed State
