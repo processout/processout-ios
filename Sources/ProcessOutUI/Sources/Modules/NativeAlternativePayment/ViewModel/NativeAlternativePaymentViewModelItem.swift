@@ -82,6 +82,18 @@ indirect enum NativeAlternativePaymentViewModelItem {
         let isInvalid: Bool
     }
 
+    struct ToggleItem: Identifiable {
+
+        /// Item identifier.
+        let id: AnyHashable
+
+        /// Title.
+        let title: String
+
+        /// Defines whether item is currently selected.
+        @Binding var isSelected: Bool
+    }
+
     struct MessageInstruction: Identifiable, Hashable {
 
         let id: AnyHashable
@@ -145,6 +157,9 @@ indirect enum NativeAlternativePaymentViewModelItem {
     /// Phone number input with selectable territories.
     case phoneNumberInput(PhoneNumberInput)
 
+    /// Toggle item.
+    case toggle(ToggleItem)
+
     /// Picker with multiple options.
     case picker(Picker)
 
@@ -183,6 +198,8 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
         case .codeInput(let item):
             return item.id
         case .phoneNumberInput(let item):
+            return item.id
+        case .toggle(let item):
             return item.id
         case .picker(let item):
             return item.id

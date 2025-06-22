@@ -32,6 +32,10 @@ struct NativeAlternativePaymentItemView: View {
                 .inputStyle(style.codeInput)
         case .phoneNumberInput(let item):
             view(for: item)
+        case .toggle(let item):
+            // todo(andrii-vysotskyi): support style customization
+            Toggle(item.title, isOn: item.$isSelected)
+                .poToggleStyle(.poCheckbox)
         case .picker(let item):
             view(for: item)
         case .progress:

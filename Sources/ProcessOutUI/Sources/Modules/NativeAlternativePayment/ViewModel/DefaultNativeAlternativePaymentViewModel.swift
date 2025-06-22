@@ -384,6 +384,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             return createItem(for: parameter, with: specification)
         case .singleSelect(let specification):
             return createItem(for: parameter, with: specification)
+        case .boolean(let specification):
+            return createItem(for: parameter, with: specification)
         default:
             break
         }
@@ -526,6 +528,24 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         default:
             return .default
         }
+    }
+
+    private func createItem(
+        for parameter: InteractorState.Parameter,
+        with specification: PONativeAlternativePaymentFormV2.Parameter.Boolean
+    ) -> NativeAlternativePaymentViewModelItem {
+        let isSelected = Binding<Bool> {
+            if case .string(let value) = parameter.value {
+                return value == true.description
+            }
+            return false
+        } set: { [weak self] newValue in
+            self?.interactor.updateValue(.string(newValue.description), for: specification.key)
+        }
+        let item = NativeAlternativePaymentViewModelItem.ToggleItem(
+            id: specification.key, title: specification.label, isSelected: isSelected
+        )
+        return .toggle(item)
     }
 
     // MARK: - Customer Instructions
