@@ -75,9 +75,6 @@ enum NativeAlternativePaymentInteractorState {
         /// - NOTE: For internal use by interactor only.
         var task: Task<Void, Never>?
 
-        /// Boolean value indicating whether completion confirmation takes longer than anticipated.
-        var isDelayed: Bool
-
         /// Boolean value indicating whether payment should be manually confirmed by user to continue.
         var shouldConfirmPayment: Bool
     }

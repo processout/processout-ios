@@ -74,7 +74,8 @@ public struct PONativeAlternativePaymentConfiguration {
         public let timeout: TimeInterval
 
         /// A delay before showing progress view during payment confirmation.
-        public let showProgressViewAfter: TimeInterval?
+        @available(*, deprecated)
+        public let showProgressViewAfter: TimeInterval? = nil
 
         /// Boolean value indicating whether gateway information (such as name/logo) should stay hidden
         /// during payment confirmation even if more specific payment provider details are not available.
@@ -101,7 +102,6 @@ public struct PONativeAlternativePaymentConfiguration {
             cancelButton: CancelButton? = nil
         ) {
             self.timeout = timeout
-            self.showProgressViewAfter = showProgressViewAfter
             self.hideGatewayDetails = hideGatewayDetails
             self.confirmButton = confirmButton
             self.cancelButton = cancelButton
@@ -457,7 +457,6 @@ extension PONativeAlternativePaymentConfiguration.Confirmation {
         secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction? = nil
     ) {
         self.timeout = timeout
-        self.showProgressViewAfter = showProgressIndicatorAfter
         self.hideGatewayDetails = hideGatewayDetails
         self.confirmButton = confirmButton
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }

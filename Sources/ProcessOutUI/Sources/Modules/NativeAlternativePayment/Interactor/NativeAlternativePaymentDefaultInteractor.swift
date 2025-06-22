@@ -245,7 +245,6 @@ final class NativeAlternativePaymentDefaultInteractor:
                 elements: resolvedElements,
                 estimatedCompletionDate: nil,
                 isCancellable: configuration.paymentConfirmation.cancelButton?.disabledFor.isZero ?? true,
-                isDelayed: false,
                 shouldConfirmPayment: shouldConfirmPayment
             )
             state = .awaitingCompletion(awaitingPaymentCompletionState)
@@ -284,21 +283,6 @@ final class NativeAlternativePaymentDefaultInteractor:
         newState.shouldConfirmPayment = false
         state = .awaitingCompletion(newState)
         logger.info("Waiting for payment completion confirmation.")
-        schedulePaymentConfirmationDelay()
-    }
-
-    private func schedulePaymentConfirmationDelay() {
-        guard let timeInterval = configuration.paymentConfirmation.showProgressViewAfter else {
-            return
-        }
-        Task { @MainActor in
-            try? await Task.sleep(seconds: timeInterval)
-            guard case .awaitingCompletion(var newState) = state else {
-                return
-            }
-            newState.isDelayed = true
-            state = .awaitingCompletion(newState)
-        }
     }
 
     // MARK: - Completed State
