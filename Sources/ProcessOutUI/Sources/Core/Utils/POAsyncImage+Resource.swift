@@ -19,18 +19,27 @@ extension POAsyncImage {
         transaction: Transaction = Transaction(animation: .default),
         @ViewBuilder placeholder: @escaping () -> Placeholder
     ) where Content == _ConditionalContent<Image, Placeholder> {
-        let image = { @Sendable @MainActor in
-            let uiImage = await ProcessOut.shared.images.image(resource: resource)
-            return uiImage.map(Image.init)
-        }
-        // swiftlint:disable:next identifier_name
-        let _content: (POAsyncImagePhase) -> _ConditionalContent<Image, Placeholder> = { phase in
+        self.init(resource: resource, transaction: transaction, placeholder: placeholder) { phase in
             if case .success(let image) = phase {
                 return ViewBuilder.buildEither(first: image)
             } else {
                 return ViewBuilder.buildEither(second: placeholder())
             }
         }
-        self.init(id: resource, image: image, transaction: transaction, content: _content)
+    }
+
+    /// Loads and displays an image from the specified resource.
+    /// - NOTE: implementation uses shared `ProcessOut` instance to load image.
+    init<Placeholder: View>(
+        resource: POImageRemoteResource,
+        transaction: Transaction = Transaction(animation: .default),
+        @ViewBuilder placeholder: @escaping () -> Placeholder,
+        @ViewBuilder content: @escaping (POAsyncImagePhase) -> Content
+    ) {
+        let image = { @Sendable @MainActor in
+            let uiImage = await ProcessOut.shared.images.image(resource: resource)
+            return uiImage.map(Image.init)
+        }
+        self.init(id: resource, image: image, transaction: transaction, content: content)
     }
 }
