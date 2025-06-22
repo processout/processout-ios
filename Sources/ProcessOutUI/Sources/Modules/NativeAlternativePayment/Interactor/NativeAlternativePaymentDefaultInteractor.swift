@@ -152,7 +152,9 @@ final class NativeAlternativePaymentDefaultInteractor:
         switch response.state {
         case .nextStepRequired:
             if let redirect = response.redirect {
-                let newState = State.AwaitingRedirect(paymentMethod: response.paymentMethod, redirect: redirect)
+                let newState = State.AwaitingRedirect(
+                    paymentMethod: await resolve(paymentMethod: response.paymentMethod), redirect: redirect
+                )
                 state = .awaitingRedirect(newState)
             } else if let elements = response.elements {
                 try await setStartedState(paymentMethod: response.paymentMethod, elements: elements)
@@ -188,7 +190,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.info("Will set started state with empty inputs, this may be unexpected.")
         }
         let startedState = State.Started(
-            paymentMethod: paymentMethod,
+            paymentMethod: await resolve(paymentMethod: paymentMethod),
             elements: try await resolve(elements: elements),
             parameters: parameters,
             isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
@@ -241,7 +243,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             let shouldConfirmPayment =
                 !resolvedElements.isEmpty && configuration.paymentConfirmation.confirmButton != nil
             let awaitingPaymentCompletionState = State.AwaitingCompletion(
-                paymentMethod: response.paymentMethod,
+                paymentMethod: await resolve(paymentMethod: response.paymentMethod),
                 elements: resolvedElements,
                 estimatedCompletionDate: nil,
                 isCancellable: configuration.paymentConfirmation.cancelButton?.disabledFor.isZero ?? true,
@@ -305,7 +307,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 completion(.success(()))
             }
             let newState = State.Completed(
-                paymentMethod: response.paymentMethod,
+                paymentMethod: await resolve(paymentMethod: response.paymentMethod),
                 elements: resolvedElements,
                 completionTask: task,
             )
@@ -554,6 +556,15 @@ final class NativeAlternativePaymentDefaultInteractor:
         case .unknown:
             return nil
         }
+    }
+
+    // MARK: - Payment Method Utils
+
+    private func resolve(
+        paymentMethod: PONativeAlternativePaymentMethodV2
+    ) async -> NativeAlternativePaymentResolvedPaymentMethod {
+        let logo = try? await imagesRepository.image(resource: paymentMethod.logo)
+        return .init(logo: logo, displayName: paymentMethod.displayName)
     }
 
     // MARK: - Default Values

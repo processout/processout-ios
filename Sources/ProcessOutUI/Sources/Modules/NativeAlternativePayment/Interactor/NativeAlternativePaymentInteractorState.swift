@@ -21,7 +21,7 @@ enum NativeAlternativePaymentInteractorState {
     struct Started {
 
         /// Payment method information.
-        var paymentMethod: PONativeAlternativePaymentMethodV2
+        var paymentMethod: NativeAlternativePaymentResolvedPaymentMethod
 
         /// Elements.
         var elements: [NativeAlternativePaymentResolvedElement]
@@ -45,7 +45,7 @@ enum NativeAlternativePaymentInteractorState {
     struct AwaitingRedirect {
 
         /// Payment method information.
-        let paymentMethod: PONativeAlternativePaymentMethodV2
+        let paymentMethod: NativeAlternativePaymentResolvedPaymentMethod
 
         /// Redirect information.
         let redirect: PONativeAlternativePaymentRedirectV2
@@ -60,7 +60,7 @@ enum NativeAlternativePaymentInteractorState {
     struct AwaitingCompletion {
 
         /// Payment method information.
-        let paymentMethod: PONativeAlternativePaymentMethodV2
+        let paymentMethod: NativeAlternativePaymentResolvedPaymentMethod
 
         /// Resolved elements.
         let elements: [NativeAlternativePaymentResolvedElement]
@@ -82,7 +82,7 @@ enum NativeAlternativePaymentInteractorState {
     struct Completed {
 
         /// Payment method information.
-        let paymentMethod: PONativeAlternativePaymentMethodV2
+        let paymentMethod: NativeAlternativePaymentResolvedPaymentMethod
 
         /// Resolved elements.
         let elements: [NativeAlternativePaymentResolvedElement]

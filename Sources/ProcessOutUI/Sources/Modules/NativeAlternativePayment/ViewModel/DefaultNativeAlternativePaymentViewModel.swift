@@ -647,11 +647,11 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createTitleItem(
-        paymentMethod: PONativeAlternativePaymentMethodV2
+        paymentMethod: NativeAlternativePaymentResolvedPaymentMethod
     ) -> NativeAlternativePaymentViewModelItem {
         let item = NativeAlternativePaymentViewModelItem.Title(
             id: "Title",
-            iconResource: paymentMethod.logo,
+            icon: paymentMethod.logo.map({ Image(uiImage: $0) }),
             text: paymentMethod.displayName
         )
         return .title(item)

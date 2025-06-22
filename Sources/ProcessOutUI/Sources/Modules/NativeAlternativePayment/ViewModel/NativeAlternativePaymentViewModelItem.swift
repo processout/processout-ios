@@ -17,7 +17,7 @@ indirect enum NativeAlternativePaymentViewModelItem {
         let id: AnyHashable
 
         /// Icon resource.
-        let iconResource: POImageRemoteResource
+        let icon: SwiftUI.Image?
 
         /// Title text.
         let text: String
