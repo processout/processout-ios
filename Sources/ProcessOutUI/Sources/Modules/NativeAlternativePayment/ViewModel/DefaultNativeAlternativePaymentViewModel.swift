@@ -167,8 +167,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func createItems(
         state: InteractorState.AwaitingCompletion
     ) -> [NativeAlternativePaymentViewModelItem] {
-        // todo(andrii-vysotskyi): use proper view
-        var items: [NativeAlternativePaymentViewModelItem] = [
+        var items: [NativeAlternativePaymentViewModelItem?] = [
             createTitleItem(paymentMethod: state.paymentMethod)
         ]
         if state.shouldConfirmPayment {
@@ -186,7 +185,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             items.append(.confirmationProgress(confirmationProgressItem))
         }
         items += createButtonItems(state: state)
-        return items
+        return items.compactMap { $0 }
     }
 
     private func createButtonItems(
@@ -212,7 +211,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         }
         let action = POButtonViewModel(
             id: "primary-button",
-            title: buttonConfiguration.title ?? String(resource: .NativeAlternativePayment.Button.confirmCapture),
+            title: buttonConfiguration.title ?? String(resource: .NativeAlternativePayment.Button.confirmPayment),
             icon: buttonConfiguration.icon,
             role: .primary,
             action: { [weak self] in
@@ -246,7 +245,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     // MARK: - Redirect
 
     private func update(with state: InteractorState.AwaitingRedirect, isRedirecting: Bool = false) {
-        var items: [NativeAlternativePaymentViewModelItem] = [
+        var items: [NativeAlternativePaymentViewModelItem?] = [
             createTitleItem(paymentMethod: state.paymentMethod)
         ]
         items.append(
@@ -259,7 +258,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             items.append(.button(viewModel))
         }
         let newState = NativeAlternativePaymentViewModelState(
-            items: items, focusedItemId: nil, confirmationDialog: nil
+            items: items.compactMap { $0 }, focusedItemId: nil, confirmationDialog: nil
         )
         self.state = newState
     }
@@ -271,7 +270,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func createRedirectButton(
         state: InteractorState.AwaitingRedirect, isRedirecting: Bool
     ) -> NativeAlternativePaymentViewModelItem {
-        // todo(andrii-vysotskyi): support customization
+        // todo(andrii-vysotskyi): decide whether button should be customizable
         let viewModel = POButtonViewModel(
             id: "redirect-button",
             title: state.redirect.hint,
@@ -298,12 +297,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createItems(state: InteractorState.Completed) -> [NativeAlternativePaymentViewModelItem] {
-        // todo(andrii-vysotskyi): localize strings
-        var items: [NativeAlternativePaymentViewModelItem] = [
+        var items: [NativeAlternativePaymentViewModelItem?] = [
             createTitleItem(paymentMethod: state.paymentMethod),
-            .success(
-                .init(title: "Payment approved!", description: "You paid $40.00 to [shop-name]")
-            )
+            createSuccessItem(state: state)
         ]
         items.append(
             contentsOf: createItems(for: state.elements, state: nil)
@@ -311,17 +307,29 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         if let doneButton = createDoneButton(state: state) {
             items.append(doneButton)
         }
-        return items
+        return items.compactMap { $0 }
+    }
+
+    private func createSuccessItem(state: InteractorState.Completed) -> NativeAlternativePaymentViewModelItem {
+        // todo(andrii-vysotskyi): support icon customization
+        let title = interactor.configuration.success?.title
+            ?? String(resource: .NativeAlternativePayment.Success.title)
+        let description = interactor.configuration.success?.message
+            ?? String(resource: .NativeAlternativePayment.Success.message)
+        let item = NativeAlternativePaymentViewModelItem.Success(
+            title: title, description: description
+        )
+        return .success(item)
     }
 
     private func createDoneButton(state: InteractorState.Completed) -> NativeAlternativePaymentViewModelItem? {
-        guard !state.elements.isEmpty else {
+        guard let configuration = interactor.configuration.success?.doneButton, !state.elements.isEmpty else {
             return nil
         }
-        // todo(andrii-vysotskyi): localize and support configuration
         let viewModel = POButtonViewModel(
             id: "complete-payment-button",
-            title: "Done",
+            title: configuration.title ?? String(resource: .NativeAlternativePayment.Button.done),
+            icon: configuration.icon,
             isEnabled: true,
             isLoading: false,
             role: .primary,
@@ -638,13 +646,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         if let customTitle = configuration.submitButton.title {
             title = customTitle
         } else {
-//            priceFormatter.currencyCode = state.transactionDetails.invoice.currencyCode
-//            if let formattedAmount = priceFormatter.string(from: state.transactionDetails.invoice.amount as NSDecimalNumber) {
-//                title = String(resource: .NativeAlternativePayment.Button.submitAmount, replacements: formattedAmount)
-//            } else {
-//                title = String(resource: .NativeAlternativePayment.Button.submit)
-//            }
-            title = String(resource: .NativeAlternativePayment.Button.submit) // todo(andrii-vysotskyi): fix title
+            title = String(resource: .NativeAlternativePayment.Button.continue)
         }
         guard !title.isEmpty else {
             return nil
@@ -711,11 +713,15 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func createTitleItem(
         paymentMethod: NativeAlternativePaymentResolvedPaymentMethod
-    ) -> NativeAlternativePaymentViewModelItem {
+    ) -> NativeAlternativePaymentViewModelItem? {
+        let title = interactor.configuration.title ?? paymentMethod.displayName
+        guard !title.isEmpty else {
+            return nil
+        }
         let item = NativeAlternativePaymentViewModelItem.Title(
             id: "Title",
-            icon: paymentMethod.logo.map({ Image(uiImage: $0) }),
-            text: paymentMethod.displayName
+            icon: paymentMethod.logo.map(Image.init),
+            text: title
         )
         return .title(item)
     }

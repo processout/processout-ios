@@ -159,3 +159,17 @@ extension NativeAlternativePaymentInteractorState: InteractorState {
         }
     }
 }
+
+// struct CancelState {
+//
+//    /// Configuration.
+//    let configuration: PONativeAlternativePaymentConfiguration.CancelButton
+//
+//    /// Indicates time until which cancel is disabled.
+//    let disabledUntil: Date?
+//
+//    /// Indicates whether cancel is currently disabled.
+//    var isDisabled: Bool {
+//        disabledUntil.map { $0.timeIntervalSinceNow > 0 } ?? false
+//    }
+// }

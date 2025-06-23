@@ -108,22 +108,41 @@ public struct PONativeAlternativePaymentConfiguration {
         }
     }
 
-    /// Payment success configuration.
+    /// Configuration for displaying the payment success screen.
     @MainActor
     @preconcurrency
     public struct Success {
 
+        /// Custom title to display user when payment completes.
+        public let title: String?
+
         /// Custom success message to display user when payment completes.
         public let message: String?
 
-        /// Defines for how long implementation delays calling completion in case of success.
-        /// Default duration is 3 seconds.
-        public let duration: TimeInterval
+        /// Duration (in seconds) the success screen remains visible when no additional information
+        /// is shown. Defaults to 3 seconds.
+        public let displayDuration: TimeInterval
+
+        /// Duration (in seconds) the success screen remains visible when additional useful information
+        /// is available to the user. Defaults to 60 seconds.
+        public let extendedDisplayDuration: TimeInterval
+
+        /// Button configuration allowing the user to manually dismiss the success screen.
+        public let doneButton: SubmitButton?
 
         /// Creates configuration instance.
-        public init(message: String? = nil, duration: TimeInterval = 3) {
+        public init(
+            title: String? = nil,
+            message: String? = nil,
+            displayDuration: TimeInterval = 3,
+            extendedDisplayDuration: TimeInterval = 60,
+            doneButton: SubmitButton? = .init()
+        ) {
+            self.title = title
             self.message = message
-            self.duration = duration
+            self.displayDuration = displayDuration
+            self.extendedDisplayDuration = extendedDisplayDuration
+            self.doneButton = doneButton
         }
     }
 
@@ -471,6 +490,16 @@ extension PONativeAlternativePaymentConfiguration.CancelButton {
             return nil
         }
         self = .init(title: title, disabledFor: disabledFor, confirmation: confirmation)
+    }
+}
+
+extension PONativeAlternativePaymentConfiguration.Success {
+
+    /// Duration (in seconds) the success screen remains visible when no additional information
+    /// is shown.
+    @available(*, deprecated, renamed: "displayDuration")
+    public var duration: TimeInterval {
+        displayDuration
     }
 }
 

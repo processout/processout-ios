@@ -342,9 +342,10 @@ final class NativeAlternativePaymentDefaultInteractor:
                 if let success = configuration.success {
                     // Sleep errors are ignored. The goal is that if this task is
                     // cancelled we should still invoke completion.
-                    // todo(andrii-vysotskyi): make configurable
                     let shouldConfirm = !resolvedElements.isEmpty
-                    try? await Task.sleep(seconds: shouldConfirm ? 5 * 60 : success.duration)
+                    try? await Task.sleep(
+                        seconds: shouldConfirm ? success.extendedDisplayDuration : success.displayDuration
+                    )
                 }
                 completion(.success(()))
             }
@@ -511,25 +512,6 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         return String(resource: resource)
     }
-
-//    private func paymentProvider(
-//        with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
-//        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
-//    ) async -> NativeAlternativePaymentInteractorState.PaymentProvider {
-//        if let parameterValues {
-//            if let url = parameterValues.providerLogoUrl, let image = await imagesRepository.image(at: url) {
-//                return .init(name: nil, image: image)
-//            }
-//            if let name = parameterValues.providerName {
-//                return .init(name: name, image: nil)
-//            }
-//        }
-//        guard !configuration.paymentConfirmation.hideGatewayDetails else {
-//            return .init(name: nil, image: nil)
-//        }
-//        let gatewayLogoImage = await imagesRepository.image(at: gateway.logoUrl)
-//        return .init(name: nil, image: gatewayLogoImage)
-//    }
 
     // MARK: - Customer Instructions
 

@@ -28,26 +28,31 @@ extension POStringResource {
         enum Button {
 
             /// Pay.
-            static let submit = POStringResource("native-alternative-payment.submit-button.default-title", comment: "")
+            static let `continue` = POStringResource("native-alternative-payment.continue-button.title", comment: "")
 
-            /// Pay %@
-            static let submitAmount = POStringResource("native-alternative-payment.submit-button.title", comment: "")
-
-            /// Capture confirmation.
-            static let confirmCapture = POStringResource(
-                "native-alternative-payment.confirm-capture-button.title", comment: ""
+            /// Payment confirmation.
+            static let confirmPayment = POStringResource(
+                "native-alternative-payment.confirm-payment-button.title", comment: ""
             )
+
+            /// Done button.
+            static let done = POStringResource(
+                "native-alternative-payment.done-button.title", comment: ""
+            )
+
+            /// Cancel button title.
+            static let cancel = POStringResource("native-alternative-payment.cancel-button.title", comment: "")
 
             /// Save barcode button.
             static let saveBarcode = POStringResource(
                 "native-alternative-payment.save-barcode-button.title", comment: ""
             )
-
-            /// Cancel button title.
-            static let cancel = POStringResource("native-alternative-payment.cancel-button.title", comment: "")
         }
 
         enum Success {
+
+            /// Success title.
+            static let title = POStringResource("native-alternative-payment.success.title", comment: "")
 
             /// Success message.
             static let message = POStringResource("native-alternative-payment.success.message", comment: "")
