@@ -135,6 +135,16 @@ indirect enum NativeAlternativePaymentViewModelItem {
 
     struct ConfirmationProgress {
 
+        /// The title of the first step.
+        let firstStepTitle: String
+
+        /// The title of the second step.
+        let secondStepTitle: String
+
+        /// A closure that returns a description for the second step based on the
+        /// remaining time string.
+        let secondStepDescription: (String) -> String
+
         /// Date components formatter.
         let formatter: DateComponentsFormatter
 

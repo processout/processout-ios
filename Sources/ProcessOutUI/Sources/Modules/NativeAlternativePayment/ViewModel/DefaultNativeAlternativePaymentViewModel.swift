@@ -186,7 +186,20 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             formatter.unitsStyle = .positional
             formatter.zeroFormattingBehavior = [.pad]
             let confirmationProgressItem = NativeAlternativePaymentViewModelItem.ConfirmationProgress(
-                formatter: formatter, estimatedCompletionDate: estimatedCompletionDate
+                firstStepTitle: String(
+                    resource: .NativeAlternativePayment.PaymentConfirmation.Progress.FirstStep.title
+                ),
+                secondStepTitle: String(
+                    resource: .NativeAlternativePayment.PaymentConfirmation.Progress.SecondStep.title
+                ),
+                secondStepDescription: { remainingDuration in
+                    String(
+                        resource: .NativeAlternativePayment.PaymentConfirmation.Progress.SecondStep.description,
+                        replacements: remainingDuration
+                    )
+                },
+                formatter: formatter,
+                estimatedCompletionDate: estimatedCompletionDate
             )
             items.append(.confirmationProgress(confirmationProgressItem))
         }

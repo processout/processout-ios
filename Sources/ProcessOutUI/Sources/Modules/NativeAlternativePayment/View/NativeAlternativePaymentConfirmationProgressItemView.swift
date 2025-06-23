@@ -16,16 +16,17 @@ struct NativeAlternativePaymentConfirmationProgressItemView: View { // swiftlint
     // MARK: -
 
     var body: some View {
+        // todo(andrii-vysotskyi): allow injecting custom style.
         GroupBox {
             VStack(alignment: .leading, spacing: 28) {
-                ProgressView("Payment sent", value: 1)
+                ProgressView(item.firstStepTitle, value: 1)
                 ProgressView(
                     value: 0.5,
                     label: {
-                        Text("Waiting for confirmation")
+                        Text(item.secondStepTitle)
                     },
                     currentValueLabel: {
-                        Text("Please wait for \(remainingWaitDurationDescription) minutes")
+                        Text(item.secondStepDescription(remainingWaitDurationDescription))
                     }
                 )
                 .onAppear {

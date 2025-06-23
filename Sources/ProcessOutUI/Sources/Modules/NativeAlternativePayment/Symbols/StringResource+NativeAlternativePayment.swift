@@ -49,6 +49,33 @@ extension POStringResource {
             )
         }
 
+        enum PaymentConfirmation {
+
+            enum Progress {
+
+                enum FirstStep {
+
+                    /// First step title.
+                    static let title = POStringResource(
+                        "native-alternative-payment.payment-confirmation.progress.step1.title", comment: ""
+                    )
+                }
+
+                enum SecondStep {
+
+                    /// Second step title.
+                    static let title = POStringResource(
+                        "native-alternative-payment.payment-confirmation.progress.step2.title", comment: ""
+                    )
+
+                    /// Second step description.
+                    static let description = POStringResource(
+                        "native-alternative-payment.payment-confirmation.progress.step2.description", comment: ""
+                    )
+                }
+            }
+        }
+
         enum Success {
 
             /// Success title.
