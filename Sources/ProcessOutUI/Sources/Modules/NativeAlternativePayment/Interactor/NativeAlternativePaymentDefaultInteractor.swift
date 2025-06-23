@@ -180,11 +180,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         case .nextStepRequired:
             if let redirect = response.redirect {
                 try await setAwaitingRedirectState(response: response, redirect: redirect)
-            } else if let elements = response.elements {
-                try await setStartedState(paymentMethod: response.paymentMethod, elements: elements)
             } else {
-                let failure = POFailure(message: "Unsupported next step.", code: .Mobile.generic)
-                setFailureState(error: failure)
+                try await setStartedState(response: response)
             }
         case .pending:
             await setAwaitingCompletionState(response: response)
@@ -199,10 +196,10 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Starting State
 
-    private func setStartedState(
-        paymentMethod: PONativeAlternativePaymentMethodV2, elements: [PONativeAlternativePaymentElementV2]
-    ) async throws {
-        let parameters = await createParameters(for: elements)
+    private func setStartedState(response: NativeAlternativePaymentServiceAdapterResponse) async throws {
+        let elements = try await resolve(elements: response.elements ?? [])
+        let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
+        let parameters = await createParameters(for: response.elements ?? [])
         switch state {
         case .starting, .submitting, .redirecting:
             break // todo(andrii-vysotskyi): check if more states should be supported
@@ -214,8 +211,8 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.info("Will set started state with empty inputs, this may be unexpected.")
         }
         let startedState = State.Started(
-            paymentMethod: await resolve(paymentMethod: paymentMethod),
-            elements: try await resolve(elements: elements),
+            paymentMethod: paymentMethod,
+            elements: elements,
             parameters: parameters,
             isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
         )
@@ -319,7 +316,11 @@ final class NativeAlternativePaymentDefaultInteractor:
     ) async throws {
         let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
         let elements = try await resolve(elements: response.elements ?? [])
-        guard case .awaitingRedirect = state else {
+        switch state {
+        case .starting, .submitting, .redirecting:
+            break // todo(andrii-vysotskyi): check if more states should be supported
+        default:
+            logger.debug("Ignoring attempt to set started state in unsupported state: \(state).")
             return
         }
         let newState = State.AwaitingRedirect(
