@@ -207,6 +207,9 @@ public struct PONativeAlternativePaymentConfiguration {
         /// When property is set implementation asks user to confirm cancel.
         public let confirmation: POConfirmationDialogConfiguration?
 
+        /// Controls whether button is hidden.
+        let isHidden: Bool
+
         /// Creates cancel button configuration.
         public init<Icon: View>(
             title: String? = nil,
@@ -218,6 +221,22 @@ public struct PONativeAlternativePaymentConfiguration {
             self.icon = icon.map(AnyView.init(erasing:))
             self.disabledFor = disabledFor
             self.confirmation = confirmation
+            isHidden = false
+        }
+
+        /// Creates cancel button configuration.
+        init<Icon: View>(
+            title: String? = nil,
+            icon: Icon? = AnyView?.none,
+            disabledFor: TimeInterval = 0,
+            confirmation: POConfirmationDialogConfiguration? = nil,
+            isHidden: Bool
+        ) {
+            self.title = title
+            self.icon = icon.map(AnyView.init(erasing:))
+            self.disabledFor = disabledFor
+            self.confirmation = confirmation
+            self.isHidden = isHidden
         }
     }
 

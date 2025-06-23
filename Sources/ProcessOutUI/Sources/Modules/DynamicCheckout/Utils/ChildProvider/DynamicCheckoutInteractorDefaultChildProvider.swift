@@ -181,10 +181,15 @@ extension PONativeAlternativePaymentConfiguration.CancelButton {
         icon = configuration.icon
         disabledFor = configuration.disabledFor
         confirmation = configuration.confirmation
+        isHidden = true
     }
 
     init(configuration: PODynamicCheckoutConfiguration.CancelButton) {
-        self.init(title: configuration.title, icon: configuration.icon, confirmation: configuration.confirmation)
+        title = configuration.title
+        icon = configuration.icon
+        disabledFor = 0
+        confirmation = configuration.confirmation
+        isHidden = true
     }
 }
 
