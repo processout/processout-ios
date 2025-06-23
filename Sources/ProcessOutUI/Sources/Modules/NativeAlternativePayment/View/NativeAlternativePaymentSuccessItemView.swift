@@ -18,8 +18,7 @@ struct NativeAlternativePaymentSuccessItemView: View {
     var body: some View {
         // todo(andrii-vysotskyi): support custom style
         VStack(spacing: POSpacing.space6) {
-            ProgressView(value: 1)
-                .poProgressViewStyle(.poStep)
+            Image(poResource: .success)
             Text(item.title)
                 .foregroundColor(Color.Text.primary)
                 .typography(.Text.s20(weight: .semibold))
