@@ -45,11 +45,13 @@ extension PONativeAlternativePaymentStyle {
         input = style.input
         codeInput = style.codeInput
         radioButton = style.radioButton
+        toggle = style.toggle
         errorDescription = style.errorText
         actionsContainer = style.actionsContainer
         progressView = style.progressView
         message = style.bodyText
         successMessage = style.paymentSuccess.message
+        backgroundColor = style.backgroundColor
         background = .init(regular: style.backgroundColor, success: style.paymentSuccess.backgroundColor)
         separatorColor = PONativeAlternativePaymentStyle.default.separatorColor
     }

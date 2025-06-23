@@ -587,7 +587,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func resolve(
         paymentMethod: PONativeAlternativePaymentMethodV2
     ) async -> NativeAlternativePaymentResolvedPaymentMethod {
-        let logo = try? await imagesRepository.image(resource: paymentMethod.logo)
+        let logo = await imagesRepository.image(resource: paymentMethod.logo)
         return .init(logo: logo, displayName: paymentMethod.displayName)
     }
 

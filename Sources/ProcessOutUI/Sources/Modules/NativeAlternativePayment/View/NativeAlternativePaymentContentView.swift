@@ -21,7 +21,7 @@ struct NativeAlternativePaymentContentView: View {
 
     var body: some View {
         ScrollViewReader { scrollView in
-            VStack(spacing: POSpacing.large) {
+            VStack(spacing: POSpacing.space16) {
                 ForEach(viewModel.state.items) { item in
                     NativeAlternativePaymentItemView(item: item, focusedItemId: $viewModel.state.focusedItemId)
                         .padding(.horizontal, insets)

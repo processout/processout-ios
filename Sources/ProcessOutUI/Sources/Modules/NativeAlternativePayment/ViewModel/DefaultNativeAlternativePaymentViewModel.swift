@@ -113,18 +113,24 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             createTitleItem(paymentMethod: state.paymentMethod)
         ]
         items += createItems(for: state.elements, state: state)
-        items += createButtonItems(state: state, isSubmitting: isSubmitting)
+        items.append(
+            createControlGroupItem(state: state, isSubmitting: isSubmitting)
+        )
         return items.compactMap { $0 }
     }
 
-    private func createButtonItems(
+    private func createControlGroupItem(
         state: InteractorState.Started, isSubmitting: Bool
-    ) -> [NativeAlternativePaymentViewModelItem] {
-        let actions = [
-            submitAction(state: state, isLoading: isSubmitting),
-            cancelAction(configuration: configuration.cancelButton, isEnabled: !isSubmitting && state.isCancellable)
-        ]
-        return actions.compactMap { $0 }.map { .button($0) }
+    ) -> NativeAlternativePaymentViewModelItem {
+        let buttons = [
+            createSubmitButton(state: state, isLoading: isSubmitting),
+            createCancelButton(
+                configuration: configuration.cancelButton,
+                isEnabled: !isSubmitting && state.isCancellable
+            )
+        ].compactMap { $0 }
+        let controlGroup = NativeAlternativePaymentViewModelItem.ControlGroup(id: "control-group", content: buttons)
+        return .controlGroup(controlGroup)
     }
 
     private func createFocusedInputId(state: InteractorState.Started) -> AnyHashable? {
@@ -184,24 +190,25 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             )
             items.append(.confirmationProgress(confirmationProgressItem))
         }
-        items += createButtonItems(state: state)
+        items.append(createControlGroupItem(state: state))
         return items.compactMap { $0 }
     }
 
-    private func createButtonItems(
+    private func createControlGroupItem(
         state: InteractorState.AwaitingCompletion
-    ) -> [NativeAlternativePaymentViewModelItem] {
+    ) -> NativeAlternativePaymentViewModelItem {
         let buttons = [
-            createConfirmPaymentCaptureAction(state: state),
-            cancelAction(
+            createConfirmPaymentButton(state: state),
+            createCancelButton(
                 configuration: configuration.paymentConfirmation.cancelButton,
                 isEnabled: state.isCancellable
             )
-        ]
-        return buttons.compactMap { $0 }.map { .button($0) }
+        ].compactMap { $0 }
+        let controlGroup = NativeAlternativePaymentViewModelItem.ControlGroup(id: "control-group", content: buttons)
+        return .controlGroup(controlGroup)
     }
 
-    private func createConfirmPaymentCaptureAction(state: InteractorState.AwaitingCompletion) -> POButtonViewModel? {
+    private func createConfirmPaymentButton(state: InteractorState.AwaitingCompletion) -> POButtonViewModel? {
         guard state.shouldConfirmPayment else {
             return nil
         }
@@ -252,15 +259,25 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             contentsOf: createItems(for: state.elements, state: nil)
         )
         items.append(
-            createRedirectButton(state: state, isRedirecting: isRedirecting)
+            createControlGroupItem(state: state, isRedirecting: isRedirecting)
         )
-        if let viewModel = cancelAction(configuration: interactor.configuration.cancelButton, isEnabled: true) {
-            items.append(.button(viewModel))
-        }
         let newState = NativeAlternativePaymentViewModelState(
             items: items.compactMap { $0 }, focusedItemId: nil, confirmationDialog: nil
         )
         self.state = newState
+    }
+
+    private func createControlGroupItem(
+        state: InteractorState.AwaitingRedirect, isRedirecting: Bool
+    ) -> NativeAlternativePaymentViewModelItem {
+        var buttons: [POButtonViewModel] = [
+            createRedirectButton(state: state, isRedirecting: isRedirecting)
+        ]
+        if let viewModel = createCancelButton(configuration: interactor.configuration.cancelButton, isEnabled: true) {
+            buttons.append(viewModel)
+        }
+        let controlGroup = NativeAlternativePaymentViewModelItem.ControlGroup(id: "control-group", content: buttons)
+        return .controlGroup(controlGroup)
     }
 
     private func update(with state: InteractorState.Redirecting) {
@@ -269,7 +286,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func createRedirectButton(
         state: InteractorState.AwaitingRedirect, isRedirecting: Bool
-    ) -> NativeAlternativePaymentViewModelItem {
+    ) -> POButtonViewModel {
         // todo(andrii-vysotskyi): decide whether button should be customizable
         let viewModel = POButtonViewModel(
             id: "redirect-button",
@@ -282,7 +299,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 self?.interactor.confirmRedirect()
             }
         )
-        return .button(viewModel)
+        return viewModel
     }
 
     // MARK: - Completed State
@@ -301,9 +318,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             createTitleItem(paymentMethod: state.paymentMethod),
             createSuccessItem(state: state)
         ]
-        items.append(
-            contentsOf: createItems(for: state.elements, state: nil)
-        )
+        items.append(contentsOf: createItems(for: state.elements, state: nil))
         if let doneButton = createDoneButton(state: state) {
             items.append(doneButton)
         }
@@ -323,7 +338,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createDoneButton(state: InteractorState.Completed) -> NativeAlternativePaymentViewModelItem? {
-        guard let configuration = interactor.configuration.success?.doneButton, !state.elements.isEmpty else {
+        guard let configuration = interactor.configuration.success?.doneButton else {
             return nil
         }
         let viewModel = POButtonViewModel(
@@ -566,7 +581,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             let imageItem = NativeAlternativePaymentViewModelItem.Image(
                 id: ObjectIdentifier(instruction.image), image: instruction.image
             )
-            let buttonItem = createButtonItem(for: instruction)
+            let buttonItem = createButton(for: instruction)
             return [.image(imageItem), .button(buttonItem)]
         case .message(let instruction):
             let item = NativeAlternativePaymentViewModelItem.MessageInstruction(
@@ -594,7 +609,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         return [.group(item)]
     }
 
-    private func createButtonItem(
+    private func createButton(
         for barcode: NativeAlternativePaymentResolvedElement.Instruction.Barcode
     ) -> POButtonViewModel {
         let configuration = interactor.configuration.barcodeInteraction.saveButton
@@ -641,19 +656,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     // MARK: - Actions
 
-    private func submitAction(state: InteractorState.Started, isLoading: Bool) -> POButtonViewModel? {
-        let title: String
-        if let customTitle = configuration.submitButton.title {
-            title = customTitle
-        } else {
-            title = String(resource: .NativeAlternativePayment.Button.continue)
-        }
-        guard !title.isEmpty else {
-            return nil
-        }
+    private func createSubmitButton(state: InteractorState.Started, isLoading: Bool) -> POButtonViewModel {
         let action = POButtonViewModel(
             id: "primary-button",
-            title: title,
+            title: configuration.submitButton.title ?? String(resource: .NativeAlternativePayment.Button.continue),
             icon: configuration.submitButton.icon,
             isEnabled: state.areParametersValid,
             isLoading: isLoading,
@@ -665,10 +671,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         return action
     }
 
-    private func cancelAction(
+    private func createCancelButton(
         configuration: PONativeAlternativePaymentConfiguration.CancelButton?, isEnabled: Bool
     ) -> POButtonViewModel? {
-        guard let configuration else {
+        guard let configuration, !configuration.isHidden else {
             return nil
         }
         let action = POButtonViewModel(

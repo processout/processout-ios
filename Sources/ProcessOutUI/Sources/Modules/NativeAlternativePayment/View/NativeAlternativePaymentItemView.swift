@@ -33,9 +33,8 @@ struct NativeAlternativePaymentItemView: View {
         case .phoneNumberInput(let item):
             view(for: item)
         case .toggle(let item):
-            // todo(andrii-vysotskyi): support style customization
             Toggle(item.title, isOn: item.$isSelected)
-                .poToggleStyle(.poCheckbox)
+                .poToggleStyle(style.toggle)
         case .picker(let item):
             view(for: item)
         case .progress:
@@ -47,6 +46,8 @@ struct NativeAlternativePaymentItemView: View {
         case .image(let item):
             Image(uiImage: item.image)
         case .group(let group):
+            view(for: group)
+        case .controlGroup(let group):
             view(for: group)
         case .button(let item):
             Button.create(with: item)
@@ -117,6 +118,7 @@ struct NativeAlternativePaymentItemView: View {
 
     @ViewBuilder
     private func view(for item: NativeAlternativePaymentViewModelItem.MessageInstruction) -> some View {
+        // todo(andrii-vysotskyi): support style customization
         if let title = item.title {
             POLabeledContent {
                 POCopyButton(
@@ -131,5 +133,17 @@ struct NativeAlternativePaymentItemView: View {
         } else {
             POMarkdown(item.value)
         }
+    }
+
+    private func view(for item: NativeAlternativePaymentViewModelItem.ControlGroup) -> some View {
+        VStack(spacing: POSpacing.space12) {
+            ForEach(item.content) { item in
+                Button.create(with: item).buttonStyle(
+                    forPrimaryRole: style.actionsContainer.primary,
+                    fallback: style.actionsContainer.secondary
+                )
+            }
+        }
+        .padding(.top, POSpacing.space12)
     }
 }

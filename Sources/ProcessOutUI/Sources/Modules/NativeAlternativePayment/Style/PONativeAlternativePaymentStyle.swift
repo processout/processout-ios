@@ -18,6 +18,7 @@ public struct PONativeAlternativePaymentStyle {
     public let title: POTextStyle
 
     /// Section title text style.
+    @available(*, deprecated)
     public let sectionTitle: POTextStyle
 
     /// Input style.
@@ -29,7 +30,11 @@ public struct PONativeAlternativePaymentStyle {
     /// Radio button style.
     public let radioButton: any ButtonStyle
 
+    /// Toggle style.
+    public let toggle: any ToggleStyle
+
     /// Error description text style.
+    @available(*, deprecated)
     public let errorDescription: POTextStyle
 
     /// Actions container style.
@@ -45,9 +50,14 @@ public struct PONativeAlternativePaymentStyle {
     public let message: POTextStyle
 
     /// Success message style.
+    @available(*, deprecated)
     public let successMessage: POTextStyle
 
+    /// Background color.
+    public let backgroundColor: Color
+
     /// Background style.
+    @available(*, deprecated, message: "Set background color instead.")
     public let background: PONativeAlternativePaymentBackgroundStyle
 
     /// Separator color.
@@ -59,11 +69,13 @@ public struct PONativeAlternativePaymentStyle {
         input: POInputStyle,
         codeInput: POInputStyle,
         radioButton: some ButtonStyle,
+        toggle: some ToggleStyle = .poCheckbox,
         errorDescription: POTextStyle,
         actionsContainer: POActionsContainerStyle,
         progressView: some ProgressViewStyle,
         message: POTextStyle,
         successMessage: POTextStyle,
+        backgroundColor: Color? = nil,
         background: PONativeAlternativePaymentBackgroundStyle,
         separatorColor: Color
     ) {
@@ -72,11 +84,13 @@ public struct PONativeAlternativePaymentStyle {
         self.input = input
         self.codeInput = codeInput
         self.radioButton = radioButton
+        self.toggle = toggle
         self.errorDescription = errorDescription
         self.actionsContainer = actionsContainer
         self.progressView = progressView
         self.message = message
         self.successMessage = successMessage
+        self.backgroundColor = backgroundColor ?? .Surface.primary
         self.background = background
         self.separatorColor = separatorColor
     }
