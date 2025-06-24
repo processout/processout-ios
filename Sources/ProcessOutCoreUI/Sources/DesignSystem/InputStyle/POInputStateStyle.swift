@@ -13,8 +13,8 @@ public struct POInputStateStyle: Sendable {
     /// Text style.
     public let text: POTextStyle
 
-    /// Placeholder text style.
-    public let placeholder: POTextStyle
+    /// Label text style.
+    public let label: POTextStyle
 
     /// Input's background color.
     public let backgroundColor: Color
@@ -31,6 +31,33 @@ public struct POInputStateStyle: Sendable {
     /// Creates style instance.
     public init(
         text: POTextStyle,
+        label: POTextStyle,
+        backgroundColor: Color,
+        border: POBorderStyle,
+        shadow: POShadowStyle,
+        tintColor: Color
+    ) {
+        self.text = text
+        self.label = label
+        self.backgroundColor = backgroundColor
+        self.border = border
+        self.shadow = shadow
+        self.tintColor = tintColor
+    }
+}
+
+extension POInputStateStyle {
+
+    /// Placeholder text style.
+    @available(*, deprecated, renamed: "label")
+    public var placeholder: POTextStyle {
+        label
+    }
+
+    /// Creates style instance.
+    @available(*, deprecated, message: "Use init that accepts label instead.")
+    public init(
+        text: POTextStyle,
         placeholder: POTextStyle,
         backgroundColor: Color,
         border: POBorderStyle,
@@ -38,7 +65,7 @@ public struct POInputStateStyle: Sendable {
         tintColor: Color
     ) {
         self.text = text
-        self.placeholder = placeholder
+        self.label = placeholder
         self.backgroundColor = backgroundColor
         self.border = border
         self.shadow = shadow

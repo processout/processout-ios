@@ -10,10 +10,11 @@ import SwiftUI
 @_spi(PO)
 @available(iOS 14, *)
 @MainActor
-public struct POCodeField: View {
+public struct POCodeField<Label: View>: View {
 
-    public init(text: Binding<String>, length: Int) {
+    public init(text: Binding<String>, length: Int, @ViewBuilder label: () -> Label = { EmptyView() }) {
         self.length = length
+        self.label = label()
         _text = text
         isMenuVisible = false
     }
@@ -28,7 +29,11 @@ public struct POCodeField: View {
             textIndex = newInsertionPoint
         }
         let configuration = CodeFieldStyleConfiguration(
-            text: text, length: length, insertionPoint: insertionPoint, isEditing: focusableView.isFocused
+            text: text,
+            length: length,
+            label: AnyView(label),
+            insertionPoint: insertionPoint,
+            isEditing: focusableView.isFocused
         )
         AnyView(style.makeBody(configuration: configuration))
             .background(
@@ -63,10 +68,13 @@ public struct POCodeField: View {
 
     // MARK: - Private Properties
 
-    private let length: Int
-
     @Binding
     private var text: String
+
+    private let length: Int
+
+    /// Code field label.
+    private let label: Label
 
     @State
     private var textIndex: String.Index?

@@ -14,15 +14,14 @@ extension Color {
     @_spi(PO)
     public enum Input {
 
-        @_spi(PO)
-        public enum Label {
+        public enum Text {
 
-            /// The "Input/Label/Default" color.
+            /// The "Input/Text/Default" color.
             public static let `default` = Color(
                 light: UIColor(0x000000), dark: UIColor(0xFFFFFF)
             )
 
-            /// The "Input/Label/Error" color.
+            /// The "Input/Text/Error" color.
             public static let error = Color(
                 light: UIColor(0xBE011B), dark: UIColor(0xFF7D6C)
             )
@@ -56,8 +55,8 @@ extension Color {
             )
         }
 
-        /// The "Input/Placeholder" color namespace.
-        enum Placeholder {
+        /// The "Input/Label" color namespace.
+        enum Label {
 
             /// The "Input/Placeholder/Default color.
             static let `default` = Color(
@@ -67,15 +66,6 @@ extension Color {
             /// The "Input/Placeholder/Error" color.
             static let error = Color(
                 light: UIColor(0xBE011B), dark: UIColor(0xFF8888)
-            )
-        }
-
-        /// The "Input/Text" color namespace.
-        enum Text {
-
-            /// The "Input/Text/Default" color.
-            static let `default` = Color(
-                light: UIColor(0x000000), dark: UIColor(0xFFFFFF)
             )
         }
 

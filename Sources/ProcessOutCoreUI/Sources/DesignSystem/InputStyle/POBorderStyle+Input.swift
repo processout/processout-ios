@@ -10,7 +10,7 @@ import SwiftUI
 extension POBorderStyle {
 
     /// Creates border style with given color that should be used with inputs.
-    static func input(color: Color) -> POBorderStyle {
-        .init(radius: 6, width: 1.5, color: color)
+    static func input(color: Color, focused: Bool = false) -> POBorderStyle {
+        .init(radius: 6, width: focused ? 2.0 : 1.5, color: color)
     }
 }

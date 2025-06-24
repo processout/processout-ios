@@ -10,10 +10,124 @@ import SwiftUI
 extension POInputStyle {
 
     /// Medium size input style.
-    public static let medium = `default`(typography: .Text.s15(weight: .medium))
+    public static let medium = POInputStyle(
+        normal: .init(
+            text: .init(
+                color: Color.Input.Text.default,
+                typography: .Text.s15(weight: .medium)
+            ),
+            label: .init(
+                color: Color.Input.Label.default,
+                typography: .Text.s15(weight: .medium)
+            ),
+            backgroundColor: Color.Input.Background.default,
+            border: .input(color: Color.Input.Border.default),
+            shadow: .clear,
+            tintColor: Color.Input.tint
+        ),
+        error: .init(
+            text: .init(
+                color: Color.Input.Text.default,
+                typography: .Text.s15(weight: .medium)
+            ),
+            label: .init(
+                color: Color.Input.Label.error,
+                typography: .Text.s15(weight: .medium)
+            ),
+            backgroundColor: Color.Input.Background.default,
+            border: .input(color: Color.Input.Border.error),
+            shadow: .clear,
+            tintColor: Color.Input.tint
+        ),
+        focused: .init(
+            text: .init(
+                color: Color.Input.Text.default,
+                typography: .Text.s15(weight: .medium)
+            ),
+            label: .init(
+                color: Color.Input.Label.default,
+                typography: .Text.s15(weight: .medium)
+            ),
+            backgroundColor: Color.Input.Background.default,
+            border: .input(color: Color.Input.Border.focused, focused: true),
+            shadow: .clear,
+            tintColor: Color.Input.tint
+        ),
+        errorFocused: .init(
+            text: .init(
+                color: Color.Input.Text.default,
+                typography: .Text.s15(weight: .medium)
+            ),
+            label: .init(
+                color: Color.Input.Label.error,
+                typography: .Text.s15(weight: .medium)
+            ),
+            backgroundColor: Color.Input.Background.default,
+            border: .input(color: Color.Input.Border.error, focused: true),
+            shadow: .clear,
+            tintColor: Color.Input.tint
+        )
+    )
 
     /// Large input style.
-    public static let large = `default`(typography: .Text.s20(weight: .medium))
+    public static let large = POInputStyle(
+        normal: .init(
+            text: .init(
+                color: Color.Input.Text.default,
+                typography: .Text.s20(weight: .medium)
+            ),
+            label: .init(
+                color: Color.Input.Text.default,
+                typography: .Text.s16(weight: .medium)
+            ),
+            backgroundColor: Color.Input.Background.default,
+            border: .input(color: Color.Input.Border.default),
+            shadow: .clear,
+            tintColor: Color.Input.tint
+        ),
+        error: .init(
+            text: .init(
+                color: Color.Input.Text.default,
+                typography: .Text.s20(weight: .medium)
+            ),
+            label: .init(
+                color: Color.Input.Text.error,
+                typography: .Text.s16(weight: .medium)
+            ),
+            backgroundColor: Color.Input.Background.default,
+            border: .input(color: Color.Input.Border.error),
+            shadow: .clear,
+            tintColor: Color.Input.tint
+        ),
+        focused: .init(
+            text: .init(
+                color: Color.Input.Text.default,
+                typography: .Text.s20(weight: .medium)
+            ),
+            label: .init(
+                color: Color.Input.Text.default,
+                typography: .Text.s16(weight: .medium)
+            ),
+            backgroundColor: Color.Input.Background.default,
+            border: .input(color: Color.Input.Border.focused, focused: true),
+            shadow: .clear,
+            tintColor: Color.Input.tint
+        ),
+        errorFocused: .init(
+            text: .init(
+                color: Color.Input.Text.default,
+                typography: .Text.s20(weight: .medium)
+            ),
+            label: .init(
+                color: Color.Input.Text.error,
+                typography: .Text.s16(weight: .medium)
+            ),
+            backgroundColor: Color.Input.Background.default,
+            border: .input(color: Color.Input.Border.error, focused: true),
+            shadow: .clear,
+            tintColor: Color.Input.tint
+        )
+    )
 
     // MARK: - Utils
 
@@ -28,69 +142,5 @@ extension POInputStyle {
             return focused
         }
         return normal
-    }
-
-    // MARK: - Private Methods
-
-    // swiftlint:disable:next function_body_length
-    private static func `default`(typography: POTypography) -> POInputStyle {
-        POInputStyle(
-            normal: .init(
-                text: .init(
-                    color: Color.Input.Text.default,
-                    typography: typography
-                ),
-                placeholder: .init(
-                    color: Color.Input.Placeholder.default,
-                    typography: typography
-                ),
-                backgroundColor: Color.Input.Background.default,
-                border: .input(color: Color.Input.Border.default),
-                shadow: .clear,
-                tintColor: Color.Input.tint
-            ),
-            error: .init(
-                text: .init(
-                    color: Color.Input.Text.default,
-                    typography: typography
-                ),
-                placeholder: .init(
-                    color: Color.Input.Placeholder.error,
-                    typography: typography
-                ),
-                backgroundColor: Color.Input.Background.default,
-                border: .input(color: Color.Input.Border.error),
-                shadow: .clear,
-                tintColor: Color.Input.tint
-            ),
-            focused: .init(
-                text: .init(
-                    color: Color.Input.Text.default,
-                    typography: typography
-                ),
-                placeholder: .init(
-                    color: Color.Input.Placeholder.default,
-                    typography: typography
-                ),
-                backgroundColor: Color.Input.Background.default,
-                border: .input(color: Color.Input.Border.focused),
-                shadow: .clear,
-                tintColor: Color.Input.tint
-            ),
-            errorFocused: .init(
-                text: .init(
-                    color: Color.Input.Text.default,
-                    typography: typography
-                ),
-                placeholder: .init(
-                    color: Color.Input.Placeholder.error,
-                    typography: typography
-                ),
-                backgroundColor: Color.Input.Background.default,
-                border: .input(color: Color.Input.Border.error),
-                shadow: .clear,
-                tintColor: Color.Input.tint
-            )
-        )
     }
 }

@@ -36,12 +36,12 @@ private struct DefaultTextFieldStyleContentView: View {
             } placeholder: {
                 configuration.prompt
                     .lineLimit(1)
-                    .textStyle(resolvedStyle.placeholder)
+                    .textStyle(resolvedStyle.label)
                     .allowsHitTesting(false)
             }
             configuration.trailingView
                 .foregroundColor(
-                    configuration.text.isEmpty ? resolvedStyle.placeholder.color : resolvedStyle.text.color
+                    configuration.text.isEmpty ? resolvedStyle.label.color : resolvedStyle.text.color
                 )
         }
         .padding(Constants.padding)

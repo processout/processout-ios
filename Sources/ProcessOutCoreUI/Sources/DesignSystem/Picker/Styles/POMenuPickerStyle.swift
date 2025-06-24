@@ -102,7 +102,7 @@ private struct ContentView: View {
                     },
                     placeholder: {
                         configuration.prompt
-                            .textStyle(style.placeholder)
+                            .textStyle(style.label)
                             .fixedSize()
                     }
                 )
