@@ -53,4 +53,11 @@ extension POInvoicesService {
     public func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
         throw POFailure(code: .Mobile.generic)
     }
+
+    @_spi(PO)
+    public func authorizeInvoice( // sourcery:completion: skip
+        request: PONativeAlternativePaymentAuthorizationRequestV2
+    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
+        throw POFailure(code: .Mobile.generic)
+    }
 }

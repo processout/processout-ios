@@ -44,7 +44,7 @@ public struct PONativeAlternativePaymentFormV2: Sendable, Decodable {
             public struct AvailableValue: Sendable, Decodable {
 
                 /// Value.
-                public let value: String
+                public let key: String
 
                 /// Value display label.
                 public let label: String
@@ -254,7 +254,7 @@ extension PONativeAlternativePaymentFormV2.Parameter: Decodable {
         switch type {
         case "text":
             self = try .text(.init(from: decoder))
-        case "single_select":
+        case "single-select":
             self = try .singleSelect(.init(from: decoder))
         case "boolean":
             self = try .boolean(.init(from: decoder))
