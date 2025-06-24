@@ -27,7 +27,7 @@ struct NativeAlternativePaymentItemView: View {
                 .inputStyle(style.input)
         case .codeInput(let item):
             POCodeField(text: item.$value, length: item.length) {
-                Text(item.la)
+                Text(item.label)
             }
             .backport.focused($focusedItemId, equals: item.id)
             .controlInvalid(item.isInvalid)
