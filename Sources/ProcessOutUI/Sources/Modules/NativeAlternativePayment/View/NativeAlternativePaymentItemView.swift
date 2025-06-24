@@ -31,18 +31,18 @@ struct NativeAlternativePaymentItemView: View {
                 .controlInvalid(item.isInvalid)
                 .inputStyle(style.codeInput)
         case .phoneNumberInput(let item):
-            view(for: item)
+            NativeAlternativePaymentPhoneItemView(item: item, focusedItemId: $focusedItemId)
         case .toggle(let item):
             Toggle(item.title, isOn: item.$isSelected)
                 .poToggleStyle(style.toggle)
         case .picker(let item):
-            view(for: item)
+            NativeAlternativePaymentPickerItemView(item: item)
         case .progress:
             ProgressView()
                 .poProgressViewStyle(style.progressView)
                 .frame(maxWidth: .infinity)
         case .messageInstruction(let item):
-            view(for: item)
+            NativeAlternativePaymentMessageInstructionItemView(item: item)
         case .image(let item):
             VStack {
                 Image(uiImage: item.image)
@@ -54,9 +54,9 @@ struct NativeAlternativePaymentItemView: View {
             }
             .padding(.horizontal, POSpacing.space48)
         case .group(let group):
-            view(for: group)
+            NativeAlternativePaymentGroupItemView(item: group, focusedItemId: $focusedItemId)
         case .controlGroup(let group):
-            view(for: group)
+            NativeAlternativePaymentControlGroupItemView(item: group)
         case .button(let item):
             Button.create(with: item)
                 .buttonStyle(forPrimaryRole: style.actionsContainer.primary, fallback: style.actionsContainer.secondary)
@@ -74,84 +74,4 @@ struct NativeAlternativePaymentItemView: View {
 
     @Environment(\.nativeAlternativePaymentStyle)
     private var style
-
-    // MARK: - Private Methods
-
-    private func view(for item: NativeAlternativePaymentViewModelItem.Picker) -> some View {
-        POPicker(selection: item.$selectedOptionId) {
-            ForEach(item.options) { option in
-                Text(option.title)
-            }
-        }
-        .modify(when: item.preferrsInline) { view in
-            let style = PORadioGroupPickerStyle(
-                radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton),
-                inputStyle: style.input
-            )
-            view.pickerStyle(style)
-        }
-        .pickerStyle(POMenuPickerStyle(inputStyle: style.input))
-    }
-
-    private func view(for item: NativeAlternativePaymentViewModelItem.PhoneNumberInput) -> some View {
-        POPhoneNumberField(
-            phoneNumber: item.$value,
-            countryPrompt: {
-                Text(verbatim: "Country")
-            },
-            numberPrompt: item.prompt
-        )
-        .phoneNumberFieldTerritories(item.territories)
-        .phoneNumberFieldStyle(
-            PODefaultPhoneNumberFieldStyle(country: POMenuPickerStyle(inputStyle: style.input), number: .automatic)
-        )
-        .inputStyle(style.input)
-        .controlInvalid(item.isInvalid)
-    }
-
-    private func view(for group: NativeAlternativePaymentViewModelItem.Group) -> some View {
-        GroupBox {
-            VStack {
-                ForEach(group.items) { item in
-                    NativeAlternativePaymentItemView(item: item, focusedItemId: $focusedItemId)
-                }
-            }
-        } label: {
-            if let label = group.label {
-                Text(label)
-            }
-        }
-        .groupBoxStyle(.poAutomatic)
-    }
-
-    @ViewBuilder
-    private func view(for item: NativeAlternativePaymentViewModelItem.MessageInstruction) -> some View {
-        // todo(andrii-vysotskyi): support style customization
-        if let title = item.title {
-            POLabeledContent {
-                POCopyButton(
-                    configuration: .init(value: item.value, copyTitle: "Copy", copiedTitle: "Copied!")
-                )
-                .backport.poControlSize(.small)
-                .controlWidth(.regular)
-                .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.secondary))
-            } label: {
-                POMarkdown(title)
-            }
-        } else {
-            POMarkdown(item.value)
-        }
-    }
-
-    private func view(for item: NativeAlternativePaymentViewModelItem.ControlGroup) -> some View {
-        VStack(spacing: POSpacing.space12) {
-            ForEach(item.content) { item in
-                Button.create(with: item).buttonStyle(
-                    forPrimaryRole: style.actionsContainer.primary,
-                    fallback: style.actionsContainer.secondary
-                )
-            }
-        }
-        .padding(.top, POSpacing.space12)
-    }
 }
