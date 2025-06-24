@@ -26,10 +26,12 @@ struct NativeAlternativePaymentItemView: View {
             POTextField.create(with: item, focusedInputId: $focusedItemId)
                 .inputStyle(style.input)
         case .codeInput(let item):
-            POCodeField(text: item.$value, length: item.length)
-                .backport.focused($focusedItemId, equals: item.id)
-                .controlInvalid(item.isInvalid)
-                .inputStyle(style.codeInput)
+            POCodeField(text: item.$value, length: item.length) {
+                Text(item.la)
+            }
+            .backport.focused($focusedItemId, equals: item.id)
+            .controlInvalid(item.isInvalid)
+            .inputStyle(style.codeInput)
         case .phoneNumberInput(let item):
             NativeAlternativePaymentPhoneItemView(item: item, focusedItemId: $focusedItemId)
         case .toggle(let item):
@@ -40,6 +42,7 @@ struct NativeAlternativePaymentItemView: View {
         case .progress:
             ProgressView()
                 .poProgressViewStyle(style.progressView)
+                .padding(.vertical, POSpacing.large)
                 .frame(maxWidth: .infinity)
         case .messageInstruction(let item):
             NativeAlternativePaymentMessageInstructionItemView(item: item)

@@ -22,7 +22,10 @@ public struct PONativeAlternativePaymentView: View {
 
     public var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            NativeAlternativePaymentContentView(viewModel: viewModel, insets: POSpacing.space20)
+            NativeAlternativePaymentContentView(
+                viewModel: viewModel,
+                insets: .init(horizontal: POSpacing.space20, vertical: POSpacing.space12)
+            )
         }
         .backport.background {
             style.backgroundColor.ignoresSafeArea()

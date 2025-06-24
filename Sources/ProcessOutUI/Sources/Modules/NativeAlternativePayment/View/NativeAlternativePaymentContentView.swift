@@ -12,7 +12,7 @@ import SwiftUI
 @MainActor
 struct NativeAlternativePaymentContentView: View {
 
-    init(viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>, insets: CGFloat) {
+    init(viewModel: AnyViewModel<NativeAlternativePaymentViewModelState>, insets: EdgeInsets) {
         self.viewModel = viewModel
         self.insets = insets
     }
@@ -24,7 +24,9 @@ struct NativeAlternativePaymentContentView: View {
             VStack(spacing: POSpacing.space16) {
                 ForEach(viewModel.state.items) { item in
                     NativeAlternativePaymentItemView(item: item, focusedItemId: $viewModel.state.focusedItemId)
-                        .padding(.horizontal, insets)
+                        .padding(
+                            .init(top: 0, leading: insets.leading, bottom: 0, trailing: insets.trailing)
+                        )
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .overlayPreferenceValue(
                             NativeAlternativePaymentViewSeparatorVisibilityPreferenceKey.self,
@@ -36,7 +38,9 @@ struct NativeAlternativePaymentContentView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .padding(.vertical, insets)
+            .padding(
+                .init(top: insets.top, leading: 0, bottom: insets.bottom, trailing: 0)
+            )
             .backport.onChange(of: viewModel.state.focusedItemId) {
                 scrollToFocusedInput(scrollView: scrollView)
             }
@@ -48,7 +52,7 @@ struct NativeAlternativePaymentContentView: View {
 
     // MARK: - Private Properties
 
-    private let insets: CGFloat
+    private let insets: EdgeInsets
 
     @Environment(\.nativeAlternativePaymentSizeClass)
     private var sizeClass

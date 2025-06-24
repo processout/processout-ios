@@ -102,11 +102,11 @@ extension PONativeAlternativePaymentStyle {
     /// Default native alternative payment style.
     public static let `default` = PONativeAlternativePaymentStyle(
         title: POTextStyle(color: .Text.primary, typography: .Text.s20(weight: .medium)),
-        sectionTitle: POTextStyle(color: .Input.Label.default, typography: .Text.s14(weight: .medium)),
+        sectionTitle: POTextStyle(color: .Input.Text.default, typography: .Text.s14(weight: .medium)),
         input: .medium,
         codeInput: .large,
         radioButton: .radio,
-        errorDescription: POTextStyle(color: .Input.Label.error, typography: .Text.s12(weight: .regular)),
+        errorDescription: POTextStyle(color: .Input.Text.error, typography: .Text.s12(weight: .regular)),
         actionsContainer: .default,
         progressView: .circular,
         message: POTextStyle(color: .Text.primary, typography: .Paragraph.s16(weight: .medium)),

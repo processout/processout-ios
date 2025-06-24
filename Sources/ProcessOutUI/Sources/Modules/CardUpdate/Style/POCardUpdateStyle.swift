@@ -57,7 +57,7 @@ public struct POCardUpdateStyle {
     ) {
         self.title = title
         self.sectionTitle = sectionTitle
-            ?? POTextStyle(color: .Input.Label.default, typography: .Text.s14(weight: .medium))
+            ?? POTextStyle(color: .Input.Text.default, typography: .Text.s14(weight: .medium))
         self.input = input
         self.radioButton = radioButton ?? .radio
         self.errorDescription = errorDescription
@@ -76,7 +76,7 @@ extension POCardUpdateStyle {
         POCardUpdateStyle(
             title: POTextStyle(color: Color.Text.primary, typography: .Text.s20(weight: .medium)),
             input: .medium,
-            errorDescription: POTextStyle(color: Color.Input.Label.error, typography: .Text.s12(weight: .regular)),
+            errorDescription: POTextStyle(color: Color.Input.Text.error, typography: .Text.s12(weight: .regular)),
             backgroundColor: Color.Surface.primary,
             actionsContainer: .default,
             progress: .circular,
