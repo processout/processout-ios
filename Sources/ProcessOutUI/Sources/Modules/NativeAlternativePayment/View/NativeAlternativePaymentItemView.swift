@@ -44,7 +44,15 @@ struct NativeAlternativePaymentItemView: View {
         case .messageInstruction(let item):
             view(for: item)
         case .image(let item):
-            Image(uiImage: item.image)
+            VStack {
+                Image(uiImage: item.image)
+                if let viewModel = item.actionButton {
+                    Button.create(with: viewModel)
+                        .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.secondary))
+                        .backport.poControlSize(.small)
+                }
+            }
+            .padding(.horizontal, POSpacing.space48)
         case .group(let group):
             view(for: group)
         case .controlGroup(let group):

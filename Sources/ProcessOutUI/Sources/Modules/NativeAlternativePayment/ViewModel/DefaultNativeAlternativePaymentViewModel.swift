@@ -383,7 +383,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 }
                 return createItems(for: form, state: state)
             case .instruction(let instruction):
-                return createItems(for: instruction)
+                return [createItem(for: instruction)]
             case .group(let group):
                 return createItems(for: group)
             }
@@ -586,28 +586,29 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     // MARK: - Customer Instructions
 
-    private func createItems(
+    private func createItem(
         for customerInstruction: NativeAlternativePaymentResolvedElement.Instruction
-    ) -> [NativeAlternativePaymentViewModelItem] {
+    ) -> NativeAlternativePaymentViewModelItem {
         switch customerInstruction {
         case .barcode(let instruction):
             let imageItem = NativeAlternativePaymentViewModelItem.Image(
-                id: ObjectIdentifier(instruction.image), image: instruction.image
+                id: ObjectIdentifier(instruction.image),
+                image: instruction.image,
+                actionButton: createButton(for: instruction)
             )
-            let buttonItem = createButton(for: instruction)
-            return [.image(imageItem), .button(buttonItem)]
+            return .image(imageItem)
         case .message(let instruction):
             let item = NativeAlternativePaymentViewModelItem.MessageInstruction(
                 id: instruction.value,
                 title: instruction.label,
                 value: instruction.value
             )
-            return [.messageInstruction(item)]
+            return .messageInstruction(item)
         case .image(let instruction):
             let item = NativeAlternativePaymentViewModelItem.Image(
-                id: ObjectIdentifier(instruction), image: instruction
+                id: ObjectIdentifier(instruction), image: instruction, actionButton: nil
             )
-            return [.image(item)]
+            return .image(item)
         }
     }
 
@@ -617,7 +618,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         let item = NativeAlternativePaymentViewModelItem.Group(
             id: group.label,
             label: group.label,
-            items: group.instructions.flatMap(createItems(for:))
+            items: group.instructions.map { createItem(for: $0) }
         )
         return [.group(item)]
     }

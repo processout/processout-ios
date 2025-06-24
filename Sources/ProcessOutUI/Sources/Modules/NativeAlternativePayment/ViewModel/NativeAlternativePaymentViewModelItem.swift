@@ -105,12 +105,15 @@ indirect enum NativeAlternativePaymentViewModelItem {
         let value: String
     }
 
-    struct Image: Identifiable, Hashable {
+    struct Image: Identifiable {
 
         let id: AnyHashable
 
         /// Image illustrating action.
         let image: UIImage
+
+        /// Action button associated with this image if any.
+        let actionButton: POButtonViewModel?
     }
 
     struct Group {
