@@ -447,6 +447,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             id: specification.key,
             length: maxLength,
             value: value,
+            label: specification.label,
             isInvalid: parameter.recentErrorMessage != nil
         )
         return .codeInput(codeInputItem)
@@ -495,8 +496,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         }
         let pickerItem = NativeAlternativePaymentViewModelItem.Picker(
             id: specification.key,
+            label: specification.label,
             options: specification.availableValues.map { availableValue in
-                .init(id: availableValue.value, title: availableValue.label)
+                .init(id: availableValue.key, title: availableValue.label)
             },
             selectedOptionId: value,
             isInvalid: parameter.recentErrorMessage != nil,

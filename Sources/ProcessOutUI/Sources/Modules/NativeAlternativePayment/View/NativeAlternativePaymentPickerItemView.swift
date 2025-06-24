@@ -20,11 +20,13 @@ struct NativeAlternativePaymentPickerItemView: View {
             ForEach(item.options) { option in
                 Text(option.title)
             }
+        } prompt: {
+            Text(item.label)
         }
         .modify(when: item.preferrsInline) { view in
             let style = PORadioGroupPickerStyle(
                 radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton),
-                inputStyle: style.input
+                inputStyle: style.codeInput
             )
             view.pickerStyle(style)
         }

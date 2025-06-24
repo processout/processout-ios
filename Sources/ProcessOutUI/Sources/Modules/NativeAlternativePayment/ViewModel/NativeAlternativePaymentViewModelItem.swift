@@ -28,6 +28,9 @@ indirect enum NativeAlternativePaymentViewModelItem {
         /// Item identifier.
         let id: AnyHashable
 
+        /// Picker label.
+        let label: String
+
         /// Available options.
         let options: [PickerOption]
 
@@ -60,6 +63,9 @@ indirect enum NativeAlternativePaymentViewModelItem {
 
         /// Current parameter's value text.
         @Binding var value: String
+
+        /// Code field label.
+        let label: String
 
         /// Boolean value indicating whether value is valid.
         let isInvalid: Bool
