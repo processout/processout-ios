@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
@@ -19,11 +20,10 @@ struct NativeAlternativePaymentPhoneItemView: View {
     // MARK: - View
 
     var body: some View {
-        // todo(andrii-vysotskyi): update localizations
         POPhoneNumberField(
             phoneNumber: item.$value,
             countryPrompt: {
-                Text(verbatim: "Country")
+                Text(String(resource: .NativeAlternativePayment.Placeholder.country))
             },
             numberPrompt: item.prompt
         )

@@ -11,6 +11,7 @@ import SwiftUI
 /// Native alternative payment method screen background style.
 @MainActor
 @preconcurrency
+@available(*, deprecated)
 public struct PONativeAlternativePaymentBackgroundStyle {
 
     /// Regular background color.
@@ -24,11 +25,9 @@ public struct PONativeAlternativePaymentBackgroundStyle {
         self.regular = regular
         self.success = success
     }
-}
-
-extension PONativeAlternativePaymentBackgroundStyle {
 
     /// Default native APM background style.
+    @available(*, deprecated)
     public static let `default` = PONativeAlternativePaymentBackgroundStyle(
         regular: .Surface.primary, success: .Surface.successSubtle
     )

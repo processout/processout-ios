@@ -26,7 +26,7 @@ struct NativeAlternativePaymentPickerItemView: View {
         .modify(when: item.preferrsInline) { view in
             let style = PORadioGroupPickerStyle(
                 radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton),
-                inputStyle: style.codeInput
+                inputStyle: style.largeInput
             )
             view.pickerStyle(style)
         }

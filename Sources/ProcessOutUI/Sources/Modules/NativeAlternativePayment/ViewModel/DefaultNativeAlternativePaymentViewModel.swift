@@ -39,20 +39,11 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private enum Constants {
         static let maximumCodeLength = 6
-        static let maximumCompactMessageLength = 150
     }
 
     // MARK: - Private Properties
 
     private let interactor: any NativeAlternativePaymentInteractor
-
-    private lazy var priceFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 2
-        return formatter
-    }()
 
     private var configuration: PONativeAlternativePaymentConfiguration {
         interactor.configuration
@@ -395,16 +386,19 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func createItems(
         for form: PONativeAlternativePaymentFormV2, state: InteractorState.Started
     ) -> [NativeAlternativePaymentViewModelItem] {
-        let items = form.parameters.parameterDefinitions.flatMap { specification in
+        let items = form.parameters.parameterDefinitions.compactMap { specification in
             guard let parameter = state.parameters[specification.key] else {
-                return [] as [NativeAlternativePaymentViewModelItem]
+                return nil as NativeAlternativePaymentViewModelItem?
             }
             var items = [createItem(parameter: parameter)]
             if let errorMessage = parameter.recentErrorMessage {
                 let messageItem = POMessage(id: errorMessage, text: errorMessage, severity: .error)
                 items.append(.message(messageItem))
             }
-            return items
+            let group = NativeAlternativePaymentViewModelItem.SizingGroup(
+                id: specification.key, content: items
+            )
+            return .sizingGroup(group)
         }
         return items
     }

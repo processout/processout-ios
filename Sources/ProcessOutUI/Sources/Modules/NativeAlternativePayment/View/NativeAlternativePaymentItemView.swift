@@ -31,7 +31,7 @@ struct NativeAlternativePaymentItemView: View {
             }
             .backport.focused($focusedItemId, equals: item.id)
             .controlInvalid(item.isInvalid)
-            .inputStyle(style.codeInput)
+            .inputStyle(style.largeInput)
         case .phoneNumberInput(let item):
             NativeAlternativePaymentPhoneItemView(item: item, focusedItemId: $focusedItemId)
         case .toggle(let item):
@@ -51,21 +51,27 @@ struct NativeAlternativePaymentItemView: View {
                 Image(uiImage: item.image)
                 if let viewModel = item.actionButton {
                     Button.create(with: viewModel)
-                        .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.secondary))
+                        .buttonStyle(POAnyButtonStyle(erasing: style.secondaryButton))
                         .backport.poControlSize(.small)
                 }
             }
             .padding(.horizontal, POSpacing.space48)
+        case .sizingGroup(let item):
+            VStack(alignment: .leading, spacing: POSpacing.space12) {
+                ForEach(item.content) { item in
+                    NativeAlternativePaymentItemView(item: item, focusedItemId: $focusedItemId)
+                }
+            }
         case .group(let group):
             NativeAlternativePaymentGroupItemView(item: group, focusedItemId: $focusedItemId)
         case .controlGroup(let group):
             NativeAlternativePaymentControlGroupItemView(item: group)
         case .button(let item):
             Button.create(with: item)
-                .buttonStyle(forPrimaryRole: style.actionsContainer.primary, fallback: style.actionsContainer.secondary)
+                .buttonStyle(forPrimaryRole: style.primaryButton, fallback: style.secondaryButton)
         case .message(let item):
-            // todo(andrii-vysotskyi): support style customization
             POMessageView(message: item)
+                .messageViewStyle(style.messageView)
         case .confirmationProgress(let item):
             NativeAlternativePaymentConfirmationProgressItemView(item: item)
         case .success(let item):

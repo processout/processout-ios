@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+@_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
 @available(iOS 14, *)
@@ -16,20 +17,25 @@ struct NativeAlternativePaymentMessageInstructionItemView: View {
     // MARK: - View
 
     var body: some View {
-        // todo(andrii-vysotskyi): support style customization and update localizations
         if let title = item.title {
             POLabeledContent {
                 POCopyButton(
-                    configuration: .init(value: item.value, copyTitle: "Copy", copiedTitle: "Copied!")
+                    configuration: .init(
+                        value: item.value,
+                        copyTitle: String(resource: .NativeAlternativePayment.Button.copy),
+                        copiedTitle: String(resource: .NativeAlternativePayment.Button.copied)
+                    )
                 )
                 .backport.poControlSize(.small)
                 .controlWidth(.regular)
-                .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.secondary))
+                .buttonStyle(POAnyButtonStyle(erasing: style.secondaryButton))
             } label: {
-                POMarkdown(title)
+                Text(title)
             }
+            .poLabeledContentStyle(style.labeledContentStyle)
         } else {
             POMarkdown(item.value)
+                .textStyle(style.bodyText)
         }
     }
 

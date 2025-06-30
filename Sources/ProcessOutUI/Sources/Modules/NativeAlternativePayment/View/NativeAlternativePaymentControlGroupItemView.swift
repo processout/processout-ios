@@ -16,11 +16,10 @@ struct NativeAlternativePaymentControlGroupItemView: View {
     // MARK: - View
 
     var body: some View {
-        VStack(spacing: POSpacing.space12) {
+        VStack(alignment: .leading, spacing: POSpacing.space12) {
             ForEach(item.content) { item in
                 Button.create(with: item).buttonStyle(
-                    forPrimaryRole: style.actionsContainer.primary,
-                    fallback: style.actionsContainer.secondary
+                    forPrimaryRole: style.primaryButton, fallback: style.secondaryButton
                 )
             }
         }

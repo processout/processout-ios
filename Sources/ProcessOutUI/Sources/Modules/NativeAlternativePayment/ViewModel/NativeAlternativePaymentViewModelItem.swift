@@ -142,6 +142,14 @@ indirect enum NativeAlternativePaymentViewModelItem {
         let content: [POButtonViewModel]
     }
 
+    struct SizingGroup {
+
+        let id: AnyHashable
+
+        /// Items
+        let content: [NativeAlternativePaymentViewModelItem]
+    }
+
     struct ConfirmationProgress {
 
         /// The title of the first step.
@@ -203,6 +211,9 @@ indirect enum NativeAlternativePaymentViewModelItem {
     /// Image to illustrate an action.
     case image(Image)
 
+    /// Allow to alter components spacing.
+    case sizingGroup(SizingGroup)
+
     /// Action button.
     case button(POButtonViewModel)
 
@@ -238,6 +249,8 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
             return item.id
         case .image(let item):
             return item.id
+        case .sizingGroup(let item):
+            return item.id
         case .group(let item):
             return item.id
         case .controlGroup(let item):
@@ -268,6 +281,10 @@ extension NativeAlternativePaymentViewModelItem: AnimationIdentityProvider {
         switch self {
         case .title(let item):
             return item.text
+        case .sizingGroup(let item):
+            return item.content.map(\.animationIdentity)
+        case .group(let item):
+            return item.items.map(\.animationIdentity)
         default:
             return id
         }

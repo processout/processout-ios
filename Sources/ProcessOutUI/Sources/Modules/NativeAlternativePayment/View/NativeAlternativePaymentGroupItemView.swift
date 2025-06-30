@@ -30,7 +30,7 @@ struct NativeAlternativePaymentGroupItemView: View {
                 Text(label)
             }
         }
-        .groupBoxStyle(.poAutomatic)
+        .poGroupBoxStyle(style.groupBoxStyle)
     }
 
     // MARK: - Private Properties
