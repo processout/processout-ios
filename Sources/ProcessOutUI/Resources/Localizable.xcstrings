@@ -2279,70 +2279,62 @@
         }
       }
     },
-    "native-alternative-payment.confirm-capture-button.title" : {
+    "native-alternative-payment.confirm-payment-button.title" : {
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "لقد دفعت"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I’ve paid"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "J'ai payé"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Płatność wykonana"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Já paguei"
+            "value" : "I’v paid"
           }
         }
       }
     },
-    "native-alternative-payment.email.placeholder" : {
+    "native-alternative-payment.continue-button.title" : {
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "name@example.com"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "name@example.com"
+            "value" : "Continue"
           }
-        },
-        "fr" : {
+        }
+      }
+    },
+    "native-alternative-payment.copied-button" : {
+      "localizations" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "nom@exemple.fr"
+            "value" : "Copied!"
           }
-        },
-        "pl" : {
+        }
+      }
+    },
+    "native-alternative-payment.copy-button" : {
+      "localizations" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "imię@przykład.pl"
+            "value" : "Copy"
           }
-        },
-        "pt-PT" : {
+        }
+      }
+    },
+    "native-alternative-payment.country-placeholder" : {
+      "localizations" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "nome@exemplo.pt"
+            "value" : "Country"
+          }
+        }
+      }
+    },
+    "native-alternative-payment.done-button.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
           }
         }
       }
@@ -2571,6 +2563,50 @@
         }
       }
     },
+    "native-alternative-payment.error.invalid-max-length-%d" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Invalid length, must be at most 1 character."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Invalid length, must be at most %d characters."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "native-alternative-payment.error.invalid-min-length-%d" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Invalid length, must be at least 1 character."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Invalid length, must be at least %d characters."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "native-alternative-payment.error.invalid-number" : {
       "localizations" : {
         "ar" : {
@@ -2707,36 +2743,32 @@
         }
       }
     },
-    "native-alternative-payment.phone.placeholder" : {
+    "native-alternative-payment.payment-confirmation.progress.step1.title" : {
       "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أدخل رقم الهاتف"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enter phone number"
+            "value" : "Payment sent"
           }
-        },
-        "fr" : {
+        }
+      }
+    },
+    "native-alternative-payment.payment-confirmation.progress.step2.description" : {
+      "localizations" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entrez votre numéro de téléphone"
+            "value" : "Please wait for %@ minutes"
           }
-        },
-        "pl" : {
+        }
+      }
+    },
+    "native-alternative-payment.payment-confirmation.progress.step2.title" : {
+      "localizations" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Twój numer telefonu"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Insira o seu número de telemóvel"
+            "value" : "Waiting for confirmation"
           }
         }
       }
@@ -2775,74 +2807,6 @@
         }
       }
     },
-    "native-alternative-payment.submit-button.default-title" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الدفع"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pay"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Payer"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zapłać"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pagar"
-          }
-        }
-      }
-    },
-    "native-alternative-payment.submit-button.title" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الدفع %@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pay %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Payer %@"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zapłać %@"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pagar %@"
-          }
-        }
-      }
-    },
     "native-alternative-payment.success.message" : {
       "localizations" : {
         "ar" : {
@@ -2877,39 +2841,8 @@
         }
       }
     },
-    "native-alternative-payment.title" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الدفع بواسطة %@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pay with %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Payer avec %@"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zapłać przy pomocy %@"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pagar com %@"
-          }
-        }
-      }
+    "native-alternative-payment.success.title" : {
+
     },
     "payment-cancel-confirmation.cancel" : {
       "localizations" : {
