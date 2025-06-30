@@ -11,14 +11,10 @@ import SwiftUI
 ///
 /// Use ``LabeledContentStyle/automatic`` to construct this style.
 @available(iOS 14, *)
-@_spi(PO)
 public struct POAutomaticLabeledContentStyle: POLabeledContentStyle {
 
     /// Creates an automatic labeled content style.
-    public init(
-        primaryTextStyle: POTextStyle,
-        secondaryTextStyle: POTextStyle
-    ) {
+    public init(primaryTextStyle: POTextStyle, secondaryTextStyle: POTextStyle) {
         self.primaryTextStyle = primaryTextStyle
         self.secondaryTextStyle = secondaryTextStyle
     }
