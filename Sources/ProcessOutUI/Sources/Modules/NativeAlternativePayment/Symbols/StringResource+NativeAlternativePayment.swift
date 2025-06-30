@@ -35,6 +35,18 @@ extension POStringResource {
             static let saveBarcode = POStringResource(
                 "native-alternative-payment.save-barcode-button.title", comment: ""
             )
+
+            /// Copy button.
+            static let copy = POStringResource("native-alternative-payment.copy-button", comment: "")
+
+            /// Copied button.
+            static let copied = POStringResource("native-alternative-payment.copied-button", comment: "")
+        }
+
+        enum Placeholder {
+
+            /// Country placeholder.
+            static let country = POStringResource("native-alternative-payment.country-placeholder", comment: "")
         }
 
         enum PaymentConfirmation {
