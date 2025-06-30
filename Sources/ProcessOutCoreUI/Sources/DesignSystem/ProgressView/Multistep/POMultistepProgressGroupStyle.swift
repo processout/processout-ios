@@ -9,7 +9,6 @@ import SwiftUI
 
 // swiftlint:disable nesting
 
-@_spi(PO)
 @available(iOS 14.0, *)
 public struct POMultistepProgressGroupBoxStyle: GroupBoxStyle {
 

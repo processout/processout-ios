@@ -9,7 +9,6 @@ import SwiftUI
 
 // todo(andrii-vysotskyi): use colors from design system
 
-@_spi(PO)
 @available(iOS 14.0, *)
 extension GroupBoxStyle where Self == POMultistepProgressGroupBoxStyle {
 
