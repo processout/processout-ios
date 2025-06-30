@@ -41,18 +41,15 @@ extension PONativeAlternativePaymentStyle {
     // swiftlint:disable:next strict_fileprivate
     fileprivate init(dynamicCheckoutStyle style: PODynamicCheckoutStyle) {
         title = PONativeAlternativePaymentStyle.default.title
-        sectionTitle = style.inputTitle
         input = style.input
-        codeInput = style.codeInput
+        largeInput = style.codeInput
         radioButton = style.radioButton
         toggle = style.toggle
-        errorDescription = style.errorText
-        actionsContainer = style.actionsContainer
+        primaryButton = style.actionsContainer.primary
+        secondaryButton = style.actionsContainer.secondary
         progressView = style.progressView
-        message = style.bodyText
-        successMessage = style.paymentSuccess.message
+        bodyText = style.bodyText
         backgroundColor = style.backgroundColor
-        background = .init(regular: style.backgroundColor, success: style.paymentSuccess.backgroundColor)
         separatorColor = PONativeAlternativePaymentStyle.default.separatorColor
     }
 }

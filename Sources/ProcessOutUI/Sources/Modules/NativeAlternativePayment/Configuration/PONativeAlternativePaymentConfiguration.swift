@@ -80,7 +80,8 @@ public struct PONativeAlternativePaymentConfiguration {
         /// Boolean value indicating whether gateway information (such as name/logo) should stay hidden
         /// during payment confirmation even if more specific payment provider details are not available.
         /// Default value is `false`.
-        public let hideGatewayDetails: Bool
+        @available(*, deprecated)
+        public let hideGatewayDetails: Bool = false
 
         /// Payment confirmation button configuration. To remove button use `nil`, this is default behaviour.
         ///
@@ -102,7 +103,6 @@ public struct PONativeAlternativePaymentConfiguration {
             cancelButton: CancelButton? = nil
         ) {
             self.timeout = timeout
-            self.hideGatewayDetails = hideGatewayDetails
             self.confirmButton = confirmButton
             self.cancelButton = cancelButton
         }
@@ -248,8 +248,9 @@ public struct PONativeAlternativePaymentConfiguration {
 
     /// A Boolean property that indicates whether the code input should be horizontally centered. This property
     /// is only applicable when there is a single code input. If there are multiple inputs the alignment is always
-    /// leading. Default value is `true`.
-    public let shouldHorizontallyCenterCodeInput: Bool
+    /// leading. Default value is `false`.
+    @available(*, deprecated)
+    public let shouldHorizontallyCenterCodeInput: Bool = false
 
     /// For parameters where user should select single option from multiple values defines
     /// maximum number of options that framework will display inline (e.g. using radio buttons).
@@ -286,7 +287,6 @@ public struct PONativeAlternativePaymentConfiguration {
     ) {
         self.flow = flow
         self.title = title
-        self.shouldHorizontallyCenterCodeInput = shouldHorizontallyCenterCodeInput
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.submitButton = submitButton
         self.cancelButton = cancelButton
@@ -400,7 +400,6 @@ extension PONativeAlternativePaymentConfiguration {
     ) {
         self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
         self.title = title
-        self.shouldHorizontallyCenterCodeInput = true
         self.success = skipSuccessScreen ? nil : .init(message: successMessage)
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }
@@ -430,7 +429,6 @@ extension PONativeAlternativePaymentConfiguration {
     ) {
         self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
         self.title = title
-        self.shouldHorizontallyCenterCodeInput = shouldHorizontallyCenterCodeInput
         self.success = skipSuccessScreen ? nil : .init(message: successMessage)
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }
@@ -455,7 +453,6 @@ extension PONativeAlternativePaymentConfiguration {
     ) {
         self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
         self.title = title
-        self.shouldHorizontallyCenterCodeInput = shouldHorizontallyCenterCodeInput
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.submitButton = submitButton
         self.cancelButton = cancelButton
@@ -495,7 +492,6 @@ extension PONativeAlternativePaymentConfiguration.Confirmation {
         secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction? = nil
     ) {
         self.timeout = timeout
-        self.hideGatewayDetails = hideGatewayDetails
         self.confirmButton = confirmButton
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }
     }

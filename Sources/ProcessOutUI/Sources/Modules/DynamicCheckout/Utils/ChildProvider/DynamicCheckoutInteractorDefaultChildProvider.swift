@@ -164,7 +164,6 @@ private extension PONativeAlternativePaymentConfiguration.Confirmation {
 
     init(configuration: PODynamicCheckoutAlternativePaymentConfiguration.PaymentConfirmation) {
         timeout = configuration.timeout
-        hideGatewayDetails = true
         if let configuration = configuration.confirmButton {
             confirmButton = .init(title: configuration.title, icon: configuration.icon)
         } else {
