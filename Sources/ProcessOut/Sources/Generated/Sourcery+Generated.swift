@@ -180,6 +180,20 @@ extension POCardsService {
 
 extension POCustomerTokensService {
 
+    /// Creates customer token using given request.
+    @available(*, deprecated, message: "Use the async method instead.")
+    @_spi(PO)
+    @preconcurrency
+    @discardableResult
+    public func createCustomerToken(
+        request: POCreateCustomerTokenRequest,
+        completion: sending @escaping @isolated(any) (Result<POCustomerToken, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await createCustomerToken(request: request)
+        }
+    }
+
     /// Assigns new source to existing customer token and optionally verifies it.
     @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
@@ -204,20 +218,6 @@ extension POCustomerTokensService {
     ) -> POCancellable {
         invoke(completion: completion) {
             try await deleteCustomerToken(request: request)
-        }
-    }
-
-    /// Creates customer token using given request.
-    @available(*, deprecated, message: "Use the async method instead.")
-    @_spi(PO)
-    @preconcurrency
-    @discardableResult
-    public func createCustomerToken(
-        request: POCreateCustomerTokenRequest,
-        completion: sending @escaping @isolated(any) (Result<POCustomerToken, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await createCustomerToken(request: request)
         }
     }
 }
@@ -265,6 +265,20 @@ extension POGatewayConfigurationsRepository {
 
 extension POInvoicesService {
 
+    /// Creates invoice with given parameters.
+    @available(*, deprecated, message: "Use the async method instead.")
+    @_spi(PO)
+    @preconcurrency
+    @discardableResult
+    public func createInvoice(
+        request: POInvoiceCreationRequest,
+        completion: sending @escaping @isolated(any) (Result<POInvoice, POFailure>) -> Void
+    ) -> POCancellable {
+        invoke(completion: completion) {
+            try await createInvoice(request: request)
+        }
+    }
+
     /// Invoice details.
     @available(*, deprecated, message: "Use the async method instead.")
     @preconcurrency
@@ -289,20 +303,6 @@ extension POInvoicesService {
     ) -> POCancellable {
         invoke(completion: completion) {
             try await authorizeInvoice(request: request, threeDSService: threeDSService)
-        }
-    }
-
-    /// Creates invoice with given parameters.
-    @available(*, deprecated, message: "Use the async method instead.")
-    @_spi(PO)
-    @preconcurrency
-    @discardableResult
-    public func createInvoice(
-        request: POInvoiceCreationRequest,
-        completion: sending @escaping @isolated(any) (Result<POInvoice, POFailure>) -> Void
-    ) -> POCancellable {
-        invoke(completion: completion) {
-            try await createInvoice(request: request)
         }
     }
 
