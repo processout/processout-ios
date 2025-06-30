@@ -35,10 +35,10 @@ public struct PONativeAlternativePaymentStyle {
     public let bodyText: POTextStyle
 
     /// Group box main purpose is to group multiple customer instructions.
-    public let groupBoxStyle: any GroupBoxStyle = .poAutomatic
+    public let groupBoxStyle: any GroupBoxStyle
 
     /// Labeled content style. Primarily used with customer instructions.
-    public let labeledContentStyle: any POLabeledContentStyle = .automatic
+    public let labeledContentStyle: any POLabeledContentStyle
 
     // MARK: - Buttons
 
@@ -54,7 +54,7 @@ public struct PONativeAlternativePaymentStyle {
     public let progressView: any ProgressViewStyle
 
     /// Payment confirmation progress view style.
-    public let paymentConfirmationProgressView: any PONativeAlternativePaymentConfirmationProgressViewStyle = .automatic
+    public let paymentConfirmationProgressView: any PONativeAlternativePaymentConfirmationProgressViewStyle
 
     // MARK: - Misc
 
@@ -62,16 +62,52 @@ public struct PONativeAlternativePaymentStyle {
     public let title: POTextStyle
 
     /// Message view style, that adopts itself depending on severity.
-    public let messageView: any POMessageViewStyle = .toast
+    public let messageView: any POMessageViewStyle
 
     /// Payment success view style.
-    public let successView: any PONativeAlternativePaymentSuccessViewStyle = .automatic
+    public let successView: any PONativeAlternativePaymentSuccessViewStyle
 
     /// Background color.
     public let backgroundColor: Color
 
     /// Separator color.
     public let separatorColor: Color
+
+    public init(
+        input: POInputStyle,
+        largeInput: POInputStyle,
+        radioButton: any ButtonStyle,
+        toggle: any ToggleStyle,
+        bodyText: POTextStyle,
+        groupBoxStyle: any GroupBoxStyle,
+        labeledContentStyle: any POLabeledContentStyle,
+        primaryButton: any ButtonStyle,
+        secondaryButton: any ButtonStyle,
+        progressView: any ProgressViewStyle,
+        paymentConfirmationProgressView: any PONativeAlternativePaymentConfirmationProgressViewStyle,
+        title: POTextStyle,
+        messageView: any POMessageViewStyle,
+        successView: any PONativeAlternativePaymentSuccessViewStyle,
+        backgroundColor: Color,
+        separatorColor: Color,
+    ) {
+        self.input = input
+        self.largeInput = largeInput
+        self.radioButton = radioButton
+        self.toggle = toggle
+        self.bodyText = bodyText
+        self.groupBoxStyle = groupBoxStyle
+        self.labeledContentStyle = labeledContentStyle
+        self.primaryButton = primaryButton
+        self.secondaryButton = secondaryButton
+        self.progressView = progressView
+        self.paymentConfirmationProgressView = paymentConfirmationProgressView
+        self.title = title
+        self.messageView = messageView
+        self.successView = successView
+        self.backgroundColor = backgroundColor
+        self.separatorColor = separatorColor
+    }
 }
 
 @available(iOS 14, *)
@@ -79,19 +115,25 @@ extension PONativeAlternativePaymentStyle {
 
     /// Default native alternative payment style.
     public static let `default` = PONativeAlternativePaymentStyle(
-        title: POTextStyle(color: .Text.primary, typography: .Text.s20(weight: .medium)),
-        sectionTitle: POTextStyle(color: .Input.Text.default, typography: .Text.s14(weight: .medium)),
         input: .medium,
-        codeInput: .large,
+        largeInput: .large,
         radioButton: .radio,
-        errorDescription: POTextStyle(color: .Input.Text.error, typography: .Text.s12(weight: .regular)),
-        actionsContainer: .default,
-        progressView: .circular,
-        message: POTextStyle(color: .Text.primary, typography: .Paragraph.s16(weight: .medium)),
-        successMessage: POTextStyle(
-            color: .Text.positive, typography: .Paragraph.s16(weight: .medium)
+        toggle: .poCheckbox,
+        bodyText: .init(
+            color: .Text.primary, typography: .Paragraph.s16(weight: .medium)
         ),
-        background: .default,
+        groupBoxStyle: .poAutomatic,
+        labeledContentStyle: .automatic,
+        primaryButton: .primary,
+        secondaryButton: .secondary,
+        progressView: .circular,
+        paymentConfirmationProgressView: .automatic,
+        title: .init(
+            color: .Text.primary, typography: .Text.s20(weight: .medium)
+        ),
+        messageView: .toast,
+        successView: .automatic,
+        backgroundColor: .Surface.primary,
         separatorColor: .Border.primary
     )
 }
@@ -164,15 +206,20 @@ extension PONativeAlternativePaymentStyle {
         background: PONativeAlternativePaymentBackgroundStyle,
         separatorColor: Color
     ) {
-        self.title = title
         self.input = input
         self.largeInput = codeInput
         self.radioButton = radioButton
         self.toggle = toggle
+        self.bodyText = message
+        self.groupBoxStyle = .poAutomatic
+        self.labeledContentStyle = .automatic
         self.primaryButton = actionsContainer.primary
         self.secondaryButton = actionsContainer.secondary
         self.progressView = progressView
-        self.bodyText = message
+        self.paymentConfirmationProgressView = .automatic
+        self.title = title
+        self.messageView = .toast
+        self.successView = .automatic
         self.backgroundColor = background.regular
         self.separatorColor = separatorColor
     }
