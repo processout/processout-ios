@@ -52,6 +52,9 @@ enum NativeAlternativePaymentInteractorState {
 
         /// Redirect information.
         let redirect: PONativeAlternativePaymentRedirectV2
+
+        /// Boolean value indicating whether user should be able to manually cancel payment in current state.
+        var isCancellable: Bool
     }
 
     struct Redirecting {
@@ -159,17 +162,3 @@ extension NativeAlternativePaymentInteractorState: InteractorState {
         }
     }
 }
-
-// struct CancelState {
-//
-//    /// Configuration.
-//    let configuration: PONativeAlternativePaymentConfiguration.CancelButton
-//
-//    /// Indicates time until which cancel is disabled.
-//    let disabledUntil: Date?
-//
-//    /// Indicates whether cancel is currently disabled.
-//    var isDisabled: Bool {
-//        disabledUntil.map { $0.timeIntervalSinceNow > 0 } ?? false
-//    }
-// }

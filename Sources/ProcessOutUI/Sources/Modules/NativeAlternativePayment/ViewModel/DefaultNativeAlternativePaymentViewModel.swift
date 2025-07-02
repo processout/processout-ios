@@ -277,8 +277,11 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         var buttons: [POButtonViewModel] = [
             createRedirectButton(state: state, isRedirecting: isRedirecting)
         ]
-        if let viewModel = createCancelButton(configuration: interactor.configuration.cancelButton, isEnabled: true) {
-            buttons.append(viewModel)
+        let cancelButton = createCancelButton(
+            configuration: interactor.configuration.cancelButton, isEnabled: state.isCancellable
+        )
+        if let cancelButton {
+            buttons.append(cancelButton)
         }
         let controlGroup = NativeAlternativePaymentViewModelItem.ControlGroup(id: "control-group", content: buttons)
         return .controlGroup(controlGroup)

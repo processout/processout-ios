@@ -227,7 +227,11 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.debug("Cancel action is not set or initially enabled.")
             return
         }
-        Task { @MainActor in
+        guard cancelationEnablingTask == nil else {
+            logger.debug("Cancel enabling is already scheduled.")
+            return
+        }
+        let task = Task { @MainActor in
             try? await Task.sleep(seconds: disabledFor)
             switch state {
             case .started(var currentState):
@@ -237,11 +241,21 @@ final class NativeAlternativePaymentDefaultInteractor:
                 var updatedSnapshot = currentState.snapshot
                 updatedSnapshot.isCancellable = true
                 state = .submitting(.init(snapshot: updatedSnapshot, task: currentState.task))
+            case .awaitingRedirect(var currentState):
+                currentState.isCancellable = true
+                state = .awaitingRedirect(currentState)
+            case .redirecting(let currentState):
+                var updatedSnapshot = currentState.snapshot
+                updatedSnapshot.isCancellable = true
+                state = .redirecting(.init(task: currentState.task, snapshot: updatedSnapshot))
             default:
                 break
             }
         }
+        self.cancelationEnablingTask = task
     }
+
+    private var cancelationEnablingTask: Task<Void, Never>?
 
     // MARK: - Awaiting Completion State
 
@@ -324,9 +338,13 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         let newState = State.AwaitingRedirect(
-            paymentMethod: paymentMethod, elements: elements, redirect: redirect
+            paymentMethod: paymentMethod,
+            elements: elements,
+            redirect: redirect,
+            isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
         )
         state = .awaitingRedirect(newState)
+        enableCancellationAfterDelay()
     }
 
     // MARK: - Completed State
@@ -426,12 +444,19 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Cancellation Availability
 
+    // swiftlint:disable:next identifier_name
+    private var paymentConfirmationCancellationEnablingTask: Task<Void, Never>?
+
     private func enablePaymentConfirmationCancellationAfterDelay() {
         guard let disabledFor = configuration.paymentConfirmation.cancelButton?.disabledFor, disabledFor > 0 else {
             logger.debug("Confirmation cancel action is not set or initially enabled.")
             return
         }
-        Task { @MainActor in
+        guard paymentConfirmationCancellationEnablingTask == nil else {
+            logger.debug("Cancel enabling is already scheduled.")
+            return
+        }
+        let task = Task { @MainActor in
             try? await Task.sleep(seconds: disabledFor)
             guard case .awaitingCompletion(var newState) = state else {
                 return
@@ -439,6 +464,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             newState.isCancellable = true
             state = .awaitingCompletion(newState)
         }
+        self.paymentConfirmationCancellationEnablingTask = task
     }
 
     // MARK: - Events

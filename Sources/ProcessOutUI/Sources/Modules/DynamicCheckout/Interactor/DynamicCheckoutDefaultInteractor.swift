@@ -670,8 +670,16 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.isReady = true
             currentState.isAwaitingNativeAlternativePaymentCapture = false
             self.state = .paymentProcessing(currentState)
-        case .awaitingRedirect, .redirecting:
-            preconditionFailure("Not supported yet.")
+        case .awaitingRedirect(let awaitingRedirectState):
+            currentState.isCancellable = awaitingRedirectState.isCancellable
+            currentState.isReady = true
+            currentState.isAwaitingNativeAlternativePaymentCapture = false
+            self.state = .paymentProcessing(currentState)
+        case .redirecting(let redirectingState):
+            currentState.isCancellable = redirectingState.snapshot.isCancellable
+            currentState.isReady = true
+            currentState.isAwaitingNativeAlternativePaymentCapture = false
+            self.state = .paymentProcessing(currentState)
         case .awaitingCompletion(let awaitingCaptureState):
             currentState.isCancellable = awaitingCaptureState.isCancellable
             currentState.isReady = true
