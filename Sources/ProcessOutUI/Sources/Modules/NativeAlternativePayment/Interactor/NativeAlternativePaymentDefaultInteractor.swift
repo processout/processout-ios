@@ -643,12 +643,12 @@ final class NativeAlternativePaymentDefaultInteractor:
         switch parameter.specification {
         case .singleSelect(let specification):
             if case .string(let value) = fallback {
-                let availableValues = Set(specification.availableValues.map(\.key))
+                let availableValues = Set(specification.availableValues.map(\.value))
                 precondition(availableValues.contains(value), "Unsupported `singleSelect` parameter value.")
                 return .string(value)
             }
             if let preselectedValue = specification.preselectedValue {
-                return .string(preselectedValue.key)
+                return .string(preselectedValue.value)
             }
         case .phoneNumber(let specification):
             if case .phone(let value) = fallback {

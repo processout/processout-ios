@@ -44,7 +44,7 @@ public struct PONativeAlternativePaymentFormV2: Sendable, Decodable {
             public struct AvailableValue: Sendable, Decodable {
 
                 /// Value.
-                public let key: String
+                public let value: String
 
                 /// Value display label.
                 public let label: String

@@ -495,7 +495,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             id: specification.key,
             label: specification.label,
             options: specification.availableValues.map { availableValue in
-                .init(id: availableValue.key, title: availableValue.label)
+                .init(id: availableValue.value, title: availableValue.label)
             },
             selectedOptionId: value,
             isInvalid: parameter.recentErrorMessage != nil,
