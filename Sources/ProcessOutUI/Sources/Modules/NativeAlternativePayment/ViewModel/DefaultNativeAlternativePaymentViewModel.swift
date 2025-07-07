@@ -445,7 +445,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             length: maxLength,
             value: value,
             label: specification.label,
-            isInvalid: parameter.recentErrorMessage != nil
+            isInvalid: parameter.recentErrorMessage != nil,
+            keyboard: keyboard(parameter: .otp(specification))
         )
         return .codeInput(codeInputItem)
     }
@@ -548,18 +549,14 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func keyboard(parameter: PONativeAlternativePaymentFormV2.Parameter) -> UIKeyboardType {
         switch parameter {
-        case .text:
-            return .default
-        case .digits:
+        case .digits, .card:
+            return .numberPad
+        case .otp(let specification) where specification.subtype == .digits:
             return .numberPad
         case .phoneNumber:
             return .phonePad
         case .email:
             return .emailAddress
-        case .card:
-            return .numberPad
-        case .otp(let specification) where specification.subtype == .digits:
-            return .numberPad
         default:
             return .default
         }

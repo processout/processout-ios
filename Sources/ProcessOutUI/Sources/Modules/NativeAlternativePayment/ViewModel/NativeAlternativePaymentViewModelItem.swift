@@ -69,6 +69,9 @@ indirect enum NativeAlternativePaymentViewModelItem {
 
         /// Boolean value indicating whether value is valid.
         let isInvalid: Bool
+
+        /// Keyboard type.
+        let keyboard: UIKeyboardType
     }
 
     struct PhoneNumberInput: Identifiable {

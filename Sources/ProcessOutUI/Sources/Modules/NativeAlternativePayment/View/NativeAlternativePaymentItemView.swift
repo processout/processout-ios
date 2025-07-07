@@ -30,8 +30,9 @@ struct NativeAlternativePaymentItemView: View {
                 Text(item.label)
             }
             .backport.focused($focusedItemId, equals: item.id)
-            .controlInvalid(item.isInvalid)
             .inputStyle(style.largeInput)
+            .controlInvalid(item.isInvalid)
+            .poKeyboardType(item.keyboard)
         case .phoneNumberInput(let item):
             NativeAlternativePaymentPhoneItemView(item: item, focusedItemId: $focusedItemId)
         case .toggle(let item):

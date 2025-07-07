@@ -36,6 +36,7 @@ struct CodeFieldRepresentable: UIViewRepresentable {
         // Since coordinator is referencing `representable` which is a struct, new
         // instance should be injected every time runtime asks us to update uiView.
         context.coordinator.representable = self
+        uiView.keyboardType = context.environment.poKeyboardType
         updateMenu(uiView: uiView)
     }
 
