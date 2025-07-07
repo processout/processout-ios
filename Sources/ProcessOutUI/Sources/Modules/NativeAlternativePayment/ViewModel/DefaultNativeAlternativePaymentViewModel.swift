@@ -578,7 +578,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             self?.interactor.updateValue(.string(newValue.description), for: specification.key)
         }
         let item = NativeAlternativePaymentViewModelItem.ToggleItem(
-            id: specification.key, title: specification.label, isSelected: isSelected
+            id: specification.key,
+            title: specification.label,
+            isSelected: isSelected,
+            isInvalid: parameter.recentErrorMessage != nil
         )
         return .toggle(item)
     }

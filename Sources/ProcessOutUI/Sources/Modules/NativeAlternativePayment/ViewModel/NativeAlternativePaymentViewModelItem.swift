@@ -98,6 +98,9 @@ indirect enum NativeAlternativePaymentViewModelItem {
 
         /// Defines whether item is currently selected.
         @Binding var isSelected: Bool
+
+        /// Boolean value indicating whether value is valid.
+        let isInvalid: Bool
     }
 
     struct MessageInstruction: Identifiable, Hashable {

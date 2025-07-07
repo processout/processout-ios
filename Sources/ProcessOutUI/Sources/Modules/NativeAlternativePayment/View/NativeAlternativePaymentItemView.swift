@@ -37,6 +37,7 @@ struct NativeAlternativePaymentItemView: View {
         case .toggle(let item):
             Toggle(item.title, isOn: item.$isSelected)
                 .poToggleStyle(style.toggle)
+                .controlInvalid(item.isInvalid)
         case .picker(let item):
             NativeAlternativePaymentPickerItemView(item: item)
         case .progress:
