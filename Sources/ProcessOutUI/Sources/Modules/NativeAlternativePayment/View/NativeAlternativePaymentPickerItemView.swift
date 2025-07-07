@@ -23,18 +23,25 @@ struct NativeAlternativePaymentPickerItemView: View {
         } prompt: {
             Text(item.label)
         }
-        .modify(when: item.preferrsInline) { view in
-            let style = PORadioGroupPickerStyle(
-                radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton),
-                inputStyle: style.largeInput
-            )
-            view.pickerStyle(style)
-        }
-        .pickerStyle(POMenuPickerStyle(inputStyle: style.input))
+        .pickerStyle(pickerStyle)
+        .controlInvalid(item.isInvalid)
     }
 
     // MARK: - Private Properties
 
     @Environment(\.nativeAlternativePaymentStyle)
     private var style
+
+    // MARK: - Private Methods
+
+    private var pickerStyle: any POPickerStyle {
+        if item.preferrsInline {
+            PORadioGroupPickerStyle(
+                radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton),
+                inputStyle: style.largeInput
+            )
+        } else {
+            POMenuPickerStyle(inputStyle: style.input)
+        }
+    }
 }

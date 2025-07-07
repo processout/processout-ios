@@ -12,7 +12,7 @@ extension View {
     /// Sets the style for picker views within this view.
     @_spi(PO)
     @available(iOS 14, *)
-    public func pickerStyle<Style: POPickerStyle>(_ style: Style) -> some View {
+    public func pickerStyle(_ style: any POPickerStyle) -> some View {
         environment(\.pickerStyle, style)
     }
 }
