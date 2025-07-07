@@ -437,9 +437,25 @@ final class NativeAlternativePaymentDefaultInteractor:
             failure = POFailure(message: "Something went wrong.", code: .Mobile.generic, underlyingError: error)
         }
         state = .failure(failure)
-        // todo(andrii-vysotskyi): add payment state to failure event
-        send(event: .didFail(.init(failure: failure)))
+        let failureEvent = PONativeAlternativePaymentEventV2.DidFail(
+            failure: failure, paymentState: currentPaymentState
+        )
+        send(event: .didFail(failureEvent))
         completion(.failure(failure))
+    }
+
+    /// Payment state resolve from current interactor's state.
+    private var currentPaymentState: PONativeAlternativePaymentStateV2? {
+        switch state {
+        case .idle, .starting, .failure:
+            return nil
+        case .started, .submitting, .awaitingRedirect, .redirecting:
+            return .nextStepRequired
+        case .awaitingCompletion:
+            return .pending
+        case .completed:
+            return .success
+        }
     }
 
     // MARK: - Cancellation Availability

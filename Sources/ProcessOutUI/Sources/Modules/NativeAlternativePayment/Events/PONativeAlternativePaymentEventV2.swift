@@ -34,6 +34,13 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
 
         /// Failure.
         public let failure: POFailure
+
+        /// Indicates the payment state at the moment the failure occurred.
+        ///
+        /// This provides additional context about where in the payment process the failure happened.
+        /// For example, in case of a user-initiated cancellation, this state can be used to determine
+        /// which step the user was on when they canceled.
+        public let paymentState: PONativeAlternativePaymentStateV2?
     }
 
     /// Initial event that is sent prior any other event.
