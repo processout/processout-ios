@@ -470,7 +470,6 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Events
 
     private func send(event: PONativeAlternativePaymentEventV2) {
-        logger.debug("Did send event: '\(event)'")
         delegate?.nativeAlternativePayment(didEmitEvent: event)
     }
 
@@ -742,7 +741,10 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
             errorMessage = validation.errorMessage
         case .phoneNumber(let specification):
-            let normalizedValue = NativeAlternativePaymentPhoneNumberNormalizer().normalize(input: parameter.value)
+            let normalizer = NativeAlternativePaymentPhoneNumberNormalizer(
+                dialingCodes: specification.dialingCodes
+            )
+            let normalizedValue = normalizer.normalize(input: parameter.value)
             let validation =
                 NativeAlternativePaymentPhoneNumberValidator(required: specification.required).validate(normalizedValue)
             if case .valid = validation {

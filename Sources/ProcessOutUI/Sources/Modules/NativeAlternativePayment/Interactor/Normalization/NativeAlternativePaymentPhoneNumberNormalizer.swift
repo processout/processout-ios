@@ -9,6 +9,10 @@
 
 struct NativeAlternativePaymentPhoneNumberNormalizer: InputNormalizer {
 
+    let dialingCodes: [PONativeAlternativePaymentFormV2.Parameter.PhoneNumber.DialingCode]
+
+    // MARK: - InputNormalizer
+
     func normalize(
         input: PONativeAlternativePaymentParameterValue?
     ) -> PONativeAlternativePaymentSubmitDataV2.Parameter.Value.Phone? {
@@ -16,10 +20,11 @@ struct NativeAlternativePaymentPhoneNumberNormalizer: InputNormalizer {
             return nil
         }
         if let regionCode = phoneNumber.regionCode, let number = phoneNumber.number {
-            guard let dialingCode = PODefaultPhoneNumberMetadataProvider.shared.countryCode(for: regionCode) else {
+            guard let dialingCode = dialingCodes.first(where: { $0.regionCode == regionCode }) else {
                 return nil
             }
-            return .init(dialingCode: dialingCode, number: number)
+            let normalizedNumber = number.filter(\.isNumber)
+            return .init(dialingCode: dialingCode.value, number: normalizedNumber)
         } else {
             return nil
         }
