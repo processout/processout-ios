@@ -54,9 +54,6 @@ struct NativeAlternativePaymentContentView: View {
 
     private let insets: EdgeInsets
 
-    @Environment(\.nativeAlternativePaymentSizeClass)
-    private var sizeClass
-
     @Environment(\.nativeAlternativePaymentStyle)
     private var style
 

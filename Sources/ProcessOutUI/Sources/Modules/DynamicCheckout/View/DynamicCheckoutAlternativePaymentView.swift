@@ -21,7 +21,6 @@ struct DynamicCheckoutAlternativePaymentView: View {
     var body: some View {
         VStack(spacing: POSpacing.large) {
             NativeAlternativePaymentContentView(viewModel: viewModel, insets: .init(horizontal: 0, vertical: 0))
-                .nativeAlternativePaymentSizeClass(.compact)
         }
     }
 
