@@ -20,10 +20,8 @@ struct NativeAlternativePaymentGroupItemView: View {
 
     var body: some View {
         GroupBox {
-            VStack {
-                ForEach(item.items) { item in
-                    NativeAlternativePaymentItemView(item: item, focusedItemId: $focusedItemId)
-                }
+            ForEach(item.items) { item in
+                NativeAlternativePaymentItemView(item: item, focusedItemId: $focusedItemId)
             }
         } label: {
             if let label = item.label {

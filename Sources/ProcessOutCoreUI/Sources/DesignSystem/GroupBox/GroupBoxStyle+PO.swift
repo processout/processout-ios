@@ -20,7 +20,7 @@ extension GroupBoxStyle where Self == POGroupBoxStyle {
             contentStyle: .init(
                 dividerColor: .Border.primary,
                 border: .regular(color: .Input.Border.default),
-                backgroundColor: .Surface.elevated
+                backgroundColor: .Surface.primary
             )
         )
     }

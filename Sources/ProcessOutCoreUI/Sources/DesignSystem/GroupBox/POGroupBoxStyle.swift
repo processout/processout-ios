@@ -45,8 +45,8 @@ public struct POGroupBoxStyle: GroupBoxStyle {
             configuration.label
                 .padding(.vertical, POSpacing.space12)
                 .textStyle(labelTextStyle)
-            Group(poSubviews: configuration.content) { children in
-                VStack(spacing: POSpacing.space1) {
+            VStack(alignment: .leading, spacing: POSpacing.space1) {
+                Group(poSubviews: configuration.content) { children in
                     ForEach(children.dropLast()) { child in
                         child.padding(POSpacing.space12)
                         Rectangle()
@@ -55,8 +55,8 @@ public struct POGroupBoxStyle: GroupBoxStyle {
                     }
                     children.last.padding(POSpacing.space12)
                 }
-                .padding(POSpacing.space4)
             }
+            .padding(POSpacing.space4)
             .background(contentStyle.backgroundColor)
             .border(style: contentStyle.border)
         }
