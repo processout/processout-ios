@@ -31,6 +31,7 @@ struct NativeAlternativePaymentMessageInstructionItemView: View {
                 .buttonStyle(POAnyButtonStyle(erasing: style.secondaryButton))
             } label: {
                 Text(title)
+                Text(item.value)
             }
             .poLabeledContentStyle(style.labeledContentStyle)
         } else {

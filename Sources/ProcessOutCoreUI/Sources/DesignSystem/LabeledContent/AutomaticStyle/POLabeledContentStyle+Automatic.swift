@@ -15,7 +15,7 @@ extension POLabeledContentStyle where Self == POAutomaticLabeledContentStyle {
     public static var automatic: POAutomaticLabeledContentStyle {
         POAutomaticLabeledContentStyle(
             primaryTextStyle: .init(
-                color: Color.Input.Text.default,
+                color: Color.Input.Label.default,
                 typography: POTypography.Text.s12(weight: .medium)
             ),
             secondaryTextStyle: .init(
