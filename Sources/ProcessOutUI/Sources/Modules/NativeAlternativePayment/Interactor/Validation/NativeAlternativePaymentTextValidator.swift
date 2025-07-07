@@ -44,6 +44,12 @@ struct NativeAlternativePaymentTextValidator: InputValidator {
                 return .invalid(errorMessage: message)
             }
             if let minLength, input.count < minLength {
+                if let maxLength, minLength == maxLength {
+                    let message = String(
+                        resource: .NativeAlternativePayment.Error.invalidLength, replacements: minLength
+                    )
+                    return .invalid(errorMessage: message)
+                }
                 let message = String(
                     resource: .NativeAlternativePayment.Error.invalidMinLength, replacements: minLength
                 )
