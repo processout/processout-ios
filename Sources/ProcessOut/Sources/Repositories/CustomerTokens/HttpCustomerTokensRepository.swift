@@ -41,7 +41,7 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
         request: PONativeAlternativePaymentTokenizationRequestV2
     ) async throws -> PONativeAlternativePaymentTokenizationResponseV2 {
         let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentTokenizationResponseV2>.post(
-            path: "/customers/\(request.customerId)/tokens/\(request.customerTokenId)/tokenize",
+            path: "/customers/\(request.customerId)/apm-tokens/\(request.customerTokenId)/tokenize",
             body: request
         )
         return try await connector.execute(request: httpRequest)
