@@ -23,6 +23,9 @@ enum NativeAlternativePaymentInteractorState {
         /// Payment method information.
         var paymentMethod: NativeAlternativePaymentResolvedPaymentMethod
 
+        /// Invoice information if any.
+        let invoice: PONativeAlternativePaymentInvoiceV2?
+
         /// Elements.
         var elements: [NativeAlternativePaymentResolvedElement]
 
@@ -46,6 +49,9 @@ enum NativeAlternativePaymentInteractorState {
 
         /// Payment method information.
         let paymentMethod: NativeAlternativePaymentResolvedPaymentMethod
+
+        /// Invoice information if any.
+        let invoice: PONativeAlternativePaymentInvoiceV2?
 
         /// Resolved elements.
         let elements: [NativeAlternativePaymentResolvedElement]
@@ -71,6 +77,9 @@ enum NativeAlternativePaymentInteractorState {
         /// Payment method information.
         let paymentMethod: NativeAlternativePaymentResolvedPaymentMethod
 
+        /// Invoice information if any.
+        let invoice: PONativeAlternativePaymentInvoiceV2?
+
         /// Resolved elements.
         let elements: [NativeAlternativePaymentResolvedElement]
 
@@ -92,6 +101,9 @@ enum NativeAlternativePaymentInteractorState {
 
         /// Payment method information.
         let paymentMethod: NativeAlternativePaymentResolvedPaymentMethod
+
+        /// Invoice information if any.
+        let invoice: PONativeAlternativePaymentInvoiceV2?
 
         /// Resolved elements.
         let elements: [NativeAlternativePaymentResolvedElement]

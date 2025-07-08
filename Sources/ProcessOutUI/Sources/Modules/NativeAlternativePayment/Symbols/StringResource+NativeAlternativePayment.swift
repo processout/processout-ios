@@ -13,9 +13,12 @@ extension POStringResource {
 
     enum NativeAlternativePayment {
 
+        /// Payment title.
+        static let title = POStringResource("native-alternative-payment.title", comment: "")
+
         enum Button {
 
-            /// Pay.
+            /// Continue.
             static let `continue` = POStringResource("native-alternative-payment.continue-button.title", comment: "")
 
             /// Payment confirmation.

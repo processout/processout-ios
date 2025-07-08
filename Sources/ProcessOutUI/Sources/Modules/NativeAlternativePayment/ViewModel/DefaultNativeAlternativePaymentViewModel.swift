@@ -101,7 +101,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         state: InteractorState.Started, isSubmitting: Bool
     ) -> [NativeAlternativePaymentViewModelItem] {
         var items = [
-            createTitleItem(paymentMethod: state.paymentMethod)
+            createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
         ]
         items += createItems(for: state.elements, state: state)
         items.append(
@@ -165,7 +165,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         state: InteractorState.AwaitingCompletion
     ) -> [NativeAlternativePaymentViewModelItem] {
         var items: [NativeAlternativePaymentViewModelItem?] = [
-            createTitleItem(paymentMethod: state.paymentMethod)
+            createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
         ]
         if state.shouldConfirmPayment {
             items.append(
@@ -257,7 +257,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func update(with state: InteractorState.AwaitingRedirect, isRedirecting: Bool = false) {
         var items: [NativeAlternativePaymentViewModelItem?] = [
-            createTitleItem(paymentMethod: state.paymentMethod)
+            createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
         ]
         items.append(
             contentsOf: createItems(for: state.elements, state: nil)
@@ -322,7 +322,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func createItems(state: InteractorState.Completed) -> [NativeAlternativePaymentViewModelItem] {
         var items: [NativeAlternativePaymentViewModelItem?] = [
-            createTitleItem(paymentMethod: state.paymentMethod),
+            createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice),
             createSuccessItem(state: state)
         ]
         items.append(contentsOf: createItems(for: state.elements, state: nil))
@@ -731,9 +731,24 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createTitleItem(
-        paymentMethod: NativeAlternativePaymentResolvedPaymentMethod
+        paymentMethod: NativeAlternativePaymentResolvedPaymentMethod,
+        invoice: PONativeAlternativePaymentInvoiceV2?
     ) -> NativeAlternativePaymentViewModelItem? {
-        let title = interactor.configuration.title ?? paymentMethod.displayName
+        let defaultTitle: () -> String? = {
+            guard let invoice else {
+                return nil
+            }
+            let formatter = NumberFormatter()
+            formatter.minimumFractionDigits = 0
+            formatter.numberStyle = .currency
+            formatter.currencyCode = invoice.currency
+            // swiftlint:disable:next legacy_objc_type
+            guard let amount = formatter.string(from: invoice.amount as NSDecimalNumber) else {
+                return nil
+            }
+            return String(resource: .NativeAlternativePayment.title, replacements: amount)
+        }
+        let title = interactor.configuration.title ?? defaultTitle() ?? ""
         guard !title.isEmpty else {
             return nil
         }

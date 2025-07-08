@@ -18,12 +18,16 @@ struct NativeAlternativePaymentTitleItemView: View {
 
     var body: some View {
         HStack(spacing: POSpacing.space16) {
+            if let icon = item.icon {
+                icon
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxHeight: 24)
+            }
             Text(item.text)
                 .textStyle(style.title)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            if let icon = item.icon {
-                icon.resizable().scaledToFit().frame(maxHeight: 24)
-            }
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(.bottom, POSpacing.space12)
         .preference(key: NativeAlternativePaymentViewSeparatorVisibilityPreferenceKey.self, value: true)

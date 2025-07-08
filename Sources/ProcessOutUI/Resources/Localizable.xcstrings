@@ -2842,7 +2842,24 @@
       }
     },
     "native-alternative-payment.success.title" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment approved!"
+          }
+        }
+      }
+    },
+    "native-alternative-payment.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay %@"
+          }
+        }
+      }
     },
     "payment-cancel-confirmation.cancel" : {
       "localizations" : {

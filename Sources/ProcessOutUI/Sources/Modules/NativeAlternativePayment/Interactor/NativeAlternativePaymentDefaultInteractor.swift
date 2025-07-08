@@ -212,6 +212,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         let startedState = State.Started(
             paymentMethod: paymentMethod,
+            invoice: response.invoice,
             elements: elements,
             parameters: parameters,
             isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
@@ -279,6 +280,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 !resolvedElements.isEmpty && configuration.paymentConfirmation.confirmButton != nil
             let awaitingPaymentCompletionState = State.AwaitingCompletion(
                 paymentMethod: await resolve(paymentMethod: response.paymentMethod),
+                invoice: response.invoice,
                 elements: resolvedElements,
                 estimatedCompletionDate: nil,
                 isCancellable: configuration.paymentConfirmation.cancelButton?.disabledFor.isZero ?? true,
@@ -339,6 +341,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         let newState = State.AwaitingRedirect(
             paymentMethod: paymentMethod,
+            invoice: response.invoice,
             elements: elements,
             redirect: redirect,
             isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
@@ -369,6 +372,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
             let newState = State.Completed(
                 paymentMethod: await resolve(paymentMethod: response.paymentMethod),
+                invoice: response.invoice,
                 elements: resolvedElements,
                 completionTask: task,
             )
