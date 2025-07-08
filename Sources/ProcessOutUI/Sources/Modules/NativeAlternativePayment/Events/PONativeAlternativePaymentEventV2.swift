@@ -92,5 +92,3 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
     @_spi(PO)
     case unknown
 }
-
-// todo(andrii-vysotskyi): add user info to failure describing at what stage payment was cancelled

@@ -104,7 +104,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 case .success, .pending:
                     send(event: .didSubmitParameters(.init(additionalParametersExpected: false)))
                 default:
-                    preconditionFailure("Unexpected payment state.")
+                    setFailureState(error: POFailure(message: "Unexpected payment state.", code: .Mobile.generic))
                 }
                 try await setState(with: payment)
             } catch {
