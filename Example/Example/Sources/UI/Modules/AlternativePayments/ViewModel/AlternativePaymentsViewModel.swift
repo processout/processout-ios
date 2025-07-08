@@ -152,11 +152,24 @@ final class AlternativePaymentsViewModel: ObservableObject {
             var authorizationSource = gatewayConfigurationId
             switch state.flow.selection {
             case .payment where state.preferNative:
-                try await authorizeNatively(invoice: invoice, gatewayConfigurationId: gatewayConfigurationId)
+                let flow = PONativeAlternativePaymentConfiguration.Flow.authorization(
+                    .init(invoiceId: invoice.id, gatewayConfigurationId: gatewayConfigurationId)
+                )
+                try await authorizeNatively(invoice: invoice, flow: flow)
             case .payment:
                 try await interactor.authorize(
                     invoice: invoice, gatewayConfigurationId: gatewayConfigurationId, saveSource: false
                 )
+            case .tokenization where state.preferNative:
+                let token = try await interactor.createToken()
+                let flow = PONativeAlternativePaymentConfiguration.Flow.tokenization(
+                    .init(
+                        customerId: token.customerId,
+                        customerTokenId: token.id,
+                        gatewayConfigurationId: gatewayConfigurationId
+                    )
+                )
+                try await authorizeNatively(invoice: invoice, flow: flow)
             case .tokenization:
                 let token = try await interactor.tokenize(gatewayConfigurationId: gatewayConfigurationId)
                 try await interactor.authorize(invoice: invoice, customerToken: token)
@@ -175,12 +188,12 @@ final class AlternativePaymentsViewModel: ObservableObject {
         }
     }
 
-    private func authorizeNatively(invoice: POInvoice, gatewayConfigurationId: String) async throws {
+    private func authorizeNatively(
+        invoice: POInvoice, flow: PONativeAlternativePaymentConfiguration.Flow
+    ) async throws {
         try await withCheckedThrowingContinuation { continuation in
             let configuration = PONativeAlternativePaymentConfiguration(
-                flow: .authorization(
-                    .init(invoiceId: invoice.id, gatewayConfigurationId: gatewayConfigurationId)
-                ),
+                flow: flow,
                 cancelButton: .init(
                     confirmation: .init()
                 ),
