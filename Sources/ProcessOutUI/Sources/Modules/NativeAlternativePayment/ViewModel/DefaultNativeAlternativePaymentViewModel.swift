@@ -734,6 +734,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         paymentMethod: NativeAlternativePaymentResolvedPaymentMethod,
         invoice: PONativeAlternativePaymentInvoiceV2?
     ) -> NativeAlternativePaymentViewModelItem? {
+        if let title = interactor.configuration.title, title.isEmpty {
+            return nil
+        }
         let defaultTitle: () -> String? = {
             guard let invoice else {
                 return nil
@@ -748,14 +751,14 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             }
             return String(resource: .NativeAlternativePayment.title, replacements: amount)
         }
-        let title = interactor.configuration.title ?? defaultTitle() ?? ""
-        guard !title.isEmpty else {
+        let title = interactor.configuration.title ?? defaultTitle()
+        guard title != nil || paymentMethod.logo != nil else {
             return nil
         }
         let item = NativeAlternativePaymentViewModelItem.Title(
             id: "Title",
             icon: paymentMethod.logo.map(Image.init),
-            text: title
+            text: title ?? ""
         )
         return .title(item)
     }
