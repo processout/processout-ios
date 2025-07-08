@@ -46,7 +46,7 @@ private struct ContentView<ProgressViewStyleType: ProgressViewStyle, GroupBoxSty
 
     var body: some View {
         GroupBox {
-            VStack(alignment: .leading, spacing: POSpacing.space28) {
+            Group {
                 ProgressView(
                     String(resource: .NativeAlternativePayment.PaymentConfirmation.Progress.FirstStep.title),
                     value: 1
@@ -72,7 +72,6 @@ private struct ContentView<ProgressViewStyleType: ProgressViewStyle, GroupBoxSty
                 }
             }
             .progressViewStyle(style.progressView)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .groupBoxStyle(style.groupBox)
     }
