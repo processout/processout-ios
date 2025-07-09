@@ -14,16 +14,21 @@ public struct PONativeAlternativePaymentAuthorizationRequestV2: Sendable, Encoda
     /// Gateway configuration identifier.
     public let gatewayConfigurationId: String
 
+    /// Payment source.
+    public let source: String?
+
     /// Payment request parameters.
     public let submitData: PONativeAlternativePaymentSubmitDataV2?
 
     public init(
         invoiceId: String,
         gatewayConfigurationId: String,
+        source: String? = nil,
         submitData: PONativeAlternativePaymentSubmitDataV2?
     ) {
         self.invoiceId = invoiceId
         self.gatewayConfigurationId = gatewayConfigurationId
+        self.source = source
         self.submitData = submitData
     }
 }

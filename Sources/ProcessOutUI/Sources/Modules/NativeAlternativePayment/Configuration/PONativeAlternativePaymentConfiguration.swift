@@ -20,9 +20,10 @@ public struct PONativeAlternativePaymentConfiguration {
 
         public struct Authorization: Sendable {
 
-            public init(invoiceId: String, gatewayConfigurationId: String) {
+            public init(invoiceId: String, gatewayConfigurationId: String, customerTokenId: String? = nil) {
                 self.invoiceId = invoiceId
                 self.gatewayConfigurationId = gatewayConfigurationId
+                self.customerTokenId = customerTokenId
             }
 
             /// Unique identifier for the invoice associated with this payment request.
@@ -30,6 +31,9 @@ public struct PONativeAlternativePaymentConfiguration {
 
             /// Identifier of the payment gateway configuration to use for this payment.
             public let gatewayConfigurationId: String
+
+            /// Customer token ID to use as a payment source.
+            public let customerTokenId: String?
         }
 
         public struct Tokenization: Sendable {

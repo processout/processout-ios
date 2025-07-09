@@ -30,6 +30,7 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
             let authorizationRequest = PONativeAlternativePaymentAuthorizationRequestV2(
                 invoiceId: flow.invoiceId,
                 gatewayConfigurationId: flow.gatewayConfigurationId,
+                source: flow.customerTokenId,
                 submitData: request.submitData
             )
             let authorizationResponse = try await invoicesService.authorizeInvoice(request: authorizationRequest)
