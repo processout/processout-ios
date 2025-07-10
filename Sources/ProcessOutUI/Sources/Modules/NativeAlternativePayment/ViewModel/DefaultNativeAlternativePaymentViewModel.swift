@@ -455,10 +455,12 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         for parameter: InteractorState.Parameter,
         with specification: PONativeAlternativePaymentFormV2.Parameter.PhoneNumber
     ) -> NativeAlternativePaymentViewModelItem {
-        let territories = specification.dialingCodes.map { dialingCode -> ProcessOutCoreUI.POPhoneNumber.Territory in
-            let displayName = Locale.current.localizedString(forRegionCode: dialingCode.regionCode)
-            return .init(id: dialingCode.regionCode, displayName: displayName ?? "", code: dialingCode.value)
-        }
+        let territories = specification.dialingCodes
+            .map { dialingCode -> ProcessOutCoreUI.POPhoneNumber.Territory in
+                let displayName = Locale.current.localizedString(forRegionCode: dialingCode.regionCode)
+                return .init(id: dialingCode.regionCode, displayName: displayName ?? "", code: dialingCode.value)
+            }
+            .sorted { $0.displayName < $1.displayName }
         let value = Binding<ProcessOutCoreUI.POPhoneNumber> {
             if case .phone(let value) = parameter.value {
                 return .init(territoryId: value.regionCode, number: value.number ?? "")
