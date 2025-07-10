@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 14.06.2025.
 //
 
+import Foundation
+
 // swiftlint:disable nesting
 
 /// Indicates that the next required step is submitting data.
@@ -113,6 +115,14 @@ public struct PONativeAlternativePaymentFormV2: Sendable, Decodable {
 
                 /// Dialing code value.
                 public let value: String
+            }
+
+            @_spi(PO)
+            public init(key: String, label: String, required: Bool, dialingCodes: [DialingCode]) {
+                self.key = key
+                self.label = label
+                self.required = required
+                self.dialingCodes = dialingCodes
             }
 
             /// Parameter key.
@@ -290,6 +300,14 @@ extension PONativeAlternativePaymentFormV2.Parameter.Otp.Subtype: Codable {
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.rawValue)
+    }
+}
+
+extension PONativeAlternativePaymentFormV2.Parameter.PhoneNumber.DialingCode {
+
+    @_spi(PO)
+    public func regionDisplayName(locale: Locale = .current) -> String? {
+        locale.localizedString(forRegionCode: regionCode)
     }
 }
 

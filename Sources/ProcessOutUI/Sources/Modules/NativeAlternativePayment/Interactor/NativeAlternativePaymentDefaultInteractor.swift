@@ -521,14 +521,25 @@ final class NativeAlternativePaymentDefaultInteractor:
             guard case let .form(form) = element else {
                 return []
             }
-            let parameters = form.parameters.parameterDefinitions.map { specification in
-                let formatter: Foundation.Formatter? = switch specification {
+            let parameters = form.parameters.parameterDefinitions.map { specification -> State.Parameter in
+                switch specification {
                 case .card:
-                    POCardNumberFormatter()
+                    let formatter = POCardNumberFormatter()
+                    return .init(specification: specification, formatter: formatter)
+                case .phoneNumber(let specification):
+                    let dialingCodes = specification.dialingCodes.sorted { lhs, rhs in
+                        lhs.regionDisplayName() ?? "" < rhs.regionDisplayName() ?? ""
+                    }
+                    let updatedSpecification = PONativeAlternativePaymentFormV2.Parameter.PhoneNumber(
+                        key: specification.key,
+                        label: specification.label,
+                        required: specification.required,
+                        dialingCodes: dialingCodes
+                    )
+                    return .init(specification: .phoneNumber(updatedSpecification), formatter: nil)
                 default:
-                    nil
+                    return .init(specification: specification, formatter: nil)
                 }
-                return State.Parameter(specification: specification, formatter: formatter)
             }
             return parameters
         }

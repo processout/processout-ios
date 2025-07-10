@@ -460,7 +460,6 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 let displayName = Locale.current.localizedString(forRegionCode: dialingCode.regionCode)
                 return .init(id: dialingCode.regionCode, displayName: displayName ?? "", code: dialingCode.value)
             }
-            .sorted { $0.displayName < $1.displayName }
         let value = Binding<ProcessOutCoreUI.POPhoneNumber> {
             if case .phone(let value) = parameter.value {
                 return .init(territoryId: value.regionCode, number: value.number ?? "")
