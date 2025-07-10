@@ -84,15 +84,11 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         willSubmit(parameters: Array(currentState.parameters.values))
-        let values: [String: PONativeAlternativePaymentSubmitDataV2.Parameter]
-        do {
-            values = try validatedValues(for: Array(currentState.parameters.values))
-        } catch {
-            attemptRecoverSubmissionError(error, replaceErrorMessages: false)
-            return
-        }
         let task = Task { @MainActor in
+            var replaceErrorMessages = false
             do {
+                let values = try validatedValues(for: Array(currentState.parameters.values))
+                replaceErrorMessages = true
                 let request = NativeAlternativePaymentServiceAdapterRequest(
                     flow: configuration.flow, submitData: .init(parameters: values)
                 )
@@ -108,7 +104,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 }
                 try await setState(with: payment)
             } catch {
-                attemptRecoverSubmissionError(error, replaceErrorMessages: true)
+                attemptRecoverSubmissionError(error, replaceErrorMessages: replaceErrorMessages)
             }
         }
         state = .submitting(.init(snapshot: currentState, task: task))
