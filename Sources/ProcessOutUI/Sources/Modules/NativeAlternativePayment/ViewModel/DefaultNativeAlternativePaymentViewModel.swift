@@ -49,7 +49,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         interactor.configuration
     }
 
-    // MARK: - Private Methods
+    // MARK: - Interactor Observation
+
+    private var lastInteractorState: InteractorState = .idle
 
     private func observeChanges(interactor: any Interactor) {
         interactor.didChange = { [weak self] in
@@ -63,7 +65,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         case .starting:
             updateWithStartingState()
         case .started(let state):
-            update(with: state)
+            update(with: state, oldState: lastInteractorState)
         case .submitting(let state):
             update(withSubmittingState: state.snapshot)
         case .awaitingRedirect(let state):
@@ -77,6 +79,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         default:
             break // Ignored
         }
+        lastInteractorState = interactor.state
     }
 
     // MARK: - Starting State
@@ -88,10 +91,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     // MARK: - Started State
 
-    private func update(with state: InteractorState.Started) {
+    private func update(with state: InteractorState.Started, oldState: InteractorState) {
         let newState = NativeAlternativePaymentViewModelState(
             items: createItems(state: state, isSubmitting: false),
-            focusedItemId: createFocusedInputId(state: state),
+            focusedItemId: createFocusedInputId(newState: state, oldState: oldState),
             confirmationDialog: nil
         )
         self.state = newState
@@ -124,14 +127,22 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         return .controlGroup(controlGroup)
     }
 
-    private func createFocusedInputId(state: InteractorState.Started) -> AnyHashable? {
-        if state.parameters.values.map(\.specification.key).map(AnyHashable.init).contains(self.state.focusedItemId) {
-            return self.state.focusedItemId // Return already focused input
+    private func createFocusedInputId(
+        newState: InteractorState.Started, oldState: InteractorState
+    ) -> AnyHashable? {
+        switch oldState {
+        case .idle, .starting, .submitting, .redirecting:
+            break
+        default:
+            let isFocusedParameterAvailable = newState.parameters.values
+                .contains { AnyHashable($0.specification.key) == state.focusedItemId }
+            return isFocusedParameterAvailable ? state.focusedItemId : nil
         }
-        if let parameter = state.parameters.values.first(where: { $0.recentErrorMessage != nil }) {
-            return parameter.specification.key // Attempt to focus first invalid parameter if available.
+        let invalidParameter = newState.parameters.values.first { $0.recentErrorMessage != nil }
+        if let invalidParameter {
+            return invalidParameter.specification.key // Attempt to focus first invalid parameter if available.
         }
-        for element in state.elements {
+        for element in newState.elements {
             if case .form(let form) = element {
                 return form.parameters.parameterDefinitions.first?.key
             }
