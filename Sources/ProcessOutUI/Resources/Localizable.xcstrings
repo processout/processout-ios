@@ -2339,40 +2339,6 @@
         }
       }
     },
-    "native-alternative-payment.error.invalid-email" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "البريد الإلكتروني غير صالح."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Email is not valid."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre adresse e-mail est invalide."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Niepoprawny adres email."
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Endereço de e-mail inválido."
-          }
-        }
-      }
-    },
     "native-alternative-payment.error.invalid-length-%d" : {
       "localizations" : {
         "ar" : {
@@ -2607,74 +2573,6 @@
         }
       }
     },
-    "native-alternative-payment.error.invalid-number" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الرقم غير صحيح."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Number is not valid."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Numéro invalide."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Niepoprawny numer."
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Número inválido."
-          }
-        }
-      }
-    },
-    "native-alternative-payment.error.invalid-phone" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رقم الهاتف غير صحيح."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phone number is not valid."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre numéro de téléphone est invalide."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Niepoprawny numer telefonu."
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Número de telemóvel inválido."
-          }
-        }
-      }
-    },
     "native-alternative-payment.error.invalid-value" : {
       "localizations" : {
         "ar" : {
@@ -2748,7 +2646,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Payment sent"
+            "value" : "Details submitted"
           }
         }
       }
@@ -2758,7 +2656,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Please wait for %@ minutes"
+            "value" : "Please wait for up to %@ minutes"
           }
         }
       }
@@ -2811,31 +2709,31 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "نجاح! تمت الموافقة على الدفع"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Success!\nPayment approved."
+            "value" : "You paid %@"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Succès !\nPaiement confirmé."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Sukces!\nPłatność przyjęta."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Successo!\nPagamento aprovado."
           }
         }
@@ -2846,7 +2744,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Payment approved!"
+            "value" : "You're all set!"
           }
         }
       }
