@@ -6,8 +6,8 @@
 //
 
 import SwiftUI
-@_spi(PO) import ProcessOutUI
-@_spi(PO) import ProcessOut
+import ProcessOutUI
+import ProcessOut
 
 @MainActor
 struct AlternativePaymentsView: View {

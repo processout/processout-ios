@@ -29,6 +29,7 @@ extension PONativeAlternativePaymentView {
             case .authorization(let flow):
                 logger[attributeKey: .invoiceId] = flow.invoiceId
                 logger[attributeKey: .gatewayConfigurationId] = flow.gatewayConfigurationId
+                logger[attributeKey: .customerTokenId] = flow.customerTokenId
             case .tokenization(let flow):
                 logger[attributeKey: .customerId] = flow.customerId
                 logger[attributeKey: .customerTokenId] = flow.customerTokenId

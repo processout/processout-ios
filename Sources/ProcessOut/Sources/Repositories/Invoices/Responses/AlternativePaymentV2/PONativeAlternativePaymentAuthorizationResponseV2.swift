@@ -18,7 +18,7 @@ public struct PONativeAlternativePaymentAuthorizationResponseV2: Sendable, Decod
     /// Invoice information.
     public let invoice: PONativeAlternativePaymentInvoiceV2
 
-    /// UI elements.
+    /// UI elements to display to user.
     public let elements: [PONativeAlternativePaymentElementV2]?
 
     /// Redirect details.

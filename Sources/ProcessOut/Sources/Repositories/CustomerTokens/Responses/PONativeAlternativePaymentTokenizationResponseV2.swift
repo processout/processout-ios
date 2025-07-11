@@ -15,7 +15,7 @@ public struct PONativeAlternativePaymentTokenizationResponseV2: Sendable, Decoda
     /// Payment method information.
     public let paymentMethod: PONativeAlternativePaymentMethodV2
 
-    /// Next step if any.
+    /// UI elements to display to user.
     public let elements: [PONativeAlternativePaymentElementV2]?
 
     /// Redirect details.
