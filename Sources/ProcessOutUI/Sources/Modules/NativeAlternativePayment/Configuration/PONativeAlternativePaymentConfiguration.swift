@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-@_spi(PO) import ProcessOut
+import ProcessOut
 
 // swiftlint:disable strict_fileprivate file_length nesting
 

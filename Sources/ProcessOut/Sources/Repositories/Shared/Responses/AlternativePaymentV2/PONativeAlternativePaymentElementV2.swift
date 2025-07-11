@@ -11,7 +11,6 @@ import Foundation
 ///
 /// This enum supports various types of UI elements such as input forms and customer instructions.
 /// It's forward-compatible via the `unknown` case.
-@_spi(PO)
 public enum PONativeAlternativePaymentElementV2: Sendable {
 
     /// Input form.

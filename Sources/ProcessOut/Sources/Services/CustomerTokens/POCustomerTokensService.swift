@@ -25,7 +25,6 @@ public protocol POCustomerTokensService: POService { // sourcery: AutoCompletion
     ) async throws -> POCustomerToken
 
     /// Tokenize alternative payment.
-    @_spi(PO)
     func tokenize( // sourcery:completion: skip
         request: PONativeAlternativePaymentTokenizationRequestV2
     ) async throws -> PONativeAlternativePaymentTokenizationResponseV2
@@ -38,13 +37,6 @@ extension POCustomerTokensService {
 
     @_spi(PO)
     public func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
-        throw POFailure(code: .Mobile.generic)
-    }
-
-    @_spi(PO)
-    public func tokenize( // sourcery:completion: skip
-        request: PONativeAlternativePaymentTokenizationRequestV2
-    ) async throws -> PONativeAlternativePaymentTokenizationResponseV2 {
         throw POFailure(code: .Mobile.generic)
     }
 }

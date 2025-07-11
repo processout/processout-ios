@@ -7,7 +7,6 @@
 
 import Foundation
 
-@_spi(PO)
 public struct PONativeAlternativePaymentTokenizationResponseV2: Sendable, Decodable {
 
     /// Payment state.

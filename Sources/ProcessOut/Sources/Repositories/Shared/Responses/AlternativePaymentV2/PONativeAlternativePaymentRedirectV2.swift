@@ -8,7 +8,6 @@
 import Foundation
 
 /// Redirect details.
-@_spi(PO)
 public struct PONativeAlternativePaymentRedirectV2: Decodable, Sendable {
 
     /// Destination URL.

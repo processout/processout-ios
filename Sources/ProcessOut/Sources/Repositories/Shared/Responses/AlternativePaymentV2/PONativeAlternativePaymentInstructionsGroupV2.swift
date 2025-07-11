@@ -6,7 +6,6 @@
 //
 
 /// Group of customer instructions.
-@_spi(PO)
 public struct PONativeAlternativePaymentInstructionsGroupV2: Decodable, Sendable {
 
     /// Group label if any.

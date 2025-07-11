@@ -6,7 +6,6 @@
 //
 
 /// Payment method details.
-@_spi(PO)
 public struct PONativeAlternativePaymentMethodV2: Decodable, Sendable {
 
     /// Gateway name.

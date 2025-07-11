@@ -5,7 +5,6 @@
 //  Created by Andrii Vysotskyi on 10.06.2025.
 //
 
-@_spi(PO)
 public struct PONativeAlternativePaymentTokenizationRequestV2: Sendable, Encodable {
 
     /// Customer ID.

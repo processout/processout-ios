@@ -5,10 +5,9 @@
 //  Created by Andrii Vysotskyi on 19.05.2025.
 //
 
-@_spi(PO) import ProcessOut
+import ProcessOut
 
 /// Native alternative payment module delegate definition.
-@_spi(PO)
 public protocol PONativeAlternativePaymentDelegateV2: AnyObject, Sendable {
 
     /// Invoked when module emits event.

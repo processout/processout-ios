@@ -8,7 +8,6 @@
 @_spi(PO) import ProcessOut
 
 /// Describes events that could happen during native alternative payment module lifecycle.
-@_spi(PO)
 public enum PONativeAlternativePaymentEventV2: Sendable {
 
     public struct WillSubmitParameters: Sendable {

@@ -5,7 +5,6 @@
 //  Created by Andrii Vysotskyi on 13.05.2025.
 //
 
-@_spi(PO)
 public struct PONativeAlternativePaymentAuthorizationRequestV2: Sendable, Encodable {
 
     /// Invoice identifier.

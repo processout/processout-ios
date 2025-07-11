@@ -8,7 +8,6 @@
 import Foundation
 
 /// Specifies instruction for the customer, providing additional information and/or describing required actions.
-@_spi(PO)
 public indirect enum PONativeAlternativePaymentCustomerInstructionV2: Sendable {
 
     /// Customer instruction provided via barcode.
