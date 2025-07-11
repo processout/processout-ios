@@ -7,11 +7,11 @@
 
 import UIKit
 
-public struct NativeAlternativePaymentResolvedPaymentMethod {
+struct NativeAlternativePaymentResolvedPaymentMethod {
 
     /// Payment method logo.
-    public let logo: UIImage?
+    let logo: UIImage?
 
     /// Payment method display name.
-    public let displayName: String
+    let displayName: String
 }
