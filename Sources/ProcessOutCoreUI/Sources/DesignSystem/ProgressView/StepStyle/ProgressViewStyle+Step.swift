@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-// todo(andrii-vysotskyi): use colors from design system once available
-
 @available(iOS 14.0, *)
 extension ProgressViewStyle where Self == POStepProgressViewStyle {
 
@@ -25,11 +23,11 @@ extension ProgressViewStyle where Self == POStepProgressViewStyle {
                 ),
                 icon: .init(
                     checkmark: nil,
-                    backgroundColor: .init(light: .init(0xFFFFFF), dark: .init(0x121314, alpha: 0.2)),
+                    backgroundColor: .init(light: .init(0xFFFFFF), dark: .init(0x26292F)),
                     border: .init(
                         radius: 9999,
                         width: 1.5,
-                        color: .init(light: .init(0xCACACA), dark: .init(0xF6F8FB, alpha: 0.24))
+                        color: .init(light: .init(0x8A8D93), dark: .init(0x707378))
                     ),
                     halo: nil
                 )
@@ -45,13 +43,13 @@ extension ProgressViewStyle where Self == POStepProgressViewStyle {
                 ),
                 icon: .init(
                     checkmark: nil,
-                    backgroundColor: .init(light: .init(0xFFFFFF), dark: .init(0xFFFFFF)),
+                    backgroundColor: .init(light: .init(0xFFFFFF), dark: .init(0x26292F)),
                     border: .init(
-                        radius: 9999, width: 1.5, color: .init(light: .init(0xA3A3A3), dark: .init(0xA3A3A3))
+                        radius: 9999, width: 1.5, color: .init(light: .init(0x8A8D93), dark: .init(0x707378))
                     ),
                     halo: .init(
                         color: Color(
-                            light: UIColor(0x000000, alpha: 0.07), dark: UIColor(0xFFFFFF, alpha: 0.24)
+                            light: UIColor(0x121314, alpha: 0.08), dark: UIColor(0xF6F8FB1F, alpha: 0.12)
                         ),
                         width: 6
                     )
@@ -67,10 +65,10 @@ extension ProgressViewStyle where Self == POStepProgressViewStyle {
                     typography: .Text.s12(weight: .medium)
                 ),
                 icon: .init(
-                    checkmark: .init(color: .init(light: .init(0xFFFFFF), dark: .init(0xFFFFFF)), width: 2),
-                    backgroundColor: .init(light: .init(0x4CA259), dark: .init(0x4CA259)),
+                    checkmark: .init(color: .init(light: .init(0xFFFFFF), dark: .init(0x000000)), width: 2),
+                    backgroundColor: .init(light: .init(0x1ABE5A), dark: .init(0x28DE6B)),
                     border: .init(
-                        radius: 9999, width: 1.5, color: Color(light: UIColor(0x4CA259), dark: UIColor(0x4CA259))
+                        radius: 9999, width: 1.5, color: Color(light: UIColor(0x1ABE5A), dark: UIColor(0x28DE6B))
                     ),
                     halo: nil
                 )
