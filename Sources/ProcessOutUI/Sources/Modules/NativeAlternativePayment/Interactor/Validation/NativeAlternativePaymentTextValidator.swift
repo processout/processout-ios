@@ -7,8 +7,6 @@
 
 @_spi(PO) import ProcessOut
 
-// todo(andrii-vysotskyi): improve validation errors
-
 /// A validator for text input that supports optional length constraints and required field checks.
 struct NativeAlternativePaymentTextValidator: InputValidator {
 

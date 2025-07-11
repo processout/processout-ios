@@ -422,7 +422,6 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createItem(parameter: InteractorState.Parameter) -> NativeAlternativePaymentViewModelItem {
-        // todo(andrii-vysotskyi): support new parameter types
         switch parameter.specification {
         case .otp(let specification):
             if let item = createItem(for: parameter, with: specification) {
