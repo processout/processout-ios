@@ -85,10 +85,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         willSubmit(parameters: Array(currentState.parameters.values))
         let task = Task { @MainActor in
-            var replaceErrorMessages = false
             do {
                 let values = try validatedValues(for: Array(currentState.parameters.values))
-                replaceErrorMessages = true
                 let request = NativeAlternativePaymentServiceAdapterRequest(
                     flow: configuration.flow, submitData: .init(parameters: values)
                 )
@@ -104,7 +102,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 }
                 try await setState(with: payment)
             } catch {
-                attemptRecoverSubmissionError(error, replaceErrorMessages: replaceErrorMessages)
+                attemptRecoverSubmissionError(error)
             }
         }
         state = .submitting(.init(snapshot: currentState, task: task))
@@ -381,7 +379,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Submission Recovery
 
-    private func attemptRecoverSubmissionError(_ error: Error, replaceErrorMessages: Bool) {
+    private func attemptRecoverSubmissionError(_ error: Error, ) {
         logger.info("Did fail to submit parameters: \(error)")
         guard let failure = error as? POFailure else {
             setFailureState(error: error)
@@ -406,14 +404,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         for parameter in newState.parameters.values {
-            let errorMessage: String?
-            if !replaceErrorMessages {
-                errorMessage = invalidFields[parameter.specification.key]?.message
-            } else if invalidFields[parameter.specification.key] != nil {
-                errorMessage = self.errorMessage(parameter: parameter.specification)
-            } else {
-                errorMessage = nil
-            }
+            let errorMessage = invalidFields[parameter.specification.key]?.message
             newState.parameters[parameter.specification.key]?.recentErrorMessage = errorMessage
         }
         state = .started(newState)
@@ -542,27 +533,6 @@ final class NativeAlternativePaymentDefaultInteractor:
         var groupedParameters = Dictionary(grouping: parameters, by: \.specification.key).compactMapValues(\.first)
         await setDefaultValues(parameters: &groupedParameters)
         return groupedParameters
-    }
-
-    private func errorMessage(
-        parameter: PONativeAlternativePaymentFormV2.Parameter
-    ) -> String {
-        // Server doesn't support localized error messages, so local generic error
-        // description is used instead in case particular field is invalid.
-        // todo(andrii-vysotskyi): remove when backend is updated
-        // todo(andrii-vysotskyi): support new parameter types
-        let resource: POStringResource
-        switch parameter {
-        case .digits, .otp:
-            resource = .NativeAlternativePayment.Error.invalidNumber
-        case .email:
-            resource = .NativeAlternativePayment.Error.invalidEmail
-        case .phoneNumber:
-            resource = .NativeAlternativePayment.Error.invalidPhone
-        default:
-            resource = .NativeAlternativePayment.Error.invalidValue
-        }
-        return String(resource: resource)
     }
 
     // MARK: - Customer Instructions

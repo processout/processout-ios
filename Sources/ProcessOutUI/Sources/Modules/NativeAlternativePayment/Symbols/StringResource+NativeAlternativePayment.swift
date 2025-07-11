@@ -90,9 +90,6 @@ extension POStringResource {
 
         enum Error {
 
-            /// Email is not valid.
-            static let invalidEmail = POStringResource("native-alternative-payment.error.invalid-email", comment: "")
-
             /// Invalid parameter length.
             static let invalidLength = POStringResource(
                 "native-alternative-payment.error.invalid-length-%d", comment: ""
@@ -107,12 +104,6 @@ extension POStringResource {
             static let invalidMaxLength = POStringResource(
                 "native-alternative-payment.error.invalid-max-length-%d", comment: ""
             )
-
-            /// Number is not valid.
-            static let invalidNumber = POStringResource("native-alternative-payment.error.invalid-number", comment: "")
-
-            /// Phone number is not valid.
-            static let invalidPhone = POStringResource("native-alternative-payment.error.invalid-phone", comment: "")
 
             /// Value is not valid.
             static let invalidValue = POStringResource("native-alternative-payment.error.invalid-value", comment: "")
