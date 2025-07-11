@@ -28,7 +28,7 @@ struct NativeAlternativePaymentMessageInstructionItemView: View {
                 )
                 .backport.poControlSize(.small)
                 .controlWidth(.regular)
-                .buttonStyle(POAnyButtonStyle(erasing: style.secondaryButton))
+                .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.secondary))
             } label: {
                 Text(title)
                 Text(item.value)

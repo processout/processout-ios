@@ -53,7 +53,7 @@ struct NativeAlternativePaymentItemView: View {
                 Image(uiImage: item.image)
                 if let viewModel = item.actionButton {
                     Button.create(with: viewModel)
-                        .buttonStyle(POAnyButtonStyle(erasing: style.secondaryButton))
+                        .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.secondary))
                         .backport.poControlSize(.small)
                 }
             }
@@ -70,7 +70,7 @@ struct NativeAlternativePaymentItemView: View {
             NativeAlternativePaymentControlGroupItemView(item: group)
         case .button(let item):
             Button.create(with: item)
-                .buttonStyle(forPrimaryRole: style.primaryButton, fallback: style.secondaryButton)
+                .buttonStyle(forPrimaryRole: style.actionsContainer.primary, fallback: style.actionsContainer.secondary)
         case .message(let item):
             POMessageView(message: item)
                 .messageViewStyle(style.messageView)

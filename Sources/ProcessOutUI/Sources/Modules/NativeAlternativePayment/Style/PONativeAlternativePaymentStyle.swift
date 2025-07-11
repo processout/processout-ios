@@ -42,11 +42,8 @@ public struct PONativeAlternativePaymentStyle {
 
     // MARK: - Buttons
 
-    /// Style for primary button.
-    public let primaryButton: any ButtonStyle
-
-    /// Style for secondary button.
-    public let secondaryButton: any ButtonStyle
+    /// Actions container style.
+    public let actionsContainer: POActionsContainerStyle
 
     // MARK: - Progress
 
@@ -81,8 +78,7 @@ public struct PONativeAlternativePaymentStyle {
         bodyText: POTextStyle,
         groupBoxStyle: any GroupBoxStyle,
         labeledContentStyle: any POLabeledContentStyle,
-        primaryButton: any ButtonStyle,
-        secondaryButton: any ButtonStyle,
+        actionsContainer: POActionsContainerStyle,
         progressView: any ProgressViewStyle,
         paymentConfirmationProgressView: any PONativeAlternativePaymentConfirmationProgressViewStyle,
         title: POTextStyle,
@@ -98,8 +94,7 @@ public struct PONativeAlternativePaymentStyle {
         self.bodyText = bodyText
         self.groupBoxStyle = groupBoxStyle
         self.labeledContentStyle = labeledContentStyle
-        self.primaryButton = primaryButton
-        self.secondaryButton = secondaryButton
+        self.actionsContainer = actionsContainer
         self.progressView = progressView
         self.paymentConfirmationProgressView = paymentConfirmationProgressView
         self.title = title
@@ -124,8 +119,7 @@ extension PONativeAlternativePaymentStyle {
         ),
         groupBoxStyle: .poAutomatic,
         labeledContentStyle: .automatic,
-        primaryButton: .primary,
-        secondaryButton: .secondary,
+        actionsContainer: .default,
         progressView: .circular,
         paymentConfirmationProgressView: .automatic,
         title: .init(
@@ -179,12 +173,6 @@ extension PONativeAlternativePaymentStyle {
     public var background: PONativeAlternativePaymentBackgroundStyle {
         .default
     }
-
-    /// Actions container style.
-    @available(*, deprecated, message: "Set primary and secondary button styles directly.")
-    public var actionsContainer: POActionsContainerStyle {
-        .default
-    }
 }
 
 @available(iOS 14, *)
@@ -213,8 +201,7 @@ extension PONativeAlternativePaymentStyle {
         self.bodyText = message
         self.groupBoxStyle = .poAutomatic
         self.labeledContentStyle = .automatic
-        self.primaryButton = actionsContainer.primary
-        self.secondaryButton = actionsContainer.secondary
+        self.actionsContainer = actionsContainer
         self.progressView = progressView
         self.paymentConfirmationProgressView = .automatic
         self.title = title

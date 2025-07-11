@@ -19,7 +19,8 @@ struct NativeAlternativePaymentControlGroupItemView: View {
         VStack(alignment: .leading, spacing: POSpacing.space12) {
             ForEach(item.content) { item in
                 Button.create(with: item).buttonStyle(
-                    forPrimaryRole: style.primaryButton, fallback: style.secondaryButton
+                    forPrimaryRole: style.actionsContainer.primary,
+                    fallback: style.actionsContainer.secondary
                 )
             }
         }
