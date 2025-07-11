@@ -85,7 +85,7 @@ public struct PONativeAlternativePaymentStyle {
         messageView: any POMessageViewStyle,
         successView: any PONativeAlternativePaymentSuccessViewStyle,
         backgroundColor: Color,
-        separatorColor: Color,
+        separatorColor: Color
     ) {
         self.input = input
         self.largeInput = largeInput
