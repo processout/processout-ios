@@ -179,9 +179,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
         ]
         if state.shouldConfirmPayment {
-            items.append(
-                contentsOf: createItems(for: state.elements, state: nil)
-            )
+            items.append(contentsOf: createItems(for: state.elements, state: nil))
         } else if let estimatedCompletionDate = state.estimatedCompletionDate {
             let formatter = DateComponentsFormatter()
             formatter.allowedUnits = [.minute, .second]
@@ -204,6 +202,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 estimatedCompletionDate: estimatedCompletionDate
             )
             items.append(.confirmationProgress(confirmationProgressItem))
+            if configuration.paymentConfirmation.confirmButton == nil {
+                items.append(contentsOf: createItems(for: state.elements, state: nil))
+            }
         }
         items.append(createControlGroupItem(state: state))
         return items.compactMap { $0 }
