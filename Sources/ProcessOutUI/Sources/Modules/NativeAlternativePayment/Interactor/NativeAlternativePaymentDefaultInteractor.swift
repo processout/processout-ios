@@ -368,7 +368,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 paymentMethod: await resolve(paymentMethod: response.paymentMethod),
                 invoice: response.invoice,
                 elements: resolvedElements,
-                completionTask: task,
+                completionTask: task
             )
             state = .completed(newState)
             send(event: .didCompletePayment)
@@ -379,7 +379,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Submission Recovery
 
-    private func attemptRecoverSubmissionError(_ error: Error, ) {
+    private func attemptRecoverSubmissionError(_ error: Error) {
         logger.info("Did fail to submit parameters: \(error)")
         guard let failure = error as? POFailure else {
             setFailureState(error: error)

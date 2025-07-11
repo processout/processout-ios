@@ -8,7 +8,7 @@
 protocol NativeAlternativePaymentServiceAdapter {
 
     func continuePayment(
-        with request: NativeAlternativePaymentServiceAdapterRequest,
+        with request: NativeAlternativePaymentServiceAdapterRequest
     ) async throws -> NativeAlternativePaymentServiceAdapterResponse
 
     func expectPaymentCompletion(

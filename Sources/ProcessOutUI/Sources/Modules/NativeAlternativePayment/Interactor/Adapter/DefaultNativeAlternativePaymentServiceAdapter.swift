@@ -23,7 +23,7 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
     // MARK: - NativeAlternativePaymentAdapter
 
     func continuePayment(
-        with request: NativeAlternativePaymentServiceAdapterRequest,
+        with request: NativeAlternativePaymentServiceAdapterRequest
     ) async throws -> NativeAlternativePaymentServiceAdapterResponse {
         switch request.flow {
         case .authorization(let flow):
