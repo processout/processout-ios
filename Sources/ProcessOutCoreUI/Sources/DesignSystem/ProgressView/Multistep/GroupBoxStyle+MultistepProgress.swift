@@ -16,11 +16,11 @@ extension GroupBoxStyle where Self == POMultistepProgressGroupBoxStyle {
         POMultistepProgressGroupBoxStyle(
             connector: .init(
                 fromCompletedToCompleted: .init(
-                    strokeColor: Color(red: 0.298, green: 0.635, blue: 0.349),
+                    strokeColor: Color(light: UIColor(0x4CA259), dark: UIColor(0x4CA259)),
                     strokeStyle: StrokeStyle(lineWidth: 2)
                 ),
                 fromCompletedToAny: .init(
-                    strokeColor: Color(red: 0.298, green: 0.635, blue: 0.349),
+                    strokeColor: Color(light: UIColor(0x4CA259), dark: UIColor(0x4CA259)),
                     strokeStyle: StrokeStyle(lineWidth: 2, dash: [3, 3])
                 ),
                 default: .init(
