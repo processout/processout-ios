@@ -628,7 +628,7 @@ final class DynamicCheckoutDefaultInteractor:
         let interactor = childProvider.nativeAlternativePaymentInteractor(
             for: method, invoiceId: startedState.invoice.id, configuration: configuration
         )
-        // interactor.delegate = self
+        interactor.delegate = self
         interactor.willChange = { [weak self] state in
             self?.nativeAlternativePayment(willChangeState: state)
         }
