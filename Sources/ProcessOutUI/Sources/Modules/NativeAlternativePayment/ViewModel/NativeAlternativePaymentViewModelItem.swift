@@ -181,7 +181,7 @@ indirect enum NativeAlternativePaymentViewModelItem {
         let title: String
 
         /// Success description.
-        let description: String
+        let description: String?
     }
 
     /// Loading indicator.

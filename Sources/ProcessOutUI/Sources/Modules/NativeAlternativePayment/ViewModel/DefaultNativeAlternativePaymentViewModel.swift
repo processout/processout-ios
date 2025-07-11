@@ -347,11 +347,15 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         // todo(andrii-vysotskyi): support icon customization
         let title = interactor.configuration.success?.title
             ?? String(resource: .NativeAlternativePayment.Success.title)
-        let description = interactor.configuration.success?.message
-            ?? String(resource: .NativeAlternativePayment.Success.message)
-        let item = NativeAlternativePaymentViewModelItem.Success(
-            title: title, description: description
-        )
+        let defaultDescription: () -> String? = {
+            if let formattedAmount = Self.formatAmount(of: state.invoice) {
+                return String(resource: .NativeAlternativePayment.Success.message, replacements: formattedAmount)
+            } else {
+                return nil
+            }
+        }
+        let description = interactor.configuration.success?.message ?? defaultDescription()
+        let item = NativeAlternativePaymentViewModelItem.Success(title: title, description: description)
         return .success(item)
     }
 
@@ -679,6 +683,34 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         }
     }
 
+    // MARK: - Title
+
+    private func createTitleItem(
+        paymentMethod: NativeAlternativePaymentResolvedPaymentMethod,
+        invoice: PONativeAlternativePaymentInvoiceV2?
+    ) -> NativeAlternativePaymentViewModelItem? {
+        if let title = interactor.configuration.title, title.isEmpty {
+            return nil
+        }
+        let defaultTitle: () -> String? = {
+            if let formattedAmount = Self.formatAmount(of: invoice) {
+                return String(resource: .NativeAlternativePayment.title, replacements: formattedAmount)
+            } else {
+                return nil
+            }
+        }
+        let title = interactor.configuration.title ?? defaultTitle()
+        guard title != nil || paymentMethod.logo != nil else {
+            return nil
+        }
+        let item = NativeAlternativePaymentViewModelItem.Title(
+            id: "Title",
+            icon: paymentMethod.logo.map(Image.init),
+            text: title ?? ""
+        )
+        return .title(item)
+    }
+
     // MARK: - Actions
 
     private func createSubmitButton(state: InteractorState.Started, isLoading: Bool) -> POButtonViewModel {
@@ -742,37 +774,16 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         return true
     }
 
-    private func createTitleItem(
-        paymentMethod: NativeAlternativePaymentResolvedPaymentMethod,
-        invoice: PONativeAlternativePaymentInvoiceV2?
-    ) -> NativeAlternativePaymentViewModelItem? {
-        if let title = interactor.configuration.title, title.isEmpty {
+    private static func formatAmount(of invoice: PONativeAlternativePaymentInvoiceV2?) -> String? {
+        guard let invoice else {
             return nil
         }
-        let defaultTitle: () -> String? = {
-            guard let invoice else {
-                return nil
-            }
-            let formatter = NumberFormatter()
-            formatter.minimumFractionDigits = 0
-            formatter.numberStyle = .currency
-            formatter.currencyCode = invoice.currency
-            // swiftlint:disable:next legacy_objc_type
-            guard let amount = formatter.string(from: invoice.amount as NSDecimalNumber) else {
-                return nil
-            }
-            return String(resource: .NativeAlternativePayment.title, replacements: amount)
-        }
-        let title = interactor.configuration.title ?? defaultTitle()
-        guard title != nil || paymentMethod.logo != nil else {
-            return nil
-        }
-        let item = NativeAlternativePaymentViewModelItem.Title(
-            id: "Title",
-            icon: paymentMethod.logo.map(Image.init),
-            text: title ?? ""
-        )
-        return .title(item)
+        let formatter = NumberFormatter()
+        formatter.minimumFractionDigits = 0
+        formatter.numberStyle = .currency
+        formatter.currencyCode = invoice.currency
+        // swiftlint:disable:next legacy_objc_type
+        return formatter.string(from: invoice.amount as NSDecimalNumber)
     }
 }
 

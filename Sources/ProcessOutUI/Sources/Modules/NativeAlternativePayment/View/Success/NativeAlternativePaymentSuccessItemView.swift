@@ -19,7 +19,9 @@ struct NativeAlternativePaymentSuccessItemView: View {
         let configuration = PONativeAlternativePaymentSuccessViewStyleConfiguration {
             Text(item.title)
         } description: {
-            Text(item.description)
+            if let description = item.description {
+                Text(description)
+            }
         }
         AnyView(style.successView.makeBody(configuration: configuration))
     }
