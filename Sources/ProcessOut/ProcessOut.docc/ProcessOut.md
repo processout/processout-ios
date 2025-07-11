@@ -94,6 +94,17 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``POCustomerTokenType``
 - ``POCustomerTokensServiceType``
 - ``PODeleteCustomerTokenRequest``
+- ``PONativeAlternativePaymentTokenizationRequestV2``
+- ``PONativeAlternativePaymentTokenizationResponseV2``
+- ``PONativeAlternativePaymentSubmitDataV2``
+- ``PONativeAlternativePaymentStateV2``
+- ``PONativeAlternativePaymentMethodV2``
+- ``PONativeAlternativePaymentInvoiceV2``
+- ``PONativeAlternativePaymentElementV2``
+- ``PONativeAlternativePaymentFormV2``
+- ``PONativeAlternativePaymentInstructionsGroupV2``
+- ``PONativeAlternativePaymentRedirectV2``
+- ``PONativeAlternativePaymentCustomerInstructionV2``
 
 ### Gateway Configurations
 
@@ -120,6 +131,18 @@ All errors that could happen as a result of interaction with the SDK are represe
 - ``PONativeAlternativePaymentMethodTransactionDetailsRequest``
 - ``PONativeAlternativePaymentMethodParameterValues``
 - ``PONativeAlternativePaymentMethodState``
+- ``PONativeAlternativePaymentAuthorizationRequestV2``
+- ``PONativeAlternativePaymentAuthorizationResponseV2``
+- ``PONativeAlternativePaymentSubmitDataV2``
+- ``PONativeAlternativePaymentStateV2``
+- ``PONativeAlternativePaymentMethodV2``
+- ``PONativeAlternativePaymentInvoiceV2``
+- ``PONativeAlternativePaymentElementV2``
+- ``PONativeAlternativePaymentFormV2``
+- ``PONativeAlternativePaymentInstructionsGroupV2``
+- ``PONativeAlternativePaymentRedirectV2``
+- ``PONativeAlternativePaymentCustomerInstructionV2``
+
 - ``PODynamicCheckoutPaymentMethod``
 - ``POInvoicesServiceType``
 
