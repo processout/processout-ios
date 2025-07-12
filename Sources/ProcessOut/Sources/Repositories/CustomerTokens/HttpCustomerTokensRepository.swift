@@ -15,15 +15,6 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
 
     // MARK: - CustomerTokensRepository
 
-    func assignCustomerToken(request: POAssignCustomerTokenRequest) async throws -> AssignCustomerTokenResponse {
-        let httpRequest = HttpConnectorRequest<AssignCustomerTokenResponse>.put(
-            path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",
-            body: request,
-            includesDeviceMetadata: true
-        )
-        return try await connector.execute(request: httpRequest)
-    }
-
     func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
         struct Response: Decodable {
             let token: POCustomerToken
@@ -35,6 +26,25 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
             requiresPrivateKey: true
         )
         return try await connector.execute(request: httpRequest).token
+    }
+
+    func assignCustomerToken(request: POAssignCustomerTokenRequest) async throws -> AssignCustomerTokenResponse {
+        let httpRequest = HttpConnectorRequest<AssignCustomerTokenResponse>.put(
+            path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",
+            body: request,
+            includesDeviceMetadata: true
+        )
+        return try await connector.execute(request: httpRequest)
+    }
+
+    func tokenize(
+        request: PONativeAlternativePaymentTokenizationRequestV2
+    ) async throws -> PONativeAlternativePaymentTokenizationResponseV2 {
+        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentTokenizationResponseV2>.post(
+            path: "/customers/\(request.customerId)/apm-tokens/\(request.customerTokenId)/tokenize",
+            body: request
+        )
+        return try await connector.execute(request: httpRequest)
     }
 
     func delete(request: PODeleteCustomerTokenRequest) async throws {

@@ -21,6 +21,10 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
 
     // MARK: - POCustomerTokensService
 
+    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
+        try await repository.createCustomerToken(request: request)
+    }
+
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
     ) async throws -> POCustomerToken {
@@ -34,13 +38,15 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
         }
     }
 
+    func tokenize(
+        request: PONativeAlternativePaymentTokenizationRequestV2
+    ) async throws -> PONativeAlternativePaymentTokenizationResponseV2 {
+        try await repository.tokenize(request: request)
+    }
+
     func deleteCustomerToken(request: PODeleteCustomerTokenRequest) async throws {
         try await repository.delete(request: request)
         eventEmitter.emit(event: POCustomerTokenDeletedEvent(customerId: request.customerId, tokenId: request.tokenId))
-    }
-
-    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
-        try await repository.createCustomerToken(request: request)
     }
 
     // MARK: - Private Properties

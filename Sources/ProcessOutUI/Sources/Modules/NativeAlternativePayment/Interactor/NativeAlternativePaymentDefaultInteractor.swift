@@ -17,14 +17,16 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     init(
         configuration: PONativeAlternativePaymentConfiguration,
-        invoicesService: POInvoicesService,
+        serviceAdapter: NativeAlternativePaymentServiceAdapter,
+        alternativePaymentsService: POAlternativePaymentsService,
         imagesRepository: POImagesRepository,
         barcodeImageProvider: BarcodeImageProvider,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         self.configuration = configuration
-        self.invoicesService = invoicesService
+        self.serviceAdapter = serviceAdapter
+        self.alternativePaymentsService = alternativePaymentsService
         self.imagesRepository = imagesRepository
         self.barcodeImageProvider = barcodeImageProvider
         self.logger = logger
@@ -35,7 +37,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Interactor
 
     let configuration: PONativeAlternativePaymentConfiguration
-    weak var delegate: PONativeAlternativePaymentDelegate?
+    weak var delegate: PONativeAlternativePaymentDelegateV2?
 
     override func start() {
         guard case .idle = state else {
@@ -45,33 +47,9 @@ final class NativeAlternativePaymentDefaultInteractor:
         send(event: .willStart)
         let task = Task { @MainActor in
             do {
-                let request = PONativeAlternativePaymentMethodTransactionDetailsRequest(
-                    invoiceId: configuration.invoiceId,
-                    gatewayConfigurationId: configuration.gatewayConfigurationId
-                )
-                let transactionDetails = try await invoicesService
-                    .nativeAlternativePaymentMethodTransactionDetails(request: request)
-                switch transactionDetails.state {
-                case .customerInput, nil:
-                    await setStartedState(transactionDetails: transactionDetails)
-                case .pendingCapture:
-                    await setAwaitingCaptureState(
-                        with: transactionDetails.parameterValues, gateway: transactionDetails.gateway
-                    )
-                case .captured:
-                    let paymentProvider = await paymentProvider(
-                        with: transactionDetails.parameterValues, gateway: transactionDetails.gateway
-                    )
-                    setCapturedState(paymentProvider: paymentProvider)
-                case .failed:
-                    throw POFailure(
-                        message: "A payment attempt was made previously and is currently in a failed state.",
-                        code: .Mobile.generic
-                    )
-                @unknown default:
-                    logger.error("Unexpected alternative payment state: \(transactionDetails.state.debugDescription).")
-                    throw POFailure(message: "Something went wrong.", code: .Mobile.internal)
-                }
+                let request = NativeAlternativePaymentServiceAdapterRequest(flow: configuration.flow)
+                let payment = try await serviceAdapter.continuePayment(with: request)
+                try await setState(with: payment)
             } catch {
                 setFailureState(error: error)
             }
@@ -79,32 +57,23 @@ final class NativeAlternativePaymentDefaultInteractor:
         state = .starting(.init(task: task))
     }
 
-    func updateValue(_ value: String?, for key: String) {
+    func updateValue(_ value: PONativeAlternativePaymentParameterValue, for key: String) {
         guard case var .started(newState) = state else {
             logger.debug("Unable to update value in unsupported state: \(state).")
             return
         }
-        let parameter = newState.parameters
-            .enumerated()
-            .first(where: { $0.element.specification.key == key })
-        guard let parameter else {
+        guard let parameter = newState.parameters[key], parameter.value != value else {
             logger.info("No value to update for key \(key).")
             return
         }
-        let formattedValue = parameter.element.formatter?.string(for: value ?? "") ?? value
-        guard parameter.element.value != formattedValue else {
-            logger.debug("Ignored the same value for key: \(key).")
-            return
-        }
-        var updatedParameter = parameter.element
-        updatedParameter.value = formattedValue
+        var updatedParameter = parameter
+        updatedParameter.value = value
         updatedParameter.recentErrorMessage = nil
-        newState.parameters[parameter.offset] = updatedParameter
+        newState.parameters[key] = updatedParameter
         state = .started(newState)
-        didUpdate(parameter: parameter.element, to: formattedValue ?? "")
+        didUpdate(parameter: parameter, to: value)
     }
 
-    // swiftlint:disable:next function_body_length
     func submit() {
         guard case let .started(currentState) = state else {
             logger.debug("Ignoring attempt to submit parameters in unsupported state: \(state).")
@@ -114,54 +83,55 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.debug("Ignoring attempt to submit invalid parameters.")
             return
         }
-        willSubmit(parameters: currentState.parameters)
-        let values: [String: String]
-        do {
-            values = try validatedValues(for: currentState.parameters)
-        } catch {
-            attemptRecoverSubmissionError(error, replaceErrorMessages: false)
-            return
-        }
+        willSubmit(parameters: Array(currentState.parameters.values))
         let task = Task { @MainActor in
             do {
-                let request = PONativeAlternativePaymentMethodRequest(
-                    invoiceId: configuration.invoiceId,
-                    gatewayConfigurationId: configuration.gatewayConfigurationId,
-                    parameters: values
+                let values = try validatedValues(for: Array(currentState.parameters.values))
+                let request = NativeAlternativePaymentServiceAdapterRequest(
+                    flow: configuration.flow, submitData: .init(parameters: values)
                 )
-                let response = try await invoicesService.initiatePayment(request: request)
-                switch response.state {
-                case .pendingCapture:
-                    send(event: .didSubmitParameters(additionalParametersExpected: false))
-                    await setAwaitingCaptureState(
-                        with: response.parameterValues,
-                        gateway: currentState.transactionDetails.gateway
-                    )
-                case .captured:
-                    send(event: .didSubmitParameters(additionalParametersExpected: false))
-                    let paymentProvider = await paymentProvider(
-                        with: response.parameterValues,
-                        gateway: currentState.transactionDetails.gateway
-                    )
-                    setCapturedState(paymentProvider: paymentProvider)
-                case .customerInput:
-                    await restoreStartedStateAfterSubmission(paymentResponse: response)
-                case .failed:
-                    throw POFailure(message: "The submitted parameters are not valid.", code: .Mobile.generic)
-                @unknown default:
-                    throw POFailure(
-                        message: "Unexpected alternative payment state: \(response.state).", code: .Mobile.internal
-                    )
+                let payment = try await serviceAdapter.continuePayment(with: request)
+                switch payment.state {
+                case .nextStepRequired:
+                    send(event: .didSubmitParameters(.init(additionalParametersExpected: true)))
+                    logger.debug("More parameters are expected, waiting for parameters to update.")
+                case .success, .pending:
+                    send(event: .didSubmitParameters(.init(additionalParametersExpected: false)))
+                default:
+                    setFailureState(error: POFailure(message: "Unexpected payment state.", code: .Mobile.generic))
                 }
+                try await setState(with: payment)
             } catch {
-                attemptRecoverSubmissionError(error, replaceErrorMessages: true)
+                attemptRecoverSubmissionError(error)
             }
         }
         state = .submitting(.init(snapshot: currentState, task: task))
     }
 
-    func confirmCapture() {
-        confirmCapture(force: false)
+    func confirmPayment() {
+        confirmPayment(force: false)
+    }
+
+    func confirmRedirect() {
+        guard case .awaitingRedirect(let currentState) = state else {
+            logger.debug("Ignoring redirect confirmation in unsupported state \(state).")
+            return
+        }
+        let task = Task {
+            do {
+                // todo(andrii-vysotskyi): allow non ephemeral sessions via configuration
+                let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+                    url: currentState.redirect.url, callback: nil, prefersEphemeralSession: true
+                )
+                _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
+                let response = try await serviceAdapter.continuePayment(with: .init(flow: configuration.flow))
+                try await setState(with: response)
+            } catch {
+                setFailureState(error: error)
+            }
+        }
+        let newState = State.Redirecting(task: task, snapshot: currentState)
+        state = .redirecting(newState)
     }
 
     override func cancel() {
@@ -170,9 +140,11 @@ final class NativeAlternativePaymentDefaultInteractor:
             currentState.task.cancel()
         case .submitting(let currentState):
             currentState.task.cancel()
-        case .awaitingCapture(let currentState):
+        case .awaitingCompletion(let currentState):
             currentState.task?.cancel()
-        case .captured(let currentState):
+        case .redirecting(let currentState):
+            currentState.task.cancel()
+        case .completed(let currentState):
             // Intent here is not to cancel invocation of completion but to fast-forward
             // it by cancelling any ongoing delay operation if any.
             currentState.completionTask.cancel()
@@ -186,34 +158,56 @@ final class NativeAlternativePaymentDefaultInteractor:
         send(event: .didRequestCancelConfirmation)
     }
 
-    // MARK: - Private Nested Types
-
-    private enum Constants {
-        static let emailRegex = #"^\S+@\S+$"#
-        static let phoneRegex = #"^\+?\d{1,3}\d*$"#
-    }
-
     // MARK: - Private Properties
 
-    private let invoicesService: POInvoicesService
+    private let serviceAdapter: NativeAlternativePaymentServiceAdapter
+    private let alternativePaymentsService: POAlternativePaymentsService
     private let imagesRepository: POImagesRepository
     private let barcodeImageProvider: BarcodeImageProvider
     private let logger: POLogger
     private let completion: (Result<Void, POFailure>) -> Void
 
+    // MARK: - State Handling
+
+    private func setState(with response: NativeAlternativePaymentServiceAdapterResponse) async throws {
+        switch response.state {
+        case .nextStepRequired:
+            if let redirect = response.redirect {
+                try await setAwaitingRedirectState(response: response, redirect: redirect)
+            } else {
+                try await setStartedState(response: response)
+            }
+        case .pending:
+            await setAwaitingCompletionState(response: response)
+        case .success:
+            await setCompletedState(response: response)
+        default:
+            logger.error("Unexpected alternative payment state: \(response.state).")
+            let failure = POFailure(message: "Something went wrong.", code: .Mobile.generic)
+            setFailureState(error: failure)
+        }
+    }
+
     // MARK: - Starting State
 
-    private func setStartedState(transactionDetails: PONativeAlternativePaymentMethodTransactionDetails) async {
-        let parameters = await createParameters(specifications: transactionDetails.parameters)
-        guard case .starting = state else {
+    private func setStartedState(response: NativeAlternativePaymentServiceAdapterResponse) async throws {
+        let elements = try await resolve(elements: response.elements ?? [])
+        let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
+        let parameters = await createParameters(for: response.elements ?? [])
+        switch state {
+        case .starting, .submitting, .redirecting:
+            break // todo(andrii-vysotskyi): check if more states should be supported
+        default:
             logger.debug("Ignoring attempt to set started state in unsupported state: \(state).")
             return
         }
-        if transactionDetails.parameters.isEmpty {
-            logger.debug("Will set started state with empty inputs, this may be unexpected.")
+        if parameters.isEmpty {
+            logger.info("Will set started state with empty inputs, this may be unexpected.")
         }
         let startedState = State.Started(
-            transactionDetails: transactionDetails,
+            paymentMethod: paymentMethod,
+            invoice: response.invoice,
+            elements: elements,
             parameters: parameters,
             isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
         )
@@ -228,7 +222,11 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.debug("Cancel action is not set or initially enabled.")
             return
         }
-        Task { @MainActor in
+        guard cancelationEnablingTask == nil else {
+            logger.debug("Cancel enabling is already scheduled.")
+            return
+        }
+        let task = Task { @MainActor in
             try? await Task.sleep(seconds: disabledFor)
             switch state {
             case .started(var currentState):
@@ -238,151 +236,150 @@ final class NativeAlternativePaymentDefaultInteractor:
                 var updatedSnapshot = currentState.snapshot
                 updatedSnapshot.isCancellable = true
                 state = .submitting(.init(snapshot: updatedSnapshot, task: currentState.task))
+            case .awaitingRedirect(var currentState):
+                currentState.isCancellable = true
+                state = .awaitingRedirect(currentState)
+            case .redirecting(let currentState):
+                var updatedSnapshot = currentState.snapshot
+                updatedSnapshot.isCancellable = true
+                state = .redirecting(.init(task: currentState.task, snapshot: updatedSnapshot))
             default:
                 break
             }
         }
+        self.cancelationEnablingTask = task
     }
 
-    // MARK: - Awaiting Capture State
+    private var cancelationEnablingTask: Task<Void, Never>?
 
-    private func setAwaitingCaptureState(
-        with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
-        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
-    ) async {
-        if configuration.paymentConfirmation.waitsConfirmation {
-            do {
-                let paymentProvider = await paymentProvider(with: parameterValues, gateway: gateway)
-                let customerAction = try await customerAction(with: parameterValues, gateway: gateway)
-                switch state {
-                case .starting, .submitting:
-                    break
-                default:
-                    logger.debug("Ignoring attempt to wait for capture from unsupported state.")
-                    return
-                }
-                send(event: .willWaitForCaptureConfirmation(additionalActionExpected: customerAction != nil))
-                // swiftlint:disable:next line_length
-                let shouldConfirmCapture = customerAction != nil && configuration.paymentConfirmation.confirmButton != nil
-                let awaitingCaptureState = State.AwaitingCapture(
-                    paymentProvider: paymentProvider,
-                    customerAction: customerAction,
-                    isCancellable: configuration.paymentConfirmation.cancelButton?.disabledFor.isZero ?? true,
-                    isDelayed: false,
-                    shouldConfirmCapture: shouldConfirmCapture
-                )
-                state = .awaitingCapture(awaitingCaptureState)
-                if !shouldConfirmCapture {
-                    confirmCapture(force: true)
-                }
-                enableCaptureCancellationAfterDelay()
-            } catch {
-                setFailureState(error: error)
-            }
-        } else {
-            logger.info("Payment capture wasn't requested, will attempt to set submitted state directly.")
-            setSubmittedState()
-        }
-    }
+    // MARK: - Awaiting Completion State
 
-    private func confirmCapture(force: Bool) {
-        guard case .awaitingCapture(let currentState) = state else {
-            logger.debug("Ignoring attempt to confirm capture from unsupported state: \(state).")
+    private func setAwaitingCompletionState(response: NativeAlternativePaymentServiceAdapterResponse) async {
+        if case .awaitingCompletion(let currentState) = state, !currentState.shouldConfirmPayment {
+            let failure = POFailure(code: .Mobile.generic)
+            setFailureState(error: failure)
             return
         }
-        guard currentState.shouldConfirmCapture || force else {
-            logger.debug("Payment is already being captured, ignored.")
-            return
-        }
-        if currentState.shouldConfirmCapture {
-            delegate?.nativeAlternativePayment(didEmitEvent: .didConfirmPayment)
-        }
-        let request = PONativeAlternativePaymentCaptureRequest(
-            invoiceId: configuration.invoiceId,
-            gatewayConfigurationId: configuration.gatewayConfigurationId,
-            timeout: configuration.paymentConfirmation.timeout
-        )
-        var newState = currentState
-        newState.task = Task { @MainActor in
-            do {
-                try await invoicesService.captureNativeAlternativePayment(request: request)
-                setCapturedState(paymentProvider: currentState.paymentProvider)
-            } catch {
-                setFailureState(error: error)
-            }
-        }
-        newState.shouldConfirmCapture = false
-        state = .awaitingCapture(newState)
-        logger.info("Waiting for invoice capture confirmation.")
-        schedulePaymentConfirmationDelay()
-    }
-
-    private func schedulePaymentConfirmationDelay() {
-        guard let timeInterval = configuration.paymentConfirmation.showProgressViewAfter else {
-            return
-        }
-        Task { @MainActor in
-            try? await Task.sleep(seconds: timeInterval)
-            guard case .awaitingCapture(var newState) = state else {
+        do {
+            let resolvedElements = try await resolve(elements: response.elements ?? [])
+            switch state {
+            case .starting, .submitting, .redirecting:
+                break
+            default:
+                logger.debug("Ignoring attempt to wait for payment confirmation from unsupported state.")
                 return
             }
-            newState.isDelayed = true
-            state = .awaitingCapture(newState)
-        }
-    }
-
-    private func customerAction(
-        with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
-        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
-    ) async throws -> NativeAlternativePaymentInteractorState.CaptureCustomerAction? {
-        // todo(andrii-vysotskyi): decide if `null` customer action should be allowed
-        let message = parameterValues?.customerActionMessage ?? gateway.customerActionMessage
-        guard let message else {
-            return nil
-        }
-        if let barcode = parameterValues?.customerActionBarcode {
-            let minimumSize = CGSize(width: 250, height: 250)
-            let image = barcodeImageProvider.image(for: barcode, minimumSize: minimumSize)
-            if image == nil {
-                throw POFailure(message: "Unable to generate barcode image.", code: .Mobile.internal)
+            send(event: .willWaitForPaymentConfirmation(.init()))
+            let shouldConfirmPayment =
+                !resolvedElements.isEmpty && configuration.paymentConfirmation.confirmButton != nil
+            let awaitingPaymentCompletionState = State.AwaitingCompletion(
+                paymentMethod: await resolve(paymentMethod: response.paymentMethod),
+                invoice: response.invoice,
+                elements: resolvedElements,
+                estimatedCompletionDate: nil,
+                isCancellable: configuration.paymentConfirmation.cancelButton?.disabledFor.isZero ?? true,
+                shouldConfirmPayment: shouldConfirmPayment
+            )
+            state = .awaitingCompletion(awaitingPaymentCompletionState)
+            if !shouldConfirmPayment {
+                confirmPayment(force: true)
             }
-            return .init(message: message, image: image, barcodeType: barcode.type)
+            enablePaymentConfirmationCancellationAfterDelay()
+        } catch {
+            setFailureState(error: error)
         }
-        let image = await imagesRepository.image(at: gateway.customerActionImageUrl)
-        return .init(message: message, image: image, barcodeType: nil)
     }
 
-    // MARK: - Captured State
-
-    private func setCapturedState(paymentProvider: NativeAlternativePaymentInteractorState.PaymentProvider) {
-        guard !state.isSink else {
-            logger.debug("Already in a sink state, ignoring attempt to set captured state.")
+    private func confirmPayment(force: Bool) {
+        guard case .awaitingCompletion(let currentState) = state else {
+            logger.debug("Ignoring attempt to confirm payment from unsupported state: \(state).")
             return
         }
-        let task = Task { @MainActor in
-            if let success = configuration.success {
-                // Sleep errors are ignored. The goal is that if this task is cancelled we should still
-                // invoke completion.
-                try? await Task.sleep(seconds: success.duration)
-            }
-            completion(.success(()))
-        }
-        state = .captured(.init(paymentProvider: paymentProvider, completionTask: task))
-        send(event: .didCompletePayment)
-    }
-
-    private func setSubmittedState() {
-        guard !state.isSink else {
-            logger.debug("Already in a sink state, ignoring attempt to set submitted state.")
+        guard currentState.shouldConfirmPayment || force else {
+            logger.debug("Payment was already confirmed, ignored.")
             return
         }
-        state = .submitted
-        completion(.success(()))
+        if currentState.shouldConfirmPayment {
+            delegate?.nativeAlternativePayment(didEmitEvent: .didConfirmPayment)
+        }
+        var newState = currentState
+        newState.task = Task { @MainActor [configuration] in
+            do {
+                let request = NativeAlternativePaymentServiceAdapterRequest(flow: configuration.flow)
+                let response = try await serviceAdapter.expectPaymentCompletion(with: request)
+                try await setState(with: response)
+            } catch {
+                setFailureState(error: error)
+            }
+        }
+        newState.estimatedCompletionDate = Date().addingTimeInterval(configuration.paymentConfirmation.timeout)
+        newState.shouldConfirmPayment = false
+        state = .awaitingCompletion(newState)
+        logger.info("Waiting for payment completion confirmation.")
+    }
+
+    // MARK: - Redirect
+
+    private func setAwaitingRedirectState(
+        response: NativeAlternativePaymentServiceAdapterResponse,
+        redirect: PONativeAlternativePaymentRedirectV2
+    ) async throws {
+        let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
+        let elements = try await resolve(elements: response.elements ?? [])
+        switch state {
+        case .starting, .submitting, .redirecting:
+            break // todo(andrii-vysotskyi): check if more states should be supported
+        default:
+            logger.debug("Ignoring attempt to set started state in unsupported state: \(state).")
+            return
+        }
+        let newState = State.AwaitingRedirect(
+            paymentMethod: paymentMethod,
+            invoice: response.invoice,
+            elements: elements,
+            redirect: redirect,
+            isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
+        )
+        state = .awaitingRedirect(newState)
+        enableCancellationAfterDelay()
+    }
+
+    // MARK: - Completed State
+
+    private func setCompletedState(response: NativeAlternativePaymentServiceAdapterResponse) async {
+        do {
+            let resolvedElements = try await resolve(elements: response.elements ?? [])
+            guard !state.isSink else {
+                logger.debug("Already in a sink state, ignoring attempt to set completed state.")
+                return
+            }
+            let task = Task { @MainActor in
+                if let success = configuration.success {
+                    // Sleep errors are ignored. The goal is that if this task is
+                    // cancelled we should still invoke completion.
+                    let shouldConfirm = !resolvedElements.isEmpty
+                    try? await Task.sleep(
+                        seconds: shouldConfirm ? success.extendedDisplayDuration : success.displayDuration
+                    )
+                }
+                completion(.success(()))
+            }
+            let newState = State.Completed(
+                paymentMethod: await resolve(paymentMethod: response.paymentMethod),
+                invoice: response.invoice,
+                elements: resolvedElements,
+                completionTask: task
+            )
+            state = .completed(newState)
+            send(event: .didCompletePayment)
+        } catch {
+            setFailureState(error: error)
+        }
     }
 
     // MARK: - Submission Recovery
 
-    private func attemptRecoverSubmissionError(_ error: Error, replaceErrorMessages: Bool) {
+    private func attemptRecoverSubmissionError(_ error: Error) {
         logger.info("Did fail to submit parameters: \(error)")
         guard let failure = error as? POFailure else {
             setFailureState(error: error)
@@ -406,33 +403,13 @@ final class NativeAlternativePaymentDefaultInteractor:
             setFailureState(error: failure)
             return
         }
-        for (offset, parameter) in newState.parameters.enumerated() {
-            let errorMessage: String?
-            if !replaceErrorMessages {
-                errorMessage = invalidFields[parameter.specification.key]?.message
-            } else if invalidFields[parameter.specification.key] != nil {
-                errorMessage = self.errorMessage(parameterType: parameter.specification.type)
-            } else {
-                errorMessage = nil
-            }
-            newState.parameters[offset].recentErrorMessage = errorMessage
+        for parameter in newState.parameters.values {
+            let errorMessage = invalidFields[parameter.specification.key]?.message
+            newState.parameters[parameter.specification.key]?.recentErrorMessage = errorMessage
         }
         state = .started(newState)
         send(event: .didFailToSubmitParameters(failure: failure))
         logger.debug("One or more parameters are not valid: \(invalidFields), waiting for parameters to update.")
-    }
-
-    // MARK: - Submission Completion
-
-    private func restoreStartedStateAfterSubmission(paymentResponse: PONativeAlternativePaymentMethodResponse) async {
-        guard case let .submitting(currentState) = state else {
-            return
-        }
-        var newState = currentState.snapshot
-        newState.parameters = await createParameters(specifications: paymentResponse.parameterDefinitions ?? [])
-        state = .started(newState)
-        send(event: .didSubmitParameters(additionalParametersExpected: true))
-        logger.debug("More parameters are expected, waiting for parameters to update.")
     }
 
     // MARK: - Failure State
@@ -451,49 +428,73 @@ final class NativeAlternativePaymentDefaultInteractor:
             failure = POFailure(message: "Something went wrong.", code: .Mobile.generic, underlyingError: error)
         }
         state = .failure(failure)
-        send(event: .didFail(failure: failure))
+        let failureEvent = PONativeAlternativePaymentEventV2.DidFail(
+            failure: failure, paymentState: currentPaymentState
+        )
+        send(event: .didFail(failureEvent))
         completion(.failure(failure))
+    }
+
+    /// Payment state resolve from current interactor's state.
+    private var currentPaymentState: PONativeAlternativePaymentStateV2? {
+        switch state {
+        case .idle, .starting, .failure:
+            return nil
+        case .started, .submitting, .awaitingRedirect, .redirecting:
+            return .nextStepRequired
+        case .awaitingCompletion:
+            return .pending
+        case .completed:
+            return .success
+        }
     }
 
     // MARK: - Cancellation Availability
 
-    private func enableCaptureCancellationAfterDelay() {
+    // swiftlint:disable:next identifier_name
+    private var paymentConfirmationCancellationEnablingTask: Task<Void, Never>?
+
+    private func enablePaymentConfirmationCancellationAfterDelay() {
         guard let disabledFor = configuration.paymentConfirmation.cancelButton?.disabledFor, disabledFor > 0 else {
             logger.debug("Confirmation cancel action is not set or initially enabled.")
             return
         }
-        Task { @MainActor in
+        guard paymentConfirmationCancellationEnablingTask == nil else {
+            logger.debug("Cancel enabling is already scheduled.")
+            return
+        }
+        let task = Task { @MainActor in
             try? await Task.sleep(seconds: disabledFor)
-            guard case .awaitingCapture(var newState) = state else {
+            guard case .awaitingCompletion(var newState) = state else {
                 return
             }
             newState.isCancellable = true
-            state = .awaitingCapture(newState)
+            state = .awaitingCompletion(newState)
         }
+        self.paymentConfirmationCancellationEnablingTask = task
     }
 
     // MARK: - Events
 
-    private func send(event: PONativeAlternativePaymentMethodEvent) {
-        assert(Thread.isMainThread, "Method should be called on main thread.")
-        logger.debug("Did send event: '\(event)'")
+    private func send(event: PONativeAlternativePaymentEventV2) {
         delegate?.nativeAlternativePayment(didEmitEvent: event)
     }
 
-    private func didUpdate(parameter: NativeAlternativePaymentInteractorState.Parameter, to value: String) {
+    private func didUpdate(
+        parameter: NativeAlternativePaymentInteractorState.Parameter,
+        to value: PONativeAlternativePaymentParameterValue
+    ) {
         logger.debug("Did update parameter value '\(value)' for '\(parameter.specification.key)' key.")
-        let parametersChangedEvent = PONativeAlternativePaymentEvent.ParametersChanged(
-            parameter: parameter.specification, value: value
+        let parametersChangedEvent = PONativeAlternativePaymentEventV2.ParametersChanged(
+            parameter: parameter.specification
         )
         send(event: .parametersChanged(parametersChangedEvent))
     }
 
     private func willSubmit(parameters: [NativeAlternativePaymentInteractorState.Parameter]) {
         logger.info("Will submit payment parameters")
-        let values = Dictionary(grouping: parameters, by: \.specification.key)
-            .compactMapValues(\.first?.value)
-        let willSubmitParametersEvent = PONativeAlternativePaymentEvent.WillSubmitParameters(
-            parameters: parameters.map(\.specification), values: values
+        let willSubmitParametersEvent = PONativeAlternativePaymentEventV2.WillSubmitParameters(
+            parameters: parameters.map(\.specification)
         )
         send(event: .willSubmitParameters(willSubmitParametersEvent))
     }
@@ -501,95 +502,166 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Utils
 
     private func createParameters(
-        specifications: [PONativeAlternativePaymentMethodParameter]
-    ) async -> [NativeAlternativePaymentInteractorState.Parameter] {
-        var parameters = specifications.map { specification in
-            let formatter: Foundation.Formatter?
-            switch specification.type {
-            case .phone:
-                formatter = POPhoneNumberFormatter()
-            default:
-                formatter = nil
+        for elements: [PONativeAlternativePaymentElementV2]
+    ) async -> [String: NativeAlternativePaymentInteractorState.Parameter] {
+        let parameters = elements.flatMap { element -> [State.Parameter] in
+            guard case let .form(form) = element else {
+                return []
             }
-            return State.Parameter(specification: specification, formatter: formatter)
+            let parameters = form.parameters.parameterDefinitions.map { specification -> State.Parameter in
+                switch specification {
+                case .card:
+                    let formatter = POCardNumberFormatter()
+                    return .init(specification: specification, formatter: formatter)
+                case .phoneNumber(let specification):
+                    let dialingCodes = specification.dialingCodes.sorted { lhs, rhs in
+                        lhs.regionDisplayName() ?? "" < rhs.regionDisplayName() ?? ""
+                    }
+                    let updatedSpecification = PONativeAlternativePaymentFormV2.Parameter.PhoneNumber(
+                        key: specification.key,
+                        label: specification.label,
+                        required: specification.required,
+                        dialingCodes: dialingCodes
+                    )
+                    return .init(specification: .phoneNumber(updatedSpecification), formatter: nil)
+                default:
+                    return .init(specification: specification, formatter: nil)
+                }
+            }
+            return parameters
         }
-        await setDefaultValues(parameters: &parameters)
-        return parameters
+        var groupedParameters = Dictionary(grouping: parameters, by: \.specification.key).compactMapValues(\.first)
+        await setDefaultValues(parameters: &groupedParameters)
+        return groupedParameters
     }
 
-    private func errorMessage(parameterType: PONativeAlternativePaymentMethodParameter.ParameterType) -> String {
-        // Server doesn't support localized error messages, so local generic error
-        // description is used instead in case particular field is invalid.
-        // todo(andrii-vysotskyi): remove when backend is updated
-        let resource: POStringResource
-        switch parameterType {
-        case .numeric:
-            resource = .NativeAlternativePayment.Error.invalidNumber
-        case .email:
-            resource = .NativeAlternativePayment.Error.invalidEmail
-        case .phone:
-            resource = .NativeAlternativePayment.Error.invalidPhone
+    // MARK: - Customer Instructions
+
+    private func resolve(
+        group: PONativeAlternativePaymentInstructionsGroupV2
+    ) async throws -> NativeAlternativePaymentResolvedElement.Group {
+        var resolvedInstructions: [NativeAlternativePaymentResolvedElement.Instruction] = []
+        for instruction in group.instructions {
+            resolvedInstructions.append(try await resolve(customerInstruction: instruction))
+        }
+        return .init(label: group.label, instructions: resolvedInstructions)
+    }
+
+    private func resolve(
+        customerInstruction: PONativeAlternativePaymentCustomerInstructionV2
+    ) async throws -> NativeAlternativePaymentResolvedElement.Instruction {
+        switch customerInstruction {
+        case .barcode(let barcode):
+            let minimumSize = CGSize(width: 250, height: 250)
+            let image = barcodeImageProvider.image(for: barcode.value, minimumSize: minimumSize)
+            guard let image else {
+                throw POFailure(message: "Unable to generate barcode image.", code: .Mobile.internal)
+            }
+            return .barcode(.init(image: image, type: barcode.value.type))
+        case .message(let message):
+            return .message(.init(label: message.label, value: message.value))
+        case .image(let image):
+            guard let image = await imagesRepository.image(resource: image.value) else {
+                throw POFailure(message: "Unable to prepare customer instruction image.", code: .Mobile.internal)
+            }
+            return .image(image)
         default:
-            resource = .NativeAlternativePayment.Error.invalidValue
+            throw POFailure(message: "Unable to resolve unknown customer instruction.", code: .Mobile.generic)
         }
-        return String(resource: resource)
     }
 
-    private func paymentProvider(
-        with parameterValues: PONativeAlternativePaymentMethodParameterValues?,
-        gateway: PONativeAlternativePaymentMethodTransactionDetails.Gateway
-    ) async -> NativeAlternativePaymentInteractorState.PaymentProvider {
-        if let parameterValues {
-            if let url = parameterValues.providerLogoUrl, let image = await imagesRepository.image(at: url) {
-                return .init(name: nil, image: image)
-            }
-            if let name = parameterValues.providerName {
-                return .init(name: name, image: nil)
+    // MARK: - Element
+
+    private func resolve(
+        elements: [PONativeAlternativePaymentElementV2]
+    ) async throws -> [NativeAlternativePaymentResolvedElement] {
+        var resolvedElements: [NativeAlternativePaymentResolvedElement] = []
+        for element in elements {
+            if let resolvedElement = try await resolve(element: element) {
+                resolvedElements.append(resolvedElement)
             }
         }
-        guard !configuration.paymentConfirmation.hideGatewayDetails else {
-            return .init(name: nil, image: nil)
+        return resolvedElements
+    }
+
+    private func resolve(
+        element: PONativeAlternativePaymentElementV2
+    ) async throws -> NativeAlternativePaymentResolvedElement? {
+        switch element {
+        case .form(let form):
+            for parameter in form.parameters.parameterDefinitions {
+                if case .unknown = parameter {
+                    throw POFailure(message: "Unable to proceed with unknown parameter.", code: .Mobile.generic)
+                }
+            }
+            return .form(form)
+        case .customerInstruction(let instruction):
+            return .instruction(try await resolve(customerInstruction: instruction))
+        case .group(let group):
+            return .group(try await resolve(group: group))
+        case .unknown:
+            return nil
         }
-        let gatewayLogoImage = await imagesRepository.image(at: gateway.logoUrl)
-        return .init(name: nil, image: gatewayLogoImage)
+    }
+
+    // MARK: - Payment Method Utils
+
+    private func resolve(
+        paymentMethod: PONativeAlternativePaymentMethodV2
+    ) async -> NativeAlternativePaymentResolvedPaymentMethod {
+        let logo = await imagesRepository.image(resource: paymentMethod.logo)
+        return .init(logo: logo, displayName: paymentMethod.displayName)
     }
 
     // MARK: - Default Values
 
     /// Updates parameters with default values.
     private func setDefaultValues(
-        parameters: inout [NativeAlternativePaymentInteractorState.Parameter]
+        parameters: inout [String: NativeAlternativePaymentInteractorState.Parameter]
     ) async {
         guard !parameters.isEmpty else {
             return
         }
         let defaultValues = await delegate?.nativeAlternativePayment(
-            defaultValuesFor: parameters.map(\.specification)
-        ) ?? [:]
-        for (offset, parameter) in parameters.enumerated() {
-            let defaultValue: String?
-            if let value = defaultValues[parameter.specification.key] {
-                switch parameter.specification.type {
-                case .singleSelect:
-                    let availableValues = parameter.specification.availableValues?.map(\.value) ?? []
-                    precondition(availableValues.contains(value), "Unknown `singleSelect` parameter value.")
-                    defaultValue = value
-                default:
-                    defaultValue = parameter.formatter?.string(for: value) ?? value
-                }
-            } else {
-                defaultValue = self.defaultValue(for: parameter)
-            }
-            parameters[offset].value = defaultValue
+            defaultValuesFor: parameters.values.map(\.specification)
+        )
+        for parameter in parameters.values {
+            parameters[parameter.specification.key]?.value = defaultValue(
+                for: parameter, fallback: defaultValues?[ parameter.specification.key]
+            )
         }
     }
 
-    private func defaultValue(for parameter: NativeAlternativePaymentInteractorState.Parameter) -> String? {
-        if let formatter = parameter.formatter {
-            return formatter.string(for: "")
-        }
-        if let availableValues = parameter.specification.availableValues {
-            return availableValues.first { $0.default == true }?.value
+    private func defaultValue(
+        for parameter: NativeAlternativePaymentInteractorState.Parameter,
+        fallback: PONativeAlternativePaymentParameterValue?
+    ) -> PONativeAlternativePaymentParameterValue? {
+        switch parameter.specification {
+        case .singleSelect(let specification):
+            if case .string(let value) = fallback {
+                let availableValues = Set(specification.availableValues.map(\.value))
+                precondition(availableValues.contains(value), "Unsupported `singleSelect` parameter value.")
+                return .string(value)
+            }
+            if let preselectedValue = specification.preselectedValue {
+                return .string(preselectedValue.value)
+            }
+        case .phoneNumber(let specification):
+            if case .phone(let value) = fallback {
+                var regionCode: String?
+                if let valueRegionCode = value.regionCode {
+                    if specification.dialingCodes.contains(where: { $0.regionCode == valueRegionCode }) {
+                        regionCode = valueRegionCode
+                    } else {
+                        assertionFailure("Unsupported region code.")
+                    }
+                }
+                return .phone(.init(regionCode: regionCode, number: value.number))
+            }
+        default:
+            if case .string(let value) = fallback {
+                return .string(parameter.formatter?.string(for: value) ?? value)
+            }
         }
         return nil
     }
@@ -598,21 +670,15 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func validatedValues(
         for parameters: [NativeAlternativePaymentInteractorState.Parameter]
-    ) throws -> [String: String] {
-        var validatedValues: [String: String] = [:]
+    ) throws -> [String: PONativeAlternativePaymentSubmitDataV2.Parameter] {
+        var validatedValues: [String: PONativeAlternativePaymentSubmitDataV2.Parameter] = [:]
         var invalidFields: [POFailure.InvalidField] = []
         parameters.forEach { parameter in
-            var normalizedValue = parameter.value
-            if case .phone = parameter.specification.type, let value = normalizedValue {
-                normalizedValue = POPhoneNumberFormatter().normalized(number: value)
-            }
-            if let normalizedValue, normalizedValue != parameter.value {
-                logger.debug("Will use updated value '\(normalizedValue)' for key '\(parameter.specification.key)'.")
-            }
-            if let invalidField = validate(value: normalizedValue ?? "", specification: parameter.specification) {
+            var invalidField: POFailure.InvalidField?
+            if let validatedValue = validate(parameter: parameter, validation: &invalidField) {
+                validatedValues[parameter.specification.key] = validatedValue
+            } else if let invalidField {
                 invalidFields.append(invalidField)
-            } else {
-                validatedValues[parameter.specification.key] = normalizedValue
             }
         }
         if invalidFields.isEmpty {
@@ -625,33 +691,100 @@ final class NativeAlternativePaymentDefaultInteractor:
         )
     }
 
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     private func validate(
-        value: String, specification: PONativeAlternativePaymentMethodParameter
-    ) -> POFailure.InvalidField? {
-        let message: String?
-        if value.isEmpty {
-            if specification.required {
-                message = String(resource: .NativeAlternativePayment.Error.requiredParameter)
-            } else {
-                message = nil
+        parameter: NativeAlternativePaymentInteractorState.Parameter, validation: inout POFailure.InvalidField?
+    ) -> PONativeAlternativePaymentSubmitDataV2.Parameter? {
+        let errorMessage: String?
+        switch parameter.specification {
+        case .text(let specification):
+            let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
+            let validator = NativeAlternativePaymentTextValidator(
+                minLength: specification.minLength,
+                maxLength: specification.maxLength,
+                required: specification.required
+            )
+            let validation = validator.validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map(PONativeAlternativePaymentSubmitDataV2.Parameter.string)
             }
-        } else if let length = specification.length, value.count != length {
-            message = String(resource: .NativeAlternativePayment.Error.invalidLength, replacements: length)
-        } else {
-            switch specification.type {
-            case .numeric where !CharacterSet(charactersIn: value).isSubset(of: .decimalDigits):
-                message = String(resource: .NativeAlternativePayment.Error.invalidNumber)
-            case .email where value.range(of: Constants.emailRegex, options: .regularExpression) == nil:
-                message = String(resource: .NativeAlternativePayment.Error.invalidEmail)
-            case .phone where value.range(of: Constants.phoneRegex, options: .regularExpression) == nil:
-                message = String(resource: .NativeAlternativePayment.Error.invalidPhone)
-            case .singleSelect where specification.availableValues?.map(\.value).contains(value) == false:
-                message = String(resource: .NativeAlternativePayment.Error.invalidValue)
-            default:
-                message = nil
+            errorMessage = validation.errorMessage
+        case .singleSelect(let specification):
+            let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
+            let validation =
+                NativeAlternativePaymentTextValidator(required: specification.required).validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .string($0) }
             }
+            errorMessage = validation.errorMessage
+        case .boolean(let specification):
+            let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
+            let validation =
+                NativeAlternativePaymentTextValidator(required: specification.required).validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .string($0) }
+            }
+            errorMessage = validation.errorMessage
+        case .digits(let specification):
+            let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
+            let validator = NativeAlternativePaymentTextValidator(
+                minLength: specification.minLength,
+                maxLength: specification.maxLength,
+                required: specification.required
+            )
+            let validation = validator.validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .string($0) }
+            }
+            errorMessage = validation.errorMessage
+        case .phoneNumber(let specification):
+            let normalizer = NativeAlternativePaymentPhoneNumberNormalizer(
+                dialingCodes: specification.dialingCodes
+            )
+            let normalizedValue = normalizer.normalize(input: parameter.value)
+            let validation =
+                NativeAlternativePaymentPhoneNumberValidator(required: specification.required).validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .init(value: .phone($0)) }
+            }
+            errorMessage = validation.errorMessage
+        case .email(let specification):
+            let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
+            let validation =
+                NativeAlternativePaymentTextValidator(required: specification.required).validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .string($0) }
+            }
+            errorMessage = validation.errorMessage
+        case .card(let specification):
+            let normalizedValue = NativeAlternativePaymentCardNumberNormalizer().normalize(input: parameter.value)
+            let validator = NativeAlternativePaymentTextValidator(
+                minLength: specification.minLength, maxLength: specification.maxLength, required: specification.required
+            )
+            let validation = validator.validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .string($0) }
+            }
+            errorMessage = validation.errorMessage
+        case .otp(let specification):
+            let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
+            let validator = NativeAlternativePaymentTextValidator(
+                minLength: specification.minLength, maxLength: specification.maxLength, required: specification.required
+            )
+            let validation = validator.validate(normalizedValue)
+            if case .valid = validation {
+                return normalizedValue.map { .string($0) }
+            }
+            errorMessage = validation.errorMessage
+        case .unknown:
+            assertionFailure("Unable to validate unknown parameter.")
+            return nil
         }
-        return message.map { POFailure.InvalidField(name: specification.key, message: $0) }
+        validation = .init(
+            name: parameter.specification.key,
+            message: errorMessage ?? String(resource: .NativeAlternativePayment.Error.invalidValue)
+        )
+        return nil
     }
 }
 

@@ -13,41 +13,76 @@ extension POStringResource {
 
     enum NativeAlternativePayment {
 
-        /// Screen title.
+        /// Payment title.
         static let title = POStringResource("native-alternative-payment.title", comment: "")
-
-        enum Placeholder {
-
-            /// Email placeholder.
-            static let email = POStringResource("native-alternative-payment.email.placeholder", comment: "")
-
-            /// Phone placeholder.
-            static let phone = POStringResource("native-alternative-payment.phone.placeholder", comment: "")
-        }
 
         enum Button {
 
-            /// Pay.
-            static let submit = POStringResource("native-alternative-payment.submit-button.default-title", comment: "")
+            /// Continue.
+            static let `continue` = POStringResource("native-alternative-payment.continue-button.title", comment: "")
 
-            /// Pay %@
-            static let submitAmount = POStringResource("native-alternative-payment.submit-button.title", comment: "")
-
-            /// Capture confirmation.
-            static let confirmCapture = POStringResource(
-                "native-alternative-payment.confirm-capture-button.title", comment: ""
+            /// Payment confirmation.
+            static let confirmPayment = POStringResource(
+                "native-alternative-payment.confirm-payment-button.title", comment: ""
             )
+
+            /// Done button.
+            static let done = POStringResource(
+                "native-alternative-payment.done-button.title", comment: ""
+            )
+
+            /// Cancel button title.
+            static let cancel = POStringResource("native-alternative-payment.cancel-button.title", comment: "")
 
             /// Save barcode button.
             static let saveBarcode = POStringResource(
                 "native-alternative-payment.save-barcode-button.title", comment: ""
             )
 
-            /// Cancel button title.
-            static let cancel = POStringResource("native-alternative-payment.cancel-button.title", comment: "")
+            /// Copy button.
+            static let copy = POStringResource("native-alternative-payment.copy-button", comment: "")
+
+            /// Copied button.
+            static let copied = POStringResource("native-alternative-payment.copied-button", comment: "")
+        }
+
+        enum Placeholder {
+
+            /// Country placeholder.
+            static let country = POStringResource("native-alternative-payment.country-placeholder", comment: "")
+        }
+
+        enum PaymentConfirmation {
+
+            enum Progress {
+
+                enum FirstStep {
+
+                    /// First step title.
+                    static let title = POStringResource(
+                        "native-alternative-payment.payment-confirmation.progress.step1.title", comment: ""
+                    )
+                }
+
+                enum SecondStep {
+
+                    /// Second step title.
+                    static let title = POStringResource(
+                        "native-alternative-payment.payment-confirmation.progress.step2.title", comment: ""
+                    )
+
+                    /// Second step description.
+                    static let description = POStringResource(
+                        "native-alternative-payment.payment-confirmation.progress.step2.description", comment: ""
+                    )
+                }
+            }
         }
 
         enum Success {
+
+            /// Success title.
+            static let title = POStringResource("native-alternative-payment.success.title", comment: "")
 
             /// Success message.
             static let message = POStringResource("native-alternative-payment.success.message", comment: "")
@@ -55,19 +90,20 @@ extension POStringResource {
 
         enum Error {
 
-            /// Email is not valid.
-            static let invalidEmail = POStringResource("native-alternative-payment.error.invalid-email", comment: "")
-
-            /// Plural format key: "%#@length@"
+            /// Invalid parameter length.
             static let invalidLength = POStringResource(
                 "native-alternative-payment.error.invalid-length-%d", comment: ""
             )
 
-            /// Number is not valid.
-            static let invalidNumber = POStringResource("native-alternative-payment.error.invalid-number", comment: "")
+            /// Parameter is too short.
+            static let invalidMinLength = POStringResource(
+                "native-alternative-payment.error.invalid-min-length-%d", comment: ""
+            )
 
-            /// Phone number is not valid.
-            static let invalidPhone = POStringResource("native-alternative-payment.error.invalid-phone", comment: "")
+            /// Parameter is too long.
+            static let invalidMaxLength = POStringResource(
+                "native-alternative-payment.error.invalid-max-length-%d", comment: ""
+            )
 
             /// Value is not valid.
             static let invalidValue = POStringResource("native-alternative-payment.error.invalid-value", comment: "")

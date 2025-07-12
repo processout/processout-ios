@@ -33,15 +33,15 @@ private struct DefaultTextFieldStyleContentView: View {
             } valueSizingView: {
                 Text(" ")
                     .typography(resolvedStyle.text.typography)
-            } placeholder: {
+            } placeholder: { isFloating in
                 configuration.prompt
                     .lineLimit(1)
-                    .textStyle(resolvedStyle.placeholder)
+                    .textStyle(resolvedStyle.label.scaledBy(isFloating ? 0.8 : 1))
                     .allowsHitTesting(false)
             }
             configuration.trailingView
                 .foregroundColor(
-                    configuration.text.isEmpty ? resolvedStyle.placeholder.color : resolvedStyle.text.color
+                    configuration.text.isEmpty ? resolvedStyle.label.color : resolvedStyle.text.color
                 )
         }
         .padding(Constants.padding)

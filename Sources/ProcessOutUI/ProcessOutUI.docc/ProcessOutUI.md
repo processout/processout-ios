@@ -58,10 +58,19 @@
 - ``PONativeAlternativePaymentViewController``
 - ``PONativeAlternativePaymentStyle``
 - ``PONativeAlternativePaymentBackgroundStyle``
+- ``PONativeAlternativePaymentConfirmationProgressViewStyle``
+- ``PONativeAlternativePaymentSuccessViewStyle``
+- ``POAutomaticNativeAlternativePaymentConfirmationProgressViewStyle``
+- ``POAutomaticNativeAlternativePaymentSuccessViewStyle``
+- ``PONativeAlternativePaymentConfirmationProgressViewStyleConfiguration``
+- ``PONativeAlternativePaymentSuccessViewStyleConfiguration``
 - ``SwiftUICore/View/nativeAlternativePaymentStyle(_:)``
 - ``PONativeAlternativePaymentConfiguration``
 - ``PONativeAlternativePaymentConfirmationConfiguration``
+- ``PONativeAlternativePaymentParameterValue``
 - ``PONativeAlternativePaymentDelegate``
+- ``PONativeAlternativePaymentEventV2``
+- ``PONativeAlternativePaymentDelegateV2``
 - ``PONativeAlternativePaymentEvent``
 
 <!--### Dynamic Checkout-->

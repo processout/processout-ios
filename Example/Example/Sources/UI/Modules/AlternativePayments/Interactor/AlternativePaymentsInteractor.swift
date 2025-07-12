@@ -101,6 +101,15 @@ final class AlternativePaymentsInteractor {
         return try await invoicesService.createInvoice(request: request)
     }
 
+    func createToken() async throws -> POCustomerToken {
+        let tokenCreationRequest = POCreateCustomerTokenRequest(
+            customerId: Example.Constants.customerId,
+            verify: true,
+            returnUrl: Example.Constants.returnUrl
+        )
+        return try await tokensService.createCustomerToken(request: tokenCreationRequest)
+    }
+
     func authorize(invoice: POInvoice, gatewayConfigurationId: String, saveSource: Bool) async throws {
         let request = POAlternativePaymentAuthorizationRequest(
             invoiceId: invoice.id,
@@ -121,12 +130,7 @@ final class AlternativePaymentsInteractor {
     }
 
     func tokenize(gatewayConfigurationId: String) async throws -> POCustomerToken {
-        let tokenCreationRequest = POCreateCustomerTokenRequest(
-            customerId: Example.Constants.customerId,
-            verify: true,
-            returnUrl: Example.Constants.returnUrl
-        )
-        let token = try await tokensService.createCustomerToken(request: tokenCreationRequest)
+        let token = try await createToken()
         let tokenizationRequest = POAlternativePaymentTokenizationRequest(
             customerId: Example.Constants.customerId,
             customerTokenId: token.id,

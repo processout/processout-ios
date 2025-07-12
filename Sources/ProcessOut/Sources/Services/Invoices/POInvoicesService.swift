@@ -12,27 +12,20 @@ public typealias POInvoicesServiceType = POInvoicesService
 
 public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 
+    /// Creates invoice with given parameters.
+    @_spi(PO)
+    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice
+
     /// Invoice details.
     func invoice(request: POInvoiceRequest) async throws -> POInvoice
-
-    /// Returns native alternative payment details.
-    @_spi(PO)
-    func nativeAlternativePayment( // sourcery:completion: skip
-        request: PONativeAlternativePaymentRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
 
     /// Performs invoice authorization with given request.
     func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws
 
     /// Performs invoice authorization using given alternative payment method details.
-    @_spi(PO)
     func authorizeInvoice( // sourcery:completion: skip
         request: PONativeAlternativePaymentAuthorizationRequestV2
     ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
-
-    /// Creates invoice with given parameters.
-    @_spi(PO)
-    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice
 
     // MARK: - Alternative Payment (Deprecated)
 
@@ -54,20 +47,6 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 }
 
 extension POInvoicesService {
-
-    @_spi(PO)
-    public func nativeAlternativePayment(
-        request: PONativeAlternativePaymentRequest
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
-        throw POFailure(code: .Mobile.generic)
-    }
-
-    @_spi(PO)
-    public func authorizeInvoice(
-        request: PONativeAlternativePaymentAuthorizationRequestV2
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
-        throw POFailure(code: .Mobile.generic)
-    }
 
     @_spi(PO)
     public func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {

@@ -7,13 +7,13 @@
 
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
+@_spi(PO) import ProcessOut
 
 @available(iOS 14, *)
 @MainActor
 struct NativeAlternativePaymentItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem
-    let horizontalPadding: CGFloat
 
     @Binding
     private(set) var focusedItemId: AnyHashable?
@@ -21,38 +21,63 @@ struct NativeAlternativePaymentItemView: View {
     var body: some View {
         switch item {
         case .title(let item):
-            NativeAlternativePaymentTitleItemView(item: item, horizontalPadding: horizontalPadding)
+            NativeAlternativePaymentTitleItemView(item: item)
         case .input(let item):
             POTextField.create(with: item, focusedInputId: $focusedItemId)
                 .inputStyle(style.input)
-                .padding(.horizontal, horizontalPadding)
         case .codeInput(let item):
-            POCodeField(text: item.$value, length: item.length)
-                .backport.focused($focusedItemId, equals: item.id)
+            POCodeField(text: item.$value, length: item.length) {
+                Text(item.label)
+            }
+            .backport.focused($focusedItemId, equals: item.id)
+            .inputStyle(style.largeInput)
+            .controlInvalid(item.isInvalid)
+            .poKeyboardType(item.keyboard)
+        case .phoneNumberInput(let item):
+            NativeAlternativePaymentPhoneItemView(item: item, focusedItemId: $focusedItemId)
+        case .toggle(let item):
+            Toggle(item.title, isOn: item.$isSelected)
+                .poToggleStyle(style.toggle)
                 .controlInvalid(item.isInvalid)
-                .inputStyle(style.codeInput)
-                .padding(.horizontal, horizontalPadding)
-        case .picker(let pickerItem):
-            POPicker(selection: pickerItem.$selectedOptionId) {
-                ForEach(pickerItem.options) { option in
-                    Text(option.title)
-                }
-            }
-            .modify(when: pickerItem.preferrsInline) { view in
-                let style = PORadioGroupPickerStyle(
-                    radioButtonStyle: POAnyButtonStyle(erasing: style.radioButton),
-                    inputStyle: style.input
-                )
-                view.pickerStyle(style)
-            }
-            .pickerStyle(POMenuPickerStyle(inputStyle: style.input))
-            .padding(.horizontal, horizontalPadding)
+        case .picker(let item):
+            NativeAlternativePaymentPickerItemView(item: item)
         case .progress:
             ProgressView()
                 .poProgressViewStyle(style.progressView)
-                .padding(.horizontal, horizontalPadding)
-        case .submitted(let item):
-            NativeAlternativePaymentSubmittedItemView(item: item, horizontalPadding: horizontalPadding)
+                .padding(.vertical, POSpacing.large)
+                .frame(maxWidth: .infinity)
+        case .messageInstruction(let item):
+            NativeAlternativePaymentMessageInstructionItemView(item: item)
+        case .image(let item):
+            VStack {
+                Image(uiImage: item.image)
+                if let viewModel = item.actionButton {
+                    Button.create(with: viewModel)
+                        .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.secondary))
+                        .backport.poControlSize(.small)
+                }
+            }
+            .padding(.horizontal, POSpacing.space48)
+        case .sizingGroup(let item):
+            VStack(alignment: .leading, spacing: POSpacing.space12) {
+                ForEach(item.content) { item in
+                    NativeAlternativePaymentItemView(item: item, focusedItemId: $focusedItemId)
+                }
+            }
+        case .group(let group):
+            NativeAlternativePaymentGroupItemView(item: group, focusedItemId: $focusedItemId)
+        case .controlGroup(let group):
+            NativeAlternativePaymentControlGroupItemView(item: group)
+        case .button(let item):
+            Button.create(with: item)
+                .buttonStyle(forPrimaryRole: style.actionsContainer.primary, fallback: style.actionsContainer.secondary)
+        case .message(let item):
+            POMessageView(message: item)
+                .messageViewStyle(style.messageView)
+        case .confirmationProgress(let item):
+            NativeAlternativePaymentConfirmationProgressItemView(item: item)
+        case .success(let item):
+            NativeAlternativePaymentSuccessItemView(item: item)
         }
     }
 

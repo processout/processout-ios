@@ -6,14 +6,18 @@
 //
 
 import SwiftUI
+import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-enum NativeAlternativePaymentViewModelItem {
+indirect enum NativeAlternativePaymentViewModelItem {
 
-    struct Title: Identifiable, Hashable {
+    struct Title: Identifiable {
 
         /// Item identifier.
         let id: AnyHashable
+
+        /// Icon resource.
+        let icon: SwiftUI.Image?
 
         /// Title text.
         let text: String
@@ -23,6 +27,9 @@ enum NativeAlternativePaymentViewModelItem {
 
         /// Item identifier.
         let id: AnyHashable
+
+        /// Picker label.
+        let label: String
 
         /// Available options.
         let options: [PickerOption]
@@ -46,8 +53,6 @@ enum NativeAlternativePaymentViewModelItem {
         let title: String
     }
 
-    typealias Input = POTextFieldViewModel
-
     struct CodeInput: Identifiable {
 
         /// Item identifier.
@@ -59,38 +64,173 @@ enum NativeAlternativePaymentViewModelItem {
         /// Current parameter's value text.
         @Binding var value: String
 
+        /// Code field label.
+        let label: String
+
+        /// Boolean value indicating whether value is valid.
+        let isInvalid: Bool
+
+        /// Keyboard type.
+        let keyboard: UIKeyboardType
+    }
+
+    struct PhoneNumberInput: Identifiable {
+
+        let id: AnyHashable
+
+        /// Available territories.
+        let territories: [POPhoneNumber.Territory]
+
+        /// Current parameter's value.
+        @Binding var value: POPhoneNumber
+
+        /// Prompt.
+        let prompt: String
+
         /// Boolean value indicating whether value is valid.
         let isInvalid: Bool
     }
 
-    struct Submitted: Identifiable, Hashable {
+    struct ToggleItem: Identifiable {
 
         /// Item identifier.
         let id: AnyHashable
 
-        /// Title text.
-        let title: String?
+        /// Title.
+        let title: String
 
-        /// Payment provider logo.
-        let logoImage: UIImage?
+        /// Defines whether item is currently selected.
+        @Binding var isSelected: Bool
 
-        /// Message markdown.
-        let message: String
-
-        /// Boolean value indicating whether layout should be vertically compact.
-        let isMessageCompact: Bool
-
-        /// Image illustrating action.
-        let image: UIImage?
-
-        /// Boolean value that indicates whether payment is already captured.
-        let isCaptured: Bool
-
-        /// Defines whether progress view should be hidden or not.
-        let isProgressViewHidden: Bool
+        /// Boolean value indicating whether value is valid.
+        let isInvalid: Bool
     }
 
-    case progress, title(Title), input(Input), codeInput(CodeInput), picker(Picker), submitted(Submitted)
+    struct MessageInstruction: Identifiable, Hashable {
+
+        let id: AnyHashable
+
+        /// Message title if any.
+        let title: String?
+
+        /// Message text.
+        let value: String
+    }
+
+    struct Image: Identifiable {
+
+        let id: AnyHashable
+
+        /// Image illustrating action.
+        let image: UIImage
+
+        /// Action button associated with this image if any.
+        let actionButton: POButtonViewModel?
+    }
+
+    struct Group {
+
+        let id: AnyHashable
+
+        /// Group label.
+        let label: String?
+
+        /// Items
+        let items: [NativeAlternativePaymentViewModelItem]
+    }
+
+    struct ControlGroup {
+
+        /// Group ID.
+        let id: AnyHashable
+
+        /// Controls.
+        let content: [POButtonViewModel]
+    }
+
+    struct SizingGroup {
+
+        let id: AnyHashable
+
+        /// Items
+        let content: [NativeAlternativePaymentViewModelItem]
+    }
+
+    struct ConfirmationProgress {
+
+        /// The title of the first step.
+        let firstStepTitle: String
+
+        /// The title of the second step.
+        let secondStepTitle: String
+
+        /// A closure that returns a description for the second step based on the
+        /// remaining time string.
+        let secondStepDescription: (String) -> String
+
+        /// Date components formatter.
+        let formatter: DateComponentsFormatter
+
+        /// Date indicating when confirmation is estimated to end.
+        let estimatedCompletionDate: Date
+    }
+
+    struct Success {
+
+        /// Success title.
+        let title: String
+
+        /// Success description.
+        let description: String?
+    }
+
+    /// Loading indicator.
+    case progress
+
+    /// Static title..
+    case title(Title)
+
+    /// Text input field.
+    case input(POTextFieldViewModel)
+
+    /// Code input field with fixed length.
+    case codeInput(CodeInput)
+
+    /// Phone number input with selectable territories.
+    case phoneNumberInput(PhoneNumberInput)
+
+    /// Toggle item.
+    case toggle(ToggleItem)
+
+    /// Picker with multiple options.
+    case picker(Picker)
+
+    /// Static message with optional title.
+    case messageInstruction(MessageInstruction)
+
+    /// Group of items displayed together.
+    case group(Group)
+
+    /// Control group.
+    case controlGroup(ControlGroup)
+
+    /// Image to illustrate an action.
+    case image(Image)
+
+    /// Allow to alter components spacing.
+    case sizingGroup(SizingGroup)
+
+    /// Action button.
+    case button(POButtonViewModel)
+
+    /// Informational message.
+    case message(POMessage)
+
+    /// Payment confirmation progress details.
+    case confirmationProgress(ConfirmationProgress)
+
+    /// Payment success item.
+    case success(Success)
 }
 
 extension NativeAlternativePaymentViewModelItem: Identifiable {
@@ -105,10 +245,30 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
             return item.id
         case .codeInput(let item):
             return item.id
+        case .phoneNumberInput(let item):
+            return item.id
+        case .toggle(let item):
+            return item.id
         case .picker(let item):
             return item.id
-        case .submitted(let item):
+        case .message(let item):
             return item.id
+        case .image(let item):
+            return item.id
+        case .sizingGroup(let item):
+            return item.id
+        case .group(let item):
+            return item.id
+        case .controlGroup(let item):
+            return item.id
+        case .button(let item):
+            return item.id
+        case .messageInstruction(let item):
+            return item.id
+        case .confirmationProgress:
+            return Constants.confirmationProgressId
+        case .success:
+            return Constants.successId
         }
     }
 
@@ -116,25 +276,23 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
 
     private enum Constants {
         static let progressId = UUID().uuidString
+        static let confirmationProgressId = UUID().uuidString
+        static let successId = UUID().uuidString
     }
 }
 
-extension NativeAlternativePaymentViewModelSection: AnimationIdentityProvider {
+extension NativeAlternativePaymentViewModelItem: AnimationIdentityProvider {
 
     var animationIdentity: AnyHashable {
-        [id, items.map(animationIdentity), error]
-    }
-
-    // MARK: - Private Methods
-
-    private func animationIdentity(of item: NativeAlternativePaymentViewModelItem) -> AnyHashable {
-        switch item {
+        switch self {
         case .title(let item):
-            return item
-        case .submitted(let item):
-            return item
+            return item.text
+        case .sizingGroup(let item):
+            return item.content.map(\.animationIdentity)
+        case .group(let item):
+            return item.items.map(\.animationIdentity)
         default:
-            return item.id
+            return id
         }
     }
 }

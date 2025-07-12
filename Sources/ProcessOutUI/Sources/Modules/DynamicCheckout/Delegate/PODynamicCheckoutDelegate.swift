@@ -69,7 +69,7 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
 
     /// Invoked when module emits alternative payment event.
     @MainActor
-    func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEvent)
+    func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEventV2)
 
     /// Notifies delegate that alternative payment is about to start and allows to override default configuration.
     @MainActor
@@ -84,7 +84,7 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
     @MainActor
     func dynamicCheckout(
         alternativePaymentDefaultsWith request: PODynamicCheckoutAlternativePaymentDefaultsRequest
-    ) async -> [String: String]
+    ) async -> [String: PONativeAlternativePaymentParameterValue]
 
     // MARK: - Pass Kit
 
@@ -141,7 +141,7 @@ extension PODynamicCheckoutDelegate {
     // MARK: - Alternative Payment
 
     @MainActor
-    public func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEvent) {
+    public func dynamicCheckout(didEmitAlternativePaymentEvent event: PONativeAlternativePaymentEventV2) {
         // Ignored
     }
 
@@ -155,7 +155,7 @@ extension PODynamicCheckoutDelegate {
     @MainActor
     public func dynamicCheckout(
         alternativePaymentDefaultsWith request: PODynamicCheckoutAlternativePaymentDefaultsRequest
-    ) async -> [String: String] {
+    ) async -> [String: PONativeAlternativePaymentParameterValue] {
         [:]
     }
 

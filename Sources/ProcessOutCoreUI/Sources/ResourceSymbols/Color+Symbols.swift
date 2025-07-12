@@ -17,9 +17,6 @@ extension Color {
 
         /// Surface/Primary color.
         public static let successSubtle = Color(light: UIColor(0xE4F9E3), dark: UIColor(0x143225))
-
-        /// Surface/Primary color.
-        public static let elevated = Color(light: UIColor(0xFFFFFF), dark: UIColor(0x000000))
     }
 
     @_spi(PO)

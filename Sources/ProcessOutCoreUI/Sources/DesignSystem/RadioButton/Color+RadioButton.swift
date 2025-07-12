@@ -121,7 +121,7 @@ extension Color {
 
             /// The "Radio/Text/Default" color.
             static let `default` = Color(
-                light: UIColor(0x000000), dark: UIColor(0xFFFFFF)
+                light: UIColor(0x585A5F), dark: UIColor(0xC0C3C8)
             )
 
             /// The "Radio/Text/Disabled" color.

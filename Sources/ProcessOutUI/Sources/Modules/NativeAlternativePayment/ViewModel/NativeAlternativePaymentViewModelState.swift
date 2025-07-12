@@ -10,13 +10,7 @@
 struct NativeAlternativePaymentViewModelState {
 
     /// Available items.
-    let sections: [NativeAlternativePaymentViewModelSection]
-
-    /// Available actions.
-    let actions: [POButtonViewModel]
-
-    /// Boolean value that indicates whether payment is already captured.
-    let isCaptured: Bool
+    let items: [NativeAlternativePaymentViewModelItem]
 
     /// Currently focused item identifier.
     var focusedItemId: AnyHashable?
@@ -28,7 +22,7 @@ struct NativeAlternativePaymentViewModelState {
 extension NativeAlternativePaymentViewModelState: AnimationIdentityProvider {
 
     var animationIdentity: AnyHashable {
-        [sections.map(\.animationIdentity), actions.map(\.id)]
+        items.map(\.animationIdentity)
     }
 }
 
@@ -36,6 +30,6 @@ extension NativeAlternativePaymentViewModelState {
 
     /// Idle state.
     static var idle: NativeAlternativePaymentViewModelState {
-        .init(sections: [], actions: [], isCaptured: false, focusedItemId: nil, confirmationDialog: nil)
+        .init(items: [], focusedItemId: nil, confirmationDialog: nil)
     }
 }

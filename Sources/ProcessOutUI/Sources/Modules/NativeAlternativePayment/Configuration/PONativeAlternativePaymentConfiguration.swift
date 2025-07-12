@@ -5,16 +5,61 @@
 //  Created by Andrii Vysotskyi on 23.11.2023.
 //
 
-// swiftlint:disable strict_fileprivate
-
 import Foundation
 import SwiftUI
 import ProcessOut
+
+// swiftlint:disable strict_fileprivate file_length nesting
 
 /// A configuration object that defines how a native alternative payment view content.
 @MainActor
 @preconcurrency
 public struct PONativeAlternativePaymentConfiguration {
+
+    public enum Flow: Sendable {
+
+        public struct Authorization: Sendable {
+
+            public init(invoiceId: String, gatewayConfigurationId: String, customerTokenId: String? = nil) {
+                self.invoiceId = invoiceId
+                self.gatewayConfigurationId = gatewayConfigurationId
+                self.customerTokenId = customerTokenId
+            }
+
+            /// Unique identifier for the invoice associated with this payment request.
+            public let invoiceId: String
+
+            /// Identifier of the payment gateway configuration to use for this payment.
+            public let gatewayConfigurationId: String
+
+            /// Customer token ID to use as a payment source.
+            public let customerTokenId: String?
+        }
+
+        public struct Tokenization: Sendable {
+
+            public init(customerId: String, customerTokenId: String, gatewayConfigurationId: String) {
+                self.customerId = customerId
+                self.customerTokenId = customerTokenId
+                self.gatewayConfigurationId = gatewayConfigurationId
+            }
+
+            /// Customer ID.
+            public let customerId: String
+
+            /// Customer token ID.
+            public let customerTokenId: String
+
+            /// Gateway configuration identifier.
+            public let gatewayConfigurationId: String
+        }
+
+        /// Payment authorization flow.
+        case authorization(Authorization)
+
+        /// Payment tokenization flow.
+        case tokenization(Tokenization)
+    }
 
     /// Payment confirmation configuration.
     @MainActor
@@ -23,19 +68,24 @@ public struct PONativeAlternativePaymentConfiguration {
 
         /// Boolean value that specifies whether module should wait for payment confirmation from PSP or will
         /// complete right after all user's input is submitted. Default value is `true`.
-        public let waitsConfirmation: Bool
+        @available(*, deprecated, message: "Implementation will always wait for payment confirmation.")
+        public var waitsConfirmation: Bool {
+            true
+        }
 
         /// Amount of time (in seconds) that module is allowed to wait before receiving final payment confirmation.
         /// Default timeout is 3 minutes while maximum value is 15 minutes.
         public let timeout: TimeInterval
 
         /// A delay before showing progress view during payment confirmation.
-        public let showProgressViewAfter: TimeInterval?
+        @available(*, deprecated)
+        public let showProgressViewAfter: TimeInterval? = nil
 
         /// Boolean value indicating whether gateway information (such as name/logo) should stay hidden
         /// during payment confirmation even if more specific payment provider details are not available.
         /// Default value is `false`.
-        public let hideGatewayDetails: Bool
+        @available(*, deprecated)
+        public let hideGatewayDetails: Bool = false
 
         /// Payment confirmation button configuration. To remove button use `nil`, this is default behaviour.
         ///
@@ -56,31 +106,47 @@ public struct PONativeAlternativePaymentConfiguration {
             confirmButton: SubmitButton? = nil,
             cancelButton: CancelButton? = nil
         ) {
-            self.waitsConfirmation = waitsConfirmation
             self.timeout = timeout
-            self.showProgressViewAfter = showProgressViewAfter
-            self.hideGatewayDetails = hideGatewayDetails
             self.confirmButton = confirmButton
             self.cancelButton = cancelButton
         }
     }
 
-    /// Payment success configuration.
+    /// Configuration for displaying the payment success screen.
     @MainActor
     @preconcurrency
     public struct Success {
 
+        /// Custom title to display user when payment completes.
+        public let title: String?
+
         /// Custom success message to display user when payment completes.
         public let message: String?
 
-        /// Defines for how long implementation delays calling completion in case of success.
-        /// Default duration is 3 seconds.
-        public let duration: TimeInterval
+        /// Duration (in seconds) the success screen remains visible when no additional information
+        /// is shown. Defaults to 3 seconds.
+        public let displayDuration: TimeInterval
+
+        /// Duration (in seconds) the success screen remains visible when additional useful information
+        /// is available to the user. Defaults to 60 seconds.
+        public let extendedDisplayDuration: TimeInterval
+
+        /// Button configuration allowing the user to manually dismiss the success screen.
+        public let doneButton: SubmitButton?
 
         /// Creates configuration instance.
-        public init(message: String? = nil, duration: TimeInterval = 3) {
+        public init(
+            title: String? = nil,
+            message: String? = nil,
+            displayDuration: TimeInterval = 3,
+            extendedDisplayDuration: TimeInterval = 60,
+            doneButton: SubmitButton? = .init()
+        ) {
+            self.title = title
             self.message = message
-            self.duration = duration
+            self.displayDuration = displayDuration
+            self.extendedDisplayDuration = extendedDisplayDuration
+            self.doneButton = doneButton
         }
     }
 
@@ -145,6 +211,9 @@ public struct PONativeAlternativePaymentConfiguration {
         /// When property is set implementation asks user to confirm cancel.
         public let confirmation: POConfirmationDialogConfiguration?
 
+        /// Controls whether button is hidden.
+        let isHidden: Bool
+
         /// Creates cancel button configuration.
         public init<Icon: View>(
             title: String? = nil,
@@ -156,22 +225,36 @@ public struct PONativeAlternativePaymentConfiguration {
             self.icon = icon.map(AnyView.init(erasing:))
             self.disabledFor = disabledFor
             self.confirmation = confirmation
+            isHidden = false
+        }
+
+        /// Creates cancel button configuration.
+        init<Icon: View>(
+            title: String? = nil,
+            icon: Icon? = AnyView?.none,
+            disabledFor: TimeInterval = 0,
+            confirmation: POConfirmationDialogConfiguration? = nil,
+            isHidden: Bool
+        ) {
+            self.title = title
+            self.icon = icon.map(AnyView.init(erasing:))
+            self.disabledFor = disabledFor
+            self.confirmation = confirmation
+            self.isHidden = isHidden
         }
     }
 
-    /// Invoice that should be authorized/captured.
-    public let invoiceId: String
-
-    /// Gateway configuration id that should be used to initiate native alternative payment.
-    public let gatewayConfigurationId: String
+    /// Payment flow.
+    public let flow: Flow
 
     /// Custom title.
     public let title: String?
 
     /// A Boolean property that indicates whether the code input should be horizontally centered. This property
     /// is only applicable when there is a single code input. If there are multiple inputs the alignment is always
-    /// leading. Default value is `true`.
-    public let shouldHorizontallyCenterCodeInput: Bool
+    /// leading. Default value is `false`.
+    @available(*, deprecated)
+    public let shouldHorizontallyCenterCodeInput: Bool = false
 
     /// For parameters where user should select single option from multiple values defines
     /// maximum number of options that framework will display inline (e.g. using radio buttons).
@@ -196,8 +279,7 @@ public struct PONativeAlternativePaymentConfiguration {
 
     /// Creates configuration.
     public init(
-        invoiceId: String,
-        gatewayConfigurationId: String,
+        flow: Flow,
         title: String? = nil,
         shouldHorizontallyCenterCodeInput: Bool = true,
         inlineSingleSelectValuesLimit: Int = 5,
@@ -207,10 +289,8 @@ public struct PONativeAlternativePaymentConfiguration {
         paymentConfirmation: Confirmation = .init(),
         success: Success? = .init()
     ) {
-        self.invoiceId = invoiceId
-        self.gatewayConfigurationId = gatewayConfigurationId
+        self.flow = flow
         self.title = title
-        self.shouldHorizontallyCenterCodeInput = shouldHorizontallyCenterCodeInput
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.submitButton = submitButton
         self.cancelButton = cancelButton
@@ -237,6 +317,28 @@ extension PONativeAlternativePaymentConfiguration {
         case cancel(
             title: String? = nil, disabledFor: TimeInterval = 0, confirmation: POConfirmationDialogConfiguration? = nil
         )
+    }
+
+    /// Invoice that should be authorized/captured.
+    @available(*, deprecated, message: "Use flow instead.")
+    public var invoiceId: String {
+        switch flow {
+        case .authorization(let flow):
+            return flow.invoiceId
+        case .tokenization:
+            return ""
+        }
+    }
+
+    /// Gateway configuration id that should be used to initiate native alternative payment.
+    @available(*, deprecated, message: "Use flow instead.")
+    public var gatewayConfigurationId: String {
+        switch flow {
+        case .authorization(let flow):
+            return flow.gatewayConfigurationId
+        case .tokenization(let flow):
+            return flow.gatewayConfigurationId
+        }
     }
 
     /// Primary action text, such as "Pay".
@@ -300,10 +402,8 @@ extension PONativeAlternativePaymentConfiguration {
         paymentConfirmationTimeout: TimeInterval = 180,
         paymentConfirmationSecondaryAction: SecondaryAction? = nil
     ) {
-        self.invoiceId = invoiceId
-        self.gatewayConfigurationId = gatewayConfigurationId
+        self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
         self.title = title
-        self.shouldHorizontallyCenterCodeInput = true
         self.success = skipSuccessScreen ? nil : .init(message: successMessage)
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }
@@ -331,16 +431,38 @@ extension PONativeAlternativePaymentConfiguration {
         skipSuccessScreen: Bool = false,
         paymentConfirmation: Confirmation = .init()
     ) {
-        self.invoiceId = invoiceId
-        self.gatewayConfigurationId = gatewayConfigurationId
+        self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
         self.title = title
-        self.shouldHorizontallyCenterCodeInput = shouldHorizontallyCenterCodeInput
         self.success = skipSuccessScreen ? nil : .init(message: successMessage)
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.paymentConfirmation = paymentConfirmation
         self.barcodeInteraction = .init()
+    }
+
+    /// Creates configuration.
+    @available(*, deprecated, message: "Use init that accepts flow instead.")
+    public init(
+        invoiceId: String,
+        gatewayConfigurationId: String,
+        title: String? = nil,
+        shouldHorizontallyCenterCodeInput: Bool = true,
+        inlineSingleSelectValuesLimit: Int = 5,
+        barcodeInteraction: BarcodeInteraction = .init(),
+        submitButton: SubmitButton = .init(),
+        cancelButton: CancelButton? = nil,
+        paymentConfirmation: Confirmation = .init(),
+        success: Success? = .init()
+    ) {
+        self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
+        self.title = title
+        self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
+        self.submitButton = submitButton
+        self.cancelButton = cancelButton
+        self.paymentConfirmation = paymentConfirmation
+        self.success = success
+        self.barcodeInteraction = barcodeInteraction
     }
 }
 
@@ -373,10 +495,7 @@ extension PONativeAlternativePaymentConfiguration.Confirmation {
         confirmButton: ConfirmButton? = nil,
         secondaryAction: PONativeAlternativePaymentConfiguration.SecondaryAction? = nil
     ) {
-        self.waitsConfirmation = waitsConfirmation
         self.timeout = timeout
-        self.showProgressViewAfter = showProgressIndicatorAfter
-        self.hideGatewayDetails = hideGatewayDetails
         self.confirmButton = confirmButton
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }
     }
@@ -393,4 +512,14 @@ extension PONativeAlternativePaymentConfiguration.CancelButton {
     }
 }
 
-// swiftlint:enable strict_fileprivate
+extension PONativeAlternativePaymentConfiguration.Success {
+
+    /// Duration (in seconds) the success screen remains visible when no additional information
+    /// is shown.
+    @available(*, deprecated, renamed: "displayDuration")
+    public var duration: TimeInterval {
+        displayDuration
+    }
+}
+
+// swiftlint:enable strict_fileprivate file_length nesting

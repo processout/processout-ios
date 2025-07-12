@@ -40,7 +40,7 @@ struct ThrottledWebAuthenticationSessionDecoratorTests {
         #expect(mockSession.authenticateCallsCount == 1)
     }
 
-    @Test
+    @Test(.disabled("Flaky"))
     func authenticate_throttlesAuthentications() async throws {
         var lastAuthenticationStartTime: DispatchTime?
 

@@ -14,19 +14,17 @@ struct FloatingValue<Value: View, ValueSizingView: View, Placeholder: View>: Vie
     init(
         isFloating: Bool,
         spacing: CGFloat? = nil,
-        scale: CGFloat = 0.78,
         animation: Animation? = .default,
         @ViewBuilder value: () -> Value,
         @ViewBuilder valueSizingView: () -> ValueSizingView = { EmptyView() },
-        @ViewBuilder placeholder: () -> Placeholder
+        @ViewBuilder placeholder: @escaping (_ isFloating: Bool) -> Placeholder
     ) {
         self.isFloating = isFloating
         self.spacing = spacing
-        self.scale = scale
         self.animation = animation
         self.value = value()
         self.valueSizingView = valueSizingView()
-        self.placeholder = placeholder()
+        self.placeholder = placeholder
     }
 
     // MARK: - View
@@ -35,8 +33,7 @@ struct FloatingValue<Value: View, ValueSizingView: View, Placeholder: View>: Vie
         let alignment = Alignment(horizontal: .leading, vertical: .center)
         ZStack(alignment: alignment) {
             VStack(alignment: alignment.horizontal, spacing: spacing) {
-                placeholder
-                    .scale(scale)
+                resolvedPlaceholder
                 ViewThatExists {
                     valueSizingView
                     value
@@ -44,8 +41,7 @@ struct FloatingValue<Value: View, ValueSizingView: View, Placeholder: View>: Vie
             }
             .hidden()
             VStack(alignment: alignment.horizontal, spacing: spacing) {
-                placeholder
-                    .scale(isFloating ? scale : 1)
+                resolvedPlaceholder
                 if isFloating {
                     ViewThatExists {
                         valueSizingView
@@ -57,9 +53,7 @@ struct FloatingValue<Value: View, ValueSizingView: View, Placeholder: View>: Vie
             .animation(animation, value: isFloating)
             VStack(alignment: alignment.horizontal, spacing: spacing) {
                 if isFloating {
-                    placeholder
-                        .scale(scale)
-                        .hidden()
+                    resolvedPlaceholder.hidden()
                 }
                 value
             }
@@ -75,9 +69,6 @@ struct FloatingValue<Value: View, ValueSizingView: View, Placeholder: View>: Vie
     /// Optional vertical spacing between the placeholder and the value view.
     private let spacing: CGFloat?
 
-    /// The scaling factor applied to the placeholder when it's in the floated position.
-    private let scale: CGFloat
-
     /// The animation applied to the placeholder's scale and position changes
     /// when transitioning between the normal and floated states.
     private let animation: Animation?
@@ -89,5 +80,11 @@ struct FloatingValue<Value: View, ValueSizingView: View, Placeholder: View>: Vie
     private let valueSizingView: ValueSizingView
 
     /// The placeholder view shown in the background.
-    private let placeholder: Placeholder
+    private let placeholder: (Bool) -> Placeholder
+
+    // MARK: - Private Methods
+
+    private var resolvedPlaceholder: some View {
+        placeholder(isFloating)
+    }
 }

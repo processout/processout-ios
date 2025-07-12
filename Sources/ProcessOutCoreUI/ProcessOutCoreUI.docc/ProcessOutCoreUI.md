@@ -46,6 +46,17 @@
 - ``SwiftUICore/EnvironmentValues/poControlWidth``
 - ``SwiftUICore/EnvironmentValues/poControlSize``
 
+### Labeled Content
+
+- ``POLabeledContentStyle``
+- ``POLabeledContentStyleConfiguration``
+- ``POAutomaticLabeledContentStyle``
+
+### Progress View
+
+- ``POMultistepProgressGroupBoxStyle``
+- ``POStepProgressViewStyle``
+
 ### Actions Container
 
 - ``POActionsContainerStyle``

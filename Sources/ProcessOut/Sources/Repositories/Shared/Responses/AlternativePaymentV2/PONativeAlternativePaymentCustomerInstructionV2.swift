@@ -8,7 +8,6 @@
 import Foundation
 
 /// Specifies instruction for the customer, providing additional information and/or describing required actions.
-@_spi(PO)
 public indirect enum PONativeAlternativePaymentCustomerInstructionV2: Sendable {
 
     /// Customer instruction provided via barcode.
@@ -19,12 +18,12 @@ public indirect enum PONativeAlternativePaymentCustomerInstructionV2: Sendable {
     }
 
     /// Customer instruction provided as a markdown text.
-    public struct Text: Sendable, Decodable {
+    public struct Message: Sendable, Decodable {
 
-        /// Text label.
+        /// Message label.
         public let label: String?
 
-        /// Text value markdown.
+        /// Message value markdown.
         public let value: String
     }
 
@@ -35,17 +34,7 @@ public indirect enum PONativeAlternativePaymentCustomerInstructionV2: Sendable {
         public let value: POImageRemoteResource
     }
 
-    /// Group of customer instructions.
-    public struct Group: Sendable, Decodable {
-
-        /// Group label if any.
-        public let label: String?
-
-        /// Grouped instructions.
-        public let instructions: [PONativeAlternativePaymentCustomerInstructionV2]
-    }
-
-    case barcode(Barcode), text(Text), image(Image), group(Group)
+    case barcode(Barcode), message(Message), image(Image)
 
     // MARK: - Unknown Future Case
 
@@ -65,10 +54,8 @@ extension PONativeAlternativePaymentCustomerInstructionV2: Decodable {
         switch type {
         case "barcode":
             self = try .barcode(.init(from: decoder))
-        case "text":
-            self = try .text(.init(from: decoder))
-        case "group":
-            self = try .group(.init(from: decoder))
+        case "message":
+            self = try .message(.init(from: decoder))
         case "image_url":
             self = try .image(.init(from: decoder))
         default:

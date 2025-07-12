@@ -74,10 +74,10 @@ extension POCardTokenizationStyle {
     public static var `default`: POCardTokenizationStyle {
         POCardTokenizationStyle(
             title: POTextStyle(color: Color.Text.primary, typography: .Text.s20(weight: .medium)),
-            sectionTitle: POTextStyle(color: Color.Input.Label.default, typography: .Text.s14(weight: .medium)),
+            sectionTitle: POTextStyle(color: Color.Input.Text.default, typography: .Text.s14(weight: .medium)),
             input: .medium,
             radioButton: .radio,
-            errorDescription: POTextStyle(color: Color.Input.Label.error, typography: .Text.s12(weight: .regular)),
+            errorDescription: POTextStyle(color: Color.Input.Text.error, typography: .Text.s12(weight: .regular)),
             backgroundColor: Color.Surface.primary,
             actionsContainer: .default,
             separatorColor: Color.Border.primary

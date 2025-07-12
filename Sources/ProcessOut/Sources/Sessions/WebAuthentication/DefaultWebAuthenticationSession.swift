@@ -24,8 +24,9 @@ final class DefaultWebAuthenticationSession:
         )
         return try await withTaskCancellationHandler(
             operation: {
-                try await withCheckedThrowingContinuation { continuation in
-                    let session = Self.createAuthenticationSession(with: request) { result in
+                let redirectUrl = try Self.normalize(url: request.url)
+                return try await withCheckedThrowingContinuation { continuation in
+                    let session = Self.createAuthenticationSession(with: request, redirectUrl: redirectUrl) { result in
                         operationProxy.setCompleted(with: result)
                     }
                     session.prefersEphemeralWebBrowserSession = request.prefersEphemeralSession
@@ -74,7 +75,7 @@ final class DefaultWebAuthenticationSession:
     // MARK: - Private Methods
 
     private static func createAuthenticationSession(
-        with request: WebAuthenticationRequest, completion: @escaping (Result<URL, POFailure>) -> Void
+        with request: WebAuthenticationRequest, redirectUrl: URL, completion: @escaping (Result<URL, POFailure>) -> Void
     ) -> ASWebAuthenticationSession {
         let completionHandler = { (url: URL?, error: Error?) in
             if let url {
@@ -88,21 +89,34 @@ final class DefaultWebAuthenticationSession:
         switch request.callback?.value {
         case .scheme(let scheme):
             return ASWebAuthenticationSession(
-                url: request.url, callbackURLScheme: scheme, completionHandler: completionHandler
+                url: redirectUrl, callbackURLScheme: scheme, completionHandler: completionHandler
             )
         case let .https(host, path):
             if #available(iOS 17.4, *) {
                 return ASWebAuthenticationSession(
-                    url: request.url, callback: .https(host: host, path: path), completionHandler: completionHandler
+                    url: redirectUrl, callback: .https(host: host, path: path), completionHandler: completionHandler
                 )
             } else {
                 preconditionFailure("HTTPs callback is unavailable before iOS 17.4")
             }
         case nil:
             return ASWebAuthenticationSession(
-                url: request.url, callbackURLScheme: nil, completionHandler: completionHandler
+                url: redirectUrl, callbackURLScheme: nil, completionHandler: completionHandler
             )
         }
+    }
+
+    private static func normalize(url: URL) throws(POFailure) -> URL {
+        let supportedSchemes: Set<String> = ["http", "https"]
+        if let scheme = url.scheme, supportedSchemes.contains(scheme) {
+            return url
+        }
+        guard url.scheme == nil, var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            throw POFailure(message: "Redirect URL is not supported.", code: .Mobile.generic)
+        }
+        let defaultScheme = "https"
+        urlComponents.scheme = urlComponents.host ?? defaultScheme
+        return urlComponents.url ?? url
     }
 
     private static func converted(error: Error) -> POFailure {

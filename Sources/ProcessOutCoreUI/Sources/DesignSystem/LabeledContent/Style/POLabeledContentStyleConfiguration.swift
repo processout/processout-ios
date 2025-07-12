@@ -9,7 +9,6 @@ import SwiftUI
 
 /// The properties of a labeled content instance.
 @available(iOS 14, *)
-@_spi(PO)
 public struct POLabeledContentStyleConfiguration {
 
     /// The label of the labeled content instance.

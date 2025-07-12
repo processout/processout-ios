@@ -11,7 +11,7 @@ import SwiftUI
 @available(iOS 14, *)
 public struct PORadioGroupPickerStyle<RadioButtonStyle: ButtonStyle>: POPickerStyle {
 
-    public init(radioButtonStyle: RadioButtonStyle = PORadioButtonStyle.radio, inputStyle: POInputStyle = .medium) {
+    public init(radioButtonStyle: RadioButtonStyle = PORadioButtonStyle.radio, inputStyle: POInputStyle = .large) {
         self.radioButtonStyle = radioButtonStyle
         self.inputStyle = inputStyle
     }
@@ -37,24 +37,28 @@ private struct ContentView: View {
     // MARK: - View
 
     var body: some View {
-        VStack(alignment: .leading, spacing: POSpacing.space2) {
-            Group(poSubviews: configuration.content) { children in
-                ForEach(children) { child in
-                    Button {
-                        configuration.selection = child.id
-                    } label: {
-                        child
+        let resolvedInputStyle = inputStyle.resolve(isInvalid: isControlInvalid, isFocused: false)
+        VStack(alignment: .leading, spacing: 0) {
+            configuration.prompt
+                .textStyle(resolvedInputStyle.label)
+                .padding(.vertical, POSpacing.space12)
+            VStack(alignment: .leading, spacing: POSpacing.space2) {
+                Group(poSubviews: configuration.content) { children in
+                    ForEach(children) { child in
+                        Button {
+                            configuration.selection = child.id
+                        } label: {
+                            child
+                        }
+                        .contentShape(.rect)
+                        .controlSelected(child.id == configuration.selection)
                     }
-                    .contentShape(.rect)
-                    .controlSelected(child.id == configuration.selection)
                 }
             }
+            .compositingGroup()
+            .padding(POSpacing.space4)
+            .border(style: resolvedInputStyle.border)
         }
-        .compositingGroup()
-        .padding(POSpacing.space4)
-        .border(
-            style: isControlInvalid ? inputStyle.error.border : inputStyle.normal.border
-        )
         .animation(.default, value: isControlInvalid)
     }
 

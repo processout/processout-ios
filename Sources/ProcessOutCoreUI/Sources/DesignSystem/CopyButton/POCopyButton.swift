@@ -19,8 +19,8 @@ public struct POCopyButton: View {
         ///
         /// - Parameters:
         ///   - value: The string to be copied to the pasteboard.
-        ///   - copyTitle: The text shown before the copy action. Default is `"Copy"`.
-        ///   - copiedTitle: The text shown after the value has been copied. Default is `"Copied!"`.
+        ///   - copyTitle: The text shown before the copy action.
+        ///   - copiedTitle: The text shown after the value has been copied.
         public init(value: String, copyTitle: String, copiedTitle: String) {
             self.value = value
             self.copyTitle = copyTitle

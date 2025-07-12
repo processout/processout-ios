@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ProcessOutUI
+import ProcessOut
 
 @MainActor
 struct AlternativePaymentsView: View {

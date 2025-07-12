@@ -21,22 +21,14 @@ public struct PONativeAlternativePaymentView: View {
     // MARK: - View
 
     public var body: some View {
-        VStack(spacing: 0) {
-            GeometryReader { geometry in
-                ScrollView(showsIndicators: false) {
-                    NativeAlternativePaymentContentView(viewModel: viewModel, insets: POSpacing.large)
-                        .frame(minHeight: geometry.size.height, alignment: .top)
-                }
-                .clipped()
-            }
-            POActionsContainerView(actions: viewModel.state.actions)
-                .actionsContainerStyle(style.actionsContainer)
+        ScrollView(.vertical, showsIndicators: false) {
+            NativeAlternativePaymentContentView(
+                viewModel: viewModel,
+                insets: .init(horizontal: POSpacing.space20, vertical: POSpacing.space12)
+            )
         }
         .backport.background {
-            let backgroundColor = viewModel.state.isCaptured ? style.background.success : style.background.regular
-            backgroundColor
-                .ignoresSafeArea()
-                .animation(.default, value: viewModel.state.isCaptured)
+            style.backgroundColor.ignoresSafeArea()
         }
         .onAppear(perform: viewModel.start)
     }

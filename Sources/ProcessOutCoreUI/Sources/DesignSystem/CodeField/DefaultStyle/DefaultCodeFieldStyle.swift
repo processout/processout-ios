@@ -11,13 +11,32 @@ import SwiftUI
 struct DefaultCodeFieldStyle: CodeFieldStyle {
 
     func makeBody(configuration: Configuration) -> some View {
-        let paddedText = self.paddedText(configuration: configuration)
-        HStack(spacing: POSpacing.space8) {
-            ForEach(Array(paddedText.indices), id: \.self) { index in
-                DefaultCodeFieldStyleCharacterView(
-                    value: paddedText[index],
-                    caretAlignment: caretAlignment(forCharacterAt: index, configuration: configuration)
+        ContentView(configuration: configuration)
+    }
+}
+
+@available(iOS 14, *)
+private struct ContentView: View {
+
+    let configuration: CodeFieldStyle.Configuration
+
+    // MARK: - View
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            configuration.label
+                .textStyle(
+                    style.resolve(isInvalid: isInvalid, isFocused: configuration.isEditing).label
                 )
+                .padding(.vertical, POSpacing.space12)
+            HStack(spacing: POSpacing.space8) {
+                let paddedText = self.paddedText()
+                ForEach(Array(paddedText.indices), id: \.self) { index in
+                    DefaultCodeFieldStyleCharacterView(
+                        value: paddedText[index],
+                        caretAlignment: caretAlignment(forCharacterAt: index)
+                    )
+                }
             }
         }
     }
@@ -28,14 +47,22 @@ struct DefaultCodeFieldStyle: CodeFieldStyle {
         static let pad = "\u{2007}" // Figure (numeric) space
     }
 
+    // MARK: - Private Properties
+
+    @Environment(\.inputStyle)
+    private var style
+
+    @Environment(\.isControlInvalid)
+    private var isInvalid
+
     // MARK: - Private Methods
 
-    private func paddedText(configuration: Configuration) -> String {
+    private func paddedText() -> String {
         configuration.text.padding(toLength: configuration.length, withPad: Constants.pad, startingAt: 0)
     }
 
     private func caretAlignment(
-        forCharacterAt index: String.Index, configuration: Configuration
+        forCharacterAt index: String.Index
     ) -> Binding<DefaultCodeFieldStyleCharacterView.CaretAlignment?> {
         let binding = Binding<DefaultCodeFieldStyleCharacterView.CaretAlignment?> {
             guard let insertionPoint = configuration.insertionPoint, configuration.isEditing else {

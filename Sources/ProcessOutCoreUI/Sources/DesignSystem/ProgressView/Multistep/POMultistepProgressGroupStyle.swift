@@ -9,7 +9,6 @@ import SwiftUI
 
 // swiftlint:disable nesting
 
-@_spi(PO)
 @available(iOS 14.0, *)
 public struct POMultistepProgressGroupBoxStyle: GroupBoxStyle {
 
@@ -56,14 +55,12 @@ public struct POMultistepProgressGroupBoxStyle: GroupBoxStyle {
     // MARK: - GroupBoxStyle
 
     public func makeBody(configuration: Configuration) -> some View {
-        GroupBox {
-            configuration
-                .content
-                .backgroundPreferenceValue(MultistepProgressGroupStylePreferenceKey.self) { preferences in
-                    makeConnectorsBody(preferences: preferences)
-                }
-        } label: {
-            configuration.label
+        VStack(alignment: .leading, spacing: POSpacing.space28) {
+            configuration.content
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .backgroundPreferenceValue(MultistepProgressGroupStylePreferenceKey.self) { preferences in
+            makeConnectorsBody(preferences: preferences)
         }
     }
 
@@ -132,7 +129,7 @@ public struct POMultistepProgressGroupBoxStyle: GroupBoxStyle {
 @available(iOS 16.0, *)
 #Preview {
     GroupBox {
-        VStack(alignment: .leading, spacing: 28) {
+        Group {
             ProgressView("Step 1", value: 1)
             ProgressView("Step 2", value: 1)
             ProgressView(
@@ -147,7 +144,6 @@ public struct POMultistepProgressGroupBoxStyle: GroupBoxStyle {
             ProgressView("Step 4", value: 0)
         }
         .progressViewStyle(.poStep)
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
     .groupBoxStyle(.poMultistepProgress)
     .padding()

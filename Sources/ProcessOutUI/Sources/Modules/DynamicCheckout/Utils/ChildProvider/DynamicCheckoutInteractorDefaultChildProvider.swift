@@ -55,7 +55,12 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
                 gatewayConfigurationId: paymentMethod.configuration.gatewayConfigurationId,
                 configuration: configuration
             ),
-            invoicesService: invoicesService,
+            serviceAdapter: DefaultNativeAlternativePaymentServiceAdapter(
+                invoicesService: ProcessOut.shared.invoices,
+                tokensService: ProcessOut.shared.customerTokens,
+                paymentConfirmationTimeout: configuration.paymentConfirmation.timeout
+            ),
+            alternativePaymentsService: ProcessOut.shared.alternativePayments,
             imagesRepository: imagesRepository,
             barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
             logger: logger,
@@ -134,8 +139,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         configuration: PODynamicCheckoutAlternativePaymentConfiguration
     ) -> PONativeAlternativePaymentConfiguration {
         let childConfiguration = PONativeAlternativePaymentConfiguration(
-            invoiceId: invoiceId,
-            gatewayConfigurationId: gatewayConfigurationId,
+            flow: .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId)),
             title: "",
             shouldHorizontallyCenterCodeInput: false,
             inlineSingleSelectValuesLimit: configuration.inlineSingleSelectValuesLimit,
@@ -159,10 +163,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
 private extension PONativeAlternativePaymentConfiguration.Confirmation {
 
     init(configuration: PODynamicCheckoutAlternativePaymentConfiguration.PaymentConfirmation) {
-        waitsConfirmation = true
         timeout = configuration.timeout
-        showProgressViewAfter = configuration.showProgressViewAfter
-        hideGatewayDetails = true
         if let configuration = configuration.confirmButton {
             confirmButton = .init(title: configuration.title, icon: configuration.icon)
         } else {
@@ -179,10 +180,15 @@ extension PONativeAlternativePaymentConfiguration.CancelButton {
         icon = configuration.icon
         disabledFor = configuration.disabledFor
         confirmation = configuration.confirmation
+        isHidden = true
     }
 
     init(configuration: PODynamicCheckoutConfiguration.CancelButton) {
-        self.init(title: configuration.title, icon: configuration.icon, confirmation: configuration.confirmation)
+        title = configuration.title
+        icon = configuration.icon
+        disabledFor = 0
+        confirmation = configuration.confirmation
+        isHidden = true
     }
 }
 

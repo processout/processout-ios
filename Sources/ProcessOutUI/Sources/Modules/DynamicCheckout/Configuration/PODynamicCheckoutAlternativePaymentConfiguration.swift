@@ -20,9 +20,6 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
         /// Default timeout is 3 minutes while maximum value is 15 minutes.
         public let timeout: TimeInterval
 
-        /// A delay before showing progress indicator during payment confirmation.
-        public let showProgressViewAfter: TimeInterval?
-
         /// Payment confirmation button configuration.
         ///
         /// Displays a confirmation button when the user needs to perform an external customer action (e.g.,
@@ -37,12 +34,10 @@ public struct PODynamicCheckoutAlternativePaymentConfiguration {
         /// Creates confirmation configuration.
         public init(
             timeout: TimeInterval = 180,
-            showProgressViewAfter: TimeInterval? = nil,
             confirmButton: PODynamicCheckoutConfiguration.SubmitButton? = nil,
             cancelButton: CancelButton? = nil
         ) {
             self.timeout = timeout
-            self.showProgressViewAfter = showProgressViewAfter
             self.confirmButton = confirmButton
             self.cancelButton = cancelButton
         }

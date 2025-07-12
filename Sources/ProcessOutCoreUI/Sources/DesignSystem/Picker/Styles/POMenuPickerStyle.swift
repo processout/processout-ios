@@ -100,9 +100,9 @@ private struct ContentView: View {
                             }
                         }
                     },
-                    placeholder: {
+                    placeholder: { isFloating in
                         configuration.prompt
-                            .textStyle(style.placeholder)
+                            .textStyle(style.label.scaledBy(isFloating ? 0.8 : 1))
                             .fixedSize()
                     }
                 )

@@ -7,9 +7,6 @@
 
 import SwiftUI
 
-// todo(andrii-vysotskyi): use colors from design system
-
-@_spi(PO)
 @available(iOS 14.0, *)
 extension GroupBoxStyle where Self == POMultistepProgressGroupBoxStyle {
 
@@ -17,15 +14,15 @@ extension GroupBoxStyle where Self == POMultistepProgressGroupBoxStyle {
         POMultistepProgressGroupBoxStyle(
             connector: .init(
                 fromCompletedToCompleted: .init(
-                    strokeColor: Color(red: 0.298, green: 0.635, blue: 0.349),
+                    strokeColor: Color(light: UIColor(0x139947), dark: UIColor(0x28DE6B)),
                     strokeStyle: StrokeStyle(lineWidth: 2)
                 ),
                 fromCompletedToAny: .init(
-                    strokeColor: Color(red: 0.298, green: 0.635, blue: 0.349),
+                    strokeColor: Color(light: UIColor(0x21222229, alpha: 0.16), dark: UIColor(0xF6F8FB, alpha: 0.2)),
                     strokeStyle: StrokeStyle(lineWidth: 2, dash: [3, 3])
                 ),
                 default: .init(
-                    strokeColor: Color(red: 0.792, green: 0.792, blue: 0.792),
+                    strokeColor: Color(light: UIColor(0x21222229, alpha: 0.16), dark: UIColor(0xF6F8FB, alpha: 0.2)),
                     strokeStyle: StrokeStyle(lineWidth: 2, dash: [3, 3])
                 )
             )

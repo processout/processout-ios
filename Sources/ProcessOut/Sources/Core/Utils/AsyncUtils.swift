@@ -47,7 +47,8 @@ func withTimeout<T: Sendable>(
 
 // MARK: - Retry
 
-func retry<T: Sendable>(
+@_spi(PO)
+public func retry<T: Sendable>(
     operation: @escaping @Sendable @isolated(any) () async throws -> T,
     while condition: @escaping @Sendable (Result<T, Error>) -> Bool,
     timeout: TimeInterval,

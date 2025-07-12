@@ -24,7 +24,7 @@ public struct POPhoneNumberField: View {
         let configuration = POPhoneNumberFieldStyleConfiguration {
             POPicker(selection: $phoneNumber.territoryId) {
                 ForEach(availableTerritories ?? []) { territory in
-                    Text("\(territory.code) \(territory.displayName)")
+                    Text("\(territory.displayName) (\(territory.code))")
                 }
             } prompt: {
                 countryPrompt
@@ -36,6 +36,7 @@ public struct POPhoneNumberField: View {
             }
         } number: {
             POTextField(text: $phoneNumber.number, formatter: formatter, prompt: numberPrompt)
+                .poKeyboardType(.numberPad)
         }
         AnyView(erasing: style.makeBody(configuration: configuration))
             .onTextFieldEditingWillChange { newValue in
