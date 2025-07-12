@@ -277,17 +277,20 @@ public struct PONativeAlternativePaymentConfiguration {
     /// Payment success screen configuration. In order to avoid showing success screen to user pass `nil`.
     public let success: Success?
 
+    /// Boolean value indicating whether forms controls should be rendered inline.
+    public let prefersInlineControls: Bool
+
     /// Creates configuration.
     public init(
         flow: Flow,
         title: String? = nil,
-        shouldHorizontallyCenterCodeInput: Bool = true,
         inlineSingleSelectValuesLimit: Int = 5,
         barcodeInteraction: BarcodeInteraction = .init(),
         submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = nil,
         paymentConfirmation: Confirmation = .init(),
-        success: Success? = .init()
+        success: Success? = .init(),
+        prefersInlineControls: Bool = true
     ) {
         self.flow = flow
         self.title = title
@@ -297,6 +300,7 @@ public struct PONativeAlternativePaymentConfiguration {
         self.paymentConfirmation = paymentConfirmation
         self.success = success
         self.barcodeInteraction = barcodeInteraction
+        self.prefersInlineControls = prefersInlineControls
     }
 }
 
@@ -414,6 +418,7 @@ extension PONativeAlternativePaymentConfiguration {
             secondaryAction: paymentConfirmationSecondaryAction
         )
         self.barcodeInteraction = .init()
+        prefersInlineControls = false
     }
 
     /// Creates configuration instance.
@@ -439,6 +444,7 @@ extension PONativeAlternativePaymentConfiguration {
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.paymentConfirmation = paymentConfirmation
         self.barcodeInteraction = .init()
+        prefersInlineControls = false
     }
 
     /// Creates configuration.
@@ -463,6 +469,7 @@ extension PONativeAlternativePaymentConfiguration {
         self.paymentConfirmation = paymentConfirmation
         self.success = success
         self.barcodeInteraction = barcodeInteraction
+        prefersInlineControls = false
     }
 }
 

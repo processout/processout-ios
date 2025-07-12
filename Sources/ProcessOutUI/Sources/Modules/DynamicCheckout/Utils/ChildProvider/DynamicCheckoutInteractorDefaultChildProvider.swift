@@ -141,7 +141,6 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         let childConfiguration = PONativeAlternativePaymentConfiguration(
             flow: .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId)),
             title: "",
-            shouldHorizontallyCenterCodeInput: false,
             inlineSingleSelectValuesLimit: configuration.inlineSingleSelectValuesLimit,
             barcodeInteraction: .init(configuration: configuration.barcodeInteraction),
             submitButton: .init(

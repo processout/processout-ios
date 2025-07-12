@@ -139,15 +139,6 @@ indirect enum NativeAlternativePaymentViewModelItem {
         let items: [NativeAlternativePaymentViewModelItem]
     }
 
-    struct ControlGroup {
-
-        /// Group ID.
-        let id: AnyHashable
-
-        /// Controls.
-        let content: [POButtonViewModel]
-    }
-
     struct SizingGroup {
 
         let id: AnyHashable
@@ -211,9 +202,6 @@ indirect enum NativeAlternativePaymentViewModelItem {
     /// Group of items displayed together.
     case group(Group)
 
-    /// Control group.
-    case controlGroup(ControlGroup)
-
     /// Image to illustrate an action.
     case image(Image)
 
@@ -258,8 +246,6 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
         case .sizingGroup(let item):
             return item.id
         case .group(let item):
-            return item.id
-        case .controlGroup(let item):
             return item.id
         case .button(let item):
             return item.id

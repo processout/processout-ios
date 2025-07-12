@@ -17,12 +17,15 @@ struct NativeAlternativePaymentViewModelState {
 
     /// Confirmation dialog to present to user.
     var confirmationDialog: POConfirmationDialog?
+
+    /// Form controls information.
+    var controls: NativeAlternativePaymentViewModelControlGroup?
 }
 
 extension NativeAlternativePaymentViewModelState: AnimationIdentityProvider {
 
     var animationIdentity: AnyHashable {
-        items.map(\.animationIdentity)
+        [items.map(\.animationIdentity), controls?.buttons.map(\.id)]
     }
 }
 
@@ -30,6 +33,6 @@ extension NativeAlternativePaymentViewModelState {
 
     /// Idle state.
     static var idle: NativeAlternativePaymentViewModelState {
-        .init(items: [], focusedItemId: nil, confirmationDialog: nil)
+        .init(items: [], focusedItemId: nil, confirmationDialog: nil, controls: nil)
     }
 }

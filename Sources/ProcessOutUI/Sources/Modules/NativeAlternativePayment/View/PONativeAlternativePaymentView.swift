@@ -21,11 +21,17 @@ public struct PONativeAlternativePaymentView: View {
     // MARK: - View
 
     public var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            NativeAlternativePaymentContentView(
-                viewModel: viewModel,
-                insets: .init(horizontal: POSpacing.space20, vertical: POSpacing.space12)
-            )
+        VStack(spacing: 0) {
+            ScrollView(.vertical, showsIndicators: false) {
+                NativeAlternativePaymentContentView(
+                    viewModel: viewModel,
+                    insets: .init(horizontal: POSpacing.space20, vertical: POSpacing.space12)
+                )
+            }
+            if let controls = viewModel.state.controls, !controls.inline {
+                POActionsContainerView(actions: controls.buttons)
+                    .actionsContainerStyle(style.actionsContainer)
+            }
         }
         .backport.background {
             style.backgroundColor.ignoresSafeArea()
