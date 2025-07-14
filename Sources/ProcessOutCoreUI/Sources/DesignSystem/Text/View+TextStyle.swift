@@ -13,7 +13,6 @@ extension View {
     ///
     /// - NOTE: When `addPadding` is set to true this method has a cumulative effect.
     @_spi(PO)
-    @available(iOS 14, *)
     @MainActor
     public func textStyle(_ style: POTextStyle, addPadding: Bool = true) -> some View {
         typography(style.typography, addPadding: addPadding)
@@ -22,14 +21,12 @@ extension View {
     }
 
     @_spi(PO)
-    @available(iOS 14, *)
     @MainActor
     public func typography(_ typography: POTypography, addPadding: Bool = true) -> some View {
         modifier(TypographyModifier(typography: typography, addPadding: addPadding))
     }
 }
 
-@available(iOS 14, *)
 @MainActor
 private struct TypographyModifier: ViewModifier {
 

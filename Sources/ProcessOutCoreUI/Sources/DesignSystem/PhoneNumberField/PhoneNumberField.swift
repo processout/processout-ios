@@ -8,7 +8,6 @@
 import SwiftUI
 @_spi(PO) import ProcessOut
 
-@available(iOS 14.0, *)
 @_spi(PO)
 public struct POPhoneNumberField: View {
 

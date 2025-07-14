@@ -10,7 +10,6 @@ import SwiftUI
 /// The default labeled content style.
 ///
 /// Use ``LabeledContentStyle/automatic`` to construct this style.
-@available(iOS 14, *)
 public struct POAutomaticLabeledContentStyle: POLabeledContentStyle {
 
     /// Creates an automatic labeled content style.

@@ -8,7 +8,6 @@
 import SwiftUI
 
 /// Describes radio button style in different states.
-@available(iOS 14, *)
 @MainActor
 @preconcurrency
 public struct PORadioButtonStyle: ButtonStyle {
@@ -59,7 +58,6 @@ public struct PORadioButtonStyle: ButtonStyle {
 }
 
 // Environments are not propagated directly to ButtonStyle in any iOS before 14.
-@available(iOS 14, *)
 @MainActor
 private struct ContentView: View {
 
@@ -150,7 +148,6 @@ private struct ContentView: View {
     }
 }
 
-@available(iOS 14, *)
 #Preview {
     VStack(spacing: 2) {
         Button("Radio Button") { }

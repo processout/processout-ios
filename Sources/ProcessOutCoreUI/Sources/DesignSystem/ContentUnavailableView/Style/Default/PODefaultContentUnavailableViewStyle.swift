@@ -8,7 +8,6 @@
 import SwiftUI
 
 /// The default content unavailable view style.
-@available(iOS 14, *)
 public struct PODefaultContentUnavailableViewStyle: POContentUnavailableViewStyle {
 
     /// Label style.
@@ -41,7 +40,6 @@ public struct PODefaultContentUnavailableViewStyle: POContentUnavailableViewStyl
     }
 }
 
-@available(iOS 14, *)
 extension POContentUnavailableViewStyle where Self == PODefaultContentUnavailableViewStyle {
 
     /// The default content unavailable view style.

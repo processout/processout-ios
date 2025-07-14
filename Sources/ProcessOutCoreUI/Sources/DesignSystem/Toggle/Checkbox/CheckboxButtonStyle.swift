@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 @MainActor
 struct CheckboxButtonStyle: ButtonStyle {
 
@@ -30,7 +29,6 @@ struct CheckboxButtonStyle: ButtonStyle {
 }
 
 // Environments are not propagated directly to ButtonStyle in any iOS before 14.
-@available(iOS 14, *)
 @MainActor
 private struct ContentView: View {
 

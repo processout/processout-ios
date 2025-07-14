@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 struct DefaultCodeFieldStyle: CodeFieldStyle {
 
     func makeBody(configuration: Configuration) -> some View {
@@ -15,7 +14,6 @@ struct DefaultCodeFieldStyle: CodeFieldStyle {
     }
 }
 
-@available(iOS 14, *)
 private struct ContentView: View {
 
     let configuration: CodeFieldStyle.Configuration

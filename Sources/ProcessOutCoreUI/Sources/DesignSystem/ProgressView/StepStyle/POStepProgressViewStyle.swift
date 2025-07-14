@@ -10,7 +10,6 @@ import SwiftUI
 // swiftlint:disable nesting
 
 /// Single step progress view style.
-@available(iOS 14.0, *)
 public struct POStepProgressViewStyle: ProgressViewStyle {
 
     /// Defines progress view style resolved in a specific state.
@@ -103,7 +102,6 @@ public struct POStepProgressViewStyle: ProgressViewStyle {
 
 // swiftlint:enable nesting
 
-@available(iOS 14.0, *)
 private struct StyleContent: View {
 
     let style: POStepProgressViewStyle, configuration: ProgressViewStyleConfiguration

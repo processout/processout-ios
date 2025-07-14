@@ -8,7 +8,6 @@
 import PassKit
 
 /// PassKit button style.
-@available(iOS 14, *)
 @MainActor
 @preconcurrency
 public struct POPassKitPaymentButtonStyle {

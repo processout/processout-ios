@@ -10,13 +10,11 @@ import SwiftUI
 extension View {
 
     @_spi(PO)
-    @available(iOS 14, *)
     public func actionsContainerStyle(_ style: POActionsContainerStyle) -> some View {
         environment(\.actionsContainerStyle, style)
     }
 }
 
-@available(iOS 14, *)
 extension EnvironmentValues {
 
     @MainActor

@@ -8,7 +8,6 @@
 import SwiftUI
 
 @_spi(PO)
-@available(iOS 14, *)
 @MainActor
 public struct POContentUnavailableView<Label: View, Description: View>: View {
 

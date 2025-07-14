@@ -11,7 +11,6 @@ import SwiftUI
 /// styling for other states automatically.
 ///
 /// - NOTE: SDK uses light color variation with light brand colors and dark otherwise.
-@available(iOS 14, *)
 @MainActor
 @preconcurrency
 public struct POBrandButtonStyle: ButtonStyle {
@@ -56,7 +55,6 @@ public struct POBrandButtonStyle: ButtonStyle {
 
 // Environments may not be propagated directly to ButtonStyle. Workaround is
 // to wrap content into additional view and use environments as usual.
-@available(iOS 14.0, *)
 @MainActor
 private struct ButtonStyleBox: View {
 

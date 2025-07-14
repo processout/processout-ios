@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 @_spi(PO)
 extension GroupBoxStyle where Self == POGroupBoxStyle {
 

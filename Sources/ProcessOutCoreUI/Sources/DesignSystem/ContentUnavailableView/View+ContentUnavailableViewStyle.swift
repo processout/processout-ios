@@ -10,13 +10,11 @@ import SwiftUI
 extension View {
 
     /// Sets the style for content unavailable views within this view.
-    @available(iOS 14, *)
     public func poContentUnavailableViewStyle(_ style: any POContentUnavailableViewStyle) -> some View {
         environment(\.poContentUnavailableViewStyle, style)
     }
 }
 
-@available(iOS 14, *)
 extension EnvironmentValues {
 
     /// The style to apply to content unavailable views.

@@ -11,13 +11,11 @@ extension View {
 
     /// Sets the style for picker views within this view.
     @_spi(PO)
-    @available(iOS 14, *)
     public func poTextFieldStyle<Style: POTextFieldStyle>(_ style: Style) -> some View {
         environment(\.poTextFieldStyle, style)
     }
 }
 
-@available(iOS 14, *)
 extension EnvironmentValues {
 
     @MainActor

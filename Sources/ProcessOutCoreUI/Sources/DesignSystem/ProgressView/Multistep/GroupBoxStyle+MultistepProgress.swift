@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14.0, *)
 extension GroupBoxStyle where Self == POMultistepProgressGroupBoxStyle {
 
     public static var poMultistepProgress: POMultistepProgressGroupBoxStyle {

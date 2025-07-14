@@ -11,7 +11,6 @@ import SwiftUI
 extension POBackport where Wrapped: View {
 
     @available(iOS, deprecated: 15)
-    @available(iOS 14, *)
     @ViewBuilder
     public func task<T>(
         id value: T = 0,
@@ -26,7 +25,6 @@ extension POBackport where Wrapped: View {
     }
 }
 
-@available(iOS 14, *)
 @MainActor
 private struct TaskModifier<Id: Equatable>: ViewModifier {
 

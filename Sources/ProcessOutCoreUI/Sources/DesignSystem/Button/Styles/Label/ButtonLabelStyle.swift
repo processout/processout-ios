@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14.0, *)
 @MainActor
 struct ButtonLabelStyle: LabelStyle {
 
@@ -20,7 +19,6 @@ struct ButtonLabelStyle: LabelStyle {
     }
 }
 
-@available(iOS 14.0, *)
 @MainActor
 private struct ContentView: View {
 

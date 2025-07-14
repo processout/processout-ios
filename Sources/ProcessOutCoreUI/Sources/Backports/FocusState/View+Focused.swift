@@ -11,7 +11,6 @@ extension POBackport where Wrapped: View {
 
     /// Modifies this view by binding its focus state to the given state value.
     /// - NOTE: Only works with `POTextField` and `POCodeField`.
-    @available(iOS 14, *)
     public func focused<Value: Hashable>(_ binding: Binding<Value?>, equals value: Value) -> some View {
         wrapped.modifier(FocusModifier(binding: binding, value: value))
     }
@@ -19,7 +18,6 @@ extension POBackport where Wrapped: View {
     /// Modifies this view by binding its focus state to the given Boolean state
     /// value.
     /// - NOTE: Only works with `POTextField` and `POCodeField`.
-    @available(iOS 14, *)
     public func focused(_ condition: Binding<Bool>) -> some View {
         let binding = Binding<Bool?>(
             get: { condition.wrappedValue },
@@ -29,7 +27,6 @@ extension POBackport where Wrapped: View {
     }
 }
 
-@available(iOS 14, *)
 @MainActor
 private struct FocusModifier<Value: Hashable>: ViewModifier {
 
