@@ -41,7 +41,7 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
                 .buttonStyle(
                     POAnyButtonStyle(erasing: style.radioButton)
                 )
-                .backport.poControlSize(.small)
+                .controlSize(.small)
                 .controlSelected(item.isSelected)
             }
             .animation(.default, value: item.isLoading)

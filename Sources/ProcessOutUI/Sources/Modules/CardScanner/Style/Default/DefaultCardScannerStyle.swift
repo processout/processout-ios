@@ -108,7 +108,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                 POToolbar(alignment: .top, spacing: POSpacing.small) {
                     configuration.torchToggle
                         .poToggleStyle(torchToggle)
-                        .backport.poControlSize(.small)
+                        .controlSize(.small)
                         .controlWidth(.regular)
                         .padding(.leading, POSpacing.extraSmall)
                 } principal: {
@@ -127,7 +127,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                     .aspectRatio(Constants.previewAspectRatio, contentMode: .fit)
                     .padding(videoPreview.overlayInsets)
                     .frame(maxWidth: .infinity)
-                    .backport.overlay {
+                    .overlay {
                         ZStack {
                             configuration.videoPreview
                             cardOverlay(with: configuration.card)
@@ -137,7 +137,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                     .border(style: videoPreview.border)
                 configuration.cancelButton
                     .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
-                    .backport.poControlSize(.small)
+                    .controlSize(.small)
             }
             .padding(
                 .init(

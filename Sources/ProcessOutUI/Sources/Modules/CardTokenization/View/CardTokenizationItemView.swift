@@ -42,7 +42,7 @@ struct CardTokenizationItemView: View {
         case .button(let buttonItem):
             Button.create(with: buttonItem)
                 .buttonStyle(forPrimaryRole: style.actionsContainer.primary, fallback: style.actionsContainer.secondary)
-                .backport.poControlSize(.small)
+                .controlSize(.small)
         case .error(let errorItem):
             Text(errorItem.description)
                 .textStyle(style.errorDescription)

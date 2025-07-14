@@ -26,7 +26,7 @@ struct NativeAlternativePaymentMessageInstructionItemView: View {
                         copiedTitle: String(resource: .NativeAlternativePayment.Button.copied)
                     )
                 )
-                .backport.poControlSize(.small)
+                .controlSize(.small)
                 .controlWidth(.regular)
                 .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.secondary))
             } label: {

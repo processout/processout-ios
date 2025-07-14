@@ -54,7 +54,7 @@ struct NativeAlternativePaymentItemView: View {
                 if let viewModel = item.actionButton {
                     Button.create(with: viewModel)
                         .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.secondary))
-                        .backport.poControlSize(.small)
+                        .controlSize(.small)
                 }
             }
             .padding(.horizontal, POSpacing.space48)
