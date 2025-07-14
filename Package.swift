@@ -6,7 +6,7 @@ let package = Package(
     name: "ProcessOut",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v13)
+        .iOS(.v15)
     ],
     products: [
         .library(name: "ProcessOut", targets: ["ProcessOut"]),

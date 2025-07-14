@@ -21,7 +21,7 @@ targets:
   ProcessOutCoreUI:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "15.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.core-ui
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutCoreUI
@@ -36,7 +36,7 @@ targets:
   ProcessOutUI:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "15.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.ui
       OTHER_SWIFT_FLAGS: "-Xfrontend -module-interface-preserve-types-as-written -enable-upcoming-feature IsolatedDefaultValues"
@@ -53,7 +53,7 @@ targets:
   ProcessOut:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "15.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-ios
       MARKETING_VERSION: ${CURRENT_VERSION}
@@ -92,7 +92,7 @@ targets:
   ProcessOutCheckout3DS:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "15.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.checkout-3ds-ios
       EXCLUDED_ARCHS: x86_64 # Checkout3DS doesn't support x86_64 so are we
@@ -108,7 +108,7 @@ targets:
   ProcessOutNetcetera3DS:
     type: framework
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "15.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.netcetera-3ds-ios
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutNetcetera3DS

@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.summary               = 'ProcessOut prebuilt UI.'
   s.source                = { :git => 'https://github.com/processout/processout-ios.git', :tag => s.version.to_s }
   s.frameworks            = 'Foundation', 'SwiftUI'
-  s.ios.deployment_target = '14.0'
+  s.ios.deployment_target = '15.0'
   s.ios.resources         = 'Sources/ProcessOutUI/Resources/**/*'
   s.source_files          = 'Sources/ProcessOutUI/**/*.swift'
   s.pod_target_xcconfig   = { 'OTHER_SWIFT_FLAGS' => '-Xfrontend -module-interface-preserve-types-as-written -enable-upcoming-feature IsolatedDefaultValues' }
