@@ -221,7 +221,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 isEnabled: state.isCancellable
             )
         ].compactMap { $0 }
-        guard buttons.isEmpty else {
+        guard !buttons.isEmpty else {
             return nil
         }
         return .init(buttons: buttons, inline: configuration.prefersInlineControls)
@@ -298,7 +298,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         if let cancelButton {
             buttons.append(cancelButton)
         }
-        guard buttons.isEmpty else {
+        guard !buttons.isEmpty else {
             return nil
         }
         return .init(buttons: buttons, inline: configuration.prefersInlineControls)
