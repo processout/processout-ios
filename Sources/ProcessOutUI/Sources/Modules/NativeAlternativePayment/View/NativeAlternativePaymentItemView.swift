@@ -9,7 +9,6 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 @_spi(PO) import ProcessOut
 
-@available(iOS 14, *)
 @MainActor
 struct NativeAlternativePaymentItemView: View {
 

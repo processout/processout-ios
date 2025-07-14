@@ -10,7 +10,6 @@ import ProcessOut
 
 /// View controller hosting `PONativeAlternativePaymentView`.
 @available(*, deprecated, message: "Use PONativeAlternativePaymentView directly instead.")
-@available(iOS 14, *)
 public final class PONativeAlternativePaymentViewController: UIHostingController<AnyView> {
 
     /// Creates native APM view controller.

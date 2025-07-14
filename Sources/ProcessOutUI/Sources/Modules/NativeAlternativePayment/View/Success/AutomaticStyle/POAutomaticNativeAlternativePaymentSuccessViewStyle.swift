@@ -8,7 +8,6 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14.0, *)
 public struct POAutomaticNativeAlternativePaymentSuccessViewStyle: PONativeAlternativePaymentSuccessViewStyle { // swiftlint:disable:this type_name line_length
 
     public init(title: POTextStyle, description: POTextStyle) {

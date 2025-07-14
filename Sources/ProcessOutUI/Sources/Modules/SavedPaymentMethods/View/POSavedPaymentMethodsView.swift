@@ -10,7 +10,6 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 /// Saved payment methods root view.
-@available(iOS 14, *)
 @MainActor
 public struct POSavedPaymentMethodsView: View {
 

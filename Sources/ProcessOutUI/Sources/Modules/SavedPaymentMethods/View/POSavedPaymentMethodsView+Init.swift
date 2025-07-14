@@ -7,7 +7,6 @@
 
 @_spi(PO) import ProcessOut
 
-@available(iOS 14, *)
 extension POSavedPaymentMethodsView {
 
     /// Creates saved payment methods view.

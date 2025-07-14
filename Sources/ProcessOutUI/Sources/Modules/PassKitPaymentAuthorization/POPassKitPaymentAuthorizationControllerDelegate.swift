@@ -43,7 +43,6 @@ public protocol POPassKitPaymentAuthorizationControllerDelegate: AnyObject {
     func paymentAuthorizationControllerWillAuthorizePayment(_ controller: POPassKitPaymentAuthorizationController)
 
     /// Requests an object that validates the identity of a merchant for a payment request.
-    @available(iOS 14, *)
     @MainActor
     func paymentAuthorizationControllerDidRequestMerchantSessionUpdate(
         controller: POPassKitPaymentAuthorizationController
@@ -103,7 +102,6 @@ extension POPassKitPaymentAuthorizationControllerDelegate {
         // Ignored
     }
 
-    @available(iOS 14, *)
     public func paymentAuthorizationControllerDidRequestMerchantSessionUpdate(
         controller: POPassKitPaymentAuthorizationController
     ) async -> PKPaymentRequestMerchantSessionUpdate? {

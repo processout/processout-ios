@@ -11,7 +11,6 @@ import SwiftUI
 
 // swiftlint:disable type_name strict_fileprivate generic_type_name
 
-@available(iOS 14.0, *)
 public struct POAutomaticNativeAlternativePaymentConfirmationProgressViewStyle<
     ProgressViewStyleType: ProgressViewStyle,
     GroupBoxStyleType: GroupBoxStyle
@@ -36,7 +35,6 @@ public struct POAutomaticNativeAlternativePaymentConfirmationProgressViewStyle<
 
 // swiftlint:enable type_name strict_fileprivate
 
-@available(iOS 14.0, *)
 private struct ContentView<ProgressViewStyleType: ProgressViewStyle, GroupBoxStyleType: GroupBoxStyle>: View {
 
     let style: POAutomaticNativeAlternativePaymentConfirmationProgressViewStyle<ProgressViewStyleType, GroupBoxStyleType> // swiftlint:disable:this line_length

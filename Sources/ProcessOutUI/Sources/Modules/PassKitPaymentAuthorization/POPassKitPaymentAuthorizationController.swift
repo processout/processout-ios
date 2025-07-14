@@ -135,7 +135,6 @@ extension POPassKitPaymentAuthorizationController: PKPaymentAuthorizationControl
         delegate?.paymentAuthorizationControllerWillAuthorizePayment(self)
     }
 
-    @available(iOS 14, *)
     public func paymentAuthorizationControllerDidRequestMerchantSessionUpdate(
         controller _: PKPaymentAuthorizationController
     ) async -> PKPaymentRequestMerchantSessionUpdate {

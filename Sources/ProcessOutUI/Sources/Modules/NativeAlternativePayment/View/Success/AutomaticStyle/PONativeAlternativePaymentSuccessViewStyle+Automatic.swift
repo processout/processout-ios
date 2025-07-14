@@ -8,7 +8,6 @@
 import SwiftUI
 import ProcessOutCoreUI
 
-@available(iOS 14.0, *)
 extension PONativeAlternativePaymentSuccessViewStyle where Self == POAutomaticNativeAlternativePaymentSuccessViewStyle {
 
     /// Default payment success view style.

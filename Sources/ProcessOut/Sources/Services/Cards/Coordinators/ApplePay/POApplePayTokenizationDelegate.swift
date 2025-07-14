@@ -22,7 +22,6 @@ public protocol POApplePayTokenizationDelegate: Sendable { // swiftlint:disable:
     func applePayTokenizationWillAuthorizePayment()
 
     /// Requests an object that validates the identity of a merchant for a payment request.
-    @available(iOS 14, *)
     @MainActor
     func applePayTokenizationDidRequestMerchantSessionUpdate() async -> PKPaymentRequestMerchantSessionUpdate?
 
@@ -68,7 +67,6 @@ extension POApplePayTokenizationDelegate {
         // Ignored
     }
 
-    @available(iOS 14, *)
     @MainActor
     public func applePayTokenizationDidRequestMerchantSessionUpdate() async -> PKPaymentRequestMerchantSessionUpdate? {
         nil

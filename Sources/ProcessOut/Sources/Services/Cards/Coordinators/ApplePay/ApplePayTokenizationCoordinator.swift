@@ -54,7 +54,6 @@ final class ApplePayTokenizationCoordinator: ApplePayAuthorizationSessionDelegat
         delegate?.applePayTokenizationWillAuthorizePayment()
     }
 
-    @available(iOS 14, *)
     func applePayAuthorizationSessionDidRequestMerchantSessionUpdate() async -> PKPaymentRequestMerchantSessionUpdate? {
         await delegate?.applePayTokenizationDidRequestMerchantSessionUpdate()
     }

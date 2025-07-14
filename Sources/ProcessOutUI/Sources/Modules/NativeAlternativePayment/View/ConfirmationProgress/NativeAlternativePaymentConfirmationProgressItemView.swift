@@ -8,7 +8,6 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14, *)
 struct NativeAlternativePaymentConfirmationProgressItemView: View { // swiftlint:disable:this type_name
 
     let item: NativeAlternativePaymentViewModelItem.ConfirmationProgress

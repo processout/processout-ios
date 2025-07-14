@@ -8,7 +8,6 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14, *)
 extension POSavedPaymentMethodsStyle where Self == PODefaultSavedPaymentMethodsStyle {
 
     /// The default saved payment method style.

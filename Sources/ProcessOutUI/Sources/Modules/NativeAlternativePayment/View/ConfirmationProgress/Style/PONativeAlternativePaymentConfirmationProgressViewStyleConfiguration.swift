@@ -9,7 +9,6 @@ import SwiftUI
 import Foundation
 
 /// Payment confirmation progress view style configuration.
-@available(iOS 14.0, *)
 public struct PONativeAlternativePaymentConfirmationProgressViewStyleConfiguration { // swiftlint:disable:this type_name
 
     /// Estimated payment completion date.

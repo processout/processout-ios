@@ -8,7 +8,6 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14, *)
 extension POCardScannerStyle where Self == PODefaultCardScannerStyle {
 
     /// The default card scanner style.
