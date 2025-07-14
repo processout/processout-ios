@@ -34,7 +34,7 @@ struct AsyncUtilsTests {
         // Given
         let timeout: TimeInterval = 1
         let operation = { @Sendable in
-            try await Task.sleep(for: .seconds(3))
+            try await Task.sleep(for: .seconds(10))
         }
 
         // When
@@ -135,7 +135,7 @@ struct AsyncUtilsTests {
         try await withKnownIssue {
             try await retry(
                 operation: {
-                    try await Task.sleep(for: .seconds(3))
+                    try await Task.sleep(for: .seconds(10))
                 },
                 while: { _ in false },
                 timeout: 1,

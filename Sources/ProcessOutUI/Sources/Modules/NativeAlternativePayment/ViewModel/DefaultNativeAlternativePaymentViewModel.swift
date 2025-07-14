@@ -93,29 +93,27 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func update(with state: InteractorState.Started, oldState: InteractorState) {
         let newState = NativeAlternativePaymentViewModelState(
-            items: createItems(state: state, isSubmitting: false),
+            items: createItems(state: state),
             focusedItemId: createFocusedInputId(newState: state, oldState: oldState),
-            confirmationDialog: nil
+            confirmationDialog: nil,
+            controls: createFormControlGroup(state: state, isSubmitting: false)
         )
         self.state = newState
     }
 
     private func createItems(
-        state: InteractorState.Started, isSubmitting: Bool
+        state: InteractorState.Started
     ) -> [NativeAlternativePaymentViewModelItem] {
         var items = [
             createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
         ]
         items += createItems(for: state.elements, state: state)
-        items.append(
-            createControlGroupItem(state: state, isSubmitting: isSubmitting)
-        )
         return items.compactMap { $0 }
     }
 
-    private func createControlGroupItem(
+    private func createFormControlGroup(
         state: InteractorState.Started, isSubmitting: Bool
-    ) -> NativeAlternativePaymentViewModelItem {
+    ) -> NativeAlternativePaymentViewModelControlGroup? {
         let buttons = [
             createSubmitButton(state: state, isLoading: isSubmitting),
             createCancelButton(
@@ -123,8 +121,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 isEnabled: !isSubmitting && state.isCancellable
             )
         ].compactMap { $0 }
-        let controlGroup = NativeAlternativePaymentViewModelItem.ControlGroup(id: "control-group", content: buttons)
-        return .controlGroup(controlGroup)
+        guard !buttons.isEmpty else {
+            return nil
+        }
+        return .init(buttons: buttons, inline: configuration.prefersInlineControls)
     }
 
     private func createFocusedInputId(
@@ -154,9 +154,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func update(withSubmittingState state: InteractorState.Started) {
         let newState = NativeAlternativePaymentViewModelState(
-            items: createItems(state: state, isSubmitting: true),
+            items: createItems(state: state),
             focusedItemId: nil,
-            confirmationDialog: nil
+            confirmationDialog: nil,
+            controls: createFormControlGroup(state: state, isSubmitting: true)
         )
         self.state = newState
     }
@@ -167,7 +168,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         let newState = NativeAlternativePaymentViewModelState(
             items: createItems(state: state),
             focusedItemId: nil,
-            confirmationDialog: nil
+            confirmationDialog: nil,
+            controls: createFormControlGroup(state: state)
         )
         self.state = newState
     }
@@ -206,13 +208,12 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 items.append(contentsOf: createItems(for: state.elements, state: nil))
             }
         }
-        items.append(createControlGroupItem(state: state))
         return items.compactMap { $0 }
     }
 
-    private func createControlGroupItem(
+    private func createFormControlGroup(
         state: InteractorState.AwaitingCompletion
-    ) -> NativeAlternativePaymentViewModelItem {
+    ) -> NativeAlternativePaymentViewModelControlGroup? {
         let buttons = [
             createConfirmPaymentButton(state: state),
             createCancelButton(
@@ -220,8 +221,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 isEnabled: state.isCancellable
             )
         ].compactMap { $0 }
-        let controlGroup = NativeAlternativePaymentViewModelItem.ControlGroup(id: "control-group", content: buttons)
-        return .controlGroup(controlGroup)
+        guard buttons.isEmpty else {
+            return nil
+        }
+        return .init(buttons: buttons, inline: configuration.prefersInlineControls)
     }
 
     private func createConfirmPaymentButton(state: InteractorState.AwaitingCompletion) -> POButtonViewModel? {
@@ -274,18 +277,18 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         items.append(
             contentsOf: createItems(for: state.elements, state: nil)
         )
-        items.append(
-            createControlGroupItem(state: state, isRedirecting: isRedirecting)
-        )
         let newState = NativeAlternativePaymentViewModelState(
-            items: items.compactMap { $0 }, focusedItemId: nil, confirmationDialog: nil
+            items: items.compactMap { $0 },
+            focusedItemId: nil,
+            confirmationDialog: nil,
+            controls: createFormControlGroup(state: state, isRedirecting: isRedirecting)
         )
         self.state = newState
     }
 
-    private func createControlGroupItem(
+    private func createFormControlGroup(
         state: InteractorState.AwaitingRedirect, isRedirecting: Bool
-    ) -> NativeAlternativePaymentViewModelItem {
+    ) -> NativeAlternativePaymentViewModelControlGroup? {
         var buttons: [POButtonViewModel] = [
             createRedirectButton(state: state, isRedirecting: isRedirecting)
         ]
@@ -295,8 +298,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         if let cancelButton {
             buttons.append(cancelButton)
         }
-        let controlGroup = NativeAlternativePaymentViewModelItem.ControlGroup(id: "control-group", content: buttons)
-        return .controlGroup(controlGroup)
+        guard buttons.isEmpty else {
+            return nil
+        }
+        return .init(buttons: buttons, inline: configuration.prefersInlineControls)
     }
 
     private func update(with state: InteractorState.Redirecting) {

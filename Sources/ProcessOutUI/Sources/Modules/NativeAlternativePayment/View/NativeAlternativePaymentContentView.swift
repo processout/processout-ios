@@ -24,9 +24,7 @@ struct NativeAlternativePaymentContentView: View {
             VStack(spacing: POSpacing.space16) {
                 ForEach(viewModel.state.items) { item in
                     NativeAlternativePaymentItemView(item: item, focusedItemId: $viewModel.state.focusedItemId)
-                        .padding(
-                            .init(top: 0, leading: insets.leading, bottom: 0, trailing: insets.trailing)
-                        )
+                        .padding(.init(top: 0, leading: insets.leading, bottom: 0, trailing: insets.trailing))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .overlayPreferenceValue(
                             NativeAlternativePaymentViewSeparatorVisibilityPreferenceKey.self,
@@ -36,6 +34,19 @@ struct NativeAlternativePaymentContentView: View {
                             }
                         )
                         .fixedSize(horizontal: false, vertical: true)
+                }
+                if let controls = viewModel.state.controls, controls.inline {
+                    VStack(spacing: POSpacing.space12) {
+                        ForEach(controls.buttons) { button in
+                            Button.create(with: button).buttonStyle(
+                                forPrimaryRole: style.actionsContainer.primary,
+                                fallback: style.actionsContainer.secondary
+                            )
+                        }
+                    }
+                    .padding(
+                        .init(top: POSpacing.space12, leading: insets.leading, bottom: 0, trailing: insets.trailing)
+                    )
                 }
             }
             .padding(

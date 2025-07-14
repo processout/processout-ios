@@ -66,8 +66,6 @@ struct NativeAlternativePaymentItemView: View {
             }
         case .group(let group):
             NativeAlternativePaymentGroupItemView(item: group, focusedItemId: $focusedItemId)
-        case .controlGroup(let group):
-            NativeAlternativePaymentControlGroupItemView(item: group)
         case .button(let item):
             Button.create(with: item)
                 .buttonStyle(forPrimaryRole: style.actionsContainer.primary, fallback: style.actionsContainer.secondary)
