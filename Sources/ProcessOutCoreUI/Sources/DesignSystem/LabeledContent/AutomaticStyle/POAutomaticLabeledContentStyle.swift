@@ -55,7 +55,7 @@ public struct POAutomaticLabeledContentStyle: POLabeledContentStyle {
             }
         }
         .buttonStyle(.secondary)
-        .backport.poControlSize(.small)
+        .controlSize(.small)
         .controlWidth(.regular)
     } label: {
         Text("Account number")

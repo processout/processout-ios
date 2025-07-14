@@ -116,7 +116,7 @@ private struct ContentView: View {
     @Environment(\.isEnabled)
     private var isEnabled
 
-    @Environment(\.poControlSize)
+    @Environment(\.controlSize)
     private var controlSize
 
     // MARK: - Private Methods
@@ -142,14 +142,10 @@ private struct ContentView: View {
 
     private var geometry: Geometry {
         switch controlSize {
-        case .regular:
-            return .init(
-                padding: POSpacing.space12,
-                minHeight: 48,
-                backgroundInsets: EdgeInsets()
-            )
-        case .small:
+        case .mini, .small:
             return .init(padding: 0, minHeight: nil, backgroundInsets: .init(horizontal: -10, vertical: -11))
+        default:
+            return .init(padding: POSpacing.space12, minHeight: 48, backgroundInsets: EdgeInsets())
         }
     }
 }
@@ -162,5 +158,5 @@ private struct ContentView: View {
     }
     .buttonStyle(PORadioButtonStyle.radio)
     .padding()
-    .backport.poControlSize(.small)
+    .controlSize(.small)
 }

@@ -49,7 +49,7 @@ private struct ContentView: View {
 
     private let configuration: LabelStyleConfiguration, titleStyle: POTextStyle
 
-    @Environment(\.poControlSize)
+    @Environment(\.controlSize)
     private var controlSize
 
     @POBackport.ScaledMetric
@@ -58,13 +58,20 @@ private struct ContentView: View {
     // MARK: - Private Methods
 
     private var scaledIconHeight: CGFloat {
-        let sizes: [POControlSize: CGFloat] = [.regular: 20, .small: 16]
-        return sizes[controlSize]! * iconScale // swiftlint:disable:this force_unwrapping
+        switch controlSize {
+        case .mini, .small:
+            return 16 * iconScale
+        default:
+            return 20 * iconScale
+        }
     }
 
     private var scaledTitleStyle: POTextStyle {
-        let scales: [POControlSize: CGFloat] = [.regular: 1, .small: 0.867]
-        let scale = scales[controlSize]! // swiftlint:disable:this force_unwrapping
-        return titleStyle.scaledBy(scale)
+        switch controlSize {
+        case .mini, .small:
+            return titleStyle.scaledBy(0.867)
+        default:
+            return titleStyle
+        }
     }
 }
