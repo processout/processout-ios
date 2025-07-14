@@ -70,9 +70,6 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
     case didFailToSubmitParameters(failure: POFailure)
 
     /// Event is sent after all information is collected, and implementation is waiting for a PSP to confirm payment.
-    /// You could check associated value `additionalActionExpected` to understand whether user needs
-    /// to execute additional action(s) outside application, for example confirming operation in his/her banking app
-    /// to finalize payment.
     case willWaitForPaymentConfirmation(WillWaitForPaymentConfirmation)
 
     /// This event is triggered during the `PENDING` state when the user confirms that they have completed
