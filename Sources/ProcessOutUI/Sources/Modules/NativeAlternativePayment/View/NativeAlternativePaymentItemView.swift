@@ -49,8 +49,11 @@ struct NativeAlternativePaymentItemView: View {
         case .messageInstruction(let item):
             NativeAlternativePaymentMessageInstructionItemView(item: item)
         case .image(let item):
-            VStack {
+            VStack(spacing: POSpacing.space16) {
                 Image(uiImage: item.image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: item.image.size.width, maxHeight: item.image.size.height)
                 if let viewModel = item.actionButton {
                     Button.create(with: viewModel)
                         .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.secondary))
