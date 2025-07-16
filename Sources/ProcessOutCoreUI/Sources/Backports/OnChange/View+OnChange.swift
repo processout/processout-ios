@@ -8,7 +8,6 @@
 import SwiftUI
 import Combine
 
-@available(iOS 14, *)
 extension POBackport where Wrapped: View {
 
     /// Adds a modifier for this view that fires an action when a specific value changes.

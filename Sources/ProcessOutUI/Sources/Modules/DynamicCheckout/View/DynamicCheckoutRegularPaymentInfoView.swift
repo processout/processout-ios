@@ -9,7 +9,6 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14, *)
 @MainActor
 struct DynamicCheckoutRegularPaymentInfoView: View {
 
@@ -41,7 +40,7 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
                 .buttonStyle(
                     POAnyButtonStyle(erasing: style.radioButton)
                 )
-                .backport.poControlSize(.small)
+                .controlSize(.small)
                 .controlSelected(item.isSelected)
             }
             .animation(.default, value: item.isLoading)

@@ -8,7 +8,6 @@
 import SwiftUI
 
 /// The appearance and behavior of a labeled content instance.
-@available(iOS 14, *)
 @MainActor
 public protocol POLabeledContentStyle {
 

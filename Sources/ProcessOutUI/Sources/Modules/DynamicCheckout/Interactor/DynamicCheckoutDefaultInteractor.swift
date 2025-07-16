@@ -11,7 +11,6 @@ import Foundation
 import PassKit
 @_spi(PO) import ProcessOut
 
-@available(iOS 14, *)
 final class DynamicCheckoutDefaultInteractor:
     BaseInteractor<DynamicCheckoutInteractorState>, DynamicCheckoutInteractor {
 
@@ -878,7 +877,6 @@ final class DynamicCheckoutDefaultInteractor:
     }
 }
 
-@available(iOS 14, *)
 extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
 
     func cardTokenizationDidEmitEvent(_ event: POCardTokenizationEvent) {
@@ -916,7 +914,6 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
     }
 }
 
-@available(iOS 14, *)
 extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegateV2 {
 
     func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentEventV2) {

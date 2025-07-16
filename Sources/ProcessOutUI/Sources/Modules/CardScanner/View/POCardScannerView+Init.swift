@@ -7,7 +7,6 @@
 
 @_spi(PO) import ProcessOut
 
-@available(iOS 14, *)
 extension POCardScannerView {
 
     /// Creates card scanner view.

@@ -9,7 +9,6 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 /// Defines style for native alternative payment module.
-@available(iOS 14, *)
 @MainActor
 @preconcurrency
 public struct PONativeAlternativePaymentStyle {
@@ -105,7 +104,6 @@ public struct PONativeAlternativePaymentStyle {
     }
 }
 
-@available(iOS 14, *)
 extension PONativeAlternativePaymentStyle {
 
     /// Default native alternative payment style.
@@ -132,7 +130,6 @@ extension PONativeAlternativePaymentStyle {
     )
 }
 
-@available(iOS 14, *)
 extension PONativeAlternativePaymentStyle {
 
     /// Input style.
@@ -175,7 +172,6 @@ extension PONativeAlternativePaymentStyle {
     }
 }
 
-@available(iOS 14, *)
 extension PONativeAlternativePaymentStyle {
 
     @available(*, deprecated)

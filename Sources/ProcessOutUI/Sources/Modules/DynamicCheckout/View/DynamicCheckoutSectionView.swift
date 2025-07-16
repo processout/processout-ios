@@ -8,7 +8,6 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14, *)
 @MainActor
 struct DynamicCheckoutSectionView: View {
 
@@ -40,7 +39,7 @@ struct DynamicCheckoutSectionView: View {
             if let viewModel = viewModel.button {
                 Button.create(with: viewModel)
                     .buttonStyle(POAnyButtonStyle(erasing: style.sectionHeader.trailingButton))
-                    .backport.poControlSize(.small)
+                    .controlSize(.small)
                     .controlWidth(.regular)
             }
         }

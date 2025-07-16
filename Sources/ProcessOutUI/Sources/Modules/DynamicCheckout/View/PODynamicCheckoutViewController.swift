@@ -9,7 +9,6 @@ import SwiftUI
 import ProcessOut
 
 /// View controller hosting `PODynamicCheckoutView`.
-@available(iOS 14, *)
 @_spi(PO)
 public final class PODynamicCheckoutViewController: UIHostingController<AnyView> {
 

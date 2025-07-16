@@ -9,7 +9,6 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14, *)
 extension POAsyncImage {
 
     /// Loads and displays an image from the specified resource.

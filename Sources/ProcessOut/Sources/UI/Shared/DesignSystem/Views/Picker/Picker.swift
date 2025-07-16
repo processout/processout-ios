@@ -38,7 +38,6 @@ final class Picker: UIControl {
 
     // MARK: - UIContextMenuInteractionDelegate
 
-    @available(iOS 14, *)
     override func contextMenuInteraction(
         _ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint
     ) -> UIContextMenuConfiguration? {

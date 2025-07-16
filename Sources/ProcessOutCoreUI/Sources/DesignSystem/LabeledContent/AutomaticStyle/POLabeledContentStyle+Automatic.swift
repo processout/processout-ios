@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 extension POLabeledContentStyle where Self == POAutomaticLabeledContentStyle {
 
     /// A labeled content style that resolves its appearance automatically based

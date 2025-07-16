@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 extension POPhoneNumberFieldStyle
     where Self == PODefaultPhoneNumberFieldStyle<POMenuPickerStyle, PODefaultTextFieldStyle> {
 

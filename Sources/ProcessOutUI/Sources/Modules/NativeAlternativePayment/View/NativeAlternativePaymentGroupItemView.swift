@@ -8,7 +8,6 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14, *)
 struct NativeAlternativePaymentGroupItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem.Group

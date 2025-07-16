@@ -10,7 +10,6 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 /// Dynamic checkout root view.
-@available(iOS 14, *)
 @_spi(PO)
 @MainActor
 public struct PODynamicCheckoutView: View {

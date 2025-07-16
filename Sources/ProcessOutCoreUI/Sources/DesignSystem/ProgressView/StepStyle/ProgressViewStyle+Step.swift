@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14.0, *)
 extension ProgressViewStyle where Self == POStepProgressViewStyle {
 
     public static var poStep: POStepProgressViewStyle {

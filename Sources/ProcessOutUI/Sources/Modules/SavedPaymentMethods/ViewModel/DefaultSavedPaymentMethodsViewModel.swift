@@ -10,7 +10,6 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14, *)
 final class DefaultSavedPaymentMethodsViewModel: ViewModel {
 
     init(interactor: some SavedPaymentMethodsInteractor) {

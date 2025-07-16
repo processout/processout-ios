@@ -11,7 +11,6 @@ import SwiftUI
 /// styling for other states automatically.
 ///
 /// - NOTE: SDK uses light color variation with light brand colors and dark otherwise.
-@available(iOS 14, *)
 @MainActor
 @preconcurrency
 public struct POBrandButtonStyle: ButtonStyle {
@@ -56,7 +55,6 @@ public struct POBrandButtonStyle: ButtonStyle {
 
 // Environments may not be propagated directly to ButtonStyle. Workaround is
 // to wrap content into additional view and use environments as usual.
-@available(iOS 14.0, *)
 @MainActor
 private struct ButtonStyleBox: View {
 
@@ -85,7 +83,7 @@ private struct ButtonStyleBox: View {
             .opacity(
                 isLoading ? 0 : 1
             )
-            .backport.overlay {
+            .overlay {
                 if isLoading {
                     ProgressView().poProgressViewStyle(progressStyle)
                 }
@@ -122,7 +120,7 @@ private struct ButtonStyleBox: View {
     @Environment(\.colorScheme)
     private var colorScheme
 
-    @Environment(\.poControlSize)
+    @Environment(\.controlSize)
     private var controlSize
 
     @Environment(\.poControlWidth)
@@ -144,8 +142,12 @@ private struct ButtonStyleBox: View {
     }
 
     private var minSize: CGFloat {
-        let sizes: [POControlSize: CGFloat] = [.small: 32, .regular: 44]
-        return sizes[controlSize]! // swiftlint:disable:this force_unwrapping
+        switch controlSize {
+        case .mini, .small:
+            return 32
+        default:
+            return 44
+        }
     }
 
     private var maxWidth: CGFloat? {

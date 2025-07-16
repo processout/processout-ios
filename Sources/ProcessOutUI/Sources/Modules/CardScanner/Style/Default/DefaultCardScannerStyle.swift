@@ -9,7 +9,6 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 /// The default card scanner style.
-@available(iOS 14, *)
 public struct PODefaultCardScannerStyle: POCardScannerStyle {
 
     public struct VideoPreview {
@@ -108,7 +107,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                 POToolbar(alignment: .top, spacing: POSpacing.small) {
                     configuration.torchToggle
                         .poToggleStyle(torchToggle)
-                        .backport.poControlSize(.small)
+                        .controlSize(.small)
                         .controlWidth(.regular)
                         .padding(.leading, POSpacing.extraSmall)
                 } principal: {
@@ -127,7 +126,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                     .aspectRatio(Constants.previewAspectRatio, contentMode: .fit)
                     .padding(videoPreview.overlayInsets)
                     .frame(maxWidth: .infinity)
-                    .backport.overlay {
+                    .overlay {
                         ZStack {
                             configuration.videoPreview
                             cardOverlay(with: configuration.card)
@@ -137,7 +136,7 @@ public struct PODefaultCardScannerStyle: POCardScannerStyle {
                     .border(style: videoPreview.border)
                 configuration.cancelButton
                     .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
-                    .backport.poControlSize(.small)
+                    .controlSize(.small)
             }
             .padding(
                 .init(

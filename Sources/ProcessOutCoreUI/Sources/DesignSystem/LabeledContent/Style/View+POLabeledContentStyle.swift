@@ -11,13 +11,11 @@ extension View {
 
     /// Sets the style for picker views within this view.
     @_spi(PO)
-    @available(iOS 14, *)
     public func poLabeledContentStyle(_ style: any POLabeledContentStyle) -> some View {
         environment(\.poLabeledContentStyle, style)
     }
 }
 
-@available(iOS 14, *)
 extension EnvironmentValues {
 
     @MainActor

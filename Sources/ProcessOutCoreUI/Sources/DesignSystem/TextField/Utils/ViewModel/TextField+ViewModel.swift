@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 extension POTextField where Trailing == AnyView {
 
     public static func create(
@@ -17,7 +16,6 @@ extension POTextField where Trailing == AnyView {
     }
 }
 
-@available(iOS 14, *)
 @MainActor
 private struct TextFieldWrapper: View {
 

@@ -14,10 +14,4 @@ extension POBackport where Wrapped: View {
     public func background<V: View>(alignment: Alignment = .center, @ViewBuilder content: () -> V) -> some View {
         wrapped.background(content(), alignment: alignment)
     }
-
-    /// Layers a secondary view in front of this view.
-    @available(iOS, deprecated: 15, message: "Use View/overlay(alignment:content:) directly.")
-    public func overlay<V: View>(alignment: Alignment = .center, @ViewBuilder content: () -> V) -> some View {
-        wrapped.overlay(content(), alignment: alignment)
-    }
 }

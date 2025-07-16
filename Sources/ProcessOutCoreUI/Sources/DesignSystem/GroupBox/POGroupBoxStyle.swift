@@ -8,7 +8,6 @@
 import SwiftUI
 
 /// A custom `GroupBoxStyle` with configurable label text style, content background, border, and dividers.
-@available(iOS 14, *)
 @_spi(PO)
 public struct POGroupBoxStyle: GroupBoxStyle {
 

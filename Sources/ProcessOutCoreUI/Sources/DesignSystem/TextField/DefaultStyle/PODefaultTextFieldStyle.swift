@@ -9,7 +9,6 @@ import SwiftUI
 
 /// The default text field style that resolves its appearance based on current input style.
 @_spi(PO)
-@available(iOS 14, *)
 public struct PODefaultTextFieldStyle: POTextFieldStyle {
 
     public func makeBody(configuration: Configuration) -> some View {
@@ -17,7 +16,6 @@ public struct PODefaultTextFieldStyle: POTextFieldStyle {
     }
 }
 
-@available(iOS 14, *)
 private struct DefaultTextFieldStyleContentView: View {
 
     let configuration: POTextFieldStyleConfiguration

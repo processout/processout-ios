@@ -11,7 +11,6 @@ import SwiftUI
 ///
 /// The instance's content represents a read-only or read-write value, and its
 /// label identifies or describes the purpose of that value.
-@available(iOS 14, *)
 @_spi(PO)
 public struct POLabeledContent<Label: View, Content: View>: View {
 

@@ -8,7 +8,6 @@
 import SwiftUI
 
 /// Payment success view style configuration.
-@available(iOS 14.0, *)
 public struct PONativeAlternativePaymentSuccessViewStyleConfiguration { // swiftlint:disable:this type_name
 
     /// View title.

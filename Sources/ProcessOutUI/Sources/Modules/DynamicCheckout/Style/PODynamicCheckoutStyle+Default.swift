@@ -8,7 +8,6 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14, *)
 extension PODynamicCheckoutStyle {
 
     /// Default dynamic checkout style.
@@ -32,7 +31,6 @@ extension PODynamicCheckoutStyle {
     )
 }
 
-@available(iOS 14, *)
 extension PODynamicCheckoutStyle.SectionHeader {
 
     /// Default dynamic checkout regular payment method style.
@@ -42,7 +40,6 @@ extension PODynamicCheckoutStyle.SectionHeader {
     )
 }
 
-@available(iOS 14, *)
 extension PODynamicCheckoutStyle.RegularPaymentMethod {
 
     /// Default dynamic checkout regular payment method style.
@@ -54,7 +51,6 @@ extension PODynamicCheckoutStyle.RegularPaymentMethod {
     )
 }
 
-@available(iOS 14, *)
 extension PODynamicCheckoutStyle.PaymentSuccess {
 
     /// Default dynamic checkout capture success style.

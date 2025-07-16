@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 struct RadioButtonKnobView: View {
 
     init(style: PORadioButtonKnobStateStyle, textStyle: UIFont.TextStyle?) {

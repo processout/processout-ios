@@ -8,7 +8,6 @@
 import SwiftUI
 
 /// A button that adds a value to the pasteboard.
-@available(iOS 14.0, *)
 @_spi(PO)
 public struct POCopyButton: View {
 

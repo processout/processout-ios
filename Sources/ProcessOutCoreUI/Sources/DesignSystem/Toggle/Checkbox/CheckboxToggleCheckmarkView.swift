@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 @MainActor
 struct CheckboxToggleCheckmarkView: View {
 

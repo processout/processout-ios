@@ -8,7 +8,6 @@
 import SwiftUI
 
 @_spi(PO)
-@available(iOS 14, *)
 public struct POMenuPickerStyle: POPickerStyle {
 
     public init(inputStyle: POInputStyle) {
@@ -24,7 +23,6 @@ public struct POMenuPickerStyle: POPickerStyle {
     private let inputStyle: POInputStyle
 }
 
-@available(iOS 14, *)
 extension POPickerStyle where Self == POMenuPickerStyle {
 
     /// A picker style that presents the options as a menu when the user
@@ -35,7 +33,6 @@ extension POPickerStyle where Self == POMenuPickerStyle {
 }
 
 @MainActor
-@available(iOS 14, *)
 private struct ContentView: View {
 
     let inputStyle: POInputStyle, configuration: POPickerStyleConfiguration

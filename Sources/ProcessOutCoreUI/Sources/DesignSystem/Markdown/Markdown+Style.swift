@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 extension POMarkdown {
 
     /// Applies given `style` to text.

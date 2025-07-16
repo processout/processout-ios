@@ -10,13 +10,11 @@ import SwiftUI
 extension View {
 
     /// Sets the style for card tokenization views within this view.
-    @available(iOS 14, *)
     public func cardTokenizationStyle(_ style: POCardTokenizationStyle) -> some View {
         environment(\.cardTokenizationStyle, style)
     }
 }
 
-@available(iOS 14, *)
 extension EnvironmentValues {
 
     @MainActor

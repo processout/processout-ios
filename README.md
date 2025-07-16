@@ -9,7 +9,7 @@ Get started with our ProcessOut [documentation](https://docs.processout.com/) or
 
 ## Requirements
 
-*iOS 13.0+*
+*iOS 15.0+*
 
 ## Modules
 

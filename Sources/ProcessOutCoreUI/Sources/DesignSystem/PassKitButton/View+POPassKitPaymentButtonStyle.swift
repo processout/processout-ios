@@ -11,13 +11,11 @@ extension View {
 
     /// Changes PassKit button style.
     @_spi(PO)
-    @available(iOS 14, *)
     public func passKitPaymentButtonStyle(_ style: POPassKitPaymentButtonStyle) -> some View {
         environment(\.passKitPaymentButtonStyle, style)
     }
 }
 
-@available(iOS 14, *)
 extension EnvironmentValues {
 
     /// PassKit button style.

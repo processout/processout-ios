@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 extension ButtonStyle where Self == POButtonStyle<CircularProgressViewStyle> {
 
     /// Default style for primary button.

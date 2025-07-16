@@ -9,7 +9,6 @@ import SwiftUI
 
 /// A type that specifies the appearance and interaction of success view styles a view hierarchy.
 @MainActor
-@available(iOS 14.0, *)
 public protocol PONativeAlternativePaymentSuccessViewStyle {
 
     /// A view representing the appearance payment success view.

@@ -14,7 +14,7 @@ extension UIFont {
             settings.numberSpacing
         ]
         let rawSettings = settings.map { setting -> [UIFontDescriptor.FeatureKey: Any] in
-            [.featureIdentifier: setting.featureType, .typeIdentifier: setting.featureSelector]
+            [.type: setting.featureType, .selector: setting.featureSelector]
         }
         let newDescriptor = fontDescriptor.addingAttributes(
             [.featureSettings: rawSettings]

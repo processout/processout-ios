@@ -10,13 +10,11 @@ import SwiftUI
 extension View {
 
     /// Sets the style for native APM views within this view.
-    @available(iOS 14, *)
     public func nativeAlternativePaymentStyle(_ style: PONativeAlternativePaymentStyle) -> some View {
         environment(\.nativeAlternativePaymentStyle, style)
     }
 }
 
-@available(iOS 14, *)
 extension EnvironmentValues {
 
     @MainActor

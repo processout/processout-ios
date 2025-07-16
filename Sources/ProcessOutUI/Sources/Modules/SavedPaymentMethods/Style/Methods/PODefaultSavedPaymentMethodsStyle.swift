@@ -9,7 +9,6 @@ import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
 /// The default saved payment methods style.
-@available(iOS 14, *)
 public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
 
     public struct Toolbar {
@@ -164,7 +163,7 @@ public struct PODefaultSavedPaymentMethodsStyle: POSavedPaymentMethodsStyle {
                 Spacer(minLength: 0)
                 configuration.cancelButton
                     .buttonStyle(POAnyButtonStyle(erasing: cancelButton))
-                    .backport.poControlSize(.regular)
+                    .controlSize(.regular)
                     .controlWidth(.regular)
             }
             .padding(POSpacing.large)

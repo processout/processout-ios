@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 public struct POToastMessageStyle: POMessageViewStyle {
 
     /// Style for specific severity.
@@ -74,7 +73,6 @@ public struct POToastMessageStyle: POMessageViewStyle {
     }
 }
 
-@available(iOS 14, *)
 extension POMessageViewStyle where Self == POToastMessageStyle {
 
     /// Toast message style.
@@ -83,7 +81,6 @@ extension POMessageViewStyle where Self == POToastMessageStyle {
     }
 }
 
-@available(iOS 14, *)
 extension POToastMessageStyle.Severity {
 
     /// Error style.
@@ -95,7 +92,6 @@ extension POToastMessageStyle.Severity {
     )
 }
 
-@available(iOS 14, *)
 #Preview {
     POMessageView(message: .init(id: "id", text: "Messeeee e e e e eage", severity: .error))
         .messageViewStyle(.toast)

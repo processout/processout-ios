@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14.0, *)
 @MainActor
 struct DefaultContentUnavailableViewLabelStyle: LabelStyle {
 
@@ -20,7 +19,6 @@ struct DefaultContentUnavailableViewLabelStyle: LabelStyle {
     }
 }
 
-@available(iOS 14.0, *)
 @MainActor
 private struct StyleBox: View {
 

@@ -10,14 +10,12 @@ import SwiftUI
 extension View {
 
     /// Sets the style for phone number fields within this view.
-    @available(iOS 14, *)
     @_spi(PO)
     public func phoneNumberFieldStyle(_ style: any POPhoneNumberFieldStyle) -> some View {
         environment(\.phoneNumberFieldStyle, style)
     }
 }
 
-@available(iOS 14, *)
 extension EnvironmentValues {
 
     /// The style to apply to phone number fields.

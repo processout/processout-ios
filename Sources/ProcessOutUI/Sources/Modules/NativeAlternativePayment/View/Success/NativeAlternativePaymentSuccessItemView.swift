@@ -8,7 +8,6 @@
 import SwiftUI
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14, *)
 struct NativeAlternativePaymentSuccessItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem.Success
@@ -32,7 +31,6 @@ struct NativeAlternativePaymentSuccessItemView: View {
     private var style
 }
 
-@available(iOS 14, *)
 #Preview {
     NativeAlternativePaymentSuccessItemView(
         item: .init(title: "Payment approved!", description: "You paid $40.00")

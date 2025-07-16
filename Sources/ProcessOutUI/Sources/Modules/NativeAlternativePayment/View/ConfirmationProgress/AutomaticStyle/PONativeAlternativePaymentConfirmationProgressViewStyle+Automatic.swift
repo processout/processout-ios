@@ -8,7 +8,6 @@
 import SwiftUI
 import ProcessOutCoreUI
 
-@available(iOS 14.0, *)
 extension PONativeAlternativePaymentConfirmationProgressViewStyle
     where Self == POAutomaticNativeAlternativePaymentConfirmationProgressViewStyle<POStepProgressViewStyle, POMultistepProgressGroupBoxStyle> { // swiftlint:disable:this line_length
 

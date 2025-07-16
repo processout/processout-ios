@@ -8,7 +8,6 @@
 import SwiftUI
 
 /// Defines button style in all possible states.
-@available(iOS 14, *)
 @MainActor
 @preconcurrency
 public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
@@ -64,7 +63,6 @@ public struct POButtonStyle<ProgressStyle: ProgressViewStyle>: ButtonStyle {
 
 // Environments may not be propagated directly to ButtonStyle. Workaround is
 // to wrap content into additional view and use environments as usual.
-@available(iOS 14.0, *)
 @MainActor
 private struct ButtonStyleBox<ProgressStyle: ProgressViewStyle>: View {
 
@@ -89,7 +87,7 @@ private struct ButtonStyleBox<ProgressStyle: ProgressViewStyle>: View {
             .opacity(
                 isLoading ? 0 : 1
             )
-            .backport.overlay {
+            .overlay {
                 if isLoading {
                     ProgressView().progressViewStyle(progressStyle)
                 }
@@ -127,7 +125,7 @@ private struct ButtonStyleBox<ProgressStyle: ProgressViewStyle>: View {
     @Environment(\.isButtonLoading)
     private var isLoading
 
-    @Environment(\.poControlSize)
+    @Environment(\.controlSize)
     private var controlSize
 
     @Environment(\.poControlWidth)
@@ -152,8 +150,12 @@ private struct ButtonStyleBox<ProgressStyle: ProgressViewStyle>: View {
     }
 
     private var minSize: CGFloat {
-        let sizes: [POControlSize: CGFloat] = [.small: 32, .regular: 44]
-        return sizes[controlSize]! // swiftlint:disable:this force_unwrapping
+        switch controlSize {
+        case .mini, .small:
+            return 32
+        default:
+            return 44
+        }
     }
 
     private var maxWidth: CGFloat? {

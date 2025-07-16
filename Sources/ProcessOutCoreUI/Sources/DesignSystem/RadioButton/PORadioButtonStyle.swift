@@ -8,7 +8,6 @@
 import SwiftUI
 
 /// Describes radio button style in different states.
-@available(iOS 14, *)
 @MainActor
 @preconcurrency
 public struct PORadioButtonStyle: ButtonStyle {
@@ -59,7 +58,6 @@ public struct PORadioButtonStyle: ButtonStyle {
 }
 
 // Environments are not propagated directly to ButtonStyle in any iOS before 14.
-@available(iOS 14, *)
 @MainActor
 private struct ContentView: View {
 
@@ -116,7 +114,7 @@ private struct ContentView: View {
     @Environment(\.isEnabled)
     private var isEnabled
 
-    @Environment(\.poControlSize)
+    @Environment(\.controlSize)
     private var controlSize
 
     // MARK: - Private Methods
@@ -142,19 +140,14 @@ private struct ContentView: View {
 
     private var geometry: Geometry {
         switch controlSize {
-        case .regular:
-            return .init(
-                padding: POSpacing.space12,
-                minHeight: 48,
-                backgroundInsets: EdgeInsets()
-            )
-        case .small:
+        case .mini, .small:
             return .init(padding: 0, minHeight: nil, backgroundInsets: .init(horizontal: -10, vertical: -11))
+        default:
+            return .init(padding: POSpacing.space12, minHeight: 48, backgroundInsets: EdgeInsets())
         }
     }
 }
 
-@available(iOS 14, *)
 #Preview {
     VStack(spacing: 2) {
         Button("Radio Button") { }
@@ -162,5 +155,5 @@ private struct ContentView: View {
     }
     .buttonStyle(PORadioButtonStyle.radio)
     .padding()
-    .backport.poControlSize(.small)
+    .controlSize(.small)
 }

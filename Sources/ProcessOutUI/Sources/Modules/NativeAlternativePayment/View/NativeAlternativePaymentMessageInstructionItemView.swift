@@ -9,7 +9,6 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14, *)
 struct NativeAlternativePaymentMessageInstructionItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem.MessageInstruction
@@ -26,7 +25,7 @@ struct NativeAlternativePaymentMessageInstructionItemView: View {
                         copiedTitle: String(resource: .NativeAlternativePayment.Button.copied)
                     )
                 )
-                .backport.poControlSize(.small)
+                .controlSize(.small)
                 .controlWidth(.regular)
                 .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.secondary))
             } label: {

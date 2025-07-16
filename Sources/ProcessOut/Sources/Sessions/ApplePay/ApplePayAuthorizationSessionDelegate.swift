@@ -19,7 +19,6 @@ protocol ApplePayAuthorizationSessionDelegate: AnyObject, Sendable {
     func applePayAuthorizationSessionWillAuthorizePayment()
 
     /// Requests an object that validates the identity of a merchant for a payment request.
-    @available(iOS 14, *)
     @MainActor
     func applePayAuthorizationSessionDidRequestMerchantSessionUpdate() async -> PKPaymentRequestMerchantSessionUpdate?
 

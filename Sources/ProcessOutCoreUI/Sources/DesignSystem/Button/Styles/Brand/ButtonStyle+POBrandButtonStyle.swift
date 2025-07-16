@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 extension ButtonStyle where Self == POBrandButtonStyle {
 
     /// Simple style that changes its appearance based on brand color ``SwiftUICore/EnvironmentValues/poButtonBrandColor``.

@@ -9,7 +9,6 @@ import SwiftUI
 
 extension View {
 
-    @available(iOS 14.0, *)
     @_spi(PO)
     public func poGroupBoxStyle(_ style: any GroupBoxStyle) -> some View {
         AnyView(groupBoxStyle(style))

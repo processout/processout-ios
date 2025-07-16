@@ -10,13 +10,11 @@ import SwiftUI
 extension View {
 
     /// Sets the style for card update views within this view.
-    @available(iOS 14, *)
     public func cardUpdateStyle(_ style: POCardUpdateStyle) -> some View {
         environment(\.cardUpdateStyle, style)
     }
 }
 
-@available(iOS 14, *)
 extension EnvironmentValues {
 
     @MainActor

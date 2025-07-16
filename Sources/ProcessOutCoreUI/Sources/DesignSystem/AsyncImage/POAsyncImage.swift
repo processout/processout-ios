@@ -8,7 +8,6 @@
 import SwiftUI
 
 @_spi(PO)
-@available(iOS 14, *)
 @MainActor
 public struct POAsyncImage<Content: View>: View {
 
@@ -36,7 +35,7 @@ public struct POAsyncImage<Content: View>: View {
                 phase = .empty
             }
         }
-        .backport.task(id: id, priority: .userInitiated) { await resolveImage() }
+        .task(id: id, priority: .userInitiated) { await resolveImage() }
     }
 
     // MARK: - Private Properties

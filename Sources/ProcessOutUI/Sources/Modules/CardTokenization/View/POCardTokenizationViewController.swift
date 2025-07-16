@@ -9,7 +9,6 @@ import SwiftUI
 import ProcessOut
 
 /// View controller hosting `POCardTokenizationView`.
-@available(iOS 14, *)
 public final class POCardTokenizationViewController: UIHostingController<AnyView> {
 
     /// Creates card tokenization view controller.

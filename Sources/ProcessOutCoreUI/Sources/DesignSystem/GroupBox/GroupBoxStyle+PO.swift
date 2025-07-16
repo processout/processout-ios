@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@available(iOS 14, *)
 @_spi(PO)
 extension GroupBoxStyle where Self == POGroupBoxStyle {
 
@@ -39,7 +38,7 @@ extension GroupBoxStyle where Self == POGroupBoxStyle {
                 }
             }
             .buttonStyle(.secondary)
-            .backport.poControlSize(.small)
+            .controlSize(.small)
             .controlWidth(.regular)
         } label: {
             Text("Amount to send")

@@ -9,7 +9,6 @@ import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI
 
-@available(iOS 14, *)
 struct NativeAlternativePaymentPhoneItemView: View {
 
     let item: NativeAlternativePaymentViewModelItem.PhoneNumberInput
