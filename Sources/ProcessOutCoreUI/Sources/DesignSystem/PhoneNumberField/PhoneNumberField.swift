@@ -39,7 +39,7 @@ public struct POPhoneNumberField: View {
                 .poKeyboardType(.numberPad)
         }
         AnyView(erasing: style.makeBody(configuration: configuration))
-            .onTextFieldEditingWillChange { newValue in
+            .onTextFieldEditingDidChange { newValue in
                 attemptToUpdatePhoneNumberTerritory(newValue: newValue)
             }
     }
@@ -72,7 +72,11 @@ public struct POPhoneNumberField: View {
         guard let phoneNumber = parser.parse(number: newValue) else {
             return
         }
-        let newTerritory = availableTerritories?.first { $0.code == phoneNumber.countryCode }
+        let newCandidates = availableTerritories?.filter { territory in
+            territory.code.removingCharacters(in: .decimalDigits.inverted) == phoneNumber.countryCode
+        }
+        let deviceRegionCode = Locale.current.regionCode
+        let newTerritory = newCandidates?.first { $0.id == deviceRegionCode } ?? newCandidates?.first
         self.phoneNumber.territoryId = newTerritory?.id
     }
 }

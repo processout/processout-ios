@@ -52,7 +52,7 @@ struct TextFieldRepresentable: UIViewRepresentable {
             formatter: formatter,
             focusableView: $focusableView,
             submitAction: submitAction,
-            editingWillChangeAction: editingWillChangeAction
+            editingDidChangeAction: editingDidChangeAction
         )
     }
 
@@ -91,8 +91,8 @@ struct TextFieldRepresentable: UIViewRepresentable {
     @Environment(\.backportSubmitAction)
     private var submitAction
 
-    @Environment(\.textFieldEditingWillChangeAction)
-    private var editingWillChangeAction
+    @Environment(\.textFieldEditingDidChangeAction)
+    private var editingDidChangeAction
 
     @Binding
     private var text: String
@@ -116,7 +116,7 @@ struct TextFieldRepresentable: UIViewRepresentable {
         coordinator.formatter = formatter
         coordinator.focusableView = $focusableView
         coordinator.submitAction = submitAction
-        coordinator.editingWillChangeAction = editingWillChangeAction
+        coordinator.editingDidChangeAction = editingDidChangeAction
     }
 }
 

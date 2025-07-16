@@ -15,13 +15,13 @@ final class TextFieldCoordinator: NSObject, TextFieldDelegate {
         formatter: Formatter?,
         focusableView: Binding<FocusableViewProxy>,
         submitAction: POBackport<Any>.SubmitAction,
-        editingWillChangeAction: TextFieldEditingWillChangeAction
+        editingDidChangeAction: TextFieldEditingDidChangeAction
     ) {
         self.text = text
         self.formatter = formatter
         self.focusableView = focusableView
         self.submitAction = submitAction
-        self.editingWillChangeAction = editingWillChangeAction
+        self.editingDidChangeAction = editingDidChangeAction
     }
 
     /// The text value bound to the text field.
@@ -36,8 +36,8 @@ final class TextFieldCoordinator: NSObject, TextFieldDelegate {
     /// Action to perform when the text field is submitted (e.g., on return key).
     var submitAction: POBackport<Any>.SubmitAction
 
-    /// Called when text field editing state is about to change.
-    var editingWillChangeAction: TextFieldEditingWillChangeAction
+    /// Called when text field editing state changed.
+    var editingDidChangeAction: TextFieldEditingDidChangeAction
 
     func mantle(textField: UITextField) {
         textField.delegate = self
@@ -77,7 +77,9 @@ final class TextFieldCoordinator: NSObject, TextFieldDelegate {
         var updatedString = originalString.replacingCharacters(in: range, with: string) as NSString
         // swiftlint:enable legacy_objc_type
         var proposedSelectedRange = NSRange(location: updatedString.length, length: 0)
-        editingWillChangeAction(newValue: updatedString as String)
+        DispatchQueue.main.async { [updatedString] in
+            self.editingDidChangeAction(proposedValue: updatedString as String)
+        }
         let isReplacementValid = formatter.isPartialStringValid(
             &updatedString,
             proposedSelectedRange: &proposedSelectedRange,
