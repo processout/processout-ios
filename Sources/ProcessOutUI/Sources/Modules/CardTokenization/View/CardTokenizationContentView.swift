@@ -11,20 +11,19 @@ import SwiftUI
 @MainActor
 struct CardTokenizationContentView: View {
 
-    init(viewModel: AnyViewModel<CardTokenizationViewModelState>, insets: CGFloat) {
+    init(viewModel: AnyViewModel<CardTokenizationViewModelState>) {
         self.viewModel = viewModel
-        self.insets = insets
     }
 
     // MARK: - View
 
     var body: some View {
         ScrollViewReader { scrollView in
-            VStack(alignment: .leading, spacing: POSpacing.large) {
+            VStack(alignment: .leading, spacing: POSpacing.space20) {
                 if let title = viewModel.state.title {
                     Text(title)
                         .textStyle(style.title)
-                        .padding(EdgeInsets(horizontal: insets, vertical: 0))
+                        .padding(EdgeInsets(horizontal: contentInsets, vertical: 0))
                     Rectangle()
                         .fill(style.separatorColor)
                         .frame(height: 1)
@@ -35,12 +34,16 @@ struct CardTokenizationContentView: View {
                         section: section, focusedInputId: $viewModel.state.focusedInputId
                     )
                 }
-                .padding(EdgeInsets(horizontal: insets, vertical: 0))
+                .padding(EdgeInsets(horizontal: contentInsets, vertical: 0))
+                if let controls = viewModel.state.controls, prefersInlineLayout(controlGroup: controls) {
+                    CardTokenizationInlineControlGroupView(configuration: controls)
+                        .padding(.horizontal, contentInsets)
+                }
             }
             .backport.onChange(of: viewModel.state.focusedInputId) {
                 scrollToFocusedInput(scrollView: scrollView)
             }
-            .padding(EdgeInsets(horizontal: 0, vertical: insets))
+            .padding(EdgeInsets(horizontal: 0, vertical: contentInsets))
             .frame(maxWidth: .infinity)
         }
         .sheet(item: $viewModel.state.cardScanner) { scanner in
@@ -64,10 +67,11 @@ struct CardTokenizationContentView: View {
 
     // MARK: - Private Properties
 
-    private let insets: CGFloat
-
     @Environment(\.cardTokenizationStyle)
     private var style
+
+    @Environment(\.cardTokenizationPresentationContext)
+    private var presentationContext
 
     @Environment(\.cardScannerStyle)
     private var cardScannerStyle
@@ -82,5 +86,18 @@ struct CardTokenizationContentView: View {
             return
         }
         withAnimation { scrollView.scrollTo(id) }
+    }
+
+    private var contentInsets: CGFloat {
+        presentationContext == .standalone ? POSpacing.space20 : 0
+    }
+
+    private func prefersInlineLayout(controlGroup: CardTokenizationViewModelControlGroup) -> Bool {
+        switch presentationContext {
+        case .inline:
+            return true
+        case .standalone:
+            return controlGroup.inline
+        }
     }
 }

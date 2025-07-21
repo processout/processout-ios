@@ -20,12 +20,19 @@ public struct POCardTokenizationView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            ScrollView(showsIndicators: false) {
-                CardTokenizationContentView(viewModel: viewModel, insets: POSpacing.large)
+            switch presentationContext {
+            case .standalone:
+                ScrollView(showsIndicators: false) {
+                    CardTokenizationContentView(viewModel: viewModel)
+                }
+                .clipped()
+            case .inline:
+                CardTokenizationContentView(viewModel: viewModel)
             }
-            .clipped()
-            POActionsContainerView(actions: viewModel.state.actions)
-                .actionsContainerStyle(style.actionsContainer)
+            if let controls = viewModel.state.controls, !prefersInlineLayout(controlGroup: controls) {
+                POActionsContainerView(actions: controls.buttons)
+                    .actionsContainerStyle(style.actionsContainer)
+            }
         }
         .backport.background {
             style.backgroundColor.ignoresSafeArea()
@@ -38,6 +45,20 @@ public struct POCardTokenizationView: View {
     @Environment(\.cardTokenizationStyle)
     private var style
 
+    @Environment(\.cardTokenizationPresentationContext)
+    private var presentationContext
+
     @StateObject
     private var viewModel: AnyViewModel<CardTokenizationViewModelState>
+
+    // MARK: - Private Methods
+
+    private func prefersInlineLayout(controlGroup: CardTokenizationViewModelControlGroup) -> Bool {
+        switch presentationContext {
+        case .inline:
+            return true
+        case .standalone:
+            return controlGroup.inline
+        }
+    }
 }
