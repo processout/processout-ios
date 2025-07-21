@@ -17,15 +17,17 @@ struct DynamicCheckoutRegularPaymentView: View {
         VStack(spacing: POSpacing.large) {
             DynamicCheckoutRegularPaymentInfoView(item: item.info)
             if case .card(let item) = item.content {
-                DynamicCheckoutCardView(item: item)
+                POCardTokenizationView(viewModel: item.viewModel())
+                    .cardTokenizationPresentationContext(.inline)
                     .id(item.id)
             } else if case .alternativePayment(let item) = item.content {
                 DynamicCheckoutAlternativePaymentView(item: item)
                     .id(item.id)
             }
-            DynamicCheckoutPaymentMethodButtonsView(
-                buttons: [item.submitButton].compactMap { $0 }
-            )
+            if let button = item.submitButton {
+                Button.create(with: button)
+                    .buttonStyle(POAnyButtonStyle(erasing: style.actionsContainer.primary))
+            }
         }
         .backport.geometryGroup()
     }
