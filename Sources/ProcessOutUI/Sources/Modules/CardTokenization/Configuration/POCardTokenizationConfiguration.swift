@@ -193,10 +193,18 @@ public struct POCardTokenizationConfiguration {
     public let isSavingAllowed: Bool
 
     /// Submit button configuration.
-    public let submitButton: SubmitButton
+    public var submitButton: SubmitButton {
+        guard let submitButton = _submitButton else {
+            preconditionFailure("Value is not set. Ensure it is provided during initialization.")
+        }
+        return submitButton
+    }
 
     /// Cancel button configuration.
     public let cancelButton: CancelButton?
+
+    /// Boolean value indicating whether forms controls should be rendered inline.
+    public let prefersInlineControls: Bool
 
     /// Metadata related to the card.
     public let metadata: [String: String]?
@@ -211,8 +219,9 @@ public struct POCardTokenizationConfiguration {
         cardScanner: CardScanner? = .init(),
         billingAddress: BillingAddress = .init(),
         isSavingAllowed: Bool = false,
-        submitButton: SubmitButton = .init(),
+        submitButton: SubmitButton? = .init(),
         cancelButton: CancelButton? = .init(),
+        prefersInlineControls: Bool = false,
         metadata: [String: String]? = nil
     ) {
         self.title = title
@@ -222,12 +231,21 @@ public struct POCardTokenizationConfiguration {
         self.cvc = cvc
         self.preferredScheme = preferredScheme
         self.cardScanner = cardScanner
-        self.submitButton = submitButton
+        self._submitButton = submitButton
         self.cancelButton = cancelButton
         self.billingAddress = billingAddress
         self.isSavingAllowed = isSavingAllowed
+        self.prefersInlineControls = prefersInlineControls
         self.metadata = metadata
     }
+
+    // MARK: - Internal
+
+    /// Backing storage for the `submitButton` property.
+    ///
+    /// This allows `submitButton` to remain a non-optional public API, while
+    /// internally supporting optional initialization.
+    let _submitButton: SubmitButton? // swiftlint:disable:this identifier_name
 }
 
 extension POCardTokenizationConfiguration {
@@ -276,10 +294,11 @@ extension POCardTokenizationConfiguration {
         self.cvc = shouldCollectCvc ? .init() : nil
         self.cardScanner = cardScanner
         self.preferredScheme = .init()
-        self.submitButton = .init(title: primaryActionTitle)
+        self._submitButton = .init(title: primaryActionTitle)
         self.cancelButton = cancelActionTitle?.isEmpty == true ? nil : .init(title: cancelActionTitle)
         self.billingAddress = billingAddress
         self.isSavingAllowed = isSavingAllowed
+        self.prefersInlineControls = false
         self.metadata = metadata
     }
 }
