@@ -7,6 +7,7 @@
 
 @_spi(PO) import ProcessOut
 
+/// A component responsible for managing the card tokenization, allowing external control.
 @MainActor
 public final class POCardTokenizationComponent {
 
@@ -25,10 +26,12 @@ public final class POCardTokenizationComponent {
         self.interactor = interactor
     }
 
+    /// Starts the card tokenization process.
     public func tokenize() {
         interactor.tokenize()
     }
 
+    /// Cancels the ongoing card tokenization process.
     public func cancel() {
         interactor.cancel()
     }
