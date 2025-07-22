@@ -97,7 +97,8 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             billingAddress: billingAddressConfiguration(with: methodConfiguration),
             isSavingAllowed: methodConfiguration.savingAllowed,
             submitButton: submitButtonConfiguration(with: configuration.submitButton),
-            cancelButton: configuration.cancelButton.map { cancelButtonConfiguration(with: $0) },
+            cancelButton: nil,
+            prefersInlineControls: true,
             metadata: configuration.card.metadata
         )
     }
@@ -123,12 +124,6 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         with configuration: PODynamicCheckoutConfiguration.SubmitButton
     ) -> POCardTokenizationConfiguration.SubmitButton {
         .init(title: configuration.title ?? String(resource: .DynamicCheckout.Button.pay), icon: configuration.icon)
-    }
-
-    private func cancelButtonConfiguration(
-        with configuration: PODynamicCheckoutConfiguration.CancelButton
-    ) -> POCardTokenizationConfiguration.CancelButton {
-        .init(title: configuration.title, icon: configuration.icon, confirmation: configuration.confirmation)
     }
 
     // MARK: - Alternative Payment Configuration

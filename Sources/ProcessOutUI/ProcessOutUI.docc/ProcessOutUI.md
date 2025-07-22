@@ -20,12 +20,14 @@
 - ``POCardTokenizationViewController``
 - ``POCardTokenizationStyle``
 - ``SwiftUICore/View/cardTokenizationStyle(_:)``
+- ``POCardTokenizationPresentationContext``
 - ``POCardTokenizationConfiguration``
 - ``POBillingAddressConfiguration``
 - ``POCardTokenizationDelegate``
 - ``POCardTokenizationEligibilityEvaluation``
 - ``POCardTokenizationEligibilityRequest``
 - ``POCardTokenizationEvent``
+- ``POCardTokenizationComponent``
 
 ### Card Update
 

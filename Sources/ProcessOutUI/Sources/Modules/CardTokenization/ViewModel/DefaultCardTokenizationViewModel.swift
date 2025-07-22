@@ -115,7 +115,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         let startedState = State(
             title: title(),
             sections: sections.compactMap { $0 },
-            actions: createActions(startedState: startedState, isSubmitting: isSubmitting),
+            controls: createFormControlGroup(startedState: startedState, isSubmitting: isSubmitting),
             focusedInputId: focusedInputId(startedState: startedState, isSubmitting: isSubmitting)
         )
         return startedState
@@ -398,20 +398,25 @@ final class DefaultCardTokenizationViewModel: ViewModel {
 
     // MARK: - Actions
 
-    private func createActions(
+    private func createFormControlGroup(
         startedState: InteractorState.Started, isSubmitting: Bool
-    ) -> [POButtonViewModel] {
-        let actions = [
+    ) -> CardTokenizationViewModelControlGroup? {
+        let buttons = [
             submitAction(startedState: startedState, isSubmitting: isSubmitting),
             cancelAction(isEnabled: !isSubmitting)
-        ]
-        return actions.compactMap { $0 }
+        ].compactMap { $0 }
+        guard !buttons.isEmpty else {
+            return nil
+        }
+        return .init(buttons: buttons, inline: configuration.prefersInlineControls)
     }
 
     private func submitAction(
         startedState: InteractorState.Started, isSubmitting: Bool
     ) -> POButtonViewModel? {
-        let buttonConfiguration = configuration.submitButton
+        guard let buttonConfiguration = configuration._submitButton else {
+            return nil
+        }
         let action = POButtonViewModel(
             id: "primary-button",
             title: buttonConfiguration.title ?? String(resource: .CardTokenization.Button.submit),

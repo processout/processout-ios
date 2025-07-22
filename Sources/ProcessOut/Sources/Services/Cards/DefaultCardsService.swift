@@ -76,7 +76,8 @@ final class DefaultCardsService: POCardsService {
         } else if filteredNumber.count >= 6 {
             iinLength = 6
         } else {
-            throw POFailure(message: "IIN must have at least 6 digits.", code: .Mobile.generic)
+            let code: POFailureCode = filteredNumber.isEmpty ? .Card.missingNumber : .Card.invalidNumber
+            throw POFailure(message: "IIN must have at least 6 digits.", code: code)
         }
         return String(filteredNumber.prefix(iinLength))
     }

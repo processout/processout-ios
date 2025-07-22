@@ -110,8 +110,8 @@ struct CardTokenizationViewModelState {
     /// Available items.
     let sections: [Section]
 
-    /// Available actions.
-    let actions: [POButtonViewModel]
+    /// Form controls information.
+    var controls: CardTokenizationViewModelControlGroup?
 
     /// Currently focused input identifier.
     var focusedInputId: AnyHashable?
@@ -123,14 +123,14 @@ struct CardTokenizationViewModelState {
 extension CardTokenizationViewModelState: AnimationIdentityProvider {
 
     static var idle: Self {
-        Self(title: nil, sections: [], actions: [], focusedInputId: nil)
+        Self(title: nil, sections: [], controls: nil, focusedInputId: nil)
     }
 
     var animationIdentity: AnyHashable {
         let sectionsIdentity = sections.map { section in
             [section.id, section.items.map(\.id)]
         }
-        return [sectionsIdentity, AnyHashable(actions.map(\.id))]
+        return [sectionsIdentity, AnyHashable(controls?.buttons.map(\.id))]
     }
 }
 

@@ -75,7 +75,7 @@ extension POCardTokenizationStyle {
             sectionTitle: POTextStyle(color: Color.Input.Text.default, typography: .Text.s14(weight: .medium)),
             input: .medium,
             radioButton: .radio,
-            errorDescription: POTextStyle(color: Color.Input.Text.error, typography: .Text.s12(weight: .regular)),
+            errorDescription: POTextStyle(color: Color.Input.Text.error, typography: .Text.s14(weight: .regular)),
             backgroundColor: Color.Surface.primary,
             actionsContainer: .default,
             separatorColor: Color.Border.primary
