@@ -11,7 +11,8 @@ protocol NativeAlternativePaymentServiceAdapter {
         with request: NativeAlternativePaymentServiceAdapterRequest
     ) async throws -> NativeAlternativePaymentServiceAdapterResponse
 
-    func expectPaymentCompletion(
-        with request: NativeAlternativePaymentServiceAdapterRequest
+    func expectPayment(
+        with request: NativeAlternativePaymentServiceAdapterRequest,
+        toSatisfy condition: @Sendable @escaping (NativeAlternativePaymentServiceAdapterResponse) -> Bool
     ) async throws -> NativeAlternativePaymentServiceAdapterResponse
 }

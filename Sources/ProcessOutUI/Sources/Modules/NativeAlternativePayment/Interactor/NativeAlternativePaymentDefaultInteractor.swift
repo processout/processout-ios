@@ -119,13 +119,27 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         let task = Task {
             do {
-                // todo(andrii-vysotskyi): allow non ephemeral sessions via configuration
-                let authenticationRequest = POAlternativePaymentAuthenticationRequest(
-                    url: currentState.redirect.url, callback: nil, prefersEphemeralSession: true
-                )
-                _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
-                let response = try await serviceAdapter.continuePayment(with: .init(flow: configuration.flow))
-                try await setState(with: response)
+                switch currentState.redirect.type {
+                case .deepLink:
+                    guard await UIApplication.shared.open(currentState.redirect.url) else {
+                        throw POFailure(errorDescription: "Unable to open deep link.", code: .Mobile.generic)
+                    }
+                    let response = try await serviceAdapter.expectPayment(
+                        with: .init(flow: configuration.flow),
+                        toSatisfy: { $0.polling?.required == false || $0.redirect != currentState.redirect }
+                    )
+                    try await setState(with: response)
+                case .web:
+                    // todo(andrii-vysotskyi): allow non ephemeral sessions via configuration
+                    let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+                        url: currentState.redirect.url, callback: nil, prefersEphemeralSession: true
+                    )
+                    _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
+                    let response = try await serviceAdapter.continuePayment(with: .init(flow: configuration.flow))
+                    try await setState(with: response)
+                default:
+                    throw POFailure(errorDescription: "Unknown redirect type.", code: .Mobile.internal)
+                }
             } catch {
                 setFailureState(error: error)
             }
@@ -306,7 +320,9 @@ final class NativeAlternativePaymentDefaultInteractor:
         newState.task = Task { @MainActor [configuration] in
             do {
                 let request = NativeAlternativePaymentServiceAdapterRequest(flow: configuration.flow)
-                let response = try await serviceAdapter.expectPaymentCompletion(with: request)
+                let response = try await serviceAdapter.expectPayment(
+                    with: request, toSatisfy: { $0.state == .success }
+                )
                 try await setState(with: response)
             } catch {
                 setFailureState(error: error)

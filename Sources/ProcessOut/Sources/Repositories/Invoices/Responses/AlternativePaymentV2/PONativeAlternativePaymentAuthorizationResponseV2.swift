@@ -23,4 +23,7 @@ public struct PONativeAlternativePaymentAuthorizationResponseV2: Sendable, Decod
 
     /// Redirect details.
     public let redirect: PONativeAlternativePaymentRedirectV2?
+
+    /// Polling information.
+    public let polling: PONativeAlternativePaymentPollingV2?
 }

@@ -47,8 +47,9 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
         }
     }
 
-    func expectPaymentCompletion(
-        with request: NativeAlternativePaymentServiceAdapterRequest
+    func expectPayment(
+        with request: NativeAlternativePaymentServiceAdapterRequest,
+        toSatisfy condition: @Sendable @escaping (NativeAlternativePaymentServiceAdapterResponse) -> Bool
     ) async throws -> NativeAlternativePaymentServiceAdapterResponse {
         try await retry(
             operation: {
@@ -57,7 +58,7 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
             while: { result in
                 switch result {
                 case let .success(response):
-                    return response.state != .success
+                    return !condition(response)
                 case let .failure(failure as POFailure):
                     let retriableCodes: [POFailureCode] = [
                         .Mobile.networkUnreachable, .Mobile.timeout, .Mobile.internal
