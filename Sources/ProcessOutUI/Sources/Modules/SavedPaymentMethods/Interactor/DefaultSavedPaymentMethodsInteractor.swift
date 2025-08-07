@@ -44,7 +44,9 @@ final class DefaultSavedPaymentMethodsInteractor:
                 return
             }
             do {
-                let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
+                let invoice = try await invoicesService.invoice(
+                    request: configuration.invoiceRequest.replacing(expand: [.paymentMethods])
+                )
                 setStartedState(invoice: invoice)
             } catch {
                 setFailureState(error)
