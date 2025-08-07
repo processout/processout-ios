@@ -107,7 +107,7 @@ public struct PONativeAlternativePaymentConfiguration {
             cancelButton: CancelButton? = nil
         ) {
             self.timeout = timeout
-            self.confirmButton = confirmButton
+            self.confirmButton = .init() // confirmButton
             self.cancelButton = cancelButton
         }
     }

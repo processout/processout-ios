@@ -83,6 +83,9 @@ enum NativeAlternativePaymentInteractorState {
         /// Resolved elements.
         let elements: [NativeAlternativePaymentResolvedElement]
 
+        /// Polling settings.
+        let polling: PONativeAlternativePaymentPollingV2?
+
         /// Date when payment is expected to be completed.
         var estimatedCompletionDate: Date?
 

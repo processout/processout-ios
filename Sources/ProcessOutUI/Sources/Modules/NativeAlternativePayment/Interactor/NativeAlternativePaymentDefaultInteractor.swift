@@ -124,11 +124,8 @@ final class NativeAlternativePaymentDefaultInteractor:
                     guard await UIApplication.shared.open(currentState.redirect.url) else {
                         throw POFailure(errorDescription: "Unable to open deep link.", code: .Mobile.generic)
                     }
-                    let response = try await serviceAdapter.expectPayment(
-                        with: .init(flow: configuration.flow),
-                        toSatisfy: { $0.polling?.required == false || $0.redirect != currentState.redirect }
-                    )
-                    try await setState(with: response)
+                    let response = try await serviceAdapter.continuePayment(with: .init(flow: configuration.flow))
+                    await setAwaitingCompletionState(response: response)
                 case .web:
                     // todo(andrii-vysotskyi): allow non ephemeral sessions via configuration
                     let authenticationRequest = POAlternativePaymentAuthenticationRequest(
@@ -284,12 +281,13 @@ final class NativeAlternativePaymentDefaultInteractor:
                 return
             }
             send(event: .willWaitForPaymentConfirmation(.init()))
-            let shouldConfirmPayment =
-                !resolvedElements.isEmpty && configuration.paymentConfirmation.confirmButton != nil
+            let shouldConfirmPayment = configuration.paymentConfirmation.confirmButton != nil
+                && (!resolvedElements.isEmpty || response.redirect?.type == .deepLink)
             let awaitingPaymentCompletionState = State.AwaitingCompletion(
                 paymentMethod: await resolve(paymentMethod: response.paymentMethod),
                 invoice: response.invoice,
                 elements: resolvedElements,
+                polling: response.polling,
                 estimatedCompletionDate: nil,
                 isCancellable: configuration.paymentConfirmation.cancelButton?.disabledFor.isZero ?? true,
                 shouldConfirmPayment: shouldConfirmPayment
@@ -318,10 +316,14 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         var newState = currentState
         newState.task = Task { @MainActor [configuration] in
+            // TODO: update elements during polling
             do {
                 let request = NativeAlternativePaymentServiceAdapterRequest(flow: configuration.flow)
                 let response = try await serviceAdapter.expectPayment(
-                    with: request, toSatisfy: { $0.state == .success }
+                    with: request,
+                    toSatisfy: { response in
+                        (response.state == .nextStepRequired && response.polling == nil) || response.state != .pending
+                    }
                 )
                 try await setState(with: response)
             } catch {

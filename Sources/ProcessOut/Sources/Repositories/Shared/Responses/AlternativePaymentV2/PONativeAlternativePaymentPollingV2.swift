@@ -7,6 +7,6 @@
 
 public struct PONativeAlternativePaymentPollingV2: Decodable, Sendable {
 
-    /// Boolean value indicating whether polling is required.
-    public let required: Bool
+    // Boolean value indicating whether polling is required.
+    // public let required: Bool
 }
