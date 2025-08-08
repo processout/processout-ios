@@ -8,13 +8,10 @@
 /// Request to get single invoice details.
 public struct POInvoiceRequest: Sendable, Codable {
 
-    public enum ExpandedProperty: String, Hashable, Sendable, Codable {
+    public struct ExpandedProperty: Hashable, Sendable, Codable {
 
-        /// Expands transaction.
-        case transaction
-
-        /// Expands invoice payment methods.
-        case paymentMethods = "payment_methods"
+        /// Property name.
+        let rawValue: String
     }
 
     /// Requested invoice ID.
@@ -52,6 +49,15 @@ public struct POInvoiceRequest: Sendable, Codable {
         self.expand = expand
         self.attachPrivateKey = attachPrivateKey
     }
+}
+
+extension POInvoiceRequest.ExpandedProperty {
+
+    /// Expands transaction.
+    public static let transaction = Self(rawValue: "transaction")
+
+    /// Expands invoice payment methods.
+    public static let paymentMethods = Self(rawValue: "payment_methods")
 }
 
 extension POInvoiceRequest {
