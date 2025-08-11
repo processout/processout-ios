@@ -48,7 +48,9 @@ final class DynamicCheckoutDefaultInteractor:
         send(event: .willStart)
         let task = Task { @MainActor in
             do {
-                let invoice = try await invoicesService.invoice(request: configuration.invoiceRequest)
+                let invoice = try await invoicesService.invoice(
+                    request: configuration.invoiceRequest.replacing(expand: [.transaction, .paymentMethods])
+                )
                 switch invoice.transaction?.status {
                 case .waiting:
                     setStartedState(invoice: invoice, clientSecret: configuration.invoiceRequest.clientSecret)
@@ -303,7 +305,9 @@ final class DynamicCheckoutDefaultInteractor:
                     throw POFailure(message: "Unable to restart dynamic checkout.", code: .Mobile.generic)
                 }
                 finishRestart(
-                    with: try await invoicesService.invoice(request: invoiceRequest),
+                    with: try await invoicesService.invoice(
+                        request: invoiceRequest.replacing(expand: [.transaction, .paymentMethods])
+                    ),
                     clientSecret: invoiceRequest.clientSecret
                 )
             } else {
