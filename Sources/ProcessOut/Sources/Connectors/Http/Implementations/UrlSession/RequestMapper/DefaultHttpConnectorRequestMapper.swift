@@ -105,7 +105,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         let deviceMetadata = await deviceMetadataProvider.deviceMetadata
         let headers = [
             "User-Agent": userAgent(deviceMetadata: deviceMetadata, configuration: configuration),
-            "Accept-Language": Strings.preferredLocalization,
+            "Accept-Language": request.locale ?? Strings.preferredLocalization,
             "Content-Type": "application/json",
             "Authorization": authorization(request: request, configuration: configuration),
             "Session-Id": configuration.sessionId,
