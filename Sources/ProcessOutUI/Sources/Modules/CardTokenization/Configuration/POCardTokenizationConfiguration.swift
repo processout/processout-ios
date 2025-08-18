@@ -206,6 +206,9 @@ public struct POCardTokenizationConfiguration {
     /// Boolean value indicating whether forms controls should be rendered inline.
     public let prefersInlineControls: Bool
 
+    /// Localization configuration. Defaults to device localization.
+    public let localization: LocalizationConfiguration
+
     /// Metadata related to the card.
     public let metadata: [String: String]?
 
@@ -222,6 +225,7 @@ public struct POCardTokenizationConfiguration {
         submitButton: SubmitButton? = .init(),
         cancelButton: CancelButton? = .init(),
         prefersInlineControls: Bool = false,
+        localization: LocalizationConfiguration = .device(),
         metadata: [String: String]? = nil
     ) {
         self.title = title
@@ -236,6 +240,7 @@ public struct POCardTokenizationConfiguration {
         self.billingAddress = billingAddress
         self.isSavingAllowed = isSavingAllowed
         self.prefersInlineControls = prefersInlineControls
+        self.localization = localization
         self.metadata = metadata
     }
 
@@ -299,6 +304,7 @@ extension POCardTokenizationConfiguration {
         self.billingAddress = billingAddress
         self.isSavingAllowed = isSavingAllowed
         self.prefersInlineControls = false
+        self.localization = .device()
         self.metadata = metadata
     }
 }

@@ -246,7 +246,7 @@ final class DefaultCardTokenizationInteractor:
         default:
             errorMessage = .CardTokenization.Error.generic
         }
-        return failure.errorDescription ?? String(resource: errorMessage)
+        return failure.errorDescription ?? String(resource: errorMessage, configuration: configuration.localization)
     }
 
     // MARK: - Failure State
@@ -264,6 +264,7 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - Tokenization Utils
 
     private func createCardTokenizationRequest(with startedState: State.Started) -> POCardTokenizationRequest {
+        // todo(andrii-vysotskyi): alter request accept language if needed
         POCardTokenizationRequest(
             number: cardNumberFormatter.normalized(number: startedState.number.value),
             expMonth: cardExpirationFormatter.expirationMonth(from: startedState.expiration.value) ?? 0,
@@ -272,7 +273,7 @@ final class DefaultCardTokenizationInteractor:
             name: startedState.cardholderName.value,
             contact: convertToContact(addressParameters: startedState.address),
             preferredScheme: startedState.cardInformation.preferredScheme?.rawValue,
-            metadata: configuration.metadata
+            metadata: configuration.metadata,
         )
     }
 
@@ -410,7 +411,7 @@ final class DefaultCardTokenizationInteractor:
             countryCodes = countryCodes.filter(supportedCountryCodes.contains)
         }
         assert(!countryCodes.isEmpty, "At least one country code should be supported.")
-        let locale = Locale.current
+        let locale = configuration.localization.localeOverride ?? .current
         let values = countryCodes
             .map { code -> State.ParameterValue in
                 let displayName = locale.localizedString(forRegionCode: code)
@@ -418,7 +419,10 @@ final class DefaultCardTokenizationInteractor:
             }
             .sorted { $0.displayName < $1.displayName }
         let configuration = configuration.billingAddress
-        var defaultCountryCode = configuration.defaultAddress?.countryCode ?? locale.regionCode
+        var defaultCountryCode = configuration.defaultAddress?.countryCode
+            ?? locale.regionCode
+            ?? Locale.current.regionCode
+            ?? values.first?.value
         if let code = defaultCountryCode, !countryCodes.contains(code) {
             logger.info("Default country code \(code) is not supported, ignored")
             defaultCountryCode = values.first?.value
