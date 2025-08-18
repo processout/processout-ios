@@ -264,7 +264,6 @@ final class DefaultCardTokenizationInteractor:
     // MARK: - Tokenization Utils
 
     private func createCardTokenizationRequest(with startedState: State.Started) -> POCardTokenizationRequest {
-        // todo(andrii-vysotskyi): alter request accept language if needed
         POCardTokenizationRequest(
             number: cardNumberFormatter.normalized(number: startedState.number.value),
             expMonth: cardExpirationFormatter.expirationMonth(from: startedState.expiration.value) ?? 0,
@@ -274,6 +273,7 @@ final class DefaultCardTokenizationInteractor:
             contact: convertToContact(addressParameters: startedState.address),
             preferredScheme: startedState.cardInformation.preferredScheme?.rawValue,
             metadata: configuration.metadata,
+            localeIdentifier: configuration.localization.localeOverride?.identifier
         )
     }
 
@@ -314,6 +314,7 @@ final class DefaultCardTokenizationInteractor:
         }
         var newCardInformation: CardTokenizationInteractorState.CardInformation
         do {
+            // todo(andrii-vysotskyi): alter request accept language if needed
             let issuerInformation = try await cardsService.issuerInformation(
                 iin: currentState.cardInformation.partialIin
             )
