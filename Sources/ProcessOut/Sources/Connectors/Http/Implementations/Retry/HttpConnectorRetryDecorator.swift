@@ -67,6 +67,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
             query: request.query,
             body: request.body,
             headers: updatedHeaders,
+            locale: request.locale,
             includesDeviceMetadata: request.includesDeviceMetadata,
             requiresPrivateKey: request.requiresPrivateKey
         )

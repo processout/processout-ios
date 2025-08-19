@@ -95,7 +95,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         if case .notEligible(let failure) = startedState.cardInformation.eligibility {
             let errorItem = State.ErrorItem(
                 id: ItemId.error,
-                description: failure?.errorDescription ?? String(resource: .CardTokenization.Error.eligibility)
+                description: failure?.errorDescription ?? String(
+                    resource: .CardTokenization.Error.eligibility, configuration: configuration.localization
+                )
             )
             cardInformationItems.append(.error(errorItem))
         } else if let error = startedState.recentErrorMessage {
@@ -124,7 +126,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     // MARK: - Title
 
     private func title() -> String? {
-        let title = configuration.title ?? String(resource: .CardTokenization.title)
+        let title = configuration.title ?? String(
+            resource: .CardTokenization.title, configuration: configuration.localization
+        )
         return title.isEmpty ? nil : title
     }
 
@@ -136,14 +140,17 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         let trackItems = [
             createItem(
                 parameter: startedState.expiration,
-                // swiftlint:disable:next line_length
-                placeholder: configuration.expirationDate.prompt ?? String(resource: .CardTokenization.CardDetails.expiration),
+                placeholder: configuration.expirationDate.prompt ?? String(
+                    resource: .CardTokenization.CardDetails.expiration, configuration: configuration.localization
+                ),
                 icon: configuration.expirationDate.icon,
                 keyboard: .asciiCapableNumberPad
             ),
             createItem(
                 parameter: startedState.cvc,
-                placeholder: configuration.cvc?.prompt ?? String(resource: .CardTokenization.CardDetails.cvc),
+                placeholder: configuration.cvc?.prompt ?? String(
+                    resource: .CardTokenization.CardDetails.cvc, configuration: configuration.localization
+                ),
                 icon: configuration.cvc?.icon ?? AnyView(Image(poResource: .Card.back).renderingMode(.template)),
                 keyboard: .asciiCapableNumberPad
             )
@@ -152,7 +159,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             createCardScanButtonItem(),
             createItem(
                 parameter: startedState.number,
-                placeholder: configuration.cardNumber.prompt ?? String(resource: .CardTokenization.CardDetails.number),
+                placeholder: configuration.cardNumber.prompt ?? String(
+                    resource: .CardTokenization.CardDetails.number, configuration: configuration.localization
+                ),
                 icon: cardNumberIcon(startedState: startedState),
                 keyboard: .asciiCapableNumberPad,
                 contentType: .creditCardNumber
@@ -162,8 +171,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             ),
             createItem(
                 parameter: startedState.cardholderName,
-                // swiftlint:disable:next line_length
-                placeholder: configuration.cardholderName?.prompt ?? String(resource: .CardTokenization.CardDetails.cardholder),
+                placeholder: configuration.cardholderName?.prompt ?? String(
+                    resource: .CardTokenization.CardDetails.cardholder, configuration: configuration.localization
+                ),
                 icon: configuration.cardholderName?.icon,
                 keyboard: .asciiCapable,
                 contentType: .name,
@@ -206,7 +216,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             .resizable()
         let viewModel = POButtonViewModel(
             id: "scan-card-button",
-            title: cardScanner.scanButton.title ?? String(resource: .CardTokenization.Button.scanCard),
+            title: cardScanner.scanButton.title ?? String(
+                resource: .CardTokenization.Button.scanCard, configuration: configuration.localization
+            ),
             icon: cardScanner.scanButton.icon ?? AnyView(defaultIcon),
             action: openScanner
         )
@@ -224,7 +236,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             return nil
         }
         let resolvedSchemeConfiguration = schemeConfiguration.resolved(
-            defaultTitle: String(resource: .CardTokenization.PreferredScheme.title)
+            defaultTitle: String(
+                resource: .CardTokenization.PreferredScheme.title, configuration: configuration.localization
+            )
         )
         let pickerItem = State.PickerItem(
             id: ItemId.scheme,
@@ -264,7 +278,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         }
         let section = CardTokenizationViewModelState.Section(
             id: SectionId.billingAddress,
-            title: String(resource: .CardTokenization.BillingAddress.title),
+            title: String(resource: .CardTokenization.BillingAddress.title, configuration: configuration.localization),
             items: items
         )
         return section
@@ -279,11 +293,19 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             let streetItems = [
                 createItem(
                     parameter: startedState.address.street1,
-                    placeholder: String(resource: .CardTokenization.BillingAddress.street, replacements: 1)
+                    placeholder: String(
+                        resource: .CardTokenization.BillingAddress.street,
+                        configuration: configuration.localization,
+                        replacements: 1
+                    )
                 ),
                 createItem(
                     parameter: startedState.address.street2,
-                    placeholder: String(resource: .CardTokenization.BillingAddress.street, replacements: 2)
+                    placeholder: String(
+                        resource: .CardTokenization.BillingAddress.street,
+                        configuration: configuration.localization,
+                        replacements: 2
+                    )
                 )
             ]
             items.append(contentsOf: streetItems)
@@ -310,7 +332,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         }
         let toggleItem = CardTokenizationViewModelState.ToggleItem(
             id: ItemId.cardSave,
-            title: String(resource: .CardTokenization.saveCardMessage),
+            title: String(resource: .CardTokenization.saveCardMessage, configuration: configuration.localization),
             isSelected: .init(
                 get: { startedState.shouldSaveCard },
                 set: { [weak self] newValue in
@@ -419,7 +441,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         }
         let action = POButtonViewModel(
             id: "primary-button",
-            title: buttonConfiguration.title ?? String(resource: .CardTokenization.Button.submit),
+            title: buttonConfiguration.title ?? String(
+                resource: .CardTokenization.Button.submit, configuration: configuration.localization
+            ),
             icon: buttonConfiguration.icon,
             isEnabled: startedState.areParametersValid,
             isLoading: isSubmitting,
@@ -437,7 +461,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         }
         let action = POButtonViewModel(
             id: "cancel-button",
-            title: buttonConfiguration.title ?? String(resource: .CardTokenization.Button.cancel),
+            title: buttonConfiguration.title ?? String(
+                resource: .CardTokenization.Button.cancel, configuration: configuration.localization
+            ),
             icon: buttonConfiguration.icon,
             isEnabled: isEnabled,
             role: .cancel,

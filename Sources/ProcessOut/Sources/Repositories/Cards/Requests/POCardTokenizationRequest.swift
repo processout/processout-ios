@@ -35,6 +35,10 @@ public struct POCardTokenizationRequest: Codable, Sendable {
     /// Metadata related to the card.
     public let metadata: [String: String]?
 
+    /// Customer's locale identifier override.
+    @POExcludedEncodable
+    public private(set) var localeIdentifier: String?
+
     public init(
         number: String,
         expMonth: Int,
@@ -43,7 +47,8 @@ public struct POCardTokenizationRequest: Codable, Sendable {
         name: String? = nil,
         contact: POContact? = nil,
         preferredScheme: String? = nil,
-        metadata: [String: String]? = nil
+        metadata: [String: String]? = nil,
+        localeIdentifier: String? = nil,
     ) {
         self.number = number
         self.expMonth = expMonth
@@ -53,5 +58,6 @@ public struct POCardTokenizationRequest: Codable, Sendable {
         self.contact = contact
         self._preferredScheme = .init(wrappedValue: preferredScheme)
         self.metadata = metadata
+        self._localeIdentifier = .init(wrappedValue: localeIdentifier)
     }
 }

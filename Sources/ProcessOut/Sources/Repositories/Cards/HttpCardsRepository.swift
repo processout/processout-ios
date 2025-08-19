@@ -25,7 +25,10 @@ final class HttpCardsRepository: CardsRepository {
 
     func tokenize(request: POCardTokenizationRequest) async throws -> POCard {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
-            path: "/cards", body: request, includesDeviceMetadata: true
+            path: "/cards",
+            body: request,
+            locale: request.localeIdentifier,
+            includesDeviceMetadata: true,
         )
         return try await connector.execute(request: httpRequest).card
     }
