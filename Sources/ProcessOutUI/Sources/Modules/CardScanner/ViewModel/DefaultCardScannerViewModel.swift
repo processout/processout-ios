@@ -91,7 +91,9 @@ final class DefaultCardScannerViewModel: ViewModel {
     // MARK: - Misc
 
     private var title: String? {
-        let title = interactor.configuration.title ?? String(resource: .CardScanner.title)
+        let title = interactor.configuration.title ?? String(
+            resource: .CardScanner.title, configuration: interactor.configuration.localization
+        )
         guard !title.isEmpty else {
             return nil
         }
@@ -99,7 +101,9 @@ final class DefaultCardScannerViewModel: ViewModel {
     }
 
     private var description: String? {
-        let description = interactor.configuration.description ?? String(resource: .CardScanner.description)
+        let description = interactor.configuration.description ?? String(
+            resource: .CardScanner.description, configuration: interactor.configuration.localization
+        )
         guard !description.isEmpty else {
             return nil
         }
@@ -112,7 +116,9 @@ final class DefaultCardScannerViewModel: ViewModel {
         }
         let viewModel = POButtonViewModel(
             id: "cancel-button",
-            title: configuration.title ?? String(resource: .CardScanner.cancelButton),
+            title: configuration.title ?? String(
+                resource: .CardScanner.cancelButton, configuration: interactor.configuration.localization
+            ),
             icon: configuration.icon,
             confirmation: configuration.confirmation.map { .cancel(with: $0) },
             action: { [weak self] in
