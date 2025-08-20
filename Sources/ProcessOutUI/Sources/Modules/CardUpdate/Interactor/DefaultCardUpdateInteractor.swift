@@ -237,7 +237,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             areParametersValid = true
             errorMessage = .CardUpdate.Error.generic
         }
-        return String(resource: errorMessage)
+        return String(resource: errorMessage, configuration: configuration.localization)
     }
 
     // MARK: - Failure State
