@@ -12,6 +12,9 @@ struct NativeAlternativePaymentPhoneNumberValidator: InputValidator {
     /// A Boolean value indicating whether the input is required.
     let required: Bool
 
+    /// Localization settings.
+    let localization: LocalizationConfiguration
+
     // MARK: -
 
     func validate(_ input: PONativeAlternativePaymentSubmitDataV2.Parameter.Value.Phone?) -> InputValidation {
@@ -19,7 +22,11 @@ struct NativeAlternativePaymentPhoneNumberValidator: InputValidator {
             return .valid
         }
         if required {
-            return .invalid(errorMessage: String(resource: .NativeAlternativePayment.Error.requiredParameter))
+            return .invalid(
+                errorMessage: String(
+                    resource: .NativeAlternativePayment.Error.requiredParameter, configuration: localization
+                )
+            )
         }
         return .valid
     }

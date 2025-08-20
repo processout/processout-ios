@@ -84,6 +84,9 @@ indirect enum NativeAlternativePaymentViewModelItem {
         /// Current parameter's value.
         @Binding var value: POPhoneNumber
 
+        /// Country picker prompt.
+        let countryPrompt: String
+
         /// Prompt.
         let prompt: String
 
@@ -115,6 +118,12 @@ indirect enum NativeAlternativePaymentViewModelItem {
 
         /// Message text.
         let value: String
+
+        /// Copy button title.
+        let copyTitle: String
+
+        /// Copied button title.
+        let copiedTitle: String
     }
 
     struct Image: Identifiable {

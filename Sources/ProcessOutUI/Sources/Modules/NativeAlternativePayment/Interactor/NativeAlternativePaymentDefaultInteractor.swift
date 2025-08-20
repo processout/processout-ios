@@ -47,7 +47,9 @@ final class NativeAlternativePaymentDefaultInteractor:
         send(event: .willStart)
         let task = Task { @MainActor in
             do {
-                let request = NativeAlternativePaymentServiceAdapterRequest(flow: configuration.flow)
+                let request = NativeAlternativePaymentServiceAdapterRequest(
+                    flow: configuration.flow, localeIdentifier: configuration.localization.localeOverride?.identifier
+                )
                 let payment = try await serviceAdapter.continuePayment(with: request)
                 try await setState(with: payment)
             } catch {
@@ -88,7 +90,9 @@ final class NativeAlternativePaymentDefaultInteractor:
             do {
                 let values = try validatedValues(for: Array(currentState.parameters.values))
                 let request = NativeAlternativePaymentServiceAdapterRequest(
-                    flow: configuration.flow, submitData: .init(parameters: values)
+                    flow: configuration.flow,
+                    submitData: .init(parameters: values),
+                    localeIdentifier: configuration.localization.localeOverride?.identifier
                 )
                 let payment = try await serviceAdapter.continuePayment(with: request)
                 switch payment.state {
@@ -124,7 +128,12 @@ final class NativeAlternativePaymentDefaultInteractor:
                     url: currentState.redirect.url, callback: nil, prefersEphemeralSession: true
                 )
                 _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
-                let response = try await serviceAdapter.continuePayment(with: .init(flow: configuration.flow))
+                let response = try await serviceAdapter.continuePayment(
+                    with: .init(
+                        flow: configuration.flow,
+                        localeIdentifier: configuration.localization.localeOverride?.identifier
+                    )
+                )
                 try await setState(with: response)
             } catch {
                 setFailureState(error: error)
@@ -305,7 +314,9 @@ final class NativeAlternativePaymentDefaultInteractor:
         var newState = currentState
         newState.task = Task { @MainActor [configuration] in
             do {
-                let request = NativeAlternativePaymentServiceAdapterRequest(flow: configuration.flow)
+                let request = NativeAlternativePaymentServiceAdapterRequest(
+                    flow: configuration.flow, localeIdentifier: configuration.localization.localeOverride?.identifier
+                )
                 let response = try await serviceAdapter.expectPaymentCompletion(with: request)
                 try await setState(with: response)
             } catch {
@@ -702,7 +713,8 @@ final class NativeAlternativePaymentDefaultInteractor:
             let validator = NativeAlternativePaymentTextValidator(
                 minLength: specification.minLength,
                 maxLength: specification.maxLength,
-                required: specification.required
+                required: specification.required,
+                localization: configuration.localization
             )
             let validation = validator.validate(normalizedValue)
             if case .valid = validation {
@@ -711,16 +723,22 @@ final class NativeAlternativePaymentDefaultInteractor:
             errorMessage = validation.errorMessage
         case .singleSelect(let specification):
             let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
-            let validation =
-                NativeAlternativePaymentTextValidator(required: specification.required).validate(normalizedValue)
+            let validator = NativeAlternativePaymentTextValidator(
+                required: specification.required,
+                localization: configuration.localization
+            )
+            let validation = validator.validate(normalizedValue)
             if case .valid = validation {
                 return normalizedValue.map { .string($0) }
             }
             errorMessage = validation.errorMessage
         case .boolean(let specification):
             let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
-            let validation =
-                NativeAlternativePaymentTextValidator(required: specification.required).validate(normalizedValue)
+            let validator = NativeAlternativePaymentTextValidator(
+                required: specification.required,
+                localization: configuration.localization
+            )
+            let validation = validator.validate(normalizedValue)
             if case .valid = validation {
                 return normalizedValue.map { .string($0) }
             }
@@ -730,7 +748,8 @@ final class NativeAlternativePaymentDefaultInteractor:
             let validator = NativeAlternativePaymentTextValidator(
                 minLength: specification.minLength,
                 maxLength: specification.maxLength,
-                required: specification.required
+                required: specification.required,
+                localization: configuration.localization
             )
             let validation = validator.validate(normalizedValue)
             if case .valid = validation {
@@ -742,16 +761,22 @@ final class NativeAlternativePaymentDefaultInteractor:
                 dialingCodes: specification.dialingCodes
             )
             let normalizedValue = normalizer.normalize(input: parameter.value)
-            let validation =
-                NativeAlternativePaymentPhoneNumberValidator(required: specification.required).validate(normalizedValue)
+            let validator = NativeAlternativePaymentPhoneNumberValidator(
+                required: specification.required,
+                localization: configuration.localization
+            )
+            let validation = validator.validate(normalizedValue)
             if case .valid = validation {
                 return normalizedValue.map { .init(value: .phone($0)) }
             }
             errorMessage = validation.errorMessage
         case .email(let specification):
             let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
-            let validation =
-                NativeAlternativePaymentTextValidator(required: specification.required).validate(normalizedValue)
+            let validator = NativeAlternativePaymentTextValidator(
+                required: specification.required,
+                localization: configuration.localization
+            )
+            let validation = validator.validate(normalizedValue)
             if case .valid = validation {
                 return normalizedValue.map { .string($0) }
             }
@@ -759,7 +784,10 @@ final class NativeAlternativePaymentDefaultInteractor:
         case .card(let specification):
             let normalizedValue = NativeAlternativePaymentCardNumberNormalizer().normalize(input: parameter.value)
             let validator = NativeAlternativePaymentTextValidator(
-                minLength: specification.minLength, maxLength: specification.maxLength, required: specification.required
+                minLength: specification.minLength,
+                maxLength: specification.maxLength,
+                required: specification.required,
+                localization: configuration.localization
             )
             let validation = validator.validate(normalizedValue)
             if case .valid = validation {
@@ -769,7 +797,10 @@ final class NativeAlternativePaymentDefaultInteractor:
         case .otp(let specification):
             let normalizedValue = NativeAlternativePaymentTextNormalizer().normalize(input: parameter.value)
             let validator = NativeAlternativePaymentTextValidator(
-                minLength: specification.minLength, maxLength: specification.maxLength, required: specification.required
+                minLength: specification.minLength,
+                maxLength: specification.maxLength,
+                required: specification.required,
+                localization: configuration.localization
             )
             let validation = validator.validate(normalizedValue)
             if case .valid = validation {
@@ -782,7 +813,9 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         validation = .init(
             name: parameter.specification.key,
-            message: errorMessage ?? String(resource: .NativeAlternativePayment.Error.invalidValue)
+            message: errorMessage ?? String(
+                resource: .NativeAlternativePayment.Error.invalidValue, configuration: configuration.localization
+            )
         )
         return nil
     }

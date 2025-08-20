@@ -128,6 +128,9 @@ public struct PODynamicCheckoutConfiguration {
     /// Capture success screen configuration. In order to avoid showing success screen to user pass `nil`.
     public let paymentSuccess: PaymentSuccess?
 
+    /// Localization configuration. Defaults to device localization.
+    public let localization: LocalizationConfiguration
+
     // Creates configuration instance.
     public init(
         invoiceRequest: POInvoiceRequest,
@@ -138,7 +141,8 @@ public struct PODynamicCheckoutConfiguration {
         allowsSkippingPaymentList: Bool = true,
         submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = .init(),
-        paymentSuccess: PaymentSuccess? = .init()
+        paymentSuccess: PaymentSuccess? = .init(),
+        localization: LocalizationConfiguration = .device()
     ) {
         self.invoiceRequest = invoiceRequest
         self.expressCheckout = expressCheckout
@@ -149,5 +153,6 @@ public struct PODynamicCheckoutConfiguration {
         self.submitButton = submitButton
         self.cancelButton = cancelButton
         self.paymentSuccess = paymentSuccess
+        self.localization = localization
     }
 }

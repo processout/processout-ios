@@ -10,10 +10,11 @@
 /// A validator for text input that supports optional length constraints and required field checks.
 struct NativeAlternativePaymentTextValidator: InputValidator {
 
-    init(minLength: Int? = nil, maxLength: Int? = nil, required: Bool) {
+    init(minLength: Int? = nil, maxLength: Int? = nil, required: Bool, localization: LocalizationConfiguration) {
         self.minLength = minLength
         self.maxLength = maxLength
         self.required = required
+        self.localization = localization
     }
 
     /// The minimum number of characters allowed in the input.
@@ -25,6 +26,9 @@ struct NativeAlternativePaymentTextValidator: InputValidator {
     /// A Boolean value indicating whether the input is required.
     let required: Bool
 
+    /// Localization settings.
+    let localization: LocalizationConfiguration
+
     // MARK: - InputValidator
 
     func validate(_ input: String?) -> InputValidation {
@@ -32,31 +36,41 @@ struct NativeAlternativePaymentTextValidator: InputValidator {
             if let maxLength, input.count > maxLength {
                 if let minLength, minLength == maxLength {
                     let message = String(
-                        resource: .NativeAlternativePayment.Error.invalidLength, replacements: maxLength
+                        resource: .NativeAlternativePayment.Error.invalidLength,
+                        configuration: localization,
+                        replacements: maxLength,
                     )
                     return .invalid(errorMessage: message)
                 }
                 let message = String(
-                    resource: .NativeAlternativePayment.Error.invalidMaxLength, replacements: maxLength
+                    resource: .NativeAlternativePayment.Error.invalidMaxLength,
+                    configuration: localization,
+                    replacements: maxLength
                 )
                 return .invalid(errorMessage: message)
             }
             if let minLength, input.count < minLength {
                 if let maxLength, minLength == maxLength {
                     let message = String(
-                        resource: .NativeAlternativePayment.Error.invalidLength, replacements: minLength
+                        resource: .NativeAlternativePayment.Error.invalidLength,
+                        configuration: localization,
+                        replacements: minLength
                     )
                     return .invalid(errorMessage: message)
                 }
                 let message = String(
-                    resource: .NativeAlternativePayment.Error.invalidMinLength, replacements: minLength
+                    resource: .NativeAlternativePayment.Error.invalidMinLength,
+                    configuration: localization,
+                    replacements: minLength
                 )
                 return .invalid(errorMessage: message)
             }
             return .valid
         }
         if required {
-            let message = String(resource: .NativeAlternativePayment.Error.requiredParameter)
+            let message = String(
+                resource: .NativeAlternativePayment.Error.requiredParameter, configuration: localization
+            )
             return .invalid(errorMessage: message)
         }
         return .valid

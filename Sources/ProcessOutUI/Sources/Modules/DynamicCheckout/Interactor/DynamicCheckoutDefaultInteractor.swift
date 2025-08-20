@@ -49,7 +49,10 @@ final class DynamicCheckoutDefaultInteractor:
         let task = Task { @MainActor in
             do {
                 let invoice = try await invoicesService.invoice(
-                    request: configuration.invoiceRequest.replacing(expand: [.transaction, .paymentMethods])
+                    request: configuration.invoiceRequest.replacing(
+                        expand: [.transaction, .paymentMethods],
+                        localeIdentifier: configuration.localization.localeOverride?.identifier
+                    )
                 )
                 switch invoice.transaction?.status {
                 case .waiting:
@@ -306,7 +309,10 @@ final class DynamicCheckoutDefaultInteractor:
                 }
                 finishRestart(
                     with: try await invoicesService.invoice(
-                        request: invoiceRequest.replacing(expand: [.transaction, .paymentMethods])
+                        request: invoiceRequest.replacing(
+                            expand: [.transaction, .paymentMethods],
+                            localeIdentifier: configuration.localization.localeOverride?.identifier
+                        )
                     ),
                     clientSecret: invoiceRequest.clientSecret
                 )

@@ -68,7 +68,9 @@ final class HttpInvoicesRepository: InvoicesRepository {
         request: PONativeAlternativePaymentAuthorizationRequestV2
     ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
         let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentAuthorizationResponseV2>.post(
-            path: "/invoices/\(request.invoiceId)/apm-payment", body: request
+            path: "/invoices/\(request.invoiceId)/apm-payment",
+            body: request,
+            locale: request.localeIdentifier
         )
         return try await connector.execute(request: httpRequest)
     }
