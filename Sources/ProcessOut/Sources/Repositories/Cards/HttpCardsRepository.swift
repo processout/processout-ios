@@ -35,7 +35,10 @@ final class HttpCardsRepository: CardsRepository {
 
     func updateCard(request: POCardUpdateRequest) async throws -> POCard {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.put(
-            path: "/cards/" + request.cardId, body: request, includesDeviceMetadata: true
+            path: "/cards/" + request.cardId,
+            body: request,
+            locale: request.localeIdentifier,
+            includesDeviceMetadata: true
         )
         return try await connector.execute(request: httpRequest).card
     }
