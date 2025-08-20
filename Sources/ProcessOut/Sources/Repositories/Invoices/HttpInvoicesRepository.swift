@@ -40,6 +40,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
                 "expand": request.expand.map(\.rawValue).joined(separator: ",")
             ],
             headers: headers.compactMapValues { $0 },
+            locale: request.localeIdentifier,
             requiresPrivateKey: request.attachPrivateKey
         )
         let response = try await connector.execute(request: httpRequest) as HttpConnectorResponse
