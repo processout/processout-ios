@@ -83,15 +83,20 @@ public struct POSavedPaymentMethodsConfiguration {
     /// Cancel button. To remove button use `nil`.
     public let cancelButton: CancelButton?
 
+    /// Localization configuration. Defaults to device localization.
+    public let localization: LocalizationConfiguration
+
     public init(
         invoiceRequest: POInvoiceRequest,
         title: String? = nil,
         paymentMethod: PaymentMethod = .init(deleteButton: .init()),
-        cancelButton: CancelButton? = .init()
+        cancelButton: CancelButton? = .init(),
+        localization: LocalizationConfiguration = .device()
     ) {
         self.invoiceRequest = invoiceRequest
         self.title = title
         self.paymentMethod = paymentMethod
         self.cancelButton = cancelButton
+        self.localization = localization
     }
 }

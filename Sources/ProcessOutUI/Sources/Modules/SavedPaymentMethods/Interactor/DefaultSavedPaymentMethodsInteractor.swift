@@ -45,7 +45,10 @@ final class DefaultSavedPaymentMethodsInteractor:
             }
             do {
                 let invoice = try await invoicesService.invoice(
-                    request: configuration.invoiceRequest.replacing(expand: [.paymentMethods])
+                    request: configuration.invoiceRequest.replacing(
+                        expand: [.paymentMethods],
+                        localeIdentifier: configuration.localization.localeOverride?.identifier
+                    )
                 )
                 setStartedState(invoice: invoice)
             } catch {
@@ -210,7 +213,8 @@ final class DefaultSavedPaymentMethodsInteractor:
             let request = PODeleteCustomerTokenRequest(
                 customerId: startedState.customerId,
                 tokenId: customerTokenId,
-                clientSecret: configuration.invoiceRequest.clientSecret ?? ""
+                clientSecret: configuration.invoiceRequest.clientSecret ?? "",
+                localeIdentifier: configuration.localization.localeOverride?.identifier
             )
             do {
                 try await customerTokensService.deleteCustomerToken(request: request)
