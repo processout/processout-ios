@@ -502,7 +502,9 @@ final class DynamicCheckoutDefaultInteractor:
                 )
                 invalidateInvoiceIfPossible()
                 var authorizationRequest = POInvoiceAuthorizationRequest(
-                    invoiceId: startedState.invoice.id, source: card.id
+                    invoiceId: startedState.invoice.id,
+                    source: card.id,
+                    localeIdentifier: configuration.localization.localeOverride?.identifier
                 )
                 let threeDSService = await delegate.dynamicCheckout(
                     willAuthorizeInvoiceWith: &authorizationRequest, using: .applePay(method)
@@ -874,7 +876,8 @@ final class DynamicCheckoutDefaultInteractor:
             saveSource: saveSource,
             allowFallbackToSale: true,
             clientSecret: startedState.clientSecret,
-            prefersEphemeralWebAuthenticationSession: prefersEphemeralWebAuthenticationSession
+            prefersEphemeralWebAuthenticationSession: prefersEphemeralWebAuthenticationSession,
+            localeIdentifier: configuration.localization.localeOverride?.identifier
         )
         let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request, using: paymentMethod)
         try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)

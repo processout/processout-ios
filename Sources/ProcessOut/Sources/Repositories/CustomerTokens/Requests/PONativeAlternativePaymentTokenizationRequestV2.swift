@@ -19,6 +19,7 @@ public struct PONativeAlternativePaymentTokenizationRequestV2: Sendable, Encodab
     /// Payment request parameters.
     public let submitData: PONativeAlternativePaymentSubmitDataV2?
 
+    /// Customer's locale identifier override.
     @POExcludedEncodable
     public private(set) var localeIdentifier: String?
 

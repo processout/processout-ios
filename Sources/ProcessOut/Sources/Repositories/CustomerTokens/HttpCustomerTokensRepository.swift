@@ -32,7 +32,8 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
         let httpRequest = HttpConnectorRequest<AssignCustomerTokenResponse>.put(
             path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",
             body: request,
-            includesDeviceMetadata: true
+            locale: request.localeIdentifier,
+            includesDeviceMetadata: true,
         )
         return try await connector.execute(request: httpRequest)
     }

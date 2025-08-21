@@ -89,6 +89,9 @@ public struct POInvoiceAuthorizationRequest: Codable, Sendable { // sourcery: Au
     @POExcludedEncodable
     public private(set) var prefersEphemeralWebAuthenticationSession: Bool
 
+    /// Customer's locale identifier override.
+    public private(set) var localeIdentifier: String? // sourcery:coding: skip
+
     public init(
         invoiceId: String,
         source: String,
@@ -104,7 +107,8 @@ public struct POInvoiceAuthorizationRequest: Codable, Sendable { // sourcery: Au
         clientSecret: String? = nil,
         metadata: [String: String]? = nil,
         webAuthenticationCallback: POWebAuthenticationCallback? = nil,
-        prefersEphemeralWebAuthenticationSession: Bool = true
+        prefersEphemeralWebAuthenticationSession: Bool = true,
+        localeIdentifier: String?
     ) {
         self.invoiceId = invoiceId
         self.source = source
@@ -121,6 +125,7 @@ public struct POInvoiceAuthorizationRequest: Codable, Sendable { // sourcery: Au
         self.metadata = metadata
         self.webAuthenticationCallback = webAuthenticationCallback
         self.prefersEphemeralWebAuthenticationSession = prefersEphemeralWebAuthenticationSession
+        self.localeIdentifier = localeIdentifier
     }
 }
 
@@ -163,5 +168,6 @@ extension POInvoiceAuthorizationRequest {
         self.metadata = metadata
         self.webAuthenticationCallback = webAuthenticationCallback
         self.prefersEphemeralWebAuthenticationSession = prefersEphemeralWebAuthenticationSession
+        self.localeIdentifier = nil
     }
 }

@@ -59,6 +59,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
             path: "/invoices/\(request.invoiceId)/authorize",
             body: request,
             headers: headers.compactMapValues { $0 },
+            locale: request.localeIdentifier,
             includesDeviceMetadata: true
         )
         return try await connector.execute(request: httpRequest).customerAction
