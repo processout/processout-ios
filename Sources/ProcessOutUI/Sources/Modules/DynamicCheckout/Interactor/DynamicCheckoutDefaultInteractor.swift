@@ -339,7 +339,9 @@ final class DynamicCheckoutDefaultInteractor:
             .contains { $0.id == currentState.pendingPaymentMethodId } ?? false
         let errorDescription: String?
         if currentState.pendingPaymentMethodId != nil, !isPendingPaymentMethodAvailable {
-            errorDescription = String(resource: .DynamicCheckout.Error.methodUnavailable)
+            errorDescription = String(
+                resource: .DynamicCheckout.Error.methodUnavailable, configuration: configuration.localization
+            )
         } else {
             errorDescription = failureDescription(currentState.failure)
         }
@@ -379,7 +381,7 @@ final class DynamicCheckoutDefaultInteractor:
         case .Mobile.cancelled, .Customer.cancelled, nil:
             return nil
         default:
-            return String(resource: .DynamicCheckout.Error.generic)
+            return String(resource: .DynamicCheckout.Error.generic, configuration: configuration.localization)
         }
     }
 
