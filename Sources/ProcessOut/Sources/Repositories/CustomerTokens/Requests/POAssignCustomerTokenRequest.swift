@@ -52,7 +52,7 @@ public struct POAssignCustomerTokenRequest: Codable, Sendable { // sourcery: Aut
     public private(set) var webAuthenticationCallback: POWebAuthenticationCallback? // sourcery:coding:skip
 
     /// Customer's locale identifier override.
-    public let localeIdentifier: String? // sourcery:coding:skip
+    public let localeIdentifier: String?
 
     /// Creates request instance.
     public init(
