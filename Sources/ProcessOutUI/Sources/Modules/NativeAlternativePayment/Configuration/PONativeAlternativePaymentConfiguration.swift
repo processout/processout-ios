@@ -280,6 +280,9 @@ public struct PONativeAlternativePaymentConfiguration {
     /// Boolean value indicating whether forms controls should be rendered inline.
     public let prefersInlineControls: Bool
 
+    /// Localization configuration. Defaults to device localization.
+    public let localization: LocalizationConfiguration
+
     /// Creates configuration.
     public init(
         flow: Flow,
@@ -290,7 +293,8 @@ public struct PONativeAlternativePaymentConfiguration {
         cancelButton: CancelButton? = nil,
         paymentConfirmation: Confirmation = .init(),
         success: Success? = .init(),
-        prefersInlineControls: Bool = true
+        prefersInlineControls: Bool = true,
+        localization: LocalizationConfiguration = .device()
     ) {
         self.flow = flow
         self.title = title
@@ -301,6 +305,7 @@ public struct PONativeAlternativePaymentConfiguration {
         self.success = success
         self.barcodeInteraction = barcodeInteraction
         self.prefersInlineControls = prefersInlineControls
+        self.localization = localization
     }
 }
 
@@ -419,6 +424,7 @@ extension PONativeAlternativePaymentConfiguration {
         )
         self.barcodeInteraction = .init()
         prefersInlineControls = false
+        localization = .device()
     }
 
     /// Creates configuration instance.
@@ -445,6 +451,7 @@ extension PONativeAlternativePaymentConfiguration {
         self.paymentConfirmation = paymentConfirmation
         self.barcodeInteraction = .init()
         prefersInlineControls = false
+        localization = .device()
     }
 
     /// Creates configuration.
@@ -470,6 +477,7 @@ extension PONativeAlternativePaymentConfiguration {
         self.success = success
         self.barcodeInteraction = barcodeInteraction
         prefersInlineControls = false
+        localization = .device()
     }
 }
 

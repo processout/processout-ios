@@ -20,10 +20,15 @@ public struct POCardUpdateRequest: Codable, Sendable {
     @POTypedRepresentation<String?, POCardScheme>
     public private(set) var preferredScheme: String?
 
+    /// Customer's locale identifier override.
+    @POExcludedEncodable
+    public private(set) var localeIdentifier: String?
+
     /// Creates request instance.
-    public init(cardId: String, cvc: String? = nil, preferredScheme: String? = nil) {
+    public init(cardId: String, cvc: String? = nil, preferredScheme: String? = nil, localeIdentifier: String? = nil) {
         self.cardId = cardId
         self.cvc = cvc
         self._preferredScheme = .init(wrappedValue: preferredScheme)
+        self._localeIdentifier = .init(wrappedValue: localeIdentifier)
     }
 }

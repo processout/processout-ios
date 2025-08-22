@@ -22,7 +22,7 @@ struct NativeAlternativePaymentPhoneItemView: View {
         POPhoneNumberField(
             phoneNumber: item.$value,
             countryPrompt: {
-                Text(String(resource: .NativeAlternativePayment.Placeholder.country))
+                Text(item.countryPrompt)
             },
             numberPrompt: item.prompt
         )

@@ -48,7 +48,7 @@ struct DynamicCheckoutRegularPaymentInfoView: View {
                 body(information: information)
             }
             if let binding = item.shouldSave {
-                Toggle(String(resource: .DynamicCheckout.savePaymentMessage), isOn: binding)
+                Toggle(item.saveTitle, isOn: binding)
                     .poToggleStyle(style.toggle)
             }
         }

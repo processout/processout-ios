@@ -26,27 +26,43 @@ public struct POInvoiceRequest: Sendable, Codable {
     /// Expanded properties.
     public let expand: Set<ExpandedProperty>
 
+    /// Customer's locale identifier override.
+    @POExcludedEncodable
+    public private(set) var localeIdentifier: String?
+
     /// Boolean value indicating whether invoice should be requested with private
     /// key attached to underlying request.
     @_spi(PO)
     public var attachPrivateKey: Bool
 
     /// Creates request instance.
-    public init(invoiceId: String, clientSecret: String? = nil, expand: Set<ExpandedProperty> = []) {
+    public init(
+        invoiceId: String,
+        clientSecret: String? = nil,
+        expand: Set<ExpandedProperty> = [],
+        localeIdentifier: String? = nil
+    ) {
         self.invoiceId = invoiceId
         self.clientSecret = clientSecret
         self.expand = expand
+        self.localeIdentifier = localeIdentifier
         self.attachPrivateKey = false
     }
 
     /// Creates request instance.
     @_spi(PO)
     public init(
-        invoiceId: String, clientSecret: String? = nil, expand: Set<ExpandedProperty> = [], attachPrivateKey: Bool
+        invoiceId: String,
+        clientSecret: String? = nil,
+        expand: Set<ExpandedProperty> = [],
+        localeIdentifier: String? = nil,
+        attachPrivateKey: Bool
     ) {
         self.invoiceId = invoiceId
         self.clientSecret = clientSecret
         self.expand = expand
+        self.localeIdentifier = nil
+        self.localeIdentifier = localeIdentifier
         self.attachPrivateKey = attachPrivateKey
     }
 }
@@ -63,12 +79,13 @@ extension POInvoiceRequest.ExpandedProperty {
 extension POInvoiceRequest {
 
     @_spi(PO)
-    public func replacing(expand: Set<ExpandedProperty>) -> Self {
+    public func replacing(expand: Set<ExpandedProperty>, localeIdentifier: String?) -> Self {
         let updatedRequest = POInvoiceRequest(
             invoiceId: self.invoiceId,
             clientSecret: self.clientSecret,
             expand: expand,
-            attachPrivateKey: self.attachPrivateKey
+            localeIdentifier: localeIdentifier,
+            attachPrivateKey: self.attachPrivateKey,
         )
         return updatedRequest
     }

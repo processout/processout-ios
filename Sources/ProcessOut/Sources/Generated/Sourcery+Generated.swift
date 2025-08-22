@@ -25,7 +25,7 @@ extension POAssignCustomerTokenRequest {
         case enableThreeDS2 = "enable_three_d_s_2"
         case thirdPartySdkVersion
         case metadata
-        case webAuthenticationCallback
+        case localeIdentifier
     }
 }
 

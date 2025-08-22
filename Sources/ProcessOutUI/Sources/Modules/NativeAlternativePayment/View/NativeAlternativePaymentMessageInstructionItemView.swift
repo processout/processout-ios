@@ -19,11 +19,7 @@ struct NativeAlternativePaymentMessageInstructionItemView: View {
         if let title = item.title {
             POLabeledContent {
                 POCopyButton(
-                    configuration: .init(
-                        value: item.value,
-                        copyTitle: String(resource: .NativeAlternativePayment.Button.copy),
-                        copiedTitle: String(resource: .NativeAlternativePayment.Button.copied)
-                    )
+                    configuration: .init(value: item.value, copyTitle: item.copyTitle, copiedTitle: item.copiedTitle)
                 )
                 .controlSize(.small)
                 .controlWidth(.regular)

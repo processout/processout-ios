@@ -93,7 +93,8 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
                 let request = POCardUpdateRequest(
                     cardId: configuration.cardId,
                     cvc: currentState.cvc,
-                    preferredScheme: currentState.preferredScheme?.rawValue
+                    preferredScheme: currentState.preferredScheme?.rawValue,
+                    localeIdentifier: configuration.localization.localeOverride?.identifier
                 )
                 setCompletedState(card: try await cardsService.updateCard(request: request))
             } catch {
@@ -237,7 +238,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
             areParametersValid = true
             errorMessage = .CardUpdate.Error.generic
         }
-        return String(resource: errorMessage)
+        return String(resource: errorMessage, configuration: configuration.localization)
     }
 
     // MARK: - Failure State

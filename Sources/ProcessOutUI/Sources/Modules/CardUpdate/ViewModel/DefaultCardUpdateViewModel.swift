@@ -26,7 +26,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     // MARK: - CardUpdateViewModel
 
     private(set) lazy var title: String? = {
-        let title = configuration.title ?? String(resource: .CardUpdate.title)
+        let title = configuration.title ?? .init(resource: .CardUpdate.title, configuration: configuration.localization)
         return title.isEmpty ? nil : title
     }()
 
@@ -146,7 +146,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
                     self?.interactor.update(cvc: newValue)
                 }
             ),
-            placeholder: String(resource: .CardUpdate.CardDetails.cvc),
+            placeholder: String(resource: .CardUpdate.CardDetails.cvc, configuration: configuration.localization),
             icon: configuration.cvc.icon ?? .init(Image(poResource: .Card.back)),
             isInvalid: !state.areParametersValid,
             isEnabled: true,
@@ -172,7 +172,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
             return nil
         }
         let resolvedPreferredSchemeConfiguration = preferredSchemeConfiguration.resolved(
-            defaultTitle: String(resource: .CardUpdate.PreferredScheme.title)
+            defaultTitle: String(resource: .CardUpdate.PreferredScheme.title, configuration: configuration.localization)
         )
         let pickerItem = CardUpdateViewModelItem.Picker(
             id: ItemId.scheme,
@@ -218,7 +218,8 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     private func submitAction(isEnabled: Bool, isLoading: Bool) -> POButtonViewModel {
         let action = POButtonViewModel(
             id: ActionId.submit,
-            title: configuration.submitButton.title ?? String(resource: .CardUpdate.Button.submit),
+            title: configuration.submitButton.title ??
+                String(resource: .CardUpdate.Button.submit, configuration: configuration.localization),
             icon: configuration.submitButton.icon,
             isEnabled: isEnabled,
             isLoading: isLoading,
@@ -236,7 +237,8 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
         }
         let action = POButtonViewModel(
             id: ActionId.cancel,
-            title: buttonConfiguration.title ?? String(resource: .CardUpdate.Button.cancel),
+            title: buttonConfiguration.title
+                ?? String(resource: .CardUpdate.Button.cancel, configuration: configuration.localization),
             icon: buttonConfiguration.icon,
             isEnabled: isEnabled,
             role: .cancel,

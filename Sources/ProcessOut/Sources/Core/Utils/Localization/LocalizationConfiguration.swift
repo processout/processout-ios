@@ -8,7 +8,7 @@
 import Foundation
 
 /// The localization parameters.
-public struct LocalizationConfiguration: Equatable {
+public struct LocalizationConfiguration: Equatable, Sendable {
 
     /// Explicitly overridden locale.
     @_spi(PO)

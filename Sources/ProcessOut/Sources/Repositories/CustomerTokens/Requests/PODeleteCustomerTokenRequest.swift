@@ -17,9 +17,14 @@ public struct PODeleteCustomerTokenRequest: Sendable, Codable {
     /// A secret key associated with the client making the request.
     public let clientSecret: String
 
-    public init(customerId: String, tokenId: String, clientSecret: String) {
+    /// Customer's locale identifier override.
+    @POExcludedEncodable
+    public private(set) var localeIdentifier: String?
+
+    public init(customerId: String, tokenId: String, clientSecret: String, localeIdentifier: String? = nil) {
         self.customerId = customerId
         self.tokenId = tokenId
         self.clientSecret = clientSecret
+        self.localeIdentifier = localeIdentifier
     }
 }

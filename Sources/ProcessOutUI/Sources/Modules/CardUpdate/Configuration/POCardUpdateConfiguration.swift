@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ProcessOut
 
 /// A configuration object that defines how a card update module behaves.
 /// Use `nil` as a value for a nullable property to indicate that default value should be used.
@@ -111,6 +112,9 @@ public struct POCardUpdateConfiguration {
     /// Cancel button configuration.
     public let cancelButton: CancelButton?
 
+    /// Localization configuration. Defaults to device localization.
+    public let localization: LocalizationConfiguration
+
     public init(
         cardId: String,
         cardInformation: POCardUpdateInformation? = nil,
@@ -118,7 +122,8 @@ public struct POCardUpdateConfiguration {
         cvc: TextField = .init(),
         preferredScheme: PreferredScheme = .init(),
         submitButton: SubmitButton = .init(),
-        cancelButton: CancelButton? = .init()
+        cancelButton: CancelButton? = .init(),
+        localization: LocalizationConfiguration = .device()
     ) {
         self.cardId = cardId
         self.cardInformation = cardInformation
@@ -127,6 +132,7 @@ public struct POCardUpdateConfiguration {
         self.preferredScheme = preferredScheme
         self.submitButton = submitButton
         self.cancelButton = cancelButton
+        self.localization = localization
     }
 }
 
@@ -160,5 +166,6 @@ extension POCardUpdateConfiguration {
         self.preferredScheme = .init()
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = cancelActionTitle?.isEmpty == true ? nil : .init(title: cancelActionTitle)
+        self.localization = .device()
     }
 }

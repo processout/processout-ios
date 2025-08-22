@@ -19,15 +19,21 @@ public struct PONativeAlternativePaymentAuthorizationRequestV2: Sendable, Encoda
     /// Payment request parameters.
     public let submitData: PONativeAlternativePaymentSubmitDataV2?
 
+    /// Customer's locale identifier override.
+    @POExcludedEncodable
+    public private(set) var localeIdentifier: String?
+
     public init(
         invoiceId: String,
         gatewayConfigurationId: String,
         source: String? = nil,
-        submitData: PONativeAlternativePaymentSubmitDataV2?
+        submitData: PONativeAlternativePaymentSubmitDataV2?,
+        localeIdentifier: String? = nil
     ) {
         self.invoiceId = invoiceId
         self.gatewayConfigurationId = gatewayConfigurationId
         self.source = source
         self.submitData = submitData
+        self.localeIdentifier = localeIdentifier
     }
 }

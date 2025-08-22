@@ -142,7 +142,8 @@ private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_e
             allowFallbackToSale: allowFallbackToSale,
             clientSecret: clientSecret,
             metadata: metadata,
-            webAuthenticationCallback: webAuthenticationCallback
+            webAuthenticationCallback: webAuthenticationCallback,
+            localeIdentifier: localeIdentifier
         )
         return updatedRequest
     }
