@@ -48,7 +48,7 @@ public struct POCardTokenizationRequest: Codable, Sendable {
         contact: POContact? = nil,
         preferredScheme: String? = nil,
         metadata: [String: String]? = nil,
-        localeIdentifier: String? = nil,
+        localeIdentifier: String? = nil
     ) {
         self.number = number
         self.expMonth = expMonth
