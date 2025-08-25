@@ -102,7 +102,6 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         if let returnUrl = configuration.returnUrl {
             setReturnUrl(returnUrl, in: challengeParameters, transactionId: parameters.threeDSServerTransactionId)
         }
-        // fixme(andrii-vysotskyi): presenting controller is being dismissed by Netcetera unintentionally
         let challengeStatus = try await transaction.doChallenge(
             challengeParameters: challengeParameters,
             timeout: Int(configuration.challengeTimeout / 60),
