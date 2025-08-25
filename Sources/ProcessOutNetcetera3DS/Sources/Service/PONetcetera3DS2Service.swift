@@ -100,8 +100,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         }
         let challengeParameters = ChallengeParameters(parameters: parameters)
         if let returnUrl = configuration.returnUrl {
-            challengeParameters.setThreeDSRequestorAppURL(threeDSRequestorAppURL: returnUrl.absoluteString)
-            observeDeepLinks()
+            setReturnUrl(returnUrl, in: challengeParameters, transactionId: parameters.threeDSServerTransactionId)
         }
         // fixme(andrii-vysotskyi): presenting controller is being dismissed by Netcetera unintentionally
         let challengeStatus = try await transaction.doChallenge(
@@ -239,7 +238,19 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
 
     // MARK: - OOB
 
-    private var deepLinkObservation: AnyObject?
+    private func setReturnUrl(_ returnUrl: URL, in challengeParameters: ChallengeParameters, transactionId: String) {
+        guard var components = URLComponents(url: returnUrl, resolvingAgainstBaseURL: false) else {
+            return
+        }
+        var queryItems = components.queryItems ?? []
+        queryItems.append(.init(name: "transID", value: transactionId))
+        components.queryItems = queryItems
+        guard let threeDSRequestorAppURL = components.url else {
+            return
+        }
+        challengeParameters.setThreeDSRequestorAppURL(threeDSRequestorAppURL: threeDSRequestorAppURL.absoluteString)
+        observeDeepLinks()
+    }
 
     private func observeDeepLinks() {
         deepLinkObservation = eventEmitter.on(PODeepLinkReceivedEvent.self) { event in
@@ -252,4 +263,6 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             return ThreeDSSDKAppDelegate.shared.appOpened(url: event.url)
         }
     }
+
+    private var deepLinkObservation: AnyObject?
 }
