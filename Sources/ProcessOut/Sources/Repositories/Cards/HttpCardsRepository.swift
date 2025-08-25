@@ -28,7 +28,7 @@ final class HttpCardsRepository: CardsRepository {
             path: "/cards",
             body: request,
             locale: request.localeIdentifier,
-            includesDeviceMetadata: true,
+            includesDeviceMetadata: true
         )
         return try await connector.execute(request: httpRequest).card
     }
