@@ -173,6 +173,9 @@ indirect enum NativeAlternativePaymentViewModelItem {
 
         /// Date indicating when confirmation is estimated to end.
         let estimatedCompletionDate: Date
+
+        /// Custom locale.
+        let locale: Locale
     }
 
     struct Success {

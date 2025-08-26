@@ -204,7 +204,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                     )
                 },
                 formatter: formatter,
-                estimatedCompletionDate: estimatedCompletionDate
+                estimatedCompletionDate: estimatedCompletionDate,
+                locale: configuration.localization.localeOverride ?? .current
             )
             items.append(.confirmationProgress(confirmationProgressItem))
             if configuration.paymentConfirmation.confirmButton == nil {
