@@ -310,13 +310,13 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             ]
             items.append(contentsOf: streetItems)
         case .city(let city):
-            let placeholder = String(resource: city.stringResource)
+            let placeholder = String(resource: city.stringResource, configuration: configuration.localization)
             items.append(createItem(parameter: startedState.address.city, placeholder: placeholder))
         case .state(let state):
-            let placeholder = String(resource: state.stringResource)
+            let placeholder = String(resource: state.stringResource, configuration: configuration.localization)
             items.append(createItem(parameter: startedState.address.state, placeholder: placeholder))
         case .postcode(let postcode):
-            let placeholder = String(resource: postcode.stringResource)
+            let placeholder = String(resource: postcode.stringResource, configuration: configuration.localization)
             items.append(createItem(parameter: startedState.address.postalCode, placeholder: placeholder))
         }
         return items.compactMap { $0 }
@@ -459,6 +459,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         guard let buttonConfiguration = configuration.cancelButton else {
             return nil
         }
+        let localizationConfiguration = interactor.configuration.localization
         let action = POButtonViewModel(
             id: "cancel-button",
             title: buttonConfiguration.title ?? String(
@@ -467,7 +468,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             icon: buttonConfiguration.icon,
             isEnabled: isEnabled,
             role: .cancel,
-            confirmation: buttonConfiguration.confirmation.map { .cancel(with: $0) },
+            confirmation: buttonConfiguration.confirmation.map { configuration in
+                .cancel(with: configuration, localization: localizationConfiguration)
+            },
             action: { [weak self] in
                 self?.interactor.cancel()
             }

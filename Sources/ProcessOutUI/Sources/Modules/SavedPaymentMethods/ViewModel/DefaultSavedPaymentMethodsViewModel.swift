@@ -141,13 +141,14 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             defaultTitle: nil,
             icon: Image(poResource: .delete).resizable().renderingMode(.template)
         )
+        let localizationConfiguration = interactor.configuration.localization
         let viewModel = POButtonViewModel(
             id: "delete-button",
             title: configuration.title,
             icon: configuration.icon,
             isLoading: isLoading,
             confirmation: configuration.confirmation.map { [weak self] configuration in
-                .delete(with: configuration) {
+                .delete(with: configuration, localization: localizationConfiguration) {
                     self?.interactor.didRequestRemovalConfirmation(
                         customerTokenId: paymentMethod.configuration.customerTokenId
                     )
@@ -167,13 +168,14 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
         guard let configuration else {
             return nil
         }
+        let localizationConfiguration = interactor.configuration.localization
         let viewModel = POButtonViewModel(
             id: "cancel-button",
             title: configuration.title,
             icon: configuration.icon,
             role: .cancel,
             confirmation: configuration.confirmation.map { configuration in
-                .cancel(with: configuration)
+                .cancel(with: configuration, localization: localizationConfiguration)
             },
             action: { [weak self] in
                 self?.interactor.cancel()

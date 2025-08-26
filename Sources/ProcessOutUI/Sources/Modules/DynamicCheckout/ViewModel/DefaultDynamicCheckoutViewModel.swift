@@ -376,7 +376,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let viewModel = POButtonViewModel(
             id: ButtonId.submit,
-            title: interactor.configuration.submitButton.title ?? String(resource: .DynamicCheckout.Button.pay),
+            title: interactor.configuration.submitButton.title ?? String(
+                resource: .DynamicCheckout.Button.pay, configuration: interactor.configuration.localization
+            ),
             icon: interactor.configuration.submitButton.icon,
             role: .primary,
             action: { [weak self] in
@@ -483,7 +485,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let viewModel = POButtonViewModel(
             id: ButtonId.submit,
-            title: interactor.configuration.submitButton.title ?? String(resource: .DynamicCheckout.Button.pay),
+            title: interactor.configuration.submitButton.title ?? String(
+                resource: .DynamicCheckout.Button.pay, configuration: interactor.configuration.localization
+            ),
             icon: interactor.configuration.submitButton.icon,
             isLoading: true,
             role: .primary,
@@ -621,14 +625,19 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func createCancelAction(
         title: String?, icon: AnyView?, isEnabled: Bool, confirmation: POConfirmationDialogConfiguration?
     ) -> POButtonViewModel {
+        let localizationConfiguration = interactor.configuration.localization
         let viewModel = POButtonViewModel(
             id: ButtonId.cancel,
-            title: title ?? String(resource: .DynamicCheckout.Button.cancel),
+            title: title ?? String(
+                resource: .DynamicCheckout.Button.cancel, configuration: interactor.configuration.localization
+            ),
             icon: icon,
             isEnabled: isEnabled,
             role: .cancel,
             confirmation: confirmation.map { configuration in
-                .paymentCancel(with: configuration) { [weak self] in self?.interactor.didRequestCancelConfirmation() }
+                .paymentCancel(with: configuration, localization: localizationConfiguration) { [weak self] in
+                    self?.interactor.didRequestCancelConfirmation()
+                }
             },
             action: { [weak self] in
                 self?.interactor.cancel()

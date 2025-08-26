@@ -43,6 +43,7 @@ private struct ContentView<ProgressViewStyleType: ProgressViewStyle, GroupBoxSty
     // MARK: - View
 
     var body: some View {
+        // TODO: Fix configuration
         GroupBox {
             Group {
                 ProgressView(

@@ -114,13 +114,16 @@ final class DefaultCardScannerViewModel: ViewModel {
         guard let configuration = interactor.configuration.cancelButton else {
             return nil
         }
+        let localizationConfiguration = interactor.configuration.localization
         let viewModel = POButtonViewModel(
             id: "cancel-button",
             title: configuration.title ?? String(
                 resource: .CardScanner.cancelButton, configuration: interactor.configuration.localization
             ),
             icon: configuration.icon,
-            confirmation: configuration.confirmation.map { .cancel(with: $0) },
+            confirmation: configuration.confirmation.map { configuration in
+                .cancel(with: configuration, localization: localizationConfiguration)
+            },
             action: { [weak self] in
                 self?.interactor.cancel()
             }

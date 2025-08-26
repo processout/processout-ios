@@ -779,6 +779,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         guard let configuration, !configuration.isHidden else {
             return nil
         }
+        let localizationConfiguration = interactor.configuration.localization
         let action = POButtonViewModel(
             id: "native-alternative-payment.secondary-button",
             title: configuration.title ?? String(
@@ -788,7 +789,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             isEnabled: isEnabled,
             role: .cancel,
             confirmation: configuration.confirmation.map { configuration in
-                .paymentCancel(with: configuration) { [weak self] in self?.interactor.didRequestCancelConfirmation() }
+                .paymentCancel(with: configuration, localization: localizationConfiguration) { [weak self] in
+                    self?.interactor.didRequestCancelConfirmation()
+                }
             },
             action: { [weak self] in
                 self?.interactor.cancel()
