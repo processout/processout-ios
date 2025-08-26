@@ -199,8 +199,7 @@ final class AlternativePaymentsViewModel: ObservableObject {
                 ),
                 paymentConfirmation: .init(
                     showProgressViewAfter: 5, confirmButton: .init(), cancelButton: .init(disabledFor: 10)
-                ),
-                localization: .custom(localeIdentifier: "PL")
+                )
             )
             let nativePaymentItem = AlternativePaymentsViewModelState.NativePayment(
                 id: UUID().uuidString,
