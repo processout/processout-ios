@@ -11,7 +11,7 @@ extension Bundle {
 
     func withLocaleOverride(_ locale: Locale) -> Bundle? {
         // todo(andrii-vysotskyi): improve matching rules
-        for identifierCandidate in [locale.identifier, locale.languageCode] {
+        for identifierCandidate in [locale.identifier, locale.languageCode].compactMap(\.self) {
             if let path = path(forResource: identifierCandidate, ofType: "lproj") {
                 return Bundle(path: path)
             }
