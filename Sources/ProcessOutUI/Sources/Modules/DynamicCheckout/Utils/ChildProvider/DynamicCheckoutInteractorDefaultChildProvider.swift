@@ -99,7 +99,8 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             submitButton: submitButtonConfiguration(with: configuration.submitButton),
             cancelButton: nil,
             prefersInlineControls: true,
-            metadata: configuration.card.metadata
+            localization: configuration.localization,
+            metadata: configuration.card.metadata,
         )
     }
 
@@ -153,7 +154,8 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
                 PONativeAlternativePaymentConfiguration.CancelButton.init
             ),
             paymentConfirmation: .init(configuration: configuration.paymentConfirmation),
-            success: nil
+            success: nil,
+            localization: self.configuration.localization
         )
         return childConfiguration
     }
