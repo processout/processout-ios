@@ -306,7 +306,7 @@ extension PONativeAlternativePaymentFormV2.Parameter.Otp.Subtype: Codable {
 extension PONativeAlternativePaymentFormV2.Parameter.PhoneNumber.DialingCode {
 
     @_spi(PO)
-    public func regionDisplayName(locale: Locale = .current) -> String? {
+    public func regionDisplayName(locale: Locale) -> String? {
         locale.localizedString(forRegionCode: regionCode)
     }
 }

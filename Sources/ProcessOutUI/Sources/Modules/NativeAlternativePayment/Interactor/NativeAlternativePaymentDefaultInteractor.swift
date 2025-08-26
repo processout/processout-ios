@@ -525,8 +525,9 @@ final class NativeAlternativePaymentDefaultInteractor:
                     let formatter = POCardNumberFormatter()
                     return .init(specification: specification, formatter: formatter)
                 case .phoneNumber(let specification):
+                    let locale = configuration.localization.localeOverride ?? .current
                     let dialingCodes = specification.dialingCodes.sorted { lhs, rhs in
-                        lhs.regionDisplayName() ?? "" < rhs.regionDisplayName() ?? ""
+                        lhs.regionDisplayName(locale: locale) ?? "" < rhs.regionDisplayName(locale: locale) ?? ""
                     }
                     let updatedSpecification = PONativeAlternativePaymentFormV2.Parameter.PhoneNumber(
                         key: specification.key,

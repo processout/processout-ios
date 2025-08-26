@@ -498,7 +498,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     ) -> NativeAlternativePaymentViewModelItem {
         let territories = specification.dialingCodes
             .map { dialingCode -> ProcessOutCoreUI.POPhoneNumber.Territory in
-                let displayName = Locale.current.localizedString(forRegionCode: dialingCode.regionCode)
+                let locale = interactor.configuration.localization.localeOverride ?? .current
+                let displayName = locale.localizedString(forRegionCode: dialingCode.regionCode)
                 return .init(id: dialingCode.regionCode, displayName: displayName ?? "", code: dialingCode.value)
             }
         let value = Binding<ProcessOutCoreUI.POPhoneNumber> {
