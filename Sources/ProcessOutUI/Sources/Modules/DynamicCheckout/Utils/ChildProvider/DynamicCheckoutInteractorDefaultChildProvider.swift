@@ -99,7 +99,8 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             submitButton: submitButtonConfiguration(with: configuration.submitButton),
             cancelButton: nil,
             prefersInlineControls: true,
-            metadata: configuration.card.metadata
+            localization: configuration.localization,
+            metadata: configuration.card.metadata,
         )
     }
 
@@ -123,7 +124,12 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
     private func submitButtonConfiguration(
         with configuration: PODynamicCheckoutConfiguration.SubmitButton
     ) -> POCardTokenizationConfiguration.SubmitButton {
-        .init(title: configuration.title ?? String(resource: .DynamicCheckout.Button.pay), icon: configuration.icon)
+        .init(
+            title: configuration.title ?? String(
+                resource: .DynamicCheckout.Button.pay, configuration: self.configuration.localization
+            ),
+            icon: configuration.icon
+        )
     }
 
     // MARK: - Alternative Payment Configuration
@@ -139,14 +145,17 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             inlineSingleSelectValuesLimit: configuration.inlineSingleSelectValuesLimit,
             barcodeInteraction: .init(configuration: configuration.barcodeInteraction),
             submitButton: .init(
-                title: self.configuration.submitButton.title ?? String(resource: .DynamicCheckout.Button.pay),
+                title: self.configuration.submitButton.title ?? String(
+                    resource: .DynamicCheckout.Button.pay, configuration: self.configuration.localization
+                ),
                 icon: self.configuration.submitButton.icon
             ),
             cancelButton: self.configuration.cancelButton.map(
                 PONativeAlternativePaymentConfiguration.CancelButton.init
             ),
             paymentConfirmation: .init(configuration: configuration.paymentConfirmation),
-            success: nil
+            success: nil,
+            localization: self.configuration.localization
         )
         return childConfiguration
     }

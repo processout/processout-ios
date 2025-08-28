@@ -45,6 +45,9 @@ struct SavedPaymentMethodsViewModelState {
 
     /// Cancel button.
     let cancelButton: POButtonViewModel?
+
+    /// Localization configuration.
+    let localizationConfiguration: LocalizationConfiguration
 }
 
 extension SavedPaymentMethodsViewModelState: AnimationIdentityProvider {
@@ -60,7 +63,8 @@ extension SavedPaymentMethodsViewModelState: AnimationIdentityProvider {
             paymentMethods: [],
             isLoading: false,
             message: nil,
-            cancelButton: nil
+            cancelButton: nil,
+            localizationConfiguration: .device()
         )
     }
 }

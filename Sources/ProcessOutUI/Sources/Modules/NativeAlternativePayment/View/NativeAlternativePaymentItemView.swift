@@ -76,6 +76,7 @@ struct NativeAlternativePaymentItemView: View {
                 .messageViewStyle(style.messageView)
         case .confirmationProgress(let item):
             NativeAlternativePaymentConfirmationProgressItemView(item: item)
+                .environment(\.locale, item.locale)
         case .success(let item):
             NativeAlternativePaymentSuccessItemView(item: item)
         }

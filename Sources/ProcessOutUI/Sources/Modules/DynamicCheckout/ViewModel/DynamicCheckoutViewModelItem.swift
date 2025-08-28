@@ -75,6 +75,10 @@ enum DynamicCheckoutViewModelItem {
         @Binding
         var isSelected: Bool
 
+        /// Static save toggle title that is available irregardless of whether save operation
+        /// is available.
+        let saveTitle: String
+
         /// Defines whether method should be saved.
         var shouldSave: Binding<Bool>?
 

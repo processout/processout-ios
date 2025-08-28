@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ProcessOut
 
 /// Card scanner view configuration.
 @MainActor
@@ -49,15 +50,20 @@ public struct POCardScannerConfiguration {
     /// Cancel button configuration.
     public let cancelButton: CancelButton?
 
+    /// Localization configuration. Defaults to device localization.
+    public let localization: LocalizationConfiguration
+
     public init(
         title: String? = nil,
         description: String? = nil,
         shouldScanExpiredCard: Bool = false,
-        cancelButton: CancelButton? = .init()
+        cancelButton: CancelButton? = .init(),
+        localization: LocalizationConfiguration = .device()
     ) {
         self.title = title
         self.description = description
         self.shouldScanExpiredCard = shouldScanExpiredCard
         self.cancelButton = cancelButton
+        self.localization = localization
     }
 }

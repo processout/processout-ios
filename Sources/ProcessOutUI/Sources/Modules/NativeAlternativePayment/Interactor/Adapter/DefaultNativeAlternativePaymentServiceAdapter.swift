@@ -31,7 +31,8 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
                 invoiceId: flow.invoiceId,
                 gatewayConfigurationId: flow.gatewayConfigurationId,
                 source: flow.customerTokenId,
-                submitData: request.submitData
+                submitData: request.submitData,
+                localeIdentifier: request.localeIdentifier
             )
             let authorizationResponse = try await invoicesService.authorizeInvoice(request: authorizationRequest)
             return .init(authorizationResponse: authorizationResponse)
@@ -40,7 +41,8 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
                 customerId: flow.customerId,
                 customerTokenId: flow.customerTokenId,
                 gatewayConfigurationId: flow.gatewayConfigurationId,
-                submitData: request.submitData
+                submitData: request.submitData,
+                localeIdentifier: request.localeIdentifier
             )
             let tokenizationResponse = try await tokensService.tokenize(request: tokenizationRequest)
             return .init(tokenizationResponse: tokenizationResponse)

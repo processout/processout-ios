@@ -65,7 +65,8 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             paymentMethods: [],
             isLoading: true,
             message: nil,
-            cancelButton: createCancelButton()
+            cancelButton: createCancelButton(),
+            localizationConfiguration: interactor.configuration.localization
         )
     }
 
@@ -81,7 +82,8 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             paymentMethods: paymentMethodsViewModels,
             isLoading: false,
             message: createMessage(failure: interactorState.recentFailure),
-            cancelButton: createCancelButton()
+            cancelButton: createCancelButton(),
+            localizationConfiguration: interactor.configuration.localization
         )
     }
 
@@ -100,14 +102,16 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             paymentMethods: paymentMethodsViewModels,
             isLoading: false,
             message: createMessage(failure: interactorState.startedStateSnapshot.recentFailure),
-            cancelButton: createCancelButton()
+            cancelButton: createCancelButton(),
+            localizationConfiguration: interactor.configuration.localization
         )
     }
 
     // MARK: - Utils
 
     private func createTitle() -> String? {
-        let title = interactor.configuration.title ?? String(resource: .SavedPaymentMethods.title)
+        let title = interactor.configuration.title
+            ?? String(resource: .SavedPaymentMethods.title, configuration: interactor.configuration.localization)
         guard !title.isEmpty else {
             return nil
         }
@@ -137,13 +141,14 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             defaultTitle: nil,
             icon: Image(poResource: .delete).resizable().renderingMode(.template)
         )
+        let localizationConfiguration = interactor.configuration.localization
         let viewModel = POButtonViewModel(
             id: "delete-button",
             title: configuration.title,
             icon: configuration.icon,
             isLoading: isLoading,
             confirmation: configuration.confirmation.map { [weak self] configuration in
-                .delete(with: configuration) {
+                .delete(with: configuration, localization: localizationConfiguration) {
                     self?.interactor.didRequestRemovalConfirmation(
                         customerTokenId: paymentMethod.configuration.customerTokenId
                     )
@@ -163,13 +168,14 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
         guard let configuration else {
             return nil
         }
+        let localizationConfiguration = interactor.configuration.localization
         let viewModel = POButtonViewModel(
             id: "cancel-button",
             title: configuration.title,
             icon: configuration.icon,
             role: .cancel,
             confirmation: configuration.confirmation.map { configuration in
-                .cancel(with: configuration)
+                .cancel(with: configuration, localization: localizationConfiguration)
             },
             action: { [weak self] in
                 self?.interactor.cancel()
@@ -182,6 +188,9 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
         guard failure != nil else {
             return nil
         }
-        return .init(id: "error-message", text: String(resource: .SavedPaymentMethods.genericError), severity: .error)
+        let errorText = String(
+            resource: .SavedPaymentMethods.genericError, configuration: interactor.configuration.localization
+        )
+        return .init(id: "error-message", text: errorText, severity: .error)
     }
 }

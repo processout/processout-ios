@@ -40,6 +40,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
                 "expand": request.expand.map(\.rawValue).joined(separator: ",")
             ],
             headers: headers.compactMapValues { $0 },
+            locale: request.localeIdentifier,
             requiresPrivateKey: request.attachPrivateKey
         )
         let response = try await connector.execute(request: httpRequest) as HttpConnectorResponse
@@ -58,6 +59,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
             path: "/invoices/\(request.invoiceId)/authorize",
             body: request,
             headers: headers.compactMapValues { $0 },
+            locale: request.localeIdentifier,
             includesDeviceMetadata: true
         )
         return try await connector.execute(request: httpRequest).customerAction
@@ -67,7 +69,9 @@ final class HttpInvoicesRepository: InvoicesRepository {
         request: PONativeAlternativePaymentAuthorizationRequestV2
     ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
         let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentAuthorizationResponseV2>.post(
-            path: "/invoices/\(request.invoiceId)/apm-payment", body: request
+            path: "/invoices/\(request.invoiceId)/apm-payment",
+            body: request,
+            locale: request.localeIdentifier
         )
         return try await connector.execute(request: httpRequest)
     }

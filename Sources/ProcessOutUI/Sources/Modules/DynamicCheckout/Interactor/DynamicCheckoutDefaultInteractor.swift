@@ -49,7 +49,10 @@ final class DynamicCheckoutDefaultInteractor:
         let task = Task { @MainActor in
             do {
                 let invoice = try await invoicesService.invoice(
-                    request: configuration.invoiceRequest.replacing(expand: [.transaction, .paymentMethods])
+                    request: configuration.invoiceRequest.replacing(
+                        expand: [.transaction, .paymentMethods],
+                        localeIdentifier: configuration.localization.localeOverride?.identifier
+                    )
                 )
                 switch invoice.transaction?.status {
                 case .waiting:
@@ -306,7 +309,10 @@ final class DynamicCheckoutDefaultInteractor:
                 }
                 finishRestart(
                     with: try await invoicesService.invoice(
-                        request: invoiceRequest.replacing(expand: [.transaction, .paymentMethods])
+                        request: invoiceRequest.replacing(
+                            expand: [.transaction, .paymentMethods],
+                            localeIdentifier: configuration.localization.localeOverride?.identifier
+                        )
                     ),
                     clientSecret: invoiceRequest.clientSecret
                 )
@@ -333,7 +339,9 @@ final class DynamicCheckoutDefaultInteractor:
             .contains { $0.id == currentState.pendingPaymentMethodId } ?? false
         let errorDescription: String?
         if currentState.pendingPaymentMethodId != nil, !isPendingPaymentMethodAvailable {
-            errorDescription = String(resource: .DynamicCheckout.Error.methodUnavailable)
+            errorDescription = String(
+                resource: .DynamicCheckout.Error.methodUnavailable, configuration: configuration.localization
+            )
         } else {
             errorDescription = failureDescription(currentState.failure)
         }
@@ -373,7 +381,7 @@ final class DynamicCheckoutDefaultInteractor:
         case .Mobile.cancelled, .Customer.cancelled, nil:
             return nil
         default:
-            return String(resource: .DynamicCheckout.Error.generic)
+            return String(resource: .DynamicCheckout.Error.generic, configuration: configuration.localization)
         }
     }
 
@@ -494,7 +502,9 @@ final class DynamicCheckoutDefaultInteractor:
                 )
                 invalidateInvoiceIfPossible()
                 var authorizationRequest = POInvoiceAuthorizationRequest(
-                    invoiceId: startedState.invoice.id, source: card.id
+                    invoiceId: startedState.invoice.id,
+                    source: card.id,
+                    localeIdentifier: configuration.localization.localeOverride?.identifier
                 )
                 let threeDSService = await delegate.dynamicCheckout(
                     willAuthorizeInvoiceWith: &authorizationRequest, using: .applePay(method)
@@ -866,7 +876,8 @@ final class DynamicCheckoutDefaultInteractor:
             saveSource: saveSource,
             allowFallbackToSale: true,
             clientSecret: startedState.clientSecret,
-            prefersEphemeralWebAuthenticationSession: prefersEphemeralWebAuthenticationSession
+            prefersEphemeralWebAuthenticationSession: prefersEphemeralWebAuthenticationSession,
+            localeIdentifier: configuration.localization.localeOverride?.identifier
         )
         let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request, using: paymentMethod)
         try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)

@@ -30,12 +30,22 @@ public struct POSavedPaymentMethodsView: View {
                 if viewModel.state.isContentUnavailable {
                     POContentUnavailableView {
                         Label {
-                            Text(String(resource: .SavedPaymentMethods.ContentUnavailable.title))
+                            Text(
+                                String(
+                                    resource: .SavedPaymentMethods.ContentUnavailable.title,
+                                    configuration: viewModel.state.localizationConfiguration
+                                )
+                            )
                         } icon: {
                             Image(poResource: .creditCard).resizable()
                         }
                     } description: {
-                        Text(String(resource: .SavedPaymentMethods.ContentUnavailable.description))
+                        Text(
+                            String(
+                                resource: .SavedPaymentMethods.ContentUnavailable.description,
+                                configuration: viewModel.state.localizationConfiguration
+                            )
+                        )
                     }
                 }
             },

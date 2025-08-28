@@ -43,20 +43,30 @@ private struct ContentView<ProgressViewStyleType: ProgressViewStyle, GroupBoxSty
     // MARK: - View
 
     var body: some View {
+        // TODO: Fix configuration
         GroupBox {
             Group {
                 ProgressView(
-                    String(resource: .NativeAlternativePayment.PaymentConfirmation.Progress.FirstStep.title),
+                    String(
+                        resource: .NativeAlternativePayment.PaymentConfirmation.Progress.FirstStep.title,
+                        configuration: .custom(localeIdentifier: locale.identifier)
+                    ),
                     value: 1
                 )
                 ProgressView(
                     value: 0.5,
                     label: {
-                        Text(String(resource: .NativeAlternativePayment.PaymentConfirmation.Progress.SecondStep.title))
+                        Text(
+                            String(
+                                resource: .NativeAlternativePayment.PaymentConfirmation.Progress.SecondStep.title,
+                                configuration: .custom(localeIdentifier: locale.identifier)
+                            )
+                        )
                     },
                     currentValueLabel: {
                         let title = String(
                             resource: .NativeAlternativePayment.PaymentConfirmation.Progress.SecondStep.description,
+                            configuration: .custom(localeIdentifier: locale.identifier),
                             replacements: remainingWaitDurationDescription
                         )
                         Text(title)
@@ -80,6 +90,9 @@ private struct ContentView<ProgressViewStyleType: ProgressViewStyle, GroupBoxSty
 
     @State
     private var remainingWaitDurationDescription: String = ""
+
+    @Environment(\.locale)
+    private var locale
 
     // MARK: - Private Methods
 

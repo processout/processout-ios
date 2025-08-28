@@ -49,7 +49,10 @@ public struct POAssignCustomerTokenRequest: Codable, Sendable { // sourcery: Aut
 
     /// An object used to evaluate navigation events in a web authentication session.
     @POExcludedEncodable
-    public private(set) var webAuthenticationCallback: POWebAuthenticationCallback?
+    public private(set) var webAuthenticationCallback: POWebAuthenticationCallback? // sourcery:coding:skip
+
+    /// Customer's locale identifier override.
+    public let localeIdentifier: String?
 
     /// Creates request instance.
     public init(
@@ -62,7 +65,8 @@ public struct POAssignCustomerTokenRequest: Codable, Sendable { // sourcery: Aut
         enableThreeDS2 _: Bool = true,
         thirdPartySdkVersion: String? = nil,
         metadata: [String: String]? = nil,
-        webAuthenticationCallback: POWebAuthenticationCallback? = nil
+        webAuthenticationCallback: POWebAuthenticationCallback? = nil,
+        localeIdentifier: String? = nil
     ) {
         self.customerId = customerId
         self.tokenId = tokenId
@@ -73,5 +77,6 @@ public struct POAssignCustomerTokenRequest: Codable, Sendable { // sourcery: Aut
         self.thirdPartySdkVersion = thirdPartySdkVersion
         self.metadata = metadata
         self.webAuthenticationCallback = webAuthenticationCallback
+        self.localeIdentifier = localeIdentifier
     }
 }

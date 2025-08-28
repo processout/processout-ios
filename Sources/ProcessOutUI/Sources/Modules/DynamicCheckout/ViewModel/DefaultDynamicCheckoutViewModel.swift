@@ -178,7 +178,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         state: DynamicCheckoutInteractorState.Started
     ) -> DynamicCheckoutViewModelState.SectionHeader? {
         let resolvedConfiguration = interactor.configuration.expressCheckout.resolved(
-            defaultTitle: String(resource: .DynamicCheckout.expressCheckout)
+            defaultTitle: String(
+                resource: .DynamicCheckout.expressCheckout, configuration: interactor.configuration.localization
+            )
         )
         let settingsButton = createExpressMethodsSettingsButton(
             paymentMethods: state.paymentMethods, configuration: resolvedConfiguration.settingsButton
@@ -286,6 +288,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             title: display.description ?? display.name,
             isLoading: isLoading,
             isSelected: isSelected,
+            saveTitle: String(
+                resource: .DynamicCheckout.savePaymentMessage, configuration: interactor.configuration.localization
+            ),
             shouldSave: shouldSavePaymentMethod(
                 isSelected: selected, shouldSaveSelected: shouldSaveSelected
             ),
@@ -321,7 +326,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
 
     private func additionalPaymentInformation(methodId: String, isExternal: Bool, isSelected: Bool) -> String? {
         if isExternal, isSelected {
-            return String(resource: .DynamicCheckout.Warning.redirect)
+            return String(
+                resource: .DynamicCheckout.Warning.redirect, configuration: interactor.configuration.localization
+            )
         }
         return nil
     }
@@ -369,7 +376,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let viewModel = POButtonViewModel(
             id: ButtonId.submit,
-            title: interactor.configuration.submitButton.title ?? String(resource: .DynamicCheckout.Button.pay),
+            title: interactor.configuration.submitButton.title ?? String(
+                resource: .DynamicCheckout.Button.pay, configuration: interactor.configuration.localization
+            ),
             icon: interactor.configuration.submitButton.icon,
             role: .primary,
             action: { [weak self] in
@@ -476,7 +485,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         let viewModel = POButtonViewModel(
             id: ButtonId.submit,
-            title: interactor.configuration.submitButton.title ?? String(resource: .DynamicCheckout.Button.pay),
+            title: interactor.configuration.submitButton.title ?? String(
+                resource: .DynamicCheckout.Button.pay, configuration: interactor.configuration.localization
+            ),
             icon: interactor.configuration.submitButton.icon,
             isLoading: true,
             role: .primary,
@@ -595,7 +606,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         guard let configuration = interactor.configuration.paymentSuccess else {
             return
         }
-        let message = configuration.message ?? String(resource: .DynamicCheckout.successMessage)
+        let message = configuration.message ?? String(
+            resource: .DynamicCheckout.successMessage, configuration: interactor.configuration.localization
+        )
         let item = DynamicCheckoutViewModelItem.Success(
             id: ItemId.success,
             message: message,
@@ -612,14 +625,19 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func createCancelAction(
         title: String?, icon: AnyView?, isEnabled: Bool, confirmation: POConfirmationDialogConfiguration?
     ) -> POButtonViewModel {
+        let localizationConfiguration = interactor.configuration.localization
         let viewModel = POButtonViewModel(
             id: ButtonId.cancel,
-            title: title ?? String(resource: .DynamicCheckout.Button.cancel),
+            title: title ?? String(
+                resource: .DynamicCheckout.Button.cancel, configuration: interactor.configuration.localization
+            ),
             icon: icon,
             isEnabled: isEnabled,
             role: .cancel,
             confirmation: confirmation.map { configuration in
-                .paymentCancel(with: configuration) { [weak self] in self?.interactor.didRequestCancelConfirmation() }
+                .paymentCancel(with: configuration, localization: localizationConfiguration) { [weak self] in
+                    self?.interactor.didRequestCancelConfirmation()
+                }
             },
             action: { [weak self] in
                 self?.interactor.cancel()

@@ -11,36 +11,58 @@
 extension POButtonViewModel.Confirmation {
 
     static func paymentCancel(
-        with configuration: POConfirmationDialogConfiguration, onAppear: (() -> Void)? = nil
+        with configuration: POConfirmationDialogConfiguration,
+        localization: LocalizationConfiguration,
+        onAppear: (() -> Void)? = nil
     ) -> Self {
         let confirmation = POButtonViewModel.Confirmation(
-            title: configuration.title ?? String(resource: .PaymentCancelConfirmation.title),
+            title: configuration.title ?? String(
+                resource: .PaymentCancelConfirmation.title, configuration: localization
+            ),
             message: configuration.message,
             confirmButtonTitle: configuration.confirmActionTitle
-                ?? String(resource: .PaymentCancelConfirmation.confirm),
-            cancelButtonTitle: configuration.cancelActionTitle ?? String(resource: .PaymentCancelConfirmation.cancel),
+                ?? String(resource: .PaymentCancelConfirmation.confirm, configuration: localization),
+            cancelButtonTitle: configuration.cancelActionTitle ?? String(
+                resource: .PaymentCancelConfirmation.cancel, configuration: localization
+            ),
             onAppear: onAppear
         )
         return confirmation
     }
 
-    static func cancel(with configuration: POConfirmationDialogConfiguration, onAppear: (() -> Void)? = nil) -> Self {
+    static func cancel(
+        with configuration: POConfirmationDialogConfiguration,
+        localization: LocalizationConfiguration,
+        onAppear: (() -> Void)? = nil
+    ) -> Self {
         let confirmation = POButtonViewModel.Confirmation(
-            title: configuration.title ?? String(resource: .CancelConfirmation.title),
+            title: configuration.title ?? String(resource: .CancelConfirmation.title, configuration: localization),
             message: configuration.message,
-            confirmButtonTitle: configuration.confirmActionTitle ?? String(resource: .CancelConfirmation.confirm),
-            cancelButtonTitle: configuration.cancelActionTitle ?? String(resource: .CancelConfirmation.cancel),
+            confirmButtonTitle: configuration.confirmActionTitle ?? String(
+                resource: .CancelConfirmation.confirm, configuration: localization
+            ),
+            cancelButtonTitle: configuration.cancelActionTitle ?? String(
+                resource: .CancelConfirmation.cancel, configuration: localization
+            ),
             onAppear: onAppear
         )
         return confirmation
     }
 
-    static func delete(with configuration: POConfirmationDialogConfiguration, onAppear: (() -> Void)? = nil) -> Self {
+    static func delete(
+        with configuration: POConfirmationDialogConfiguration,
+        localization: LocalizationConfiguration,
+        onAppear: (() -> Void)? = nil
+    ) -> Self {
         let confirmation = POButtonViewModel.Confirmation(
-            title: configuration.title ?? String(resource: .DeleteConfirmation.title),
+            title: configuration.title ?? String(resource: .DeleteConfirmation.title, configuration: localization),
             message: configuration.message,
-            confirmButtonTitle: configuration.confirmActionTitle ?? String(resource: .DeleteConfirmation.confirm),
-            cancelButtonTitle: configuration.cancelActionTitle ?? String(resource: .DeleteConfirmation.cancel),
+            confirmButtonTitle: configuration.confirmActionTitle ?? String(
+                resource: .DeleteConfirmation.confirm, configuration: localization
+            ),
+            cancelButtonTitle: configuration.cancelActionTitle ?? String(
+                resource: .DeleteConfirmation.cancel, configuration: localization
+            ),
             onAppear: onAppear
         )
         return confirmation

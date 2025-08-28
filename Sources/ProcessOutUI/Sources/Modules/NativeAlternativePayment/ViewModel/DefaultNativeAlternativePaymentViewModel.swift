@@ -183,24 +183,29 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             items.append(contentsOf: createItems(for: state.elements, state: nil))
         } else if let estimatedCompletionDate = state.estimatedCompletionDate {
             let formatter = DateComponentsFormatter()
+            formatter.calendar = configuration.localization.localeOverride?.calendar ?? .current
             formatter.allowedUnits = [.minute, .second]
             formatter.unitsStyle = .positional
             formatter.zeroFormattingBehavior = [.pad]
             let confirmationProgressItem = NativeAlternativePaymentViewModelItem.ConfirmationProgress(
                 firstStepTitle: String(
-                    resource: .NativeAlternativePayment.PaymentConfirmation.Progress.FirstStep.title
+                    resource: .NativeAlternativePayment.PaymentConfirmation.Progress.FirstStep.title,
+                    configuration: configuration.localization
                 ),
                 secondStepTitle: String(
-                    resource: .NativeAlternativePayment.PaymentConfirmation.Progress.SecondStep.title
+                    resource: .NativeAlternativePayment.PaymentConfirmation.Progress.SecondStep.title,
+                    configuration: configuration.localization
                 ),
-                secondStepDescription: { remainingDuration in
+                secondStepDescription: { [configuration] remainingDuration in
                     String(
                         resource: .NativeAlternativePayment.PaymentConfirmation.Progress.SecondStep.description,
+                        configuration: configuration.localization,
                         replacements: remainingDuration
                     )
                 },
                 formatter: formatter,
-                estimatedCompletionDate: estimatedCompletionDate
+                estimatedCompletionDate: estimatedCompletionDate,
+                locale: configuration.localization.localeOverride ?? .current
             )
             items.append(.confirmationProgress(confirmationProgressItem))
             if configuration.paymentConfirmation.confirmButton == nil {
@@ -236,7 +241,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         }
         let action = POButtonViewModel(
             id: "primary-button",
-            title: buttonConfiguration.title ?? String(resource: .NativeAlternativePayment.Button.confirmPayment),
+            title: buttonConfiguration.title ?? String(
+                resource: .NativeAlternativePayment.Button.confirmPayment, configuration: configuration.localization
+            ),
             icon: buttonConfiguration.icon,
             role: .primary,
             action: { [weak self] in
@@ -255,11 +262,19 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 }
             } else if let configuration = barcodeInteraction.saveErrorConfirmation {
                 let dialog = POConfirmationDialog(
-                    title: configuration.title ?? String(resource: .NativeAlternativePayment.BarcodeError.title),
-                    message: configuration.message ?? String(resource: .NativeAlternativePayment.BarcodeError.message),
+                    title: configuration.title ?? String(
+                        resource: .NativeAlternativePayment.BarcodeError.title,
+                        configuration: self.configuration.localization
+                    ),
+                    message: configuration.message ?? String(
+                        resource: .NativeAlternativePayment.BarcodeError.message,
+                        configuration: self.configuration.localization
+                    ),
                     primaryButton: .init(
-                        // swiftlint:disable:next line_length
-                        title: configuration.confirmActionTitle ?? String(resource: .NativeAlternativePayment.BarcodeError.confirm)
+                        title: configuration.confirmActionTitle ?? String(
+                            resource: .NativeAlternativePayment.BarcodeError.confirm,
+                            configuration: self.configuration.localization
+                        )
                     )
                 )
                 self.state.confirmationDialog = dialog
@@ -351,10 +366,16 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func createSuccessItem(state: InteractorState.Completed) -> NativeAlternativePaymentViewModelItem {
         // todo(andrii-vysotskyi): support icon customization
         let title = interactor.configuration.success?.title
-            ?? String(resource: .NativeAlternativePayment.Success.title)
-        let defaultDescription: () -> String? = {
-            if let formattedAmount = Self.formatAmount(of: state.invoice) {
-                return String(resource: .NativeAlternativePayment.Success.message, replacements: formattedAmount)
+            ?? String(resource: .NativeAlternativePayment.Success.title, configuration: configuration.localization)
+        let defaultDescription: () -> String? = { [configuration] in
+            if let formattedAmount = Self.formatAmount(
+                of: state.invoice, locale: configuration.localization.localeOverride ?? .current
+            ) {
+                return String(
+                    resource: .NativeAlternativePayment.Success.message,
+                    configuration: configuration.localization,
+                    replacements: formattedAmount
+                )
             } else {
                 return nil
             }
@@ -370,7 +391,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         }
         let viewModel = POButtonViewModel(
             id: "complete-payment-button",
-            title: configuration.title ?? String(resource: .NativeAlternativePayment.Button.done),
+            title: configuration.title ?? String(
+                resource: .NativeAlternativePayment.Button.done, configuration: self.configuration.localization
+            ),
             icon: configuration.icon,
             isEnabled: true,
             isLoading: false,
@@ -476,7 +499,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     ) -> NativeAlternativePaymentViewModelItem {
         let territories = specification.dialingCodes
             .map { dialingCode -> ProcessOutCoreUI.POPhoneNumber.Territory in
-                let displayName = Locale.current.localizedString(forRegionCode: dialingCode.regionCode)
+                let locale = interactor.configuration.localization.localeOverride ?? .current
+                let displayName = locale.localizedString(forRegionCode: dialingCode.regionCode)
                 return .init(id: dialingCode.regionCode, displayName: displayName ?? "", code: dialingCode.value)
             }
         let value = Binding<ProcessOutCoreUI.POPhoneNumber> {
@@ -494,6 +518,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             id: specification.key,
             territories: territories,
             value: value,
+            countryPrompt: String(
+                resource: .NativeAlternativePayment.Placeholder.country, configuration: configuration.localization
+            ),
             prompt: specification.label,
             isInvalid: parameter.recentErrorMessage != nil
         )
@@ -620,7 +647,13 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             let item = NativeAlternativePaymentViewModelItem.MessageInstruction(
                 id: instruction.value,
                 title: instruction.label,
-                value: instruction.value
+                value: instruction.value,
+                copyTitle: String(
+                    resource: .NativeAlternativePayment.Button.copy, configuration: configuration.localization
+                ),
+                copiedTitle: String(
+                    resource: .NativeAlternativePayment.Button.copied, configuration: configuration.localization
+                )
             )
             return .messageInstruction(item)
         case .image(let instruction):
@@ -648,6 +681,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         let configuration = interactor.configuration.barcodeInteraction.saveButton
         let defaultTitle = String(
             resource: .NativeAlternativePayment.Button.saveBarcode,
+            configuration: self.configuration.localization,
             replacements: barcode.type.rawValue.uppercased()
         )
         let viewModel = POButtonViewModel(
@@ -696,9 +730,15 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         if let title = interactor.configuration.title, title.isEmpty {
             return nil
         }
-        let defaultTitle: () -> String? = {
-            if let formattedAmount = Self.formatAmount(of: invoice) {
-                return String(resource: .NativeAlternativePayment.title, replacements: formattedAmount)
+        let defaultTitle: () -> String? = { [configuration] in
+            if let formattedAmount = Self.formatAmount(
+                of: invoice, locale: configuration.localization.localeOverride ?? .current
+            ) {
+                return String(
+                    resource: .NativeAlternativePayment.title,
+                    configuration: self.configuration.localization,
+                    replacements: formattedAmount
+                )
             } else {
                 return nil
             }
@@ -720,7 +760,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func createSubmitButton(state: InteractorState.Started, isLoading: Bool) -> POButtonViewModel {
         let action = POButtonViewModel(
             id: "primary-button",
-            title: configuration.submitButton.title ?? String(resource: .NativeAlternativePayment.Button.continue),
+            title: configuration.submitButton.title ?? String(
+                resource: .NativeAlternativePayment.Button.continue, configuration: configuration.localization
+            ),
             icon: configuration.submitButton.icon,
             isEnabled: state.areParametersValid,
             isLoading: isLoading,
@@ -738,14 +780,19 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         guard let configuration, !configuration.isHidden else {
             return nil
         }
+        let localizationConfiguration = interactor.configuration.localization
         let action = POButtonViewModel(
             id: "native-alternative-payment.secondary-button",
-            title: configuration.title ?? String(resource: .NativeAlternativePayment.Button.cancel),
+            title: configuration.title ?? String(
+                resource: .NativeAlternativePayment.Button.cancel, configuration: self.configuration.localization
+            ),
             icon: configuration.icon,
             isEnabled: isEnabled,
             role: .cancel,
             confirmation: configuration.confirmation.map { configuration in
-                .paymentCancel(with: configuration) { [weak self] in self?.interactor.didRequestCancelConfirmation() }
+                .paymentCancel(with: configuration, localization: localizationConfiguration) { [weak self] in
+                    self?.interactor.didRequestCancelConfirmation()
+                }
             },
             action: { [weak self] in
                 self?.interactor.cancel()
@@ -778,11 +825,14 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         return true
     }
 
-    private static func formatAmount(of invoice: PONativeAlternativePaymentInvoiceV2?) -> String? {
+    private static func formatAmount(
+        of invoice: PONativeAlternativePaymentInvoiceV2?, locale: Locale
+    ) -> String? {
         guard let invoice else {
             return nil
         }
         let formatter = NumberFormatter()
+        formatter.locale = locale
         formatter.minimumFractionDigits = 0
         formatter.numberStyle = .currency
         formatter.currencyCode = invoice.currency
