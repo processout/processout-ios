@@ -40,11 +40,7 @@ public struct PODynamicCheckoutView: View {
                 .actionsContainerStyle(style.actionsContainer)
         }
         .backport.background {
-            let backgroundColor = viewModel.state.isCompleted
-                ? style.paymentSuccess.backgroundColor : style.backgroundColor
-            backgroundColor
-                .ignoresSafeArea()
-                .animation(.default, value: viewModel.state.isCompleted)
+            style.backgroundColor.ignoresSafeArea()
         }
         .backport.geometryGroup()
         .onAppear(perform: viewModel.start)

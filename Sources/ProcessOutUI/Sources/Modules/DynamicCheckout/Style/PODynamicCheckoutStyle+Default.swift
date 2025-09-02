@@ -55,7 +55,7 @@ extension PODynamicCheckoutStyle.PaymentSuccess {
 
     /// Default dynamic checkout capture success style.
     public static let `default` = Self(
-        message: POTextStyle(color: .Text.positive, typography: .Paragraph.s16(weight: .medium)),
-        backgroundColor: .Surface.successSubtle
+        title: .init(color: .Text.primary, typography: .Text.s20(weight: .semibold)),
+        message: .init(color: .Text.secondary, typography: .Paragraph.s16(weight: .regular))
     )
 }

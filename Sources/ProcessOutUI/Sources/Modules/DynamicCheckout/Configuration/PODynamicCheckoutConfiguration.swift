@@ -48,14 +48,18 @@ public struct PODynamicCheckoutConfiguration {
     @MainActor
     public struct PaymentSuccess {
 
-        /// Custom success message to display user when payment completes.
+        /// Custom title to display to user when payment completes.
+        public let title: String?
+
+        /// Custom success message to display to user when payment completes.
         public let message: String?
 
         /// Defines for how long implementation delays calling completion in case of success.
         public let duration: TimeInterval
 
         /// Creates configuration instance.
-        public init(message: String? = nil, duration: TimeInterval = 3) {
+        public init(title: String? = nil, message: String? = nil, duration: TimeInterval = 3) {
+            self.title = title
             self.message = message
             self.duration = duration
         }

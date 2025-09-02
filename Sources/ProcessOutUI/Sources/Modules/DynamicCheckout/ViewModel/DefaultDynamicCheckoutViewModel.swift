@@ -89,7 +89,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         let section = DynamicCheckoutViewModelState.Section(
             id: SectionId.default, header: nil, items: [.progress], isTight: false, areBezelsVisible: false
         )
-        state = DynamicCheckoutViewModelState(sections: [section], actions: [], isCompleted: false)
+        state = DynamicCheckoutViewModelState(sections: [section], actions: [])
     }
 
     // MARK: - Started
@@ -101,7 +101,6 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         let newState = DynamicCheckoutViewModelState(
             sections: createSectionsWithStartedState(state, selectedMethodId: nil, shouldSaveSelectedMethod: nil),
             actions: newActions.compactMap { $0 },
-            isCompleted: false,
             savedPaymentMethods: self.state.savedPaymentMethods
         )
         self.state = newState
@@ -364,7 +363,6 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
                 shouldSaveSelectedMethod: state.shouldSavePaymentMethod
             ),
             actions: newActions.compactMap { $0 },
-            isCompleted: false,
             savedPaymentMethods: self.state.savedPaymentMethods
         )
         self.state = newState
@@ -397,7 +395,6 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         let newState = DynamicCheckoutViewModelState(
             sections: createSectionsWithPaymentProcessingState(state),
             actions: newActions.compactMap { $0 },
-            isCompleted: false,
             savedPaymentMethods: self.state.savedPaymentMethods
         )
         self.state = newState
@@ -541,7 +538,6 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         let newState = DynamicCheckoutViewModelState(
             sections: createSectionsWithRestartingState(state),
             actions: newActions.compactMap { $0 },
-            isCompleted: false,
             savedPaymentMethods: self.state.savedPaymentMethods
         )
         self.state = newState
@@ -606,18 +602,19 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         guard let configuration = interactor.configuration.paymentSuccess else {
             return
         }
+        let title = configuration.title ?? String(
+            resource: .DynamicCheckout.successTitle, configuration: interactor.configuration.localization
+        )
         let message = configuration.message ?? String(
             resource: .DynamicCheckout.successMessage, configuration: interactor.configuration.localization
         )
         let item = DynamicCheckoutViewModelItem.Success(
-            id: ItemId.success,
-            message: message,
-            image: UIImage(poResource: .success).withRenderingMode(.alwaysTemplate)
+            id: ItemId.success, title: title, message: message,
         )
         let section = DynamicCheckoutViewModelState.Section(
             id: SectionId.default, header: nil, items: [.success(item)], isTight: false, areBezelsVisible: false
         )
-        state = DynamicCheckoutViewModelState(sections: [section], actions: [], isCompleted: true)
+        state = DynamicCheckoutViewModelState(sections: [section], actions: [])
     }
 
     // MARK: - Utils

@@ -13,22 +13,18 @@ struct DynamicCheckoutPaymentSuccessView: View {
 
     let item: DynamicCheckoutViewModelItem.Success
 
+    // MARK: - View
+
     var body: some View {
-        VStack(spacing: POSpacing.large) {
+        VStack(spacing: POSpacing.space6) {
+            Image(poResource: .success)
+            Text(item.title)
+                .textStyle(style.paymentSuccess.title)
             Text(item.message)
                 .textStyle(style.paymentSuccess.message)
-                .multilineTextAlignment(.center)
-            Spacer()
-                .frame(height: POSpacing.large)
-            if let image = item.image {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: min(Constants.maximumDecorationImageHeight, image.size.height))
-                    .foregroundColor(style.paymentSuccess.message.color)
-            }
         }
-        .padding(POSpacing.large)
+        .multilineTextAlignment(.center)
+        .padding(.top, POSpacing.space28)
         .frame(maxWidth: .infinity)
         .backport.geometryGroup()
     }

@@ -118,11 +118,11 @@ enum DynamicCheckoutViewModelItem {
         /// Item ID.
         let id: AnyHashable
 
+        /// Title.
+        let title: String
+
         /// Success message.
         let message: String
-
-        /// Decoration image.
-        let image: UIImage?
     }
 
     /// Progress item.

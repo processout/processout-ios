@@ -56,9 +56,6 @@ struct DynamicCheckoutViewModelState {
     /// Available actions.
     let actions: [POButtonViewModel]
 
-    /// Indicates whether state represents final success state.
-    let isCompleted: Bool
-
     /// Confirmation dialog to present to user.
     var confirmationDialog: POConfirmationDialog?
 
@@ -73,7 +70,7 @@ extension DynamicCheckoutViewModelState: AnimationIdentityProvider {
     }
 
     static var idle: DynamicCheckoutViewModelState {
-        .init(sections: [], actions: [], isCompleted: false)
+        .init(sections: [], actions: [])
     }
 }
 
