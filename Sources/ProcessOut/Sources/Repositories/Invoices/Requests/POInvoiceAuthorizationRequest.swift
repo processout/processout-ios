@@ -108,7 +108,7 @@ public struct POInvoiceAuthorizationRequest: Codable, Sendable { // sourcery: Au
         metadata: [String: String]? = nil,
         webAuthenticationCallback: POWebAuthenticationCallback? = nil,
         prefersEphemeralWebAuthenticationSession: Bool = true,
-        localeIdentifier: String?
+        localeIdentifier: String? = nil
     ) {
         self.invoiceId = invoiceId
         self.source = source
