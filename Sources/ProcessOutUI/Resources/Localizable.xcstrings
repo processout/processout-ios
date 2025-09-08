@@ -2114,31 +2114,65 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "نجاح! تمت الموافقة على الدفع"
+            "value" : "تمت الموافقة على الدفع"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Success!\nPayment approved."
+            "value" : "Payment approved."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Succès !\nPaiement confirmé."
+            "value" : "Paiement confirmé."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sukces!\nPłatność przyjęta."
+            "value" : "Płatność przyjęta."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Successo!\nPagamento aprovado."
+            "value" : "Pagamento aprovado."
+          }
+        }
+      }
+    },
+    "dynamic-checkout.success-title" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم كل شيء بنجاح!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're all set!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout est prêt !"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wszystko gotowe!"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tudo pronto!"
           }
         }
       }

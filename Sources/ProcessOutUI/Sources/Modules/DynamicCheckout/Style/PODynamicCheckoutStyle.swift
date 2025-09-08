@@ -58,16 +58,27 @@ public struct PODynamicCheckoutStyle {
     @MainActor
     public struct PaymentSuccess {
 
+        /// Success screen title style.
+        public let title: POTextStyle
+
         /// Success message style.
         public let message: POTextStyle
 
         /// Success background style.
-        public let backgroundColor: Color
+        @available(*, deprecated, message: "No longer used.")
+        public let backgroundColor = Color.clear
 
         /// Creates style instance.
-        public init(message: POTextStyle, backgroundColor: Color) {
+        public init(title: POTextStyle, message: POTextStyle) {
+            self.title = title
             self.message = message
-            self.backgroundColor = backgroundColor
+        }
+
+        /// Creates style instance.
+        @available(*, deprecated, message: "No longer used.")
+        public init(message: POTextStyle, backgroundColor: Color) {
+            self.title = .init(color: .Text.primary, typography: .Text.s20(weight: .semibold))
+            self.message = message
         }
     }
 
