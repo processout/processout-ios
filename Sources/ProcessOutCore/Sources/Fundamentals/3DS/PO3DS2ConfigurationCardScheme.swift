@@ -8,6 +8,8 @@
 // todo(andrii-vysotskyi): remove when updating to 5.0.0
 
 /// Available card schemes.
+@available(iOS 15, *)
+@_originallyDefinedIn(module: "ProcessOut", iOS 15)
 public enum PO3DS2ConfigurationCardScheme: RawRepresentable, Hashable, Sendable {
 
     /// Known card schemes.

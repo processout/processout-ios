@@ -6,6 +6,8 @@
 //
 
 /// Contains information about completion of the challenge process.
+@available(iOS 15, *)
+@_originallyDefinedIn(module: "ProcessOut", iOS 15)
 public struct PO3DS2ChallengeResult: Codable, Sendable {
 
     /// The transaction status that was received in the final challenge response.

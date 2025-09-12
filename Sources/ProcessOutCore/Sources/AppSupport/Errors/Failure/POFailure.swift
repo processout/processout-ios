@@ -8,6 +8,8 @@
 import Foundation
 
 /// Information about an error that occurred.
+@available(iOS 15, *)
+@_originallyDefinedIn(module: "ProcessOut", iOS 15)
 public struct POFailure: LocalizedError {
 
     public struct InvalidField: Codable, Sendable {

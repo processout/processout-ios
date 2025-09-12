@@ -8,7 +8,8 @@
 import Foundation
 
 /// Holds information about 3DS redirect.
-@available(*, deprecated, message: "Redirects are handled internally.")
+@available(iOS, introduced: 15, deprecated, message: "Redirects are handled internally.")
+@_originallyDefinedIn(module: "ProcessOut", iOS 15)
 public struct PO3DSRedirect: Hashable, Sendable {
 
     /// Redirect url.

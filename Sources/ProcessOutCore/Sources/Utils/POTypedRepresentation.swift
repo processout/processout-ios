@@ -10,7 +10,9 @@
 import Foundation
 
 /// Introduces typed version of a property in a backward compatible way.
+@available(iOS 15, *)
 @propertyWrapper
+@_originallyDefinedIn(module: "ProcessOut", iOS 15)
 public struct POTypedRepresentation<Wrapped, Representation: RawRepresentable> {
 
     public init(wrappedValue: Wrapped) {

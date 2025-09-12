@@ -8,6 +8,8 @@
 // swiftlint:disable inclusive_language file_length
 
 /// Represents a failure code that describes an error encountered during a request.
+@available(iOS 15, *)
+@_originallyDefinedIn(module: "ProcessOut", iOS 15)
 public struct POFailureCode: Sendable, Equatable {
 
     /// The raw string representation of the failure code.

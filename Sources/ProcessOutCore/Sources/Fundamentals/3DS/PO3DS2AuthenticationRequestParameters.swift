@@ -9,6 +9,8 @@
 public typealias PO3DS2AuthenticationRequest = PO3DS2AuthenticationRequestParameters
 
 /// Holds transaction data that the 3DS Server requires to create the AReq.
+@available(iOS 15, *)
+@_originallyDefinedIn(module: "ProcessOut", iOS 15)
 public struct PO3DS2AuthenticationRequestParameters: Hashable, Sendable, Codable {
 
     /// Encrypted device data as a JWE string.

@@ -9,7 +9,8 @@
 public typealias PO3DSServiceType = PO3DSService
 
 /// This interface provides methods to process 3-D Secure transactions.
-@available(*, deprecated, message: "Implement PO3DS2Service service directly instead.")
+@available(iOS, introduced: 15, deprecated, message: "Implement PO3DS2Service service directly instead.")
+@_originallyDefinedIn(module: "ProcessOut", iOS 15)
 public protocol PO3DSService: PO3DS2Service {
 
     /// Asks implementation to create request that will be passed to 3DS Server to create the AReq.

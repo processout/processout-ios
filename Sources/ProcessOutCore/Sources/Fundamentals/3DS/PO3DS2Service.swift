@@ -6,7 +6,9 @@
 //
 
 /// This interface provides methods to process 3-D Secure transactions.
+@available(iOS 15, *)
 @preconcurrency
+@_originallyDefinedIn(module: "ProcessOut", iOS 15)
 public protocol PO3DS2Service: Sendable {
 
     /// Returns the version of the 3DS SDK that is integrated with the 3DS Requestor App.

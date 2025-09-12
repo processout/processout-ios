@@ -6,6 +6,8 @@
 //
 
 /// Represents the configuration parameters that are required by the 3DS SDK for initialization.
+@available(iOS 15, *)
+@_originallyDefinedIn(module: "ProcessOut", iOS 15)
 public struct PO3DS2Configuration: Codable, Hashable, Sendable {
 
     /// The identifier of the directory server to use during the transaction creation phase.

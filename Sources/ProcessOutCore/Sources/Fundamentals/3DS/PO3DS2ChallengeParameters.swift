@@ -10,6 +10,8 @@ public typealias PO3DS2Challenge = PO3DS2ChallengeParameters
 
 /// Information from the 3DS Server's authentication response that could be used by the 3DS2 SDK to initiate
 /// the challenge flow.
+@available(iOS 15, *)
+@_originallyDefinedIn(module: "ProcessOut", iOS 15)
 public struct PO3DS2ChallengeParameters: Codable, Hashable, Sendable {
 
     /// Unique transaction identifier assigned by the ACS.
