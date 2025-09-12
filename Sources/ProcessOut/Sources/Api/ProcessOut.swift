@@ -5,10 +5,11 @@
 //  Created by Andrii Vysotskyi on 14.10.2024.
 //
 
-// swiftlint:disable force_unwrapping type_body_length
+// swiftlint:disable force_unwrapping
 
 import Foundation
 import UIKit
+@_exported import ProcessOutCore
 
 @available(*, deprecated, renamed: "ProcessOut")
 public typealias ProcessOutApi = ProcessOut
@@ -59,12 +60,10 @@ public final class ProcessOut: @unchecked Sendable {
     public let images: POImagesRepository = UrlSessionImagesRepository(session: .shared)
 
     /// Logger with application category.
-    @_spi(PO)
-    public let logger: POLogger
+    package let logger: POLogger
 
     /// Event emitter to use for events exchange.
-    @_spi(PO)
-    public let eventEmitter: POEventEmitter
+    package let eventEmitter: POEventEmitter
 
     // MARK: - Internal
 
@@ -394,4 +393,4 @@ extension ProcessOut {
     }
 }
 
-// swiftlint:enable force_unwrapping type_body_length
+// swiftlint:enable force_unwrapping

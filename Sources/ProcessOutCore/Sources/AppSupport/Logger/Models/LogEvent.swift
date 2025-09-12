@@ -7,29 +7,29 @@
 
 import Foundation
 
-struct LogEvent: @unchecked Sendable {
+package struct LogEvent: @unchecked Sendable {
 
     /// Logging level.
-    let level: LogLevel
+    package let level: LogLevel
 
     /// Actual log message.
-    let message: String
+    package let message: String
 
     /// The string that categorises event.
-    let category: String
+    package let category: String
 
     /// Date associated with message.
-    let timestamp: Date
+    package let timestamp: Date
 
     /// DSO handle.
-    let dso: UnsafeRawPointer?
+    package let dso: UnsafeRawPointer?
 
     /// File name.
-    let file: String
+    package let file: String
 
     /// Line number.
-    let line: Int
+    package let line: Int
 
     /// Additional attributes.
-    let additionalAttributes: [POLogAttributeKey: String]
+    package let additionalAttributes: [POLogAttributeKey: String]
 }

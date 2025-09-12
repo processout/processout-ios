@@ -5,8 +5,7 @@
 //  Created by Andrii Vysotskyi on 10.05.2023.
 //
 
-@_spi(PO)
-public protocol POEventEmitterEvent: Sendable {
+package protocol POEventEmitterEvent: Sendable {
 
     /// Event name.
     static var name: String { get }
@@ -14,7 +13,7 @@ public protocol POEventEmitterEvent: Sendable {
 
 extension POEventEmitterEvent {
 
-    public static var name: String {
+    package static var name: String {
         String(describing: self)
     }
 }

@@ -8,10 +8,9 @@
 import Foundation
 
 /// An object for writing interpolated string messages to the processout logging system.
-@_spi(PO)
-public struct POLogger: @unchecked Sendable {
+package struct POLogger: @unchecked Sendable {
 
-    init(destinations: [LoggerDestination] = [], category: String, minimumLevel: LogLevel = .debug) {
+    package init(destinations: [LoggerDestination] = [], category: String, minimumLevel: LogLevel = .debug) {
         self.destinations = destinations
         self.category = category
         self.storage = .init(minimumLevel: minimumLevel)
@@ -23,12 +22,12 @@ public struct POLogger: @unchecked Sendable {
     let category: String
 
     /// Replaces current minimum logging level.
-    func replace(minimumLevel: LogLevel) {
+    package func replace(minimumLevel: LogLevel) {
         lock.withLock { self.storage.minimumLevel = minimumLevel }
     }
 
     /// Add, change, or remove a logging attribute.
-    public subscript(attributeKey attributeKey: POLogAttributeKey) -> String? {
+    package subscript(attributeKey attributeKey: POLogAttributeKey) -> String? {
         get {
             lock.withLock { attributes[attributeKey] }
         }
@@ -38,7 +37,7 @@ public struct POLogger: @unchecked Sendable {
     }
 
     /// Logs a message at the `debug` level.
-    public func debug(
+    package func debug(
         _ message: @autoclosure () -> POLogMessage,
         attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
@@ -49,7 +48,7 @@ public struct POLogger: @unchecked Sendable {
     }
 
     /// Logs a message at the `info` level.
-    public func info(
+    package func info(
         _ message: @autoclosure () -> POLogMessage,
         attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
@@ -60,7 +59,7 @@ public struct POLogger: @unchecked Sendable {
     }
 
     /// Logs a message at the `warn` level.
-    public func warn(
+    package func warn(
         _ message: @autoclosure () -> POLogMessage,
         attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,
@@ -71,7 +70,7 @@ public struct POLogger: @unchecked Sendable {
     }
 
     /// Logs a message at the `error` level.
-    public func error(
+    package func error(
         _ message: @autoclosure () -> POLogMessage,
         attributes: @autoclosure () -> [POLogAttributeKey: String] = [:],
         dso: UnsafeRawPointer? = #dsohandle,

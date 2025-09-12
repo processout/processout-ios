@@ -51,7 +51,6 @@ let package = Package(
             name: "ProcessOutNetcetera3DS",
             dependencies: [
                 .target(name: "ProcessOutCore"),
-                .target(name: "ProcessOut"),
                 .target(name: "NetceteraShim"),
                 .product(name: "ThreeDS_SDK", package: "SPM"),
             ],

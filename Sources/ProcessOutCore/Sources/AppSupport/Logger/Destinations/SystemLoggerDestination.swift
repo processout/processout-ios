@@ -8,15 +8,15 @@
 import Foundation
 import os
 
-final class SystemLoggerDestination: LoggerDestination, @unchecked Sendable {
+package final class SystemLoggerDestination: LoggerDestination, @unchecked Sendable {
 
-    init(subsystem: String) {
+    package init(subsystem: String) {
         self.subsystem = subsystem
         lock = NSLock()
         logs = [:]
     }
 
-    func log(event: LogEvent) {
+    package func log(event: LogEvent) {
         os_log(
             "%{public}@ %{public}@",
             dso: event.dso,

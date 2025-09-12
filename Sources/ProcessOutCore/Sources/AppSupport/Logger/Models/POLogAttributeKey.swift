@@ -7,8 +7,7 @@
 
 import Foundation
 
-@_spi(PO)
-public struct POLogAttributeKey: RawRepresentable, ExpressibleByStringLiteral, Hashable, Sendable {
+package struct POLogAttributeKey: RawRepresentable, ExpressibleByStringLiteral, Hashable, Sendable {
 
     public init(rawValue: String) {
         self.rawValue = rawValue
@@ -24,17 +23,17 @@ public struct POLogAttributeKey: RawRepresentable, ExpressibleByStringLiteral, H
 extension POLogAttributeKey {
 
     /// Gateway configuration ID.
-    public static let gatewayConfigurationId: Self = "GatewayConfigurationId"
+    package static let gatewayConfigurationId: Self = "GatewayConfigurationId"
 
     /// Card ID.
-    public static let cardId: Self = "CardId"
+    package static let cardId: Self = "CardId"
 
     /// Invoice ID.
-    public static let invoiceId: Self = "InvoiceId"
+    package static let invoiceId: Self = "InvoiceId"
 
     /// Invoice ID.
-    public static let customerId: Self = "CustomerId"
+    package static let customerId: Self = "CustomerId"
 
     /// Invoice ID.
-    public static let customerTokenId: Self = "CustomerTokenId"
+    package static let customerTokenId: Self = "CustomerTokenId"
 }

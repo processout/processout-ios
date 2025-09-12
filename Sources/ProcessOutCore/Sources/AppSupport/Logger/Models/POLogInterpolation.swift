@@ -5,8 +5,7 @@
 //  Created by Andrii Vysotskyi on 25.10.2022.
 //
 
-@_spi(PO)
-public struct POLogInterpolation: StringInterpolationProtocol, Sendable {
+package struct POLogInterpolation: StringInterpolationProtocol, Sendable {
 
     /// Privacy options for specifying privacy level of the interpolated expressions
     /// in the string interpolations passed to the log APIs.
@@ -28,11 +27,11 @@ public struct POLogInterpolation: StringInterpolationProtocol, Sendable {
     /// Interpolation's content.
     private(set) var value: String
 
-    public mutating func appendLiteral(_ literal: String) {
+    package mutating func appendLiteral(_ literal: String) {
         value.append(literal)
     }
 
-    public mutating func appendInterpolation(_ value: String, privacy: Privacy = .public) {
+    package mutating func appendInterpolation(_ value: String, privacy: Privacy = .public) {
         switch privacy {
         case .public:
             self.value.append(value)
@@ -41,21 +40,21 @@ public struct POLogInterpolation: StringInterpolationProtocol, Sendable {
         }
     }
 
-    public mutating func appendInterpolation<Value: CustomStringConvertible>(
+    package mutating func appendInterpolation<Value: CustomStringConvertible>(
         _ value: Value, privacy: Privacy = .public
     ) {
         appendInterpolation(value.description, privacy: privacy)
     }
 
-    public mutating func appendInterpolation(_ error: Error, privacy: Privacy = .public) {
+    package mutating func appendInterpolation(_ error: Error, privacy: Privacy = .public) {
         appendInterpolation(String(describing: error), privacy: privacy)
     }
 
-    public mutating func appendInterpolation<Value>(_ value: Value, privacy: Privacy = .public) {
+    package mutating func appendInterpolation<Value>(_ value: Value, privacy: Privacy = .public) {
         appendInterpolation(String(describing: value), privacy: privacy)
     }
 
-    public init(literalCapacity: Int, interpolationCount: Int) {
+    package init(literalCapacity: Int, interpolationCount: Int) {
         value = String()
         value.reserveCapacity(literalCapacity)
     }

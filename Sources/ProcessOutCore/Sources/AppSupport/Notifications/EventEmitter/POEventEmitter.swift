@@ -7,8 +7,7 @@
 
 import Foundation
 
-@_spi(PO)
-public protocol POEventEmitter: Sendable {
+package protocol POEventEmitter: Sendable {
 
     /// Emits given event.
     @discardableResult

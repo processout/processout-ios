@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 28.04.2025.
 //
 
-import ProcessOut
+import ProcessOutCore
 import ThreeDS_SDK
 
 extension PO3DS2ChallengeResult {

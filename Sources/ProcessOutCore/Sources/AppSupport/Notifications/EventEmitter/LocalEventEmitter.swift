@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class LocalEventEmitter: POEventEmitter, @unchecked Sendable {
+package final class LocalEventEmitter: POEventEmitter, @unchecked Sendable {
 
-    init(logger: POLogger) {
+    package init(logger: POLogger) {
         self.logger = logger
         lock = NSLock()
         subscriptions = [:]
@@ -17,7 +17,7 @@ final class LocalEventEmitter: POEventEmitter, @unchecked Sendable {
 
     // MARK: - POEventEmitter
 
-    func emit<Event: POEventEmitterEvent>(event: Event) -> Bool {
+    package func emit<Event: POEventEmitterEvent>(event: Event) -> Bool {
         lock.lock()
         guard let eventSubscriptions = subscriptions[Event.name]?.values, !eventSubscriptions.isEmpty else {
             lock.unlock()
@@ -36,7 +36,7 @@ final class LocalEventEmitter: POEventEmitter, @unchecked Sendable {
         return isHandled
     }
 
-    func on<Event: POEventEmitterEvent>(
+    package func on<Event: POEventEmitterEvent>(
         _ eventType: Event.Type, listener: @escaping @Sendable (Event) -> Bool
     ) -> AnyObject {
         let subscription = Subscription { event in

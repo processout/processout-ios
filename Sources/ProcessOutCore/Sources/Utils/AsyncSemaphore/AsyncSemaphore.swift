@@ -7,13 +7,12 @@
 
 import Foundation
 
-@_spi(PO)
-public actor AsyncSemaphore {
+package actor AsyncSemaphore {
 
     // MARK: - Creating a Semaphore
 
     /// Creates a semaphore.
-    public init(value: UInt) {
+    package init(value: UInt) {
         initialValue = Int(value)
         self.value = Int(value)
     }
@@ -31,7 +30,7 @@ public actor AsyncSemaphore {
     ///
     /// If the count is negative, the current task is suspended without blocking
     /// the thread. Otherwise, no suspension occurs.
-    public func wait() async {
+    package func wait() async {
         if value == 0 {
             await withUnsafeContinuation { continuation in
                 let suspension = AsyncSemaphoreSuspension()
@@ -50,7 +49,7 @@ public actor AsyncSemaphore {
     /// the thread. Otherwise, no suspension occurs.
     ///
     /// If canceled before signalling, this function throws `cancellationError`.
-    public func waitUnlessCancelled(
+    package func waitUnlessCancelled(
         cancellationError: @Sendable @escaping @autoclosure () -> Error = CancellationError()
     ) async throws {
         do {
@@ -80,7 +79,7 @@ public actor AsyncSemaphore {
     ///
     /// Increases the semaphore's count, potentially unblocking a suspended task
     /// if the count transitions from negative to non-negative.
-    public nonisolated func signal() {
+    package nonisolated func signal() {
         Task {
             await signalSemaphore()
         }

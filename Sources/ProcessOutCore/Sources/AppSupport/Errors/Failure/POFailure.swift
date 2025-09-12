@@ -18,8 +18,7 @@ public struct POFailure: LocalizedError {
         /// Message describing an error.
         public let message: String
 
-        @_spi(PO)
-        public init(name: String, message: String) {
+        package init(name: String, message: String) {
             self.name = name
             self.message = message
         }

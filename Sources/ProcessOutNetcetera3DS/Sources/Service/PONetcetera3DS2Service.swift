@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 22.04.2025.
 //
 
-@_spi(PO) import ProcessOut
+@_spi(PO) import ProcessOutCore
 @_spi(PO) import NetceteraShim
 import ThreeDS_SDK
 
@@ -17,7 +17,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         configuration: PONetcetera3DS2ServiceConfiguration = .init(),
         delegate: PONetcetera3DS2ServiceDelegate? = nil
     ) {
-        self.eventEmitter = ProcessOut.shared.eventEmitter
+        self.eventEmitter = nil
         self.configuration = configuration
         self.delegate = delegate
     }
@@ -132,22 +132,9 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         executionSemaphore.signal()
     }
 
-    // MARK: -
-
-    init(
-        configuration: PONetcetera3DS2ServiceConfiguration = .init(),
-        delegate: PONetcetera3DS2ServiceDelegate? = nil,
-        eventEmitter: POEventEmitter
-    ) {
-        self.eventEmitter = eventEmitter
-        self.configuration = configuration
-        self.delegate = delegate
-        self.service = .init()
-    }
-
     // MARK: - Private Properties
 
-    private let configuration: PONetcetera3DS2ServiceConfiguration, eventEmitter: POEventEmitter
+    private let configuration: PONetcetera3DS2ServiceConfiguration, eventEmitter: POEventEmitter?
     private var service: ThreeDS2ServiceSDK?, transaction: Transaction?, transactionId: String?
 
     /// A semaphore used to ensure that only one method of this object runs at a time,
@@ -252,7 +239,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
     }
 
     private func observeDeepLinks() {
-        deepLinkObservation = eventEmitter.on(PODeepLinkReceivedEvent.self) { event in
+        deepLinkObservation = eventEmitter?.on(PODeepLinkReceivedEvent.self) { event in
             let userActivitySchemes: Set<String> = ["http", "https"]
             if let scheme = event.url.scheme, userActivitySchemes.contains(scheme) {
                 let userActivity = NSUserActivity(activityType: NSUserActivityTypeBrowsingWeb)
