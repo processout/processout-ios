@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 28.02.2023.
 //
 
-@_spi(PO) import ProcessOut
+import ProcessOutCore
 import Checkout3DS
 
 /// 3DS2 service implementation that is based on Checkout3DS.
@@ -16,7 +16,7 @@ public final class POCheckout3DSService: PO3DS2Service {
     public nonisolated init(delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production) {
         self.errorMapper = DefaultAuthenticationErrorMapper()
         self.configurationMapper = DefaultConfigurationMapper()
-        self.eventEmitter = ProcessOut.shared.eventEmitter
+        self.eventEmitter = nil
         self.delegate = delegate
         self.environment = environment
     }
@@ -81,7 +81,7 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     private let errorMapper: AuthenticationErrorMapper
     private let configurationMapper: ConfigurationMapper
-    private let eventEmitter: POEventEmitter
+    private let eventEmitter: POEventEmitter?
 
     private let environment: Checkout3DS.Environment
     private let delegate: POCheckout3DSServiceDelegate?
@@ -131,7 +131,7 @@ public final class POCheckout3DSService: PO3DS2Service {
     }
 
     private func observeDeepLinks() {
-        deepLinkObservation = eventEmitter.on(PODeepLinkReceivedEvent.self) { event in
+        deepLinkObservation = eventEmitter?.on(PODeepLinkReceivedEvent.self) { event in
             Checkout3DSService.handleAppURL(url: event.url)
         }
     }
