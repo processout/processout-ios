@@ -5,9 +5,6 @@
 //  Created by Andrii Vysotskyi on 03.11.2022.
 //
 
-@available(*, deprecated, renamed: "PO3DSService")
-public typealias PO3DSServiceType = PO3DSService
-
 /// This interface provides methods to process 3-D Secure transactions.
 @available(iOS, introduced: 15, deprecated, message: "Implement PO3DS2Service service directly instead.")
 @_originallyDefinedIn(module: "ProcessOut", iOS 15)

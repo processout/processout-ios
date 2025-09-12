@@ -5,9 +5,6 @@
 //  Created by Andrii Vysotskyi on 03.11.2022.
 //
 
-@available(*, deprecated, renamed: "PO3DS2AuthenticationRequestParameters")
-public typealias PO3DS2AuthenticationRequest = PO3DS2AuthenticationRequestParameters
-
 /// Holds transaction data that the 3DS Server requires to create the AReq.
 @available(iOS 15, *)
 @_originallyDefinedIn(module: "ProcessOut", iOS 15)

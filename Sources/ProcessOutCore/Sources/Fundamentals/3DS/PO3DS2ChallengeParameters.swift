@@ -5,9 +5,6 @@
 //  Created by Andrii Vysotskyi on 02.11.2022.
 //
 
-@available(*, deprecated, renamed: "PO3DS2ChallengeParameters")
-public typealias PO3DS2Challenge = PO3DS2ChallengeParameters
-
 /// Information from the 3DS Server's authentication response that could be used by the 3DS2 SDK to initiate
 /// the challenge flow.
 @available(iOS 15, *)
