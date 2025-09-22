@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 14.10.2024.
 //
 
-// swiftlint:disable force_unwrapping
+// swiftlint:disable force_unwrapping type_body_length
 
 import Foundation
 import UIKit
@@ -174,7 +174,10 @@ public final class ProcessOut: @unchecked Sendable {
     ) -> POInvoicesService {
         let repository = HttpInvoicesRepository(connector: httpConnector)
         return DefaultInvoicesService(
-            repository: repository, customerActionsService: customerActionsService, logger: logger
+            repository: repository,
+            customerActionsService: customerActionsService,
+            threeDSServiceFactory: Default3DSServiceFactory(),
+            logger: logger
         )
     }
 
@@ -393,4 +396,4 @@ extension ProcessOut {
     }
 }
 
-// swiftlint:enable force_unwrapping
+// swiftlint:enable force_unwrapping type_body_length

@@ -22,6 +22,12 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
     /// Performs invoice authorization with given request.
     func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws
 
+    /// Performs invoice authorization with given request.
+    ///
+    /// Implementation uses default 3DS service to perform authorization if one is available,
+    /// otherwise throws an error,
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws // sourcery:completion: skip
+
     /// Performs invoice authorization using given alternative payment method details.
     func authorizeInvoice( // sourcery:completion: skip
         request: PONativeAlternativePaymentAuthorizationRequestV2
