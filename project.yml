@@ -24,6 +24,7 @@ targets:
     deploymentTarget: "15.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.core-ui
+      OTHER_SWIFT_FLAGS: "-package-name ProcessOut"
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutCoreUI
     preBuildScripts:
       - path: Scripts/Lint.sh
@@ -39,7 +40,7 @@ targets:
     deploymentTarget: "15.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.ui
-      OTHER_SWIFT_FLAGS: "-Xfrontend -module-interface-preserve-types-as-written -enable-upcoming-feature IsolatedDefaultValues"
+      OTHER_SWIFT_FLAGS: "-Xfrontend -module-interface-preserve-types-as-written -enable-upcoming-feature IsolatedDefaultValues -package-name ProcessOut"
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutUI
     preBuildScripts:
       - path: Scripts/Lint.sh
@@ -58,7 +59,7 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-ios
       MARKETING_VERSION: ${CURRENT_VERSION}
       CURRENT_PROJECT_VERSION: 1
-      OTHER_SWIFT_FLAGS: "-Xfrontend -module-interface-preserve-types-as-written"
+      OTHER_SWIFT_FLAGS: "-Xfrontend -module-interface-preserve-types-as-written -package-name ProcessOut"
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOut
     preBuildScripts:
       - path: Scripts/Lint.sh
@@ -71,6 +72,22 @@ targets:
       - path: Sources/ProcessOut
     dependencies:
       - framework: Vendor/cmark_gfm.xcframework
+  ProcessOutCore:
+    type: framework
+    platform: iOS
+    deploymentTarget: "15.0"
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.processout.processout-core-ios
+      MARKETING_VERSION: ${CURRENT_VERSION}
+      CURRENT_PROJECT_VERSION: 1
+      OTHER_SWIFT_FLAGS: "-Xfrontend -module-interface-preserve-types-as-written -package-name ProcessOut"
+      TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutCore
+    preBuildScripts:
+      - path: Scripts/Lint.sh
+        name: Swiftlint
+        basedOnDependencyAnalysis: false
+    sources:
+      - path: Sources/ProcessOutCore
   ProcessOutTests:
     type: bundle.unit-test
     platform: iOS
@@ -96,6 +113,7 @@ targets:
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.checkout-3ds-ios
       EXCLUDED_ARCHS: x86_64 # Checkout3DS doesn't support x86_64 so are we
+      OTHER_SWIFT_FLAGS: "-package-name ProcessOut"
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutCheckout3DS
     preBuildScripts:
       - path: Scripts/Lint.sh
@@ -103,7 +121,7 @@ targets:
         basedOnDependencyAnalysis: false
     dependencies:
       - package: Checkout3DSPackages
-      - target: ProcessOut
+      - target: ProcessOutCore
     sources: Sources/ProcessOutCheckout3DS
   ProcessOutNetcetera3DS:
     type: framework
@@ -111,6 +129,7 @@ targets:
     deploymentTarget: "15.0"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.processout.netcetera-3ds-ios
+      OTHER_SWIFT_FLAGS: "-package-name ProcessOut"
       TARGET_ROOT: $(PROJECT_DIR)/Sources/ProcessOutNetcetera3DS
     preBuildScripts:
       - path: Scripts/Lint.sh
@@ -118,7 +137,7 @@ targets:
         basedOnDependencyAnalysis: false
     dependencies:
       - package: ThreeDS_SDK
-      - target: ProcessOut
+      - target: ProcessOutCore
       - framework: Vendor/NetceteraShim.xcframework
     sources: Sources/ProcessOutNetcetera3DS
   ProcessOutCheckout3DSTests:
