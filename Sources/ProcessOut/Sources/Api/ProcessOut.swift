@@ -223,6 +223,7 @@ public final class ProcessOut: @unchecked Sendable {
             repository: repository,
             customerActionsService: customerActionsService,
             eventEmitter: eventEmitter,
+            threeDSServiceFactory: Default3DSServiceFactory(),
             logger: logger
         )
     }
