@@ -13,11 +13,23 @@ import ThreeDS_SDK
 public actor PONetcetera3DS2Service: PO3DS2Service {
 
     /// Creates a new instance of `PONetcetera3DS2Service`.
+    @_disfavoredOverload
     public init(
         configuration: PONetcetera3DS2ServiceConfiguration = .init(),
         delegate: PONetcetera3DS2ServiceDelegate? = nil
     ) {
         self.eventEmitter = nil
+        self.configuration = configuration
+        self.delegate = delegate
+    }
+
+    /// Creates a new instance of `PONetcetera3DS2Service`.
+    package init(
+        configuration: PONetcetera3DS2ServiceConfiguration = .init(),
+        delegate: PONetcetera3DS2ServiceDelegate? = nil,
+        eventEmitter: POEventEmitter
+    ) {
+        self.eventEmitter = eventEmitter
         self.configuration = configuration
         self.delegate = delegate
     }

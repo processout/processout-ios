@@ -13,10 +13,24 @@ import Checkout3DS
 public final class POCheckout3DSService: PO3DS2Service {
 
     /// Creates service instance.
+    @_disfavoredOverload
     public nonisolated init(delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production) {
         self.errorMapper = DefaultAuthenticationErrorMapper()
         self.configurationMapper = DefaultConfigurationMapper()
         self.eventEmitter = nil
+        self.delegate = delegate
+        self.environment = environment
+    }
+
+    @_disfavoredOverload
+    package nonisolated init(
+        delegate: POCheckout3DSServiceDelegate? = nil,
+        environment: Environment = .production,
+        eventEmitter: POEventEmitter
+    ) {
+        self.errorMapper = DefaultAuthenticationErrorMapper()
+        self.configurationMapper = DefaultConfigurationMapper()
+        self.eventEmitter = eventEmitter
         self.delegate = delegate
         self.environment = environment
     }

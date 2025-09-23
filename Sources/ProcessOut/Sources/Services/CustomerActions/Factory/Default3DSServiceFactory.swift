@@ -12,6 +12,12 @@ import ProcessOutNetcetera3DS
 
 struct Default3DSServiceFactory: ThreeDSServiceFactory {
 
+    init(eventEmitter: POEventEmitter) {
+        self.eventEmitter = eventEmitter
+    }
+
+    // MARK: - ThreeDSServiceFactory
+
     func make3DSService(with input: ThreeDSServiceFactoryInput) throws(POFailure) -> PO3DS2Service {
         #if canImport(ProcessOutNetcetera3DS)
         PONetcetera3DS2Service(
@@ -22,12 +28,17 @@ struct Default3DSServiceFactory: ThreeDSServiceFactory {
                 bridgingExtensionVersion: nil,
                 returnUrl: returnUrl(with: input),
             ),
-            delegate: nil
+            delegate: nil,
+            eventEmitter: eventEmitter
         )
         #else
         throw POFailure(message: "Default 3DS Service is not available.", code: .Mobile.generic)
         #endif
     }
+
+    // MARK: - Private Properties
+
+    private let eventEmitter: POEventEmitter
 
     // MARK: - Private Methods
 
