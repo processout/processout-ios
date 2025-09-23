@@ -6,7 +6,7 @@ PROJECT='ProcessOut.xcodeproj'
 DESTINATION=$(./Scripts/Tests/Destination.swift)
 
 # Run Tests
-for PRODUCT in "ProcessOut" "ProcessOutUI" "ProcessOutCheckout3DS" "ProcessOutNetcetera3DS"; do
+for PRODUCT in "ProcessOutCore" "ProcessOut" "ProcessOutUI" "ProcessOutCheckout3DS" "ProcessOutNetcetera3DS"; do
     xcodebuild clean test \
         -destination "$DESTINATION" \
         -project $PROJECT \
