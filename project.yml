@@ -167,6 +167,14 @@ targets:
       - target: ProcessOutNetcetera3DS
     sources: Tests/ProcessOutNetcetera3DSTests
 schemes:
+  ProcessOutCore:
+    build:
+      targets:
+        ProcessOutCore: all
+        ProcessOutCoreTests: [test]
+    test:
+      gatherCoverageData: true
+      targets: [ProcessOutCoreTests]
   ProcessOut:
     build:
       targets:
