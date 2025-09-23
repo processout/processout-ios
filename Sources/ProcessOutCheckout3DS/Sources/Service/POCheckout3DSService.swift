@@ -22,7 +22,6 @@ public final class POCheckout3DSService: PO3DS2Service {
         self.environment = environment
     }
 
-    @_disfavoredOverload
     package nonisolated init(
         delegate: POCheckout3DSServiceDelegate? = nil,
         environment: Environment = .production,
