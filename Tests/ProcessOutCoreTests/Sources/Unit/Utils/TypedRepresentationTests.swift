@@ -7,7 +7,7 @@
 
 import Foundation
 import Testing
-@testable import ProcessOut
+@testable import ProcessOutCore
 
 struct TypedRepresentationTests {
 

@@ -6,7 +6,7 @@
 //
 
 import Testing
-@testable @_spi(PO) import ProcessOut
+@testable import ProcessOutCore
 
 struct AsyncSemaphoreTests {
 

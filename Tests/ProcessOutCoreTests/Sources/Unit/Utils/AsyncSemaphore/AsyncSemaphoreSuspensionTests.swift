@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 10.10.2024.
 //
 
-@testable import ProcessOut
+@testable import ProcessOutCore
 import Testing
 
 struct AsyncSemaphoreSuspensionTests {

@@ -29,6 +29,22 @@ public struct PO3DS2Configuration: Codable, Hashable, Sendable {
     /// 3DS protocol version identifier.
     public let messageVersion: String
 
+    package init(
+        directoryServerId: String,
+        directoryServerPublicKey: String,
+        directoryServerRootCertificates: [String],
+        directoryServerTransactionId: String,
+        scheme: PO3DS2ConfigurationCardScheme? = nil,
+        messageVersion: String
+    ) {
+        self.directoryServerId = directoryServerId
+        self.directoryServerPublicKey = directoryServerPublicKey
+        self.directoryServerRootCertificates = directoryServerRootCertificates
+        self.directoryServerTransactionId = directoryServerTransactionId
+        self._scheme = .init(wrappedValue: scheme)
+        self.messageVersion = messageVersion
+    }
+
     // MARK: - Private Nested Types
 
     private enum CodingKeys: String, CodingKey {

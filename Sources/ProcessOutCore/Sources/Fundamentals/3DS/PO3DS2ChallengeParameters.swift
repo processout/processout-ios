@@ -24,6 +24,18 @@ public struct PO3DS2ChallengeParameters: Codable, Hashable, Sendable {
     /// Unique identifier for the authentication assigned by the DS (Card Scheme).
     public let threeDSServerTransactionId: String
 
+    package init(
+        acsTransactionId: String,
+        acsReferenceNumber: String,
+        acsSignedContent: String,
+        threeDSServerTransactionId: String
+    ) {
+        self.acsTransactionId = acsTransactionId
+        self.acsReferenceNumber = acsReferenceNumber
+        self.acsSignedContent = acsSignedContent
+        self.threeDSServerTransactionId = threeDSServerTransactionId
+    }
+
     // MARK: - Private Nested Types
 
     private enum CodingKeys: String, CodingKey {
