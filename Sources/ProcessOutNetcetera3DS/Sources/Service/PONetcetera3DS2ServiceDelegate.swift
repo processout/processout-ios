@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 25.04.2025.
 //
 
-import ProcessOut
+import ProcessOutCore
 import ThreeDS_SDK
 
 /// A delegate that allows customization of the 3DS2 flow in `PONetcetera3DS2Service`.

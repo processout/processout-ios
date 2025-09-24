@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 13.11.2024.
 //
 
-import ProcessOut
+import ProcessOutCore
 
 @available(*, deprecated)
 final class ThreeDSServiceAdapter: PO3DSService {

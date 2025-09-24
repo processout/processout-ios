@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 01.03.2023.
 //
 
-import ProcessOut
+import ProcessOutCore
 import Checkout3DS
 
 /// Checkout 3DS service delegate.
@@ -74,11 +74,11 @@ public protocol POCheckout3DSServiceDelegate: AnyObject, Sendable {
 
     /// Notifies delegate that service did complete device fingerprinting.
     @available(*, deprecated, renamed: "checkout3DSService(_:didCreateAuthenticationRequestParameters:)")
-    func didCreateAuthenticationRequest(result: Result<PO3DS2AuthenticationRequest, POFailure>)
+    func didCreateAuthenticationRequest(result: Result<PO3DS2AuthenticationRequestParameters, POFailure>)
 
     /// Notifies delegate that implementation is about to handle 3DS2 challenge.
     @available(*, deprecated, renamed: "checkout3DSService(_:willPerformChallengeWith:)")
-    func willHandle(challenge: PO3DS2Challenge)
+    func willHandle(challenge: PO3DS2ChallengeParameters)
 
     /// Notifies delegate that service did end handling 3DS2 challenge with given result.
     @available(*, deprecated, renamed: "checkout3DSService(_:didPerformChallenge:)")
@@ -156,12 +156,12 @@ extension POCheckout3DSServiceDelegate {
     }
 
     @available(*, deprecated)
-    public func didCreateAuthenticationRequest(result: Result<PO3DS2AuthenticationRequest, POFailure>) {
+    public func didCreateAuthenticationRequest(result: Result<PO3DS2AuthenticationRequestParameters, POFailure>) {
         // Ignored
     }
 
     @available(*, deprecated)
-    public func willHandle(challenge: PO3DS2Challenge) {
+    public func willHandle(challenge: PO3DS2ChallengeParameters) {
         // Ignored
     }
 
