@@ -8,6 +8,9 @@
 @MainActor
 protocol NativeAlternativePaymentInteractor: Interactor<NativeAlternativePaymentInteractorState> {
 
+    /// Starts interactor.
+    func start() async
+
     /// Configuration.
     var configuration: PONativeAlternativePaymentConfiguration { get }
 

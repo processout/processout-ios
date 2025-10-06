@@ -61,6 +61,39 @@ public struct PONativeAlternativePaymentConfiguration {
         case tokenization(Tokenization)
     }
 
+    @MainActor
+    public struct Redirect {
+
+        /// An object used to evaluate navigation events in a web authentication session.
+        public let callback: POWebAuthenticationCallback?
+
+        /// A boolean value that indicates whether the session should ask the browser for a
+        /// private authentication session.
+        ///
+        /// Set `prefersEphemeralSession` to true to request that the browser
+        /// doesn’t share cookies or other browsing data between the authentication session
+        /// and the user’s normal browser session.
+        ///
+        /// The value of this property is `true` by default.
+        public let prefersEphemeralSession: Bool
+
+        /// Enables headless mode.
+        ///
+        /// The web redirect will be handled directly when it's the first step in the flow,
+        /// and if it's the only required step, it will complete the flow without starting the bottom sheet.
+        public let enableHeadlessMode: Bool
+
+        public init(
+            callback: POWebAuthenticationCallback? = nil,
+            prefersEphemeralSession: Bool = true,
+            enableHeadlessMode: Bool = false
+        ) {
+            self.callback = callback
+            self.prefersEphemeralSession = prefersEphemeralSession
+            self.enableHeadlessMode = enableHeadlessMode
+        }
+    }
+
     /// Payment confirmation configuration.
     @MainActor
     @preconcurrency
@@ -265,6 +298,9 @@ public struct PONativeAlternativePaymentConfiguration {
     /// Barcode interaction configuration.
     public let barcodeInteraction: BarcodeInteraction
 
+    /// Redirect configuration.
+    public let redirect: Redirect
+
     /// Submit button configuration.
     public let submitButton: SubmitButton
 
@@ -289,6 +325,7 @@ public struct PONativeAlternativePaymentConfiguration {
         title: String? = nil,
         inlineSingleSelectValuesLimit: Int = 5,
         barcodeInteraction: BarcodeInteraction = .init(),
+        redirect: Redirect = .init(),
         submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = nil,
         paymentConfirmation: Confirmation = .init(),
@@ -299,11 +336,12 @@ public struct PONativeAlternativePaymentConfiguration {
         self.flow = flow
         self.title = title
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
+        self.barcodeInteraction = barcodeInteraction
+        self.redirect = redirect
         self.submitButton = submitButton
         self.cancelButton = cancelButton
         self.paymentConfirmation = paymentConfirmation
         self.success = success
-        self.barcodeInteraction = barcodeInteraction
         self.prefersInlineControls = prefersInlineControls
         self.localization = localization
     }
