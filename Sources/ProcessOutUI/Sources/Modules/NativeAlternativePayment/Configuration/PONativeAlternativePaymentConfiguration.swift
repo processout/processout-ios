@@ -62,6 +62,40 @@ public struct PONativeAlternativePaymentConfiguration {
     }
 
     @MainActor
+    public enum Header {
+
+        @MainActor
+        public struct Standard {
+
+            /// Custom title.
+            public let title: String?
+
+            public init(title: String?) {
+                self.title = title
+            }
+        }
+
+        @MainActor
+        public struct Custom {
+
+            let content: AnyView
+
+            public init(@ViewBuilder _ content: () -> some View) {
+                self.content = AnyView(content())
+            }
+        }
+
+        /// Header is resolved automatically based on context.
+        case automatic
+
+        /// Standard header configuration.
+        case standard(Standard)
+
+        /// Fully custom header.
+        case custom(Custom)
+    }
+
+    @MainActor
     public struct Redirect {
 
         /// An object used to evaluate navigation events in a web authentication session.
@@ -281,7 +315,20 @@ public struct PONativeAlternativePaymentConfiguration {
     public let flow: Flow
 
     /// Custom title.
-    public let title: String?
+    @available(*, deprecated)
+    public var title: String? {
+        switch header {
+        case .automatic, .custom:
+            return nil
+        case nil:
+            return ""
+        case .standard(let configuration):
+            return configuration.title
+        }
+    }
+
+    /// Header configuration.
+    public let header: Header?
 
     /// A Boolean property that indicates whether the code input should be horizontally centered. This property
     /// is only applicable when there is a single code input. If there are multiple inputs the alignment is always
@@ -322,7 +369,7 @@ public struct PONativeAlternativePaymentConfiguration {
     /// Creates configuration.
     public init(
         flow: Flow,
-        title: String? = nil,
+        header: Header? = .automatic,
         inlineSingleSelectValuesLimit: Int = 5,
         barcodeInteraction: BarcodeInteraction = .init(),
         redirect: Redirect = .init(),
@@ -334,7 +381,7 @@ public struct PONativeAlternativePaymentConfiguration {
         localization: LocalizationConfiguration = .device()
     ) {
         self.flow = flow
-        self.title = title
+        self.header = header
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.barcodeInteraction = barcodeInteraction
         self.redirect = redirect
@@ -348,6 +395,20 @@ public struct PONativeAlternativePaymentConfiguration {
 }
 
 // MARK: - Deprecated Symbols
+
+extension PONativeAlternativePaymentConfiguration.Header {
+
+    @available(*, deprecated)
+    static func create(compatibleWithTitle title: String?) -> Self? {
+        guard let title else {
+            return .automatic
+        }
+        guard !title.isEmpty else {
+            return nil
+        }
+        return .standard(Standard(title: title))
+    }
+}
 
 extension PONativeAlternativePaymentConfiguration {
 
@@ -433,6 +494,35 @@ extension PONativeAlternativePaymentConfiguration {
         success?.message
     }
 
+    /// Creates configuration.
+    @available(*, deprecated)
+    @_disfavoredOverload
+    public init(
+        flow: Flow,
+        title: String? = nil,
+        inlineSingleSelectValuesLimit: Int = 5,
+        barcodeInteraction: BarcodeInteraction = .init(),
+        redirect: Redirect = .init(),
+        submitButton: SubmitButton = .init(),
+        cancelButton: CancelButton? = nil,
+        paymentConfirmation: Confirmation = .init(),
+        success: Success? = .init(),
+        prefersInlineControls: Bool = true,
+        localization: LocalizationConfiguration = .device()
+    ) {
+        self.flow = flow
+        self.header = .create(compatibleWithTitle: title)
+        self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
+        self.barcodeInteraction = barcodeInteraction
+        self.redirect = redirect
+        self.submitButton = submitButton
+        self.cancelButton = cancelButton
+        self.paymentConfirmation = paymentConfirmation
+        self.success = success
+        self.prefersInlineControls = prefersInlineControls
+        self.localization = localization
+    }
+
     /// Creates configuration instance.
     @available(*, deprecated)
     @_disfavoredOverload
@@ -450,7 +540,7 @@ extension PONativeAlternativePaymentConfiguration {
         paymentConfirmationSecondaryAction: SecondaryAction? = nil
     ) {
         self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
-        self.title = title
+        self.header = .create(compatibleWithTitle: title)
         self.success = skipSuccessScreen ? nil : .init(message: successMessage)
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }
@@ -461,6 +551,7 @@ extension PONativeAlternativePaymentConfiguration {
             secondaryAction: paymentConfirmationSecondaryAction
         )
         self.barcodeInteraction = .init()
+        self.redirect = .init()
         prefersInlineControls = false
         localization = .device()
     }
@@ -481,13 +572,14 @@ extension PONativeAlternativePaymentConfiguration {
         paymentConfirmation: Confirmation = .init()
     ) {
         self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
-        self.title = title
+        self.header = .create(compatibleWithTitle: title)
         self.success = skipSuccessScreen ? nil : .init(message: successMessage)
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.paymentConfirmation = paymentConfirmation
         self.barcodeInteraction = .init()
+        self.redirect = .init()
         prefersInlineControls = false
         localization = .device()
     }
@@ -507,13 +599,14 @@ extension PONativeAlternativePaymentConfiguration {
         success: Success? = .init()
     ) {
         self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
-        self.title = title
+        self.header = .create(compatibleWithTitle: title)
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.submitButton = submitButton
         self.cancelButton = cancelButton
         self.paymentConfirmation = paymentConfirmation
         self.success = success
         self.barcodeInteraction = barcodeInteraction
+        self.redirect = .init()
         prefersInlineControls = false
         localization = .device()
     }

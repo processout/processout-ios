@@ -194,6 +194,7 @@ final class AlternativePaymentsViewModel: ObservableObject {
         try await withCheckedThrowingContinuation { continuation in
             let configuration = PONativeAlternativePaymentConfiguration(
                 flow: flow,
+                header: .automatic,
                 cancelButton: .init(
                     confirmation: .init()
                 ),

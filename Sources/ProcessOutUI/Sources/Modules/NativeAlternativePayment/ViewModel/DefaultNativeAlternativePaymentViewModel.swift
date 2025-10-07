@@ -727,30 +727,34 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         paymentMethod: NativeAlternativePaymentResolvedPaymentMethod,
         invoice: PONativeAlternativePaymentInvoiceV2?
     ) -> NativeAlternativePaymentViewModelItem? {
-        if let title = interactor.configuration.title, title.isEmpty {
+        let title: String?
+        switch interactor.configuration.header {
+        case .automatic:
+            title = nil
+        case .standard(let configuration):
+            title = configuration.title
+        case .custom(let configuration):
+            return .view(configuration.content)
+        case nil:
             return nil
         }
         let defaultTitle: () -> String? = { [configuration] in
-            if let formattedAmount = Self.formatAmount(
-                of: invoice, locale: configuration.localization.localeOverride ?? .current
-            ) {
-                return String(
-                    resource: .NativeAlternativePayment.title,
-                    configuration: self.configuration.localization,
-                    replacements: formattedAmount
-                )
-            } else {
+            let locale = configuration.localization.localeOverride ?? .current
+            guard let formattedAmount = Self.formatAmount(of: invoice, locale: locale) else {
                 return nil
             }
+            return String(
+                resource: .NativeAlternativePayment.title,
+                configuration: configuration.localization,
+                replacements: formattedAmount
+            )
         }
-        let title = interactor.configuration.title ?? defaultTitle()
-        guard title != nil || paymentMethod.logo != nil else {
+        let resolvedTitle = title ?? defaultTitle()
+        guard resolvedTitle != nil || paymentMethod.logo != nil else {
             return nil
         }
         let item = NativeAlternativePaymentViewModelItem.Title(
-            id: "Title",
-            icon: paymentMethod.logo.map(Image.init),
-            text: title ?? ""
+            id: "Title", icon: paymentMethod.logo.map(Image.init), text: resolvedTitle ?? ""
         )
         return .title(item)
     }
