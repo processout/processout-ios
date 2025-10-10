@@ -734,6 +734,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             title = nil
         case .standard(let configuration):
             title = configuration.title
+        case .custom where isPaymentCompleted:
+            return nil
         case .custom(let configuration):
             return .view(configuration.content)
         case nil:
