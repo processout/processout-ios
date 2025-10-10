@@ -104,7 +104,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         state: InteractorState.Started
     ) -> [NativeAlternativePaymentViewModelItem] {
         var items = [
-            createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
+            createHeaderItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
         ]
         items += createItems(for: state.elements, state: state)
         return items.compactMap { $0 }
@@ -177,7 +177,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         state: InteractorState.AwaitingCompletion
     ) -> [NativeAlternativePaymentViewModelItem] {
         var items: [NativeAlternativePaymentViewModelItem?] = [
-            createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
+            createHeaderItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
         ]
         if state.shouldConfirmPayment {
             items.append(contentsOf: createItems(for: state.elements, state: nil))
@@ -286,7 +286,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func update(with state: InteractorState.AwaitingRedirect, isRedirecting: Bool = false) {
         var items: [NativeAlternativePaymentViewModelItem?] = [
-            createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
+            createHeaderItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
         ]
         items.append(
             contentsOf: createItems(for: state.elements, state: nil)
@@ -353,7 +353,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func createItems(state: InteractorState.Completed) -> [NativeAlternativePaymentViewModelItem] {
         var items: [NativeAlternativePaymentViewModelItem?] = [
-            createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice),
+            createHeaderItem(paymentMethod: state.paymentMethod, invoice: state.invoice),
             createSuccessItem(state: state)
         ]
         items.append(contentsOf: createItems(for: state.elements, state: nil))
@@ -723,7 +723,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     // MARK: - Title
 
-    private func createTitleItem(
+    private func createHeaderItem(
         paymentMethod: NativeAlternativePaymentResolvedPaymentMethod,
         invoice: PONativeAlternativePaymentInvoiceV2?
     ) -> NativeAlternativePaymentViewModelItem? {
