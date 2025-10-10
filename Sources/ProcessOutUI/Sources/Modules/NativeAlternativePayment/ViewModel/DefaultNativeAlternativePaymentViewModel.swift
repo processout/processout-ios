@@ -353,7 +353,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func createItems(state: InteractorState.Completed) -> [NativeAlternativePaymentViewModelItem] {
         var items: [NativeAlternativePaymentViewModelItem?] = [
-            createHeaderItem(paymentMethod: state.paymentMethod, invoice: state.invoice),
+            createHeaderItem(paymentMethod: state.paymentMethod, invoice: state.invoice, isPaymentCompleted: true),
             createSuccessItem(state: state)
         ]
         items.append(contentsOf: createItems(for: state.elements, state: nil))
@@ -725,7 +725,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func createHeaderItem(
         paymentMethod: NativeAlternativePaymentResolvedPaymentMethod,
-        invoice: PONativeAlternativePaymentInvoiceV2?
+        invoice: PONativeAlternativePaymentInvoiceV2?,
+        isPaymentCompleted: Bool = false
     ) -> NativeAlternativePaymentViewModelItem? {
         let title: String?
         switch interactor.configuration.header {
@@ -738,9 +739,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         case nil:
             return nil
         }
-        let defaultTitle: () -> String? = { [configuration] in
+        let defaultTitle: () -> String? = { [configuration, isPaymentCompleted] in
             let locale = configuration.localization.localeOverride ?? .current
-            guard let formattedAmount = Self.formatAmount(of: invoice, locale: locale) else {
+            guard !isPaymentCompleted, let formattedAmount = Self.formatAmount(of: invoice, locale: locale) else {
                 return nil
             }
             return String(
