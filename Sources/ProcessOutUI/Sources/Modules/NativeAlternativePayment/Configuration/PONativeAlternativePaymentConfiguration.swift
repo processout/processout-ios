@@ -61,37 +61,51 @@ public struct PONativeAlternativePaymentConfiguration {
         case tokenization(Tokenization)
     }
 
+    /// A representation of header configurations.
     @MainActor
     public enum Header {
 
+        /// A standard header configuration displaying a payment method logo and an optional title.
+        ///
+        /// If a title is provided, it appears alongside the payment method logo. Otherwise it behaves
+        /// identically to the `.automatic` configuration.
         @MainActor
         public struct Standard {
 
-            /// Custom title.
+            /// The custom title displayed in the header.
+            ///
+            /// If `nil`, the default automatic behavior is used.
             public let title: String?
 
+            /// Creates a new standard header configuration.
             public init(title: String?) {
                 self.title = title
             }
         }
 
+        /// A fully custom header configuration.
+        ///
+        /// The provided view receives the same padding as the rest of the content. The custom
+        /// header is **not displayed** on the payment success screen.
         @MainActor
         public struct Custom {
 
+            /// The type-erased view representing the custom header content.
             let content: AnyView
 
+            /// Creates a new custom header using a provided view builder.
             public init(@ViewBuilder _ content: () -> some View) {
                 self.content = AnyView(content())
             }
         }
 
-        /// Header is resolved automatically based on context.
+        /// A header configuration that resolves automatically based on context.
         case automatic
 
-        /// Standard header configuration.
+        /// A standard header.
         case standard(Standard)
 
-        /// Fully custom header.
+        /// A fully custom header view.
         case custom(Custom)
     }
 
