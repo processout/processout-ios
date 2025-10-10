@@ -60,6 +60,7 @@ struct NativeAlternativePaymentItemView: View {
                 }
             }
             .padding(.horizontal, POSpacing.space48)
+            .frame(maxWidth: .infinity)
         case .sizingGroup(let item):
             VStack(alignment: .leading, spacing: POSpacing.space12) {
                 ForEach(item.content) { item in
