@@ -404,8 +404,8 @@ final class NativeAlternativePaymentDefaultInteractor:
                     try? await Task.sleep(
                         seconds: shouldConfirm ? success.extendedDisplayDuration : success.displayDuration
                     )
+                    completion(.success(()))
                 }
-                completion(.success(()))
             }
             let newState = State.Completed(
                 paymentMethod: await resolve(paymentMethod: response.paymentMethod),
@@ -415,6 +415,9 @@ final class NativeAlternativePaymentDefaultInteractor:
             )
             state = .completed(newState)
             send(event: .didCompletePayment)
+            if configuration.success == nil {
+                completion(.success(()))
+            }
         } catch {
             setFailureState(error: error)
         }
