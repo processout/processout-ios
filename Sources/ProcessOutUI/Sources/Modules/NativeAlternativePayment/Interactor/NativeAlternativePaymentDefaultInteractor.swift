@@ -40,6 +40,12 @@ final class NativeAlternativePaymentDefaultInteractor:
     weak var delegate: PONativeAlternativePaymentDelegateV2?
 
     override func start() {
+        Task {
+            await start()
+        }
+    }
+
+    func start() async {
         guard case .idle = state else {
             return
         }
@@ -57,6 +63,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
         }
         state = .starting(.init(task: task))
+        _ = await task.result
     }
 
     func updateValue(_ value: PONativeAlternativePaymentParameterValue, for key: String) {
@@ -123,9 +130,10 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         let task = Task {
             do {
-                // todo(andrii-vysotskyi): allow non ephemeral sessions via configuration
                 let authenticationRequest = POAlternativePaymentAuthenticationRequest(
-                    url: currentState.redirect.url, callback: nil, prefersEphemeralSession: true
+                    url: currentState.redirect.url,
+                    callback: configuration.redirect.callback,
+                    prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
                 )
                 _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
                 let response = try await serviceAdapter.continuePayment(
@@ -181,7 +189,9 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func setState(with response: NativeAlternativePaymentServiceAdapterResponse) async throws {
         switch response.state {
         case .nextStepRequired:
-            if let redirect = response.redirect {
+            if case .starting = state, let redirect = response.redirect, configuration.redirect.enableHeadlessMode {
+                try await continueStart(withHeadlessRedirect: redirect)
+            } else if let redirect = response.redirect {
                 try await setAwaitingRedirectState(response: response, redirect: redirect)
             } else {
                 try await setStartedState(response: response)
@@ -198,6 +208,26 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     // MARK: - Starting State
+
+    private func continueStart(withHeadlessRedirect redirect: PONativeAlternativePaymentRedirectV2) async throws {
+        guard case .starting = state else {
+            logger.error("Attempted to handle headless redirect while not in starting state. Ignoring.")
+            return
+        }
+        let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+            url: redirect.url,
+            callback: configuration.redirect.callback,
+            prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
+        )
+        _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
+        let localeIdentifier = configuration.localization.localeOverride?.identifier
+        let response = try await serviceAdapter.continuePayment(
+            with: .init(flow: configuration.flow, localeIdentifier: localeIdentifier)
+        )
+        try await setState(with: response)
+    }
+
+    // MARK: - Started State
 
     private func setStartedState(response: NativeAlternativePaymentServiceAdapterResponse) async throws {
         let elements = try await resolve(elements: response.elements ?? [])
@@ -221,7 +251,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
         )
         state = .started(startedState)
-        send(event: .didStart)
+        sendDidStartEventIfNeeded()
         logger.info("Did start payment, waiting for parameters.")
         enableCancellationAfterDelay()
     }
@@ -278,6 +308,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 logger.debug("Ignoring attempt to wait for payment confirmation from unsupported state.")
                 return
             }
+            sendDidStartEventIfNeeded()
             send(event: .willWaitForPaymentConfirmation(.init()))
             let shouldConfirmPayment =
                 !resolvedElements.isEmpty && configuration.paymentConfirmation.confirmButton != nil
@@ -351,6 +382,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             redirect: redirect,
             isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
         )
+        sendDidStartEventIfNeeded()
         state = .awaitingRedirect(newState)
         enableCancellationAfterDelay()
     }
@@ -372,8 +404,8 @@ final class NativeAlternativePaymentDefaultInteractor:
                     try? await Task.sleep(
                         seconds: shouldConfirm ? success.extendedDisplayDuration : success.displayDuration
                     )
+                    completion(.success(()))
                 }
-                completion(.success(()))
             }
             let newState = State.Completed(
                 paymentMethod: await resolve(paymentMethod: response.paymentMethod),
@@ -383,6 +415,9 @@ final class NativeAlternativePaymentDefaultInteractor:
             )
             state = .completed(newState)
             send(event: .didCompletePayment)
+            if configuration.success == nil {
+                completion(.success(()))
+            }
         } catch {
             setFailureState(error: error)
         }
@@ -487,9 +522,15 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Events
 
-    private func send(event: PONativeAlternativePaymentEventV2) {
-        delegate?.nativeAlternativePayment(didEmitEvent: event)
+    private func sendDidStartEventIfNeeded() {
+        guard !didEmitStartEvent else {
+            return
+        }
+        didEmitStartEvent = true
+        send(event: .didStart)
     }
+
+    private var didEmitStartEvent = false
 
     private func didUpdate(
         parameter: NativeAlternativePaymentInteractorState.Parameter,
@@ -508,6 +549,10 @@ final class NativeAlternativePaymentDefaultInteractor:
             parameters: parameters.map(\.specification)
         )
         send(event: .willSubmitParameters(willSubmitParametersEvent))
+    }
+
+    private func send(event: PONativeAlternativePaymentEventV2) {
+        delegate?.nativeAlternativePayment(didEmitEvent: event)
     }
 
     // MARK: - Utils

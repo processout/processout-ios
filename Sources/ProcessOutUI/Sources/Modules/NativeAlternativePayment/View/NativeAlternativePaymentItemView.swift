@@ -60,6 +60,7 @@ struct NativeAlternativePaymentItemView: View {
                 }
             }
             .padding(.horizontal, POSpacing.space48)
+            .frame(maxWidth: .infinity)
         case .sizingGroup(let item):
             VStack(alignment: .leading, spacing: POSpacing.space12) {
                 ForEach(item.content) { item in
@@ -74,6 +75,8 @@ struct NativeAlternativePaymentItemView: View {
         case .message(let item):
             POMessageView(message: item)
                 .messageViewStyle(style.messageView)
+        case .view(let view):
+            view
         case .confirmationProgress(let item):
             NativeAlternativePaymentConfirmationProgressItemView(item: item)
                 .environment(\.locale, item.locale)

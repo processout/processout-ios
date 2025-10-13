@@ -191,25 +191,31 @@ final class AlternativePaymentsViewModel: ObservableObject {
     private func authorizeNatively(
         invoice: POInvoice, flow: PONativeAlternativePaymentConfiguration.Flow
     ) async throws {
-        try await withCheckedThrowingContinuation { continuation in
-            let configuration = PONativeAlternativePaymentConfiguration(
-                flow: flow,
-                cancelButton: .init(
-                    confirmation: .init()
-                ),
-                paymentConfirmation: .init(
-                    showProgressViewAfter: 5, confirmButton: .init(), cancelButton: .init(disabledFor: 10)
-                )
+        let configuration = PONativeAlternativePaymentConfiguration(
+            flow: flow,
+            header: .automatic,
+            redirect: .init(enableHeadlessMode: true),
+            cancelButton: .init(
+                confirmation: .init()
+            ),
+            paymentConfirmation: .init(
+                showProgressViewAfter: 5, confirmButton: .init(), cancelButton: .init(disabledFor: 10)
             )
-            let nativePaymentItem = AlternativePaymentsViewModelState.NativePayment(
-                id: UUID().uuidString,
-                configuration: configuration,
-                completion: { [weak self] result in
-                    self?.state.nativePayment = nil
-                    continuation.resume(with: result)
-                }
-            )
-            state.nativePayment = nativePaymentItem
+        )
+        var continuation: CheckedContinuation<Void, any Error>?, result: Result<Void, POFailure>?
+        let component = PONativeAlternativePaymentComponent(configuration: configuration) { [weak self] paymentResult in
+            self?.state.nativePayment = nil
+            continuation?.resume(with: paymentResult)
+            result = paymentResult
+        }
+        await component.start()
+        if let result {
+            try result.get()
+            return
+        }
+        try await withCheckedThrowingContinuation { newContinuation in
+            continuation = newContinuation
+            state.nativePayment = .init(id: UUID().uuidString, component: component)
         }
     }
 }

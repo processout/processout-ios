@@ -104,7 +104,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         state: InteractorState.Started
     ) -> [NativeAlternativePaymentViewModelItem] {
         var items = [
-            createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
+            createHeaderItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
         ]
         items += createItems(for: state.elements, state: state)
         return items.compactMap { $0 }
@@ -177,7 +177,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         state: InteractorState.AwaitingCompletion
     ) -> [NativeAlternativePaymentViewModelItem] {
         var items: [NativeAlternativePaymentViewModelItem?] = [
-            createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
+            createHeaderItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
         ]
         if state.shouldConfirmPayment {
             items.append(contentsOf: createItems(for: state.elements, state: nil))
@@ -286,7 +286,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func update(with state: InteractorState.AwaitingRedirect, isRedirecting: Bool = false) {
         var items: [NativeAlternativePaymentViewModelItem?] = [
-            createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
+            createHeaderItem(paymentMethod: state.paymentMethod, invoice: state.invoice)
         ]
         items.append(
             contentsOf: createItems(for: state.elements, state: nil)
@@ -353,7 +353,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func createItems(state: InteractorState.Completed) -> [NativeAlternativePaymentViewModelItem] {
         var items: [NativeAlternativePaymentViewModelItem?] = [
-            createTitleItem(paymentMethod: state.paymentMethod, invoice: state.invoice),
+            createHeaderItem(paymentMethod: state.paymentMethod, invoice: state.invoice, isPaymentCompleted: true),
             createSuccessItem(state: state)
         ]
         items.append(contentsOf: createItems(for: state.elements, state: nil))
@@ -723,34 +723,41 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     // MARK: - Title
 
-    private func createTitleItem(
+    private func createHeaderItem(
         paymentMethod: NativeAlternativePaymentResolvedPaymentMethod,
-        invoice: PONativeAlternativePaymentInvoiceV2?
+        invoice: PONativeAlternativePaymentInvoiceV2?,
+        isPaymentCompleted: Bool = false
     ) -> NativeAlternativePaymentViewModelItem? {
-        if let title = interactor.configuration.title, title.isEmpty {
+        let title: String?
+        switch interactor.configuration.header {
+        case .automatic:
+            title = nil
+        case .standard(let configuration):
+            title = configuration.title
+        case .custom where isPaymentCompleted:
+            return nil
+        case .custom(let configuration):
+            return .view(configuration.content)
+        case nil:
             return nil
         }
-        let defaultTitle: () -> String? = { [configuration] in
-            if let formattedAmount = Self.formatAmount(
-                of: invoice, locale: configuration.localization.localeOverride ?? .current
-            ) {
-                return String(
-                    resource: .NativeAlternativePayment.title,
-                    configuration: self.configuration.localization,
-                    replacements: formattedAmount
-                )
-            } else {
+        let defaultTitle: () -> String? = { [configuration, isPaymentCompleted] in
+            let locale = configuration.localization.localeOverride ?? .current
+            guard !isPaymentCompleted, let formattedAmount = Self.formatAmount(of: invoice, locale: locale) else {
                 return nil
             }
+            return String(
+                resource: .NativeAlternativePayment.title,
+                configuration: configuration.localization,
+                replacements: formattedAmount
+            )
         }
-        let title = interactor.configuration.title ?? defaultTitle()
-        guard title != nil || paymentMethod.logo != nil else {
+        let resolvedTitle = title ?? defaultTitle()
+        guard resolvedTitle != nil || paymentMethod.logo != nil else {
             return nil
         }
         let item = NativeAlternativePaymentViewModelItem.Title(
-            id: "Title",
-            icon: paymentMethod.logo.map(Image.init),
-            text: title ?? ""
+            id: "Title", icon: paymentMethod.logo.map(Image.init), text: resolvedTitle ?? ""
         )
         return .title(item)
     }
