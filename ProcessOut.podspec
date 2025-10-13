@@ -12,5 +12,5 @@ Pod::Spec.new do |s|
   s.vendored_frameworks   = "Vendor/cmark_gfm.xcframework"
   s.ios.resources         = 'Sources/ProcessOut/Resources/**/*'
   s.source_files          = 'Sources/ProcessOut/**/*.swift'
-  s.pod_target_xcconfig   = { 'OTHER_SWIFT_FLAGS' => '-Xfrontend -module-interface-preserve-types-as-written' }
+  s.pod_target_xcconfig   = { 'OTHER_SWIFT_FLAGS' => '-Xfrontend -module-interface-preserve-types-as-written -package-name ProcessOut' }
 end

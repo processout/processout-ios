@@ -5,7 +5,7 @@
 set +e
 
 # Push Podspecs
-for PRODUCT in "ProcessOut" "ProcessOutCoreUI" "ProcessOutUI" "ProcessOutCheckout3DS"; do
+for PRODUCT in "ProcessOutCore" "ProcessOut" "ProcessOutCoreUI" "ProcessOutUI" "ProcessOutCheckout3DS"; do
 
   # This script is intended to be run on CI where cocoapods is already installed.
   pod trunk push $PRODUCT.podspec --allow-warnings --synchronous

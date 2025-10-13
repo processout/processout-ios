@@ -8,12 +8,12 @@
 import Foundation
 import Testing
 @testable import ProcessOutNetcetera3DS
-@_spi(PO) @testable import ProcessOut
+@testable import ProcessOutCore
 
 struct Netcetera3DS2ServiceTests {
 
     init() async {
-        processOut = await .init(configuration: .init(projectId: "proj_test"))
+        eventEmitter = LocalEventEmitter(logger: .init(category: ""))
     }
 
     // MARK: -
@@ -21,7 +21,7 @@ struct Netcetera3DS2ServiceTests {
     @Test
     func authenticationRequestParameters_whenConfigurationIsInvalid_fails() async throws {
         // Given
-        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter)
+        let sut = PONetcetera3DS2Service(eventEmitter: eventEmitter)
         let configuration = PO3DS2Configuration(
             directoryServerId: "",
             directoryServerPublicKey: "",
@@ -42,7 +42,7 @@ struct Netcetera3DS2ServiceTests {
     @Test
     func authenticationRequestParameters_whenDirectoryServerIsKnown_ignoresInvalidPublicKey() async throws {
         // Given
-        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter)
+        let sut = PONetcetera3DS2Service(eventEmitter: eventEmitter)
         let configuration = PO3DS2Configuration(
             directoryServerId: "A000000003",
             directoryServerPublicKey: "",
@@ -64,7 +64,7 @@ struct Netcetera3DS2ServiceTests {
     @Test
     func authenticationRequestParameters_whenDirectoryServerIsUnknown_succeeds() async throws {
         // Given
-        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter)
+        let sut = PONetcetera3DS2Service(eventEmitter: eventEmitter)
         let configuration = PO3DS2Configuration(
             directoryServerId: "0000123456",
             directoryServerPublicKey:
@@ -97,5 +97,5 @@ struct Netcetera3DS2ServiceTests {
 
     // MARK: - Private Properties
 
-    private let processOut: ProcessOut
+    private let eventEmitter: POEventEmitter
 }

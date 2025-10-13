@@ -11,11 +11,13 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
         repository: CustomerTokensRepository,
         customerActionsService: CustomerActionsService,
         eventEmitter: POEventEmitter,
+        threeDSServiceFactory: ThreeDSServiceFactory,
         logger: POLogger
     ) {
         self.repository = repository
         self.customerActionsService = customerActionsService
         self.eventEmitter = eventEmitter
+        self.threeDSServiceFactory = threeDSServiceFactory
         self.logger = logger
     }
 
@@ -38,6 +40,16 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
         }
     }
 
+    func assignCustomerToken(request: POAssignCustomerTokenRequest) async throws -> POCustomerToken {
+        let threeDSService = try threeDSServiceFactory.make3DSService(
+            with: .init(
+                localeIdentifier: request.localeIdentifier,
+                webAuthenticationCallback: request.webAuthenticationCallback
+            )
+        )
+        return try await assignCustomerToken(request: request, threeDSService: threeDSService)
+    }
+
     func tokenize(
         request: PONativeAlternativePaymentTokenizationRequestV2
     ) async throws -> PONativeAlternativePaymentTokenizationResponseV2 {
@@ -54,6 +66,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
     private let repository: CustomerTokensRepository
     private let customerActionsService: CustomerActionsService
     private let eventEmitter: POEventEmitter
+    private let threeDSServiceFactory: ThreeDSServiceFactory
     private let logger: POLogger
 
     // MARK: - Private Methods
