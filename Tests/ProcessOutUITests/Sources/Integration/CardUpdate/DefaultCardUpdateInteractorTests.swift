@@ -13,7 +13,7 @@ import Testing
 struct DefaultCardUpdateInteractorTests {
 
     init() {
-        let processOut = ProcessOut(configuration: .init(projectId: Constants.projectId))
+        let processOut = ProcessOut(configuration: .init(projectId: ProcessOutUITests.Constants.projectId))
         cardsService = processOut.cards
     }
 
@@ -192,7 +192,9 @@ struct DefaultCardUpdateInteractorTests {
     @Test
     func submit_whenCvcIsNotSet_causesError() async {
         // Given
-        let configuration = POCardUpdateConfiguration(cardId: "", cardInformation: .init(scheme: "visa"))
+        let configuration = POCardUpdateConfiguration(
+            cardId: Constants.testCardId, cardInformation: .init(scheme: "visa")
+        )
         let sut = createSut(configuration: configuration)
 
         // When
@@ -218,7 +220,7 @@ struct DefaultCardUpdateInteractorTests {
     func submit_whenValidCvcIsSet_completes() async {
         // Given
         let configuration = POCardUpdateConfiguration(
-            cardId: "card_ZbHkl2Uh3Udafx2cbb2uN4pP2evwHPyf", cardInformation: .init(scheme: "visa")
+            cardId: Constants.testCardId, cardInformation: .init(scheme: "visa")
         )
         let sut = createSut(configuration: configuration)
 
@@ -240,6 +242,12 @@ struct DefaultCardUpdateInteractorTests {
         default:
             Issue.record("Unexpected state.")
         }
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum Constants {
+        static let testCardId = "card_ZbHkl2Uh3Udafx2cbb2uN4pP2evwHPyf"
     }
 
     // MARK: - Private Properties
