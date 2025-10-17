@@ -1,5 +1,5 @@
 {
-  "originHash" : "797eaf02a4c0b4b477a991945fa6c684312886a42f6d1845fd6cf70d1c09d2fd",
+  "originHash" : "4f3cede1cc7a25636df024aefb0bc09574094aab273612fbc1191e7de9353c14",
   "pins" : [
     {
       "identity" : "checkout-3ds-sdk-ios",
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ios-3ds-sdk/SPM",
       "state" : {
-        "revision" : "421449969baa6ef80c33fd077c217f724ccfd348",
-        "version" : "2.5.30"
+        "revision" : "bf1c56bc9722ea15078f855445c7d66e6e5b7128",
+        "version" : "2.5.32"
       }
     },
     {

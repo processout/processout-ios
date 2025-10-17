@@ -1,5 +1,5 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 6.0.3 effective-5.10 (swiftlang-6.0.3.1.10 clang-1600.0.30.1)
+// swift-compiler-version: Apple Swift version 6.0.2 effective-5.10 (swiftlang-6.0.2.1.2 clang-1600.0.26.4)
 // swift-module-flags: -target x86_64-apple-ios11.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name ThreeDS_SDK
 // swift-module-flags-ignorable: -no-verify-emitted-module-interface
 import AdSupport
@@ -235,11 +235,14 @@ extension ThreeDS_SDK.RuntimeErrorEvent : Foundation.NSCopying {
   func initialize(_ configParameters: ThreeDS_SDK.ConfigParameters, locale: Swift.String?, uiCustomization: ThreeDS_SDK.UiCustomization?) throws
   @objc func initialize(_ configParameters: ThreeDS_SDK.ConfigParameters, locale: Swift.String?, uiCustomizationMap: [Swift.String : ThreeDS_SDK.UiCustomization]?) throws
   @objc func initialize(_ configParameters: ThreeDS_SDK.ConfigParameters, locale: Swift.String?, uiCustomizationMap: [Swift.String : ThreeDS_SDK.UiCustomization]?, success: @escaping () -> (), failure: @escaping (any Swift.Error) -> ())
-  @objc func createTransaction(directoryServerId: Swift.String, messageVersion: Swift.String?) throws -> any ThreeDS_SDK.Transaction
+  @objc func createTransaction(directoryServerId: Swift.String, messageVersion: Swift.String?, additionalParameters: [Swift.String : Swift.String]?) throws -> any ThreeDS_SDK.Transaction
   @objc func getWarnings() throws -> [ThreeDS_SDK.Warning]
   @objc func getSDKVersion() throws -> Swift.String
   @objc func getSDKInfo() throws -> ThreeDS_SDK.SDKInfo
   @objc func cleanup() throws
+}
+extension ThreeDS_SDK.ThreeDS2Service {
+  public func createTransaction(directoryServerId: Swift.String, messageVersion: Swift.String?) throws -> any ThreeDS_SDK.Transaction
 }
 @_inheritsConvenienceInitializers @objc(NCAChallengeParameters) @objcMembers public class ChallengeParameters : ObjectiveC.NSObject {
   @objc public init(threeDSServerTransactionID: Swift.String?, acsTransactionID: Swift.String?, acsRefNumber: Swift.String?, acsSignedContent: Swift.String?)
@@ -454,7 +457,7 @@ extension ThreeDS_SDK.ProtocolErrorEvent : Foundation.NSCopying {
   @objc public func initialize(_ configParameters: ThreeDS_SDK.ConfigParameters, locale: Swift.String?, uiCustomization: ThreeDS_SDK.UiCustomization?) throws
   @objc public func initialize(_ configParameters: ThreeDS_SDK.ConfigParameters, locale: Swift.String?, uiCustomizationMap: [Swift.String : ThreeDS_SDK.UiCustomization]?) throws
   @objc public func initialize(_ configParameters: ThreeDS_SDK.ConfigParameters, locale: Swift.String?, uiCustomizationMap: [Swift.String : ThreeDS_SDK.UiCustomization]?, success: @escaping () -> (), failure: @escaping (any Swift.Error) -> ())
-  @objc public func createTransaction(directoryServerId: Swift.String, messageVersion: Swift.String?) throws -> any ThreeDS_SDK.Transaction
+  @objc public func createTransaction(directoryServerId: Swift.String, messageVersion: Swift.String?, additionalParameters: [Swift.String : Swift.String]? = [:]) throws -> any ThreeDS_SDK.Transaction
   @objc public func getWarnings() throws -> [ThreeDS_SDK.Warning]
   @objc public func getSDKVersion() throws -> Swift.String
   @objc public func cleanup() throws
