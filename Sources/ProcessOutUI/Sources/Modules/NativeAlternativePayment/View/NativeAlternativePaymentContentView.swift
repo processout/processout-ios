@@ -54,7 +54,7 @@ struct NativeAlternativePaymentContentView: View {
             .backport.onChange(of: viewModel.state.focusedItemId) {
                 scrollToFocusedInput(scrollView: scrollView)
             }
-            .backport.geometryGroup()
+            .frame(maxWidth: .infinity)
         }
         .backport.geometryGroup()
         .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
