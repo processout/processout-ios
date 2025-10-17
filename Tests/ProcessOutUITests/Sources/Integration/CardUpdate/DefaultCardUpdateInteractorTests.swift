@@ -13,7 +13,7 @@ import Testing
 struct DefaultCardUpdateInteractorTests {
 
     init() {
-        let processOut = ProcessOut(configuration: .init(projectId: Constants.projectId))
+        let processOut = ProcessOut(configuration: .init(projectId: ProcessOutUITests.Constants.projectId))
         cardsService = processOut.cards
     }
 
