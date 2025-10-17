@@ -26,7 +26,7 @@
 		</data>
 		<key>Assets.car</key>
 		<data>
-		kTMbOUKowDryM10tvAXwtIPZkFk=
+		nDIwHS/L8OZDaH/U81yYyXwxPpA=
 		</data>
 		<key>BrandingZoneView.nib</key>
 		<data>
@@ -94,7 +94,7 @@
 		</data>
 		<key>Headers/ThreeDS_SDK-Swift.h</key>
 		<data>
-		w6SBFyRncWzakRW6ZyU0nYD5Sjw=
+		haWscrUDafGguFz0iO26pFSv12o=
 		</data>
 		<key>Headers/ThreeDS_SDK.h</key>
 		<data>
@@ -102,7 +102,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		RMPh6jVk7JmabjAPjItBmnWC8zc=
+		z0lSzAaGQftoCSVeqojuffNMN+4=
 		</data>
 		<key>InformationView.nib</key>
 		<data>
@@ -110,23 +110,23 @@
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.abi.json</key>
 		<data>
-		9/BivDJA0/+QYUwh4j0gsZHKGXw=
+		dpqN6Yryfm4U8bVtknZTqZwJIOs=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
 		<data>
-		BjNNYn8LcILSLe3wh5E8I+sSSY4=
+		8aFm4Gx7raGSyTFVS7diA06VC6A=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.swiftdoc</key>
 		<data>
-		wP+jd5Bvud10daEDCOq0BA8SoHg=
+		eVG9J9Vf2D9Pw7cB+L9Av6L+ZKk=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.swiftinterface</key>
 		<data>
-		BjNNYn8LcILSLe3wh5E8I+sSSY4=
+		8aFm4Gx7raGSyTFVS7diA06VC6A=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<data>
-		u7k3QthtRHjq6+20ybxfDPLnAiY=
+		QmO642Xx1aRsyYnwbXs6LQKPsG4=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -266,7 +266,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			ny8ty1N4GKUMjV9E6BDzoj942qphto75YgsmePgpcq4=
+			5TevZAYpC9htBGkQQ/kpij0+dDK3+Ma/hSo8DOxaRBs=
 			</data>
 		</dict>
 		<key>BrandingZoneView.nib</key>
@@ -385,7 +385,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			g2VqnJudD1OzhgakrRJKD4rqGp/jOsYCKpzmSbC9JMs=
+			i9an8M5NWbP+Eg3TL/ILQsROFU4U6cjHickzWoukrJQ=
 			</data>
 		</dict>
 		<key>Headers/ThreeDS_SDK.h</key>
@@ -406,35 +406,35 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			IM7dWzNTioEpomKwX8OWaUdlTWATtK7/nWYbglz5jvU=
+			7i0aUC1IGlgnmaizx/NctGaawocZLnJYA9eIl7fveU8=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			bGPtRMTl86gUU/EJV6SrF8p4y66Va4K5pQtkQAbmyWo=
+			Xx3nscQlsNWhyY0RQAkjnXVAS85sNXDTC1pi0Se3j2w=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Fut/IPuDS4/7ydWn8KCyzj0Pw2ozAQ+xltivdG7g/Mk=
+			uOBdWYamQVvWlP0JaQkflfq4R5B53I0FM5hCBwHM3Ko=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			bGPtRMTl86gUU/EJV6SrF8p4y66Va4K5pQtkQAbmyWo=
+			Xx3nscQlsNWhyY0RQAkjnXVAS85sNXDTC1pi0Se3j2w=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			iL7Rkez22Wlum5lNs6tUKKSemx9AWIvt1a8bePi7btI=
+			MhJGafvNcMM3i6rJyHArk7U+tfPaP8HBA+bkHxIPJD8=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
