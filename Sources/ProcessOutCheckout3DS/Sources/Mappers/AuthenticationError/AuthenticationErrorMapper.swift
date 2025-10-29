@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 06.03.2023.
 //
 
-import ProcessOut
+import ProcessOutCore
 import Checkout3DS
 
 protocol AuthenticationErrorMapper: Sendable {

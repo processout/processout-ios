@@ -2,10 +2,10 @@
 
 set -euo pipefail
 
-# Validates arguments acount
+# Validates arguments count
 test $# -eq 1
 
 # Add owner
-for POD in "ProcessOut" "ProcessOutCoreUI" "ProcessOutUI" "ProcessOutCheckout3DS"; do
+for POD in "ProcessOutCore" "ProcessOut" "ProcessOutCoreUI" "ProcessOutUI" "ProcessOutCheckout3DS"; do
     pod trunk add-owner $POD $1
 done

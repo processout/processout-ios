@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import ProcessOut
+import ProcessOutCore
 import Checkout3DS
 
 /// Builder to configure and create service capable of handling 3DS challenges using Checkout3DS SDK.

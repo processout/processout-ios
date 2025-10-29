@@ -5,10 +5,11 @@
 //  Created by Andrii Vysotskyi on 14.10.2024.
 //
 
-// swiftlint:disable force_unwrapping type_body_length
+// swiftlint:disable force_unwrapping type_body_length file_length
 
 import Foundation
 import UIKit
+@_exported import ProcessOutCore
 
 @available(*, deprecated, renamed: "ProcessOut")
 public typealias ProcessOutApi = ProcessOut
@@ -59,12 +60,10 @@ public final class ProcessOut: @unchecked Sendable {
     public let images: POImagesRepository = UrlSessionImagesRepository(session: .shared)
 
     /// Logger with application category.
-    @_spi(PO)
-    public let logger: POLogger
+    package let logger: POLogger
 
     /// Event emitter to use for events exchange.
-    @_spi(PO)
-    public let eventEmitter: POEventEmitter
+    package let eventEmitter: POEventEmitter
 
     // MARK: - Internal
 
@@ -144,7 +143,10 @@ public final class ProcessOut: @unchecked Sendable {
         )
         gatewayConfigurations = HttpGatewayConfigurationsRepository(connector: httpConnector)
         invoices = Self.createInvoicesService(
-            httpConnector: httpConnector, customerActionsService: customerActionsService, logger: serviceLogger
+            httpConnector: httpConnector,
+            customerActionsService: customerActionsService,
+            eventEmitter: eventEmitter,
+            logger: serviceLogger
         )
         _alternativePayments = Self.createAlternativePaymentsService(
             configuration: configuration, webAuthenticationSession: webAuthenticationSession, logger: serviceLogger
@@ -171,11 +173,17 @@ public final class ProcessOut: @unchecked Sendable {
     // MARK: - Services
 
     private static func createInvoicesService(
-        httpConnector: HttpConnector, customerActionsService: CustomerActionsService, logger: POLogger
+        httpConnector: HttpConnector,
+        customerActionsService: CustomerActionsService,
+        eventEmitter: POEventEmitter,
+        logger: POLogger
     ) -> POInvoicesService {
         let repository = HttpInvoicesRepository(connector: httpConnector)
         return DefaultInvoicesService(
-            repository: repository, customerActionsService: customerActionsService, logger: logger
+            repository: repository,
+            customerActionsService: customerActionsService,
+            threeDSServiceFactory: Default3DSServiceFactory(eventEmitter: eventEmitter),
+            logger: logger
         )
     }
 
@@ -221,6 +229,7 @@ public final class ProcessOut: @unchecked Sendable {
             repository: repository,
             customerActionsService: customerActionsService,
             eventEmitter: eventEmitter,
+            threeDSServiceFactory: Default3DSServiceFactory(eventEmitter: eventEmitter),
             logger: logger
         )
     }
@@ -394,4 +403,4 @@ extension ProcessOut {
     }
 }
 
-// swiftlint:enable force_unwrapping type_body_length
+// swiftlint:enable force_unwrapping type_body_length file_length
