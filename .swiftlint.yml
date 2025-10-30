@@ -88,6 +88,21 @@ opt_in_rules:
   - vertical_whitespace_closing_braces
   - yoda_condition
 
+modifier_order:
+  preferred_modifier_order:
+    - override
+    - acl
+    - setterACL
+    - isolation
+    - dynamic
+    - mutators
+    - lazy
+    - final
+    - required
+    - convenience
+    - typeMethods
+    - owned
+
 disabled_rules:
   - todo
   - optional_data_string_conversion

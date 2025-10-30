@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name                  = 'ProcessOutUI'
-  s.version               = '4.35.1'
+  s.version               = '4.35.2'
   s.swift_versions        = ['5.10']
   s.license               = { :type => 'MIT', :file => 'LICENSE' }
   s.homepage              = 'https://github.com/processout/processout-ios'

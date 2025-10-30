@@ -23,7 +23,7 @@ struct AsnNull: AsnNode {
 
 extension AsnNode where Self == AsnNull {
 
-    static var null: some AsnNode {
+    static var null: AsnNull {
         AsnNull()
     }
 }
