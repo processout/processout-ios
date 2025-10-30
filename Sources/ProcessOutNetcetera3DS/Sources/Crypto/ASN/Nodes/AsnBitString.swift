@@ -33,11 +33,11 @@ enum AsnBitString: AsnNode {
 
 extension AsnNode where Self == AsnBitString {
 
-    static func bitString(encapsulating element: AsnNode) -> some AsnNode {
+    static func bitString(encapsulating element: AsnNode) -> AsnBitString {
         AsnBitString.encapsulated(element)
     }
 
-    static func bitString(bits data: Data) -> some AsnNode {
+    static func bitString(bits data: Data) -> AsnBitString {
         AsnBitString.primitive(data)
     }
 }

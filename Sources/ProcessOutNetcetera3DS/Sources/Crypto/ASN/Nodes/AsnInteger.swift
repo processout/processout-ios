@@ -29,7 +29,7 @@ struct AsnInteger: AsnNode {
 
 extension AsnNode where Self == AsnInteger {
 
-    static func integer(_ rawValue: Data) -> some AsnNode {
+    static func integer(_ rawValue: Data) -> AsnInteger {
         AsnInteger(rawValue: rawValue)
     }
 }
