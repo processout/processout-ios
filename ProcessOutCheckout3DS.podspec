@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '15.0'
   s.ios.resources         = 'Sources/ProcessOutCheckout3DS/Resources/**/*'
   s.source_files          = 'Sources/ProcessOutCheckout3DS/**/*.swift'
-  s.pod_target_xcconfig   = { 'EXCLUDED_ARCHS' => 'x86_64', 'OTHER_SWIFT_FLAGS' => '-package-name ProcessOut' }
-  s.dependency            'ProcessOutCore', s.version.to_s
+  s.pod_target_xcconfig   = { 'EXCLUDED_ARCHS' => 'x86_64' }
+  s.dependency            'ProcessOut', s.version.to_s
   s.dependency            'Checkout3DS', '3.2.5'
 end

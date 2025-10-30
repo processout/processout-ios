@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 06.03.2023.
 //
 
-import ProcessOutCore
+import ProcessOut
 import Checkout3DS
 
 struct DefaultAuthenticationErrorMapper: AuthenticationErrorMapper {

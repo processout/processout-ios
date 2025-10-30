@@ -9,15 +9,9 @@ import Foundation
 
 final class DefaultInvoicesService: POInvoicesService {
 
-    init(
-        repository: InvoicesRepository,
-        customerActionsService: CustomerActionsService,
-        threeDSServiceFactory: ThreeDSServiceFactory,
-        logger: POLogger
-    ) {
+    init(repository: InvoicesRepository, customerActionsService: CustomerActionsService, logger: POLogger) {
         self.repository = repository
         self.customerActionsService = customerActionsService
-        self.threeDSServiceFactory = threeDSServiceFactory
         self.logger = logger
     }
 
@@ -39,16 +33,6 @@ final class DefaultInvoicesService: POInvoicesService {
             throw error
         }
         await threeDSService.clean()
-    }
-
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws {
-        let threeDSService = try threeDSServiceFactory.make3DSService(
-            with: .init(
-                localeIdentifier: request.localeIdentifier,
-                webAuthenticationCallback: request.webAuthenticationCallback
-            )
-        )
-        try await authorizeInvoice(request: request, threeDSService: threeDSService)
     }
 
     func authorizeInvoice(
@@ -111,7 +95,6 @@ final class DefaultInvoicesService: POInvoicesService {
 
     private let repository: InvoicesRepository
     private let customerActionsService: CustomerActionsService
-    private let threeDSServiceFactory: ThreeDSServiceFactory
     private let logger: POLogger
 
     // MARK: - Private Methods

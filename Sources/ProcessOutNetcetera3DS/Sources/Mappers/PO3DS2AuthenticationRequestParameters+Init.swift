@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 25.04.2025.
 //
 
-import ProcessOutCore
+import ProcessOut
 import ThreeDS_SDK
 
 extension PO3DS2AuthenticationRequestParameters {

@@ -24,14 +24,6 @@ public protocol POCustomerTokensService: POService { // sourcery: AutoCompletion
         request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
     ) async throws -> POCustomerToken
 
-    /// Assigns new source to existing customer token and optionally verifies it.
-    ///
-    /// Implementation uses default 3DS service to perform assignment if one is available,
-    /// otherwise throws an error,
-    func assignCustomerToken( // sourcery:completion: skip
-        request: POAssignCustomerTokenRequest
-    ) async throws -> POCustomerToken
-
     /// Tokenize alternative payment.
     func tokenize( // sourcery:completion: skip
         request: PONativeAlternativePaymentTokenizationRequestV2
