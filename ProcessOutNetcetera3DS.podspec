@@ -12,6 +12,5 @@ Pod::Spec.new do |s|
   s.vendored_frameworks   = 'Vendor/ThreeDS_SDK.xcframework', 'Vendor/NetceteraShim.xcframework'
   s.ios.resources         = 'Sources/ProcessOutNetcetera3DS/Resources/**/*'
   s.source_files          = 'Sources/ProcessOutNetcetera3DS/**/*.swift'
-  s.pod_target_xcconfig   = { 'OTHER_SWIFT_FLAGS' => '-package-name ProcessOut' }
-  s.dependency            'ProcessOutCore', s.version.to_s
+  s.dependency            'ProcessOut', s.version.to_s
 end

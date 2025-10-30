@@ -11,6 +11,5 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '15.0'
   s.ios.resources         = 'Sources/ProcessOutCoreUI/Resources/**/*'
   s.source_files          = 'Sources/ProcessOutCoreUI/**/*.swift'
-  s.pod_target_xcconfig   = { 'OTHER_SWIFT_FLAGS' => '-Xfrontend -module-interface-preserve-types-as-written -package-name ProcessOut' }
   s.dependency            'ProcessOut' # todo(andrii-vysotskyi): vendor cmark_gfm.xcframework instead after UI migration is completed
 end

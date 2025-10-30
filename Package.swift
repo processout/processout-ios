@@ -22,25 +22,18 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "ProcessOutCore",
+            name: "ProcessOut",
+            dependencies: [
+                .product(name: "cmark-gfm", package: "swift-cmark")
+            ],
             resources: [
                 .process("Resources")
             ]
         ),
         .target(
-            name: "ProcessOut",
-            dependencies: [
-                .target(name: "ProcessOutCore"),
-                .product(name: "cmark-gfm", package: "swift-cmark"),
-            ],
-            resources: [
-                .process("Resources")
-            ],
-        ),
-        .target(
             name: "ProcessOutCheckout3DS",
             dependencies: [
-                .target(name: "ProcessOutCore"),
+                .target(name: "ProcessOut"),
                 .product(name: "Checkout3DSPackages", package: "checkout-3ds-sdk-ios")
             ],
             resources: [
@@ -50,9 +43,9 @@ let package = Package(
         .target(
             name: "ProcessOutNetcetera3DS",
             dependencies: [
-                .target(name: "ProcessOutCore"),
+                .target(name: "ProcessOut"),
                 .target(name: "NetceteraShim"),
-                .product(name: "ThreeDS_SDK", package: "SPM"),
+                .product(name: "ThreeDS_SDK", package: "SPM")
             ],
             resources: [
                 .process("Resources")

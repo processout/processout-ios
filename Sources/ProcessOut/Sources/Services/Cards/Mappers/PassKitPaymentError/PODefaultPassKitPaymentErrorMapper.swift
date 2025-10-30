@@ -9,9 +9,10 @@
 
 import PassKit
 
-package final class PODefaultPassKitPaymentErrorMapper: POPassKitPaymentErrorMapper {
+@_spi(PO)
+public final class PODefaultPassKitPaymentErrorMapper: POPassKitPaymentErrorMapper {
 
-    package init(logger: POLogger) {
+    public init(logger: POLogger) {
         self.logger = logger
     }
 
