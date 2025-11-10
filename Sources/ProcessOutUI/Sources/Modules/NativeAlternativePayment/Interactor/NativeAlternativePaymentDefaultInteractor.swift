@@ -599,14 +599,16 @@ final class NativeAlternativePaymentDefaultInteractor:
     ) async throws -> NativeAlternativePaymentResolvedElement.Group {
         var resolvedInstructions: [NativeAlternativePaymentResolvedElement.Instruction] = []
         for instruction in group.instructions {
-            resolvedInstructions.append(try await resolve(customerInstruction: instruction))
+            if let resolvedInstruction = try await resolve(customerInstruction: instruction) {
+                resolvedInstructions.append(resolvedInstruction)
+            }
         }
         return .init(label: group.label, instructions: resolvedInstructions)
     }
 
     private func resolve(
         customerInstruction: PONativeAlternativePaymentCustomerInstructionV2
-    ) async throws -> NativeAlternativePaymentResolvedElement.Instruction {
+    ) async throws -> NativeAlternativePaymentResolvedElement.Instruction? {
         switch customerInstruction {
         case .barcode(let barcode):
             let minimumSize = CGSize(width: 250, height: 250)
@@ -618,8 +620,9 @@ final class NativeAlternativePaymentDefaultInteractor:
         case .message(let message):
             return .message(.init(label: message.label, value: message.value))
         case .image(let image):
-            guard let image = await imagesRepository.image(resource: image.value) else {
-                throw POFailure(message: "Unable to prepare customer instruction image.", code: .Mobile.internal)
+            guard let image = await imagesRepository.image(resource: image.value) else { // Treated as decoration
+                logger.debug("Unable to prepare customer instruction image.")
+                return nil
             }
             return .image(image)
         default:
@@ -653,12 +656,15 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
             return .form(form)
         case .customerInstruction(let instruction):
-            return .instruction(try await resolve(customerInstruction: instruction))
+            if let resolvedInstruction = try await resolve(customerInstruction: instruction) {
+                return .instruction(resolvedInstruction)
+            }
         case .group(let group):
             return .group(try await resolve(group: group))
         case .unknown:
             return nil
         }
+        return nil
     }
 
     // MARK: - Payment Method Utils

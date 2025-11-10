@@ -87,9 +87,22 @@ final class UrlSessionHttpConnector: HttpConnector {
     private func convertToFailure(urlError error: Error) -> Failure {
         let code: Failure.Code
         switch error {
+        case URLError.appTransportSecurityRequiresSecureConnection,
+             URLError.secureConnectionFailed,
+             URLError.serverCertificateHasBadDate,
+             URLError.serverCertificateHasUnknownRoot,
+             URLError.serverCertificateNotYetValid,
+             URLError.serverCertificateUntrusted,
+             URLError.clientCertificateRejected,
+             URLError.clientCertificateRequired:
+            code = .security
         case URLError.cancelled:
             code = .cancelled
-        case URLError.notConnectedToInternet, URLError.networkConnectionLost:
+        case URLError.notConnectedToInternet,
+             URLError.networkConnectionLost,
+             URLError.internationalRoamingOff,
+             URLError.dataNotAllowed,
+             URLError.callIsActive:
             code = .networkUnreachable
         case URLError.timedOut:
             code = .timeout

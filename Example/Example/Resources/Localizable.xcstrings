@@ -361,6 +361,16 @@
         }
       }
     },
+    "dynamic-checkout.3ds-service" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3DS Service"
+          }
+        }
+      }
+    },
     "dynamic-checkout.error-message" : {
       "localizations" : {
         "en" : {
