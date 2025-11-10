@@ -14,6 +14,9 @@ extension LocalizedStringResource {
         /// Title.
         static let title = LocalizedStringResource("dynamic-checkout.title")
 
+        /// 3DS service.
+        static let threeDSService = LocalizedStringResource("dynamic-checkout.3ds-service")
+
         /// Continue button.
         static let pay = LocalizedStringResource("dynamic-checkout.pay")
 

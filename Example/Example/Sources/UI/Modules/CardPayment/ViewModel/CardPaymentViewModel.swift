@@ -18,13 +18,12 @@ final class CardPaymentViewModel: ObservableObject {
 
     init(invoicesService: POInvoicesService) {
         self.invoicesService = invoicesService
-        commonInit()
     }
 
     // MARK: -
 
     @Published
-    var state: CardPaymentViewModelState! // swiftlint:disable:this implicitly_unwrapped_optional
+    var state = CardPaymentViewModelState()
 
     func pay() {
         state.message = nil
@@ -36,13 +35,6 @@ final class CardPaymentViewModel: ObservableObject {
     private let invoicesService: POInvoicesService
 
     // MARK: - Private Methods
-
-    private func commonInit() {
-        state = .init(
-            authenticationService: .init(sources: [.test, .checkout, .netcetera], id: \.self, selection: .netcetera),
-            cardTokenization: nil
-        )
-    }
 
     private func setCardTokenizationItem() {
         let configuration = POCardTokenizationConfiguration(

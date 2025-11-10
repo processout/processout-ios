@@ -41,7 +41,9 @@ struct CardPaymentViewModelState {
     var invoice = InvoiceViewModel()
 
     /// 3DS service.
-    var authenticationService: PickerData<AuthenticationService, AuthenticationService>
+    var authenticationService = PickerData<AuthenticationService, AuthenticationService>(
+        sources: [.test, .checkout, .netcetera], id: \.self, selection: .netcetera
+    )
 
     /// Card tokenization.
     var cardTokenization: CardTokenization?
