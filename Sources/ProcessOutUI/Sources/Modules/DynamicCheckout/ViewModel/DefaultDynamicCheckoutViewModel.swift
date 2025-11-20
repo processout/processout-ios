@@ -609,7 +609,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             resource: .DynamicCheckout.successMessage, configuration: interactor.configuration.localization
         )
         let item = DynamicCheckoutViewModelItem.Success(
-            id: ItemId.success, title: title, message: message,
+            id: ItemId.success, title: title, message: message
         )
         let section = DynamicCheckoutViewModelState.Section(
             id: SectionId.default, header: nil, items: [.success(item)], isTight: false, areBezelsVisible: false

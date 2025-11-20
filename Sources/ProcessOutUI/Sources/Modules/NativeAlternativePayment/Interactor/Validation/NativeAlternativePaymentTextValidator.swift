@@ -38,7 +38,7 @@ struct NativeAlternativePaymentTextValidator: InputValidator {
                     let message = String(
                         resource: .NativeAlternativePayment.Error.invalidLength,
                         configuration: localization,
-                        replacements: maxLength,
+                        replacements: maxLength
                     )
                     return .invalid(errorMessage: message)
                 }

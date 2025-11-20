@@ -33,7 +33,7 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
             path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",
             body: request,
             locale: request.localeIdentifier,
-            includesDeviceMetadata: true,
+            includesDeviceMetadata: true
         )
         return try await connector.execute(request: httpRequest)
     }
