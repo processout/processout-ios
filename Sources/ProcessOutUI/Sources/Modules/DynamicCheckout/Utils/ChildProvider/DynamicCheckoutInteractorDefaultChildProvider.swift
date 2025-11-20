@@ -100,7 +100,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             cancelButton: nil,
             prefersInlineControls: true,
             localization: configuration.localization,
-            metadata: configuration.card.metadata,
+            metadata: configuration.card.metadata
         )
     }
 

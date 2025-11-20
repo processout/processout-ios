@@ -85,7 +85,7 @@ extension POInvoiceRequest {
             clientSecret: self.clientSecret,
             expand: expand,
             localeIdentifier: localeIdentifier,
-            attachPrivateKey: self.attachPrivateKey,
+            attachPrivateKey: self.attachPrivateKey
         )
         return updatedRequest
     }
