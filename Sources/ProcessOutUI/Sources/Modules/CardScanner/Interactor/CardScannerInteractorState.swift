@@ -34,6 +34,12 @@ enum CardScannerInteractorState: InteractorState {
         var card: POScannedCard?
     }
 
+    struct NotAuthorized {
+
+        /// Indicates whether app is permitted to use media capture devices.
+        let isRestricted: Bool
+    }
+
     /// Idle state.
     case idle
 
@@ -42,6 +48,9 @@ enum CardScannerInteractorState: InteractorState {
 
     /// Started state.
     case started(Started)
+
+    /// Indicates that user is not authorized to use camera.
+    case notAuthorized(NotAuthorized)
 
     /// Completed state.
     case completed(Result<POScannedCard, POFailure>)
