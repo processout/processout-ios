@@ -16,6 +16,10 @@ actor MockCameraSession: CameraSession {
 
     // MARK: - CameraSession
 
+    func requestAccess() async -> (isAuthorized: Bool, AVAuthorizationStatus) {
+        (isAuthorized: false, .denied)
+    }
+
     func start() async -> Bool {
         startCallsCount += 1
         return await startFromClosure()
