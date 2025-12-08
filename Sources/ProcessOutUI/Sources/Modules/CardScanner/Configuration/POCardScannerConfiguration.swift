@@ -37,6 +37,29 @@ public struct POCardScannerConfiguration {
         }
     }
 
+    public struct DeniedCameraAuthorization {
+
+        public init(
+            confirmation: POConfirmationDialogConfiguration = .init(),
+            shouldSuggestAuthorizationChange: Bool = true
+        ) {
+            self.confirmation = confirmation
+            self.shouldSuggestAuthorizationChange = shouldSuggestAuthorizationChange
+        }
+
+        /// Dialog to display when authorization is denied.
+        public let confirmation: POConfirmationDialogConfiguration
+
+        /// Boolean flag indicating whether user should be suggested to change camera authorization
+        /// via settings when possible.
+        ///
+        /// - Warning: When authorization is changed via settings, system kills application process,
+        /// so make sure your app supports state restoration.
+        ///
+        /// Default value is `false`.
+        public let shouldSuggestAuthorizationChange: Bool
+    }
+
     /// Custom title. Use empty string to hide title.
     public let title: String?
 
@@ -46,6 +69,9 @@ public struct POCardScannerConfiguration {
     /// A Boolean value that determines whether the card scanner should allow scanning of expired cards.
     /// Default value is `false`.
     public let shouldScanExpiredCard: Bool
+
+    /// Denied camera authorization configuration.
+    public let deniedCameraAuthorization: DeniedCameraAuthorization?
 
     /// Cancel button configuration.
     public let cancelButton: CancelButton?
@@ -57,12 +83,14 @@ public struct POCardScannerConfiguration {
         title: String? = nil,
         description: String? = nil,
         shouldScanExpiredCard: Bool = false,
+        deniedCameraAuthorization: DeniedCameraAuthorization? = .init(),
         cancelButton: CancelButton? = .init(),
         localization: LocalizationConfiguration = .device()
     ) {
         self.title = title
         self.description = description
         self.shouldScanExpiredCard = shouldScanExpiredCard
+        self.deniedCameraAuthorization = deniedCameraAuthorization
         self.cancelButton = cancelButton
         self.localization = localization
     }

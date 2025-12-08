@@ -11,6 +11,9 @@ import CoreImage
 /// A session that manages the capture pipeline, which includes the capture session, device inputs, and capture outputs.
 protocol CameraSession: Sendable, AnyObject {
 
+    /// Requests access to capture device if needed and return authorization status.
+    func requestAccess() async -> (isAuthorized: Bool, AVAuthorizationStatus)
+
     /// Starts camera session.
     @discardableResult
     func start() async -> Bool

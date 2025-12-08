@@ -25,6 +25,7 @@ public struct POCardScannerView: View {
         AnyView(
             style.makeBody(configuration: styleConfiguration)
         )
+        .poConfirmationDialog(item: $viewModel.state.confirmationDialog)
         .onAppear(perform: viewModel.start)
     }
 
