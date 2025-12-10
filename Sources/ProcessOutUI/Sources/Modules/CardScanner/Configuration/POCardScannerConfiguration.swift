@@ -41,7 +41,7 @@ public struct POCardScannerConfiguration {
 
         public init(
             confirmation: POConfirmationDialogConfiguration = .init(),
-            shouldSuggestAuthorizationChange: Bool = true
+            shouldSuggestAuthorizationChange: Bool = false
         ) {
             self.confirmation = confirmation
             self.shouldSuggestAuthorizationChange = shouldSuggestAuthorizationChange
