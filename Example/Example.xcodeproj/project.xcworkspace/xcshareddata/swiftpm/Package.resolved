@@ -1,13 +1,13 @@
 {
-  "originHash" : "4f3cede1cc7a25636df024aefb0bc09574094aab273612fbc1191e7de9353c14",
+  "originHash" : "266863387af04e16a0f954fb43175ab621bcb1685384b8fb6abf643e46088d62",
   "pins" : [
     {
       "identity" : "checkout-3ds-sdk-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/checkout/checkout-3ds-sdk-ios",
       "state" : {
-        "revision" : "17bee169a7ef971f85513a90a07af34e830ff19a",
-        "version" : "3.2.5"
+        "revision" : "69790aaef65dae9538981190c80be4d9d9eda31f",
+        "version" : "3.2.9"
       }
     },
     {
