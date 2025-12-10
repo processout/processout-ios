@@ -13,8 +13,8 @@ import SwiftUI
 @preconcurrency
 public struct PONativeAlternativePaymentView: View {
 
-    init(viewModel: @autoclosure @escaping () -> AnyViewModel<NativeAlternativePaymentViewModelState>) {
-        self._viewModel = .init(wrappedValue: viewModel())
+    init(viewModel: @autoclosure @escaping () -> some ViewModel<NativeAlternativePaymentViewModelState>) {
+        self._viewModel = .init(wrappedValue: .init(erasing: viewModel()))
     }
 
     // MARK: - View

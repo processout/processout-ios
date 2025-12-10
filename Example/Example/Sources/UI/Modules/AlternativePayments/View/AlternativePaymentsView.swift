@@ -57,7 +57,7 @@ struct AlternativePaymentsView: View {
         }
         .onAppear(perform: viewModel.start)
         .sheet(item: $viewModel.state.nativePayment) { item in
-            PONativeAlternativePaymentView(configuration: item.configuration, completion: item.completion)
+            PONativeAlternativePaymentView(component: item.component)
         }
         .navigationTitle(String(localized: .AlternativePayments.title))
         .navigationBarTitleDisplayMode(.inline)

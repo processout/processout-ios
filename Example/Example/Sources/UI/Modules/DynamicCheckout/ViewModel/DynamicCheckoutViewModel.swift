@@ -9,6 +9,9 @@ import PassKit
 import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutUI
+import ProcessOutCheckout3DS
+import ProcessOutNetcetera3DS
+import Checkout3DS
 
 @MainActor
 final class DynamicCheckoutViewModel: ObservableObject {
@@ -112,7 +115,16 @@ extension DynamicCheckoutViewModel: PODynamicCheckoutDelegate {
         willAuthorizeInvoiceWith request: inout POInvoiceAuthorizationRequest,
         using paymentMethod: PODynamicCheckoutPaymentMethod
     ) async -> any PO3DS2Service {
-        POTest3DSService()
+        switch state.authenticationService.selection {
+        case .test:
+            return POTest3DSService()
+        case .checkout:
+            let delegate = DefaultCheckout3DSDelegate()
+            return POCheckout3DSService(delegate: delegate, environment: .sandbox)
+        case .netcetera:
+            let configuration = PONetcetera3DS2ServiceConfiguration(returnUrl: Constants.returnUrl)
+            return PONetcetera3DS2Service(configuration: configuration)
+        }
     }
 
     func dynamicCheckout(willAuthorizeInvoiceWith request: PKPaymentRequest) async {

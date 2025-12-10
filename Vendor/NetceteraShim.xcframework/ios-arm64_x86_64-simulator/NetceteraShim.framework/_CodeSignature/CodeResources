@@ -6,51 +6,51 @@
 	<dict>
 		<key>Headers/NetceteraShim-Swift.h</key>
 		<data>
-		Pg7WS7f9gl+TcRGypTNp5hLpA7o=
+		qO04JtwvI/8oWvOzIlzgCjJY4RI=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		324RBPcyhbnyxBlPGW2dUOEZHNA=
+		Qig2LvjOXw+uufQIPwM7Z10r1Eg=
 		</data>
 		<key>Modules/NetceteraShim.swiftmodule/arm64-apple-ios-simulator.abi.json</key>
 		<data>
-		nrEhMYm84dvkxP3OH3rwsWEFAx0=
+		t48T8PtHm7qnukpC45Bz4rTdw0g=
 		</data>
 		<key>Modules/NetceteraShim.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		y4qW3T5DMaNyoDJt81aUaGNw22E=
+		NLSL5y0bBXUztmsWvPoMTF7Ujy8=
 		</data>
 		<key>Modules/NetceteraShim.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		1XkQcErJOMEAUdgbD8OeOp2O4/Y=
+		/NeeArGyRZhKQ7zKH6ho7yoy5hQ=
 		</data>
 		<key>Modules/NetceteraShim.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		9hDkbj29j0es0d65dwZad+PajPE=
+		XNzsqKJ1IhAIupRidozBWztJN+Y=
 		</data>
 		<key>Modules/NetceteraShim.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		LjmftBQesvYpU+SBDzVlD5hL3+o=
+		ANYimnWzh6eAeKfHYyERNXm5Ot4=
 		</data>
 		<key>Modules/NetceteraShim.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<data>
-		nrEhMYm84dvkxP3OH3rwsWEFAx0=
+		t48T8PtHm7qnukpC45Bz4rTdw0g=
 		</data>
 		<key>Modules/NetceteraShim.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		yPCYsCIP1aoh3Op+cowffAtGalc=
+		dv0tUaHgE2jvelNt6JJrCE+Qqpk=
 		</data>
 		<key>Modules/NetceteraShim.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		JGAB5A91hiJdI1796eTUuxqLqWA=
+		DG1OFYV66laObcVMHv/IXfh9kUE=
 		</data>
 		<key>Modules/NetceteraShim.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		S16JJowe5H4SemcLSBdkWPzYbxs=
+		/3J5M2A1v3Ny4CKH6xQQhL0TlqM=
 		</data>
 		<key>Modules/NetceteraShim.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		Y/FYJahpY1HuMwykekXUUBN1ou4=
+		H71XbdL49JPFHSUhlbe6EOk6vmQ=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -63,77 +63,77 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			753xwtj9USywQCZ+jWdnmS1TvuE2YVvAhwLyi4ThewU=
+			kBgZ/PbIhXUY7h/W1hgjA+QjHwXTku7XUUzt2l5TIoE=
 			</data>
 		</dict>
 		<key>Modules/NetceteraShim.swiftmodule/arm64-apple-ios-simulator.abi.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			vKboX6fMIlEnYGGBLU4+lVSPPFvG139ZQqV8T4Vx0WQ=
+			4f+k1w1SS8QxlIWUYwpWDSB5Q0VnSa7Ku7T5ylA9oV4=
 			</data>
 		</dict>
 		<key>Modules/NetceteraShim.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			tMX7jAUF6L2/lfS9M9p9ZimQwOVu7W0v1AExqNlyNDs=
+			8g1zyJVfB8RJ1Of2A2pDBdRtySoxLE1YU3P5/0o5Y6I=
 			</data>
 		</dict>
 		<key>Modules/NetceteraShim.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			X/iwYWAuZchFNgJ1D2MVPf1HgILzlBrWF40dOORLUYQ=
+			PbYhFDkz3gIDXplk2F9G8hBtimn017SC9aVRoIF+lPw=
 			</data>
 		</dict>
 		<key>Modules/NetceteraShim.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			V0cuQMPNqZoLtqvnzFNfRkXYRmWB5SU62HCcGBgs8oM=
+			t+O6UxQRQjFzZRqMzcVori4gZk2LG7R2W1Eaxw3zblk=
 			</data>
 		</dict>
 		<key>Modules/NetceteraShim.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			xLex3VHnNy7F5yTSHK7HEuyMH+59IG2uguvhYsiMwVU=
+			7IKcyVpnAU5eQLLc2LazyA1zqjtnRoLaOEUfEzT8Qto=
 			</data>
 		</dict>
 		<key>Modules/NetceteraShim.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			vKboX6fMIlEnYGGBLU4+lVSPPFvG139ZQqV8T4Vx0WQ=
+			4f+k1w1SS8QxlIWUYwpWDSB5Q0VnSa7Ku7T5ylA9oV4=
 			</data>
 		</dict>
 		<key>Modules/NetceteraShim.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Rx9FDRvSHI1ztpnEDUn0A/gEhezerPS4gdVXehaaUXI=
+			+4xd6MnM2ujyxfvOPrK7WJTikh0YCpp6t/9HP/lhCxY=
 			</data>
 		</dict>
 		<key>Modules/NetceteraShim.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			0Z3yQRvfgMA+Jc+kNQrRHWXG5hyHXvJ5LqmBLFLctNg=
+			8cqtp20vJhgnyMI3MnZ7HVYaT9ljJt9KZyK0XcjAKsQ=
 			</data>
 		</dict>
 		<key>Modules/NetceteraShim.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Swg3MXW4Pn24SxKvQ4ZJKrWAh7+E2WOgDjTnk4sWJp8=
+			LNk9faV43MavpdSy4Y+IyCoKxXv7ct+piLdw9x1VcsQ=
 			</data>
 		</dict>
 		<key>Modules/NetceteraShim.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			ngwYnnLoSyKQt+CplOzvc09gN2r4S/WICKgde3XTlfA=
+			LOWkE9M/yf7/ohGdyCBSX5C9uB6JVSxqKu3NV8eSmWM=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>

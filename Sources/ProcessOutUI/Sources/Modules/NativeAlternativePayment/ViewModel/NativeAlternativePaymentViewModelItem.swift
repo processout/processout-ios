@@ -226,6 +226,9 @@ indirect enum NativeAlternativePaymentViewModelItem {
     /// Informational message.
     case message(POMessage)
 
+    /// Any view.
+    case view(AnyView)
+
     /// Payment confirmation progress details.
     case confirmationProgress(ConfirmationProgress)
 
@@ -263,6 +266,8 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
             return item.id
         case .messageInstruction(let item):
             return item.id
+        case .view:
+            return Constants.anyViewId
         case .confirmationProgress:
             return Constants.confirmationProgressId
         case .success:
@@ -276,6 +281,7 @@ extension NativeAlternativePaymentViewModelItem: Identifiable {
         static let progressId = UUID().uuidString
         static let confirmationProgressId = UUID().uuidString
         static let successId = UUID().uuidString
+        static let anyViewId = UUID().uuidString
     }
 }
 

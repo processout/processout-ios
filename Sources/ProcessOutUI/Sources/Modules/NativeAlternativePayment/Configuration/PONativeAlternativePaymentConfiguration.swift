@@ -61,6 +61,87 @@ public struct PONativeAlternativePaymentConfiguration {
         case tokenization(Tokenization)
     }
 
+    /// A representation of header configurations.
+    @MainActor
+    public enum Header {
+
+        /// A standard header configuration displaying a payment method logo and an optional title.
+        ///
+        /// If a title is provided, it appears alongside the payment method logo. Otherwise it behaves
+        /// identically to the `.automatic` configuration.
+        @MainActor
+        public struct Standard {
+
+            /// The custom title displayed in the header.
+            ///
+            /// If `nil`, the default automatic behavior is used.
+            public let title: String?
+
+            /// Creates a new standard header configuration.
+            public init(title: String?) {
+                self.title = title
+            }
+        }
+
+        /// A fully custom header configuration.
+        ///
+        /// The provided view receives the same padding as the rest of the content. The custom
+        /// header is **not displayed** on the payment success screen.
+        @MainActor
+        public struct Custom {
+
+            /// The type-erased view representing the custom header content.
+            let content: AnyView
+
+            /// Creates a new custom header using a provided view builder.
+            public init(@ViewBuilder _ content: () -> some View) {
+                self.content = AnyView(content())
+            }
+        }
+
+        /// A header configuration that resolves automatically based on context.
+        case automatic
+
+        /// A standard header.
+        case standard(Standard)
+
+        /// A fully custom header view.
+        case custom(Custom)
+    }
+
+    @MainActor
+    public struct Redirect {
+
+        /// An object used to evaluate navigation events in a web authentication session.
+        public let callback: POWebAuthenticationCallback?
+
+        /// A boolean value that indicates whether the session should ask the browser for a
+        /// private authentication session.
+        ///
+        /// Set `prefersEphemeralSession` to true to request that the browser
+        /// doesn’t share cookies or other browsing data between the authentication session
+        /// and the user’s normal browser session.
+        ///
+        /// The value of this property is `true` by default.
+        public let prefersEphemeralSession: Bool
+
+        /// Enables headless mode.
+        ///
+        /// The web redirect will be handled directly when it's the first step in the flow,
+        /// and if it's the only required step, it will complete the flow without starting the bottom sheet.
+        public let enableHeadlessMode: Bool
+
+        public init(
+            callback: POWebAuthenticationCallback? = nil,
+            prefersEphemeralSession: Bool = true,
+            enableHeadlessMode: Bool = false
+        ) {
+            self.callback = callback
+            self.prefersEphemeralSession = prefersEphemeralSession
+            self.enableHeadlessMode = enableHeadlessMode
+        }
+    }
+
     /// Payment confirmation configuration.
     @MainActor
     @preconcurrency
@@ -248,7 +329,20 @@ public struct PONativeAlternativePaymentConfiguration {
     public let flow: Flow
 
     /// Custom title.
-    public let title: String?
+    @available(*, deprecated)
+    public var title: String? {
+        switch header {
+        case .automatic, .custom:
+            return nil
+        case nil:
+            return ""
+        case .standard(let configuration):
+            return configuration.title
+        }
+    }
+
+    /// Header configuration.
+    public let header: Header?
 
     /// A Boolean property that indicates whether the code input should be horizontally centered. This property
     /// is only applicable when there is a single code input. If there are multiple inputs the alignment is always
@@ -264,6 +358,9 @@ public struct PONativeAlternativePaymentConfiguration {
 
     /// Barcode interaction configuration.
     public let barcodeInteraction: BarcodeInteraction
+
+    /// Redirect configuration.
+    public let redirect: Redirect
 
     /// Submit button configuration.
     public let submitButton: SubmitButton
@@ -286,9 +383,10 @@ public struct PONativeAlternativePaymentConfiguration {
     /// Creates configuration.
     public init(
         flow: Flow,
-        title: String? = nil,
+        header: Header? = .automatic,
         inlineSingleSelectValuesLimit: Int = 5,
         barcodeInteraction: BarcodeInteraction = .init(),
+        redirect: Redirect = .init(),
         submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = nil,
         paymentConfirmation: Confirmation = .init(),
@@ -297,19 +395,34 @@ public struct PONativeAlternativePaymentConfiguration {
         localization: LocalizationConfiguration = .device()
     ) {
         self.flow = flow
-        self.title = title
+        self.header = header
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
+        self.barcodeInteraction = barcodeInteraction
+        self.redirect = redirect
         self.submitButton = submitButton
         self.cancelButton = cancelButton
         self.paymentConfirmation = paymentConfirmation
         self.success = success
-        self.barcodeInteraction = barcodeInteraction
         self.prefersInlineControls = prefersInlineControls
         self.localization = localization
     }
 }
 
 // MARK: - Deprecated Symbols
+
+extension PONativeAlternativePaymentConfiguration.Header {
+
+    @available(*, deprecated)
+    static func create(compatibleWithTitle title: String?) -> Self? {
+        guard let title else {
+            return .automatic
+        }
+        guard !title.isEmpty else {
+            return nil
+        }
+        return .standard(Standard(title: title))
+    }
+}
 
 extension PONativeAlternativePaymentConfiguration {
 
@@ -395,6 +508,35 @@ extension PONativeAlternativePaymentConfiguration {
         success?.message
     }
 
+    /// Creates configuration.
+    @available(*, deprecated)
+    @_disfavoredOverload
+    public init(
+        flow: Flow,
+        title: String? = nil,
+        inlineSingleSelectValuesLimit: Int = 5,
+        barcodeInteraction: BarcodeInteraction = .init(),
+        redirect: Redirect = .init(),
+        submitButton: SubmitButton = .init(),
+        cancelButton: CancelButton? = nil,
+        paymentConfirmation: Confirmation = .init(),
+        success: Success? = .init(),
+        prefersInlineControls: Bool = true,
+        localization: LocalizationConfiguration = .device()
+    ) {
+        self.flow = flow
+        self.header = .create(compatibleWithTitle: title)
+        self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
+        self.barcodeInteraction = barcodeInteraction
+        self.redirect = redirect
+        self.submitButton = submitButton
+        self.cancelButton = cancelButton
+        self.paymentConfirmation = paymentConfirmation
+        self.success = success
+        self.prefersInlineControls = prefersInlineControls
+        self.localization = localization
+    }
+
     /// Creates configuration instance.
     @available(*, deprecated)
     @_disfavoredOverload
@@ -412,7 +554,7 @@ extension PONativeAlternativePaymentConfiguration {
         paymentConfirmationSecondaryAction: SecondaryAction? = nil
     ) {
         self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
-        self.title = title
+        self.header = .create(compatibleWithTitle: title)
         self.success = skipSuccessScreen ? nil : .init(message: successMessage)
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }
@@ -423,6 +565,7 @@ extension PONativeAlternativePaymentConfiguration {
             secondaryAction: paymentConfirmationSecondaryAction
         )
         self.barcodeInteraction = .init()
+        self.redirect = .init()
         prefersInlineControls = false
         localization = .device()
     }
@@ -443,13 +586,14 @@ extension PONativeAlternativePaymentConfiguration {
         paymentConfirmation: Confirmation = .init()
     ) {
         self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
-        self.title = title
+        self.header = .create(compatibleWithTitle: title)
         self.success = skipSuccessScreen ? nil : .init(message: successMessage)
         self.submitButton = .init(title: primaryActionTitle)
         self.cancelButton = secondaryAction.flatMap { .init(bridging: $0) }
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.paymentConfirmation = paymentConfirmation
         self.barcodeInteraction = .init()
+        self.redirect = .init()
         prefersInlineControls = false
         localization = .device()
     }
@@ -469,13 +613,14 @@ extension PONativeAlternativePaymentConfiguration {
         success: Success? = .init()
     ) {
         self.flow = .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId))
-        self.title = title
+        self.header = .create(compatibleWithTitle: title)
         self.inlineSingleSelectValuesLimit = inlineSingleSelectValuesLimit
         self.submitButton = submitButton
         self.cancelButton = cancelButton
         self.paymentConfirmation = paymentConfirmation
         self.success = success
         self.barcodeInteraction = barcodeInteraction
+        self.redirect = .init()
         prefersInlineControls = false
         localization = .device()
     }

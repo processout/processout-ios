@@ -27,6 +27,9 @@ struct HttpConnectorFailure: Error, Sendable {
         /// Cancellation error.
         case cancelled
 
+        /// An attempt to establish a secure connection failed.
+        case security
+
         /// Internal error.
         case `internal`
     }

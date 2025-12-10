@@ -46,6 +46,9 @@ struct CardScannerViewModelState {
 
     /// Cancel button.
     let cancelButton: POButtonViewModel?
+
+    /// Confirmation dialog to present to user.
+    var confirmationDialog: POConfirmationDialog?
 }
 
 extension CardScannerViewModelState: AnimationIdentityProvider {

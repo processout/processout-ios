@@ -46,11 +46,8 @@ struct AlternativePaymentsViewModelState {
 
         let id: String
 
-        /// Configuration.
-        let configuration: PONativeAlternativePaymentConfiguration
-
-        /// Completion.
-        let completion: (Result<Void, POFailure>) -> Void
+        /// Payment component.
+        let component: PONativeAlternativePaymentComponent
     }
 
     /// Invoice details.

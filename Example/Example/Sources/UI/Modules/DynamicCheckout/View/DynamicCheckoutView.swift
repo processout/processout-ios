@@ -16,6 +16,13 @@ struct DynamicCheckoutView: View {
                 MessageView(viewModel: viewModel)
             }
             InvoiceView(viewModel: $viewModel.state.invoice)
+            Section {
+                Picker(data: $viewModel.state.authenticationService) { service in
+                    Text(service.rawValue.capitalized)
+                } label: {
+                    Text(.DynamicCheckout.threeDSService)
+                }
+            }
             Button(String(localized: .DynamicCheckout.pay)) {
                 viewModel.pay()
             }

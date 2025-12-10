@@ -101,18 +101,23 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
             throw POFailure(message: message, code: .generic(.mobile), underlyingError: nil)
         }
         let queryItems = components.queryItems ?? []
+        if let gatewayToken = queryItems.queryItemValue(name: "token") {
+            if gatewayToken.isEmpty {
+                logger.debug("Gateway 'token' is empty in \(url), this may be an error.")
+            }
+            let tokenId = queryItems.queryItemValue(name: "token_id")
+            if let customerId = queryItems.queryItemValue(name: "customer_id"), let tokenId {
+                return .init(
+                    gatewayToken: gatewayToken, customerId: customerId, tokenId: tokenId, returnType: .createToken
+                )
+            }
+            return .init(gatewayToken: gatewayToken, customerId: nil, tokenId: tokenId, returnType: .authorization)
+        }
         if let errorCode = queryItems.queryItemValue(name: "error_code") {
             throw POFailure(code: .init(rawValue: errorCode))
         }
-        let gatewayToken = queryItems.queryItemValue(name: "token") ?? ""
-        if gatewayToken.isEmpty {
-            logger.debug("Gateway 'token' is not set in \(url), this may be an error.")
-        }
-        let tokenId = queryItems.queryItemValue(name: "token_id")
-        if let customerId = queryItems.queryItemValue(name: "customer_id"), let tokenId {
-            return .init(gatewayToken: gatewayToken, customerId: customerId, tokenId: tokenId, returnType: .createToken)
-        }
-        return .init(gatewayToken: gatewayToken, customerId: nil, tokenId: tokenId, returnType: .authorization)
+        logger.warn("Both token and error_code are not set in \(url).")
+        return .init(gatewayToken: "", customerId: nil, tokenId: nil, returnType: .authorization)
     }
 
     // MARK: -
@@ -154,14 +159,17 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
             throw POFailure(message: message, code: .Mobile.generic, underlyingError: nil)
         }
         let queryItems = components.queryItems ?? []
+        if let gatewayToken = queryItems.queryItemValue(name: "token") {
+            if gatewayToken.isEmpty {
+                logger.debug("Gateway 'token' is empty in \(url), this may be an error.")
+            }
+            return .init(gatewayToken: gatewayToken)
+        }
         if let errorCode = queryItems.queryItemValue(name: "error_code") {
             throw POFailure(code: .init(rawValue: errorCode))
         }
-        let gatewayToken = queryItems.queryItemValue(name: "token") ?? ""
-        if gatewayToken.isEmpty {
-            logger.debug("Gateway 'token' is not set in \(url), this may be an error.")
-        }
-        return .init(gatewayToken: gatewayToken)
+        logger.warn("Both token and error_code are not set in \(url).")
+        return .init(gatewayToken: "")
     }
 }
 

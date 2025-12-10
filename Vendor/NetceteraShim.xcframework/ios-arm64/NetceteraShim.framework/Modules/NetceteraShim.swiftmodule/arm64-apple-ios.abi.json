@@ -15,6 +15,16 @@
         ]
       },
       {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "NetceteraShim",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
         "kind": "TypeDecl",
         "name": "ConfigurationBuilder",
         "printedName": "ConfigurationBuilder",
@@ -34,7 +44,7 @@
             "usr": "c:@CM@NetceteraShim@ThreeDS_SDK@objc(cs)NCAConfigurationBuilder(im)poApiKeyAndReturnError:",
             "mangledName": "$s11ThreeDS_SDK20ConfigurationBuilderC13NetceteraShimE8poApiKeyyyKF",
             "moduleName": "NetceteraShim",
-            "intro_iOS": "13",
+            "intro_iOS": "15",
             "declAttributes": [
               "Dynamic",
               "AccessControl",

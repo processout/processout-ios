@@ -506,6 +506,9 @@ extension POFailureCode {
         /// Cancellation error.
         public static let cancelled = POFailureCode(rawValue: "processout-mobile.cancelled")
 
+        /// An attempt to establish a secure connection failed.
+        public static let connectionSecurity = POFailureCode(rawValue: "processout-mobile.connection-security")
+
         /// Internal error.
         public static let `internal` = POFailureCode(rawValue: "processout-mobile.internal")
     }

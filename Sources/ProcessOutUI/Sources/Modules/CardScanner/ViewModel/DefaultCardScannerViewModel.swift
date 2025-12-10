@@ -54,6 +54,8 @@ final class DefaultCardScannerViewModel: ViewModel {
             updateWithStartingState()
         case .started(let currentState):
             update(with: currentState)
+        case .notAuthorized(let currentState):
+            update(with: currentState)
         case .completed:
             return
         }
@@ -66,7 +68,8 @@ final class DefaultCardScannerViewModel: ViewModel {
             isTorchEnabled: .constant(false),
             preview: .init(source: nil),
             recognizedCard: nil,
-            cancelButton: cancelButtonViewModel
+            cancelButton: cancelButtonViewModel,
+            confirmationDialog: nil
         )
     }
 
@@ -84,7 +87,20 @@ final class DefaultCardScannerViewModel: ViewModel {
             ),
             preview: .init(source: startedState.previewSource),
             recognizedCard: cardViewModel(with: startedState.card),
-            cancelButton: cancelButtonViewModel
+            cancelButton: cancelButtonViewModel,
+            confirmationDialog: nil
+        )
+    }
+
+    private func update(with notAuthorizedState: CardScannerInteractorState.NotAuthorized) {
+        state = .init(
+            title: title,
+            description: description,
+            isTorchEnabled: .constant(false),
+            preview: .init(source: nil),
+            recognizedCard: nil,
+            cancelButton: cancelButtonViewModel,
+            confirmationDialog: deniedCameraAuthroizationConfirmation(isRestricted: notAuthorizedState.isRestricted)
         )
     }
 
@@ -136,5 +152,47 @@ final class DefaultCardScannerViewModel: ViewModel {
             return nil
         }
         return .init(number: card.number, expiration: card.expiration?.description, cardholderName: card.cardholderName)
+    }
+
+    private func deniedCameraAuthroizationConfirmation(isRestricted: Bool) -> POConfirmationDialog? {
+        guard let configuration = interactor.configuration.deniedCameraAuthorization else {
+            return nil
+        }
+        let secondaryButton: POConfirmationDialog.Button?
+        if !isRestricted, configuration.shouldSuggestAuthorizationChange {
+            secondaryButton = .init(
+                title: configuration.confirmation.confirmActionTitle ?? String(
+                    resource: .CardScanner.DeniedAuthorization.openSettings,
+                    configuration: interactor.configuration.localization
+                ),
+                action: { [weak self] in
+                    self?.interactor.openApplicationSetting()
+                }
+            )
+        } else {
+            secondaryButton = nil
+        }
+        let confirmationDialog = POConfirmationDialog(
+            title: configuration.confirmation.title ?? String(
+                resource: .CardScanner.DeniedAuthorization.title,
+                configuration: interactor.configuration.localization
+            ),
+            message: configuration.confirmation.message ?? String(
+                resource: .CardScanner.DeniedAuthorization.message,
+                configuration: interactor.configuration.localization
+            ),
+            primaryButton: .init(
+                title: configuration.confirmation.cancelActionTitle ?? String(
+                    resource: .CardScanner.DeniedAuthorization.cancel,
+                    configuration: interactor.configuration.localization
+                ),
+                role: .cancel,
+                action: { [weak self] in
+                    self?.interactor.cancel()
+                }
+            ),
+            secondaryButton: secondaryButton
+        )
+        return confirmationDialog
     }
 }

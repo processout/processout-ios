@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 25.11.2024.
 //
 
+import class UIKit.UIApplication
 import AVFoundation
 @_spi(PO) import ProcessOut
 
@@ -32,10 +33,18 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
     let configuration: POCardScannerConfiguration
 
     override func start() {
-        guard case .idle = state else {
+        switch state {
+        case .idle, .notAuthorized:
+            break
+        default:
             return
         }
         Task { @MainActor in
+            let (isCameraAccessAuthorized, cameraAuthorizationStatus) = await cameraSession.requestAccess()
+            guard isCameraAccessAuthorized else {
+                setNotAuthorizedState(cameraAuthorizationStatus: cameraAuthorizationStatus)
+                return
+            }
             await cardRecognitionSession.setDelegate(self)
             if await cameraSession.start() {
                 await cardRecognitionSession.setCameraSession(cameraSession)
@@ -67,6 +76,12 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
             await enableTorch(isEnabled)
         }
         state = .started(newState)
+    }
+
+    func openApplicationSetting() {
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url)
+        }
     }
 
     // MARK: - Private Properties
@@ -112,6 +127,14 @@ final class DefaultCardScannerInteractor: BaseInteractor<CardScannerInteractorSt
             completion(.failure(failure))
         }
         stopSessions()
+    }
+
+    private func setNotAuthorizedState(cameraAuthorizationStatus: AVAuthorizationStatus) {
+        guard case .starting = state else {
+            return
+        }
+        let newState = CardScannerInteractorState.NotAuthorized(isRestricted: cameraAuthorizationStatus == .restricted)
+        state = .notAuthorized(newState)
     }
 
     // MARK: - Torch

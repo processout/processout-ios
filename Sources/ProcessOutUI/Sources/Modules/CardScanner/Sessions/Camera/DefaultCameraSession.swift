@@ -33,9 +33,27 @@ actor DefaultCameraSession:
 
     // MARK: - CameraSession
 
+    func requestAccess() async -> (isAuthorized: Bool, AVAuthorizationStatus) {
+        let isAuthorized: Bool, mediaType = AVMediaType.video
+        switch AVCaptureDevice.authorizationStatus(for: mediaType) {
+        case .authorized:
+            isAuthorized = true
+        case .denied, .restricted:
+            isAuthorized = false
+        case .notDetermined:
+            // If the system hasn't determined their authorization status,
+            // explicitly prompt them for approval.
+            isAuthorized = await AVCaptureDevice.requestAccess(for: mediaType)
+        @unknown default:
+            isAuthorized = false
+        }
+        let status = AVCaptureDevice.authorizationStatus(for: mediaType)
+        return (isAuthorized, status)
+    }
+
     @discardableResult
     func start() async -> Bool {
-        guard await isAuthorized else {
+        guard await requestAccess().isAuthorized else {
             return false
         }
         guard !captureSession.isRunning else {
@@ -157,26 +175,6 @@ actor DefaultCameraSession:
 
     /// Boolean value indicating whether new video frames should be discarded.
     private nonisolated(unsafe) var shouldDiscardVideoFrames = POUnfairlyLocked(wrappedValue: false)
-
-    // MARK: - Authorization
-
-    /// A Boolean value that indicates whether a user authorizes this app to use device cameras.
-    private var isAuthorized: Bool {
-        get async {
-            switch AVCaptureDevice.authorizationStatus(for: .video) {
-            case .authorized:
-                return true
-            case .denied, .restricted:
-                return false
-            case .notDetermined:
-                // If the system hasn't determined their authorization status,
-                // explicitly prompt them for approval.
-                return await AVCaptureDevice.requestAccess(for: .video)
-            @unknown default:
-                return false
-            }
-        }
-    }
 
     // MARK: - Session Configuration
 

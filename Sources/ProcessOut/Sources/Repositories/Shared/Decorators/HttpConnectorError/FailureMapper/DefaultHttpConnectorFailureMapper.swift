@@ -34,6 +34,10 @@ final class DefaultHttpConnectorFailureMapper: HttpConnectorFailureMapper {
             message = "Request was cancelled."
             code = .Mobile.cancelled
             invalidFields = nil
+        case .security:
+            message = "An attempt to establish a secure connection failed."
+            code = .Mobile.connectionSecurity
+            invalidFields = nil
         case let .server(error, _):
             message = error.message
             code = .init(rawValue: error.errorType)
