@@ -783,6 +783,142 @@
         }
       }
     },
+    "card-scanner.denied-authorization.cancel" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة يدويًا"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add manually"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter manuellement"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj ręcznie"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar manualmente"
+          }
+        }
+      }
+    },
+    "card-scanner.denied-authorization.message" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الوصول إلى الكاميرا مطلوب لمسح بطاقتك. يرجى تعديل إعداداتك أو إدخال التفاصيل يدويًا."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera permission is required to scan your card. Please adjust your settings or enter the details manually."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'accès à la caméra est nécessaire pour scanner votre carte. Veuillez ajuster vos paramètres ou saisir les informations manuellement."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dostęp do kamery jest wymagany do zeskanowania karty. Proszę dostosować ustawienia lub wprowadzić dane ręcznie."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O acesso à câmera é necessário para escanear o seu cartão. Por favor, ajuste suas configurações ou insira os dados manualmente."
+          }
+        }
+      }
+    },
+    "card-scanner.denied-authorization.open-settings" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فتح الإعدادات"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open settings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les paramètres"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz ustawienia"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir configurações"
+          }
+        }
+      }
+    },
+    "card-scanner.denied-authorization.title" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم رفض الوصول إلى الكاميرا"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera access denied"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accès à la caméra refusé"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odrzucono dostęp do kamery"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acesso à câmera negado"
+          }
+        }
+      }
+    },
     "card-scanner.description" : {
       "localizations" : {
         "ar" : {
