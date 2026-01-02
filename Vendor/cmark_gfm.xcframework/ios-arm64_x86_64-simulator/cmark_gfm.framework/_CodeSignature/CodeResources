@@ -6,7 +6,7 @@
 	<dict>
 		<key>Headers/buffer.h</key>
 		<data>
-		tZpGMMzqwegWbq252w/RH22CNrQ=
+		wfbeqvUnFehytVJ1ML6NASHSGeA=
 		</data>
 		<key>Headers/chunk.h</key>
 		<data>
@@ -18,7 +18,11 @@
 		</data>
 		<key>Headers/cmark-gfm.h</key>
 		<data>
-		gMxXnkLT8Xk24L4+rRUW6n7Fczk=
+		viz54P9eVVarz1O7qF0vs6A7wvA=
+		</data>
+		<key>Headers/cmark-gfm_config.h</key>
+		<data>
+		JU/rNGlNlmyydIBpASErUaSm+ho=
 		</data>
 		<key>Headers/cmark-gfm_version.h</key>
 		<data>
@@ -38,7 +42,7 @@
 		</data>
 		<key>Headers/houdini.h</key>
 		<data>
-		cdK/+50Xjo8dkbWZ0God+pJhjUs=
+		ooMALuT3E0h7z+/U2RqOtg7AhrY=
 		</data>
 		<key>Headers/html.h</key>
 		<data>
@@ -46,7 +50,7 @@
 		</data>
 		<key>Headers/inlines.h</key>
 		<data>
-		lZDi0u096rbPTVI6tM0i0aR5NXs=
+		azDZTLxrx8sX0iE+2CiUYrwSPeg=
 		</data>
 		<key>Headers/iterator.h</key>
 		<data>
@@ -58,7 +62,7 @@
 		</data>
 		<key>Headers/mutex.h</key>
 		<data>
-		EJktaLcpiYZn0llxq0a6bSEWAKM=
+		eiGmaPfaL2wiB83dwpkQNQ4U2l4=
 		</data>
 		<key>Headers/node.h</key>
 		<data>
@@ -90,7 +94,7 @@
 		</data>
 		<key>Headers/syntax_extension.h</key>
 		<data>
-		1wydFh4CKYUMACGv/p711oPBxDs=
+		yLZZUM+eNlVEIMUUKtBMEFRzKoc=
 		</data>
 		<key>Headers/utf8.h</key>
 		<data>
@@ -98,11 +102,11 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		nik1eesxCJfQzvaxshBw1qzHquA=
+		jSB4QCKjz4JuXXxrn3rowY6AdCU=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
-		aDY+uO8mS99xJpy7EZ9hFMN2jsI=
+		aeWD4669zElmCJ24eiqomVybpaY=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -111,7 +115,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			IPNeKV5OwWeWMyIVRkN4yhEUwcE59sHsJtw+otyVzhU=
+			NobwioP+AODhA47re9Sx0pDxfS0ArPyJgkMxEhOlFW8=
 			</data>
 		</dict>
 		<key>Headers/chunk.h</key>
@@ -132,7 +136,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			L7vDsGVOaQOUm1MtMIBSauxR4bWaAa2DhHs38so3yEE=
+			wGHfQhkjKM3Veh3Nk6dJXvePGLOgh+2LObWjm/zLJxE=
+			</data>
+		</dict>
+		<key>Headers/cmark-gfm_config.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			z3hVzfVbTwc+G0K93NX7IPSQM93WO/ryciiSjVg/gxg=
 			</data>
 		</dict>
 		<key>Headers/cmark-gfm_version.h</key>
@@ -167,7 +178,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			seLGibIxbw+xfKwyWQTdt0HpGEiH1+2TkKHddphNk9U=
+			s0n6Ls5mkrxsdnqJ0Yuw2SoqwXOaDctu0TYebJ8ps3Y=
 			</data>
 		</dict>
 		<key>Headers/html.h</key>
@@ -181,7 +192,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			YGlNNSUK6SHNkMO/2I+1ZEJuQcPgp3iVi6c1fiMncxM=
+			PgxQwwUogGeS0/u/w0cpGpqmG8F9yMmjwufSyyj4Jxg=
 			</data>
 		</dict>
 		<key>Headers/iterator.h</key>
@@ -202,7 +213,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			mAGTs4eeFXw5IzWXHK3uYsIPXFXNTcGfLACSJ4l5WG4=
+			B0nyOxvTFJzXK607lQSqXWlH7Z3ZaleGQ2NIUvJpfLw=
 			</data>
 		</dict>
 		<key>Headers/node.h</key>
@@ -258,7 +269,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			MY06t7fzn9RWoTzNRsXjygttbLqlOBAVe7v+wzX2H4k=
+			9a93BMYNeJKFfGy8+4M515xhT9gGQHDeLg+yQInLtp4=
 			</data>
 		</dict>
 		<key>Headers/utf8.h</key>
@@ -272,7 +283,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			gvWLs+T1yW6fvGh/Cml17oYqvsXpiIsUJ/Tno5I97Lw=
+			4/sQRhUaoPODdlA9dO5ZO3VldfkT7WU1oQlplyzMyl0=
 			</data>
 		</dict>
 	</dict>
