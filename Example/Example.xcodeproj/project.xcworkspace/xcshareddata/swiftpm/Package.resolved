@@ -1,13 +1,13 @@
 {
-  "originHash" : "266863387af04e16a0f954fb43175ab621bcb1685384b8fb6abf643e46088d62",
+  "originHash" : "797eaf02a4c0b4b477a991945fa6c684312886a42f6d1845fd6cf70d1c09d2fd",
   "pins" : [
     {
       "identity" : "checkout-3ds-sdk-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/checkout/checkout-3ds-sdk-ios",
       "state" : {
-        "revision" : "69790aaef65dae9538981190c80be4d9d9eda31f",
-        "version" : "3.2.9"
+        "revision" : "cabb8d59b37092c35b044f55db1ab80a09431079",
+        "version" : "3.2.11"
       }
     },
     {
@@ -20,12 +20,30 @@
       }
     },
     {
+      "identity" : "joseswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/airsidemobile/JOSESwift.git",
+      "state" : {
+        "revision" : "10ed3b6736def7c26eb87135466b1cb46ea7e37f",
+        "version" : "2.4.0"
+      }
+    },
+    {
+      "identity" : "plcrashreporter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/microsoft/plcrashreporter.git",
+      "state" : {
+        "revision" : "8c61e5e38e9f737dd68512ed1ea5ab081244ad65",
+        "version" : "1.12.0"
+      }
+    },
+    {
       "identity" : "spm",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ios-3ds-sdk/SPM",
       "state" : {
-        "revision" : "bf1c56bc9722ea15078f855445c7d66e6e5b7128",
-        "version" : "2.5.32"
+        "revision" : "bcd39004106ca322809b14337043b478e070e6c6",
+        "version" : "2.6.0"
       }
     },
     {
@@ -33,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiftlang/swift-cmark",
       "state" : {
-        "revision" : "b022b08312decdc46585e0b3440d97f6f22ef703",
-        "version" : "0.6.0"
+        "revision" : "5d9bdaa4228b381639fff09403e39a04926e2dbe",
+        "version" : "0.7.1"
       }
     }
   ],
