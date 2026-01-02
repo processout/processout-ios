@@ -19,6 +19,9 @@ public struct PONativeAlternativePaymentTokenizationRequestV2: Sendable, Encodab
     /// Payment request parameters.
     public let submitData: PONativeAlternativePaymentSubmitDataV2?
 
+    /// Redirect result.
+    public let redirect: PONativeAlternativePaymentRedirectResultV2?
+
     /// Customer's locale identifier override.
     @POExcludedEncodable
     public private(set) var localeIdentifier: String?
@@ -28,12 +31,14 @@ public struct PONativeAlternativePaymentTokenizationRequestV2: Sendable, Encodab
         customerTokenId: String,
         gatewayConfigurationId: String,
         submitData: PONativeAlternativePaymentSubmitDataV2? = nil,
+        redirect: PONativeAlternativePaymentRedirectResultV2? = nil,
         localeIdentifier: String? = nil
     ) {
         self.customerId = customerId
         self.customerTokenId = customerTokenId
         self.gatewayConfigurationId = gatewayConfigurationId
         self.submitData = submitData
+        self.redirect = redirect
         self.localeIdentifier = localeIdentifier
     }
 }
