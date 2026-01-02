@@ -1,13 +1,13 @@
 {
-  "originHash" : "772fa5a1381fb7fb9e0191e91027d19e29ef15c9fe0557e9719277e15edfdb23",
+  "originHash" : "f0dea65319f61fc4eb5425bf9ab12c27909b4cd3c34f4c96e68ad38a116d01b2",
   "pins" : [
     {
       "identity" : "checkout-3ds-sdk-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/checkout/checkout-3ds-sdk-ios",
       "state" : {
-        "revision" : "69790aaef65dae9538981190c80be4d9d9eda31f",
-        "version" : "3.2.9"
+        "revision" : "cabb8d59b37092c35b044f55db1ab80a09431079",
+        "version" : "3.2.11"
       }
     },
     {
@@ -17,6 +17,24 @@
       "state" : {
         "revision" : "a914d754b4ffb1843730e8e1f8e7e60c4bf81cf9",
         "version" : "1.2.4"
+      }
+    },
+    {
+      "identity" : "joseswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/airsidemobile/JOSESwift.git",
+      "state" : {
+        "revision" : "10ed3b6736def7c26eb87135466b1cb46ea7e37f",
+        "version" : "2.4.0"
+      }
+    },
+    {
+      "identity" : "plcrashreporter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/microsoft/plcrashreporter.git",
+      "state" : {
+        "revision" : "8c61e5e38e9f737dd68512ed1ea5ab081244ad65",
+        "version" : "1.12.0"
       }
     },
     {
