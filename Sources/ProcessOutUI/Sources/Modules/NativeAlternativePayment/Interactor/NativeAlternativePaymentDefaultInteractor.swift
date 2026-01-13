@@ -148,7 +148,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 let response = try await serviceAdapter.continuePayment(
                     with: .init(
                         flow: configuration.flow,
-                        redirect: currentState.redirect.redirectConfirmationRequired ? .init(success: didOpenUrl) : nil,
+                        redirect: currentState.redirect.confirmationRequired ? .init(success: didOpenUrl) : nil,
                         localeIdentifier: configuration.localization.localeOverride?.identifier
                     )
                 )
@@ -242,7 +242,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         let response = try await serviceAdapter.continuePayment(
             with: .init(
                 flow: configuration.flow,
-                redirect: redirect.redirectConfirmationRequired ? .init(success: didOpenUrl) : nil,
+                redirect: redirect.confirmationRequired ? .init(success: didOpenUrl) : nil,
                 localeIdentifier: configuration.localization.localeOverride?.identifier
             )
         )

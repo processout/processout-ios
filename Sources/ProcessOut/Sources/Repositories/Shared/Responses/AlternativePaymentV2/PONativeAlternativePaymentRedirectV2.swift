@@ -31,7 +31,7 @@ public struct PONativeAlternativePaymentRedirectV2: Decodable, Sendable {
 
     /// Boolean value indicating whether backend expects redirect confirmation after customer
     /// is redirected to url.
-    public let redirectConfirmationRequired: Bool
+    public let confirmationRequired: Bool
 }
 
 extension PONativeAlternativePaymentRedirectV2.RedirectType: Decodable {
