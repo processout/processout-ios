@@ -16,9 +16,9 @@ let package = Package(
         .library(name: "ProcessOutNetcetera3DS", targets: ["ProcessOutNetcetera3DS"])
     ],
     dependencies: [
-        .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", exact: "3.2.9"),
-        .package(url: "https://github.com/swiftlang/swift-cmark", from: "0.6.0"),
-        .package(url: "https://github.com/ios-3ds-sdk/SPM", exact: "2.5.32")
+        .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", exact: "3.2.11"),
+        .package(url: "https://github.com/swiftlang/swift-cmark", exact: "0.7.1"),
+        .package(url: "https://github.com/ios-3ds-sdk/SPM", exact: "2.6.00")
     ],
     targets: [
         .target(
