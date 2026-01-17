@@ -130,15 +130,25 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         let task = Task {
             do {
-                let authenticationRequest = POAlternativePaymentAuthenticationRequest(
-                    url: currentState.redirect.url,
-                    callback: configuration.redirect.callback,
-                    prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
-                )
-                _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
+                let didOpenUrl: Bool
+                switch currentState.redirect.type {
+                case .deepLink:
+                    didOpenUrl = await UIApplication.shared.open(currentState.redirect.url)
+                case .web:
+                    let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+                        url: currentState.redirect.url,
+                        callback: configuration.redirect.callback,
+                        prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
+                    )
+                    _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
+                    didOpenUrl = true
+                default:
+                    throw POFailure(errorDescription: "Unknown redirect type.", code: .Mobile.internal)
+                }
                 let response = try await serviceAdapter.continuePayment(
                     with: .init(
                         flow: configuration.flow,
+                        redirect: currentState.redirect.confirmationRequired ? .init(success: didOpenUrl) : nil,
                         localeIdentifier: configuration.localization.localeOverride?.identifier
                     )
                 )
@@ -214,15 +224,27 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.error("Attempted to handle headless redirect while not in starting state. Ignoring.")
             return
         }
-        let authenticationRequest = POAlternativePaymentAuthenticationRequest(
-            url: redirect.url,
-            callback: configuration.redirect.callback,
-            prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
-        )
-        _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
-        let localeIdentifier = configuration.localization.localeOverride?.identifier
+        let didOpenUrl: Bool
+        switch redirect.type {
+        case .deepLink:
+            didOpenUrl = await UIApplication.shared.open(redirect.url)
+        case .web:
+            let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+                url: redirect.url,
+                callback: configuration.redirect.callback,
+                prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
+            )
+            _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
+            didOpenUrl = true
+        default:
+            throw POFailure(errorDescription: "Unknown redirect type.", code: .Mobile.internal)
+        }
         let response = try await serviceAdapter.continuePayment(
-            with: .init(flow: configuration.flow, localeIdentifier: localeIdentifier)
+            with: .init(
+                flow: configuration.flow,
+                redirect: redirect.confirmationRequired ? .init(success: didOpenUrl) : nil,
+                localeIdentifier: configuration.localization.localeOverride?.identifier
+            )
         )
         try await setState(with: response)
     }
