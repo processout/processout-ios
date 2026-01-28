@@ -66,9 +66,8 @@ public final class ProcessOut: @unchecked Sendable {
     @_spi(PO)
     public let eventEmitter: POEventEmitter
 
-    // MARK: - Internal
-
-    func replace(configuration newConfiguration: ProcessOutConfiguration) {
+    @_spi(PO)
+    public func replace(configuration newConfiguration: ProcessOutConfiguration) {
         _configuration.withLock { configuration in
             replaceLoggersConfiguration(with: newConfiguration)
             replaceConnectorsConfiguration(with: newConfiguration, sessionId: UUID().uuidString)
