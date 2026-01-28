@@ -102,12 +102,21 @@ final class NativeAlternativePaymentDefaultInteractor:
                     localeIdentifier: configuration.localization.localeOverride?.identifier
                 )
                 let payment = try await serviceAdapter.continuePayment(with: request)
+                let submittedParametersSpecifications = Array(currentState.parameters.values.map(\.specification))
                 switch payment.state {
                 case .nextStepRequired:
-                    send(event: .didSubmitParameters(.init(additionalParametersExpected: true)))
+                    send(
+                        event: .didSubmitParameters(
+                            .init(parameters: submittedParametersSpecifications, additionalParametersExpected: true)
+                        )
+                    )
                     logger.debug("More parameters are expected, waiting for parameters to update.")
                 case .success, .pending:
-                    send(event: .didSubmitParameters(.init(additionalParametersExpected: false)))
+                    send(
+                        event: .didSubmitParameters(
+                            .init(parameters: submittedParametersSpecifications, additionalParametersExpected: false)
+                        )
+                    )
                 default:
                     setFailureState(error: POFailure(message: "Unexpected payment state.", code: .Mobile.generic))
                 }
