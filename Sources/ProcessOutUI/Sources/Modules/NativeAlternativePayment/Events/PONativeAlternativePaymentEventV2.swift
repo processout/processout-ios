@@ -12,12 +12,16 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
 
     public struct WillSubmitParameters: Sendable {
 
-        /// Available parameters.
+        /// Represents the current set of user-provided values that are about to be sent.
         public let parameters: [PONativeAlternativePaymentFormV2.Parameter]
     }
 
     public struct DidSubmitParameters: Sendable {
 
+        /// Reflects the parameters that were successfully submitted to the backend.
+        public let parameters: [PONativeAlternativePaymentFormV2.Parameter]
+
+        /// Indicates whether further user input is required after this submission.
         public let additionalParametersExpected: Bool
     }
 
@@ -25,7 +29,7 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
 
     public struct ParametersChanged: Sendable {
 
-        /// Parameter definition that the user changed.
+        /// Identifies the specific parameter definition that the user modified.
         public let parameter: PONativeAlternativePaymentFormV2.Parameter
     }
 
