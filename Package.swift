@@ -18,7 +18,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/checkout/checkout-3ds-sdk-ios", exact: "3.2.11"),
         .package(url: "https://github.com/swiftlang/swift-cmark", exact: "0.7.1"),
-        .package(url: "https://github.com/ios-3ds-sdk/SPM", exact: "2.6.00")
+        .package(url: "https://github.com/netceteragroup/ios-3ds-sdk-spm", exact: "2.6.00")
     ],
     targets: [
         .target(
@@ -45,7 +45,7 @@ let package = Package(
             dependencies: [
                 .target(name: "ProcessOut"),
                 .target(name: "NetceteraShim"),
-                .product(name: "ThreeDS_SDK", package: "SPM")
+                .product(name: "ThreeDS_SDK", package: "ios-3ds-sdk-spm")
             ],
             resources: [
                 .process("Resources")

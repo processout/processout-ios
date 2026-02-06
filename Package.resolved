@@ -1,5 +1,5 @@
 {
-  "originHash" : "b5e0aa779995b390b3b3b56a88bcb1ef2eacefc5d9ca594b23ebc546f6df67da",
+  "originHash" : "f18c95ff701ebdb0037cdceea59a7f1e69f9a14539b0fa8984b729ad9e2c1e2a",
   "pins" : [
     {
       "identity" : "checkout-3ds-sdk-ios",
@@ -20,6 +20,15 @@
       }
     },
     {
+      "identity" : "ios-3ds-sdk-spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/netceteragroup/ios-3ds-sdk-spm",
+      "state" : {
+        "revision" : "0cabeb92c66959ab922cd1e872e8dbaecc66174a",
+        "version" : "2.6.0"
+      }
+    },
+    {
       "identity" : "joseswift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/airsidemobile/JOSESwift.git",
@@ -35,15 +44,6 @@
       "state" : {
         "revision" : "8c61e5e38e9f737dd68512ed1ea5ab081244ad65",
         "version" : "1.12.0"
-      }
-    },
-    {
-      "identity" : "spm",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ios-3ds-sdk/SPM",
-      "state" : {
-        "revision" : "bcd39004106ca322809b14337043b478e070e6c6",
-        "version" : "2.6.0"
       }
     },
     {
