@@ -35,7 +35,8 @@ public struct PONetcetera3DS2ServiceConfiguration {
         showsProgressView: Bool = true,
         bridgingExtensionVersion: BridgingExtensionVersion? = nil,
         returnUrl: URL? = nil,
-        challengeTimeout: TimeInterval = 5 * 60
+        challengeTimeout: TimeInterval = 5 * 60,
+        logLevel: LogLevel = .error
     ) {
         self.authenticationMode = authenticationMode
         self.locale = locale
@@ -44,6 +45,7 @@ public struct PONetcetera3DS2ServiceConfiguration {
         self.bridgingExtensionVersion = bridgingExtensionVersion
         self.returnUrl = returnUrl
         self.challengeTimeout = challengeTimeout
+        self.logLevel = logLevel
     }
 
     /// Defines the mode of device information collection.
@@ -75,4 +77,7 @@ public struct PONetcetera3DS2ServiceConfiguration {
     /// Timeout interval within which the challenge process must be completed.
     /// The minimum timeout interval is defined to be 5 minutes.
     public let challengeTimeout: TimeInterval
+
+    /// Netcetera SDK log level. Defaults to `.error`.
+    public let logLevel: LogLevel
 }

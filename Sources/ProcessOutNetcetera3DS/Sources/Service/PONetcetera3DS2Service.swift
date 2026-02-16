@@ -182,7 +182,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
                 // - I011: Available locale identifiers
                 try builder.restrictedParameters(["I003", "I011"])
             }
-            try builder.log(to: .error)
+            try builder.log(to: self.configuration.logLevel)
         } catch {
             throw POFailure(
                 message: "Unable to create configuration parameters.", code: .Mobile.generic, underlyingError: error
