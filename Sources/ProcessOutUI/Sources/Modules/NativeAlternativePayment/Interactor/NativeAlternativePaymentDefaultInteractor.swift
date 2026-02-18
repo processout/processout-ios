@@ -142,7 +142,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 let didOpenUrl: Bool
                 switch currentState.redirect.type {
                 case .deepLink:
-                    didOpenUrl = await UIApplication.shared.open(currentState.redirect.url)
+                    didOpenUrl = await openDeepLink(url: currentState.redirect.url)
                 case .web:
                     let authenticationRequest = POAlternativePaymentAuthenticationRequest(
                         url: currentState.redirect.url,
@@ -236,7 +236,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         let didOpenUrl: Bool
         switch redirect.type {
         case .deepLink:
-            didOpenUrl = await UIApplication.shared.open(redirect.url)
+            didOpenUrl = await openDeepLink(url: redirect.url)
         case .web:
             let authenticationRequest = POAlternativePaymentAuthenticationRequest(
                 url: redirect.url,
@@ -901,6 +901,18 @@ final class NativeAlternativePaymentDefaultInteractor:
             )
         )
         return nil
+    }
+
+    // MARK: - Redirect Utils
+
+    private func openDeepLink(url: URL) async -> Bool {
+        let options: [UIApplication.OpenExternalURLOptionsKey: Any]
+        if url.scheme == "https" || url.scheme == "http" { // Determines whether link could be universal
+            options = [.universalLinksOnly: true]
+        } else {
+            options = [:]
+        }
+        return await UIApplication.shared.open(url, options: options)
     }
 }
 
