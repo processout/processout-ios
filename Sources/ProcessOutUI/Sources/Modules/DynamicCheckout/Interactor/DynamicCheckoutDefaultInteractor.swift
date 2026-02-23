@@ -913,6 +913,43 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         )
     }
 
+    func cardTokenization( // swiftlint:disable:this cyclomatic_complexity
+        evaluateEligibilityWith request: POCardTokenizationEligibilityRequest
+    ) async -> POCardTokenizationEligibilityEvaluation {
+        if let eligibility = await delegate?.dynamicCheckout(evaluateCardEligibilityWith: request) {
+            return eligibility
+        }
+        guard case .paymentProcessing(let currentState) = state,
+              case .card(let cardPaymentMethod) = currentState.paymentMethod else {
+            return .eligible()
+        }
+        if let restrictToIins = cardPaymentMethod.configuration.restrictToIins {
+            var hasEligibleIin = false
+            for eligibleIin in restrictToIins {
+                hasEligibleIin = hasEligibleIin || eligibleIin == request.iin.prefix(eligibleIin.count)
+            }
+            if !hasEligibleIin {
+                return .notEligible()
+            }
+        }
+        if let eligibleSchemes = cardPaymentMethod.configuration.restrictToSchemes {
+            let isSchemeEligible = eligibleSchemes.contains(request.issuerInformation.$scheme.typed)
+            if let coScheme = request.issuerInformation.$coScheme.typed {
+                let isCoSchemeEligible = eligibleSchemes.contains(coScheme)
+                if !isSchemeEligible, !isCoSchemeEligible {
+                    return .notEligible()
+                } else if isSchemeEligible, !isCoSchemeEligible {
+                    return .eligible(scheme: request.issuerInformation.$scheme.typed)
+                } else if isCoSchemeEligible, !isSchemeEligible {
+                    return .eligible(scheme: coScheme)
+                }
+            } else if !isSchemeEligible {
+                return .notEligible()
+            }
+        }
+        return .eligible()
+    }
+
     func cardTokenization(preferredSchemeWith issuerInformation: POCardIssuerInformation) -> POCardScheme? {
         if let scheme = delegate?.dynamicCheckout(preferredSchemeWith: issuerInformation) {
             return scheme
