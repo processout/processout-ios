@@ -135,7 +135,7 @@ extension PODynamicCheckoutDelegate {
     }
 
     @MainActor
-    func dynamicCheckout(
+    public func dynamicCheckout(
         evaluateCardEligibilityWith request: POCardTokenizationEligibilityRequest
     ) async -> POCardTokenizationEligibilityEvaluation? {
         nil
