@@ -25,14 +25,17 @@ final class DefaultInvoicesService: POInvoicesService {
         try await repository.invoice(request: request)
     }
 
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
+    func authorizeInvoice(
+        request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service
+    ) async throws -> POInvoiceAuthorizationResponse {
         do {
-            try await _authorizeInvoice(request: request, threeDSService: threeDSService)
+            let response = try await _authorizeInvoice(request: request, threeDSService: threeDSService)
+            await threeDSService.clean()
+            return response
         } catch {
             await threeDSService.clean()
             throw error
         }
-        await threeDSService.clean()
     }
 
     func authorizeInvoice(
@@ -99,12 +102,15 @@ final class DefaultInvoicesService: POInvoicesService {
 
     // MARK: - Private Methods
 
-    private func _authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
+    private func _authorizeInvoice(
+        request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service
+    ) async throws -> POInvoiceAuthorizationResponse {
         let request = request.replacing(
             thirdPartySdkVersion: request.thirdPartySdkVersion ?? threeDSService.version
         )
-        guard let customerAction = try await repository.authorizeInvoice(request: request) else {
-            return
+        let response = try await repository.authorizeInvoice(request: request)
+        guard let customerAction = response.customerAction else {
+            return .init(customerTokenId: response.customerTokenId)
         }
         let newRequest: POInvoiceAuthorizationRequest
         do {
@@ -121,7 +127,7 @@ final class DefaultInvoicesService: POInvoicesService {
             logger.warn("Did fail to authorize invoice: \(error)", attributes: [.invoiceId: request.invoiceId])
             throw error
         }
-        try await _authorizeInvoice(request: newRequest, threeDSService: threeDSService)
+        return try await _authorizeInvoice(request: newRequest, threeDSService: threeDSService)
     }
 }
 
