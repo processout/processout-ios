@@ -880,7 +880,13 @@ final class DynamicCheckoutDefaultInteractor:
             localeIdentifier: configuration.localization.localeOverride?.identifier
         )
         let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request, using: paymentMethod)
-        try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
+        let response = try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
+        if let customerTokenId = response.customerTokenId {
+            let tokenizeEvent = PODynamicCheckoutEvent.DidTokenizePaymentMethod(
+                paymentMethod: paymentMethod, customerTokenId: customerTokenId
+            )
+            delegate.dynamicCheckout(didEmitEvent: .didTokenizePaymentMethod(tokenizeEvent))
+        }
     }
 
     private func paymentMethod(withId id: String, in state: State.Started) -> PODynamicCheckoutPaymentMethod? {
