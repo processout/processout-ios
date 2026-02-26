@@ -199,8 +199,9 @@ final class AlternativePaymentsViewModel: ObservableObject {
                 confirmation: .init()
             ),
             paymentConfirmation: .init(
-                showProgressViewAfter: 5, confirmButton: .init(), cancelButton: .init(disabledFor: 10)
-            )
+                showProgressViewAfter: 5, cancelButton: .init()
+            ),
+            success: nil
         )
         var continuation: CheckedContinuation<Void, any Error>?, result: Result<Void, POFailure>?
         let component = PONativeAlternativePaymentComponent(configuration: configuration) { [weak self] paymentResult in
@@ -215,7 +216,6 @@ final class AlternativePaymentsViewModel: ObservableObject {
         }
         try await withCheckedThrowingContinuation { newContinuation in
             continuation = newContinuation
-            state.nativePayment = .init(id: UUID().uuidString, component: component)
         }
     }
 }
